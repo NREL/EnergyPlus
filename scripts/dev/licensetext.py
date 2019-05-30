@@ -139,6 +139,7 @@ def checkLicense(filename,possible,correct,offset=0,toolname='unspecified',
     except IndexError:
         message({'tool':toolname,
                  'filename':filename,
+                 'file':filename,
                  'line':1,
                  'messagetype':'error',
                  'message':'License text cannot be matched, check entire license'})
@@ -148,6 +149,7 @@ def checkLicense(filename,possible,correct,offset=0,toolname='unspecified',
         if possibleYear != correctYear:
             message({'tool':toolname,
                      'filename':filename,
+                     'file':filename,
                      'line':1,
                      'messagetype':'error',
                      'message':'License year is incorrect'})
@@ -157,12 +159,14 @@ def checkLicense(filename,possible,correct,offset=0,toolname='unspecified',
     except:
         message({'tool':toolname,
                  'filename':filename,
+                 'file':filename,
                  'line':1,
                  'messagetype':'error',
                  'message':'License text cannot be matched, check entire license'})
         return
     message({'tool':toolname,
              'filename':filename,
+             'file':filename,
              'line':1,
              'messagetype':'error',
              'message':'Non-year differences in license text, check entire license'})
@@ -226,6 +230,7 @@ class Checker(CodeChecker):
             except:
                 self.message({'tool':self.toolname,
                               'filename':filepath,
+                              'file':filepath,
                               'line':0,
                               'messagetype':'error',
                               'message':'UnicodeDecodeError: '+ str(exc)})
@@ -242,12 +247,14 @@ class Checker(CodeChecker):
             if n > 1:
                 self.message({'tool':self.toolname,
                               'filename':filepath,
+                              'file':filepath,
                               'line':1,
                               'messagetype':'error',
                               'message':'Multiple instances of license text'})
             if not txt.startswith(self.text):
                 self.message({'tool':self.toolname,
                               'filename':filepath,
+                              'file':filepath,
                               'line':1,
                               'messagetype':'error',
                               'message':'License text is not at top of file'})

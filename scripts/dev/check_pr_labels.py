@@ -34,6 +34,7 @@ try:
                 print(json.dumps({
                     'tool': 'check_required_labels.py',
                     'filename': 'Pull Request # ' + str(p['number']),
+                    'file': 'Pull Request # ' + str(p['number']),
                     'line': 0,
                     'messagetype': 'warning',
                     'message': 'Pull Request was missing required labels, must have one of these: Defect, NewFeature, Performance, Refactoring, DoNotPublish'

@@ -66,6 +66,7 @@ for line in idd_lines:
                 print(json.dumps({
                     'tool': 'validate_idd_units.py',
                     'filename': '/idd/Energy+.idd.in',
+                    'file': '/idd/Energy+.idd.in',
                     'line': line_num,
                     'messagetype': 'warning',
                     'message': "Unexpected number of unit specifications"
@@ -74,6 +75,7 @@ for line in idd_lines:
                 print(json.dumps({
                     'tool': 'validate_idd_units.py',
                     'filename': '/idd/Energy+.idd.in',
+                    'file': '/idd/Energy+.idd.in',
                     'line': line_num,
                     'messagetype': 'warning',
                     'message': "Unexpected unit type found: " + real_tokens[1]
