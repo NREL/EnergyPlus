@@ -119,9 +119,17 @@ def parse_idd(data):
             obj_data = parse_obj(data)
             root['properties'][obj_name] = {}
             root['properties'][obj_name]['patternProperties'] = {}
-            root['properties'][obj_name]['patternProperties']['.*'] = obj_data
+
+            name_pattern_properties = '.*'
             if 'name' in obj_data:
-                root['properties'][obj_name]['name'] = obj_data.pop('name')
+                name_data = obj_data.pop('name')
+                root['properties'][obj_name]['name'] = name_data
+                required_name = name_data.get('is_required', False)
+                if required_name:
+                    name_pattern_properties = R'^.*\S.*$'
+                    root['properties'][obj_name]['additionalProperties'] = False
+
+            root['properties'][obj_name]['patternProperties'][name_pattern_properties] = obj_data
 
             root['properties'][obj_name]['legacy_idd'] = obj_data.pop('legacy_idd')
             root['properties'][obj_name]['type'] = 'object'
