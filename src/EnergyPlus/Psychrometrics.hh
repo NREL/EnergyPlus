@@ -72,7 +72,7 @@ namespace EnergyPlus {
 #define EP_cache_PsyTwbFnTdbWPb
 #define EP_cache_PsyPsatFnTemp
 #undef EP_cache_PsyTsatFnPb
-#define EP_cache_PsyTsatFnHPb
+#undef EP_cache_PsyTsatFnHPb
 #endif
 #define EP_psych_errors
 
@@ -746,14 +746,72 @@ namespace Psychrometrics {
 
 #endif
 
-    Real64 PsyTsatFnHPb(Real64 const H,                              // enthalpy {J/kg}
-                        Real64 const PB,                             // barometric pressure {Pascals}
-                        std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
-    );
+
+#ifdef EP_cache_PsyTsatFnHPb
     Real64 PsyTsatFnHPb_raw(Real64 const H,                              // enthalpy {J/kg}
                             Real64 const PB,                             // barometric pressure {Pascals}
                             std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     );
+    inline Real64 PsyTsatFnHPb(Real64 const H,
+                               Real64 const Pb,              // barometric pressure {Pascals}
+                               std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+    )
+    {
+
+
+        Real64 Tsat_result; // result=> Sat-Temp {C}
+
+        Int64 const Grid_Shift((64 - 12 - tsat_hbp_precision_bits));
+
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        Int64 H_tag;
+        Int64 Pb_tag;
+        Int64 hash;
+        Real64 H_tag_r;
+        Real64 Pb_tag_r;
+
+#ifdef EP_psych_stats
+        ++NumTimesCalled(iPsyTwbFnTdbWPb_cache);
+#endif
+
+        H_tag = bit_transfer(H, H_tag);
+        Pb_tag = bit_transfer(Pb, Pb_tag);
+
+        H_tag = bit_shift(H_tag, -Grid_Shift);
+        Pb_tag = bit_shift(Pb_tag, -Grid_Shift);
+        hash = bit_and(bit_xor(H_tag, Pb_tag), Int64(tsat_hbp_cache_size - 1));
+
+        if (cached_Tsat_HPb(hash).iH != H_tag || cached_Tsat_HPb(hash).iPb != Pb_tag) {
+            cached_Tsat_HPb(hash).iH = H_tag;
+            cached_Tsat_HPb(hash).iPb = Pb_tag;
+
+            H_tag_r = bit_transfer(bit_shift(H_tag, Grid_Shift), H_tag_r);
+            Pb_tag_r = bit_transfer(bit_shift(Pb_tag, Grid_Shift), Pb_tag_r);
+
+            cached_Tsat_HPb(hash).Tsat = PsyTsatFnHPb(H_tag_r, Pb_tag_r, CalledFrom);
+        }
+
+        //  Twbresult_last = cached_Twb(hash)%Twb
+        //  Twb_result = Twbresult_last
+        Tsat_result = cached_Tsat_HPb(hash).Tsat;
+
+        return Tsat_result;
+    }
+
+#else
+
+    Real64 PsyTsatFnHPb(Real64 const H,                              // enthalpy {J/kg}
+                        Real64 const PB,                             // barometric pressure {Pascals}
+                        std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+    );
+
+#endif
 
     inline Real64 PsyRhovFnTdbRh(Real64 const Tdb,                            // dry-bulb temperature {C}
                                  Real64 const RH,                             // relative humidity value (0.0-1.0)
