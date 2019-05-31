@@ -209,7 +209,7 @@ namespace Psychrometrics {
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
     int const tsat_hbp_cache_size(1024 * 1024);
-    int const tsat_hbp_precision_bits(24); // 28  //24  //32
+    int const tsat_hbp_precision_bits(20); // 28  //24  //32
 #endif
     // MODULE VARIABLE DECLARATIONS:
     // na
@@ -1068,7 +1068,7 @@ namespace Psychrometrics {
         bool FlagError; // Set when errors should be flagged
         Real64 Hloc;    // local value of H
 
-        HH = H + 1.78637e4;  //TODO: what is that???
+        HH = H + 1.78637e4;
 
         if (H >= 0.0) {
             Hloc = max(0.00001, H);
@@ -1100,109 +1100,94 @@ namespace Psychrometrics {
             }
         }
 #endif
-        // Array1D CaseRange = [-4.24e4, -2.2138e4, -6.7012e2, 2.7297e4, 7.5222e4, 1.8379e5, 4.7577e5, 1.5445e6, 3.8353e6, 4.5866e7];
-        // Real64 CaseIndex = 0;
+        std::array<double, 10> CaseRange = {-4.24e4, -2.2138e4, -6.7012e2, 2.7297e4, 7.5222e4, 1.8379e5, 4.7577e5, 1.5445e6, 3.8353e6, 4.5866e7};
+        int CaseIndex = 0;
+        int beg(0), mid, end(9);                      // 1-based indexing
 
-        if (HH > 7.5222e4) goto Label20;
-        if (HH > 2.7297e4) goto Label60;
-        if (HH > -6.7012e2) goto Label50;
-        if (HH > -2.2138e4) goto Label40;
-        if (HH < -4.24e4) HH = -4.24e4; // Peg to minimum
-        goto Label30;
-    Label20:;
-        if (HH < 1.8379e5) goto Label70;
-        if (HH < 4.7577e5) goto Label80;
-        if (HH < 1.5445e6) goto Label90;
-        if (HH < 3.8353e6) goto Label100;
-        if (HH > 4.5866e7) HH = 4.5866e7; // Peg to maximum
-        goto Label110;
-        //                                      TEMP. IS FROM -60 C  TO  -40 C
-    Label30:;
-        T = F6(HH, -19.44, 8.53675e-4, -5.12637e-9, -9.85546e-14, -1.00102e-18, -4.2705e-24);
-        goto Label120;
-        //                                      TEMP. IS FROM -40 C  TO  -20 C
-    Label40:;
-        T = F6(HH, -1.94224e1, 8.5892e-4, -4.50709e-9, -6.19492e-14, 8.71734e-20, 8.73051e-24);
-        goto Label120;
-        //                                      TEMP. IS FROM -20 C  TO    0 C
-    Label50:;
-        T = F6(HH, -1.94224e1, 8.59061e-4, -4.4875e-9, -5.76696e-14, 7.72217e-19, 3.97894e-24);
-        goto Label120;
-        //                                      TEMP. IS FROM   0 C  TO   20 C
-    Label60:;
-        T = F6(HH, -2.01147e1, 9.04936e-4, -6.83305e-9, 2.3261e-14, 7.27237e-20, -6.31939e-25);
-        goto Label120;
-        //                                      TEMP. IS FROM  20 C  TO   40 C
-    Label70:;
-        T = F6(HH, -1.82124e1, 8.31683e-4, -6.16461e-9, 3.06411e-14, -8.60964e-20, 1.03003e-25);
-        goto Label120;
-        //                                      TEMP. IS FROM  40 C  TO   60 C
-    Label80:;
-        T = F6(HH, -1.29419, 3.88538e-4, -1.30237e-9, 2.78254e-15, -3.27225e-21, 1.60969e-27);
-        goto Label120;
-        //                                      TEMP. IS FROM   60 C TO   80 C
-    Label90:;
-        T = F6(HH, 2.39214e1, 1.27519e-4, -1.52089e-10, 1.1043e-16, -4.33919e-23, 7.05296e-30);
-        goto Label120;
-        //                                      TEMP. IS FROM   80 C TO   90 C
-    Label100:;
-        T = F6(HH, 4.88446e1, 3.85534e-5, -1.78805e-11, 4.87224e-18, -7.15283e-25, 4.36246e-32);
-        goto Label120;
-        //                                      TEMP. IS FROM   90 C TO  100C
-    Label110:;
-        T = F7(HH, 7.60565e11, 5.80534e4, -7.36433e-3, 5.11531e-10, -1.93619e-17, 3.70511e-25, -2.77313e-33);
-        //                                      IF THE BAROMETRIC PRESSURE IS
-        //                                      EQUAL TO 1.0133E5 , SATURATION
-        //                                      TEMP. IS CALCULATED BY ABOVE EQUA
-        //                                      OTHERWISE TEMP. IS COMPUTED BY
-        //                                      FOLLOWING ITERATION METHOD
-    Label120:;
+        while (beg + 1 < end) {
+            mid = ((beg + end) >> 1);
+            (HH > CaseRange[mid] ? beg : end) = mid;
+        }
+
+        CaseIndex = beg + 1;
+
+        switch(CaseIndex) {
+            case 0 :
+                HH = -4.24e4; //HH < -4.24e4, Peg to minimum
+            case 1 : // -2.2138e4 > HH > -4.24e4
+                T = F6(HH, -19.44, 8.53675e-4, -5.12637e-9, -9.85546e-14, -1.00102e-18, -4.2705e-24);
+                break;
+            case 2 : // -6.7012e2 > HH > -2.2138e4
+                T = F6(HH, -1.94224e1, 8.5892e-4, -4.50709e-9, -6.19492e-14, 8.71734e-20, 8.73051e-24);
+                break;
+            case 3 : // 2.7297e4 > HH > -6.7012e2
+                T = F6(HH, -1.94224e1, 8.59061e-4, -4.4875e-9, -5.76696e-14, 7.72217e-19, 3.97894e-24);
+                break;
+            case 4 :// 7.5222e4 > HH > 2.7297e4
+                T = F6(HH, -2.01147e1, 9.04936e-4, -6.83305e-9, 2.3261e-14, 7.27237e-20, -6.31939e-25);
+                break;
+            case 5 :// 7.5222e4 > HH > 2.7297e4
+                T = F6(HH, -1.82124e1, 8.31683e-4, -6.16461e-9, 3.06411e-14, -8.60964e-20, 1.03003e-25);
+                break;
+            case 6 :
+                T = F6(HH, -1.29419, 3.88538e-4, -1.30237e-9, 2.78254e-15, -3.27225e-21, 1.60969e-27);
+                break;
+            case 7 :
+                T = F6(HH, 2.39214e1, 1.27519e-4, -1.52089e-10, 1.1043e-16, -4.33919e-23, 7.05296e-30);
+                break;
+            case 8 :
+                T = F6(HH, 4.88446e1, 3.85534e-5, -1.78805e-11, 4.87224e-18, -7.15283e-25, 4.36246e-32);
+                break;
+            case 10 :
+                HH = 4.5866e7;
+            case 9 :
+                T = F7(HH, 7.60565e11, 5.80534e4, -7.36433e-3, 5.11531e-10, -1.93619e-17, 3.70511e-25, -2.77313e-33);
+                break;
+        }
+
 #ifdef EP_psych_errors
         if (FlagError) {
             ShowContinueError(" Initial Resultant Temperature= " + TrimSigDigits(T, 2));
         }
 #endif
-        if (std::abs(PB - 1.0133e5) / 1.0133e5 <= 0.01) goto Label170;
-        IterCount = 0;
-        T1 = T;
-        H1 = PsyHFnTdbW(T1, PsyWFnTdbTwbPb(T1, T1, PB));
-        Y1 = H1 - Hloc;
-        if (std::abs(Y1 / Hloc) <= 0.1e-4) goto Label140;
-        T2 = T1 * 0.9;
-    Label130:;
-        ++IterCount;
-        H2 = PsyHFnTdbW(T2, PsyWFnTdbTwbPb(T2, T2, PB));
-        Y2 = H2 - Hloc;
-        if (std::abs(Y2 / Hloc) <= 0.1e-4) goto Label150;
-        if (Y2 == Y1) goto Label150;
-        TN = T2 - Y2 / (Y2 - Y1) * (T2 - T1);
-        if (IterCount > 30) goto Label160;
-        T1 = T2;
-        T2 = TN;
-        Y1 = Y2;
-        goto Label130;
-    Label140:;
-        T = T1;
-        goto Label170;
-    Label150:;
-        T = T2;
-        goto Label170;
-    Label160:;
-#ifdef EP_psych_errors
-        if (FlagError) {
-            ShowSevereError("Temperature did not converge (PsyTsatFnHPb)");
-            if (!CalledFrom.empty()) {
-                ShowContinueErrorTimeStamp(" Routine=" + CalledFrom + ',');
+        if (std::abs(PB - 1.0133e5) / 1.0133e5 > 0.01) {
+            IterCount = 0;
+            T1 = T;
+            H1 = PsyHFnTdbW(T1, PsyWFnTdbTwbPb(T1, T1, PB));
+            Y1 = H1 - Hloc;
+            if (std::abs(Y1 / Hloc) <= 0.1e-4) {
+                T = T1;
             } else {
-                ShowContinueErrorTimeStamp(" Routine=Unknown,");
-            }
-            String = " Enthalpy=" + TrimSigDigits(HH, 5) + " Pressure= " + TrimSigDigits(PB, 2);
-            ShowContinueError(String + " Last T=" + TrimSigDigits(T, 2));
-        }
-#endif
-    Label170:;
+                T2 = T1 * 0.9;
+                while (IterCount <= 30) {
+                    ++IterCount;
+                    H2 = PsyHFnTdbW(T2, PsyWFnTdbTwbPb(T2, T2, PB));
+                    Y2 = H2 - Hloc;
+                    if (std::abs(Y2 / Hloc) <= 0.1e-4 || Y2 == Y1) {
+                        T = T2;
+                        break;
+                    }
 
-        //   result is T
+                    TN = T2 - Y2 / (Y2 - Y1) * (T2 - T1);
+                    T1 = T2;
+                    T2 = TN;
+                    Y1 = Y2;
+                }
+#ifdef EP_psych_errors
+                if (FlagError && IterCount > 30){
+                    ShowSevereError("Temperature did not converge (PsyTsatFnHPb)");
+                    if (!CalledFrom.empty()) {
+                        ShowContinueErrorTimeStamp(" Routine=" + CalledFrom + ',');
+                    } else {
+                        ShowContinueErrorTimeStamp(" Routine=Unknown,");
+                    }
+                    String = " Enthalpy=" + TrimSigDigits(HH, 5) + " Pressure= " + TrimSigDigits(PB, 2);
+                    ShowContinueError(String + " Last T=" + TrimSigDigits(T, 2));
+                }
+#endif
+            }
+
+        }
 
         return T;
     }
