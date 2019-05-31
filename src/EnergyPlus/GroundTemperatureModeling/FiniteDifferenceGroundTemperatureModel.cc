@@ -176,7 +176,7 @@ void FiniteDiffGroundTempsModel::getWeatherData()
 
     // PURPOSE OF THIS SUBROUTINE:
     // Finds correct environment for reading all weather data. Loops over all weather data in weather file
-    //	and data structure containing daily average of required weather data.
+    // and data structure containing daily average of required weather data.
 
     // USE STATEMENTS:
     using WeatherManager::GetNextEnvironment;
@@ -218,11 +218,13 @@ void FiniteDiffGroundTempsModel::getWeatherData()
     bool EndHourFlag_reset = EndHourFlag;
 
     if (!WeatherFileExists) {
-        ShowContinueError("Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.");
+        ShowSevereError("Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.");
         ShowContinueError("Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw");
-        ShowFatalError("Simulation halted due to input error in ground temperaure model.");
+        ShowFatalError("Simulation halted due to input error in ground temperature model.");
     }
 
+    // We add a new period to force running all weather data
+    int originalNumOfEnvn = WeatherManager::NumOfEnvrn;
     ++NumOfEnvrn;
     ++TotRunPers;
     Environment.redimension(NumOfEnvrn);
@@ -235,115 +237,117 @@ void FiniteDiffGroundTempsModel::getWeatherData()
 
     SetupEnvironmentTypes();
 
-    ResetEnvironmentCounter();
-
+    // We reset the counter to the original number of run periods, so that GetNextEnvironment will fetch the one we added
+    WeatherManager::Envrn = originalNumOfEnvn;
     Available = true;
     ErrorsFound = false;
+    GetNextEnvironment(Available, ErrorsFound);
+    if (ErrorsFound) {
+        ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data");
+    }
 
-    for (int i = 1; i <= NumOfEnvrn; ++i) { // loop over environments
+    if (KindOfSim != ksReadAllWeatherData) {
+        // This shouldn't happen
+        ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data, bad KindOfSim.");
+    }
 
-        GetNextEnvironment(Available, ErrorsFound);
+    weatherDataArray.dimension(NumDaysInYear);
 
-        if (KindOfSim != ksReadAllWeatherData) continue;
+    BeginEnvrnFlag = true;
+    EndEnvrnFlag = false;
+    EndMonthFlag = false;
+    WarmupFlag = false;
+    DayOfSim = 0;
+    DayOfSimChr = "0";
+    NumOfWarmupDays = 0;
 
-        weatherDataArray.dimension(NumDaysInYear);
+    annualAveAirTemp_num = 0.0;
 
-        BeginEnvrnFlag = true;
-        EndEnvrnFlag = false;
-        EndMonthFlag = false;
-        WarmupFlag = false;
-        DayOfSim = 0;
-        DayOfSimChr = "0";
-        NumOfWarmupDays = 0;
+    while ((DayOfSim < NumDaysInYear) || (WarmupFlag)) { // Begin day loop ...
 
-        annualAveAirTemp_num = 0.0;
+        ++DayOfSim;
 
-        while ((DayOfSim < NumDaysInYear) || (WarmupFlag)) { // Begin day loop ...
+        // Reset daily values
+        outDryBulbTemp_num = 0.0;
+        relHum_num = 0.0;
+        windSpeed_num = 0.0;
+        horizSolarRad_num = 0.0;
+        airDensity_num = 0.0;
+        denominator = 0;
 
-            ++DayOfSim;
+        auto &tdwd = weatherDataArray(DayOfSim); // "This day weather data"
 
-            // Reset daily values
-            outDryBulbTemp_num = 0.0;
-            relHum_num = 0.0;
-            windSpeed_num = 0.0;
-            horizSolarRad_num = 0.0;
-            airDensity_num = 0.0;
-            denominator = 0;
+        BeginDayFlag = true;
+        EndDayFlag = false;
 
-            auto &tdwd = weatherDataArray(DayOfSim); // "This day weather data"
+        for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
 
-            BeginDayFlag = true;
-            EndDayFlag = false;
+            BeginHourFlag = true;
+            EndHourFlag = false;
 
-            for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+            for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
 
-                BeginHourFlag = true;
-                EndHourFlag = false;
+                BeginTimeStepFlag = true;
 
-                for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+                // Set the End__Flag variables to true if necessary.  Note that
+                // each flag builds on the previous level.  EndDayFlag cannot be
+                // .TRUE. unless EndHourFlag is also .TRUE., etc.  Note that the
+                // EndEnvrnFlag and the EndSimFlag cannot be set during warmup.
+                // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
+                // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-                    BeginTimeStepFlag = true;
-
-                    //				 Set the End__Flag variables to true if necessary.  Note that
-                    //				 each flag builds on the previous level.  EndDayFlag cannot be
-                    //				 .TRUE. unless EndHourFlag is also .TRUE., etc.  Note that the
-                    //				 EndEnvrnFlag and the EndSimFlag cannot be set during warmup.
-                    //				 Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
-                    //				 SubTimeStepFlags can/will be set/reset in the HVAC Manager.
-
-                    if (TimeStep == NumOfTimeStepInHour) {
-                        EndHourFlag = true;
-                        if (HourOfDay == 24) {
-                            EndDayFlag = true;
-                            if (!WarmupFlag && (DayOfSim == NumOfDayInEnvrn)) {
-                                EndEnvrnFlag = true;
-                            }
+                if (TimeStep == NumOfTimeStepInHour) {
+                    EndHourFlag = true;
+                    if (HourOfDay == 24) {
+                        EndDayFlag = true;
+                        if (!WarmupFlag && (DayOfSim == NumOfDayInEnvrn)) {
+                            EndEnvrnFlag = true;
                         }
                     }
+                }
 
-                    ManageWeather();
+                ManageWeather();
 
-                    outDryBulbTemp_num += OutDryBulbTemp;
-                    airDensity_num += OutAirDensity;
-                    relHum_num += OutRelHumValue;
-                    windSpeed_num += WindSpeed;
-                    horizSolarRad_num += BeamSolarRad + DifSolarRad;
+                outDryBulbTemp_num += OutDryBulbTemp;
+                airDensity_num += OutAirDensity;
+                relHum_num += OutRelHumValue;
+                windSpeed_num += WindSpeed;
+                horizSolarRad_num += BeamSolarRad + DifSolarRad;
 
-                    BeginHourFlag = false;
-                    BeginDayFlag = false;
-                    BeginEnvrnFlag = false;
-                    BeginSimFlag = false;
-                    BeginFullSimFlag = false;
+                BeginHourFlag = false;
+                BeginDayFlag = false;
+                BeginEnvrnFlag = false;
+                BeginSimFlag = false;
+                BeginFullSimFlag = false;
 
-                    ++denominator;
+                ++denominator;
 
-                } // TimeStep loop
+            } // TimeStep loop
 
-                PreviousHour = HourOfDay;
+            PreviousHour = HourOfDay;
 
-            } // ... End hour loop.
+        } // ... End hour loop.
 
-            tdwd.dryBulbTemp = outDryBulbTemp_num / denominator;
-            tdwd.relativeHumidity = relHum_num / denominator;
-            tdwd.windSpeed = windSpeed_num / denominator;
-            tdwd.horizontalRadiation = horizSolarRad_num / denominator;
-            tdwd.airDensity = airDensity_num / denominator;
+        tdwd.dryBulbTemp = outDryBulbTemp_num / denominator;
+        tdwd.relativeHumidity = relHum_num / denominator;
+        tdwd.windSpeed = windSpeed_num / denominator;
+        tdwd.horizontalRadiation = horizSolarRad_num / denominator;
+        tdwd.airDensity = airDensity_num / denominator;
 
-            // Log data for domain initialization using KA model
-            annualAveAirTemp_num += tdwd.dryBulbTemp;
+        // Log data for domain initialization using KA model
+        annualAveAirTemp_num += tdwd.dryBulbTemp;
 
-            if (tdwd.dryBulbTemp < minDailyAirTemp) {
-                minDailyAirTemp = tdwd.dryBulbTemp;
-                dayOfMinDailyAirTemp = DayOfSim;
-            }
+        if (tdwd.dryBulbTemp < minDailyAirTemp) {
+            minDailyAirTemp = tdwd.dryBulbTemp;
+            dayOfMinDailyAirTemp = DayOfSim;
+        }
 
-            if (tdwd.dryBulbTemp > maxDailyAirTemp) {
-                maxDailyAirTemp = tdwd.dryBulbTemp;
-            }
+        if (tdwd.dryBulbTemp > maxDailyAirTemp) {
+            maxDailyAirTemp = tdwd.dryBulbTemp;
+        }
 
-        } // ... End day loop.
+    } // ... End day loop.
 
-    } // ... End environment loop.
 
     annualAveAirTemp = annualAveAirTemp_num / NumDaysInYear; // Used for initalizing domain
 

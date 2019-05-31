@@ -150,7 +150,7 @@ This field is only valid when the user selects ``SurfaceWeighted'' or ``AngleFac
 
 \paragraph{Field: Work Efficiency Schedule Name}\label{field-work-efficiency-schedule-name}
 
-This field is the name of the schedule that determines the efficiency of energy usage within the human body that will be used for thermal comfort calculations. Note that all energy produced by the body is assumed to be converted to heat for the zone heat balance calculation. A value of zero corresponds to all of the energy produced in the body being converted to heat. A value of unity corresponds to all of the energy produced in the body being converted to mechanical energy. The values for this parameter defined in the schedule must be between 0.0 and 1.0. Any value greater than zero will result in a reduction of heat that impacts the thermal comfort energy balance of a person within the space, resulting in PMV results appearing lower than expected.~ Ensure that if this value is non-zero, the base activity level is chosen to ensure that the net activity converted to heat and zone conditions are sufficient to maintain thermal comfort. This field is required to run one of the following thermal comfort models: Fanger, Pierce, or KSU.
+This field is the name of the schedule that determines the efficiency of energy usage within the human body that will be used for thermal comfort calculations. Note that all energy produced by the body is assumed to be converted to heat for the zone heat balance calculation. A value of zero corresponds to all of the energy produced in the body being converted to heat. A value of unity corresponds to all of the energy produced in the body being converted to mechanical energy. The values for this parameter defined in the schedule must be between 0.0 and 1.0. Any value greater than zero will result in a reduction of heat that impacts the thermal comfort energy balance of a person within the space, resulting in PMV results appearing lower than expected.~ Ensure that if this value is non-zero, the base activity level is chosen to ensure that the net activity converted to heat and zone conditions are sufficient to maintain thermal comfort. This field is required to run one of the following thermal comfort models: Fanger, Pierce, or KSU. If a schedule is listed here but no thermal comfort model is selected, then a warning message will be produced and this schedule will be listed as "unused" in the error file.
 
 \paragraph{Field: Clothing Insulation Calculation Method}\label{field-clothing-insulation-calculation-method}
 
@@ -192,11 +192,11 @@ This field specifies which clothing insulation method (ClothingInsulationSchedul
 
 \paragraph{Field: Clothing Insulation Schedule Name}\label{field-clothing-insulation-schedule-name}
 
-This field is the name of the schedule that defines the amount of clothing being worn by a typical zone occupant during various times in the simulation period. The choice from the Clothing Insulation Calculation Method field should be ``\textbf{ClothingInsulationSchedule}''. This parameter must be a positive real number and has units of Clo. Typical values for Clo can be seen in the ASHRAE 2009 HOF Table 7, page 9.8 (for clothing ensembles) and Table~\ref{table:window-modeling-options}, page 9.9 (for garment values) ) or www.cbe.berkeley.edu/comforttool/. This field is required to run one of the following thermal comfort models: Fanger, Pierce, or KSU.
+This field is the name of the schedule that defines the amount of clothing being worn by a typical zone occupant during various times in the simulation period. The choice from the Clothing Insulation Calculation Method field should be ``\textbf{ClothingInsulationSchedule}''. This parameter must be a positive real number and has units of Clo. Typical values for Clo can be seen in the ASHRAE 2009 HOF Table 7, page 9.8 (for clothing ensembles) and Table~\ref{table:window-modeling-options}, page 9.9 (for garment values) ) or www.cbe.berkeley.edu/comforttool/. This field is required to run one of the following thermal comfort models: Fanger, Pierce, or KSU. If a schedule is listed here but no thermal comfort model is selected, then a warning message will be produced and this schedule will be listed as "unused" in the error file.
 
 \paragraph{Field: Air Velocity Schedule Name}\label{field-air-velocity-schedule-name}
 
-This field is the name of the schedule that approximates the amount of air movement in the space as a function of time throughout the simulation period. The user has control over this parameter through the schedule that requires the individual numbers in the schedule to be positive real numbers having units of meters per second. This field is required to run one of the following thermal comfort models: Fanger, Pierce, or KSU.
+This field is the name of the schedule that approximates the amount of air movement in the space as a function of time throughout the simulation period. The user has control over this parameter through the schedule that requires the individual numbers in the schedule to be positive real numbers having units of meters per second. This field is required to run one of the following thermal comfort models: Fanger, Pierce, or KSU. If a schedule is listed here but no thermal comfort model is selected, then a warning message will be produced and this schedule will be listed as "unused" in the error file.
 
 \paragraph{Field: Thermal Comfort Model Type (up to 5 allowed)}\label{field-thermal-comfort-model-type-up-to-5-allowed}
 
@@ -220,6 +220,8 @@ People,
   ZoneAveraged,         !- Mean Radiant Temperature Calculation Type
   ,                     !- Surface Name/Angle Factor List Name
   WORK_EFF_SCH,         !- Work Efficiency Schedule Name
+  ClothingInsulationSchedule, !- Clothing Insulation Calculation Method
+  ,                     !- Clothing Insulation Calculation Method Schedule Name
   CLOTHING_SCH,         !- Clothing Insulation Schedule Name
   AIR_VELO_SCH,         !- Air Velocity Schedule Name
   Fanger;               !- Thermal Comfort Model 1 Type

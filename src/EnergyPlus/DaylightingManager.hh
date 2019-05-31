@@ -76,6 +76,7 @@ namespace DaylightingManager {
     extern int TotWindowsWithDayl;    // Total number of exterior windows in all daylit zones
     extern int OutputFileDFS;         // Unit number for daylight factors
     extern Array1D<Real64> DaylIllum; // Daylight illuminance at reference points (lux)
+    extern int maxNumRefPtInAnyZone;  // The most number of reference points that any single zone has
     extern Real64 PHSUN;              // Solar altitude (radians)
     extern Real64 SPHSUN;             // Sine of solar altitude
     extern Real64 CPHSUN;             // Cosine of solar altitude
