@@ -237,6 +237,8 @@ private:
 
     json const &getFields(std::string const &objectType);
 
+    json const &getPatternProperties(json const &schema_obj);
+
     inline std::string convertToUpper(std::string s)
     {
         size_t len = s.size();

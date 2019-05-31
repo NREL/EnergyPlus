@@ -100,6 +100,9 @@ bool Validation::validate(json const &parsed_input)
                     context += *it;
 
                 errors_.emplace_back(context + " - " + error.description);
+                if (max_context == 2 && error.description == "Object contains properties that could not be validated using 'properties' or 'additionalProperties' constraints") {
+                    errors_.emplace_back(context + " - Object name is required and cannot be blank or whitespace");
+                }
             }
         }
         return false;

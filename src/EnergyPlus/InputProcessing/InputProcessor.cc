@@ -159,6 +159,23 @@ json const &InputProcessor::getFields(std::string const &objectType)
     return it2.value();
 }
 
+json const & InputProcessor::getPatternProperties(json const &schema_obj)
+{
+    std::string pattern_property;
+    auto const & pattern_properties = schema_obj["patternProperties"];
+    int dot_star_present = pattern_properties.count(".*");
+    int no_whitespace_present = pattern_properties.count(R"(^.*\S.*$)");
+    if (dot_star_present) {
+        pattern_property = ".*";
+    } else if (no_whitespace_present) {
+        pattern_property = R"(^.*\S.*$)";
+    } else {
+        ShowFatalError(R"(The patternProperties value is not a valid choice (".*", "^.*\S.*$"))");
+    }
+    auto const &schema_obj_props = pattern_properties[pattern_property]["properties"];
+    return schema_obj_props;
+}
+
 // Functions
 
 void InputProcessor::clear_state()
@@ -483,7 +500,7 @@ bool InputProcessor::getDefaultValue(std::string const &objectWord, std::string 
     }
     auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
     auto const &epJSON_schema_it_val = epJSON_schema_it.value();
-    auto const &schema_obj_props = epJSON_schema_it_val["patternProperties"][".*"]["properties"];
+    auto const &schema_obj_props = getPatternProperties(epJSON_schema_it_val);
     auto const &sizing_factor_schema_field_obj = schema_obj_props.at(fieldName);
     bool defaultFound = findDefault(value, sizing_factor_schema_field_obj);
     return defaultFound;
@@ -501,7 +518,7 @@ bool InputProcessor::getDefaultValue(std::string const &objectWord, std::string 
     }
     auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
     auto const &epJSON_schema_it_val = epJSON_schema_it.value();
-    auto const &schema_obj_props = epJSON_schema_it_val["patternProperties"][".*"]["properties"];
+    auto const &schema_obj_props = getPatternProperties(epJSON_schema_it_val);
     auto const &sizing_factor_schema_field_obj = schema_obj_props.at(fieldName);
     bool defaultFound = findDefault(value, sizing_factor_schema_field_obj);
     return defaultFound;
@@ -573,7 +590,7 @@ void InputProcessor::getObjectItem(std::string const &Object,
     auto const &epJSON_schema_it_val = epJSON_schema_it.value();
 
     // Locations in JSON schema relating to normal fields
-    auto const &schema_obj_props = epJSON_schema_it_val["patternProperties"][".*"]["properties"];
+    auto const &schema_obj_props = getPatternProperties(epJSON_schema_it_val);
 
     // Locations in JSON schema storing the positional aspects from the IDD format, legacy prefixed
     auto const &legacy_idd = epJSON_schema_it_val["legacy_idd"];
