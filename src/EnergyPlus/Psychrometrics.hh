@@ -71,7 +71,7 @@ namespace EnergyPlus {
 #else
 #define EP_cache_PsyTwbFnTdbWPb
 #define EP_cache_PsyPsatFnTemp
-#undef EP_cache_PsyTsatFnPb
+#define EP_cache_PsyTsatFnPb
 #undef EP_cache_PsyTsatFnHPb
 #endif
 #define EP_psych_errors
