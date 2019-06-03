@@ -1,6 +1,6 @@
 compilers:
   - name: "gcc"
-    version: "7.3"
+    version: "7.4"
     build_package_generator: "STGZ"
     release_build_cmake_extra_flags: -DENABLE_REGRESSION_TESTING:BOOL=ON -DBUILD_DOCS:BOOL=ON
     cmake_extra_flags: -DBUILD_DOCS:BOOL=ON -DTEX_INTERACTION="nonstopmode" -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DBUILD_PERFORMANCE_TESTS:BOOL=ON -DVALGRIND_ANALYZE_PERFORMANCE_TESTS:BOOL=ON
@@ -9,7 +9,7 @@ compilers:
     s3_upload_bucket: energyplus
 
   - name: "gcc"
-    version: "7.3"
+    version: "7.4"
     build_package_generator: "TGZ"
     build_tag: "tgz"
     release_only: true
@@ -28,9 +28,11 @@ compilers:
       - ./scripts/dev/verify_idfs_in_cmake.py
       - ./scripts/dev/check_non_utf8.py
       - ./scripts/dev/check_pr_labels.py
+      - ./scripts/dev/verify_file_encodings.py
+      - ./scripts/dev/validate_idd_units.py
 
   - name: "gcc"
-    version: "7.3"
+    version: "7.4"
     build_type: Debug
     build_package_generator: "STGZ"
     cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF
@@ -45,7 +47,7 @@ compilers:
     skip_packaging: true
 
   - name: "gcc"
-    version: "7.3"
+    version: "7.4"
     build_type: Debug
     build_package_generator: "STGZ"
     cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF
@@ -58,3 +60,4 @@ compilers:
     ctest_filter: -R "integration.*"
     skip_regression: true
     skip_packaging: true
+

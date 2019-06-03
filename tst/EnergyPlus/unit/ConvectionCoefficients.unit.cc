@@ -728,3 +728,35 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_EvaluateHnModels)
 
 }
 
+TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestCalcZoneSystemACH)
+{
+    
+    int ZoneNum = 1;
+    int TotalNumberofZones = 1;
+    Real64 ACHAnswer;
+    Real64 ACHExpected;
+    
+    if (!allocated(DataHeatBalance::Zone)) DataHeatBalance::Zone.allocate(TotalNumberofZones);
+    DataHeatBalance::Zone(ZoneNum).Volume = 100.0;
+    DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber = 1;
+    DataGlobals::BeginEnvrnFlag = false;
+    DataHeatBalance::Zone(ZoneNum).Multiplier = 1.0;
+    DataHeatBalance::Zone(ZoneNum).ListMultiplier = 1.0;
+    EnergyPlus::DataEnvironment::OutBaroPress = 101400.0;
+    Real64 ZoneNode = DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber;
+    
+    // Test 1: Node not allocated, returns a zero ACH
+    if (allocated(EnergyPlus::DataLoopNode::Node)) EnergyPlus::DataLoopNode::Node.deallocate();
+    ACHExpected = 0.0;
+    ACHAnswer = CalcZoneSystemACH(ZoneNum);
+    EXPECT_NEAR(ACHExpected, ACHAnswer, 0.0001);
+    
+    // Test 2: Node now allocated, needs to return a proper ACH
+    EnergyPlus::DataLoopNode::Node.allocate(DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber);
+    EnergyPlus::DataLoopNode::Node(ZoneNode).Temp = 20.0;
+    EnergyPlus::DataLoopNode::Node(ZoneNode).MassFlowRate = 0.2;
+    ACHExpected = 6.11506;
+    ACHAnswer = CalcZoneSystemACH(ZoneNum);
+    EXPECT_NEAR(ACHExpected, ACHAnswer, 0.0001);
+    
+}
