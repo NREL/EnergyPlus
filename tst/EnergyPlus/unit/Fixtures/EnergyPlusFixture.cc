@@ -97,6 +97,7 @@
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -339,6 +340,7 @@ void EnergyPlusFixture::clear_all_states()
     DataRoomAirModel::clear_state();
     DataRuntimeLanguage::clear_state();
     DataSizing::clear_state();
+    DataStringGlobals::clear_state();
     DataSurfaceLists::clear_state();
     DataSurfaces::clear_state();
     DataSystemVariables::clear_state();
