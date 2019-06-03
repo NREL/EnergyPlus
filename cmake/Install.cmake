@@ -254,7 +254,6 @@ if( APPLE )
 
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/bin/EP-Launch-Lite/EP-Launch-Lite.app" DESTINATION "PreProcess")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/bin/IDFVersionUpdater/Run-Mac/IDFVersionUpdater.app" DESTINATION "PreProcess/IDFVersionUpdater")
-  install(DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Mac/Uninstall EnergyPlus.app" DESTINATION "./")
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/bin/EP-Compare/Run-Mac/EP-Compare.app" DESTINATION "PostProcess/EP-Compare")
   install(FILES "${CMAKE_SOURCE_DIR}/bin/EP-Compare/GraphHints.csv" DESTINATION "PostProcess/EP-Compare/")
   install(PROGRAMS "${CMAKE_SOURCE_DIR}/bin/EPMacro/Mac/EPMacro" DESTINATION "./")
