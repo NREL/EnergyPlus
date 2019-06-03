@@ -266,10 +266,6 @@ if( APPLE )
   install(PROGRAMS scripts/runreadvars DESTINATION "./")
 
   install(CODE "MESSAGE(\"Creating symlinks.\")" COMPONENT Symlinks)
-  # This is only used by PackageMaker, which we are specifically no longer using in favor of QtIFW
-  # configure_file("${PROJECT_SOURCE_DIR}/cmake/darwinpostflight.sh.in" ${CMAKE_BINARY_DIR}/darwinpostflight.sh)
-  # set(CPACK_POSTFLIGHT_SCRIPT "${CMAKE_BINARY_DIR}/darwinpostflight.sh")
-
 
 endif()
 
