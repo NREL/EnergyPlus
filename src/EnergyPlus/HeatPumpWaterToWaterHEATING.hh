@@ -93,8 +93,8 @@ namespace HeatPumpWaterToWaterHEATING {
         Real64 LoadSideUACoeff;          // Load Side heat transfer coeff  W/K
         Real64 CompPistonDisp;           // compressor piston displacement m3
         Real64 CompClearanceFactor;      // compressor clearance factor
-        Real64 CompSucPressDrop;         // deltap ,  compressor suction and discharge pressure drop Pascals
-        Real64 SuperheatTemp;            // deltatsh , super heating  �C
+        Real64 CompSucPressDrop;         // deltap,  compressor suction and discharge pressure drop Pascals
+        Real64 SuperheatTemp;            // deltatsh, super heating degC
         Real64 PowerLosses;              // constant part of electro mechanical power losses  watts Joules/sec
         Real64 LossFactor;               // loss factor used ot define the electro mechanical
         // loss that is supposed to be proportional to the theoretical power
