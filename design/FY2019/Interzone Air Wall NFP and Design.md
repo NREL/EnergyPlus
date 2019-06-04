@@ -4,7 +4,7 @@ Air Thermal Boundary - aka Interzone Air Wall
 **Michael J. Witte, GARD Analytics, Inc.**
 
  - Original May 8, 2019
- - Revision June 2, 2019
+ - Revision June 4, 2019
      - Drop "AirWall" as a surface type.
      - Add "Construction:AirBoundary" with input fields to control attributes such as air mixing and grouping
      - Drop the term "superzone", speak of grouping zones for calculations
@@ -118,7 +118,7 @@ and group zone surfaces together for solar, daylighting, and radiant exchange ca
 specify mixing flows or group the zone air masses together for airflow network calculations. See Figure 1 for
 an example application.
 
-![Diagram](Airwall-Fig1-OpenPlanOffice.png)
+![Diagram](Airwall-Fig1-OpenPlanOffice.jpg)
 
 **Figure 1. Example Application - Open Plan Office**
 
@@ -212,18 +212,31 @@ must be either *Surface* or *Zone*. A base surface with Construction:AirBoundary
 *Field: Name*
 The name of the construction.
 
-*Field: Solar and Radiant Modeling Method*
-This field controls how the surface is modeled for solar distribution, daylighting, and radiant exchange calculations. There are two
+*Field: Solar and Daylighting Method*
+This field controls how the surface is modeled for solar distribution and daylighting calculations. There are two
 choices:
 
   **GroupedZones** - The two zones separated by this air boundary will be grouped together into a combined zone. If a given zone has
   and air boundary with more than one zone, then all of the connected zones will be grouped together. For example, if there is an air
   boundary between zones A and B, and another air boundary between zones B and C, all three zones A, B, and C will be grouped into a
-  single zone for solar, daylighting, and radiant exchange.
+  single zone for solar distribution and daylighting.
 
-  **InteriorWindow** - The air boundary will be modeled as a perfectly transmitting interior window. The inside face surface temperature
-  will be set equal to the mean radiant temperature (MRT) of the  zone to approximate radiant exchange across the boundary.
-  The inside face temperature will be set equal to the MRT of the adjacent zone.
+  **InteriorWindow** - The air boundary will be modeled as a perfectly transmitting interior window. As with other interior windows,
+  all direct solar passing through the interior window will be diffuse in the adjacent zone.
+
+*Field: Radiant Exchange Method*
+This field controls how the surface is modeled for radiant exchange calculations. There are two
+choices:
+
+  **GroupedZones** - The two zones separated by this air boundary will be grouped together into a combined zone. If a given zone has
+  and air boundary with more than one zone, then all of the connected zones will be grouped together. For example, if there is an air
+  boundary between zones A and B, and another air boundary between zones B and C, all three zones A, B, and C will be grouped into a
+  single zone for radiant exchange. Normal default simplified view factors will apply unless detailed view factors are specified using
+  ZoneProperty:UserViewFactors:bySurfaceName.
+
+  **MRTSurface** - The air boundary will be modeled as a surface with the inside face surface temperature
+  will be set equal to the mean radiant temperature (MRT) of the adjacent zone to approximate radiant exchange across the boundary.
+  The outside face temperature will be set equal to the MRT of the zone containing the air boundary surface.
 
 *Field: Air Exchange Method*
 
@@ -233,14 +246,15 @@ choices:
   and ZoneCrossMixing or AirflowNetwork openings may be specified if desired.
   
   **SimpleMixing** - For each pair of zones connected by Construction:AirBoundary, a pair of ZoneMixing objects will created automatically.
+  These mixing objects may be automatically adjusted to balance HVAC system flows using the ZoneAirMassFlowConservation object.
 
 *Field: Simple Mixing Air Changes per Hour*
 If the Air Exchange Method is *SimpleMixing* then this field specifies the air change rate [1/hr] using the volume of the smaller zone
-as the basis. The default is 0.5. If an AirflowNetwork simulations is active this field is ignored.
+as the basis. The default is 0.5. If an AirflowNetwork simulation is active this field is ignored.
 
 *Field: Simple Mixing Schedule Name*
 If the Air Exchange Method is *SimpleMixing* then this field specifies the schedule name for the air mixing across this boundary. If this field
-is blank, then the schedule defaults to always 1.0. If an AirflowNetwork simulations is active this field is ignored.
+is blank, then the schedule defaults to always 1.0. If an AirflowNetwork simulation is active this field is ignored.
 
 ### *Modified object* - ZoneProperty:UserViewFactors:bySurfaceName ###
 
@@ -254,10 +268,10 @@ Enter the applicable surface pairs with non-zero view factors. Any omitted surfa
 
 *Field: From Surface 1*
 
-This field specifies the name of the “from surface”. All other surfaces in this object must be within the 
-same enclosure at this surface. If there are no air boundaries in the simulation with Solar and Radiant Modeling Method = GroupedZones,
- then that all of the surfaces must be within the same zone. If there are GroupedZone air boundaries, then all of the surfaces must be
- within the connected group of zones.
+This field specifies the name of the "from surface". All other surfaces in this object must be within the 
+same enclosure at this surface. If the zone for this surface has no air boundaries (Construction:AirBoundary) with 
+Radiant Exchange Method = GroupedZones, then all other surfaces must be within the same zone. If there are one or more
+ GroupedZone air boundaries, then all other surfaces must be within the connected group of zones.
 
 ## Outputs Description ##
 
