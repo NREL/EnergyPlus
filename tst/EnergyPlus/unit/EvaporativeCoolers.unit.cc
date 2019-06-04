@@ -761,6 +761,49 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeDirEvapCoolerTest)
     FinalSysSizing.deallocate();
 }
 
+TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndirectRDDEvapCoolerOperatingMode)
+{
+
+    OutBaroPress = 101325.0;
+    int const EvapCoolNum(1);
+    EvaporativeCoolers::EvapCond.allocate(EvapCoolNum);
+    auto &thisEvapCooler = EvaporativeCoolers::EvapCond(EvapCoolNum);
+    // model inputs
+    thisEvapCooler.InletMassFlowRate = 1.0;
+    thisEvapCooler.SecInletMassFlowRate = 1.0;
+    thisEvapCooler.MinOATDBEvapCooler = -99.0;
+    thisEvapCooler.MaxOATDBEvapCooler = 99.0;
+    thisEvapCooler.MaxOATWBEvapCooler = 99.0;
+    thisEvapCooler.WetCoilMaxEfficiency = 0.8;
+    thisEvapCooler.InletTemp = 25.5;
+    thisEvapCooler.InletHumRat = 0.0140;
+    thisEvapCooler.InletWetBulbTemp = PsyTwbFnTdbWPb(EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat, OutBaroPress);
+    thisEvapCooler.SecInletTemp = thisEvapCooler.InletTemp;
+    thisEvapCooler.SecInletHumRat = thisEvapCooler.InletHumRat;
+    thisEvapCooler.SecInletWetBulbTemp = thisEvapCooler.InletWetBulbTemp;
+    // set up arguments
+    Real64 const TdbOutSysWetMin(22.0);
+    Real64 const TdbOutSysDryMin(25.5);
+    // set desired outlet teperature below the wet operation
+    // minimum temperature to force it to wet full operation
+    thisEvapCooler.DesiredOutletTemp = 21.0;
+
+    // determine operating mode
+    int Result_WetFullOperatingMode = EvaporativeCoolers::IndirectResearchSpecialEvapCoolerOperatingMode(
+        EvapCoolNum, thisEvapCooler.SecInletTemp, thisEvapCooler.SecInletWetBulbTemp, TdbOutSysWetMin, TdbOutSysDryMin);
+    // check operating mode
+    EXPECT_EQ(Result_WetFullOperatingMode, EvaporativeCoolers::WetFull);
+    // get outlet temperature in full wet operating mode
+    EvaporativeCoolers::CalcIndirectRDDEvapCoolerOutletTemp(EvapCoolNum,
+                                                            Result_WetFullOperatingMode,
+                                                            thisEvapCooler.SecInletMassFlowRate,
+                                                            thisEvapCooler.SecInletTemp,
+                                                            thisEvapCooler.SecInletWetBulbTemp,
+                                                            thisEvapCooler.SecInletHumRat);
+    // test outlet temperature in full wet operating mode
+    EXPECT_NEAR(22.03, thisEvapCooler.OutletTemp, 0.001);
+}
+
 TEST_F(EnergyPlusFixture, DirectEvapCoolerAutosizeWithoutSysSizingRunDone)
 {
 

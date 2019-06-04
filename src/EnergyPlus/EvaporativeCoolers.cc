@@ -2520,32 +2520,10 @@ namespace EvaporativeCoolers {
         CalcIndirectRDDEvapCoolerOutletTemp(EvapCoolNum, DryFull, MassFlowRateSecMax, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
         TdbOutSysDryMin = EvapCond(EvapCoolNum).OutletTemp;
 
-        // Now determine the operating modes of indirect evaporative cooler research special. There are five allowed operating modes
-        if ((TEDB <= SysTempSetPoint) ||
-            (TEDB > EvapCond(EvapCoolNum).MaxOATDBEvapCooler && InletWetBulbTempSec > EvapCond(EvapCoolNum).MaxOATWBEvapCooler) ||
-            (TEDB <= InletDryBulbTempSec)) {
-            EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode = None;
-        } else if ((InletDryBulbTempSec < EvapCond(EvapCoolNum).MinOATDBEvapCooler && TdbOutSysDryMin < SysTempSetPoint)) {
-            EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode = DryModulated; // dry mode capacity modulated
-        } else if ((InletDryBulbTempSec < EvapCond(EvapCoolNum).MinOATDBEvapCooler && SysTempSetPoint <= TdbOutSysDryMin)) {
-            EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode = DryFull; // dry mode in full capacity
-        } else if ((InletDryBulbTempSec >= EvapCond(EvapCoolNum).MinOATDBEvapCooler &&
-                    InletWetBulbTempSec < EvapCond(EvapCoolNum).MaxOATWBEvapCooler && SysTempSetPoint <= TdbOutSysWetMin)) {
-            EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode = WetFull; // wet mode in full capacity
-        } else if ((InletDryBulbTempSec >= EvapCond(EvapCoolNum).MinOATDBEvapCooler &&
-                    InletWetBulbTempSec < EvapCond(EvapCoolNum).MaxOATWBEvapCooler &&
-                    TdbOutSysWetMin < SysTempSetPoint)) {                    // && SysTempSetPoint < TdbOutSysDryMin
-            EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode = WetModulated; // wet mode capacity modulated
-        } else if ((InletDryBulbTempSec >= EvapCond(EvapCoolNum).MinOATDBEvapCooler &&
-                    InletDryBulbTempSec < EvapCond(EvapCoolNum).MaxOATDBEvapCooler &&
-                    InletWetBulbTempSec < EvapCond(EvapCoolNum).MaxOATWBEvapCooler && SysTempSetPoint < TdbOutSysDryMin &&
-                    TdbOutSysWetMin < SysTempSetPoint)) {
-            EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode =
-                DryWetModulated; // modulated in dry and wet mode, and the lower total power will be used
-        } else {
-            EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode =
-                None; // this condition should not happen unless the bounds do not cover all combinations possible
-        }
+        // get current operating modes of indirect evaporative cooler research special
+        EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode =
+            IndirectResearchSpecialEvapCoolerOperatingMode(EvapCoolNum, InletDryBulbTempSec, InletWetBulbTempSec, TdbOutSysWetMin, TdbOutSysDryMin);
+
         MassFlowRateSecMin = 0.0;
         AirMassFlowSec = MassFlowRateSecMax;
         PartLoad = EvapCond(EvapCoolNum).PartLoadFract;
@@ -2882,6 +2860,56 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).IECOperatingStatus = 0;
             EvapCond(EvapCoolNum).StageEff = 0.0;
         }
+    }
+
+    int IndirectResearchSpecialEvapCoolerOperatingMode(int const EvapCoolNum,
+                                                       Real64 const InletDryBulbTempSec,
+                                                       Real64 const InletWetBulbTempSec,
+                                                       Real64 const TdbOutSysWetMin,
+                                                       Real64 const TdbOutSysDryMin)
+    {
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Determines current operating mode of indirect research special evaporative cooler
+        // from the five valid operating modes depending the primary and secondary air
+        // temperatures, setpoint temperature, and full capacity air outlet temperature.
+
+        // METHODOLOGY EMPLOYED:
+        // compares various temperatures to determine the operating mode
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 InletDryBulbTempPri; // entering air dry bulb temperature of primary air
+        Real64 SysTempSetPoint;     // evaporative cooler outlet setpoint temperature, drybulb
+        int OperatingMode;          // current operating mode of indrect evaporative cooler
+
+        InletDryBulbTempPri = EvapCond(EvapCoolNum).InletTemp;
+        SysTempSetPoint = EvapCond(EvapCoolNum).DesiredOutletTemp;
+
+        // Now determine the operating modes of indirect evaporative cooler research special. There are five allowed operating modes
+        if ((InletDryBulbTempPri <= SysTempSetPoint) ||
+            (InletDryBulbTempPri > EvapCond(EvapCoolNum).MaxOATDBEvapCooler && InletWetBulbTempSec > EvapCond(EvapCoolNum).MaxOATWBEvapCooler) ||
+            (InletDryBulbTempPri < InletDryBulbTempSec)) {
+            OperatingMode = None;
+        } else if ((InletDryBulbTempSec < EvapCond(EvapCoolNum).MinOATDBEvapCooler && TdbOutSysDryMin < SysTempSetPoint)) {
+            OperatingMode = DryModulated; // dry mode capacity modulated
+        } else if ((InletDryBulbTempSec < EvapCond(EvapCoolNum).MinOATDBEvapCooler && SysTempSetPoint <= TdbOutSysDryMin)) {
+            OperatingMode = DryFull; // dry mode in full capacity
+        } else if ((InletDryBulbTempSec >= EvapCond(EvapCoolNum).MinOATDBEvapCooler &&
+                    InletWetBulbTempSec < EvapCond(EvapCoolNum).MaxOATWBEvapCooler && SysTempSetPoint <= TdbOutSysWetMin)) {
+            OperatingMode = WetFull; // wet mode in full capacity
+        } else if ((InletDryBulbTempSec >= EvapCond(EvapCoolNum).MinOATDBEvapCooler &&
+                    InletWetBulbTempSec < EvapCond(EvapCoolNum).MaxOATWBEvapCooler &&
+                    TdbOutSysWetMin < SysTempSetPoint)) { // && SysTempSetPoint < TdbOutSysDryMin
+            OperatingMode = WetModulated;                 // wet mode capacity modulated
+        } else if ((InletDryBulbTempSec >= EvapCond(EvapCoolNum).MinOATDBEvapCooler &&
+                    InletDryBulbTempSec < EvapCond(EvapCoolNum).MaxOATDBEvapCooler &&
+                    InletWetBulbTempSec < EvapCond(EvapCoolNum).MaxOATWBEvapCooler && SysTempSetPoint < TdbOutSysDryMin &&
+                    TdbOutSysWetMin < SysTempSetPoint)) {
+            OperatingMode = DryWetModulated; // modulated in dry and wet mode, and the lower total power will be used
+        } else {
+            OperatingMode = None; // this condition should not happen unless the bounds do not cover all combinations possible
+        }
+        return OperatingMode;
     }
 
     Real64 CalcEvapCoolRDDSecFlowResidual(Real64 const AirMassFlowSec, // secondary air mass flow rate in kg/s
