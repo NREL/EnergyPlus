@@ -79,11 +79,11 @@ namespace DataStringGlobals {
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    std::string const UpperCase("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖØÙÚÛÜİ");
-    std::string const LowerCase("abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïğñòóôõöøùúûüı");
-    std::string const AccentedUpperCase("ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖØÙÚÛÜİ");
-    std::string const AccentedLowerCase("àáâãäåæçèéêëìíîïğñòóôõöøùúûüı");
-    std::string const AllCase("àáâãäåæçèéêëìíîïğñòóôõöøùúûüıÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖØÙÚÛÜİABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+    std::string const UpperCase("ABCDEFGHIJKLMNOPQRSTUVWXYZÃ€ÃÃ‚ÃƒÃ„Ã…Ã†Ã‡ÃˆÃ‰ÃŠÃ‹ÃŒÃÃÃÃÃ‘Ã’Ã“Ã”Ã•Ã–Ã˜Ã™ÃšÃ›ÃœÃ");
+    std::string const LowerCase("abcdefghijklmnopqrstuvwxyzÃ Ã¡Ã¢Ã£Ã¤Ã¥Ã¦Ã§Ã¨Ã©ÃªÃ«Ã¬Ã­Ã®Ã¯Ã°Ã±Ã²Ã³Ã´ÃµÃ¶Ã¸Ã¹ÃºÃ»Ã¼Ã½");
+    std::string const AccentedUpperCase("Ã€ÃÃ‚ÃƒÃ„Ã…Ã†Ã‡ÃˆÃ‰ÃŠÃ‹ÃŒÃÃÃÃÃ‘Ã’Ã“Ã”Ã•Ã–Ã˜Ã™ÃšÃ›ÃœÃ");
+    std::string const AccentedLowerCase("Ã Ã¡Ã¢Ã£Ã¤Ã¥Ã¦Ã§Ã¨Ã©ÃªÃ«Ã¬Ã­Ã®Ã¯Ã°Ã±Ã²Ã³Ã´ÃµÃ¶Ã¸Ã¹ÃºÃ»Ã¼Ã½");
+    std::string const AllCase("Ã Ã¡Ã¢Ã£Ã¤Ã¥Ã¦Ã§Ã¨Ã©ÃªÃ«Ã¬Ã­Ã®Ã¯Ã°Ã±Ã²Ã³Ã´ÃµÃ¶Ã¸Ã¹ÃºÃ»Ã¼Ã½Ã€ÃÃ‚ÃƒÃ„Ã…Ã†Ã‡ÃˆÃ‰ÃŠÃ‹ÃŒÃÃÃÃÃ‘Ã’Ã“Ã”Ã•Ã–Ã˜Ã™ÃšÃ›ÃœÃABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
 #ifdef _WIN32
     std::string const NL("\r\n"); // Platform newline
 #else
@@ -163,10 +163,6 @@ namespace DataStringGlobals {
     std::string outputTblTabFileName("eplustbl.tab");
     std::string outputTblTxtFileName("eplustbl.txt");
     std::string outputTblXmlFileName("eplustbl.xml");
-    std::string inputFileName;
-    std::string inputIddFileName;
-    std::string inputEpJSONSchemaFileName;
-    std::string inputWeatherFileName;
     std::string outputAdsFileName("eplusADS.out");
     std::string outputDfsFileName("eplusout.dfs");
     std::string outputGLHEFileName("eplusout.glhe");
@@ -192,15 +188,15 @@ namespace DataStringGlobals {
     std::string outputScreenCsvFileName("eplusscreen.csv");
     std::string outputSqlFileName("eplusout.sql");
     std::string outputSqliteErrFileName("eplussqlite.err");
-    std::string EnergyPlusIniFileName;
-    std::string inStatFileName;
     std::string TarcogIterationsFileName("TarcogIterations.dbg");
-    std::string eplusADSFileName;
     std::string outputCsvFileName("eplusout.csv");
     std::string outputMtrCsvFileName("eplusmtr.csv");
     std::string outputRvauditFileName("eplusout.rvaudit");
     std::string outputExtShdFracFileName("eplusshading.csv");
 
+    std::string EnergyPlusIniFileName;
+    std::string inStatFileName;
+    std::string eplusADSFileName;
     std::string idfFileNameOnly;
     std::string idfDirPathName;
     std::string outDirPathName;
@@ -208,18 +204,48 @@ namespace DataStringGlobals {
     std::string inputDirPathName;
     std::string outputDirPathName;
     std::string exeDirectory;
-
+    std::string inputFileName;
+    std::string inputIddFileName;
+    std::string inputEpJSONSchemaFileName;
+    std::string inputWeatherFileName;
+    std::string FullName;
+    std::string weatherFileNameOnly;
     std::string ProgramPath;          // Path for Program from INI file
     std::string CurrentWorkingFolder; // Current working directory for run
+    std::string CurrentDateTime;      // For printing current date and time at start of run
     std::string IDDVerString;         // Version information from the IDD (line 1)
+
     std::string
         VerString("EnergyPlus, Version ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}"); // String that
                                                                                                                                       // represents
                                                                                                                                       // version
                                                                                                                                       // information
     std::string MatchVersion("${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}"); // String to be matched by Version object
-    std::string CurrentDateTime;                                               // For printing current date and time at start of run
 
+
+    void clear_state()
+    {
+        EnergyPlusIniFileName.clear();
+        inStatFileName.clear();
+        eplusADSFileName.clear();
+        idfFileNameOnly.clear();
+        idfDirPathName.clear();
+        outDirPathName.clear();
+        inputFileNameOnly.clear();
+        inputDirPathName.clear();
+        outputDirPathName.clear();
+        exeDirectory.clear();
+        inputFileName.clear();
+        inputIddFileName.clear();
+        inputEpJSONSchemaFileName.clear();
+        inputWeatherFileName.clear();
+        FullName.clear();
+        weatherFileNameOnly.clear();
+        ProgramPath.clear();
+        CurrentWorkingFolder.clear();
+        CurrentDateTime.clear();
+        IDDVerString.clear();
+    }
 } // namespace DataStringGlobals
 
 } // namespace EnergyPlus

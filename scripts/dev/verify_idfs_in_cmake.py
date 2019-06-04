@@ -54,6 +54,7 @@ if len(need_to_add_to_cmake) > 0:
         print(json.dumps({
             'tool': 'verify_idfs_in_cmake',
             'filename': this_file,
+            'file': this_file,
             'line': 0,
             'messagetype': 'error',
             'message': 'File missing from testfiles/CMakeLists.txt'

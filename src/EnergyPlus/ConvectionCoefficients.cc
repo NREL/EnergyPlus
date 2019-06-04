@@ -4014,7 +4014,7 @@ namespace ConvectionCoefficients {
     Real64 CalcZoneSystemACH(int const ZoneNum)
     {
         // FLOW:
-        if (SysSizingCalc || ZoneSizingCalc || !allocated(Node)) {
+        if (!allocated(Node)) {
             return 0.0;
         } else {
             // Set local variables
