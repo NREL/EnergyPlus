@@ -535,6 +535,10 @@ Heat Recovery:
   HVAC,Average,VRF Heat Pump Heat Recovery Status Change Multiplier {[]}
 \item
   HVAC,Average,VRF Heat Pump Simultaneous Cooling and Heating Efficiency {[}Btu/h/W{]}
+\item
+  HVAC,Average,VRF Heat Pump Heat Recovery Rate {[W]}
+\item
+  HVAC,Sum,VRF Heat Pump Heat Recovery Energy {[J]}
 \end{itemize}
 
 Evap-cooled:
@@ -743,6 +747,14 @@ The ratio of the total capacity of the system (heating and cooling capacity) to 
 % AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl
 \subsection{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}\label{airconditionervariablerefrigerantflowfluidtemperaturecontrol}
 \subsubsection{Inputs}\label{inputs-1-048}
+
+\paragraph{\texorpdfstring{VRF Heat Pump Heat Recovery Rate {[}W{]}}{VRF Heat Pump Heat Recovery Rate}}\label{vrf-heat-pump-heat-recovery-rate}
+
+The rate of heat recovered by the system in watts. This value represents the amount of heat recovered at the terminal units while in heat recovery operating mode. If the VRF system is in cooling mode and recovers heat then that amount of heat was recovered from terminal units in zone(s) requiring heating. If the VRF system is in heating mode and recovers heat then that amount of heat was recovered from terminal units in zone(s) requiring cooling. The results are averaged for the time step being reported. Reports at the detailed time frequency should match the corresponding coil total cooling/heating rate since piping losses are not included.
+
+\paragraph{\texorpdfstring{VRF Heat Pump Heat Recovery Energy {[}J{]}}{VRF Heat Pump Heat Recovery Energy}}\label{vrf-heat-pump-heat-recovery-energy}
+
+The rate of heat recovered by the system in joules. This value represents the amount of heat energy recovered at the terminal units while in heat recovery operating mode. If the VRF system is in cooling mode and recovers heat then that amount of heat was recovered from terminal units in zone(s) requiring heating. If the VRF system is in heating mode and recovers heat then that amount of heat was recovered from terminal units in zone(s) requiring cooling. The results are summed for the time step being reported. Reports at the detailed time frequency should match the corresponding coil total cooling/heating energy since piping losses are not included.
 
 \paragraph{Field: Heat Pump Name}\label{field-heat-pump-name-1}
 
