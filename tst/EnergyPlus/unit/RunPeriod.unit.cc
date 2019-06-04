@@ -420,3 +420,47 @@ TEST_F(EnergyPlusFixture, SizingPeriod_WeatherFile)
 
     }
 }
+
+TEST_F(EnergyPlusFixture, RunPeriod_BadLeapDayFlagLogic)
+{
+    std::string const idf_objects = delimited_string({
+        "SimulationControl, NO, NO, NO, YES, YES;",
+        "Timestep,4;",
+        "RunPeriod,",
+        "RP3,                     !- Name",
+        "1,                       !- Begin Month",
+        "1,                       !- Begin Day of Month",
+        "2019,                    !- Begin Year",
+        "12,                      !- End Month",
+        "31,                      !- End Day of Month",
+        ",                        !- End Year",
+        ",                        !- Day of Week for Start Day",
+        "Yes,                     !- Use Weather File Holidays and Special Days",
+        "Yes,                     !- Use Weather File Daylight Saving Period",
+        "No,                      !- Apply Weekend Holiday Rule",
+        "Yes,                     !- Use Weather File Rain Indicators",
+        "Yes;                     !- Use Weather File Snow Indicators",
+        "BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;"
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool errors_in_input(false);
+    int totalrps(1);
+    WeatherManager::GetRunPeriodData(totalrps, errors_in_input);
+
+    EXPECT_FALSE(errors_in_input);
+
+    WeatherManager::Environment.allocate(1);
+    // These may already be set, but do it anyway
+    DataEnvironment::TotDesDays = 0;
+    WeatherManager::TotRunPers = 1;
+    WeatherManager::TotRunDesPers = 0;
+
+    WeatherManager::WFAllowsLeapYears = true; // This was hitting a bad bit of logic
+    WeatherManager::SetupEnvironmentTypes();
+    
+    EXPECT_FALSE(WeatherManager::Environment[0].IsLeapYear);
+    EXPECT_EQ(365, WeatherManager::Environment[0].TotalDays);
+
+    WeatherManager::Environment.deallocate();
+}

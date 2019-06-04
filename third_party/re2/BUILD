@@ -8,6 +8,21 @@ licenses(["notice"])
 
 exports_files(["LICENSE"])
 
+config_setting(
+    name = "darwin",
+    values = {"cpu": "darwin"},
+)
+
+config_setting(
+    name = "windows",
+    values = {"cpu": "x64_windows"},
+)
+
+config_setting(
+    name = "windows_msvc",
+    values = {"cpu": "x64_windows_msvc"},
+)
+
 cc_library(
     name = "re2",
     srcs = [
@@ -43,6 +58,7 @@ cc_library(
         "util/logging.h",
         "util/mix.h",
         "util/mutex.h",
+        "util/pod_array.h",
         "util/rune.cc",
         "util/sparse_array.h",
         "util/sparse_set.h",
@@ -57,8 +73,20 @@ cc_library(
         "re2/set.h",
         "re2/stringpiece.h",
     ],
-    copts = ["-pthread"],
-    linkopts = ["-pthread"],
+    copts = select({
+        ":windows": [],
+        ":windows_msvc": [],
+        "//conditions:default": ["-pthread"],
+    }),
+    linkopts = select({
+        # Darwin doesn't need `-pthread' when linking and it appears that
+        # older versions of Clang will warn about the unused command line
+        # argument, so just don't pass it.
+        ":darwin": [],
+        ":windows": [],
+        ":windows_msvc": [],
+        "//conditions:default": ["-pthread"],
+    }),
     visibility = ["//visibility:public"],
 )
 
@@ -207,9 +235,5 @@ cc_binary(
     name = "regexp_benchmark",
     testonly = 1,
     srcs = ["re2/testing/regexp_benchmark.cc"],
-    linkopts = [
-        "-lm",
-        "-lrt",
-    ],
     deps = [":benchmark"],
 )

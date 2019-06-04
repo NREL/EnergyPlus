@@ -1,6 +1,6 @@
 \section{Group -- Non-Zone Equipment}\label{group-non-zone-equipment}
 
-The non-zone equipment group consists of plant objects that connect to the demand side of the plant loop but are not associated with a a specific Zone (and do not have their own group). There is currently one non-zone equipment object called LoadProfile:Plant. This object places a scheduled demand load on the plant.
+The non-zone equipment group consists of plant objects that connect to the demand side of the plant loop but are not associated with a a specific Zone (and do not have their own group). There is currently one non-zone equipment object called \hyperref[loadprofileplant]{LoadProfile:Plant}. This object places a scheduled demand load on the plant.
 
 Non-zone equipment allows the option of performing a plant-only EnergyPlus simulation, i.e.~without any zones. This can be useful for comparing the performance of various plant configurations or components without the added complexity of a full building description.
 
@@ -83,6 +83,9 @@ These report the overall cooling or heating energy that the load profile object 
 The inlet and outlet node temperatures and mass flow rates can be monitored using the system node output variables:
 
 \begin{itemize}
-\item HVAC,Average,System Node Temperature [C]
-\item HVAC,Average,System Node Mass Flow Rate [kg/s]
+\item
+  HVAC,Average,System Node Temperature {[}C{]}
+\item
+  HVAC,Average,System Node Mass Flow Rate {[}kg/s{]}
 \end{itemize}
+

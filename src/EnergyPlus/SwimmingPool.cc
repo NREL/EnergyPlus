@@ -997,7 +997,7 @@ namespace SwimmingPool {
         ZoneNum = Surface(SurfNum).Zone;
 
         // Convection coefficient calculation
-        HConvIn = 0.22 * std::pow(abs(Pool(PoolNum).PoolWaterTemp - MAT(ZoneNum)), 1.0 / 3.0) * Pool(PoolNum).CurCoverConvFac;
+        HConvIn = 0.22 * std::pow(std::abs(Pool(PoolNum).PoolWaterTemp - MAT(ZoneNum)), 1.0 / 3.0) * Pool(PoolNum).CurCoverConvFac;
 
         CalcSwimmingPoolEvap(EvapRate, PoolNum, SurfNum, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
         Pool(PoolNum).MakeUpWaterMassFlowRate = EvapRate;

@@ -1027,7 +1027,7 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_extensible)
             }
         }
     }
-    json::parse(epJSON.dump(2));
+    auto const output = json::parse(epJSON.dump(2));
     auto const &errors = validationErrors();
     auto const &warnings = validationWarnings();
     EXPECT_EQ(errors.size() + warnings.size(), 0ul);
@@ -1140,7 +1140,7 @@ TEST_F(InputProcessorFixture, parse_idf_and_validate_two_extensible_objects)
         }
     }
 
-    json::parse(epJSON.dump(2));
+    auto const output = json::parse(epJSON.dump(2));
     auto const &errors = validationErrors();
     auto const &warnings = validationWarnings();
     EXPECT_EQ(errors.size() + warnings.size(), 0ul);
@@ -1508,7 +1508,7 @@ TEST_F(InputProcessorFixture, non_existent_keys)
 
     };
 
-    json::parse(root.dump(2));
+    auto const output = json::parse(root.dump(2));
     auto const &errors = validationErrors();
     auto const &warnings = validationWarnings();
     // EXPECT_EQ(errors.size(), 2ul);
@@ -1552,7 +1552,7 @@ TEST_F(InputProcessorFixture, required_fields_required_extensibles_and_missing_e
             {"maximum_number_of_warmup_days", 25},
             {"minimum_number_of_warmup_days", 6}}}}}};
 
-    json::parse(root.dump(2));
+    auto const output = json::parse(root.dump(2));
     auto const &errors = validationErrors();
     auto const &warnings = validationWarnings();
     // EXPECT_EQ(errors.size(), 4ul);
@@ -1606,7 +1606,7 @@ TEST_F(InputProcessorFixture, min_and_max_validation)
             {"daylighting_reference_point_coordinate_system", "Relative"},
             {"rectangular_surface_coordinate_system", "Relative"}}}}},
     };
-    json::parse(root.dump(2));
+    auto const output = json::parse(root.dump(2));
     auto const &errors = validationErrors();
     auto const &warnings = validationWarnings();
     // EXPECT_EQ(errors.size(), 5ul);

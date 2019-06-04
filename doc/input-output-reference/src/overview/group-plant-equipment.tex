@@ -2,7 +2,7 @@
 
 \subsection{Equipment Types}\label{equipment-types-000}
 
-In each \textbf{PlantEquipmentList} described using the above syntax, various equipment types and names must be given. Each type-name pair must then have a corresponding equipment definition. This subsection lists the various equipment types that are available and examples from an IDF. Where appropriate, notes and comments on the input structure are provided.
+In each \textbf{\hyperref[plantequipmentlist]{PlantEquipmentList}} described using the above syntax, various equipment types and names must be given. Each type-name pair must then have a corresponding equipment definition. This subsection lists the various equipment types that are available and examples from an IDF. Where appropriate, notes and comments on the input structure are provided.
 
 \subsection{Generic Chiller Outputs}\label{generic-chiller-outputs}
 
@@ -285,7 +285,7 @@ These outputs are the heat recovery inlet and outlet temperatures and flow rate 
 
 \subsubsection{Chiller Effective Heat Rejection Temperature {[}C{]}}\label{chiller-effective-heat-rejection-temperature-c}
 
-This output variable is available for heat recovery chillers that model split bundle condenser.~ The condenser fluid temperatures used to characterize chiller performance are modified to account for the temperature of the heat recovery fluid.~ This output is the resulting temperature used for characterizing chiller performance and is a blend of the temperatures in the condenser and heat recovery fluid streams.~ For the Chiller:Electric and Chiller:Electric:EIR models, this is an effective inlet temperature while for the Chiller:Electric:ReformulatedEIR model, this is an effective outlet temperature.
+This output variable is available for heat recovery chillers that model split bundle condenser.~ The condenser fluid temperatures used to characterize chiller performance are modified to account for the temperature of the heat recovery fluid.~ This output is the resulting temperature used for characterizing chiller performance and is a blend of the temperatures in the condenser and heat recovery fluid streams.~ For the \hyperref[chillerelectric]{Chiller:Electric} and \hyperref[chillerelectriceir]{Chiller:Electric:EIR} models, this is an effective inlet temperature while for the \hyperref[chillerelectricreformulatedeir]{Chiller:Electric:ReformulatedEIR} model, this is an effective outlet temperature.
 
 \subsubsection{Chiller \textless{}Fuel Type\textgreater{} Rate {[}W{]}}\label{chiller-fuel-type-rate-w}
 
@@ -535,7 +535,7 @@ These chiller output variables are defined above under ``Generic Chiller Outputs
 
 \subsection{Chiller:Absorption:Indirect}\label{chillerabsorptionindirect}
 
-The Chiller:Absorption:Indirect object is an enhanced version of the absorption chiller model found in the Building Loads and System Thermodynamics (BLAST) program. This enhanced model is nearly identical to the existing absorption chiller model (Ref. Chiller:Absorption) with the exceptions that: 1) the enhanced indirect absorption chiller model provides more flexible performance curves and 2) chiller performance now includes the impact of varying evaporator, condenser, and generator temperatures. Since these absorption chiller models are nearly identical (i.e., the performance curves of the enhanced model can be manipulated to produce similar results to the previous model), it is quite probable that the Chiller:Absorption model will be deprecated in a future release of EnergyPlus.
+The Chiller:Absorption:Indirect object is an enhanced version of the absorption chiller model found in the Building Loads and System Thermodynamics (BLAST) program. This enhanced model is nearly identical to the existing absorption chiller model (Ref. \hyperref[chillerabsorption]{Chiller:Absorption}) with the exceptions that: 1) the enhanced indirect absorption chiller model provides more flexible performance curves and 2) chiller performance now includes the impact of varying evaporator, condenser, and generator temperatures. Since these absorption chiller models are nearly identical (i.e., the performance curves of the enhanced model can be manipulated to produce similar results to the previous model), it is quite probable that the \hyperref[chillerabsorption]{Chiller:Absorption} model will be deprecated in a future release of EnergyPlus.
 
 \subsubsection{Inputs}\label{inputs-1-033}
 
@@ -817,7 +817,7 @@ This required alpha field contains the identifying name for the constant COP chi
 
 \paragraph{Field: Condenser Inlet Node Name}\label{field-condenser-inlet-node-name-2}
 
-This alpha field contains the identifying name for the constant COP chiller condenser side inlet node. This node name is required if the chiller is WaterCooled, and optional if the chiller is AirCooled or EvaporativelyCooled. If the chiller is AirCooled or EvaporativelyCooled and a condenser inlet node name is specified here, the node name specified must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air temperature is taken directly from the weather data. If the chiller is AirCooled or EvaporativelyCooled and this field is left blank, the program automatically creates an outdoor air node and the air temperature information on this node is taken directly from the weather file (no node height adjustment).
+This alpha field contains the identifying name for the constant COP chiller condenser side inlet node. This node name is required if the chiller is WaterCooled, and optional if the chiller is AirCooled or EvaporativelyCooled. If the chiller is AirCooled or EvaporativelyCooled and a condenser inlet node name is specified here, the node name specified must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor air temperature is taken directly from the weather data. If the chiller is AirCooled or EvaporativelyCooled and this field is left blank, the program automatically creates an outdoor air node and the air temperature information on this node is taken directly from the weather file (no node height adjustment).
 
 \paragraph{Field: Condenser Outlet Node Name}\label{field-condenser-outlet-node-name-2}
 
@@ -825,7 +825,7 @@ This alpha field contains the identifying name for the constant COP chiller cond
 
 \paragraph{Field: Condenser Type}\label{field-condenser-type-001}
 
-This alpha field determines what type of condenser will be modeled with this chiller. The 3 type of condensers are AirCooled, WaterCooled, and EvaporativelyCooled with the default being AirCooled if not specified. AirCooled and EvaporativelyCooled do not require a CondenserLoop to be specified, whereas the WaterCooled option requires the full specification of the CondenserLoop and its associated equipment.
+This alpha field determines what type of condenser will be modeled with this chiller. The 3 type of condensers are AirCooled, WaterCooled, and EvaporativelyCooled with the default being AirCooled if not specified. AirCooled and EvaporativelyCooled do not require a \hyperref[condenserloop]{CondenserLoop} to be specified, whereas the WaterCooled option requires the full specification of the \hyperref[condenserloop]{CondenserLoop} and its associated equipment.
 
 \paragraph{Field: Chiller Flow Mode}\label{field-chiller-flow-mode-2}
 
@@ -989,7 +989,7 @@ This required alpha field contains the identifying name for the electric chiller
 
 \paragraph{Field: Condenser Inlet Node Name}\label{field-condenser-inlet-node-name-3}
 
-This alpha field contains the identifying name for the electric chiller condenser side inlet node. This node name is required if the chiller is WaterCooled, and optional if the chiller is AirCooled or EvaporativelyCooled. If the chiller is AirCooled or EvaporativelyCooled and a condenser inlet node name is specified here, the node name specified must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air temperature is taken directly from the weather data. If the chiller is AirCooled or EvaporativelyCooled and this field is left blank, the program automatically creates an outdoor air node and the air temperature information on this node is taken directly from the weather file (no node height adjustment).
+This alpha field contains the identifying name for the electric chiller condenser side inlet node. This node name is required if the chiller is WaterCooled, and optional if the chiller is AirCooled or EvaporativelyCooled. If the chiller is AirCooled or EvaporativelyCooled and a condenser inlet node name is specified here, the node name specified must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor air temperature is taken directly from the weather data. If the chiller is AirCooled or EvaporativelyCooled and this field is left blank, the program automatically creates an outdoor air node and the air temperature information on this node is taken directly from the weather file (no node height adjustment).
 
 \paragraph{Field: Condenser Outlet Node Name}\label{field-condenser-outlet-node-name-3}
 
@@ -1169,7 +1169,7 @@ This field is optional.~ It can be used to refine the model and controls for hea
 
 \paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-13}
 
-This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the chiller will be assigned to the ``General'' end-use subcategory.
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the chiller will be assigned to the ``General'' end-use subcategory.
 
 
 An example of this statement in an IDF is:
@@ -1484,7 +1484,7 @@ This required alpha field contains the identifying name for the chiller plant si
 
 \paragraph{Field: Condenser Inlet Node Name}\label{field-condenser-inlet-node-name-4}
 
-This alpha field contains the identifying name for the chiller condenser side inlet node. This node name is required if the chiller is WaterCooled, and optional if the chiller is AirCooled or EvaporativelyCooled. If the chiller is AirCooled or EvaporativelyCooled and a condenser inlet node name is specified here, the node name specified must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air temperature is taken directly from the weather data. If the chiller is AirCooled or EvaporativelyCooled and this field is left blank, the program automatically creates an outdoor air node and the air temperature information on this node is taken directly from the weather file (no node height adjustment).
+This alpha field contains the identifying name for the chiller condenser side inlet node. This node name is required if the chiller is WaterCooled, and optional if the chiller is AirCooled or EvaporativelyCooled. If the chiller is AirCooled or EvaporativelyCooled and a condenser inlet node name is specified here, the node name specified must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor air temperature is taken directly from the weather data. If the chiller is AirCooled or EvaporativelyCooled and this field is left blank, the program automatically creates an outdoor air node and the air temperature information on this node is taken directly from the weather file (no node height adjustment).
 
 \paragraph{Field: Condenser Outlet Node Name}\label{field-condenser-outlet-node-name-4}
 
@@ -1552,7 +1552,7 @@ This field is optional.~ It can be used to refine the model and controls for hea
 
 \paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-11}
 
-This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the chiller will be assigned to the ``General'' end-use subcategory.
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the chiller will be assigned to the ``General'' end-use subcategory.
 
 An example of this statement in an IDF is:
 
@@ -1795,11 +1795,11 @@ These outputs are the water use for evaporatively-cooled condensers. When the ch
 
 \subsection{Chiller:Electric:ReformulatedEIR}\label{chillerelectricreformulatedeir}
 
-This chiller model, developed through the CoolTools™ project sponsored by Pacific Gas and Electric Company (PG\&E), is an empirical model similar to EnergyPlus' Chiller:Electric:EIR model. The model uses performance information at reference conditions along with three curve fits for cooling capacity and efficiency to determine chiller operation at off-reference conditions. The model has the same capabilities as the Chiller:Electric:EIR model, but can potentially provide significant accuracy improvement over the Chiller:Electric:EIR model for variable-speed compressor drive and variable condenser water flow applications. Chiller performance curves can be generated by fitting manufacturer's catalog data or measured data. Performance curves developed from manufacturer's performance data are provided in the EnergyPlus Reference DataSets (Chillers.idf and AllDataSets.idf). This chiller model can be used to predict the performance of various chiller types (e.g., reciprocating, screw, scroll, and centrifugal) with water-cooled condensers.
+This chiller model, developed through the CoolTools\textsuperscript{TM} project sponsored by Pacific Gas and Electric Company (PG\&E), is an empirical model similar to EnergyPlus' \hyperref[chillerelectriceir]{Chiller:Electric:EIR} model. The model uses performance information at reference conditions along with three curve fits for cooling capacity and efficiency to determine chiller operation at off-reference conditions. The model has the same capabilities as the \hyperref[chillerelectriceir]{Chiller:Electric:EIR} model, but can potentially provide significant accuracy improvement over the \hyperref[chillerelectriceir]{Chiller:Electric:EIR} model for variable-speed compressor drive and variable condenser water flow applications. Chiller performance curves can be generated by fitting manufacturer's catalog data or measured data. Performance curves developed from manufacturer's performance data are provided in the EnergyPlus Reference DataSets (Chillers.idf and AllDataSets.idf). This chiller model can be used to predict the performance of various chiller types (e.g., reciprocating, screw, scroll, and centrifugal) with water-cooled condensers.
 
-The main difference between this model and the Chiller:Electric:EIR model is the condenser fluid temperature used in the associated performance curves: the Chiller:Electric:ReformulatedEIR model uses the LEAVING condenser water temperature while the Chiller:Electric:EIR model uses the ENTERING condenser water temperature.
+The main difference between this model and the \hyperref[chillerelectriceir]{Chiller:Electric:EIR} model is the condenser fluid temperature used in the associated performance curves: the Chiller:Electric:ReformulatedEIR model uses the LEAVING condenser water temperature while the \hyperref[chillerelectriceir]{Chiller:Electric:EIR} model uses the ENTERING condenser water temperature.
 
-Note: Chiller:Electric:Reformulated EIR objects and their associated performance curve objects are developed using performance information for a specific chiller and should almost always be used together for an EnergyPlus simulation. Changing the object input values, or swapping performance curves between chillers, should be done with extreme caution. For example, if the user wishes to model a chiller size that is different from the reference capacity, it is highly recommended that the reference flow rates be scaled proportionately to the change in reference capacity. Although this model can provide more accurate prediction than the Chiller:Electric:EIR model, it requires more performance data to develop the associated performance curves (at least 12 points from full-load performance and 7 points from part-load performance).
+Note: Chiller:Electric:Reformulated EIR objects and their associated performance curve objects are developed using performance information for a specific chiller and should almost always be used together for an EnergyPlus simulation. Changing the object input values, or swapping performance curves between chillers, should be done with extreme caution. For example, if the user wishes to model a chiller size that is different from the reference capacity, it is highly recommended that the reference flow rates be scaled proportionately to the change in reference capacity. Although this model can provide more accurate prediction than the \hyperref[chillerelectriceir]{Chiller:Electric:EIR} model, it requires more performance data to develop the associated performance curves (at least 12 points from full-load performance and 7 points from part-load performance).
 
 \subsubsection{Inputs}\label{inputs-5-021}
 
@@ -1837,7 +1837,7 @@ The name of a biquadratic performance curve (ref: Performance Curves) that param
 
 \paragraph{Field: Electric Input to Cooling Output Ratio Function of Temperature Curve Name}\label{field-electric-input-to-cooling-output-ratio-function-of-temperature-curve-name-1}
 
-The name of the Electric Input to Cooling Output Ratio Function of Temperature Curve. Valid curve object types are Curve:Quadratic or Table:TwoIndependentVariables. The performance curve (ref: Performance Curves) parameterizes the variation of the energy input to cooling output ratio (EIR) as a function of the leaving chilled water temperature and the leaving condenser water temperature. The EIR is the inverse of the COP. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) to give the EIR at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified above. The biquadratic curve or the Table:TwoIndependentVariables should be valid for the range of water temperatures anticipated for the simulation (otherwise the program issues warning messages).
+The name of the Electric Input to Cooling Output Ratio Function of Temperature Curve. Valid curve object types are \hyperref[curvequadratic]{Curve:Quadratic} or \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables}. The performance curve (ref: Performance Curves) parameterizes the variation of the energy input to cooling output ratio (EIR) as a function of the leaving chilled water temperature and the leaving condenser water temperature. The EIR is the inverse of the COP. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) to give the EIR at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified above. The biquadratic curve or the \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} should be valid for the range of water temperatures anticipated for the simulation (otherwise the program issues warning messages).
 
 \paragraph{Field: Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type}\label{field-electric-input-to-cooling-output-ratio-function-of-part-load-ratio-curve-type}
 
@@ -1847,10 +1847,10 @@ This choice field determines which type of the Electric Input to Cooling Output 
 
 The name of performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) as a function of the leaving condenser water temperature and the part-load ratio (EIRfTPLR). The form of this curve is based on the input for Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type.
 
-For the type of LeavingCondenserWaterTemperature, the curve object type should be Curve:Bicubic or Table:TwoIndependentVariables that parameterizes
+For the type of LeavingCondenserWaterTemperature, the curve object type should be \hyperref[curvebicubic]{Curve:Bicubic} or \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} that parameterizes
 the variation of the energy input to cooling output ratio (EIR) as a function of the leaving chilled water temperature and the leaving condenser water temperature.
 
-For the type of Lift, the curve object type should be Curve:ChillerPartLoadWithLift or Table:MultiVariableLookup that parameterizes the variation of EIR
+For the type of Lift, the curve object type should be \hyperref[curvechillerpartloadwithlift]{Curve:ChillerPartLoadWithLift} or \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} that parameterizes the variation of EIR
 as a function of the normalized fractional Lift, normalized Tdev and the PLR. Tdev is the difference between Leaving Chilled Water Temperature and Reference Chilled Water Temperature.
 Lift is the difference between the Leaving Condenser Water Temperature and Leaving Chilled Water Temperature.
 The EIR is the inverse of the COP, and the part-load ratio is the actual cooling load divided by the chiller's available cooling capacity.
@@ -1864,7 +1864,7 @@ An ideal chiller with the same efficiency at all part-load ratio's would use a p
 (i.e., part-load efficiency often differs from rated efficiency). The bicubic curve should be valid for the range of condenser water temperatures
 and part-load ratios anticipated for the simulation (otherwise the program issues warning messages).
 
-Note: Although a bicubic curve requires 10 coefficients (ref. Curve:Bicubic), coefficients 7, 9 and 10 are typically not used in the performance curve described here and should be entered as 0 unless sufficient performance data and regression accuracy exist to justify the use of these coefficients. Additionally, coefficients 2, 3, and 6 should not be used unless sufficient temperature data is available to accurately define the performance curve (i.e., negative values may result from insufficient data).
+Note: Although a bicubic curve requires 10 coefficients (ref. \hyperref[curvebicubic]{Curve:Bicubic}), coefficients 7, 9 and 10 are typically not used in the performance curve described here and should be entered as 0 unless sufficient performance data and regression accuracy exist to justify the use of these coefficients. Additionally, coefficients 2, 3, and 6 should not be used unless sufficient temperature data is available to accurately define the performance curve (i.e., negative values may result from insufficient data).
 
 \paragraph{Field: Minimum Part Load Ratio}\label{field-minimum-part-load-ratio-4}
 
@@ -1940,7 +1940,7 @@ This field is optional.~ It can be used to refine the model and controls for hea
 
 \paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-12}
 
-This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the chiller will be assigned to the ``General'' end-use subcategory.
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the chiller will be assigned to the ``General'' end-use subcategory.
 
 
 An example of this statement in an IDF is:
@@ -2058,7 +2058,7 @@ This required alpha field contains the identifying name for the chiller plant si
 
 \paragraph{Field: Condenser Inlet Node Name}\label{field-condenser-inlet-node-name-5}
 
-This alpha field contains the identifying name for the chiller condenser side inlet node. This node name is required if the chiller is WaterCooled, and optional if the chiller is AirCooled or EvaporativelyCooled. If the chiller is AirCooled or EvaporativelyCooled and a condenser inlet node name is specified here, the node name specified must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air temperature is taken directly from the weather data. If the chiller is AirCooled or EvaporativelyCooled and this field is left blank, the program automatically creates an outdoor air node and the air temperature information on this node is taken directly from the weather file (no node height adjustment).
+This alpha field contains the identifying name for the chiller condenser side inlet node. This node name is required if the chiller is WaterCooled, and optional if the chiller is AirCooled or EvaporativelyCooled. If the chiller is AirCooled or EvaporativelyCooled and a condenser inlet node name is specified here, the node name specified must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor air temperature is taken directly from the weather data. If the chiller is AirCooled or EvaporativelyCooled and this field is left blank, the program automatically creates an outdoor air node and the air temperature information on this node is taken directly from the weather file (no node height adjustment).
 
 \paragraph{Field: Condenser Outlet Node Name}\label{field-condenser-outlet-node-name-5}
 
@@ -2546,7 +2546,7 @@ This required alpha field contains the identifying name for the combustion turbi
 
 \paragraph{Field: Condenser Inlet Node Name}\label{field-condenser-inlet-node-name-6}
 
-This alpha field contains the identifying name for the combustion turbine chiller condenser side inlet node. This node name is required if the chiller is WaterCooled, and optional if the chiller is AirCooled or EvaporativelyCooled. If the chiller is AirCooled or EvaporativelyCooled and a condenser inlet node name is specified here, the node name specified must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air temperature is taken directly from the weather data. If the chiller is AirCooled or EvaporativelyCooled and this field is left blank, the program automatically creates an outdoor air node and the air temperature information on this node is taken directly from the weather file (no node height adjustment).
+This alpha field contains the identifying name for the combustion turbine chiller condenser side inlet node. This node name is required if the chiller is WaterCooled, and optional if the chiller is AirCooled or EvaporativelyCooled. If the chiller is AirCooled or EvaporativelyCooled and a condenser inlet node name is specified here, the node name specified must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor air temperature is taken directly from the weather data. If the chiller is AirCooled or EvaporativelyCooled and this field is left blank, the program automatically creates an outdoor air node and the air temperature information on this node is taken directly from the weather file (no node height adjustment).
 
 \paragraph{Field: Condenser Outlet Node Name}\label{field-condenser-outlet-node-name-6}
 
@@ -2814,7 +2814,7 @@ This numeric field contains the second (exponential) coefficient for the overall
 
 \paragraph{Field: Gas Turbine Engine Capacity}\label{field-gas-turbine-engine-capacity}
 
-This numeric field contains the capacity of the gas turbine engine in watts.  This field is autosizable.  When autosized the field below called Turbine Engine Effciency can be used to scale the resulting size. 
+This numeric field contains the capacity of the gas turbine engine in watts.  This field is autosizable.  When autosized the field below called Turbine Engine Effciency can be used to scale the resulting size.
 
 \paragraph{Field: Maximum Exhaust Flow per Unit of Power Output}\label{field-maximum-exhaust-flow-per-unit-of-power-output-1-000}
 
@@ -3078,7 +3078,7 @@ This required alpha field contains the identifying name for the chiller chilled 
 
 \paragraph{Field: Condenser Inlet Node Name}\label{field-condenser-inlet-node-name-7}
 
-This required alpha field contains the identifying name for the chiller condenser side inlet node. If the Chiller is AirCooled, the node name specified must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air dry-bulb temperature from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air dry-bulb temperature is taken directly from the weather data.
+This required alpha field contains the identifying name for the chiller condenser side inlet node. If the Chiller is AirCooled, the node name specified must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air dry-bulb temperature from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor air dry-bulb temperature is taken directly from the weather data.
 
 \paragraph{Field: Condenser Outlet Node Name}\label{field-condenser-outlet-node-name-7}
 
@@ -3477,7 +3477,7 @@ This required alpha field contains the identifying name for the chiller chilled 
 
 \paragraph{Field: Condenser Inlet Node Name}\label{field-condenser-inlet-node-name-8}
 
-This required alpha field contains the identifying name for the chiller condenser side inlet node. If the Chiller is AirCooled, the node name specified must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air dry-bulb temperature from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air dry-bulb temperature is taken directly from the weather data.
+This required alpha field contains the identifying name for the chiller condenser side inlet node. If the Chiller is AirCooled, the node name specified must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air dry-bulb temperature from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor air dry-bulb temperature is taken directly from the weather data.
 
 \paragraph{Field: Condenser Outlet Node Name}\label{field-condenser-outlet-node-name-8}
 
@@ -3596,11 +3596,11 @@ The chilled water supply temperature in degrees C below which the chiller will s
 
 \paragraph{Field: Exhaust Source}\label{field-exhaust-source}
 
-This alpha field determines the type of exhaust source the chiller uses. The default is MicroTurbine. Key Generator:MicroTurbine
+This alpha field determines the type of exhaust source the chiller uses. The default is MicroTurbine. Key \hyperref[generatormicroturbine]{Generator:MicroTurbine}
 
 \paragraph{Field: Exhaust Source Object}\label{field-exhaust-source-object}
 
-This alpha field shows the name of the Exhaust source object -- a Generator:MicroTurbine in this case
+This alpha field shows the name of the Exhaust source object -- a \hyperref[generatormicroturbine]{Generator:MicroTurbine} in this case
 
 \paragraph{Field: Sizing Factor}\label{field-sizing-factor-9}
 
@@ -3986,7 +3986,7 @@ This optional numeric field allows the user to specify a sizing factor for this 
 
 \paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-10}
 
-This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the boiler will be assigned to the ``General'' end-use subcategory.
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the boiler will be assigned to the ``General'' end-use subcategory.
 
 An example of this statement in an IDF is:
 
@@ -4242,7 +4242,7 @@ This optional numeric field allows the user to specify a sizing factor for this 
 
 \paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-11}
 
-This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the boiler will be assigned to the ``General'' end-use subcategory.
+This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the boiler will be assigned to the ``General'' end-use subcategory.
 
 
 More information on the technical aspects of steam boiler can be found in the Engineering Reference Document.
@@ -4424,15 +4424,15 @@ These outputs are the energy input to the boiler. Valid fuel types are:~ Electri
 
 The EnergyPlus has three water-to-water heat pump models, parameter estimation, equation fit and an EIR-formulated version, to choose from.
 
-\textbf{HeatPump:WaterToWater:EquationFit:Cooling}
+\textbf{\hyperref[heatpumpwatertowaterequationfitcooling]{HeatPump:WaterToWater:EquationFit:Cooling}}
 
-\textbf{HeatPump:WaterToWater:EquationFit:Heating}
+\textbf{\hyperref[heatpumpwatertowaterequationfitheating]{HeatPump:WaterToWater:EquationFit:Heating}}
 
 This model is an equation-fit model from the catalog data which resembles a black box with no usage of heat transfer equations. The performance of the heat pump is modeled using curves fitted from the catalog data.
 
-\textbf{HeatPump:WaterToWater:ParameterEstimation:Cooling}
+\textbf{\hyperref[heatpumpwatertowaterparameterestimationcooling]{HeatPump:WaterToWater:ParameterEstimation:Cooling}}
 
-\textbf{HeatPump:WaterToWater:ParameterEstimation:Heating}
+\textbf{\hyperref[heatpumpwatertowaterparameterestimationheating]{HeatPump:WaterToWater:ParameterEstimation:Heating}}
 
 This model is a parameter estimation based model that uses physical parameters generated from the catalog data. The physical parameters are then used to predict the performance of the heat pump using thermodynamic laws and heat transfer equations. The heat pump has a reciprocating compressor that serves both the hot water and the chilled water loop. Note that this model is currently ``hardwired'' to fluid property R22. FluidProperties:* objects for R-22 must be included in the idf file. These may be copied from DataSets\\FluidPropertiesRefData.idf.
 
@@ -4522,7 +4522,7 @@ a component to meet part of the plant loop's design load while continuing to use
 
 \paragraph{Field: Companion Heating Heat Pump Name}\label{field-heating-companion-name}
 
-This optional name field allows the user to specify the companion heating water to water heat pump for this cooling component.  This should be the name of an HeatPump:WaterToWater:EquationFit:Heating object defined elsewhere in the input file.  Because the cooling and heating models are often intended to represent separate operating modes of one single reversible heat pump, it is useful to identify the corresponding heating heat pump input object by name.  This is currently used with autosizing so that the sizing calculations can be coordinated so that the two companion heat pumps get the same design reference flow rates. 
+This optional name field allows the user to specify the companion heating water to water heat pump for this cooling component.  This should be the name of an \hyperref[heatpumpwatertowaterequationfitheating]{HeatPump:WaterToWater:EquationFit:Heating} object defined elsewhere in the input file.  Because the cooling and heating models are often intended to represent separate operating modes of one single reversible heat pump, it is useful to identify the corresponding heating heat pump input object by name.  This is currently used with autosizing so that the sizing calculations can be coordinated so that the two companion heat pumps get the same design reference flow rates.
 
 An idf example:
 
@@ -4694,7 +4694,7 @@ a component to meet part of the plant loop's design load while continuing to use
 
 \paragraph{Field: Companion Cooling Heat Pump Name}\label{field-cooling-companion-name}
 
-This optional name field allows the user to specify the companion cooling water to water heat pump for this heating component.  This should be the name of an HeatPump:WaterToWater:EquationFit:Cooling object defined elsewhere in the input file.  Because the cooling and heating models are often intended to represent separate operating modes of one single reversible heat pump, it is useful to identify the corresponding cooling heat pump input object by name.  This is currently used with autosizing so that the sizing calculations can be coordinated  so that the two companion heat pumps get the same design reference flow rates.
+This optional name field allows the user to specify the companion cooling water to water heat pump for this heating component.  This should be the name of an \hyperref[heatpumpwatertowaterequationfitcooling]{HeatPump:WaterToWater:EquationFit:Cooling} object defined elsewhere in the input file.  Because the cooling and heating models are often intended to represent separate operating modes of one single reversible heat pump, it is useful to identify the corresponding cooling heat pump input object by name.  This is currently used with autosizing so that the sizing calculations can be coordinated  so that the two companion heat pumps get the same design reference flow rates.
 
 
 An idf example:
@@ -5632,7 +5632,7 @@ The following four items are repeated up to a maximum of 20 individual chiller-h
 
 \paragraph{Field: Chiller Heater Module Performance Component Object Type \textless{}x\textgreater{}}\label{field-chiller-heater-module-performance-component-object-type-x}
 
-This alpha field describes the type of the chiller-heater comprising this module set. Only the chiller-heater type ChillerHeaterPerformance:EIectric:EIR is currently available. Note that up to 20 sets of chiller-heater module name, schedule, and number of identical chiller-heater may be entered for a single central heat pump system.
+This alpha field describes the type of the chiller-heater comprising this module set. Only the chiller-heater type \hyperref[chillerheaterperformancelectriceir]{ChillerHeaterPerformance:Electric:EIR} is currently available. Note that up to 20 sets of chiller-heater module name, schedule, and number of identical chiller-heater may be entered for a single central heat pump system.
 
 \paragraph{Field: Chiller Heater Module Performance Component Name \textless{}x\textgreater{}}\label{field-chiller-heater-module-performance-component-name-x}
 
@@ -5768,7 +5768,7 @@ These outputs are the hot water inlet and outlet temperatures and flow rate.
 
 These outputs are the source water inlet and outlet temperatures and flow rate.
 
-\subsection{ChillerHeaterPerformance:EIectric:EIR}\label{chillerheaterperformanceeiectriceir}
+\subsection{ChillerHeaterPerformance:Electric:EIR}\label{chillerheaterperformancelectriceir}
 
 The performance of the chiller-heater will be defined by two sets of curves meant to describe unloading for: 1) cooling-only mode, and 2) heating-only mode or simultaneous cooling-heating mode. Reference conditions must be defined for both because each has its own set of three unloading curves based on their associated reference conditions. The cooling-mode curves are typically (but not always) based on condenser entering water temperature while the heating-only mode curves are typically based on condenser leaving water temperature. This chiller-heater object allows the user to specify whether to use condenser leaving or condenser entering as a dependent variable to differentiate, if necessary, the condenser temperature basis used to generate the cooling- and heating-only mode curves.
 
@@ -5900,7 +5900,7 @@ This numeric field contains the chiller-heater's optimum part-load ratio during 
 
 \subsubsection{Field: Sizing Factor}\label{field-sizing-factor-12}
 
-This optional numeric field allows the user to specify a sizing factor for this component. The Sizing Factor is a multiplier on the design plant chilled water loop flow rate associated with the chiller-heaters parent CentralHeatPumpSystem object. The chiller-heater's modified chilled water flow can then be used to autocalculate the Design Condenser Water Flow Rate and Reference Cooling Mode Evaporator Capacity values. In general, it is best to autosize all three fields or set fixed values for all three fields.
+This optional numeric field allows the user to specify a sizing factor for this component. The Sizing Factor is a multiplier on the design plant chilled water loop flow rate associated with the chiller-heaters parent \hyperref[centralheatpumpsystem]{CentralHeatPumpSystem} object. The chiller-heater's modified chilled water flow can then be used to autocalculate the Design Condenser Water Flow Rate and Reference Cooling Mode Evaporator Capacity values. In general, it is best to autosize all three fields or set fixed values for all three fields.
 
 An example of this statement in an IDF is:
 
@@ -6096,16 +6096,16 @@ There are four types of cold thermal storage objects that can be added to plant 
 
 \begin{itemize}
 \item
-  ThermalStorage:Ice:Simple
+  \hyperref[thermalstorageicesimple]{ThermalStorage:Ice:Simple}
 \item
-  ThermalStorage:Ice:Detailed
+  \hyperref[thermalstorageicedetailed]{ThermalStorage:Ice:Detailed}
 \item
-  ThermalStorage:ChilledWater:Mixed
+  \hyperref[thermalstoragechilledwatermixed]{ThermalStorage:ChilledWater:Mixed}
 \item
-  ThermalStorage:ChilledWater:Stratified
+  \hyperref[thermalstoragechilledwaterstratified]{ThermalStorage:ChilledWater:Stratified}
 \end{itemize}
 
-These objects are typically placed on the supply side of a primary chilled water loop in series or in parallel with one or more chillers.~ Using the the component set point (PlantEquipmentOperation:ComponentSetpoint) plant operation scheme type, the chiller and storage tank setpoints are used to control operation. Using a SetpointManager:Scheduled object (or other appropriate type of set point manager), the setpoints on the chiller outlet node and the ice storage outlet node can be used to control how the cooling load is shared and when charging of storage occurs.~ Example setpoints to use for various modes of operation are shown in the table below:
+These objects are typically placed on the supply side of a primary chilled water loop in series or in parallel with one or more chillers.~ Using the the component set point (\hyperref[plantequipmentoperationcomponentsetpoint]{PlantEquipmentOperation:ComponentSetpoint}) plant operation scheme type, the chiller and storage tank setpoints are used to control operation. Using a \hyperref[setpointmanagerscheduled]{SetpointManager:Scheduled} object (or other appropriate type of set point manager), the setpoints on the chiller outlet node and the ice storage outlet node can be used to control how the cooling load is shared and when charging of storage occurs.~ Example setpoints to use for various modes of operation are shown in the table below:
 
 \begin{longtable}[c]{p{3.0in}p{1.5in}p{1.5in}}
 \toprule
@@ -6143,14 +6143,14 @@ Other considerations for applying cold thermal storage objects include:
 
 \begin{itemize}
 \item
-  In the PlantLoop object, the ``Minimum Loop Temperature'' must be set equal to or less than the lowest setpoint to be used anywhere in the loop.
+  In the \hyperref[plantloop]{PlantLoop} object, the ``Minimum Loop Temperature'' must be set equal to or less than the lowest setpoint to be used anywhere in the loop.
 \item
-  To end the storage charging cycle, use a AvailabilityManager:LowTemperatureTurnOff to shut off the primary chilled water loop when the temperature leaving the storage tank nears the charging mode chiller setpoint indicating that the tank is fully charged.~ For example, if the chiller is set to provide --5C chilled water during charging, then charging can be shut down when the water temperature leaving the storage unit reaches --4C.~ When using a primary-secondary loop arrangement, it may be necessary to schedule this availability manager to be active only when the HVAC systems are off to avoid fighting between the demand controls and the availability manager.
+  To end the storage charging cycle, use a \hyperref[availabilitymanagerlowtemperatureturnoff]{AvailabilityManager:LowTemperatureTurnOff} to shut off the primary chilled water loop when the temperature leaving the storage tank nears the charging mode chiller setpoint indicating that the tank is fully charged.~ For example, if the chiller is set to provide --5C chilled water during charging, then charging can be shut down when the water temperature leaving the storage unit reaches --4C.~ When using a primary-secondary loop arrangement, it may be necessary to schedule this availability manager to be active only when the HVAC systems are off to avoid fighting between the demand controls and the availability manager.
 \end{itemize}
 
 \subsection{ThermalStorage:Ice:Simple}\label{thermalstorageicesimple}
 
-This thermal storage model is based on a simple simulation of an ice storage tank with a fixed capacity.~ The tank is charged, or frozen, in an ice-on-coil configuration where ice builds up on the outside of the tubes carrying the brine or glycol solution from the chiller.~ There are two discharge (melt) options, internal or external.~ Internal melt uses the same fluid tubes for charging and discharging.~ External melt uses a separate fluid path for discharge such that the outer layers of ice melt first.~ The ice storage model includes an implied 3-way valve to control the amount if charge/discharge based on the incoming water temperature and the outlet node setpoint temperature.~ The storage tank is assumed to be fully charged (full of ice) at the beginning of each environment.~ The tank is then allowed to charge and discharge during the warmup days of the environment.~ The tank is best controlled using the PlantEquipmentOperation:ComponentSetpoint plant operation scheme, and requires that a setpoint be placed by a set point manager on the ice storage Plant Outlet Node.
+This thermal storage model is based on a simple simulation of an ice storage tank with a fixed capacity.~ The tank is charged, or frozen, in an ice-on-coil configuration where ice builds up on the outside of the tubes carrying the brine or glycol solution from the chiller.~ There are two discharge (melt) options, internal or external.~ Internal melt uses the same fluid tubes for charging and discharging.~ External melt uses a separate fluid path for discharge such that the outer layers of ice melt first.~ The ice storage model includes an implied 3-way valve to control the amount if charge/discharge based on the incoming water temperature and the outlet node setpoint temperature.~ The storage tank is assumed to be fully charged (full of ice) at the beginning of each environment.~ The tank is then allowed to charge and discharge during the warmup days of the environment.~ The tank is best controlled using the \hyperref[plantequipmentoperationcomponentsetpoint]{PlantEquipmentOperation:ComponentSetpoint} plant operation scheme, and requires that a setpoint be placed by a set point manager on the ice storage Plant Outlet Node.
 
 The input fields for the object are described in detail below:
 
@@ -6487,7 +6487,7 @@ The reference to the zone object specifying the ambient air temperature around t
 
 \paragraph{Field: Ambient Temperature Outdoor Air Node Name}\label{field-ambient-temperature-outdoor-air-node-name}
 
-This optional alpha field specifies the outdoor air node (OutdoorAir:Node) name used to define the ambient conditions surrounding the chilled water tank. This field is applicable only when the Ambient Temperature Indicator is specified as \emph{Exterior}, otherwise this field should be left blank. The node name specified must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air conditions from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air conditions are taken directly from the weather data.
+This optional alpha field specifies the outdoor air node (\hyperref[outdoorairnode]{OutdoorAir:Node}) name used to define the ambient conditions surrounding the chilled water tank. This field is applicable only when the Ambient Temperature Indicator is specified as \emph{Exterior}, otherwise this field should be left blank. The node name specified must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air conditions from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor air conditions are taken directly from the weather data.
 
 \paragraph{Field: Heat Gain Coefficient from Ambient Temperature}\label{field-heat-gain-coefficient-from-ambient-temperature}
 
@@ -6729,7 +6729,7 @@ The reference to the zone object specifying the ambient air temperature around t
 
 \paragraph{Field: Ambient Temperature Outside Air Node Name}\label{field-ambient-temperature-outside-air-node-name-000}
 
-This optional alpha field specifies the outdoor air node name used to define the ambient conditions surrounding the chilled water tank. This field is applicable only when the Ambient Temperature Indicator is specified as \emph{Exterior}, otherwise this field should be left blank. The node name specified must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air conditions from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air conditions are taken directly from the weather data.
+This optional alpha field specifies the outdoor air node name used to define the ambient conditions surrounding the chilled water tank. This field is applicable only when the Ambient Temperature Indicator is specified as \emph{Exterior}, otherwise this field should be left blank. The node name specified must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor air conditions from the weather data. Alternately, the node name may be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor air conditions are taken directly from the weather data.
 
 \paragraph{Field: Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature}\label{field-uniform-skin-loss-coefficient-per-unit-area-to-ambient-temperature}
 

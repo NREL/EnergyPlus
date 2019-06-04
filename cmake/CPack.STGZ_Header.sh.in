@@ -1,40 +1,67 @@
 #!/usr/bin/env sh
+# vim: set tabstop=2:softtabstop=2:shiftwidth=2:noexpandtab
+
+# Reset
+Color_Off='\033[0m'				# Text Reset
+BRed='\033[1;31m'				# Bold Red
 
 package_name="EnergyPlus-@CPACK_PACKAGE_VERSION_MAJOR@-@CPACK_PACKAGE_VERSION_MINOR@-@CPACK_PACKAGE_VERSION_PATCH@"
 
-    cat << '____cpack__here_doc____'
+		cat << '____cpack__here_doc____'
 @CPACK_RESOURCE_FILE_LICENSE_CONTENT@
 ____cpack__here_doc____
-    echo
-    echo "Do you accept the license? [yN]: "
-    read line leftover
-    case ${line} in
-      y* | Y*)
-        cpack_license_accepted=TRUE;;
-      *)
-        echo "License not accepted. Exiting ..."
-        exit 1;;
-    esac
+		echo
+		# Default is no
+		echo "Do you accept the license? [y/${BRed}N${Color_Off}]: "
+		read line leftover
+		case ${line} in
+			y* | Y*)
+				cpack_license_accepted=TRUE;;
+			*)
+				echo "License not accepted. Exiting ..."
+				exit 1;;
+		esac
 
-default_install_directory="/usr/local"
+default_install_directory="/usr/local/${package_name}"
 install_directory=""
 
-until [ -d "$install_directory" ]; do
+install_dir_ok=0
+
+# Add a check to make sure the parent directory exists, or ask user for confirmation
+# This will ensure that the user doesn't make gross typos when installing to say /usr/local
+until [ $install_dir_ok -eq 1 ]; do
 	echo "EnergyPlus install directory [$default_install_directory]:"
 	read install_directory
 	if [ "$install_directory" = "" ]; then
 		install_directory=$default_install_directory
 	fi
-	if [ ! -d "$install_directory" ]; then
-		echo "Directory does not exist, please renter your selection."
+	pardir=$(dirname "$install_directory")
+	if [ ! -d "$pardir" ]; then
+		echo
+		echo "Parent Directory '$pardir' does not exist."
+		# Default is No
+		echo "Are you sure you want to continue? [y/${BRed}N${Color_Off}] "
+		read go_ahead leftover
+		case ${go_ahead} in
+			y* | Y*)
+				install_dir_ok=1;;
+			*)
+				install_dir_ok=0
+		esac
+	else
+		install_dir_ok=1
 	fi
 done
+
+# Make the install_directory, (creating as many intermediate directories as needed)
+mkdir -p "${install_directory}"
+
 
 default_link_directory="/usr/local/bin"
 link_directory=""
 
 until [ -d "$link_directory" ]; do
-	echo "Symbolic link location (enter \"n\" for no links) [$default_link_directory]:"
+	echo "Symbolic link location (enter ${BRed}\"n\"${Color_Off} for no links) [$default_link_directory]:"
 	read link_directory
 	if [ "$link_directory" = "n" ]; then
 		break
@@ -59,11 +86,9 @@ echo "Extracting, please wait..."
 use_new_tail_syntax="-n"
 tail $use_new_tail_syntax +1 "$0" 2>&1 > /dev/null || use_new_tail_syntax=""
 
-mkdir -p "${install_directory}"
-
 tail $use_new_tail_syntax +###CPACK_HEADER_LENGTH### "$0" | gunzip | (cd "${install_directory}" && tar xf -) || exit 1 "Problem unpacking the @CPACK_PACKAGE_FILE_NAME@"
 
-echo "Unpacking to directory ${install_directory} was successful."
+echo "Unpacking to directory '${install_directory}' was successful."
 
 link_err ()
 {
@@ -71,75 +96,70 @@ link_err ()
 	exit 0
 }
 
-chmod o+w "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/"
+chmod o+w "${install_directory}/PreProcess/IDFVersionUpdater/"
 
 if [ "$(id -u)" = "0" ]; then
-  # make the man page directory if it doesn't exist
-  mkdir -p /usr/local/share/man/man1
-  # then move the man page in there
-  mv "${install_directory}/${package_name}/energyplus.1" /usr/local/share/man/man1/
+	# make the man page directory if it doesn't exist
+	mkdir -p /usr/local/share/man/man1
+	# then move the man page in there
+	mv "${install_directory}/energyplus.1" /usr/local/share/man/man1/
 else
-  echo "Man page installation skipped since script is executing without root privileges" 1>&2
+	echo "Man page installation skipped since script is executing without root privileges" 1>&2
 fi
 
 if [ ! "$link_directory" = "n" ]; then
-	uninstall="$install_directory/$package_name/uninstall.sh"
+	uninstall="$install_directory/uninstall.sh"
 	echo "#!/usr/bin/env sh" > $uninstall
 
-  ln -sf "${install_directory}/${package_name}/PreProcess/GrndTempCalc/Basement" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PreProcess/GrndTempCalc/BasementGHT.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PostProcess/convertESOMTRpgm/convertESOMTR" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/energyplus" "${link_directory}/EnergyPlus" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/energyplus" "${link_directory}/energyplus" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/Energy+.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/Energy+.schema.epJSON" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PostProcess/EP-Compare/EP-Compare" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/EPMacro" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/ExpandObjects" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PostProcess/HVAC-Diagram" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/IDFVersionUpdater" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PreProcess/ParametricPreProcessor/ParametricPreprocessor" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PreProcess/FMUParser/parser" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PostProcess/ReadVarsESO" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/runenergyplus" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/runepmacro" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/runreadvars" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PreProcess/GrndTempCalc/Slab" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PreProcess/GrndTempCalc/SlabGHT.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/Transition-V8-2-0-to-V8-3-0" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/V8-2-0-Energy+.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/V8-3-0-Energy+.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
-	(
-		cat <<-HERE
-      rm -f "${link_directory}/Basement"
-      rm -f "${link_directory}/BasementGHT.idd"
-      rm -f "${link_directory}/convertESOMTR"
-      rm -f "${link_directory}/EnergyPlus"
-      rm -f "${link_directory}/Energy+.idd"
-      rm -f "${link_directory}/Energy+.schema.epJSON"
-      rm -f "${link_directory}/EP-Compare"
-      rm -f "${link_directory}/EPMacro"
-      rm -f "${link_directory}/ExpandObjects"
-      rm -f "${link_directory}/HVAC-Diagram"
-      rm -f "${link_directory}/IDFVersionUpdater"
-      rm -f "${link_directory}/ParametricPreprocessor"
-      rm -f "${link_directory}/parser"
-      rm -f "${link_directory}/ReadVarsESO"
-      rm -f "${link_directory}/runenergyplus"
-      rm -f "${link_directory}/runepmacro"
-      rm -f "${link_directory}/runreadvars"
-      rm -f "${link_directory}/Slab"
-      rm -f "${link_directory}/SlabGHT.idd"
-      rm -f "${link_directory}/Transition-V8-2-0-to-V8-3-0"
-      rm -f "${link_directory}/V8-2-0-Energy+.idd"
-      rm -f "${link_directory}/V8-3-0-Energy+.idd"
-      rm -f /usr/local/share/man/man1/energyplus.1
-			echo "Symbolic links to this installation of EnergyPlus have been removed."
-			echo "You may remove the EnergyPlus directory to completely uninstall the software."
-		HERE
-	) >> $uninstall
-  chmod +x "$uninstall"
-  echo "Symbolic links were successful."
+	ln -sf "${install_directory}/PreProcess/GrndTempCalc/Basement" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/PreProcess/GrndTempCalc/BasementGHT.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/PostProcess/convertESOMTRpgm/convertESOMTR" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/energyplus" "${link_directory}/EnergyPlus" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/energyplus" "${link_directory}/energyplus" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/Energy+.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/Energy+.schema.epJSON" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/PostProcess/EP-Compare/EP-Compare" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/EPMacro" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/ExpandObjects" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/PostProcess/HVAC-Diagram" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/PreProcess/IDFVersionUpdater/IDFVersionUpdater" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/PreProcess/ParametricPreprocessor/ParametricPreprocessor" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/PreProcess/FMUParser/parser" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/PostProcess/ReadVarsESO" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/runenergyplus" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/runepmacro" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/runreadvars" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/PreProcess/GrndTempCalc/Slab" "${link_directory}" 2> /dev/null > /dev/null || link_err
+	ln -sf "${install_directory}/PreProcess/GrndTempCalc/SlabGHT.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
+
+	# Note: careful about tabs/spaces here. It HAS to be tabs or it'll fail cryptically
+	cat <<- _HERE_ >> $uninstall
+		rm -f "${link_directory}/Basement"
+		rm -f "${link_directory}/BasementGHT.idd"
+		rm -f "${link_directory}/convertESOMTR"
+		rm -f "${link_directory}/EnergyPlus"
+		rm -f "${link_directory}/energyplus"
+		rm -f "${link_directory}/Energy+.idd"
+		rm -f "${link_directory}/Energy+.schema.epJSON"
+		rm -f "${link_directory}/EP-Compare"
+		rm -f "${link_directory}/EPMacro"
+		rm -f "${link_directory}/ExpandObjects"
+		rm -f "${link_directory}/HVAC-Diagram"
+		rm -f "${link_directory}/IDFVersionUpdater"
+		rm -f "${link_directory}/ParametricPreprocessor"
+		rm -f "${link_directory}/parser"
+		rm -f "${link_directory}/ReadVarsESO"
+		rm -f "${link_directory}/runenergyplus"
+		rm -f "${link_directory}/runepmacro"
+		rm -f "${link_directory}/runreadvars"
+		rm -f "${link_directory}/Slab"
+		rm -f "${link_directory}/SlabGHT.idd"
+		rm -f /usr/local/share/man/man1/energyplus.1
+		echo "Symbolic links to this installation of EnergyPlus have been removed."
+		echo "You may remove the EnergyPlus directory to completely uninstall the software."
+	_HERE_
+	chmod +x "$uninstall"
+	echo "Symbolic links were successful."
 fi
 
 exit 0

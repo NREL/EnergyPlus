@@ -81,7 +81,7 @@ b.	Water-cooled: total heat transfer rate with outdoor air
 Detailed calculation of HVAC rejected heat varies with different HVAC object groups and component types, as summarized in Table~\ref{table:emission-from-hvac-components}.
 
 % table 94
-\begin{longtable}[c]{p{4.5in}p{1.5in}}
+\begin{longtable}[c]{p{1.0in}p{2.0in}p{3in}}
 \caption{Heat Rejection Calculation for Different HVAC Component Types \label{table:emission-from-hvac-components}} \tabularnewline
 \toprule 
 Object Group & Component & Calculation Methods \tabularnewline
@@ -92,24 +92,24 @@ Coils      & Chilled water cooling coil   & Emit heat in condensing unit defined
            & Hot water/steam heating coil & Emit heat in plant source defined in Plant Heating and Cooling Equipment \tabularnewline
            & DX cooling coil (air-cooled) & Cooling Coil Source Side Heat Transfer Rate + Cooling Coil Electric Power + Cooling Coil Crankcase Heater Electric Energy + Fuel Waste Heat \tabularnewline
            & DX cooling coil (Evaporatively-cooled)  & Evaporative Cooler Condenser Pump Electricity Consumption + Cooling Coil Basin Heater Electric Energy + Evaporative Cooler Water Volume * rho * evaporation heat of water (\(\delta H_{we}\)) \tabularnewline
-           & DX VRF cooling coil          & Emit heat in condensing unit defined in Variable Refrigerant Flow Equipment
-           & DX heating coil (air-cooled) & Heating Coil Electric Power / Fuel Consumed + Heating Coil Defrost Electric Power + Heating Coil Crankcase Heater Electric Power – Heating Coil Total Heating Rate
-           & Water to air heat pump       & Emit heat in condensing unit defined in Condenser Equipment
-           & DX VRF cooling /heating coil & Emit heat in condensing unit defined in Variable Refrigerant Flow Equipment
+           & DX VRF cooling coil          & Emit heat in condensing unit defined in Variable Refrigerant Flow Equipment \tabularnewline
+           & DX heating coil (air-cooled) & Heating Coil Electric Power / Fuel Consumed + Heating Coil Defrost Electric Power + Heating Coil Crankcase Heater Electric Power – Heating Coil Total Heating Rate \tabularnewline
+           & Water to air heat pump       & Emit heat in condensing unit defined in Condenser Equipment \tabularnewline
+           & DX VRF cooling /heating coil & Emit heat in condensing unit defined in Variable Refrigerant Flow Equipment \tabularnewline
 
-Evaporative Coolers                 & Evaporative Cooler Condenser Pump Electricity Consumption + Cooling Coil Basin Heater Electric Energy + Evaporative Cooler Water Volume * rho * evaporation heat of water (\(\delta H_{we}\))
-Variable Refrigerant Flow Equipment & VRF air-to-air heat pump condensing unit (air-cooled) & VRF Heat Pump Total Cooling Rate + VRF Heat Pump Total Electric Power (cooling mode)<br>VRF Heat Pump Total Heating Electric Power / Fuel Rate - VRF Heat Pump Total Heating Rate (heating mode)
-                                    & VRF air-to-air heat pump condensing unit (evaporative-cooled) & Evaporative Cooler Condenser Pump Electricity Consumption + Cooling Coil Basin Heater Electric Energy + Evaporative Cooler Water Volume * rho * evaporation heat of water (\(\delta H_{we}\))
-                                    & VRF air-to-air heat pump condensing unit (water-cooled) & VRF Heat Pump Condenser Heat Transfer Rate
-Plant Heating and Cooling Equipment & Hot water/Steam boiler & Boiler <Fuel Type> Rate + Boiler Ancillary Electric Energy - Boiler Heating Rate
-                                    & Chiller water-cooled & Emit heat in Condenser Equipment
-                                    & Chiller air-cooled / evap-cooled & Chiller Condenser Heat Transfer Rate
-Condenser Equipment                 & Cooling Tower & Cooling Tower Heat Transfer Rate + Cooling Tower Fan Electric Power
-Water Heaters and Thermal Storage   & Water heater & Water Heater <Fuel Type> Rate - Water Heater Heating Rate
-Zone HVAC Forced Air Units          & Window air conditioner / Packaged terminal air conditioner (PTAC) / Packaged terminal heat pump (PTHP); Energy recovery ventilator (ERV); Unit ventilator/heater; Zone outdoor air unit & <unit type> Total Cooling Rate + <unit type> Electric Energy (cooling mode)<br><unit type> Heating Electric Power / Fuel Rate + <unit type> Electric Power - <unit type> Total Heating Rate (heating mode)
-                                    & Water-to-air heat pump & Emit heat in condensing unit defined in Condenser Equipment
-                                    & Zone evaporative cooler & Emit heat in condensing unit defined in Evaporative Coolers
-                                    & Hybrid Unitary HVAC & System dependent; Calculated according to the equipment specification as above
+Evaporative Coolers                 & Evaporative Coolers & Evaporative Cooler Condenser Pump Electricity Consumption + Cooling Coil Basin Heater Electric Energy + Evaporative Cooler Water Volume * rho * evaporation heat of water (\(\delta H_{we}\)) \tabularnewline
+Variable Refrigerant Flow Equipment & VRF air-to-air heat pump condensing unit (air-cooled) & VRF Heat Pump Total Cooling Rate + VRF Heat Pump Total Electric Power (cooling mode)<br>VRF Heat Pump Total Heating Electric Power / Fuel Rate - VRF Heat Pump Total Heating Rate (heating mode) \tabularnewline
+                                    & VRF air-to-air heat pump condensing unit (evaporative-cooled) & Evaporative Cooler Condenser Pump Electricity Consumption + Cooling Coil Basin Heater Electric Energy + Evaporative Cooler Water Volume * rho * evaporation heat of water (\(\delta H_{we}\)) \tabularnewline
+                                    & VRF air-to-air heat pump condensing unit (water-cooled) & VRF Heat Pump Condenser Heat Transfer Rate \tabularnewline
+Plant Heating and Cooling Equipment & Hot water/Steam boiler & Boiler <Fuel Type> Rate + Boiler Ancillary Electric Energy - Boiler Heating Rate \tabularnewline
+                                    & Chiller water-cooled & Emit heat in Condenser Equipment \tabularnewline
+                                    & Chiller air-cooled / evap-cooled & Chiller Condenser Heat Transfer Rate \tabularnewline
+Condenser Equipment                 & Cooling Tower & Cooling Tower Heat Transfer Rate + Cooling Tower Fan Electric Power \tabularnewline
+Water Heaters and Thermal Storage   & Water heater & Water Heater <Fuel Type> Rate - Water Heater Heating Rate \tabularnewline
+Zone HVAC Forced Air Units          & Window air conditioner / Packaged terminal air conditioner (PTAC) / Packaged terminal heat pump (PTHP); Energy recovery ventilator (ERV); Unit ventilator/heater; Zone outdoor air unit & <unit type> Total Cooling Rate + <unit type> Electric Energy (cooling mode)<br><unit type> Heating Electric Power / Fuel Rate + <unit type> Electric Power - <unit type> Total Heating Rate (heating mode) \tabularnewline
+                                    & Water-to-air heat pump & Emit heat in condensing unit defined in Condenser Equipment \tabularnewline
+                                    & Zone evaporative cooler & Emit heat in condensing unit defined in Evaporative Coolers \tabularnewline
+                                    & Hybrid Unitary HVAC & System dependent; Calculated according to the equipment specification as above \tabularnewline
 \bottomrule
 \end{longtable}
 

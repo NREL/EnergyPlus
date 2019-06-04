@@ -332,7 +332,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.1;",
+        "  Version,9.2;",
 
         "  Building,",
         "    House with AirflowNetwork simulation,  !- Name",
@@ -820,7 +820,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
 {
 
     std::string const idf_objects =
-        delimited_string({"  Version,9.1;",
+        delimited_string({"  Version,9.2;",
 
                           "  Building,",
                           "    House with Local Air Nodes,  !- Name",
@@ -1363,7 +1363,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.1;",
+        "  Version,9.2;",
 
         "  Building,",
         "    House with Local Air Nodes,  !- Name",
@@ -1980,7 +1980,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 {
 
     std::string const idf_objects =
-        delimited_string({"  Version,9.1;",
+        delimited_string({"  Version,9.2;",
 
                           "  Building,",
                           "    House with AirflowNetwork simulation,  !- Name",
