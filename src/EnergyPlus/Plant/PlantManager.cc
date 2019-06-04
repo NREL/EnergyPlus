@@ -71,9 +71,12 @@
 #include <GroundHeatExchangers.hh>
 #include <HVACInterfaceManager.hh>
 #include <HeatPumpWaterToWaterSimple.hh>
+#include <HeatPumpWaterToWaterCOOLING.hh>
+#include <HeatPumpWaterToWaterHEATING.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
+#include <OutsideEnergySources.hh>
 #include <PipeHeatTransfer.hh>
 #include <Pipes.hh>
 #include <Plant/PlantLoopSolver.hh>
@@ -82,6 +85,7 @@
 #include <PlantLoopEquip.hh>
 #include <PlantPipingSystemsManager.hh>
 #include <PlantUtilities.hh>
+#include <PlantValves.hh>
 #include <PondGroundHeatExchanger.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
@@ -1181,6 +1185,7 @@ namespace EnergyPlus {
                                 }
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "HeatPump:WaterToWater:ParameterEstimation:Heating")) {
+                                this_comp.compPtr = HeatPumpWaterToWaterHEATING::GshpPeHeatingSpecs::factory(CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HPWaterPEHeating;
                                 this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                                 if (LoopSideNum == DemandSide) {
@@ -1190,6 +1195,7 @@ namespace EnergyPlus {
                                 }
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "HeatPump:WaterToWater:ParameterEstimation:Cooling")) {
+                                this_comp.compPtr = HeatPumpWaterToWaterCOOLING::GshpPeCoolingSpecs::factory(CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HPWaterPECooling;
                                 this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                                 if (LoopSideNum == DemandSide) {
@@ -1231,9 +1237,11 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "DistrictCooling")) {
                                 this_comp.TypeOf_Num = TypeOf_PurchChilledWater;
                                 this_comp.GeneralEquipType = GenEquipTypes_Purchased;
+                                this_comp.compPtr = OutsideEnergySources::OutsideEnergySourceSpecs::factory(TypeOf_PurchChilledWater, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "DistrictHeating")) {
                                 this_comp.TypeOf_Num = TypeOf_PurchHotWater;
                                 this_comp.GeneralEquipType = GenEquipTypes_Purchased;
+                                this_comp.compPtr = OutsideEnergySources::OutsideEnergySourceSpecs::factory(TypeOf_PurchHotWater, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Simple")) {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceSimple;
                                 this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
@@ -1241,6 +1249,7 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceDetailed;
                                 this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
                             } else if (UtilityRoutines::SameString(this_comp_type, "TemperingValve")) {
+                                this_comp.compPtr = PlantValves::TemperValveData::factory(CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_ValveTempering;
                                 this_comp.GeneralEquipType = GenEquipTypes_Valve;
                             } else if (UtilityRoutines::SameString(this_comp_type, "HeatExchanger:FluidToFluid")) {
