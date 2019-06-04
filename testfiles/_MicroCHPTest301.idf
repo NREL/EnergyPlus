@@ -33,7 +33,7 @@
     6;                       !- Minimum Number of Warmup Days
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     9,                       !- Begin Day of Month
     ,                        !- Begin Year
