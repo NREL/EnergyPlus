@@ -445,7 +445,6 @@ namespace EvaporativeCoolers {
     );
 
     void ControlZoneEvapUnitOutput(int const UnitNum,           // unit number
-                                   int const ZoneNum,           // number of zone being served
                                    Real64 const ZoneCoolingLoad // target cooling load
     );
 

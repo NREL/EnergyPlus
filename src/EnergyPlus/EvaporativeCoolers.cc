@@ -4442,7 +4442,7 @@ namespace EvaporativeCoolers {
                     } else {
                         ZoneCoolingLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
                         // calculate part load ratio for cycling fan/unit first
-                        ControlZoneEvapUnitOutput(UnitNum, ZoneNum, ZoneCoolingLoad);
+                        ControlZoneEvapUnitOutput(UnitNum, ZoneCoolingLoad);
                         PartLoadRatio = ZoneEvapUnit(UnitNum).UnitPartLoadRatio;
                         CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                     }
@@ -4468,7 +4468,7 @@ namespace EvaporativeCoolers {
                         CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                     } else {
                         // calculate part load ratio for cycling fan/unit first
-                        ControlZoneEvapUnitOutput(UnitNum, ZoneNum, ZoneCoolingLoad);
+                        ControlZoneEvapUnitOutput(UnitNum, ZoneCoolingLoad);
                         PartLoadRatio = ZoneEvapUnit(UnitNum).UnitPartLoadRatio;
                         CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                     }
@@ -4610,7 +4610,6 @@ namespace EvaporativeCoolers {
     }
 
     void ControlZoneEvapUnitOutput(int const UnitNum,           // unit number
-                                   int const ZoneNum,           // zone number being served
                                    Real64 const ZoneCoolingLoad // target cooling load
     )
     {
