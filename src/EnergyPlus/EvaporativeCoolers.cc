@@ -1203,6 +1203,7 @@ namespace EvaporativeCoolers {
                     }
                 }
             } else { // Autosize or hardsize with design data
+                CheckSysSizing(CompType, EvapCond(EvapCoolNum).EvapCoolerName);
                 if (CoolerOnMainAirLoop) {
                     IndirectVolFlowRateDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
                 } else if (CoolerOnOApath) {
@@ -1288,6 +1289,7 @@ namespace EvaporativeCoolers {
                 //"User-Specified Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
                 //}
             } else { // Autosize or hardsize with design data
+                CheckSysSizing(CompType, EvapCond(EvapCoolNum).EvapCoolerName);
                 if (CoolerOnMainAirLoop) {
                     volFlowRateDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
                 } else if (CoolerOnOApath) {
@@ -1370,6 +1372,7 @@ namespace EvaporativeCoolers {
                                            EvapCond(EvapCoolNum).PadArea);
                     }
                 } else { // Autosize or hardsize with design data
+                    CheckSysSizing(CompType, EvapCond(EvapCoolNum).EvapCoolerName);
                     if (CoolerOnMainAirLoop) {
                         IndirectVolFlowRateDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
                     } else if (CoolerOnOApath) {
@@ -1498,6 +1501,7 @@ namespace EvaporativeCoolers {
                                            EvapCond(EvapCoolNum).IndirectPadArea);
                     }
                 } else { // Autosize or hardsize with design data
+                    CheckSysSizing(CompType, EvapCond(EvapCoolNum).EvapCoolerName);
                     if (!CoolerOnMainAirLoop) {
                         CoolerOnOApath = true;
                     }
