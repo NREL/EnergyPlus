@@ -5141,32 +5141,31 @@ namespace HVACVariableRefrigerantFlow {
         static std::string const RoutineName("InitVRF");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int InNode;                                  // TU inlet node
-        int OutNode;                                 // TU outlet node
-        int OutsideAirNode;                          // TU mixer outside air inlet node
-        int NumTULoop;                               // loop counter, number of TU's in list
-        int ELLoop;                                  // loop counter, number of zone equipment lists
-        int ListLoop;                                // loop counter, number of equipment is each list
-        int VRFCond;                                 // index to VRF condenser
-        int TUIndex;                                 // index to TU
-        int TUListNum;                               // index to VRF AC system terminal unit list
-        int TUListIndex;                             // pointer to TU list for this VRF system
-        int IndexToTUInTUList;                       // index to TU in TerminalUnilList
-        Real64 RhoAir;                               // air density at InNode
-        static Real64 CurrentEndTime;                // end time of current time step
-        static Real64 CurrentEndTimeLast;            // end time of last time step
-        static Real64 TimeStepSysLast;               // system time step on last time step
-        Real64 TempOutput;                           // Sensible output of TU
-        Real64 LoadToCoolingSP;                      // thermostat load to cooling setpoint (W)
-        Real64 LoadToHeatingSP;                      // thermostat load to heating setpoint (W)
-        bool EnableSystem;                           // use to turn on secondary operating mode if OA temp limits exceeded
-        bool ErrorsFound;                            // flag returned from mining call
-        Real64 rho;                                  // density of water (kg/m3)
-        Real64 OutsideDryBulbTemp;                   // Outdoor air temperature at external node height
-        static Array1D_bool MySuppCoilPlantScanFlag; // used to initialize plant comp for water and steam heating coils
-        bool errFlag;                                // local error flag
-        Real64 SuppHeatCoilLoad;                     // additional heating required by supplemental heater (W)
-        Real64 SuppHeatCoilCapacity;                 // supplemental heating coil size (W)
+        int InNode;                       // TU inlet node
+        int OutNode;                      // TU outlet node
+        int OutsideAirNode;               // TU mixer outside air inlet node
+        int NumTULoop;                    // loop counter, number of TU's in list
+        int ELLoop;                       // loop counter, number of zone equipment lists
+        int ListLoop;                     // loop counter, number of equipment is each list
+        int VRFCond;                      // index to VRF condenser
+        int TUIndex;                      // index to TU
+        int TUListNum;                    // index to VRF AC system terminal unit list
+        int TUListIndex;                  // pointer to TU list for this VRF system
+        int IndexToTUInTUList;            // index to TU in TerminalUnilList
+        Real64 RhoAir;                    // air density at InNode
+        static Real64 CurrentEndTime;     // end time of current time step
+        static Real64 CurrentEndTimeLast; // end time of last time step
+        static Real64 TimeStepSysLast;    // system time step on last time step
+        Real64 TempOutput;                // Sensible output of TU
+        Real64 LoadToCoolingSP;           // thermostat load to cooling setpoint (W)
+        Real64 LoadToHeatingSP;           // thermostat load to heating setpoint (W)
+        bool EnableSystem;                // use to turn on secondary operating mode if OA temp limits exceeded
+        bool ErrorsFound;                 // flag returned from mining call
+        Real64 rho;                       // density of water (kg/m3)
+        Real64 OutsideDryBulbTemp;        // Outdoor air temperature at external node height
+        bool errFlag;                     // local error flag
+        Real64 SuppHeatCoilLoad;          // additional heating required by supplemental heater (W)
+        Real64 SuppHeatCoilCapacity;      // supplemental heating coil size (W)
         // FLOW:
 
         // ALLOCATE and Initialize subroutine variables
@@ -5205,9 +5204,6 @@ namespace HVACVariableRefrigerantFlow {
             MyOneTimeFlag = false;
             MyVRFCondFlag = true;
 
-            MySuppCoilPlantScanFlag.allocate(NumVRFTU);
-            MySuppCoilPlantScanFlag = true;
-
         } // IF (MyOneTimeFlag) THEN
 
         // identify VRF condenser connected to this TU
@@ -5241,82 +5237,89 @@ namespace HVACVariableRefrigerantFlow {
             VRFTU(VRFTUNum).AvailStatus = ZoneComp(VRFTerminalUnit_Num).ZoneCompAvailMgrs(VRFTUNum).AvailStatus;
         }
 
-        if (MySuppCoilPlantScanFlag(VRFTUNum) && allocated(PlantLoop)) {
-            if ((VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) ||
-                (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam)) {
+        if (VRFTU(VRFTUNum).MySuppCoilPlantScanFlag && allocated(PlantLoop)) {
+            if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
+                // hot water supplemental heating coil
+                errFlag = false;
+                PlantUtilities::ScanPlantLoopsForObject(VRFTU(VRFTUNum).SuppHeatCoilName,
+                                                        TypeOf_CoilWaterSimpleHeating,
+                                                        VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
+                                                        VRFTU(VRFTUNum).SuppHeatCoilLoopSide,
+                                                        VRFTU(VRFTUNum).SuppHeatCoilBranchNum,
+                                                        VRFTU(VRFTUNum).SuppHeatCoilCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _);
 
-                if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
-                    // hot water supplemental heating coil
-                    errFlag = false;
-                    PlantUtilities::ScanPlantLoopsForObject(VRFTU(VRFTUNum).SuppHeatCoilName,
-                                                            TypeOf_CoilWaterSimpleHeating,
-                                                            VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
-                                                            VRFTU(VRFTUNum).SuppHeatCoilLoopSide,
-                                                            VRFTU(VRFTUNum).SuppHeatCoilBranchNum,
-                                                            VRFTU(VRFTUNum).SuppHeatCoilCompNum,
-                                                            errFlag,
-                                                            _,
-                                                            _,
-                                                            _,
-                                                            _,
-                                                            _);
+                WaterCoils::SetCoilDesFlow(DataHVACGlobals::cAllCoilTypes(VRFTU(VRFTUNum).SuppHeatCoilType_Num),
+                                           VRFTU(VRFTUNum).SuppHeatCoilName,
+                                           VRFTU(VRFTUNum).MaxHeatAirVolFlow,
+                                           errFlag);
 
-                    WaterCoils::SetCoilDesFlow(DataHVACGlobals::cAllCoilTypes(VRFTU(VRFTUNum).SuppHeatCoilType_Num),
-                                               VRFTU(VRFTUNum).SuppHeatCoilName,
-                                               VRFTU(VRFTUNum).MaxHeatAirVolFlow,
-                                               errFlag);
-
-                    if (errFlag) {
-                        ShowFatalError(RoutineName + ": Program terminated for previous conditions.");
-                    }
-                    VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow =
-                        WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", VRFTU(VRFTUNum).SuppHeatCoilName, ErrorsFound);
-
-                    if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow > 0.0) {
-                        rho = GetDensityGlycol(PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
-                                               DataGlobals::HWInitConvTemp,
-                                               PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidIndex,
-                                               RoutineName);
-                        VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * rho;
-                    }
-                } else if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
-                    // steam supplemental heating coil
-                    errFlag = false;
-                    PlantUtilities::ScanPlantLoopsForObject(VRFTU(VRFTUNum).SuppHeatCoilName,
-                                                            TypeOf_CoilSteamAirHeating,
-                                                            VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
-                                                            VRFTU(VRFTUNum).SuppHeatCoilLoopSide,
-                                                            VRFTU(VRFTUNum).SuppHeatCoilBranchNum,
-                                                            VRFTU(VRFTUNum).SuppHeatCoilCompNum,
-                                                            errFlag,
-                                                            _,
-                                                            _,
-                                                            _,
-                                                            _,
-                                                            _);
-                    if (errFlag) {
-                        ShowFatalError(RoutineName + ": Program terminated for previous conditions.");
-                    }
-                    VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = SteamCoils::GetCoilMaxSteamFlowRate(VRFTU(VRFTUNum).SuppHeatCoilIndex, ErrorsFound);
-                    if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow > 0.0) {
-                        int SteamIndex = 0; // fluid type index of 0 is passed if steam
-                        Real64 TempSteamIn = 100.0;
-                        Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
-                        VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * SteamDensity;
-                    }
+                if (errFlag) {
+                    ShowFatalError(RoutineName + ": Program terminated for previous conditions.");
                 }
+                VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow =
+                    WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", VRFTU(VRFTUNum).SuppHeatCoilName, ErrorsFound);
+
+                if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow > 0.0) {
+                    rho = GetDensityGlycol(PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
+                                           DataGlobals::HWInitConvTemp,
+                                           PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidIndex,
+                                           RoutineName);
+                    VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * rho;
+                }
+
+                // fill fluid outlet node for hot water coil SuppHeatCoilFluidOutletNode
+                VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode = PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum)
+                                                                  .LoopSide(VRFTU(VRFTUNum).SuppHeatCoilLoopSide)
+                                                                  .Branch(VRFTU(VRFTUNum).SuppHeatCoilBranchNum)
+                                                                  .Comp(VRFTU(VRFTUNum).SuppHeatCoilCompNum)
+                                                                  .NodeNumOut;
+                VRFTU(VRFTUNum).MySuppCoilPlantScanFlag = false;
+
+            } else if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
+                // steam supplemental heating coil
+                errFlag = false;
+                PlantUtilities::ScanPlantLoopsForObject(VRFTU(VRFTUNum).SuppHeatCoilName,
+                                                        TypeOf_CoilSteamAirHeating,
+                                                        VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
+                                                        VRFTU(VRFTUNum).SuppHeatCoilLoopSide,
+                                                        VRFTU(VRFTUNum).SuppHeatCoilBranchNum,
+                                                        VRFTU(VRFTUNum).SuppHeatCoilCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _);
+                if (errFlag) {
+                    ShowFatalError(RoutineName + ": Program terminated for previous conditions.");
+                }
+                VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = SteamCoils::GetCoilMaxSteamFlowRate(VRFTU(VRFTUNum).SuppHeatCoilIndex, ErrorsFound);
+                if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow > 0.0) {
+                    int SteamIndex = 0; // fluid type index of 0 is passed if steam
+                    Real64 TempSteamIn = 100.0;
+                    Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
+                    VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow = VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * SteamDensity;
+                }
+
                 // fill fluid outlet node for steam coil SuppHeatCoilFluidOutletNode
                 VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode = PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum)
                                                                   .LoopSide(VRFTU(VRFTUNum).SuppHeatCoilLoopSide)
                                                                   .Branch(VRFTU(VRFTUNum).SuppHeatCoilBranchNum)
                                                                   .Comp(VRFTU(VRFTUNum).SuppHeatCoilCompNum)
                                                                   .NodeNumOut;
-                MySuppCoilPlantScanFlag(VRFTUNum) = false;
+                VRFTU(VRFTUNum).MySuppCoilPlantScanFlag = false;
+
             } else { // VRF terminal unit not connected to plant
-                MySuppCoilPlantScanFlag(VRFTUNum) = false;
+                VRFTU(VRFTUNum).MySuppCoilPlantScanFlag = false;
             }
-        } else if (MySuppCoilPlantScanFlag(VRFTUNum) && !AnyPlantInModel) {
-            MySuppCoilPlantScanFlag(VRFTUNum) = false;
+        } else if (VRFTU(VRFTUNum).MySuppCoilPlantScanFlag && !AnyPlantInModel) {
+            VRFTU(VRFTUNum).MySuppCoilPlantScanFlag = false;
         }
 
         // If all VRF Terminal Units on this VRF AC System have been simulated, reset the IsSimulated flag
@@ -6160,7 +6163,7 @@ namespace HVACVariableRefrigerantFlow {
                     OutsideDryBulbTemp <= VRF(VRFCond).MaxOATCooling) {
                     CoolingLoad(VRFCond) = true;
                 } else if (TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList) && OutsideDryBulbTemp >= VRF(VRFCond).MinOATHeating &&
-                    OutsideDryBulbTemp <= VRF(VRFCond).MaxOATHeating) {
+                           OutsideDryBulbTemp <= VRF(VRFCond).MaxOATHeating) {
                     HeatingLoad(VRFCond) = true;
                 }
             }
@@ -6282,7 +6285,7 @@ namespace HVACVariableRefrigerantFlow {
         }
 
         SetAverageAirFlow(VRFTUNum, 0.0, OnOffAirFlowRatio);
-    }
+    } // namespace HVACVariableRefrigerantFlow
 
     void SetCompFlowRate(int const VRFTUNum, int const VRFCond, Optional_bool_const UseCurrentMode)
     {
@@ -7567,7 +7570,8 @@ namespace HVACVariableRefrigerantFlow {
             VRFTU(VRFTUNum).ControlVRF_FluidTCtrl(VRFTUNum, QZnReq, FirstHVACIteration, PartLoadRatio, OnOffAirFlowRatio, SuppHeatCoilLoad);
             VRFTU(VRFTUNum).CalcVRF_FluidTCtrl(
                 VRFTUNum, FirstHVACIteration, PartLoadRatio, SysOutputProvided, OnOffAirFlowRatio, SuppHeatCoilLoad, LatOutputProvided);
-            if (PartLoadRatio == 0.0) { // set coil inlet conditions when coil does not operate. Inlet conditions are set in ControlVRF_FluidTCtrl when PLR=1
+            if (PartLoadRatio ==
+                0.0) { // set coil inlet conditions when coil does not operate. Inlet conditions are set in ControlVRF_FluidTCtrl when PLR=1
                 if (VRFTU(VRFTUNum).CoolingCoilPresent) {
                     VRFTU(VRFTUNum).coilInNodeT = DataLoopNode::Node(DXCoils::DXCoil(VRFTU(VRFTUNum).CoolCoilIndex).AirInNode).Temp;
                     VRFTU(VRFTUNum).coilInNodeW = DataLoopNode::Node(DXCoils::DXCoil(VRFTU(VRFTUNum).CoolCoilIndex).AirInNode).HumRat;
@@ -9141,8 +9145,8 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
-    void VRFTerminalUnitEquipment::CalcVRFIUVariableTeTc(Real64 &EvapTemp,   // evaporating temperature
-                                                         Real64 &CondTemp    // condensing temperature
+    void VRFTerminalUnitEquipment::CalcVRFIUVariableTeTc(Real64 &EvapTemp, // evaporating temperature
+                                                         Real64 &CondTemp  // condensing temperature
     )
     {
         // SUBROUTINE INFORMATION:

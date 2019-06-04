@@ -727,6 +727,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 coilInNodeT;              // coil inlet node temp at full flow (C)
         Real64 coilInNodeW;              // coil inlet node humidity ratio at full flow (kg/kg)
         int fanOutletNode;               // fan outlet node index
+        bool MySuppCoilPlantScanFlag;    // flag used to initialize plant comp for water and steam heating coils
         // Default Constructor
         VRFTerminalUnitEquipment()
             : VRFTUType_Num(0), SchedPtr(-1), VRFSysNum(0), TUListIndex(0), IndexToTUInTUList(0), ZoneNum(0), VRFTUInletNodeNum(0),
@@ -747,7 +748,7 @@ namespace HVACVariableRefrigerantFlow {
               ZonePtr(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0),
               ATMixerOutNode(0), SuppHeatCoilAirInletNode(0), SuppHeatCoilAirOutletNode(0), SuppHeatCoilFluidInletNode(0), firstPass(true),
               SuppHeatCoilLoopNum(), SuppHeatCoilLoopSide(), SuppHeatCoilBranchNum(), SuppHeatCoilCompNum(), coilInNodeT(0.0), coilInNodeW(0.0),
-              fanOutletNode(0)
+              fanOutletNode(0), MySuppCoilPlantScanFlag(true)
         {
         }
 
