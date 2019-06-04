@@ -3580,7 +3580,7 @@
   Output:Variable,*,Zone Mean Air Temperature,annual;
 
   Output:Variable,*,Zone Mean Air Temperature,runperiod,Office Occupancy;
-    Run Period 2,            !- Name
+
   Output:Variable,*,Zone Mean Radiant Temperature,monthly;
 
   Output:Variable,*,Zone Mean Radiant Temperature,monthly,Office Occupancy;
@@ -3588,7 +3588,7 @@
   Output:Variable,*,Zone Mean Radiant Temperature,annual;
 
   Output:Variable,*,Zone Mean Radiant Temperature,runperiod,Office Occupancy;
-    Run Period 3,            !- Name
+
   Output:Variable,*,Zone People Occupant Count,monthly;
 
   Output:Variable,*,Zone People Occupant Count,annual;
@@ -3752,7 +3752,7 @@
   Output:Variable,*,Zone Air Relative Humidity,annual;
 
   Output:Variable,*,Zone Air Relative Humidity,runperiod,Office Occupancy;
-    Run Period 4,            !- Name
+
   Output:Variable,*,Zone Air Terminal Sensible Cooling Energy,monthly;
 
   Output:Variable,*,Zone Air Terminal Sensible Cooling Energy,annual;
