@@ -93,8 +93,8 @@ namespace HeatPumpWaterToWaterHEATING {
         Real64 LoadSideUACoeff;          // Load Side heat transfer coeff  W/K
         Real64 CompPistonDisp;           // compressor piston displacement m3
         Real64 CompClearanceFactor;      // compressor clearance factor
-        Real64 CompSucPressDrop;         // deltap,  compressor suction and discharge pressure drop Pascals
-        Real64 SuperheatTemp;            // deltatsh, super heating degC
+        Real64 CompSucPressDrop;         // deltap ,  compressor suction and discharge pressure drop Pascals
+        Real64 SuperheatTemp;            // deltatsh , super heating  °C
         Real64 PowerLosses;              // constant part of electro mechanical power losses  watts Joules/sec
         Real64 LossFactor;               // loss factor used ot define the electro mechanical
         // loss that is supposed to be proportional to the theoretical power
@@ -122,10 +122,10 @@ namespace HeatPumpWaterToWaterHEATING {
         Real64 QLoadEnergy;               // Load Side heat transfer Joules
         Real64 QSource;                   // Source Side heat transfer rate Watts
         Real64 QSourceEnergy;             // Source Side heat transfer Joules
-        Real64 LoadSideWaterInletTemp;    // Load Side outlet temperature degC
-        Real64 SourceSideWaterInletTemp;  // Source Side outlet temperature degC
-        Real64 LoadSideWaterOutletTemp;   // Load Side outlet temperature degC
-        Real64 SourceSideWaterOutletTemp; // Source Side outlet temperature degC
+        Real64 LoadSideWaterInletTemp;    // Load Side outlet temperature °C
+        Real64 SourceSideWaterInletTemp;  // Source Side outlet temperature °C
+        Real64 LoadSideWaterOutletTemp;   // Load Side outlet temperature °C
+        Real64 SourceSideWaterOutletTemp; // Source Side outlet temperature °C
         Real64 LoadSideWaterMassFlowRate; // Mass flow rate of the cooling water in Load Side Kg/s
         Real64 SourceSideWaterMassFlowRate; // Mass flow rate of chilled water in Eavporator Kg/s
         int Running;                      // On reporting Flag
