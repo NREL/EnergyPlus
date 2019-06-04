@@ -146,6 +146,16 @@ namespace EvaporativeCoolers {
 
     static std::string const BlankString;
 
+    namespace {
+        // These were static variables within different functions. They were pulled out into the namespace
+        // to facilitate easier unit testing of those functions.
+        // These are purposefully not in the header file as an extern variable. No one outside of this should
+        // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+        // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+        bool InitZoneHVACEvapCoolerOneTimeFlag(true);
+        bool InitEvapCoolerMyOneTimeFlag(true);
+    } // namespace
+
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
@@ -958,12 +968,11 @@ namespace EvaporativeCoolers {
         int OutNode;
         int EvapUnitNum;
         static bool MySetPointCheckFlag(true);
-        static bool MyOneTimeFlag(true);
         static bool localSetPointCheck(false);
 
-        if (MyOneTimeFlag) {
+        if (InitEvapCoolerMyOneTimeFlag) {
             MySizeFlag.dimension(NumEvapCool, true);
-            MyOneTimeFlag = false;
+            InitEvapCoolerMyOneTimeFlag = false;
         }
 
         // FLOW:
@@ -4069,7 +4078,6 @@ namespace EvaporativeCoolers {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true); // one time flag
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MyFanFlag;
         static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
@@ -4077,13 +4085,14 @@ namespace EvaporativeCoolers {
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         Real64 TimeElapsed;
 
-        if (MyOneTimeFlag) {
+        if (InitZoneHVACEvapCoolerOneTimeFlag) {
             MySizeFlag.dimension(NumZoneEvapUnits, true);
             MyEnvrnFlag.dimension(NumZoneEvapUnits, true);
             MyFanFlag.dimension(NumZoneEvapUnits, true);
             MyZoneEqFlag.allocate(NumZoneEvapUnits);
             MyZoneEqFlag = true;
-            MyOneTimeFlag = false;
+            InitZoneHVACEvapCoolerOneTimeFlag = false;
+            ZoneEquipmentListChecked = false;
         }
 
         if (allocated(ZoneComp)) {
@@ -4997,6 +5006,8 @@ namespace EvaporativeCoolers {
         MySizeFlag.clear();
         CheckEquipName.clear();
         CheckZoneEvapUnitName.clear();
+        InitZoneHVACEvapCoolerOneTimeFlag = true;
+        InitEvapCoolerMyOneTimeFlag = true;
     }
 
 } // namespace EvaporativeCoolers
