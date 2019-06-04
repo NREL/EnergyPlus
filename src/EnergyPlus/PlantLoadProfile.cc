@@ -193,7 +193,7 @@ namespace PlantLoadProfile {
             if (allocated(PlantLoop)) { // TODO: is this check needed?
                 errFlag = false;
                 ScanPlantLoopsForObject(
-                    Name, m_plantProfileType, m_loopIndex, m_loopSideIndex, m_branchIndex, m_componentIndex, errFlag, _, _, _, _, _,);
+                    Name, m_plantProfileType, m_loopIndex, m_loopSideIndex, m_branchIndex, m_componentIndex, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError("InitPlantProfile: Program terminated for previous conditions.");
                 }
