@@ -131,7 +131,14 @@ namespace Boilers {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumBoilers(0);              // Number of boilers
+    Real64 FuelUsed(0.0);           // W - Boiler fuel used
+    Real64 ParasiticElecPower(0.0); // W - Parasitic electrical power (e.g. forced draft fan)
+    Real64 BoilerLoad(0.0);         // W - Boiler Load
+    Real64 BoilerMassFlowRate(0.0); // kg/s - Boiler mass flow rate
+    Real64 BoilerOutletTemp(0.0);   // W - Boiler outlet temperature
+    Real64 BoilerPLR(0.0);          // Boiler operating part-load ratio
     bool GetBoilerInputFlag(true);
+    bool BoilerOneTimeFlag(true);
     Array1D_bool CheckEquipName;
 
     // Object Data
@@ -140,9 +147,16 @@ namespace Boilers {
     void clear_state()
     {
         NumBoilers = 0;
+        FuelUsed = 0.0;
+        ParasiticElecPower = 0.0;
+        BoilerLoad = 0.0;
+        BoilerMassFlowRate = 0.0;
+        BoilerOutletTemp = 0.0;
+        BoilerPLR = 0.0;
         CheckEquipName.deallocate();
         Boiler.deallocate();
         GetBoilerInputFlag = true;
+        BoilerOneTimeFlag = true;
     }
 
     void SimBoiler(std::string const &EP_UNUSED(BoilerType), // boiler type (used in CASE statement)
@@ -958,7 +972,7 @@ namespace Boilers {
 
         BoilerLoad = 0.0;
         ParasiticElecPower = 0.0;
-        this->MassFlowRate = 0.0;
+        BoilerMassFlowRate = 0.0;
         BoilerInletNode = this->BoilerInletNodeNum;
         BoilerOutletNode = this->BoilerOutletNodeNum;
         BoilerNomCap = this->NomCap;
@@ -978,7 +992,7 @@ namespace Boilers {
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that flow resolver
         // will not shut down the branch
         if (MyLoad <= 0.0 || !RunFlag) {
-            if (EquipFlowCtrl == ControlType_SeriesActive) this->MassFlowRate = Node(BoilerInletNode).MassFlowRate;
+            if (EquipFlowCtrl == ControlType_SeriesActive) BoilerMassFlowRate = Node(BoilerInletNode).MassFlowRate;
             return;
         }
 
@@ -1003,7 +1017,8 @@ namespace Boilers {
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
             if ((this->FlowMode == ConstantFlow) || (this->FlowMode == NotModulated)) {
                 // Then find the flow rate and outlet temp
-                SetComponentFlowRate(this->MassFlowRate,
+                BoilerMassFlowRate = BoilerMassFlowRateMax;
+                SetComponentFlowRate(BoilerMassFlowRate,
                                      BoilerInletNode,
                                      BoilerOutletNode,
                                      this->LoopNum,
@@ -1011,8 +1026,8 @@ namespace Boilers {
                                      this->BranchNum,
                                      this->CompNum);
 
-                if ((this->MassFlowRate != 0.0) && (MyLoad > 0.0)) {
-                    BoilerDeltaTemp = BoilerLoad / this->MassFlowRate / Cp;
+                if ((BoilerMassFlowRate != 0.0) && (MyLoad > 0.0)) {
+                    BoilerDeltaTemp = BoilerLoad / BoilerMassFlowRate / Cp;
                 } else {
                     BoilerDeltaTemp = 0.0;
                 }
@@ -1037,14 +1052,14 @@ namespace Boilers {
                 BoilerOutletTemp = BoilerDeltaTemp + Node(BoilerInletNode).Temp;
 
                 if ((BoilerDeltaTemp > 0.0) && (BoilerLoad > 0.0)) {
-                    this->MassFlowRate = BoilerLoad / Cp / BoilerDeltaTemp;
+                    BoilerMassFlowRate = BoilerLoad / Cp / BoilerDeltaTemp;
 
-                    this->MassFlowRate = min(BoilerMassFlowRateMax, this->MassFlowRate);
+                    BoilerMassFlowRate = min(BoilerMassFlowRateMax, BoilerMassFlowRate);
 
                 } else {
-                    this->MassFlowRate = 0.0;
+                    BoilerMassFlowRate = 0.0;
                 }
-                SetComponentFlowRate(this->MassFlowRate,
+                SetComponentFlowRate(BoilerMassFlowRate,
                                      BoilerInletNode,
                                      BoilerOutletNode,
                                      this->LoopNum,
@@ -1056,13 +1071,13 @@ namespace Boilers {
 
         } else { // If FlowLock is True
             // Set the boiler flow rate from inlet node and then check performance
-            this->MassFlowRate = Node(BoilerInletNode).MassFlowRate;
+            BoilerMassFlowRate = Node(BoilerInletNode).MassFlowRate;
 
-            if ((MyLoad > 0.0) && (this->MassFlowRate > 0.0)) { // this boiler has a heat load
+            if ((MyLoad > 0.0) && (BoilerMassFlowRate > 0.0)) { // this boiler has a heat load
                 BoilerLoad = MyLoad;
                 if (BoilerLoad > BoilerNomCap * BoilerMaxPLR) BoilerLoad = BoilerNomCap * BoilerMaxPLR;
                 if (BoilerLoad < BoilerNomCap * BoilerMinPLR) BoilerLoad = BoilerNomCap * BoilerMinPLR;
-                BoilerOutletTemp = Node(BoilerInletNode).Temp + BoilerLoad / (this->MassFlowRate * Cp);
+                BoilerOutletTemp = Node(BoilerInletNode).Temp + BoilerLoad / (BoilerMassFlowRate * Cp);
                 BoilerDeltaTemp = BoilerOutletTemp - Node(BoilerInletNode).Temp;
             } else {
                 BoilerLoad = 0.0;
