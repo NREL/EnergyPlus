@@ -7,7 +7,7 @@ if(CPACK_GENERATOR MATCHES "NSIS")
   set(CPACK_NSIS_PACKAGE_NAME "${CPACK_PACKAGING_INSTALL_PREFIX}")
   set(CPACK_NSIS_INSTALL_ROOT "C:")
   set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGING_INSTALL_PREFIX}")
-  set(CPACK_NSIS_DEFINES "  
+  set(CPACK_NSIS_DEFINES "
     !define MUI_STARTMENUPAGE_DEFAULTFOLDER \"${CPACK_PACKAGING_INSTALL_PREFIX} Programs\"
     !include \"LogicLib.nsh\"
     !include \"x64.nsh\"
@@ -16,15 +16,15 @@ if(CPACK_GENERATOR MATCHES "NSIS")
 
   set(CPACK_NSIS_MENU_LINKS
     "Documentation/index.html" "EnergyPlus Documentation"
-    "PostProcess/EP-Compare/EP-Compare.exe" "EP-Compare" 
-    "PreProcess/EPDraw/EPDrawGUI.exe" "EPDrawGUI" 
+    "PostProcess/EP-Compare/EP-Compare.exe" "EP-Compare"
+    "PreProcess/EPDraw/EPDrawGUI.exe" "EPDrawGUI"
     "EP-Launch.exe" "EP-Launch"
     "ExampleFiles/ExampleFiles.html" "Example Files Summary"
-    "ExampleFiles/ExampleFiles-ObjectsLink.html" "ExampleFiles Link to Objects" 
+    "ExampleFiles/ExampleFiles-ObjectsLink.html" "ExampleFiles Link to Objects"
     "PreProcess/IDFEditor/IDFEditor.exe" "IDFEditor"
     "PreProcess/IDFVersionUpdater/IDFVersionUpdater.exe" "IDFVersionUpdater"
-    "readme.html" "Readme Notes" 
-    "PreProcess/WeatherConverter/Weather.exe" "Weather Statistics and Conversions" 
+    "readme.html" "Readme Notes"
+    "PreProcess/WeatherConverter/Weather.exe" "Weather Statistics and Conversions"
   )
 
   set(CPACK_NSIS_PAGE_COMPONENTS "
