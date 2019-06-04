@@ -65,7 +65,7 @@
 
 using namespace EnergyPlus;
 
-TEST_F(EnergyPlusFixture, DISABLED_FiniteDiffGroundTempModelTest)
+TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModelTest)
 {
 
     using DataGlobals::Pi;
@@ -145,7 +145,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FiniteDiffGroundTempModelTest)
     EXPECT_NEAR(14.52, thisModel->getGroundTempAtTimeInSeconds(25.0, 30153600), 0.01);
 }
 
-TEST_F(EnergyPlusFixture, DISABLED_FiniteDiffGroundTempModel_GetWeather_NoWeather) {
+TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_NoWeather) {
 
     std::shared_ptr<EnergyPlus::FiniteDiffGroundTempsModel> thisModel(new EnergyPlus::FiniteDiffGroundTempsModel());
 
@@ -174,7 +174,7 @@ TEST_F(EnergyPlusFixture, DISABLED_FiniteDiffGroundTempModel_GetWeather_NoWeathe
 
 }
 
-TEST_F(EnergyPlusFixture, DISABLED_FiniteDiffGroundTempModel_GetWeather_Weather) {
+TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
 
     // I have to actually specify the RunPerod and SizingPeriods because in getWeatherData calls WeatherManager::GetNextEnvironment
     // I cannot hard set WeatherManager's GetBranchInputOneTimeFlag (in anonymous namespace) to false,
