@@ -15,7 +15,25 @@ Well, it turns out there are some cases where it would be convenient to have the
 
 ## E-mail and  Conference Call Conclusions ##
 
-insert text
+Based on the feedback received on the proposal, I am inclined to go with Option A, changing the fraction to a schedule. It allows for the most user flexibility. 
+
+### Feedback on Proposal
+
+from Chris Balbach, PSD:
+
+> Of the (3) Options presented, PSD prefers **Option A**
+
+> Specifically **Option A** provides a method for 'recording' any changes that a EMS program might make to the schedule values. Using the OpenStudio API, I can imagine an EMS measure that first clones the existing schedule for archival purposes (leaving a transparent record of the original schedule values), and then applies logic to potentially replace the active schedule value at each model timestep. The subsequent  schedule also represents a transparent and easily inspect-able object.
+
+from Brent Griffith:
+
+> I like option C. It will likely work better for HVAC control because it could update faster to vary within system iterations.
+
+from Mike Witte:
+
+> I'm ok with A or C. The transiton for A isn't all that bad - just add one-liner Schedule:Constant objects for each unique fraction (not likely to be many) and leave it blank for incoming values of 1.0
+
+> Brent suggested the EMS control would be tighter but I think it would be the same either way because getcurrentschedulevalue checks for ems override at the time it's called.
 
 ## Overview ##
 
