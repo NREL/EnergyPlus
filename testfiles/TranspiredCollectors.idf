@@ -42,7 +42,7 @@
     Yes;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     2,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -57,7 +57,7 @@
     yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 2,            !- Name
     2,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year

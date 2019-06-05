@@ -263,19 +263,19 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
             }
             u64toa(root[obj_name].size() + 1, s);
             std::string name = obj_name + " " + s;
+
             if (!obj.is_null()) {
                 auto const &name_iter = obj.find("name");
+                // If you find a name field, use that
                 if (name_iter != obj.end()) {
                     name = name_iter.value();
                     obj.erase(name_iter);
                 } else {
-                    auto const it = obj_loc.find("name");
+                    // Otherwise, see if it should have a name field
+                    auto const &it = obj_loc.find("name");
                     if (it != obj_loc.end()) {
-                        if (obj_name == "RunPeriod") {
-                            name = obj_name + " " + s;
-                        } else {
-                            name = "";
-                        }
+                        // Let it slide, as a blank string, to be handled in the appropriate GetInput routine
+                        name = "";
                     }
                 }
             }
@@ -307,8 +307,17 @@ json IdfParser::parse_object(
     auto const &legacy_idd_extensibles_iter = legacy_idd.find("extensibles");
 
     auto const &schema_patternProperties = schema_obj_loc["patternProperties"];
-    auto const &schema_dot_star = schema_patternProperties[".*"];
-    auto const &schema_obj_props = schema_dot_star["properties"];
+    std::string patternProperty;
+    int dot_star_present = schema_patternProperties.count(".*");
+    int no_whitespace_present = schema_patternProperties.count(R"(^.*\S.*$)");
+    if (dot_star_present) {
+        patternProperty = ".*";
+    } else if (no_whitespace_present) {
+        patternProperty = R"(^.*\S.*$)";
+    } else {
+        throw std::runtime_error(R"(The patternProperties value is not a valid choice (".*", "^.*\S.*$"))");
+    }
+    auto const &schema_obj_props = schema_patternProperties[patternProperty]["properties"];
     auto key = legacy_idd.find("extension");
 
     json const *schema_obj_extensions = nullptr;

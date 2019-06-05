@@ -133,7 +133,7 @@
   SurfaceConvectionAlgorithm:Outside,DOE-2;
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     7,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
