@@ -1059,6 +1059,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -1500,6 +1501,7 @@ namespace DXCoils {
 
             ++DXCoilNum;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -2021,6 +2023,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
             DXCoil(DXCoilNum).Name = Alphas(1);
             DXCoil(DXCoilNum).DXCoilType = CurrentModuleObject;
@@ -2440,6 +2443,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -2974,6 +2978,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -3418,6 +3423,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -3764,6 +3770,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
             DXCoil(DXCoilNum).Name = Alphas(1);
             // Initialize DataHeatBalance heat reclaim variable name for use by heat reclaim coils
@@ -4287,6 +4294,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -4755,6 +4763,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -4877,6 +4886,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -4990,6 +5000,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -5088,6 +5099,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);

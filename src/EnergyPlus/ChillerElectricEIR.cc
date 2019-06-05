@@ -378,7 +378,6 @@ namespace ChillerElectricEIR {
         static int CurveCheck(0);          // Used to evaluate PLFFPLR curve objects
         Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
         Real64 CurveValTmp;                // Used to evaluate PLFFPLR curve objects
-        bool errFlag;                      // Used to tell if a unique chiller name has been specified
         std::string StringVar;             // Used for EIRFPLR warning messages
         int CurveValPtr;                   // Index to EIRFPLR curve output
 
@@ -419,10 +418,9 @@ namespace ChillerElectricEIR {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+
             ElectricEIRChiller(EIRChillerNum).Name = cAlphaArgs(1);
 
             //   Performance curves
