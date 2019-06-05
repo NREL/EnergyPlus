@@ -1253,6 +1253,7 @@ namespace PlantChillers {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
+            errFlag = false;
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
             if (errFlag) {
                 ErrorsFound = true;
