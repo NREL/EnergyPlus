@@ -2279,7 +2279,7 @@ namespace PlantUtilities {
                            std::string const &CompName,      // user name of component
                            int const NodeNumIn,              // component water inlet node
                            int const EP_UNUSED(NodeNumOut),  // component water outlet node
-                           bool &ErrorsFound,                // set to true if there's an error
+                           bool &ErrorsFound,                // set to true if there's an error, unchanged otherwise
                            Optional_bool_const SupressErrors // used for WSHP's where condenser loop may not be on a plant loop
     )
     {
@@ -2318,7 +2318,6 @@ namespace PlantUtilities {
 
         MyPltLoopNum = 0;
         MyPltSizNum = 0;
-        ErrorsFound = false;
         if (present(SupressErrors)) {
             PrintErrorFlag = SupressErrors;
         } else {

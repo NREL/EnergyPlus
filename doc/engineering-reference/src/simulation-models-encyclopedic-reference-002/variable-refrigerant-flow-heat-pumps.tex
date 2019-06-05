@@ -895,7 +895,7 @@ These features enhance the simulation accuracy of the VRF system performance in 
 
 Note that a number of calculation steps are coupled together in the VRF-FluidTCtrl model, for instance, the piping loss calculation and the system performance calculation. More specifically, the piping loss changes the operating conditions of the system, which may lead to a different control strategy and thus in reverse affect the amount of piping loss. This makes it difficult to obtain an analytical solution for a number of operational parameters (e.g., enthalpy of refrigerant entering the indoor unit), and therefore numerical iterations are employed to address this problem (refer to Figure VRF-FluidTCtrl-3 for more details). Therefore, the VRF-FluidTCtrl model can have a longer execution time to perform the simulation than the VRF-SysCurve model. 
 
-The object connections for VRF-FluidTCtrl model is similar to those for VRF-SysCurve model. The difference lies in the object used to describe a specific components. For example, VRF-SysCurve model uses \emph{AirConditioner:VariableRefrigerantFlow} object to describe the VRF outdoor unit performance, while in VRF-FluidTCtrl model the \emph{AirConditioner:VariableRefrigerantFlow} object is used.
+The object connections for VRF-FluidTCtrl model is similar to those for VRF-SysCurve model. The difference lies in the object used to describe a specific components. For example, VRF-SysCurve model uses \emph{AirConditioner:VariableRefrigerantFlow} object to describe the VRF outdoor unit performance, while in VRF-FluidTCtrl model the \emph{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl} object is used.
 
 \begin{figure}[hbtp] % figure VRF-FluidTCtrl-1b
 \centering

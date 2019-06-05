@@ -97,6 +97,7 @@
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -128,6 +129,8 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
@@ -180,6 +183,7 @@
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
 #include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/PlantValves.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -336,6 +340,7 @@ void EnergyPlusFixture::clear_all_states()
     DataRoomAirModel::clear_state();
     DataRuntimeLanguage::clear_state();
     DataSizing::clear_state();
+    DataStringGlobals::clear_state();
     DataSurfaceLists::clear_state();
     DataSurfaces::clear_state();
     DataSystemVariables::clear_state();
@@ -372,6 +377,8 @@ void EnergyPlusFixture::clear_all_states()
     HeatBalanceSurfaceManager::clear_state();
     HeatBalFiniteDiffManager::clear_state();
     HeatPumpWaterToWaterSimple::GshpSpecs::clear_state();
+    HeatPumpWaterToWaterCOOLING::clear_state();
+    HeatPumpWaterToWaterHEATING::clear_state();
     HeatRecovery::clear_state();
     HeatingCoils::clear_state();
     HighTempRadiantSystem::clear_state();
@@ -416,6 +423,7 @@ void EnergyPlusFixture::clear_all_states()
     PlantPressureSystem::clear_state();
     PlantUtilities::clear_state();
     PlantPipingSystemsManager::clear_state();
+    PlantValves::clear_state();
     PollutionModule::clear_state();
     PoweredInductionUnits::clear_state();
     Psychrometrics::clear_state();
