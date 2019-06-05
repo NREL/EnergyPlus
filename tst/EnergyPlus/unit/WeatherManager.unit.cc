@@ -75,7 +75,7 @@ TEST_F(EnergyPlusFixture, SkyTempTest)
         "SimulationControl, NO, NO, NO, YES, YES;",
         "Timestep,4;",
         "RunPeriod,",
-        ",                        !- Name",
+        "RP1,                     !- Name",
         "2,                       !- Begin Month",
         "27,                      !- Begin Day of Month",
         ",                        !- Begin Year",
@@ -493,7 +493,7 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
 TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,9.1;",
+        "  Version,9.2;",
 
         "  SizingPeriod:DesignDay,",
         "    Atlanta Jan 21 cooling,  !- Name",

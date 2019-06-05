@@ -5653,7 +5653,7 @@ namespace PlantChillers {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
 
-        static gio::Fmt OutputFormat("(F6.2)");
+        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcElectricChillerModel");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -5863,7 +5863,7 @@ namespace PlantChillers {
             //  Warn user if entering condenser temperature falls below 0C
             if (Node(CondInletNode).Temp < 0.0 && !WarmupFlag) {
                 ElectricChiller(ChillNum).Base.PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 ElectricChiller(ChillNum).Base.MsgBuffer1 = "CalcElectricChillerModel - Chiller:Electric \"" + ElectricChiller(ChillNum).Base.Name +
                                                             "\" - Air Cooled Condenser Inlet Temperature below 0C";
                 ElectricChiller(ChillNum).Base.MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar +
@@ -5880,7 +5880,7 @@ namespace PlantChillers {
             //  Warn user if evap condenser wet bulb temperature falls below 10C
             if (Node(CondInletNode).Temp < 10.0 && !WarmupFlag) {
                 ElectricChiller(ChillNum).Base.PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 ElectricChiller(ChillNum).Base.MsgBuffer1 = "CalcElectricChillerModel - Chiller:Electric \"" + ElectricChiller(ChillNum).Base.Name +
                                                             "\" - Evap Cooled Condenser Inlet Temperature below 10C";
                 ElectricChiller(ChillNum).Base.MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar +
@@ -6367,7 +6367,7 @@ namespace PlantChillers {
         Real64 const ReferenceTemp(25.0); // Reference temperature by which lower heating
         // value is reported.  This should be subtracted
         // off of when calculated exhaust energies.
-        static gio::Fmt OutputFormat("(F6.2)");
+        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcEngineDrivenChillerModel");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -6547,7 +6547,7 @@ namespace PlantChillers {
             //  Warn user if entering condenser temperature falls below 0C
             if (Node(CondInletNode).Temp < 0.0 && !WarmupFlag) {
                 EngineDrivenChiller(ChillerNum).Base.PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 EngineDrivenChiller(ChillerNum).Base.MsgBuffer1 = "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"" +
                                                                   EngineDrivenChiller(ChillerNum).Base.Name +
                                                                   "\" - Air Cooled Condenser Inlet Temperature below 0C";
@@ -6563,7 +6563,7 @@ namespace PlantChillers {
             //  Warn user if evap condenser wet bulb temperature falls below 10C
             if (Node(CondInletNode).Temp < 10.0 && !WarmupFlag) {
                 EngineDrivenChiller(ChillerNum).Base.PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 EngineDrivenChiller(ChillerNum).Base.MsgBuffer1 = "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"" +
                                                                   EngineDrivenChiller(ChillerNum).Base.Name +
                                                                   "\" - Evap Cooled Condenser Inlet Temperature below 10C";
@@ -7139,7 +7139,7 @@ namespace PlantChillers {
         // SUBROUTINE PARAMETER DEFINITIONS:
 
         Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat
-        static gio::Fmt OutputFormat("(F6.2)");
+        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcGTChillerModel");
         static std::string const RoutineNameHeatRecovery("ChillerHeatRecovery");
 
@@ -7313,7 +7313,7 @@ namespace PlantChillers {
             //  Warn user if entering condenser temperature falls below 0C
             if (Node(CondInletNode).Temp < 0.0 && !WarmupFlag) {
                 GTChiller(ChillerNum).Base.PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 GTChiller(ChillerNum).Base.MsgBuffer1 = "CalcGasTurbineChillerModel - Chiller:CombustionTurbine \"" +
                                                         GTChiller(ChillerNum).Base.Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
                 GTChiller(ChillerNum).Base.MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar +
@@ -7328,7 +7328,7 @@ namespace PlantChillers {
             //  Warn user if evap condenser wet bulb temperature falls below 10C
             if (Node(CondInletNode).Temp < 10.0 && !WarmupFlag) {
                 GTChiller(ChillerNum).Base.PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 GTChiller(ChillerNum).Base.MsgBuffer1 = "CalcGasTurbineChillerModel - Chiller:CombustionTurbine \"" +
                                                         GTChiller(ChillerNum).Base.Name + "\" - Evap Cooled Condenser Inlet Temperature below 10C";
                 GTChiller(ChillerNum).Base.MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar +
@@ -7990,7 +7990,7 @@ namespace PlantChillers {
         // SUBROUTINE PARAMETER DEFINITIONS:
 
         Real64 const DeltaTempTol(0.0001); // C - minimum significant mass flow rate
-        static gio::Fmt OutputFormat("(F6.2)");
+        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcConstCOPChillerModel");
 
         // DERIVED TYPE DEFINITIONS
@@ -8178,7 +8178,7 @@ namespace PlantChillers {
             //  Warn user if entering condenser temperature falls below 0C
             if (Node(CondInletNode).Temp < 0.0 && !WarmupFlag) {
                 ConstCOPChiller(ChillNum).Base.PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 ConstCOPChiller(ChillNum).Base.MsgBuffer1 = "CalcConstCOPChillerModel - Chiller:ConstantCOP \"" +
                                                             ConstCOPChiller(ChillNum).Base.Name +
                                                             "\" - Air Cooled Condenser Inlet Temperature below 0C";
@@ -8194,7 +8194,7 @@ namespace PlantChillers {
             //  Warn user if evap condenser wet bulb temperature falls below 10C
             if (Node(CondInletNode).Temp < 10.0 && !WarmupFlag) {
                 ConstCOPChiller(ChillNum).Base.PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 ConstCOPChiller(ChillNum).Base.MsgBuffer1 = "CalcConstCOPChillerModel - Chiller:ConstantCOP \"" +
                                                             ConstCOPChiller(ChillNum).Base.Name +
                                                             "\" - Evap Cooled Condenser Inlet Temperature below 10C";

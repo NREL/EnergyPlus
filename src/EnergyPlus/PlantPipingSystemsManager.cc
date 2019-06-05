@@ -205,9 +205,9 @@ namespace EnergyPlus {
 
             static std::string const RoutineName("InitAndSimGroundDomain");
 
-            static gio::Fmt DomainCellsToEIOHeader(
+            static ObjexxFCL::gio::Fmt DomainCellsToEIOHeader(
                     "('! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells')");
-            static gio::Fmt DomainCellsToEIO("(A,',',I5',',I5',',I5)");
+            static ObjexxFCL::gio::Fmt DomainCellsToEIO("(A,',',I5',',I5',',I5)");
 
             // Read input if necessary
             if (GetInputFlag) {
@@ -323,7 +323,7 @@ namespace EnergyPlus {
                                 // Zone interface cells
                                 if (thisDomain.Cells(X, yMax, Z).cellType == CellType::ZoneGroundInterface) {
                                     thisDomain.WeightingFactor(X, Z) =
-                                            abs((ZoneTemp - thisDomain.Cells(X, yMax, Z).Temperature_PrevTimeStep) /
+                                            std::abs((ZoneTemp - thisDomain.Cells(X, yMax, Z).Temperature_PrevTimeStep) /
                                                 (ZoneTemp - AvgSlabTemp));
                                 }
                             }
@@ -394,11 +394,11 @@ namespace EnergyPlus {
 
             if (WriteEIOFlag) {
                 // Write eio header
-                gio::write(DataGlobals::OutputFileInits, DomainCellsToEIOHeader);
+                ObjexxFCL::gio::write(DataGlobals::OutputFileInits, DomainCellsToEIOHeader);
 
                 // Write eio data
                 for (auto &thisDomain : domains) {
-                    gio::write(DataGlobals::OutputFileInits, DomainCellsToEIO)
+                    ObjexxFCL::gio::write(DataGlobals::OutputFileInits, DomainCellsToEIO)
                             << thisDomain.Name << thisDomain.NumDomainCells << thisDomain.NumGroundSurfCells
                             << thisDomain.NumInsulationCells;
                 }
@@ -1851,7 +1851,7 @@ namespace EnergyPlus {
                 //******* We'll first set up the domain ********
                 // the extents will be: zMax = axial length; yMax = burial depth*2; xMax = ( NumPipes+1 )*HorizontalPipeSpacing
                 thisDomain.IsActuallyPartOfAHorizontalTrench = true;
-                gio::write(thisDomain.Name, "( 'HorizontalTrenchDomain',I4 )") << HorizontalGHXCtr;
+                ObjexxFCL::gio::write(thisDomain.Name, "( 'HorizontalTrenchDomain',I4 )") << HorizontalGHXCtr;
                 thisDomain.Extents.xMax = (double(NumPipeSegments) + 1.0) * thisInterPipeSpacing;
                 thisDomain.Extents.yMax = 2.0 * thisBurialDepth;
                 thisDomain.Extents.zMax = DataIPShortCuts::rNumericArgs(2);

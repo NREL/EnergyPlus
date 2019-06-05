@@ -2804,7 +2804,7 @@ namespace SimAirServingZones {
         // SUBROUTINE PARAMETER DEFINITIONS:
         // Maximum iterations of an air system/controllers simulation sequence
         int const MaxIter(50);
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK DEFINITIONS: None
 
@@ -2927,7 +2927,7 @@ namespace SimAirServingZones {
                             ++ErrCount;
                             if (ErrCount < 15) {
                                 ErrEnvironmentName = EnvironmentName;
-                                gio::write(CharErrOut, fmtLD) << MaxIter;
+                                ObjexxFCL::gio::write(CharErrOut, fmtLD) << MaxIter;
                                 strip(CharErrOut);
                                 ShowWarningError("SolveAirLoopControllers: Maximum iterations (" + CharErrOut + ") exceeded for " +
                                                  PrimaryAirSystem(AirLoopNum).Name + ", at " + EnvironmentName + ", " + CurMnDy + ' ' +
@@ -3046,7 +3046,7 @@ namespace SimAirServingZones {
         // SUBROUTINE PARAMETER DEFINITIONS:
         // Maximum iterations of an air system/controllers simulation sequence
         int const MaxIter(50);
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DEFINITIONS
         // TRUE if controller supports speculative warm restart
@@ -3139,7 +3139,7 @@ namespace SimAirServingZones {
                         ++ErrCount;
                         if (ErrCount < 15) {
                             ErrEnvironmentName = EnvironmentName;
-                            gio::write(CharErrOut, fmtLD) << MaxIter;
+                            ObjexxFCL::gio::write(CharErrOut, fmtLD) << MaxIter;
                             strip(CharErrOut);
                             ShowWarningError("SolveAirLoopControllers: Maximum iterations (" + CharErrOut + ") exceeded for " +
                                              PrimaryAirSystem(AirLoopNum).Name + ":" + ControllerName + ", at " + EnvironmentName + ", " + CurMnDy +
@@ -5147,17 +5147,17 @@ namespace SimAirServingZones {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
-        static gio::Fmt SSizeFmt10("('Time')");
-        static gio::Fmt SSizeFmt11("(A1,A,A,A1,A,A,A1,A,A,A1,A,A)");
-        static gio::Fmt SSizeFmt12("(A1,A,A,I2,A,A1,A,A,I2,A,A1,A,A,I2,A,A1,A,A,I2,A,A1,A,A,I2,A)");
-        static gio::Fmt SSizeFmt20("(I2.2,':',I2.2,':00')");
-        static gio::Fmt SSizeFmt21("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)");
-        static gio::Fmt SSizeFmt22("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)");
-        static gio::Fmt SSizeFmt30("('Coinc Peak   ')");
-        static gio::Fmt SSizeFmt31("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)");
-        static gio::Fmt SSizeFmt40("('NonCoinc Peak')");
-        static gio::Fmt SSizeFmt41("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6 )");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt SSizeFmt10("('Time')");
+        static ObjexxFCL::gio::Fmt SSizeFmt11("(A1,A,A,A1,A,A,A1,A,A,A1,A,A)");
+        static ObjexxFCL::gio::Fmt SSizeFmt12("(A1,A,A,I2,A,A1,A,A,I2,A,A1,A,A,I2,A,A1,A,A,I2,A,A1,A,A,I2,A)");
+        static ObjexxFCL::gio::Fmt SSizeFmt20("(I2.2,':',I2.2,':00')");
+        static ObjexxFCL::gio::Fmt SSizeFmt21("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)");
+        static ObjexxFCL::gio::Fmt SSizeFmt22("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)");
+        static ObjexxFCL::gio::Fmt SSizeFmt30("('Coinc Peak   ')");
+        static ObjexxFCL::gio::Fmt SSizeFmt31("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)");
+        static ObjexxFCL::gio::Fmt SSizeFmt40("('NonCoinc Peak')");
+        static ObjexxFCL::gio::Fmt SSizeFmt41("(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6 )");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -6991,10 +6991,10 @@ namespace SimAirServingZones {
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileSysSizing, SSizeFmt10, flags);
+                    ObjexxFCL::gio::write(OutputFileSysSizing, SSizeFmt10, flags);
                 }
                 // for ( I = 1; I <= NumPrimaryAirSys; ++I ) {
-                // 	{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileSysSizing, SSizeFmt11, flags ) << SizingFileColSep <<
+                // 	{ IOFlags flags; flags.ADVANCE( "No" ); ObjexxFCL::gio::write( OutputFileSysSizing, SSizeFmt11, flags ) << SizingFileColSep <<
                 // CalcSysSizing( I ).AirPriLoopName << ":Des Heat Mass Flow [kg/s]" << SizingFileColSep << CalcSysSizing( I ).AirPriLoopName << ":Des
                 // Cool Mass Flow [kg/s]" << SizingFileColSep << CalcSysSizing( I ).AirPriLoopName << ":Des Heat Cap [W]" << SizingFileColSep <<
                 // CalcSysSizing( I ).AirPriLoopName << ":Des Sens Cool Cap [W]"; }
@@ -7004,7 +7004,7 @@ namespace SimAirServingZones {
                         {
                             IOFlags flags;
                             flags.ADVANCE("No");
-                            gio::write(OutputFileSysSizing, SSizeFmt12, flags)
+                            ObjexxFCL::gio::write(OutputFileSysSizing, SSizeFmt12, flags)
                                 << SizingFileColSep << CalcSysSizing(I).AirPriLoopName << ":DesPer" << J << ":Des Heat Mass Flow [kg/s]"
                                 << SizingFileColSep << CalcSysSizing(I).AirPriLoopName << ":DesPer" << J << ":Des Heat Cap [W]" << SizingFileColSep
                                 << CalcSysSizing(I).AirPriLoopName << ":DesPer" << J << ":Des Cool Mass Flow [kg/s]" << SizingFileColSep
@@ -7013,7 +7013,7 @@ namespace SimAirServingZones {
                         }
                     }
                 }
-                gio::write(OutputFileSysSizing);
+                ObjexxFCL::gio::write(OutputFileSysSizing);
                 //      HourFrac = 0.0
                 Minutes = 0;
                 TimeStepIndex = 0;
@@ -7030,14 +7030,14 @@ namespace SimAirServingZones {
                         {
                             IOFlags flags;
                             flags.ADVANCE("No");
-                            gio::write(OutputFileSysSizing, SSizeFmt20, flags) << HourPrint << Minutes;
+                            ObjexxFCL::gio::write(OutputFileSysSizing, SSizeFmt20, flags) << HourPrint << Minutes;
                         }
                         for (I = 1; I <= NumPrimaryAirSys; ++I) {
                             for (J = 1; J <= TotDesDays + TotRunDesPersDays; ++J) {
                                 {
                                     IOFlags flags;
                                     flags.ADVANCE("No");
-                                    gio::write(OutputFileSysSizing, SSizeFmt22, flags)
+                                    ObjexxFCL::gio::write(OutputFileSysSizing, SSizeFmt22, flags)
                                         << SizingFileColSep << SysSizing(J, I).HeatFlowSeq(TimeStepIndex) << SizingFileColSep
                                         << SysSizing(J, I).HeatCapSeq(TimeStepIndex) << SizingFileColSep << SysSizing(J, I).CoolFlowSeq(TimeStepIndex)
                                         << SizingFileColSep << SysSizing(J, I).SensCoolCapSeq(TimeStepIndex) << SizingFileColSep
@@ -7045,39 +7045,39 @@ namespace SimAirServingZones {
                                 }
                             }
                         }
-                        gio::write(OutputFileSysSizing);
+                        ObjexxFCL::gio::write(OutputFileSysSizing);
                     }
                 }
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileSysSizing, SSizeFmt30, flags);
+                    ObjexxFCL::gio::write(OutputFileSysSizing, SSizeFmt30, flags);
                 }
                 for (I = 1; I <= NumPrimaryAirSys; ++I) {
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(OutputFileSysSizing, SSizeFmt31, flags)
+                        ObjexxFCL::gio::write(OutputFileSysSizing, SSizeFmt31, flags)
                             << SizingFileColSep << CalcSysSizing(I).CoinHeatMassFlow << SizingFileColSep << CalcSysSizing(I).CoinCoolMassFlow
                             << SizingFileColSep << CalcSysSizing(I).HeatCap << SizingFileColSep << CalcSysSizing(I).SensCoolCap;
                     }
                 }
-                gio::write(OutputFileSysSizing);
+                ObjexxFCL::gio::write(OutputFileSysSizing);
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileSysSizing, SSizeFmt40, flags);
+                    ObjexxFCL::gio::write(OutputFileSysSizing, SSizeFmt40, flags);
                 }
                 for (I = 1; I <= NumPrimaryAirSys; ++I) {
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(OutputFileSysSizing, SSizeFmt41, flags)
+                        ObjexxFCL::gio::write(OutputFileSysSizing, SSizeFmt41, flags)
                             << SizingFileColSep << CalcSysSizing(I).NonCoinHeatMassFlow << SizingFileColSep << CalcSysSizing(I).NonCoinCoolMassFlow
                             << SizingFileColSep << CalcSysSizing(I).HeatCap << SizingFileColSep << CalcSysSizing(I).SensCoolCap;
                     }
                 }
-                gio::write(OutputFileSysSizing);
+                ObjexxFCL::gio::write(OutputFileSysSizing);
 
                 // have moved a big section to later in calling order, write predefined standard 62.1 report data
             }

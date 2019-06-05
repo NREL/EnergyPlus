@@ -2240,7 +2240,7 @@ namespace HVACDXSystem {
                                 SpeedRatio = 0.0;
                                 SolveRoot(Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
                                 if (SolFla == -1) {
-                                    if (!WarmupFlag && abs(Node(OutletNode).Temp - DesOutTemp) > Acc) {
+                                    if (!WarmupFlag && std::abs(Node(OutletNode).Temp - DesOutTemp) > Acc) {
                                         if (DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
                                             ++DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter;
                                             ShowWarningError(DXCoolingSystem(DXSystemNum).DXCoolingSystemType +
@@ -2327,7 +2327,7 @@ namespace HVACDXSystem {
                                         CycRatio = PartLoadFrac;
                                     }
                                     if (SolFla == -1) {
-                                        if (!WarmupFlag && abs(Node(OutletNode).Temp - DesOutTemp) > Acc) {
+                                        if (!WarmupFlag && std::abs(Node(OutletNode).Temp - DesOutTemp) > Acc) {
                                             if (DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
                                                 ++DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter;
                                                 ShowWarningError(
@@ -2451,7 +2451,7 @@ namespace HVACDXSystem {
                                         }
 
                                         if (SolFla == -1) {
-                                            if (!WarmupFlag && abs(Node(OutletNode).HumRat - DesOutHumRat) > (Acc / 100.0)) {
+                                            if (!WarmupFlag && std::abs(Node(OutletNode).HumRat - DesOutHumRat) > (Acc / 100.0)) {
                                                 if (DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
                                                     ++DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter;
                                                     ShowWarningError(
@@ -2507,7 +2507,7 @@ namespace HVACDXSystem {
                                         CycRatio = PartLoadFrac;
                                     }
                                     if (SolFla == -1) {
-                                        if (!WarmupFlag && abs(Node(OutletNode).HumRat - DesOutHumRat) > (Acc / 100.0)) {
+                                        if (!WarmupFlag && std::abs(Node(OutletNode).HumRat - DesOutHumRat) > (Acc / 100.0)) {
                                             if (DXCoolingSystem(DXSystemNum).DXCoilLatPLRIter < 1) {
                                                 ++DXCoolingSystem(DXSystemNum).DXCoilLatPLRIter;
                                                 ShowWarningError(

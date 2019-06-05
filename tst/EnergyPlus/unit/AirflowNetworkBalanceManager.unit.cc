@@ -3016,7 +3016,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.1;",
+        "  Version,9.2;",
 
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
@@ -3115,7 +3115,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
         "    0.0;                     !- Sky Clearness",
 
         "  RunPeriod,",
-        "    ,                        !- Name",
+        "    RP1,                     !- Name",
         "    1,                       !- Begin Month",
         "    1,                       !- Begin Day of Month",
         "    ,                        !- Begin Year",
@@ -8128,7 +8128,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricCurve)
 TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,9.1;",
+        {"Version,9.2;",
          "Material,",
          "  A1 - 1 IN STUCCO,        !- Name",
          "  Smooth,                  !- Roughness",
@@ -8820,7 +8820,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,9.1;",
+        {"Version,9.2;",
          "SimulationControl,",
          "  No,                      !- Do Zone Sizing Calculation",
          "  No,                      !- Do System Sizing Calculation",
@@ -12866,7 +12866,7 @@ TEST_F(EnergyPlusFixture, AFN_CheckNumOfFansInAirLoopTest)
 TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
 {
     std::string const idf_objects = delimited_string(
-        { "Version,9.1;",
+        { "Version,9.2;",
         "SimulationControl,",
         "  No,                      !- Do Zone Sizing Calculation",
         "  No,                      !- Do System Sizing Calculation",

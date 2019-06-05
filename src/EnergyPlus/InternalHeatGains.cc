@@ -260,7 +260,7 @@ namespace InternalHeatGains {
         using NodeInputManager::GetOnlySingleNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
         static std::string const RoutineName("GetInternalHeatGains: ");
         int const noOtherFuelTypeZero = 0;
 
@@ -304,14 +304,14 @@ namespace InternalHeatGains {
         int Item1;
 
         // Formats
-        static gio::Fmt Format_720("(' Zone Internal Gains Nominal, ',A,',',A,',',A,',')");
-        static gio::Fmt Format_721("('! <Zone Internal Gains Nominal>,Zone Name, Floor Area {m2},# Occupants,','Area per Occupant "
+        static ObjexxFCL::gio::Fmt Format_720("(' Zone Internal Gains Nominal, ',A,',',A,',',A,',')");
+        static ObjexxFCL::gio::Fmt Format_721("('! <Zone Internal Gains Nominal>,Zone Name, Floor Area {m2},# Occupants,','Area per Occupant "
                                    "{m2/person},Occupant per Area {person/m2},Interior Lighting {W/m2},','Electric Load {W/m2},Gas Load {W/m2},Other "
                                    "Load {W/m2},Hot Water Eq {W/m2},','Steam Equipment {W/m2},Sum Loads per Area {W/m2},Outdoor Controlled Baseboard "
                                    "Heat')");
-        static gio::Fmt Format_722("(' ',A,' Internal Gains Nominal, ',A,',',A,',',A,',',A,',',A,',')");
-        static gio::Fmt Format_723("('! <',A,' Internal Gains Nominal>,Name,Schedule Name,Zone Name,Zone Floor Area {m2},# Zone Occupants,',A)");
-        static gio::Fmt Format_724("(' ',A,', ',A)");
+        static ObjexxFCL::gio::Fmt Format_722("(' ',A,' Internal Gains Nominal, ',A,',',A,',',A,',',A,',',A,',')");
+        static ObjexxFCL::gio::Fmt Format_723("('! <',A,' Internal Gains Nominal>,Name,Schedule Name,Zone Name,Zone Floor Area {m2},# Zone Occupants,',A)");
+        static ObjexxFCL::gio::Fmt Format_724("(' ',A,', ',A)");
 
         // FLOW:
         ZoneIntGain.allocate(NumOfZones);
@@ -707,8 +707,24 @@ namespace InternalHeatGains {
                         MustInpSch = false;
                         UsingThermalComfort = false;
                         lastOption = NumAlpha;
+                        
+                        // check to see if the user has specified schedules for air velocity, clothing insulation, and/or work efficiency
+                        // but have NOT made a selection for a thermal comfort model.  If so, then the schedules are reported as unused
+                        // which could cause confusion.  The solution is for the user to either remove those schedules or pick a thermal
+                        // comfort model.
+                        int const NumFirstTCModel = 14;
+                        if (NumAlpha < NumFirstTCModel) {
+                            bool NoTCModelSelectedWithSchedules = false;
+                            NoTCModelSelectedWithSchedules = CheckThermalComfortSchedules(lAlphaFieldBlanks(9),lAlphaFieldBlanks(12),lAlphaFieldBlanks(13));
+                            if (NoTCModelSelectedWithSchedules) {
+                                ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\" has comfort related schedules but no thermal comfort model selected.");
+                                ShowContinueError("If schedules are specified for air velocity, clothing insulation, and/or work efficiency but no thermal comfort");
+                                ShowContinueError("thermal comfort model is selected, the schedules will be listed as unused schedules in the .err file.");
+                                ShowContinueError("To avoid these errors, select a valid thermal comfort model or eliminate these schedules in the PEOPLE input.");
+                            }
+                        }
 
-                        for (OptionNum = 14; OptionNum <= lastOption; ++OptionNum) {
+                        for (OptionNum = NumFirstTCModel; OptionNum <= lastOption; ++OptionNum) {
 
                             {
                                 auto const thermalComfortType(AlphaName(OptionNum));
@@ -4608,7 +4624,7 @@ namespace InternalHeatGains {
             ShowFatalError(RoutineName + "Errors found in Getting Internal Gains Input, Program Stopped");
         }
 
-        gio::write(OutputFileInits, Format_721);
+        ObjexxFCL::gio::write(OutputFileInits, Format_721);
         for (Loop = 1; Loop <= NumOfZones; ++Loop) {
             LightTot = 0.0;
             ElecTot = 0.0;
@@ -4654,7 +4670,7 @@ namespace InternalHeatGains {
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, Format_720, flags)
+                    ObjexxFCL::gio::write(OutputFileInits, Format_720, flags)
                         << Zone(Loop).Name << RoundSigDigits(Zone(Loop).FloorArea, 2) << RoundSigDigits(Zone(Loop).TotOccupants, 1);
                 }
                 if (Zone(Loop).TotOccupants > 0.0) {
@@ -4665,67 +4681,67 @@ namespace InternalHeatGains {
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
                 }
                 StringOut = RoundSigDigits(Zone(Loop).TotOccupants / Zone(Loop).FloorArea, 3);
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
                 }
                 StringOut = RoundSigDigits(LightTot / Zone(Loop).FloorArea, 3);
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
                 }
                 StringOut = RoundSigDigits(ElecTot / Zone(Loop).FloorArea, 3);
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
                 }
                 StringOut = RoundSigDigits(GasTot / Zone(Loop).FloorArea, 3);
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
                 }
                 StringOut = RoundSigDigits(OthTot / Zone(Loop).FloorArea, 3);
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
                 }
                 StringOut = RoundSigDigits(HWETot / Zone(Loop).FloorArea, 3);
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
                 }
                 StringOut = RoundSigDigits(StmTot / Zone(Loop).FloorArea, 3);
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
                 }
                 StringOut = RoundSigDigits(Zone(Loop).InternalHeatGains / Zone(Loop).FloorArea, 3);
-                gio::write(OutputFileInits, fmtA) << StringOut + ',' + BBHeatInd;
+                ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut + ',' + BBHeatInd;
             } else {
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, Format_720, flags)
+                    ObjexxFCL::gio::write(OutputFileInits, Format_720, flags)
                         << Zone(Loop).Name << RoundSigDigits(Zone(Loop).FloorArea, 2) << RoundSigDigits(Zone(Loop).TotOccupants, 1);
                 }
-                gio::write(OutputFileInits, fmtA) << "0.0,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A" + BBHeatInd;
+                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "0.0,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A" + BBHeatInd;
             }
         }
         for (Loop = 1; Loop <= TotPeople; ++Loop) {
             if (Loop == 1) {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_723, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_723, flags)
                     << "People"
                     << "Number of People {},People/Floor Area {person/m2},Floor Area per person {m2/person},Fraction Radiant,Fraction "
                        "Convected,Sensible Fraction Calculation,Activity level,ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,Nominal Minimum "
@@ -4733,32 +4749,32 @@ namespace InternalHeatGains {
             };
             if (Loop == 1) {
                 if (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU) {
-                    gio::write(OutputFileInits, fmtA) << ",MRT Calculation Type,Work Efficiency, Clothing Insulation Calculation Method,Clothing "
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << ",MRT Calculation Type,Work Efficiency, Clothing Insulation Calculation Method,Clothing "
                                                          "Insulation Calculation Method Schedule,Clothing,Air Velocity,Fanger Calculation,Pierce "
                                                          "Calculation,KSU Calculation";
                 } else {
-                    gio::write(OutputFileInits);
+                    ObjexxFCL::gio::write(OutputFileInits);
                 }
             }
 
             ZoneNum = People(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                gio::write(OutputFileInits, Format_724) << "People-Illegal Zone specified" << People(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "People-Illegal Zone specified" << People(Loop).Name;
                 continue;
             }
 
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_722, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
                     << "People" << People(Loop).Name << GetScheduleName(People(Loop).NumberOfPeoplePtr) << Zone(ZoneNum).Name
                     << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
             }
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(People(Loop).NumberOfPeople, 1) + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(People(Loop).NumberOfPeople, 1) + ',';
             }
             if (Zone(ZoneNum).FloorArea > 0.0) {
                 StringOut = RoundSigDigits(People(Loop).NumberOfPeople / Zone(ZoneNum).FloorArea, 3);
@@ -4768,7 +4784,7 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (People(Loop).NumberOfPeople > 0.0) {
                 if (Zone(ZoneNum).FloorArea > 0.0) {
@@ -4782,19 +4798,19 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(People(Loop).FractionRadiant, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(People(Loop).FractionConvected, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (People(Loop).UserSpecSensFrac == AutoCalculate) {
                 StringOut = "AutoCalculate";
@@ -4804,13 +4820,13 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = GetScheduleName(People(Loop).ActivityLevelPtr);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (People(Loop).Show55Warning) {
                 StringOut = "Yes";
@@ -4820,26 +4836,26 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(People(Loop).CO2RateFactor, 4);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(People(Loop).NomMinNumberPeople, 0);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(People(Loop).NomMaxNumberPeople, 0);
             if (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU) {
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
                 }
                 if (People(Loop).MRTCalcType == ZoneAveraged) {
                     StringOut = "Zone Averaged";
@@ -4853,12 +4869,12 @@ namespace InternalHeatGains {
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
                 }
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << GetScheduleName(People(Loop).WorkEffPtr) + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << GetScheduleName(People(Loop).WorkEffPtr) + ',';
                 }
 
                 if (People(Loop).ClothingType == 1) {
@@ -4873,7 +4889,7 @@ namespace InternalHeatGains {
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
                 }
 
                 if (People(Loop).ClothingType == 3) {
@@ -4884,18 +4900,18 @@ namespace InternalHeatGains {
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
                 }
 
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << GetScheduleName(People(Loop).ClothingPtr) + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << GetScheduleName(People(Loop).ClothingPtr) + ',';
                 }
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << GetScheduleName(People(Loop).AirVelocityPtr) + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << GetScheduleName(People(Loop).AirVelocityPtr) + ',';
                 }
                 if (People(Loop).Fanger) {
                     StringOut = "Yes";
@@ -4905,7 +4921,7 @@ namespace InternalHeatGains {
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
                 }
                 if (People(Loop).Pierce) {
                     StringOut = "Yes";
@@ -4915,21 +4931,21 @@ namespace InternalHeatGains {
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
                 }
                 if (People(Loop).KSU) {
                     StringOut = "Yes";
                 } else {
                     StringOut = "No";
                 }
-                gio::write(OutputFileInits, fmtA) << StringOut;
+                ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
             } else {
-                gio::write(OutputFileInits, fmtA) << StringOut;
+                ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
             }
         }
         for (Loop = 1; Loop <= TotLights; ++Loop) {
             if (Loop == 1)
-                gio::write(OutputFileInits, Format_723) << "Lights"
+                ObjexxFCL::gio::write(OutputFileInits, Format_723) << "Lights"
                                                         << "Lighting Level {W},Lights/Floor Area {W/m2},Lights per person {W/person},Fraction Return "
                                                            "Air,Fraction Radiant,Fraction Short Wave,Fraction Convected,Fraction Replaceable,End-Use "
                                                            "Category,Nominal Minimum Lighting Level {W},Nominal Maximum Lighting Level {W}";
@@ -4937,14 +4953,14 @@ namespace InternalHeatGains {
             ZoneNum = Lights(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                gio::write(OutputFileInits, Format_724) << "Lights-Illegal Zone specified" << Lights(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "Lights-Illegal Zone specified" << Lights(Loop).Name;
                 continue;
             }
 
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_722, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
                     << "Lights" << Lights(Loop).Name << GetScheduleName(Lights(Loop).SchedPtr) << Zone(ZoneNum).Name
                     << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
             }
@@ -4952,7 +4968,7 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(Lights(Loop).DesignLevel, 3) + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(Lights(Loop).DesignLevel, 3) + ',';
             }
             if (Zone(ZoneNum).FloorArea > 0.0) {
                 StringOut = RoundSigDigits(Lights(Loop).DesignLevel / Zone(ZoneNum).FloorArea, 3);
@@ -4962,7 +4978,7 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).TotOccupants > 0.0) {
                 StringOut = RoundSigDigits(Lights(Loop).DesignLevel / Zone(ZoneNum).TotOccupants, 3);
@@ -4972,55 +4988,55 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Lights(Loop).FractionReturnAir, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Lights(Loop).FractionRadiant, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Lights(Loop).FractionShortWave, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Lights(Loop).FractionConvected, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Lights(Loop).FractionReplaceable, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << Lights(Loop).EndUseSubcategory + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << Lights(Loop).EndUseSubcategory + ',';
             }
             StringOut = RoundSigDigits(Lights(Loop).NomMinDesignLevel, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Lights(Loop).NomMaxDesignLevel, 3);
-            gio::write(OutputFileInits, fmtA) << StringOut;
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
         }
         for (Loop = 1; Loop <= TotElecEquip; ++Loop) {
             if (Loop == 1)
-                gio::write(OutputFileInits, Format_723)
+                ObjexxFCL::gio::write(OutputFileInits, Format_723)
                     << "ElectricEquipment"
                     << "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
                        "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
@@ -5028,14 +5044,14 @@ namespace InternalHeatGains {
             ZoneNum = ZoneElectric(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                gio::write(OutputFileInits, Format_724) << "Electric Equipment-Illegal Zone specified" << ZoneElectric(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "Electric Equipment-Illegal Zone specified" << ZoneElectric(Loop).Name;
                 continue;
             }
 
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_722, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
                     << "ElectricEquipment" << ZoneElectric(Loop).Name << GetScheduleName(ZoneElectric(Loop).SchedPtr) << Zone(ZoneNum).Name
                     << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
             }
@@ -5043,7 +5059,7 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneElectric(Loop).DesignLevel, 3) + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneElectric(Loop).DesignLevel, 3) + ',';
             }
             if (Zone(ZoneNum).FloorArea > 0.0) {
                 StringOut = RoundSigDigits(ZoneElectric(Loop).DesignLevel / Zone(ZoneNum).FloorArea, 3);
@@ -5053,7 +5069,7 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).TotOccupants > 0.0) {
                 StringOut = RoundSigDigits(ZoneElectric(Loop).DesignLevel / Zone(ZoneNum).TotOccupants, 3);
@@ -5063,49 +5079,49 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneElectric(Loop).FractionLatent, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneElectric(Loop).FractionRadiant, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneElectric(Loop).FractionLost, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneElectric(Loop).FractionConvected, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << ZoneElectric(Loop).EndUseSubcategory + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << ZoneElectric(Loop).EndUseSubcategory + ',';
             }
             StringOut = RoundSigDigits(ZoneElectric(Loop).NomMinDesignLevel, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneElectric(Loop).NomMaxDesignLevel, 3);
-            gio::write(OutputFileInits, fmtA) << StringOut;
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
         }
         for (Loop = 1; Loop <= TotGasEquip; ++Loop) {
             if (Loop == 1)
-                gio::write(OutputFileInits, Format_723)
+                ObjexxFCL::gio::write(OutputFileInits, Format_723)
                     << "GasEquipment"
                     << "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
                        "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
@@ -5113,14 +5129,14 @@ namespace InternalHeatGains {
             ZoneNum = ZoneGas(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                gio::write(OutputFileInits, Format_724) << "Gas Equipment-Illegal Zone specified" << ZoneGas(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "Gas Equipment-Illegal Zone specified" << ZoneGas(Loop).Name;
                 continue;
             }
 
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_722, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
                     << "GasEquipment" << ZoneGas(Loop).Name << GetScheduleName(ZoneGas(Loop).SchedPtr) << Zone(ZoneNum).Name
                     << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
             }
@@ -5128,7 +5144,7 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneGas(Loop).DesignLevel, 3) + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneGas(Loop).DesignLevel, 3) + ',';
             }
 
             if (Zone(ZoneNum).FloorArea > 0.0) {
@@ -5139,7 +5155,7 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).TotOccupants > 0.0) {
                 StringOut = RoundSigDigits(ZoneGas(Loop).DesignLevel / Zone(ZoneNum).TotOccupants, 3);
@@ -5149,50 +5165,50 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneGas(Loop).FractionLatent, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneGas(Loop).FractionRadiant, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneGas(Loop).FractionLost, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneGas(Loop).FractionConvected, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << ZoneGas(Loop).EndUseSubcategory + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << ZoneGas(Loop).EndUseSubcategory + ',';
             }
             StringOut = RoundSigDigits(ZoneGas(Loop).NomMinDesignLevel, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneGas(Loop).NomMaxDesignLevel, 3);
-            gio::write(OutputFileInits, fmtA) << StringOut;
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
         }
 
         for (Loop = 1; Loop <= TotHWEquip; ++Loop) {
             if (Loop == 1)
-                gio::write(OutputFileInits, Format_723)
+                ObjexxFCL::gio::write(OutputFileInits, Format_723)
                     << "HotWaterEquipment"
                     << "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
                        "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
@@ -5200,14 +5216,14 @@ namespace InternalHeatGains {
             ZoneNum = ZoneHWEq(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                gio::write(OutputFileInits, Format_724) << "Hot Water Equipment-Illegal Zone specified" << ZoneHWEq(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "Hot Water Equipment-Illegal Zone specified" << ZoneHWEq(Loop).Name;
                 continue;
             }
 
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_722, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
                     << "HotWaterEquipment" << ZoneHWEq(Loop).Name << GetScheduleName(ZoneHWEq(Loop).SchedPtr) << Zone(ZoneNum).Name
                     << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
             }
@@ -5215,7 +5231,7 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneHWEq(Loop).DesignLevel, 3) + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneHWEq(Loop).DesignLevel, 3) + ',';
             }
 
             if (Zone(ZoneNum).FloorArea > 0.0) {
@@ -5226,7 +5242,7 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).TotOccupants > 0.0) {
                 StringOut = RoundSigDigits(ZoneHWEq(Loop).DesignLevel / Zone(ZoneNum).TotOccupants, 3);
@@ -5236,50 +5252,50 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneHWEq(Loop).FractionLatent, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneHWEq(Loop).FractionRadiant, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneHWEq(Loop).FractionLost, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneHWEq(Loop).FractionConvected, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << ZoneHWEq(Loop).EndUseSubcategory + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << ZoneHWEq(Loop).EndUseSubcategory + ',';
             }
             StringOut = RoundSigDigits(ZoneHWEq(Loop).NomMinDesignLevel, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneHWEq(Loop).NomMaxDesignLevel, 3);
-            gio::write(OutputFileInits, fmtA) << StringOut;
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
         }
 
         for (Loop = 1; Loop <= TotStmEquip; ++Loop) {
             if (Loop == 1)
-                gio::write(OutputFileInits, Format_723)
+                ObjexxFCL::gio::write(OutputFileInits, Format_723)
                     << "SteamEquipment"
                     << "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
                        "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
@@ -5287,14 +5303,14 @@ namespace InternalHeatGains {
             ZoneNum = ZoneSteamEq(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                gio::write(OutputFileInits, Format_724) << "Steam Equipment-Illegal Zone specified" << ZoneSteamEq(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "Steam Equipment-Illegal Zone specified" << ZoneSteamEq(Loop).Name;
                 continue;
             }
 
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_722, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
                     << "SteamEquipment" << ZoneSteamEq(Loop).Name << GetScheduleName(ZoneSteamEq(Loop).SchedPtr) << Zone(ZoneNum).Name
                     << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
             }
@@ -5302,7 +5318,7 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneSteamEq(Loop).DesignLevel, 3) + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneSteamEq(Loop).DesignLevel, 3) + ',';
             }
 
             if (Zone(ZoneNum).FloorArea > 0.0) {
@@ -5313,7 +5329,7 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).TotOccupants > 0.0) {
                 StringOut = RoundSigDigits(ZoneSteamEq(Loop).DesignLevel / Zone(ZoneNum).TotOccupants, 3);
@@ -5323,64 +5339,64 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneSteamEq(Loop).FractionLatent, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneSteamEq(Loop).FractionRadiant, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneSteamEq(Loop).FractionLost, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneSteamEq(Loop).FractionConvected, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << ZoneSteamEq(Loop).EndUseSubcategory + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << ZoneSteamEq(Loop).EndUseSubcategory + ',';
             }
             StringOut = RoundSigDigits(ZoneSteamEq(Loop).NomMinDesignLevel, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneSteamEq(Loop).NomMaxDesignLevel, 3);
-            gio::write(OutputFileInits, fmtA) << StringOut;
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
         }
 
         for (Loop = 1; Loop <= TotOthEquip; ++Loop) {
             if (Loop == 1)
-                gio::write(OutputFileInits, Format_723)
+                ObjexxFCL::gio::write(OutputFileInits, Format_723)
                     << "OtherEquipment"
                     << "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
                        "Lost,Fraction Convected,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
             ZoneNum = ZoneOtherEq(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                gio::write(OutputFileInits, Format_724) << "Other Equipment-Illegal Zone specified" << ZoneOtherEq(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "Other Equipment-Illegal Zone specified" << ZoneOtherEq(Loop).Name;
                 continue;
             }
 
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_722, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
                     << "OtherEquipment" << ZoneOtherEq(Loop).Name << GetScheduleName(ZoneOtherEq(Loop).SchedPtr) << Zone(ZoneNum).Name
                     << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
             }
@@ -5388,7 +5404,7 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneOtherEq(Loop).DesignLevel, 3) + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneOtherEq(Loop).DesignLevel, 3) + ',';
             }
 
             if (Zone(ZoneNum).FloorArea > 0.0) {
@@ -5399,7 +5415,7 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).TotOccupants > 0.0) {
                 StringOut = RoundSigDigits(ZoneOtherEq(Loop).DesignLevel / Zone(ZoneNum).TotOccupants, 3);
@@ -5409,45 +5425,45 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneOtherEq(Loop).FractionLatent, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneOtherEq(Loop).FractionRadiant, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneOtherEq(Loop).FractionLost, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneOtherEq(Loop).FractionConvected, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneOtherEq(Loop).NomMinDesignLevel, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneOtherEq(Loop).NomMaxDesignLevel, 3);
-            gio::write(OutputFileInits, fmtA) << StringOut;
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
         }
 
         for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
             if (Loop == 1)
-                gio::write(OutputFileInits, Format_723)
+                ObjexxFCL::gio::write(OutputFileInits, Format_723)
                     << "ElectricEquipment:ITE:AirCooled"
                     << "Equipment Level {W},"
                        "Equipment/Floor Area {W/m2},Equipment per person {W/person},"
@@ -5457,14 +5473,14 @@ namespace InternalHeatGains {
             ZoneNum = ZoneITEq(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                gio::write(OutputFileInits, Format_724) << "ElectricEquipment:ITE:AirCooled-Illegal Zone specified" << ZoneITEq(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "ElectricEquipment:ITE:AirCooled-Illegal Zone specified" << ZoneITEq(Loop).Name;
                 continue;
             }
 
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_722, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
                     << "ElectricEquipment:ITE:AirCooled" << ZoneITEq(Loop).Name << GetScheduleName(ZoneITEq(Loop).OperSchedPtr) << Zone(ZoneNum).Name
                     << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
             }
@@ -5472,7 +5488,7 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneITEq(Loop).DesignTotalPower, 3) + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(ZoneITEq(Loop).DesignTotalPower, 3) + ',';
             }
             if (Zone(ZoneNum).FloorArea > 0.0) {
                 StringOut = RoundSigDigits(ZoneITEq(Loop).DesignTotalPower / Zone(ZoneNum).FloorArea, 3);
@@ -5482,7 +5498,7 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).TotOccupants > 0.0) {
                 StringOut = RoundSigDigits(ZoneITEq(Loop).DesignTotalPower / Zone(ZoneNum).TotOccupants, 3);
@@ -5493,56 +5509,56 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << ZoneITEq(Loop).EndUseSubcategoryCPU + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << ZoneITEq(Loop).EndUseSubcategoryCPU + ',';
             }
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << ZoneITEq(Loop).EndUseSubcategoryFan + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << ZoneITEq(Loop).EndUseSubcategoryFan + ',';
             }
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << ZoneITEq(Loop).EndUseSubcategoryUPS + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << ZoneITEq(Loop).EndUseSubcategoryUPS + ',';
             }
             StringOut = RoundSigDigits(ZoneITEq(Loop).NomMinDesignLevel, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneITEq(Loop).NomMaxDesignLevel, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneITEq(Loop).DesignAirVolFlowRate, 10);
-            gio::write(OutputFileInits, fmtA) << StringOut;
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
         }
 
         for (Loop = 1; Loop <= TotBBHeat; ++Loop) {
             if (Loop == 1)
-                gio::write(OutputFileInits, Format_723) << "Outdoor Controlled Baseboard Heat"
+                ObjexxFCL::gio::write(OutputFileInits, Format_723) << "Outdoor Controlled Baseboard Heat"
                                                         << "Capacity at Low Temperature {W},Low Temperature {C},Capacity at High Temperature "
                                                            "{W},High Temperature {C},Fraction Radiant,Fraction Convected,End-Use Subcategory";
 
             ZoneNum = ZoneBBHeat(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                gio::write(OutputFileInits, Format_724) << "Outdoor Controlled Baseboard Heat-Illegal Zone specified" << ZoneBBHeat(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_724) << "Outdoor Controlled Baseboard Heat-Illegal Zone specified" << ZoneBBHeat(Loop).Name;
                 continue;
             }
 
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_722, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_722, flags)
                     << "Outdoor Controlled Baseboard Heat" << ZoneBBHeat(Loop).Name << GetScheduleName(ZoneBBHeat(Loop).SchedPtr)
                     << Zone(ZoneNum).Name << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
             }
@@ -5551,39 +5567,39 @@ namespace InternalHeatGains {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneBBHeat(Loop).LowTemperature, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneBBHeat(Loop).CapatHighTemperature, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneBBHeat(Loop).HighTemperature, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneBBHeat(Loop).FractionRadiant, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(ZoneBBHeat(Loop).FractionConvected, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
-            gio::write(OutputFileInits, fmtA) << ZoneBBHeat(Loop).EndUseSubcategory;
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << ZoneBBHeat(Loop).EndUseSubcategory;
         }
     }
 
@@ -6332,7 +6348,7 @@ namespace InternalHeatGains {
                 TAirOut = TAirIn;
             }
 
-            if (abs(TAirOut - TSupply) < SmallTempDiff) {
+            if (std::abs(TAirOut - TSupply) < SmallTempDiff) {
                 TAirOut = TSupply;
             }
 
@@ -6796,7 +6812,20 @@ namespace InternalHeatGains {
 
         return DesignLightingLevelSum;
     }
-
+    
+    bool CheckThermalComfortSchedules(bool const WorkEffSch, // Blank work efficiency schedule = true
+                                      bool const CloInsSch,  // Blank clothing insulation schedule = true
+                                      bool const AirVeloSch) // Blank air velocity schedule = true
+    {
+        bool TCSchedsPresent = false;
+        
+        if ( !WorkEffSch || !CloInsSch || !AirVeloSch ) {
+            TCSchedsPresent = true;
+        }
+        
+        return TCSchedsPresent;
+    }
+    
     void CheckLightsReplaceableMinMaxForZone(int const WhichZone) // Zone Number
     {
 

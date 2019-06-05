@@ -681,7 +681,7 @@ namespace Psychrometrics {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         Int64 const Tdb_tag(
-            bit::bit_shift(bit::bit_transfer(T, Grid_Shift), -Grid_Shift)); // Note that 2nd arg to TRANSFER is not used: Only type matters
+            bit_shift(bit_transfer(T, Grid_Shift), -Grid_Shift)); // Note that 2nd arg to TRANSFER is not used: Only type matters
         //		Int64 const hash( bit::bit_and( Tdb_tag, psatcache_mask ) ); //Tuned Replaced by below
         Int64 const hash(Tdb_tag & psatcache_mask);
         auto &cPsat(cached_Psat(hash));
@@ -689,7 +689,7 @@ namespace Psychrometrics {
         if (cPsat.iTdb != Tdb_tag) {
             cPsat.iTdb = Tdb_tag;
             Real64 Tdb_tag_r;
-            Tdb_tag_r = bit::bit_transfer(bit::bit_shift(Tdb_tag, Grid_Shift), Tdb_tag_r);
+            Tdb_tag_r = bit_transfer(bit_shift(Tdb_tag, Grid_Shift), Tdb_tag_r);
             cPsat.Psat = PsyPsatFnTemp_raw(Tdb_tag_r, CalledFrom);
         }
 

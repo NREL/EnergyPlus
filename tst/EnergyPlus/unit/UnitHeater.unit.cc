@@ -144,7 +144,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
         "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
 
         "  RunPeriod,",
-        "    ,                        !- Name",
+        "    WinterDay,               !- Name",
         "    1,                       !- Begin Month",
         "    14,                      !- Begin Day of Month",
         "    ,                        !- Begin Year",
@@ -1384,7 +1384,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,9.1;",
+        "Version,9.2;",
 
         "Timestep,1;",
 

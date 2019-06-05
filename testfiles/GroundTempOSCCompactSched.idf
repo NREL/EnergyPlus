@@ -3,7 +3,7 @@
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 
-  Version,9.1;
+  Version,9.2;
 
   Building,
     anyplace Load Calc,      !- Name
@@ -24,7 +24,7 @@
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year

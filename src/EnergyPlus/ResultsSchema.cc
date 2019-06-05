@@ -90,7 +90,7 @@ namespace ResultsFramework {
     using OutputProcessor::RealVariableType;
     using OutputProcessor::RealVariables;
 
-    static gio::Fmt fmtLD("*");
+    static ObjexxFCL::gio::Fmt fmtLD("*");
 
     std::unique_ptr<ResultsSchema> OutputSchema(new ResultsSchema);
 

@@ -1,5 +1,4 @@
-  Version,
-    9.1;                    !- Version Identifier
+  Version,9.2;               !- Version Identifier
 
   SimulationControl,
     Yes,
@@ -151,7 +150,7 @@
     Opaque Door panel_con;   !- Outside Layer
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year

@@ -82,14 +82,20 @@
 namespace EnergyPlus {
 namespace HeatBalanceKivaManager {
 
-    void kivaErrorCallback(const int messageType, const std::string message, void *)
+    void kivaErrorCallback(const int messageType, const std::string message, void *contextPtr)
     {
+        std::string fullMessage;
+        if (contextPtr) {
+            fullMessage = *(std::string*)contextPtr + ": " + message;
+        } else {
+            fullMessage = "Kiva: " + message;
+        }
         if (messageType == Kiva::MSG_INFO) {
-            ShowMessage("Kiva: " + message);
+            ShowMessage(fullMessage);
         } else if (messageType == Kiva::MSG_WARN) {
-            ShowWarningError("Kiva: " + message);
+            ShowWarningError(fullMessage);
         } else /* if (messageType == Kiva::MSG_ERR) */ {
-            ShowSevereError("Kiva: " + message);
+            ShowSevereError(fullMessage);
             ShowFatalError("Kiva: Errors discovered, program terminates.");
         }
     }
@@ -436,7 +442,7 @@ namespace HeatBalanceKivaManager {
         {
             IOFlags flags;
             flags.ACTION("read");
-            gio::open(kivaWeatherFileUnitNumber, DataStringGlobals::inputWeatherFileName, flags);
+            ObjexxFCL::gio::open(kivaWeatherFileUnitNumber, DataStringGlobals::inputWeatherFileName, flags);
             if (flags.err()) ShowFatalError("Kiva::ReadWeatherFile: Could not OPEN EPW Weather File");
         }
 
@@ -457,7 +463,7 @@ namespace HeatBalanceKivaManager {
         while (StillLooking) {
             {
                 IOFlags flags;
-                gio::read(kivaWeatherFileUnitNumber, "(A)", flags) >> Line;
+                ObjexxFCL::gio::read(kivaWeatherFileUnitNumber, "(A)", flags) >> Line;
                 if (flags.end())
                     ShowFatalError(
                         "Kiva::ReadWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" +
@@ -500,7 +506,7 @@ namespace HeatBalanceKivaManager {
                         if (Pos == std::string::npos) {
                             if (len(Line) == 0) {
                                 while (Pos == std::string::npos) {
-                                    gio::read(kivaWeatherFileUnitNumber, "(A)") >> Line;
+                                    ObjexxFCL::gio::read(kivaWeatherFileUnitNumber, "(A)") >> Line;
                                     strip(Line);
                                     uppercase(Line);
                                     Pos = index(Line, ',');
@@ -573,7 +579,7 @@ namespace HeatBalanceKivaManager {
         while (!ReadStatus) {
             {
                 IOFlags flags;
-                gio::read(kivaWeatherFileUnitNumber, "(A)", flags) >> WeatherDataLine;
+                ObjexxFCL::gio::read(kivaWeatherFileUnitNumber, "(A)", flags) >> WeatherDataLine;
                 ReadStatus = flags.ios();
             }
             if (ReadStatus < 0) {
@@ -632,12 +638,12 @@ namespace HeatBalanceKivaManager {
         // Annual averages
         kivaWeather.annualAverageDrybulbTemp = totalDB / count;
 
-        gio::close(kivaWeatherFileUnitNumber);
+        ObjexxFCL::gio::close(kivaWeatherFileUnitNumber);
     }
 
     bool KivaManager::setupKivaInstances()
     {
-        Kiva::setMessageCallback(kivaErrorCallback, NULL);
+        Kiva::setMessageCallback(kivaErrorCallback, nullptr);
         bool ErrorsFound = false;
 
         if (DataZoneControls::GetZoneAirStatsInputFlag) {
@@ -1052,7 +1058,7 @@ namespace HeatBalanceKivaManager {
             }
         }
 
-        gio::write(DataGlobals::OutputFileInits, "(A)") << "! <Kiva Foundation Name>, Horizontal Cells, Vertical Cells, Total Cells, Total Exposed "
+        ObjexxFCL::gio::write(DataGlobals::OutputFileInits, "(A)") << "! <Kiva Foundation Name>, Horizontal Cells, Vertical Cells, Total Cells, Total Exposed "
                                                            "Perimeter, Perimeter Fraction, Wall Height, Wall Construction, Floor Surface, Wall "
                                                            "Surface(s)";
         std::string fmt = "(A,',',I0',',I0',',I0',',A',',A',',A',',A',',A,A)";
@@ -1070,7 +1076,7 @@ namespace HeatBalanceKivaManager {
             for (auto &wl : kv.wallSurfaces) {
                 wallSurfaceString += "," + DataSurfaces::Surface(wl).Name;
             }
-            gio::write(DataGlobals::OutputFileInits, fmt)
+            ObjexxFCL::gio::write(DataGlobals::OutputFileInits, fmt)
                 << foundationInputs[DataSurfaces::Surface(kv.floorSurface).OSCPtr].name << grnd->nX << grnd->nZ << grnd->nX * grnd->nZ
                 << General::RoundSigDigits(grnd->foundation.netPerimeter, 2) << General::RoundSigDigits(kv.floorWeight, 2)
                 << General::RoundSigDigits(grnd->foundation.foundationDepth, 2) << constructionName << DataSurfaces::Surface(kv.floorSurface).Name
@@ -1192,10 +1198,13 @@ namespace HeatBalanceKivaManager {
     {
         for (int surfNum = 1; surfNum <= (int)DataSurfaces::Surface.size(); ++surfNum) {
             if (DataSurfaces::Surface(surfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                std::string contextStr = "Surface=\"" + DataSurfaces::Surface(surfNum).Name + "\"";
+                Kiva::setMessageCallback(kivaErrorCallback, &contextStr);
                 surfaceMap[surfNum].calc_weighted_results();
                 DataHeatBalance::HConvIn(surfNum) = SurfaceGeometry::kivaManager.surfaceMap[surfNum].results.hconv;
             }
         }
+        Kiva::setMessageCallback(kivaErrorCallback, nullptr);
     }
 
     void KivaManager::defineDefaultFoundation()

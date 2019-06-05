@@ -94,7 +94,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.1;
+  Version,9.2;
 
   Building,
     Building,                !- Name
@@ -161,7 +161,7 @@
     YES;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     7,                       !- Begin Month
     15,                      !- Begin Day of Month
     ,                        !- Begin Year

@@ -506,9 +506,15 @@ namespace ConvectionCoefficients {
 
     Real64 CalcCeilingDiffuserACH(int const ZoneNum);
 
-    Real64 CalcCeilingDiffuserIntConvCoeff(Real64 const Tilt, Real64 const ACH);
+    Real64 CalcCeilingDiffuserIntConvCoeff(Real64 const ACH,  // [1/hr] air system air change rate
+                                           Real64 const Tsurf,
+                                           Real64 const Tair,
+                                           Real64 const cosTilt,
+                                           Real64 const humRat,
+                                           Real64 const height,
+                                           bool const isWindow=false);
 
-    void CalcCeilingDiffuserIntConvCoeff(int const ZoneNum); // zone number for which coefficients are being calculated
+    void CalcCeilingDiffuserIntConvCoeff(int const ZoneNum, Array1S<Real64> const SurfaceTemperatures); // zone number for which coefficients are being calculated
 
     // CalcCeilingDiffuserInletCorr should replace CalcCeilingDiffuser (above), if ZoneTempPredictorCorrector can
     // ever be made to work correctly with the inlet air temperature.
@@ -588,11 +594,29 @@ namespace ConvectionCoefficients {
                                             Real64 const CosineTilt // Cosine of tilt angle
     );
 
-    Real64 CalcFisherPedersenCeilDiffuserFloor(Real64 const AirChangeRate); // [1/hr] air system air change rate
+    Real64 CalcFisherPedersenCeilDiffuserFloor(Real64 const ACH,  // [1/hr] air system air change rate
+                                               Real64 const Tsurf,
+                                               Real64 const Tair,
+                                               Real64 const cosTilt,
+                                               Real64 const humRat,
+                                               Real64 const height,
+                                               bool const isWindow=false);
 
-    Real64 CalcFisherPedersenCeilDiffuserCeiling(Real64 const AirChangeRate); // [1/hr] air system air change rate
+    Real64 CalcFisherPedersenCeilDiffuserCeiling(Real64 const ACH,  // [1/hr] air system air change rate
+                                                 Real64 const Tsurf,
+                                                 Real64 const Tair,
+                                                 Real64 const cosTilt,
+                                                 Real64 const humRat,
+                                                 Real64 const height,
+                                                 bool const isWindow=false);
 
-    Real64 CalcFisherPedersenCeilDiffuserWalls(Real64 const AirChangeRate); // [1/hr] air system air change rate
+    Real64 CalcFisherPedersenCeilDiffuserWalls(Real64 const ACH,  // [1/hr] air system air change rate
+                                               Real64 const Tsurf,
+                                               Real64 const Tair,
+                                               Real64 const cosTilt,
+                                               Real64 const humRat,
+                                               Real64 const height,
+                                               bool const isWindow=false);
 
     Real64 CalcAlamdariHammondUnstableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
                                                    Real64 const HydraulicDiameter  // [m] characteristic size, = (4 * area) / perimeter

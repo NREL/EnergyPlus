@@ -1274,8 +1274,8 @@ namespace ChillerReformulatedEIR {
         Real64 DesignHeatRecVolFlowRateUser(0.0); // Hardsized design heat recovery flow for reporting
 
         // Formats
-        static gio::Fmt Format_530("('Cond Temp (C) = ',11(F7.2))");
-        static gio::Fmt Format_531("('Curve Output  = ',11(F7.2))");
+        static ObjexxFCL::gio::Fmt Format_530("('Cond Temp (C) = ',11(F7.2))");
+        static ObjexxFCL::gio::Fmt Format_531("('Curve Output  = ',11(F7.2))");
 
         if (MyOneTimeFlag) {
             MyFlag.dimension(NumElecReformEIRChillers, true);
@@ -1720,17 +1720,17 @@ namespace ChillerReformulatedEIR {
                     ShowContinueError(
                         "EIR as a function of PLR curve output at various part-load ratios and condenser water temperatures shown below:");
                     ShowContinueError("PLR           =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00");
-                    gio::write(StringVar, "'Cond Temp(C) = '");
+                    ObjexxFCL::gio::write(StringVar, "'Cond Temp(C) = '");
                     for (CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr) {
-                        gio::write(StringVar, "(F7.2,$)") << CondTempArray(CurveValPtr);
+                        ObjexxFCL::gio::write(StringVar, "(F7.2,$)") << CondTempArray(CurveValPtr);
                     }
-                    gio::write(StringVar);
+                    ObjexxFCL::gio::write(StringVar);
                     ShowContinueError(StringVar);
-                    gio::write(StringVar, "'Curve Output = '");
+                    ObjexxFCL::gio::write(StringVar, "'Curve Output = '");
                     for (CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr) {
-                        gio::write(StringVar, "(F7.2,$)") << CurveValArray(CurveValPtr);
+                        ObjexxFCL::gio::write(StringVar, "(F7.2,$)") << CurveValArray(CurveValPtr);
                     }
-                    gio::write(StringVar);
+                    ObjexxFCL::gio::write(StringVar);
                     ShowContinueError(StringVar);
                     ErrorsFound = true;
                 }
@@ -2287,7 +2287,7 @@ namespace ChillerReformulatedEIR {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
 
-        static gio::Fmt OutputFormat("(F6.2)");
+        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcElecReformEIRChillerModel");
 
         // INTERFACE BLOCK SPECIFICATIONS

@@ -252,6 +252,9 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     DXCoilPartLoadRatio.allocate(1);
     DXCoilFanOpMode.allocate(1);
 
+    DataLoopNode::Node.allocate(1);
+    DXCoil(CoilIndex).AirOutNode = 1;
+
     Real64 SpeedRatio = 0.0;
     Real64 CycRatio = 1.0;
     int SpeedNum = 2;
@@ -426,6 +429,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.DefrostStrategy = Resistive;
     Coil.Name = "DX Heating coil";
     Coil.NumOfSpeeds = 2;
+    DataLoopNode::Node.allocate(1);
+    Coil.AirOutNode = 1;
 
     Coil.MSRatedTotCap.allocate(Coil.NumOfSpeeds);
     Coil.MSRatedSHR.allocate(Coil.NumOfSpeeds);
@@ -796,6 +801,8 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
     Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
     Coil.SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    DataLoopNode::Node.allocate(1);
+    Coil.AirOutNode = 1;
 
     Coil.RatedSHR(1) = 1.0;
     Coil.RatedTotCap(1) = 11012.634487601337;
@@ -1863,7 +1870,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.1;",
+        "  Version,9.2;",
 
         "  Schedule:Compact,",
         "    FanAvailSched,           !- Name",
@@ -1966,7 +1973,7 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.1;",
+        "  Version,9.2;",
 
         "  Schedule:Compact,",
         "    FanAvailSched,           !- Name",

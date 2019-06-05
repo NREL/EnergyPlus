@@ -70,7 +70,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.1;
+  Version,9.2;
 
   AirLoopHVAC:UnitaryHeatCool,
     FURNACE_PACU_CAV:1_Unitary_Package,  !- Name
@@ -685,7 +685,7 @@
     9;                       !- Maximum Plant Iterations
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -702,7 +702,7 @@
 !
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 2,            !- Name
     7,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year

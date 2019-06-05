@@ -627,12 +627,12 @@ namespace StandardRatings {
         static bool MyOneTimeFlag(true);
 
         // Formats
-        static gio::Fmt Format_990(
+        static ObjexxFCL::gio::Fmt Format_990(
             "('! <Chiller Standard Rating Information>, Component Type, Component Name, ','IPLV in SI Units {W/W}, ','IPLV in IP Units {Btu/W-h}')");
-        static gio::Fmt Format_991("(' Chiller Standard Rating Information, ',A,', ',A,', ',A,', ',A)");
+        static ObjexxFCL::gio::Fmt Format_991("(' Chiller Standard Rating Information, ',A,', ',A,', ',A,', ',A)");
 
         if (MyOneTimeFlag) {
-            gio::write(OutputFileInits, Format_990);
+            ObjexxFCL::gio::write(OutputFileInits, Format_990);
             MyOneTimeFlag = false;
         }
 
@@ -640,13 +640,13 @@ namespace StandardRatings {
             auto const SELECT_CASE_var(ChillerType);
             if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
 
-                gio::write(OutputFileInits, Format_991)
+                ObjexxFCL::gio::write(OutputFileInits, Format_991)
                     << "Chiller:Electric:EIR" << ChillerName << RoundSigDigits(IPLVValueSI, 2) << RoundSigDigits(IPLVValueIP, 2);
                 PreDefTableEntry(pdchMechType, ChillerName, "Chiller:Electric:EIR");
 
             } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
 
-                gio::write(OutputFileInits, Format_991)
+                ObjexxFCL::gio::write(OutputFileInits, Format_991)
                     << "Chiller:Electric:ReformulatedEIR" << ChillerName << RoundSigDigits(IPLVValueSI, 2) << RoundSigDigits(IPLVValueIP, 2);
                 PreDefTableEntry(pdchMechType, ChillerName, "Chiller:Electric:ReformulatedEIR");
             }
@@ -2428,27 +2428,27 @@ namespace StandardRatings {
         static bool MyHeatOneTimeFlag(true);
 
         // Formats
-        static gio::Fmt Format_990("('! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, ','Standard Rating (Net) "
+        static ObjexxFCL::gio::Fmt Format_990("('! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, ','Standard Rating (Net) "
                                    "Cooling Capacity {W}, ','Standard Rated Net COP {W/W}, ','EER {Btu/W-h}, ','SEER {Btu/W-h}, ','IEER {Btu/W-h}')");
-        static gio::Fmt Format_991("(' DX Cooling Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
-        static gio::Fmt Format_992("('! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, ','High Temperature Heating "
+        static ObjexxFCL::gio::Fmt Format_991("(' DX Cooling Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
+        static ObjexxFCL::gio::Fmt Format_992("('! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, ','High Temperature Heating "
                                    "(net) Rating Capacity {W}, ','Low Temperature Heating (net) Rating Capacity {W}, ','HSPF {Btu/W-h}, ','Region "
                                    "Number')");
-        static gio::Fmt Format_993("(' DX Heating Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
-        static gio::Fmt Format_994("('! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, ','Standard Rating (Net) "
+        static ObjexxFCL::gio::Fmt Format_993("(' DX Heating Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
+        static ObjexxFCL::gio::Fmt Format_994("('! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, ','Standard Rating (Net) "
                                    "Cooling Capacity {W}, ','Standard Rated Net COP {W/W}, ','EER {Btu/W-h}, ','SEER {Btu/W-h}, ','IEER {Btu/W-h}')");
-        static gio::Fmt Format_995("(' DX Cooling Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
+        static ObjexxFCL::gio::Fmt Format_995("(' DX Cooling Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
 
         {
             auto const SELECT_CASE_var(CompTypeNum);
 
             if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) {
                 if (MyCoolOneTimeFlag) {
-                    gio::write(OutputFileInits, Format_990);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_990);
                     MyCoolOneTimeFlag = false;
                 }
 
-                gio::write(OutputFileInits, Format_991)
+                ObjexxFCL::gio::write(OutputFileInits, Format_991)
                     << CompType << CompName << RoundSigDigits(CoolCapVal, 1) << RoundSigDigits(EERValueSI, 2) << RoundSigDigits(EERValueIP, 2)
                     << RoundSigDigits(SEERValueIP, 2) << RoundSigDigits(IEERValueIP, 2);
 
@@ -2464,11 +2464,11 @@ namespace StandardRatings {
 
             } else if ((SELECT_CASE_var == CoilDX_HeatingEmpirical) || (SELECT_CASE_var == CoilDX_MultiSpeedHeating)) {
                 if (MyHeatOneTimeFlag) {
-                    gio::write(OutputFileInits, Format_992);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_992);
                     MyHeatOneTimeFlag = false;
                 }
 
-                gio::write(OutputFileInits, Format_993)
+                ObjexxFCL::gio::write(OutputFileInits, Format_993)
                     << CompType << CompName << RoundSigDigits(HighHeatingCapVal, 1) << RoundSigDigits(LowHeatingCapVal, 1)
                     << RoundSigDigits(HSPFValueIP, 2) << RoundSigDigits(RegionNum);
 
@@ -2482,11 +2482,11 @@ namespace StandardRatings {
 
             } else if (SELECT_CASE_var == CoilDX_MultiSpeedCooling) {
                 if (MyCoolOneTimeFlag) {
-                    gio::write(OutputFileInits, Format_994);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_994);
                     MyCoolOneTimeFlag = false;
                 }
 
-                gio::write(OutputFileInits, Format_995)
+                ObjexxFCL::gio::write(OutputFileInits, Format_995)
                     << CompType << CompName << RoundSigDigits(CoolCapVal, 1) << ' ' << ' ' << RoundSigDigits(SEERValueIP, 2) << ' ';
 
                 PreDefTableEntry(pdchDXCoolCoilType, CompName, CompType);
@@ -2553,12 +2553,12 @@ namespace StandardRatings {
         static std::string CompNameNew;
 
         // Formats
-        static gio::Fmt Format_101("('! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 "
+        static ObjexxFCL::gio::Fmt Format_101("('! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 "
                                    "Classification, ','Rated Net Cooling Capacity Test A {W}, ','Rated Total Electric Power Test A {W}, ','Rated Net "
                                    "Cooling Capacity Test B {W}, ','Rated Total Electric Power Test B {W}, ','Rated Net Cooling Capacity Test C {W}, "
                                    "','Rated Total Electric Power Test C {W}, ','Rated Net Cooling Capacity Test D {W}, ','Rated Total Electric "
                                    "Power Test D {W} ')");
-        static gio::Fmt Format_102(
+        static ObjexxFCL::gio::Fmt Format_102(
             "(' DX Cooling Coil ASHRAE 127 Standard Ratings Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
 
         {
@@ -2566,14 +2566,14 @@ namespace StandardRatings {
 
             if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) {
                 if (MyCoolOneTimeFlag) {
-                    gio::write(OutputFileInits, Format_101);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_101);
                     MyCoolOneTimeFlag = false;
                 }
                 for (ClassNum = 1; ClassNum <= 4; ++ClassNum) {
                     Num = (ClassNum - 1) * 4;
                     ClassName = "Class " + RoundSigDigits(ClassNum);
                     CompNameNew = CompName + "(" + ClassName + ")";
-                    gio::write(OutputFileInits, Format_102)
+                    ObjexxFCL::gio::write(OutputFileInits, Format_102)
                         << CompType << CompName << ClassName << RoundSigDigits(NetCoolingCapRated(Num + 1), 1)
                         << RoundSigDigits(TotElectricPowerRated(Num + 1), 1) << RoundSigDigits(NetCoolingCapRated(Num + 2), 1)
                         << RoundSigDigits(TotElectricPowerRated(Num + 2), 1) << RoundSigDigits(NetCoolingCapRated(Num + 3), 1)

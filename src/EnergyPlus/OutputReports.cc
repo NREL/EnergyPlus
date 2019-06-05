@@ -73,7 +73,7 @@
 
 namespace EnergyPlus {
 
-static gio::Fmt fmtLD("*");
+static ObjexxFCL::gio::Fmt fmtLD("*");
 
 void ReportSurfaces()
 {
@@ -240,9 +240,9 @@ void LinesOut(std::string const &option)
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static gio::Fmt fmt700("(5(f10.2,','),f10.2)");
-    static gio::Fmt fmtA("(A)");
-    static gio::Fmt fmtcoord("(2X,2(f10.2,','),f10.2,A,A)");
+    static ObjexxFCL::gio::Fmt fmt700("(5(f10.2,','),f10.2)");
+    static ObjexxFCL::gio::Fmt fmtA("(A)");
+    static ObjexxFCL::gio::Fmt fmtcoord("(2X,2(f10.2,','),f10.2,A,A)");
     static std::string const vertexstring("X,Y,Z ==> Vertex");
 
     // INTERFACE BLOCK SPECIFICATIONS
@@ -278,7 +278,7 @@ void LinesOut(std::string const &option)
     {
         IOFlags flags;
         flags.ACTION("write");
-        gio::open(unit, DataStringGlobals::outputSlnFileName, flags);
+        ObjexxFCL::gio::open(unit, DataStringGlobals::outputSlnFileName, flags);
         write_stat = flags.ios();
     }
     if (write_stat != 0) {
@@ -289,38 +289,38 @@ void LinesOut(std::string const &option)
         for (surf = 1; surf <= TotSurfaces; ++surf) {
             if (Surface(surf).Class == SurfaceClass_IntMass) continue;
             if (Surface(surf).Sides == 0) continue;
-            gio::write(unit, fmtA) << Surface(surf).ZoneName + ':' + Surface(surf).Name;
+            ObjexxFCL::gio::write(unit, fmtA) << Surface(surf).ZoneName + ':' + Surface(surf).Name;
             for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
                 if (vert != Surface(surf).Sides) {
-                    gio::write(unit, fmt700) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
+                    ObjexxFCL::gio::write(unit, fmt700) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
                                              << Surface(surf).Vertex(vert + 1).x << Surface(surf).Vertex(vert + 1).y
                                              << Surface(surf).Vertex(vert + 1).z;
                 } else {
-                    gio::write(unit, fmt700) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
+                    ObjexxFCL::gio::write(unit, fmt700) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
                                              << Surface(surf).Vertex(1).x << Surface(surf).Vertex(1).y << Surface(surf).Vertex(1).z;
                 }
             }
         }
     } else {
-        gio::write(unit, fmtA) << " Building North Axis = 0";
-        gio::write(unit, fmtA) << "GlobalGeometryRules,UpperLeftCorner,CounterClockwise,WorldCoordinates;";
+        ObjexxFCL::gio::write(unit, fmtA) << " Building North Axis = 0";
+        ObjexxFCL::gio::write(unit, fmtA) << "GlobalGeometryRules,UpperLeftCorner,CounterClockwise,WorldCoordinates;";
         for (surf = 1; surf <= TotSurfaces; ++surf) {
             if (Surface(surf).Class == SurfaceClass_IntMass) continue;
             if (Surface(surf).Sides == 0) continue;
             // process heat transfer surfaces
-            gio::write(unit, fmtA) << " Surface=" + cSurfaceClass(Surface(surf).Class) + ", Name=" + Surface(surf).Name +
+            ObjexxFCL::gio::write(unit, fmtA) << " Surface=" + cSurfaceClass(Surface(surf).Class) + ", Name=" + Surface(surf).Name +
                                           ", Azimuth=" + RoundSigDigits(Surface(surf).Azimuth, 1);
-            gio::write(unit, fmtA) << "  " + RoundSigDigits(Surface(surf).Sides) + ",  !- Number of (X,Y,Z) groups in this surface";
+            ObjexxFCL::gio::write(unit, fmtA) << "  " + RoundSigDigits(Surface(surf).Sides) + ",  !- Number of (X,Y,Z) groups in this surface";
             for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
                 optcommasemi = ",";
                 if (vert == Surface(surf).Sides) optcommasemi = ";";
-                gio::write(unit, fmtcoord) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
+                ObjexxFCL::gio::write(unit, fmtcoord) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
                                            << optcommasemi << "  !- " + vertexstring + ' ' + RoundSigDigits(vert);
             }
         }
     }
 
-    gio::close(unit);
+    ObjexxFCL::gio::close(unit);
 }
 
 void DXFOut(std::string &PolygonAction,
@@ -420,34 +420,34 @@ void DXFOut(std::string &PolygonAction,
     Array1D<dTriangle> mytriangles;
 
     // Formats
-    static gio::Fmt Format_702("('  0',/,'SECTION',/,'  2',/,'ENTITIES')");
-    static gio::Fmt Format_707("('999',/,'DXF created from EnergyPlus')");
-    static gio::Fmt Format_708("('999',/,A,A,A)");
-    static gio::Fmt Format_800("('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' "
+    static ObjexxFCL::gio::Fmt Format_702("('  0',/,'SECTION',/,'  2',/,'ENTITIES')");
+    static ObjexxFCL::gio::Fmt Format_707("('999',/,'DXF created from EnergyPlus')");
+    static ObjexxFCL::gio::Fmt Format_708("('999',/,A,A,A)");
+    static ObjexxFCL::gio::Fmt Format_800("('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' "
                                "30',/,f15.5,/,' 40',/,' .25',/,'  1',/,'True North',/,' 41',/,' 0.0',/,'  "
                                "7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')");
-    static gio::Fmt Format_801("('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' "
+    static ObjexxFCL::gio::Fmt Format_801("('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' "
                                "30',/,f15.5,/,' 40',/,' .4',/,'  1',/,A,/,' 41',/,' 0.0',/,'  "
                                "7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')");
-    static gio::Fmt Format_703_0("('  0',/,'3DFACE',/,'  8',/,'1',/,' 62',/,I3)");
-    static gio::Fmt Format_703_1("(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)");
-    static gio::Fmt Format_703_2("(' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)");
-    static gio::Fmt Format_703_3("(' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)");
-    static gio::Fmt Format_703_4("(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)");
-    static gio::Fmt Format_715("('  0',/,'POLYLINE',/,'  8',/,A,/,' 62',/,I3,/,' 66',/,'  1',/,' 10',/,' 0.0',/,' 20',/,' 0.0',/,' 30',/,f15.5,/,' "
+    static ObjexxFCL::gio::Fmt Format_703_0("('  0',/,'3DFACE',/,'  8',/,'1',/,' 62',/,I3)");
+    static ObjexxFCL::gio::Fmt Format_703_1("(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_703_2("(' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_703_3("(' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_703_4("(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_715("('  0',/,'POLYLINE',/,'  8',/,A,/,' 62',/,I3,/,' 66',/,'  1',/,' 10',/,' 0.0',/,' 20',/,' 0.0',/,' 30',/,f15.5,/,' "
                                "70',/,'   9',/,' 40',/,A,/,' 41',/,A)");
-    static gio::Fmt Format_716("('  0',/,'VERTEX',/,'  8',/,A,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)");
-    static gio::Fmt Format_717("('  0',/,'SEQEND',/,'  8',/,A)");
-    static gio::Fmt Format_704("('  0',/,'3DFACE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 11',/,f15.5,/,' "
+    static ObjexxFCL::gio::Fmt Format_716("('  0',/,'VERTEX',/,'  8',/,A,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_717("('  0',/,'SEQEND',/,'  8',/,A)");
+    static ObjexxFCL::gio::Fmt Format_704("('  0',/,'3DFACE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 11',/,f15.5,/,' "
                                "21',/,f15.5,/,' 31',/,f15.5,/,' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)");
-    static gio::Fmt Format_704_0("('  0',/,'3DFACE',/,'  8',/,A,/,' 62',/,I3)");
-    static gio::Fmt Format_704_1("(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)");
-    static gio::Fmt Format_704_2("(' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)");
-    static gio::Fmt Format_704_3("(' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)");
-    static gio::Fmt Format_705("(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)");
-    static gio::Fmt Format_706("('  0',/,'ENDSEC',/,'  0',/,'EOF')");
-    static gio::Fmt Format_709("('  0',/,'CIRCLE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,f15.5)");
-    static gio::Fmt Format_710("('999',/,A)");
+    static ObjexxFCL::gio::Fmt Format_704_0("('  0',/,'3DFACE',/,'  8',/,A,/,' 62',/,I3)");
+    static ObjexxFCL::gio::Fmt Format_704_1("(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_704_2("(' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_704_3("(' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_705("(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_706("('  0',/,'ENDSEC',/,'  0',/,'EOF')");
+    static ObjexxFCL::gio::Fmt Format_709("('  0',/,'CIRCLE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_710("('999',/,A)");
 
     if (PolygonAction == "TRIANGULATE3DFACE" || PolygonAction == "TRIANGULATE" || PolygonAction == "") {
         TriangulateFace = true;
@@ -480,35 +480,35 @@ void DXFOut(std::string &PolygonAction,
     {
         IOFlags flags;
         flags.ACTION("write");
-        gio::open(unit, DataStringGlobals::outputDxfFileName, flags);
+        ObjexxFCL::gio::open(unit, DataStringGlobals::outputDxfFileName, flags);
         write_stat = flags.ios();
     }
     if (write_stat != 0) {
         ShowFatalError("DXFOut: Could not open file " + DataStringGlobals::outputDxfFileName + " for output (write).");
     }
 
-    gio::write(unit, Format_702); // Start of Entities section
+    ObjexxFCL::gio::write(unit, Format_702); // Start of Entities section
 
-    gio::write(unit, Format_707); // Comment
+    ObjexxFCL::gio::write(unit, Format_707); // Comment
 
-    gio::write(unit, Format_708) << "Program Version"
+    ObjexxFCL::gio::write(unit, Format_708) << "Program Version"
                                  << "," << VerString;
 
     if (PolygonAction == "") {
-        gio::write(unit, Format_708) << "Polygon Action"
+        ObjexxFCL::gio::write(unit, Format_708) << "Polygon Action"
                                      << ","
                                      << "ThickPolyline";
     } else {
-        gio::write(unit, Format_708) << "Polygon Action"
+        ObjexxFCL::gio::write(unit, Format_708) << "Polygon Action"
                                      << "," << PolygonAction;
     }
 
     if (ColorScheme == "") {
-        gio::write(unit, Format_708) << "Color Scheme"
+        ObjexxFCL::gio::write(unit, Format_708) << "Color Scheme"
                                      << ","
                                      << "Default";
     } else {
-        gio::write(unit, Format_708) << "Color Scheme"
+        ObjexxFCL::gio::write(unit, Format_708) << "Color Scheme"
                                      << "," << ColorScheme;
     }
 
@@ -538,58 +538,58 @@ void DXFOut(std::string &PolygonAction,
     }
 
     // This writes "True North" above the Arrow Head
-    gio::write(unit, Format_710) << "Text - True North";
-    gio::write(unit, Format_800) << DXFcolorno(ColorNo_Text) << StemX(1) - 1.0 << StemY(1) << StemZ(1);
+    ObjexxFCL::gio::write(unit, Format_710) << "Text - True North";
+    ObjexxFCL::gio::write(unit, Format_800) << DXFcolorno(ColorNo_Text) << StemX(1) - 1.0 << StemY(1) << StemZ(1);
 
-    gio::write(unit, Format_710) << "Text - Building Title";
-    gio::write(unit, Format_801) << DXFcolorno(ColorNo_Text) << StemX(1) - 4.0 << StemY(1) - 4.0 << StemZ(1) << "Building - " + BuildingName;
+    ObjexxFCL::gio::write(unit, Format_710) << "Text - Building Title";
+    ObjexxFCL::gio::write(unit, Format_801) << DXFcolorno(ColorNo_Text) << StemX(1) - 4.0 << StemY(1) - 4.0 << StemZ(1) << "Building - " + BuildingName;
 
     // We want to point the north arrow to true north
-    gio::write(unit, Format_710) << "North Arrow Stem";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << StemX(1) << StemY(1) << StemZ(1);
-    gio::write(unit, Format_703_2) << StemX(2) << StemY(2) << StemZ(2);
-    gio::write(unit, Format_703_3) << StemX(3) << StemY(3) << StemZ(3);
-    gio::write(unit, Format_703_4) << StemX(4) << StemY(4) << StemZ(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Stem";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << StemX(1) << StemY(1) << StemZ(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << StemX(2) << StemY(2) << StemZ(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << StemX(3) << StemY(3) << StemZ(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << StemX(4) << StemY(4) << StemZ(4);
 
-    gio::write(unit, Format_710) << "North Arrow Head 1";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << Head1X(1) << Head1Y(1) << Head1Z(1);
-    gio::write(unit, Format_703_2) << Head1X(2) << Head1Y(2) << Head1Z(2);
-    gio::write(unit, Format_703_3) << Head1X(3) << Head1Y(3) << Head1Z(3);
-    gio::write(unit, Format_703_4) << Head1X(4) << Head1Y(4) << Head1Z(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Head 1";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << Head1X(1) << Head1Y(1) << Head1Z(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << Head1X(2) << Head1Y(2) << Head1Z(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << Head1X(3) << Head1Y(3) << Head1Z(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << Head1X(4) << Head1Y(4) << Head1Z(4);
 
-    gio::write(unit, Format_710) << "North Arrow Head 2";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << Head2X(1) << Head2Y(1) << Head2Z(1);
-    gio::write(unit, Format_703_2) << Head2X(2) << Head2Y(2) << Head2Z(2);
-    gio::write(unit, Format_703_3) << Head2X(3) << Head2Y(3) << Head2Z(3);
-    gio::write(unit, Format_703_4) << Head2X(4) << Head2Y(4) << Head2Z(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Head 2";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << Head2X(1) << Head2Y(1) << Head2Z(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << Head2X(2) << Head2Y(2) << Head2Z(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << Head2X(3) << Head2Y(3) << Head2Z(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << Head2X(4) << Head2Y(4) << Head2Z(4);
 
-    gio::write(unit, Format_710) << "North Arrow Side 1";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << NSide1X(1) << NSide1Y(1) << NSide1Z(1);
-    gio::write(unit, Format_703_2) << NSide1X(2) << NSide1Y(2) << NSide1Z(2);
-    gio::write(unit, Format_703_3) << NSide1X(3) << NSide1Y(3) << NSide1Z(3);
-    gio::write(unit, Format_703_4) << NSide1X(4) << NSide1Y(4) << NSide1Z(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Side 1";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << NSide1X(1) << NSide1Y(1) << NSide1Z(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << NSide1X(2) << NSide1Y(2) << NSide1Z(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << NSide1X(3) << NSide1Y(3) << NSide1Z(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << NSide1X(4) << NSide1Y(4) << NSide1Z(4);
 
-    gio::write(unit, Format_710) << "North Arrow Side 2";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << NSide2X(1) << NSide2Y(1) << NSide2Z(1);
-    gio::write(unit, Format_703_2) << NSide2X(2) << NSide2Y(2) << NSide2Z(2);
-    gio::write(unit, Format_703_3) << NSide2X(3) << NSide2Y(3) << NSide2Z(3);
-    gio::write(unit, Format_703_4) << NSide2X(4) << NSide2Y(4) << NSide2Z(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Side 2";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << NSide2X(1) << NSide2Y(1) << NSide2Z(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << NSide2X(2) << NSide2Y(2) << NSide2Z(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << NSide2X(3) << NSide2Y(3) << NSide2Z(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << NSide2X(4) << NSide2Y(4) << NSide2Z(4);
 
-    gio::write(unit, Format_710) << "North Arrow Side 3";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << NSide3X(1) << NSide3Y(1) << NSide3Z(1);
-    gio::write(unit, Format_703_2) << NSide3X(2) << NSide3Y(2) << NSide3Z(2);
-    gio::write(unit, Format_703_3) << NSide3X(3) << NSide3Y(3) << NSide3Z(3);
-    gio::write(unit, Format_703_4) << NSide3X(4) << NSide3Y(4) << NSide3Z(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Side 3";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << NSide3X(1) << NSide3Y(1) << NSide3Z(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << NSide3X(2) << NSide3Y(2) << NSide3Z(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << NSide3X(3) << NSide3Y(3) << NSide3Z(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << NSide3X(4) << NSide3Y(4) << NSide3Z(4);
 
-    gio::write(unit, Format_710) << "Zone Names";
+    ObjexxFCL::gio::write(unit, Format_710) << "Zone Names";
     for (zones = 1; zones <= NumOfZones; ++zones) {
-        gio::write(ZoneNum, fmtLD) << zones;
+        ObjexxFCL::gio::write(ZoneNum, fmtLD) << zones;
         strip(ZoneNum);
         TempZoneName = Zone(zones).Name;
         pos = index(TempZoneName, ' ');
@@ -602,7 +602,7 @@ void DXFOut(std::string &PolygonAction,
             TempZoneName[pos] = '_';
             pos = index(TempZoneName, ':');
         }
-        gio::write(unit, Format_710) << "Zone=" + ZoneNum + ':' + TempZoneName;
+        ObjexxFCL::gio::write(unit, Format_710) << "Zone=" + ZoneNum + ':' + TempZoneName;
     }
 
     colorindex = ColorNo_ShdDetFix;
@@ -616,20 +616,20 @@ void DXFOut(std::string &PolygonAction,
         if (Surface(surf).IsPV) colorindex = ColorNo_PV;
         if (Surface(surf).Class == SurfaceClass_Detached_F) {
             ShadeType = "Fixed Shading";
-            gio::write(unit, Format_710) << "Fixed Shading:" + Surface(surf).Name;
+            ObjexxFCL::gio::write(unit, Format_710) << "Fixed Shading:" + Surface(surf).Name;
         } else if (Surface(surf).Class == SurfaceClass_Detached_B) {
             ShadeType = "Building Shading";
-            gio::write(unit, Format_710) << "Building Shading:" + Surface(surf).Name;
+            ObjexxFCL::gio::write(unit, Format_710) << "Building Shading:" + Surface(surf).Name;
         }
         if (Surface(surf).Sides <= 4) {
-            gio::write(unit, Format_704_0) << ShadeType << DXFcolorno(colorindex);
-            gio::write(unit, Format_704_1) << Surface(surf).Vertex(1).x << Surface(surf).Vertex(1).y << Surface(surf).Vertex(1).z;
-            gio::write(unit, Format_704_2) << Surface(surf).Vertex(2).x << Surface(surf).Vertex(2).y << Surface(surf).Vertex(2).z;
-            gio::write(unit, Format_704_3) << Surface(surf).Vertex(3).x << Surface(surf).Vertex(3).y << Surface(surf).Vertex(3).z;
+            ObjexxFCL::gio::write(unit, Format_704_0) << ShadeType << DXFcolorno(colorindex);
+            ObjexxFCL::gio::write(unit, Format_704_1) << Surface(surf).Vertex(1).x << Surface(surf).Vertex(1).y << Surface(surf).Vertex(1).z;
+            ObjexxFCL::gio::write(unit, Format_704_2) << Surface(surf).Vertex(2).x << Surface(surf).Vertex(2).y << Surface(surf).Vertex(2).z;
+            ObjexxFCL::gio::write(unit, Format_704_3) << Surface(surf).Vertex(3).x << Surface(surf).Vertex(3).y << Surface(surf).Vertex(3).z;
             if (Surface(surf).Sides == 3) {
-                gio::write(unit, Format_705) << Surface(surf).Vertex(3).x << Surface(surf).Vertex(3).y << Surface(surf).Vertex(3).z;
+                ObjexxFCL::gio::write(unit, Format_705) << Surface(surf).Vertex(3).x << Surface(surf).Vertex(3).y << Surface(surf).Vertex(3).z;
             } else {
-                gio::write(unit, Format_705) << Surface(surf).Vertex(4).x << Surface(surf).Vertex(4).y << Surface(surf).Vertex(4).z;
+                ObjexxFCL::gio::write(unit, Format_705) << Surface(surf).Vertex(4).x << Surface(surf).Vertex(4).y << Surface(surf).Vertex(4).z;
             }
         } else { // polygon
             if (!TriangulateFace) {
@@ -637,12 +637,12 @@ void DXFOut(std::string &PolygonAction,
                 for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
                     minz = min(minz, Surface(surf).Vertex(vert).z);
                 }
-                gio::write(unit, Format_715) << ShadeType << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
+                ObjexxFCL::gio::write(unit, Format_715) << ShadeType << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
                 for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
-                    gio::write(unit, Format_716) << ShadeType << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y
+                    ObjexxFCL::gio::write(unit, Format_716) << ShadeType << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y
                                                  << Surface(surf).Vertex(vert).z;
                 }
-                gio::write(unit, Format_717) << ShadeType;
+                ObjexxFCL::gio::write(unit, Format_717) << ShadeType;
             } else {
                 ntri = Triangulate(Surface(surf).Sides,
                                    Surface(surf).Vertex,
@@ -655,11 +655,11 @@ void DXFOut(std::string &PolygonAction,
                     vv0 = mytriangles(svert).vv0;
                     vv1 = mytriangles(svert).vv1;
                     vv2 = mytriangles(svert).vv2;
-                    gio::write(unit, Format_704) << ShadeType << DXFcolorno(colorindex) << Surface(surf).Vertex(vv0).x << Surface(surf).Vertex(vv0).y
+                    ObjexxFCL::gio::write(unit, Format_704) << ShadeType << DXFcolorno(colorindex) << Surface(surf).Vertex(vv0).x << Surface(surf).Vertex(vv0).y
                                                  << Surface(surf).Vertex(vv0).z << Surface(surf).Vertex(vv1).x << Surface(surf).Vertex(vv1).y
                                                  << Surface(surf).Vertex(vv1).z << Surface(surf).Vertex(vv2).x << Surface(surf).Vertex(vv2).y
                                                  << Surface(surf).Vertex(vv2).z;
-                    gio::write(unit, Format_705) << Surface(surf).Vertex(vv2).x << Surface(surf).Vertex(vv2).y << Surface(surf).Vertex(vv2).z;
+                    ObjexxFCL::gio::write(unit, Format_705) << Surface(surf).Vertex(vv2).x << Surface(surf).Vertex(vv2).y << Surface(surf).Vertex(vv2).z;
                 }
                 mytriangles.deallocate();
             }
@@ -694,16 +694,16 @@ void DXFOut(std::string &PolygonAction,
             }
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
 
-            gio::write(unit, Format_710) << Surface(surf).ZoneName + ':' + Surface(surf).Name;
+            ObjexxFCL::gio::write(unit, Format_710) << Surface(surf).ZoneName + ':' + Surface(surf).Name;
             if (Surface(surf).Sides <= 4) {
-                gio::write(unit, Format_704_0) << TempZoneName << DXFcolorno(colorindex);
-                gio::write(unit, Format_704_1) << Surface(surf).Vertex(1).x << Surface(surf).Vertex(1).y << Surface(surf).Vertex(1).z;
-                gio::write(unit, Format_704_2) << Surface(surf).Vertex(2).x << Surface(surf).Vertex(2).y << Surface(surf).Vertex(2).z;
-                gio::write(unit, Format_704_3) << Surface(surf).Vertex(3).x << Surface(surf).Vertex(3).y << Surface(surf).Vertex(3).z;
+                ObjexxFCL::gio::write(unit, Format_704_0) << TempZoneName << DXFcolorno(colorindex);
+                ObjexxFCL::gio::write(unit, Format_704_1) << Surface(surf).Vertex(1).x << Surface(surf).Vertex(1).y << Surface(surf).Vertex(1).z;
+                ObjexxFCL::gio::write(unit, Format_704_2) << Surface(surf).Vertex(2).x << Surface(surf).Vertex(2).y << Surface(surf).Vertex(2).z;
+                ObjexxFCL::gio::write(unit, Format_704_3) << Surface(surf).Vertex(3).x << Surface(surf).Vertex(3).y << Surface(surf).Vertex(3).z;
                 if (Surface(surf).Sides == 3) {
-                    gio::write(unit, Format_705) << Surface(surf).Vertex(3).x << Surface(surf).Vertex(3).y << Surface(surf).Vertex(3).z;
+                    ObjexxFCL::gio::write(unit, Format_705) << Surface(surf).Vertex(3).x << Surface(surf).Vertex(3).y << Surface(surf).Vertex(3).z;
                 } else {
-                    gio::write(unit, Format_705) << Surface(surf).Vertex(4).x << Surface(surf).Vertex(4).y << Surface(surf).Vertex(4).z;
+                    ObjexxFCL::gio::write(unit, Format_705) << Surface(surf).Vertex(4).x << Surface(surf).Vertex(4).y << Surface(surf).Vertex(4).z;
                 }
             } else { // polygon surface
                 if (!TriangulateFace) {
@@ -711,12 +711,12 @@ void DXFOut(std::string &PolygonAction,
                     for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
                         minz = min(minz, Surface(surf).Vertex(vert).z);
                     }
-                    gio::write(unit, Format_715) << TempZoneName << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
+                    ObjexxFCL::gio::write(unit, Format_715) << TempZoneName << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
                     for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
-                        gio::write(unit, Format_716)
+                        ObjexxFCL::gio::write(unit, Format_716)
                             << TempZoneName << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z;
                     }
-                    gio::write(unit, Format_717) << TempZoneName;
+                    ObjexxFCL::gio::write(unit, Format_717) << TempZoneName;
                 } else {
                     ntri = Triangulate(Surface(surf).Sides,
                                        Surface(surf).Vertex,
@@ -729,11 +729,11 @@ void DXFOut(std::string &PolygonAction,
                         vv0 = mytriangles(svert).vv0;
                         vv1 = mytriangles(svert).vv1;
                         vv2 = mytriangles(svert).vv2;
-                        gio::write(unit, Format_704) << TempZoneName << DXFcolorno(colorindex) << Surface(surf).Vertex(vv0).x
+                        ObjexxFCL::gio::write(unit, Format_704) << TempZoneName << DXFcolorno(colorindex) << Surface(surf).Vertex(vv0).x
                                                      << Surface(surf).Vertex(vv0).y << Surface(surf).Vertex(vv0).z << Surface(surf).Vertex(vv1).x
                                                      << Surface(surf).Vertex(vv1).y << Surface(surf).Vertex(vv1).z << Surface(surf).Vertex(vv2).x
                                                      << Surface(surf).Vertex(vv2).y << Surface(surf).Vertex(vv2).z;
-                        gio::write(unit, Format_705) << Surface(surf).Vertex(vv2).x << Surface(surf).Vertex(vv2).y << Surface(surf).Vertex(vv2).z;
+                        ObjexxFCL::gio::write(unit, Format_705) << Surface(surf).Vertex(vv2).x << Surface(surf).Vertex(vv2).y << Surface(surf).Vertex(vv2).z;
                     }
                     mytriangles.deallocate();
                 }
@@ -747,16 +747,16 @@ void DXFOut(std::string &PolygonAction,
             if (Surface(surf).Sides == 0) continue;
             colorindex = ColorNo_ShdAtt;
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
-            gio::write(unit, Format_710) << Surface(surf).ZoneName + ':' + Surface(surf).Name;
+            ObjexxFCL::gio::write(unit, Format_710) << Surface(surf).ZoneName + ':' + Surface(surf).Name;
             if (Surface(surf).Sides <= 4) {
-                gio::write(unit, Format_704_0) << TempZoneName << DXFcolorno(colorindex);
-                gio::write(unit, Format_704_1) << Surface(surf).Vertex(1).x << Surface(surf).Vertex(1).y << Surface(surf).Vertex(1).z;
-                gio::write(unit, Format_704_2) << Surface(surf).Vertex(2).x << Surface(surf).Vertex(2).y << Surface(surf).Vertex(2).z;
-                gio::write(unit, Format_704_3) << Surface(surf).Vertex(3).x << Surface(surf).Vertex(3).y << Surface(surf).Vertex(3).z;
+                ObjexxFCL::gio::write(unit, Format_704_0) << TempZoneName << DXFcolorno(colorindex);
+                ObjexxFCL::gio::write(unit, Format_704_1) << Surface(surf).Vertex(1).x << Surface(surf).Vertex(1).y << Surface(surf).Vertex(1).z;
+                ObjexxFCL::gio::write(unit, Format_704_2) << Surface(surf).Vertex(2).x << Surface(surf).Vertex(2).y << Surface(surf).Vertex(2).z;
+                ObjexxFCL::gio::write(unit, Format_704_3) << Surface(surf).Vertex(3).x << Surface(surf).Vertex(3).y << Surface(surf).Vertex(3).z;
                 if (Surface(surf).Sides == 3) {
-                    gio::write(unit, Format_705) << Surface(surf).Vertex(3).x << Surface(surf).Vertex(3).y << Surface(surf).Vertex(3).z;
+                    ObjexxFCL::gio::write(unit, Format_705) << Surface(surf).Vertex(3).x << Surface(surf).Vertex(3).y << Surface(surf).Vertex(3).z;
                 } else {
-                    gio::write(unit, Format_705) << Surface(surf).Vertex(4).x << Surface(surf).Vertex(4).y << Surface(surf).Vertex(4).z;
+                    ObjexxFCL::gio::write(unit, Format_705) << Surface(surf).Vertex(4).x << Surface(surf).Vertex(4).y << Surface(surf).Vertex(4).z;
                 }
             } else { // polygon attached shading
                 if (!TriangulateFace) {
@@ -764,12 +764,12 @@ void DXFOut(std::string &PolygonAction,
                     for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
                         minz = min(minz, Surface(surf).Vertex(vert).z);
                     }
-                    gio::write(unit, Format_715) << TempZoneName << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
+                    ObjexxFCL::gio::write(unit, Format_715) << TempZoneName << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
                     for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
-                        gio::write(unit, Format_716)
+                        ObjexxFCL::gio::write(unit, Format_716)
                             << TempZoneName << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z;
                     }
-                    gio::write(unit, Format_717) << TempZoneName;
+                    ObjexxFCL::gio::write(unit, Format_717) << TempZoneName;
                 } else {
                     if (Surface(surf).Shape == SurfaceShape::RectangularOverhang) {
                         ntri = Triangulate(Surface(surf).Sides,
@@ -792,11 +792,11 @@ void DXFOut(std::string &PolygonAction,
                         vv0 = mytriangles(svert).vv0;
                         vv1 = mytriangles(svert).vv1;
                         vv2 = mytriangles(svert).vv2;
-                        gio::write(unit, Format_704) << TempZoneName << DXFcolorno(colorindex) << Surface(surf).Vertex(vv0).x
+                        ObjexxFCL::gio::write(unit, Format_704) << TempZoneName << DXFcolorno(colorindex) << Surface(surf).Vertex(vv0).x
                                                      << Surface(surf).Vertex(vv0).y << Surface(surf).Vertex(vv0).z << Surface(surf).Vertex(vv1).x
                                                      << Surface(surf).Vertex(vv1).y << Surface(surf).Vertex(vv1).z << Surface(surf).Vertex(vv2).x
                                                      << Surface(surf).Vertex(vv2).y << Surface(surf).Vertex(vv2).z;
-                        gio::write(unit, Format_705) << Surface(surf).Vertex(vv2).x << Surface(surf).Vertex(vv2).y << Surface(surf).Vertex(vv2).z;
+                        ObjexxFCL::gio::write(unit, Format_705) << Surface(surf).Vertex(vv2).x << Surface(surf).Vertex(vv2).y << Surface(surf).Vertex(vv2).z;
                     }
                     mytriangles.deallocate();
                 }
@@ -823,8 +823,8 @@ void DXFOut(std::string &PolygonAction,
             pos = index(TempZoneName, ':');
         }
         for (refpt = 1; refpt <= ZoneDaylight(zones).TotalDaylRefPoints; ++refpt) {
-            gio::write(unit, Format_710) << Zone(zones).Name + ":DayRefPt:" + TrimSigDigits(refpt);
-            gio::write(unit, Format_709) << TempZoneName << DXFcolorno(curcolorno) << ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt)
+            ObjexxFCL::gio::write(unit, Format_710) << Zone(zones).Name + ":DayRefPt:" + TrimSigDigits(refpt);
+            ObjexxFCL::gio::write(unit, Format_709) << TempZoneName << DXFcolorno(curcolorno) << ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt)
                                          << ZoneDaylight(zones).DaylRefPtAbsCoord(2, refpt) << ZoneDaylight(zones).DaylRefPtAbsCoord(3, refpt) << 0.2;
             curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
         }
@@ -846,8 +846,8 @@ void DXFOut(std::string &PolygonAction,
         for (mapnum = 1; mapnum <= TotIllumMaps; ++mapnum) {
             if (IllumMapCalc(mapnum).Zone != zones) continue;
             for (refpt = 1; refpt <= IllumMapCalc(mapnum).TotalMapRefPoints; ++refpt) {
-                gio::write(unit, Format_710) << Zone(zones).Name + ":MapRefPt:" + TrimSigDigits(refpt);
-                gio::write(unit, Format_709) << TempZoneName << DXFcolorno(curcolorno) << IllumMapCalc(mapnum).MapRefPtAbsCoord(1, refpt)
+                ObjexxFCL::gio::write(unit, Format_710) << Zone(zones).Name + ":MapRefPt:" + TrimSigDigits(refpt);
+                ObjexxFCL::gio::write(unit, Format_709) << TempZoneName << DXFcolorno(curcolorno) << IllumMapCalc(mapnum).MapRefPtAbsCoord(1, refpt)
                                              << IllumMapCalc(mapnum).MapRefPtAbsCoord(2, refpt) << IllumMapCalc(mapnum).MapRefPtAbsCoord(3, refpt)
                                              << 0.05;
             }
@@ -869,16 +869,16 @@ void DXFOut(std::string &PolygonAction,
             pos = index(TempZoneName, ':');
         }
         for (refpt = 1; refpt <= ZoneDaylight(zones).TotalDaylRefPoints; ++refpt) {
-            gio::write(unit, Format_710) << Zone(zones).Name + ":DEDayRefPt:" + TrimSigDigits(refpt);
-            gio::write(unit, Format_709) << TempZoneName << DXFcolorno(curcolorno) << ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt)
+            ObjexxFCL::gio::write(unit, Format_710) << Zone(zones).Name + ":DEDayRefPt:" + TrimSigDigits(refpt);
+            ObjexxFCL::gio::write(unit, Format_709) << TempZoneName << DXFcolorno(curcolorno) << ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt)
                                          << ZoneDaylight(zones).DaylRefPtAbsCoord(2, refpt) << ZoneDaylight(zones).DaylRefPtAbsCoord(3, refpt) << 0.2;
             curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
         }
     }
 
-    gio::write(unit, Format_706);
+    ObjexxFCL::gio::write(unit, Format_706);
 
-    gio::close(unit);
+    ObjexxFCL::gio::close(unit);
 }
 
 void DXFOutLines(std::string const &ColorScheme)
@@ -964,28 +964,28 @@ void DXFOutLines(std::string const &ColorScheme)
     int write_stat;
 
     // Formats
-    static gio::Fmt Format_702("('  0',/,'SECTION',/,'  2',/,'ENTITIES')");
-    static gio::Fmt Format_707("('999',/,'DXF created from EnergyPlus')");
-    static gio::Fmt Format_708("('999',/,A,A,A)");
-    static gio::Fmt Format_800("('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' "
+    static ObjexxFCL::gio::Fmt Format_702("('  0',/,'SECTION',/,'  2',/,'ENTITIES')");
+    static ObjexxFCL::gio::Fmt Format_707("('999',/,'DXF created from EnergyPlus')");
+    static ObjexxFCL::gio::Fmt Format_708("('999',/,A,A,A)");
+    static ObjexxFCL::gio::Fmt Format_800("('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' "
                                "30',/,f15.5,/,' 40',/,' .25',/,'  1',/,'True North',/,' 41',/,' 0.0',/,'  "
                                "7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')");
-    static gio::Fmt Format_801("('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' "
+    static ObjexxFCL::gio::Fmt Format_801("('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' "
                                "30',/,f15.5,/,' 40',/,' .4',/,'  1',/,A,/,' 41',/,' 0.0',/,'  "
                                "7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')");
-    static gio::Fmt Format_703_0("('  0',/,'3DFACE',/,'  8',/,'1',/,' 62',/,I3)");
-    static gio::Fmt Format_703_1("(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)");
-    static gio::Fmt Format_703_2("(' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)");
-    static gio::Fmt Format_703_3("(' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)");
-    static gio::Fmt Format_703_4("(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)");
-    static gio::Fmt Format_704("('  0',/,'3DFACE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 11',/,f15.5,/,' "
+    static ObjexxFCL::gio::Fmt Format_703_0("('  0',/,'3DFACE',/,'  8',/,'1',/,' 62',/,I3)");
+    static ObjexxFCL::gio::Fmt Format_703_1("(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_703_2("(' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_703_3("(' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_703_4("(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_704("('  0',/,'3DFACE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 11',/,f15.5,/,' "
                                "21',/,f15.5,/,' 31',/,f15.5,/,' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)");
-    static gio::Fmt Format_705("(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)");
-    static gio::Fmt Format_711("('  0',/,'LINE',/,'  8',/,A,/,' 62',/,I3)");
-    static gio::Fmt Format_712("(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)");
-    static gio::Fmt Format_706("('  0',/,'ENDSEC',/,'  0',/,'EOF')");
-    static gio::Fmt Format_709("('  0',/,'CIRCLE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,f15.5)");
-    static gio::Fmt Format_710("('999',/,A)");
+    static ObjexxFCL::gio::Fmt Format_705("(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_711("('  0',/,'LINE',/,'  8',/,A,/,' 62',/,I3)");
+    static ObjexxFCL::gio::Fmt Format_712("(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_706("('  0',/,'ENDSEC',/,'  0',/,'EOF')");
+    static ObjexxFCL::gio::Fmt Format_709("('  0',/,'CIRCLE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_710("('999',/,A)");
 
     if (TotSurfaces > 0 && !allocated(Surface)) {
         // no error needed, probably in end processing, just return
@@ -996,28 +996,28 @@ void DXFOutLines(std::string const &ColorScheme)
     {
         IOFlags flags;
         flags.ACTION("write");
-        gio::open(unit, DataStringGlobals::outputDxfFileName, flags);
+        ObjexxFCL::gio::open(unit, DataStringGlobals::outputDxfFileName, flags);
         write_stat = flags.ios();
     }
     if (write_stat != 0) {
         ShowFatalError("DXFOutLines: Could not open file " + DataStringGlobals::outputDxfFileName + " for output (write).");
     }
 
-    gio::write(unit, Format_702); // Start of Entities section
+    ObjexxFCL::gio::write(unit, Format_702); // Start of Entities section
 
-    gio::write(unit, Format_707); // Comment
+    ObjexxFCL::gio::write(unit, Format_707); // Comment
 
-    gio::write(unit, Format_708) << "Program Version"
+    ObjexxFCL::gio::write(unit, Format_708) << "Program Version"
                                  << "," << VerString;
 
-    gio::write(unit, Format_708) << "DXF using Lines" << ' ' << ' ';
+    ObjexxFCL::gio::write(unit, Format_708) << "DXF using Lines" << ' ' << ' ';
 
     if (ColorScheme == "") {
-        gio::write(unit, Format_708) << "Color Scheme"
+        ObjexxFCL::gio::write(unit, Format_708) << "Color Scheme"
                                      << ","
                                      << "Default";
     } else {
-        gio::write(unit, Format_708) << "Color Scheme"
+        ObjexxFCL::gio::write(unit, Format_708) << "Color Scheme"
                                      << "," << ColorScheme;
     }
 
@@ -1047,58 +1047,58 @@ void DXFOutLines(std::string const &ColorScheme)
     }
 
     // This writes "True North" above the Arrow Head
-    gio::write(unit, Format_710) << "Text - True North";
-    gio::write(unit, Format_800) << DXFcolorno(ColorNo_Text) << StemX(1) - 1.0 << StemY(1) << StemZ(1);
+    ObjexxFCL::gio::write(unit, Format_710) << "Text - True North";
+    ObjexxFCL::gio::write(unit, Format_800) << DXFcolorno(ColorNo_Text) << StemX(1) - 1.0 << StemY(1) << StemZ(1);
 
-    gio::write(unit, Format_710) << "Text - Building Title";
-    gio::write(unit, Format_801) << DXFcolorno(ColorNo_Text) << StemX(1) - 4.0 << StemY(1) - 4.0 << StemZ(1) << "Building - " + BuildingName;
+    ObjexxFCL::gio::write(unit, Format_710) << "Text - Building Title";
+    ObjexxFCL::gio::write(unit, Format_801) << DXFcolorno(ColorNo_Text) << StemX(1) - 4.0 << StemY(1) - 4.0 << StemZ(1) << "Building - " + BuildingName;
 
     // We want to point the north arrow to true north
-    gio::write(unit, Format_710) << "North Arrow Stem";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << StemX(1) << StemY(1) << StemZ(1);
-    gio::write(unit, Format_703_2) << StemX(2) << StemY(2) << StemZ(2);
-    gio::write(unit, Format_703_3) << StemX(3) << StemY(3) << StemZ(3);
-    gio::write(unit, Format_703_4) << StemX(4) << StemY(4) << StemZ(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Stem";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << StemX(1) << StemY(1) << StemZ(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << StemX(2) << StemY(2) << StemZ(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << StemX(3) << StemY(3) << StemZ(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << StemX(4) << StemY(4) << StemZ(4);
 
-    gio::write(unit, Format_710) << "North Arrow Head 1";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << Head1X(1) << Head1Y(1) << Head1Z(1);
-    gio::write(unit, Format_703_2) << Head1X(2) << Head1Y(2) << Head1Z(2);
-    gio::write(unit, Format_703_3) << Head1X(3) << Head1Y(3) << Head1Z(3);
-    gio::write(unit, Format_703_4) << Head1X(4) << Head1Y(4) << Head1Z(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Head 1";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << Head1X(1) << Head1Y(1) << Head1Z(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << Head1X(2) << Head1Y(2) << Head1Z(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << Head1X(3) << Head1Y(3) << Head1Z(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << Head1X(4) << Head1Y(4) << Head1Z(4);
 
-    gio::write(unit, Format_710) << "North Arrow Head 2";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << Head2X(1) << Head2Y(1) << Head2Z(1);
-    gio::write(unit, Format_703_2) << Head2X(2) << Head2Y(2) << Head2Z(2);
-    gio::write(unit, Format_703_3) << Head2X(3) << Head2Y(3) << Head2Z(3);
-    gio::write(unit, Format_703_4) << Head2X(4) << Head2Y(4) << Head2Z(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Head 2";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << Head2X(1) << Head2Y(1) << Head2Z(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << Head2X(2) << Head2Y(2) << Head2Z(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << Head2X(3) << Head2Y(3) << Head2Z(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << Head2X(4) << Head2Y(4) << Head2Z(4);
 
-    gio::write(unit, Format_710) << "North Arrow Side 1";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << NSide1X(1) << NSide1Y(1) << NSide1Z(1);
-    gio::write(unit, Format_703_2) << NSide1X(2) << NSide1Y(2) << NSide1Z(2);
-    gio::write(unit, Format_703_3) << NSide1X(3) << NSide1Y(3) << NSide1Z(3);
-    gio::write(unit, Format_703_4) << NSide1X(4) << NSide1Y(4) << NSide1Z(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Side 1";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << NSide1X(1) << NSide1Y(1) << NSide1Z(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << NSide1X(2) << NSide1Y(2) << NSide1Z(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << NSide1X(3) << NSide1Y(3) << NSide1Z(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << NSide1X(4) << NSide1Y(4) << NSide1Z(4);
 
-    gio::write(unit, Format_710) << "North Arrow Side 2";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << NSide2X(1) << NSide2Y(1) << NSide2Z(1);
-    gio::write(unit, Format_703_2) << NSide2X(2) << NSide2Y(2) << NSide2Z(2);
-    gio::write(unit, Format_703_3) << NSide2X(3) << NSide2Y(3) << NSide2Z(3);
-    gio::write(unit, Format_703_4) << NSide2X(4) << NSide2Y(4) << NSide2Z(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Side 2";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << NSide2X(1) << NSide2Y(1) << NSide2Z(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << NSide2X(2) << NSide2Y(2) << NSide2Z(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << NSide2X(3) << NSide2Y(3) << NSide2Z(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << NSide2X(4) << NSide2Y(4) << NSide2Z(4);
 
-    gio::write(unit, Format_710) << "North Arrow Side 3";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << NSide3X(1) << NSide3Y(1) << NSide3Z(1);
-    gio::write(unit, Format_703_2) << NSide3X(2) << NSide3Y(2) << NSide3Z(2);
-    gio::write(unit, Format_703_3) << NSide3X(3) << NSide3Y(3) << NSide3Z(3);
-    gio::write(unit, Format_703_4) << NSide3X(4) << NSide3Y(4) << NSide3Z(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Side 3";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << NSide3X(1) << NSide3Y(1) << NSide3Z(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << NSide3X(2) << NSide3Y(2) << NSide3Z(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << NSide3X(3) << NSide3Y(3) << NSide3Z(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << NSide3X(4) << NSide3Y(4) << NSide3Z(4);
 
-    gio::write(unit, Format_710) << "Zone Names";
+    ObjexxFCL::gio::write(unit, Format_710) << "Zone Names";
     for (zones = 1; zones <= NumOfZones; ++zones) {
-        gio::write(ZoneNum, fmtLD) << zones;
+        ObjexxFCL::gio::write(ZoneNum, fmtLD) << zones;
         strip(ZoneNum);
         TempZoneName = Zone(zones).Name;
         pos = index(TempZoneName, ' ');
@@ -1111,7 +1111,7 @@ void DXFOutLines(std::string const &ColorScheme)
             TempZoneName[pos] = '_';
             pos = index(TempZoneName, ':');
         }
-        gio::write(unit, Format_710) << "Zone=" + ZoneNum + ':' + TempZoneName;
+        ObjexxFCL::gio::write(unit, Format_710) << "Zone=" + ZoneNum + ':' + TempZoneName;
     }
 
     //  Do all detached shading surfaces first
@@ -1124,13 +1124,13 @@ void DXFOutLines(std::string const &ColorScheme)
         if (Surface(surf).IsPV) colorindex = ColorNo_PV;
         if (Surface(surf).Class == SurfaceClass_Detached_F) {
             ShadeType = "Fixed Shading";
-            gio::write(unit, Format_710) << "Fixed Shading:" + Surface(surf).Name;
+            ObjexxFCL::gio::write(unit, Format_710) << "Fixed Shading:" + Surface(surf).Name;
         } else if (Surface(surf).Class == SurfaceClass_Detached_B) {
             ShadeType = "Building Shading";
-            gio::write(unit, Format_710) << "Building Shading:" + Surface(surf).Name;
+            ObjexxFCL::gio::write(unit, Format_710) << "Building Shading:" + Surface(surf).Name;
         }
         ++surfcount;
-        gio::write(cSurfNum, fmtLD) << surfcount;
+        ObjexxFCL::gio::write(cSurfNum, fmtLD) << surfcount;
         strip(cSurfNum);
         ShadeType += "_" + cSurfNum;
         minz = 99999.0;
@@ -1145,8 +1145,8 @@ void DXFOutLines(std::string const &ColorScheme)
                 } else {
                     sptr = 1;
                 }
-                gio::write(unit, Format_711) << ShadeType << DXFcolorno(colorindex); //,minz ,TRIM(PolylineWidth),TRIM(PolylineWidth)
-                gio::write(unit, Format_712) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
+                ObjexxFCL::gio::write(unit, Format_711) << ShadeType << DXFcolorno(colorindex); //,minz ,TRIM(PolylineWidth),TRIM(PolylineWidth)
+                ObjexxFCL::gio::write(unit, Format_712) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
                                              << Surface(surf).Vertex(sptr).x << Surface(surf).Vertex(sptr).y << Surface(surf).Vertex(sptr).z;
             }
         } else { // polygon
@@ -1156,8 +1156,8 @@ void DXFOutLines(std::string const &ColorScheme)
                 } else {
                     sptr = 1;
                 }
-                gio::write(unit, Format_711) << ShadeType << DXFcolorno(colorindex); //,minz ,TRIM(PolylineWidth),TRIM(PolylineWidth)
-                gio::write(unit, Format_712) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
+                ObjexxFCL::gio::write(unit, Format_711) << ShadeType << DXFcolorno(colorindex); //,minz ,TRIM(PolylineWidth),TRIM(PolylineWidth)
+                ObjexxFCL::gio::write(unit, Format_712) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
                                              << Surface(surf).Vertex(sptr).x << Surface(surf).Vertex(sptr).y << Surface(surf).Vertex(sptr).z;
             }
         }
@@ -1193,10 +1193,10 @@ void DXFOutLines(std::string const &ColorScheme)
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
             ++surfcount;
-            gio::write(cSurfNum, fmtLD) << surfcount;
+            ObjexxFCL::gio::write(cSurfNum, fmtLD) << surfcount;
             strip(cSurfNum);
 
-            gio::write(unit, Format_710) << Surface(surf).ZoneName + ':' + Surface(surf).Name;
+            ObjexxFCL::gio::write(unit, Format_710) << Surface(surf).ZoneName + ':' + Surface(surf).Name;
             TempZoneName += "_" + cSurfNum;
             minz = 99999.0;
             for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
@@ -1209,8 +1209,8 @@ void DXFOutLines(std::string const &ColorScheme)
                     } else {
                         sptr = 1;
                     }
-                    gio::write(unit, Format_711) << TempZoneName << DXFcolorno(colorindex); //,minz,TRIM(PolylineWidth),TRIM(PolylineWidth)
-                    gio::write(unit, Format_712) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
+                    ObjexxFCL::gio::write(unit, Format_711) << TempZoneName << DXFcolorno(colorindex); //,minz,TRIM(PolylineWidth),TRIM(PolylineWidth)
+                    ObjexxFCL::gio::write(unit, Format_712) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
                                                  << Surface(surf).Vertex(sptr).x << Surface(surf).Vertex(sptr).y << Surface(surf).Vertex(sptr).z;
                 }
             } else { // polygon
@@ -1220,8 +1220,8 @@ void DXFOutLines(std::string const &ColorScheme)
                     } else {
                         sptr = 1;
                     }
-                    gio::write(unit, Format_711) << TempZoneName << DXFcolorno(colorindex); //,minz,TRIM(PolylineWidth),TRIM(PolylineWidth)
-                    gio::write(unit, Format_712) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
+                    ObjexxFCL::gio::write(unit, Format_711) << TempZoneName << DXFcolorno(colorindex); //,minz,TRIM(PolylineWidth),TRIM(PolylineWidth)
+                    ObjexxFCL::gio::write(unit, Format_712) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
                                                  << Surface(surf).Vertex(sptr).x << Surface(surf).Vertex(sptr).y << Surface(surf).Vertex(sptr).z;
                 }
             }
@@ -1241,10 +1241,10 @@ void DXFOutLines(std::string const &ColorScheme)
             colorindex = ColorNo_ShdAtt;
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
-            gio::write(cSurfNum, fmtLD) << surfcount;
+            ObjexxFCL::gio::write(cSurfNum, fmtLD) << surfcount;
             strip(cSurfNum);
 
-            gio::write(unit, Format_710) << Surface(surf).ZoneName + ':' + Surface(surf).Name;
+            ObjexxFCL::gio::write(unit, Format_710) << Surface(surf).ZoneName + ':' + Surface(surf).Name;
             TempZoneName += "_" + cSurfNum;
             minz = 99999.0;
             for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
@@ -1257,8 +1257,8 @@ void DXFOutLines(std::string const &ColorScheme)
                     } else {
                         sptr = 1;
                     }
-                    gio::write(unit, Format_711) << TempZoneName << DXFcolorno(colorindex); //,minz,TRIM(PolylineWidth),TRIM(PolylineWidth)
-                    gio::write(unit, Format_712) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
+                    ObjexxFCL::gio::write(unit, Format_711) << TempZoneName << DXFcolorno(colorindex); //,minz,TRIM(PolylineWidth),TRIM(PolylineWidth)
+                    ObjexxFCL::gio::write(unit, Format_712) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
                                                  << Surface(surf).Vertex(sptr).x << Surface(surf).Vertex(sptr).y << Surface(surf).Vertex(sptr).z;
                 }
             } else { // polygon attached shading
@@ -1268,8 +1268,8 @@ void DXFOutLines(std::string const &ColorScheme)
                     } else {
                         sptr = 1;
                     }
-                    gio::write(unit, Format_711) << TempZoneName << DXFcolorno(colorindex); //,minz,TRIM(PolylineWidth),TRIM(PolylineWidth)
-                    gio::write(unit, Format_712) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
+                    ObjexxFCL::gio::write(unit, Format_711) << TempZoneName << DXFcolorno(colorindex); //,minz,TRIM(PolylineWidth),TRIM(PolylineWidth)
+                    ObjexxFCL::gio::write(unit, Format_712) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z
                                                  << Surface(surf).Vertex(sptr).x << Surface(surf).Vertex(sptr).y << Surface(surf).Vertex(sptr).z;
                 }
             }
@@ -1291,8 +1291,8 @@ void DXFOutLines(std::string const &ColorScheme)
             pos = index(TempZoneName, ':');
         }
         for (refpt = 1; refpt <= ZoneDaylight(zones).TotalDaylRefPoints; ++refpt) {
-            gio::write(unit, Format_710) << Zone(zones).Name + ":DayRefPt:" + TrimSigDigits(refpt);
-            gio::write(unit, Format_709) << TempZoneName << DXFcolorno(curcolorno) << ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt)
+            ObjexxFCL::gio::write(unit, Format_710) << Zone(zones).Name + ":DayRefPt:" + TrimSigDigits(refpt);
+            ObjexxFCL::gio::write(unit, Format_709) << TempZoneName << DXFcolorno(curcolorno) << ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt)
                                          << ZoneDaylight(zones).DaylRefPtAbsCoord(2, refpt) << ZoneDaylight(zones).DaylRefPtAbsCoord(3, refpt) << 0.2;
             curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
         }
@@ -1313,16 +1313,16 @@ void DXFOutLines(std::string const &ColorScheme)
             pos = index(TempZoneName, ':');
         }
         for (refpt = 1; refpt <= ZoneDaylight(zones).TotalDaylRefPoints; ++refpt) {
-            gio::write(unit, Format_710) << Zone(zones).Name + ":DEDayRefPt:" + TrimSigDigits(refpt);
-            gio::write(unit, Format_709) << TempZoneName << DXFcolorno(curcolorno) << ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt)
+            ObjexxFCL::gio::write(unit, Format_710) << Zone(zones).Name + ":DEDayRefPt:" + TrimSigDigits(refpt);
+            ObjexxFCL::gio::write(unit, Format_709) << TempZoneName << DXFcolorno(curcolorno) << ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt)
                                          << ZoneDaylight(zones).DaylRefPtAbsCoord(2, refpt) << ZoneDaylight(zones).DaylRefPtAbsCoord(3, refpt) << 0.2;
             curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
         }
     }
 
-    gio::write(unit, Format_706);
+    ObjexxFCL::gio::write(unit, Format_706);
 
-    gio::close(unit);
+    ObjexxFCL::gio::close(unit);
 }
 
 void DXFOutWireFrame(std::string const &ColorScheme)
@@ -1408,30 +1408,30 @@ void DXFOutWireFrame(std::string const &ColorScheme)
     int write_stat;
 
     // Formats
-    static gio::Fmt Format_702("('  0',/,'SECTION',/,'  2',/,'ENTITIES')");
-    static gio::Fmt Format_707("('999',/,'DXF created from EnergyPlus')");
-    static gio::Fmt Format_708("('999',/,A,A,A)");
-    static gio::Fmt Format_800("('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' "
+    static ObjexxFCL::gio::Fmt Format_702("('  0',/,'SECTION',/,'  2',/,'ENTITIES')");
+    static ObjexxFCL::gio::Fmt Format_707("('999',/,'DXF created from EnergyPlus')");
+    static ObjexxFCL::gio::Fmt Format_708("('999',/,A,A,A)");
+    static ObjexxFCL::gio::Fmt Format_800("('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' "
                                "30',/,f15.5,/,' 40',/,' .25',/,'  1',/,'True North',/,' 41',/,' 0.0',/,'  "
                                "7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')");
-    static gio::Fmt Format_801("('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' "
+    static ObjexxFCL::gio::Fmt Format_801("('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' "
                                "30',/,f15.5,/,' 40',/,' .4',/,'  1',/,A,/,' 41',/,' 0.0',/,'  "
                                "7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')");
-    static gio::Fmt Format_703_0("('  0',/,'3DFACE',/,'  8',/,'1',/,' 62',/,I3)");
-    static gio::Fmt Format_703_1("(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)");
-    static gio::Fmt Format_703_2("(' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)");
-    static gio::Fmt Format_703_3("(' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)");
-    static gio::Fmt Format_703_4("(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)");
-    static gio::Fmt Format_715("('  0',/,'POLYLINE',/,'  8',/,A,/,' 62',/,I3,/,' 66',/,'  1',/,' 10',/,' 0.0',/,' 20',/,' 0.0',/,' 30',/,f15.5,/,' "
+    static ObjexxFCL::gio::Fmt Format_703_0("('  0',/,'3DFACE',/,'  8',/,'1',/,' 62',/,I3)");
+    static ObjexxFCL::gio::Fmt Format_703_1("(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_703_2("(' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_703_3("(' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_703_4("(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_715("('  0',/,'POLYLINE',/,'  8',/,A,/,' 62',/,I3,/,' 66',/,'  1',/,' 10',/,' 0.0',/,' 20',/,' 0.0',/,' 30',/,f15.5,/,' "
                                "70',/,'   9',/,' 40',/,A,/,' 41',/,A)");
-    static gio::Fmt Format_716("('  0',/,'VERTEX',/,'  8',/,A,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)");
-    static gio::Fmt Format_717("('  0',/,'SEQEND',/,'  8',/,A)");
-    static gio::Fmt Format_704("('  0',/,'3DFACE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 11',/,f15.5,/,' "
+    static ObjexxFCL::gio::Fmt Format_716("('  0',/,'VERTEX',/,'  8',/,A,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_717("('  0',/,'SEQEND',/,'  8',/,A)");
+    static ObjexxFCL::gio::Fmt Format_704("('  0',/,'3DFACE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 11',/,f15.5,/,' "
                                "21',/,f15.5,/,' 31',/,f15.5,/,' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)");
-    static gio::Fmt Format_705("(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)");
-    static gio::Fmt Format_706("('  0',/,'ENDSEC',/,'  0',/,'EOF')");
-    static gio::Fmt Format_709("('  0',/,'CIRCLE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,f15.5)");
-    static gio::Fmt Format_710("('999',/,A)");
+    static ObjexxFCL::gio::Fmt Format_705("(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_706("('  0',/,'ENDSEC',/,'  0',/,'EOF')");
+    static ObjexxFCL::gio::Fmt Format_709("('  0',/,'CIRCLE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,f15.5)");
+    static ObjexxFCL::gio::Fmt Format_710("('999',/,A)");
 
     if (TotSurfaces > 0 && !allocated(Surface)) {
         // no error needed, probably in end processing, just return
@@ -1442,28 +1442,28 @@ void DXFOutWireFrame(std::string const &ColorScheme)
     {
         IOFlags flags;
         flags.ACTION("write");
-        gio::open(unit, DataStringGlobals::outputDxfFileName, flags);
+        ObjexxFCL::gio::open(unit, DataStringGlobals::outputDxfFileName, flags);
         write_stat = flags.ios();
     }
     if (write_stat != 0) {
         ShowFatalError("DXFOutWireFrame: Could not open file " + DataStringGlobals::outputDxfFileName + " for output (write).");
     }
 
-    gio::write(unit, Format_702); // Start of Entities section
+    ObjexxFCL::gio::write(unit, Format_702); // Start of Entities section
 
-    gio::write(unit, Format_707); // Comment
+    ObjexxFCL::gio::write(unit, Format_707); // Comment
 
-    gio::write(unit, Format_708) << "Program Version"
+    ObjexxFCL::gio::write(unit, Format_708) << "Program Version"
                                  << "," << VerString;
 
-    gio::write(unit, Format_708) << "DXF using Wireframe" << ' ' << ' ';
+    ObjexxFCL::gio::write(unit, Format_708) << "DXF using Wireframe" << ' ' << ' ';
 
     if (ColorScheme == "") {
-        gio::write(unit, Format_708) << "Color Scheme"
+        ObjexxFCL::gio::write(unit, Format_708) << "Color Scheme"
                                      << ","
                                      << "Default";
     } else {
-        gio::write(unit, Format_708) << "Color Scheme"
+        ObjexxFCL::gio::write(unit, Format_708) << "Color Scheme"
                                      << "," << ColorScheme;
     }
 
@@ -1493,58 +1493,58 @@ void DXFOutWireFrame(std::string const &ColorScheme)
     }
 
     // This writes "True North" above the Arrow Head
-    gio::write(unit, Format_710) << "Text - True North";
-    gio::write(unit, Format_800) << DXFcolorno(ColorNo_Text) << StemX(1) - 1.0 << StemY(1) << StemZ(1);
+    ObjexxFCL::gio::write(unit, Format_710) << "Text - True North";
+    ObjexxFCL::gio::write(unit, Format_800) << DXFcolorno(ColorNo_Text) << StemX(1) - 1.0 << StemY(1) << StemZ(1);
 
-    gio::write(unit, Format_710) << "Text - Building Title";
-    gio::write(unit, Format_801) << DXFcolorno(ColorNo_Text) << StemX(1) - 4.0 << StemY(1) - 4.0 << StemZ(1) << "Building - " + BuildingName;
+    ObjexxFCL::gio::write(unit, Format_710) << "Text - Building Title";
+    ObjexxFCL::gio::write(unit, Format_801) << DXFcolorno(ColorNo_Text) << StemX(1) - 4.0 << StemY(1) - 4.0 << StemZ(1) << "Building - " + BuildingName;
 
     // We want to point the north arrow to true north
-    gio::write(unit, Format_710) << "North Arrow Stem";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << StemX(1) << StemY(1) << StemZ(1);
-    gio::write(unit, Format_703_2) << StemX(2) << StemY(2) << StemZ(2);
-    gio::write(unit, Format_703_3) << StemX(3) << StemY(3) << StemZ(3);
-    gio::write(unit, Format_703_4) << StemX(4) << StemY(4) << StemZ(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Stem";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << StemX(1) << StemY(1) << StemZ(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << StemX(2) << StemY(2) << StemZ(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << StemX(3) << StemY(3) << StemZ(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << StemX(4) << StemY(4) << StemZ(4);
 
-    gio::write(unit, Format_710) << "North Arrow Head 1";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << Head1X(1) << Head1Y(1) << Head1Z(1);
-    gio::write(unit, Format_703_2) << Head1X(2) << Head1Y(2) << Head1Z(2);
-    gio::write(unit, Format_703_3) << Head1X(3) << Head1Y(3) << Head1Z(3);
-    gio::write(unit, Format_703_4) << Head1X(4) << Head1Y(4) << Head1Z(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Head 1";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << Head1X(1) << Head1Y(1) << Head1Z(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << Head1X(2) << Head1Y(2) << Head1Z(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << Head1X(3) << Head1Y(3) << Head1Z(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << Head1X(4) << Head1Y(4) << Head1Z(4);
 
-    gio::write(unit, Format_710) << "North Arrow Head 2";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << Head2X(1) << Head2Y(1) << Head2Z(1);
-    gio::write(unit, Format_703_2) << Head2X(2) << Head2Y(2) << Head2Z(2);
-    gio::write(unit, Format_703_3) << Head2X(3) << Head2Y(3) << Head2Z(3);
-    gio::write(unit, Format_703_4) << Head2X(4) << Head2Y(4) << Head2Z(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Head 2";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << Head2X(1) << Head2Y(1) << Head2Z(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << Head2X(2) << Head2Y(2) << Head2Z(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << Head2X(3) << Head2Y(3) << Head2Z(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << Head2X(4) << Head2Y(4) << Head2Z(4);
 
-    gio::write(unit, Format_710) << "North Arrow Side 1";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << NSide1X(1) << NSide1Y(1) << NSide1Z(1);
-    gio::write(unit, Format_703_2) << NSide1X(2) << NSide1Y(2) << NSide1Z(2);
-    gio::write(unit, Format_703_3) << NSide1X(3) << NSide1Y(3) << NSide1Z(3);
-    gio::write(unit, Format_703_4) << NSide1X(4) << NSide1Y(4) << NSide1Z(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Side 1";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << NSide1X(1) << NSide1Y(1) << NSide1Z(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << NSide1X(2) << NSide1Y(2) << NSide1Z(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << NSide1X(3) << NSide1Y(3) << NSide1Z(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << NSide1X(4) << NSide1Y(4) << NSide1Z(4);
 
-    gio::write(unit, Format_710) << "North Arrow Side 2";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << NSide2X(1) << NSide2Y(1) << NSide2Z(1);
-    gio::write(unit, Format_703_2) << NSide2X(2) << NSide2Y(2) << NSide2Z(2);
-    gio::write(unit, Format_703_3) << NSide2X(3) << NSide2Y(3) << NSide2Z(3);
-    gio::write(unit, Format_703_4) << NSide2X(4) << NSide2Y(4) << NSide2Z(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Side 2";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << NSide2X(1) << NSide2Y(1) << NSide2Z(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << NSide2X(2) << NSide2Y(2) << NSide2Z(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << NSide2X(3) << NSide2Y(3) << NSide2Z(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << NSide2X(4) << NSide2Y(4) << NSide2Z(4);
 
-    gio::write(unit, Format_710) << "North Arrow Side 3";
-    gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
-    gio::write(unit, Format_703_1) << NSide3X(1) << NSide3Y(1) << NSide3Z(1);
-    gio::write(unit, Format_703_2) << NSide3X(2) << NSide3Y(2) << NSide3Z(2);
-    gio::write(unit, Format_703_3) << NSide3X(3) << NSide3Y(3) << NSide3Z(3);
-    gio::write(unit, Format_703_4) << NSide3X(4) << NSide3Y(4) << NSide3Z(4);
+    ObjexxFCL::gio::write(unit, Format_710) << "North Arrow Side 3";
+    ObjexxFCL::gio::write(unit, Format_703_0) << DXFcolorno(ColorNo_Text);
+    ObjexxFCL::gio::write(unit, Format_703_1) << NSide3X(1) << NSide3Y(1) << NSide3Z(1);
+    ObjexxFCL::gio::write(unit, Format_703_2) << NSide3X(2) << NSide3Y(2) << NSide3Z(2);
+    ObjexxFCL::gio::write(unit, Format_703_3) << NSide3X(3) << NSide3Y(3) << NSide3Z(3);
+    ObjexxFCL::gio::write(unit, Format_703_4) << NSide3X(4) << NSide3Y(4) << NSide3Z(4);
 
-    gio::write(unit, Format_710) << "Zone Names";
+    ObjexxFCL::gio::write(unit, Format_710) << "Zone Names";
     for (zones = 1; zones <= NumOfZones; ++zones) {
-        gio::write(ZoneNum, fmtLD) << zones;
+        ObjexxFCL::gio::write(ZoneNum, fmtLD) << zones;
         strip(ZoneNum);
         TempZoneName = Zone(zones).Name;
         pos = index(TempZoneName, ' ');
@@ -1557,7 +1557,7 @@ void DXFOutWireFrame(std::string const &ColorScheme)
             TempZoneName[pos] = '_';
             pos = index(TempZoneName, ':');
         }
-        gio::write(unit, Format_710) << "Zone=" + ZoneNum + ':' + TempZoneName;
+        ObjexxFCL::gio::write(unit, Format_710) << "Zone=" + ZoneNum + ':' + TempZoneName;
     }
 
     //  Do all detached shading surfaces first
@@ -1570,13 +1570,13 @@ void DXFOutWireFrame(std::string const &ColorScheme)
         if (Surface(surf).IsPV) colorindex = ColorNo_PV;
         if (Surface(surf).Class == SurfaceClass_Detached_F) {
             ShadeType = "Fixed Shading";
-            gio::write(unit, Format_710) << "Fixed Shading:" + Surface(surf).Name;
+            ObjexxFCL::gio::write(unit, Format_710) << "Fixed Shading:" + Surface(surf).Name;
         } else if (Surface(surf).Class == SurfaceClass_Detached_B) {
             ShadeType = "Building Shading";
-            gio::write(unit, Format_710) << "Building Shading:" + Surface(surf).Name;
+            ObjexxFCL::gio::write(unit, Format_710) << "Building Shading:" + Surface(surf).Name;
         }
         ++surfcount;
-        gio::write(cSurfNum, fmtLD) << surfcount;
+        ObjexxFCL::gio::write(cSurfNum, fmtLD) << surfcount;
         strip(cSurfNum);
         ShadeType += "_" + cSurfNum;
         minz = 99999.0;
@@ -1584,19 +1584,19 @@ void DXFOutWireFrame(std::string const &ColorScheme)
             minz = min(minz, Surface(surf).Vertex(vert).z);
         }
         if (Surface(surf).Sides <= 4) {
-            gio::write(unit, Format_715) << ShadeType << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
+            ObjexxFCL::gio::write(unit, Format_715) << ShadeType << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
             for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
-                gio::write(unit, Format_716) << ShadeType << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y
+                ObjexxFCL::gio::write(unit, Format_716) << ShadeType << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y
                                              << Surface(surf).Vertex(vert).z;
             }
-            gio::write(unit, Format_717) << ShadeType;
+            ObjexxFCL::gio::write(unit, Format_717) << ShadeType;
         } else { // polygon
-            gio::write(unit, Format_715) << ShadeType << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
+            ObjexxFCL::gio::write(unit, Format_715) << ShadeType << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
             for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
-                gio::write(unit, Format_716) << ShadeType << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y
+                ObjexxFCL::gio::write(unit, Format_716) << ShadeType << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y
                                              << Surface(surf).Vertex(vert).z;
             }
-            gio::write(unit, Format_717) << ShadeType;
+            ObjexxFCL::gio::write(unit, Format_717) << ShadeType;
         }
     }
 
@@ -1629,29 +1629,29 @@ void DXFOutWireFrame(std::string const &ColorScheme)
             }
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
-            gio::write(cSurfNum, fmtLD) << surfcount;
+            ObjexxFCL::gio::write(cSurfNum, fmtLD) << surfcount;
             strip(cSurfNum);
 
-            gio::write(unit, Format_710) << Surface(surf).ZoneName + ':' + Surface(surf).Name;
+            ObjexxFCL::gio::write(unit, Format_710) << Surface(surf).ZoneName + ':' + Surface(surf).Name;
             TempZoneName = SaveZoneName + '_' + cSurfNum;
             minz = 99999.0;
             for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
                 minz = min(minz, Surface(surf).Vertex(vert).z);
             }
             if (Surface(surf).Sides <= 4) {
-                gio::write(unit, Format_715) << TempZoneName << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
+                ObjexxFCL::gio::write(unit, Format_715) << TempZoneName << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
                 for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
-                    gio::write(unit, Format_716) << TempZoneName << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y
+                    ObjexxFCL::gio::write(unit, Format_716) << TempZoneName << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y
                                                  << Surface(surf).Vertex(vert).z;
                 }
-                gio::write(unit, Format_717) << TempZoneName;
+                ObjexxFCL::gio::write(unit, Format_717) << TempZoneName;
             } else { // polygon
-                gio::write(unit, Format_715) << TempZoneName << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
+                ObjexxFCL::gio::write(unit, Format_715) << TempZoneName << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
                 for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
-                    gio::write(unit, Format_716) << TempZoneName << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y
+                    ObjexxFCL::gio::write(unit, Format_716) << TempZoneName << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y
                                                  << Surface(surf).Vertex(vert).z;
                 }
-                gio::write(unit, Format_717) << TempZoneName;
+                ObjexxFCL::gio::write(unit, Format_717) << TempZoneName;
             }
         }
         // still have to do shading surfaces for zone
@@ -1663,29 +1663,29 @@ void DXFOutWireFrame(std::string const &ColorScheme)
             colorindex = ColorNo_ShdAtt;
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
-            gio::write(cSurfNum, fmtLD) << surfcount;
+            ObjexxFCL::gio::write(cSurfNum, fmtLD) << surfcount;
             strip(cSurfNum);
 
-            gio::write(unit, Format_710) << Surface(surf).ZoneName + ':' + Surface(surf).Name;
+            ObjexxFCL::gio::write(unit, Format_710) << Surface(surf).ZoneName + ':' + Surface(surf).Name;
             TempZoneName = SaveZoneName + '_' + cSurfNum;
             minz = 99999.0;
             for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
                 minz = min(minz, Surface(surf).Vertex(vert).z);
             }
             if (Surface(surf).Sides <= 4) {
-                gio::write(unit, Format_715) << TempZoneName << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
+                ObjexxFCL::gio::write(unit, Format_715) << TempZoneName << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
                 for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
-                    gio::write(unit, Format_716) << TempZoneName << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y
+                    ObjexxFCL::gio::write(unit, Format_716) << TempZoneName << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y
                                                  << Surface(surf).Vertex(vert).z;
                 }
-                gio::write(unit, Format_717) << TempZoneName;
+                ObjexxFCL::gio::write(unit, Format_717) << TempZoneName;
             } else { // polygon attached shading
-                gio::write(unit, Format_715) << TempZoneName << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
+                ObjexxFCL::gio::write(unit, Format_715) << TempZoneName << DXFcolorno(colorindex) << minz << PolylineWidth << PolylineWidth;
                 for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
-                    gio::write(unit, Format_716) << TempZoneName << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y
+                    ObjexxFCL::gio::write(unit, Format_716) << TempZoneName << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y
                                                  << Surface(surf).Vertex(vert).z;
                 }
-                gio::write(unit, Format_717) << TempZoneName;
+                ObjexxFCL::gio::write(unit, Format_717) << TempZoneName;
             }
         }
     }
@@ -1709,8 +1709,8 @@ void DXFOutWireFrame(std::string const &ColorScheme)
             pos = index(TempZoneName, ':');
         }
         for (refpt = 1; refpt <= ZoneDaylight(zones).TotalDaylRefPoints; ++refpt) {
-            gio::write(unit, Format_710) << Zone(zones).Name + ":DayRefPt:" + TrimSigDigits(refpt);
-            gio::write(unit, Format_709) << TempZoneName << DXFcolorno(curcolorno) << ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt)
+            ObjexxFCL::gio::write(unit, Format_710) << Zone(zones).Name + ":DayRefPt:" + TrimSigDigits(refpt);
+            ObjexxFCL::gio::write(unit, Format_709) << TempZoneName << DXFcolorno(curcolorno) << ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt)
                                          << ZoneDaylight(zones).DaylRefPtAbsCoord(2, refpt) << ZoneDaylight(zones).DaylRefPtAbsCoord(3, refpt) << 0.2;
             curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
         }
@@ -1731,16 +1731,16 @@ void DXFOutWireFrame(std::string const &ColorScheme)
             pos = index(TempZoneName, ':');
         }
         for (refpt = 1; refpt <= ZoneDaylight(zones).TotalDaylRefPoints; ++refpt) {
-            gio::write(unit, Format_710) << Zone(zones).Name + ":DEDayRefPt:" + TrimSigDigits(refpt);
-            gio::write(unit, Format_709) << TempZoneName << DXFcolorno(curcolorno) << ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt)
+            ObjexxFCL::gio::write(unit, Format_710) << Zone(zones).Name + ":DEDayRefPt:" + TrimSigDigits(refpt);
+            ObjexxFCL::gio::write(unit, Format_709) << TempZoneName << DXFcolorno(curcolorno) << ZoneDaylight(zones).DaylRefPtAbsCoord(1, refpt)
                                          << ZoneDaylight(zones).DaylRefPtAbsCoord(2, refpt) << ZoneDaylight(zones).DaylRefPtAbsCoord(3, refpt) << 0.2;
             curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
         }
     }
 
-    gio::write(unit, Format_706);
+    ObjexxFCL::gio::write(unit, Format_706);
 
-    gio::close(unit);
+    ObjexxFCL::gio::close(unit);
 }
 
 void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only, 11=Details with vertices)
@@ -2285,7 +2285,7 @@ void CostInfoOut()
     int write_stat;
 
     // Formats
-    static gio::Fmt Format_801("(I5,',',A,',',A,',',A,',',f14.5,',',f14.5)");
+    static ObjexxFCL::gio::Fmt Format_801("(I5,',',A,',',A,',',A,',',f14.5,',',f14.5)");
 
     if (TotSurfaces > 0 && !allocated(Surface)) {
         // no error needed, probably in end processing, just return
@@ -2311,27 +2311,27 @@ void CostInfoOut()
     {
         IOFlags flags;
         flags.ACTION("write");
-        gio::open(unit, DataStringGlobals::outputSciFileName, flags);
+        ObjexxFCL::gio::open(unit, DataStringGlobals::outputSciFileName, flags);
         write_stat = flags.ios();
     }
     if (write_stat != 0) {
         ShowFatalError("CostInfoOut: Could not open file " + DataStringGlobals::outputSciFileName + " for output (write).");
     }
-    gio::write(unit, fmtLD) << TotSurfaces << int(count(uniqueSurf));
-    gio::write(unit, fmtLD) << "data for surfaces useful for cost information";
-    gio::write(unit, fmtLD) << "Number, Name, Construction, class, area, grossarea";
+    ObjexxFCL::gio::write(unit, fmtLD) << TotSurfaces << int(count(uniqueSurf));
+    ObjexxFCL::gio::write(unit, fmtLD) << "data for surfaces useful for cost information";
+    ObjexxFCL::gio::write(unit, fmtLD) << "Number, Name, Construction, class, area, grossarea";
 
     for (surf = 1; surf <= TotSurfaces; ++surf) {
         // if (surface(surf)%class .eq. SurfaceClass_IntMass) CYCLE
         if (!uniqueSurf(surf)) continue;
         // why the heck are constructions == 0 ?
         if (Surface(surf).Construction != 0) {
-            gio::write(unit, Format_801) << surf << Surface(surf).Name << Construct(Surface(surf).Construction).Name
+            ObjexxFCL::gio::write(unit, Format_801) << surf << Surface(surf).Name << Construct(Surface(surf).Construction).Name
                                          << cSurfaceClass(Surface(surf).Class) << Surface(surf).Area << Surface(surf).GrossArea;
         }
     }
 
-    gio::close(unit);
+    ObjexxFCL::gio::close(unit);
 
     uniqueSurf.deallocate();
 }
@@ -2407,17 +2407,17 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
     Array1D<dTriangle> mytriangles;
 
     // Formats
-    static gio::Fmt Format_702("('#VRML V2.0 utf8')");
-    static gio::Fmt Format_707("('WorldInfo {',/,3X,'title \"Building - ',A,'\"',/,3X,'info [\"EnergyPlus Program Version ',A,'\"]',/,3X,'info "
+    static ObjexxFCL::gio::Fmt Format_702("('#VRML V2.0 utf8')");
+    static ObjexxFCL::gio::Fmt Format_707("('WorldInfo {',/,3X,'title \"Building - ',A,'\"',/,3X,'info [\"EnergyPlus Program Version ',A,'\"]',/,3X,'info "
                                "[\"Surface Color Scheme ',A,'\"]',/,'}')");
-    static gio::Fmt Format_800("('Shape {',/,'appearance DEF ',A,' Appearance {',/,'material Material { diffuseColor ',A,' }',/,'}',/,'}')");
-    static gio::Fmt Format_801(
+    static ObjexxFCL::gio::Fmt Format_800("('Shape {',/,'appearance DEF ',A,' Appearance {',/,'material Material { diffuseColor ',A,' }',/,'}',/,'}')");
+    static ObjexxFCL::gio::Fmt Format_801(
         "('Shape {',/,'appearance USE ',A,/,'geometry IndexedFaceSet {',/,'solid TRUE',/,'coord DEF ',A,' Coordinate {',/,'point [')");
-    static gio::Fmt Format_802("(F15.5,1X,F15.5,1X,F15.5,',')");
-    static gio::Fmt Format_803("(']',/,'}',/,'coordIndex [')");
-    static gio::Fmt Format_804("(A)");
-    static gio::Fmt Format_805("(']',/,'ccw TRUE',/,'solid TRUE',/,'}',/,'}')");
-    static gio::Fmt Format_710("(A)");
+    static ObjexxFCL::gio::Fmt Format_802("(F15.5,1X,F15.5,1X,F15.5,',')");
+    static ObjexxFCL::gio::Fmt Format_803("(']',/,'}',/,'coordIndex [')");
+    static ObjexxFCL::gio::Fmt Format_804("(A)");
+    static ObjexxFCL::gio::Fmt Format_805("(']',/,'ccw TRUE',/,'solid TRUE',/,'}',/,'}')");
+    static ObjexxFCL::gio::Fmt Format_710("(A)");
 
     if (PolygonAction == "TRIANGULATE3DFACE" || PolygonAction == "TRIANGULATE") {
         TriangulateFace = true;
@@ -2441,24 +2441,24 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
     {
         IOFlags flags;
         flags.ACTION("write");
-        gio::open(unit, DataStringGlobals::outputWrlFileName, flags);
+        ObjexxFCL::gio::open(unit, DataStringGlobals::outputWrlFileName, flags);
         write_stat = flags.ios();
     }
     if (write_stat != 0) {
         ShowFatalError("VRMLOut: Could not open file " + DataStringGlobals::outputWrlFileName + " for output (write).");
     }
 
-    gio::write(unit, Format_702); // Beginning
+    ObjexxFCL::gio::write(unit, Format_702); // Beginning
 
     if (ColorScheme == "") {
-        gio::write(unit, Format_707) << BuildingName << VerString << "Default"; // World Info
+        ObjexxFCL::gio::write(unit, Format_707) << BuildingName << VerString << "Default"; // World Info
     } else {
-        gio::write(unit, Format_707) << BuildingName << VerString << ColorScheme; // World Info
+        ObjexxFCL::gio::write(unit, Format_707) << BuildingName << VerString << ColorScheme; // World Info
     }
 
-    gio::write(unit, Format_710) << "# Zone Names";
+    ObjexxFCL::gio::write(unit, Format_710) << "# Zone Names";
     for (zones = 1; zones <= NumOfZones; ++zones) {
-        gio::write(ZoneNum, fmtLD) << zones;
+        ObjexxFCL::gio::write(ZoneNum, fmtLD) << zones;
         strip(ZoneNum);
         TempZoneName = Zone(zones).Name;
         pos = index(TempZoneName, ' ');
@@ -2471,30 +2471,30 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
             TempZoneName[pos] = '_';
             pos = index(TempZoneName, ':');
         }
-        gio::write(unit, Format_710) << "# Zone=" + ZoneNum + ':' + TempZoneName;
+        ObjexxFCL::gio::write(unit, Format_710) << "# Zone=" + ZoneNum + ':' + TempZoneName;
     }
 
     // Define the colors:
 
-    gio::write(unit, Format_800) << "FLOOR"
+    ObjexxFCL::gio::write(unit, Format_800) << "FLOOR"
                                  << "0.502 0.502 0.502";
-    gio::write(unit, Format_800) << "ROOF"
+    ObjexxFCL::gio::write(unit, Format_800) << "ROOF"
                                  << "1 1 0";
-    gio::write(unit, Format_800) << "WALL"
+    ObjexxFCL::gio::write(unit, Format_800) << "WALL"
                                  << "0 1 0";
-    gio::write(unit, Format_800) << "WINDOW"
+    ObjexxFCL::gio::write(unit, Format_800) << "WINDOW"
                                  << "0 1 1";
-    gio::write(unit, Format_800) << "DOOR"
+    ObjexxFCL::gio::write(unit, Format_800) << "DOOR"
                                  << "0 1 1";
-    gio::write(unit, Format_800) << "GLASSDOOR"
+    ObjexxFCL::gio::write(unit, Format_800) << "GLASSDOOR"
                                  << "0 1 1";
-    gio::write(unit, Format_800) << "FIXEDSHADE"
+    ObjexxFCL::gio::write(unit, Format_800) << "FIXEDSHADE"
                                  << "1 0 1";
-    gio::write(unit, Format_800) << "BLDGSHADE"
+    ObjexxFCL::gio::write(unit, Format_800) << "BLDGSHADE"
                                  << "0 0 1";
-    gio::write(unit, Format_800) << "SUBSHADE"
+    ObjexxFCL::gio::write(unit, Format_800) << "SUBSHADE"
                                  << "1 0 1";
-    gio::write(unit, Format_800) << "BACKCOLOR"
+    ObjexxFCL::gio::write(unit, Format_800) << "BACKCOLOR"
                                  << "0.502 0.502 0.784";
 
     //  Do all detached shading surfaces first
@@ -2506,30 +2506,30 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
         if (Surface(surf).Class == SurfaceClass_Detached_B) colorindex = 7;
         if (Surface(surf).Class == SurfaceClass_Detached_F) {
             ShadeType = "Fixed Shading";
-            gio::write(unit, Format_710) << "# Fixed Shading:" + Surface(surf).Name;
+            ObjexxFCL::gio::write(unit, Format_710) << "# Fixed Shading:" + Surface(surf).Name;
         } else if (Surface(surf).Class == SurfaceClass_Detached_B) {
             ShadeType = "Building Shading";
-            gio::write(unit, Format_710) << "# Building Shading:" + Surface(surf).Name;
+            ObjexxFCL::gio::write(unit, Format_710) << "# Building Shading:" + Surface(surf).Name;
         }
-        gio::write(csurfnumber, fmtLD) << surf;
+        ObjexxFCL::gio::write(csurfnumber, fmtLD) << surf;
         strip(csurfnumber);
-        gio::write(unit, Format_801) << colorstring(colorindex) << "Surf" + csurfnumber;
+        ObjexxFCL::gio::write(unit, Format_801) << colorstring(colorindex) << "Surf" + csurfnumber;
         for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
-            gio::write(unit, Format_802) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z;
+            ObjexxFCL::gio::write(unit, Format_802) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z;
         }
-        gio::write(unit, Format_803);
+        ObjexxFCL::gio::write(unit, Format_803);
         if (Surface(surf).Sides <= 4 || !TriangulateFace) {
             for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
-                gio::write(csidenumber, fmtLD) << vert - 1;
+                ObjexxFCL::gio::write(csidenumber, fmtLD) << vert - 1;
                 strip(csidenumber);
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(unit, Format_804, flags) << ' ' + csidenumber;
+                    ObjexxFCL::gio::write(unit, Format_804, flags) << ' ' + csidenumber;
                 }
-                if (vert == Surface(surf).Sides) gio::write(unit, Format_804) << " -1";
+                if (vert == Surface(surf).Sides) ObjexxFCL::gio::write(unit, Format_804) << " -1";
             }
-            gio::write(unit, Format_805);
+            ObjexxFCL::gio::write(unit, Format_805);
         } else { // will be >4 sided polygon with triangulate option
             ntri = Triangulate(Surface(surf).Sides,
                                Surface(surf).Vertex,
@@ -2540,32 +2540,32 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
                                Surface(surf).Class);
             for (svert = 1; svert <= ntri; ++svert) {
                 vv0 = mytriangles(svert).vv0;
-                gio::write(csidenumber, fmtLD) << vv0 - 1;
+                ObjexxFCL::gio::write(csidenumber, fmtLD) << vv0 - 1;
                 strip(csidenumber);
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(unit, Format_804, flags) << ' ' + csidenumber;
+                    ObjexxFCL::gio::write(unit, Format_804, flags) << ' ' + csidenumber;
                 }
                 vv1 = mytriangles(svert).vv1;
-                gio::write(csidenumber, fmtLD) << vv1 - 1;
+                ObjexxFCL::gio::write(csidenumber, fmtLD) << vv1 - 1;
                 strip(csidenumber);
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(unit, Format_804, flags) << ' ' + csidenumber;
+                    ObjexxFCL::gio::write(unit, Format_804, flags) << ' ' + csidenumber;
                 }
                 vv2 = mytriangles(svert).vv2;
-                gio::write(csidenumber, fmtLD) << vv2 - 1;
+                ObjexxFCL::gio::write(csidenumber, fmtLD) << vv2 - 1;
                 strip(csidenumber);
                 {
                     IOFlags flags;
                     flags.ADVANCE("No");
-                    gio::write(unit, Format_804, flags) << ' ' + csidenumber;
+                    ObjexxFCL::gio::write(unit, Format_804, flags) << ' ' + csidenumber;
                 }
-                gio::write(unit, Format_804) << " -1";
+                ObjexxFCL::gio::write(unit, Format_804) << " -1";
             }
-            gio::write(unit, Format_805);
+            ObjexxFCL::gio::write(unit, Format_805);
             mytriangles.deallocate();
         }
     }
@@ -2591,26 +2591,26 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
             if (Surface(surf).Class == SurfaceClass_Floor) colorindex = 6;
             if (Surface(surf).Class == SurfaceClass_Window) colorindex = 2;
             if (Surface(surf).Class == SurfaceClass_Door) colorindex = 2;
-            gio::write(csurfnumber, fmtLD) << surf;
+            ObjexxFCL::gio::write(csurfnumber, fmtLD) << surf;
             strip(csurfnumber);
-            gio::write(unit, Format_710) << "# " + Surface(surf).ZoneName + ':' + Surface(surf).Name;
-            gio::write(unit, Format_801) << colorstring(colorindex) << "Surf" + csurfnumber;
+            ObjexxFCL::gio::write(unit, Format_710) << "# " + Surface(surf).ZoneName + ':' + Surface(surf).Name;
+            ObjexxFCL::gio::write(unit, Format_801) << colorstring(colorindex) << "Surf" + csurfnumber;
             for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
-                gio::write(unit, Format_802) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z;
+                ObjexxFCL::gio::write(unit, Format_802) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z;
             }
-            gio::write(unit, Format_803);
+            ObjexxFCL::gio::write(unit, Format_803);
             if (Surface(surf).Sides <= 4 || !TriangulateFace) {
                 for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
-                    gio::write(csidenumber, fmtLD) << vert - 1;
+                    ObjexxFCL::gio::write(csidenumber, fmtLD) << vert - 1;
                     strip(csidenumber);
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(unit, Format_804, flags) << ' ' + csidenumber;
+                        ObjexxFCL::gio::write(unit, Format_804, flags) << ' ' + csidenumber;
                     }
-                    if (vert == Surface(surf).Sides) gio::write(unit, Format_804) << " -1";
+                    if (vert == Surface(surf).Sides) ObjexxFCL::gio::write(unit, Format_804) << " -1";
                 }
-                gio::write(unit, Format_805);
+                ObjexxFCL::gio::write(unit, Format_805);
             } else { // will be >4 sided polygon with triangulate option
                 ntri = Triangulate(Surface(surf).Sides,
                                    Surface(surf).Vertex,
@@ -2621,32 +2621,32 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
                                    Surface(surf).Class);
                 for (svert = 1; svert <= ntri; ++svert) {
                     vv0 = mytriangles(svert).vv0;
-                    gio::write(csidenumber, fmtLD) << vv0 - 1;
+                    ObjexxFCL::gio::write(csidenumber, fmtLD) << vv0 - 1;
                     strip(csidenumber);
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(unit, Format_804, flags) << ' ' + csidenumber;
+                        ObjexxFCL::gio::write(unit, Format_804, flags) << ' ' + csidenumber;
                     }
                     vv1 = mytriangles(svert).vv1;
-                    gio::write(csidenumber, fmtLD) << vv1 - 1;
+                    ObjexxFCL::gio::write(csidenumber, fmtLD) << vv1 - 1;
                     strip(csidenumber);
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(unit, Format_804, flags) << ' ' + csidenumber;
+                        ObjexxFCL::gio::write(unit, Format_804, flags) << ' ' + csidenumber;
                     }
                     vv2 = mytriangles(svert).vv2;
-                    gio::write(csidenumber, fmtLD) << vv2 - 1;
+                    ObjexxFCL::gio::write(csidenumber, fmtLD) << vv2 - 1;
                     strip(csidenumber);
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(unit, Format_804, flags) << ' ' + csidenumber;
+                        ObjexxFCL::gio::write(unit, Format_804, flags) << ' ' + csidenumber;
                     }
-                    gio::write(unit, Format_804) << " -1";
+                    ObjexxFCL::gio::write(unit, Format_804) << " -1";
                 }
-                gio::write(unit, Format_805);
+                ObjexxFCL::gio::write(unit, Format_805);
                 mytriangles.deallocate();
             }
         }
@@ -2657,24 +2657,24 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
             if (Surface(surf).Class != SurfaceClass_Shading) continue;
             if (Surface(surf).ZoneName != Zone(zones).Name) continue;
             if (Surface(surf).Sides == 0) continue;
-            gio::write(unit, Format_710) << "# " + Surface(surf).ZoneName + ':' + Surface(surf).Name;
-            gio::write(unit, Format_801) << colorstring(colorindex) << "Surf" + csurfnumber;
+            ObjexxFCL::gio::write(unit, Format_710) << "# " + Surface(surf).ZoneName + ':' + Surface(surf).Name;
+            ObjexxFCL::gio::write(unit, Format_801) << colorstring(colorindex) << "Surf" + csurfnumber;
             for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
-                gio::write(unit, Format_802) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z;
+                ObjexxFCL::gio::write(unit, Format_802) << Surface(surf).Vertex(vert).x << Surface(surf).Vertex(vert).y << Surface(surf).Vertex(vert).z;
             }
-            gio::write(unit, Format_803);
+            ObjexxFCL::gio::write(unit, Format_803);
             if (Surface(surf).Sides <= 4 || !TriangulateFace) {
                 for (vert = 1; vert <= Surface(surf).Sides; ++vert) {
-                    gio::write(csidenumber, fmtLD) << vert - 1;
+                    ObjexxFCL::gio::write(csidenumber, fmtLD) << vert - 1;
                     strip(csidenumber);
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(unit, Format_804, flags) << ' ' + csidenumber;
+                        ObjexxFCL::gio::write(unit, Format_804, flags) << ' ' + csidenumber;
                     }
-                    if (vert == Surface(surf).Sides) gio::write(unit, Format_804) << " -1";
+                    if (vert == Surface(surf).Sides) ObjexxFCL::gio::write(unit, Format_804) << " -1";
                 }
-                gio::write(unit, Format_805);
+                ObjexxFCL::gio::write(unit, Format_805);
             } else { // will be >4 sided polygon with triangulate option
                 ntri = Triangulate(Surface(surf).Sides,
                                    Surface(surf).Vertex,
@@ -2685,32 +2685,32 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
                                    Surface(surf).Class);
                 for (svert = 1; svert <= ntri; ++svert) {
                     vv0 = mytriangles(svert).vv0;
-                    gio::write(csidenumber, fmtLD) << vv0 - 1;
+                    ObjexxFCL::gio::write(csidenumber, fmtLD) << vv0 - 1;
                     strip(csidenumber);
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(unit, Format_804, flags) << ' ' + csidenumber;
+                        ObjexxFCL::gio::write(unit, Format_804, flags) << ' ' + csidenumber;
                     }
                     vv1 = mytriangles(svert).vv1;
-                    gio::write(csidenumber, fmtLD) << vv1 - 1;
+                    ObjexxFCL::gio::write(csidenumber, fmtLD) << vv1 - 1;
                     strip(csidenumber);
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(unit, Format_804, flags) << ' ' + csidenumber;
+                        ObjexxFCL::gio::write(unit, Format_804, flags) << ' ' + csidenumber;
                     }
                     vv2 = mytriangles(svert).vv2;
-                    gio::write(csidenumber, fmtLD) << vv2 - 1;
+                    ObjexxFCL::gio::write(csidenumber, fmtLD) << vv2 - 1;
                     strip(csidenumber);
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(unit, Format_804, flags) << ' ' + csidenumber;
+                        ObjexxFCL::gio::write(unit, Format_804, flags) << ' ' + csidenumber;
                     }
-                    gio::write(unit, Format_804) << " -1";
+                    ObjexxFCL::gio::write(unit, Format_804) << " -1";
                 }
-                gio::write(unit, Format_805);
+                ObjexxFCL::gio::write(unit, Format_805);
                 mytriangles.deallocate();
             }
         }
@@ -2718,7 +2718,7 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
 
     // vrml does not have daylighting reference points included
 
-    gio::close(unit);
+    ObjexxFCL::gio::close(unit);
 }
 
 } // namespace EnergyPlus

@@ -75,7 +75,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.1;
+  Version,9.2;
 
   Building,
     Building,                !- Name
@@ -105,7 +105,7 @@
 ! 6, 16 to 6, 19
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     6,                       !- Begin Month
     16,                      !- Begin Day of Month
     ,                        !- Begin Year

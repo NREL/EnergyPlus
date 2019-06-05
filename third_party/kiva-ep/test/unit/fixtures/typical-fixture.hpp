@@ -5,6 +5,7 @@
 #define TYPICAL_FIXTURE_HPP_
 
 #include "base-fixture.hpp"
+#include "foundation-fixture.hpp"
 
 using namespace Kiva;
 

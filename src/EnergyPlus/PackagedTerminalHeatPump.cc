@@ -5487,7 +5487,7 @@ namespace PackagedTerminalHeatPump {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500);    // maximum number of iterations
         Real64 const MinPLF(0.0); // minimum part load factor allowed
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -5640,7 +5640,7 @@ namespace PackagedTerminalHeatPump {
                         if (!FirstHVACIteration && !WarmupFlag) {
                             CalcPTUnit(PTUnitNum, FirstHVACIteration, PartLoadFrac, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
                             if (PTUnit(PTUnitNum).IterErrIndex == 0) {
-                                gio::write(IterNum, fmtLD) << MaxIte;
+                                ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
                                 strip(IterNum);
                                 ShowWarningError(PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                                 ShowContinueError(

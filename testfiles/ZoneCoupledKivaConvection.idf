@@ -20,7 +20,7 @@
 !           chillers and purchased cooling.  Priority based controls determine which piece of equipment
 !           tries to meet the load.
 
-  Version,9.1;
+  Version,9.2;
 
   Timestep,6;
 
@@ -108,7 +108,7 @@
     1.00;                    !- Sky Clearness
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
