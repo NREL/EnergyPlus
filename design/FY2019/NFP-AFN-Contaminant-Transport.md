@@ -91,7 +91,7 @@ The above "Approach" section will be adapted to the Engineering reference format
 The I/O Reference will be modified to describe the modified and additional
 inputs.
 
-The zone object will be modified to include sources and sinks:
+The zone object will be modified to include sources, sinks, and a multiplier:
 
 ```
 AirflowNetwork:MultiZone:Zone,
@@ -112,12 +112,15 @@ AirflowNetwork:MultiZone:Zone,
       \type object-list
       \object-list AirflowNetworkOccupantVentilationControlNames
       \note Enter the name where Occupancy Ventilation Control is required.
+  N7, \field Source Sink Muliplier
+      \type real
+      \default 1.0
+      \note Multiplier to be applied to sources and sinks
   A7, \field Contaminant Source Sink 1
       \begin-extensible
       \type object-list
       \object-list AirflowNetworkContaminantSourceSinks
   A8, \field Contaminant Source Sink 2
-      \begin-extensible
       \type object-list
       \object-list AirflowNetworkMaterialSourceSinks
   ...
@@ -143,10 +146,14 @@ AirflowNetwork:Distribution:Linkage,
       \note Only used if component = AirflowNetwork:Distribution:Component:Duct
       \note The zone name is where AirflowNetwork:Distribution:Component:Duct is exposed. Leave this field blank if the duct
       \note conduction loss is ignored.
- A6 , \field Filter Component 1
+ A6 , \field Filter 1
       \begin-extensible
       \type object-list
       \object-list AirflowNetworkFilters
+ A7 , \field Filter 2
+      \type object-list
+      \object-list AirflowNetworkFilters
+ ...
 ```
 
 The simulation control object will be modified to include a simulation option:
@@ -179,9 +186,9 @@ AirflowNetwork:SimulationControl,
       \default None
 ```
 
-The additional IDD objects are:
+The new IDD objects are:
 
-* A material object that describes a contaminant material
+* A material object that describes a transported material
 
 ```
 AirflowNetwork:Material,
