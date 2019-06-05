@@ -1220,7 +1220,6 @@ namespace PlantChillers {
         int NumNums;    // Number of elements in the numeric array
         int IOStat;     // IO Status when calling get input subroutine
         static bool ErrorsFound(false);
-        bool errFlag;
         bool Okay;
 
         // FLOW
@@ -1253,11 +1252,9 @@ namespace PlantChillers {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            errFlag = false;
-            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise 
+            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+            
             EngineDrivenChiller(ChillerNum).Base.Name = cAlphaArgs(1);
 
             EngineDrivenChiller(ChillerNum).Base.NomCap = rNumericArgs(1);
@@ -1914,7 +1911,6 @@ namespace PlantChillers {
         int NumNums;    // Number of elements in the numeric array
         int IOStat;     // IO Status when calling get input subroutine
         static bool ErrorsFound(false);
-        bool errFlag;
         bool Okay;
 
         // FLOW
@@ -1946,10 +1942,9 @@ namespace PlantChillers {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise 
+            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+            
             GTChiller(ChillerNum).Base.Name = cAlphaArgs(1);
 
             GTChiller(ChillerNum).Base.NomCap = rNumericArgs(1);
@@ -2535,7 +2530,6 @@ namespace PlantChillers {
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
         static bool ErrorsFound(false);
-        bool errFlag;
         bool Okay;
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
@@ -2568,10 +2562,9 @@ namespace PlantChillers {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise 
+            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+            
             ConstCOPChiller(ChillerNum).Base.Name = cAlphaArgs(1);
             ConstCOPChiller(ChillerNum).Base.NomCap = rNumericArgs(1);
             if (ConstCOPChiller(ChillerNum).Base.NomCap == AutoSize) {
