@@ -240,7 +240,7 @@ SizingPeriod:DesignDay,
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
 RunPeriod,
-    ,                        !- Name
+    July Run Period,         !- Name
     7,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -255,7 +255,7 @@ RunPeriod,
     Yes;                     !- Use Weather File Snow Indicators
 
 RunPeriod,
-    ,                        !- Name
+    February Run Period,     !- Name
     2,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
