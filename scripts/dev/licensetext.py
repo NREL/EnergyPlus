@@ -1,3 +1,4 @@
+import codecs
 import datetime
 import fnmatch
 import json
@@ -138,6 +139,7 @@ def checkLicense(filename,possible,correct,offset=0,toolname='unspecified',
     except IndexError:
         message({'tool':toolname,
                  'filename':filename,
+                 'file':filename,
                  'line':1,
                  'messagetype':'error',
                  'message':'License text cannot be matched, check entire license'})
@@ -147,6 +149,7 @@ def checkLicense(filename,possible,correct,offset=0,toolname='unspecified',
         if possibleYear != correctYear:
             message({'tool':toolname,
                      'filename':filename,
+                     'file':filename,
                      'line':1,
                      'messagetype':'error',
                      'message':'License year is incorrect'})
@@ -156,12 +159,14 @@ def checkLicense(filename,possible,correct,offset=0,toolname='unspecified',
     except:
         message({'tool':toolname,
                  'filename':filename,
+                 'file':filename,
                  'line':1,
                  'messagetype':'error',
                  'message':'License text cannot be matched, check entire license'})
         return
     message({'tool':toolname,
              'filename':filename,
+             'file':filename,
              'line':1,
              'messagetype':'error',
              'message':'Non-year differences in license text, check entire license'})
@@ -214,17 +219,18 @@ class Checker(CodeChecker):
         self.toolname = toolname
         self.message = message
     def filecheck(self, filepath):
-        fp = open(filepath,'r')
+        fp = codecs.open(filepath,'r',encoding='utf-8',errors='ignore')
         try:
             txt = fp.read()
         except UnicodeDecodeError as exc:
             try:
                 fp.close()
-                fp = open(filepath,'r',encoding='utf8')
+                fp = codecs.open(filepath,'r',encoding='utf8')
                 txt = fp.read()
             except:
                 self.message({'tool':self.toolname,
                               'filename':filepath,
+                              'file':filepath,
                               'line':0,
                               'messagetype':'error',
                               'message':'UnicodeDecodeError: '+ str(exc)})
@@ -241,12 +247,14 @@ class Checker(CodeChecker):
             if n > 1:
                 self.message({'tool':self.toolname,
                               'filename':filepath,
+                              'file':filepath,
                               'line':1,
                               'messagetype':'error',
                               'message':'Multiple instances of license text'})
             if not txt.startswith(self.text):
                 self.message({'tool':self.toolname,
                               'filename':filepath,
+                              'file':filepath,
                               'line':1,
                               'messagetype':'error',
                               'message':'License text is not at top of file'})
@@ -261,14 +269,14 @@ class Replacer(CodeChecker):
         self.replaced = 0
         self.failures = []
     def filecheck(self,filepath):
-        fp = open(filepath,'r')
+        fp = codecs.open(filepath,'r',encoding='utf-8',errors='ignore')
         try:
             txt = fp.read()
         except UnicodeDecodeError as exc:
             message = filepath + ', UnicodeDecodeError: '+ str(exc)
             try:
                 fp.close()
-                fp = open(filepath,'r',encoding='utf8')
+                fp = codecs.open(filepath,'r',encoding='utf8')
                 txt = fp.read()
             except:
                 self.failures.append(message)
@@ -280,7 +288,7 @@ class Replacer(CodeChecker):
         else:
             txt = txt.replace(self.oldtxt, self.newtxt)
             if self.newtxt in txt:
-                fp = open(filepath,'w')
+                fp = codecs.open(filepath,'w',encoding='utf-8',errors='ignore')
                 fp.write(txt)
                 fp.close()
                 self.replaced += 1
