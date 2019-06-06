@@ -118,12 +118,12 @@ namespace Boilers {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumBoilers(0);              // Number of boilers
-    Real64 FuelUsed(0.0);           // W - Boiler fuel used
-    Real64 ParasiticElecPower(0.0); // W - Parasitic electrical power (e.g. forced draft fan)
-    Real64 BoilerLoad(0.0);         // W - Boiler Load
-    Real64 BoilerMassFlowRate(0.0); // kg/s - Boiler mass flow rate
-    Real64 BoilerOutletTemp(0.0);   // W - Boiler outlet temperature
-    Real64 BoilerPLR(0.0);          // Boiler operating part-load ratio
+    Real64 aFuelUsed(0.0);           // W - Boiler fuel used
+    Real64 aParasiticElecPower(0.0); // W - Parasitic electrical power (e.g. forced draft fan)
+    Real64 aBoilerLoad(0.0);         // W - Boiler Load
+    Real64 aBoilerMassFlowRate(0.0); // kg/s - Boiler mass flow rate
+    Real64 aBoilerOutletTemp(0.0);   // W - Boiler outlet temperature
+    Real64 aBoilerPLR(0.0);          // Boiler operating part-load ratio
     bool GetBoilerInputFlag(true);
     Array1D_bool CheckEquipName;
 
@@ -134,12 +134,12 @@ namespace Boilers {
     void clear_state()
     {
         NumBoilers = 0;
-        FuelUsed = 0.0;
-        ParasiticElecPower = 0.0;
-        BoilerLoad = 0.0;
-        BoilerMassFlowRate = 0.0;
-        BoilerOutletTemp = 0.0;
-        BoilerPLR = 0.0;
+        aFuelUsed = 0.0;
+        aParasiticElecPower = 0.0;
+        aBoilerLoad = 0.0;
+        aBoilerMassFlowRate = 0.0;
+        aBoilerOutletTemp = 0.0;
+        aBoilerPLR = 0.0;
         CheckEquipName.deallocate();
         Boiler.deallocate();
         BoilerReport.deallocate();
@@ -890,9 +890,9 @@ namespace Boilers {
         Real64 EffCurveOutput = 1.0;  // Output of boiler efficiency curve
         Real64 Cp;
 
-        BoilerLoad = 0.0;
-        ParasiticElecPower = 0.0;
-        BoilerMassFlowRate = 0.0;
+        aBoilerLoad = 0.0;
+        aParasiticElecPower = 0.0;
+        aBoilerMassFlowRate = 0.0;
         BoilerInletNode = Boiler(BoilerNum).BoilerInletNodeNum;
         BoilerOutletNode = Boiler(BoilerNum).BoilerOutletNodeNum;
         BoilerNomCap = Boiler(BoilerNum).NomCap;
@@ -912,7 +912,7 @@ namespace Boilers {
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that flow resolver
         // will not shut down the branch
         if (MyLoad <= 0.0 || !RunFlag) {
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive) BoilerMassFlowRate = DataLoopNode::Node(BoilerInletNode).MassFlowRate;
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive) aBoilerMassFlowRate = DataLoopNode::Node(BoilerInletNode).MassFlowRate;
             return;
         }
 
@@ -931,14 +931,14 @@ namespace Boilers {
         }
 
         // Set the current load equal to the boiler load
-        BoilerLoad = MyLoad;
+        aBoilerLoad = MyLoad;
 
         if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) {
             // Either set the flow to the Constant value or caluclate the flow for the variable volume
             if ((Boiler(BoilerNum).FlowMode == ConstantFlow) || (Boiler(BoilerNum).FlowMode == NotModulated)) {
                 // Then find the flow rate and outlet temp
-                BoilerMassFlowRate = BoilerMassFlowRateMax;
-                PlantUtilities::SetComponentFlowRate(BoilerMassFlowRate,
+                aBoilerMassFlowRate = BoilerMassFlowRateMax;
+                PlantUtilities::SetComponentFlowRate(aBoilerMassFlowRate,
                                      BoilerInletNode,
                                      BoilerOutletNode,
                                      Boiler(BoilerNum).LoopNum,
@@ -946,13 +946,13 @@ namespace Boilers {
                                      Boiler(BoilerNum).BranchNum,
                                      Boiler(BoilerNum).CompNum);
 
-                if ((BoilerMassFlowRate != 0.0) && (MyLoad > 0.0)) {
-                    BoilerDeltaTemp = BoilerLoad / BoilerMassFlowRate / Cp;
+                if ((aBoilerMassFlowRate != 0.0) && (MyLoad > 0.0)) {
+                    BoilerDeltaTemp = aBoilerLoad / aBoilerMassFlowRate / Cp;
                 } else {
                     BoilerDeltaTemp = 0.0;
                 }
 
-                BoilerOutletTemp = BoilerDeltaTemp + DataLoopNode::Node(BoilerInletNode).Temp;
+                aBoilerOutletTemp = BoilerDeltaTemp + DataLoopNode::Node(BoilerInletNode).Temp;
 
             } else if (Boiler(BoilerNum).FlowMode == LeavingSetPointModulated) {
                 // Calculate the Delta Temp from the inlet temp to the boiler outlet setpoint
@@ -969,17 +969,17 @@ namespace Boilers {
                     }
                 }
 
-                BoilerOutletTemp = BoilerDeltaTemp + DataLoopNode::Node(BoilerInletNode).Temp;
+                aBoilerOutletTemp = BoilerDeltaTemp + DataLoopNode::Node(BoilerInletNode).Temp;
 
-                if ((BoilerDeltaTemp > 0.0) && (BoilerLoad > 0.0)) {
-                    BoilerMassFlowRate = BoilerLoad / Cp / BoilerDeltaTemp;
+                if ((BoilerDeltaTemp > 0.0) && (aBoilerLoad > 0.0)) {
+                    aBoilerMassFlowRate = aBoilerLoad / Cp / BoilerDeltaTemp;
 
-                    BoilerMassFlowRate = min(BoilerMassFlowRateMax, BoilerMassFlowRate);
+                    aBoilerMassFlowRate = min(BoilerMassFlowRateMax, aBoilerMassFlowRate);
 
                 } else {
-                    BoilerMassFlowRate = 0.0;
+                    aBoilerMassFlowRate = 0.0;
                 }
-                PlantUtilities::SetComponentFlowRate(BoilerMassFlowRate,
+                PlantUtilities::SetComponentFlowRate(aBoilerMassFlowRate,
                                      BoilerInletNode,
                                      BoilerOutletNode,
                                      Boiler(BoilerNum).LoopNum,
@@ -991,35 +991,35 @@ namespace Boilers {
 
         } else { // If FlowLock is True
             // Set the boiler flow rate from inlet node and then check performance
-            BoilerMassFlowRate = DataLoopNode::Node(BoilerInletNode).MassFlowRate;
+            aBoilerMassFlowRate = DataLoopNode::Node(BoilerInletNode).MassFlowRate;
 
-            if ((MyLoad > 0.0) && (BoilerMassFlowRate > 0.0)) { // this boiler has a heat load
-                BoilerLoad = MyLoad;
-                if (BoilerLoad > BoilerNomCap * BoilerMaxPLR) BoilerLoad = BoilerNomCap * BoilerMaxPLR;
-                if (BoilerLoad < BoilerNomCap * BoilerMinPLR) BoilerLoad = BoilerNomCap * BoilerMinPLR;
-                BoilerOutletTemp = DataLoopNode::Node(BoilerInletNode).Temp + BoilerLoad / (BoilerMassFlowRate * Cp);
+            if ((MyLoad > 0.0) && (aBoilerMassFlowRate > 0.0)) { // this boiler has a heat load
+                aBoilerLoad = MyLoad;
+                if (aBoilerLoad > BoilerNomCap * BoilerMaxPLR) aBoilerLoad = BoilerNomCap * BoilerMaxPLR;
+                if (aBoilerLoad < BoilerNomCap * BoilerMinPLR) aBoilerLoad = BoilerNomCap * BoilerMinPLR;
+                aBoilerOutletTemp = DataLoopNode::Node(BoilerInletNode).Temp + aBoilerLoad / (aBoilerMassFlowRate * Cp);
             } else {
-                BoilerLoad = 0.0;
-                BoilerOutletTemp = DataLoopNode::Node(BoilerInletNode).Temp;
+                aBoilerLoad = 0.0;
+                aBoilerOutletTemp = DataLoopNode::Node(BoilerInletNode).Temp;
             }
 
         } // End of the FlowLock If block
 
         // Limit BoilerOutletTemp.  If > max temp, trip boiler off
-        if (BoilerOutletTemp > TempUpLimitBout) {
-            BoilerLoad = 0.0;
-            BoilerOutletTemp = DataLoopNode::Node(BoilerInletNode).Temp;
+        if (aBoilerOutletTemp > TempUpLimitBout) {
+            aBoilerLoad = 0.0;
+            aBoilerOutletTemp = DataLoopNode::Node(BoilerInletNode).Temp;
         }
 
-        OperPLR = BoilerLoad / BoilerNomCap;
+        OperPLR = aBoilerLoad / BoilerNomCap;
         OperPLR = min(OperPLR, BoilerMaxPLR);
         OperPLR = max(OperPLR, BoilerMinPLR);
 
         // set report variable
-        BoilerPLR = OperPLR;
+        aBoilerPLR = OperPLR;
 
         // calculate theoretical fuel use based on nominal thermal efficiency
-        TheorFuelUse = BoilerLoad / BoilerEff;
+        TheorFuelUse = aBoilerLoad / BoilerEff;
 
         // calculate normalized efficiency based on curve object type
         if (Boiler(BoilerNum).EfficiencyCurvePtr > 0) {
@@ -1028,7 +1028,7 @@ namespace Boilers {
                 if (Boiler(BoilerNum).CurveTempMode == EnteringBoilerTemp) {
                     EffCurveOutput = CurveManager::CurveValue(Boiler(BoilerNum).EfficiencyCurvePtr, OperPLR, DataLoopNode::Node(BoilerInletNode).Temp);
                 } else if (Boiler(BoilerNum).CurveTempMode == LeavingBoilerTemp) {
-                    EffCurveOutput = CurveManager::CurveValue(Boiler(BoilerNum).EfficiencyCurvePtr, OperPLR, BoilerOutletTemp);
+                    EffCurveOutput = CurveManager::CurveValue(Boiler(BoilerNum).EfficiencyCurvePtr, OperPLR, aBoilerOutletTemp);
                 }
 
             } else {
@@ -1040,7 +1040,7 @@ namespace Boilers {
 
         // warn if efficiency curve produces zero or negative results
         if (!DataGlobals::WarmupFlag && EffCurveOutput <= 0.0) {
-            if (BoilerLoad > 0.0) {
+            if (aBoilerLoad > 0.0) {
                 if (Boiler(BoilerNum).EffCurveOutputError < 1) {
                     ++Boiler(BoilerNum).EffCurveOutputError;
                     ShowWarningError("Boiler:HotWater \"" + Boiler(BoilerNum).Name + "\"");
@@ -1050,7 +1050,7 @@ namespace Boilers {
                         if (Boiler(BoilerNum).CurveTempMode == EnteringBoilerTemp) {
                             ShowContinueError("...Curve input y value (Tinlet) = " + General::TrimSigDigits(DataLoopNode::Node(BoilerInletNode).Temp, 2));
                         } else if (Boiler(BoilerNum).CurveTempMode == LeavingBoilerTemp) {
-                            ShowContinueError("...Curve input y value (Toutlet) = " + General::TrimSigDigits(BoilerOutletTemp, 2));
+                            ShowContinueError("...Curve input y value (Toutlet) = " + General::TrimSigDigits(aBoilerOutletTemp, 2));
                         }
                     }
                     ShowContinueError("...Curve output (normalized eff) = " + General::TrimSigDigits(EffCurveOutput, 5));
@@ -1070,7 +1070,7 @@ namespace Boilers {
 
         // warn if overall efficiency greater than 1.1
         if (!DataGlobals::WarmupFlag && EffCurveOutput * BoilerEff > 1.1) {
-            if (BoilerLoad > 0.0 && Boiler(BoilerNum).EfficiencyCurvePtr > 0) {
+            if (aBoilerLoad > 0.0 && Boiler(BoilerNum).EfficiencyCurvePtr > 0) {
                 if (Boiler(BoilerNum).CalculatedEffError < 1) {
                     ++Boiler(BoilerNum).CalculatedEffError;
                     ShowWarningError("Boiler:HotWater \"" + Boiler(BoilerNum).Name + "\"");
@@ -1081,7 +1081,7 @@ namespace Boilers {
                         if (Boiler(BoilerNum).CurveTempMode == EnteringBoilerTemp) {
                             ShowContinueError("...Curve input y value (Tinlet) = " + General::TrimSigDigits(DataLoopNode::Node(BoilerInletNode).Temp, 2));
                         } else if (Boiler(BoilerNum).CurveTempMode == LeavingBoilerTemp) {
-                            ShowContinueError("...Curve input y value (Toutlet) = " + General::TrimSigDigits(BoilerOutletTemp, 2));
+                            ShowContinueError("...Curve input y value (Toutlet) = " + General::TrimSigDigits(aBoilerOutletTemp, 2));
                         }
                     }
                     ShowContinueError("...Curve output (normalized eff) = " + General::TrimSigDigits(EffCurveOutput, 5));
@@ -1100,8 +1100,8 @@ namespace Boilers {
         }
 
         // calculate fuel used based on normalized boiler efficiency curve (=1 when no curve used)
-        FuelUsed = TheorFuelUse / EffCurveOutput;
-        if (BoilerLoad > 0.0) ParasiticElecPower = ParasiticElecLoad * OperPLR;
+        aFuelUsed = TheorFuelUse / EffCurveOutput;
+        if (aBoilerLoad > 0.0) aParasiticElecPower = ParasiticElecLoad * OperPLR;
     }
 
     void UpdateBoilerRecords(Real64 const MyLoad, // boiler operating load
@@ -1139,12 +1139,12 @@ namespace Boilers {
         } else {
             // set node temperatures
             PlantUtilities::SafeCopyPlantNode(BoilerInletNode, BoilerOutletNode);
-            DataLoopNode::Node(BoilerOutletNode).Temp = BoilerOutletTemp;
-            BoilerReport(Num).BoilerOutletTemp = BoilerOutletTemp;
-            BoilerReport(Num).BoilerLoad = BoilerLoad;
-            BoilerReport(Num).FuelUsed = FuelUsed;
-            BoilerReport(Num).ParasiticElecPower = ParasiticElecPower;
-            BoilerReport(Num).BoilerPLR = BoilerPLR;
+            DataLoopNode::Node(BoilerOutletNode).Temp = aBoilerOutletTemp;
+            BoilerReport(Num).BoilerOutletTemp = aBoilerOutletTemp;
+            BoilerReport(Num).BoilerLoad = aBoilerLoad;
+            BoilerReport(Num).FuelUsed = aFuelUsed;
+            BoilerReport(Num).ParasiticElecPower = aParasiticElecPower;
+            BoilerReport(Num).BoilerPLR = aBoilerPLR;
         }
 
         BoilerReport(Num).BoilerInletTemp = DataLoopNode::Node(BoilerInletNode).Temp;

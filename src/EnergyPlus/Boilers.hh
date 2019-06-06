@@ -79,16 +79,14 @@ namespace Boilers {
     extern int const NotModulated;
     extern int const LeavingSetPointModulated;
 
-    // DERIVED TYPE DEFINITIONS
-
     // MODULE VARIABLE DECLARATIONS:
     extern int NumBoilers;            // Number of boilers
-    extern Real64 FuelUsed;           // W - Boiler fuel used
-    extern Real64 ParasiticElecPower; // W - Parasitic electrical power (e.g. forced draft fan)
-    extern Real64 BoilerLoad;         // W - Boiler Load
-    extern Real64 BoilerMassFlowRate; // kg/s - Boiler mass flow rate
-    extern Real64 BoilerOutletTemp;   // W - Boiler outlet temperature
-    extern Real64 BoilerPLR;          // Boiler operating part-load ratio
+    extern Real64 aFuelUsed;           // W - Boiler fuel used
+    extern Real64 aParasiticElecPower; // W - Parasitic electrical power (e.g. forced draft fan)
+    extern Real64 aBoilerLoad;         // W - Boiler Load
+    extern Real64 aBoilerMassFlowRate; // kg/s - Boiler mass flow rate
+    extern Real64 aBoilerOutletTemp;   // W - Boiler outlet temperature
+    extern Real64 aBoilerPLR;          // Boiler operating part-load ratio
     extern bool GetBoilerInputFlag;   // Boiler input flag, false if input is processed
 
     extern Array1D_bool CheckEquipName;
