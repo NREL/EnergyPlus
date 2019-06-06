@@ -81,12 +81,6 @@ namespace Boilers {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumBoilers;            // Number of boilers
-    extern Real64 aFuelUsed;           // W - Boiler fuel used
-    extern Real64 aParasiticElecPower; // W - Parasitic electrical power (e.g. forced draft fan)
-    extern Real64 aBoilerLoad;         // W - Boiler Load
-    extern Real64 aBoilerMassFlowRate; // kg/s - Boiler mass flow rate
-    extern Real64 aBoilerOutletTemp;   // W - Boiler outlet temperature
-    extern Real64 aBoilerPLR;          // Boiler operating part-load ratio
     extern bool GetBoilerInputFlag;   // Boiler input flag, false if input is processed
 
     extern Array1D_bool CheckEquipName;
@@ -138,6 +132,18 @@ namespace Boilers {
         bool MyEnvrnFlag;
         bool MyFlag;
 
+        Real64 FuelUsed;           // W - Boiler fuel used
+        Real64 ParasiticElecPower; // W - Parasitic electrical power (e.g. forced draft fan)
+        Real64 BoilerLoad;         // W - Boiler Load
+        Real64 BoilerMassFlowRate; // kg/s - Boiler mass flow rate
+        Real64 BoilerOutletTemp;   // W - Boiler outlet temperature
+        Real64 BoilerPLR;          // Boiler operating part-load ratio
+
+        Real64 BoilerEnergy;             // J - Boiler energy integrated over time
+        Real64 FuelConsumed;             // J - Boiler Fuel consumed integrated over time
+        Real64 BoilerInletTemp;          // C - Boiler inlet temperature
+        Real64 ParasiticElecConsumption; // J - Parasitic Electrical Consumption (e.g. forced draft fan)
+
         // Default Constructor
         BoilerSpecs()
             : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), Available(false), ON(false), NomCap(0.0),
@@ -146,35 +152,14 @@ namespace Boilers {
               BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0),
               CurveTempMode(BoilerTempModeNotSet), EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0),
               EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), IsThisSized(false),
-              FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), MyEnvrnFlag(true), MyFlag(true)
-        {
-        }
-    };
-
-    struct ReportVars
-    {
-        // Members
-        Real64 BoilerLoad;               // W - Boiler operating load
-        Real64 BoilerEnergy;             // J - Boiler energy integrated over time
-        Real64 FuelUsed;                 // W - Boiler fuel used
-        Real64 FuelConsumed;             // J - Boiler Fuel consumed integrated over time
-        Real64 BoilerInletTemp;          // C - Boiler inlet temperature
-        Real64 BoilerOutletTemp;         // C - Boiler outlet temperature
-        Real64 Mdot;                     // kg/s - Boiler mass flow rate
-        Real64 ParasiticElecPower;       // W - Parasitic Electrical Power (e.g. forced draft fan)
-        Real64 ParasiticElecConsumption; // J - Parasitic Electrical Consumption (e.g. forced draft fan)
-        Real64 BoilerPLR;                // Boiler operating part-load ratio
-
-        // Default Constructor
-        ReportVars()
-            : BoilerLoad(0.0), BoilerEnergy(0.0), FuelUsed(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), BoilerOutletTemp(0.0), Mdot(0.0),
-              ParasiticElecPower(0.0), ParasiticElecConsumption(0.0), BoilerPLR(0.0)
+              FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), MyEnvrnFlag(true), MyFlag(true),
+              FuelUsed(0.0), ParasiticElecPower(0.0), BoilerLoad(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerPLR(0.0),
+              BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), ParasiticElecConsumption(0.0)
         {
         }
     };
 
     extern Array1D<BoilerSpecs> Boiler;      // boiler data - dimension to number of machines
-    extern Array1D<ReportVars> BoilerReport; // report vars - dimension to number of machines
 
     void clear_state();
 
