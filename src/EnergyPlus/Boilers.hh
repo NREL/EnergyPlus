@@ -159,6 +159,19 @@ namespace Boilers {
               BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), ParasiticElecConsumption(0.0), BoilerFuelTypeForOutputVariable("")
         {
         }
+
+        void InitBoiler(); // number of the current boiler being simulated
+
+        void SizeBoiler();
+
+        void CalcBoilerModel(Real64 MyLoad,    // W - hot water demand to be met by boiler
+                             bool RunFlag,     // TRUE if boiler operating
+                             int EquipFlowCtrl // Flow control mode for the equipment
+        );
+
+        void UpdateBoilerRecords(Real64 MyLoad, // boiler operating load
+                                 bool RunFlag   // boiler on when TRUE
+        );
     };
 
     extern Array1D<BoilerSpecs> Boiler;      // boiler data - dimension to number of machines
@@ -180,21 +193,6 @@ namespace Boilers {
     );
 
     void GetBoilerInput();
-
-    void InitBoiler(int BoilerNum); // number of the current boiler being simulated
-
-    void SizeBoiler(int BoilerNum);
-
-    void CalcBoilerModel(int &BoilerNum,         // boiler identifier
-                         Real64 MyLoad,    // W - hot water demand to be met by boiler
-                         bool RunFlag,     // TRUE if boiler operating
-                         int EquipFlowCtrl // Flow control mode for the equipment
-    );
-
-    void UpdateBoilerRecords(Real64 MyLoad, // boiler operating load
-                             bool RunFlag,  // boiler on when TRUE
-                             int Num        // boiler number
-    );
 
 } // namespace Boilers
 
