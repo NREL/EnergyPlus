@@ -163,6 +163,15 @@ namespace Boilers {
 
         void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                         Real64 &EP_UNUSED(MaxLoad),
+                                         Real64 &EP_UNUSED(MinLoad),
+                                         Real64 &EP_UNUSED(OptLoad)) override;
+
+        void getSizingFactor(Real64 &EP_UNUSED(SizFac)) override;
+
+        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+
         void SetupOutputVars();
 
         void InitBoiler(); // number of the current boiler being simulated

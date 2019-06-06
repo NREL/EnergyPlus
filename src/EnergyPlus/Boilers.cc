@@ -186,20 +186,19 @@ namespace Boilers {
             }
         }
 
+        // dummy location
+        static PlantLocation p;
+
         // Initialize Loop Equipment
         if (InitLoopEquip) {
-            Boiler(BoilerNum).InitBoiler();
-            Boiler(BoilerNum).SizeBoiler();
-            MinCap = Boiler(BoilerNum).NomCap * Boiler(BoilerNum).MinPartLoadRat;
-            MaxCap = Boiler(BoilerNum).NomCap * Boiler(BoilerNum).MaxPartLoadRat;
-            OptCap = Boiler(BoilerNum).NomCap * Boiler(BoilerNum).OptPartLoadRat;
+            Boiler(BoilerNum).onInitLoopEquip(p);
+            Boiler(BoilerNum).getDesignCapacities(p, MaxCap, MinCap, OptCap);
             if (GetSizingFactor) {
-                SizingFactor = Boiler(BoilerNum).SizFac;
+                Boiler(BoilerNum).getSizingFactor(SizingFactor);
             }
             return;
         }
 
-        static PlantLocation p;
         static bool no_first_hvac = false;
         Boiler(BoilerNum).simulate(p, no_first_hvac, MyLoad, RunFlag);
 
@@ -212,6 +211,27 @@ namespace Boilers {
         this->InitBoiler();
         this->CalcBoilerModel(CurLoad, RunFlag, sim_component.FlowCtrl);
         this->UpdateBoilerRecords(CurLoad, RunFlag);
+    }
+
+    void BoilerSpecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                             Real64 &MaxLoad,
+                             Real64 &MinLoad,
+                             Real64 &OptLoad)
+    {
+        MinLoad = this->NomCap * this->MinPartLoadRat;
+        MaxLoad = this->NomCap * this->MaxPartLoadRat;
+        OptLoad = this->NomCap * this->OptPartLoadRat;
+    }
+
+    void BoilerSpecs::getSizingFactor(Real64 &SizFactor)
+    {
+        SizFactor = this->SizFac;
+    }
+
+    void BoilerSpecs::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    {
+        this->InitBoiler();
+        this->SizeBoiler();
     }
 
     void GetBoilerInput()
