@@ -290,9 +290,12 @@ namespace EvaporativeCoolers {
         int UnitVSControlLimitsErrorIndex;    // regula falsi errors, limits exceeded.
         int UnitLoadControlMaxIterErrorIndex; // root solver errors, part load ratio iteration limits exceeded
         int UnitLoadControlLimitsErrorIndex;  // root solver errors, art load ratio limits exceeded.
-
-        int ZonePtr;         // pointer to a zone served by an evaportive cooler unit
-        int HVACSizingIndex; // index of a HVACSizing object for an evaportive cooler unit
+        int ZonePtr;                          // pointer to a zone served by an evaportive cooler unit
+        int HVACSizingIndex;                  // index of a HVACSizing object for an evaportive cooler unit
+        bool MySize;                          // sizing logic flag
+        bool MyEnvrn;                         // sim environmental logic flag
+        bool MyFan;                           // fan sizing logic flag
+        bool MyZoneEq;                        // logic flag used to set up zone equipment availability managers
 
         // Default Constructor
         ZoneEvapCoolerUnitStruct()
@@ -307,7 +310,7 @@ namespace EvaporativeCoolers {
               UnitSensibleCoolingRate(0.0), UnitSensibleCoolingEnergy(0.0), UnitLatentHeatingRate(0.0), UnitLatentHeatingEnergy(0.0),
               UnitLatentCoolingRate(0.0), UnitLatentCoolingEnergy(0.0), UnitFanSpeedRatio(0.0), UnitPartLoadRatio(0.0),
               UnitVSControlMaxIterErrorIndex(0), UnitVSControlLimitsErrorIndex(0), UnitLoadControlMaxIterErrorIndex(0),
-              UnitLoadControlLimitsErrorIndex(0), ZonePtr(0), HVACSizingIndex(0)
+              UnitLoadControlLimitsErrorIndex(0), ZonePtr(0), HVACSizingIndex(0), MySize(true), MyEnvrn(true), MyFan(true), MyZoneEq(true)
         {
         }
     };

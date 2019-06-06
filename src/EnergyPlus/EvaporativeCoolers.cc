@@ -152,7 +152,6 @@ namespace EvaporativeCoolers {
         // These are purposefully not in the header file as an extern variable. No one outside of this should
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-        bool InitZoneHVACEvapCoolerOneTimeFlag(true);
         bool InitEvapCoolerMyOneTimeFlag(true);
     } // namespace
 
@@ -4096,7 +4095,6 @@ namespace EvaporativeCoolers {
         using General::TrimSigDigits;
 
         // Locals
-        static Array1D_bool MySizeFlag;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -4110,28 +4108,15 @@ namespace EvaporativeCoolers {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MyFanFlag;
-        static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
         int Loop;
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         Real64 TimeElapsed;
 
-        if (InitZoneHVACEvapCoolerOneTimeFlag) {
-            MySizeFlag.dimension(NumZoneEvapUnits, true);
-            MyEnvrnFlag.dimension(NumZoneEvapUnits, true);
-            MyFanFlag.dimension(NumZoneEvapUnits, true);
-            MyZoneEqFlag.allocate(NumZoneEvapUnits);
-            MyZoneEqFlag = true;
-            InitZoneHVACEvapCoolerOneTimeFlag = false;
-            ZoneEquipmentListChecked = false;
-        }
-
         if (allocated(ZoneComp)) {
-            if (MyZoneEqFlag(UnitNum)) { // initialize the name of each availability manager list and zone number
+            if (ZoneEvapUnit(UnitNum).MyZoneEq) { // initialize the name of each availability manager list and zone number
                 ZoneComp(ZoneEvaporativeCoolerUnit_Num).ZoneCompAvailMgrs(UnitNum).AvailManagerListName = ZoneEvapUnit(UnitNum).AvailManagerListName;
                 ZoneComp(ZoneEvaporativeCoolerUnit_Num).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
-                MyZoneEqFlag(UnitNum) = false;
+                ZoneEvapUnit(UnitNum).MyZoneEq = false;
             }
             ZoneEvapUnit(UnitNum).FanAvailStatus = ZoneComp(ZoneEvaporativeCoolerUnit_Num).ZoneCompAvailMgrs(UnitNum).AvailStatus;
         }
@@ -4148,12 +4133,12 @@ namespace EvaporativeCoolers {
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(UnitNum)) {
+        if (!SysSizingCalc && ZoneEvapUnit(UnitNum).MySize) {
             SizeZoneEvaporativeCoolerUnit(UnitNum);
-            MySizeFlag(UnitNum) = false;
+            ZoneEvapUnit(UnitNum).MySize = false;
         }
 
-        if (MyFanFlag(UnitNum)) {
+        if (ZoneEvapUnit(UnitNum).MyFan) {
             if (ZoneEvapUnit(UnitNum).ActualFanVolFlowRate != AutoSize) {
 
                 if (ZoneEvapUnit(UnitNum).ActualFanVolFlowRate < ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate) {
@@ -4164,7 +4149,7 @@ namespace EvaporativeCoolers {
                         "...evap cooler unit volumetric flow rate = " + TrimSigDigits(ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate, 5) + " m3/s.");
                     ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = ZoneEvapUnit(UnitNum).ActualFanVolFlowRate;
                     ShowContinueError("...evaporative cooler unit design supply air flow rate will match fan flow rate and simulation continues.");
-                    MyEnvrnFlag(UnitNum) = true; // re-initialize to set mass flow rate and max mass flow rate
+                    ZoneEvapUnit(UnitNum).MyEnvrn = true; // re-initialize to set mass flow rate and max mass flow rate
                 }
 
                 if (ZoneEvapUnit(UnitNum).ActualFanVolFlowRate > 0.0) {
@@ -4172,7 +4157,7 @@ namespace EvaporativeCoolers {
                         ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate / ZoneEvapUnit(UnitNum).ActualFanVolFlowRate;
                 }
 
-                MyFanFlag(UnitNum) = false;
+                ZoneEvapUnit(UnitNum).MyFan = false;
             } else {
                 if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     GetFanVolFlow(ZoneEvapUnit(UnitNum).FanIndex, ZoneEvapUnit(UnitNum).ActualFanVolFlowRate);
@@ -4212,7 +4197,7 @@ namespace EvaporativeCoolers {
             }
         }
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(UnitNum)) {
+        if (BeginEnvrnFlag && ZoneEvapUnit(UnitNum).MyEnvrn) {
 
             ZoneEvapUnit(UnitNum).DesignAirMassFlowRate = StdRhoAir * ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate;
             Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRateMax = ZoneEvapUnit(UnitNum).DesignAirMassFlowRate;
@@ -4256,10 +4241,10 @@ namespace EvaporativeCoolers {
                 }
             }
 
-            MyEnvrnFlag(UnitNum) = false;
+            ZoneEvapUnit(UnitNum).MyEnvrn = false;
         }
         if (!BeginEnvrnFlag) {
-            MyEnvrnFlag(UnitNum) = true;
+            ZoneEvapUnit(UnitNum).MyEnvrn = true;
         }
 
         TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
@@ -5038,7 +5023,6 @@ namespace EvaporativeCoolers {
         MySizeFlag.clear();
         CheckEquipName.clear();
         CheckZoneEvapUnitName.clear();
-        InitZoneHVACEvapCoolerOneTimeFlag = true;
         InitEvapCoolerMyOneTimeFlag = true;
     }
 
