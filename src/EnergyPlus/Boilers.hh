@@ -160,6 +160,8 @@ namespace Boilers {
         {
         }
 
+        void SetupOutputVars();
+
         void InitBoiler(); // number of the current boiler being simulated
 
         void SizeBoiler();

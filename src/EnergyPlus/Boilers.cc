@@ -187,9 +187,7 @@ namespace Boilers {
 
         // Initialize Loop Equipment
         if (InitLoopEquip) {
-            //			Boiler( BoilerNum ).IsThisSized = false;
             Boiler(BoilerNum).InitBoiler();
-            //			Boiler( BoilerNum ).IsThisSized = true;
             Boiler(BoilerNum).SizeBoiler();
             MinCap = Boiler(BoilerNum).NomCap * Boiler(BoilerNum).MinPartLoadRat;
             MaxCap = Boiler(BoilerNum).NomCap * Boiler(BoilerNum).MaxPartLoadRat;
@@ -199,7 +197,6 @@ namespace Boilers {
             }
             return;
         }
-        // Calculate Load
 
         // Select boiler type and call boiler model
         Boiler(BoilerNum).InitBoiler();
@@ -446,88 +443,89 @@ namespace Boilers {
             ShowFatalError(RoutineName + "Errors found in processing " + DataIPShortCuts::cCurrentModuleObject + " input.");
         }
 
-        for (int BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum) {
-            SetupOutputVariable(
-                "Boiler Heating Rate", OutputProcessor::Unit::W, Boiler(BoilerNum).BoilerLoad, "System", "Average", Boiler(BoilerNum).Name);
-            SetupOutputVariable("Boiler Heating Energy",
-                                OutputProcessor::Unit::J,
-                                Boiler(BoilerNum).BoilerEnergy,
-                                "System",
-                                "Sum",
-                                Boiler(BoilerNum).Name,
-                                _,
-                                "ENERGYTRANSFER",
-                                "BOILERS",
-                                _,
-                                "Plant");
-            if (UtilityRoutines::SameString(Boiler(BoilerNum).BoilerFuelTypeForOutputVariable, "Electric")) {
-                SetupOutputVariable("Boiler " + Boiler(BoilerNum).BoilerFuelTypeForOutputVariable + " Power",
-                                    OutputProcessor::Unit::W,
-                                    Boiler(BoilerNum).FuelUsed,
-                                    "System",
-                                    "Average",
-                                    Boiler(BoilerNum).Name);
-            } else {
-                SetupOutputVariable("Boiler " + Boiler(BoilerNum).BoilerFuelTypeForOutputVariable + " Rate",
-                                    OutputProcessor::Unit::W,
-                                    Boiler(BoilerNum).FuelUsed,
-                                    "System",
-                                    "Average",
-                                    Boiler(BoilerNum).Name);
-            }
-            SetupOutputVariable("Boiler " + Boiler(BoilerNum).BoilerFuelTypeForOutputVariable + " Energy",
-                                OutputProcessor::Unit::J,
-                                Boiler(BoilerNum).FuelConsumed,
-                                "System",
-                                "Sum",
-                                Boiler(BoilerNum).Name,
-                                _,
-                                Boiler(BoilerNum).BoilerFuelTypeForOutputVariable,
-                                "Heating",
-                                Boiler(BoilerNum).EndUseSubcategory,
-                                "Plant");
-            SetupOutputVariable("Boiler Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                Boiler(BoilerNum).BoilerInletTemp,
-                                "System",
-                                "Average",
-                                Boiler(BoilerNum).Name);
-            SetupOutputVariable("Boiler Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                Boiler(BoilerNum).BoilerOutletTemp,
-                                "System",
-                                "Average",
-                                Boiler(BoilerNum).Name);
-            SetupOutputVariable(
-                "Boiler Mass Flow Rate", OutputProcessor::Unit::kg_s, Boiler(BoilerNum).BoilerMassFlowRate, "System", "Average", Boiler(BoilerNum).Name);
-            SetupOutputVariable("Boiler Ancillary Electric Power",
-                                OutputProcessor::Unit::W,
-                                Boiler(BoilerNum).ParasiticElecPower,
-                                "System",
-                                "Average",
-                                Boiler(BoilerNum).Name);
-            SetupOutputVariable("Boiler Ancillary Electric Energy",
-                                OutputProcessor::Unit::J,
-                                Boiler(BoilerNum).ParasiticElecConsumption,
-                                "System",
-                                "Sum",
-                                Boiler(BoilerNum).Name,
-                                _,
-                                "ELECTRICITY",
-                                "Heating",
-                                "Boiler Parasitic",
-                                "Plant");
-            SetupOutputVariable("Boiler Part Load Ratio",
-                                OutputProcessor::Unit::None,
-                                Boiler(BoilerNum).BoilerPLR,
-                                "System",
-                                "Average",
-                                Boiler(BoilerNum).Name);
-            if (DataGlobals::AnyEnergyManagementSystemInModel) {
-                SetupEMSInternalVariable("Boiler Nominal Capacity", Boiler(BoilerNum).Name, "[W]", Boiler(BoilerNum).NomCap);
-            }
-        }
+    }
 
+    void BoilerSpecs::SetupOutputVars()
+    {
+        SetupOutputVariable(
+            "Boiler Heating Rate", OutputProcessor::Unit::W, this->BoilerLoad, "System", "Average", this->Name);
+        SetupOutputVariable("Boiler Heating Energy",
+                            OutputProcessor::Unit::J,
+                            this->BoilerEnergy,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "ENERGYTRANSFER",
+                            "BOILERS",
+                            _,
+                            "Plant");
+        if (UtilityRoutines::SameString(this->BoilerFuelTypeForOutputVariable, "Electric")) {
+            SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Power",
+                                OutputProcessor::Unit::W,
+                                this->FuelUsed,
+                                "System",
+                                "Average",
+                                this->Name);
+        } else {
+            SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
+                                OutputProcessor::Unit::W,
+                                this->FuelUsed,
+                                "System",
+                                "Average",
+                                this->Name);
+        }
+        SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Energy",
+                            OutputProcessor::Unit::J,
+                            this->FuelConsumed,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            this->BoilerFuelTypeForOutputVariable,
+                            "Heating",
+                            this->EndUseSubcategory,
+                            "Plant");
+        SetupOutputVariable("Boiler Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->BoilerInletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Boiler Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->BoilerOutletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable(
+            "Boiler Mass Flow Rate", OutputProcessor::Unit::kg_s, this->BoilerMassFlowRate, "System", "Average", this->Name);
+        SetupOutputVariable("Boiler Ancillary Electric Power",
+                            OutputProcessor::Unit::W,
+                            this->ParasiticElecPower,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Boiler Ancillary Electric Energy",
+                            OutputProcessor::Unit::J,
+                            this->ParasiticElecConsumption,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "ELECTRICITY",
+                            "Heating",
+                            "Boiler Parasitic",
+                            "Plant");
+        SetupOutputVariable("Boiler Part Load Ratio",
+                            OutputProcessor::Unit::None,
+                            this->BoilerPLR,
+                            "System",
+                            "Average",
+                            this->Name);
+        if (DataGlobals::AnyEnergyManagementSystemInModel) {
+            SetupEMSInternalVariable("Boiler Nominal Capacity", this->Name, "[W]", this->NomCap);
+        }
     }
 
     void BoilerSpecs::InitBoiler() // number of the current boiler being simulated
@@ -550,6 +548,10 @@ namespace Boilers {
 
         // Init more variables
         if (this->MyFlag) {
+
+            // setup the output variable pointers
+            this->SetupOutputVars();
+
             // Locate the boilers on the plant loops for later usage
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(this->Name,
