@@ -59,11 +59,6 @@ namespace EnergyPlus {
 
 namespace Boilers {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
     // Boiler normalized efficiency curve types
     extern int const Linear;
     extern int const BiLinear;
@@ -72,7 +67,6 @@ namespace Boilers {
     extern int const Cubic;
     extern int const QuadraticLinear;
     extern int const BiCubic;
-    extern int const TriQuadratic;
 
     // water temperature evaluation method
     extern int const BoilerTempModeNotSet;
@@ -98,10 +92,6 @@ namespace Boilers {
     extern bool GetBoilerInputFlag;   // Boiler input flag, false if input is processed
 
     extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
-
-    // Types
 
     struct BoilerSpecs
     {
@@ -183,50 +173,41 @@ namespace Boilers {
         }
     };
 
-    // Object Data
     extern Array1D<BoilerSpecs> Boiler;      // boiler data - dimension to number of machines
     extern Array1D<ReportVars> BoilerReport; // report vars - dimension to number of machines
-
-    // Functions
 
     void clear_state();
 
     void SimBoiler(std::string const &BoilerType, // boiler type (used in CASE statement)
                    std::string const &BoilerName, // boiler identifier
-                   int const EquipFlowCtrl,       // Flow control mode for the equipment
+                   int EquipFlowCtrl,       // Flow control mode for the equipment
                    int &CompIndex,                // boiler counter/identifier
-                   bool const RunFlag,            // if TRUE run boiler simulation--boiler is ON
+                   bool RunFlag,            // if TRUE run boiler simulation--boiler is ON
                    bool &InitLoopEquip,           // If not zero, calculate the max load for operating conditions
                    Real64 &MyLoad,                // W - Actual demand boiler must satisfy--calculated by load dist. routine
                    Real64 &MaxCap,                // W - maximum boiler operating capacity
                    Real64 &MinCap,                // W - minimum boiler operating capacity
                    Real64 &OptCap,                // W - optimal boiler operating capacity
-                   bool const GetSizingFactor,    // TRUE when just the sizing factor is requested
+                   bool GetSizingFactor,    // TRUE when just the sizing factor is requested
                    Real64 &SizingFactor           // sizing factor
     );
 
     void GetBoilerInput();
 
-    void InitBoiler(int const BoilerNum); // number of the current boiler being simulated
+    void InitBoiler(int BoilerNum); // number of the current boiler being simulated
 
-    void SizeBoiler(int const BoilerNum);
+    void SizeBoiler(int BoilerNum);
 
     void CalcBoilerModel(int &BoilerNum,         // boiler identifier
-                         Real64 const MyLoad,    // W - hot water demand to be met by boiler
-                         bool const RunFlag,     // TRUE if boiler operating
-                         int const EquipFlowCtrl // Flow control mode for the equipment
+                         Real64 MyLoad,    // W - hot water demand to be met by boiler
+                         bool RunFlag,     // TRUE if boiler operating
+                         int EquipFlowCtrl // Flow control mode for the equipment
     );
 
-    // Beginning of Record Keeping subroutines for the BOILER:HOTWATER Module
-    // *****************************************************************************
-
-    void UpdateBoilerRecords(Real64 const MyLoad, // boiler operating load
-                             bool const RunFlag,  // boiler on when TRUE
-                             int const Num        // boiler number
+    void UpdateBoilerRecords(Real64 MyLoad, // boiler operating load
+                             bool RunFlag,  // boiler on when TRUE
+                             int Num        // boiler number
     );
-
-    // End of Record Keeping subroutines for the BOILER:HOTWATER Module
-    // *****************************************************************************
 
 } // namespace Boilers
 

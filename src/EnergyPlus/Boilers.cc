@@ -117,7 +117,6 @@ namespace Boilers {
     int const Cubic(5);
     int const QuadraticLinear(6);
     int const BiCubic(7);
-    int const TriQuadratic(8);
 
     // water temperature evaluation method
     int const BoilerTempModeNotSet(100);
@@ -142,18 +141,9 @@ namespace Boilers {
     bool BoilerOneTimeFlag(true);
     Array1D_bool CheckEquipName;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
-
     // Object Data
     Array1D<BoilerSpecs> Boiler;      // boiler data - dimension to number of machines
     Array1D<ReportVars> BoilerReport; // report vars - dimension to number of machines
-
-    // MODULE SUBROUTINES:
-
-    // Beginning of Boiler Module Driver Subroutines
-    //*************************************************************************
-
-    // Functions
 
     void clear_state()
     {
@@ -195,8 +185,6 @@ namespace Boilers {
         // This subrountine controls the boiler component simulation
 
         int BoilerNum; // boiler counter/identifier
-
-        // FLOW
 
         // Get Input
         if (GetBoilerInputFlag) {
@@ -262,8 +250,6 @@ namespace Boilers {
         // METHODOLOGY EMPLOYED:
         // standard EnergyPlus input retrieval using input Processor
 
-        // REFERENCES: na
-
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using namespace DataGlobalConstants;
@@ -276,7 +262,6 @@ namespace Boilers {
         using NodeInputManager::GetOnlySingleNode;
 
         // Locals
-        // PARAMETERS
         static std::string const RoutineName("GetBoilerInput: ");
 
         // LOCAL VARIABLES
@@ -945,8 +930,6 @@ namespace Boilers {
         // and a second order polynomial fit of performance data to obtain part
         // load performance
 
-        // REFERENCES:
-
         // Using/Aliasing
         using CurveManager::CurveValue;
         using DataBranchAirLoopPlant::ControlType_SeriesActive;
@@ -961,14 +944,8 @@ namespace Boilers {
         using General::TrimSigDigits;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcBoilerModel");
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 BoilerEff;             // boiler efficiency
@@ -987,8 +964,6 @@ namespace Boilers {
         Real64 ParasiticElecLoad;     // Boiler parasitic electric power at full load
         Real64 EffCurveOutput;        // Output of boiler efficiency curve
         Real64 Cp;
-
-        // FLOW
 
         BoilerLoad = 0.0;
         ParasiticElecPower = 0.0;
@@ -1221,26 +1196,8 @@ namespace Boilers {
         // PURPOSE OF THIS SUBROUTINE:
         // boiler simulation reporting
 
-        // METHODOLOGY EMPLOYED:na
-
-        // REFERENCES: na
-
-        // USE STATEMENTS: na
-
         // Using/Aliasing
         using PlantUtilities::SafeCopyPlantNode;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BoilerInletNode;      // Boiler inlet node number
@@ -1280,9 +1237,6 @@ namespace Boilers {
         BoilerReport(Num).FuelConsumed = BoilerReport(Num).FuelUsed * ReportingConstant;
         BoilerReport(Num).ParasiticElecConsumption = BoilerReport(Num).ParasiticElecPower * ReportingConstant;
     }
-
-    // End of Record Keeping subroutines for the BOILER:HOTWATER Module
-    // *****************************************************************************
 
 } // namespace Boilers
 
