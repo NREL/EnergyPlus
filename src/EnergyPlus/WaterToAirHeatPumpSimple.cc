@@ -405,6 +405,7 @@ namespace WaterToAirHeatPumpSimple {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             SimpleWatertoAirHP(HPNum).Name = AlphArray(1);
@@ -527,6 +528,7 @@ namespace WaterToAirHeatPumpSimple {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             SimpleWatertoAirHP(HPNum).Name = AlphArray(1);
