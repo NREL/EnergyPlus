@@ -137,6 +137,8 @@ namespace Boilers {
         int FaultyBoilerFoulingIndex;     // Index of the fault object corresponding to the boiler
         Real64 FaultyBoilerFoulingFactor; // Boiler fouling factor
         std::string EndUseSubcategory;    // identifier use for the end use subcategory
+        bool MyEnvrnFlag;
+        bool MyFlag;
 
         // Default Constructor
         BoilerSpecs()
@@ -146,7 +148,7 @@ namespace Boilers {
               BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0),
               CurveTempMode(BoilerTempModeNotSet), EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0),
               EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), IsThisSized(false),
-              FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0)
+              FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), MyEnvrnFlag(true), MyFlag(true)
         {
         }
     };

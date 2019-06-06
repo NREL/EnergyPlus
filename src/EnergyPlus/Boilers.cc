@@ -125,7 +125,6 @@ namespace Boilers {
     Real64 BoilerOutletTemp(0.0);   // W - Boiler outlet temperature
     Real64 BoilerPLR(0.0);          // Boiler operating part-load ratio
     bool GetBoilerInputFlag(true);
-    bool BoilerOneTimeFlag(true);
     Array1D_bool CheckEquipName;
 
     // Object Data
@@ -145,7 +144,6 @@ namespace Boilers {
         Boiler.deallocate();
         BoilerReport.deallocate();
         GetBoilerInputFlag = true;
-        BoilerOneTimeFlag = true;
     }
 
     void SimBoiler(std::string const &EP_UNUSED(BoilerType), // boiler type (used in CASE statement)
@@ -169,7 +167,7 @@ namespace Boilers {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subrountine controls the boiler component simulation
+        // This subroutine controls the boiler component simulation
 
         int BoilerNum; // boiler counter/identifier
 
@@ -248,7 +246,7 @@ namespace Boilers {
         int NumAlphas;                                  // Number of elements in the alpha array
         int NumNums;                                    // Number of elements in the numeric array
         int IOStat;                                     // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);                 // Flag to show errors were found during GetInput
+        bool ErrorsFound(false);                        // Flag to show errors were found during GetInput
         Array1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
 
         // GET NUMBER OF ALL EQUIPMENT
@@ -573,24 +571,12 @@ namespace Boilers {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitBoiler");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag; // environment flag
-        static Array1D_bool MyFlag;
         Real64 rho;
         bool FatalError;
         bool errFlag;
 
-        // Do the one time initializations
-        if (BoilerOneTimeFlag) {
-            MyFlag.allocate(NumBoilers);
-            MyEnvrnFlag.allocate(NumBoilers);
-            MyFlag = true;
-            MyEnvrnFlag = true;
-            BoilerOneTimeFlag = false;
-        }
-
         // Init more variables
-        if (MyFlag(BoilerNum)) {
+        if (Boiler(BoilerNum).MyFlag) {
             // Locate the boilers on the plant loops for later usage
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(Boiler(BoilerNum).Name,
@@ -618,10 +604,10 @@ namespace Boilers {
                     .FlowPriority = DataPlant::LoopFlowStatus_NeedyIfLoopOn;
             }
 
-            MyFlag(BoilerNum) = false;
+            Boiler(BoilerNum).MyFlag = false;
         }
 
-        if (MyEnvrnFlag(BoilerNum) && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (Boiler(BoilerNum).MyEnvrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
             // if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
             rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(Boiler(BoilerNum).LoopNum).FluidName,
                                    DataGlobals::HWInitConvTemp,
@@ -669,11 +655,11 @@ namespace Boilers {
                 }
             }
 
-            MyEnvrnFlag(BoilerNum) = false;
+            Boiler(BoilerNum).MyEnvrnFlag = false;
         }
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(BoilerNum) = true;
+            Boiler(BoilerNum).MyEnvrnFlag = true;
         }
 
         // every iteration inits.  (most in calc routine)
