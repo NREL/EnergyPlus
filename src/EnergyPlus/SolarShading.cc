@@ -655,7 +655,13 @@ namespace SolarShading {
             } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "PixelCounting")) {
                 shadingMethod = ShadingMethod::PixelCounting;
                 cAlphaArgs(aNum) = "PixelCounting";
-                penumbra = std::unique_ptr<Pumbra::Penumbra>(new Pumbra::Penumbra(512u));
+                unsigned pixelRes;
+                if (NumNumbers >= 3) {
+                    pixelRes = (unsigned)rNumericArgs(3);
+                } else {
+                    pixelRes = 512u;
+                }
+                penumbra = std::unique_ptr<Pumbra::Penumbra>(new Pumbra::Penumbra(pixelRes));
             } else {
                 ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
                 ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", PolygonClipping will be used.");

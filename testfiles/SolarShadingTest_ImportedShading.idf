@@ -204,6 +204,7 @@
     1,                       !- Shading Calculation Update Frequency
     ,                        !- Maximum Figures in Shadow Overlap Calculations
     ,                        !- Polygon Clipping Algorithm
+    ,                        !- Pixel Counting Resolution
     ,                        !- Sky Diffuse Modeling Algorithm
     No;                      !- Output External Shading Calculation Results
 

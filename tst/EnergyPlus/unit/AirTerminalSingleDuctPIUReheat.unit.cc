@@ -339,6 +339,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
         "    ,                        !- Shading Calculation Update Frequency",
         "    15000,                   !- Maximum Figures in Shadow Overlap Calculations",
         "    ,                        !- Polygon Clipping Algorithm",
+        "    ,                        !- Pixel Counting Resolution",
         "    SimpleSkyDiffuseModeling;!- Sky Diffuse Modeling Algorithm",
 
         "SurfaceConvectionAlgorithm:Inside,",
