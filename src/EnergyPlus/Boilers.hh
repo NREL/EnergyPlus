@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -85,7 +86,7 @@ namespace Boilers {
 
     extern Array1D_bool CheckEquipName;
 
-    struct BoilerSpecs
+    struct BoilerSpecs : PlantComponent
     {
         // Members
         std::string Name;             // user identifier
@@ -159,6 +160,8 @@ namespace Boilers {
               BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), ParasiticElecConsumption(0.0), BoilerFuelTypeForOutputVariable("")
         {
         }
+
+        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
         void SetupOutputVars();
 

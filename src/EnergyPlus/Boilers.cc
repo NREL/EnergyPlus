@@ -66,6 +66,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <EMSManager.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <FaultsManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
@@ -134,7 +135,7 @@ namespace Boilers {
 
     void SimBoiler(std::string const &EP_UNUSED(BoilerType), // boiler type (used in CASE statement)
                    std::string const &BoilerName,            // boiler identifier
-                   int const EquipFlowCtrl,                  // Flow control mode for the equipment
+                   int const EP_UNUSED(EquipFlowCtrl),                  // Flow control mode for the equipment
                    int &CompIndex,                           // boiler counter/identifier
                    bool const RunFlag,                       // if TRUE run boiler simulation--boiler is ON
                    bool &InitLoopEquip,                      // If not zero, calculate the max load for operating conditions
@@ -198,10 +199,19 @@ namespace Boilers {
             return;
         }
 
+        static PlantLocation p;
+        static bool no_first_hvac = false;
+        Boiler(BoilerNum).simulate(p, no_first_hvac, MyLoad, RunFlag);
+
+    }
+
+    void BoilerSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool const EP_UNUSED(FirstHVACIteration), Real64 &CurLoad, bool const RunFlag)
+    {
+        auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
         // Select boiler type and call boiler model
-        Boiler(BoilerNum).InitBoiler();
-        Boiler(BoilerNum).CalcBoilerModel(MyLoad, RunFlag, EquipFlowCtrl);
-        Boiler(BoilerNum).UpdateBoilerRecords(MyLoad, RunFlag);
+        this->InitBoiler();
+        this->CalcBoilerModel(CurLoad, RunFlag, sim_component.FlowCtrl);
+        this->UpdateBoilerRecords(CurLoad, RunFlag);
     }
 
     void GetBoilerInput()
@@ -852,9 +862,6 @@ namespace Boilers {
         Real64 BoilerEff = this->Effic;  // boiler efficiency
         Real64 const TempUpLimitBout = this->TempUpLimitBoilerOut;  // C - boiler high temperature limit
         Real64 const BoilerMassFlowRateMax = this->DesMassFlowRate;  // Max Design Boiler Mass Flow Rate converted from Volume Flow Rate
-        Real64 const ParasiticElecLoad = this->ParasiticElecLoad;  // Boiler parasitic electric power at full load
-        int const LoopNum = this->LoopNum;
-        int const LoopSideNum = this->LoopSideNum;
 
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
             DataPlant::PlantLoop(this->LoopNum).FluidName, DataLoopNode::Node(BoilerInletNode).Temp, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
@@ -887,7 +894,7 @@ namespace Boilers {
         // Initialize the delta temperature to zero
         Real64 BoilerDeltaTemp; // C - boiler inlet to outlet temperature difference, set in all necessary code paths so no initialization required
 
-        if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) {
+        if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) {
             // Either set the flow to the Constant value or calculate the flow for the variable volume
             if ((this->FlowMode == ConstantFlow) || (this->FlowMode == NotModulated)) {
                 // Then find the flow rate and outlet temp
@@ -1051,7 +1058,7 @@ namespace Boilers {
 
         // calculate fuel used based on normalized boiler efficiency curve (=1 when no curve used)
         this->FuelUsed = TheorFuelUse / EffCurveOutput;
-        if (this->BoilerLoad > 0.0) this->ParasiticElecPower = ParasiticElecLoad * OperPLR;
+        if (this->BoilerLoad > 0.0) this->ParasiticElecPower = this->ParasiticElecLoad * OperPLR;
     }
 
     void BoilerSpecs::UpdateBoilerRecords(Real64 const MyLoad, // boiler operating load
