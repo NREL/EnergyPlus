@@ -774,7 +774,6 @@ namespace Boilers {
                                 }
                             }
                         }
-                        tmpNomCap = NomCapUser;
                     }
                 }
             }
@@ -902,7 +901,7 @@ namespace Boilers {
         int LoopSideNum;              // Plant loop side with boiler (supply, demand)
         Real64 BoilerMassFlowRateMax; // Max Design Boiler Mass Flow Rate converted from Volume Flow Rate
         Real64 ParasiticElecLoad;     // Boiler parasitic electric power at full load
-        Real64 EffCurveOutput;        // Output of boiler efficiency curve
+        Real64 EffCurveOutput = 1.0;  // Output of boiler efficiency curve
         Real64 Cp;
 
         BoilerLoad = 0.0;
@@ -1013,7 +1012,6 @@ namespace Boilers {
                 if (BoilerLoad > BoilerNomCap * BoilerMaxPLR) BoilerLoad = BoilerNomCap * BoilerMaxPLR;
                 if (BoilerLoad < BoilerNomCap * BoilerMinPLR) BoilerLoad = BoilerNomCap * BoilerMinPLR;
                 BoilerOutletTemp = DataLoopNode::Node(BoilerInletNode).Temp + BoilerLoad / (BoilerMassFlowRate * Cp);
-                BoilerDeltaTemp = BoilerOutletTemp - DataLoopNode::Node(BoilerInletNode).Temp;
             } else {
                 BoilerLoad = 0.0;
                 BoilerOutletTemp = DataLoopNode::Node(BoilerInletNode).Temp;
@@ -1023,7 +1021,6 @@ namespace Boilers {
 
         // Limit BoilerOutletTemp.  If > max temp, trip boiler off
         if (BoilerOutletTemp > TempUpLimitBout) {
-            BoilerDeltaTemp = 0.0;
             BoilerLoad = 0.0;
             BoilerOutletTemp = DataLoopNode::Node(BoilerInletNode).Temp;
         }
