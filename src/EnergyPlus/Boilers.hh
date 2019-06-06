@@ -144,6 +144,8 @@ namespace Boilers {
         Real64 BoilerInletTemp;          // C - Boiler inlet temperature
         Real64 ParasiticElecConsumption; // J - Parasitic Electrical Consumption (e.g. forced draft fan)
 
+        std::string BoilerFuelTypeForOutputVariable;
+
         // Default Constructor
         BoilerSpecs()
             : FuelType(0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), Available(false), ON(false), NomCap(0.0),
@@ -154,7 +156,7 @@ namespace Boilers {
               EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), IsThisSized(false),
               FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), MyEnvrnFlag(true), MyFlag(true),
               FuelUsed(0.0), ParasiticElecPower(0.0), BoilerLoad(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerPLR(0.0),
-              BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), ParasiticElecConsumption(0.0)
+              BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), ParasiticElecConsumption(0.0), BoilerFuelTypeForOutputVariable("")
         {
         }
     };
