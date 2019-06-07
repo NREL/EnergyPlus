@@ -86,6 +86,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
+#include <HVACFan.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
 #include <HeatingCoils.hh>
 #include <InputProcessing/InputProcessor.hh>
@@ -1341,24 +1342,50 @@ namespace AirflowNetworkBalanceManager {
                 int fanIndex;
                 Real64 flowRate;
                 int fanType_Num;
+                int inletNode;
+                int outletNode;
 
-                GetFanIndex(fan_name, fanIndex, FanErrorFound);
+                if (UtilityRoutines::SameString(UtilityRoutines::MakeUPPERCase(fan_type), "FAN:SYSTEMMODEL")) {
+                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fan_name));
+                    fanIndex = HVACFan::getFanObjectVectorIndex(fan_name);
+                    if (fanIndex < 0) {
+                        ShowSevereError("...occurs in " + CurrentModuleObject + " = " + DisSysCompCVFData(i).Name);
+                        success = false;
+                    } else {
+                        flowRate = HVACFan::fanObjs[fanIndex]->designAirVolFlowRate;
+                        flowRate *= StdRhoAir;
+                        DisSysCompCVFData(i).FanModelFlag = true;
+                        inletNode = HVACFan::fanObjs[fanIndex]->inletNodeNum;
+                        outletNode = HVACFan::fanObjs[fanIndex]->outletNodeNum;
+                        if (HVACFan::fanObjs[fanIndex]->speedControl == HVACFan::FanSystem::SpeedControlMethod::Continuous) {
+                            fanType_Num = FanType_SimpleVAV;
+                            VAVSystem = true;
+                        } else {
+                            fanType_Num = FanType_SimpleOnOff;
+                        }
+                        SupplyFanType = fanType_Num;
+                    }
 
-                if (FanErrorFound) {
-                    ShowSevereError("...occurs in " + CurrentModuleObject + " = " + DisSysCompCVFData(i).Name);
-                    success = false;
+                } else {
+
+                    GetFanIndex(fan_name, fanIndex, FanErrorFound);
+
+                    if (FanErrorFound) {
+                        ShowSevereError("...occurs in " + CurrentModuleObject + " = " + DisSysCompCVFData(i).Name);
+                        success = false;
+                    }
+
+                    GetFanVolFlow(fanIndex, flowRate);
+                    flowRate *= StdRhoAir;
+
+                    GetFanType(fan_name, fanType_Num, FanErrorFound);
+                    SupplyFanType = fanType_Num;
                 }
 
-                GetFanVolFlow(fanIndex, flowRate);
-                flowRate *= StdRhoAir;
-
-                GetFanType(fan_name, fanType_Num, FanErrorFound);
-
-                SupplyFanType = fanType_Num;
                 if (!(fanType_Num == FanType_SimpleConstVolume || fanType_Num == FanType_SimpleOnOff || fanType_Num == FanType_SimpleVAV)) {
                     ShowSevereError(RoutineName + "The Supply Fan Object Type in " + CurrentModuleObject + " = " + thisObjectName +
                                     " is not a valid fan type.");
-                    ShowContinueError("Valid fan types are  Fan:ConstantVolume or Fan:OnOff");
+                    ShowContinueError("Valid fan types are  Fan:ConstantVolume, Fan:OnOff, Fan:VariableVolume, or Fan:SystemModel.");
                     success = false;
                 } else {
                     if (UtilityRoutines::SameString(fan_type, "Fan:ConstantVolume") && fanType_Num == FanType_SimpleOnOff) {
@@ -1373,17 +1400,15 @@ namespace AirflowNetworkBalanceManager {
                     }
                 }
                 bool ErrorsFound{false};
-                int inletNode;
-                int outletNode;
                 if (fanType_Num == FanType_SimpleConstVolume) {
                     inletNode = GetFanInletNode("Fan:ConstantVolume", fan_name, ErrorsFound);
                     outletNode = GetFanOutletNode("Fan:ConstantVolume", fan_name, ErrorsFound);
                 }
-                if (fanType_Num == FanType_SimpleOnOff) {
+                if (fanType_Num == FanType_SimpleOnOff && !DisSysCompCVFData(i).FanModelFlag) {
                     inletNode = GetFanInletNode("Fan:OnOff", fan_name, ErrorsFound);
                     outletNode = GetFanOutletNode("Fan:OnOff", fan_name, ErrorsFound);
                 }
-                if (fanType_Num == FanType_SimpleVAV) {
+                if (fanType_Num == FanType_SimpleVAV && !DisSysCompCVFData(i).FanModelFlag) {
                     inletNode = GetFanInletNode("Fan:VariableVolume", fan_name, ErrorsFound);
                     outletNode = GetFanOutletNode("Fan:VariableVolume", fan_name, ErrorsFound);
                     VAVSystem = true;
@@ -9880,7 +9905,11 @@ namespace AirflowNetworkBalanceManager {
                     n = DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).FanIndex;
                     DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).AirLoopNum =
                         AirflowNetworkLinkageData(i).AirLoopNum;
-                    SetFanAirLoopNumber(n, AirflowNetworkLinkageData(i).AirLoopNum);
+                    if (DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).FanModelFlag) {
+                        HVACFan::fanObjs[DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).FanIndex]->AirLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
+                    } else {
+                        SetFanAirLoopNumber(n, AirflowNetworkLinkageData(i).AirLoopNum);
+                    }
                 }
                 if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == EPlusTypeNum_COI) {
                     DisSysCompCoilData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).AirLoopNum =
@@ -10207,9 +10236,18 @@ namespace AirflowNetworkBalanceManager {
             if (DisSysNumOfCVFs > 1) {
                 bool OnOffFanFlag = false;
                 for (i = 1; i <= DisSysNumOfCVFs; i++) {
-                    if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff) {
+                    if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff && !DisSysCompCVFData(i).FanModelFlag) {
                         OnOffFanFlag = true;
                         break;
+                    }
+                    if (DisSysCompCVFData(i).FanModelFlag && DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff) {
+                        int fanIndex = HVACFan::getFanObjectVectorIndex(DisSysCompCVFData(i).Name);
+                        if ( HVACFan::fanObjs[fanIndex]->AirPathFlag) {
+                            DisSysCompCVFData(i).FanTypeNum = FanType_SimpleConstVolume;
+                        } else {
+                            OnOffFanFlag = true;
+                            break;
+                        }
                     }
                 }
                 if (OnOffFanFlag) {
@@ -10264,6 +10302,54 @@ namespace AirflowNetworkBalanceManager {
                                                     AirflowNetworkLinkageData(i).Name);
                             }
                         }
+                    }
+                }
+            }
+            bool FanModelConstFlag = false;
+            for (i = 1; i <= DisSysNumOfCVFs; i++) {
+                if (DisSysCompCVFData(i).FanModelFlag) {
+                    int fanIndex = HVACFan::getFanObjectVectorIndex(DisSysCompCVFData(i).Name);
+                    if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff && HVACFan::fanObjs[fanIndex]->AirPathFlag) {
+                        DisSysCompCVFData(i).FanTypeNum = FanType_SimpleConstVolume;
+                        SupplyFanType = FanType_SimpleConstVolume;
+                        FanModelConstFlag = true;
+                        break;
+                    }
+                }
+            }
+            if (FanModelConstFlag) {
+                for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
+                    if (SupplyFanType == FanType_SimpleConstVolume) {
+                        SetupOutputVariable("AFN Linkage Node 1 to Node 2 Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            AirflowNetworkLinkReport(i).FLOW,
+                            "System",
+                            "Average",
+                            AirflowNetworkLinkageData(i).Name);
+                        SetupOutputVariable("AFN Linkage Node 2 to Node 1 Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            AirflowNetworkLinkReport(i).FLOW2,
+                            "System",
+                            "Average",
+                            AirflowNetworkLinkageData(i).Name);
+                        SetupOutputVariable("AFN Linkage Node 1 to Node 2 Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            AirflowNetworkLinkReport(i).VolFLOW,
+                            "System",
+                            "Average",
+                            AirflowNetworkLinkageData(i).Name);
+                        SetupOutputVariable("AFN Linkage Node 2 to Node 1 Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            AirflowNetworkLinkReport(i).VolFLOW2,
+                            "System",
+                            "Average",
+                            AirflowNetworkLinkageData(i).Name);
+                        SetupOutputVariable("AFN Linkage Node 1 to Node 2 Pressure Difference",
+                            OutputProcessor::Unit::Pa,
+                            AirflowNetworkLinkSimu(i).DP,
+                            "System",
+                            "Average",
+                            AirflowNetworkLinkageData(i).Name);
                     }
                 }
             }
@@ -10343,8 +10429,12 @@ namespace AirflowNetworkBalanceManager {
                     k = AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum;
                     FanFlow = Node(j).MassFlowRate;
                     if (DisSysCompCVFData(k).FanTypeNum == FanType_SimpleVAV) {
-                        GetFanVolFlow(DisSysCompCVFData(k).FanIndex, FanFlow);
-                        DisSysCompCVFData(k).MaxAirMassFlowRate = FanFlow * StdRhoAir;
+                        if (DisSysCompCVFData(k).FanModelFlag) {
+                            DisSysCompCVFData(k).MaxAirMassFlowRate = HVACFan::fanObjs[DisSysCompCVFData(k).FanIndex]->designAirVolFlowRate * StdRhoAir;
+                        } else {
+                            GetFanVolFlow(DisSysCompCVFData(k).FanIndex, FanFlow);
+                            DisSysCompCVFData(k).MaxAirMassFlowRate = FanFlow * StdRhoAir;
+                        }
                     }
                 } else if (SELECT_CASE_var == CompTypeNum_FAN) { //'FAN'
                                                                  // Check ventilation status for large openings

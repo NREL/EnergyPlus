@@ -2,7 +2,7 @@
 
 \subsection{Overview}\label{overview}
 
-The Airflow Network model provides the ability to simulate multizone airflows driven by wind and also by forced air distribution systems. The model can also simulate the heat and moisture gains or losses from the air distribution system itself (e.g., ductwork). When modeling air distribution systems, the current version of the Airflow Network model is allowed to simulate multiple forced air systems (i.e., \hyperref[airloophvac]{AirLoopHVAC} object) with a constant volume supply air fan (\hyperref[fanconstantvolume]{Fan:ConstantVolume} or \hyperref[fanonoff]{Fan:OnOff}) and a VAV supply air fan (\hyperref[fanvariablevolume]{Fan:VariableVolume}). The capabilities of the model are to:
+The Airflow Network model provides the ability to simulate multizone airflows driven by wind and also by forced air distribution systems. The model can also simulate the heat and moisture gains or losses from the air distribution system itself (e.g., ductwork). When modeling air distribution systems, the current version of the Airflow Network model is allowed to simulate multiple forced air systems (i.e., \hyperref[airloophvac]{AirLoopHVAC} object). Each forced air system allows a constant volume supply air fan (\hyperref[fanconstantvolume]{Fan:ConstantVolume} or \hyperref[fanonoff]{Fan:OnOff}), a VAV supply air fan (\hyperref[fanvariablevolume]{Fan:VariableVolume}), or a fan system model \hyperref[fansystemmodel]({Fan:SystemMode}). The capabilities of the model are to:
 
 \begin{itemize}
 \item
@@ -1997,17 +1997,17 @@ AirflowNetwork:Distribution:Component:Duct,
 
 \subsection{AirflowNetwork:Distribution:Component:Fan}\label{airflownetworkdistributioncomponentfan}
 
-This component represents a constant volume fan in the air distribution system (\hyperref[airloophvac]{AirLoopHVAC}). The air flow rate and air conditions (temperature and humidity) are obtained from the associated \hyperref[fanconstantvolume]{Fan:ConstantVolume}, \hyperref[fanonoff]{Fan:OnOff}, or \hyperref[fanvariablevolume]{Fan:VariableVolume} object.
+This component represents a constant or variable volume fan in the air distribution system (\hyperref[airloophvac]{AirLoopHVAC}). The air flow rate and air conditions (temperature and humidity) are obtained from the associated \hyperref[fanconstantvolume]{Fan:ConstantVolume}, \hyperref[fanonoff]{Fan:OnOff}, \hyperref[fanvariablevolume]{Fan:VariableVolume}, or \hyperref[fansystemmodel]{Fan:SystemModel} object.
 
 \subsubsection{Inputs}\label{inputs-16-001}
 
 \paragraph{Field: Fan Name}\label{field-fan-name-000}
 
-The name identifying an AirflowNetwork constant volume fan in an air distribution system. This name must be the same as the name of the associated \hyperref[fanconstantvolume]{Fan:ConstantVolume},~ \hyperref[fanonoff]{Fan:OnOff} or \hyperref[fanvariablevolume]{Fan:VariableVolume} object. This name will be referenced by an \hyperref[airflownetworkdistributionlinkage]{AirflowNetwork:Distribution:Linkage} object to represent a component.
+The name identifying an AirflowNetwork constant volume fan in an air distribution system. This name must be the same as the name of the associated \hyperref[fanconstantvolume]{Fan:ConstantVolume},~ \hyperref[fanonoff]{Fan:OnOff}, \hyperref[fanvariablevolume]{Fan:VariableVolume}, or \hyperref[fansystemmodel]{Fan:SystemModel} object. This name will be referenced by an \hyperref[airflownetworkdistributionlinkage]{AirflowNetwork:Distribution:Linkage} object to represent a component.
 
 \paragraph{Field: Supply Fan Object Type}\label{field-supply-fan-object-type}
 
-This choice field defines the type of fan. The only valid choices are \hyperref[fanonoff]{Fan:OnOff},~ \hyperref[fanconstantvolume]{Fan:ConstantVolume}, and \hyperref[fanvariablevolume]{Fan:VariableVolume}, with the default being \hyperref[fanconstantvolume]{Fan:ConstantVolume}. Both cycling and continuous fan operating modes are allowed for \hyperref[fanonoff]{Fan:OnOff}. Only the continuous fan operating mode is allowed for \hyperref[fanconstantvolume]{Fan:ConstantVolume}. The variable airflow rate is allowed for \hyperref[fanvariablevolume]{Fan:VariableVolume}.
+This choice field defines the type of fan. The only valid choices are \hyperref[fanonoff]{Fan:OnOff},~ \hyperref[fanconstantvolume]{Fan:ConstantVolume}, \hyperref[fanvariablevolume]{Fan:VariableVolume}, and  \hyperref[fansystemmodel]{Fan:SystemModel} with the default being \hyperref[fanconstantvolume]{Fan:ConstantVolume}. Both cycling and continuous fan operating modes are allowed for \hyperref[fanonoff]{Fan:OnOff}. Only the continuous fan operating mode is allowed for \hyperref[fanconstantvolume]{Fan:ConstantVolume} with constant volume and \hyperref[fanvariablevolume]{Fan:VariableVolume} with variable volume, respectively. An advanced fan model for \hyperref[fansystemmodel]{Fan:SystemModel} is also allowed.
 
 Note: Make sure that the volumetric air flow rates for the fan, coils, and parent components (e.g., unitary system or furnace) are the same so that fan energy and air distribution system losses/gains are properly calculated.
 
