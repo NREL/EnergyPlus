@@ -40,6 +40,7 @@ def check_file_encoding(idf_path):
         rel_file = os.path.relpath(idf_path, start=ROOT_DIR)
         ci_msg = {'tool': 'verify_file_encodings',
                   'filename': idf_path,
+                  'file': idf_path,
                   'messagetype': 'error',
                   'message': "{} isn't UTF-8 encoded".format(rel_file)
                   }

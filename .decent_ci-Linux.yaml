@@ -29,6 +29,8 @@ compilers:
       - ./scripts/dev/check_non_utf8.py
       - ./scripts/dev/check_pr_labels.py
       - ./scripts/dev/verify_file_encodings.py
+      - ./scripts/dev/validate_idd_units.py
+      - ./scripts/dev/find_byref_bool_override.py
 
   - name: "gcc"
     version: "7.4"
