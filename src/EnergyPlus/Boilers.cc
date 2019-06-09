@@ -133,75 +133,23 @@ namespace Boilers {
         GetBoilerInputFlag = true;
     }
 
-    void SimBoiler(std::string const &EP_UNUSED(BoilerType), // boiler type (used in CASE statement)
-                   std::string const &BoilerName,            // boiler identifier
-                   int const EP_UNUSED(EquipFlowCtrl),                  // Flow control mode for the equipment
-                   int &CompIndex,                           // boiler counter/identifier
-                   bool const RunFlag,                       // if TRUE run boiler simulation--boiler is ON
-                   bool &InitLoopEquip,                      // If not zero, calculate the max load for operating conditions
-                   Real64 &MyLoad,                           // W - Actual demand boiler must satisfy--calculated by load dist. routine
-                   Real64 &MaxCap,                           // W - maximum boiler operating capacity
-                   Real64 &MinCap,                           // W - minimum boiler operating capacity
-                   Real64 &OptCap,                           // W - optimal boiler operating capacity
-                   bool const GetSizingFactor,               // TRUE when just the sizing factor is requested
-                   Real64 &SizingFactor                      // sizing factor
-    )
+    PlantComponent *BoilerSpecs::factory(std::string const &objectName)
     {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         DAN FISHER
-        //       DATE WRITTEN   Sept. 1998
-        //       MODIFIED       Taecheol Kim, May 2000
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine controls the boiler component simulation
-
-        int BoilerNum; // boiler counter/identifier
-
-        // Get Input
+        // Process the input data for boilers if it hasn't been done already
         if (GetBoilerInputFlag) {
             GetBoilerInput();
             GetBoilerInputFlag = false;
         }
-
-        // Find the correct Equipment
-        if (CompIndex == 0) {
-            BoilerNum = UtilityRoutines::FindItemInList(BoilerName, Boiler);
-            if (BoilerNum == 0) {
-                ShowFatalError("SimBoiler: Unit not found=" + BoilerName);
-            }
-            CompIndex = BoilerNum;
-        } else {
-            BoilerNum = CompIndex;
-            if (BoilerNum > NumBoilers || BoilerNum < 1) {
-                ShowFatalError("SimBoiler:  Invalid CompIndex passed=" + General::TrimSigDigits(BoilerNum) + ", Number of Units=" + General::TrimSigDigits(NumBoilers) +
-                               ", Entered Unit name=" + BoilerName);
-            }
-            if (CheckEquipName(BoilerNum)) {
-                if (BoilerName != Boiler(BoilerNum).Name) {
-                    ShowFatalError("SimBoiler: Invalid CompIndex passed=" + General::TrimSigDigits(BoilerNum) + ", Unit name=" + BoilerName +
-                                   ", stored Unit Name for that index=" + Boiler(BoilerNum).Name);
-                }
-                CheckEquipName(BoilerNum) = false;
+        // Now look for this particular pipe in the list
+        for (auto &boiler : Boiler) {
+            if (boiler.Name == objectName) {
+                return &boiler;
             }
         }
-
-        // dummy location
-        static PlantLocation p;
-
-        // Initialize Loop Equipment
-        if (InitLoopEquip) {
-            Boiler(BoilerNum).onInitLoopEquip(p);
-            Boiler(BoilerNum).getDesignCapacities(p, MaxCap, MinCap, OptCap);
-            if (GetSizingFactor) {
-                Boiler(BoilerNum).getSizingFactor(SizingFactor);
-            }
-            return;
-        }
-
-        static bool no_first_hvac = false;
-        Boiler(BoilerNum).simulate(p, no_first_hvac, MyLoad, RunFlag);
-
+        // If we didn't find it, fatal
+        ShowFatalError("LocalBoilerFactory: Error getting inputs for boiler named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
     }
 
     void BoilerSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool const EP_UNUSED(FirstHVACIteration), Real64 &CurLoad, bool const RunFlag)

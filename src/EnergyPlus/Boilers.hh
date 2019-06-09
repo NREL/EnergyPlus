@@ -161,14 +161,14 @@ namespace Boilers {
         {
         }
 
-        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
-                                         Real64 &EP_UNUSED(MaxLoad),
-                                         Real64 &EP_UNUSED(MinLoad),
-                                         Real64 &EP_UNUSED(OptLoad)) override;
+                                         Real64 &MaxLoad,
+                                         Real64 &MinLoad,
+                                         Real64 &OptLoad) override;
 
-        void getSizingFactor(Real64 &EP_UNUSED(SizFac)) override;
+        void getSizingFactor(Real64 &SizFac) override;
 
         void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
@@ -186,25 +186,13 @@ namespace Boilers {
         void UpdateBoilerRecords(Real64 MyLoad, // boiler operating load
                                  bool RunFlag   // boiler on when TRUE
         );
+
+        static PlantComponent *factory(std::string const &objectName);
     };
 
-    extern Array1D<BoilerSpecs> Boiler;      // boiler data - dimension to number of machines
+    extern Array1D<BoilerSpecs> Boiler; // boiler data - dimension to number of machines
 
     void clear_state();
-
-    void SimBoiler(std::string const &BoilerType, // boiler type (used in CASE statement)
-                   std::string const &BoilerName, // boiler identifier
-                   int EquipFlowCtrl,       // Flow control mode for the equipment
-                   int &CompIndex,                // boiler counter/identifier
-                   bool RunFlag,            // if TRUE run boiler simulation--boiler is ON
-                   bool &InitLoopEquip,           // If not zero, calculate the max load for operating conditions
-                   Real64 &MyLoad,                // W - Actual demand boiler must satisfy--calculated by load dist. routine
-                   Real64 &MaxCap,                // W - maximum boiler operating capacity
-                   Real64 &MinCap,                // W - minimum boiler operating capacity
-                   Real64 &OptCap,                // W - optimal boiler operating capacity
-                   bool GetSizingFactor,    // TRUE when just the sizing factor is requested
-                   Real64 &SizingFactor           // sizing factor
-    );
 
     void GetBoilerInput();
 
