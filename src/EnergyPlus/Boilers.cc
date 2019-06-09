@@ -894,6 +894,12 @@ namespace Boilers {
                     } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
                         BoilerDeltaTemp = DataLoopNode::Node(BoilerOutletNode).TempSetPointLo - DataLoopNode::Node(BoilerInletNode).Temp;
                     } else {
+                        // the BoilerDeltaTemp is not used in this code path because of the assert(false)
+                        // however, Mac CI is failing to recognize that and throwing a build warning
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "UnusedValue"
+                        BoilerDeltaTemp = 0.0;
+#pragma clang diagnostic pop
                         assert(false);
                     }
                 }
