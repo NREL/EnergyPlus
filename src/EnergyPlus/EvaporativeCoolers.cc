@@ -3963,6 +3963,20 @@ namespace EvaporativeCoolers {
                     }
                 }
 
+                // check that fan type is consistent with control methods ZoneCoolingLoadOnOffCycling and ZoneTemperatureDeadBandOnOffCycling
+                if ((ZoneEvapUnit(UnitLoop).ControlSchemeType == ZoneCoolingLoadOnOffCycling) ||
+                    (ZoneEvapUnit(UnitLoop).ControlSchemeType == ZoneTemperatureDeadBandOnOffCycling)) {
+                    if (UtilityRoutines::SameString(ZoneEvapUnit(UnitLoop).FanObjectClassName, "Fan:ComponentModel") ||
+                        UtilityRoutines::SameString(ZoneEvapUnit(UnitLoop).FanObjectClassName, "Fan:ConstantVolume") ||
+                        UtilityRoutines::SameString(ZoneEvapUnit(UnitLoop).FanObjectClassName, "Fan:VariableVolume")) {
+
+                        ShowSevereError(CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
+                        ShowContinueError(DataHVACGlobals::cFanTypes(ZoneEvapUnit(UnitLoop).FanType_Num) + " is not consistent ");
+                        ShowContinueError("with cooler control methods ZoneCoolingLoadOnOffCycling or ZoneTemperatureDeadBandOnOffCycling.");
+                        ShowContinueError("Change to Fan:OnOff or Fan:SystemModel fan object type");
+                        ErrorsFound = true;
+                    }
+                }
             } // unit loop
         }
 
@@ -4307,12 +4321,12 @@ namespace EvaporativeCoolers {
         std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
         Real64 TempSize;          // autosized value of coil input field
         int FieldNum;             // IDD numeric field number where input field description is found
-        int SizingMethod;  // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing,
-                           // HeatingCapacitySizing, etc.)
-        bool PrintFlag;    // TRUE when sizing information is reported in the eio file
-        int zoneHVACIndex; // index of zoneHVAC equipment sizing specification
-        int SAFMethod(0);  // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
-                           // FractionOfAutosizedHeatingAirflow ...)
+        int SizingMethod;         // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing,
+                                  // CoolingCapacitySizing, HeatingCapacitySizing, etc.)
+        bool PrintFlag;           // TRUE when sizing information is reported in the eio file
+        int zoneHVACIndex;        // index of zoneHVAC equipment sizing specification
+        int SAFMethod(0);         // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
+                                  // FractionOfAutosizedHeatingAirflow ...)
 
         DataScalableSizingON = false;
         ZoneHeatingOnlyFan = false;
