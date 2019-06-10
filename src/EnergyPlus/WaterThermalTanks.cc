@@ -7938,7 +7938,9 @@ namespace WaterThermalTanks {
 
         static std::string const RoutineName("CalcWaterThermalTankStratified");
         const Real64 TemperatureConvergenceCriteria = 0.0001;
-        const Real64 maxDt = 60.0;
+        const Real64 subTimestepMax = 60.0 * 10.0; // seconds
+        const Real64 subTimestepMin = 1.0; // seconds
+        Real64 dt = subTimestepMin;
 
         // Using/Aliasing
         using DataGlobals::HourOfDay;
@@ -8111,9 +8113,6 @@ namespace WaterThermalTanks {
                     Qheater2 = 0.0;
                 }
             }
-
-            // Determine the internal time step
-            Real64 dt = min(TimeRemaining, maxDt);
 
             // Make initial guess that average and final temperatures over the timestep are equal to the starting temperatures
             for (int i = 0; i < nTankNodes; i++) {
@@ -8345,6 +8344,56 @@ namespace WaterThermalTanks {
                 Tank.FirstRecoveryFuel += Qrecovery * dt;
                 if (SetPointRecovered) Tank.FirstRecoveryDone = true;
             }
+
+            // Set the maximum tank temperature change allowed
+            Real64 dT_max = std::numeric_limits<Real64>::max();
+            if (Tank.HeaterOn1) {
+                if (Tank.Node(Tank.HeaterNode1).Temp < Tank.SetPointTemp) {
+                    // Node temperature is less than setpoint and heater is on
+                    dT_max = min(dT_max, Tank.SetPointTemp - Tank.Node(Tank.HeaterNode1).Temp);
+                } else {
+                    // Node temperature is greater than or equal to setpoint and heater is on
+                    // Heater will turn off next time around, calculate assuming that
+                    dT_max = min(dT_max, Tank.Node(Tank.HeaterNode1).Temp - MinTemp1);
+                }
+            } else { // Heater off
+                if (Tank.Node(Tank.HeaterNode1).Temp >= MinTemp1) {
+                    // Node temperature is greater than or equal to cut in temperature and heater is off
+                    dT_max = min(dT_max, Tank.Node(Tank.HeaterNode1).Temp - MinTemp1);
+                } else {
+                    // Heater will turn on next time around, calculate to setpoint
+                    dT_max = min(dT_max, Tank.SetPointTemp - Tank.Node(Tank.HeaterNode1).Temp);
+                }
+            }
+            if (Tank.HeaterOn2) {
+                if (Tank.Node(Tank.HeaterNode2).Temp < Tank.SetPointTemp2) {
+                    // Node temperature is less than setpoint and heater is on
+                    dT_max = min(dT_max, Tank.SetPointTemp2 - Tank.Node(Tank.HeaterNode2).Temp);
+                } else {
+                    // Node temperature is greater than or equal to setpoint and heater is on
+                    // Heater will turn off next time around, calculate assuming that
+                    dT_max = min(dT_max, Tank.Node(Tank.HeaterNode2).Temp - MinTemp2);
+                }
+            } else { // Heater off
+                if (Tank.Node(Tank.HeaterNode2).Temp >= MinTemp2) {
+                    // Node temperature is greater than or equal to cut in temperature and heater is off
+                    dT_max = min(dT_max, Tank.Node(Tank.HeaterNode2).Temp - MinTemp2);
+                } else {
+                    // Heater will turn on next time around, calculate to setpoint
+                    dT_max = min(dT_max, Tank.SetPointTemp2 - Tank.Node(Tank.HeaterNode2).Temp);
+                }
+            }
+            // TODO: Check for venting temperature?
+
+            // Set the sub timestep (dt) for the next time around
+            dt = TimeRemaining;
+            for (int i = 0; i < nTankNodes; ++i) {
+                const Real64 Denominator = fabs(A[i] * Tavg[i] + B[i]);
+                if (Denominator != 0.0)
+                    dt = min(dt, dT_max / Denominator);
+            }
+            dt = max(subTimestepMin, dt);
+            dt = min(subTimestepMax, dt);
 
 
         } // end while TimeRemaining > 0.0
