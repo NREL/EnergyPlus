@@ -314,14 +314,6 @@ namespace FanCoilUnits {
     void SizeFanCoilUnit(int const FanCoilNum,
                          int const ControlledZoneNum); // index into ZoneEquipConfig array; may not be equal to ZoneNum
 
-    void SizeCoilWaterFlowRate(std::string const &WaterCoilType,
-                               std::string const &WaterCoilName,
-                               int const WaterCoilType_Num,
-                               int const WLoopNum,
-                               Real64 &MaxWaterVolFlowDes,
-                               Real64 &DesignLoad,
-                               bool &ErrorsFound);
-
     void Sim4PipeFanCoil(int &FanCoilNum,               // number of the current fan coil unit being simulated
                          int const ZoneNum,             // number of zone being served
                          int const ControlledZoneNum,   // index into ZoneEqupConfig
