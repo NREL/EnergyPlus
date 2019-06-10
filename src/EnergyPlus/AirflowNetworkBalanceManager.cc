@@ -1340,8 +1340,8 @@ namespace AirflowNetworkBalanceManager {
 
                 bool FanErrorFound = false;
                 int fanIndex;
-                Real64 flowRate;
-                int fanType_Num;
+                Real64 flowRate = 0.0;
+                int fanType_Num = 0;
                 int inletNode;
                 int outletNode;
 
