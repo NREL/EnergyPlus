@@ -92,7 +92,7 @@
     1.00;                    !- Sky Clearness
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     8,                       !- Begin Month
     21,                      !- Begin Day of Month
     ,                        !- Begin Year

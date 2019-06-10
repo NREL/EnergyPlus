@@ -2313,7 +2313,7 @@ Determine when \textbf{condensation} occurs & Print the variables ``Surface Wind
 
 \subsection{InternalMass}\label{internalmass}
 
-Any surface that would logically be described as an interior wall, floor or ceiling can just as easily be described as Internal Mass. Internal Mass surface types only exchange energy with the zone in which they are described; they do not see any other zones. There are two approaches to using internal mass. The first approach is to have several pieces of internal mass with each piece having a different construction type. The other approach is to choose an average construction type and combine all of the interior surfaces into a single internal mass. Similar to internal surfaces with an adiabatic boundary condition, the zone will only exchange energy with the inside of the Internal Mass construction. If both sides of the surface exchange energy with the zone then the user should input twice the area when defining the Internal Mass object. Note that furniture and other large objects within a zone can be described using internal mass. However, simplifying calculations using internal mass must be used with caution when the ``FullInteriorAndExterior'' or ``FullInteriorAndExteriorWithReflections'' Solar Distribution model (see Building parameters) is chosen.
+Any surface that would logically be described as an interior wall, floor or ceiling can just as easily be described as Internal Mass. Internal Mass surface types only exchange energy with the zone in which they are described; they do not see any other zones. There are two approaches to using internal mass. The first approach is to have several pieces of internal mass with each piece having a different construction type. The other approach is to choose an average construction type and combine all of the interior surfaces into a single internal mass. Similar to internal surfaces with an adiabatic boundary condition, the zone will only exchange energy with the inside of the Internal Mass construction. If both sides of the surface exchange energy with the zone then the user should input twice the area when defining the Internal Mass object. Note that furniture and other large objects within a zone can be described using internal mass. However, simplifying calculations using internal mass must be used with caution when the ``FullInteriorAndExterior'' or ``FullInteriorAndExteriorWithReflections'' Solar Distribution model (see Building parameters) is chosen. A single Internal Mass object can be applied to a set of zones. This requires specifying a zone list name instead of a zone name in the input field \textit{Zone or ZoneList Name}.
 
 \subsubsection{Inputs}\label{inputs-25-004}
 
@@ -2339,9 +2339,9 @@ This is a unique character string associated with the internal mass surface. Tho
 
 This is the name of the construction (ref: Construction object) used in the surface.
 
-\paragraph{Field: Zone Name}\label{field-zone-name-14}
+\paragraph{Field: Zone or ZoneList Name}\label{field-zone-or-zonelist-name-14}
 
-This is the name of the zone in which the internal mass is represented.
+This field is the name of the zone (ref: Zone) or ZoneList (ref: ZoneList) and represents a particular internal mass object in a thermal zone or set of thermal zones in the building. When the ZoneList option is used then this internal mass object is applied to each of the zones in the zone list. The name of the actual internal mass object in each zone becomes <Zone Name> <InternalMass Object Name> and should be less than the standard length (100 characters) for a name field. If it is greater than this standard length, it may be difficult to specify in output reporting as it will be truncated. A warning will be shown if the generated name is greater than 100 characters. If it duplicates another such concatenated name, there will be a severe error and terminate the run.
 
 \paragraph{Field: Surface Area}\label{field-surface-area}
 
@@ -2353,13 +2353,13 @@ IDF examples of Internal Mass surfaces:
 InternalMass,
   Zn002:IntM001,                !- Surface Name
   INTERIOR,                     !- Construction Name
-  DORM ROOMS AND COMMON AREAS,  !- Zone
+  DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList Name
   408.7734;                     !- Total area exposed to Zone {m2}
 
 InternalMass,
   Zn002:IntM002,                !- Surface Name
   PARTITION02,                  !- Construction Name
-  DORM ROOMS AND COMMON AREAS,  !- Zone
+  DORM ROOMS AND COMMON AREAS,  !- Zone or ZoneList Name
   371.6122;                     !- Total area exposed to Zone {m2}
 \end{lstlisting}
 
