@@ -3638,8 +3638,8 @@ namespace EvaporativeCoolers {
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using DataGlobals::NumOfZones;
-        using DataHVACGlobals::FanType_SimpleConstVolume;
-        using DataHVACGlobals::FanType_SimpleOnOff;
+        // using DataHVACGlobals::FanType_SimpleConstVolume;
+        // using DataHVACGlobals::FanType_SimpleOnOff;
         using DataSizing::ZoneHVACSizing;
         using DataZoneEquipment::ZoneEquipConfig;
         using Fans::GetFanAvailSchPtr;
@@ -3782,7 +3782,8 @@ namespace EvaporativeCoolers {
                 }
 
                 if (ZoneEvapUnit(UnitLoop).FanType_Num == DataHVACGlobals::FanType_SimpleOnOff ||
-                    ZoneEvapUnit(UnitLoop).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                    ZoneEvapUnit(UnitLoop).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ||
+                    ZoneEvapUnit(UnitLoop).FanType_Num == DataHVACGlobals::FanType_ComponentModel) {
                     ZoneEvapUnit(UnitLoop).OpMode = DataHVACGlobals::CycFanCycCoil;
                 } else {
                     ZoneEvapUnit(UnitLoop).OpMode = DataHVACGlobals::ContFanCycCoil;
@@ -3950,12 +3951,12 @@ namespace EvaporativeCoolers {
 
                 // check that fan type is consistent with control method
                 if (ZoneEvapUnit(UnitLoop).ControlSchemeType == ZoneCoolingLoadVariableSpeedFan) { // must have a VS fan type
-                    if (ZoneEvapUnit(UnitLoop).FanType_Num == FanType_SimpleConstVolume) {
+                    if (ZoneEvapUnit(UnitLoop).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                         ShowSevereError(CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
                         ShowContinueError("Fan:ConstantVolume is not consistent with control method ZoneCoolingLoadVariableSpeedFan.");
                         ShowContinueError("Change to a variable speed fan object type");
                         ErrorsFound = true;
-                    } else if (ZoneEvapUnit(UnitLoop).FanType_Num == FanType_SimpleOnOff) {
+                    } else if (ZoneEvapUnit(UnitLoop).FanType_Num == DataHVACGlobals::FanType_SimpleOnOff) {
                         ShowSevereError(CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
                         ShowContinueError("Fan:OnOff is not consistent with control method ZoneCoolingLoadVariableSpeedFan.");
                         ShowContinueError("Change to a variable speed fan object type");
@@ -3963,20 +3964,21 @@ namespace EvaporativeCoolers {
                     }
                 }
 
-                // check that fan type is consistent with control methods ZoneCoolingLoadOnOffCycling and ZoneTemperatureDeadBandOnOffCycling
-                if ((ZoneEvapUnit(UnitLoop).ControlSchemeType == ZoneCoolingLoadOnOffCycling) ||
-                    (ZoneEvapUnit(UnitLoop).ControlSchemeType == ZoneTemperatureDeadBandOnOffCycling)) {
-                    if (UtilityRoutines::SameString(ZoneEvapUnit(UnitLoop).FanObjectClassName, "Fan:ComponentModel") ||
-                        UtilityRoutines::SameString(ZoneEvapUnit(UnitLoop).FanObjectClassName, "Fan:ConstantVolume") ||
-                        UtilityRoutines::SameString(ZoneEvapUnit(UnitLoop).FanObjectClassName, "Fan:VariableVolume")) {
+                //// check that fan type is consistent with control methods ZoneCoolingLoadOnOffCycling and ZoneTemperatureDeadBandOnOffCycling
+                // if ((ZoneEvapUnit(UnitLoop).ControlSchemeType == ZoneCoolingLoadOnOffCycling) ||
+                //    (ZoneEvapUnit(UnitLoop).ControlSchemeType == ZoneTemperatureDeadBandOnOffCycling)) {
 
-                        ShowSevereError(CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
-                        ShowContinueError(DataHVACGlobals::cFanTypes(ZoneEvapUnit(UnitLoop).FanType_Num) + " is not consistent ");
-                        ShowContinueError("with cooler control methods ZoneCoolingLoadOnOffCycling or ZoneTemperatureDeadBandOnOffCycling.");
-                        ShowContinueError("Change to Fan:OnOff or Fan:SystemModel fan object type");
-                        ErrorsFound = true;
-                    }
-                }
+                //    if (ZoneEvapUnit(UnitLoop).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume ||
+                //        ZoneEvapUnit(UnitLoop).FanType_Num == DataHVACGlobals::FanType_ComponentModel ||
+                //        ZoneEvapUnit(UnitLoop).FanType_Num == DataHVACGlobals::FanType_SimpleVAV) {
+
+                //        ShowSevereError(CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
+                //        ShowContinueError(DataHVACGlobals::cFanTypes(ZoneEvapUnit(UnitLoop).FanType_Num) + " is not consistent ");
+                //        ShowContinueError("with cooler control methods ZoneCoolingLoadOnOffCycling or ZoneTemperatureDeadBandOnOffCycling.");
+                //        ShowContinueError("Change to Fan:OnOff, Fan:ComponentModel or Fan:SystemModel fan object type");
+                //        ErrorsFound = true;
+                //    }
+                //}
             } // unit loop
         }
 
