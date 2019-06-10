@@ -11,6 +11,10 @@ Air Thermal Boundary - aka Interzone Air Wall
      - Add discussion of internal view factors
      - Add discussion of interior solar distribution
      - Add options to discuss for simple airflow
+ - Final Revision June 10, 2019
+     - Change *MRTSurface* to *IRTSurface* for Radiant Exchange Method
+     - Add more discussion of output variables
+ 
 
 ## Table of Contents ##
 
@@ -110,7 +114,12 @@ no direct radiant exchange across the boundary.
  - No subsurfaces on an AirWall.
  - Perhaps an AirWall subsurface should be handled differently than an AirWall base surface to prevent the entire building from being connected into a single grouped zone. 
  - Maybe the new choice for fenestration objects (subsurfaces) should be "Opening" and it would behave as an interzone window with perfect transmittance. Something to consider.
- - 
+
+### Conference Call Conclusions June 5 ###
+ - For Radiant Exchange Method, replace *MRTSurface* with *IRTSurface* using a similar method as `Material:InfraredTransparent` for long-wave radiant energy.
+ - For surface outputs, only create relevant output variables for the air boundary surfaces.
+ - New outputs at the grouped zone level may be necessary to allow energy balances to be shown.
+ 
 ## Approach ##
 
 The proposed approach is to remove the air boundary surface entirely from most of the heat transfer calculations
@@ -234,9 +243,10 @@ choices:
   single zone for radiant exchange. Normal default simplified view factors will apply unless detailed view factors are specified using
   ZoneProperty:UserViewFactors:bySurfaceName.
 
-  **MRTSurface** - The air boundary will be modeled as a surface with the inside face surface temperature
-  will be set equal to the mean radiant temperature (MRT) of the adjacent zone to approximate radiant exchange across the boundary.
-  The outside face temperature will be set equal to the MRT of the zone containing the air boundary surface.
+  **IRTSurface** - The air boundary will be modeled as blackbody surface between the adjacent zones (similar, but not exactly the same 
+  as `Material:InfraredTransparent`. The surface participates in
+  the radiant exchange within each zone and receives long-wave radiant energy from internal sources. The surface does not absorb any
+  visible or solar radiation, has no thermal resistance, and has zero convective heat transfer coefficients on both sides.
 
 *Field: Air Exchange Method*
 
@@ -276,6 +286,17 @@ Radiant Exchange Method = GroupedZones, then all other surfaces must be within t
 ## Outputs Description ##
 
 Various output descriptions may need notes to explain what happens when energy crosses an airwall boundary.
+For surface outputs, only relevant output variables will be instantiated for the air boundary surfaces. This will vary
+depending on the options selected for Solar and Daylighting Method and Radiant Exchange Method. If *GroupedZone* is
+selected for both of these methods, then no surface output variables will be instantiated.
+
+ - For Solar and Daylighting Method = InteriorWindow the relevant window output variables will be instantiated, the same
+ as for a normal interior window.
+ - For Raidant Exchange Method = IRTSurface, the relevant opaque surface output variables will be instantiated, the same
+ as for a normal interzone surface (i.e. no outside face surface temperature will be instantiated).
+ 
+New outputs at the grouped zone level may be necessary to allow energy balances to be shown, because it will be impossible
+to track solar and radiant energy which travels from one zone to another across an air boundary. 
 
 ## Engineering Reference ##
 
@@ -290,7 +311,7 @@ One or more example files will be developed which use air boundaries in various 
 None.
 
 ## Design ##
-*The design will be more fully developed after the NFP conference call.*
+*The design is not complete.*
 
 The overall plan is to tackle radiant exchange first, then solar/daylighting, then air exchange.
 
