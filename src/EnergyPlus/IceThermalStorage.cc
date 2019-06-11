@@ -1108,8 +1108,8 @@ namespace IceThermalStorage {
             } else {
                 ShowSevereError(cCurrentModuleObject + ": Discharge curve independent variable options not valid, option=" + cAlphaArgs(5));
                 ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                ShowContinueError("The curve referenced must have 2 independent variables and the valid options are either:");
-                ShowContinueError("FractionDischargedLMTD or LMTDMassFlow");
+                ShowContinueError("The curve referenced must have 2 independent variables and the valid options are:");
+                ShowContinueError("FractionChargedLMTD, FractionDischargedLMTD, LMTDMassFlow or LMTDFractionCharged");
                 ErrorsFound = true;
             }
 
@@ -1141,8 +1141,8 @@ namespace IceThermalStorage {
             } else {
                 ShowSevereError(cCurrentModuleObject + ": Charge curve independent variable options not valid, option=" + cAlphaArgs(7));
                 ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                ShowContinueError("The curve referenced must have 2 independent variables and the valid options are either:");
-                ShowContinueError("FractionDischargedLMTD or LMTDMassFlow");
+                ShowContinueError("The curve referenced must have 2 independent variables and the valid options are:");
+                ShowContinueError("FractionChargedLMTD, FractionDischargedLMTD, LMTDMassFlow or LMTDFractionCharged");
                 ErrorsFound = true;
             }
 
