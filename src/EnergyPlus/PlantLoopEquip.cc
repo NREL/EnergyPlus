@@ -840,11 +840,11 @@ namespace PlantLoopEquip {
                 ShowFatalError("Preceding condition causes termination.");
             }
 
-//            if (InitLoopEquip && EquipNum == 0) {
-//                ShowSevereError("InitLoop did not set Equipment Index for Boiler=" + sim_component.TypeOf);
-//                ShowContinueError("..Boiler Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop(LoopNum).Name);
-//                ShowFatalError("Previous condition causes termination.");
-//            }
+            //            if (InitLoopEquip && EquipNum == 0) {
+            //                ShowSevereError("InitLoop did not set Equipment Index for Boiler=" + sim_component.TypeOf);
+            //                ShowContinueError("..Boiler Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop(LoopNum).Name);
+            //                ShowFatalError("Previous condition causes termination.");
+            //            }
 
             // WATER HEATER
         } else if (GeneralEquipType == GenEquipTypes_WaterThermalTank) {
