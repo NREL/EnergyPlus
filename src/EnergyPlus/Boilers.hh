@@ -84,8 +84,6 @@ namespace Boilers {
     extern int NumBoilers;            // Number of boilers
     extern bool GetBoilerInputFlag;   // Boiler input flag, false if input is processed
 
-    extern Array1D_bool CheckEquipName;
-
     struct BoilerSpecs : PlantComponent
     {
         // Members
