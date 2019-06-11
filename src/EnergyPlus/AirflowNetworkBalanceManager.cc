@@ -9817,6 +9817,8 @@ namespace AirflowNetworkBalanceManager {
                         ShowSevereError(RoutineName + NodeID(i) + " is not defined as an AirflowNetwork:Distribution:Node object.");
                         ErrorsFound = true;
                     } else {
+                        // TODO: I fail to see how you could enter this block given than NumOAMixers (returned by GetNumOAMixers())
+                        // is initialized to zero, and we check above if '> 0' or '== 0'
                         if (NumOfOAFans == 1 && DisSysCompOutdoorAirData(1).InletNode == 0) {
                             DisSysCompOutdoorAirData(1).InletNode = GetOAMixerInletNodeNumber(1);
                         }
