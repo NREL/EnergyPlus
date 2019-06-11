@@ -3128,9 +3128,9 @@
     0.6,                     !- Capacity {GJ}
     Main Chiller ChW Outlet, !- Inlet Node Name
     Chilled Water Loop ChW Pri Supply Outlet,  !- Outlet Node Name
-    QuadraticLinear,         !- Discharging Curve Object Type
+    FractionDischargedLMTD,  !- Discharging Curve Object Type
     DischargeCurve,          !- Discharging Curve Name
-    QuadraticLinear,         !- Charging Curve Object Type
+    FractionChargedLMTD,     !- Charging Curve Object Type
     ChargeCurve,             !- Charging Curve Name
     1.0,                     !- Timestep of the Curve Data {hr}
     0.0001,                  !- Parasitic Electric Load During Discharging {dimensionless}
