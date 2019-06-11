@@ -9729,8 +9729,14 @@ namespace AirflowNetworkBalanceManager {
                 for (j = 1; j <= NumOfZones; ++j) {
                     if (!ZoneEquipConfig(j).IsControlled) continue;
                     if (ZoneEquipConfig(j).ZoneNode == i) {
-                        NodeFound(i) = true;
-                        AirflowNetworkNodeData(ZoneEquipConfig(j).ActualZoneNum).EPlusNodeNum = i;
+                        if (ZoneEquipConfig(j).ActualZoneNum > AirflowNetworkNumOfNodes) {
+                            ShowSevereError(RoutineName + NodeID(i) + " is not defined as an AirflowNetwork:Distribution:Node object.");
+                            ShowContinueError("This Node is the zone air node for Zone '" + ZoneEquipConfig(j).ZoneName + "'.");
+                            ErrorsFound = true;
+                        } else {
+                            NodeFound(i) = true;
+                            AirflowNetworkNodeData(ZoneEquipConfig(j).ActualZoneNum).EPlusNodeNum = i;
+                        }
                         break;
                     }
                 }
@@ -9836,8 +9842,14 @@ namespace AirflowNetworkBalanceManager {
                 for (j = 1; j <= NumOfZones; j++) {
                     if (!ZoneEquipConfig(j).IsControlled) continue;
                     if (MultizoneZoneData(i).ZoneNum == j) {
-                        // No multiple Airloop
-                        AirflowNetworkNodeData(i).AirLoopNum = ZoneEquipConfig(j).InletNodeAirLoopNum(1);
+                        if (ZoneEquipConfig(j).NumInletNodes == 0) {
+                            ShowSevereError("Zone '" + ZoneEquipConfig(i).ZoneName + "' is a Controlled Zone referenced in an AirflowNetwork:MultiZone:Zone and therefore must have an inlet node.");
+                            ShowContinueError("This node must also be referenced in an AirflowNetwork:Distribution:Node object.");
+                            ErrorsFound = true;
+                        } else {
+                            // No multiple Airloop
+                            AirflowNetworkNodeData(i).AirLoopNum = ZoneEquipConfig(j).InletNodeAirLoopNum(1);
+                        }
                     }
                 }
             }
