@@ -845,63 +845,72 @@ namespace Boilers {
         // Initialize the delta temperature to zero
         Real64 BoilerDeltaTemp; // C - boiler inlet to outlet temperature difference, set in all necessary code paths so no initialization required
 
-        // Either set the flow to the Constant value or calculate the flow for the variable volume
-        if ((this->FlowMode == ConstantFlow) || (this->FlowMode == NotModulated)) {
-            // Then find the flow rate and outlet temp
-            this->BoilerMassFlowRate = BoilerMassFlowRateMax;
-            PlantUtilities::SetComponentFlowRate(this->BoilerMassFlowRate,
-                                 BoilerInletNode,
-                                 BoilerOutletNode,
-                                 this->LoopNum,
-                                 this->LoopSideNum,
-                                 this->BranchNum,
-                                 this->CompNum);
+        if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) {
+            // Either set the flow to the Constant value or calculate the flow for the variable volume
+            if ((this->FlowMode == ConstantFlow) || (this->FlowMode == NotModulated)) {
+                // Then find the flow rate and outlet temp
+                this->BoilerMassFlowRate = BoilerMassFlowRateMax;
+                PlantUtilities::SetComponentFlowRate(this->BoilerMassFlowRate,
+                                     BoilerInletNode,
+                                     BoilerOutletNode,
+                                     this->LoopNum,
+                                     this->LoopSideNum,
+                                     this->BranchNum,
+                                     this->CompNum);
 
-            if ((this->BoilerMassFlowRate != 0.0) && (MyLoad > 0.0)) {
-                BoilerDeltaTemp = this->BoilerLoad / this->BoilerMassFlowRate / Cp;
+                if ((this->BoilerMassFlowRate != 0.0) && (MyLoad > 0.0)) {
+                    BoilerDeltaTemp = this->BoilerLoad / this->BoilerMassFlowRate / Cp;
+                } else {
+                    BoilerDeltaTemp = 0.0;
+                }
+
+                this->BoilerOutletTemp = BoilerDeltaTemp + DataLoopNode::Node(BoilerInletNode).Temp;
+
+            } else if (this->FlowMode == LeavingSetPointModulated) {
+                // Calculate the Delta Temp from the inlet temp to the boiler outlet setpoint
+                // Then find the flow rate and outlet temp
+
+                if (DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::SingleSetPoint) {
+                    BoilerDeltaTemp = DataLoopNode::Node(BoilerOutletNode).TempSetPoint - DataLoopNode::Node(BoilerInletNode).Temp;
+                } else { // DataPlant::DualSetPointDeadBand
+                    BoilerDeltaTemp = DataLoopNode::Node(BoilerOutletNode).TempSetPointLo - DataLoopNode::Node(BoilerInletNode).Temp;
+                }
+
+                this->BoilerOutletTemp = BoilerDeltaTemp + DataLoopNode::Node(BoilerInletNode).Temp;
+
+                if ((BoilerDeltaTemp > 0.0) && (this->BoilerLoad > 0.0)) {
+                    this->BoilerMassFlowRate = this->BoilerLoad / Cp / BoilerDeltaTemp;
+
+                    this->BoilerMassFlowRate = min(BoilerMassFlowRateMax, this->BoilerMassFlowRate);
+
+                } else {
+                    this->BoilerMassFlowRate = 0.0;
+                }
+                PlantUtilities::SetComponentFlowRate(this->BoilerMassFlowRate,
+                                     BoilerInletNode,
+                                     BoilerOutletNode,
+                                     this->LoopNum,
+                                     this->LoopSideNum,
+                                     this->BranchNum,
+                                     this->CompNum);
+
+            } // End of Constant/Variable Flow If Block
+
+        } else { // If FlowLock is True
+            // Set the boiler flow rate from inlet node and then check performance
+            this->BoilerMassFlowRate = DataLoopNode::Node(BoilerInletNode).MassFlowRate;
+
+            if ((MyLoad > 0.0) && (this->BoilerMassFlowRate > 0.0)) { // this boiler has a heat load
+                this->BoilerLoad = MyLoad;
+                if (this->BoilerLoad > BoilerNomCap * BoilerMaxPLR) this->BoilerLoad = BoilerNomCap * BoilerMaxPLR;
+                if (this->BoilerLoad < BoilerNomCap * BoilerMinPLR) this->BoilerLoad = BoilerNomCap * BoilerMinPLR;
+                this->BoilerOutletTemp = DataLoopNode::Node(BoilerInletNode).Temp + this->BoilerLoad / (this->BoilerMassFlowRate * Cp);
             } else {
-                BoilerDeltaTemp = 0.0;
+                this->BoilerLoad = 0.0;
+                this->BoilerOutletTemp = DataLoopNode::Node(BoilerInletNode).Temp;
             }
 
-            this->BoilerOutletTemp = BoilerDeltaTemp + DataLoopNode::Node(BoilerInletNode).Temp;
-
-        } else if (this->FlowMode == LeavingSetPointModulated) {
-            // Calculate the Delta Temp from the inlet temp to the boiler outlet setpoint
-            // Then find the flow rate and outlet temp
-
-            if (DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme == DataPlant::SingleSetPoint) {
-                BoilerDeltaTemp = DataLoopNode::Node(BoilerOutletNode).TempSetPoint - DataLoopNode::Node(BoilerInletNode).Temp;
-            } else { // DataPlant::DualSetPointDeadBand
-                BoilerDeltaTemp = DataLoopNode::Node(BoilerOutletNode).TempSetPointLo - DataLoopNode::Node(BoilerInletNode).Temp;
-            }
-
-            this->BoilerOutletTemp = BoilerDeltaTemp + DataLoopNode::Node(BoilerInletNode).Temp;
-
-            if ((BoilerDeltaTemp > 0.0) && (this->BoilerLoad > 0.0)) {
-                this->BoilerMassFlowRate = this->BoilerLoad / Cp / BoilerDeltaTemp;
-                this->BoilerMassFlowRate = min(BoilerMassFlowRateMax, this->BoilerMassFlowRate);
-            } else {
-                this->BoilerMassFlowRate = 0.0;
-            }
-            PlantUtilities::SetComponentFlowRate(this->BoilerMassFlowRate,
-                                 BoilerInletNode,
-                                 BoilerOutletNode,
-                                 this->LoopNum,
-                                 this->LoopSideNum,
-                                 this->BranchNum,
-                                 this->CompNum);
-
-        } // End of Constant/Variable Flow If Block
-
-        if ((MyLoad > 0.0) && (this->BoilerMassFlowRate > 0.0)) { // this boiler has a heat load
-            this->BoilerLoad = MyLoad;
-            if (this->BoilerLoad > BoilerNomCap * BoilerMaxPLR) this->BoilerLoad = BoilerNomCap * BoilerMaxPLR;
-            if (this->BoilerLoad < BoilerNomCap * BoilerMinPLR) this->BoilerLoad = BoilerNomCap * BoilerMinPLR;
-            this->BoilerOutletTemp = DataLoopNode::Node(BoilerInletNode).Temp + this->BoilerLoad / (this->BoilerMassFlowRate * Cp);
-        } else {
-            this->BoilerLoad = 0.0;
-            this->BoilerOutletTemp = DataLoopNode::Node(BoilerInletNode).Temp;
-        }
+        } // End of the FlowLock If block
 
         // Limit BoilerOutletTemp.  If > max temp, trip boiler off
         if (this->BoilerOutletTemp > TempUpLimitBout) {
