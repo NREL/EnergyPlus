@@ -691,21 +691,13 @@ namespace HVACInterfaceManager {
 
         } else { // tank has mass
             if (MassFlowRate > 0.0) {
-                if (-(MassFlowRate * Cp) / (ThisTankMass * Cp) * TimeStepSeconds < -700){
-                    TankFinalTemp = (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp);
-                    TankAverageTemp = ((ThisTankMass * Cp) / (MassFlowRate * Cp) *
-                                           (LastTankOutletTemp - (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp)) *
-                                           (1.0) / TimeStepSeconds + (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp));
-                }
-                else{
-                    TankFinalTemp = (LastTankOutletTemp - (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp)) *
+                TankFinalTemp = (LastTankOutletTemp - (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp)) *
                                     std::exp(-(MassFlowRate * Cp) / (ThisTankMass * Cp) * TimeStepSeconds) +
                                 (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp);
-                    TankAverageTemp = ((ThisTankMass * Cp) / (MassFlowRate * Cp) *
+                TankAverageTemp = ((ThisTankMass * Cp) / (MassFlowRate * Cp) *
                                        (LastTankOutletTemp - (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp)) *
                                        (1.0 - std::exp(-(MassFlowRate * Cp) / (ThisTankMass * Cp) * TimeStepSeconds)) / TimeStepSeconds +
                                    (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp));
-                }
             } else {
                 TankFinalTemp = PumpHeat / (ThisTankMass * Cp) * TimeStepSeconds + LastTankOutletTemp;
                 TankAverageTemp = (TankFinalTemp + LastTankOutletTemp) / 2.0;
