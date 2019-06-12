@@ -38,6 +38,7 @@ def check_for_stray_fields(idd_path):
             if field not in exclude:
                 offending_lines.append({'tool': 'check_stray_fields_in_idd',
                                         'filename': idd_path,
+                                        'file': idd_path,
                                         'line': i + 1,
                                         'messagetype': 'error',
                                         'message': ('Stray field '

@@ -5832,7 +5832,7 @@ namespace FluidProperties {
         for (RefrigNum = 1; RefrigNum <= NumOfRefrigerants; ++RefrigNum) {
             RefrigIndex = 0; // used in routine calls -- value is returned when first 0
             // Lay out the basic values:
-            if (RefrigData(RefrigNum).Name != "") {
+            if (!RefrigData(RefrigNum).Name.empty()) {
                 ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "Refrigerant=" + RefrigData(RefrigNum).Name;
             }
             if (RefrigData(RefrigNum).NumPsPoints > 0) {
