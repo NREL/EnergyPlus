@@ -81,8 +81,8 @@ namespace Boilers {
     extern int const LeavingSetPointModulated;
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int NumBoilers;          // Number of boilers
-    extern bool GetBoilerInputFlag; // Boiler input flag, false if input is processed
+    extern int NumBoilers;            // Number of boilers
+    extern bool GetBoilerInputFlag;   // Boiler input flag, false if input is processed
 
     struct BoilerSpecs : PlantComponent
     {
@@ -151,17 +151,20 @@ namespace Boilers {
               NomCapWasAutoSized(false), Effic(0.0), TempDesBoilerOut(0.0), FlowMode(FlowModeNotSet), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), VolFlowRate(0.0), VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0), MassFlowRate(0.0), SizFac(0.0),
               BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0),
-              CurveTempMode(BoilerTempModeNotSet), EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0), EffCurveOutputError(0),
-              EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), IsThisSized(false), FaultyBoilerFoulingFlag(false),
-              FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), MyEnvrnFlag(true), MyFlag(true), FuelUsed(0.0), ParasiticElecPower(0.0),
-              BoilerLoad(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerPLR(0.0), BoilerEnergy(0.0), FuelConsumed(0.0),
-              BoilerInletTemp(0.0), ParasiticElecConsumption(0.0), BoilerFuelTypeForOutputVariable("")
+              CurveTempMode(BoilerTempModeNotSet), EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0),
+              EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), IsThisSized(false),
+              FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), MyEnvrnFlag(true), MyFlag(true),
+              FuelUsed(0.0), ParasiticElecPower(0.0), BoilerLoad(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerPLR(0.0),
+              BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), ParasiticElecConsumption(0.0), BoilerFuelTypeForOutputVariable("")
         {
         }
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                         Real64 &MaxLoad,
+                                         Real64 &MinLoad,
+                                         Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &SizFac) override;
 
