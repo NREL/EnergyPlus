@@ -388,6 +388,29 @@ point to the `RadiantEnclosure` associated with that zone. `ZoneToResimulate` is
 radiant equipment in more than one zone within the same enclosure, this will result in the entire enclosure being solved multiple times as each zone's
 radiant system updates. The calls to resimulate will be examined to see if this duplication can be avoided.
 
+### Distribution of Internal Radiant Gains with Grouped Zones ###
+`HeatBalanceSurfaceManager::ComputeIntThermalAbsorpFactors` "computes the fractions of long-wave radiation from lights, equipment and people 
+that is absorbed by each zone surface". Visible gains from lights are tracked separately.
+
+Pertinent variables (*inferring units from usage - not documented - grrr*):
+
+  `DataHeatBalance::TMULT` [1/m2?] - Zone multiplier - essentially 1/Sum(Area*ThermalAbsorptance) in the zone
+  `DataHeatBalance::QL` [W?] - Total thermal radiation added to a zone
+  `DataHeatBalance::QS` [W?] - Zone short-wave flux density
+  `DataHeatBalance::QSLights` [W?] - Like QS, but Lights short-wave only.
+  `DataHeatBalance::QSDifSol` [W?] - Like QS, but diffuse solar short-wave only.
+  
+  
+Pertinent functions:
+
+  `HeatBalanceSurfaceManager::InitIntSolarDistribution`
+  `HeatBalanceSurfaceManager::ComputeIntThermalAbsorpFactors`
+  `HeatBalanceSurfaceManager::GatherComponentLoadsSurfAbsFact`
+  `InternalHeatGains::InitInternalHeatGains`
+
+Initial thought is to keep `QL` and `TMULT` as-is per zone and add new `QLEnclosure` and `TMULTEnclosure` which are for the grouped zone enclosures.
+Similar for `QS`.
+
 ### Grouped Zones for Solar Distribution and Daylighting ###
 
 For diffuse interior solar distribution, `SolarShading::CalcWinTransDifSolInitialDistribution` and `CalcInteriorWinTransDifSolInitialDistribution.`
