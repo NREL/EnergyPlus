@@ -171,3 +171,6 @@ add_custom_command( OUTPUT ${CMAKE_BINARY_DIR}/doc/${OUTPUT_FILENAME}.pdf
 add_custom_target( zPDF_${OUTPUT_FILENAME}
                    DEPENDS ${CMAKE_BINARY_DIR}/doc/${OUTPUT_FILENAME}.pdf
                  )
+
+# Make top-level 'documentation' target depend on this one
+add_dependencies(documentation zPDF_${OUTPUT_FILENAME})
