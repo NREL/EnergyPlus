@@ -11,9 +11,10 @@ Air Thermal Boundary - aka Interzone Air Wall
      - Add discussion of internal view factors
      - Add discussion of interior solar distribution
      - Add options to discuss for simple airflow
- - Final Revision June 10, 2019
+ - Final NFP Revision June 10, 2019
      - Change *MRTSurface* to *IRTSurface* for Radiant Exchange Method
      - Add more discussion of output variables
+ - Draft Final Design June 12, 2019
  
 
 ## Table of Contents ##
@@ -311,28 +312,110 @@ One or more example files will be developed which use air boundaries in various 
 None.
 
 ## Design ##
-*The design is not complete.*
-
 The overall plan is to tackle radiant exchange first, then solar/daylighting, then air exchange.
 
-### Grouped Zones ###
-For the grouped zone concept, a second zone number field will be added to the surface data
-structure(s). For solar, daylighting, and radiant exchange, the alternate grouped zone number will
-be used to determine which surfaces to use and how they interact.
+### New object Construction:AirBoundary ###
+In `HeatBalanceManager::GetConstructData` add code to process Construction:AirBoundary objects in a new
+function `CreateAirBoundaryConstructions`.
 
-Will this work? Probably not initially. There are places that assume all of the surfaces in a
-zone are adjacent to each other in the `Surface` data structure. e.g.
+In `DataHeatBalance` add new fields to struct `ConstructionData`:
 
-```
-        for (ISurf = Zone(ZoneNum).SurfaceFirst; ISurf <= Zone(ZoneNum).SurfaceLast; ++ISurf) {
-```
+    bool TypeIsAirBoundarySolar(false) // true for Construction:AirBoundary with grouped zones for solar and daylighting
+    bool TypeIsAirBoundaryInteriorWindow(false) // true for Construction:AirBoundary with InteriorWindow for solar and daylighting
+    bool TypeIsAirBoundaryRadiant(false) // true for Construction:AirBoundary with grouped zones for radiant
+    bool TypeIsAirBoundaryIRTSurface(false) // true for Construction:AirBoundary with IRTSurface for radiant
+    bool TypeIsAirBoundaryLumpedAirMass(false) // true for Construction:AirBoundary with grouped zones for air exchange
+    bool TypeIsAirBoundaryMixing(false) // true for Construction:AirBoundary with SimpleMixing for air exchange
 
-This example is from daylighting, so it will need to be changed. Other examples of this usage occur
-in convection coefficients and other places where the current method will not be impacted. 
-This can be addressed by using zone-level lists of surface numbers (which is already being 
-developed in a separate effort).
+For the *IRTSurface* option, use existing `TypeIsIRT` as a guide, but there will be some differences for `TypeIsAirBoundaryIRTSurface`.
+For the *InteriorWindow* option, will likely use existing `TypeIsWindow` in combination with `TypeIsAirBoundaryInteriorWindow`.
+
+*I must say I'm not sure I want to add to the long list of `TypeIs...` variables in `ConstructionData`, but they get the job done.
+Several are used only for error checking, some are used only for inits, others are used in the simulation loops (primarily to skip a surface with `continue`. 
+In fact, the entire `ConstructionData` struct is full of stuff that's only used for one type of construction or another. There's some common stuff,
+but lots of extra baggage. I'm open to suggestions.*
+
+### IRTSurface for Radiant Exchange ###
+When *IRTSurface* is specified, then the surface will be modeled the same way that the existing `Material:InfraredTransparent` is used, but the convection
+coefficients will automatically be set to zero rather than expecting user inputs for that.
+
+### InteriorWindow for Solar Distribution and Daylighting ###
+When *InteriorWindow* is specified, then the surface will be set up like any other interior window, except it will have perfect transmittance and will
+not participate in any other heat exchange. It will likely need a flag variable that can be checked to skip it for certain calculations. For example,
+any window optical calculations can be skipped and simply transmit all of the incident solar.
+
+### Simple Mixing for Air Exchange ###
+When *SimpleMixing* is specified for a surface, a pair of ZoneMixing objects will be created between the two zones, using the specified
+air change rate based on the smaller of the two zone volumes. Checks will be required to prevent duplicate sets of mixing objects between the same
+zone pair. These will likely be set up in `HeatBalanceAirManager::GetSimpleAirModelInputs` along with the user-specified ZoneMixing objects by looping
+through all of the surfaces. 
+
+### Grouped Zones for Radiant Exchange ###
+
+In [PR #7267](https://github.com/NREL/EnergyPlus/pull/7267/files) "Streamline ManageSurfaceHeatBalance - Part 1,"
+new lists of surfaces have been added to streamline loops in `HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf`:
+
+    DataSurfaces::AllHTSurfaceList // List of all heat transfer surface
+    DataSurfaces::AllIZSurfaceList
+    DataHeatBalance::Zone(ZoneToResimulate).ZoneHTSurfaceList // List of HT surfaces related to this zone (includes adjacent interzone surfaces)
+    DataHeatBalance::Zone(ZoneToResimulate).ZoneIZSurfaceList // List of interzone surfaces in this zone
+
+For radiant exchange, similar surface lists and related data already exist in `DataViewFactorInformation.hh struct ZoneViewFactorInformation`:  
+
+    std::string Name;           // Zone name
+    int NumOfSurfaces;          // Number of surfaces in the zone
+    Array2D<Real64> F;          // View Factors
+    Array2D<Real64> ScriptF;    // Hottel's Script F //Tuned Transposed
+    Array1D<Real64> Area;       // Surface area
+    Array1D<Real64> Emissivity; // Surface emissivity
+    Array1D<Real64> Azimuth;    // Azimuth angle of the surface (in degrees)
+    Array1D<Real64> Tilt;       // Tilt angle of the surface (in degrees)
+    Array1D_int SurfacePtr;     // Surface ALLOCATABLE (to Surface derived type)
+    Array1D_string Class;       // Class of surface (Wall, Roof, etc.)
+
+`DataViewFactorInformation::ZoneInfo(ZoneNum).SurfacePtr` is a 1d array analagous to `DataHeatBalance::Zone(ZoneToResimulate).ZoneHTSurfaceList`.
+`ZoneInfo` is populated in `HeatBalanceIntRadExchange::InitInteriorRadExchange` for the heat transfer surfaces in a given zone. `ZoneInfo.F` is
+also used for interior solar diffuse distribution in `SolarShading::CalcWinTransDifSolInitialDistribution` and `CalcInteriorWinTransDifSolInitialDistribution.`
+
+Initial thoughts are to change `ZoneInfo` to `RadiantEnclosure` and add `SolarEnclosure`. `RadiantEnclosure` would be used exactly the same way 
+that `ZoneInfo` is used, except the included surfaces would differ depending on the presence of Construction:AirBoundary surfaces with *GroupedZone* radiant
+exchange. In that case, all of the surfaces within the connected grouped zones would be in the same `RadiantEnclosure` list. In this case, the number of
+radiant enclosures would be less than the number of zones. 
+
+When `HeatBalanceIntRadExchange::CalcInteriorRadExchange` is called without the optional `ZoneToResimulate`
+argument, then it will simply loop through the members of `RadiantEnclosure` to cover all zones or groups. When `ZoneToResimulate` is used, then a new variable in the `Zone` struct will
+point to the `RadiantEnclosure` associated with that zone. `ZoneToResimulate` is used when there is radiant heating/coooling equipment in a zone. If there is
+radiant equipment in more than one zone within the same enclosure, this will result in the entire enclosure being solved multiple times as each zone's
+radiant system updates. The calls to resimulate will be examined to see if this duplication can be avoided.
+
+### Grouped Zones for Solar Distribution and Daylighting ###
+
+For diffuse interior solar distribution, `SolarShading::CalcWinTransDifSolInitialDistribution` and `CalcInteriorWinTransDifSolInitialDistribution.`
+will use the new `DataViewFactorInformation::SolarEnclosure` surface lists instead of the current `ZoneInfo` lists.
+
+For direct solar, searching the code for `FullnteriorExterior` points to the following functions that will need modifications to use the new 
+`SolarEnclosure` surface lists and to skip air boundary surfaces:
+
+  * `SolarShading::ComputeIntSolarAbsorpFactors` - When not using FullInterior solar distribution, this function calculates the factors to distribute
+direct solar entering a zone; to the floor(s) if present, otherwise distribute evenly. 
+  * `SolarShading::DetermineShadowingCombinations` - This function calculates possible shadow combinations. It has a different path for FullInterior.
+  Once these combinations are set here, then the rest of the solar shading calculations should flow directly without any other changes, because
+  the shadow combinations will already include or exclude the appropriate combinations within the solar enclosures.
+  * `SolarShading::CalcInteriorSolarDistributionWCESimple` - Calculates various zone solar output variables such as "Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate".
+  Some of these outputs will be fine as-is even for grouped zones, because the source surfaces are still associated with their respective zones. Others may
+  require modifications to allocate the solar energy correctly among the grouped zones.
+  
+For daylighting, pretty much every function will need to be converted to use the `SolarEnclosure` surface lists instead of the current 
+approach of `for (ISurf = Zone(ZoneNum).SurfaceFirst; ISurf <= Zone(ZoneNum).SurfaceLast; ++ISurf) {`.
+
+### Grouped Zones for Air Exchange ###
+It's not clear how go about this conceptually. There are so many calculations that depend on the zone air temperature - inside surface heat balances,
+infiltration and mixing, HVAC system operation. It won't be correct to simply average the zone air masses together at the end of a time step, for example.
+Using a single air mass for the entire group would require that any HVAC controls in the group of zones are all working towards the same setpoint which
+defeats the whole purpose of the separate zones in the first place. So, punting this one until the end. It may ultimately be removed as an option.
 
 ### Reporting ###
-Various zone-level outputs will be reviewed to determine the proper accounting of 
-solar and radiant gains. Reporting at the grouped zone level has been considered, but if at all 
+Various zone and surface outputs will be reviewed to determine their relevance and the proper accounting of 
+solar and radiant gains. Irrelevant output variables will be suppressed for air boundary surfaces (dependent on the options specified
+for radiant, solar, and air exchange) and grouped zones. Reporting at the grouped zone level has been considered, but if at all 
 possible, it would be preferable to keep reporting at the original zone level only.
