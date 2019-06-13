@@ -262,6 +262,7 @@ namespace SolarShading {
     int maxNumberOfFigures(0);
 
     std::unique_ptr<Pumbra::Penumbra> penumbra = nullptr;
+    const static bool compareShadingMethods = false;
 
     int const NPhi = 6;                      // Number of altitude angle steps for sky integration
     int const NTheta = 24;                   // Number of azimuth angle steps for sky integration
@@ -636,6 +637,7 @@ namespace SolarShading {
         }
 
         int aNum = 1;
+        unsigned pixelRes = 512u;
         if (NumAlphas >= aNum) {
             if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Scheduled")) {
                 shadingMethod = ShadingMethod::Scheduled;
@@ -655,11 +657,8 @@ namespace SolarShading {
             } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "PixelCounting")) {
                 shadingMethod = ShadingMethod::PixelCounting;
                 cAlphaArgs(aNum) = "PixelCounting";
-                unsigned pixelRes;
                 if (NumNumbers >= 3) {
                     pixelRes = (unsigned)rNumericArgs(3);
-                } else {
-                    pixelRes = 512u;
                 }
                 penumbra = std::unique_ptr<Pumbra::Penumbra>(new Pumbra::Penumbra(pixelRes));
             } else {
@@ -886,12 +885,12 @@ namespace SolarShading {
 
         ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Shadowing/Sun Position Calculations Annual Simulations>, Shading Calculation Method, "
                                              "Shading Calculation Update Frequency Method, Shading Calculation Update Frequency {days}, "
-                                             "Maximum Figures in Shadow Overlap Calculations {}, Polygon Clipping Algorithm, Sky Diffuse Modeling "
+                                             "Maximum Figures in Shadow Overlap Calculations {}, Polygon Clipping Algorithm, Pixel Counting Resolution, Sky Diffuse Modeling "
                                              "Algorithm, Output External Shading Calculation Results, Disable "
                                              "Self-Shading Within Shading Zone Groups, Disable Self-Shading From Shading Zone Groups to Other Zones";
         ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs(1) + ',' + cAlphaArgs(2) + ',' +
                                                  RoundSigDigits(ShadowingCalcFrequency) + ',' + RoundSigDigits(MaxHCS) + ',' +
-                                                 cAlphaArgs(3) + ',' + cAlphaArgs(4) + ',' + cAlphaArgs(5) + ',' + cAlphaArgs(6) + ',' +
+                                                 cAlphaArgs(3) + ',' + RoundSigDigits(pixelRes) + ',' + cAlphaArgs(4) + ',' + cAlphaArgs(5) + ',' + cAlphaArgs(6) + ',' +
                                                  cAlphaArgs(7);
     }
 
@@ -4928,59 +4927,103 @@ namespace SolarShading {
 
             if (!ShadowingSurf && !Surface(GRSNR).HeatTransSurf) continue;
             HTS = GRSNR;
-            if (!ShadowingSurf && !Surface(GRSNR).ExtSolar) continue; // Skip surfaces with no external solar
 
-            if (penumbra && !Surface(GRSNR).MirroredSurf) {  // Penumbra doesn't need mirrored surfaces TODO: Don't bother creating them in the first place?
-                // Add surfaces to penumbra...
-                Pumbra::Polygon poly;
+            if (penumbra) {
 
-                if (Surface(GRSNR).Reveal > 0.0) {
-                    Real64 R = Surface(GRSNR).Reveal;
-                    auto& norm = Surface(GRSNR).NewellSurfaceNormalVector;
-                    for (auto v : Surface(GRSNR).Vertex) {
-                        poly.push_back(v.x + norm.x*R);
-                        poly.push_back(v.y + norm.y*R);
-                        poly.push_back(v.z + norm.z*R);
-                    }
-                } else {
-                    for (auto v : Surface(GRSNR).Vertex) {
-                        poly.push_back(v.x);
-                        poly.push_back(v.y);
-                        poly.push_back(v.z);
+                bool skipSurface = Surface(GRSNR).MirroredSurf;   // Penumbra doesn't need mirrored surfaces TODO: Don't bother creating them in the first place?
+
+                // Skip interior surfaces if the other side has already been added to penumbra
+                if (Surface(GRSNR).ExtBoundCond > 0) {
+                    if (Surface(Surface(GRSNR).ExtBoundCond).PenumbraID >= 0) {
+                        Surface(GRSNR).PenumbraID = Surface(Surface(GRSNR).ExtBoundCond).PenumbraID;
+                        skipSurface = true;
                     }
                 }
-                Pumbra::Surface pSurf(poly);
 
-                // Punch holes for subsurfaces
-                if (Surface(GRSNR).BaseSurf == GRSNR) {  // Only look for subsurfaces on base surfaces
-                    for (int subSurface = 1; subSurface <= TotSurfaces; ++subSurface) {
-                        if (Surface(subSurface).BaseSurf != GRSNR) continue; // Ignore subsurfaces of other surfaces
-                        if (!Surface(subSurface).HeatTransSurf) continue;    // Skip non heat transfer subsurfaces
-                        if (subSurface == GRSNR) continue;                   // Surface itself cannot be its own subsurface
+                if (!skipSurface) {
+                    // Add surfaces to penumbra...
+                    Pumbra::Polygon poly;
 
-                        Pumbra::Polygon subPoly;
-                        if (Surface(subSurface).Reveal > 0.0) {
-                            Real64 R = Surface(subSurface).Reveal;
-                            auto& norm = Surface(subSurface).NewellSurfaceNormalVector;
-                            for (auto v : Surface(subSurface).Vertex) {
-                                subPoly.push_back(v.x + norm.x*R);
-                                subPoly.push_back(v.y + norm.y*R);
-                                subPoly.push_back(v.z + norm.z*R);
+                    if (Surface(GRSNR).Reveal > 0.0) {
+                        Real64 R = Surface(GRSNR).Reveal;
+                        auto& norm = Surface(GRSNR).NewellSurfaceNormalVector;
+                        auto& v = Surface(GRSNR).Vertex;
+                        for (unsigned i = 0; i < v.size(); ++i) {
+                            poly.push_back(v[i].x);
+                            poly.push_back(v[i].y);
+                            poly.push_back(v[i].z);
+
+
+                            Vector vPrev;
+                            if (i == 0) {
+                                vPrev = v[v.size() - 1];
+                            } else {
+                                vPrev = v[i - 1];
                             }
-                        } else {
-                            for (auto v : Surface(subSurface).Vertex) {
-                                subPoly.push_back(v.x);
-                                subPoly.push_back(v.y);
-                                subPoly.push_back(v.z);
-                            }
+
+                            Pumbra::Polygon rPoly; // Reveal surface
+                            rPoly.push_back(v[i].x);
+                            rPoly.push_back(v[i].y);
+                            rPoly.push_back(v[i].z);
+
+
+                            rPoly.push_back(v[i].x + norm.x*R);
+                            rPoly.push_back(v[i].y + norm.y*R);
+                            rPoly.push_back(v[i].z + norm.z*R);
+
+                            rPoly.push_back(vPrev.x + norm.x*R);
+                            rPoly.push_back(vPrev.y + norm.y*R);
+                            rPoly.push_back(vPrev.z + norm.z*R);
+
+                            rPoly.push_back(vPrev.x);
+                            rPoly.push_back(vPrev.y);
+                            rPoly.push_back(vPrev.z);
+
+                            Pumbra::Surface rSurf(rPoly);
+                            penumbra->addSurface(rSurf);
+
                         }
-
-                        pSurf.addHole(subPoly);
+                    } else {
+                        for (auto v : Surface(GRSNR).Vertex) {
+                            poly.push_back(v.x);
+                            poly.push_back(v.y);
+                            poly.push_back(v.z);
+                        }
                     }
-                }
+                    Pumbra::Surface pSurf(poly);
 
-                Surface(GRSNR).PenumbraID = penumbra->addSurface(pSurf);
+                    // Punch holes for subsurfaces
+                    if (Surface(GRSNR).BaseSurf == GRSNR) {  // Only look for subsurfaces on base surfaces
+                        for (int subSurface = 1; subSurface <= TotSurfaces; ++subSurface) {
+                            if (Surface(subSurface).BaseSurf != GRSNR) continue; // Ignore subsurfaces of other surfaces
+                            if (!Surface(subSurface).HeatTransSurf) continue;    // Skip non heat transfer subsurfaces
+                            if (subSurface == GRSNR) continue;                   // Surface itself cannot be its own subsurface
+
+                            Pumbra::Polygon subPoly;
+                            if (Surface(subSurface).Reveal > 0.0) {
+                                Real64 R = Surface(subSurface).Reveal;
+                                auto& norm = Surface(subSurface).NewellSurfaceNormalVector;
+                                for (auto v : Surface(subSurface).Vertex) {
+                                    subPoly.push_back(v.x + norm.x*R);
+                                    subPoly.push_back(v.y + norm.y*R);
+                                    subPoly.push_back(v.z + norm.z*R);
+                                }
+                            } else {
+                                for (auto v : Surface(subSurface).Vertex) {
+                                    subPoly.push_back(v.x);
+                                    subPoly.push_back(v.y);
+                                    subPoly.push_back(v.z);
+                                }
+                            }
+
+                            pSurf.addHole(subPoly);
+                        }
+                    }
+                    Surface(GRSNR).PenumbraID = penumbra->addSurface(pSurf);
+                }
             }
+
+            if (!ShadowingSurf && !Surface(GRSNR).ExtSolar) continue; // Skip surfaces with no external solar
 
             if (!ShadowingSurf && Surface(GRSNR).BaseSurf != GRSNR) { // Skip subsurfaces (SBS)
                 continue;
@@ -5298,11 +5341,9 @@ namespace SolarShading {
 
         SAREA = 0.0;
 
-        Real64 ElevSun, AzimSun;
-
         if (penumbra) {
-            ElevSun = PiOvr2 - std::acos(SUNCOS(3));
-            AzimSun = std::atan2(SUNCOS(1), SUNCOS(2));
+            Real64 ElevSun = PiOvr2 - std::acos(SUNCOS(3));
+            Real64 AzimSun = std::atan2(SUNCOS(1), SUNCOS(2));
             penumbra->setSunPosition(AzimSun, ElevSun);
         }
 
@@ -5334,21 +5375,19 @@ namespace SolarShading {
                 SAREA(HTS) = Surface(GRSNR).NetAreaShadowCalc;
             } else { // Surface in sun and either shading surfaces or subsurfaces present (or both)
 
-                const static bool compareMethods = false;
-
-                if (penumbra && Surface(HTS).PenumbraID >= 0 && !compareMethods) {
-                    SAREA(HTS) = penumbra->calculatePSSF(Surface(HTS).PenumbraID)/CTHETA(HTS);
+                if (penumbra && Surface(HTS).PenumbraID >= 0 && !compareShadingMethods) {
+                    SAREA(HTS) = penumbra->calculatePSSA(Surface(HTS).PenumbraID)/CTHETA(HTS);
                     for (int SS = 1; SS <= NSBS; ++SS) {
                         auto HTSS = ShadowComb(HTS).SubSurf(SS);
                         if (Surface(HTSS).PenumbraID >= 0) {
-                            SAREA(HTSS) = penumbra->calculatePSSF(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
+                            SAREA(HTSS) = penumbra->calculatePSSA(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
                             if (SAREA(HTSS) > 0.0) {
                                 if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
-                                SHDRVL(HTSS, HTSS, iHour, TS); // Determine shadowing from reveal.
+                                //SHDRVL(HTSS, HTSS, iHour, TS); // Determine shadowing from reveal.
                             }
                         }
                     }
-                } else if (!penumbra || compareMethods) {
+                } else if (!penumbra || compareShadingMethods) {
 
                     NGRS = Surface(GRSNR).BaseSurf;
                     if (Surface(GRSNR).ShadowingSurf) NGRS = GRSNR;
@@ -5382,13 +5421,14 @@ namespace SolarShading {
                     HCT(1) = 1.0;
 
                     SHDGSS(NGRS, iHour, TS, GRSNR, NGSS, HTS); // Determine shadowing on surface.
-                    if (!CalcSkyDifShading) {
-                        SHDBKS(NGRS, GRSNR, NBKS, HTS); // Determine possible back surfaces.
-                    }
-
-                    SHDSBS(iHour, GRSNR, NBKS, NSBS, HTS, TS); // Subtract subsurf areas from total
 
                 }
+
+                if (!CalcSkyDifShading) {
+                    SHDBKS(Surface(GRSNR).BaseSurf, GRSNR, NBKS, HTS); // Determine possible back surfaces.
+                }
+
+                SHDSBS(iHour, GRSNR, NBKS, NSBS, HTS, TS); // Subtract subsurf areas from total
 
                 // Error checking:  require that 0 <= SAREA <= AREA.  + or - .01*AREA added for round-off errors
                 SurfArea = Surface(GRSNR).NetAreaShadowCalc;
@@ -5396,18 +5436,18 @@ namespace SolarShading {
 
                 SAREA(HTS) = min(SAREA(HTS), SurfArea);
 
-                if (penumbra && Surface(HTS).PenumbraID >= 0 && compareMethods) {
+                if (penumbra && Surface(HTS).PenumbraID >= 0 && compareShadingMethods) {
 
-                    Real64 pSAREA = penumbra->calculatePSSF(Surface(HTS).PenumbraID)/CTHETA(HTS);
+                    Real64 pSAREA = penumbra->calculatePSSA(Surface(HTS).PenumbraID)/CTHETA(HTS);
                     pSAREA = max(0.0, pSAREA);
                     pSAREA = min(pSAREA, SurfArea);
                     if (!CalcSkyDifShading || true) {
                         if (std::abs(pSAREA - SAREA(HTS))/Surface(HTS).Area > 0.05) {
                             std::cout << Surface(HTS).Name << " CPU: " << SAREA(HTS)/Surface(HTS).Area << ", GPU: " << pSAREA/Surface(HTS).Area <<  std::endl;
-                            std::cout << "  Elevation: " << ElevSun << ", Azimuth: " << AzimSun << ", CosI: " << CTHETA(HTS) << std::endl;
+                            std::cout << "  Elevation: " << penumbra->getSunAltitude() << ", Azimuth: " << penumbra->getSunAzimuth() << ", CosI: " << CTHETA(HTS) << std::endl;
                             penumbra->renderScene(Surface(HTS).PenumbraID);
                         } else {
-                            //std::cout << Surface(HTS).Name << " GOOD! " << SAREA(HTS)/Surface(HTS).Area << "  (Diff = " << std::abs(pSAREA - SAREA(HTS))/Surface(HTS).Area << ")" << std::endl;
+                            std::cout << Surface(HTS).Name << " GOOD! " << SAREA(HTS)/Surface(HTS).Area << "  (Diff = " << std::abs(pSAREA - SAREA(HTS))/Surface(HTS).Area << ")" << std::endl;
                         }
                     }
                     SAREA(HTS) = pSAREA;
@@ -5415,7 +5455,7 @@ namespace SolarShading {
                         auto HTSS = ShadowComb(HTS).SubSurf(SS);
                         if (Surface(HTSS).PenumbraID >= 0) {
                             auto CPUArea = SAREA(HTSS);
-                            SAREA(HTSS) = penumbra->calculatePSSF(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
+                            SAREA(HTSS) = penumbra->calculatePSSA(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
                             if (SAREA(HTSS) > 0.0) {
                                 if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
 
@@ -5431,10 +5471,10 @@ namespace SolarShading {
                             if (!CalcSkyDifShading || true) {
                                 if (std::abs(pSAREA - SAREA(HTSS))/Surface(HTSS).Area > 0.05) {
                                     std::cout << Surface(HTSS).Name << " CPU: " << SAREA(HTSS)/Surface(HTSS).Area << ", GPU: " << pSAREA/Surface(HTSS).Area <<  std::endl;
-                                    std::cout << "  Elevation: " << ElevSun << ", Azimuth: " << AzimSun << ", CosI: " << CTHETA(HTS) << std::endl;
+                                    std::cout << "  Elevation: " << penumbra->getSunAltitude() << ", Azimuth: " << penumbra->getSunAzimuth() << ", CosI: " << CTHETA(HTSS) << std::endl;
                                     penumbra->renderScene(Surface(HTSS).PenumbraID);
                                 } else {
-                                    //std::cout << Surface(HTSS).Name << " GOOD! " << SAREA(HTSS)/Surface(HTSS).Area << "  (Diff = " << std::abs(pSAREA - SAREA(HTSS))/Surface(HTSS).Area << ")" << std::endl;
+                                    std::cout << Surface(HTSS).Name << " GOOD! " << SAREA(HTSS)/Surface(HTSS).Area << "  (Diff = " << std::abs(pSAREA - SAREA(HTSS))/Surface(HTSS).Area << ")" << std::endl;
                                 }
                             }
                             SAREA(HTSS) = pSAREA;
@@ -5956,57 +5996,101 @@ namespace SolarShading {
 
             if (!UseSimpleDistribution) { // Compute overlaps
 
-                FINSHC = FSBSHC + NSBSHC;
+                std::map<unsigned, float> pssas;
 
-                JBKS = 0;
-                JBKSbase = 0;
-
-                for (int IBKS = 1; IBKS <= NBKSHC; ++IBKS) { // Loop over back surfaces to GRSNR this hour. NBKSHC is the number of
-                    // back surfaces that would receive beam radiation from the base surface, GRSNR,
-                    // if the base surface was transparent. In general, some (at least one) or all of these
-                    // will receive beam radiation from the exterior window subsurface, HTSS, of GRSNR,
-                    // depending on the size of HTSS and its location on GRSNR
-
-                    BackSurfNum = HCNS(FBKSHC - 1 + IBKS);
-
-                    // Determine if this back surface number can receive beam radiation from the
-                    // exterior window, HTSS, this hour, i.e., overlap area is positive
-
-                    LOCHCA = FINSHC - 1;
-
-                    MULTOL(FBKSHC - 1 + IBKS, FSBSHC - 1, NSBSHC);
-
-                    // Compute overlap area for this back surface
-
-                    NINSHC = LOCHCA - FINSHC + 1;
-                    if (NINSHC <= 0) continue;
-                    OverlapArea = HCAREA(FINSHC);
-                    for (int J = 2; J <= NINSHC; ++J) {
-                        OverlapArea += HCAREA(FINSHC - 1 + J) * (1.0 - HCT(FINSHC - 1 + J));
+                if (penumbra) {
+                    // Add back surfaces to array
+                    std::vector<unsigned> pbBackSurfaces;
+                    for (int IBKS = 1; IBKS <= NBKSHC; ++IBKS) {
+                        BackSurfNum = HCNS(FBKSHC - 1 + IBKS);
+                        pbBackSurfaces.push_back(Surface(BackSurfNum).PenumbraID);
                     }
+                    pssas = penumbra->calculateInteriorPSSAs({(unsigned)Surface(HTSS).PenumbraID}, pbBackSurfaces);
 
-                    if (OverlapArea > 0.001) {
-                        ++JBKS;
-                        if (Surface(BackSurfNum).BaseSurf == BackSurfNum) JBKSbase = JBKS;
-                        if (JBKS <= MaxBkSurf) {
+                    JBKS = 0;
+                    for (int IBKS = 1; IBKS <= NBKSHC; ++IBKS) {
+                        BackSurfNum = HCNS(FBKSHC - 1 + IBKS);
+                        if (pssas[Surface(BackSurfNum).PenumbraID] > 0) {
+                            ++JBKS;
                             BackSurfaces(TS, iHour, JBKS, HTSS) = BackSurfNum;
-                            // Remove following IF check: multiplying by sunlit fraction in the following is incorrect
-                            // (FCW, 6/28/02)
-                            // IF (WindowRevealStatus(HTSS,IHOUR,TS) == WindowShadedOnlyByReveal) THEN
-                            //  OverlapArea = OverlapArea*(SAREA(HTSS)/Surface(HTSS)%Area)
-                            // ENDIF
+                            OverlapArea = pssas[Surface(BackSurfNum).PenumbraID]/CTHETA(HTSS);
                             OverlapAreas(TS, iHour, JBKS, HTSS) = OverlapArea * SurfaceWindow(HTSS).GlazedFrac;
-                            // If this is a subsurface, subtract its overlap area from the base surface
-                            if (Surface(BackSurfNum).BaseSurf != BackSurfNum && JBKSbase != 0) {
-                                OverlapAreas(TS, iHour, JBKSbase, HTSS) =
-                                    max(0.0, OverlapAreas(TS, iHour, JBKSbase, HTSS) - OverlapAreas(TS, iHour, JBKS, HTSS));
-                            }
                         }
                     }
 
-                } // End of loop over back surfaces
-            }
+                }
 
+                if (!penumbra || (penumbra && compareShadingMethods)) {
+
+                    FINSHC = FSBSHC + NSBSHC;
+
+                    JBKS = 0;
+                    JBKSbase = 0;
+
+                    for (int IBKS = 1; IBKS <= NBKSHC; ++IBKS) { // Loop over back surfaces to GRSNR this hour. NBKSHC is the number of
+                        // back surfaces that would receive beam radiation from the base surface, GRSNR,
+                        // if the base surface was transparent. In general, some (at least one) or all of these
+                        // will receive beam radiation from the exterior window subsurface, HTSS, of GRSNR,
+                        // depending on the size of HTSS and its location on GRSNR
+
+                        BackSurfNum = HCNS(FBKSHC - 1 + IBKS);
+
+                        // Determine if this back surface number can receive beam radiation from the
+                        // exterior window, HTSS, this hour, i.e., overlap area is positive
+
+                        LOCHCA = FINSHC - 1;
+
+                        MULTOL(FBKSHC - 1 + IBKS, FSBSHC - 1, NSBSHC);
+
+                        // Compute overlap area for this back surface
+
+                        NINSHC = LOCHCA - FINSHC + 1;
+                        if (NINSHC <= 0) continue;
+                        OverlapArea = HCAREA(FINSHC);
+                        for (int J = 2; J <= NINSHC; ++J) {
+                            OverlapArea += HCAREA(FINSHC - 1 + J) * (1.0 - HCT(FINSHC - 1 + J));
+                        }
+
+                        if (OverlapArea > 0.001) {
+                            ++JBKS;
+                            if (Surface(BackSurfNum).BaseSurf == BackSurfNum) JBKSbase = JBKS;
+                            if (JBKS <= MaxBkSurf) {
+                                BackSurfaces(TS, iHour, JBKS, HTSS) = BackSurfNum;
+                                // Remove following IF check: multiplying by sunlit fraction in the following is incorrect
+                                // (FCW, 6/28/02)
+                                // IF (WindowRevealStatus(HTSS,IHOUR,TS) == WindowShadedOnlyByReveal) THEN
+                                //  OverlapArea = OverlapArea*(SAREA(HTSS)/Surface(HTSS)%Area)
+                                // ENDIF
+                                OverlapAreas(TS, iHour, JBKS, HTSS) = OverlapArea * SurfaceWindow(HTSS).GlazedFrac;
+                                // If this is a subsurface, subtract its overlap area from the base surface
+                                if (Surface(BackSurfNum).BaseSurf != BackSurfNum && JBKSbase != 0) {
+                                    OverlapAreas(TS, iHour, JBKSbase, HTSS) =
+                                        max(0.0, OverlapAreas(TS, iHour, JBKSbase, HTSS) - OverlapAreas(TS, iHour, JBKS, HTSS));
+                                }
+
+                            }
+                        }
+
+                    } // End of loop over back surfaces
+
+
+                    if (penumbra && compareShadingMethods) {
+                        for (int IBKS = 1; IBKS <= MaxBkSurf; ++IBKS) {
+                            BackSurfNum = BackSurfaces(TS, iHour, IBKS, HTSS);
+                            if (BackSurfNum == 0) break;
+                            Real64 penumbraOverlapArea = pssas[Surface(BackSurfNum).PenumbraID]/CTHETA(HTSS);
+
+                            if (std::abs(OverlapAreas(TS, iHour, IBKS, HTSS) - penumbraOverlapArea)/Surface(HTSS).Area > 0.05) {
+                                std::cout << Surface(HTSS).Name << " -> " << Surface(BackSurfNum).Name << " CPU: " << OverlapAreas(TS, iHour, IBKS, HTSS)/Surface(HTSS).Area << ", GPU: " << penumbraOverlapArea/Surface(HTSS).Area <<  std::endl;
+                                std::cout << "  Elevation: " << penumbra->getSunAltitude() << ", Azimuth: " << penumbra->getSunAzimuth() << ", CosI: " << CTHETA(HTSS) << std::endl;
+                                penumbra->renderInteriorScene({(unsigned)Surface(HTSS).PenumbraID}, {(unsigned)Surface(BackSurfNum).PenumbraID});
+                            } else {
+                                std::cout << Surface(HTSS).Name << " -> " << Surface(BackSurfNum).Name << " GOOD!" << std::endl;// << SAREA(HTS)/Surface(HTS).Area << "  (Diff = " << std::abs(pSAREA - SAREA(HTS))/Surface(HTS).Area << ")" << std::endl;
+                            }
+                        }
+                    }
+                }
+            }
         } // End of check that sunlit area > 0.
     }
 

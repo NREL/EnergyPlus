@@ -1,5 +1,5 @@
 /* Copyright (c) 2017 Big Ladder Software LLC. All rights reserved.
-* See the LICENSE file for additional terms and conditions. */
+ * See the LICENSE file for additional terms and conditions. */
 
 #ifndef SHADER_H_
 #define SHADER_H_
@@ -12,13 +12,14 @@ namespace Pumbra {
 
 class GLShader {
 public:
-  GLShader(GLenum type, const char* source);
+  GLShader(GLenum type, const char *source);
   ~GLShader();
   GLuint getInt();
+
 private:
   GLuint shader;
 };
 
-}
+} // namespace Pumbra
 
 #endif // SHADER_H_

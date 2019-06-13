@@ -1,5 +1,5 @@
 /* Copyright (c) 2017 Big Ladder Software LLC. All rights reserved.
-* See the LICENSE file for additional terms and conditions. */
+ * See the LICENSE file for additional terms and conditions. */
 
 #ifndef PENUMBRA_ERROR_H_
 #define PENUMBRA_ERROR_H_
@@ -10,12 +10,9 @@
 namespace Pumbra {
 
 extern PenumbraCallbackFunction penumbraCallbackFunction;
-extern void* messageCallbackContextPtr;
+extern void *messageCallbackContextPtr;
 
-void showMessage(
-  const int messageType,
-  const std::string message
-);
+void showMessage(const int messageType, const std::string message);
 
-}
+} // namespace Pumbra
 #endif // PENUMBRA_ERROR_H_

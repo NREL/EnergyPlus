@@ -1,5 +1,5 @@
 /* Copyright (c) 2017 Big Ladder Software LLC. All rights reserved.
-* See the LICENSE file for additional terms and conditions. */
+ * See the LICENSE file for additional terms and conditions. */
 
 #ifndef PROGRAM_H_
 #define PROGRAM_H_
@@ -12,13 +12,14 @@ namespace Pumbra {
 
 class GLProgram {
 public:
-  GLProgram(const char* vertexSource, const char* fragmentSource);
+  GLProgram(const char *vertexSource, const char *fragmentSource);
   ~GLProgram();
   GLuint getInt();
+
 private:
   GLuint program;
 };
 
-}
+} // namespace Pumbra
 
 #endif // PROGRAM_H_

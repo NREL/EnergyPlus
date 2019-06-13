@@ -1,5 +1,5 @@
 /* Copyright (c) 2017 Big Ladder Software LLC. All rights reserved.
-* See the LICENSE file for additional terms and conditions. */
+ * See the LICENSE file for additional terms and conditions. */
 
 #ifndef MODEL_H_
 #define MODEL_H_
@@ -13,18 +13,29 @@
 
 namespace Pumbra {
 
+class SurfaceBuffer {
+public:
+  SurfaceBuffer(GLuint begin = 0u, GLuint count = 0u, GLint index = -1);
+  GLuint begin;
+  GLuint count;
+  GLint index;
+};
+
 class GLModel {
 public:
   ~GLModel();
-  void setVertices(const std::vector<float>& vertices);
-  void draw(GLint first, GLsizei count);
+  void setVertices(const std::vector<float> &vertices);
+  void drawSurface(SurfaceBuffer surfaceBuffer);
+  void drawAll();
+  void drawExcept(std::vector<SurfaceBuffer> hiddenSurfaces);
   void clearModel();
   std::vector<float> vertexArray;
-  unsigned numVerts;
+  unsigned numPoints;
+  static const int vertexSize = 3; // i.e., 3D
 private:
   GLuint vbo, vao;
 };
 
-}
+} // namespace Pumbra
 
 #endif // MODEL_H_

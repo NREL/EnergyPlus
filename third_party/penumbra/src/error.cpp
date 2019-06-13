@@ -1,5 +1,5 @@
 /* Copyright (c) 2017 Big Ladder Software LLC. All rights reserved.
-* See the LICENSE file for additional terms and conditions. */
+ * See the LICENSE file for additional terms and conditions. */
 
 // Standard
 #include <iostream>
@@ -10,13 +10,9 @@
 namespace Pumbra {
 
 PenumbraCallbackFunction penumbraCallbackFunction;
-void* messageCallbackContextPtr;
+void *messageCallbackContextPtr;
 
-void showMessage(
-  const int messageType,
-  const std::string message
-)
-{
+void showMessage(const int messageType, const std::string message) {
   if (penumbraCallbackFunction != NULL) {
     (*penumbraCallbackFunction)(messageType, message, messageCallbackContextPtr);
   } else {
@@ -31,4 +27,4 @@ void showMessage(
   }
 }
 
-}
+} // namespace Pumbra
