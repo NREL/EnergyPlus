@@ -981,6 +981,7 @@ namespace WeatherManager {
 
             // Throw a Fatal now that we have said it'll terminalte
             if (ErrorsFound) {
+                CloseWeatherFile(); // will only close if opened.
                 ShowFatalError(RoutineName + "Errors found in Weater Data Input. Program terminates.");
             }
 
