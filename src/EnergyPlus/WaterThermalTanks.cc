@@ -8673,12 +8673,13 @@ namespace WaterThermalTanks {
         PartLoadRatio = 0.0;
         WaterThermalTank(WaterThermalTankNum).SourceMassFlowRate = 0.0;
         // reset tank inlet temp from previous time step
-        WaterThermalTank(WaterThermalTankNum).SourceInletTemp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp;
+        WaterThermalTank(WaterThermalTankNum).SourceInletTemp = WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp;
         WaterHeaterDesuperheater(DesuperheaterNum).DesuperheaterPLR = 0.0;
 
         Node(WaterInletNode).MassFlowRate = 0.0;
+        Node(WaterInletNode).Temp = WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp;
         Node(WaterOutletNode).MassFlowRate = 0.0;
-        Node(WaterOutletNode).Temp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp;
+        Node(WaterOutletNode).Temp = WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp;
 
         WaterHeaterDesuperheater(DesuperheaterNum).DesuperheaterPLR = 0.0;
         WaterHeaterDesuperheater(DesuperheaterNum).OnCycParaFuelRate = 0.0;
@@ -8753,11 +8754,16 @@ namespace WaterThermalTanks {
         Effic = WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff;
 
         // store first iteration tank temperature and desuperheater mode of operation
-        if (FirstHVACIteration && !ShortenTimeStepSys) {
+        if (FirstHVACIteration && !ShortenTimeStepSys && WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag) {
             // Save conditions from end of previous system timestep
             // Every iteration that does not advance time should reset to these values
             WaterThermalTank(WaterThermalTankNum).SavedTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
             WaterHeaterDesuperheater(DesuperheaterNum).SaveMode = WaterHeaterDesuperheater(DesuperheaterNum).Mode;
+            WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag = false;
+        }
+
+        if (!FirstHVACIteration) {
+            WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag = true;
         }
 
         TankTemp = WaterThermalTank(WaterThermalTankNum).SavedTankTemp;
