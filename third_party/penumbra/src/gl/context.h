@@ -43,10 +43,13 @@ public:
 private:
   GLFWwindow *window;
   GLuint query, fbo, rbo;
-  static const char *vertexShaderSource;
-  static const char *fragmentShaderSource;
+  static const char *renderVertexShaderSource;
+  static const char *renderFragmentShaderSource;
+  static const char *calculationVertexShaderSource;
   unsigned size;
   GLModel model;
+  std::unique_ptr<GLProgram> renderProgram;
+  std::unique_ptr<GLProgram> calcProgram;
   bool modelSet;
   float pixelArea;
   float modelBox[8][4];

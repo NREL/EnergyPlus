@@ -9,7 +9,7 @@
 
 namespace Pumbra {
 
-const char *Context::vertexShaderSource =
+const char *Context::renderVertexShaderSource =
     R"src(
   #version 120
   uniform mat4 MVP;
@@ -23,13 +23,24 @@ const char *Context::vertexShaderSource =
   }
 )src";
 
-const char *Context::fragmentShaderSource =
+const char *Context::renderFragmentShaderSource =
     R"src(
   #version 120
   varying vec3 color;
   void main()
   {
     gl_FragColor = vec4(color, 1.0);
+  }
+)src";
+
+const char *Context::calculationVertexShaderSource =
+    R"src(
+  #version 120
+  uniform mat4 MVP;
+  attribute vec3 vPos;
+  void main()
+  {
+    gl_Position = MVP * vec4(vPos, 1.0);
   }
 )src";
 
@@ -150,11 +161,14 @@ Context::Context(unsigned size)
   glEnable(GL_DEPTH_TEST);
 
   // Shader program
-  GLProgram program(vertexShaderSource, fragmentShaderSource);
+  calcProgram = std::unique_ptr<GLProgram>(new GLProgram(calculationVertexShaderSource, nullptr));
 
-  glBindAttribLocation(program.getInt(), 0, "vPos");
-  mvpLocation = glGetUniformLocation(program.getInt(), "MVP");
-  vColLocation = glGetUniformLocation(program.getInt(), "vCol");
+  glBindAttribLocation(calcProgram->getInt(), 0, "vPos");
+
+  renderProgram = std::unique_ptr<GLProgram>(new GLProgram(renderVertexShaderSource, renderFragmentShaderSource));
+  glBindAttribLocation(renderProgram->getInt(), 0, "vPos");
+  mvpLocation = glGetUniformLocation(calcProgram->getInt(), "MVP");
+  vColLocation = glGetUniformLocation(renderProgram->getInt(), "vCol");
 
   glGenFramebuffersEXT(1, &fbo);
   glGenRenderbuffersEXT(1, &rbo);
@@ -165,7 +179,10 @@ Context::Context(unsigned size)
 Context::~Context() {
   glDeleteFramebuffersEXT(1, &fbo);
   glDeleteRenderbuffersEXT(1, &rbo);
+  glDeleteProgram(calcProgram->getInt());
+  glDeleteProgram(renderProgram->getInt());
   glfwDestroyWindow(window);
+
 }
 void Context::toggleWireFrame() {
   isWireFrame = !isWireFrame;
@@ -462,6 +479,7 @@ Context::calculateInteriorPSSAs(const std::vector<SurfaceBuffer> &hiddenSurfaces
 }
 
 void Context::initOffScreenMode() {
+  glUseProgram(calcProgram->getInt());
   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
   glDrawBuffer(GL_NONE);
   glReadBuffer(GL_NONE);
@@ -500,12 +518,11 @@ void Context::initOffScreenMode() {
   }
 
   glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-
-  glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f); // TODO: Change shader to ignore color in this case
 }
 
 void Context::initRenderMode() {
   // set to default framebuffer and renderbuffer
+  glUseProgram(renderProgram->getInt());
   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
   glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
   glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);

@@ -10,11 +10,12 @@ namespace Pumbra {
 GLProgram::GLProgram(const char *vertexSource, const char *fragmentSource) {
   program = glCreateProgram();
   GLShader vertex(GL_VERTEX_SHADER, vertexSource);
-  GLShader fragment(GL_FRAGMENT_SHADER, fragmentSource);
   glAttachShader(program, vertex.getInt());
-  glAttachShader(program, fragment.getInt());
+  if (fragmentSource) {
+    GLShader fragment(GL_FRAGMENT_SHADER, fragmentSource);
+    glAttachShader(program, fragment.getInt());
+  }
   glLinkProgram(program);
-  glUseProgram(program);
 }
 
 GLProgram::~GLProgram() {}
