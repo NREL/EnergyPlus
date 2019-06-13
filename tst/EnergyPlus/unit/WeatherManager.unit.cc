@@ -75,7 +75,7 @@ TEST_F(EnergyPlusFixture, SkyTempTest)
         "SimulationControl, NO, NO, NO, YES, YES;",
         "Timestep,4;",
         "RunPeriod,",
-        ",                        !- Name",
+        "RP1,                     !- Name",
         "2,                       !- Begin Month",
         "27,                      !- Begin Day of Month",
         ",                        !- Begin Year",

@@ -233,10 +233,11 @@ namespace SurfaceGeometry {
                                  int const TotFinsProjection       // Number of Fins (projection) to obtain
     );
 
-    void GetIntMassSurfaceData(bool &ErrorsFound,   // Error flag indicator (true if errors found)
-                               int &SurfNum,        // Count of Current SurfaceNumber
-                               int const TotIntMass // Number of Internal Mass Surfaces to obtain
+    void GetIntMassSurfaceData(bool &ErrorsFound, // Error flag indicator (true if errors found)
+                               int &SurfNum       // Count of Current SurfaceNumber
     );
+
+    int GetNumIntMassSurfaces(); // Number of Internal Mass Surfaces to obtain
 
     void GetShadingSurfReflectanceData(bool &ErrorsFound); // If errors found in input
 
@@ -254,7 +255,7 @@ namespace SurfaceGeometry {
         void getData(bool &ErrorsFound);
         struct Data
         {
-            double exposedFraction = -1;  // hush up cppcheck
+            double exposedFraction = -1; // hush up cppcheck
             std::vector<bool> isExposedPerimeter;
             bool useDetailedExposedPerimeter;
         };
