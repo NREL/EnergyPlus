@@ -3044,12 +3044,16 @@ namespace UnitarySystems {
                                         DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .EquipName(EquipNum) != thisObjectName)
                                         continue;
+                                    // When used as zone equipment these 2 variables will not be used to access SequencedOutput variables
+                                    // leave this here in case it could be used in the future. It would need to be changed to use equipIndex instead.
+                                    // (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
                                     thisSys.m_ZoneSequenceCoolingNum =
                                         DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                             .CoolingPriority(EquipNum);
                                     thisSys.m_ZoneSequenceHeatingNum =
                                         DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                             .HeatingPriority(EquipNum);
+                                    break;
                                 }
                             }
                             thisSys.ControlZoneNum = ControlledZoneNum;
@@ -3112,6 +3116,9 @@ namespace UnitarySystems {
                                             DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                     .EquipName(EquipNum) != thisObjectName)
                                             continue;
+                                        // When used as zone equipment these 2 variables will not be used to access SequencedOutput variables
+                                        // leave this here in case it could be used in the future. It would need to be changed to use equipIndex instead.
+                                        // (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
                                         thisSys.m_ZoneSequenceCoolingNum =
                                             DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .CoolingPriority(EquipNum);
@@ -3178,6 +3185,9 @@ namespace UnitarySystems {
                                             DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                     .EquipName(EquipNum) != thisObjectName)
                                             continue;
+                                        // When used as zone equipment these 2 variables will not be used to access SequencedOutput variables
+                                        // leave this here in case it could be used in the future. It would need to be changed to use equipIndex instead.
+                                        // (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
                                         thisSys.m_ZoneSequenceCoolingNum =
                                             DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .CoolingPriority(EquipNum);
@@ -7276,7 +7286,8 @@ namespace UnitarySystems {
                 // here we need to deal with sequenced zone equip
                 HeatingLoad = false;
                 CoolingLoad = false;
-                if (this->m_ZoneSequenceCoolingNum > 0 && this->m_ZoneSequenceHeatingNum > 0) {
+                if (this->m_ZoneSequenceCoolingNum > 0 && this->m_ZoneSequenceHeatingNum > 0 and this->m_AirLoopEquipment) {
+                    // air loop equipment uses sequenced variables
                     QToCoolSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum)
                                        .SequencedOutputRequiredToCoolingSP(this->m_ZoneSequenceCoolingNum);
                     QToHeatSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum)
@@ -7301,10 +7312,11 @@ namespace UnitarySystems {
                     MoistureLoad = DataZoneEnergyDemands::ZoneSysMoistureDemand(this->ControlZoneNum)
                                        .SequencedOutputRequiredToDehumidSP(this->m_ZoneSequenceCoolingNum);
                 } else {
+                    // zone equipment uses Remaining* variables
                     ZoneLoad = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputRequired;
-                    QToCoolSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).OutputRequiredToCoolingSP;
-                    QToHeatSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).OutputRequiredToHeatingSP;
-                    MoistureLoad = DataZoneEnergyDemands::ZoneSysMoistureDemand(this->ControlZoneNum).OutputRequiredToDehumidifyingSP;
+                    QToCoolSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputReqToCoolSP;
+                    QToHeatSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputReqToHeatSP;
+                    MoistureLoad = DataZoneEnergyDemands::ZoneSysMoistureDemand(this->ControlZoneNum).RemainingOutputReqToDehumidSP;
                 }
 
                 if (this->m_DehumidControlType_Num != DehumCtrlType::None) {
@@ -8637,10 +8649,10 @@ namespace UnitarySystems {
                     this->m_ZoneSequenceHeatingNum = heatingPriority;
                 }
                 this->m_MyCheckFlag = false;
-                if (this->m_ZoneSequenceCoolingNum == 0) {
-                    ShowSevereError(this->UnitType + " \"" + this->Name +
-                                    "\": No matching air terminal found in the zone equipment list for zone = " +
-                                    DataHeatBalance::Zone(this->ControlZoneNum).Name + ".");
+                if (this->m_ZoneSequenceCoolingNum == 0 || this->m_ZoneSequenceHeatingNum == 0) {
+                    ShowSevereError(this->UnitType + " \"" + this->Name + "\": Airloop air terminal in the zone equipment list for zone = " +
+                                    DataHeatBalance::Zone(this->ControlZoneNum).Name +
+                                    " not found or is not allowed Zone Equipment Cooling or Heating Sequence = 0.");
                     ShowFatalError("Subroutine InitLoadBasedControl: Errors found in getting " + this->UnitType +
                                    " input.  Preceding condition(s) causes termination.");
                 }
