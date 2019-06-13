@@ -749,7 +749,7 @@ namespace IceThermalStorage {
                 if ((DetIceStor(IceNum).IceFracRemaining - ChargeFrac) < 0.0) ChargeFrac = DetIceStor(IceNum).IceFracRemaining;
                 AvgFracCharged = DetIceStor(IceNum).IceFracRemaining - (ChargeFrac / 2.0);
 
-                Qstar = std::abs(CalcQstar(DetIceStor(IceNum).DischargeCurveNum,DetIceStor(IceNum).ChargeCurveTypeNum,AvgFracCharged,LMTDstar,MassFlowstar));
+                Qstar = std::abs(CalcQstar(DetIceStor(IceNum).DischargeCurveNum,DetIceStor(IceNum).DischargeCurveTypeNum,AvgFracCharged,LMTDstar,MassFlowstar));
 
                 ActualLoad = Qstar * DetIceStor(IceNum).NomCapacity / DetIceStor(IceNum).CurveFitTimeStep;
 
@@ -774,7 +774,7 @@ namespace IceThermalStorage {
                             ToutOld = ToutNew;
                             LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, DetIceStor(IceNum).FreezingTemp);
 
-                            Qstar = std::abs(CalcQstar(DetIceStor(IceNum).DischargeCurveNum,DetIceStor(IceNum).ChargeCurveTypeNum,AvgFracCharged,LMTDstar,MassFlowstar));
+                            Qstar = std::abs(CalcQstar(DetIceStor(IceNum).DischargeCurveNum,DetIceStor(IceNum).DischargeCurveTypeNum,AvgFracCharged,LMTDstar,MassFlowstar));
 
                             // Now make sure that we don't go below 100% discharged and calculate the new average fraction
                             ChargeFrac = Qstar * (TimeStepSys / DetIceStor(IceNum).CurveFitTimeStep);
