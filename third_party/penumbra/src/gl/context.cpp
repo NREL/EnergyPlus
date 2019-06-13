@@ -428,12 +428,6 @@ float Context::calculatePSSA(const SurfaceBuffer &surfaceBuffer) {
   model.drawSurface(surfaceBuffer);
   glEndQuery(GL_SAMPLES_PASSED);
 
-  // wait until the result is available
-  GLint ready(0);
-  while (!ready) {
-    glGetQueryObjectiv(query, GL_QUERY_RESULT_AVAILABLE, &ready);
-  }
-
   // retrieve result
   GLint pixelCount;
   glGetQueryObjectiv(query, GL_QUERY_RESULT, &pixelCount);
@@ -461,12 +455,6 @@ Context::calculateInteriorPSSAs(const std::vector<SurfaceBuffer> &hiddenSurfaces
     glBeginQuery(GL_SAMPLES_PASSED, query);
     model.drawSurface(intSurf);
     glEndQuery(GL_SAMPLES_PASSED);
-
-    // wait until the result is available
-    GLint ready(0);
-    while (!ready) {
-      glGetQueryObjectiv(query, GL_QUERY_RESULT_AVAILABLE, &ready);
-    }
 
     // retrieve result
     GLint pixelCount;
