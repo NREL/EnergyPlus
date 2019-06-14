@@ -13,6 +13,7 @@
 #include <array>
 #include <limits>
 #include <map>
+#include <memory>
 
 // Penumbra
 #include <sun.h>

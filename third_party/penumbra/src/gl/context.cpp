@@ -44,7 +44,9 @@ const char *Context::calculationVertexShaderSource =
   }
 )src";
 
-static void glErrorCallback(int, const char *description) { showMessage(MSG_INFO, description); }
+static void glErrorCallback(int, const char *description) {
+  showMessage(MSG_INFO, description);
+}
 
 Context::Context(unsigned size)
     : size(size), modelSet(false), isWireFrame(false), isCameraMode(false), viewScale(1.f),
@@ -160,19 +162,24 @@ Context::Context(unsigned size)
 
   glEnable(GL_DEPTH_TEST);
 
-  // Shader program
+  // Shader programs
+
+  // Program for off-screen calculation
   calcProgram = std::unique_ptr<GLProgram>(new GLProgram(calculationVertexShaderSource, nullptr));
 
   glBindAttribLocation(calcProgram->getInt(), 0, "vPos");
 
-  renderProgram = std::unique_ptr<GLProgram>(new GLProgram(renderVertexShaderSource, renderFragmentShaderSource));
+  // Program for on-screen rendering (mostly for debugging)
+  renderProgram = std::unique_ptr<GLProgram>(
+      new GLProgram(renderVertexShaderSource, renderFragmentShaderSource));
   glBindAttribLocation(renderProgram->getInt(), 0, "vPos");
-  mvpLocation = glGetUniformLocation(calcProgram->getInt(), "MVP");
   vColLocation = glGetUniformLocation(renderProgram->getInt(), "vCol");
 
+  // Frame and render buffers
   glGenFramebuffersEXT(1, &fbo);
   glGenRenderbuffersEXT(1, &rbo);
 
+  // Start in off-screen mode
   initOffScreenMode();
 }
 
@@ -182,7 +189,6 @@ Context::~Context() {
   glDeleteProgram(calcProgram->getInt());
   glDeleteProgram(renderProgram->getInt());
   glfwDestroyWindow(window);
-
 }
 void Context::toggleWireFrame() {
   isWireFrame = !isWireFrame;
@@ -320,7 +326,9 @@ void Context::calcCameraView() {
   mat4x4_transpose(cameraView, tempMat); // Transpose back.
 }
 
-void Context::setMVP() { glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, (const GLfloat *)mvp); }
+void Context::setMVP() {
+  glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, (const GLfloat *)mvp);
+}
 
 void Context::setCameraMVP() {
   float deltaW, deltaH;
@@ -468,6 +476,7 @@ Context::calculateInteriorPSSAs(const std::vector<SurfaceBuffer> &hiddenSurfaces
 
 void Context::initOffScreenMode() {
   glUseProgram(calcProgram->getInt());
+  mvpLocation = glGetUniformLocation(calcProgram->getInt(), "MVP");
   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
   glDrawBuffer(GL_NONE);
   glReadBuffer(GL_NONE);
@@ -511,6 +520,8 @@ void Context::initOffScreenMode() {
 void Context::initRenderMode() {
   // set to default framebuffer and renderbuffer
   glUseProgram(renderProgram->getInt());
+  mvpLocation = glGetUniformLocation(renderProgram->getInt(), "MVP");
+  setMVP();
   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
   glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
   glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
