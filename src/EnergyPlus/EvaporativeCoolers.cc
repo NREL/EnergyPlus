@@ -1735,8 +1735,12 @@ namespace EvaporativeCoolers {
             //***************************************************************************
             //                  ENERGY CONSUMED BY THE RECIRCULATING PUMP
             // Add the pump energy to the total Evap Cooler energy comsumption
-            EvapCond(EvapCoolNum).EvapCoolerPower += EvapCond(EvapCoolNum).RecircPumpPower;
-
+            Real64 FlowFraction = 1.0;
+            Real64 MassFlowRateMax = Node(EvapCond(EvapCoolNum).InletNode).MassFlowRateMax;
+            if (MassFlowRateMax > 0) {
+                FlowFraction = EvapCond(EvapCoolNum).InletMassFlowRate / MassFlowRateMax;
+            }
+            EvapCond(EvapCoolNum).EvapCoolerPower += FlowFraction * EvapCond(EvapCoolNum).RecircPumpPower;
             //******************
             //             WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
             //             H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
@@ -1885,16 +1889,21 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).OutletEnthalpy = PsyHFnTdbW(EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).OutletHumRat);
 
             //***************************************************************************
+            Real64 FlowFraction = 1.0;
+            Real64 MassFlowRateMax = Node(EvapCond(EvapCoolNum).InletNode).MassFlowRateMax;
+            if (MassFlowRateMax > 0) {
+                FlowFraction = EvapCond(EvapCoolNum).InletMassFlowRate / MassFlowRateMax;
+            }
             //                  POWER OF THE SECONDARY AIR FAN
             if (EvapCond(EvapCoolNum).IndirectFanEff > 0.0) {
-                EvapCond(EvapCoolNum).EvapCoolerPower +=
-                    EvapCond(EvapCoolNum).IndirectFanDeltaPress * EvapCond(EvapCoolNum).IndirectVolFlowRate / EvapCond(EvapCoolNum).IndirectFanEff;
+                EvapCond(EvapCoolNum).EvapCoolerPower += FlowFraction * EvapCond(EvapCoolNum).IndirectFanDeltaPress *
+                                                         EvapCond(EvapCoolNum).IndirectVolFlowRate / EvapCond(EvapCoolNum).IndirectFanEff;
             }
 
             //                  ENERGY CONSUMED BY THE RECIRCULATING PUMP
             //                  ENERGY CONSUMED BY THE RECIRCULATING PUMP
             // Add the pump energy to the total Evap Cooler energy comsumption
-            EvapCond(EvapCoolNum).EvapCoolerPower += EvapCond(EvapCoolNum).IndirectRecircPumpPower;
+            EvapCond(EvapCoolNum).EvapCoolerPower += FlowFraction * EvapCond(EvapCoolNum).IndirectRecircPumpPower;
 
             //******************
             //             WATER CONSUMPTION IN LITERS OF WATER FOR DIRECT
@@ -1907,7 +1916,7 @@ namespace EvaporativeCoolers {
                  PsyRhoAirFnPbTdbW(EvapCond(EvapCoolNum).SecInletPressure, TDBSec, HumRatSec)) /
                 2.0;
             EvapCond(EvapCoolNum).EvapWaterConsumpRate =
-                (HumRatSec - EvapCond(EvapCoolNum).SecInletHumRat) * EvapCond(EvapCoolNum).IndirectVolFlowRate * RhoAir / RhoWater;
+                FlowFraction * (HumRatSec - EvapCond(EvapCoolNum).SecInletHumRat) * EvapCond(EvapCoolNum).IndirectVolFlowRate * RhoAir / RhoWater;
             // A numerical check to keep from having very tiny negative water consumption values being reported
             if (EvapCond(EvapCoolNum).EvapWaterConsumpRate < 0.0) EvapCond(EvapCoolNum).EvapWaterConsumpRate = 0.0;
 
@@ -2037,16 +2046,21 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).OutletEnthalpy = PsyHFnTdbW(EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).OutletHumRat);
 
             //***************************************************************************
+            Real64 FlowFraction = 1.0;
+            Real64 MassFlowRateMax = Node(EvapCond(EvapCoolNum).InletNode).MassFlowRateMax;
+            if (MassFlowRateMax > 0) {
+                FlowFraction = EvapCond(EvapCoolNum).InletMassFlowRate / MassFlowRateMax;
+            }
             //                  POWER OF THE SECONDARY AIR FAN
             if (EvapCond(EvapCoolNum).IndirectFanEff > 0.0) {
-                EvapCond(EvapCoolNum).EvapCoolerPower +=
-                    EvapCond(EvapCoolNum).IndirectFanDeltaPress * EvapCond(EvapCoolNum).IndirectVolFlowRate / EvapCond(EvapCoolNum).IndirectFanEff;
+                EvapCond(EvapCoolNum).EvapCoolerPower += FlowFraction * EvapCond(EvapCoolNum).IndirectFanDeltaPress *
+                                                         EvapCond(EvapCoolNum).IndirectVolFlowRate / EvapCond(EvapCoolNum).IndirectFanEff;
             }
 
             //                  ENERGY CONSUMED BY THE RECIRCULATING PUMP
             //                  ENERGY CONSUMED BY THE RECIRCULATING PUMP
             // Add the pump energy to the total Evap Cooler energy comsumption
-            EvapCond(EvapCoolNum).EvapCoolerPower += EvapCond(EvapCoolNum).IndirectRecircPumpPower;
+            EvapCond(EvapCoolNum).EvapCoolerPower += FlowFraction * EvapCond(EvapCoolNum).IndirectRecircPumpPower;
 
             //******************
             //             WATER CONSUMPTION IN LITERS OF WATER FOR Wet InDIRECT
@@ -2054,7 +2068,7 @@ namespace EvaporativeCoolers {
             //******************
             //***** FIRST calculate the heat exchange on the primary air side**********
             RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
-            QHX = CFMAir * RhoAir * (EvapCond(EvapCoolNum).InletEnthalpy - EvapCond(EvapCoolNum).OutletEnthalpy);
+            QHX = FlowFraction * CFMAir * RhoAir * (EvapCond(EvapCoolNum).InletEnthalpy - EvapCond(EvapCoolNum).OutletEnthalpy);
 
             RhoWater = RhoH2O(EvapCond(EvapCoolNum).SecInletTemp);
             EvapCond(EvapCoolNum).EvapWaterConsumpRate = (QHX / StageEff) / (2500000.0 * RhoWater);
