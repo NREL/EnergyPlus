@@ -299,16 +299,6 @@ namespace SteamCoils {
                                        bool &ErrorsFound            // set to true if problem
     );
 
-    //// register that a coil is used as a regeneration air heating coil in
-    //// desiccant dehumidification system
-    // void
-    // SetSteamCoilAsDesicRegenCoil(
-    //	std::string const & CoilType, // must match coil types in this module
-    //	std::string const & CoilName, // must match coil names for the coil type
-    //	int & DesiccantDehumIndex, // index of desiccant dehumidifier
-    //	bool & ErrorsFound // set to true if problem
-    //);
-
     // sets data to a coil that is used as a regeneration air heating coil in
     // desiccant dehumidification system
     void SetSteamCoilData(int const CoilNum,                           // index of hot steam heating Coil

@@ -144,7 +144,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
         "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
 
         "  RunPeriod,",
-        "    ,                        !- Name",
+        "    WinterDay,               !- Name",
         "    1,                       !- Begin Month",
         "    14,                      !- Begin Day of Month",
         "    ,                        !- Begin Year",

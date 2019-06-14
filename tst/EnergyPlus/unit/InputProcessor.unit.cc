@@ -592,7 +592,7 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
 {
     std::string const idf(delimited_string({
         "  RunPeriod,",
-        "    ,                        !- Name",
+        "    WinterDay,               !- Name",
         "    1,                       !- Begin Month",
         "    1,                       !- Begin Day of Month",
         "    ,                        !- Begin Year",
@@ -607,7 +607,7 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
         "    Yes;                     !- Use Weather File Snow Indicators",
         "",
         "  RunPeriod,",
-        "    ,                        !- Name",
+        "    SummerDay,               !- Name",
         "    7,                       !- Begin Month",
         "    1,                       !- Begin Day of Month",
         "    ,                        !- Begin Year",
@@ -623,7 +623,7 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
     }));
 
     json expected = {{"RunPeriod",
-                      {{"RunPeriod 1",
+                      {{"WinterDay",
                         {{"apply_weekend_holiday_rule", "No"},
                          {"begin_day_of_month", 1},
                          {"begin_month", 1},
@@ -634,7 +634,7 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
                          {"use_weather_file_holidays_and_special_days", "Yes"},
                          {"use_weather_file_rain_indicators", "Yes"},
                          {"use_weather_file_snow_indicators", "Yes"}}},
-                       {"RunPeriod 2",
+                       {"SummerDay",
                         {{"apply_weekend_holiday_rule", "No"},
                          {"begin_day_of_month", 1},
                          {"begin_month", 7},
