@@ -5383,7 +5383,6 @@ namespace SolarShading {
                             SAREA(HTSS) = penumbra->calculatePSSA(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
                             if (SAREA(HTSS) > 0.0) {
                                 if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
-                                //SHDRVL(HTSS, HTSS, iHour, TS); // Determine shadowing from reveal.
                             }
                         }
                     }
@@ -5422,10 +5421,9 @@ namespace SolarShading {
 
                     SHDGSS(NGRS, iHour, TS, GRSNR, NGSS, HTS); // Determine shadowing on surface.
 
-                }
-
-                if (!CalcSkyDifShading) {
-                    SHDBKS(Surface(GRSNR).BaseSurf, GRSNR, NBKS, HTS); // Determine possible back surfaces.
+                    if (!CalcSkyDifShading) {
+                        SHDBKS(Surface(GRSNR).BaseSurf, GRSNR, NBKS, HTS); // Determine possible back surfaces.
+                    }
                 }
 
                 SHDSBS(iHour, GRSNR, NBKS, NSBS, HTS, TS); // Subtract subsurf areas from total
@@ -6001,19 +5999,22 @@ namespace SolarShading {
                 if (penumbra) {
                     // Add back surfaces to array
                     std::vector<unsigned> pbBackSurfaces;
-                    for (int IBKS = 1; IBKS <= NBKSHC; ++IBKS) {
-                        BackSurfNum = HCNS(FBKSHC - 1 + IBKS);
-                        pbBackSurfaces.push_back(Surface(BackSurfNum).PenumbraID);
+                    for (auto bkSurfNum : ShadowComb(GRSNR).BackSurf) {
+                        if (bkSurfNum == 0) continue;
+                        if (CTHETA(bkSurfNum) < SunIsUpValue) {
+                            pbBackSurfaces.push_back(Surface(bkSurfNum).PenumbraID);
+                        }
                     }
                     pssas = penumbra->calculateInteriorPSSAs({(unsigned)Surface(HTSS).PenumbraID}, pbBackSurfaces);
+                    //penumbra->renderInteriorScene({(unsigned)Surface(HTSS).PenumbraID}, pbBackSurfaces);
 
                     JBKS = 0;
-                    for (int IBKS = 1; IBKS <= NBKSHC; ++IBKS) {
-                        BackSurfNum = HCNS(FBKSHC - 1 + IBKS);
-                        if (pssas[Surface(BackSurfNum).PenumbraID] > 0) {
+                    for (auto bkSurfNum : ShadowComb(GRSNR).BackSurf) {
+                        if (bkSurfNum == 0) continue;
+                        if (pssas[Surface(bkSurfNum).PenumbraID] > 0) {
                             ++JBKS;
-                            BackSurfaces(TS, iHour, JBKS, HTSS) = BackSurfNum;
-                            OverlapArea = pssas[Surface(BackSurfNum).PenumbraID]/CTHETA(HTSS);
+                            BackSurfaces(TS, iHour, JBKS, HTSS) = bkSurfNum;
+                            OverlapArea = pssas[Surface(bkSurfNum).PenumbraID]/CTHETA(HTSS);
                             OverlapAreas(TS, iHour, JBKS, HTSS) = OverlapArea * SurfaceWindow(HTSS).GlazedFrac;
                         }
                     }
@@ -6087,6 +6088,7 @@ namespace SolarShading {
                             } else {
                                 std::cout << Surface(HTSS).Name << " -> " << Surface(BackSurfNum).Name << " GOOD!" << std::endl;// << SAREA(HTS)/Surface(HTS).Area << "  (Diff = " << std::abs(pSAREA - SAREA(HTS))/Surface(HTS).Area << ")" << std::endl;
                             }
+                            OverlapAreas(TS, iHour, IBKS, HTSS) = penumbraOverlapArea;
                         }
                     }
                 }
@@ -9316,70 +9318,72 @@ namespace SolarShading {
 
                 K = Surface(SBSNR).Construction;
 
-                if ((OverlapStatus != TooManyVertices) && (OverlapStatus != TooManyFigures) && (SAREA(HTS) > 0.0)) {
+                if (!penumbra || compareShadingMethods) {
+                    if ((OverlapStatus != TooManyVertices) && (OverlapStatus != TooManyFigures) && (SAREA(HTS) > 0.0)) {
 
-                    // Re-order vertices to clockwise sequential; compute homogeneous coordinates.
-                    NVS = Surface(SBSNR).Sides;
-                    for (N = 1; N <= NVS; ++N) {
-                        XVS(N) = ShadeV(SBSNR).XV(NVS + 1 - N);
-                        YVS(N) = ShadeV(SBSNR).YV(NVS + 1 - N);
+                        // Re-order vertices to clockwise sequential; compute homogeneous coordinates.
+                        NVS = Surface(SBSNR).Sides;
+                        for (N = 1; N <= NVS; ++N) {
+                            XVS(N) = ShadeV(SBSNR).XV(NVS + 1 - N);
+                            YVS(N) = ShadeV(SBSNR).YV(NVS + 1 - N);
+                        }
+                        LOCHCA = FSBSHC;
+                        HTRANS1(LOCHCA, NVS);
+                        HCAREA(LOCHCA) = -HCAREA(LOCHCA);
+                        HCT(LOCHCA) = 1.0;
+                        NSBSHC = LOCHCA - FSBSHC + 1;
+
+                        // Determine sunlit area of subsurface due to shadows on general receiving surface.
+                        if (NGSSHC > 0) {
+                            MULTOL(LOCHCA, FGSSHC - 1, NGSSHC);
+                            if ((OverlapStatus != TooManyVertices) && (OverlapStatus != TooManyFigures)) NSBSHC = LOCHCA - FSBSHC + 1;
+                        }
                     }
-                    LOCHCA = FSBSHC;
-                    HTRANS1(LOCHCA, NVS);
-                    HCAREA(LOCHCA) = -HCAREA(LOCHCA);
-                    HCT(LOCHCA) = 1.0;
-                    NSBSHC = LOCHCA - FSBSHC + 1;
 
-                    // Determine sunlit area of subsurface due to shadows on general receiving surface.
-                    if (NGSSHC > 0) {
-                        MULTOL(LOCHCA, FGSSHC - 1, NGSSHC);
-                        if ((OverlapStatus != TooManyVertices) && (OverlapStatus != TooManyFigures)) NSBSHC = LOCHCA - FSBSHC + 1;
-                    }
-                }
+                    if ((OverlapStatus == TooManyVertices) || (OverlapStatus == TooManyFigures) ||
+                        (SAREA(HTS) <= 0.0)) { // General receiving surface totally shaded.
 
-                if ((OverlapStatus == TooManyVertices) || (OverlapStatus == TooManyFigures) ||
-                    (SAREA(HTS) <= 0.0)) { // General receiving surface totally shaded.
+                        SAREA(HTSS) = 0.0;
 
-                    SAREA(HTSS) = 0.0;
+                        if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = 0.0;
 
-                    if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = 0.0;
+                    } else if ((NGSSHC <= 0) || (NSBSHC == 1)) { // No shadows.
 
-                } else if ((NGSSHC <= 0) || (NSBSHC == 1)) { // No shadows.
-
-                    SAREA(HTSS) = HCAREA(FSBSHC);
-                    SAREA(HTS) -= SAREA(HTSS); // Revise sunlit area of general receiving surface.
-
-                    // TH. This is a bug.  SunLitFracWithoutReveal should be a ratio of area
-                    // IF(IHour > 0 .AND. TS > 0) SunLitFracWithoutReveal(HTSS,IHour,TS) = &
-                    //      Surface(HTSS)%NetAreaShadowCalc
-
-                    // new code fixed part of CR 7596. TH 5/29/2009
-                    if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).NetAreaShadowCalc;
-
-                    SHDRVL(HTSS, SBSNR, iHour, TS); // Determine shadowing from reveal.
-
-                    if ((OverlapStatus == TooManyVertices) || (OverlapStatus == TooManyFigures)) SAREA(HTSS) = 0.0;
-
-                } else { // Compute area.
-
-                    A = HCAREA(FSBSHC);
-                    for (J = 2; J <= NSBSHC; ++J) {
-                        A += HCAREA(FSBSHC - 1 + J) * (1.0 - HCT(FSBSHC - 1 + J));
-                    }
-                    SAREA(HTSS) = A;
-                    if (SAREA(HTSS) > 0.0) {
-
+                        SAREA(HTSS) = HCAREA(FSBSHC);
                         SAREA(HTS) -= SAREA(HTSS); // Revise sunlit area of general receiving surface.
 
-                        if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
+                        // TH. This is a bug.  SunLitFracWithoutReveal should be a ratio of area
+                        // IF(IHour > 0 .AND. TS > 0) SunLitFracWithoutReveal(HTSS,IHour,TS) = &
+                        //      Surface(HTSS)%NetAreaShadowCalc
+
+                        // new code fixed part of CR 7596. TH 5/29/2009
+                        if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).NetAreaShadowCalc;
 
                         SHDRVL(HTSS, SBSNR, iHour, TS); // Determine shadowing from reveal.
 
                         if ((OverlapStatus == TooManyVertices) || (OverlapStatus == TooManyFigures)) SAREA(HTSS) = 0.0;
 
-                    } else { // General receiving surface totally shaded.
+                    } else { // Compute area.
 
-                        SAREA(HTSS) = 0.0;
+                        A = HCAREA(FSBSHC);
+                        for (J = 2; J <= NSBSHC; ++J) {
+                            A += HCAREA(FSBSHC - 1 + J) * (1.0 - HCT(FSBSHC - 1 + J));
+                        }
+                        SAREA(HTSS) = A;
+                        if (SAREA(HTSS) > 0.0) {
+
+                            SAREA(HTS) -= SAREA(HTSS); // Revise sunlit area of general receiving surface.
+
+                            if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
+
+                            SHDRVL(HTSS, SBSNR, iHour, TS); // Determine shadowing from reveal.
+
+                            if ((OverlapStatus == TooManyVertices) || (OverlapStatus == TooManyFigures)) SAREA(HTSS) = 0.0;
+
+                        } else { // General receiving surface totally shaded.
+
+                            SAREA(HTSS) = 0.0;
+                        }
                     }
                 }
 
