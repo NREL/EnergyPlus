@@ -6275,21 +6275,21 @@ This is the name of the node that connects the ice storage system to the plant l
 
 This is the name of the other node that connects the ice storage system to the plant loop. It is the outlet node to the ice storage component.
 
-\paragraph{Field: Discharging Curve Object Type}\label{field-discharging-curve-object-type}
+\paragraph{Field: Discharging Curve Variable Specifications}\label{field-discharging-curve-variable-specifications}
 
-The detailed ice storage model in EnergyPlus takes advantage of the Curve feature of the program. Currently, the only two allowed curve fit types for the detailed ice storage model are the QuadraticLinear and the CubicLinear curves. More information on this curve can be found in the section on Curves.
+The detailed ice storage model in EnergyPlus takes advantage of the Curve feature of the program.  The discharging curve can use any curve that has two independent variables.  This field controls which two parameters are the independent variables in modeling the performance of the detailed ice storage model during discharging. Currently, there are four different independent variable specifications: PercentChargedLMTD (where Percent Charged is the first independent variable and LMTD is the second independent variable), PercentDischargedLMTD (where Percent Disharged is the first independent variable and LMTD is the second independent variable), LMTDMassFlow (where LMTD is the first independent variable and Mass Flow rate is the second independent variable), and LMTDPercentCharged (where LMTD is the first independent variable and Percent Charged is the second independent variable). More information on curve types can be found in the section on Curves.  For additional information on how these curves are used in the Detailed Ice Storage model, please consult the Engineering Reference.
 
 \paragraph{Field: Discharging Curve Name}\label{field-discharging-curve-name}
 
-This field specifies the name of the actual curve fit to be used to model the discharging process of the detailed ice storage system.
+This field specifies the name of the actual curve fit to be used to model the discharging process of the detailed ice storage system. Note that this must be a curve that has two independent variables.
 
-\paragraph{Field: Charging Curve Object Type}\label{field-charging-curve-object-type}
+\paragraph{Field: Charging Curve Variable Specifications}\label{field-charging-curve-variable-specifications}
 
-The detailed ice storage model in EnergyPlus takes advantage of the Curve feature of the program. Currently, the only two allowed curve fit types for the detailed ice storage model are the QuadraticLinear and the CubicLinear curves. More information on this curve can be found in the section on Curves.
+The detailed ice storage model in EnergyPlus takes advantage of the Curve feature of the program.  The charging curve can use any curve that has two independent variables.  This field controls which two parameters are the independent variables in modeling the performance of the detailed ice storage model during charging. Currently, there are four different independent variable specifications: PercentChargedLMTD (where Percent Charged is the first independent variable and LMTD is the second independent variable), PercentDischargedLMTD (where Percent Disharged is the first independent variable and LMTD is the second independent variable), LMTDMassFlow (where LMTD is the first independent variable and Mass Flow rate is the second independent variable), and LMTDPercentCharged (where LMTD is the first independent variable and Percent Charged is the second independent variable). More information on curve types can be found in the section on Curves.  For additional information on how these curves are used in the Detailed Ice Storage model, please consult the Engineering Reference.
 
 \paragraph{Field: Charging Curve Name}\label{field-charging-curve-name}
 
-This field specifies the name of the actual curve fit to be used to model the charging process of the detailed ice storage system.
+This field specifies the name of the actual curve fit to be used to model the charging process of the detailed ice storage system. Note that this must be a curve that has two independent variables.
 
 \paragraph{Field: Timestep of the Curve Data}\label{field-timestep-of-the-curve-data}
 
@@ -6325,9 +6325,9 @@ ThermalStorage:Ice:Detailed,
       0.5,                     !- Ice Storage Capacity {GJ}
       Ice Tank Inlet Node,     !- Plant Loop Inlet Node
       Ice Tank Outlet Node,    !- Plant Loop Outlet Node
-      QuadraticLinear,         !- Discharging Curve Fit Type
+      PercentDischargedLMTD,   !- Discharging Curve Fit Type
       DischargeCurve,          !- Discharging Curve Name
-      QuadraticLinear,         !- Charging Curve Fit Type
+      PercentChargedLMTD,      !- Charging Curve Fit Type
       ChargeCurve,             !- Charging Curve Name
       1.0,                     !- Timestep of Curve Fit Data
       0.0001,                  !- Parasitic electric load during discharging
