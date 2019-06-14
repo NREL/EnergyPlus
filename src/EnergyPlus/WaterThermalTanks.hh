@@ -664,7 +664,7 @@ namespace WaterThermalTanks {
               OffCycParaFuelRate(0.0), Mode(0), SaveMode(0), SaveWHMode(0), BackupElementCapacity(0.0), DXSysPLR(0.0),
               ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(0), SetPointError(0), SetPointErrIndex1(0), IterLimitErrIndex1(0),
               IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0), RegulaFalsiFailedNum1(0), IterLimitErrIndex2(0), IterLimitExceededNum2(0),
-              RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(false)
+              RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(true)
         {
         }
     };

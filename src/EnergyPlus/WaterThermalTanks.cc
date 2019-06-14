@@ -8677,7 +8677,6 @@ namespace WaterThermalTanks {
         WaterHeaterDesuperheater(DesuperheaterNum).DesuperheaterPLR = 0.0;
 
         Node(WaterInletNode).MassFlowRate = 0.0;
-        Node(WaterInletNode).Temp = WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp;
         Node(WaterOutletNode).MassFlowRate = 0.0;
         Node(WaterOutletNode).Temp = WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp;
 
@@ -8758,6 +8757,7 @@ namespace WaterThermalTanks {
             // Save conditions from end of previous system timestep
             // Every iteration that does not advance time should reset to these values
             WaterThermalTank(WaterThermalTankNum).SavedTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
+            WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp;
             WaterHeaterDesuperheater(DesuperheaterNum).SaveMode = WaterHeaterDesuperheater(DesuperheaterNum).Mode;
             WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag = false;
         }
@@ -8767,6 +8767,7 @@ namespace WaterThermalTanks {
         }
 
         TankTemp = WaterThermalTank(WaterThermalTankNum).SavedTankTemp;
+        Node(WaterInletNode).Temp = WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp;
         WaterHeaterDesuperheater(DesuperheaterNum).Mode = WaterHeaterDesuperheater(DesuperheaterNum).SaveMode;
 
         if (WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp > 0) {
