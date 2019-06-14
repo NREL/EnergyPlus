@@ -128,22 +128,9 @@ namespace NodeInputManager {
                      Optional_string_const InputFieldName = _      // Input Field Name
     );
 
-    void GetNodeList(std::string const &Name,                 // Node List Name for which information is obtained
-                     int &NumNodes,                           // Number of nodes accompanying this Name
-                     Array1S_int NodeNumbers,                 // NodeNumbers accompanying this Name
-                     bool &errFlag,                           // Set to true when requested Node List not found
-                     int const NodeFluidType,                 // Fluidtype for checking/setting node FluidType
-                     std::string const &NodeObjectType,       // Node Object Type (i.e. "Chiller:Electric")
-                     std::string const &NodeObjectName,       // Node Object Name (i.e. "MyChiller")
-                     int const NodeConnectionType,            // Node Connection Type (see DataLoopNode)
-                     int const NodeFluidStream,               // Which Fluid Stream (1,2,3,...)
-                     bool const ObjectIsParent,               // True/False
-                     Optional_string_const InputFieldName = _ // Input Field Name
-    );
-
     void SetupNodeVarsForReporting();
 
-    void GetNodeListsInput(bool &ErrorsFound);
+    void GetNodeListsInput(bool &ErrorsFound);                // Set to true when requested Node List not found, unchanged otherwise
 
     int AssignNodeNumber(std::string const &Name, // Name for assignment
                          int const NodeFluidType, // must be valid

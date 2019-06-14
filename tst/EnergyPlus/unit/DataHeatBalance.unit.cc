@@ -115,7 +115,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
         "    No;                      !- Run Simulation for Weather File Run Periods",
 
         "  RunPeriod,",
-        "    ,                        !- Name",
+        "    RP1,                     !- Name",
         "    1,                       !- Begin Month",
         "    1,                       !- Begin Day of Month",
         "    ,                        !- Begin Year",

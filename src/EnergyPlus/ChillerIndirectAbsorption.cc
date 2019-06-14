@@ -329,7 +329,6 @@ namespace ChillerIndirectAbsorption {
         int NumNums;     // Number of elements in the numeric array
         int IOStat;      // IO Status when calling get input subroutine
         static bool ErrorsFound(false);
-        bool errFlag;                         // GetInput error flag
         Array1D_bool GenInputOutputNodesUsed; // Used for SetupOutputVariable
 
         // FLOW
@@ -364,10 +363,10 @@ namespace ChillerIndirectAbsorption {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+
             IndirectAbsorber(AbsorberNum).Name = cAlphaArgs(1);
             IndirectAbsorber(AbsorberNum).NomCap = rNumericArgs(1);
             if (IndirectAbsorber(AbsorberNum).NomCap == AutoSize) {
