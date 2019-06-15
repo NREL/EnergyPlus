@@ -2402,7 +2402,6 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck){
 
     int TankNum = 1;
     int DXNum = 1;
-    Real64 Eff = 0.25;
     bool FirstHVAC = true;
 
     ErrorsFound = false;
