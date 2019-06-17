@@ -332,7 +332,6 @@ namespace ChillerReformulatedEIR {
         int NumNums;                      // Number of elements in the numeric array
         int IOStat;                       // IO Status when calling get input subroutine
         static bool ErrorsFound(false);   // True when input errors found
-        bool errFlag;                     // Error flag, used to tell if a unique chiller name has been specified
         static bool AllocatedFlag(false); // True when arrays are allocated
         std::string PartLoadCurveType;    // Part load curve type
 
@@ -367,10 +366,10 @@ namespace ChillerReformulatedEIR {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+
             ElecReformEIRChiller(EIRChillerNum).Name = cAlphaArgs(1);
             // Performance curves
             ElecReformEIRChiller(EIRChillerNum).ChillerCapFT = GetCurveIndex(cAlphaArgs(2));

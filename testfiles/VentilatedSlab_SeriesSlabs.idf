@@ -217,7 +217,7 @@
 !    WetBulb;                 !- Humidity Indicating Type
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     7,                       !- Begin Month
     5,                       !- Begin Day of Month
     ,                        !- Begin Year

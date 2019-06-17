@@ -285,7 +285,6 @@ namespace Boilers {
         int NumNums;                                    // Number of elements in the numeric array
         int IOStat;                                     // IO Status when calling get input subroutine
         static bool ErrorsFound(false);                 // Flag to show errors were found during GetInput
-        bool errFlag;                                   // Flag to show errors were found during function call
         Array1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
 
         // GET NUMBER OF ALL EQUIPMENT
@@ -322,10 +321,8 @@ namespace Boilers {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-            VerifyUniqueBoilerName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueBoilerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
             Boiler(BoilerNum).Name = cAlphaArgs(1);
             Boiler(BoilerNum).TypeNum = TypeOf_Boiler_Simple;
 

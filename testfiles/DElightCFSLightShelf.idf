@@ -22,7 +22,7 @@
   Version,9.2;
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     4,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year

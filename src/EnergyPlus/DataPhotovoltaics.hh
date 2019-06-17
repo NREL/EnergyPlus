@@ -198,11 +198,11 @@ namespace DataPhotovoltaics {
         Real64 BVoc0; // Temperature coefficient for module open-circuit-voltage at reference conditions
         //   (Volts/degC)
         Real64 mBVoc; // Coefficient for irradiance dependence of open-circuit-voltage-temperature
-        //  coefficient  (V/캜)
+        //  coefficient  (V/째C)
         Real64 BVmp0; // Temperature coefficient for module maximum-power-voltage at reference conditions
-        //   (V/캜)
+        //   (V/째C)
         Real64 mBVmp; // Cofficient for irradiance dependence of maximum-power-voltage-temperature
-        //   coefficient (V/캜)
+        //   coefficient (V/째C)
         Real64 DiodeFactor; // Empirically determined 'diode factor' for individual cells (unitless)
         Real64 c_2;         // Empirical coefficients relating Vmp to Ee (unitless)
         //   (coefficient relating Vmp to irradiance)
@@ -219,7 +219,7 @@ namespace DataPhotovoltaics {
         Real64 b_3; // Empirical coefficients for f1(AOI) polynomial (unitless)
         Real64 b_4; // Empirical coefficients for f1(AOI) polynomial (unitless)
         Real64 b_5; // Empirical coefficients for f1(AOI) polynomial (unitless)
-        Real64 DT0; // Temperature difference between Tc and Tm at Eo (캜),
+        Real64 DT0; // Temperature difference between Tc and Tm at Eo (째C),
         // (This is d(Tc) in Sandia database)
         Real64 fd; // Fraction of diffuse irradiance used by module (unitless)
         Real64 a;  // Empirical coefficient for module temp.at low wind,
