@@ -9838,20 +9838,14 @@ namespace AirflowNetworkBalanceManager {
             }
             NodeFound.deallocate();
 
-            // Asign AirLoop Number to every node and linkage
+            // Assign AirLoop Number to every node and linkage
             // Zone first
             for (i = 1; i <= AirflowNetworkNumOfZones; i++) {
                 for (j = 1; j <= NumOfZones; j++) {
                     if (!ZoneEquipConfig(j).IsControlled) continue;
-                    if (MultizoneZoneData(i).ZoneNum == j) {
-                        if (ZoneEquipConfig(j).NumInletNodes == 0) {
-                            ShowSevereError("Zone '" + ZoneEquipConfig(i).ZoneName + "' is a Controlled Zone referenced in an AirflowNetwork:MultiZone:Zone and therefore must have an inlet node.");
-                            ShowContinueError("This node must also be referenced in an AirflowNetwork:Distribution:Node object.");
-                            ErrorsFound = true;
-                        } else {
-                            // No multiple Airloop
-                            AirflowNetworkNodeData(i).AirLoopNum = ZoneEquipConfig(j).InletNodeAirLoopNum(1);
-                        }
+                    if ((MultizoneZoneData(i).ZoneNum == j) && (ZoneEquipConfig(j).NumInletNodes > 0)) {
+                        // No multiple Airloop
+                        AirflowNetworkNodeData(i).AirLoopNum = ZoneEquipConfig(j).InletNodeAirLoopNum(1);
                     }
                 }
             }

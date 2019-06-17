@@ -13448,20 +13448,9 @@ TEST_F(EnergyPlusFixture, AFN_CheckMultiZoneNodes_NoInletNode)
 
     // MixedAir::NumOAMixers.allocate(1);
 
-    ASSERT_THROW(ValidateDistributionSystem(), std::runtime_error);
+    ASSERT_NO_THROW(ValidateDistributionSystem());
 
-    std::string const error_string = delimited_string({
-
-        "   ** Severe  ** Zone 'ATTIC ZONE' is a Controlled Zone referenced in an AirflowNetwork:MultiZone:Zone and therefore must have an inlet node.",
-        "   **   ~~~   ** This node must also be referenced in an AirflowNetwork:Distribution:Node object.",
-        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
-        "   ...Summary of Errors that led to program termination:",
-        "   ..... Reference severe error count=1",
-        "   ..... Last severe error=Zone 'ATTIC ZONE' is a Controlled Zone referenced in an AirflowNetwork:MultiZone:Zone and therefore must have an inlet node.",
-
-    });
-
-    EXPECT_TRUE(compare_err_stream(error_string, true));
+    EXPECT_TRUE(compare_err_stream("", true));
 }
 
 } // namespace EnergyPlus
