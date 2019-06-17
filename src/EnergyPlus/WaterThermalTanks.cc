@@ -1184,10 +1184,10 @@ namespace WaterThermalTanks {
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
                     UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-                    VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-                    if (errFlag) {
-                        ErrorsFound = true;
-                    }
+
+                    // ErrorsFound will be set to True if problem was found, left untouched otherwise
+                    VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+
                     WaterHeaterDesuperheater(DesuperheaterNum).Name = cAlphaArgs(1);
                     WaterHeaterDesuperheater(DesuperheaterNum).Type = cCurrentModuleObject;
 
