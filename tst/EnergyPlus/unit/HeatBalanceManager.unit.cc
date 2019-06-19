@@ -1594,7 +1594,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_Default)
 
     std::string const idf_objects = delimited_string({
         "  Building, My Building;",
-        });
+    });
 
     EXPECT_TRUE(process_idf(idf_objects));
 
@@ -1621,7 +1621,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
         "  205.2,                      !- Surface Temperature Upper Limit",
         "  0.004,                      !- Minimum Surface Convection Heat Transfer Coefficient Value",
         "  200.6;                      !- Maximum Surface Convection Heat Transfer Coefficient Value",
-        });
+    });
 
     EXPECT_TRUE(process_idf(idf_objects));
 
@@ -1647,7 +1647,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_EMPD)
         "  Building, My Building;",
         "  HeatBalanceAlgorithm,",
         "  MoisturePenetrationDepthConductionTransferFunction; !- Algorithm",
-        });
+    });
 
     EXPECT_TRUE(process_idf(idf_objects));
 
@@ -1670,7 +1670,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
         "  Building, My Building;",
         "  HeatBalanceAlgorithm,",
         "  ConductionFiniteDifference; !- Algorithm",
-        });
+    });
 
     EXPECT_TRUE(process_idf(idf_objects));
 
@@ -1693,7 +1693,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
         "  Building, My Building;",
         "  HeatBalanceAlgorithm,",
         "  CombinedHeatAndMoistureFiniteElement; !- Algorithm",
-        });
+    });
 
     EXPECT_TRUE(process_idf(idf_objects));
 
