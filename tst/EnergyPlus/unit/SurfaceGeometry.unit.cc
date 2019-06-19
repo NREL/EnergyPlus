@@ -3387,6 +3387,7 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
 {
+    // Test surface heat transfer algorithms and heat balance surface lists
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
@@ -3629,6 +3630,20 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
         "Simulation continues.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    // Check heat balance surface lists
+    // Remember that ZoneHTSurfaceList includes all HT surfaces in the zone PLUS any adjacent interzone surfaces - same for ZoneIZSurfaceList
+    EXPECT_EQ(DataSurfaces::AllHTSurfaceList.size(), 4);
+    EXPECT_EQ(DataSurfaces::AllIZSurfaceList.size(), 2);
+
+    int zoneNum = UtilityRoutines::FindItemInList("DATATELCOM", DataHeatBalance::Zone);
+    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneHTSurfaceList.size(), 2);
+    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneIZSurfaceList.size(), 2);
+
+    zoneNum = UtilityRoutines::FindItemInList("ZONE1", DataHeatBalance::Zone);
+    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneHTSurfaceList.size(), 4);
+    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneIZSurfaceList.size(), 2);
+
 }
 
 // Test for #7071: if a Surface references an outside boundary surface that cannot be found, we handle it gracefully with an error message
