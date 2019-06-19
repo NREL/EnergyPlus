@@ -358,7 +358,7 @@ namespace SurfaceGeometry {
             ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "Surface,Class,Area,Tilt";
         }
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Loop through all surfaces to find windows and build sim list
+        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Loop through all surfaces to find windows...
 
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip shadowing (sub)surfaces
             ZoneNum = Surface(SurfNum).Zone;
