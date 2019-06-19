@@ -488,7 +488,7 @@ namespace DataHeatBalance {
     int DefaultOutsideConvectionAlgo(1);         // 1 = simple (ASHRAE); 2 = detailed; etc (BLAST, TARP, MOWITT, DOE-2)
     int SolarDistribution(0);                    // Solar Distribution Algorithm
     int InsideSurfIterations(0);                 // Counts inside surface iterations
-    int OverallHeatTransferSolutionAlgo(DataSurfaces::HeatTransferModel_CTF); // UseCTF Solution, UseEMPD moisture solution, UseCondFD solution
+    int OverallHeatTransferSolutionAlgo(DataSurfaces::HeatTransferModel_CTF); // Global HeatBalanceAlgorithm setting 
    // Flags for HeatTransfer Algorithms Used
     bool AnyCTF(false);    // CTF used
     bool AnyEMPD(false);   // EMPD used
@@ -853,6 +853,11 @@ namespace DataHeatBalance {
         SolarDistribution = 0;
         InsideSurfIterations = 0;
         OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+        AnyCTF = false;
+        AnyEMPD = false;
+        AnyCondFD = false;
+        AnyHAMT = false;
+        AnyKiva = false;
         MaxNumberOfWarmupDays = 25;
         MinNumberOfWarmupDays = 6;
         CondFDRelaxFactor = 1.0;

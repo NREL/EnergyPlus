@@ -1010,22 +1010,18 @@ namespace HeatBalanceManager {
                                           cNumericFieldNames);
             {
                 auto const SELECT_CASE_var(AlphaName(1));
-                // The default is CTF = 0.  Then the moisture solution is EMPD =2
-                if ((SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") || (SELECT_CASE_var == "DEFAULT") || (SELECT_CASE_var == "CTF")) {
+                // The default is CTF
+                if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
                     DataHeatBalance::AnyCTF = true;
-                    AlphaName(1) = "CTF - Conduction Transfer Function";
 
-                } else if ((SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") || (SELECT_CASE_var == "EMPD")) {
+                } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_EMPD;
                     DataHeatBalance::AnyEMPD = true;
-                    AlphaName(1) = "EMPD - Effective Moisture Penetration Depth";
 
-                } else if ((SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") || (SELECT_CASE_var == "CONDFD") ||
-                           (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCEDETAILED")) {
+                } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CondFD;
                     DataHeatBalance::AnyCondFD = true;
-                    AlphaName(1) = "CONDFD - Conduction Finite Difference";
                     if (NumOfTimeStepInHour < 20) {
                         ShowSevereError("GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Conduction Finite Difference but Number of TimeSteps in Hour < 20, Value is " +
@@ -1034,10 +1030,9 @@ namespace HeatBalanceManager {
                                           "Errors or inaccurate calculations may occur.");
                     }
 
-                } else if ((SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") || (SELECT_CASE_var == "HAMT")) {
+                } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_HAMT;
                     DataHeatBalance::AnyHAMT = true;
-                    AlphaName(1) = "HAMT - Combined Heat and Moisture Transfer Finite Element";
                     if (NumOfTimeStepInHour < 20) {
                         ShowSevereError("GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Combined Heat and Moisture Finite Element but Number of TimeSteps in Hour < 20, Value is " +
@@ -1050,7 +1045,6 @@ namespace HeatBalanceManager {
 
                 } else {
                     OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
-                    AlphaName(1) = "CTF - Conduction Transfer Function";
                     DataHeatBalance::AnyCTF = true;
                 }
             }
@@ -1075,7 +1069,6 @@ namespace HeatBalanceManager {
         } else {
             OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
             DataHeatBalance::AnyCTF = true;
-            AlphaName(1) = "ConductionTransferFunction";
             MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
             MaxSurfaceTempLimitBeforeFatal = MaxSurfaceTempLimit * 2.5;
         }
