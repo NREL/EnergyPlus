@@ -249,7 +249,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_EndYearOnly)
         "SimulationControl, NO, NO, NO, YES, YES;",
         "Timestep,4;",
         "RunPeriod,",
-        ",                        !- Name",
+        "RP1,                     !- Name",
         "2,                       !- Begin Month",
         "27,                      !- Begin Day of Month",
         ",                        !- Begin Year",
@@ -271,6 +271,39 @@ TEST_F(EnergyPlusFixture, RunPeriod_EndYearOnly)
     WeatherManager::GetRunPeriodData(totalrps, errors_in_input);
 
     EXPECT_TRUE(errors_in_input);
+}
+
+// Test for #6937: this tests that whenever the RunPeriod doesn't have a name, it should be rejected
+TEST_F(EnergyPlusFixture, RunPeriod_NoName) {
+
+    // Doesn't have a name, InputProcessor should reject it
+    std::string const idf_objects = delimited_string({
+        "RunPeriod,",
+        "  ,                        !- Name",
+        "  1,                       !- Begin Month",
+        "  1,                       !- Begin Day of Month",
+        "  2005,                    !- Begin Year",
+        "  12,                      !- End Month",
+        "  31,                      !- End Day of Month",
+        "  ,                        !- End Year",
+        "  Tuesday,                 !- Day of Week for Start Day",
+        "  Yes,                     !- Use Weather File Holidays and Special Days",
+        "  Yes,                     !- Use Weather File Daylight Saving Period",
+        "  No,                      !- Apply Weekend Holiday Rule",
+        "  Yes,                     !- Use Weather File Rain Indicators",
+        "  Yes;                     !- Use Weather File Snow Indicators",
+
+    });
+
+    ASSERT_FALSE(process_idf(idf_objects, false));
+
+    std::string const error_string =
+        delimited_string({
+            "   ** Severe  ** <root>[RunPeriod] - Object contains properties that could not be validated using 'properties' or 'additionalProperties' constraints",
+            "   ** Severe  ** <root>[RunPeriod] - Object name is required and cannot be blank or whitespace"
+        });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
 // Test for #6937: this tests that whenever the RunPeriod has a name, it should be used in the error warnings
@@ -312,43 +345,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_NameOfPeriodInWarning)
 
     }
 
-    // Case 2: doesn't have a name, should default to "RUNPERIOD 1" via InputProcessor, and mistmatched start day and year
-    {
-
-        std::string const idf_objects = delimited_string({
-            "RunPeriod,",
-            "  ,                        !- Name",
-            "  1,                       !- Begin Month",
-            "  1,                       !- Begin Day of Month",
-            "  2005,                    !- Begin Year",
-            "  12,                      !- End Month",
-            "  31,                      !- End Day of Month",
-            "  ,                        !- End Year",
-            "  Tuesday,                 !- Day of Week for Start Day",
-            "  Yes,                     !- Use Weather File Holidays and Special Days",
-            "  Yes,                     !- Use Weather File Daylight Saving Period",
-            "  No,                      !- Apply Weekend Holiday Rule",
-            "  Yes,                     !- Use Weather File Rain Indicators",
-            "  Yes;                     !- Use Weather File Snow Indicators",
-
-        });
-
-        ASSERT_TRUE(process_idf(idf_objects));
-        bool ErrorsFound = false;
-        int totalrps(1);
-        WeatherManager::GetRunPeriodData(totalrps, ErrorsFound);
-        // This should just issue a warning
-        EXPECT_FALSE(ErrorsFound);
-
-        std::string const error_string =
-            delimited_string({"   ** Warning ** RunPeriod: object=RUNPERIOD 1, start weekday (TUESDAY) does not match the start year (2005), corrected to SATURDAY."});
-
-        EXPECT_TRUE(compare_err_stream(error_string, true));
-
-    }
-
-
-    // Case 3: has a name, but starts on 2/29 on a non-leap year.
+    // Case 2: has a name, but starts on 2/29 on a non-leap year.
     {
 
         std::string const idf_objects = delimited_string({
@@ -458,7 +455,7 @@ TEST_F(EnergyPlusFixture, RunPeriod_BadLeapDayFlagLogic)
 
     WeatherManager::WFAllowsLeapYears = true; // This was hitting a bad bit of logic
     WeatherManager::SetupEnvironmentTypes();
-    
+
     EXPECT_FALSE(WeatherManager::Environment[0].IsLeapYear);
     EXPECT_EQ(365, WeatherManager::Environment[0].TotalDays);
 
