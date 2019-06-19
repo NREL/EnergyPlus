@@ -2583,9 +2583,14 @@ namespace ChillerReformulatedEIR {
             // Either set the flow to the Constant value or calculate the flow for the variable volume case
             if ((ElecReformEIRChiller(EIRChillNum).FlowMode == ConstantFlow) || (ElecReformEIRChiller(EIRChillNum).FlowMode == NotModulated)) {
                 // Set the evaporator mass flow rate to design
-                // Start by assuming max (design) flow
-                EvapMassFlowRate = EvapMassFlowRateMax;
-                // Use SetComponentFlowRate to decide actual flow
+                // TRANE, no this messes up flow resolution wrt to load dispatch // Start by assuming max (design) flow
+                // TRANE  EvapMassFlowRate = EvapMassFlowRateMax;
+                // TRANE scale evaporator mass flow with PLR, if VS pumps then flow will modulate per load dispatch, if constant it won't matter
+                if (MyLoad < 0.0 && RunFlag) {                            // TRANE
+                    EvapMassFlowRate = EvapMassFlowRateMax * PartLoadRat; // TRANE
+                } else {                                                  // TRANE
+                    EvapMassFlowRate = 0.0;                               // TRANE
+                }                                                         // TRANE
                 SetComponentFlowRate(EvapMassFlowRate,
                                      EvapInletNode,
                                      EvapOutletNode,
