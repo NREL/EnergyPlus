@@ -3956,14 +3956,16 @@ This alpha field identifies the nature of heat exchanger.~ Heat exchanger model 
 \item
   \textbf{CrossFlowSupplyMixedDemandUnMixed}.~ Specifes a single-pass, cross-flow heat exchanger.~ The effectiveness will be calculated using a cross-flow heat exchanger correlation for flow mixed on the Loop Supply side and flow unmixed on the Loop Demand Side.
 \item
-  \textbf{CrossFlowSupplyUnMixedDemandMixed}.~~ Specifes a single-pass, cross-flow heat exchanger.~ The effectiveness will be calculated using a cross-flow heat exchanger correlation for flow unmixed on the Loop Supply side and flow mixed on the Loop Demand Side.
+  \textbf{CrossFlowSupplyUnMixedDemandMixed}.~ Specifes a single-pass, cross-flow heat exchanger.~ The effectiveness will be calculated using a cross-flow heat exchanger correlation for flow unmixed on the Loop Supply side and flow mixed on the Loop Demand Side.
 \item
-  \textbf{CounterFlow}. Specifies a counter-flow shell and tube heat exchanger.~ The effectiveness will be calculated using a counter-flow shell and tube heat exchanger correlation.
+  \textbf{CounterFlow}. Specifies a counter-flow shell and tube heat exchanger(one fluid has the opposite direction to the other fluid).~ The effectiveness will be calculated using a counter-flow shell and tube heat exchanger correlation.
 \item
-  \textbf{ParallelFlow}. Specifies a parallel-flow shell and tube heat exchanger.~ The effectiveness will be calculated using a parallel-flow shell and tube heat exchanger correlation.
+  \textbf{ParallelFlow}. Specifies a parallel-flow shell and tube heat exchanger(both fluids have the same direction).~ The effectiveness will be calculated using a parallel-flow shell and tube heat exchanger correlation.
 \item
   \textbf{Ideal}. Specifies an ideal heat exchanger.~ The effectiveness will be set to `1.0' and the specified UA will be ignored.~ The heat transfer rate will be calculated as the maximum possible heat transfer rate.
 \end{itemize}
+
+For effectiveness of each heat exchanger model type in detail, See "Heat Exchangers: Plant Loop Fluid-to-Fluid Heat Exchanger" Section in Engineering Reference.
 
 \paragraph{Field: Heat Exchanger U-Factor Times Area Value}\label{field-heat-exchanger-u-factor-times-area-value}
 
