@@ -60,6 +60,12 @@ struct ScheduleConstant : ScheduleBase
     Real64 getCurrentValue() override;
     static void processInput();
     static void clear_state();
+    //ScheduleConstant() = default;
+    explicit ScheduleConstant(std::string _scheduleName)
+    {
+        this->name = _scheduleName;
+    }
+    ~ScheduleConstant() = default;
 };
 extern std::vector<ScheduleConstant> scheduleConstants;
 

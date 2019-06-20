@@ -84,7 +84,7 @@ void clear_state();
 
 int GetScheduleIndex(const std::string& scheduleName);
 
-ScheduleBase *getScheduleReference(std::string& scheduleName);
+ScheduleBase *getScheduleReference(const std::string& scheduleName);
 
 void processAllSchedules();
 

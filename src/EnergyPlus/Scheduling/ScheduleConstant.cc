@@ -59,7 +59,7 @@ Real64 ScheduleConstant::getCurrentValue()
 
 void ScheduleConstant::processInput()
 {
-    scheduleConstants.emplace_back();
+    scheduleConstants.emplace_back("my_schedule");
 }
 
 void ScheduleConstant::clear_state()

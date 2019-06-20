@@ -47,13 +47,33 @@
 
 #include <gtest/gtest.h>
 
+#include <Scheduling/Manager.hh>
+
 #include <Fixtures/EnergyPlusFixture.hh>
 
 namespace EnergyPlus {
 
-TEST_F(EnergyPlusFixture, TestA)
+TEST_F(EnergyPlusFixture, SchedulingManager_TestClearState)
 {
-    EXPECT_EQ(1, 1);
+    // as of right now there's really not much to test here, but I can at least confirm that it does have a clear_state method
+    Scheduling::clear_state();
+}
+
+TEST_F(EnergyPlusFixture, SchedulingManager_TestGetScheduleIndex)
+{
+    EXPECT_EQ(1, Scheduling::GetScheduleIndex("my_schedule"));
+}
+
+TEST_F(EnergyPlusFixture, SchedulingManager_TestGetScheduleValue)
+{
+    EXPECT_EQ(1, Scheduling::GetScheduleIndex("my_schedule"));
+    EXPECT_EQ(0.0, Scheduling::GetScheduleValue(1));
+}
+
+TEST_F(EnergyPlusFixture, SchedulingManager_TestGetScheduleReference) {
+    std::string schedName = "my_schedule";
+    Scheduling::ScheduleBase *thisReference = Scheduling::getScheduleReference(schedName);
+    EXPECT_NE(thisReference, nullptr);
 }
 
 }

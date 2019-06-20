@@ -47,13 +47,30 @@
 
 #include <gtest/gtest.h>
 
+#include <EnergyPlus/Scheduling/ScheduleConstant.hh>
 #include <Fixtures/EnergyPlusFixture.hh>
 
 namespace EnergyPlus {
 
-TEST_F(EnergyPlusFixture, TestC)
+TEST_F(EnergyPlusFixture, ScheduleConstant_TestProcessInput)
 {
-    EXPECT_EQ(1, 1);
+    Scheduling::ScheduleConstant::processInput();
+    EXPECT_EQ(1u, Scheduling::scheduleConstants.size());
+}
+
+TEST_F(EnergyPlusFixture, ScheduleConstant_TestGetCurrentValue)
+{
+    Scheduling::ScheduleConstant::processInput();
+    EXPECT_EQ(1u, Scheduling::scheduleConstants.size());
+    EXPECT_EQ(0, Scheduling::scheduleConstants[0].getCurrentValue());
+}
+
+TEST_F(EnergyPlusFixture, ScheduleConstant_TestClearState)
+{
+    Scheduling::ScheduleConstant::processInput();
+    EXPECT_EQ(1u, Scheduling::scheduleConstants.size());
+    Scheduling::ScheduleConstant::clear_state();
+    EXPECT_EQ(0u, Scheduling::scheduleConstants.size());
 }
 
 }
