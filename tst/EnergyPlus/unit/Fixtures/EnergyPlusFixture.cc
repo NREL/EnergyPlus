@@ -196,6 +196,9 @@
 #include <EnergyPlus/RoomAirModelManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/Scheduling/Manager.hh>
+#include <EnergyPlus/Scheduling/ScheduleBase.hh>
+#include <EnergyPlus/Scheduling/ScheduleConstant.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -437,6 +440,9 @@ void EnergyPlusFixture::clear_all_states()
     RoomAirModelManager::clear_state();
     RuntimeLanguageProcessor::clear_state();
     ScheduleManager::clear_state();
+    Scheduling::clear_state();
+    Scheduling::ScheduleBase::clear_state();
+    Scheduling::ScheduleConstant::clear_state();
     SetPointManager::clear_state();
     SimAirServingZones::clear_state();
     SimulationManager::clear_state();

@@ -141,6 +141,9 @@ set( test_src
   RunPeriod.unit.cc
   RuntimeLanguageProcessor.unit.cc
   ScheduleManager.unit.cc
+  Scheduling/Manager.unit.cc
+  Scheduling/ScheduleBase.unit.cc
+  Scheduling/ScheduleConstant.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
   SimAirServingZones.unit.cc
