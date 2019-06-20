@@ -1,3 +1,5 @@
+#include <utility>
+
 // EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
@@ -60,10 +62,9 @@ struct ScheduleConstant : ScheduleBase
     Real64 getCurrentValue() override;
     static void processInput();
     static void clear_state();
-    //ScheduleConstant() = default;
     explicit ScheduleConstant(std::string _scheduleName)
     {
-        this->name = _scheduleName;
+        this->name = std::move(_scheduleName);
     }
     ~ScheduleConstant() = default;
 };
