@@ -1008,7 +1008,6 @@ namespace WaterThermalTanks {
         using DataZoneEquipment::ZoneEquipList;
         using DXCoils::DXCoil;
         using DXCoils::GetDXCoilIndex;
-        using DXCoils::NumDXCoils;
         using Fans::GetFanIndex;
         using Fans::GetFanInletNode;
         using Fans::GetFanOutletNode;
