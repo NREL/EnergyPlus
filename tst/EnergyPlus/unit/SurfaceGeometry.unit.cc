@@ -3633,16 +3633,16 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
 
     // Check heat balance surface lists
     // Remember that ZoneHTSurfaceList includes all HT surfaces in the zone PLUS any adjacent interzone surfaces - same for ZoneIZSurfaceList
-    EXPECT_EQ(DataSurfaces::AllHTSurfaceList.size(), 4);
-    EXPECT_EQ(DataSurfaces::AllIZSurfaceList.size(), 2);
+    EXPECT_EQ(DataSurfaces::AllHTSurfaceList.size(), 4u);
+    EXPECT_EQ(DataSurfaces::AllIZSurfaceList.size(), 2u);
 
     int zoneNum = UtilityRoutines::FindItemInList("DATATELCOM", DataHeatBalance::Zone);
-    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneHTSurfaceList.size(), 2);
-    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneIZSurfaceList.size(), 2);
+    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneHTSurfaceList.size(), 2u);
+    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
 
     zoneNum = UtilityRoutines::FindItemInList("ZONE1", DataHeatBalance::Zone);
-    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneHTSurfaceList.size(), 4);
-    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneIZSurfaceList.size(), 2);
+    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneHTSurfaceList.size(), 4u);
+    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
 
 }
 
