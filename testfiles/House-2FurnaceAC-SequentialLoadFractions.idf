@@ -1177,14 +1177,14 @@
     LIVING ZONE Air Terminal 1,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    0.75,                    !- Zone Equipment 1 Sequential Cooling Load Fraction
-    0.75,                    !- Zone Equipment 1 Sequential Heating Load Fraction
+    0.75,                    !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    0.75,                    !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
     LIVING ZONE Air Terminal 2,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    1.0,                    !- Zone Equipment 2 Sequential Cooling Load Fraction
-    1.0;                    !- Zone Equipment 2 Sequential Heating Load Fraction
+    1.0,                    !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    1.0;                    !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     LIVING ZONE Air Terminal 1,  !- Name
