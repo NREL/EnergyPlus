@@ -185,35 +185,33 @@ namespace ScheduleManager {
     extern Array1D<WeekScheduleData> WeekSchedule; // Week Schedule Storage
     extern Array1D<ScheduleData> Schedule;         // Schedule Storage
 
-    // Functions
-
     // Clears the global data in ScheduleManager.
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
     void ProcessScheduleInput();
 
-    void ReportScheduleDetails(int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
+    void ReportScheduleDetails(int LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
 
-    Real64 GetCurrentScheduleValue(int const ScheduleIndex);
+    Real64 GetCurrentScheduleValue(int ScheduleIndex);
 
     void UpdateScheduleValues();
 
-    Real64 LookUpScheduleValue(int const ScheduleIndex,
-                               int const ThisHour = -1,    // Negative => unspecified
-                               int const ThisTimeStep = -1 // Negative => unspecified
+    Real64 LookUpScheduleValue(int ScheduleIndex,
+                               int ThisHour = -1,    // Negative => unspecified
+                               int ThisTimeStep = -1 // Negative => unspecified
     );
 
     int GetScheduleIndex(std::string const &ScheduleName);
 
-    std::string GetScheduleType(int const ScheduleIndex);
+    std::string GetScheduleType(int ScheduleIndex);
 
     int GetDayScheduleIndex(std::string &ScheduleName);
 
     void
-    GetScheduleValuesForDay(int const ScheduleIndex, Array2S<Real64> DayValues, Optional_int_const JDay = _, Optional_int_const CurDayofWeek = _);
+    GetScheduleValuesForDay(int ScheduleIndex, Array2S<Real64> DayValues, Optional_int_const JDay = _, Optional_int_const CurDayofWeek = _);
 
-    void GetSingleDayScheduleValues(int const DayScheduleIndex, // Index of the DaySchedule for values
+    void GetSingleDayScheduleValues(int DayScheduleIndex, // Index of the DaySchedule for values
                                     Array2S<Real64> DayValues   // Returned set of values
     );
 
@@ -221,10 +219,10 @@ namespace ScheduleManager {
                                       Real64 &Value // The new value for the schedule
     );
 
-    void ProcessIntervalFields(Array1S_string const Untils,
-                               Array1S<Real64> const Numbers,
-                               int const NumUntils,
-                               int const NumNumbers,
+    void ProcessIntervalFields(Array1S_string Untils,
+                               Array1S<Real64> Numbers,
+                               int NumUntils,
+                               int NumNumbers,
                                Array2A<Real64> MinuteValue,
                                Array2A_bool SetMinuteValue,
                                bool &ErrorsFound,
@@ -250,77 +248,77 @@ namespace ScheduleManager {
                             bool &ErrorsFound               // Will be true if error found.
     );
 
-    bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
+    bool CheckScheduleValueMinMax(int ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
-                                  Real64 const Minimum          // Minimum desired value
+                                  Real64 Minimum          // Minimum desired value
     );
 
-    bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
+    bool CheckScheduleValueMinMax(int ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
-                                  Real64 const Minimum,         // Minimum desired value
+                                  Real64 Minimum,         // Minimum desired value
                                   std::string const &MaxString, // Maximum indicator ('<', ',=')
-                                  Real64 const Maximum          // Maximum desired value
+                                  Real64 Maximum          // Maximum desired value
     );
 
-    bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
+    bool CheckScheduleValueMinMax(int ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
-                                  Real32 const Minimum          // Minimum desired value
+                                  Real32 Minimum          // Minimum desired value
     );
 
-    bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
+    bool CheckScheduleValueMinMax(int ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
-                                  Real32 const Minimum,         // Minimum desired value
+                                  Real32 Minimum,         // Minimum desired value
                                   std::string const &MaxString, // Maximum indicator ('<', ',=')
-                                  Real32 const Maximum          // Maximum desired value
+                                  Real32 Maximum          // Maximum desired value
     );
 
-    bool CheckScheduleValue(int const ScheduleIndex, // Which Schedule being tested
-                            Real64 const Value       // Actual desired value
+    bool CheckScheduleValue(int ScheduleIndex, // Which Schedule being tested
+                            Real64 Value       // Actual desired value
     );
 
-    bool CheckScheduleValue(int const ScheduleIndex, // Which Schedule being tested
-                            int const Value          // Actual desired value
+    bool CheckScheduleValue(int ScheduleIndex, // Which Schedule being tested
+                            int Value          // Actual desired value
     );
 
-    bool CheckDayScheduleValueMinMax(int const ScheduleIndex,            // Which Day Schedule being tested
-                                     Real64 const Minimum,               // Minimum desired value
+    bool CheckDayScheduleValueMinMax(int ScheduleIndex,            // Which Day Schedule being tested
+                                     Real64 Minimum,               // Minimum desired value
                                      std::string const &MinString,       // Minimum indicator ('>', '>=')
                                      Optional<Real64 const> Maximum = _, // Maximum desired value
                                      Optional_string_const MaxString = _ // Maximum indicator ('<', ',=')
     );
 
-    bool CheckDayScheduleValueMinMax(int const ScheduleIndex,            // Which Day Schedule being tested
-                                     Real32 const Minimum,               // Minimum desired value
+    bool CheckDayScheduleValueMinMax(int ScheduleIndex,            // Which Day Schedule being tested
+                                     Real32 Minimum,               // Minimum desired value
                                      std::string const &MinString,       // Minimum indicator ('>', '>=')
                                      Optional<Real32 const> Maximum = _, // Maximum desired value
                                      Optional_string_const MaxString = _ // Maximum indicator ('<', ',=')
     );
 
-    bool HasFractionalScheduleValue(int const ScheduleIndex); // Which Schedule being tested
+    bool HasFractionalScheduleValue(int ScheduleIndex); // Which Schedule being tested
 
-    Real64 GetScheduleMinValue(int const ScheduleIndex); // Which Schedule being tested
+    Real64 GetScheduleMinValue(int ScheduleIndex); // Which Schedule being tested
 
-    Real64 GetScheduleMaxValue(int const ScheduleIndex); // Which Schedule being tested
+    Real64 GetScheduleMaxValue(int ScheduleIndex); // Which Schedule being tested
 
-    std::string GetScheduleName(int const ScheduleIndex);
+    std::string GetScheduleName(int ScheduleIndex);
 
     void ReportScheduleValues();
 
     void ReportOrphanSchedules();
 
-    Real64 ScheduleAnnualFullLoadHours(int const ScheduleIndex,  // Which Schedule being tested
-                                       int const StartDayOfWeek, // Day of week for start of year
-                                       bool const isItLeapYear   // true if it is a leap year containing February 29
+    Real64 ScheduleAnnualFullLoadHours(int ScheduleIndex,  // Which Schedule being tested
+                                       int StartDayOfWeek, // Day of week for start of year
+                                       bool isItLeapYear   // true if it is a leap year containing February 29
     );
 
-    Real64 ScheduleAverageHoursPerWeek(int const ScheduleIndex,  // Which Schedule being tested
-                                       int const StartDayOfWeek, // Day of week for start of year
-                                       bool const isItLeapYear   // true if it is a leap year containing February 29
+    Real64 ScheduleAverageHoursPerWeek(int ScheduleIndex,  // Which Schedule being tested
+                                       int StartDayOfWeek, // Day of week for start of year
+                                       bool isItLeapYear   // true if it is a leap year containing February 29
     );
 
-    Real64 ScheduleHoursGT1perc(int const ScheduleIndex,  // Which Schedule being tested
-                                int const StartDayOfWeek, // Day of week for start of year
-                                bool const isItLeapYear   // true if it is a leap year containing February 29
+    Real64 ScheduleHoursGT1perc(int ScheduleIndex,  // Which Schedule being tested
+                                int StartDayOfWeek, // Day of week for start of year
+                                bool isItLeapYear   // true if it is a leap year containing February 29
     );
 
     int GetNumberOfSchedules();

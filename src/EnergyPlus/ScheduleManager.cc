@@ -89,13 +89,8 @@ namespace ScheduleManager {
     // validating it, and storing it in such a manner that the schedule manager
     // can provide the scheduling value needs for the simulation.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
     // REFERENCES:
     // Proposal for Schedule Manager in EnergyPlus (Rick Strand)
-
-    // OTHER NOTES:
 
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
@@ -113,7 +108,6 @@ namespace ScheduleManager {
     using DataGlobals::OutputFileInits;
     using DataGlobals::TimeStep;
 
-    // Data
     // MODULE PARAMETER DEFINITIONS
     int const MaxDayTypes(12);
     static std::string const BlankString;
@@ -154,12 +148,6 @@ namespace ScheduleManager {
     int const ScheduleInput_constant(4);
     int const ScheduleInput_external(5);
 
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE BLOCK SPECIFICATIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
     // Integer Variables for the Module
     int NumScheduleTypes(0);
     int NumDaySchedules(0);
@@ -179,8 +167,6 @@ namespace ScheduleManager {
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool CheckScheduleValueMinMaxRunOnceOnly(true);
     } // namespace
-
-    // Derived Types Variables
 
     // Object Data
     Array1D<ScheduleTypeData> ScheduleType; // Allowed Schedule Types
@@ -248,12 +234,10 @@ namespace ScheduleManager {
         using DataSystemVariables::iUnicode_end;
         using DataSystemVariables::TempFullFileName;
 
-        // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ProcessScheduleInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         Array1D_int DaysInYear(366);
         int UnitNumber;
         int LoopIndex;
@@ -1368,7 +1352,7 @@ namespace ScheduleManager {
             while (NumField < NumAlphas) {
                 //   Process "Through"
                 if (!has_prefix(Alphas(NumField), "THROUGH:") && !has_prefix(Alphas(NumField), "THROUGH")) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + "\", Expecting \"Through:\" date");
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + R"(", Expecting "Through:" date)");
                     ShowContinueError("Instead, found entry=" + Alphas(NumField));
                     ErrorsFound = true;
                     goto Through_exit;
@@ -1385,12 +1369,12 @@ namespace ScheduleManager {
                 ErrorHere = false;
                 ProcessDateString(Alphas(NumField), EndMonth, EndDay, PWeekDay, PDateType, ErrorHere);
                 if (PDateType > 1) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + "\", Invalid \"Through:\" date");
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + R"(", Invalid "Through:" date)");
                     ShowContinueError("Found entry=" + Alphas(NumField));
                     ErrorsFound = true;
                     goto Through_exit;
                 } else if (ErrorHere) {
-                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + "\", Invalid \"Through:\" date");
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name + R"(", Invalid "Through:" date)");
                     ShowContinueError("Found entry=" + Alphas(NumField));
                     ErrorsFound = true;
                     goto Through_exit;
@@ -1399,7 +1383,7 @@ namespace ScheduleManager {
                     if (EndPointer == 366) {
                         if (FullYearSet) {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Schedule(SchNum).Name +
-                                            "\", New \"Through\" entry when \"full year\" already set");
+                                            R"(", New "Through" entry when "full year" already set)");
                             ShowContinueError("\"Through\" field=" + CurrentThrough);
                             ErrorsFound = true;
                         }
@@ -1448,7 +1432,7 @@ namespace ScheduleManager {
                         }
                     } else {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
-                                        "\", Looking for \"For\" field, found=" + Alphas(NumField));
+                                        R"(", Looking for "For" field, found=)" + Alphas(NumField));
                         ErrorsFound = true;
                         //          CALL ShowSevereError(RoutineName//TRIM(CurrentModuleObject)//'="'//TRIM(Schedule(SchNum)%Name)//  &
                         //               '", Expecting "For:" day types')
@@ -1507,7 +1491,7 @@ namespace ScheduleManager {
                             Alphas(UntilFld + xxcount) = Alphas(NumField); // Incase next is "until"
                         } else {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
-                                            "\", Looking for \"Until\" field, found=" + Alphas(NumField));
+                                            R"(", Looking for "Until" field, found=)" + Alphas(NumField));
                             ErrorsFound = true;
                             goto Through_exit;
                         }
@@ -1742,41 +1726,6 @@ namespace ScheduleManager {
             rowLimitCount = (Numbers(3) * 60.0) / MinutesPerItem;
             hrLimitCount = 60 / MinutesPerItem;
 
-            //    ! Number of numbers in the Numbers list okay to process
-            //    Hr=1
-            //    CurMinute=MinutesPerItem
-            //    SCount=1
-            //    DO NumFields=2,NumNumbers
-            //      MinuteValue(Hr,SCount:CurMinute)=Numbers(NumFields)
-            //      SCount=CurMinute+1
-            //      CurMinute=CurMinute+MinutesPerItem
-            //      IF (CurMinute > 60) THEN
-            //        CurMinute=MinutesPerItem
-            //        SCount=1
-            //        Hr=Hr+1
-            //      ENDIF
-            //    ENDDO
-            //    ! Now parcel into TS Value....
-            //    IF (DaySchedule(Count)%IntervalInterpolated) THEN
-            //      DO Hr=1,24
-            //        SCount=1
-            //        CurMinute=MinutesPerTimeStep
-            //        DO TS=1,NumOfTimeStepInHour
-            //          DaySchedule(Count)%TSValue(Hr,TS)=SUM(MinuteValue(Hr,SCount:CurMinute))/REAL(MinutesPerTimeStep,r64)
-            //          SCount=CurMinute+1
-            //          CurMinute=CurMinute+MinutesPerTimeStep
-            //        ENDDO
-            //      ENDDO
-            //    ELSE
-            //      DO Hr=1,24
-            //        CurMinute=MinutesPerTimeStep
-            //        DO TS=1,NumOfTimeStepInHour
-            //          DaySchedule(Count)%TSValue(Hr,TS)=MinuteValue(Hr,CurMinute)
-            //          Curminute=CurMinute+MinutesPerTimeStep
-            //        ENDDO
-            //      ENDDO
-            //    ENDIF
-
             CheckForActualFileName(Alphas(3), FileExists, TempFullFileName);
 
             //    INQUIRE(file=Alphas(3),EXIST=FileExists)
@@ -1885,7 +1834,7 @@ namespace ScheduleManager {
                     if (colCnt == curcolCount) {
                         columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
                         if (errFlag) {
-                            std::string test = subString;
+                            // std::string test = subString;
                             ++numerrors;
                             columnValue = 0.0;
                         }
@@ -2095,7 +2044,7 @@ namespace ScheduleManager {
             DaySchedule(AddDaySch).ScheduleTypePtr = Schedule(SchNum).ScheduleTypePtr;
             // schedule is pointing to the week schedule
             Schedule(SchNum).WeekSchedulePointer = AddWeekSch;
-            curHrVal = Numbers(1);
+            // curHrVal = Numbers(1);
             DaySchedule(AddDaySch).TSValue = Numbers(1);
 
             if (AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
@@ -2154,7 +2103,7 @@ namespace ScheduleManager {
             if (NumNumbers < 1) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
                                  "\", initial value is not numeric or is missing. Fix idf file.");
-                NumErrorFlag = true;
+                // NumErrorFlag = true;
             }
             ExternalInterfaceSetSchedule(AddDaySch, Numbers(1));
         }
@@ -2220,7 +2169,7 @@ namespace ScheduleManager {
             if (NumNumbers < 1) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
                                  "\", initial value is not numeric or is missing. Fix idf file.");
-                NumErrorFlag = true;
+                // NumErrorFlag = true;
             }
             ExternalInterfaceSetSchedule(AddDaySch, Numbers(1));
         }
@@ -2287,7 +2236,7 @@ namespace ScheduleManager {
             if (NumNumbers < 1) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
                                  "\", initial value is not numeric or is missing. Fix idf file.");
-                NumErrorFlag = true;
+                // NumErrorFlag = true;
             }
             ExternalInterfaceSetSchedule(AddDaySch, Numbers(1));
         }
@@ -2312,11 +2261,9 @@ namespace ScheduleManager {
             CurrentModuleObject = "Output:Schedules";
             NumFields = inputProcessor->getNumObjectsFound(CurrentModuleObject);
 
-            //    RptSchedule=.FALSE.
             RptLevel = 1;
             for (Count = 1; Count <= NumFields; ++Count) {
                 inputProcessor->getObjectItem(CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, Status);
-                //      RptSchedule=.TRUE.
 
                 {
                     auto const SELECT_CASE_var(Alphas(1));
@@ -2334,7 +2281,7 @@ namespace ScheduleManager {
                         ReportScheduleDetails(RptLevel);
 
                     } else {
-                        ShowWarningError(RoutineName + "Report for Schedules should specify \"HOURLY\" or \"TIMESTEP\" (\"DETAILED\")");
+                        ShowWarningError(RoutineName + R"(Report for Schedules should specify "HOURLY" or "TIMESTEP" ("DETAILED"))");
                         ShowContinueError("HOURLY report will be done");
                         RptLevel = 1;
                         ReportScheduleDetails(RptLevel);
@@ -2365,18 +2312,9 @@ namespace ScheduleManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine puts the details of the Schedules on the .eio file (Inits file).
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataGlobals::OutputFileDebug;
         using General::RoundSigDigits;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const Months(12, {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"});
@@ -2391,12 +2329,6 @@ namespace ScheduleManager {
         static ObjexxFCL::gio::Fmt ThruFmt("(',Through ',A,1X,I2.2,',',A)");
         static ObjexxFCL::gio::Fmt SchDFmt0("('! <DaySchedule>,Name,ScheduleType,Interpolated {Yes/No},Time (HH:MM) =>',$)");
         static ObjexxFCL::gio::Fmt SchDFmtdata0("('DaySchedule,',A,',',A,',',A,',',A,$)");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;
@@ -2510,9 +2442,6 @@ namespace ScheduleManager {
                     ObjexxFCL::gio::write(OutputFileInits, SchTFmtdata) << ScheduleType(Count).Name << NoAverageLinear << Num1 << Num2 << YesNo2;
                 }
 
-                //      WRITE(Num1,*) NumOfTimeStepInHour*24
-                //      Num1=ADJUSTL(Num1)
-                //      SchDFmtdata=TRIM(SchDFmtdata)//TRIM(Num1)//"(',',A))"
                 for (Count = 1; Count <= NumDaySchedules; ++Count) {
                     switch (DaySchedule(Count).IntervalInterpolated) {
                     case ScheduleInterpolation::Average:
@@ -2732,29 +2661,6 @@ namespace ScheduleManager {
         // input will equate to 0 indices in arrays -- which has been set up to return legally with
         // 0.0 values.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
         if (!ScheduleDSTSFileWarningIssued) {
             if (DSTIndicator == 1) {
                 if (Schedule(ScheduleIndex).SchType == ScheduleInput_file) {
@@ -2799,43 +2705,20 @@ namespace ScheduleManager {
         // input will equate to 0 indices in arrays -- which has been set up to return legally with
         // 0.0 values.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataEnvironment::DayOfYear_Schedule;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ScheduleIndex;
-        int WhichHour;
-        int WeekSchedulePointer;
-        int DaySchedulePointer;
-
         if (!ScheduleInputProcessed) {
             ProcessScheduleInput();
             ScheduleInputProcessed = true;
         }
 
-        WhichHour = HourOfDay + DSTIndicator;
+        int WhichHour = HourOfDay + DSTIndicator;
 
-        for (ScheduleIndex = 1; ScheduleIndex <= NumSchedules; ++ScheduleIndex) {
+        for (int ScheduleIndex = 1; ScheduleIndex <= NumSchedules; ++ScheduleIndex) {
 
             // Determine which Week Schedule is used
             //  Cant use stored day of year because of leap year inconsistency
-            WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule);
+            int WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DataEnvironment::DayOfYear_Schedule);
+
+            int DaySchedulePointer;
 
             // Now, which day?
             if (DayOfWeek <= 7 && HolidayIndex > 0) {
@@ -2871,29 +2754,8 @@ namespace ScheduleManager {
         // This function provides a method to look up schedule values for any hour, timestep, day
         // of the year (rather than just the "current time").
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataEnvironment::DayOfYear_Schedule;
-
         // Return value
         Real64 LookUpScheduleValue(0.0);
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WeekSchedulePointer;
@@ -2925,7 +2787,7 @@ namespace ScheduleManager {
 
             // Determine which Week Schedule is used
             //  Cant use stored day of year because of leap year inconsistency
-            WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule);
+            WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DataEnvironment::DayOfYear_Schedule);
 
             // Now, which day?
             if (DayOfWeek <= 7 && HolidayIndex > 0) {
@@ -2958,7 +2820,7 @@ namespace ScheduleManager {
             } else {
                 // Determine which Week Schedule is used
                 //  Cant use stored day of year because of leap year inconsistency
-                WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule);
+                WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DataEnvironment::DayOfYear_Schedule);
 
                 // Now, which day?
                 if (DayOfWeek <= 7 && HolidayIndex > 0) {
@@ -3008,10 +2870,6 @@ namespace ScheduleManager {
         // Return value
         int GetScheduleIndex;
 
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int DayCtr;
-        int WeekCtr;
-
         if (!ScheduleInputProcessed) {
             ProcessScheduleInput();
             ScheduleInputProcessed = true;
@@ -3022,10 +2880,10 @@ namespace ScheduleManager {
             if (GetScheduleIndex > 0) {
                 if (!Schedule(GetScheduleIndex).Used) {
                     Schedule(GetScheduleIndex).Used = true;
-                    for (WeekCtr = 1; WeekCtr <= 366; ++WeekCtr) {
+                    for (int WeekCtr = 1; WeekCtr <= 366; ++WeekCtr) {
                         if (Schedule(GetScheduleIndex).WeekSchedulePointer(WeekCtr) > 0) {
                             WeekSchedule(Schedule(GetScheduleIndex).WeekSchedulePointer(WeekCtr)).Used = true;
-                            for (DayCtr = 1; DayCtr <= MaxDayTypes; ++DayCtr) {
+                            for (int DayCtr = 1; DayCtr <= MaxDayTypes; ++DayCtr) {
                                 DaySchedule(WeekSchedule(Schedule(GetScheduleIndex).WeekSchedulePointer(WeekCtr)).DaySchedulePointer(DayCtr)).Used =
                                     true;
                             }
@@ -3052,31 +2910,8 @@ namespace ScheduleManager {
         // PURPOSE OF THIS FUNCTION:
         // This function returns the internal pointer to Schedule "ScheduleName".
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
         // Return value
         std::string TypeOfSchedule;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int curSchType;
 
         if (!ScheduleInputProcessed) {
             ProcessScheduleInput();
@@ -3084,7 +2919,7 @@ namespace ScheduleManager {
         }
 
         if ((ScheduleIndex > 0) && (ScheduleIndex <= NumSchedules)) {
-            curSchType = Schedule(ScheduleIndex).ScheduleTypePtr;
+            int curSchType = Schedule(ScheduleIndex).ScheduleTypePtr;
             if ((curSchType > 0) && (curSchType <= NumScheduleTypes)) {
                 TypeOfSchedule = ScheduleType(curSchType).Name;
             } else {
@@ -3143,26 +2978,6 @@ namespace ScheduleManager {
         // METHODOLOGY EMPLOYED:
         // Use internal data to fill DayValues array.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataEnvironment::DayOfYear_Schedule;
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WeekSchedulePointer;
         int DaySchedulePointer;
@@ -3182,7 +2997,7 @@ namespace ScheduleManager {
 
         // Determine which Week Schedule is used
         if (!present(JDay)) {
-            WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule);
+            WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DataEnvironment::DayOfYear_Schedule);
         } else {
             WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(JDay);
         }
@@ -3221,29 +3036,6 @@ namespace ScheduleManager {
         // METHODOLOGY EMPLOYED:
         // Use internal data to fill DayValues array.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         if (!ScheduleInputProcessed) {
             ProcessScheduleInput();
             ScheduleInputProcessed = true;
@@ -3271,34 +3063,9 @@ namespace ScheduleManager {
         // for supervisory controls or internal gains obtained from real-time occupancy
         // measurements.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataGlobals::NumOfTimeStepInHour;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int TS; // Counter for Num Of Time Steps in Hour
-        int Hr; // Hour Counter
-
         // Assign the value of the variable
-        for (Hr = 1; Hr <= 24; ++Hr) {
-            for (TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
+        for (int Hr = 1; Hr <= 24; ++Hr) {
+            for (int TS = 1; TS <= DataGlobals::NumOfTimeStepInHour; ++TS) {
                 DaySchedule(ScheduleIndex).TSValue(TS, Hr) = Value;
             }
         }
@@ -3327,30 +3094,9 @@ namespace ScheduleManager {
         // This subroutine processes the "interval" fields with/without optional "until" in front of
         // time (hh:mm).
 
-        // METHODOLOGY EMPLOYED:
-        // na.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Argument array dimensioning
         MinuteValue.dim(60, 24);
         SetMinuteValue.dim(60, 24);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;
@@ -3374,8 +3120,6 @@ namespace ScheduleManager {
         SMin = 1;
         EHr = 0;
         EMin = 0;
-        sFld = 0;
-
         Real64 StartValue = 0;
         Real64 EndValue = 0;
 
@@ -3537,38 +3281,19 @@ namespace ScheduleManager {
         // This subroutine decodes a hhmm date field input as part of the "until" time in a schedule
         // representation.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt hhmmFormat("(I2.2)");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOS;
         Real64 rRetHH; // real Returned "hour"
         Real64 rRetMM; // real Returned "minute"
-        bool nonIntegral;
         std::string hHour;
         std::string mMinute;
 
         std::string String = stripped(FieldValue);
         std::string::size_type const Pos = index(String, ':');
-        nonIntegral = false;
+        bool nonIntegral = false;
         if (Pos == std::string::npos) {
             ShowSevereError("ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (no : separator in hh:mm)=" +
                             stripped(FullFieldValue));
@@ -3663,38 +3388,13 @@ namespace ScheduleManager {
         // This subroutine processes a field "For: day types" and returns
         // those day types (can be multiple) from field.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Argument array dimensioning
         TheseDays.dim(MaxDayTypes);
         AlReady.dim(MaxDayTypes);
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int DayT;
-        bool OneValid;
-        bool DupAssignment;
-
-        OneValid = false;
-        DupAssignment = false;
+        bool OneValid = false;
+        bool DupAssignment = false;
         // Just test for specific days
         if (has(ForDayField, "WEEKDAY")) {
             TheseDays({2, 6}) = true;
@@ -3838,7 +3538,7 @@ namespace ScheduleManager {
             OneValid = true;
         }
         if (has(ForDayField, "ALLOTHERDAY")) {
-            for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+            for (int DayT = 1; DayT <= MaxDayTypes; ++DayT) {
                 if (AlReady(DayT)) continue;
                 TheseDays(DayT) = true;
                 AlReady(DayT) = true;
@@ -3877,36 +3577,8 @@ namespace ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        bool CheckScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int Loop;             // Loop Control variable
-        int DayT;             // Day Type Loop control
-        int WkSch;            // Pointer for WeekSchedule value
         Real64 MinValue(0.0); // For total minimum
         Real64 MaxValue(0.0); // For total maximum
-        bool MinValueOk(true);
-        bool MaxValueOk(true);
-
         if (ScheduleIndex == -1) {
             MinValue = 1.0;
             MaxValue = 1.0;
@@ -3919,16 +3591,16 @@ namespace ScheduleManager {
 
         if (ScheduleIndex > 0) {
             if (!Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
-                WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
+                int WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
                 MinValue = minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 MaxValue = maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                for (DayT = 2; DayT <= MaxDayTypes; ++DayT) {
+                for (int DayT = 2; DayT <= MaxDayTypes; ++DayT) {
                     MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                     MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                 }
-                for (Loop = 2; Loop <= 366; ++Loop) {
+                for (int Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                    for (int DayT = 1; DayT <= MaxDayTypes; ++DayT) {
                         MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                         MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                     }
@@ -3940,6 +3612,8 @@ namespace ScheduleManager {
         }
 
         //  Min/max for schedule has been set.  Test.
+        bool MinValueOk(true);
+        bool MaxValueOk(true);
         MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
         if (MinString == ">") {
             MinValueOk = (Schedule(ScheduleIndex).MinValue > Minimum);
@@ -3947,9 +3621,7 @@ namespace ScheduleManager {
             MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
         }
 
-        CheckScheduleValueMinMax = (MinValueOk && MaxValueOk);
-
-        return CheckScheduleValueMinMax;
+        return (MinValueOk && MaxValueOk);
     }
 
     bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
@@ -3975,47 +3647,17 @@ namespace ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        bool CheckScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int Loop;             // Loop Control variable
-        int DayT;             // Day Type Loop control
-        int WkSch;            // Pointer for WeekSchedule value
-        Real64 MinValue(0.0); // For total minimum
-        Real64 MaxValue(0.0); // For total maximum
-        bool MinValueOk(true);
-        bool MaxValueOk(true);
-        /////////// hoisted into namespace CheckScheduleValueMinMaxRunOnceOnly////////////
-        // static bool RunOnceOnly( true );
-        /////////////////////////////////////////////////
-        // precompute the dayschedule max and min so that it is not in nested loop
+        // pre-compute the day-schedule max and min so that it is not in nested loop
         if (CheckScheduleValueMinMaxRunOnceOnly) {
-            for (Loop = 0; Loop <= NumDaySchedules; ++Loop) {
+            for (int Loop = 0; Loop <= NumDaySchedules; ++Loop) {
                 DaySchedule(Loop).TSValMin = minval(DaySchedule(Loop).TSValue);
                 DaySchedule(Loop).TSValMax = maxval(DaySchedule(Loop).TSValue);
             }
             CheckScheduleValueMinMaxRunOnceOnly = false;
         }
 
+        Real64 MinValue(0.0); // For total minimum
+        Real64 MaxValue(0.0); // For total maximum
         if (ScheduleIndex == -1) {
             MinValue = 1.0;
             MaxValue = 1.0;
@@ -4028,16 +3670,16 @@ namespace ScheduleManager {
 
         if (ScheduleIndex > 0) {
             if (!Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
-                WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
+                int WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
                 MinValue = DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValMin;
                 MaxValue = DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValMax;
-                for (DayT = 2; DayT <= MaxDayTypes; ++DayT) {
+                for (int DayT = 2; DayT <= MaxDayTypes; ++DayT) {
                     MinValue = min(MinValue, DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValMin);
                     MaxValue = max(MaxValue, DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValMax);
                 }
-                for (Loop = 2; Loop <= 366; ++Loop) {
+                for (int Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                    for (int DayT = 1; DayT <= MaxDayTypes; ++DayT) {
                         MinValue = min(MinValue, DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValMin);
                         MaxValue = max(MaxValue, DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValMax);
                     }
@@ -4048,6 +3690,7 @@ namespace ScheduleManager {
             }
         }
 
+        bool MinValueOk(true);
         //  Min/max for schedule has been set.  Test.
         if (MinString == ">") {
             MinValueOk = (Schedule(ScheduleIndex).MinValue > Minimum);
@@ -4055,16 +3698,14 @@ namespace ScheduleManager {
             MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
         }
 
-        MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
+        bool MaxValueOk(true);
         if (MaxString == "<") {
             MaxValueOk = (Schedule(ScheduleIndex).MaxValue < Maximum);
         } else {
             MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
         }
 
-        CheckScheduleValueMinMax = (MinValueOk && MaxValueOk);
-
-        return CheckScheduleValueMinMax;
+        return (MinValueOk && MaxValueOk);
     }
 
     bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
@@ -4088,36 +3729,9 @@ namespace ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        bool CheckScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int Loop;             // Loop Control variable
-        int DayT;             // Day Type Loop control
-        int WkSch;            // Pointer for WeekSchedule value
         Real64 MinValue(0.0); // For total minimum
         Real64 MaxValue(0.0); // For total maximum
-        bool MinValueOk(true);
-        bool MaxValueOk(true);
-
         if (ScheduleIndex == -1) {
             MinValue = 1.0;
             MaxValue = 1.0;
@@ -4130,16 +3744,16 @@ namespace ScheduleManager {
 
         if (ScheduleIndex > 0) {
             if (!Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
-                WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
+                int WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
                 MinValue = minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 MaxValue = maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                for (DayT = 2; DayT <= MaxDayTypes; ++DayT) {
+                for (int DayT = 2; DayT <= MaxDayTypes; ++DayT) {
                     MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                     MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                 }
-                for (Loop = 2; Loop <= 366; ++Loop) {
+                for (int Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                    for (int DayT = 1; DayT <= MaxDayTypes; ++DayT) {
                         MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                         MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                     }
@@ -4151,6 +3765,8 @@ namespace ScheduleManager {
         }
 
         //  Min/max for schedule has been set.  Test.
+        bool MinValueOk(true);
+        bool MaxValueOk(true);
         MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
         if (MinString == ">") {
             MinValueOk = (Schedule(ScheduleIndex).MinValue > Minimum);
@@ -4158,9 +3774,7 @@ namespace ScheduleManager {
             MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
         }
 
-        CheckScheduleValueMinMax = (MinValueOk && MaxValueOk);
-
-        return CheckScheduleValueMinMax;
+        return (MinValueOk && MaxValueOk);
     }
 
     bool CheckScheduleValueMinMax(int const ScheduleIndex,      // Which Schedule being tested
@@ -4186,36 +3800,9 @@ namespace ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        bool CheckScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int Loop;             // Loop Control variable
-        int DayT;             // Day Type Loop control
-        int WkSch;            // Pointer for WeekSchedule value
         Real64 MinValue(0.0); // For total minimum
         Real64 MaxValue(0.0); // For total maximum
-        bool MinValueOk;
-        bool MaxValueOk;
-
         if (ScheduleIndex == -1) {
             MinValue = 1.0;
             MaxValue = 1.0;
@@ -4228,16 +3815,16 @@ namespace ScheduleManager {
 
         if (ScheduleIndex > 0) {
             if (!Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
-                WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
+                int WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(1);
                 MinValue = minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 MaxValue = maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                for (DayT = 2; DayT <= MaxDayTypes; ++DayT) {
+                for (int DayT = 2; DayT <= MaxDayTypes; ++DayT) {
                     MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                     MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                 }
-                for (Loop = 2; Loop <= 366; ++Loop) {
+                for (int Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
+                    for (int DayT = 1; DayT <= MaxDayTypes; ++DayT) {
                         MinValue = min(MinValue, minval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                         MaxValue = max(MaxValue, maxval(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                     }
@@ -4249,24 +3836,20 @@ namespace ScheduleManager {
         }
 
         //  Min/max for schedule has been set.  Test.
-        MinValueOk = true;
-        MaxValueOk = true;
+        bool MinValueOk;
         if (MinString == ">") {
             MinValueOk = (Schedule(ScheduleIndex).MinValue > Minimum);
         } else {
             MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
         }
-
-        MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
+        bool MaxValueOk;
         if (MaxString == "<") {
             MaxValueOk = (Schedule(ScheduleIndex).MaxValue < Maximum);
         } else {
             MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
         }
 
-        CheckScheduleValueMinMax = (MinValueOk && MaxValueOk);
-
-        return CheckScheduleValueMinMax;
+        return (MinValueOk && MaxValueOk);
     }
 
     bool CheckScheduleValue(int const ScheduleIndex, // Which Schedule being tested
@@ -4288,26 +3871,8 @@ namespace ScheduleManager {
         // This routine is best used with "discrete" schedules.  The routine must traverse all values
         // in the schedule and compares by equality.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckScheduleValue;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;  // Loop Control variable
@@ -4360,26 +3925,8 @@ namespace ScheduleManager {
         // This routine is best used with "discrete" schedules.  The routine must traverse all values
         // in the schedule and compares by equality.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckScheduleValue;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;  // Loop Control variable
@@ -4434,27 +3981,6 @@ namespace ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        bool CheckDayScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0); // For total minimum
         Real64 MaxValue(0.0); // For total maximum
@@ -4498,9 +4024,7 @@ namespace ScheduleManager {
             }
         }
 
-        CheckDayScheduleValueMinMax = (MinValueOk && MaxValueOk);
-
-        return CheckDayScheduleValueMinMax;
+        return (MinValueOk && MaxValueOk);
     }
 
     bool CheckDayScheduleValueMinMax(int const ScheduleIndex,        // Which Day Schedule being tested
@@ -4526,27 +4050,6 @@ namespace ScheduleManager {
         // looks up minimum and maximum values for the schedule and then sets result of function based on
         // requested minimum/maximum checks.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        bool CheckDayScheduleValueMinMax;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0); // For total minimum
         Real64 MaxValue(0.0); // For total maximum
@@ -4589,9 +4092,7 @@ namespace ScheduleManager {
             }
         }
 
-        CheckDayScheduleValueMinMax = (MinValueOk && MaxValueOk);
-
-        return CheckDayScheduleValueMinMax;
+        return (MinValueOk && MaxValueOk);
     }
 
     bool HasFractionalScheduleValue(int const ScheduleIndex) // Which Schedule being tested
@@ -4607,29 +4108,8 @@ namespace ScheduleManager {
         // This function returns true if the schedule contains fractional
         // values [>0, <1].
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool HasFractions; // True if the schedule has fractional values
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WkSch;
@@ -4695,30 +4175,6 @@ namespace ScheduleManager {
         // This function returns the minimum value used by a schedule over
         // the entire year.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 MinimumValue; // Minimum value for schedule
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0);
         Real64 MaxValue(0.0);
@@ -4758,12 +4214,10 @@ namespace ScheduleManager {
             }
 
             //  Min/max for schedule has been set.
-            MinimumValue = Schedule(ScheduleIndex).MinValue;
+            return Schedule(ScheduleIndex).MinValue;
         } else {
-            MinimumValue = MinValue;
+            return MinValue;
         }
-
-        return MinimumValue;
     }
 
     Real64 GetScheduleMaxValue(int const ScheduleIndex) // Which Schedule being tested
@@ -4778,30 +4232,6 @@ namespace ScheduleManager {
         // PURPOSE OF THIS FUNCTION:
         // This function returns the maximum value used by a schedule over
         // the entire year.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        Real64 MaximumValue; // Maximum value for schedule
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0);
@@ -4843,12 +4273,10 @@ namespace ScheduleManager {
 
             //  Min/max for schedule has been set.
 
-            MaximumValue = Schedule(ScheduleIndex).MaxValue;
+            return Schedule(ScheduleIndex).MaxValue;
         } else {
-            MaximumValue = MaxValue;
+            return MaxValue;
         }
-
-        return MaximumValue;
     }
 
     std::string GetScheduleName(int const ScheduleIndex)
@@ -4863,32 +4291,8 @@ namespace ScheduleManager {
         // PURPOSE OF THIS FUNCTION:
         // This function returns the schedule name from the Schedule Index.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         std::string ScheduleName;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         if (!ScheduleInputProcessed) {
             ProcessScheduleInput();
@@ -4921,27 +4325,8 @@ namespace ScheduleManager {
         // This subroutine puts the proper current schedule values into the "reporting"
         // slot for later reporting.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataEnvironment::DayOfYear_Schedule;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ScheduleIndex;
@@ -5008,40 +4393,15 @@ namespace ScheduleManager {
         // PURPOSE OF THIS SUBROUTINE:
         // In response to CR7498, report orphan (unused) schedule items.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataGlobals::DisplayUnusedSchedules;
         using General::RoundSigDigits;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
+        bool NeedOrphanMessage = true;
+        bool NeedUseMessage = false;
+        int NumCount = 0;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool NeedOrphanMessage;
-        bool NeedUseMessage;
-        int Item;
-        int NumCount;
-
-        NeedOrphanMessage = true;
-        NeedUseMessage = false;
-        NumCount = 0;
-
-        for (Item = 1; Item <= NumSchedules; ++Item) {
+        for (int Item = 1; Item <= NumSchedules; ++Item) {
             if (Schedule(Item).Used) continue;
             if (NeedOrphanMessage && DisplayUnusedSchedules) {
                 ShowWarningError("The following schedule names are \"Unused Schedules\".  These schedules are in the idf");
@@ -5063,7 +4423,7 @@ namespace ScheduleManager {
         NeedOrphanMessage = true;
         NumCount = 0;
 
-        for (Item = 1; Item <= NumWeekSchedules; ++Item) {
+        for (int Item = 1; Item <= NumWeekSchedules; ++Item) {
             if (WeekSchedule(Item).Used) continue;
             if (WeekSchedule(Item).Name == BlankString) continue;
             if (NeedOrphanMessage && DisplayUnusedSchedules) {
@@ -5086,7 +4446,7 @@ namespace ScheduleManager {
         NeedOrphanMessage = true;
         NumCount = 0;
 
-        for (Item = 1; Item <= NumDaySchedules; ++Item) {
+        for (int Item = 1; Item <= NumDaySchedules; ++Item) {
             if (DaySchedule(Item).Used) continue;
             if (DaySchedule(Item).Name == BlankString) continue;
             if (NeedOrphanMessage && DisplayUnusedSchedules) {
@@ -5236,36 +4596,7 @@ namespace ScheduleManager {
         // PURPOSE OF THIS FUNCTION:
         // This function returns the number of schedules.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        int NumberOfSchedules;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        NumberOfSchedules = NumSchedules;
-
-        return NumberOfSchedules;
+        return NumSchedules;
     }
 
 } // namespace ScheduleManager
