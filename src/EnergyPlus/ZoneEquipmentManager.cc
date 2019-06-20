@@ -4140,8 +4140,8 @@ namespace ZoneEquipmentManager {
                 const int &equipNum = PrioritySimOrder(priorityNum).EquipPtr;
 
                 // Determine whether we're heating or cooling and choose the appropriate fraction
-                const Real64 &heatLoadRatio = thisZEqList.SequentialHeatingFraction(equipNum);
-                const Real64 &coolLoadRatio = thisZEqList.SequentialCoolingFraction(equipNum);
+                const Real64 heatLoadRatio = thisZEqList.SequentialHeatingFraction(equipNum);
+                const Real64 coolLoadRatio = thisZEqList.SequentialCoolingFraction(equipNum);
                 const Real64 loadRatio = (energy.TotalOutputRequired >= 0.0) ? heatLoadRatio : coolLoadRatio;
 
                 // Energy loads

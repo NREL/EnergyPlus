@@ -627,6 +627,12 @@ namespace DataZoneEquipment {
                         thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) = ScheduleAlwaysOn;
                     } else {
                         thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) = GetScheduleIndex(AlphArray(coolingFractionArrayIdx));
+                        if (thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) == 0) {
+                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                            ShowContinueError("invalid " + cAlphaFields(coolingFractionArrayIdx)  + "=[" + AlphArray(coolingFractionArrayIdx) + "].");
+                            ShowContinueError("Schedule does not exist.");
+                            GetZoneEquipmentDataErrorsFound = true;
+                        }
                     }
 
                     const int heatingFractionArrayIdx = nAlphasInExtensible * ZoneEquipTypeIdx + nAlphasBeforeExtensible + 4;
@@ -634,6 +640,12 @@ namespace DataZoneEquipment {
                         thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) = ScheduleAlwaysOn;
                     } else {
                         thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) = GetScheduleIndex(AlphArray(heatingFractionArrayIdx));
+                        if (thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) == 0) {
+                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                            ShowContinueError("invalid " + cAlphaFields(heatingFractionArrayIdx)  + "=[" + AlphArray(heatingFractionArrayIdx) + "].");
+                            ShowContinueError("Schedule does not exist.");
+                            GetZoneEquipmentDataErrorsFound = true;
+                        }
                     }
 
                     // do this here for initial prototype, but later will call all the equipment in a separate function to see who is on - maybe
@@ -1863,6 +1875,17 @@ namespace DataZoneEquipment {
         }
         DataHVACGlobals::MinAirLoopIterationsAfterFirst = minIterations;
     }
+
+    Real64 EquipList::SequentialHeatingFraction(const int equipNum)
+    {
+        return ScheduleManager::GetCurrentScheduleValue(SequentialHeatingFractionSchedPtr(equipNum));
+    }
+
+    Real64 EquipList::SequentialCoolingFraction(const int equipNum)
+    {
+        return ScheduleManager::GetCurrentScheduleValue(SequentialCoolingFractionSchedPtr(equipNum));
+    }
+
 
 } // namespace DataZoneEquipment
 

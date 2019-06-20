@@ -414,6 +414,10 @@ namespace DataZoneEquipment {
                                        int &coolingPriority,   // Cooling priority num for matching equipment
                                        int &heatingPriority    // Heating priority num for matching equipment
         );
+
+        Real64 SequentialHeatingFraction(int equipNum);
+
+        Real64 SequentialCoolingFraction(int equipNum);
     };
 
     struct ControlList
