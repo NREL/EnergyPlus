@@ -13520,7 +13520,7 @@ namespace OutputReportTabular {
                 // use standard sea level air pressure because air pressure is not tracked with sizing data
                 if (CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax) < 1.0 &&
                     CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax) > 0.0) {
-                    compLoad.outsideWebBulb = PsyTwbFnTdbWPb(CalcFinalZoneSizing(zoneIndex).CoolOutTempSeq(timeOfMax),
+                    compLoad.outsideWetBulb = PsyTwbFnTdbWPb(CalcFinalZoneSizing(zoneIndex).CoolOutTempSeq(timeOfMax),
                                                              CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax),
                                                              101325.0);
                 }
@@ -13573,7 +13573,7 @@ namespace OutputReportTabular {
                 // use standard sea level air pressure because air pressure is not tracked with sizing data
                 if (CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax) < 1.0 &&
                     CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax) > 0.0) {
-                    compLoad.outsideWebBulb = PsyTwbFnTdbWPb(CalcFinalZoneSizing(zoneIndex).HeatOutTempSeq(timeOfMax),
+                    compLoad.outsideWetBulb = PsyTwbFnTdbWPb(CalcFinalZoneSizing(zoneIndex).HeatOutTempSeq(timeOfMax),
                                                              CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax),
                                                              101325.0);
                 }
@@ -13795,7 +13795,7 @@ namespace OutputReportTabular {
         compLoadTotal.timeStepMax = compLoadPartial.timeStepMax;
         compLoadTotal.peakDateHrMin = compLoadPartial.peakDateHrMin;
         compLoadTotal.outsideDryBulb = compLoadPartial.outsideDryBulb;
-        compLoadTotal.outsideWebBulb = compLoadPartial.outsideWebBulb;
+        compLoadTotal.outsideWetBulb = compLoadPartial.outsideWetBulb;
         compLoadTotal.outsideHumRatio = compLoadPartial.outsideHumRatio;
         compLoadTotal.zoneDryBulb = compLoadPartial.zoneDryBulb;
         compLoadTotal.zoneRelHum = compLoadPartial.zoneRelHum;
@@ -13902,7 +13902,7 @@ namespace OutputReportTabular {
             }
             int tempConvIndx = getSpecificUnitIndex("C", "F");
             compLoadTotal.outsideDryBulb = ConvertIP(tempConvIndx, compLoadTotal.outsideDryBulb);
-            compLoadTotal.outsideWebBulb = ConvertIP(tempConvIndx, compLoadTotal.outsideWebBulb);
+            compLoadTotal.outsideWetBulb = ConvertIP(tempConvIndx, compLoadTotal.outsideWetBulb);
             compLoadTotal.zoneDryBulb = ConvertIP(tempConvIndx, compLoadTotal.zoneDryBulb);
             compLoadTotal.peakDesSensLoad *= powerConversion;
 
@@ -14122,7 +14122,7 @@ namespace OutputReportTabular {
                 if (curCompLoad.timeStepMax != 0) {
                     tableBody(1, 1) = curCompLoad.peakDateHrMin;                  // Time of Peak Load
                     tableBody(1, 2) = RealToStr(curCompLoad.outsideDryBulb, 2);   // Outside  Dry Bulb Temperature
-                    tableBody(1, 3) = RealToStr(curCompLoad.outsideWebBulb, 2);   // Outside  Wet Bulb Temperature
+                    tableBody(1, 3) = RealToStr(curCompLoad.outsideWetBulb, 2);   // Outside  Wet Bulb Temperature
                     tableBody(1, 4) = RealToStr(curCompLoad.outsideHumRatio, 5);  // Outside Humidity Ratio at Peak
                     tableBody(1, 5) = RealToStr(curCompLoad.zoneDryBulb, 2);      // Zone Dry Bulb Temperature
                     tableBody(1, 6) = RealToStr(100 * curCompLoad.zoneRelHum, 2); // Zone Relative Humdity

@@ -6685,7 +6685,7 @@ TEST(OutputReportTabularTest, CombineLoadCompResults_test)
     compLoadPartial.cells(1, 1) = 1.1;
     compLoadPartial.cells(4, 25) = 1.2;
     compLoadPartial.cellUsed(3, 17) = true;
-    compLoadPartial.outsideWebBulb = 17.;
+    compLoadPartial.outsideWetBulb = 17.;
     compLoadPartial.diffDesignPeak = 11.;
 
     CombineLoadCompResults(compLoadTotal, compLoadPartial, multiplier);
@@ -6693,7 +6693,7 @@ TEST(OutputReportTabularTest, CombineLoadCompResults_test)
     EXPECT_EQ(1.1 * 3., compLoadTotal.cells(1, 1));
     EXPECT_EQ(1.2 * 3., compLoadTotal.cells(4, 25));
     EXPECT_EQ(true, compLoadTotal.cellUsed(3, 17));
-    EXPECT_EQ(17., compLoadTotal.outsideWebBulb);
+    EXPECT_EQ(17., compLoadTotal.outsideWetBulb);
     EXPECT_EQ(33., compLoadTotal.diffDesignPeak);
 }
 
