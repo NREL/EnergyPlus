@@ -13016,7 +13016,7 @@ namespace OutputReportTabular {
                 if (!ZoneEquipConfig(iZone).IsControlled) continue;
                 mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
                 if (mult == 0.0) mult = 1.0;
-                if (displayZoneComponentLoadSummary && (timeCoolMax == ZoneCoolCompLoadTables(iZone).desDayNum) &&
+                if (displayZoneComponentLoadSummary && (coolDesSelected == ZoneCoolCompLoadTables(iZone).desDayNum) &&
                     (timeCoolMax == ZoneCoolCompLoadTables(iZone).timeStepMax) &&
                     (OutputReportTabular::unitsStyle != OutputReportTabular::unitsStyleInchPound)) {
                     FacilityZonesCoolCompLoadTables(iZone) = ZoneCoolCompLoadTables(iZone);
@@ -13052,7 +13052,7 @@ namespace OutputReportTabular {
                 FacilityZonesCoolCompLoadTables(iZone).desDayNum = coolDesSelected;
                 CombineLoadCompResults(FacilityCoolCompLoadTables, FacilityZonesCoolCompLoadTables(iZone), mult);
 
-                if (displayZoneComponentLoadSummary && (timeHeatMax == ZoneHeatCompLoadTables(iZone).desDayNum) &&
+                if (displayZoneComponentLoadSummary && (heatDesSelected == ZoneHeatCompLoadTables(iZone).desDayNum) &&
                     (timeHeatMax == ZoneHeatCompLoadTables(iZone).timeStepMax) &&
                     (OutputReportTabular::unitsStyle != OutputReportTabular::unitsStyleInchPound)) {
                     FacilityZonesHeatCompLoadTables(iZone) = ZoneHeatCompLoadTables(iZone);
