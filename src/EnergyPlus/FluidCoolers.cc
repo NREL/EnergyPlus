@@ -380,6 +380,9 @@ namespace FluidCoolers {
                 AlphArray(3), ErrorsFound, cCurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
             SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = NumArray(1);
+            if (SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA == AutoSize) {
+                SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized = true;
+            }
             SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity = NumArray(2);
             SimpleFluidCooler(FluidCoolerNum).DesignEnteringWaterTemp = NumArray(3);
             SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirTemp = NumArray(4);
@@ -715,7 +718,8 @@ namespace FluidCoolers {
                 }
                 ShowContinueError(
                     "Design fluid cooler UA field must be left blank when nominal fluid cooler capacity performance input method is used.");
-                ErrorsFound = true;
+                ShowContinueError("Design fluid cooler UA value will be reset to zero and the simulation continuous.");
+                SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = 0.0;
             }
         } else { // Fluid cooler performance input method is not specified as a valid "choice"
             ShowSevereError(cCurrentModuleObject + "= \"" + AlphArray(1) + "\", invalid " + cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
