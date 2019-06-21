@@ -13513,10 +13513,10 @@ namespace OutputReportTabular {
                     compLoad.peakDateHrMin = CoolPeakDateHrMin(zoneIndex);
                 }
 
-                // Outside  Dry Bulb Temperature
+                // Outside Dry Bulb Temperature
                 compLoad.outsideDryBulb = CalcFinalZoneSizing(zoneIndex).CoolOutTempSeq(timeOfMax);
 
-                // Outside  Wet Bulb Temperature
+                // Outside Wet Bulb Temperature
                 // use standard sea level air pressure because air pressure is not tracked with sizing data
                 if (CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax) < 1.0 &&
                     CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax) > 0.0) {
@@ -13566,10 +13566,10 @@ namespace OutputReportTabular {
                     compLoad.peakDateHrMin = HeatPeakDateHrMin(zoneIndex);
                 }
 
-                // Outside  Dry Bulb Temperature
+                // Outside Dry Bulb Temperature
                 compLoad.outsideDryBulb = CalcFinalZoneSizing(zoneIndex).HeatOutTempSeq(timeOfMax);
 
-                // Outside  Wet Bulb Temperature
+                // Outside Wet Bulb Temperature
                 // use standard sea level air pressure because air pressure is not tracked with sizing data
                 if (CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax) < 1.0 &&
                     CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax) > 0.0) {
@@ -14081,8 +14081,8 @@ namespace OutputReportTabular {
                 columnHead(1) = "Value";
                 if (unitsStyle != unitsStyleInchPound) {
                     rowHead(1) = "Time of Peak Load";
-                    rowHead(2) = "Outside  Dry Bulb Temperature [C]";
-                    rowHead(3) = "Outside  Wet Bulb Temperature [C]";
+                    rowHead(2) = "Outside Dry Bulb Temperature [C]";
+                    rowHead(3) = "Outside Wet Bulb Temperature [C]";
                     rowHead(4) = "Outside Humidity Ratio at Peak [kgWater/kgAir]";
                     rowHead(5) = "Zone Dry Bulb Temperature [C]";
                     rowHead(6) = "Zone Relative Humidity [%]";
@@ -14100,8 +14100,8 @@ namespace OutputReportTabular {
                     rowHead(16) = "Difference Between Peak and Estimated Sensible Load [W]";
                 } else {
                     rowHead(1) = "Time of Peak Load";
-                    rowHead(2) = "Outside  Dry Bulb Temperature [F]";
-                    rowHead(3) = "Outside  Wet Bulb Temperature [F]";
+                    rowHead(2) = "Outside Dry Bulb Temperature [F]";
+                    rowHead(3) = "Outside Wet Bulb Temperature [F]";
                     rowHead(4) = "Outside Humidity Ratio at Peak [lbWater/lbAir]";
                     rowHead(5) = "Zone Dry Bulb Temperature [F]";
                     rowHead(6) = "Zone Relative Humidity [%]";
@@ -14121,8 +14121,8 @@ namespace OutputReportTabular {
 
                 if (curCompLoad.timeStepMax != 0) {
                     tableBody(1, 1) = curCompLoad.peakDateHrMin;                  // Time of Peak Load
-                    tableBody(1, 2) = RealToStr(curCompLoad.outsideDryBulb, 2);   // Outside  Dry Bulb Temperature
-                    tableBody(1, 3) = RealToStr(curCompLoad.outsideWetBulb, 2);   // Outside  Wet Bulb Temperature
+                    tableBody(1, 2) = RealToStr(curCompLoad.outsideDryBulb, 2);   // Outside Dry Bulb Temperature
+                    tableBody(1, 3) = RealToStr(curCompLoad.outsideWetBulb, 2);   // Outside Wet Bulb Temperature
                     tableBody(1, 4) = RealToStr(curCompLoad.outsideHumRatio, 5);  // Outside Humidity Ratio at Peak
                     tableBody(1, 5) = RealToStr(curCompLoad.zoneDryBulb, 2);      // Zone Dry Bulb Temperature
                     tableBody(1, 6) = RealToStr(100 * curCompLoad.zoneRelHum, 2); // Zone Relative Humdity
