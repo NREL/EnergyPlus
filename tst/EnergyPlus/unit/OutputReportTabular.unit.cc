@@ -70,6 +70,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
@@ -6951,6 +6952,178 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     EXPECT_EQ(76ul, strings.size());
     EXPECT_EQ("AirLoop Component Load Summary", strings[0][2]); // just make sure that the output table was generated and did not crash
 }
+
+
+// Test for https://github.com/NREL/EnergyPlus/issues/7346
+// We ensure that if the Airloop peak matches the zone peak, we don't do the IP conversion twice
+TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoop_IPConversion)
+{
+    EnergyPlus::sqlite->sqliteBegin();
+    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    OutputReportTabular::SetupUnitConversions();
+    OutputReportTabular::unitsStyle = OutputReportTabular::unitsStyleInchPound;
+
+    // We ask for the air loop component load summary since that's the one we test
+    // We also ask for the zone component load summary because that's necessary to "copy" the load and trigger a potential double conversion
+    OutputReportTabular::displayAirLoopComponentLoadSummary = true;
+    OutputReportTabular::displayZoneComponentLoadSummary = true;
+    DataGlobals::CompLoadReportIsReq = true;
+
+
+    Psychrometrics::InitializePsychRoutines();
+    createCoilSelectionReportObj();
+
+    // Two design days
+    int numDesDays = 2;
+    DataEnvironment::TotDesDays = numDesDays;
+    DataEnvironment::TotRunDesPersDays = 0;
+    WeatherManager::DesDayInput.allocate(2);
+    WeatherManager::DesDayInput(1).Month = 7;
+    WeatherManager::DesDayInput(1).DayOfMonth = 21;
+    WeatherManager::DesDayInput(2).Month = 1;
+    WeatherManager::DesDayInput(2).DayOfMonth = 21;
+
+
+    DataGlobals::NumOfTimeStepInHour = 4;
+    DataGlobals::MinutesPerTimeStep = 15;
+    int numTimeStepInDay = 96;
+
+
+    // One Zone
+    DataGlobals::NumOfZones = 1;
+    DataHeatBalance::Zone.allocate(1);
+    DataHeatBalance::Zone(1).Multiplier = 1;
+    DataHeatBalance::Zone(1).ListMultiplier = 1;
+    DataHeatBalance::Zone(1).FloorArea = 100.;
+    // Trick E+ into not iterating on Surfaces
+    DataHeatBalance::Zone(1).SurfaceFirst = 1;
+    DataHeatBalance::Zone(1).SurfaceLast = 0;
+
+
+
+    // Cool Peak on 1st DD at 16:00 and Heat Peak on 2nd DD at 1:00
+    DataSizing::CalcFinalZoneSizing.allocate(DataGlobals::NumOfZones);
+
+    int coolDDNum = 1;
+    int coolTimeOfMax = 64;
+    DataSizing::CalcFinalZoneSizing(1).CoolDDNum = coolDDNum;
+    DataSizing::CalcFinalZoneSizing(1).TimeStepNumAtCoolMax = coolTimeOfMax;
+    DataSizing::CoolPeakDateHrMin.allocate(1);
+
+    DataSizing::CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(numTimeStepInDay);
+    DataSizing::CalcFinalZoneSizing(1).CoolOutTempSeq(coolTimeOfMax) = 38.;
+    DataSizing::CalcFinalZoneSizing(1).CoolOutHumRatSeq.allocate(numTimeStepInDay);
+    DataSizing::CalcFinalZoneSizing(1).CoolOutHumRatSeq(coolTimeOfMax) = 0.01459;
+    DataSizing::CalcFinalZoneSizing(1).CoolZoneTempSeq.allocate(numTimeStepInDay);
+    DataSizing::CalcFinalZoneSizing(1).CoolZoneTempSeq(coolTimeOfMax) = 24.;
+    DataSizing::CalcFinalZoneSizing(1).CoolZoneHumRatSeq.allocate(numTimeStepInDay);
+    DataSizing::CalcFinalZoneSizing(1).CoolZoneHumRatSeq(coolTimeOfMax) = 0.00979;
+    DataSizing::CalcFinalZoneSizing(1).DesCoolLoad = 500.;
+    DataSizing::CalcFinalZoneSizing(1).ZnCoolDgnSAMethod = SupplyAirTemperature;
+    DataSizing::CalcFinalZoneSizing(1).CoolDesTemp = 13.;
+    DataSizing::CalcFinalZoneSizing(1).DesCoolVolFlow = 3.3;
+
+
+    int heatDDNum = 2;
+    int heatTimeOfMax = 4;
+    DataSizing::CalcFinalZoneSizing(1).HeatDDNum = heatDDNum;
+    DataSizing::CalcFinalZoneSizing(1).TimeStepNumAtHeatMax = heatTimeOfMax;
+    DataSizing::HeatPeakDateHrMin.allocate(1);
+
+    DataSizing::CalcFinalZoneSizing(1).HeatOutTempSeq.allocate(numTimeStepInDay);
+    DataSizing::CalcFinalZoneSizing(1).HeatOutTempSeq(heatTimeOfMax) = -17.4;
+    DataSizing::CalcFinalZoneSizing(1).HeatOutHumRatSeq.allocate(numTimeStepInDay);
+    DataSizing::CalcFinalZoneSizing(1).HeatOutHumRatSeq(heatTimeOfMax) = 0.01459;
+
+    DataSizing::FinalZoneSizing.allocate(1);
+    DataSizing::FinalZoneSizing(1).DesCoolLoad = 600.;
+
+    // One airloop, that serves this zone.
+    DataHVACGlobals::NumPrimaryAirSys = 1;
+    DataSizing::SysSizPeakDDNum.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    DataSizing::FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    DataSizing::CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+
+    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
+
+    DataSizing::CalcFinalZoneSizing(1).HeatZoneTempSeq.allocate(numTimeStepInDay);
+    DataSizing::CalcFinalZoneSizing(1).HeatZoneTempSeq(heatTimeOfMax) = 20.;
+    DataSizing::CalcFinalZoneSizing(1).HeatZoneHumRatSeq.allocate(numTimeStepInDay);
+    DataSizing::CalcFinalZoneSizing(1).HeatZoneHumRatSeq(heatTimeOfMax) = 0.00979;
+    DataSizing::CalcFinalZoneSizing(1).DesHeatLoad = 750.;
+    DataSizing::CalcFinalZoneSizing(1).ZnHeatDgnSAMethod = SupplyAirTemperature;
+    DataSizing::CalcFinalZoneSizing(1).HeatDesTemp = 35.;
+    DataSizing::CalcFinalZoneSizing(1).DesHeatVolFlow = 3.3;
+
+
+    DataSizing::CalcZoneSizing.allocate(numDesDays, DataGlobals::NumOfZones);
+    DataSizing::CalcZoneSizing(1, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
+    DataSizing::CalcZoneSizing(1, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
+    DataSizing::CalcZoneSizing(2, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
+    DataSizing::CalcZoneSizing(2, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
+
+    DataAirLoop::AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    DataAirLoop::AirToZoneNodeInfo(1).NumZonesCooled = 1;
+    DataAirLoop::AirToZoneNodeInfo(1).CoolCtrlZoneNums.allocate(1);
+    DataAirLoop::AirToZoneNodeInfo(1).CoolCtrlZoneNums(1) = 1;
+    DataAirLoop::AirToZoneNodeInfo(1).NumZonesHeated = 1;
+    DataAirLoop::AirToZoneNodeInfo(1).HeatCtrlZoneNums.allocate(1);
+    DataAirLoop::AirToZoneNodeInfo(1).HeatCtrlZoneNums(1) = 1;
+
+
+    // same Design Days peak and timestep peak as the zone it serves. This is the critical part of the test
+    DataSizing::FinalSysSizing(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
+
+    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = 1;
+    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = 2;
+    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
+    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk(1) = 64;
+    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk.allocate(numDesDays);
+    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk(2) = 4;
+
+
+
+    AllocateLoadComponentArrays();
+    WriteLoadComponentSummaryTables();
+
+    // TableName, ReportName, value
+    std::vector<std::tuple<std::string, std::string, std::string>> results_strings({
+        // -17.4C gives 0.68F
+        {"Heating Peak Conditions", "Zone Component Load Summary",    "        0.68"},
+        {"Heating Peak Conditions", "AirLoop Component Load Summary", "        0.68"},
+
+        // 38C gives 100.4 F
+        {"Cooling Peak Conditions", "Zone Component Load Summary",    "      100.40"},
+        {"Cooling Peak Conditions", "AirLoop Component Load Summary", "      100.40"},
+    });
+
+    // Would have used bind_text in sqlite3 with a single prepared statement, but m_db is protected in SQLiteProcedures
+    std::string tableName;
+    std::string reportName;
+
+    for (auto v : results_strings) {
+
+        tableName = std::get<0>(v);
+        reportName = std::get<1>(v);
+
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE ReportName = '" + reportName + "'"
+                          "  AND TableName = '" + tableName + "'"
+                          "  AND RowName = 'Outside Dry Bulb Temperature';");
+
+        std::string oa_db = queryResult(query, "TabularDataWithStrings")[0][0];
+        // Not needed, we're just querying, not inside a transaction
+        // EnergyPlus::sqlite->sqliteCommit();
+
+        // Add informative message if failed
+        EXPECT_EQ(std::get<2>(v), oa_db) << "Failed for TableName=" << tableName << "; ReportName=" << reportName;
+    }
+
+
+}
+
 
 TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_hasSizingPeriodsDays_SizingPeriodDesignDay)
 {
