@@ -267,7 +267,7 @@
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 5,            !- Name
     1,                       !- Begin Month
     5,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -282,7 +282,7 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 6,            !- Name
     7,                       !- Begin Month
     5,                       !- Begin Day of Month
     ,                        !- Begin Year

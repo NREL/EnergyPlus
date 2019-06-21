@@ -542,6 +542,7 @@ namespace VariableSpeedCoils {
                                           cAlphaFields,
                                           cNumericFields);
 
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             VarSpeedCoil(DXCoilNum).bIsDesuperheater = false;
@@ -925,6 +926,7 @@ namespace VariableSpeedCoils {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             VarSpeedCoil(DXCoilNum).bIsDesuperheater = false;
@@ -1319,6 +1321,7 @@ namespace VariableSpeedCoils {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             VarSpeedCoil(DXCoilNum).bIsDesuperheater = false;
@@ -1672,6 +1675,7 @@ namespace VariableSpeedCoils {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             VarSpeedCoil(DXCoilNum).bIsDesuperheater = false;
@@ -2004,6 +2008,7 @@ namespace VariableSpeedCoils {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             VarSpeedCoil(DXCoilNum).bIsDesuperheater = false;

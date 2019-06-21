@@ -437,10 +437,10 @@ namespace HeatingCoils {
             HeatingCoilNumericFields(CoilNum).FieldNames = cNumericFields;
 
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, InputErrorsFound);
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), errFlag, CurrentModuleObject + " Name");
-            if (errFlag) {
-                InputErrorsFound = true;
-            }
+
+            // InputErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), InputErrorsFound, CurrentModuleObject + " Name");
+
             HeatingCoil(CoilNum).Name = Alphas(1);
             HeatingCoil(CoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
@@ -539,10 +539,8 @@ namespace HeatingCoils {
             HeatingCoilNumericFields(CoilNum).FieldNames = cNumericFields;
 
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, InputErrorsFound);
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), errFlag, CurrentModuleObject + " Name");
-            if (errFlag) {
-                InputErrorsFound = true;
-            }
+            // InputErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), InputErrorsFound, CurrentModuleObject + " Name");
             HeatingCoil(CoilNum).Name = Alphas(1);
             HeatingCoil(CoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
@@ -650,10 +648,8 @@ namespace HeatingCoils {
             HeatingCoilNumericFields(CoilNum).FieldNames = cNumericFields;
 
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, InputErrorsFound);
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), errFlag, CurrentModuleObject + " Name");
-            if (errFlag) {
-                InputErrorsFound = true;
-            }
+            // InputErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), InputErrorsFound, CurrentModuleObject + " Name");
             coil.Name = Alphas(1);
             coil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
@@ -788,10 +784,8 @@ namespace HeatingCoils {
             HeatingCoilNumericFields(CoilNum).FieldNames = cNumericFields;
 
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, InputErrorsFound);
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), errFlag, CurrentModuleObject + " Name");
-            if (errFlag) {
-                InputErrorsFound = true;
-            }
+            // InputErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), InputErrorsFound, CurrentModuleObject + " Name");
             HeatingCoil(CoilNum).Name = Alphas(1);
             HeatingCoil(CoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
@@ -946,10 +940,8 @@ namespace HeatingCoils {
             HeatingCoilNumericFields(CoilNum).FieldNames = cNumericFields;
 
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, InputErrorsFound);
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), errFlag, CurrentModuleObject + " Name");
-            if (errFlag) {
-                InputErrorsFound = true;
-            }
+            // InputErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), InputErrorsFound, CurrentModuleObject + " Name");
             HeatingCoil(CoilNum).Name = Alphas(1);
             HeatingCoil(CoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {

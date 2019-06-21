@@ -1059,6 +1059,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -1500,6 +1501,7 @@ namespace DXCoils {
 
             ++DXCoilNum;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -2021,6 +2023,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
             DXCoil(DXCoilNum).Name = Alphas(1);
             DXCoil(DXCoilNum).DXCoilType = CurrentModuleObject;
@@ -2440,6 +2443,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -2974,6 +2978,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -3418,6 +3423,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -3764,6 +3770,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
             DXCoil(DXCoilNum).Name = Alphas(1);
             // Initialize DataHeatBalance heat reclaim variable name for use by heat reclaim coils
@@ -4287,6 +4294,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -4755,6 +4763,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -4877,6 +4886,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -4990,6 +5000,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -5088,6 +5099,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -10191,7 +10203,6 @@ namespace DXCoils {
         int airOutletNode = DXCoil(DXCoilNum).AirOutNode;
         Node(airOutletNode).Temp = DXCoil(DXCoilNum).OutletAirTemp;
         Node(airOutletNode).HumRat = DXCoil(DXCoilNum).OutletAirHumRat;
-
     }
 
     void CalcDXHeatingCoil(int const DXCoilNum,                      // the number of the DX heating coil to be simulated
@@ -13684,14 +13695,16 @@ namespace DXCoils {
         int index;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_890("('! <VAV DX Cooling Coil Standard Rating Information>, DX Coil Type, DX Coil Name, Fan Type, Fan Name, "
-                                   "','Standard Net Cooling Capacity {W}, Standard Net Cooling Capacity {Btu/h}, IEER {Btu/W-h}, ','COP 100% "
-                                   "Capacity {W/W}, COP 75% Capacity {W/W}, COP 50% Capacity {W/W}, COP 25% Capacity {W/W}, ','EER 100% Capacity "
-                                   "{Btu/W-h}, EER 75% Capacity {Btu/W-h}, EER 50% Capacity {Btu/W-h}, EER 25% Capacity {Btu/W-h}, ','Supply Air "
-                                   "Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}')");
-        static ObjexxFCL::gio::Fmt Format_891("(' VAV DX Cooling Coil Standard Rating Information, "
-                                   "',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,'"
-                                   ",',A)");
+        static ObjexxFCL::gio::Fmt Format_890(
+            "('! <VAV DX Cooling Coil Standard Rating Information>, DX Coil Type, DX Coil Name, Fan Type, Fan Name, "
+            "','Standard Net Cooling Capacity {W}, Standard Net Cooling Capacity {Btu/h}, IEER {Btu/W-h}, ','COP 100% "
+            "Capacity {W/W}, COP 75% Capacity {W/W}, COP 50% Capacity {W/W}, COP 25% Capacity {W/W}, ','EER 100% Capacity "
+            "{Btu/W-h}, EER 75% Capacity {Btu/W-h}, EER 50% Capacity {Btu/W-h}, EER 25% Capacity {Btu/W-h}, ','Supply Air "
+            "Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}')");
+        static ObjexxFCL::gio::Fmt Format_891(
+            "(' VAV DX Cooling Coil Standard Rating Information, "
+            "',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,'"
+            ",',A)");
 
         // Get fan index and name if not already available
         if (DXCoil(DXCoilNum).SupplyFanIndex == -1)
@@ -16388,7 +16401,12 @@ namespace DXCoils {
             EIR = DXCoil(DXCoilNum).RatedEIR(Mode) * EIRTempModFac * EIRFlowModFac;
 
             // Calculate PLRHeating: modified PartLoadRatio due to defrost ( reverse-cycle defrost only )
-            PLRHeating = min(1.0, (PartLoadRatio + LoadDueToDefrost / TotCap));
+            if (TotCap > 0.0) {
+                PLRHeating = min(1.0, (PartLoadRatio + LoadDueToDefrost / TotCap));
+            } else {
+                PLRHeating = min(1.0, PartLoadRatio);
+            }
+
             if (DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_Heating && DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating) {
                 PLF = CurveValue(DXCoil(DXCoilNum).PLFFPLR(Mode), PLRHeating); // Calculate part-load factor
             } else {

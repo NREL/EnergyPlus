@@ -3,6 +3,7 @@
 # Attempt to automatically change the version number of all idf and imf files in a repo
 # Two arguments: old version number and new version number
 
+import codecs
 import fnmatch
 import os
 import sys
@@ -32,11 +33,11 @@ for extension in ['*.idf', '*.imf']:
         this_dir = os.path.join(repo, folder)
         for root, dir_names, file_names in os.walk(this_dir):
             for filename in fnmatch.filter(file_names, extension):
-                with open(os.path.join(root, filename)) as input_file:
+                with codecs.open(os.path.join(root, filename), encoding='utf-8', errors='ignore') as input_file:
                     file_data = input_file.read()
                     file_data = file_data.replace('Version,' + v_old, 'Version,' + v_new)
                     file_data = file_data.replace('VERSION,' + v_old, 'Version,' + v_new)
-                with open(os.path.join(root, filename), 'w') as output_file:
+                with codecs.open(os.path.join(root, filename), 'w', encoding='utf-8') as output_file:
                     output_file.write(file_data)
 
 # then walk across all the unit test files too
@@ -44,9 +45,9 @@ for folder in [os.path.join('tst', 'EnergyPlus', 'unit')]:
     this_dir = os.path.join(repo, folder)
     for root, dir_names, file_names in os.walk(this_dir):
         for filename in fnmatch.filter(file_names, '*.cc'):
-            with open(os.path.join(root, filename)) as input_file:
+            with codecs.open(os.path.join(root, filename), encoding='utf-8', errors='ignore') as input_file:
                 file_data = input_file.read()
                 file_data = file_data.replace('Version,' + v_old, 'Version,' + v_new)
                 file_data = file_data.replace('VERSION,' + v_old, 'Version,' + v_new)
-            with open(os.path.join(root, filename), 'w') as output_file:
+            with codecs.open(os.path.join(root, filename), 'w', encoding='utf-8') as output_file:
                 output_file.write(file_data)

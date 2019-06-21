@@ -2732,7 +2732,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
         "  Always 20C, !- Schedule Name",
         "  Water Cooling Coil Air Outlet Node;  !- Setpoint Node or NodeList Name",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
@@ -2748,11 +2748,11 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
     thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                   // expect no errors
 
-    auto unitarySystemAirInletNodeIndex = UtilityRoutines::FindItemInList("WATER COOLING COIL AIR INLET NODE", DataLoopNode::NodeID);                 // was Node 1
+    auto unitarySystemAirInletNodeIndex = UtilityRoutines::FindItemInList("WATER COOLING COIL AIR INLET NODE", DataLoopNode::NodeID); // was Node 1
     auto coolingCoilAirInletNodeIndex = UtilityRoutines::FindItemInList("WATER COOLING COIL AIR INLET NODE", DataLoopNode::NodeID);   // was Node 3
-    auto coolingCoilAirOutletNodeIndex = UtilityRoutines::FindItemInList("WATER COOLING COIL AIR OUTLET NODE", DataLoopNode::NodeID);  // was Node 6
+    auto coolingCoilAirOutletNodeIndex = UtilityRoutines::FindItemInList("WATER COOLING COIL AIR OUTLET NODE", DataLoopNode::NodeID); // was Node 6
     auto coolingCoilWaterInletNodeIndex = UtilityRoutines::FindItemInList("CHWINLETNODE", DataLoopNode::NodeID);                      // was Node 10
-    auto coolingCoilWaterOutletNodeIndex = UtilityRoutines::FindItemInList("CHWOUTLETNODE", DataLoopNode::NodeID);                      // was Node 10
+    auto coolingCoilWaterOutletNodeIndex = UtilityRoutines::FindItemInList("CHWOUTLETNODE", DataLoopNode::NodeID);                    // was Node 10
 
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "WATER COOLING COIL";
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
@@ -2783,8 +2783,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
     DataLoopNode::Node(unitarySystemAirInletNodeIndex).MassFlowRateMaxAvail = 1.9; // max avail at fan inlet so fan won't limit flow
 
     // test COOLING condition
-    DataLoopNode::Node(unitarySystemAirInletNodeIndex).Temp = 24.0;         // 24C db
-    DataLoopNode::Node(unitarySystemAirInletNodeIndex).HumRat = 0.013;    // 18C dp
+    DataLoopNode::Node(unitarySystemAirInletNodeIndex).Temp = 24.0;    // 24C db
+    DataLoopNode::Node(unitarySystemAirInletNodeIndex).HumRat = 0.013; // 18C dp
     DataLoopNode::Node(unitarySystemAirInletNodeIndex).Enthalpy = 57217.0;
 
     // Cooling coil air inlet node
@@ -2820,7 +2820,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
     // if cooling coil meets cooling set point temperature expect cooling coil water flow to be less than max water flow
     EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMax);
     EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate,
-        DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
+              DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
 
     // Case 1 - COOLING mode - sensible control only, no extra dehumidification required
     DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRatMax = 0.02;
@@ -2828,22 +2828,22 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
     thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
 
     // check that CW coil air outlet node is at set point
-    EXPECT_NEAR(DataLoopNode::Node( coolingCoilAirOutletNodeIndex ).Temp, DataLoopNode::Node( coolingCoilAirOutletNodeIndex ).TempSetPoint, 0.001 );
+    EXPECT_NEAR(DataLoopNode::Node(coolingCoilAirOutletNodeIndex).Temp, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).TempSetPoint, 0.001);
     // check that CW coil air outlet node humrat is >= set point
     EXPECT_LE(DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRat, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRatMax);
     // CW air inlet node temp is greater than CW air outlet node temp
-    EXPECT_GT( DataLoopNode::Node( coolingCoilAirInletNodeIndex ).Temp, DataLoopNode::Node( coolingCoilAirOutletNodeIndex ).Temp );
+    EXPECT_GT(DataLoopNode::Node(coolingCoilAirInletNodeIndex).Temp, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).Temp);
     // CW water inlet node flow is greater than 0
-    EXPECT_GT(DataLoopNode::Node( coolingCoilWaterInletNodeIndex ).MassFlowRate, 0.0 );
+    EXPECT_GT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, 0.0);
     // CW water node flow is the same at inlet and outlet
     EXPECT_EQ(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(coolingCoilWaterOutletNodeIndex).MassFlowRate);
     // CW water outlet node temp is greater than CW inlet node temp
-    EXPECT_GT( DataLoopNode::Node(coolingCoilWaterOutletNodeIndex).Temp, DataLoopNode::Node( coolingCoilWaterInletNodeIndex ).Temp );
+    EXPECT_GT(DataLoopNode::Node(coolingCoilWaterOutletNodeIndex).Temp, DataLoopNode::Node(coolingCoilWaterInletNodeIndex).Temp);
 
     // if cooling coil meets cooling set point temperature expect cooling coil water flow to be less than max water flow
     EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMax);
     EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate,
-        DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
+              DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
 
     // Case 2 - COOLING mode - sensible and latent load, extra dehumidification required
     DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRatMax = 0.009;
@@ -2866,7 +2866,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
     // if cooling coil meets cooling set point temperature expect cooling coil water flow to be less than max water flow
     EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMax);
     EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate,
-        DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
+              DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
 
     // Case 3 - COOLING mode - only latent load
     DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRatMax = 0.009;
@@ -2889,7 +2889,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
     // if cooling coil meets cooling set point temperature expect cooling coil water flow to be less than max water flow
     EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMax);
     EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate,
-        DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
+              DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
@@ -7482,6 +7482,25 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
                 0.0001);                                                          // fan PLR at minimum speed
     EXPECT_LT(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMaxOutletTemp); // outlet temperature does not exceed max limit
 
+    // test with 0 water flow rate to ensure divide by 0 does not happen (plant off, size = 0, etc.)
+    Real64 saveSystemHeatWaterFlowRate = thisSys->MaxHeatCoilFluidFlow;
+    // test that heating coil was operating prior to the next call to simulate
+    EXPECT_GT(DataLoopNode::Node(thisSys->HeatCoilFluidInletNode).MassFlowRate, 0.0);
+    EXPECT_GT(WaterCoils::WaterCoil(thisSys->m_HeatingCoilIndex).TotWaterHeatingCoilRate, 0.0);
+    EXPECT_LT(DataLoopNode::Node(thisSys->HeatCoilInletNodeNum).Temp, DataLoopNode::Node(thisSys->HeatCoilOutletNodeNum).Temp);
+    thisSys->MaxHeatCoilFluidFlow = 0.0;
+    // use a smaller heat load so fan heat exceeds the load and the SZVAV model will be called
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).SequencedOutputRequiredToHeatingSP(1) = 800.0;
+    thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
+    // test that heating coil was NOT operating due to this specific test
+    // the fact that the unit test proceeded to here means the program did not crash
+    EXPECT_EQ(1.0, thisSys->m_HeatingPartLoadFrac);                                   // model tried to turn on coil
+    EXPECT_EQ(0.0, DataLoopNode::Node(thisSys->HeatCoilFluidInletNode).MassFlowRate); // these show coil is off
+    EXPECT_EQ(0.0, WaterCoils::WaterCoil(thisSys->m_HeatingCoilIndex).TotWaterHeatingCoilRate);
+    EXPECT_EQ(DataLoopNode::Node(thisSys->HeatCoilInletNodeNum).Temp, DataLoopNode::Node(thisSys->HeatCoilOutletNodeNum).Temp);
+    // reset for next unit tests
+    thisSys->MaxHeatCoilFluidFlow = saveSystemHeatWaterFlowRate;
+
     // increase heating load so that upper temperature limit is reached
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = 6000.0; // heating load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = 8000.0;
@@ -7658,6 +7677,23 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     EXPECT_NEAR(thisSys->CoolCoilWaterFlowRatio, 0.392, 0.001);                           // cooling coil water flow ratio, cooling coil is on
     EXPECT_NEAR(thisSys->FanPartLoadRatio, 0.5117, 0.0001);                               // fan PLR above minimum speed
     EXPECT_NEAR(DataLoopNode::Node(OutletNode).Temp, thisSys->DesignMinOutletTemp, 0.01); // outlet temperature modulated to meet max limit
+
+    // test with 0 water flow rate to ensure divide by 0 does not happen (plant off, size = 0, etc.)
+    Real64 saveSystemCoolWaterFlowRate = thisSys->MaxCoolCoilFluidFlow;
+    // test that cooling coil was operating prior to the next call to simulate
+    EXPECT_GT(DataLoopNode::Node(thisSys->CoolCoilFluidInletNode).MassFlowRate, 0.0);
+    EXPECT_GT(WaterCoils::WaterCoil(thisSys->m_CoolingCoilIndex).TotWaterCoolingCoilRate, 0.0);
+    EXPECT_GT(DataLoopNode::Node(thisSys->CoolCoilInletNodeNum).Temp, DataLoopNode::Node(thisSys->CoolCoilOutletNodeNum).Temp);
+    thisSys->MaxCoolCoilFluidFlow = 0.0;
+    thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
+    // test that cooling coil was NOT operating due to this specific test
+    // the fact that the unit test proceeded to here means the program did not crash
+    EXPECT_EQ(1.0, thisSys->m_CoolingPartLoadFrac);                                   // model tried to turn on coil
+    EXPECT_EQ(0.0, DataLoopNode::Node(thisSys->CoolCoilFluidInletNode).MassFlowRate); // these show coil is off
+    EXPECT_EQ(0.0, WaterCoils::WaterCoil(thisSys->m_CoolingCoilIndex).TotWaterCoolingCoilRate);
+    EXPECT_EQ(DataLoopNode::Node(thisSys->CoolCoilInletNodeNum).Temp, DataLoopNode::Node(thisSys->CoolCoilOutletNodeNum).Temp);
+    // reset for next unit tests
+    thisSys->MaxCoolCoilFluidFlow = saveSystemCoolWaterFlowRate;
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -18000.0; // cooling load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(ControlZoneNum).OutputRequiredToCoolingSP = -18000.0;
