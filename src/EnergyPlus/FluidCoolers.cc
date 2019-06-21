@@ -2507,6 +2507,8 @@ namespace FluidCoolers {
 
     void clear_state()
     {
+        NumSimpleFluidCoolers = 0;
+        SimpleFluidCooler.clear();
         UniqueSimpleFluidCoolerNames.clear();
         GetFluidCoolerInputFlag = true;
     }
