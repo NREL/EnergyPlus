@@ -6968,6 +6968,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     // We also ask for the zone component load summary because that's necessary to "copy" the load and trigger a potential double conversion
     OutputReportTabular::displayAirLoopComponentLoadSummary = true;
     OutputReportTabular::displayZoneComponentLoadSummary = true;
+    OutputReportTabular::displayFacilityComponentLoadSummary = true;
     DataGlobals::CompLoadReportIsReq = true;
 
 
@@ -7076,13 +7077,19 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     // same Design Days peak and timestep peak as the zone it serves. This is the critical part of the test
     DataSizing::FinalSysSizing(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
 
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = 1;
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = 2;
+    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = coolDDNum;
+    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = heatDDNum;
     DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk(1) = 64;
+    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk(1) = coolTimeOfMax;
     DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk.allocate(numDesDays);
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk(2) = 4;
+    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk(2) = heatTimeOfMax;
 
+
+    // Set up Facility to peak like the zone too
+    DataSizing::CalcFinalFacilitySizing.CoolDDNum = coolDDNum;
+    DataSizing::CalcFinalFacilitySizing.TimeStepNumAtCoolMax = coolTimeOfMax;
+    DataSizing::CalcFinalFacilitySizing.HeatDDNum = heatDDNum;
+    DataSizing::CalcFinalFacilitySizing.TimeStepNumAtHeatMax = heatTimeOfMax;
 
 
     AllocateLoadComponentArrays();
@@ -7091,12 +7098,15 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     // TableName, ReportName, value
     std::vector<std::tuple<std::string, std::string, std::string>> results_strings({
         // -17.4C gives 0.68F
-        {"Heating Peak Conditions", "Zone Component Load Summary",    "        0.68"},
-        {"Heating Peak Conditions", "AirLoop Component Load Summary", "        0.68"},
+        {"Heating Peak Conditions", "Zone Component Load Summary",     "        0.68"},
+        {"Heating Peak Conditions", "AirLoop Component Load Summary",  "        0.68"},
+        {"Heating Peak Conditions", "Facility Component Load Summary", "        0.68"},
 
         // 38C gives 100.4 F
-        {"Cooling Peak Conditions", "Zone Component Load Summary",    "      100.40"},
-        {"Cooling Peak Conditions", "AirLoop Component Load Summary", "      100.40"},
+        {"Cooling Peak Conditions", "Zone Component Load Summary",     "      100.40"},
+        {"Cooling Peak Conditions", "AirLoop Component Load Summary",  "      100.40"},
+        {"Cooling Peak Conditions", "Facility Component Load Summary", "      100.40"},
+
     });
 
     // Would have used bind_text in sqlite3 with a single prepared statement, but m_db is protected in SQLiteProcedures
