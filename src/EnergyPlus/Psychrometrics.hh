@@ -133,7 +133,7 @@ namespace Psychrometrics {
 #endif
 #ifdef EP_cache_PsyTsatFnPb
     extern int const tsatcache_size;
-    extern int const tsatprecision_bits; // 28  //24  //32
+    extern int const tsatprecision_bits;
     extern Int64 const tsatcache_mask;
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
@@ -176,12 +176,11 @@ namespace Psychrometrics {
     struct cached_tsat_h_pb
     {
         // Members
-        Int64 iH;
-        Int64 iPb;
+        Int64 iH_Pb;
         Real64 Tsat;
 
         // Default Constructor
-        cached_tsat_h_pb() : iH(0), iPb(0), Tsat(0.0)
+        cached_tsat_h_pb() : iH_Pb(0), Tsat(0.0)
         {
         }
     };
@@ -770,35 +769,21 @@ namespace Psychrometrics {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Int64 H_tag;
-        Int64 Pb_tag;
+        Int64 H_Pb_tag;
         Int64 hash;
-        Real64 H_tag_r;
-        Real64 Pb_tag_r;
 
 #ifdef EP_psych_stats
         ++NumTimesCalled(iPsyTwbFnTdbWPb_cache);
 #endif
 
-        H_tag = bit_transfer(H, H_tag);
-        Pb_tag = bit_transfer(Pb, Pb_tag);
-
-        H_tag = bit_shift(H_tag, -Grid_Shift);
-        Pb_tag = bit_shift(Pb_tag, -Grid_Shift);
-        hash = bit_and(bit_xor(H_tag, Pb_tag), Int64(tsat_hbp_cache_size - 1));
-
-        if (cached_Tsat_HPb(hash).iH != H_tag || cached_Tsat_HPb(hash).iPb != Pb_tag) {
-            cached_Tsat_HPb(hash).iH = H_tag;
-            cached_Tsat_HPb(hash).iPb = Pb_tag;
-
-            H_tag_r = bit_transfer(bit_shift(H_tag, Grid_Shift), H_tag_r);
-            Pb_tag_r = bit_transfer(bit_shift(Pb_tag, Grid_Shift), Pb_tag_r);
-
-            cached_Tsat_HPb(hash).Tsat = PsyTsatFnHPb(H_tag_r, Pb_tag_r, CalledFrom);
+        H_Pb_tag = bit_transfer(Pb * 10000 + H, H_Pb_tag);
+        H_Pb_tag = bit_shift(H_Pb_tag, -Grid_Shift);
+        hash = bit_and(H_Pb_tag, Int64(tsat_hbp_cache_size - 1));
+        if (cached_Tsat_HPb(hash).iH_Pb != H_Pb_tag ) {
+            cached_Tsat_HPb(hash).iH_Pb = H_Pb_tag;
+            cached_Tsat_HPb(hash).Tsat = PsyTsatFnHPb_raw(H, Pb, CalledFrom);
         }
 
-        //  Twbresult_last = cached_Twb(hash)%Twb
-        //  Twb_result = Twbresult_last
         Tsat_result = cached_Tsat_HPb(hash).Tsat;
 
         return Tsat_result;
@@ -1160,9 +1145,8 @@ namespace Psychrometrics {
 
         Int64 const Grid_Shift(28);                         // Tuned This is a hot spot
         assert(Grid_Shift == 64 - 12 - tsatprecision_bits); // Force Grid_Shift updates when precision bits changes
-        Int64 const Pb_tag(
-                bit_shift(bit_transfer(Press, Grid_Shift), -Grid_Shift)); // Note that 2nd arg to TRANSFER is not used: Only type matters
-//        Int64 const Pb_tag(Press);
+        Int64 const Pb_tag(bit_shift(bit_transfer(Press, Grid_Shift), -Grid_Shift));
+
         Int64 const hash(Pb_tag & tsatcache_mask);
         auto &cTsat(cached_Tsat(hash));
         if (cTsat.iPb != Pb_tag) {
@@ -1170,7 +1154,7 @@ namespace Psychrometrics {
             cTsat.Tsat = PsyTsatFnPb_raw(Press, CalledFrom);
         }
 
-        return cTsat.Tsat; // saturation pressure {Pascals}
+        return cTsat.Tsat; // saturation temperature
     }
 
 #else
