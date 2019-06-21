@@ -53,7 +53,7 @@ Design\;Air\;Flow\;Rate = \frac{{0.5{\rho_{air}}(Fan\;power\;at\;Design\;Air\;Fl
 
 where a fan pressure rise of 190 Pascals and total fan efficiency of 0.5 are assumed.
 
-\textbf{\emph{Field: Design Fan Power}}
+\paragraph{Field: Design Fan Power}\label{field-design-fan-power}
 
 This numeric field contains the fan power (in watts) at the design air flow rate specified in the previous field. A value greater than zero must be specified regardless of the tower performance input method, or this field can be autosized. If autosized, the fan power is calculated as follows:
 
@@ -77,7 +77,7 @@ is used.
 
 This numeric field contains the heat transfer coefficient-area product (UA) in watts per Kelvin corresponding to the design air and water flow rates specified above. If the input field ``Performance Input Method'' is specified as ``UFactorTimesAreaAndDesignWaterFlowRate'', then a UA value greater than zero but less than or equal to 300,000 must be defined, or the field can be autosized. If autosized, a Plant Sizing object must be defined and the design tower UA value is derived from the design load to be rejected by the condenser loop and the design loop delta T (Ref. Sizing and Input for Design Calculations and Component Autosizing sections), assuming a tower water inlet temperature of 35C and tower inlet air at 35C drybulb/25.6C wetbulb. If ``Performance Input Method'' is specified as ``NominalCapacity'', then this field must be left blank since the model automatically calculates the tower UA based on the tower capacity specified in the field ``Nominal Capacity''.
 
-\paragraph{Field:Free Convection Regime Air Flow Rate}\label{fieldfree-convection-regime-air-flow-rate}
+\paragraph{Field: Free Convection Regime Air Flow Rate}\label{fieldfree-convection-regime-air-flow-rate}
 
 This numeric field contains the air flow rate (m\(^{3}\)/s) when the tower is in the ``free convection'' regime (water flow exists but tower fan is turned off). This value must be less than the value specified for the field ``Design Air Flow Rate''. This field may be autocalculated, in which case it is set to a fraction of the ``Design Air Flow Rate'' determined in the following input field. If the user does not wish to model ``free convection'' and is using the Performance Input Method ``UFactorTimesAreaAndDesignWaterFlowRate'', then this field should be set to 0.0. If the user specifies the U-Factor Times Area Value at Free Convection Air Flow Rate or Free Convection Capacity as a value greater than zero, then the free convection air flow rate must be specified greater than 0.0.
 
@@ -85,7 +85,7 @@ This numeric field contains the air flow rate (m\(^{3}\)/s) when the tower is in
 
 This numeric field contains the sizing factor to use when calculating the free convection regime air flow rate.~ The default is 0.1.
 
-\paragraph{Field:Free Convection Regine U-Factor Times Area Value}\label{fieldfree-convection-regine-u-factor-times-area-value}
+\paragraph{Field: Free Convection Regime U-Factor Times Area Value}\label{fieldfree-convection-regine-u-factor-times-area-value}
 
 This numeric field contains the heat transfer coefficient-area product (W/K) when the tower is in the ``free convection'' regime (water flow exists but tower fan is turned off). This value must be less than the value specified for the field ``U-Factor Times Area Value at Design Air Flow Rate''. This field may be autosized, in which case it is set to a fraction of the ``U-Factor Times Area Value at Design Air Flow Rate'' determined in the following input field. If the user does not wish to model ``free convection'' and is using the~ Performance Input Method ``UFactorTimesAreaAndDesignWaterFlowRate'', then this field should be set to 0.0. If ``Performance Input Method'' is specified as ``NominalCapacity'', then this field must be left blank since the model automatically calculates the tower UA based on the tower capacity specified in the field ``Free Convection Capacity''.\textbackslash{}
 
@@ -112,6 +112,22 @@ This numeric input field contains the ``nominal'' heat rejection capacity of the
 \paragraph{Field: Free Convection Nominal Capacity Sizing Factor}\label{field-free-convection-nominal-capacity-sizing-factor}
 
 This numeric field contains the sizing factor to use when calculating the Free Convection Capacity. The default is 0.1.
+
+\paragraph{Field: Design Inlet Air Dry-Bulb Temperature}\label{field-design-inlet-air-drybulb-temperature}
+
+This numeric field specifies the design inlet air dry-bulb temperature of the tower. The default is 35.0\(*^{\circ}\)C.
+
+\paragraph{Field: Design Inlet Air Wet-Bulb Temperature}\label{field-design-inlet-air-wetbulb-temperature}
+
+This numeric field specifies the design inlet air wet-bulb temperature of the tower. The default is 25.6\(*^{\circ}\)C.
+
+\paragraph{Field: Design Approach Temperature}\label{field-design-approach-temperature}
+
+This numeric field specifies the design approach temperature of the tower corresponding to the design inlet air wet-bulb temperature and the design temperature range.  The approach temperature should be the outlet water temperature minus the inlet air wet-bulb temperature at design conditions. This parameter is autosizable and when autosized it is set to 3.9\(*^{\circ}\)C.
+
+\paragraph{Field: Design Temperature Range}\label{field-design-temperature-range}
+
+This numeric field specifies the design  temperature range of the tower corresponding to the design inlet air wet-bulb temperature and the design approach temperature.  The design range  should be the inlet water temperature minus the outlet water temperature at design conditions. This parameter is autosizable and when autosized it is set to 5.5\(*^{\circ}\)C.
 
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity}
 

@@ -3899,7 +3899,7 @@ Linear \to Eff = {A_0} + {A_1}\cdot PLR
 
 \paragraph{Field: Nominal Thermal Efficiency}\label{field-nominal-thermal-efficiency}
 
-This required numeric field contains the heating efficiency (as a fraction between 0 and 1) of the boiler's burner.~ This is the efficiency relative to the higher heating value (HHV) of fuel at a part load ratio of 1.0 and the temperature entered for the Design Boiler Water Outlet Temp. Manufacturers typically specify the efficiency of a boiler using the higher heating value of the fuel. For the rare occurences when a manufacturers (or particular data set) thermal efficiency is based on the lower heating value (LHV) of the fuel, multiply the thermal efficiency by the lower-to-higher heating value ratio. For example, assume a fuel's lower and higher heating values are approximately 45,450 and 50,000 kJ/kg, respectively. For a manuracturers thermal effiency rating of 0.90 (based on the LHV), the nominal thermal efficiency entered here is 0.82 (i.e.~0.9 multiplied by 45,450/50,000).
+This required numeric field contains the heating efficiency (as a fraction between 0 and 1) of the boiler's burner.~ This is the efficiency relative to the higher heating value (HHV) of fuel at a part load ratio of 1.0. Manufacturers typically specify the efficiency of a boiler using the higher heating value of the fuel. For the rare occurences when a manufacturers (or particular data set) thermal efficiency is based on the lower heating value (LHV) of the fuel, multiply the thermal efficiency by the lower-to-higher heating value ratio. For example, assume a fuel's lower and higher heating values are approximately 45,450 and 50,000 kJ/kg, respectively. For a manuracturers thermal effiency rating of 0.90 (based on the LHV), the nominal thermal efficiency entered here is 0.82 (i.e.~0.9 multiplied by 45,450/50,000).
 
 \paragraph{Field: Efficiency Curve Temperature Evaluation Variable}\label{field-efficiency-curve-temperature-evaluation-variable}
 
@@ -3946,7 +3946,7 @@ T\(_{w}\) = boiler water temperature {[}ºC{]} {]}, this can be either entering 
 
 \paragraph{Field: Design Water Flow Rate}\label{field-design-water-flow-rate-001}
 
-This numeric field contains the maximum design water volumetric flow rate in m\(^{3}\)/sec.~This should be the largest flow rate than can be heated to the design outlet temperature. This field is autosizable.
+This numeric field contains the maximum design water volumetric flow rate in m\(^{3}\)/sec.~This should be the largest flow rate than can be heated. This field is autosizable.
 
 \paragraph{Field: Minimum Part Load Ratio}\label{field-minimum-part-load-ratio-9}
 
@@ -3999,7 +3999,6 @@ An example of this statement in an IDF is:
       EnteringBoiler       !- Efficiency Curve Temperature Evaluation Variable
       0.89,                !- Nominal Thermal Efficiency
       CondensingBoilerEff, !- Boiler Efficiency Curve Name
-      75,                  !- Design Boiler Water Outlet Temp {C}
       0.0021,              !- Max Design Boiler Water Flow Rate {m3/s}
       0.10,                !- Minimum Part Load Ratio
       1.00,                !- Maximum Part Load Ratio
@@ -6150,7 +6149,7 @@ Other considerations for applying cold thermal storage objects include:
 
 \subsection{ThermalStorage:Ice:Simple}\label{thermalstorageicesimple}
 
-This thermal storage model is based on a simple simulation of an ice storage tank with a fixed capacity.~ The tank is charged, or frozen, in an ice-on-coil configuration where ice builds up on the outside of the tubes carrying the brine or glycol solution from the chiller.~ There are two discharge (melt) options, internal or external.~ Internal melt uses the same fluid tubes for charging and discharging.~ External melt uses a separate fluid path for discharge such that the outer layers of ice melt first.~ The ice storage model includes an implied 3-way valve to control the amount if charge/discharge based on the incoming water temperature and the outlet node setpoint temperature.~ The storage tank is assumed to be fully charged (full of ice) at the beginning of each environment.~ The tank is then allowed to charge and discharge during the warmup days of the environment.~ The tank is best controlled using the \hyperref[plantequipmentoperationcomponentsetpoint]{PlantEquipmentOperation:ComponentSetpoint} plant operation scheme, and requires that a setpoint be placed by a set point manager on the ice storage Plant Outlet Node.
+This thermal storage model is based on a simple simulation of an ice storage tank with a fixed capacity.~ The tank is charged, or frozen, in an ice-on-coil configuration where ice builds up on the outside of the tubes carrying the brine or glycol solution from the chiller.~ There are two discharge (melt) options, internal or external.~ Internal melt uses the same fluid tubes for charging and discharging.~ External melt uses a separate fluid path for discharge such that the outer layers of ice melt first.~ The ice storage model includes an implied 3-way valve to control the amount of charge/discharge based on the incoming water temperature and the outlet node setpoint temperature.~ The storage tank is assumed to be fully charged (full of ice) at the beginning of each environment.~ The tank is then allowed to charge and discharge during the warmup days of the environment.~ The tank is best controlled using the \hyperref[plantequipmentoperationcomponentsetpoint]{PlantEquipmentOperation:ComponentSetpoint} plant operation scheme, and requires that a setpoint be placed by a set point manager on the ice storage Plant Outlet Node.
 
 The input fields for the object are described in detail below:
 

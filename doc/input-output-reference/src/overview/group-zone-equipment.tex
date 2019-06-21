@@ -313,8 +313,13 @@ Examples of this statement in an IDF are:
       Zone1DirectAir,          !- Zone Equipment 1 Name
       1,                       !- Zone Equipment 1 Cooling Sequence
       1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+      0.5,                     !- Zone Equipment 1 Sequential Cooling Fraction
+      0.5,                     !- Zone Equipment 1 Sequential Heating Fraction
       ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
       Zone1WTAHP,              !- Zone Equipment 2 Name
       2,                       !- Zone Equipment 2 Cooling Sequence
-      2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+      2,                       !- Zone Equipment 2 Heating or No-Load Sequence
+      0.5,                     !- Zone Equipment 2 Sequential Cooling Fraction
+      0.5;                     !- Zone Equipment 2 Sequential Heating Fraction
+
 \end{lstlisting}
