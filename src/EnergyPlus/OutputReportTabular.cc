@@ -12894,9 +12894,12 @@ namespace OutputReportTabular {
                 // them for specific design day and time of max
                 for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
                     if (!ZoneEquipConfig(iZone).IsControlled) continue;
+                    // In case of IP reporting, the ZoneCoolCompLoadTables already has the conversion done above,
+                    // so we'd end up calling it twice wrongly.
                     if (displayZoneComponentLoadSummary &&
                         (AirLoopZonesCoolCompLoadTables(iZone).desDayNum == ZoneCoolCompLoadTables(iZone).desDayNum) &&
-                        (AirLoopZonesCoolCompLoadTables(iZone).timeStepMax == ZoneCoolCompLoadTables(iZone).timeStepMax)) {
+                        (AirLoopZonesCoolCompLoadTables(iZone).timeStepMax == ZoneCoolCompLoadTables(iZone).timeStepMax) &&
+                        (OutputReportTabular::unitsStyle != OutputReportTabular::unitsStyleInchPound)) {
                         AirLoopZonesCoolCompLoadTables(iZone) = ZoneCoolCompLoadTables(iZone);
                     } else {
                         coolDesSelected = AirLoopZonesCoolCompLoadTables(iZone).desDayNum;
@@ -12931,7 +12934,8 @@ namespace OutputReportTabular {
                     }
                     if (displayZoneComponentLoadSummary &&
                         (AirLoopZonesHeatCompLoadTables(iZone).desDayNum == ZoneHeatCompLoadTables(iZone).desDayNum) &&
-                        (AirLoopZonesHeatCompLoadTables(iZone).timeStepMax == ZoneHeatCompLoadTables(iZone).timeStepMax)) {
+                        (AirLoopZonesHeatCompLoadTables(iZone).timeStepMax == ZoneHeatCompLoadTables(iZone).timeStepMax) &&
+                        (OutputReportTabular::unitsStyle != OutputReportTabular::unitsStyleInchPound)) {
                         AirLoopZonesHeatCompLoadTables(iZone) = ZoneHeatCompLoadTables(iZone);
                     } else {
                         heatDesSelected = AirLoopZonesHeatCompLoadTables(iZone).desDayNum;
@@ -13013,7 +13017,8 @@ namespace OutputReportTabular {
                 mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
                 if (mult == 0.0) mult = 1.0;
                 if (displayZoneComponentLoadSummary && (timeCoolMax == ZoneCoolCompLoadTables(iZone).desDayNum) &&
-                    (timeCoolMax == ZoneCoolCompLoadTables(iZone).timeStepMax)) {
+                    (timeCoolMax == ZoneCoolCompLoadTables(iZone).timeStepMax) &&
+                    (OutputReportTabular::unitsStyle != OutputReportTabular::unitsStyleInchPound)) {
                     FacilityZonesCoolCompLoadTables(iZone) = ZoneCoolCompLoadTables(iZone);
                 } else {
                     GetDelaySequences(coolDesSelected,
@@ -13048,7 +13053,8 @@ namespace OutputReportTabular {
                 CombineLoadCompResults(FacilityCoolCompLoadTables, FacilityZonesCoolCompLoadTables(iZone), mult);
 
                 if (displayZoneComponentLoadSummary && (timeHeatMax == ZoneHeatCompLoadTables(iZone).desDayNum) &&
-                    (timeHeatMax == ZoneHeatCompLoadTables(iZone).timeStepMax)) {
+                    (timeHeatMax == ZoneHeatCompLoadTables(iZone).timeStepMax) &&
+                    (OutputReportTabular::unitsStyle != OutputReportTabular::unitsStyleInchPound)) {
                     FacilityZonesHeatCompLoadTables(iZone) = ZoneHeatCompLoadTables(iZone);
                 } else {
                     GetDelaySequences(heatDesSelected,
