@@ -72,7 +72,7 @@ namespace EnergyPlus {
 #define EP_cache_PsyTwbFnTdbWPb
 #define EP_cache_PsyPsatFnTemp
 #undef EP_cache_PsyTsatFnPb
-#undef EP_cache_PsyTsatFnHPb
+#define EP_cache_PsyTsatFnHPb
 #endif
 #define EP_psych_errors
 
@@ -176,11 +176,12 @@ namespace Psychrometrics {
     struct cached_tsat_h_pb
     {
         // Members
-        Int64 iH_Pb;
+        Int64 iH;
+        Int64 iPb;
         Real64 Tsat;
 
         // Default Constructor
-        cached_tsat_h_pb() : iH_Pb(0), Tsat(0.0)
+        cached_tsat_h_pb() : iH(0), iPb(0), Tsat(0.0)
         {
         }
     };
@@ -769,18 +770,22 @@ namespace Psychrometrics {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Int64 H_Pb_tag;
+        Int64 H_tag;
+        Int64 Pb_tag;
         Int64 hash;
 
 #ifdef EP_psych_stats
         ++NumTimesCalled(iPsyTwbFnTdbWPb_cache);
 #endif
 
-        H_Pb_tag = bit_transfer(Pb * 10000 + H, H_Pb_tag);
-        H_Pb_tag = bit_shift(H_Pb_tag, -Grid_Shift);
-        hash = bit_and(H_Pb_tag, Int64(tsat_hbp_cache_size - 1));
-        if (cached_Tsat_HPb(hash).iH_Pb != H_Pb_tag ) {
-            cached_Tsat_HPb(hash).iH_Pb = H_Pb_tag;
+        H_tag = bit_transfer(H, H_tag);
+        H_tag = bit_shift(H_tag, -Grid_Shift);
+        Pb_tag = bit_transfer(Pb, Pb_tag);
+        Pb_tag = bit_shift(Pb_tag, -Grid_Shift);
+        hash = bit_and(bit_xor(H_tag, Pb_tag), Int64(tsat_hbp_cache_size - 1));
+        if (cached_Tsat_HPb(hash).iH != H_tag || cached_Tsat_HPb(hash).iPb != Pb_tag) {
+            cached_Tsat_HPb(hash).iH = H_tag;
+            cached_Tsat_HPb(hash).iPb = Pb_tag;
             cached_Tsat_HPb(hash).Tsat = PsyTsatFnHPb_raw(H, Pb, CalledFrom);
         }
 
