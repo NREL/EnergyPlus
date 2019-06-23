@@ -59,9 +59,6 @@ namespace EnergyPlus {
 
 namespace FluidCoolers {
 
-    // Using/Aliasing
-
-    // Data
     // MODULE PARAMETER DEFINITIONS:
     extern std::string const cFluidCooler_SingleSpeed;
     extern std::string const cFluidCooler_TwoSpeed;
@@ -71,8 +68,6 @@ namespace FluidCoolers {
 
     extern int const FluidCooler_SingleSpeed;
     extern int const FluidCooler_TwoSpeed;
-
-    // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumSimpleFluidCoolers; // Number of similar fluid coolers
@@ -86,27 +81,10 @@ namespace FluidCoolers {
     extern int WaterInletNode;       // Node number at fluid cooler inlet
     extern int WaterOutletNode;      // Node number at fluid cooler outlet
     extern Real64 WaterMassFlowRate; // WaterMassFlowRate through fluid cooler
-    // DSU this is plant level stuff now  :: FluidCoolerMassFlowRateMax     = 0.0    ! Max Hardware Mass Flow Rate
-    // DSU this is plant level stuff now  :: FluidCoolerMassFlowRateMin     = 0.0    ! Min Hardware Mass Flow Rate
-    // DSU this is plant level stuff now  :: LoopMassFlowRateMaxAvail = 0.0    ! Max Loop Mass Flow Rate available
-    // DSU this is plant level stuff now  :: LoopMassFlowRateMinAvail = 0.0    ! Min Loop Mass Flow Rate available
     extern Real64 Qactual;  // Fluid cooler heat transfer
     extern Real64 FanPower; // Fluid cooler fan power used
 
     extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE CondenserLoopFluidCoolers
-
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-    // also, calculates UA based on nominal capacity input(s)
-
-    // Update routines to check convergence and update nodes
-
-    // Types
 
     struct FluidCoolerspecs
     {
@@ -162,6 +140,8 @@ namespace FluidCoolers {
         int LoopSideNum;
         int BranchNum;
         int CompNum;
+        bool oneTimeInit;
+        bool beginEnvrnInit;
 
         // Default Constructor
         FluidCoolerspecs()
@@ -176,7 +156,8 @@ namespace FluidCoolers {
               FluidCoolerLowSpeedNomCapSizingFactor(0.0), WaterInletNodeNum(0), WaterOutletNodeNum(0), OutdoorAirInletNodeNum(0),
               HighMassFlowErrorCount(0), HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0), OutletWaterTempErrorIndex(0),
               SmallWaterMassFlowErrorCount(0), SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0), WMFRLessThanMinAvailErrIndex(0),
-              WMFRGreaterThanMaxAvailErrCount(0), WMFRGreaterThanMaxAvailErrIndex(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0)
+              WMFRGreaterThanMaxAvailErrCount(0), WMFRGreaterThanMaxAvailErrIndex(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
+              oneTimeInit(true), beginEnvrnInit(true)
         {
         }
     };
@@ -234,65 +215,35 @@ namespace FluidCoolers {
                          std::string &FluidCoolerName,
                          int &CompIndex,
                          bool &RunFlag,
-                         bool const InitLoopEquip,
+                         bool InitLoopEquip,
                          Real64 &MaxCap,
                          Real64 &MinCap,
                          Real64 &OptCap);
 
-    // End CondenserLoopFluidCoolers Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of CondenserLoopFluidCoolers Module Get Input subroutines
-    //******************************************************************************
-
     void GetFluidCoolerInput();
-
-    // End of Get Input subroutines for the CondenserLoopFluidCoolers Module
-    //******************************************************************************
-
-    // Beginning Initialization Section for the CondenserLoopFluidCoolers Module
-    //******************************************************************************
 
     void InitSimVars();
 
-    void InitFluidCooler(int const FluidCoolerNum, // Number of the current fluid cooler being simulated
-                         bool const RunFlag        // TRUE if fluid cooler is ON
+    void InitFluidCooler(int FluidCoolerNum, // Number of the current fluid cooler being simulated
+                         bool RunFlag        // TRUE if fluid cooler is ON
     );
 
-    void SizeFluidCooler(int const FluidCoolerNum);
-
-    // End Initialization Section for the CondenserLoopFluidCoolers Module
-    //******************************************************************************
-
-    // Beginning of the CondenserLoopFluidCoolers Module Simulation Subroutines
-    // *****************************************************************************
+    void SizeFluidCooler(int FluidCoolerNum);
 
     void SingleSpeedFluidCooler(int &FluidCoolerNum);
 
     void TwoSpeedFluidCooler(int &FluidCoolerNum);
 
     void SimSimpleFluidCooler(
-        int const FluidCoolerNum, Real64 const _WaterMassFlowRate, Real64 const AirFlowRate, Real64 const UAdesign, Real64 &_OutletWaterTemp);
+        int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
 
-    Real64 SimpleFluidCoolerUAResidual(Real64 const UA,          // UA of fluid cooler
+    Real64 SimpleFluidCoolerUAResidual(Real64 UA,          // UA of fluid cooler
                                        Array1<Real64> const &Par // par(1) = design fluid cooler load [W]
     );
 
-    // End of the CondenserLoopFluidCoolers Module Simulation Subroutines
-    // *****************************************************************************
+    void UpdateFluidCooler(int FluidCoolerNum);
 
-    // Beginning of Record Keeping subroutines for the FluidCooler Module
-    // *****************************************************************************
-
-    void UpdateFluidCooler(int const FluidCoolerNum);
-
-    // End of Record Keeping subroutines for the FluidCooler Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the FluidCooler Module
-    // *****************************************************************************
-
-    void ReportFluidCooler(bool const RunFlag, int const FluidCoolerNum);
+    void ReportFluidCooler(bool RunFlag, int FluidCoolerNum);
 
     void clear_state();
 

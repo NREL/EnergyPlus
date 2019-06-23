@@ -265,7 +265,7 @@ namespace FluidCoolers {
         int NumAlphas;                    // Number of elements in the alpha array
         int NumNums;                      // Number of elements in the numeric array
         int IOStat;                       // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);   // Logical flag set .TRUE. if errors found while getting input data
+        bool ErrorsFound(false);   // Logical flag set .TRUE. if errors found while getting input data
         Array1D<Real64> NumArray(16);     // Numeric input data array
         Array1D_string AlphArray(5);      // Character string input data array
 
@@ -852,25 +852,11 @@ namespace FluidCoolers {
         static std::string const RoutineName("InitFluidCooler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // Flag if input data errors are found
-        static bool MyOneTimeFlag(true);
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool OneTimeFlagForEachFluidCooler;
+        bool ErrorsFound(false); // Flag if input data errors are found
         int TypeOf_Num(0);
         Real64 rho; // local density of fluid
 
-        // Do the one time initializations
-        if (MyOneTimeFlag) {
-
-            MyEnvrnFlag.allocate(NumSimpleFluidCoolers);
-            OneTimeFlagForEachFluidCooler.allocate(NumSimpleFluidCoolers);
-
-            OneTimeFlagForEachFluidCooler = true;
-            MyEnvrnFlag = true;
-            MyOneTimeFlag = false;
-        }
-
-        if (OneTimeFlagForEachFluidCooler(FluidCoolerNum)) {
+        if (SimpleFluidCooler(FluidCoolerNum).oneTimeInit) {
 
             if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == FluidCooler_SingleSpeed) {
                 TypeOf_Num = DataPlant::TypeOf_FluidCooler_SingleSpd;
@@ -898,11 +884,11 @@ namespace FluidCoolers {
                 ShowFatalError("InitFluidCooler: Program terminated due to previous condition(s).");
             }
 
-            OneTimeFlagForEachFluidCooler(FluidCoolerNum) = false;
+            SimpleFluidCooler(FluidCoolerNum).oneTimeInit = false;
         }
 
         // Begin environment initializations
-        if (MyEnvrnFlag(FluidCoolerNum) && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (SimpleFluidCooler(FluidCoolerNum).beginEnvrnInit && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
                                    DataGlobals::InitConvTemp,
@@ -917,11 +903,11 @@ namespace FluidCoolers {
                                SimpleFluidCooler(FluidCoolerNum).LoopSideNum,
                                SimpleFluidCooler(FluidCoolerNum).BranchNum,
                                SimpleFluidCooler(FluidCoolerNum).CompNum);
-            MyEnvrnFlag(FluidCoolerNum) = false;
+            SimpleFluidCooler(FluidCoolerNum).beginEnvrnInit = false;
         }
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(FluidCoolerNum) = true;
+            SimpleFluidCooler(FluidCoolerNum).beginEnvrnInit = true;
         }
 
         // Each time initializations
