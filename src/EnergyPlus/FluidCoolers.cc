@@ -150,7 +150,7 @@ namespace FluidCoolers {
             GetFluidCoolerInput();
             GetFluidCoolerInputFlag = false;
         }
-        // INITIALIZE
+
         // Find the correct Equipment
         if (CompIndex == 0) {
             FluidCoolerNum = UtilityRoutines::FindItemInList(FluidCoolerName, SimpleFluidCooler);
@@ -233,11 +233,6 @@ namespace FluidCoolers {
         using namespace DataIPShortCuts; // Data for field names, blank numerics
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int FluidCoolerNum;               // Fluid cooler number, reference counter for SimpleFluidCooler data array
-        int NumSingleSpeedFluidCoolers;   // Total number of single-speed Fluid Coolers
-        int SingleSpeedFluidCoolerNumber; // Specific single-speed fluid cooler of interest
-        int NumTwoSpeedFluidCoolers;      // Number of two-speed Fluid Coolers
-        int TwoSpeedFluidCoolerNumber;    // Specific two-speed fluid cooler of interest
         int NumAlphas;                    // Number of elements in the alpha array
         int NumNums;                      // Number of elements in the numeric array
         int IOStat;                       // IO Status when calling get input subroutine
@@ -248,8 +243,8 @@ namespace FluidCoolers {
         //! LKL - still more renaming stuff to go.
 
         // Get number of all Fluid Coolers specified in the input data file (idf)
-        NumSingleSpeedFluidCoolers = inputProcessor->getNumObjectsFound("FluidCooler:SingleSpeed");
-        NumTwoSpeedFluidCoolers = inputProcessor->getNumObjectsFound("FluidCooler:TwoSpeed");
+        int const NumSingleSpeedFluidCoolers = inputProcessor->getNumObjectsFound("FluidCooler:SingleSpeed");
+        int const NumTwoSpeedFluidCoolers = inputProcessor->getNumObjectsFound("FluidCooler:TwoSpeed");
         NumSimpleFluidCoolers = NumSingleSpeedFluidCoolers + NumTwoSpeedFluidCoolers;
 
         if (NumSimpleFluidCoolers <= 0)
@@ -265,9 +260,11 @@ namespace FluidCoolers {
         UniqueSimpleFluidCoolerNames.reserve(NumSimpleFluidCoolers);
         CheckEquipName.dimension(NumSimpleFluidCoolers, true);
 
+        int FluidCoolerNum;
+
         // Load data structures with fluid cooler input data
         cCurrentModuleObject = cFluidCooler_SingleSpeed;
-        for (SingleSpeedFluidCoolerNumber = 1; SingleSpeedFluidCoolerNumber <= NumSingleSpeedFluidCoolers; ++SingleSpeedFluidCoolerNumber) {
+        for (int SingleSpeedFluidCoolerNumber = 1; SingleSpeedFluidCoolerNumber <= NumSingleSpeedFluidCoolers; ++SingleSpeedFluidCoolerNumber) {
             FluidCoolerNum = SingleSpeedFluidCoolerNumber;
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           SingleSpeedFluidCoolerNumber,
@@ -336,7 +333,7 @@ namespace FluidCoolers {
         } // End Single-Speed fluid cooler Loop
 
         cCurrentModuleObject = cFluidCooler_TwoSpeed;
-        for (TwoSpeedFluidCoolerNumber = 1; TwoSpeedFluidCoolerNumber <= NumTwoSpeedFluidCoolers; ++TwoSpeedFluidCoolerNumber) {
+        for (int TwoSpeedFluidCoolerNumber = 1; TwoSpeedFluidCoolerNumber <= NumTwoSpeedFluidCoolers; ++TwoSpeedFluidCoolerNumber) {
             FluidCoolerNum = NumSingleSpeedFluidCoolers + TwoSpeedFluidCoolerNumber;
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           TwoSpeedFluidCoolerNumber,
@@ -809,22 +806,12 @@ namespace FluidCoolers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // Flag if input data errors are found
-        int TypeOf_Num(0);
-        Real64 rho; // local density of fluid
 
         if (SimpleFluidCooler(FluidCoolerNum).oneTimeInit) {
 
-            if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
-                TypeOf_Num = DataPlant::TypeOf_FluidCooler_SingleSpd;
-            } else if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_TwoSpd) {
-                TypeOf_Num = DataPlant::TypeOf_FluidCooler_TwoSpd;
-            } else {
-                assert(false);
-            }
-
             // Locate the tower on the plant loops for later usage
             PlantUtilities::ScanPlantLoopsForObject(SimpleFluidCooler(FluidCoolerNum).Name,
-                                    TypeOf_Num,
+                                                    SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num,
                                     SimpleFluidCooler(FluidCoolerNum).LoopNum,
                                     SimpleFluidCooler(FluidCoolerNum).LoopSideNum,
                                     SimpleFluidCooler(FluidCoolerNum).BranchNum,
@@ -846,7 +833,7 @@ namespace FluidCoolers {
         // Begin environment initializations
         if (SimpleFluidCooler(FluidCoolerNum).beginEnvrnInit && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
-            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
+            Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
                                    DataGlobals::InitConvTemp,
                                                     DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidIndex,
                                    RoutineName);
@@ -924,7 +911,6 @@ namespace FluidCoolers {
         static std::string const CalledFrom("SizeFluidCooler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int PltSizCondNum(0);           // Plant Sizing index for condenser loop
         int SolFla;                     // Flag of solver
         Real64 DesFluidCoolerLoad(0.0); // Design fluid cooler load [W]
         Real64 UA0;                     // Lower bound for UA [W/C]
@@ -936,16 +922,14 @@ namespace FluidCoolers {
         std::string equipName;
         Real64 Cp;                            // local specific heat for fluid
         Real64 rho;                           // local density for fluid
-        Real64 tmpDesignWaterFlowRate;        // local temporary for water volume flow rate
         Real64 tmpHighSpeedFanPower;          // local temporary for high speed fan power
-        Real64 tmpHighSpeedAirFlowRate;       // local temporary for high speed air flow rate
         Real64 tmpHighSpeedEvapFluidCoolerUA; // local temporary for high speed cooler UA
         bool ErrorsFound;
 
-        tmpDesignWaterFlowRate = SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate;
-        tmpHighSpeedAirFlowRate = SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRate;
+        Real64 tmpDesignWaterFlowRate = SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate;
+        Real64 tmpHighSpeedAirFlowRate = SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRate;
         // Find the appropriate Plant Sizing object
-        PltSizCondNum = DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).PlantSizNum;
+        int PltSizCondNum = DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).PlantSizNum;
 
         if (SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized) {
             if (PltSizCondNum > 0) {
@@ -1649,30 +1633,19 @@ namespace FluidCoolers {
         static std::string const RoutineName("SingleSpeedFluidCooler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 AirFlowRate;
-        Real64 UAdesign; // UA value at design conditions (entered by user or calculated)
-        Real64 OutletWaterTempOFF;
-        Real64 FanModeFrac;
-        Real64 FanPowerOn;
-        Real64 CpWater;
         Real64 TempSetPoint = 0.0;
-        int LoopNum;
-        int LoopSideNum;
 
         // set inlet and outlet nodes
         auto & waterInletNode = SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum;
         SimpleFluidCooler(FluidCoolerNum).Qactual = 0.0;
-        FanModeFrac = 0.0;
         SimpleFluidCooler(FluidCoolerNum).FanPower = 0.0;
         SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;
-        LoopNum = SimpleFluidCooler(FluidCoolerNum).LoopNum;
-        LoopSideNum = SimpleFluidCooler(FluidCoolerNum).LoopSideNum;
         {
-            auto const SELECT_CASE_var(DataPlant::PlantLoop(LoopNum).LoopDemandCalcScheme);
+            auto const SELECT_CASE_var(DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                TempSetPoint = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).TempSetPoint;
+                TempSetPoint = DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).LoopSide(SimpleFluidCooler(FluidCoolerNum).LoopSideNum).TempSetPoint;
             } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                TempSetPoint = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).TempSetPointHi;
+                TempSetPoint = DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).LoopSide(SimpleFluidCooler(FluidCoolerNum).LoopSideNum).TempSetPointHi;
             }
         }
 
@@ -1684,17 +1657,18 @@ namespace FluidCoolers {
         }
 
         //   Initialize local variables
-        OutletWaterTempOFF = DataLoopNode::Node(waterInletNode).Temp;
+        Real64 OutletWaterTempOFF = DataLoopNode::Node(waterInletNode).Temp;
         SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp = OutletWaterTempOFF;
 
-        UAdesign = SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA;
-        AirFlowRate = SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRate;
-        FanPowerOn = SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPower;
+        Real64 UAdesign = SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA;
+        Real64 AirFlowRate = SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRate;
+        Real64 FanPowerOn = SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPower;
 
         SimSimpleFluidCooler(FluidCoolerNum, SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate, AirFlowRate, UAdesign, SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp);
 
         if (SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp <= TempSetPoint) {
             //   Setpoint was met with pump ON and fan ON, calculate run-time fraction or just wasn't needed at all
+            Real64 FanModeFrac = 0.0;
             if (SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp != OutletWaterTempOFF) { // don't divide by zero
                 FanModeFrac = (TempSetPoint - OutletWaterTempOFF) / (SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp - OutletWaterTempOFF);
             }
@@ -1704,7 +1678,7 @@ namespace FluidCoolers {
             //    Setpoint was not met, fluid cooler ran at full capacity
             SimpleFluidCooler(FluidCoolerNum).FanPower = FanPowerOn;
         }
-        CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
+        Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
                                                          DataLoopNode::Node(waterInletNode).Temp,
                                                          DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidIndex,
                                         RoutineName);
@@ -1765,51 +1739,38 @@ namespace FluidCoolers {
         static std::string const RoutineName("TwoSpeedFluidCooler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 AirFlowRate;
-        Real64 UAdesign; // UA value at design conditions (entered by user) [W/C]
-        Real64 OutletWaterTempOFF;
-        Real64 OutletWaterTemp1stStage;
-        Real64 OutletWaterTemp2ndStage;
-        Real64 FanModeFrac;
-        Real64 FanPowerLow;
-        Real64 FanPowerHigh;
-        Real64 CpWater;
         Real64 TempSetPoint = 0.0;
-        int LoopNum;
-        int LoopSideNum;
 
         auto & waterInletNode = SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum;
         SimpleFluidCooler(FluidCoolerNum).Qactual = 0.0;
         SimpleFluidCooler(FluidCoolerNum).FanPower = 0.0;
         SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;
-        LoopNum = SimpleFluidCooler(FluidCoolerNum).LoopNum;
-        LoopSideNum = SimpleFluidCooler(FluidCoolerNum).LoopSideNum;
         {
-            auto const SELECT_CASE_var(DataPlant::PlantLoop(LoopNum).LoopDemandCalcScheme);
+            auto const SELECT_CASE_var(DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                TempSetPoint = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).TempSetPoint;
+                TempSetPoint = DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).LoopSide(SimpleFluidCooler(FluidCoolerNum).LoopSideNum).TempSetPoint;
             } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                TempSetPoint = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).TempSetPointHi;
+                TempSetPoint = DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).LoopSide(SimpleFluidCooler(FluidCoolerNum).LoopSideNum).TempSetPointHi;
             }
         }
 
         // MassFlowTol is a parameter to indicate a no flow condition
-        if (SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) return;
+        if (SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).LoopSide(SimpleFluidCooler(FluidCoolerNum).LoopSideNum).FlowLock == 0) return;
 
         // set local variable for fluid cooler
         SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate = DataLoopNode::Node(waterInletNode).MassFlowRate;
-        OutletWaterTempOFF = DataLoopNode::Node(waterInletNode).Temp;
-        OutletWaterTemp1stStage = OutletWaterTempOFF;
-        OutletWaterTemp2ndStage = OutletWaterTempOFF;
-        FanModeFrac = 0.0;
+        Real64 OutletWaterTempOFF = DataLoopNode::Node(waterInletNode).Temp;
+        Real64 OutletWaterTemp1stStage = OutletWaterTempOFF;
+        Real64 OutletWaterTemp2ndStage = OutletWaterTempOFF;
+        Real64 FanModeFrac = 0.0;
 
         if (OutletWaterTempOFF < TempSetPoint) { // already there don't need to run the cooler
             return;
         }
 
-        UAdesign = SimpleFluidCooler(FluidCoolerNum).LowSpeedFluidCoolerUA;
-        AirFlowRate = SimpleFluidCooler(FluidCoolerNum).LowSpeedAirFlowRate;
-        FanPowerLow = SimpleFluidCooler(FluidCoolerNum).LowSpeedFanPower;
+        Real64 UAdesign = SimpleFluidCooler(FluidCoolerNum).LowSpeedFluidCoolerUA;
+        Real64 AirFlowRate = SimpleFluidCooler(FluidCoolerNum).LowSpeedAirFlowRate;
+        Real64 FanPowerLow = SimpleFluidCooler(FluidCoolerNum).LowSpeedFanPower;
 
         SimSimpleFluidCooler(FluidCoolerNum, SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp1stStage);
 
@@ -1825,7 +1786,7 @@ namespace FluidCoolers {
             // Setpoint was not met, turn on fluid cooler 2nd stage fan
             UAdesign = SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA;
             AirFlowRate = SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRate;
-            FanPowerHigh = SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPower;
+            Real64 FanPowerHigh = SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPower;
 
             SimSimpleFluidCooler(FluidCoolerNum, SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp2ndStage);
 
@@ -1840,7 +1801,7 @@ namespace FluidCoolers {
                 SimpleFluidCooler(FluidCoolerNum).FanPower = FanPowerHigh;
             }
         }
-        CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
+        Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
                                                          DataLoopNode::Node(waterInletNode).Temp,
                                                          DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidIndex,
                                         RoutineName);
@@ -1870,53 +1831,37 @@ namespace FluidCoolers {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SimSimpleFluidCooler");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 MdotCpWater;      // Water mass flow rate times the heat capacity [W/K]
-        Real64 InletAirTemp;     // Dry-bulb temperature of air entering the fluid cooler [C]
-        Real64 CpWater;          // Heat capacity of water [J/kg/K]
-        Real64 CpAir;            // Heat capacity of air [J/kg/K]
-        Real64 AirDensity;       // Density of air [kg/m3]
-        Real64 AirMassFlowRate;  // Mass flow rate of air [kg/s]
-        Real64 effectiveness;    // Effectiveness of the heat exchanger [-]
-        Real64 AirCapacity;      // MdotCp of air through the fluid cooler
-        Real64 CapacityRatioMin; // Minimum capacity of airside and waterside
-        Real64 CapacityRatioMax; // Maximum capacity of airside and waterside
-        Real64 CapacityRatio;    // Ratio of minimum to maximum capacity
-        Real64 NumTransferUnits; // Number of transfer Units [NTU]
-        Real64 ETA;              // initialize some local variables
-        Real64 A;                // initialize some local variables
+        if (UAdesign == 0.0) return;
 
         // set local fluid cooler inlet and outlet temperature variables
         _InletWaterTemp = SimpleFluidCooler(FluidCoolerNum).WaterTemp;
         _OutletWaterTemp = _InletWaterTemp;
-        InletAirTemp = SimpleFluidCooler(FluidCoolerNum).AirTemp;
-
-        if (UAdesign == 0.0) return;
+        Real64 InletAirTemp = SimpleFluidCooler(FluidCoolerNum).AirTemp;
 
         // set water and air properties
-        AirDensity =
+        Real64 AirDensity =
                 Psychrometrics::PsyRhoAirFnPbTdbW(SimpleFluidCooler(FluidCoolerNum).AirPress, InletAirTemp, SimpleFluidCooler(FluidCoolerNum).AirHumRat);
-        AirMassFlowRate = AirFlowRate * AirDensity;
-        CpAir = Psychrometrics::PsyCpAirFnWTdb(SimpleFluidCooler(FluidCoolerNum).AirHumRat, InletAirTemp);
-        CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
+        Real64 AirMassFlowRate = AirFlowRate * AirDensity;
+        Real64 CpAir = Psychrometrics::PsyCpAirFnWTdb(SimpleFluidCooler(FluidCoolerNum).AirHumRat, InletAirTemp);
+        Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
                                         _InletWaterTemp,
                                                          DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidIndex,
                                         RoutineName);
 
-        // Calcluate mass flow rates
-        MdotCpWater = _WaterMassFlowRate * CpWater;
-        AirCapacity = AirMassFlowRate * CpAir;
+        // Calculate mass flow rates
+        Real64 MdotCpWater = _WaterMassFlowRate * CpWater;
+        Real64 AirCapacity = AirMassFlowRate * CpAir;
 
         // calculate the minimum to maximum capacity ratios of airside and waterside
-        CapacityRatioMin = min(AirCapacity, MdotCpWater);
-        CapacityRatioMax = max(AirCapacity, MdotCpWater);
-        CapacityRatio = CapacityRatioMin / CapacityRatioMax;
+        Real64 CapacityRatioMin = min(AirCapacity, MdotCpWater);
+        Real64 CapacityRatioMax = max(AirCapacity, MdotCpWater);
+        Real64 CapacityRatio = CapacityRatioMin / CapacityRatioMax;
 
         // Calculate number of transfer units (NTU)
-        NumTransferUnits = UAdesign / CapacityRatioMin;
-        ETA = std::pow(NumTransferUnits, 0.22);
-        A = CapacityRatio * NumTransferUnits / ETA;
-        effectiveness = 1.0 - std::exp((std::exp(-A) - 1.0) / (CapacityRatio / ETA));
+        Real64 NumTransferUnits = UAdesign / CapacityRatioMin;
+        Real64 ETA = std::pow(NumTransferUnits, 0.22);
+        Real64 A = CapacityRatio * NumTransferUnits / ETA;
+        Real64 effectiveness = 1.0 - std::exp((std::exp(-A) - 1.0) / (CapacityRatio / ETA));
 
         // calculate water to air heat transfer
         _Qactual = effectiveness * CapacityRatioMin * (_InletWaterTemp - InletAirTemp);
