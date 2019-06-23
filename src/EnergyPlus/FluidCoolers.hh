@@ -68,6 +68,8 @@ namespace FluidCoolers {
         U_FACTOR
     };
 
+    extern int NumSimpleFluidCoolers; // Number of similar fluid coolers
+
     extern Array1D_bool CheckEquipName;
 
     struct FluidCoolerspecs
@@ -127,6 +129,21 @@ namespace FluidCoolers {
         bool oneTimeInit;
         bool beginEnvrnInit;
 
+        // Report vars
+        Real64 InletWaterTemp;    // Fluid cooler inlet water temperature (C)
+        Real64 OutletWaterTemp;   // Fluid cooler outlet water temperature (C)
+        Real64 WaterMassFlowRate; // Fluid cooler water mass flow rate (m3/s)
+        Real64 Qactual;           // Fluid cooler heat rejection rate (W)
+        Real64 FanPower;          // Fluid cooler fan power (W)
+        Real64 FanEnergy;         // Fluid cooler fan energy consumption (J)
+
+        // Inlet conds
+        Real64 WaterTemp;
+        Real64 AirTemp;
+        Real64 AirHumRat;
+        Real64 AirPress;
+        Real64 AirWetBulb;
+
         // Default Constructor
         FluidCoolerspecs()
             : FluidCoolerType_Num(0), PerformanceInputMethod_Num(PerfInputMethod::NOMINAL_CAPACITY), Available(true), ON(true), DesignWaterFlowRate(0.0),
@@ -141,46 +158,14 @@ namespace FluidCoolers {
               HighMassFlowErrorCount(0), HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0), OutletWaterTempErrorIndex(0),
               SmallWaterMassFlowErrorCount(0), SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0), WMFRLessThanMinAvailErrIndex(0),
               WMFRGreaterThanMaxAvailErrCount(0), WMFRGreaterThanMaxAvailErrIndex(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
-              oneTimeInit(true), beginEnvrnInit(true)
-        {
-        }
-    };
-
-    struct FluidCoolerInletConds
-    {
-        // Members
-        Real64 WaterTemp;  // Fluid cooler water inlet temperature (C)
-        Real64 AirTemp;    // Fluid cooler air inlet dry-bulb temperature (C)
-        Real64 AirWetBulb; // Fluid cooler air inlet wet-bulb temperature (C)
-        Real64 AirPress;   // Fluid cooler air barometric pressure
-        Real64 AirHumRat;  // Fluid cooler air inlet humidity ratio (kg/kg)
-
-        // Default Constructor
-        FluidCoolerInletConds() : WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0), AirPress(0.0), AirHumRat(0.0)
-        {
-        }
-    };
-
-    struct ReportVars
-    {
-        // Members
-        Real64 InletWaterTemp;    // Fluid cooler inlet water temperature (C)
-        Real64 OutletWaterTemp;   // Fluid cooler outlet water temperature (C)
-        Real64 WaterMassFlowRate; // Fluid cooler water mass flow rate (m3/s)
-        Real64 Qactual;           // Fluid cooler heat rejection rate (W)
-        Real64 FanPower;          // Fluid cooler fan power (W)
-        Real64 FanEnergy;         // Fluid cooler fan energy consumption (J)
-
-        // Default Constructor
-        ReportVars() : InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0)
+              oneTimeInit(true), beginEnvrnInit(true), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0),
+              WaterTemp(0.0), AirTemp(0.0), AirHumRat(0.0), AirPress(0.0), AirWetBulb(0.0)
         {
         }
     };
 
     // Object Data
     extern Array1D<FluidCoolerspecs> SimpleFluidCooler;           // dimension to number of machines
-    extern Array1D<FluidCoolerInletConds> SimpleFluidCoolerInlet; // inlet conditions
-    extern Array1D<ReportVars> SimpleFluidCoolerReport;           // report variables
 
     // Functions
     bool TestFluidCoolerSingleSpeedInputForDesign(std::string const &cCurrentModuleObject,

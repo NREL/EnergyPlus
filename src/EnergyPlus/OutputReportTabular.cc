@@ -4848,8 +4848,7 @@ namespace OutputReportTabular {
         using EvaporativeCoolers::NumEvapCool;
         using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
         using EvaporativeFluidCoolers::SimpleEvapFluidCoolerReport;
-        using FluidCoolers::NumSimpleFluidCoolers;
-        using FluidCoolers::SimpleFluidCoolerReport;
+        using FluidCoolers::SimpleFluidCooler;
         using HeatingCoils::HeatingCoil;
         using HeatingCoils::NumHeatingCoils;
         using HVACVariableRefrigerantFlow::NumVRFCond;
@@ -4919,8 +4918,8 @@ namespace OutputReportTabular {
             SysTotalHVACRejectHeatLoss +=
                 SimpleEvapFluidCoolerReport(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCoolerReport(iCooler).FanEnergy;
         }
-        for (iCooler = 1; iCooler <= NumSimpleFluidCoolers; ++iCooler) {
-            SysTotalHVACRejectHeatLoss += SimpleFluidCoolerReport(iCooler).Qactual * TimeStepSysSec + SimpleFluidCoolerReport(iCooler).FanEnergy;
+        for (iCooler = 1; iCooler <= FluidCoolers::NumSimpleFluidCoolers; ++iCooler) {
+            SysTotalHVACRejectHeatLoss += SimpleFluidCooler(iCooler).Qactual * TimeStepSysSec + SimpleFluidCooler(iCooler).FanEnergy;
         }
 
         // Air- and Evap-cooled chiller
