@@ -56,7 +56,7 @@ upon the airflows.
 
 To advance the conservation equations through time, there are a number of
 different options. For now, the first order finite difference discretization in
-time will be used in three different ways. First, the implicit Euler method will
+time will be used in two different ways. First, the implicit Euler method will
 be implemented as follows, with subscript indicating time:
 
 ```
@@ -64,7 +64,8 @@ M_(t+h) = M_t + h*RHS_(t+h)
 ```
 
 where `h` is the timestep. This method is implicit in that the right hand side
-is evaluated at time `t+h`, which requires a solution of simultaneous equations.Fortunately, the methods that are used to solve the airflow problem (e.g. the
+is evaluated at time `t+h`, which requires a solution of simultaneous equations. Fortunately,
+the methods that are used to solve the airflow problem (e.g. the
 skyline approach) may also be used here. The Crank-Nicolson method is an
 alternative semi-implicit approach uses information from both `t` and `t+h`:
 
@@ -72,17 +73,18 @@ alternative semi-implicit approach uses information from both `t` and `t+h`:
 M_(t+h) = M_t + 0.5*h*(RHS_(t+h) + RHS_t)
 ```
 
-This method also requires solution of simultaneous equations. Finally, an
-explicit Euler method will be implemented as
+This method also requires solution of simultaneous equations. In the future, an
+explicit Euler method may be implemented as
 
 ```
 M_(t+h) = M_t + h*RHS_(t)  
 ```
 
-This approach is limited in step size, while the other two are stable for all
-step sizes (though in some cases one will do better than the other). The main
-advantage of the explicit Euler approach is that it does not require solution
-of simulataneous equations.
+This approach was included in the original NFP, but due to the need for warnings and/or
+guidance on the step size limitations of the explicit approach, implementation of this approach
+is deferred for a later release. The main advantage of the explicit Euler approach is that it does
+not require solution of simulataneous equations, and should a need arise for very small step sizes
+the addition of this method will be reconsidered.
 
 ## Engineering Reference ##
 The above "Approach" section will be adapted to the Engineering reference formatand expanded to include additional references.
@@ -119,7 +121,7 @@ AirflowNetwork:MultiZone:Zone,
   A7, \field Contaminant Source Sink 1
       \begin-extensible
       \type object-list
-      \object-list AirflowNetworkContaminantSourceSinks
+      \object-list AirflowNetworkMaterialSourceSinks
   A8, \field Contaminant Source Sink 2
       \type object-list
       \object-list AirflowNetworkMaterialSourceSinks
@@ -154,6 +156,45 @@ AirflowNetwork:Distribution:Linkage,
       \type object-list
       \object-list AirflowNetworkFilters
  ...
+```
+To leverage objects previously in the IDD and avoid repetition, the generic sources and sinks
+will be modified to inlcude a material choice:
+
+```
+ZoneContaminantSourceAndSink:Generic:Constant,
+   \memo Sets internal generic contaminant gains and sinks in a zone with constant values.
+  A1 , \field Name
+       \required-field
+       \type alpha
+       \reference AirflowNetworkMaterialSourceSinks
+  A2 , \field Zone Name
+       \required-field
+       \type object-list
+       \object-list ZoneNames
+  A3 , \field AirflowNetwork Material
+       \type object-list
+       \object-list AirflowNetworkMaterials
+  N1 , \field Design Generation Rate
+       \units m3/s
+       \type real
+       \minimum 0.0
+       \note The values represent source.
+  A3 , \field Generation Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+       \note Value in this schedule should be a fraction (generally 0.0 - 1.0) applied to the Design Generation Rate
+  N2 , \field Design Removal Coefficient
+       \units m3/s
+       \type real
+       \minimum 0.0
+       \note The value represent sink.
+  A4 ; \field Removal Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+       \note Value in this schedule should be a fraction (generally 0.0 - 1.0) applied to the
+       \note Design removal Coefficient
 ```
 
 The simulation control object will be modified to include a simulation option:
@@ -198,7 +239,7 @@ AirflowNetwork:Material,
       \type alpha
       \reference AirflowNetworkMaterials
       \note A unique name for the material.
- N1;  \field Ambient Concentration
+ N1;  \field Default Concentration
       \required-field
       \type real
       \minimum 0
@@ -215,7 +256,7 @@ AirflowNetwork:SimpleFilter,
       \type alpha
       \reference AirflowNetworkFilters
       \note A unique name for the filter.
- A2,  \field Material
+ A2,  \field AirflowNetworkMaterial
       \required-field
       \type object-list
       \object-list AirflowNetworkMaterials
@@ -237,7 +278,7 @@ AirflowNetwork:SourceSink:ConstantCoefficient,
       \type alpha
       \reference AirflowNetworkMaterialSourceSinks
       \note A unique name for the source/sink.
- A2,  \field Material
+ A2,  \field AirflowNetwork Material
       \required-field
       \type object-list
       \object-list AirflowNetworkMaterials
@@ -257,6 +298,16 @@ TBD
 
 ## Example File and Transition Changes ##
 An example file will be created that demonstrates the new feature.
+
+## Discussion and Comments
+
+* Inclusion of explicit solution method (Lixing Gu): The stability issue is hard to address with documentation and/or warnings,
+so leaving this for a future release after the feature has gotten some use is a better path
+* Filter as a full-fledged component with a flow model (Lixing Gu): This would simplify the implementation somewhat, but
+would probably tightly link the flow model and material transport model too much. Considering options for renaming the additional
+field in linkages.
+* Ambient versus default concentration (Lixing Gu): Will rename the ambient concentration field to be default.
+* Use of Material as name (Mike Witte): After further discussion, the terminology "AirflowNetwork Material" will be adopted for use in EnergyPlus 
 
 ## References ##
 Lorenzetti, David M, and Craig P Wray. "Air-Handling System Modeling in EnergyPlus: Recommendations for Meeting Stakeholder Needs." 2014. LBNL-6863E.
