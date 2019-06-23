@@ -1002,9 +1002,7 @@ namespace FluidCoolers {
         bool ErrorsFound;
 
         tmpDesignWaterFlowRate = SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate;
-        tmpHighSpeedFanPower = SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPower;
         tmpHighSpeedAirFlowRate = SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRate;
-        tmpHighSpeedEvapFluidCoolerUA = SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA;
         // Find the appropriate Plant Sizing object
         PltSizCondNum = DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).PlantSizNum;
 
@@ -1714,10 +1712,9 @@ namespace FluidCoolers {
         Real64 UAdesign; // UA value at design conditions (entered by user or calculated)
         Real64 OutletWaterTempOFF;
         Real64 FanModeFrac;
-        Real64 DesignWaterFlowRate;
         Real64 FanPowerOn;
         Real64 CpWater;
-        Real64 TempSetPoint;
+        Real64 TempSetPoint = 0.0;
         int LoopNum;
         int LoopSideNum;
 
@@ -1747,7 +1744,6 @@ namespace FluidCoolers {
         }
 
         //   Initialize local variables
-        DesignWaterFlowRate = SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate;
         OutletWaterTempOFF = DataLoopNode::Node(WaterInletNode).Temp;
         OutletWaterTemp = OutletWaterTempOFF;
 
@@ -1835,11 +1831,10 @@ namespace FluidCoolers {
         Real64 OutletWaterTemp1stStage;
         Real64 OutletWaterTemp2ndStage;
         Real64 FanModeFrac;
-        Real64 DesignWaterFlowRate;
         Real64 FanPowerLow;
         Real64 FanPowerHigh;
         Real64 CpWater;
-        Real64 TempSetPoint;
+        Real64 TempSetPoint = 0.0;
         int LoopNum;
         int LoopSideNum;
 
@@ -1848,7 +1843,6 @@ namespace FluidCoolers {
         Qactual = 0.0;
         FanPower = 0.0;
         OutletWaterTemp = DataLoopNode::Node(WaterInletNode).Temp;
-        FanModeFrac = 0.0;
         LoopNum = SimpleFluidCooler(FluidCoolerNum).LoopNum;
         LoopSideNum = SimpleFluidCooler(FluidCoolerNum).LoopSideNum;
         {
@@ -1864,7 +1858,6 @@ namespace FluidCoolers {
         if (WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0) return;
 
         // set local variable for fluid cooler
-        DesignWaterFlowRate = SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate;
         WaterMassFlowRate = DataLoopNode::Node(WaterInletNode).MassFlowRate;
         OutletWaterTempOFF = DataLoopNode::Node(WaterInletNode).Temp;
         OutletWaterTemp1stStage = OutletWaterTempOFF;
@@ -1916,7 +1909,7 @@ namespace FluidCoolers {
     }
 
     void SimSimpleFluidCooler(
-        int const FluidCoolerNum, Real64 const WaterMassFlowRate, Real64 const AirFlowRate, Real64 const UAdesign, Real64 &OutletWaterTemp)
+        int const FluidCoolerNum, Real64 const _WaterMassFlowRate, Real64 const AirFlowRate, Real64 const UAdesign, Real64 &_OutletWaterTemp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1932,8 +1925,8 @@ namespace FluidCoolers {
         // See methodology for Single Speed or Two Speed Fluid Cooler model
 
         // Locals
-        Real64 InletWaterTemp; // Water inlet temperature
-        Real64 Qactual;        // Actual heat transfer rate between fluid cooler water and air [W]
+        Real64 _InletWaterTemp; // Water inlet temperature
+        Real64 _Qactual;        // Actual heat transfer rate between fluid cooler water and air [W]
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SimSimpleFluidCooler");
@@ -1946,7 +1939,6 @@ namespace FluidCoolers {
         Real64 AirDensity;       // Density of air [kg/m3]
         Real64 AirMassFlowRate;  // Mass flow rate of air [kg/s]
         Real64 effectiveness;    // Effectiveness of the heat exchanger [-]
-        Real64 OutletAirTemp;    // Drybulb temp of exiting moist air [C]
         Real64 AirCapacity;      // MdotCp of air through the fluid cooler
         Real64 CapacityRatioMin; // Minimum capacity of airside and waterside
         Real64 CapacityRatioMax; // Maximum capacity of airside and waterside
@@ -1957,10 +1949,9 @@ namespace FluidCoolers {
 
         WaterInletNode = SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum;
         WaterOutletNode = SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum;
-        Qactual = 0.0;
         // set local fluid cooler inlet and outlet temperature variables
-        InletWaterTemp = SimpleFluidCoolerInlet(FluidCoolerNum).WaterTemp;
-        OutletWaterTemp = InletWaterTemp;
+        _InletWaterTemp = SimpleFluidCoolerInlet(FluidCoolerNum).WaterTemp;
+        _OutletWaterTemp = _InletWaterTemp;
         InletAirTemp = SimpleFluidCoolerInlet(FluidCoolerNum).AirTemp;
 
         if (UAdesign == 0.0) return;
@@ -1971,12 +1962,12 @@ namespace FluidCoolers {
         AirMassFlowRate = AirFlowRate * AirDensity;
         CpAir = Psychrometrics::PsyCpAirFnWTdb(SimpleFluidCoolerInlet(FluidCoolerNum).AirHumRat, InletAirTemp);
         CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
-                                        InletWaterTemp,
+                                        _InletWaterTemp,
                                                          DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidIndex,
                                         RoutineName);
 
         // Calcluate mass flow rates
-        MdotCpWater = WaterMassFlowRate * CpWater;
+        MdotCpWater = _WaterMassFlowRate * CpWater;
         AirCapacity = AirMassFlowRate * CpAir;
 
         // calculate the minimum to maximum capacity ratios of airside and waterside
@@ -1991,15 +1982,12 @@ namespace FluidCoolers {
         effectiveness = 1.0 - std::exp((std::exp(-A) - 1.0) / (CapacityRatio / ETA));
 
         // calculate water to air heat transfer
-        Qactual = effectiveness * CapacityRatioMin * (InletWaterTemp - InletAirTemp);
+        _Qactual = effectiveness * CapacityRatioMin * (_InletWaterTemp - InletAirTemp);
 
-        // calculate new exiting dry bulb temperature of airstream
-        OutletAirTemp = InletAirTemp + Qactual / AirCapacity;
-
-        if (Qactual >= 0.0) {
-            OutletWaterTemp = InletWaterTemp - Qactual / MdotCpWater;
+        if (_Qactual >= 0.0) {
+            _OutletWaterTemp = _InletWaterTemp - _Qactual / MdotCpWater;
         } else {
-            OutletWaterTemp = InletWaterTemp;
+            _OutletWaterTemp = _InletWaterTemp;
         }
     }
 

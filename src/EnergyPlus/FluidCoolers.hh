@@ -272,7 +272,7 @@ namespace FluidCoolers {
     void TwoSpeedFluidCooler(int &FluidCoolerNum);
 
     void SimSimpleFluidCooler(
-        int const FluidCoolerNum, Real64 const WaterMassFlowRate, Real64 const AirFlowRate, Real64 const UAdesign, Real64 &OutletWaterTemp);
+        int const FluidCoolerNum, Real64 const _WaterMassFlowRate, Real64 const AirFlowRate, Real64 const UAdesign, Real64 &_OutletWaterTemp);
 
     Real64 SimpleFluidCoolerUAResidual(Real64 const UA,          // UA of fluid cooler
                                        Array1<Real64> const &Par // par(1) = design fluid cooler load [W]
