@@ -68,15 +68,6 @@ namespace FluidCoolers {
         U_FACTOR
     };
 
-//    extern int NumSimpleFluidCoolers; // Number of similar fluid coolers
-//    extern Real64 m_InletWaterTemp;    // CW temperature at fluid cooler inlet
-//    extern Real64 OutletWaterTemp;   // CW temperature at fluid cooler outlet
-//    extern int m_WaterInletNode;       // Node number at fluid cooler inlet
-//    extern int m_WaterOutletNode;      // Node number at fluid cooler outlet
-//    extern Real64 WaterMassFlowRate; // WaterMassFlowRate through fluid cooler
-//    extern Real64 Qactual;  // Fluid cooler heat transfer
-//    extern Real64 FanPower; // Fluid cooler fan power used
-
     extern Array1D_bool CheckEquipName;
 
     struct FluidCoolerspecs
@@ -214,8 +205,6 @@ namespace FluidCoolers {
                          Real64 &OptCap);
 
     void GetFluidCoolerInput();
-
-    void InitSimVars();
 
     void InitFluidCooler(int FluidCoolerNum, // Number of the current fluid cooler being simulated
                          bool RunFlag        // TRUE if fluid cooler is ON
