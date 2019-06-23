@@ -188,8 +188,8 @@ namespace FluidCoolers {
                 }
                 InitFluidCooler(FluidCoolerNum, RunFlag);
                 SingleSpeedFluidCooler(FluidCoolerNum);
-                UpdateFluidCooler(FluidCoolerNum);
-                ReportFluidCooler(RunFlag, FluidCoolerNum);
+                SimpleFluidCooler(FluidCoolerNum).UpdateFluidCooler();
+                SimpleFluidCooler(FluidCoolerNum).ReportFluidCooler(RunFlag);
 
             } else if (SELECT_CASE_var == DataPlant::TypeOf_FluidCooler_TwoSpd) {
                 if (InitLoopEquip) {
@@ -202,9 +202,8 @@ namespace FluidCoolers {
                 }
                 InitFluidCooler(FluidCoolerNum, RunFlag);
                 TwoSpeedFluidCooler(FluidCoolerNum);
-                UpdateFluidCooler(FluidCoolerNum);
-                ReportFluidCooler(RunFlag, FluidCoolerNum);
-
+                SimpleFluidCooler(FluidCoolerNum).UpdateFluidCooler();
+                SimpleFluidCooler(FluidCoolerNum).ReportFluidCooler(RunFlag);
             } else {
                 ShowFatalError("SimFluidCoolers: Invalid Fluid Cooler Type Requested = " + FluidCoolerType);
             }
@@ -1212,8 +1211,8 @@ namespace FluidCoolers {
                         ShowContinueError("Autosizing of fluid cooler UA failed for fluid cooler = " + SimpleFluidCooler(FluidCoolerNum).Name);
                         ShowContinueError("The final UA value =" + General::RoundSigDigits(UA, 2) + " W/K, and the simulation continues...");
                     } else if (SolFla == -2) {
-                        SimSimpleFluidCooler(int(Par(2)), Par(3), Par(4), UA0, OutWaterTempAtUA0);
-                        SimSimpleFluidCooler(int(Par(2)), Par(3), Par(4), UA1, OutWaterTempAtUA1);
+                        CalcFluidCoolerOutlet(int(Par(2)), Par(3), Par(4), UA0, OutWaterTempAtUA0);
+                        CalcFluidCoolerOutlet(int(Par(2)), Par(3), Par(4), UA1, OutWaterTempAtUA1);
                         ShowSevereError(CalledFrom + ": The combination of design input values did not allow the calculation of a ");
                         ShowContinueError("reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                         ShowContinueError(R"(sizes for some "autosizable" fields while autosizing other "autosizable" fields may be )");
@@ -1326,8 +1325,8 @@ namespace FluidCoolers {
                     ShowContinueError("Autosizing of fluid cooler UA failed for fluid cooler = " + SimpleFluidCooler(FluidCoolerNum).Name);
                     ShowContinueError("The final UA value =" + General::RoundSigDigits(UA, 2) + " W/K, and the simulation continues...");
                 } else if (SolFla == -2) {
-                    SimSimpleFluidCooler(int(Par(2)), Par(3), Par(4), UA0, OutWaterTempAtUA0);
-                    SimSimpleFluidCooler(int(Par(2)), Par(3), Par(4), UA1, OutWaterTempAtUA1);
+                    CalcFluidCoolerOutlet(int(Par(2)), Par(3), Par(4), UA0, OutWaterTempAtUA0);
+                    CalcFluidCoolerOutlet(int(Par(2)), Par(3), Par(4), UA1, OutWaterTempAtUA1);
                     ShowSevereError(CalledFrom + ": The combination of design input values did not allow the calculation of a ");
                     ShowContinueError("reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                     ShowContinueError(R"(sizes for some "autosizable" fields while autosizing other "autosizable" fields may be )");
@@ -1503,8 +1502,8 @@ namespace FluidCoolers {
                     ShowContinueError("Autosizing of fluid cooler UA failed for fluid cooler = " + SimpleFluidCooler(FluidCoolerNum).Name);
                     ShowContinueError("The final UA value at low fan speed =" + General::RoundSigDigits(UA, 2) + " W/C, and the simulation continues...");
                 } else if (SolFla == -2) {
-                    SimSimpleFluidCooler(int(Par(2)), Par(3), Par(4), UA0, OutWaterTempAtUA0);
-                    SimSimpleFluidCooler(int(Par(2)), Par(3), Par(4), UA1, OutWaterTempAtUA1);
+                    CalcFluidCoolerOutlet(int(Par(2)), Par(3), Par(4), UA0, OutWaterTempAtUA0);
+                    CalcFluidCoolerOutlet(int(Par(2)), Par(3), Par(4), UA1, OutWaterTempAtUA1);
                     ShowSevereError(CalledFrom + ": The combination of design input values did not allow the calculation of a ");
                     ShowContinueError("reasonable low-speed UA value. Review and revise design input values as appropriate. ");
                     ShowContinueError(R"(Specifying hard sizes for some "autosizable" fields while autosizing other "autosizable" )");
@@ -1664,7 +1663,8 @@ namespace FluidCoolers {
         Real64 AirFlowRate = SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRate;
         Real64 FanPowerOn = SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPower;
 
-        SimSimpleFluidCooler(FluidCoolerNum, SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate, AirFlowRate, UAdesign, SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp);
+        CalcFluidCoolerOutlet(FluidCoolerNum, SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate, AirFlowRate,
+                              UAdesign, SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp);
 
         if (SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp <= TempSetPoint) {
             //   Setpoint was met with pump ON and fan ON, calculate run-time fraction or just wasn't needed at all
@@ -1772,7 +1772,8 @@ namespace FluidCoolers {
         Real64 AirFlowRate = SimpleFluidCooler(FluidCoolerNum).LowSpeedAirFlowRate;
         Real64 FanPowerLow = SimpleFluidCooler(FluidCoolerNum).LowSpeedFanPower;
 
-        SimSimpleFluidCooler(FluidCoolerNum, SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp1stStage);
+        CalcFluidCoolerOutlet(FluidCoolerNum, SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate, AirFlowRate,
+                              UAdesign, OutletWaterTemp1stStage);
 
         if (OutletWaterTemp1stStage <= TempSetPoint) {
             // Setpoint was met with pump ON and fan ON 1st stage, calculate fan mode fraction
@@ -1788,7 +1789,8 @@ namespace FluidCoolers {
             AirFlowRate = SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRate;
             Real64 FanPowerHigh = SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPower;
 
-            SimSimpleFluidCooler(FluidCoolerNum, SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp2ndStage);
+            CalcFluidCoolerOutlet(FluidCoolerNum, SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate, AirFlowRate,
+                                  UAdesign, OutletWaterTemp2ndStage);
 
             if ((OutletWaterTemp2ndStage <= TempSetPoint) && UAdesign > 0.0) {
                 // Setpoint was met with pump ON and fan ON 2nd stage, calculate fan mode fraction
@@ -1808,8 +1810,8 @@ namespace FluidCoolers {
         SimpleFluidCooler(FluidCoolerNum).Qactual = SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate * CpWater * (DataLoopNode::Node(waterInletNode).Temp - SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp);
     }
 
-    void SimSimpleFluidCooler(
-        int const FluidCoolerNum, Real64 const _WaterMassFlowRate, Real64 const AirFlowRate, Real64 const UAdesign, Real64 &_OutletWaterTemp)
+    void CalcFluidCoolerOutlet(
+            int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1829,7 +1831,7 @@ namespace FluidCoolers {
         Real64 _Qactual;        // Actual heat transfer rate between fluid cooler water and air [W]
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SimSimpleFluidCooler");
+        static std::string const RoutineName("CalcFluidCoolerOutlet");
 
         if (UAdesign == 0.0) return;
 
@@ -1889,7 +1891,7 @@ namespace FluidCoolers {
         // Fluid cooler output depends on the UA which is being varied to zero the residual.
 
         // METHODOLOGY EMPLOYED:
-        // Puts UA into the fluid cooler data structure, calls SimSimpleFluidCooler, and calculates
+        // Puts UA into the fluid cooler data structure, calls CalcFluidCoolerOutlet, and calculates
         // the residual as defined above.
 
         // REFERENCES:
@@ -1906,13 +1908,13 @@ namespace FluidCoolers {
         Real64 Output;        // Fluid cooler  output [W]
 
         FluidCoolerIndex = int(Par(2));
-        SimSimpleFluidCooler(FluidCoolerIndex, Par(3), Par(4), UA, OutWaterTemp);
+        CalcFluidCoolerOutlet(FluidCoolerIndex, Par(3), Par(4), UA, OutWaterTemp);
         Output = Par(5) * Par(3) * (SimpleFluidCooler(FluidCoolerIndex).WaterTemp - OutWaterTemp);
         Real64 Residuum = (Par(1) - Output) / Par(1);
         return Residuum;
     }
 
-    void UpdateFluidCooler(int const FluidCoolerNum)
+    void FluidCoolerspecs::UpdateFluidCooler()
     {
 
         // SUBROUTINE INFORMATION:
@@ -1930,79 +1932,75 @@ namespace FluidCoolers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string CharErrOut;
         std::string CharLowOutletTemp;
-        int LoopNum;
-        int LoopSideNum;
         Real64 LoopMinTemp;
 
-        auto & waterOutletNode = SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum;
-        DataLoopNode::Node(waterOutletNode).Temp = SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp;
+        auto & waterOutletNode = this->WaterOutletNodeNum;
+        DataLoopNode::Node(waterOutletNode).Temp = this->OutletWaterTemp;
 
-        LoopNum = SimpleFluidCooler(FluidCoolerNum).LoopNum;
-        LoopSideNum = SimpleFluidCooler(FluidCoolerNum).LoopSideNum;
-        if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == 0 || DataGlobals::WarmupFlag) return;
+        if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0 || DataGlobals::WarmupFlag) return;
 
         // Check flow rate through fluid cooler and compare to design flow rate, show warning if greater than Design * Mulitplier
         if (DataLoopNode::Node(waterOutletNode).MassFlowRate >
-            SimpleFluidCooler(FluidCoolerNum).DesWaterMassFlowRate * SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier) {
-            ++SimpleFluidCooler(FluidCoolerNum).HighMassFlowErrorCount;
-            if (SimpleFluidCooler(FluidCoolerNum).HighMassFlowErrorCount < 2) {
-                ShowWarningError(SimpleFluidCooler(FluidCoolerNum).FluidCoolerType + " \"" + SimpleFluidCooler(FluidCoolerNum).Name + "\"");
+            this->DesWaterMassFlowRate * this->FluidCoolerMassFlowRateMultiplier) {
+            ++this->HighMassFlowErrorCount;
+            if (this->HighMassFlowErrorCount < 2) {
+                ShowWarningError(this->FluidCoolerType + " \"" + this->Name + "\"");
                 ShowContinueError(" Condenser Loop Mass Flow Rate is much greater than the fluid coolers design mass flow rate.");
                 ShowContinueError(" Condenser Loop Mass Flow Rate = " + General::TrimSigDigits(DataLoopNode::Node(waterOutletNode).MassFlowRate, 6));
                 ShowContinueError(" Fluid Cooler Design Mass Flow Rate   = " +
-                                          General::TrimSigDigits(SimpleFluidCooler(FluidCoolerNum).DesWaterMassFlowRate, 6));
+                                          General::TrimSigDigits(this->DesWaterMassFlowRate, 6));
                 ShowContinueErrorTimeStamp("");
             } else {
                 ShowRecurringWarningErrorAtEnd(
-                    SimpleFluidCooler(FluidCoolerNum).FluidCoolerType + " \"" + SimpleFluidCooler(FluidCoolerNum).Name +
+                    this->FluidCoolerType + " \"" + this->Name +
                         "\"  Condenser Loop Mass Flow Rate is much greater than the fluid coolers design mass flow rate error continues...",
-                    SimpleFluidCooler(FluidCoolerNum).HighMassFlowErrorIndex,
+                    this->HighMassFlowErrorIndex,
                     DataLoopNode::Node(waterOutletNode).MassFlowRate,
                     DataLoopNode::Node(waterOutletNode).MassFlowRate);
             }
         }
 
         // Check if OutletWaterTemp is below the minimum condenser loop temp and warn user
-        LoopMinTemp = DataPlant::PlantLoop(LoopNum).MinTemp;
-        if (SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp < LoopMinTemp && SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate > 0.0) {
-            ++SimpleFluidCooler(FluidCoolerNum).OutletWaterTempErrorCount;
+        LoopMinTemp = DataPlant::PlantLoop(this->LoopNum).MinTemp;
+        if (this->OutletWaterTemp < LoopMinTemp && this->WaterMassFlowRate > 0.0) {
+            ++this->OutletWaterTempErrorCount;
             ObjexxFCL::gio::write(CharLowOutletTemp, LowTempFmt) << LoopMinTemp;
-            ObjexxFCL::gio::write(CharErrOut, LowTempFmt) << SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp;
+            ObjexxFCL::gio::write(CharErrOut, LowTempFmt) << this->OutletWaterTemp;
             strip(CharErrOut);
-            if (SimpleFluidCooler(FluidCoolerNum).OutletWaterTempErrorCount < 2) {
-                ShowWarningError(SimpleFluidCooler(FluidCoolerNum).FluidCoolerType + " \"" + SimpleFluidCooler(FluidCoolerNum).Name + "\"");
+            if (this->OutletWaterTempErrorCount < 2) {
+                ShowWarningError(this->FluidCoolerType + " \"" + this->Name + "\"");
                 ShowContinueError(" Fluid cooler water outlet temperature (" + CharErrOut +
                                   " C) is below the specified minimum condenser loop temp of " + stripped(CharLowOutletTemp) + " C");
                 ShowContinueErrorTimeStamp("");
             } else {
                 ShowRecurringWarningErrorAtEnd(
-                    SimpleFluidCooler(FluidCoolerNum).FluidCoolerType + " \"" + SimpleFluidCooler(FluidCoolerNum).Name +
+                    this->FluidCoolerType + " \"" + this->Name +
                         "\" Fluid cooler water outlet temperature is below the specified minimum condenser loop temp error continues...",
-                    SimpleFluidCooler(FluidCoolerNum).OutletWaterTempErrorIndex,
-                    SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp,
-                    SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp);
+                    this->OutletWaterTempErrorIndex,
+                    this->OutletWaterTemp,
+                    this->OutletWaterTemp);
             }
         }
 
         // Check if water mass flow rate is small (e.g. no flow) and warn user
-        if (SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate > 0.0 && SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
-            ++SimpleFluidCooler(FluidCoolerNum).SmallWaterMassFlowErrorCount;
-            if (SimpleFluidCooler(FluidCoolerNum).SmallWaterMassFlowErrorCount < 2) {
-                ShowWarningError(SimpleFluidCooler(FluidCoolerNum).FluidCoolerType + " \"" + SimpleFluidCooler(FluidCoolerNum).Name + "\"");
+        if (this->WaterMassFlowRate > 0.0 && this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
+            ++this->SmallWaterMassFlowErrorCount;
+            if (this->SmallWaterMassFlowErrorCount < 2) {
+                ShowWarningError(this->FluidCoolerType + " \"" + this->Name + "\"");
                 ShowContinueError(" Fluid cooler water mass flow rate near zero.");
                 ShowContinueErrorTimeStamp("");
-                ShowContinueError("Actual Mass flow = " + General::TrimSigDigits(SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate, 2));
+                ShowContinueError("Actual Mass flow = " + General::TrimSigDigits(this->WaterMassFlowRate, 2));
             } else {
-                ShowRecurringWarningErrorAtEnd(SimpleFluidCooler(FluidCoolerNum).FluidCoolerType + " \"" + SimpleFluidCooler(FluidCoolerNum).Name +
+                ShowRecurringWarningErrorAtEnd(this->FluidCoolerType + " \"" + this->Name +
                                                    "\" Fluid cooler water mass flow rate near zero error continues...",
-                                               SimpleFluidCooler(FluidCoolerNum).SmallWaterMassFlowErrorIndex,
-                                               SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate,
-                                               SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate);
+                                               this->SmallWaterMassFlowErrorIndex,
+                                               this->WaterMassFlowRate,
+                                               this->WaterMassFlowRate);
             }
         }
     }
 
-    void ReportFluidCooler(bool const RunFlag, int const FluidCoolerNum)
+    void FluidCoolerspecs::ReportFluidCooler(bool const RunFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2015,16 +2013,16 @@ namespace FluidCoolers {
         // This subroutine updates the report variables for the fluid cooler.
 
         Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        auto & waterInletNode = SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum;
+        auto & waterInletNode = this->WaterInletNodeNum;
         if (!RunFlag) {
-            SimpleFluidCooler(FluidCoolerNum).InletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;
-            SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;
-            SimpleFluidCooler(FluidCoolerNum).Qactual = 0.0;
-            SimpleFluidCooler(FluidCoolerNum).FanPower = 0.0;
-            SimpleFluidCooler(FluidCoolerNum).FanEnergy = 0.0;
+            this->InletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;
+            this->OutletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;
+            this->Qactual = 0.0;
+            this->FanPower = 0.0;
+            this->FanEnergy = 0.0;
         } else {
-            SimpleFluidCooler(FluidCoolerNum).InletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;
-            SimpleFluidCooler(FluidCoolerNum).FanEnergy = SimpleFluidCooler(FluidCoolerNum).FanPower * ReportingConstant;
+            this->InletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;
+            this->FanEnergy = this->FanPower * ReportingConstant;
         }
     }
 

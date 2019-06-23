@@ -162,6 +162,11 @@ namespace FluidCoolers {
               WaterTemp(0.0), AirTemp(0.0), AirHumRat(0.0), AirPress(0.0), AirWetBulb(0.0)
         {
         }
+
+        void UpdateFluidCooler();
+
+        void ReportFluidCooler(bool RunFlag);
+
     };
 
     // Object Data
@@ -201,16 +206,12 @@ namespace FluidCoolers {
 
     void TwoSpeedFluidCooler(int &FluidCoolerNum);
 
-    void SimSimpleFluidCooler(
-        int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
+    void CalcFluidCoolerOutlet(
+            int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
 
     Real64 SimpleFluidCoolerUAResidual(Real64 UA,          // UA of fluid cooler
                                        Array1<Real64> const &Par // par(1) = design fluid cooler load [W]
     );
-
-    void UpdateFluidCooler(int FluidCoolerNum);
-
-    void ReportFluidCooler(bool RunFlag, int FluidCoolerNum);
 
     void clear_state();
 
