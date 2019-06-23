@@ -105,21 +105,11 @@ namespace FluidCoolers {
     // MODULE PARAMETER DEFINITIONS:
     std::string const cFluidCooler_SingleSpeed("FluidCooler:SingleSpeed");
     std::string const cFluidCooler_TwoSpeed("FluidCooler:TwoSpeed");
-
-    bool GetFluidCoolerInputFlag(true);
-    int const PIM_NominalCapacity(1);
-    int const PIM_UFactor(2);
-    int const FluidCooler_SingleSpeed(1);
-    int const FluidCooler_TwoSpeed(2);
     static std::string const BlankString;
 
-    // MODULE VARIABLE DECLARATIONS:
+    bool GetFluidCoolerInputFlag(true);
+
     int NumSimpleFluidCoolers(0); // Number of similar fluid coolers
-
-    // The following block of variables are used to carry model results for a fluid cooler instance
-    // across sim, update, and report routines.  Simulation manager must be careful
-    // in models with multiple fluid coolers.
-
     Real64 InletWaterTemp(0.0);    // CW temperature at fluid cooler inlet
     Real64 OutletWaterTemp(0.0);   // CW temperature at fluid cooler outlet
     int WaterInletNode(0);         // Node number at fluid cooler inlet
@@ -201,7 +191,7 @@ namespace FluidCoolers {
         {
             auto const SELECT_CASE_var(SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num);
 
-            if (SELECT_CASE_var == FluidCooler_SingleSpeed) {
+            if (SELECT_CASE_var == DataPlant::TypeOf_FluidCooler_SingleSpd) {
                 if (InitLoopEquip) {
                     InitFluidCooler(FluidCoolerNum, RunFlag);
                     SizeFluidCooler(FluidCoolerNum);
@@ -215,7 +205,7 @@ namespace FluidCoolers {
                 UpdateFluidCooler(FluidCoolerNum);
                 ReportFluidCooler(RunFlag, FluidCoolerNum);
 
-            } else if (SELECT_CASE_var == FluidCooler_TwoSpeed) {
+            } else if (SELECT_CASE_var == DataPlant::TypeOf_FluidCooler_TwoSpd) {
                 if (InitLoopEquip) {
                     InitFluidCooler(FluidCoolerNum, RunFlag);
                     SizeFluidCooler(FluidCoolerNum);
@@ -311,7 +301,7 @@ namespace FluidCoolers {
 
             SimpleFluidCooler(FluidCoolerNum).Name = AlphArray(1);
             SimpleFluidCooler(FluidCoolerNum).FluidCoolerType = cCurrentModuleObject;
-            SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num = FluidCooler_SingleSpeed;
+            SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num = DataPlant::TypeOf_FluidCooler_SingleSpd;
             SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 2.5;
             SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(
                 AlphArray(2), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
@@ -380,7 +370,7 @@ namespace FluidCoolers {
 
             SimpleFluidCooler(FluidCoolerNum).Name = AlphArray(1);
             SimpleFluidCooler(FluidCoolerNum).FluidCoolerType = cCurrentModuleObject;
-            SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num = FluidCooler_TwoSpeed;
+            SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num = DataPlant::TypeOf_FluidCooler_TwoSpd;
             SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 2.5;
             SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(
                 AlphArray(2), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
@@ -615,7 +605,7 @@ namespace FluidCoolers {
 
         //   Check various inputs for both the performance input methods
         if (UtilityRoutines::SameString(AlphArray(4), "UFactorTimesAreaAndDesignWaterFlowRate")) {
-            SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PIM_UFactor;
+            SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::U_FACTOR;
             if (SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA <= 0.0 &&
                 SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA != DataSizing::AutoSize) {
                 ShowSevereError(cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" + cNumericFieldNames(1) +
@@ -623,7 +613,7 @@ namespace FluidCoolers {
                 ErrorsFound = true;
             }
         } else if (UtilityRoutines::SameString(AlphArray(4), "NominalCapacity")) {
-            SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PIM_NominalCapacity;
+            SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::NOMINAL_CAPACITY;
             if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity <= 0.0) {
                 ShowSevereError(cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" + cNumericFieldNames(2) +
                                 "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
@@ -740,7 +730,7 @@ namespace FluidCoolers {
         }
 
         if (UtilityRoutines::SameString(AlphArray(4), "UFactorTimesAreaAndDesignWaterFlowRate")) {
-            SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PIM_UFactor;
+            SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::U_FACTOR;
             if (SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA <= 0.0 &&
                 !SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized) {
                 ShowSevereError(cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" + cNumericFieldNames(1) +
@@ -760,7 +750,7 @@ namespace FluidCoolers {
                 ErrorsFound = true;
             }
         } else if (UtilityRoutines::SameString(AlphArray(4), "NominalCapacity")) {
-            SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PIM_NominalCapacity;
+            SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::NOMINAL_CAPACITY;
             if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity <= 0.0) {
                 ShowSevereError(cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" + cNumericFieldNames(4) +
                                 "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames(4) + "= \"" + AlphArray(4) + "\".");
@@ -858,9 +848,9 @@ namespace FluidCoolers {
 
         if (SimpleFluidCooler(FluidCoolerNum).oneTimeInit) {
 
-            if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == FluidCooler_SingleSpeed) {
+            if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
                 TypeOf_Num = DataPlant::TypeOf_FluidCooler_SingleSpd;
-            } else if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == FluidCooler_TwoSpeed) {
+            } else if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_TwoSpd) {
                 TypeOf_Num = DataPlant::TypeOf_FluidCooler_TwoSpd;
             } else {
                 assert(false);
@@ -1039,7 +1029,7 @@ namespace FluidCoolers {
 
         PlantUtilities::RegisterPlantCompDesignFlow(SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum, tmpDesignWaterFlowRate);
 
-        if (SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num == PIM_UFactor &&
+        if (SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num == PerfInputMethod::U_FACTOR &&
             SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized) {
             if (PltSizCondNum > 0) {
                 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
@@ -1059,7 +1049,7 @@ namespace FluidCoolers {
 
         if (SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPowerWasAutoSized) {
             // We assume the nominal fan power is 0.0105 times the design load
-            if (SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num == PIM_NominalCapacity) {
+            if (SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num == PerfInputMethod::NOMINAL_CAPACITY) {
                 tmpHighSpeedFanPower = 0.0105 * SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity;
                 if (DataPlant::PlantFirstSizesOkayToFinalize) SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPower = tmpHighSpeedFanPower;
             } else {
@@ -1105,7 +1095,7 @@ namespace FluidCoolers {
                     }
                 }
             }
-            if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == FluidCooler_SingleSpeed) {
+            if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(SimpleFluidCooler(FluidCoolerNum).FluidCoolerType,
@@ -1120,7 +1110,7 @@ namespace FluidCoolers {
                                            SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPower);
                     }
                 }
-            } else if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == FluidCooler_TwoSpeed) {
+            } else if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_TwoSpd) {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(SimpleFluidCooler(FluidCoolerNum).FluidCoolerType,
@@ -1139,7 +1129,7 @@ namespace FluidCoolers {
         }
 
         if (SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRateWasAutoSized) {
-            if (SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num == PIM_NominalCapacity) {
+            if (SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num == PerfInputMethod::NOMINAL_CAPACITY) {
                 tmpHighSpeedAirFlowRate =
                     SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity /
                     (SimpleFluidCooler(FluidCoolerNum).DesignEnteringWaterTemp - SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirTemp) * 4.0;
@@ -1192,7 +1182,7 @@ namespace FluidCoolers {
                     }
                 }
             }
-            if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == FluidCooler_SingleSpeed) {
+            if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(SimpleFluidCooler(FluidCoolerNum).FluidCoolerType,
@@ -1314,7 +1304,7 @@ namespace FluidCoolers {
                     tmpHighSpeedEvapFluidCoolerUA = 0.0;
                     if (DataPlant::PlantFirstSizesOkayToFinalize) SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = tmpHighSpeedEvapFluidCoolerUA;
                 }
-                if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == FluidCooler_SingleSpeed) {
+                if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput(SimpleFluidCooler(FluidCoolerNum).FluidCoolerType,
@@ -1329,7 +1319,7 @@ namespace FluidCoolers {
                                                SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA);
                         }
                     }
-                } else if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == FluidCooler_TwoSpeed) {
+                } else if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_TwoSpd) {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput(SimpleFluidCooler(FluidCoolerNum).FluidCoolerType,
@@ -1353,7 +1343,7 @@ namespace FluidCoolers {
             }
         }
 
-        if (SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num == PIM_NominalCapacity) {
+        if (SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num == PerfInputMethod::NOMINAL_CAPACITY) {
             if (SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
                                        DataGlobals::InitConvTemp,
@@ -1425,7 +1415,7 @@ namespace FluidCoolers {
             } else {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = 0.0;
             }
-            if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == FluidCooler_SingleSpeed) {
+            if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(SimpleFluidCooler(FluidCoolerNum).FluidCoolerType,
@@ -1440,7 +1430,7 @@ namespace FluidCoolers {
                                            SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA);
                     }
                 }
-            } else if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == FluidCooler_TwoSpeed) {
+            } else if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_TwoSpd) {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(SimpleFluidCooler(FluidCoolerNum).FluidCoolerType,
@@ -1509,8 +1499,8 @@ namespace FluidCoolers {
             }
         }
 
-        if (SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num == PIM_NominalCapacity &&
-            SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == FluidCooler_TwoSpeed) {
+        if (SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num == PerfInputMethod::NOMINAL_CAPACITY &&
+            SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_TwoSpd) {
             if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerLowSpeedNomCapWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
                 SimpleFluidCooler(FluidCoolerNum).FluidCoolerLowSpeedNomCap =
                     SimpleFluidCooler(FluidCoolerNum).FluidCoolerLowSpeedNomCapSizingFactor *
@@ -1627,7 +1617,7 @@ namespace FluidCoolers {
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, equipName, SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity);
         }
 
-        if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == FluidCooler_TwoSpeed && DataPlant::PlantFirstSizesOkayToFinalize) {
+        if (SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_TwoSpd && DataPlant::PlantFirstSizesOkayToFinalize) {
             if (SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate > 0.0) {
                 if (SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRate <= SimpleFluidCooler(FluidCoolerNum).LowSpeedAirFlowRate) {
                     ShowSevereError("FluidCooler:TwoSpeed  \"" + SimpleFluidCooler(FluidCoolerNum).Name +

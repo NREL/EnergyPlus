@@ -63,19 +63,12 @@ namespace FluidCoolers {
     extern std::string const cFluidCooler_SingleSpeed;
     extern std::string const cFluidCooler_TwoSpeed;
 
-    extern int const PIM_NominalCapacity;
-    extern int const PIM_UFactor;
+    enum class PerfInputMethod {
+        NOMINAL_CAPACITY,
+        U_FACTOR
+    };
 
-    extern int const FluidCooler_SingleSpeed;
-    extern int const FluidCooler_TwoSpeed;
-
-    // MODULE VARIABLE DECLARATIONS:
     extern int NumSimpleFluidCoolers; // Number of similar fluid coolers
-
-    // The following block of variables are used to carry model results for a fluid cooler instance
-    // across sim, update, and report routines.  Simulation manager must be careful
-    // in models with multiple fluid coolers.
-
     extern Real64 InletWaterTemp;    // CW temperature at fluid cooler inlet
     extern Real64 OutletWaterTemp;   // CW temperature at fluid cooler outlet
     extern int WaterInletNode;       // Node number at fluid cooler inlet
@@ -92,7 +85,7 @@ namespace FluidCoolers {
         std::string Name;            // User identifier
         std::string FluidCoolerType; // Type of fluid cooler
         int FluidCoolerType_Num;
-        int PerformanceInputMethod_Num;
+        PerfInputMethod PerformanceInputMethod_Num;
         bool Available;                               // need an array of logicals--load identifiers of available equipment
         bool ON;                                      // Simulate the machine at it's operating part load ratio
         Real64 DesignWaterFlowRate;                   // Design water flow rate through the fluid cooler [m3/s]
@@ -145,7 +138,7 @@ namespace FluidCoolers {
 
         // Default Constructor
         FluidCoolerspecs()
-            : FluidCoolerType_Num(0), PerformanceInputMethod_Num(0), Available(true), ON(true), DesignWaterFlowRate(0.0),
+            : FluidCoolerType_Num(0), PerformanceInputMethod_Num(PerfInputMethod::NOMINAL_CAPACITY), Available(true), ON(true), DesignWaterFlowRate(0.0),
               DesignWaterFlowRateWasAutoSized(false), DesWaterMassFlowRate(0.0), HighSpeedAirFlowRate(0.0), HighSpeedAirFlowRateWasAutoSized(false),
               HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false), HighSpeedFluidCoolerUA(0.0), HighSpeedFluidCoolerUAWasAutoSized(false),
               LowSpeedAirFlowRate(0.0), LowSpeedAirFlowRateWasAutoSized(false), LowSpeedAirFlowRateSizingFactor(0.0), LowSpeedFanPower(0.0),

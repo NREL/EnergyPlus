@@ -85,7 +85,7 @@ TEST_F(EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test1)
 
     SimpleFluidCooler(FluidCoolerNum).Name = "Test";
     SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 2.5;
-    SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PIM_NominalCapacity;
+    SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::NOMINAL_CAPACITY;
     SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum = 1;
     SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = 1;
     SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity = 50000;
@@ -152,7 +152,7 @@ TEST_F(EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test2)
 
     SimpleFluidCooler(FluidCoolerNum).Name = "Test";
     SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 1.0;
-    SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PIM_UFactor;
+    SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::U_FACTOR;
     SimpleFluidCooler(FluidCoolerNum).DesignEnteringWaterTemp = 52;
     SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirTemp = 35;
     SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirWetBulbTemp = 25;
@@ -209,7 +209,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test3)
 
     SimpleFluidCooler(FluidCoolerNum).Name = "Test";
     SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 2.5;
-    SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PIM_UFactor;
+    SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::U_FACTOR;
     SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum = 1;
     SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = 1;
     SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity = 50000;
