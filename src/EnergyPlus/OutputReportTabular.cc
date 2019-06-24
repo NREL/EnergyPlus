@@ -4918,8 +4918,8 @@ namespace OutputReportTabular {
             SysTotalHVACRejectHeatLoss +=
                 SimpleEvapFluidCoolerReport(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCoolerReport(iCooler).FanEnergy;
         }
-        for (iCooler = 1; iCooler <= FluidCoolers::NumSimpleFluidCoolers; ++iCooler) {
-            SysTotalHVACRejectHeatLoss += SimpleFluidCooler(iCooler).Qactual * TimeStepSysSec + SimpleFluidCooler(iCooler).FanEnergy;
+        for (auto & cooler : SimpleFluidCooler) {
+            SysTotalHVACRejectHeatLoss += cooler.Qactual * TimeStepSysSec + cooler.FanEnergy;
         }
 
         // Air- and Evap-cooled chiller
