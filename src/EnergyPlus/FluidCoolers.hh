@@ -144,6 +144,9 @@ namespace FluidCoolers {
         Real64 AirPress;
         Real64 AirWetBulb;
 
+        // additional stuff
+        int indexInArray;
+
         // Default Constructor
         FluidCoolerspecs()
             : FluidCoolerType_Num(0), PerformanceInputMethod_Num(PerfInputMethod::NOMINAL_CAPACITY), Available(true), ON(true), DesignWaterFlowRate(0.0),
@@ -159,13 +162,31 @@ namespace FluidCoolers {
               SmallWaterMassFlowErrorCount(0), SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0), WMFRLessThanMinAvailErrIndex(0),
               WMFRGreaterThanMaxAvailErrCount(0), WMFRGreaterThanMaxAvailErrIndex(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
               oneTimeInit(true), beginEnvrnInit(true), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0),
-              WaterTemp(0.0), AirTemp(0.0), AirHumRat(0.0), AirPress(0.0), AirWetBulb(0.0)
+              WaterTemp(0.0), AirTemp(0.0), AirHumRat(0.0), AirPress(0.0), AirWetBulb(0.0), indexInArray(0)
         {
         }
+
+        void InitFluidCooler();
+
+        void SizeFluidCooler();
 
         void UpdateFluidCooler();
 
         void ReportFluidCooler(bool RunFlag);
+
+        bool TestFluidCoolerSingleSpeedInputForDesign(std::string const &cCurrentModuleObject,
+                                                      Array1D<std::string> const &AlphArray,
+                                                      Array1D<std::string> const &cNumericFieldNames,
+                                                      Array1D<std::string> const &cAlphaFieldNames);
+
+        bool TestFluidCoolerTwoSpeedInputForDesign(std::string const &cCurrentModuleObject,
+                                                   Array1D<std::string> const &AlphArray,
+                                                   Array1D<std::string> const &cNumericFieldNames,
+                                                   Array1D<std::string> const &cAlphaFieldNames);
+
+        void SingleSpeedFluidCooler();
+
+        void TwoSpeedFluidCooler();
 
     };
 
@@ -173,17 +194,7 @@ namespace FluidCoolers {
     extern Array1D<FluidCoolerspecs> SimpleFluidCooler;           // dimension to number of machines
 
     // Functions
-    bool TestFluidCoolerSingleSpeedInputForDesign(std::string const &cCurrentModuleObject,
-                                                  Array1D<std::string> const &AlphArray,
-                                                  Array1D<std::string> const &cNumericFieldNames,
-                                                  Array1D<std::string> const &cAlphaFieldNames,
-                                                  int const &FluidCoolerNum);
 
-    bool TestFluidCoolerTwoSpeedInputForDesign(std::string const &cCurrentModuleObject,
-                                               Array1D<std::string> const &AlphArray,
-                                               Array1D<std::string> const &cNumericFieldNames,
-                                               Array1D<std::string> const &cAlphaFieldNames,
-                                               int const &FluidCoolerNum);
 
     void SimFluidCoolers(std::string &FluidCoolerType,
                          std::string &FluidCoolerName,
@@ -195,16 +206,6 @@ namespace FluidCoolers {
                          Real64 &OptCap);
 
     void GetFluidCoolerInput();
-
-    void InitFluidCooler(int FluidCoolerNum, // Number of the current fluid cooler being simulated
-                         bool RunFlag        // TRUE if fluid cooler is ON
-    );
-
-    void SizeFluidCooler(int FluidCoolerNum);
-
-    void SingleSpeedFluidCooler(int &FluidCoolerNum);
-
-    void TwoSpeedFluidCooler(int &FluidCoolerNum);
 
     void CalcFluidCoolerOutlet(
             int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
