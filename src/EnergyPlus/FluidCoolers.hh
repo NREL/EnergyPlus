@@ -168,6 +168,8 @@ namespace FluidCoolers {
 
         void InitFluidCooler();
 
+        void setupOutputVars();
+
         void SizeFluidCooler();
 
         void UpdateFluidCooler();

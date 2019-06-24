@@ -426,98 +426,52 @@ namespace FluidCoolers {
         if (ErrorsFound) {
             ShowFatalError("Errors found in getting fluid cooler input.");
         }
-
-        // Set up output variables, CurrentModuleObject='FluidCooler:SingleSpeed'
-        for (FluidCoolerNum = 1; FluidCoolerNum <= NumSingleSpeedFluidCoolers; ++FluidCoolerNum) {
-            SetupOutputVariable("Cooling Tower Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                SimpleFluidCooler(FluidCoolerNum).InletWaterTemp,
-                                "System",
-                                "Average",
-                                SimpleFluidCooler(FluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp,
-                                "System",
-                                "Average",
-                                SimpleFluidCooler(FluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate,
-                                "System",
-                                "Average",
-                                SimpleFluidCooler(FluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                SimpleFluidCooler(FluidCoolerNum).Qactual,
-                                "System",
-                                "Average",
-                                SimpleFluidCooler(FluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Power",
-                                OutputProcessor::Unit::W,
-                                SimpleFluidCooler(FluidCoolerNum).FanPower,
-                                "System",
-                                "Average",
-                                SimpleFluidCooler(FluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Energy",
-                                OutputProcessor::Unit::J,
-                                SimpleFluidCooler(FluidCoolerNum).FanEnergy,
-                                "System",
-                                "Sum",
-                                SimpleFluidCooler(FluidCoolerNum).Name,
-                                _,
-                                "Electric",
-                                "HeatRejection",
-                                _,
-                                "Plant");
-        }
-
-        // CurrentModuleObject='FluidCooler:TwoSpeed'
-        for (FluidCoolerNum = NumSingleSpeedFluidCoolers + 1; FluidCoolerNum <= NumSingleSpeedFluidCoolers + NumTwoSpeedFluidCoolers;
-             ++FluidCoolerNum) {
-            SetupOutputVariable("Cooling Tower Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                SimpleFluidCooler(FluidCoolerNum).InletWaterTemp,
-                                "System",
-                                "Average",
-                                SimpleFluidCooler(FluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                SimpleFluidCooler(FluidCoolerNum).OutletWaterTemp,
-                                "System",
-                                "Average",
-                                SimpleFluidCooler(FluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                SimpleFluidCooler(FluidCoolerNum).WaterMassFlowRate,
-                                "System",
-                                "Average",
-                                SimpleFluidCooler(FluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                SimpleFluidCooler(FluidCoolerNum).Qactual,
-                                "System",
-                                "Average",
-                                SimpleFluidCooler(FluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Power",
-                                OutputProcessor::Unit::W,
-                                SimpleFluidCooler(FluidCoolerNum).FanPower,
-                                "System",
-                                "Average",
-                                SimpleFluidCooler(FluidCoolerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Energy",
-                                OutputProcessor::Unit::J,
-                                SimpleFluidCooler(FluidCoolerNum).FanEnergy,
-                                "System",
-                                "Sum",
-                                SimpleFluidCooler(FluidCoolerNum).Name,
-                                _,
-                                "Electric",
-                                "HeatRejection",
-                                _,
-                                "Plant");
-        }
     }
+
+    void FluidCoolerspecs::setupOutputVars() {
+
+        SetupOutputVariable("Cooling Tower Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->InletWaterTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Cooling Tower Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->OutletWaterTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Cooling Tower Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->WaterMassFlowRate,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Cooling Tower Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->Qactual,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Cooling Tower Fan Electric Power",
+                            OutputProcessor::Unit::W,
+                            this->FanPower,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Cooling Tower Fan Electric Energy",
+                            OutputProcessor::Unit::J,
+                            this->FanEnergy,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "Electric",
+                            "HeatRejection",
+                            _,
+                            "Plant");
+}
 
     bool FluidCoolerspecs::TestFluidCoolerSingleSpeedInputForDesign(std::string const &cCurrentModuleObject,
                                                   Array1D<std::string> const &AlphArray,
@@ -803,6 +757,8 @@ namespace FluidCoolers {
         bool ErrorsFound(false); // Flag if input data errors are found
 
         if (this->oneTimeInit) {
+
+            this->setupOutputVars();
 
             // Locate the tower on the plant loops for later usage
             PlantUtilities::ScanPlantLoopsForObject(this->Name,
