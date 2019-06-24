@@ -8762,7 +8762,7 @@ namespace WaterThermalTanks {
             WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag = false;
         }
 
-        if (!FirstHVACIteration) {
+        else if (!FirstHVACIteration) {
             WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag = true;
         }
 
