@@ -423,6 +423,7 @@ Given the no load loss (NL) and the load loss (LL) at rated load and conditions,
 
 \begin{equation}
 TL(t) = NL + LL(t) = NL + LL*P{(t)^2}*{f_T}(t)
+\label{eq:TotalEnergyLossesInTransformers}
 \end{equation}
 
 where:
@@ -543,15 +544,17 @@ Combining Equations~\ref{eq:ElecLoadetanp863} and~\ref{eq:ElecLoadLLnp866}, we c
 
 \begin{equation}
 NL = \frac{{{S_B}*{P_{np}}*(1 - {\eta_{np}})}}{{{\eta_{np}}*\left[ {1 + {{\left( {\frac{{{P_{ref}}}}{{P{}_{max,\eta}}}} \right)}^2}} \right]}}
+\label{eq:NoLoadLossAtRatedCondition}
 \end{equation}
 
 Substitute NL into Equation~\ref{eq:ElecLoadNL864}, we can calculate the load loss at rated conditions as:
 
 \begin{equation}
 LL = \frac{{NL}}{{{f_{T,max-\eta}}*P_{max,\eta}^2}} = \frac{{NL}}{{{f_{T,np}}*P_{max,\eta}^2}}
+\label{eq:LoadLossAtRatedCondition}
 \end{equation}
 
-Since both no load and load losses at rated conditions are known, the total energy losses in a transformer at time t can then be calculated according to Equation
+Since both no load and load losses at rated conditions are known, the total energy losses in a transformer at time t can then be calculated according to Equation~\ref{eq:TotalEnergyLossesInTransformers}.
 
 \subsubsection{References:}\label{references-1-008}
 
