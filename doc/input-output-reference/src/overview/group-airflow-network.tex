@@ -101,7 +101,15 @@ The Airflow Network input objects are:
 \item
   The \textbf{\hyperref[airflownetworkmultizonezone]{AirflowNetwork:MultiZone:Zone}} object specifies the ventilation control that applies to all of the openable exterior and interior windows and doors in the corresponding thermal zone. Surface-level ventilation control can be used to override the zone-level ventilation control if required (see AirflowNetwork: MultiZone:Surface object below).
 \item
-  \textbf{\hyperref[airflownetworkmultizonesurface]{AirflowNetwork:MultiZone:Surface}} object indicates whether a heat transfer surface (wall, window, etc.) has a crack or opening and references an \textbf{\hyperref[airflownetworkmultizonesurfacecrack]{AirflowNetwork:MultiZone:Surface:Crack}, \hyperref[airflownetworkmultizonesurfaceeffectiveleakagearea]{AirflowNetwork:Multi-Zone:Surface:EffectiveLeakageArea}, \hyperref[airflownetworkmultizonecomponentsimpleopening]{AirflowNetwork:MultiZone:Component:SimpleOpening}, \hyperref[airflownetworkmultizonecomponentdetailedopening]{AirflowNetwork:Multi-Zone:Component:DetailedOpening}, \hyperref[airflownetworkmultizonecomponenthorizontalopening]{AirflowNetwork:MultiZone:Component:HorizontalOpening} or \hyperref[airflownetworkmultizonecomponentzoneexhaustfan]{AirflowNetwork:Multi-Zone:Component:ZoneExhaustFan}} object that gives the air flow characteristics of that crack, opening, or zone exhaust fan. The \hyperref[airflownetworkmultizonesurface]{AirflowNetwork:MultiZone:Surface} object can also be used to specify individual ventilation control for openable exterior and interior windows and doors.
+  \textbf{\hyperref[airflownetworkmultizonesurface]{AirflowNetwork:MultiZone:Surface}} object indicates whether a heat transfer surface (wall, window, etc.) has a crack or opening and references an object in the list below that gives the air flow characteristics of that crack, opening, or zone exhaust fan. The \hyperref[airflownetworkmultizonesurface]{AirflowNetwork:MultiZone:Surface} object can also be used to specify individual ventilation control for openable exterior and interior windows and doors.
+\begin{itemize}
+\item \textbf{\hyperref[airflownetworkmultizonesurfacecrack]{AirflowNetwork:MultiZone:Surface:Crack}
+\item \hyperref[airflownetworkmultizonesurfaceeffectiveleakagearea]{AirflowNetwork:Multi-Zone:Surface:EffectiveLeakageArea}
+\item \hyperref[airflownetworkmultizonecomponentsimpleopening]{AirflowNetwork:MultiZone:Component:SimpleOpening}
+\item \hyperref[airflownetworkmultizonecomponentdetailedopening]{AirflowNetwork:Multi-Zone:Component:DetailedOpening}
+\item \hyperref[airflownetworkmultizonecomponenthorizontalopening]{AirflowNetwork:MultiZone:Component:HorizontalOpening}
+\item \hyperref[airflownetworkmultizonecomponentzoneexhaustfan]{AirflowNetwork:Multi-Zone:Component:ZoneExhaustFan}}
+\end{itemize}
 \item
   \textbf{\hyperref[airflownetworkmultizonereferencecrackconditions]{AirflowNetwork:MultiZone:ReferenceCrackConditions}} is used to normalize crack information that is based on measurements of crack air flow.
 \item

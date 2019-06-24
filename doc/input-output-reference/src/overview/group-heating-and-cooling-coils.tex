@@ -5069,7 +5069,7 @@ The DX system can operate with a cycling compressor or a varying speed compresso
 
 The heat exchanger-assisted DX cooling coil is a virtual component consisting of a direct expansion (DX) cooling coil and an air-to-air heat exchanger as shown in Figure~\ref{fig:schematic-of-the-coilsystem-cooling-dx} below. The air-to-air heat exchanger pre-conditions the air entering the cooling coil, and reuses this energy to post-condition the supply air leaving the cooling coil. This heat exchange process improves the latent removal performance of the cooling coil by allowing it to dedicate more of its cooling capacity toward dehumidification (lower sensible heat ratio).
 
-This compound object models the basic operation of an air-to-air heat exchanger in conjunction with a cooling coil. The heat exchanger-assisted DX cooling coil does not have an operating schedule of its own; its operating schedule is governed by the availability schedules for the DX cooling coil and the air-to-air heat exchanger. This compound object is used in place of where a DX cooling coil object would normally be used by itself.
+This compound object models the basic operation of an air-to-air heat exchanger in conjunction with a cooling coil. The heat exchanger-assisted DX cooling coil does not have an operating schedule of its own; its operating schedule is governed by the availability schedules for the DX cooling coil and the air-to-air heat exchanger. This compound object is used in place of where a DX cooling coil object would normally be used by itself. However, unlike other similar objects like CoilSystem:Cooling:Water:HeatExchangerAssisted, it cannot be used directly on branches.
 
 To model a heat exchanger-assisted DX cooling coil, the input data file should include the following objects:
 
@@ -5077,7 +5077,15 @@ To model a heat exchanger-assisted DX cooling coil, the input data file should i
 \item
   CoilSystem:Cooling:DX:HeatExchangerAssisted object
 \item
-  Air-to-air heat exchanger object (\hyperref[heatexchangerairtoairflatplate]{HeatExchanger:AirToAir:FlatPlate}, \hyperref[heatexchangerairtoairsensibleandlatent]{HeatExchanger:AirToAir:SensibleAndLatent}, or \hyperref[heatexchangerdesiccantbalancedflow]{HeatExchanger:Desiccant:BalancedFlow})
+  Air-to-air heat exchanger object such as:
+\begin{itemize}
+\item
+\hyperref[heatexchangerairtoairflatplate]{HeatExchanger:AirToAir:FlatPlate}
+\item
+\hyperref[heatexchangerairtoairsensibleandlatent]{HeatExchanger:AirToAir:SensibleAndLatent}
+\item
+\hyperref[heatexchangerdesiccantbalancedflow]{HeatExchanger:Desiccant:BalancedFlow}
+\end{itemize}
 \item
   DX cooling coil object (\hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} or \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed})
 \end{itemize}
