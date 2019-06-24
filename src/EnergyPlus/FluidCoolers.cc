@@ -131,19 +131,19 @@ namespace FluidCoolers {
     }
 
     void FluidCoolerspecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool const EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool const RunFlag) {
-        this->InitFluidCooler();
+        this->initialize();
         if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
-            this->SingleSpeedFluidCooler();
+            this->calcSingleSpeed();
         } else {
-            this->TwoSpeedFluidCooler();
+            this->calcTwoSpeed();
         }
-        this->UpdateFluidCooler();
-        this->ReportFluidCooler(RunFlag);
+        this->update();
+        this->report(RunFlag);
     }
 
     void FluidCoolerspecs::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) {
-        this->InitFluidCooler();
-        this->SizeFluidCooler();
+        this->initialize();
+        this->size();
     }
 
     void FluidCoolerspecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
@@ -269,7 +269,7 @@ namespace FluidCoolers {
                 }
             }
 
-            ErrorsFound |= SimpleFluidCooler(FluidCoolerNum).TestFluidCoolerSingleSpeedInputForDesign(
+            ErrorsFound |= SimpleFluidCooler(FluidCoolerNum).validateSingleSpeedInputs(
                                              cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
 
         } // End Single-Speed fluid cooler Loop
@@ -363,7 +363,7 @@ namespace FluidCoolers {
                 }
             }
 
-            ErrorsFound |= SimpleFluidCooler(FluidCoolerNum).TestFluidCoolerTwoSpeedInputForDesign(
+            ErrorsFound |= SimpleFluidCooler(FluidCoolerNum).validateTwoSpeedInputs(
                                              cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
         }
 
@@ -417,7 +417,7 @@ namespace FluidCoolers {
                             "Plant");
 }
 
-    bool FluidCoolerspecs::TestFluidCoolerSingleSpeedInputForDesign(std::string const &cCurrentModuleObject,
+    bool FluidCoolerspecs::validateSingleSpeedInputs(std::string const &cCurrentModuleObject,
                                                   Array1D<std::string> const &AlphArray,
                                                   Array1D<std::string> const &cNumericFieldNames,
                                                   Array1D<std::string> const &cAlphaFieldNames)
@@ -516,7 +516,7 @@ namespace FluidCoolers {
         return ErrorsFound;
     }
 
-    bool FluidCoolerspecs::TestFluidCoolerTwoSpeedInputForDesign(std::string const &cCurrentModuleObject,
+    bool FluidCoolerspecs::validateTwoSpeedInputs(std::string const &cCurrentModuleObject,
                                                Array1D<std::string> const &AlphArray,
                                                Array1D<std::string> const &cNumericFieldNames,
                                                Array1D<std::string> const &cAlphaFieldNames)
@@ -675,7 +675,7 @@ namespace FluidCoolers {
         return ErrorsFound;
     }
 
-    void FluidCoolerspecs::InitFluidCooler()
+    void FluidCoolerspecs::initialize()
     {
 
         // SUBROUTINE INFORMATION:
@@ -779,7 +779,7 @@ namespace FluidCoolers {
                              this->CompNum);
     }
 
-    void FluidCoolerspecs::SizeFluidCooler()
+    void FluidCoolerspecs::size()
     {
 
         // SUBROUTINE INFORMATION:
@@ -1481,7 +1481,7 @@ namespace FluidCoolers {
         }
     }
 
-    void FluidCoolerspecs::SingleSpeedFluidCooler()
+    void FluidCoolerspecs::calcSingleSpeed()
     {
 
         // SUBROUTINE INFORMATION:
@@ -1581,7 +1581,7 @@ namespace FluidCoolers {
         this->Qactual = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(waterInletNode).Temp - this->OutletWaterTemp);
     }
 
-    void FluidCoolerspecs::TwoSpeedFluidCooler()
+    void FluidCoolerspecs::calcTwoSpeed()
     {
 
         // SUBROUTINE INFORMATION:
@@ -1808,7 +1808,7 @@ namespace FluidCoolers {
         return Residuum;
     }
 
-    void FluidCoolerspecs::UpdateFluidCooler()
+    void FluidCoolerspecs::update()
     {
 
         // SUBROUTINE INFORMATION:
@@ -1894,7 +1894,7 @@ namespace FluidCoolers {
         }
     }
 
-    void FluidCoolerspecs::ReportFluidCooler(bool const RunFlag)
+    void FluidCoolerspecs::report(bool const RunFlag)
     {
 
         // SUBROUTINE INFORMATION:

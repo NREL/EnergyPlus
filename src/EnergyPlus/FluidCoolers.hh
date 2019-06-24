@@ -165,29 +165,29 @@ namespace FluidCoolers {
         {
         }
 
-        void InitFluidCooler();
+        void initialize();
 
         void setupOutputVars();
 
-        void SizeFluidCooler();
+        void size();
 
-        void UpdateFluidCooler();
+        void update();
 
-        void ReportFluidCooler(bool RunFlag);
+        void report(bool RunFlag);
 
-        bool TestFluidCoolerSingleSpeedInputForDesign(std::string const &cCurrentModuleObject,
+        bool validateSingleSpeedInputs(std::string const &cCurrentModuleObject,
                                                       Array1D<std::string> const &AlphArray,
                                                       Array1D<std::string> const &cNumericFieldNames,
                                                       Array1D<std::string> const &cAlphaFieldNames);
 
-        bool TestFluidCoolerTwoSpeedInputForDesign(std::string const &cCurrentModuleObject,
+        bool validateTwoSpeedInputs(std::string const &cCurrentModuleObject,
                                                    Array1D<std::string> const &AlphArray,
                                                    Array1D<std::string> const &cNumericFieldNames,
                                                    Array1D<std::string> const &cAlphaFieldNames);
 
-        void SingleSpeedFluidCooler();
+        void calcSingleSpeed();
 
-        void TwoSpeedFluidCooler();
+        void calcTwoSpeed();
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -203,15 +203,6 @@ namespace FluidCoolers {
     };
 
     extern Array1D<FluidCoolerspecs> SimpleFluidCooler;           // dimension to number of machines
-
-    void SimFluidCoolers(std::string &FluidCoolerType,
-                         std::string &FluidCoolerName,
-                         int &CompIndex,
-                         bool &RunFlag,
-                         bool InitLoopEquip,
-                         Real64 &MaxCap,
-                         Real64 &MinCap,
-                         Real64 &OptCap);
 
     void GetFluidCoolerInput();
 
