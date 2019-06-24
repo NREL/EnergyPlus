@@ -130,7 +130,11 @@ namespace FluidCoolers {
         return nullptr;
     }
 
-    void FluidCoolerspecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool const EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool const RunFlag) {
+    void FluidCoolerspecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                    bool const EP_UNUSED(FirstHVACIteration),
+                                    Real64 &EP_UNUSED(CurLoad),
+                                    bool const RunFlag)
+    {
         this->initialize();
         if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
             this->calcSingleSpeed();
@@ -141,15 +145,14 @@ namespace FluidCoolers {
         this->report(RunFlag);
     }
 
-    void FluidCoolerspecs::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) {
+    void FluidCoolerspecs::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    {
         this->initialize();
         this->size();
     }
 
-    void FluidCoolerspecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
-                             Real64 &MaxLoad,
-                             Real64 &MinLoad,
-                             Real64 &OptLoad) {
+    void FluidCoolerspecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    {
         MaxLoad = this->FluidCoolerNominalCapacity;
         OptLoad = this->FluidCoolerNominalCapacity;
         MinLoad = 0.0;
@@ -177,12 +180,12 @@ namespace FluidCoolers {
         using namespace DataIPShortCuts; // Data for field names, blank numerics
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumAlphas;                    // Number of elements in the alpha array
-        int NumNums;                      // Number of elements in the numeric array
-        int IOStat;                       // IO Status when calling get input subroutine
-        bool ErrorsFound(false);   // Logical flag set .TRUE. if errors found while getting input data
-        Array1D<Real64> NumArray(16);     // Numeric input data array
-        Array1D_string AlphArray(5);      // Character string input data array
+        int NumAlphas;                // Number of elements in the alpha array
+        int NumNums;                  // Number of elements in the numeric array
+        int IOStat;                   // IO Status when calling get input subroutine
+        bool ErrorsFound(false);      // Logical flag set .TRUE. if errors found while getting input data
+        Array1D<Real64> NumArray(16); // Numeric input data array
+        Array1D_string AlphArray(5);  // Character string input data array
 
         // Get number of all Fluid Coolers specified in the input data file (idf)
         int const NumSingleSpeedFluidCoolers = inputProcessor->getNumObjectsFound("FluidCooler:SingleSpeed");
@@ -226,10 +229,22 @@ namespace FluidCoolers {
             SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num = DataPlant::TypeOf_FluidCooler_SingleSpd;
             SimpleFluidCooler(FluidCoolerNum).indexInArray = FluidCoolerNum;
             SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 2.5;
-            SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(
-                AlphArray(2), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
-            SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(
-                AlphArray(3), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
+            SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(2),
+                                                                                                      ErrorsFound,
+                                                                                                      cCurrentModuleObject,
+                                                                                                      AlphArray(1),
+                                                                                                      DataLoopNode::NodeType_Water,
+                                                                                                      DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                      1,
+                                                                                                      DataLoopNode::ObjectIsNotParent);
+            SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(3),
+                                                                                                       ErrorsFound,
+                                                                                                       cCurrentModuleObject,
+                                                                                                       AlphArray(1),
+                                                                                                       DataLoopNode::NodeType_Water,
+                                                                                                       DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                       1,
+                                                                                                       DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
             SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = NumArray(1);
             SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity = NumArray(2);
@@ -253,14 +268,15 @@ namespace FluidCoolers {
             if (AlphArray(5).empty()) {
                 SimpleFluidCooler(FluidCoolerNum).OutdoorAirInletNodeNum = 0;
             } else {
-                SimpleFluidCooler(FluidCoolerNum).OutdoorAirInletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(5),
-                                                                                             ErrorsFound,
-                                                                                             cCurrentModuleObject,
-                                                                                             SimpleFluidCooler(FluidCoolerNum).Name,
-                                                                                             DataLoopNode::NodeType_Air,
-                                                                                             DataLoopNode::NodeConnectionType_OutsideAirReference,
-                                                                                             1,
-                                                                                             DataLoopNode::ObjectIsNotParent);
+                SimpleFluidCooler(FluidCoolerNum).OutdoorAirInletNodeNum =
+                    NodeInputManager::GetOnlySingleNode(AlphArray(5),
+                                                        ErrorsFound,
+                                                        cCurrentModuleObject,
+                                                        SimpleFluidCooler(FluidCoolerNum).Name,
+                                                        DataLoopNode::NodeType_Air,
+                                                        DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                        1,
+                                                        DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(SimpleFluidCooler(FluidCoolerNum).OutdoorAirInletNodeNum)) {
                     ShowSevereError(cCurrentModuleObject + "= \"" + SimpleFluidCooler(FluidCoolerNum).Name + "\" " + cAlphaFieldNames(5) + "= \"" +
                                     AlphArray(5) + "\" not valid.");
@@ -269,8 +285,8 @@ namespace FluidCoolers {
                 }
             }
 
-            ErrorsFound |= SimpleFluidCooler(FluidCoolerNum).validateSingleSpeedInputs(
-                                             cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+            ErrorsFound |=
+                SimpleFluidCooler(FluidCoolerNum).validateSingleSpeedInputs(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
 
         } // End Single-Speed fluid cooler Loop
 
@@ -296,10 +312,22 @@ namespace FluidCoolers {
             SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num = DataPlant::TypeOf_FluidCooler_TwoSpd;
             SimpleFluidCooler(FluidCoolerNum).indexInArray = FluidCoolerNum;
             SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 2.5;
-            SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(
-                AlphArray(2), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
-            SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(
-                AlphArray(3), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
+            SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(2),
+                                                                                                      ErrorsFound,
+                                                                                                      cCurrentModuleObject,
+                                                                                                      AlphArray(1),
+                                                                                                      DataLoopNode::NodeType_Water,
+                                                                                                      DataLoopNode::NodeConnectionType_Inlet,
+                                                                                                      1,
+                                                                                                      DataLoopNode::ObjectIsNotParent);
+            SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(3),
+                                                                                                       ErrorsFound,
+                                                                                                       cCurrentModuleObject,
+                                                                                                       AlphArray(1),
+                                                                                                       DataLoopNode::NodeType_Water,
+                                                                                                       DataLoopNode::NodeConnectionType_Outlet,
+                                                                                                       1,
+                                                                                                       DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
             SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = NumArray(1);
@@ -347,14 +375,15 @@ namespace FluidCoolers {
             if (AlphArray(5).empty()) {
                 SimpleFluidCooler(FluidCoolerNum).OutdoorAirInletNodeNum = 0;
             } else {
-                SimpleFluidCooler(FluidCoolerNum).OutdoorAirInletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(5),
-                                                                                             ErrorsFound,
-                                                                                             cCurrentModuleObject,
-                                                                                             SimpleFluidCooler(FluidCoolerNum).Name,
-                                                                                             DataLoopNode::NodeType_Air,
-                                                                                             DataLoopNode::NodeConnectionType_OutsideAirReference,
-                                                                                             1,
-                                                                                             DataLoopNode::ObjectIsNotParent);
+                SimpleFluidCooler(FluidCoolerNum).OutdoorAirInletNodeNum =
+                    NodeInputManager::GetOnlySingleNode(AlphArray(5),
+                                                        ErrorsFound,
+                                                        cCurrentModuleObject,
+                                                        SimpleFluidCooler(FluidCoolerNum).Name,
+                                                        DataLoopNode::NodeType_Air,
+                                                        DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                        1,
+                                                        DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(SimpleFluidCooler(FluidCoolerNum).OutdoorAirInletNodeNum)) {
                     ShowSevereError(cCurrentModuleObject + "= \"" + SimpleFluidCooler(FluidCoolerNum).Name + "\" " + cAlphaFieldNames(5) + "= \"" +
                                     AlphArray(5) + "\" not valid.");
@@ -363,8 +392,8 @@ namespace FluidCoolers {
                 }
             }
 
-            ErrorsFound |= SimpleFluidCooler(FluidCoolerNum).validateTwoSpeedInputs(
-                                             cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+            ErrorsFound |=
+                SimpleFluidCooler(FluidCoolerNum).validateTwoSpeedInputs(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
         }
 
         if (ErrorsFound) {
@@ -372,38 +401,14 @@ namespace FluidCoolers {
         }
     }
 
-    void FluidCoolerspecs::setupOutputVars() {
+    void FluidCoolerspecs::setupOutputVars()
+    {
 
-        SetupOutputVariable("Cooling Tower Inlet Temperature",
-                            OutputProcessor::Unit::C,
-                            this->InletWaterTemp,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Cooling Tower Outlet Temperature",
-                            OutputProcessor::Unit::C,
-                            this->OutletWaterTemp,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Cooling Tower Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
-                            this->WaterMassFlowRate,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Cooling Tower Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
-                            this->Qactual,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Cooling Tower Fan Electric Power",
-                            OutputProcessor::Unit::W,
-                            this->FanPower,
-                            "System",
-                            "Average",
-                            this->Name);
+        SetupOutputVariable("Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, this->InletWaterTemp, "System", "Average", this->Name);
+        SetupOutputVariable("Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, this->OutletWaterTemp, "System", "Average", this->Name);
+        SetupOutputVariable("Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, "System", "Average", this->Name);
+        SetupOutputVariable("Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
+        SetupOutputVariable("Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
         SetupOutputVariable("Cooling Tower Fan Electric Energy",
                             OutputProcessor::Unit::J,
                             this->FanEnergy,
@@ -415,12 +420,12 @@ namespace FluidCoolers {
                             "HeatRejection",
                             _,
                             "Plant");
-}
+    }
 
     bool FluidCoolerspecs::validateSingleSpeedInputs(std::string const &cCurrentModuleObject,
-                                                  Array1D<std::string> const &AlphArray,
-                                                  Array1D<std::string> const &cNumericFieldNames,
-                                                  Array1D<std::string> const &cAlphaFieldNames)
+                                                     Array1D<std::string> const &AlphArray,
+                                                     Array1D<std::string> const &cNumericFieldNames,
+                                                     Array1D<std::string> const &cAlphaFieldNames)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR:          Chandan Sharma
@@ -483,8 +488,7 @@ namespace FluidCoolers {
         //   Check various inputs for both the performance input methods
         if (UtilityRoutines::SameString(AlphArray(4), "UFactorTimesAreaAndDesignWaterFlowRate")) {
             this->PerformanceInputMethod_Num = PerfInputMethod::U_FACTOR;
-            if (this->HighSpeedFluidCoolerUA <= 0.0 &&
-                this->HighSpeedFluidCoolerUA != DataSizing::AutoSize) {
+            if (this->HighSpeedFluidCoolerUA <= 0.0 && this->HighSpeedFluidCoolerUA != DataSizing::AutoSize) {
                 ShowSevereError(cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" + cNumericFieldNames(1) +
                                 "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                 ErrorsFound = true;
@@ -517,9 +521,9 @@ namespace FluidCoolers {
     }
 
     bool FluidCoolerspecs::validateTwoSpeedInputs(std::string const &cCurrentModuleObject,
-                                               Array1D<std::string> const &AlphArray,
-                                               Array1D<std::string> const &cNumericFieldNames,
-                                               Array1D<std::string> const &cAlphaFieldNames)
+                                                  Array1D<std::string> const &AlphArray,
+                                                  Array1D<std::string> const &cNumericFieldNames,
+                                                  Array1D<std::string> const &cAlphaFieldNames)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR:          Chandan Sharma
@@ -582,8 +586,7 @@ namespace FluidCoolers {
         }
         //   High speed air flow rate must be greater than low speed air flow rate.
         //   Can't tell yet if autosized, check later in InitFluidCooler.
-        if (this->HighSpeedAirFlowRate <= this->LowSpeedAirFlowRate &&
-            !this->HighSpeedAirFlowRateWasAutoSized) {
+        if (this->HighSpeedAirFlowRate <= this->LowSpeedAirFlowRate && !this->HighSpeedAirFlowRateWasAutoSized) {
             ShowSevereError(cCurrentModuleObject + "= \"" + this->Name +
                             "\". Fluid cooler air flow rate at low fan speed must be less than the air flow rate at high fan speed.");
             ErrorsFound = true;
@@ -598,8 +601,7 @@ namespace FluidCoolers {
                             "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
             ErrorsFound = true;
         }
-        if (this->HighSpeedFanPower <= this->LowSpeedFanPower &&
-            !this->HighSpeedFanPowerWasAutoSized) {
+        if (this->HighSpeedFanPower <= this->LowSpeedFanPower && !this->HighSpeedFanPowerWasAutoSized) {
             ShowSevereError(cCurrentModuleObject + "= \"" + this->Name +
                             "\". Fluid cooler low speed fan power must be less than high speed fan power.");
             ErrorsFound = true;
@@ -607,20 +609,17 @@ namespace FluidCoolers {
 
         if (UtilityRoutines::SameString(AlphArray(4), "UFactorTimesAreaAndDesignWaterFlowRate")) {
             this->PerformanceInputMethod_Num = PerfInputMethod::U_FACTOR;
-            if (this->HighSpeedFluidCoolerUA <= 0.0 &&
-                !this->HighSpeedFluidCoolerUAWasAutoSized) {
+            if (this->HighSpeedFluidCoolerUA <= 0.0 && !this->HighSpeedFluidCoolerUAWasAutoSized) {
                 ShowSevereError(cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" + cNumericFieldNames(1) +
                                 "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                 ErrorsFound = true;
             }
-            if (this->LowSpeedFluidCoolerUA <= 0.0 &&
-                !this->LowSpeedFluidCoolerUAWasAutoSized) {
+            if (this->LowSpeedFluidCoolerUA <= 0.0 && !this->LowSpeedFluidCoolerUAWasAutoSized) {
                 ShowSevereError(cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" + cNumericFieldNames(2) +
                                 "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
                 ErrorsFound = true;
             }
-            if (this->HighSpeedFluidCoolerUA <= this->LowSpeedFluidCoolerUA &&
-                !this->HighSpeedFluidCoolerUAWasAutoSized) {
+            if (this->HighSpeedFluidCoolerUA <= this->LowSpeedFluidCoolerUA && !this->HighSpeedFluidCoolerUAWasAutoSized) {
                 ShowSevereError(cCurrentModuleObject + "= \"" + this->Name +
                                 "\". Fluid cooler UA at low fan speed must be less than the fluid cooler UA at high fan speed.");
                 ErrorsFound = true;
@@ -632,8 +631,7 @@ namespace FluidCoolers {
                                 "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames(4) + "= \"" + AlphArray(4) + "\".");
                 ErrorsFound = true;
             }
-            if (this->FluidCoolerLowSpeedNomCap <= 0.0 &&
-                !this->FluidCoolerLowSpeedNomCapWasAutoSized) {
+            if (this->FluidCoolerLowSpeedNomCap <= 0.0 && !this->FluidCoolerLowSpeedNomCapWasAutoSized) {
                 ShowSevereError(cCurrentModuleObject + " = \"" + AlphArray(1) + "\", invalid data for \"" + cNumericFieldNames(5) +
                                 "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames(4) + "= \"" + AlphArray(4) + "\".");
                 ErrorsFound = true;
@@ -705,18 +703,8 @@ namespace FluidCoolers {
             this->setupOutputVars();
 
             // Locate the tower on the plant loops for later usage
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
-                                                    this->FluidCoolerType_Num,
-                                    this->LoopNum,
-                                    this->LoopSideNum,
-                                    this->BranchNum,
-                                    this->CompNum,
-                                    ErrorsFound,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                this->Name, this->FluidCoolerType_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
 
             if (ErrorsFound) {
                 ShowFatalError("InitFluidCooler: Program terminated due to previous condition(s).");
@@ -729,18 +717,18 @@ namespace FluidCoolers {
         if (this->beginEnvrnInit && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                   DataGlobals::InitConvTemp,
-                                                    DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                   RoutineName);
+                                                                 DataGlobals::InitConvTemp,
+                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                 RoutineName);
             this->DesWaterMassFlowRate = this->DesignWaterFlowRate * rho;
             PlantUtilities::InitComponentNodes(0.0,
-                               this->DesWaterMassFlowRate,
-                               this->WaterInletNodeNum,
-                               this->WaterOutletNodeNum,
-                               this->LoopNum,
-                               this->LoopSideNum,
-                               this->BranchNum,
-                               this->CompNum);
+                                               this->DesWaterMassFlowRate,
+                                               this->WaterInletNodeNum,
+                                               this->WaterOutletNodeNum,
+                                               this->LoopNum,
+                                               this->LoopSideNum,
+                                               this->BranchNum,
+                                               this->CompNum);
             this->beginEnvrnInit = false;
         }
 
@@ -763,20 +751,16 @@ namespace FluidCoolers {
             this->AirWetBulb = DataEnvironment::OutWetBulbTemp;
         }
 
-        this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(this->LoopNum,
-                                                           this->LoopSideNum,
-                                                           this->BranchNum,
-                                                           this->CompNum,
-                                                           this->DesWaterMassFlowRate *
-                                                               this->FluidCoolerMassFlowRateMultiplier);
+        this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(
+            this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesWaterMassFlowRate * this->FluidCoolerMassFlowRateMultiplier);
 
         PlantUtilities::SetComponentFlowRate(this->WaterMassFlowRate,
-                             this->WaterInletNodeNum,
-                             this->WaterOutletNodeNum,
-                             this->LoopNum,
-                             this->LoopSideNum,
-                             this->BranchNum,
-                             this->CompNum);
+                                             this->WaterInletNodeNum,
+                                             this->WaterOutletNodeNum,
+                                             this->LoopNum,
+                                             this->LoopSideNum,
+                                             this->BranchNum,
+                                             this->CompNum);
     }
 
     void FluidCoolerspecs::size()
@@ -837,16 +821,12 @@ namespace FluidCoolers {
                 }
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                           this->Name,
-                                           "Design Water Flow Rate [m3/s]",
-                                           this->DesignWaterFlowRate);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->FluidCoolerType, this->Name, "Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                           this->Name,
-                                           "Initial Design Water Flow Rate [m3/s]",
-                                           this->DesignWaterFlowRate);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->FluidCoolerType, this->Name, "Initial Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                     }
                 }
             } else {
@@ -861,8 +841,7 @@ namespace FluidCoolers {
                 ShowSevereError("Error when autosizing the UA value for fluid cooler = " + this->Name + '.');
                 ShowContinueError("Design Loop Exit Temperature (" + General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2) +
                                   " C) must be greater than design entering air dry-bulb temperature (" +
-                                          General::RoundSigDigits(this->DesignEnteringAirTemp, 2) +
-                                  " C) when autosizing the fluid cooler UA.");
+                                  General::RoundSigDigits(this->DesignEnteringAirTemp, 2) + " C) when autosizing the fluid cooler UA.");
                 ShowContinueError("It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp plus the Fluid Cooler "
                                   "design approach temperature (e.g., 4 C).");
                 ShowContinueError("If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be "
@@ -873,17 +852,16 @@ namespace FluidCoolers {
 
         PlantUtilities::RegisterPlantCompDesignFlow(this->WaterInletNodeNum, tmpDesignWaterFlowRate);
 
-        if (this->PerformanceInputMethod_Num == PerfInputMethod::U_FACTOR &&
-            this->HighSpeedFluidCoolerUAWasAutoSized) {
+        if (this->PerformanceInputMethod_Num == PerfInputMethod::U_FACTOR && this->HighSpeedFluidCoolerUAWasAutoSized) {
             if (PltSizCondNum > 0) {
                 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                       DataGlobals::InitConvTemp,
+                                                        DataGlobals::InitConvTemp,
                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                       CalledFrom);
+                                                        CalledFrom);
                 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
                                                             DataSizing::PlantSizData(PltSizCondNum).ExitTemp,
                                                             DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                           CalledFrom);
+                                                            CalledFrom);
                 DesFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * DataSizing::PlantSizData(PltSizCondNum).DeltaT;
                 if (DataPlant::PlantFirstSizesOkayToFinalize) this->FluidCoolerNominalCapacity = DesFluidCoolerLoad;
             } else {
@@ -905,12 +883,12 @@ namespace FluidCoolers {
                         // This conditional statement is to trap when the user specified Condenser/Fluid Cooler water design setpoint
                         // temperature is less than design inlet air dry bulb temperature
                         if (DataSizing::PlantSizData(PltSizCondNum).ExitTemp <= this->DesignEnteringAirTemp &&
-                                DataPlant::PlantFirstSizesOkayToFinalize) {
+                            DataPlant::PlantFirstSizesOkayToFinalize) {
                             ShowSevereError("Error when autosizing the UA value for fluid cooler = " + this->Name + '.');
-                            ShowContinueError("Design Loop Exit Temperature (" + General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2) +
+                            ShowContinueError("Design Loop Exit Temperature (" +
+                                              General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2) +
                                               " C) must be greater than design entering air dry-bulb temperature (" +
-                                                      General::RoundSigDigits(this->DesignEnteringAirTemp, 2) +
-                                              " C) when autosizing the fluid cooler UA.");
+                                              General::RoundSigDigits(this->DesignEnteringAirTemp, 2) + " C) when autosizing the fluid cooler UA.");
                             ShowContinueError("It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp plus the "
                                               "Fluid Cooler design approach temperature (e.g., 4 C).");
                             ShowContinueError("If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design "
@@ -918,13 +896,13 @@ namespace FluidCoolers {
                             ShowFatalError("Review and revise design input values as appropriate.");
                         }
                         rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                               DataGlobals::InitConvTemp,
+                                                                DataGlobals::InitConvTemp,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                               CalledFrom);
+                                                                CalledFrom);
                         Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
                                                                     DataSizing::PlantSizData(PltSizCondNum).ExitTemp,
                                                                     DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                                   CalledFrom);
+                                                                    CalledFrom);
                         DesFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * DataSizing::PlantSizData(PltSizCondNum).DeltaT;
                         tmpHighSpeedFanPower = 0.0105 * DesFluidCoolerLoad;
                         if (DataPlant::PlantFirstSizesOkayToFinalize) this->HighSpeedFanPower = tmpHighSpeedFanPower;
@@ -942,31 +920,23 @@ namespace FluidCoolers {
             if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                           this->Name,
-                                           "Fan Power at Design Air Flow Rate [W]",
-                                           this->HighSpeedFanPower);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->FluidCoolerType, this->Name, "Fan Power at Design Air Flow Rate [W]", this->HighSpeedFanPower);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                           this->Name,
-                                           "Initial Fan Power at Design Air Flow Rate [W]",
-                                           this->HighSpeedFanPower);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->FluidCoolerType, this->Name, "Initial Fan Power at Design Air Flow Rate [W]", this->HighSpeedFanPower);
                     }
                 }
             } else if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_TwoSpd) {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                           this->Name,
-                                           "Fan Power at High Fan Speed [W]",
-                                           this->HighSpeedFanPower);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->FluidCoolerType, this->Name, "Fan Power at High Fan Speed [W]", this->HighSpeedFanPower);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                           this->Name,
-                                           "Initial Fan Power at High Fan Speed [W]",
-                                           this->HighSpeedFanPower);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->FluidCoolerType, this->Name, "Initial Fan Power at High Fan Speed [W]", this->HighSpeedFanPower);
                     }
                 }
             }
@@ -974,27 +944,23 @@ namespace FluidCoolers {
 
         if (this->HighSpeedAirFlowRateWasAutoSized) {
             if (this->PerformanceInputMethod_Num == PerfInputMethod::NOMINAL_CAPACITY) {
-                tmpHighSpeedAirFlowRate =
-                    this->FluidCoolerNominalCapacity /
-                    (this->DesignEnteringWaterTemp - this->DesignEnteringAirTemp) * 4.0;
+                tmpHighSpeedAirFlowRate = this->FluidCoolerNominalCapacity / (this->DesignEnteringWaterTemp - this->DesignEnteringAirTemp) * 4.0;
                 if (DataPlant::PlantFirstSizesOkayToFinalize) this->HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
             } else {
                 if (DesFluidCoolerLoad > 0.0) {
-                    tmpHighSpeedAirFlowRate =
-                        DesFluidCoolerLoad /
-                        (this->DesignEnteringWaterTemp - this->DesignEnteringAirTemp) * 4.0;
+                    tmpHighSpeedAirFlowRate = DesFluidCoolerLoad / (this->DesignEnteringWaterTemp - this->DesignEnteringAirTemp) * 4.0;
                     if (DataPlant::PlantFirstSizesOkayToFinalize) this->HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
                 } else if (PltSizCondNum > 0) {
                     if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                         // This conditional statement is to trap when the user specified Condenser/Fluid Cooler water design setpoint
                         // temperature is less than design inlet air dry bulb temperature
                         if (DataSizing::PlantSizData(PltSizCondNum).ExitTemp <= this->DesignEnteringAirTemp &&
-                                DataPlant::PlantFirstSizesOkayToFinalize) {
+                            DataPlant::PlantFirstSizesOkayToFinalize) {
                             ShowSevereError("Error when autosizing the UA value for fluid cooler = " + this->Name + '.');
-                            ShowContinueError("Design Loop Exit Temperature (" + General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2) +
+                            ShowContinueError("Design Loop Exit Temperature (" +
+                                              General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2) +
                                               " C) must be greater than design entering air dry-bulb temperature (" +
-                                                      General::RoundSigDigits(this->DesignEnteringAirTemp, 2) +
-                                              " C) when autosizing the fluid cooler UA.");
+                                              General::RoundSigDigits(this->DesignEnteringAirTemp, 2) + " C) when autosizing the fluid cooler UA.");
                             ShowContinueError("It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp plus the "
                                               "Fluid Cooler design approach temperature (e.g., 4 C).");
                             ShowContinueError("If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design "
@@ -1002,18 +968,15 @@ namespace FluidCoolers {
                             ShowFatalError("Review and revise design input values as appropriate.");
                         }
                         rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                               DataGlobals::InitConvTemp,
+                                                                DataGlobals::InitConvTemp,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                               CalledFrom);
+                                                                CalledFrom);
                         Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
                                                                     DataSizing::PlantSizData(PltSizCondNum).ExitTemp,
                                                                     DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                                   CalledFrom);
+                                                                    CalledFrom);
                         DesFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * DataSizing::PlantSizData(PltSizCondNum).DeltaT;
-                        tmpHighSpeedAirFlowRate =
-                            DesFluidCoolerLoad /
-                            (this->DesignEnteringWaterTemp - this->DesignEnteringAirTemp) *
-                            4.0;
+                        tmpHighSpeedAirFlowRate = DesFluidCoolerLoad / (this->DesignEnteringWaterTemp - this->DesignEnteringAirTemp) * 4.0;
                         if (DataPlant::PlantFirstSizesOkayToFinalize) this->HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
                     } else {
                         tmpHighSpeedAirFlowRate = 0.0;
@@ -1029,31 +992,23 @@ namespace FluidCoolers {
             if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                           this->Name,
-                                           "Design Air Flow Rate [m3/s]",
-                                           this->HighSpeedAirFlowRate);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->FluidCoolerType, this->Name, "Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                           this->Name,
-                                           "Initial Design Air Flow Rate [m3/s]",
-                                           this->HighSpeedAirFlowRate);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->FluidCoolerType, this->Name, "Initial Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                     }
                 }
             } else if (this->FluidCoolerType == "FluidCooler:TwoSpeed") {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                           this->Name,
-                                           "Air Flow Rate at High Fan Speed [m3/s]",
-                                           this->HighSpeedAirFlowRate);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->FluidCoolerType, this->Name, "Air Flow Rate at High Fan Speed [m3/s]", this->HighSpeedAirFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                           this->Name,
-                                           "Initial Air Flow Rate at High Fan Speed [m3/s]",
-                                           this->HighSpeedAirFlowRate);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->FluidCoolerType, this->Name, "Initial Air Flow Rate at High Fan Speed [m3/s]", this->HighSpeedAirFlowRate);
                     }
                 }
             }
@@ -1064,13 +1019,12 @@ namespace FluidCoolers {
                 if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                     // This conditional statement is to trap when the user specified Condenser/Fluid Cooler water design setpoint
                     // temperature is less than design inlet air dry bulb temperature
-                    if (DataSizing::PlantSizData(PltSizCondNum).ExitTemp <= this->DesignEnteringAirTemp &&
-                            DataPlant::PlantFirstSizesOkayToFinalize) {
+                    if (DataSizing::PlantSizData(PltSizCondNum).ExitTemp <= this->DesignEnteringAirTemp && DataPlant::PlantFirstSizesOkayToFinalize) {
                         ShowSevereError("Error when autosizing the UA value for fluid cooler = " + this->Name + '.');
-                        ShowContinueError("Design Loop Exit Temperature (" + General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2) +
+                        ShowContinueError("Design Loop Exit Temperature (" +
+                                          General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2) +
                                           " C) must be greater than design entering air dry-bulb temperature (" +
-                                                  General::RoundSigDigits(this->DesignEnteringAirTemp, 2) +
-                                          " C) when autosizing the fluid cooler UA.");
+                                          General::RoundSigDigits(this->DesignEnteringAirTemp, 2) + " C) when autosizing the fluid cooler UA.");
                         ShowContinueError("It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp plus the Fluid "
                                           "Cooler design approach temperature (e.g., 4 C).");
                         ShowContinueError("If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint "
@@ -1078,13 +1032,13 @@ namespace FluidCoolers {
                         ShowFatalError("Review and revise design input values as appropriate.");
                     }
                     rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                           DataGlobals::InitConvTemp,
+                                                            DataGlobals::InitConvTemp,
                                                             DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                           CalledFrom);
+                                                            CalledFrom);
                     Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
                                                                 DataSizing::PlantSizData(PltSizCondNum).ExitTemp,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                               CalledFrom);
+                                                                CalledFrom);
                     DesFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * DataSizing::PlantSizData(PltSizCondNum).DeltaT;
                     Par(1) = DesFluidCoolerLoad;
                     Par(2) = double(this->indexInArray);
@@ -1097,10 +1051,7 @@ namespace FluidCoolers {
                     this->AirTemp = this->DesignEnteringAirTemp;
                     this->AirWetBulb = this->DesignEnteringAirWetBulbTemp;
                     this->AirPress = DataEnvironment::StdBaroPress;
-                    this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp,
-                                                                                      this->AirWetBulb,
-                                                                                      this->AirPress,
-                                                                                      CalledFrom);
+                    this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp, this->AirWetBulb, this->AirPress, CalledFrom);
                     General::SolveRoot(Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par);
                     if (SolFla == -1) {
                         ShowWarningError("Iteration limit exceeded in calculating fluid cooler UA.");
@@ -1124,17 +1075,15 @@ namespace FluidCoolers {
                         ShowContinueError("Inputs to the fluid cooler object:");
                         ShowContinueError("Design Fluid Cooler Load [W]                       = " + General::RoundSigDigits(Par(1), 2));
                         ShowContinueError("Design Fluid Cooler Water Volume Flow Rate [m3/s]  = " +
-                                                  General::RoundSigDigits(this->DesignWaterFlowRate, 6));
+                                          General::RoundSigDigits(this->DesignWaterFlowRate, 6));
                         ShowContinueError("Design Fluid Cooler Air Volume Flow Rate [m3/s]    = " + General::RoundSigDigits(Par(4), 2));
-                        ShowContinueError("Design Fluid Cooler Air Inlet Dry-bulb Temp [C]    = " +
-                                                  General::RoundSigDigits(this->AirTemp, 2));
+                        ShowContinueError("Design Fluid Cooler Air Inlet Dry-bulb Temp [C]    = " + General::RoundSigDigits(this->AirTemp, 2));
                         ShowContinueError("Inputs to the plant sizing object:");
                         ShowContinueError("Design Exit Water Temp [C]                         = " +
-                                                  General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2));
+                                          General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2));
                         ShowContinueError("Loop Design Temperature Difference [C]             = " +
-                                                  General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).DeltaT, 2));
-                        ShowContinueError("Design Fluid Cooler Water Inlet Temp [C]           = " +
-                                                  General::RoundSigDigits(this->WaterTemp, 2));
+                                          General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).DeltaT, 2));
+                        ShowContinueError("Design Fluid Cooler Water Inlet Temp [C]           = " + General::RoundSigDigits(this->WaterTemp, 2));
                         ShowContinueError("Calculated water outlet temp at low UA [C] (UA = " + General::RoundSigDigits(UA0, 2) +
                                           " W/K) = " + General::RoundSigDigits(OutWaterTempAtUA0, 2));
                         ShowContinueError("Calculated water outlet temp at high UA [C](UA = " + General::RoundSigDigits(UA1, 2) +
@@ -1152,30 +1101,28 @@ namespace FluidCoolers {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                               this->Name,
-                                               "U-factor Times Area Value at Design Air Flow Rate [W/K]",
-                                               this->HighSpeedFluidCoolerUA);
+                                                                    this->Name,
+                                                                    "U-factor Times Area Value at Design Air Flow Rate [W/K]",
+                                                                    this->HighSpeedFluidCoolerUA);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                               this->Name,
-                                               "Initial U-factor Times Area Value at Design Air Flow Rate [W/K]",
-                                               this->HighSpeedFluidCoolerUA);
+                                                                    this->Name,
+                                                                    "Initial U-factor Times Area Value at Design Air Flow Rate [W/K]",
+                                                                    this->HighSpeedFluidCoolerUA);
                         }
                     }
                 } else if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_TwoSpd) {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                               this->Name,
-                                               "U-factor Times Area Value at High Fan Speed [W/K]",
-                                               this->HighSpeedFluidCoolerUA);
+                            ReportSizingManager::ReportSizingOutput(
+                                this->FluidCoolerType, this->Name, "U-factor Times Area Value at High Fan Speed [W/K]", this->HighSpeedFluidCoolerUA);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                               this->Name,
-                                               "Initial U-factor Times Area Value at High Fan Speed [W/K]",
-                                               this->HighSpeedFluidCoolerUA);
+                                                                    this->Name,
+                                                                    "Initial U-factor Times Area Value at High Fan Speed [W/K]",
+                                                                    this->HighSpeedFluidCoolerUA);
                         }
                     }
                 }
@@ -1190,31 +1137,26 @@ namespace FluidCoolers {
         if (this->PerformanceInputMethod_Num == PerfInputMethod::NOMINAL_CAPACITY) {
             if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                       DataGlobals::InitConvTemp,
+                                                        DataGlobals::InitConvTemp,
                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                       CalledFrom);
+                                                        CalledFrom);
                 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                           this->DesignEnteringWaterTemp,
+                                                            this->DesignEnteringWaterTemp,
                                                             DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                           CalledFrom);
+                                                            CalledFrom);
                 DesFluidCoolerLoad = this->FluidCoolerNominalCapacity;
                 Par(1) = DesFluidCoolerLoad;
                 Par(2) = double(this->indexInArray);
                 Par(3) = rho * tmpDesignWaterFlowRate; // design water mass flow rate
                 Par(4) = tmpHighSpeedAirFlowRate;      // design air volume flow rate
                 Par(5) = Cp;
-                UA0 = 0.0001 * DesFluidCoolerLoad; // Assume deltaT = 10000K (limit)
-                UA1 = DesFluidCoolerLoad;          // Assume deltaT = 1K
-                this->WaterTemp =
-                    this->DesignEnteringWaterTemp; // design inlet water temperature
-                this->AirTemp =
-                    this->DesignEnteringAirTemp; // design inlet air dry-bulb temp
-                this->AirWetBulb =
-                    this->DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
+                UA0 = 0.0001 * DesFluidCoolerLoad;                     // Assume deltaT = 10000K (limit)
+                UA1 = DesFluidCoolerLoad;                              // Assume deltaT = 1K
+                this->WaterTemp = this->DesignEnteringWaterTemp;       // design inlet water temperature
+                this->AirTemp = this->DesignEnteringAirTemp;           // design inlet air dry-bulb temp
+                this->AirWetBulb = this->DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
                 this->AirPress = DataEnvironment::StdBaroPress;
-                this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp,
-                                                                                  this->AirWetBulb,
-                                                                                  this->AirPress);
+                this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp, this->AirWetBulb, this->AirPress);
                 General::SolveRoot(Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowWarningError("Iteration limit exceeded in calculating fluid cooler UA.");
@@ -1238,17 +1180,15 @@ namespace FluidCoolers {
                     ShowContinueError("Inputs to the fluid cooler object:");
                     ShowContinueError("Design Fluid Cooler Load [W]                       = " + General::RoundSigDigits(Par(1), 2));
                     ShowContinueError("Design Fluid Cooler Water Volume Flow Rate [m3/s]  = " +
-                                              General::RoundSigDigits(this->DesignWaterFlowRate, 6));
+                                      General::RoundSigDigits(this->DesignWaterFlowRate, 6));
                     ShowContinueError("Design Fluid Cooler Air Volume Flow Rate [m3/s]    = " + General::RoundSigDigits(Par(4), 2));
-                    ShowContinueError("Design Fluid Cooler Air Inlet Dry-bulb Temp [C]    = " +
-                                              General::RoundSigDigits(this->AirTemp, 2));
+                    ShowContinueError("Design Fluid Cooler Air Inlet Dry-bulb Temp [C]    = " + General::RoundSigDigits(this->AirTemp, 2));
                     ShowContinueError("Inputs to the plant sizing object:");
                     ShowContinueError("Design Exit Water Temp [C]                         = " +
-                                              General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2));
+                                      General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2));
                     ShowContinueError("Loop Design Temperature Difference [C]             = " +
-                                              General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).DeltaT, 2));
-                    ShowContinueError("Design Fluid Cooler Water Inlet Temp [C]           = " +
-                                              General::RoundSigDigits(this->WaterTemp, 2));
+                                      General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).DeltaT, 2));
+                    ShowContinueError("Design Fluid Cooler Water Inlet Temp [C]           = " + General::RoundSigDigits(this->WaterTemp, 2));
                     ShowContinueError("Calculated water outlet temp at low UA [C] (UA = " + General::RoundSigDigits(UA0, 2) +
                                       " W/K) = " + General::RoundSigDigits(OutWaterTempAtUA0, 2));
                     ShowContinueError("Calculated water outlet temp at high UA [C] (UA = " + General::RoundSigDigits(UA1, 2) +
@@ -1263,140 +1203,114 @@ namespace FluidCoolers {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                           this->Name,
-                                           "Fluid cooler UA value at design air flow rate based on nominal capacity input [W/K]",
-                                           this->HighSpeedFluidCoolerUA);
+                                                                this->Name,
+                                                                "Fluid cooler UA value at design air flow rate based on nominal capacity input [W/K]",
+                                                                this->HighSpeedFluidCoolerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                           this->Name,
-                                           "Initial Fluid cooler UA value at design air flow rate based on nominal capacity input [W/K]",
-                                           this->HighSpeedFluidCoolerUA);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->FluidCoolerType,
+                            this->Name,
+                            "Initial Fluid cooler UA value at design air flow rate based on nominal capacity input [W/K]",
+                            this->HighSpeedFluidCoolerUA);
                     }
                 }
             } else if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_TwoSpd) {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                           this->Name,
-                                           "Fluid cooler UA value at high fan speed based on nominal capacity input [W/K]",
-                                           this->HighSpeedFluidCoolerUA);
+                                                                this->Name,
+                                                                "Fluid cooler UA value at high fan speed based on nominal capacity input [W/K]",
+                                                                this->HighSpeedFluidCoolerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                           this->Name,
-                                           "Initial Fluid cooler UA value at high fan speed based on nominal capacity input [W/K]",
-                                           this->HighSpeedFluidCoolerUA);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->FluidCoolerType,
+                            this->Name,
+                            "Initial Fluid cooler UA value at high fan speed based on nominal capacity input [W/K]",
+                            this->HighSpeedFluidCoolerUA);
                     }
                 }
             }
         }
 
         if (this->LowSpeedAirFlowRateWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
-            this->LowSpeedAirFlowRate =
-                this->LowSpeedAirFlowRateSizingFactor * this->HighSpeedAirFlowRate;
+            this->LowSpeedAirFlowRate = this->LowSpeedAirFlowRateSizingFactor * this->HighSpeedAirFlowRate;
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                   this->Name,
-                                   "Air Flow Rate at Low Fan Speed [m3/s]",
-                                   this->LowSpeedAirFlowRate);
+                ReportSizingManager::ReportSizingOutput(
+                    this->FluidCoolerType, this->Name, "Air Flow Rate at Low Fan Speed [m3/s]", this->LowSpeedAirFlowRate);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                   this->Name,
-                                   "Initial Air Flow Rate at Low Fan Speed [m3/s]",
-                                   this->LowSpeedAirFlowRate);
+                ReportSizingManager::ReportSizingOutput(
+                    this->FluidCoolerType, this->Name, "Initial Air Flow Rate at Low Fan Speed [m3/s]", this->LowSpeedAirFlowRate);
             }
         }
 
         if (this->LowSpeedFanPowerWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
-            this->LowSpeedFanPower =
-                this->LowSpeedFanPowerSizingFactor * this->HighSpeedFanPower;
+            this->LowSpeedFanPower = this->LowSpeedFanPowerSizingFactor * this->HighSpeedFanPower;
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                   this->Name,
-                                   "Fan Power at Low Fan Speed [W]",
-                                   this->LowSpeedFanPower);
+                ReportSizingManager::ReportSizingOutput(this->FluidCoolerType, this->Name, "Fan Power at Low Fan Speed [W]", this->LowSpeedFanPower);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                   this->Name,
-                                   "Initial Fan Power at Low Fan Speed [W]",
-                                   this->LowSpeedFanPower);
+                ReportSizingManager::ReportSizingOutput(
+                    this->FluidCoolerType, this->Name, "Initial Fan Power at Low Fan Speed [W]", this->LowSpeedFanPower);
             }
         }
 
         if (this->LowSpeedFluidCoolerUAWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
-            this->LowSpeedFluidCoolerUA =
-                this->LowSpeedFluidCoolerUASizingFactor * this->HighSpeedFluidCoolerUA;
+            this->LowSpeedFluidCoolerUA = this->LowSpeedFluidCoolerUASizingFactor * this->HighSpeedFluidCoolerUA;
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                   this->Name,
-                                   "U-factor Times Area Value at Low Fan Speed [W/K]",
-                                   this->LowSpeedFluidCoolerUA);
+                ReportSizingManager::ReportSizingOutput(
+                    this->FluidCoolerType, this->Name, "U-factor Times Area Value at Low Fan Speed [W/K]", this->LowSpeedFluidCoolerUA);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                   this->Name,
-                                   "Initial U-factor Times Area Value at Low Fan Speed [W/K]",
-                                   this->LowSpeedFluidCoolerUA);
+                ReportSizingManager::ReportSizingOutput(
+                    this->FluidCoolerType, this->Name, "Initial U-factor Times Area Value at Low Fan Speed [W/K]", this->LowSpeedFluidCoolerUA);
             }
         }
 
         if (this->PerformanceInputMethod_Num == PerfInputMethod::NOMINAL_CAPACITY &&
             this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_TwoSpd) {
             if (this->FluidCoolerLowSpeedNomCapWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
-                this->FluidCoolerLowSpeedNomCap =
-                    this->FluidCoolerLowSpeedNomCapSizingFactor *
-                    this->FluidCoolerNominalCapacity;
+                this->FluidCoolerLowSpeedNomCap = this->FluidCoolerLowSpeedNomCapSizingFactor * this->FluidCoolerNominalCapacity;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                       this->Name,
-                                       "Low Fan Speed Nominal Capacity [W]",
-                                       this->FluidCoolerLowSpeedNomCap);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->FluidCoolerType, this->Name, "Low Fan Speed Nominal Capacity [W]", this->FluidCoolerLowSpeedNomCap);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                       this->Name,
-                                       "Initial Low Fan Speed Nominal Capacity [W]",
-                                       this->FluidCoolerLowSpeedNomCap);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->FluidCoolerType, this->Name, "Initial Low Fan Speed Nominal Capacity [W]", this->FluidCoolerLowSpeedNomCap);
                 }
             }
 
-            if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow &&
-                this->FluidCoolerLowSpeedNomCap > 0.0) {
+            if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow && this->FluidCoolerLowSpeedNomCap > 0.0) {
                 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                       DataGlobals::InitConvTemp,
+                                                        DataGlobals::InitConvTemp,
                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                       CalledFrom);
+                                                        CalledFrom);
                 Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                           this->DesignEnteringWaterTemp,
+                                                            this->DesignEnteringWaterTemp,
                                                             DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                           CalledFrom);
+                                                            CalledFrom);
                 DesFluidCoolerLoad = this->FluidCoolerLowSpeedNomCap;
                 Par(1) = DesFluidCoolerLoad;
                 Par(2) = double(this->indexInArray);
-                Par(3) = rho * tmpDesignWaterFlowRate;                          // design water mass flow rate
-                Par(4) = this->LowSpeedAirFlowRate; // Air volume flow rate at low fan speed
+                Par(3) = rho * tmpDesignWaterFlowRate; // design water mass flow rate
+                Par(4) = this->LowSpeedAirFlowRate;    // Air volume flow rate at low fan speed
                 Par(5) = Cp;
-                UA0 = 0.0001 * DesFluidCoolerLoad; // Assume deltaT = 10000K (limit)
-                UA1 = DesFluidCoolerLoad;          // Assume deltaT = 1K
-                this->WaterTemp =
-                    this->DesignEnteringWaterTemp; // design inlet water temperature
-                this->AirTemp =
-                    this->DesignEnteringAirTemp; // design inlet air dry-bulb temp
-                this->AirWetBulb =
-                    this->DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
+                UA0 = 0.0001 * DesFluidCoolerLoad;                     // Assume deltaT = 10000K (limit)
+                UA1 = DesFluidCoolerLoad;                              // Assume deltaT = 1K
+                this->WaterTemp = this->DesignEnteringWaterTemp;       // design inlet water temperature
+                this->AirTemp = this->DesignEnteringAirTemp;           // design inlet air dry-bulb temp
+                this->AirWetBulb = this->DesignEnteringAirWetBulbTemp; // design inlet air wet-bulb temp
                 this->AirPress = DataEnvironment::StdBaroPress;
-                this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp,
-                                                                                  this->AirWetBulb,
-                                                                                  this->AirPress,
-                                                                                  CalledFrom);
+                this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp, this->AirWetBulb, this->AirPress, CalledFrom);
                 General::SolveRoot(Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowWarningError("Iteration limit exceeded in calculating fluid cooler UA.");
                     ShowContinueError("Autosizing of fluid cooler UA failed for fluid cooler = " + this->Name);
-                    ShowContinueError("The final UA value at low fan speed =" + General::RoundSigDigits(UA, 2) + " W/C, and the simulation continues...");
+                    ShowContinueError("The final UA value at low fan speed =" + General::RoundSigDigits(UA, 2) +
+                                      " W/C, and the simulation continues...");
                 } else if (SolFla == -2) {
                     CalcFluidCoolerOutlet(int(Par(2)), Par(3), Par(4), UA0, OutWaterTempAtUA0);
                     CalcFluidCoolerOutlet(int(Par(2)), Par(3), Par(4), UA1, OutWaterTempAtUA1);
@@ -1415,17 +1329,15 @@ namespace FluidCoolers {
                     ShowContinueError("Inputs to the fluid cooler object:");
                     ShowContinueError("Design Fluid Cooler Load [W]                         = " + General::RoundSigDigits(Par(1), 2));
                     ShowContinueError("Design Fluid Cooler Water Volume Flow Rate [m3/s]    = " +
-                                              General::RoundSigDigits(this->DesignWaterFlowRate, 6));
+                                      General::RoundSigDigits(this->DesignWaterFlowRate, 6));
                     ShowContinueError("Design Fluid Cooler Air Volume Flow Rate [m3/s]      = " + General::RoundSigDigits(Par(4), 2));
-                    ShowContinueError("Design Fluid Cooler Air Inlet Dry-bulb Temp [C]      = " +
-                                              General::RoundSigDigits(this->AirTemp, 2));
+                    ShowContinueError("Design Fluid Cooler Air Inlet Dry-bulb Temp [C]      = " + General::RoundSigDigits(this->AirTemp, 2));
                     ShowContinueError("Inputs to the plant sizing object:");
                     ShowContinueError("Design Exit Water Temp [C]                           = " +
-                                              General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2));
+                                      General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2));
                     ShowContinueError("Loop Design Temperature Difference [C]               = " +
-                                              General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).DeltaT, 2));
-                    ShowContinueError("Design Fluid Cooler Water Inlet Temp [C]             = " +
-                                              General::RoundSigDigits(this->WaterTemp, 2));
+                                      General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).DeltaT, 2));
+                    ShowContinueError("Design Fluid Cooler Water Inlet Temp [C]             = " + General::RoundSigDigits(this->WaterTemp, 2));
                     ShowContinueError("Calculated water outlet temp at low UA [C](UA = " + General::RoundSigDigits(UA0, 2) +
                                       " W/C) = " + General::RoundSigDigits(OutWaterTempAtUA0, 2));
                     ShowContinueError("Calculated water outlet temp at high UA [C](UA = " + General::RoundSigDigits(UA1, 2) +
@@ -1438,16 +1350,12 @@ namespace FluidCoolers {
             }
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                       this->Name,
-                                       "U-factor Times Area Value at Low Fan Speed [W/C]",
-                                       this->LowSpeedFluidCoolerUA);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->FluidCoolerType, this->Name, "U-factor Times Area Value at Low Fan Speed [W/C]", this->LowSpeedFluidCoolerUA);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->FluidCoolerType,
-                                       this->Name,
-                                       "Initial U-factor Times Area Value at Low Fan Speed [W/C]",
-                                       this->LowSpeedFluidCoolerUA);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->FluidCoolerType, this->Name, "Initial U-factor Times Area Value at Low Fan Speed [W/C]", this->LowSpeedFluidCoolerUA);
                 }
             }
         }
@@ -1531,7 +1439,7 @@ namespace FluidCoolers {
         Real64 TempSetPoint = 0.0;
 
         // set inlet and outlet nodes
-        auto & waterInletNode = this->WaterInletNodeNum;
+        auto &waterInletNode = this->WaterInletNodeNum;
         this->Qactual = 0.0;
         this->FanPower = 0.0;
         this->OutletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;
@@ -1559,8 +1467,7 @@ namespace FluidCoolers {
         Real64 AirFlowRate = this->HighSpeedAirFlowRate;
         Real64 FanPowerOn = this->HighSpeedFanPower;
 
-        CalcFluidCoolerOutlet(this->indexInArray, this->WaterMassFlowRate, AirFlowRate,
-                              UAdesign, this->OutletWaterTemp);
+        CalcFluidCoolerOutlet(this->indexInArray, this->WaterMassFlowRate, AirFlowRate, UAdesign, this->OutletWaterTemp);
 
         if (this->OutletWaterTemp <= TempSetPoint) {
             //   Setpoint was met with pump ON and fan ON, calculate run-time fraction or just wasn't needed at all
@@ -1575,9 +1482,9 @@ namespace FluidCoolers {
             this->FanPower = FanPowerOn;
         }
         Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                         DataLoopNode::Node(waterInletNode).Temp,
-                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                        RoutineName);
+                                                                DataLoopNode::Node(waterInletNode).Temp,
+                                                                DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                RoutineName);
         this->Qactual = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(waterInletNode).Temp - this->OutletWaterTemp);
     }
 
@@ -1637,7 +1544,7 @@ namespace FluidCoolers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TempSetPoint = 0.0;
 
-        auto & waterInletNode = this->WaterInletNodeNum;
+        auto &waterInletNode = this->WaterInletNodeNum;
         this->Qactual = 0.0;
         this->FanPower = 0.0;
         this->OutletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;
@@ -1651,7 +1558,9 @@ namespace FluidCoolers {
         }
 
         // MassFlowTol is a parameter to indicate a no flow condition
-        if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) return;
+        if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance ||
+            DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0)
+            return;
 
         // set local variable for fluid cooler
         this->WaterMassFlowRate = DataLoopNode::Node(waterInletNode).MassFlowRate;
@@ -1668,8 +1577,7 @@ namespace FluidCoolers {
         Real64 AirFlowRate = this->LowSpeedAirFlowRate;
         Real64 FanPowerLow = this->LowSpeedFanPower;
 
-        CalcFluidCoolerOutlet(this->indexInArray, this->WaterMassFlowRate, AirFlowRate,
-                              UAdesign, OutletWaterTemp1stStage);
+        CalcFluidCoolerOutlet(this->indexInArray, this->WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp1stStage);
 
         if (OutletWaterTemp1stStage <= TempSetPoint) {
             // Setpoint was met with pump ON and fan ON 1st stage, calculate fan mode fraction
@@ -1685,8 +1593,7 @@ namespace FluidCoolers {
             AirFlowRate = this->HighSpeedAirFlowRate;
             Real64 FanPowerHigh = this->HighSpeedFanPower;
 
-            CalcFluidCoolerOutlet(this->indexInArray, this->WaterMassFlowRate, AirFlowRate,
-                                  UAdesign, OutletWaterTemp2ndStage);
+            CalcFluidCoolerOutlet(this->indexInArray, this->WaterMassFlowRate, AirFlowRate, UAdesign, OutletWaterTemp2ndStage);
 
             if ((OutletWaterTemp2ndStage <= TempSetPoint) && UAdesign > 0.0) {
                 // Setpoint was met with pump ON and fan ON 2nd stage, calculate fan mode fraction
@@ -1700,14 +1607,13 @@ namespace FluidCoolers {
             }
         }
         Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                         DataLoopNode::Node(waterInletNode).Temp,
-                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                        RoutineName);
+                                                                DataLoopNode::Node(waterInletNode).Temp,
+                                                                DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                RoutineName);
         this->Qactual = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(waterInletNode).Temp - this->OutletWaterTemp);
     }
 
-    void CalcFluidCoolerOutlet(
-            int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp)
+    void CalcFluidCoolerOutlet(int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1738,13 +1644,13 @@ namespace FluidCoolers {
 
         // set water and air properties
         Real64 AirDensity =
-                Psychrometrics::PsyRhoAirFnPbTdbW(SimpleFluidCooler(FluidCoolerNum).AirPress, InletAirTemp, SimpleFluidCooler(FluidCoolerNum).AirHumRat);
+            Psychrometrics::PsyRhoAirFnPbTdbW(SimpleFluidCooler(FluidCoolerNum).AirPress, InletAirTemp, SimpleFluidCooler(FluidCoolerNum).AirHumRat);
         Real64 AirMassFlowRate = AirFlowRate * AirDensity;
         Real64 CpAir = Psychrometrics::PsyCpAirFnWTdb(SimpleFluidCooler(FluidCoolerNum).AirHumRat, InletAirTemp);
         Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
-                                        _InletWaterTemp,
-                                                         DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidIndex,
-                                        RoutineName);
+                                                                _InletWaterTemp,
+                                                                DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidIndex,
+                                                                RoutineName);
 
         // Calculate mass flow rates
         Real64 MdotCpWater = _WaterMassFlowRate * CpWater;
@@ -1799,7 +1705,7 @@ namespace FluidCoolers {
         // par(5) = water specific heat [J/(kg*C)]
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 OutWaterTemp;  // outlet water temperature [C]
+        Real64 OutWaterTemp; // outlet water temperature [C]
 
         int FluidCoolerIndex = int(Par(2));
         CalcFluidCoolerOutlet(FluidCoolerIndex, Par(3), Par(4), UA, OutWaterTemp);
@@ -1828,21 +1734,19 @@ namespace FluidCoolers {
         std::string CharLowOutletTemp;
         Real64 LoopMinTemp;
 
-        auto & waterOutletNode = this->WaterOutletNodeNum;
+        auto &waterOutletNode = this->WaterOutletNodeNum;
         DataLoopNode::Node(waterOutletNode).Temp = this->OutletWaterTemp;
 
         if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0 || DataGlobals::WarmupFlag) return;
 
         // Check flow rate through fluid cooler and compare to design flow rate, show warning if greater than Design * Mulitplier
-        if (DataLoopNode::Node(waterOutletNode).MassFlowRate >
-            this->DesWaterMassFlowRate * this->FluidCoolerMassFlowRateMultiplier) {
+        if (DataLoopNode::Node(waterOutletNode).MassFlowRate > this->DesWaterMassFlowRate * this->FluidCoolerMassFlowRateMultiplier) {
             ++this->HighMassFlowErrorCount;
             if (this->HighMassFlowErrorCount < 2) {
                 ShowWarningError(this->FluidCoolerType + " \"" + this->Name + "\"");
                 ShowContinueError(" Condenser Loop Mass Flow Rate is much greater than the fluid coolers design mass flow rate.");
                 ShowContinueError(" Condenser Loop Mass Flow Rate = " + General::TrimSigDigits(DataLoopNode::Node(waterOutletNode).MassFlowRate, 6));
-                ShowContinueError(" Fluid Cooler Design Mass Flow Rate   = " +
-                                          General::TrimSigDigits(this->DesWaterMassFlowRate, 6));
+                ShowContinueError(" Fluid Cooler Design Mass Flow Rate   = " + General::TrimSigDigits(this->DesWaterMassFlowRate, 6));
                 ShowContinueErrorTimeStamp("");
             } else {
                 ShowRecurringWarningErrorAtEnd(
@@ -1907,7 +1811,7 @@ namespace FluidCoolers {
         // This subroutine updates the report variables for the fluid cooler.
 
         Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-        auto & waterInletNode = this->WaterInletNodeNum;
+        auto &waterInletNode = this->WaterInletNodeNum;
         if (!RunFlag) {
             this->InletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;
             this->OutletWaterTemp = DataLoopNode::Node(waterInletNode).Temp;
@@ -1919,7 +1823,6 @@ namespace FluidCoolers {
             this->FanEnergy = this->FanPower * ReportingConstant;
         }
     }
-
 
     void clear_state()
     {
