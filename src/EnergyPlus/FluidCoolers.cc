@@ -108,106 +108,51 @@ namespace FluidCoolers {
     bool GetFluidCoolerInputFlag(true);
     int NumSimpleFluidCoolers(0); // Number of similar fluid coolers
 
-    Array1D_bool CheckEquipName;
-
     // Object Data
     Array1D<FluidCoolerspecs> SimpleFluidCooler; // dimension to number of machines
     std::unordered_map<std::string, std::string> UniqueSimpleFluidCoolerNames;
 
-    void SimFluidCoolers(std::string &FluidCoolerType,
-                         std::string &FluidCoolerName,
-                         int &CompIndex,
-                         bool &RunFlag,
-                         bool const InitLoopEquip,
-                         Real64 &MaxCap,
-                         Real64 &MinCap,
-                         Real64 &OptCap)
+    PlantComponent *FluidCoolerspecs::factory(int objectType, std::string objectName)
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Chandan Sharma
-        //       DATE WRITTEN   August 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Main fluid cooler driver subroutine. Gets called from PlantCondLoopSupplySideManager
-
-        // METHODOLOGY EMPLOYED:
-        // After being called by PlantCondLoopSupplySideManager, this subroutine
-        // calls GetFluidCoolerInput to get all fluid cooler input info (one time only),
-        // then calls the appropriate subroutine to calculate fluid cooler performance,
-        // update records (node info) and writes output report info.
-
-        // REFERENCES:
-        // Based on SimTowers subroutine by Fred Buhl, May 2002; Richard Raustad, FSEC, Feb 2005
-
-        // LOCAL VARIABLE DECLARATIONS:
-        int FluidCoolerNum;
-
-        // GET INPUT
         if (GetFluidCoolerInputFlag) {
             GetFluidCoolerInput();
             GetFluidCoolerInputFlag = false;
         }
-
-        // Find the correct Equipment
-        if (CompIndex == 0) {
-            FluidCoolerNum = UtilityRoutines::FindItemInList(FluidCoolerName, SimpleFluidCooler);
-            if (FluidCoolerNum == 0) {
-                ShowFatalError("SimFluidCoolers: Unit not found = " + FluidCoolerName);
-            }
-            CompIndex = FluidCoolerNum;
-        } else {
-            FluidCoolerNum = CompIndex;
-            if (FluidCoolerNum > NumSimpleFluidCoolers || FluidCoolerNum < 1) {
-                ShowFatalError("SimFluidCoolers:  Invalid CompIndex passed = " + General::TrimSigDigits(FluidCoolerNum) +
-                               ", Number of Units = " + General::TrimSigDigits(NumSimpleFluidCoolers) + ", Entered Unit name = " + FluidCoolerName);
-            }
-            if (CheckEquipName(FluidCoolerNum)) {
-                if (FluidCoolerName != SimpleFluidCooler(FluidCoolerNum).Name) {
-                    ShowFatalError("SimFluidCoolers: Invalid CompIndex passed = " + General::TrimSigDigits(FluidCoolerNum) + ", Unit name = " +
-                                   FluidCoolerName + ", stored Unit Name for that index = " + SimpleFluidCooler(FluidCoolerNum).Name);
-                }
-                CheckEquipName(FluidCoolerNum) = false;
+        // Now look for this particular pipe in the list
+        for (auto &fc : SimpleFluidCooler) {
+            if (fc.FluidCoolerType_Num == objectType && fc.Name == objectName) {
+                return &fc;
             }
         }
+        // If we didn't find it, fatal
+        ShowFatalError("FluidCooler::factory: Error getting inputs for cooler named: " + objectName);
+        // Shut up the compiler
+        return nullptr;
+    }
 
-        // CALCULATE
-        {
-            auto const SELECT_CASE_var(SimpleFluidCooler(FluidCoolerNum).FluidCoolerType_Num);
+    void FluidCoolerspecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool const EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool const RunFlag) {
+        this->InitFluidCooler();
+        if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
+            this->SingleSpeedFluidCooler();
+        } else {
+            this->TwoSpeedFluidCooler();
+        }
+        this->UpdateFluidCooler();
+        this->ReportFluidCooler(RunFlag);
+    }
 
-            if (SELECT_CASE_var == DataPlant::TypeOf_FluidCooler_SingleSpd) {
-                if (InitLoopEquip) {
-                    SimpleFluidCooler(FluidCoolerNum).InitFluidCooler();
-                    SimpleFluidCooler(FluidCoolerNum).SizeFluidCooler();
-                    MinCap = 0.0;
-                    MaxCap = SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity;
-                    OptCap = SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity;
-                    return;
-                }
-                SimpleFluidCooler(FluidCoolerNum).InitFluidCooler();
-                SimpleFluidCooler(FluidCoolerNum).SingleSpeedFluidCooler();
-                SimpleFluidCooler(FluidCoolerNum).UpdateFluidCooler();
-                SimpleFluidCooler(FluidCoolerNum).ReportFluidCooler(RunFlag);
+    void FluidCoolerspecs::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) {
+        this->InitFluidCooler();
+        this->SizeFluidCooler();
+    }
 
-            } else if (SELECT_CASE_var == DataPlant::TypeOf_FluidCooler_TwoSpd) {
-                if (InitLoopEquip) {
-                    SimpleFluidCooler(FluidCoolerNum).InitFluidCooler();
-                    SimpleFluidCooler(FluidCoolerNum).SizeFluidCooler();
-                    MinCap = 0.0; // signifies non-load based model (i.e. forward
-                    MaxCap = SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity;
-                    OptCap = SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity;
-                    return;
-                }
-                SimpleFluidCooler(FluidCoolerNum).InitFluidCooler();
-                SimpleFluidCooler(FluidCoolerNum).TwoSpeedFluidCooler();
-                SimpleFluidCooler(FluidCoolerNum).UpdateFluidCooler();
-                SimpleFluidCooler(FluidCoolerNum).ReportFluidCooler(RunFlag);
-            } else {
-                ShowFatalError("SimFluidCoolers: Invalid Fluid Cooler Type Requested = " + FluidCoolerType);
-            }
-        } // TypeOfEquip
+    void FluidCoolerspecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                             Real64 &MaxLoad,
+                             Real64 &MinLoad,
+                             Real64 &OptLoad) {
+        MaxLoad = this->FluidCoolerNominalCapacity;
+        OptLoad = this->FluidCoolerNominalCapacity;
+        MinLoad = 0.0;
     }
 
     void GetFluidCoolerInput()
@@ -255,7 +200,6 @@ namespace FluidCoolers {
         // Allocate data structures to hold fluid cooler input data, report data and fluid cooler inlet conditions
         SimpleFluidCooler.allocate(NumSimpleFluidCoolers);
         UniqueSimpleFluidCoolerNames.reserve(NumSimpleFluidCoolers);
-        CheckEquipName.dimension(NumSimpleFluidCoolers, true);
 
         int FluidCoolerNum;
 
@@ -1975,6 +1919,7 @@ namespace FluidCoolers {
             this->FanEnergy = this->FanPower * ReportingConstant;
         }
     }
+
 
     void clear_state()
     {

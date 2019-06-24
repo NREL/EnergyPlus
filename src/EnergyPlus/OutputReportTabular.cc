@@ -4909,7 +4909,7 @@ namespace OutputReportTabular {
         }
         BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss * convertJtoGJ;
 
-        // Consendor water loop
+        // Condenser water loop
         for (iCooler = 1; iCooler <= NumSimpleTowers; ++iCooler) {
             SysTotalHVACRejectHeatLoss += SimpleTowerReport(iCooler).Qactual * TimeStepSysSec + SimpleTowerReport(iCooler).FanEnergy +
                                           SimpleTowerReport(iCooler).BasinHeaterConsumption;

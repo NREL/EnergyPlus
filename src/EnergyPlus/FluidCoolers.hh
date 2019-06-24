@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -70,9 +71,7 @@ namespace FluidCoolers {
 
     extern int NumSimpleFluidCoolers; // Number of similar fluid coolers
 
-    extern Array1D_bool CheckEquipName;
-
-    struct FluidCoolerspecs
+    struct FluidCoolerspecs : PlantComponent
     {
         // Members
         std::string Name;            // User identifier
@@ -190,13 +189,20 @@ namespace FluidCoolers {
 
         void TwoSpeedFluidCooler();
 
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                         Real64 &EP_UNUSED(MaxLoad),
+                                         Real64 &EP_UNUSED(MinLoad),
+                                         Real64 &EP_UNUSED(OptLoad)) override;
+
+        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+
+        static PlantComponent *factory(int typeOf, std::string objectName);
+
     };
 
-    // Object Data
     extern Array1D<FluidCoolerspecs> SimpleFluidCooler;           // dimension to number of machines
-
-    // Functions
-
 
     void SimFluidCoolers(std::string &FluidCoolerType,
                          std::string &FluidCoolerName,
