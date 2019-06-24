@@ -137,6 +137,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: CurrentRunPeriodNames
   CHARACTER(len=20) :: PotentialRunPeriodName
 
+  ! Only needed for ZoneHVAC:EquipmentList translation
+  INTEGER zeqNum
+  CHARACTER(len=20) :: zeqNumStr
+  CHARACTER(len=7) :: zeqHeatingOrCooling
+
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -480,6 +485,28 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with W, insert the rules here
 
               ! If your original object starts with Z, insert the rules here
+              CASE('ZONEHVAC:EQUIPMENTLIST')
+                nodiff = .false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                DO CurField = 1, CurArgs
+                  IF (CurField < 3) THEN
+                    zeqHeatingOrCooling = 'Neither'
+                  ELSE IF (MOD((CurField - 2) - 5, 6) == 0) THEN
+                    zeqHeatingOrCooling = 'Cooling'
+                  ELSE IF (MOD((CurField - 2) - 6, 6) == 0) THEN
+                    zeqHeatingOrCooling = 'Heating'
+                  ELSE
+                    zeqHeatingOrCooling = 'Neither'
+                  END IF
+                  IF (InArgs(CurField) /= Blank .AND. (zeqHeatingOrCooling == 'Cooling' .OR. zeqheatingOrCooling == 'Heating')) THEN
+                    zeqNum = (CurField - 3) / 6 + 1
+                    WRITE(zeqNumStr, *) zeqNum
+                    OutArgs(CurField) = TRIM(InArgs(1)) // ' ' // zeqHeatingOrCooling // 'Frac' // TRIM(ADJUSTL(zeqNumStr))
+                    CALL WriteOutIDFLines(DifLfn,'Schedule:Constant',3,[OutArgs(CurField), '', InArgs(CurField)],['Name                     ', 'Schedule Type Limits Name', 'Hourly Value             '],['', '', ''])
+                  ELSE
+                    OutArgs(CurField) = InArgs(CurField)
+                  END IF
+                END DO
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
