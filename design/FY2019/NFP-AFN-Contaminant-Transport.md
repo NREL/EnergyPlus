@@ -31,16 +31,15 @@ For simulation of transport of trace contaminants, conservation of mass for a
 transported material is written for each zone as:
 
 ```
-dM/dt = sum(FF_j) + G - R*M
+dM/dt = sum(dot(M)) + G - R*M
 ```
 
-where `M` is the mass of material in a zone, the `FF_j`s are the fluxes of mass
+where `M` is the mass of material in a zone, the `dot(M)`s are the fluxes of mass
 of material into and out of the zone, `G` is the generation of material in the
 zone, and `R` is the removal rate of material (by non-flux processes) from the
-zone. Filtration
-processes are embedded in the `FF_j`s and the equation is typically divided by
-mass of air in the zone to obtain an equation in terms of concentrations. The
-resulting equation is
+zone. Filtration processes are embedded in the `dot(M)`s and the equation is
+typically writte in terms of zonal concentrations rather than mass. The resulting
+equation is
 
 ```
 dC/dt = sum(F_j*(1-n_j)C_j) + G - R*C = RHS
@@ -171,9 +170,11 @@ ZoneContaminantSourceAndSink:Generic:Constant,
        \required-field
        \type object-list
        \object-list ZoneNames
+       \note This field is ignored for the AirflowNetwork transport calculation
   A3 , \field AirflowNetwork Material
        \type object-list
        \object-list AirflowNetworkMaterials
+       \note This field is only used for the AirflowNetwork transport calculation and is ignored for the generic calculation
   N1 , \field Design Generation Rate
        \units m3/s
        \type real
