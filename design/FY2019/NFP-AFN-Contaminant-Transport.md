@@ -31,13 +31,13 @@ For simulation of transport of trace contaminants, conservation of mass for a
 transported material is written for each zone as:
 
 ```
-dM/dt = sum(dot(M)) + G - R*M
+dM/dt = sum(dot(M)_j) + G - R*M
 ```
 
-where `M` is the mass of material in a zone, the `dot(M)`s are the fluxes of mass
+where `M` is the mass of material in a zone, the `dot(M)_j`s are the fluxes of mass
 of material into and out of the zone, `G` is the generation of material in the
 zone, and `R` is the removal rate of material (by non-flux processes) from the
-zone. Filtration processes are embedded in the `dot(M)`s and the equation is
+zone. Filtration processes are embedded in the `dot(M)_j`s and the equation is
 typically writte in terms of zonal concentrations rather than mass. The resulting
 equation is
 
