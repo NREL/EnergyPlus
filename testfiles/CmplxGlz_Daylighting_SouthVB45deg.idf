@@ -85353,7 +85353,7 @@
     22,                      !- Maximum Allowable Discomfort Glare Index
     ,                        !- DElight Gridding Resolution {m2}
     COMFENZone_DaylRefPt1,   !- Daylighting Reference Point 1 Name
-    0,                       !- Fraction of Zone Controlled by Reference Point 1
+    1,                       !- Fraction of Zone Controlled by Reference Point 1
     538.195;                 !- Illuminance Setpoint at Reference Point 1 {lux}
 
   Daylighting:ReferencePoint,
@@ -86440,7 +86440,7 @@
 
   Output:Variable,EXTWALL,Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area,Hourly;
 
-  Output:Variable,EXTWALL,Surface Inside Temperature,Hourly;
+  Output:Variable,EXTWALL,Surface Inside Face Temperature,Hourly;
 
   Output:Variable,EXTWALL,Surface Outside Face Sunlit Fraction,Hourly;
 
@@ -86450,7 +86450,7 @@
 
   Output:Variable,Win_421,Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area,Hourly;
 
-  Output:Variable,Win_421,Surface Inside Temperature,Hourly;
+  Output:Variable,Win_421,Surface Inside Face Temperature,Hourly;
 
   Output:Variable,Win_421,Surface Outside Face Sunlit Fraction,Hourly;
 
@@ -86482,11 +86482,7 @@
 
   Output:Variable,*,Daylighting Reference Point 1 Illuminance,Hourly;
 
-  Output:Variable,*,Daylighting Reference Point 2 Illuminance,Hourly;
-
   Output:Variable,*,Daylighting Reference Point 1 Glare Index,Hourly;
-
-  Output:Variable,*,Daylighting Reference Point 2 Glare Index,Hourly;
 
   Output:Variable,*,People Occupant Count,Hourly;
 
@@ -86565,12 +86561,8 @@
     2,                       !- Digits After Decimal
     Daylighting Reference Point 1 Illuminance,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Daylighting Reference Point 2 Illuminance,  !- Variable or Meter 2 Name
-    SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Daylighting Reference Point 1 Glare Index,  !- Variable or Meter 3 Name
-    SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Daylighting Reference Point 2 Glare Index,  !- Variable or Meter 4 Name
-    SumOrAverage;            !- Aggregation Type for Variable or Meter 4
+    Daylighting Reference Point 1 Glare Index,  !- Variable or Meter 2 Name
+    SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
     Occupant Comfort Data Summary,  !- Name

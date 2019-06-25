@@ -5,6 +5,7 @@
 #define Domain_HPP
 
 #include "Cell.hpp"
+#include "Errors.hpp"
 #include "Foundation.hpp"
 #include "Functions.hpp"
 #include "Mesher.hpp"
