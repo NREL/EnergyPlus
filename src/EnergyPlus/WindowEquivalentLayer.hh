@@ -108,8 +108,8 @@ namespace WindowEquivalentLayer {
 
     void SetEquivalentLayerWindowProperties(int const ConstrNum);
 
-    void CalcEQLWindowUvalue(CFSTY const &FS, // CFS to be calculated
-                             Real64 &UNFRC    // NFRC U-factor, W/m2-K
+    void CalcEQLWindowUvalue(CFSTY &FS,    // CFS to be calculated
+                             Real64 &UNFRC // NFRC U-factor, W/m2-K
     );
 
     void CalcEQLWindowSHGCAndTransNormal(CFSTY &FS,          // fenestration system
@@ -462,7 +462,7 @@ namespace WindowEquivalentLayer {
                  Array1S<Real64> XSOL // returned: solution vector, min req dimension: XSOL( N)
     );
 
-    bool ASHWAT_Thermal(CFSTY const &FS,  // fenestration system
+    bool ASHWAT_Thermal(CFSTY &FS,        // fenestration system
                         Real64 const TIN, // indoor / outdoor air temperature, K
                         Real64 const TOUT,
                         Real64 const HCIN, // indoor / outdoor convective heat transfer
@@ -479,8 +479,8 @@ namespace WindowEquivalentLayer {
                         Array1A<Real64> JF,              // returned: front (outside facing) radiosity of surfaces, W/m2
                         Array1A<Real64> JB,              // returned: back (inside facing) radiosity, W/m2
                         Array1A<Real64> HC,              // returned: gap convective heat transfer coefficient, W/m2K
-                        Real64 &UCG,                     // returned: center-glass U-factor, W/m2-K
-                        Real64 &SHGC,                    // returned: center-glass SHGC (Solar Heat Gain Coefficient)
+                        Optional<Real64> UCG = _,        // returned: center-glass U-factor, W/m2-K
+                        Optional<Real64> SHGC = _,       // returned: center-glass SHGC (Solar Heat Gain Coefficient)
                         Optional_bool_const HCInFlag = _ // If true uses ISO Std 150099 routine for HCIn calc
     );
 
@@ -554,7 +554,7 @@ namespace WindowEquivalentLayer {
 
     Real64 ConvectionFactor(CFSLAYER const &L); // window layer
 
-    bool CFSUFactor(CFSTY const &FS,    // fenestration system
+    bool CFSUFactor(CFSTY &FS,          // fenestration system
                     Real64 const TOUT,  // outdoor temperature, C (air and MRT)
                     Real64 const HCOUT, // outdoor convective coefficient, W/m2-K
                     Real64 const TIN,   // indoor air temperature, C

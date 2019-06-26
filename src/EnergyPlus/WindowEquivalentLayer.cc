@@ -446,8 +446,8 @@ namespace WindowEquivalentLayer {
         if (CFSHasControlledShade(CFS(EQLNum)) > 0) CFS(EQLNum).ISControlled = true; // is controlled
     }
 
-    void CalcEQLWindowUvalue(CFSTY const &FS, // CFS to be calculated
-                             Real64 &UNFRC    // NFRC U-factor, W/m2-K
+    void CalcEQLWindowUvalue(CFSTY &FS,    // CFS to be calculated
+                             Real64 &UNFRC // NFRC U-factor, W/m2-K
     )
     {
         // SUBROUTINE INFORMATION:
@@ -822,9 +822,6 @@ namespace WindowEquivalentLayer {
         Real64 TRMIN;
         Real64 Tout(0);
         Real64 TRMOUT;
-        Real64 UCG;
-        Real64 SHGC;
-        Real64 QRLWX;
         Real64 QCONV;
         Array1D<Real64> QOCF(CFSMAXNL);
         Real64 QOCFRoom;
@@ -1025,12 +1022,12 @@ namespace WindowEquivalentLayer {
         QAllSWwinAbs({1, NL + 1}) = QRadSWwinAbs({1, NL + 1}, SurfNum);
         //  Solve energy balance(s) for temperature at each node/layer and
         //  heat flux, including components, between each pair of nodes/layers
-        ASHWAT_ThermalR = ASHWAT_Thermal(
-            CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, 0.0, QAllSWwinAbs({1, NL + 1}), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H, UCG, SHGC);
-        // long wave radiant power to room not including reflected
-        QRLWX = JB(NL) - (1.0 - LWAbsIn) * JF(NL + 1);
-        // nominal surface temp = effective radiant temperature
-        SurfInsideTemp = TRadC(QRLWX, LWAbsIn);
+        ASHWAT_ThermalR =
+            ASHWAT_Thermal(CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, 0.0, QAllSWwinAbs({1, NL + 1}), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+
+        // effective surface temperature is set to surface temperature calculated
+        // by the fenestration layers temperature solver
+        SurfInsideTemp = T(NL) - KelvinConv;
         // Convective to room
         QCONV = H(NL) * (T(NL) - TIN);
         // Other convective = total conv - standard model prediction
@@ -5006,7 +5003,7 @@ namespace WindowEquivalentLayer {
         }
     }
 
-    bool ASHWAT_Thermal(CFSTY const &FS,  // fenestration system
+    bool ASHWAT_Thermal(CFSTY &FS,        // fenestration system
                         Real64 const TIN, // indoor / outdoor air temperature, K
                         Real64 const TOUT,
                         Real64 const HCIN, // indoor / outdoor convective heat transfer
@@ -5023,8 +5020,8 @@ namespace WindowEquivalentLayer {
                         Array1A<Real64> JF,           // returned: front (outside facing) radiosity of surfaces, W/m2
                         Array1A<Real64> JB,           // returned: back (inside facing) radiosity, W/m2
                         Array1A<Real64> HC,           // returned: gap convective heat transfer coefficient, W/m2K
-                        Real64 &UCG,                  // returned: center-glass U-factor, W/m2-K
-                        Real64 &SHGC,                 // returned: center-glass SHGC (Solar Heat Gain Coefficient)
+                        Optional<Real64> UCG,         // returned: center-glass U-factor, W/m2-K
+                        Optional<Real64> SHGC,        // returned: center-glass SHGC (Solar Heat Gain Coefficient)
                         Optional_bool_const HCInFlag  // If true uses ISO Std 150099 routine for HCIn calc
     )
     {
@@ -5083,6 +5080,7 @@ namespace WindowEquivalentLayer {
 
         // FUNCTION PARAMETER DEFINITIONS:
         Real64 const Height(1.0); // Window height (m) for standard ratings calculation
+        int const MaxIter(100);   // maximum number of iterations allowed
         static std::string const RoutineName("ASHWAT_Thermal: ");
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -5240,7 +5238,7 @@ namespace WindowEquivalentLayer {
         ALPHA = 1.0;
         if (NL >= 2) {
             if (FS.G(NL - 1).GTYPE == gtyOPENin) ALPHA = 0.5;
-            if (FS.G(1).GTYPE == gtyOPENout) ALPHA = 0.1;
+            if (FS.G(1).GTYPE == gtyOPENout) ALPHA = 0.10;
         }
 
         //   FIRST ESTIMATE OF GLAZING TEMPERATURES AND BLACK EMISSIVE POWERS
@@ -5259,7 +5257,7 @@ namespace WindowEquivalentLayer {
         Real64 const TRMOUT_4(pow_4(TRMOUT));
         Real64 const TRMIN_4(pow_4(TRMIN));
 
-        for (ITRY = 1; ITRY <= 100; ++ITRY) {
+        for (ITRY = 1; ITRY <= MaxIter; ++ITRY) {
 
             //  CALCULATE GAS LAYER CONVECTIVE HEAT TRANSFER COEFFICIENTS
 
@@ -5422,7 +5420,6 @@ namespace WindowEquivalentLayer {
             A(ADIM + 1, L) = EPSF_ROOM * StefanBoltzmann * TRMIN_4;
 
             //  SOLVE MATRIX
-
             //  Call SOLMATS for single precision matrix solution
             SOLMATS(ADIM, A, XSOL);
 
@@ -5467,9 +5464,19 @@ namespace WindowEquivalentLayer {
         } // main iteration
 
         if (CONVRG == 0) {
-            ShowSevereError(RoutineName + "Net radiation analysis did not converge for " + FS.Name);
-            ShowContinueError("...Maximum error is = " + TrimSigDigits(MAXERR, 6));
-            ShowContinueError("...Convergence tolerance is = " + TrimSigDigits(TOL, 6));
+
+            if (FS.WEQLSolverErrorIndex < 1) {
+                ++FS.WEQLSolverErrorIndex;
+                ShowSevereError("CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"");
+                ShowContinueError(RoutineName + "Net radiation analysis did not converge");
+                ShowContinueError("...Maximum error is = " + TrimSigDigits(MAXERR, 6));
+                ShowContinueError("...Convergence tolerance is = " + TrimSigDigits(TOL, 6));
+                ShowContinueErrorTimeStamp("");
+            } else {
+                ShowRecurringWarningErrorAtEnd("CONSTRUCTION:WINDOWEQUIVALENTLAYER = \"" + FS.Name + "\"; " + RoutineName +
+                                                   "Net radiation analysis did not converge error continues.",
+                                               FS.WEQLSolverErrorIndex);
+            }
         }
 
         //  NOTE:  HC_SA, HC_GA and HC_SG are only available if there is
@@ -5489,6 +5496,9 @@ namespace WindowEquivalentLayer {
         // New code follows from here - for calculating Ucg and SHGC
         // NOTE: This code can be bypassed if
         //       indices of merit are not needed
+        if (!(present(UCG) && present(SHGC))) {
+            return ASHWAT_Thermal;
+        }
 
         if (IM_ON != 1) return ASHWAT_Thermal;
 
@@ -5799,7 +5809,6 @@ namespace WindowEquivalentLayer {
 
         SHGC = 0.0;
         if (std::abs(ISOL) > 0.01) {
-
             ADIM = NL;
             A = 0.0;
             XSOL = 0.0;
@@ -6760,7 +6769,7 @@ namespace WindowEquivalentLayer {
         return ConvectionFactor;
     }
 
-    bool CFSUFactor(CFSTY const &FS,    // fenestration system
+    bool CFSUFactor(CFSTY &FS,          // fenestration system
                     Real64 const TOUT,  // outdoor temperature, C (air and MRT)
                     Real64 const HCOUT, // outdoor convective coefficient, W/m2-K
                     Real64 const TIN,   // indoor air temperature, C
