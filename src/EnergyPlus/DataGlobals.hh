@@ -297,7 +297,8 @@ namespace DataGlobals {
     extern bool ShowDecayCurvesInEIO;    // true if the Radiant to Convective Decay Curves should appear in the EIO file
     extern bool AnySlabsInModel;         // true if there are any zone-coupled ground domains in the input file
     extern bool AnyBasementsInModel;     // true if there are any basements in the input file
-
+    extern bool DoCoilDirectSolutions;        //true if use coil direction solutions
+    extern bool UseCachedUtilityFunctions;    //true if use the cached version for some utility functions
     extern int Progress;
     extern void (*fProgressPtr)(int const);
     extern void (*fMessagePtr)(std::string const &);

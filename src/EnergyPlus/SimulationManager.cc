@@ -1154,6 +1154,31 @@ namespace SimulationManager {
             ShowFatalError("Errors found getting Project Input");
         }
 
+        CurrentModuleObject = "PerformancePrecisionTradeoffs";
+        NumRunControl = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        if (NumRunControl > 0) {
+            RunControlInInput = true;
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          1,
+                                          Alphas,
+                                          NumAlpha,
+                                          Number,
+                                          NumNumber,
+                                          IOStat,
+                                          lNumericFieldBlanks,
+                                          lAlphaFieldBlanks,
+                                          cAlphaFieldNames,
+                                          cNumericFieldNames);
+            if (Alphas(1) == "YES") DoCoilDirectSolutions = true;
+            if (NumAlpha > 1) {
+                if (Alphas(2) == "YES") UseCachedUtilityFunctions = true;
+            }
+        }
+
+        if (ErrorsFound) {
+            ShowFatalError("Errors found getting Project Input");
+        }
+
         ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Version>, Version ID";
         ObjexxFCL::gio::write(OutputFileInits, Format_721) << VersionID;
 
