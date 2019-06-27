@@ -2148,7 +2148,7 @@ namespace DataHeatBalance {
         }
     };
 
-    struct HeatReclaimRefrigeratedRackData: HeatReclaimDataBase        //inherented from base struct
+    struct HeatReclaimRefrigeratedRackData : HeatReclaimDataBase // inherited from base struct
     {
         // Customized Members
         Real64 UsedWaterHeater; // amount of avail used at plant water heater
@@ -2160,7 +2160,7 @@ namespace DataHeatBalance {
         }
     };
 
-    struct HeatReclaimRefrigCondenserData: HeatReclaimDataBase        //inherented from base struct
+    struct HeatReclaimRefrigCondenserData : HeatReclaimDataBase // inherited from base struct
     {
         // Customized Members
         Real64 AvailTemperature; // Temperature of heat reclaim source
@@ -2173,14 +2173,14 @@ namespace DataHeatBalance {
         }
     };
 
-    struct HeatReclaimDXCoilData: HeatReclaimDataBase        //inherented from base struct
+    struct HeatReclaimDXCoilData : HeatReclaimDataBase // inherited from base struct
     {
     };
 
-    struct HeatReclaimHPCoilData: HeatReclaimDataBase        //inherented from base struct
+    struct HeatReclaimHPCoilData : HeatReclaimDataBase // inherited from base struct
     {
         // Customized Members
-        Real64 DesuperheaterReclaimedHeat;   // Reclaimed heat from WAHP coil
+        Real64 DesuperheaterReclaimedHeat; // Reclaimed heat from WAHP coil
 
         // Default Constructor
         HeatReclaimHPCoilData() : DesuperheaterReclaimedHeat(0.0)
