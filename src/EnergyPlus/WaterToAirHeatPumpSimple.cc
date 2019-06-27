@@ -1123,7 +1123,6 @@ namespace WaterToAirHeatPumpSimple {
         SimpleWatertoAirHP(HPNum).EnergySource = 0.0;
         SimpleWatertoAirHP(HPNum).COP = 0.0;
         DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = 0.0;
-        DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).DesuperheaterReclaimedHeat = 0.0;
     }
 
     void SizeHVACWaterToAir(int const HPNum)
