@@ -1184,10 +1184,10 @@ namespace WaterThermalTanks {
                                                   cAlphaFieldNames,
                                                   cNumericFieldNames);
                     UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-                    VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-                    if (errFlag) {
-                        ErrorsFound = true;
-                    }
+
+                    // ErrorsFound will be set to True if problem was found, left untouched otherwise
+                    VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+
                     WaterHeaterDesuperheater(DesuperheaterNum).Name = cAlphaArgs(1);
                     WaterHeaterDesuperheater(DesuperheaterNum).Type = cCurrentModuleObject;
 
@@ -8291,7 +8291,7 @@ namespace WaterThermalTanks {
                             return Qheatpump * node.HPWHWrappedCondenserHeatingFrac;
                         }
                     } else {
-                        return node.UseMassFlowRate * Cp * (Tank.SourceInletTemp - Tavg[i]);
+                        return node.SourceMassFlowRate * Cp * (Tank.SourceInletTemp - Tavg[i]);
                     }
                 }();
 
@@ -8673,12 +8673,12 @@ namespace WaterThermalTanks {
         PartLoadRatio = 0.0;
         WaterThermalTank(WaterThermalTankNum).SourceMassFlowRate = 0.0;
         // reset tank inlet temp from previous time step
-        WaterThermalTank(WaterThermalTankNum).SourceInletTemp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp;
+        WaterThermalTank(WaterThermalTankNum).SourceInletTemp = WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp;
         WaterHeaterDesuperheater(DesuperheaterNum).DesuperheaterPLR = 0.0;
 
         Node(WaterInletNode).MassFlowRate = 0.0;
         Node(WaterOutletNode).MassFlowRate = 0.0;
-        Node(WaterOutletNode).Temp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp;
+        Node(WaterOutletNode).Temp = WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp;
 
         WaterHeaterDesuperheater(DesuperheaterNum).DesuperheaterPLR = 0.0;
         WaterHeaterDesuperheater(DesuperheaterNum).OnCycParaFuelRate = 0.0;
@@ -8753,14 +8753,21 @@ namespace WaterThermalTanks {
         Effic = WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff;
 
         // store first iteration tank temperature and desuperheater mode of operation
-        if (FirstHVACIteration && !ShortenTimeStepSys) {
+        if (FirstHVACIteration && !ShortenTimeStepSys && WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag) {
             // Save conditions from end of previous system timestep
             // Every iteration that does not advance time should reset to these values
             WaterThermalTank(WaterThermalTankNum).SavedTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
+            WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp;
             WaterHeaterDesuperheater(DesuperheaterNum).SaveMode = WaterHeaterDesuperheater(DesuperheaterNum).Mode;
+            WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag = false;
+        }
+
+        else if (!FirstHVACIteration) {
+            WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag = true;
         }
 
         TankTemp = WaterThermalTank(WaterThermalTankNum).SavedTankTemp;
+        Node(WaterInletNode).Temp = WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp;
         WaterHeaterDesuperheater(DesuperheaterNum).Mode = WaterHeaterDesuperheater(DesuperheaterNum).SaveMode;
 
         if (WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp > 0) {

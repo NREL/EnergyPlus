@@ -3111,7 +3111,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
         "    0.0;                     !- Sky Clearness",
 
         "  RunPeriod,",
-        "    ,                        !- Name",
+        "    RP1,                     !- Name",
         "    1,                       !- Begin Month",
         "    1,                       !- Begin Day of Month",
         "    ,                        !- Begin Year",

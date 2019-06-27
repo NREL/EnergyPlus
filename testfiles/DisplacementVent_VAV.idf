@@ -98,7 +98,7 @@
     Yes;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     6,                       !- Begin Month
     29,                      !- Begin Day of Month
     ,                        !- Begin Year

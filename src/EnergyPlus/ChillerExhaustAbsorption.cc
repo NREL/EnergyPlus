@@ -374,6 +374,8 @@ namespace ChillerExhaustAbsorption {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, Get_ErrorsFound);
+
+            // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), Get_ErrorsFound, cCurrentModuleObject + " Name");
 
             ExhaustAbsorber(AbsorberNum).Name = cAlphaArgs(1);
