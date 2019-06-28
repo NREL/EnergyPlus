@@ -29,7 +29,7 @@ public:
   unsigned surfaceCounter;
   std::vector<SurfacePrivate> surfaces;
   bool checkSurface(const unsigned index);
-  std::vector<SurfaceBuffer> surfaceBuffers;
+  // std::vector<SurfaceBuffer> surfaceBuffers;
 };
 
 } // namespace Pumbra

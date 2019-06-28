@@ -184,6 +184,7 @@ Context::Context(unsigned size)
 }
 
 Context::~Context() {
+  glDeleteQueries(queries.size(), queries.data());
   glDeleteFramebuffersEXT(1, &fbo);
   glDeleteRenderbuffersEXT(1, &rbo);
   glDeleteProgram(calcProgram->getInt());
@@ -213,13 +214,25 @@ void Context::toggleCameraMode() {
 
 void Context::clearModel() {
   model.clearModel();
+  glDeleteQueries(queries.size(), queries.data());
   modelSet = false;
 }
 
-void Context::setModel(const std::vector<float> &vertices) {
+void Context::setModel(const std::vector<float> &vertices, const std::vector<SurfaceBuffer> &surfaceBuffers) {
+  if (modelSet) {
+    clearModel();
+  }
 
   // set model vertices
   model.setVertices(vertices);
+  model.setSurfaceBuffers(surfaceBuffers);
+  // queries.resize(surfaceBuffers.size());
+  queries.resize(bufferSize);
+  indexBuffer = std::vector<unsigned>(bufferSize, -1);
+  pixelAreas.resize(surfaceBuffers.size());
+  pixelCounts = std::vector<GLint>(surfaceBuffers.size(), -1);
+
+  glGenQueries(queries.size(), queries.data());
 
   float bLeft = MAX_FLOAT, bBottom = MAX_FLOAT, bFront = MAX_FLOAT;
   float bRight = -MAX_FLOAT, bTop = -MAX_FLOAT, bBack = -MAX_FLOAT;
@@ -251,7 +264,7 @@ void Context::setModel(const std::vector<float> &vertices) {
   modelSet = true;
 }
 
-void Context::setScene(const SurfaceBuffer &surfaceBuffer, mat4x4 sunView, bool clipFar) {
+float Context::setScene(const SurfaceBuffer &surfaceBuffer, mat4x4 sunView, bool clipFar) {
 
   if (!modelSet) {
     showMessage(MSG_ERR, "Model has not been set. Cannot set OpenGL scene.");
@@ -308,18 +321,85 @@ void Context::setScene(const SurfaceBuffer &surfaceBuffer, mat4x4 sunView, bool 
   // calculate pixel area (A[i]*cos(theta) for each pixel of the surface)
   // multiplies by the number of pixels to get projected sunlit surface area
 
-  pixelArea = (right - left) * (top - bottom) / (size * size);
+  auto const pixelArea = (right - left) * (top - bottom) / (size * size);
 
   mat4x4_ortho(projection, left, right, bottom, top, -near_, -far_);
   mat4x4_mul(mvp, projection, view);
 
   setMVP();
+
+  return pixelArea;
+}
+
+float Context::setScene(mat4x4 sunView, bool clipFar) {
+
+  if (!modelSet) {
+    showMessage(MSG_ERR, "Model has not been set. Cannot set OpenGL scene.");
+  }
+
+  mat4x4_dup(view, sunView);
+
+  // calculate clipping planes in rendered coorinates
+  left = MAX_FLOAT;
+  right = -MAX_FLOAT;
+  bottom = MAX_FLOAT;
+  top = -MAX_FLOAT;
+  near_ = -MAX_FLOAT;
+  far_ = MAX_FLOAT;
+
+  for (GLuint i = 0; i < model.vertexArray.size(); i += model.vertexSize) {
+    vec4 point = {model.vertexArray[i], model.vertexArray[i + 1], model.vertexArray[i + 2], 0};
+    vec4 trans;
+    mat4x4_mul_vec4(trans, view, point);
+    left = std::min(trans[0], left);
+    right = std::max(trans[0], right);
+    bottom = std::min(trans[1], bottom);
+    top = std::max(trans[1], top);
+    // near_ = min(trans[2], near_);
+    far_ = std::min(trans[2], far_);
+  }
+
+  // Use model box to determine near clipping plane (and far if looking interior)
+  for (std::size_t i = 0; i < 8; i++) {
+    vec4 trans;
+    mat4x4_mul_vec4(trans, view, modelBox[i]);
+    near_ = std::max(trans[2], near_);
+    if (!clipFar) {
+      far_ = std::min(trans[2], far_);
+    }
+  }
+
+  // account for camera position
+  near_ -= 1.f;
+  far_ -= 1.001f; // For some reason, -1. is too tight when sun is perpendicular to the surface.
+
+  // Grow horizontal extents of view by one pixel on each side
+  float deltaX = (right - left) / size;
+  left -= deltaX;
+  right += deltaX;
+
+  // Grow vertical extents of view by one pixel on each side
+  float deltaY = (top - bottom) / size;
+  bottom -= deltaY;
+  top += deltaY;
+
+  // calculate pixel area (A[i]*cos(theta) for each pixel of the surface)
+  // multiplies by the number of pixels to get projected sunlit surface area
+
+  auto const pixelArea = (right - left) * (top - bottom) / (size * size);
+
+  mat4x4_ortho(projection, left, right, bottom, top, -near_, -far_);
+  mat4x4_mul(mvp, projection, view);
+
+  setMVP();
+
+  return pixelArea;
 }
 
 void Context::calcCameraView() {
   // Do something here to give the appearance of rotating the scene.
   mat4x4
-      tempMat; // Transpose changes the affects of consecutive rotations from local to global space.
+  tempMat; // Transpose changes the affects of consecutive rotations from local to global space.
   mat4x4_transpose(tempMat, cameraView);
   mat4x4_rotate_X(cameraView, tempMat, cameraRotAngleX);
   mat4x4_rotate_Y(tempMat, cameraView, cameraRotAngleY);
@@ -423,54 +503,173 @@ void Context::showInteriorRendering(const std::vector<SurfaceBuffer> &hiddenSurf
   glfwHideWindow(window);
 }
 
-float Context::calculatePSSA(const SurfaceBuffer &surfaceBuffer) {
-
-  if (isRenderMode) { // if currently render mode, switch to off screen mode
-    initOffScreenMode();
-    isRenderMode = false;
-  }
-
-  glGenQueries(1, &query);
+void Context::submitPSSA(const unsigned surfaceIndex, mat4x4 sunView) {
+  auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
+  auto const pixelArea = setScene(surfaceBuffer, sunView);
   drawModel();
-  glBeginQuery(GL_SAMPLES_PASSED, query);
+  glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
   model.drawSurface(surfaceBuffer);
   glEndQuery(GL_SAMPLES_PASSED);
+  pixelAreas.at(surfaceBuffer.index) = pixelArea;
+}
+
+void Context::bufferedQuery(const unsigned surfaceIndex) {
+  int i = 0;
+  for (; i < bufferSize; ++i) {
+    if (indexBuffer[i] == surfaceIndex) break;
+  }
+  if (i == bufferSize) return;
+
+  glGetQueryObjectiv(queries[i], GL_QUERY_RESULT, &(pixelCounts.at(indexBuffer[i])));
+  indexBuffer[i] = -1;
+}
+
+void Context::bufferedQuery(const SurfaceBuffer &surfaceBuffer) {
+  if (indexBuffer[currentBufferIndex] > -1) {
+    glGetQueryObjectiv(queries[currentBufferIndex], GL_QUERY_RESULT, &(pixelCounts.at(indexBuffer[currentBufferIndex])));
+  }
+
+  glBeginQuery(GL_SAMPLES_PASSED, queries[currentBufferIndex]);
+  model.drawSurface(surfaceBuffer);
+  glEndQuery(GL_SAMPLES_PASSED);
+  pixelCounts.at(surfaceBuffer.index) = -1;
+  indexBuffer[currentBufferIndex] = surfaceBuffer.index;
+  currentBufferIndex++;
+  if (currentBufferIndex % bufferSize == 0) {
+    currentBufferIndex = 0;
+  }
+}
+
+void Context::submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sunView) {
+  auto const pixelArea = setScene(sunView);
+  drawModel();
+  for (size_t i = 0; i < surfaceIndices.size(); ++i) {
+    auto const surfaceIndex = surfaceIndices[i];
+    auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
+    // auto const pixelArea = setScene(surfaceBuffer, sunView);
+    // drawModel();
+    bufferedQuery(surfaceBuffer);
+    pixelAreas.at(surfaceBuffer.index) = pixelArea;
+  }
+}
+
+// void Context::submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sunView) {
+//   for (auto const surfaceIndex : surfaceIndices) {
+//     auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
+//     auto const pixelArea = setScene(surfaceBuffer, sunView);
+//     drawModel();
+//     glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
+//     model.drawSurface(surfaceBuffer);
+//     glEndQuery(GL_SAMPLES_PASSED);
+//     pixelAreas.at(surfaceBuffer.index) = pixelArea;
+//   }
+// }
+
+void Context::submitPSSA(mat4x4 sunView) {
+  for (auto const & surfaceBuffer : model.surfaceBuffers) {
+    auto const pixelArea = setScene(surfaceBuffer, sunView);
+    drawModel();
+    glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
+    model.drawSurface(surfaceBuffer);
+    glEndQuery(GL_SAMPLES_PASSED);
+    pixelAreas.at(surfaceBuffer.index) = pixelArea;
+  }
+}
+
+float Context::calculatePSSA(const unsigned surfaceIndex) {
+
+  // if (isRenderMode) { // if currently render mode, switch to off screen mode
+  //   initOffScreenMode();
+  //   isRenderMode = false;
+  // }
 
   // retrieve result
-  GLint pixelCount;
-  glGetQueryObjectiv(query, GL_QUERY_RESULT, &pixelCount);
+  if (pixelCounts.at(surfaceIndex) < 0) {
+    bufferedQuery(surfaceIndex);
+  }
+  // glGetQueryObjectiv(queries[surfaceIndex], GL_QUERY_RESULT, &(pixelCounts.at(surfaceIndex)));
 
-  glDeleteQueries(1, &query);
+  return pixelCounts[surfaceIndex] * pixelAreas[surfaceIndex];
+}
 
-  return pixelCount * pixelArea;
+std::vector<float> Context::calculatePSSA(const std::vector<unsigned> &surfaceIndices) {
+
+  // if (isRenderMode) { // if currently render mode, switch to off screen mode
+  //   initOffScreenMode();
+  //   isRenderMode = false;
+  // }
+
+  // retrieve result
+  std::vector<float> results;
+  results.reserve(surfaceIndices.size());
+  for (auto const & surfaceIndex : surfaceIndices) {
+    glGetQueryObjectiv(queries[surfaceIndex], GL_QUERY_RESULT, &(pixelCounts.at(surfaceIndex)));
+    results.emplace_back(pixelCounts[surfaceIndex] * pixelAreas[surfaceIndex]);
+  }
+
+  return results;
+}
+
+std::vector<float> Context::calculatePSSA() {
+
+  // if (isRenderMode) { // if currently render mode, switch to off screen mode
+  //   initOffScreenMode();
+  //   isRenderMode = false;
+  // }
+
+  // retrieve result
+  std::vector<float> results;
+  results.reserve(model.surfaceBuffers.size());
+  for (auto const & surfaceBuffer : model.surfaceBuffers) {
+    glGetQueryObjectiv(queries[surfaceBuffer.index], GL_QUERY_RESULT, &(pixelCounts.at(surfaceBuffer.index)));
+    results.emplace_back(pixelCounts[surfaceBuffer.index] * pixelAreas[surfaceBuffer.index]);
+  }
+
+  return results;
 }
 
 std::map<unsigned, float>
-Context::calculateInteriorPSSAs(const std::vector<SurfaceBuffer> &hiddenSurfaces,
-                                const std::vector<SurfaceBuffer> &interiorSurfaces) {
+Context::calculateInteriorPSSAs(const std::vector<unsigned> &hiddenSurfaceIndices,
+                                const std::vector<unsigned> &interiorSurfaceIndices, mat4x4 sunView) {
 
-  if (isRenderMode) { // if currently render mode, switch to off screen mode
-    initOffScreenMode();
-    isRenderMode = false;
+  // if (isRenderMode) { // if currently render mode, switch to off screen mode
+  //   initOffScreenMode();
+  //   isRenderMode = false;
+  // }
+
+  std::vector<GLuint> pssasQueries(interiorSurfaceIndices.size());
+  std::map<unsigned, float> pssas;
+
+  glGenQueries(pssasQueries.size(), pssasQueries.data());
+
+  auto const pixelArea = setScene(model.surfaceBuffers[hiddenSurfaceIndices.at(0)], sunView, false);
+
+  std::vector<SurfaceBuffer> hiddenSurfaces;
+  for (auto const hiddenSurf : hiddenSurfaceIndices) {
+    hiddenSurfaces.push_back(model.surfaceBuffers[hiddenSurf]);
+  }
+  std::vector<SurfaceBuffer> interiorSurfaces;
+  for (auto &intSurf : interiorSurfaceIndices) {
+    interiorSurfaces.push_back(model.surfaceBuffers[intSurf]);
   }
 
-  glGenQueries(1, &query);
   drawExcept(hiddenSurfaces);
 
-  std::map<unsigned, float> pssas;
-  for (auto &intSurf : interiorSurfaces) {
-    glGenQueries(1, &query);
-    glBeginQuery(GL_SAMPLES_PASSED, query);
-    model.drawSurface(intSurf);
+  for (size_t i = 0; i < interiorSurfaces.size(); ++i) {
+    glBeginQuery(GL_SAMPLES_PASSED, pssasQueries[i]);
+    model.drawSurface(interiorSurfaces[i]);
     glEndQuery(GL_SAMPLES_PASSED);
+  }
 
+  for (size_t i = 0; i < interiorSurfaces.size(); ++i) {
     // retrieve result
     GLint pixelCount;
-    glGetQueryObjectiv(query, GL_QUERY_RESULT, &pixelCount);
+    glGetQueryObjectiv(pssasQueries[i], GL_QUERY_RESULT, &pixelCount);
 
-    glDeleteQueries(1, &query);
-    pssas[intSurf.index] = pixelCount * pixelArea;
+    pssas[interiorSurfaces[i].index] = pixelCount * pixelArea;
   }
+
+  glDeleteQueries(pssasQueries.size(), pssasQueries.data());
   return pssas;
 }
 

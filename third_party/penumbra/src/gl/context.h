@@ -31,12 +31,20 @@ public:
   Context(unsigned size = 512);
   ~Context();
   void showRendering(const SurfaceBuffer &surfaceBuffer);
-  void setModel(const std::vector<float> &vertices);
-  void setScene(const SurfaceBuffer &surfaceBuffer, mat4x4 sunView, bool clipFar = true);
-  float calculatePSSA(const SurfaceBuffer &surfaceBuffer);
+  void setModel(const std::vector<float> &vertices, const std::vector<SurfaceBuffer> &surfaceBuffers);
+  float setScene(const SurfaceBuffer &surfaceBuffer, mat4x4 sunView, bool clipFar = true);
+  float setScene(mat4x4 sunView, bool clipFar = true);
+  void bufferedQuery(const unsigned surfaceIndex);
+  void bufferedQuery(const SurfaceBuffer &surfaceBuffer);
+  void submitPSSA(const unsigned surfaceIndex, mat4x4 sunView);
+  void submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sunView);
+  void submitPSSA(mat4x4 sunView);
+  float calculatePSSA(const unsigned surfaceIndex);
+  std::vector<float> calculatePSSA(const std::vector<unsigned> &surfaceIndices);
+  std::vector<float> calculatePSSA();
   std::map<unsigned, float>
-  calculateInteriorPSSAs(const std::vector<SurfaceBuffer> &hiddenSurfaces,
-                         const std::vector<SurfaceBuffer> &interiorSurfaces);
+  calculateInteriorPSSAs(const std::vector<unsigned> &hiddenSurfaces,
+                         const std::vector<unsigned> &interiorSurfaces, mat4x4 sunView);
   void showInteriorRendering(const std::vector<SurfaceBuffer> &hiddenSurfaces,
                              const SurfaceBuffer &interiorSurface);
   void clearModel();
@@ -52,7 +60,7 @@ private:
   std::unique_ptr<GLProgram> renderProgram;
   std::unique_ptr<GLProgram> calcProgram;
   bool modelSet;
-  float pixelArea;
+  // float pixelArea;
   float modelBox[8][4];
   mat4x4 projection, view, mvp;
   mat4x4 cameraView;
@@ -65,6 +73,12 @@ private:
   float cameraRotAngleX, cameraRotAngleY;
   bool lbutton_down;
   bool isRenderMode;
+  std::vector<GLuint> queries;
+  std::vector<float> pixelAreas;
+  std::vector<GLint> pixelCounts;
+  std::vector<unsigned> indexBuffer;
+  int currentBufferIndex = 0;
+  int bufferSize = 16;
 
   void drawModel();
   void drawExcept(const std::vector<SurfaceBuffer> &hiddenSurfaces);

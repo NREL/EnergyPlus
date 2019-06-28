@@ -27,6 +27,7 @@ GLModel::~GLModel() { clearModel(); }
 void GLModel::clearModel() {
   glDeleteVertexArraysX(1, &vao);
   glDeleteBuffers(1, &vbo);
+  surfaceBuffers.clear();
 }
 
 void GLModel::setVertices(const std::vector<float> &vertices) {
@@ -45,6 +46,10 @@ void GLModel::setVertices(const std::vector<float> &vertices) {
   // Set drawing pointers for current vertex buffer
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void *)0);
+}
+
+void GLModel::setSurfaceBuffers(const std::vector<SurfaceBuffer> &surfaceBuffers) {
+  this->surfaceBuffers = surfaceBuffers;
 }
 
 void GLModel::drawSurface(SurfaceBuffer surfaceBuffer) {

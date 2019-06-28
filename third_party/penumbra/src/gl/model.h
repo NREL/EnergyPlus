@@ -25,11 +25,13 @@ class GLModel {
 public:
   ~GLModel();
   void setVertices(const std::vector<float> &vertices);
+  void setSurfaceBuffers(const std::vector<SurfaceBuffer> &surfaceBuffers);
   void drawSurface(SurfaceBuffer surfaceBuffer);
   void drawAll();
   void drawExcept(std::vector<SurfaceBuffer> hiddenSurfaces);
   void clearModel();
   std::vector<float> vertexArray;
+  std::vector<SurfaceBuffer> surfaceBuffers;
   unsigned numPoints;
   static const int vertexSize = 3; // i.e., 3D
 private:

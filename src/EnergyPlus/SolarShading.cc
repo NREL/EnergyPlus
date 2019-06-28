@@ -219,6 +219,7 @@ namespace SolarShading {
         bool MustAllocSolarShading(true);
         bool GetInputFlag(true);
         bool firstTime(true);
+        std::vector<unsigned> penumbraIDs;
     } // namespace
 
     std::ofstream shd_stream; // Shading file stream
@@ -4911,6 +4912,8 @@ namespace SolarShading {
         BKS.dimension(MaxGSS, 0);
         SBS.dimension(MaxGSS, 0);
 
+        penumbraIDs.clear();
+
         HTS = 0;
 
         // Check every surface as a possible shadow receiving surface ("RS" = receiving surface).
@@ -5020,6 +5023,7 @@ namespace SolarShading {
                         }
                     }
                     Surface(GRSNR).PenumbraID = penumbra->addSurface(pSurf);
+                    penumbraIDs.push_back(Surface(GRSNR).PenumbraID);
                 }
             }
 
@@ -5347,6 +5351,10 @@ namespace SolarShading {
             penumbra->setSunPosition(AzimSun, ElevSun);
         }
 
+        if (penumbra) {
+            penumbra->submitPSSA(penumbraIDs);
+        }
+
         for (GRSNR = 1; GRSNR <= TotSurfaces; ++GRSNR) {
 
             if (!ShadowComb(GRSNR).UseThisSurf) continue;
@@ -5375,12 +5383,18 @@ namespace SolarShading {
                 SAREA(HTS) = Surface(GRSNR).NetAreaShadowCalc;
             } else { // Surface in sun and either shading surfaces or subsurfaces present (or both)
 
-                if (penumbra && Surface(HTS).PenumbraID >= 0 && !compareShadingMethods) {
-                    SAREA(HTS) = penumbra->calculatePSSA(Surface(HTS).PenumbraID)/CTHETA(HTS);
+                auto id = Surface(HTS).PenumbraID;
+                if (penumbra && id >= 0 && !compareShadingMethods) {
+                    // SAREA(HTS) = buildingPSSF.at(id) / CTHETA(HTS);
+                    SAREA(HTS) = penumbra->calculatePSSA(id) / CTHETA(HTS);
+                    // SAREA(HTS) = penumbra->calculatePSSA(Surface(HTS).PenumbraID)/CTHETA(HTS);
                     for (int SS = 1; SS <= NSBS; ++SS) {
                         auto HTSS = ShadowComb(HTS).SubSurf(SS);
-                        if (Surface(HTSS).PenumbraID >= 0) {
-                            SAREA(HTSS) = penumbra->calculatePSSA(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
+                        id = Surface(HTSS).PenumbraID;
+                        if (id >= 0) {
+                            // SAREA(HTSS) = buildingPSSF.at(id) / CTHETA(HTSS);
+                            SAREA(HTSS) = penumbra->calculatePSSA(id) / CTHETA(HTSS);
+                            // SAREA(HTSS) = penumbra->calculatePSSA(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
                             if (SAREA(HTSS) > 0.0) {
                                 if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
                             }
