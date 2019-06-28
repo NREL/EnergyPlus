@@ -653,7 +653,6 @@ namespace WaterThermalTanks {
         int IterLimitExceededNum2;   // Counter for recurring iteration limit warning messages
         int RegulaFalsiFailedIndex2; // Index for recurring RegulaFalsi failed warning messages
         int RegulaFalsiFailedNum2;   // Counter for recurring RegulaFalsi failed warning messages
-        Real64 TimeElapsed;            // Time elapsed (h)
         bool FirstTimeThroughFlag;   // Flag for saving water heater status
 
         // Default Constructor
@@ -666,7 +665,7 @@ namespace WaterThermalTanks {
               OffCycParaFuelRate(0.0), Mode(0), SaveMode(0), SaveWHMode(0), BackupElementCapacity(0.0), DXSysPLR(0.0),
               ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(0), SetPointError(0), SetPointErrIndex1(0), IterLimitErrIndex1(0),
               IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0), RegulaFalsiFailedNum1(0), IterLimitErrIndex2(0), IterLimitExceededNum2(0),
-              RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), TimeElapsed(0.0), FirstTimeThroughFlag(true)
+              RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(true)
         {
         }
     };
