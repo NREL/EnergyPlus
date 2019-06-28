@@ -194,7 +194,6 @@ namespace PlantLoopEquip {
         // na
 
         // Using/Aliasing
-        using Boilers::SimBoiler;
         using ChillerAbsorption::SimBLASTAbsorber;
         using ChillerElectricEIR::SimElectricEIRChiller;
         using ChillerExhaustAbsorption::SimExhaustAbsorber;
@@ -268,6 +267,10 @@ namespace PlantLoopEquip {
                     sim_component_location, sim_component.MaxLoad, sim_component.MinLoad, sim_component.OptLoad);
                 sim_component.compPtr->getDesignTemperatures(sim_component.TempDesCondIn, sim_component.TempDesEvapOut);
 
+                if (GetCompSizFac) {
+                    sim_component.compPtr->getSizingFactor(sim_component.SizFac);
+                }
+
                 // KLUGEY HACK ALERT!!!
                 // Some components before transition were never checking InitLoopEquip, and each call to SimXYZ would actually just pass through the
                 // calculation Other components, on the other hand, would check InitLoopEquip, do a few things, then exit early without doing any
@@ -281,9 +284,6 @@ namespace PlantLoopEquip {
                     compsToSimAfterInitLoopEquip.end()) {
                     return;
                 }
-            }
-            if (GetCompSizFac) {
-                sim_component.compPtr->getSizingFactor(sim_component.SizFac);
             }
         }
 
@@ -808,27 +808,7 @@ namespace PlantLoopEquip {
             // BOILERS
         } else if (GeneralEquipType == GenEquipTypes_Boiler) {
             if (EquipTypeNum == TypeOf_Boiler_Simple) {
-                SimBoiler(sim_component.TypeOf,
-                          sim_component.Name,
-                          EquipFlowCtrl,
-                          EquipNum,
-                          RunFlag,
-                          InitLoopEquip,
-                          CurLoad,
-                          MaxLoad,
-                          MinLoad,
-                          OptLoad,
-                          GetCompSizFac,
-                          SizingFac); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Boiler_Steam) {
                 SimSteamBoiler(sim_component.TypeOf,
@@ -860,11 +840,11 @@ namespace PlantLoopEquip {
                 ShowFatalError("Preceding condition causes termination.");
             }
 
-            if (InitLoopEquip && EquipNum == 0) {
-                ShowSevereError("InitLoop did not set Equipment Index for Boiler=" + sim_component.TypeOf);
-                ShowContinueError("..Boiler Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop(LoopNum).Name);
-                ShowFatalError("Previous condition causes termination.");
-            }
+            //            if (InitLoopEquip && EquipNum == 0) {
+            //                ShowSevereError("InitLoop did not set Equipment Index for Boiler=" + sim_component.TypeOf);
+            //                ShowContinueError("..Boiler Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop(LoopNum).Name);
+            //                ShowFatalError("Previous condition causes termination.");
+            //            }
 
             // WATER HEATER
         } else if (GeneralEquipType == GenEquipTypes_WaterThermalTank) {
