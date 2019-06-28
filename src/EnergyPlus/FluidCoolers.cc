@@ -118,7 +118,7 @@ namespace FluidCoolers {
             GetFluidCoolerInput();
             GetFluidCoolerInputFlag = false;
         }
-        // Now look for this particular pipe in the list
+        // Now look for this particular fluid cooler in the list
         for (auto &fc : SimpleFluidCooler) {
             if (fc.FluidCoolerType_Num == objectType && fc.Name == objectName) {
                 return &fc;
