@@ -54,67 +54,31 @@
 // EnergyPlus Headers
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
 namespace FluidCoolers {
 
-    // Using/Aliasing
-
-    // Data
     // MODULE PARAMETER DEFINITIONS:
     extern std::string const cFluidCooler_SingleSpeed;
     extern std::string const cFluidCooler_TwoSpeed;
 
-    extern int const PIM_NominalCapacity;
-    extern int const PIM_UFactor;
+    enum class PerfInputMethod
+    {
+        NOMINAL_CAPACITY,
+        U_FACTOR
+    };
 
-    extern int const FluidCooler_SingleSpeed;
-    extern int const FluidCooler_TwoSpeed;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
     extern int NumSimpleFluidCoolers; // Number of similar fluid coolers
 
-    // The following block of variables are used to carry model results for a fluid cooler instance
-    // across sim, update, and report routines.  Simulation manager must be careful
-    // in models with multiple fluid coolers.
-
-    extern Real64 InletWaterTemp;    // CW temperature at fluid cooler inlet
-    extern Real64 OutletWaterTemp;   // CW temperature at fluid cooler outlet
-    extern int WaterInletNode;       // Node number at fluid cooler inlet
-    extern int WaterOutletNode;      // Node number at fluid cooler outlet
-    extern Real64 WaterMassFlowRate; // WaterMassFlowRate through fluid cooler
-    // DSU this is plant level stuff now  :: FluidCoolerMassFlowRateMax     = 0.0    ! Max Hardware Mass Flow Rate
-    // DSU this is plant level stuff now  :: FluidCoolerMassFlowRateMin     = 0.0    ! Min Hardware Mass Flow Rate
-    // DSU this is plant level stuff now  :: LoopMassFlowRateMaxAvail = 0.0    ! Max Loop Mass Flow Rate available
-    // DSU this is plant level stuff now  :: LoopMassFlowRateMinAvail = 0.0    ! Min Loop Mass Flow Rate available
-    extern Real64 Qactual;  // Fluid cooler heat transfer
-    extern Real64 FanPower; // Fluid cooler fan power used
-
-    extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE CondenserLoopFluidCoolers
-
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-    // also, calculates UA based on nominal capacity input(s)
-
-    // Update routines to check convergence and update nodes
-
-    // Types
-
-    struct FluidCoolerspecs
+    struct FluidCoolerspecs : PlantComponent
     {
         // Members
         std::string Name;            // User identifier
         std::string FluidCoolerType; // Type of fluid cooler
         int FluidCoolerType_Num;
-        int PerformanceInputMethod_Num;
+        PerfInputMethod PerformanceInputMethod_Num;
         bool Available;                               // need an array of logicals--load identifiers of available equipment
         bool ON;                                      // Simulate the machine at it's operating part load ratio
         Real64 DesignWaterFlowRate;                   // Design water flow rate through the fluid cooler [m3/s]
@@ -162,43 +126,10 @@ namespace FluidCoolers {
         int LoopSideNum;
         int BranchNum;
         int CompNum;
+        bool oneTimeInit;
+        bool beginEnvrnInit;
 
-        // Default Constructor
-        FluidCoolerspecs()
-            : FluidCoolerType_Num(0), PerformanceInputMethod_Num(0), Available(true), ON(true), DesignWaterFlowRate(0.0),
-              DesignWaterFlowRateWasAutoSized(false), DesWaterMassFlowRate(0.0), HighSpeedAirFlowRate(0.0), HighSpeedAirFlowRateWasAutoSized(false),
-              HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false), HighSpeedFluidCoolerUA(0.0), HighSpeedFluidCoolerUAWasAutoSized(false),
-              LowSpeedAirFlowRate(0.0), LowSpeedAirFlowRateWasAutoSized(false), LowSpeedAirFlowRateSizingFactor(0.0), LowSpeedFanPower(0.0),
-              LowSpeedFanPowerWasAutoSized(false), LowSpeedFanPowerSizingFactor(0.0), LowSpeedFluidCoolerUA(0.0),
-              LowSpeedFluidCoolerUAWasAutoSized(false), LowSpeedFluidCoolerUASizingFactor(0.0), DesignEnteringWaterTemp(0.0),
-              DesignLeavingWaterTemp(0.0), DesignEnteringAirTemp(0.0), DesignEnteringAirWetBulbTemp(0.0), FluidCoolerMassFlowRateMultiplier(0.0),
-              FluidCoolerNominalCapacity(0.0), FluidCoolerLowSpeedNomCap(0.0), FluidCoolerLowSpeedNomCapWasAutoSized(false),
-              FluidCoolerLowSpeedNomCapSizingFactor(0.0), WaterInletNodeNum(0), WaterOutletNodeNum(0), OutdoorAirInletNodeNum(0),
-              HighMassFlowErrorCount(0), HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0), OutletWaterTempErrorIndex(0),
-              SmallWaterMassFlowErrorCount(0), SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0), WMFRLessThanMinAvailErrIndex(0),
-              WMFRGreaterThanMaxAvailErrCount(0), WMFRGreaterThanMaxAvailErrIndex(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0)
-        {
-        }
-    };
-
-    struct FluidCoolerInletConds
-    {
-        // Members
-        Real64 WaterTemp;  // Fluid cooler water inlet temperature (C)
-        Real64 AirTemp;    // Fluid cooler air inlet dry-bulb temperature (C)
-        Real64 AirWetBulb; // Fluid cooler air inlet wet-bulb temperature (C)
-        Real64 AirPress;   // Fluid cooler air barometric pressure
-        Real64 AirHumRat;  // Fluid cooler air inlet humidity ratio (kg/kg)
-
-        // Default Constructor
-        FluidCoolerInletConds() : WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0), AirPress(0.0), AirHumRat(0.0)
-        {
-        }
-    };
-
-    struct ReportVars
-    {
-        // Members
+        // Report vars
         Real64 InletWaterTemp;    // Fluid cooler inlet water temperature (C)
         Real64 OutletWaterTemp;   // Fluid cooler outlet water temperature (C)
         Real64 WaterMassFlowRate; // Fluid cooler water mass flow rate (m3/s)
@@ -206,93 +137,81 @@ namespace FluidCoolers {
         Real64 FanPower;          // Fluid cooler fan power (W)
         Real64 FanEnergy;         // Fluid cooler fan energy consumption (J)
 
+        // Inlet conds
+        Real64 WaterTemp;
+        Real64 AirTemp;
+        Real64 AirHumRat;
+        Real64 AirPress;
+        Real64 AirWetBulb;
+
+        // additional stuff
+        int indexInArray;
+
         // Default Constructor
-        ReportVars() : InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0)
+        FluidCoolerspecs()
+            : FluidCoolerType_Num(0), PerformanceInputMethod_Num(PerfInputMethod::NOMINAL_CAPACITY), Available(true), ON(true),
+              DesignWaterFlowRate(0.0), DesignWaterFlowRateWasAutoSized(false), DesWaterMassFlowRate(0.0), HighSpeedAirFlowRate(0.0),
+              HighSpeedAirFlowRateWasAutoSized(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false), HighSpeedFluidCoolerUA(0.0),
+              HighSpeedFluidCoolerUAWasAutoSized(false), LowSpeedAirFlowRate(0.0), LowSpeedAirFlowRateWasAutoSized(false),
+              LowSpeedAirFlowRateSizingFactor(0.0), LowSpeedFanPower(0.0), LowSpeedFanPowerWasAutoSized(false), LowSpeedFanPowerSizingFactor(0.0),
+              LowSpeedFluidCoolerUA(0.0), LowSpeedFluidCoolerUAWasAutoSized(false), LowSpeedFluidCoolerUASizingFactor(0.0),
+              DesignEnteringWaterTemp(0.0), DesignLeavingWaterTemp(0.0), DesignEnteringAirTemp(0.0), DesignEnteringAirWetBulbTemp(0.0),
+              FluidCoolerMassFlowRateMultiplier(0.0), FluidCoolerNominalCapacity(0.0), FluidCoolerLowSpeedNomCap(0.0),
+              FluidCoolerLowSpeedNomCapWasAutoSized(false), FluidCoolerLowSpeedNomCapSizingFactor(0.0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
+              OutdoorAirInletNodeNum(0), HighMassFlowErrorCount(0), HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0),
+              OutletWaterTempErrorIndex(0), SmallWaterMassFlowErrorCount(0), SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0),
+              WMFRLessThanMinAvailErrIndex(0), WMFRGreaterThanMaxAvailErrCount(0), WMFRGreaterThanMaxAvailErrIndex(0), LoopNum(0), LoopSideNum(0),
+              BranchNum(0), CompNum(0), oneTimeInit(true), beginEnvrnInit(true), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0),
+              Qactual(0.0), FanPower(0.0), FanEnergy(0.0), WaterTemp(0.0), AirTemp(0.0), AirHumRat(0.0), AirPress(0.0), AirWetBulb(0.0),
+              indexInArray(0)
         {
         }
+
+        void initialize();
+
+        void setupOutputVars();
+
+        void size();
+
+        void update();
+
+        void report(bool RunFlag);
+
+        bool validateSingleSpeedInputs(std::string const &cCurrentModuleObject,
+                                       Array1D<std::string> const &AlphArray,
+                                       Array1D<std::string> const &cNumericFieldNames,
+                                       Array1D<std::string> const &cAlphaFieldNames);
+
+        bool validateTwoSpeedInputs(std::string const &cCurrentModuleObject,
+                                    Array1D<std::string> const &AlphArray,
+                                    Array1D<std::string> const &cNumericFieldNames,
+                                    Array1D<std::string> const &cAlphaFieldNames);
+
+        void calcSingleSpeed();
+
+        void calcTwoSpeed();
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                 Real64 &EP_UNUSED(MaxLoad),
+                                 Real64 &EP_UNUSED(MinLoad),
+                                 Real64 &EP_UNUSED(OptLoad)) override;
+
+        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+
+        static PlantComponent *factory(int typeOf, std::string objectName);
     };
 
-    // Object Data
-    extern Array1D<FluidCoolerspecs> SimpleFluidCooler;           // dimension to number of machines
-    extern Array1D<FluidCoolerInletConds> SimpleFluidCoolerInlet; // inlet conditions
-    extern Array1D<ReportVars> SimpleFluidCoolerReport;           // report variables
-
-    // Functions
-    bool TestFluidCoolerSingleSpeedInputForDesign(std::string const &cCurrentModuleObject,
-                                                  Array1D<std::string> const &AlphArray,
-                                                  Array1D<std::string> const &cNumericFieldNames,
-                                                  Array1D<std::string> const &cAlphaFieldNames,
-                                                  int const &FluidCoolerNum);
-
-    bool TestFluidCoolerTwoSpeedInputForDesign(std::string const &cCurrentModuleObject,
-                                               Array1D<std::string> const &AlphArray,
-                                               Array1D<std::string> const &cNumericFieldNames,
-                                               Array1D<std::string> const &cAlphaFieldNames,
-                                               int const &FluidCoolerNum);
-
-    void SimFluidCoolers(std::string &FluidCoolerType,
-                         std::string &FluidCoolerName,
-                         int &CompIndex,
-                         bool &RunFlag,
-                         bool const InitLoopEquip,
-                         Real64 &MaxCap,
-                         Real64 &MinCap,
-                         Real64 &OptCap);
-
-    // End CondenserLoopFluidCoolers Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of CondenserLoopFluidCoolers Module Get Input subroutines
-    //******************************************************************************
+    extern Array1D<FluidCoolerspecs> SimpleFluidCooler; // dimension to number of machines
 
     void GetFluidCoolerInput();
 
-    // End of Get Input subroutines for the CondenserLoopFluidCoolers Module
-    //******************************************************************************
+    void CalcFluidCoolerOutlet(int FluidCoolerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
 
-    // Beginning Initialization Section for the CondenserLoopFluidCoolers Module
-    //******************************************************************************
-
-    void InitSimVars();
-
-    void InitFluidCooler(int const FluidCoolerNum, // Number of the current fluid cooler being simulated
-                         bool const RunFlag        // TRUE if fluid cooler is ON
-    );
-
-    void SizeFluidCooler(int const FluidCoolerNum);
-
-    // End Initialization Section for the CondenserLoopFluidCoolers Module
-    //******************************************************************************
-
-    // Beginning of the CondenserLoopFluidCoolers Module Simulation Subroutines
-    // *****************************************************************************
-
-    void SingleSpeedFluidCooler(int &FluidCoolerNum);
-
-    void TwoSpeedFluidCooler(int &FluidCoolerNum);
-
-    void SimSimpleFluidCooler(
-        int const FluidCoolerNum, Real64 const WaterMassFlowRate, Real64 const AirFlowRate, Real64 const UAdesign, Real64 &OutletWaterTemp);
-
-    Real64 SimpleFluidCoolerUAResidual(Real64 const UA,          // UA of fluid cooler
+    Real64 SimpleFluidCoolerUAResidual(Real64 UA,                // UA of fluid cooler
                                        Array1<Real64> const &Par // par(1) = design fluid cooler load [W]
     );
-
-    // End of the CondenserLoopFluidCoolers Module Simulation Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the FluidCooler Module
-    // *****************************************************************************
-
-    void UpdateFluidCooler(int const FluidCoolerNum);
-
-    // End of Record Keeping subroutines for the FluidCooler Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the FluidCooler Module
-    // *****************************************************************************
-
-    void ReportFluidCooler(bool const RunFlag, int const FluidCoolerNum);
 
     void clear_state();
 
