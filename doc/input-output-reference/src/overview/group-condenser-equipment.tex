@@ -3948,22 +3948,15 @@ This field specifies the design flow rate, in m\(^{3}\)/s, of the fluid passing 
 
 This alpha field identifies the nature of heat exchanger.~ Heat exchanger model type is specified by one of the following four key word choices:
 
-\begin{itemize}
-\item
-  \textbf{CrossFlowBothUnMixed}.~ Specifies a single-pass, cross-flow heat exchanger.~ The effectiveness will be calculated using a cross-flow heat exchanger correlation for both streams unmixed.
-\item
-  \textbf{CrossFlowBothMixed}.~ Specifies a single-pass, cross-flow heat exchanger. The effectiveness will be calculated using a cross-flow heat exchanger correlation for both streams mixed.
-\item
-  \textbf{CrossFlowSupplyMixedDemandUnMixed}.~ Specifes a single-pass, cross-flow heat exchanger.~ The effectiveness will be calculated using a cross-flow heat exchanger correlation for flow mixed on the Loop Supply side and flow unmixed on the Loop Demand Side.
-\item
-  \textbf{CrossFlowSupplyUnMixedDemandMixed}.~ Specifes a single-pass, cross-flow heat exchanger.~ The effectiveness will be calculated using a cross-flow heat exchanger correlation for flow unmixed on the Loop Supply side and flow mixed on the Loop Demand Side.
-\item
-  \textbf{CounterFlow}. Specifies a counter-flow shell and tube heat exchanger(one fluid has the opposite direction to the other fluid).~ The effectiveness will be calculated using a counter-flow shell and tube heat exchanger correlation.
-\item
-  \textbf{ParallelFlow}. Specifies a parallel-flow shell and tube heat exchanger(both fluids have the same direction).~ The effectiveness will be calculated using a parallel-flow shell and tube heat exchanger correlation.
-\item
-  \textbf{Ideal}. Specifies an ideal heat exchanger.~ The effectiveness will be set to `1.0' and the specified UA will be ignored.~ The heat transfer rate will be calculated as the maximum possible heat transfer rate.
-\end{itemize}
+\begin{description}
+\item [CrossFlowBothUnMixed] Specifies a single-pass, cross-flow heat exchanger. The effectiveness will be calculated using a cross-flow heat exchanger correlation for both streams unmixed.
+\item [CrossFlowBothMixed]  Specifies a single-pass, cross-flow heat exchanger. The effectiveness will be calculated using a cross-flow heat exchanger correlation for both streams mixed.
+\item [CrossFlowSupplyMixedDemandUnMixed] Specifes a single-pass, cross-flow heat exchanger. The effectiveness will be calculated using a cross-flow heat exchanger correlation for flow mixed on the Loop Supply side and flow unmixed on the Loop Demand Side.
+\item [CrossFlowSupplyUnMixedDemandMixed] Specifes a single-pass, cross-flow heat exchanger. The effectiveness will be calculated using a cross-flow heat exchanger correlation for flow unmixed on the Loop Supply side and flow mixed on the Loop Demand Side.
+\item [CounterFlow] Specifies a counter-flow shell and tube heat exchanger (one fluid has the opposite direction to the other fluid). The effectiveness will be calculated using a counter-flow shell and tube heat exchanger correlation.
+\item [ParallelFlow] Specifies a parallel-flow shell and tube heat exchanger (both fluids have the same direction). The effectiveness will be calculated using a parallel-flow shell and tube heat exchanger correlation.
+\item [Ideal] Specifies an ideal heat exchanger. The effectiveness will be set to `1.0' and the specified UA will be ignored. The heat transfer rate will be calculated as the maximum possible heat transfer rate.
+\end{description}
 
 For effectiveness of each heat exchanger model type in detail, See "Heat Exchangers: Plant Loop Fluid-to-Fluid Heat Exchanger" Section in Engineering Reference.
 
