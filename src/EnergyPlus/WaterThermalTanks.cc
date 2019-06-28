@@ -8724,7 +8724,9 @@ namespace WaterThermalTanks {
             WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp;
             WaterHeaterDesuperheater(DesuperheaterNum).SaveMode = WaterHeaterDesuperheater(DesuperheaterNum).Mode;
             WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag = false;
-            DataHeatBalance::HeatReclaimSimple_WAHPCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum).DesuperheaterReclaimedHeat= 0.0;
+            if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_AIR_WATER_HEATPUMP_EQ) {
+                DataHeatBalance::HeatReclaimSimple_WAHPCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum).DesuperheaterReclaimedHeat= 0.0;
+            }
         }
 
         else if (!FirstHVACIteration) {
