@@ -67,7 +67,6 @@
 #include <DataPlant.hh>
 #include <DataPrecisionGlobals.hh>
 #include <EvaporativeFluidCoolers.hh>
-#include <FluidCoolers.hh>
 #include <FuelCellElectricGenerator.hh>
 #include <GroundHeatExchangers.hh>
 #include <HVACVariableRefrigerantFlow.hh>
@@ -209,7 +208,6 @@ namespace PlantLoopEquip {
         using CondenserLoopTowers::SimTowers;
         using CTElectricGenerator::SimCTPlantHeatRecovery;
         using EvaporativeFluidCoolers::SimEvapFluidCoolers;
-        using FluidCoolers::SimFluidCoolers;
         using FuelCellElectricGenerator::SimFuelCellPlantHeatRecovery;
         using ICEngineElectricGenerator::SimICEPlantHeatRecovery;
         using IceThermalStorage::SimIceStorage;
@@ -721,37 +719,7 @@ namespace PlantLoopEquip {
             // FLUID COOLERS
         } else if (GeneralEquipType == GenEquipTypes_FluidCooler) {
 
-            // FluidCoolerS
-            if (EquipTypeNum == TypeOf_FluidCooler_SingleSpd) {
-
-                SimFluidCoolers(sim_component.TypeOf, sim_component.Name, EquipNum, RunFlag, InitLoopEquip, MaxLoad, MinLoad, OptLoad); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
-
-            } else if (EquipTypeNum == TypeOf_FluidCooler_TwoSpd) {
-
-                SimFluidCoolers(sim_component.TypeOf, sim_component.Name, EquipNum, RunFlag, InitLoopEquip, MaxLoad, MinLoad, OptLoad); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
-            } else {
-                ShowSevereError("SimPlantEquip: Invalid FluidCooler Type=" + sim_component.TypeOf);
-                ShowContinueError("Occurs in Plant Loop=" + PlantLoop(LoopNum).Name);
-                ShowFatalError("Preceding condition causes termination.");
-            }
-
-            if (InitLoopEquip && EquipNum == 0) {
-                ShowSevereError("InitLoop did not set Equipment Index for Fluid Cooler=" + sim_component.TypeOf);
-                ShowContinueError("..Fluid Cooler Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop(LoopNum).Name);
-                ShowFatalError("Previous condition causes termination.");
-            }
+            sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
         } else if (GeneralEquipType == GenEquipTypes_EvapFluidCooler) {
 
