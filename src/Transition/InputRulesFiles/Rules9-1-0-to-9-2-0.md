@@ -10,9 +10,9 @@ Field A1 "Name" is now a required field. If blank, add a name. If the old idf ha
 # Object Change: `ThermalStorage:Ice:Detailed`
 Fields A5 and A7 change description to Discharging Curve Variable Specifications and Charging Curve Variable Specifications, respectively.  The old options for these fields were either QuadraticLinear or CubicLinear.  
 
-For A5 (field 6), if the field previously had QuadraticLinear, it should be changed to PercentDischargedLMTD.  If A5 was defined as CubicLinear, it should be changed to LMTDMassFlow.  
+For A5 (field 6), if the field previously had QuadraticLinear, it should be changed to FractionDischargedLMTD.  If A5 was defined as CubicLinear, it should be changed to LMTDMassFlow.  
 
-For A7 (field 7), if the field had previously been QuadraticLinear, it should now say PercentChargedLMTD.  If A7 was CubicLinear, it should be changed to LMTDMassFlow.
+For A7 (field 7), if the field had previously been QuadraticLinear, it should now say FractionChargedLMTD.  If A7 was CubicLinear, it should be changed to LMTDMassFlow.
 
 # Object Change: `ObjectNameB`
 

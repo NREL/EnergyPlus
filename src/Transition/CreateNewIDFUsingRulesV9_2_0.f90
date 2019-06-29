@@ -478,7 +478,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 nodiff=.false.
                 OutArgs(1:5)=InArgs(1:5)
                 IF (SameString(TRIM(InArgs(6)), 'QUADRATICLINEAR')) THEN
-                  OutArgs(6) = 'PercentDischargedLMTD'
+                  OutArgs(6) = 'FractionDischargedLMTD'
                 ELSEIF (SameString(TRIM(InArgs(6)), 'CUBICLINEAR')) THEN
                   OutArgs(6) = 'LMTDMassFlow'
                 ELSE
@@ -486,7 +486,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ENDIF
                 OutArgs(7)=InArgs(7)
                 IF (SameString(TRIM(InArgs(8)), 'QUADRATICLINEAR')) THEN
-                  OutArgs(8) = 'PercentChargedLMTD'
+                  OutArgs(8) = 'FractionChargedLMTD'
                 ELSEIF (SameString(TRIM(InArgs(8)), 'CUBICLINEAR')) THEN
                   OutArgs(8) = 'LMTDMassFlow'
                 ELSE
