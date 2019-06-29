@@ -473,6 +473,29 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with T, insert the rules here
 
+              CASE('THERMALSTORAGE:ICE:DETAILED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:5)=InArgs(1:5)
+                IF (SameString(TRIM(InArgs(6)), 'QUADRATICLINEAR')) THEN
+                  OutArgs(6) = 'PercentDischargedLMTD'
+                ELSEIF (SameString(TRIM(InArgs(6)), 'CUBICLINEAR')) THEN
+                  OutArgs(6) = 'LMTDMassFlow'
+                ELSE
+                  OutArgs(6) = InArgs(6)
+                ENDIF
+                OutArgs(7)=InArgs(7)
+                IF (SameString(TRIM(InArgs(8)), 'QUADRATICLINEAR')) THEN
+                  OutArgs(8) = 'PercentChargedLMTD'
+                ELSEIF (SameString(TRIM(InArgs(8)), 'CUBICLINEAR')) THEN
+                  OutArgs(8) = 'LMTDMassFlow'
+                ELSE
+                  OutArgs(8) = InArgs(8)
+                ENDIF
+                
+                 OutArgs(9:CurArgs)=InArgs(9:CurArgs)
+                 NoDiff = .false.
+
               ! If your original object starts with U, insert the rules here
 
               ! If your original object starts with V, insert the rules here
