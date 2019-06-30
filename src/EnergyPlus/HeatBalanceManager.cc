@@ -3583,8 +3583,10 @@ namespace HeatBalanceManager {
                 Material(MaterNum).ReflFrontDiffDiffVis = MaterialProps(14);
                 Material(MaterNum).ReflBackDiffDiffVis = MaterialProps(15);
             }
-            if (!lNumericFieldBlanks(19) && !lNumericFieldBlanks(20) && !lNumericFieldBlanks(21)) {
+            if (!lNumericFieldBlanks(19)) {
                 Material(MaterNum).TausThermal = MaterialProps(19);
+            }
+            if (!lNumericFieldBlanks(20) && !lNumericFieldBlanks(21)) {
                 Material(MaterNum).EmissThermalFront = MaterialProps(20);
                 Material(MaterNum).EmissThermalBack = MaterialProps(21);
             }
