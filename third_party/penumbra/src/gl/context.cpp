@@ -226,9 +226,9 @@ void Context::setModel(const std::vector<float> &vertices, const std::vector<Sur
   // set model vertices
   model.setVertices(vertices);
   model.setSurfaceBuffers(surfaceBuffers);
-  // queries.resize(surfaceBuffers.size());
-  queries.resize(bufferSize);
-  indexBuffer = std::vector<unsigned>(bufferSize, -1);
+  queries.resize(surfaceBuffers.size());
+  // queries.resize(bufferSize);
+  // indexBuffer = std::vector<int>(bufferSize, -1);
   pixelAreas.resize(surfaceBuffers.size());
   pixelCounts = std::vector<GLint>(surfaceBuffers.size(), -1);
 
@@ -540,38 +540,39 @@ void Context::bufferedQuery(const SurfaceBuffer &surfaceBuffer) {
   }
 }
 
-void Context::submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sunView) {
-  auto const pixelArea = setScene(sunView);
-  drawModel();
-  for (size_t i = 0; i < surfaceIndices.size(); ++i) {
-    auto const surfaceIndex = surfaceIndices[i];
-    auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
-    // auto const pixelArea = setScene(surfaceBuffer, sunView);
-    // drawModel();
-    bufferedQuery(surfaceBuffer);
-    pixelAreas.at(surfaceBuffer.index) = pixelArea;
-  }
-}
-
 // void Context::submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sunView) {
-//   for (auto const surfaceIndex : surfaceIndices) {
+//   auto const pixelArea = setScene(sunView);
+//   drawModel();
+//   for (size_t i = 0; i < surfaceIndices.size(); ++i) {
+//     auto const surfaceIndex = surfaceIndices[i];
 //     auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
-//     auto const pixelArea = setScene(surfaceBuffer, sunView);
-//     drawModel();
-//     glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
-//     model.drawSurface(surfaceBuffer);
-//     glEndQuery(GL_SAMPLES_PASSED);
+//     // auto const pixelArea = setScene(surfaceBuffer, sunView);
+//     // drawModel();
+//     bufferedQuery(surfaceBuffer);
 //     pixelAreas.at(surfaceBuffer.index) = pixelArea;
 //   }
 // }
 
-void Context::submitPSSA(mat4x4 sunView) {
-  for (auto const & surfaceBuffer : model.surfaceBuffers) {
-    auto const pixelArea = setScene(surfaceBuffer, sunView);
-    drawModel();
+void Context::submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sunView) {
+  auto const pixelArea = setScene(sunView);
+  drawModel();
+  for (auto const surfaceIndex : surfaceIndices) {
+    auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
     glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
     model.drawSurface(surfaceBuffer);
     glEndQuery(GL_SAMPLES_PASSED);
+    pixelAreas.at(surfaceBuffer.index) = pixelArea;
+  }
+}
+
+void Context::submitPSSA(mat4x4 sunView) {
+  auto const pixelArea = setScene(sunView);
+  drawModel();
+  for (auto const & surfaceBuffer : model.surfaceBuffers) {
+   glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
+   model.drawSurface(surfaceBuffer);
+   glEndQuery(GL_SAMPLES_PASSED);
+    // bufferedQuery(surfaceBuffer);
     pixelAreas.at(surfaceBuffer.index) = pixelArea;
   }
 }
@@ -584,10 +585,10 @@ float Context::calculatePSSA(const unsigned surfaceIndex) {
   // }
 
   // retrieve result
-  if (pixelCounts.at(surfaceIndex) < 0) {
-    bufferedQuery(surfaceIndex);
-  }
-  // glGetQueryObjectiv(queries[surfaceIndex], GL_QUERY_RESULT, &(pixelCounts.at(surfaceIndex)));
+  // if (pixelCounts.at(surfaceIndex) < 0) {
+  //   bufferedQuery(surfaceIndex);
+  // }
+  glGetQueryObjectiv(queries[surfaceIndex], GL_QUERY_RESULT, &(pixelCounts.at(surfaceIndex)));
 
   return pixelCounts[surfaceIndex] * pixelAreas[surfaceIndex];
 }

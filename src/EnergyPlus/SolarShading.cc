@@ -5352,7 +5352,7 @@ namespace SolarShading {
         }
 
         if (penumbra) {
-            penumbra->submitPSSA(penumbraIDs);
+            penumbra->submitPSSA();
         }
 
         for (GRSNR = 1; GRSNR <= TotSurfaces; ++GRSNR) {
@@ -5448,51 +5448,51 @@ namespace SolarShading {
 
                 SAREA(HTS) = min(SAREA(HTS), SurfArea);
 
-                if (penumbra && Surface(HTS).PenumbraID >= 0 && compareShadingMethods) {
+                // if (penumbra && Surface(HTS).PenumbraID >= 0 && compareShadingMethods) {
 
-                    Real64 pSAREA = penumbra->calculatePSSA(Surface(HTS).PenumbraID)/CTHETA(HTS);
-                    pSAREA = max(0.0, pSAREA);
-                    pSAREA = min(pSAREA, SurfArea);
-                    if (!CalcSkyDifShading || true) {
-                        if (std::abs(pSAREA - SAREA(HTS))/Surface(HTS).Area > 0.05) {
-                            std::cout << Surface(HTS).Name << " CPU: " << SAREA(HTS)/Surface(HTS).Area << ", GPU: " << pSAREA/Surface(HTS).Area <<  std::endl;
-                            std::cout << "  Elevation: " << penumbra->getSunAltitude() << ", Azimuth: " << penumbra->getSunAzimuth() << ", CosI: " << CTHETA(HTS) << std::endl;
-                            penumbra->renderScene(Surface(HTS).PenumbraID);
-                        } else {
-                            std::cout << Surface(HTS).Name << " GOOD! " << SAREA(HTS)/Surface(HTS).Area << "  (Diff = " << std::abs(pSAREA - SAREA(HTS))/Surface(HTS).Area << ")" << std::endl;
-                        }
-                    }
-                    SAREA(HTS) = pSAREA;
-                    for (int SS = 1; SS <= NSBS; ++SS) {
-                        auto HTSS = ShadowComb(HTS).SubSurf(SS);
-                        if (Surface(HTSS).PenumbraID >= 0) {
-                            auto CPUArea = SAREA(HTSS);
-                            SAREA(HTSS) = penumbra->calculatePSSA(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
-                            if (SAREA(HTSS) > 0.0) {
-                                if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
+                //     Real64 pSAREA = penumbra->calculatePSSA(Surface(HTS).PenumbraID)/CTHETA(HTS);
+                //     pSAREA = max(0.0, pSAREA);
+                //     pSAREA = min(pSAREA, SurfArea);
+                //     if (!CalcSkyDifShading || true) {
+                //         if (std::abs(pSAREA - SAREA(HTS))/Surface(HTS).Area > 0.05) {
+                //             std::cout << Surface(HTS).Name << " CPU: " << SAREA(HTS)/Surface(HTS).Area << ", GPU: " << pSAREA/Surface(HTS).Area <<  std::endl;
+                //             std::cout << "  Elevation: " << penumbra->getSunAltitude() << ", Azimuth: " << penumbra->getSunAzimuth() << ", CosI: " << CTHETA(HTS) << std::endl;
+                //             penumbra->renderScene(Surface(HTS).PenumbraID);
+                //         } else {
+                //             std::cout << Surface(HTS).Name << " GOOD! " << SAREA(HTS)/Surface(HTS).Area << "  (Diff = " << std::abs(pSAREA - SAREA(HTS))/Surface(HTS).Area << ")" << std::endl;
+                //         }
+                //     }
+                //     SAREA(HTS) = pSAREA;
+                //     for (int SS = 1; SS <= NSBS; ++SS) {
+                //         auto HTSS = ShadowComb(HTS).SubSurf(SS);
+                //         if (Surface(HTSS).PenumbraID >= 0) {
+                //             auto CPUArea = SAREA(HTSS);
+                //             SAREA(HTSS) = penumbra->calculatePSSA(Surface(HTSS).PenumbraID)/CTHETA(HTSS);
+                //             if (SAREA(HTSS) > 0.0) {
+                //                 if (iHour > 0 && TS > 0) SunlitFracWithoutReveal(TS, iHour, HTSS) = SAREA(HTSS) / Surface(HTSS).Area;
 
-                                SHDRVL(HTSS, HTSS, iHour, TS); // Determine shadowing from reveal.
-                            }
+                //                 SHDRVL(HTSS, HTSS, iHour, TS); // Determine shadowing from reveal.
+                //             }
 
-                            pSAREA = SAREA(HTSS);
-                            pSAREA = max(0.0, pSAREA);
-                            pSAREA = min(pSAREA, SurfArea);
+                //             pSAREA = SAREA(HTSS);
+                //             pSAREA = max(0.0, pSAREA);
+                //             pSAREA = min(pSAREA, SurfArea);
 
-                            SAREA(HTSS) = CPUArea;
+                //             SAREA(HTSS) = CPUArea;
 
-                            if (!CalcSkyDifShading || true) {
-                                if (std::abs(pSAREA - SAREA(HTSS))/Surface(HTSS).Area > 0.05) {
-                                    std::cout << Surface(HTSS).Name << " CPU: " << SAREA(HTSS)/Surface(HTSS).Area << ", GPU: " << pSAREA/Surface(HTSS).Area <<  std::endl;
-                                    std::cout << "  Elevation: " << penumbra->getSunAltitude() << ", Azimuth: " << penumbra->getSunAzimuth() << ", CosI: " << CTHETA(HTSS) << std::endl;
-                                    penumbra->renderScene(Surface(HTSS).PenumbraID);
-                                } else {
-                                    std::cout << Surface(HTSS).Name << " GOOD! " << SAREA(HTSS)/Surface(HTSS).Area << "  (Diff = " << std::abs(pSAREA - SAREA(HTSS))/Surface(HTSS).Area << ")" << std::endl;
-                                }
-                            }
-                            SAREA(HTSS) = pSAREA;
-                        }
-                    }
-                }
+                //             if (!CalcSkyDifShading || true) {
+                //                 if (std::abs(pSAREA - SAREA(HTSS))/Surface(HTSS).Area > 0.05) {
+                //                     std::cout << Surface(HTSS).Name << " CPU: " << SAREA(HTSS)/Surface(HTSS).Area << ", GPU: " << pSAREA/Surface(HTSS).Area <<  std::endl;
+                //                     std::cout << "  Elevation: " << penumbra->getSunAltitude() << ", Azimuth: " << penumbra->getSunAzimuth() << ", CosI: " << CTHETA(HTSS) << std::endl;
+                //                     penumbra->renderScene(Surface(HTSS).PenumbraID);
+                //                 } else {
+                //                     std::cout << Surface(HTSS).Name << " GOOD! " << SAREA(HTSS)/Surface(HTSS).Area << "  (Diff = " << std::abs(pSAREA - SAREA(HTSS))/Surface(HTSS).Area << ")" << std::endl;
+                //                 }
+                //             }
+                //             SAREA(HTSS) = pSAREA;
+                //         }
+                //     }
+                // }
             } // ...end of surface in sun/surface with shaders and/or subsurfaces IF-THEN block
 
             // NOTE:

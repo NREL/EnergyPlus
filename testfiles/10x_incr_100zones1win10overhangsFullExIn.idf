@@ -20445,7 +20445,7 @@ ShadowCalculation,
   7, !- Shading Calculation Update Frequency
   , !- Maximum Figures in Shadow Overlap Calculations
   , !- Polygon Clipping Algorithm
-  1024; !- Pixel Counting Resolution
+  2048; !- Pixel Counting Resolution
 
 SurfaceConvectionAlgorithm:Inside,
   TARP;                                   !- Algorithm

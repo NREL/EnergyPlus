@@ -76,7 +76,7 @@ private:
   std::vector<GLuint> queries;
   std::vector<float> pixelAreas;
   std::vector<GLint> pixelCounts;
-  std::vector<unsigned> indexBuffer;
+  std::vector<int> indexBuffer;
   int currentBufferIndex = 0;
   int bufferSize = 16;
 
