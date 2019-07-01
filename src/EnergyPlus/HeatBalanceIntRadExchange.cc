@@ -301,6 +301,11 @@ namespace HeatBalanceIntRadExchange {
                                 (ShadeFlagPrev != IntBlindOn && ShadeFlag == IntBlindOn) ||
                                 (ShadeFlagPrev == IntShadeOn && ShadeFlag != IntShadeOn) || (ShadeFlagPrev == IntBlindOn && ShadeFlag != IntBlindOn))
                                 IntShadeOrBlindStatusChanged = true;
+                            if (SurfaceWindow(SurfNum).WindowModelType == WindowEQLModel &&
+                                DataWindowEquivalentLayer::CFS(Construct(ConstrNum).EQLConsPtr).ISControlled) {
+                                IntShadeOrBlindStatusChanged = true;
+                            }
+
                         } else {
                             UpdateMovableInsulationFlag(IntMovInsulChanged, SurfNum);
                         }
@@ -322,6 +327,10 @@ namespace HeatBalanceIntRadExchange {
                         if (Surface(SurfNum).MovInsulIntPresent) {
                             HeatBalanceMovableInsulation::EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
                             zone_info.Emissivity(ZoneSurfNum) = Material(Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal;
+                        }
+                        if (surface_window.WindowModelType == WindowEQLModel &&
+                            DataWindowEquivalentLayer::CFS(Construct(ConstrNum).EQLConsPtr).ISControlled) {
+                            zone_info.Emissivity(ZoneSurfNum) = EQLWindowInsideEffectiveEmiss(ConstrNum);
                         }
                     }
 
@@ -473,8 +482,8 @@ namespace HeatBalanceIntRadExchange {
         MovableInsulationChange = false;
         if (Surface(SurfNum).MaterialMovInsulInt > 0) {
             Real64 HMovInsul; // "Resistance" value of movable insulation (if present)
-            Real64 AbsInt; // Absorptivity of movable insulation material
-                           // (supercedes that of the construction if interior movable insulation is present)
+            Real64 AbsInt;    // Absorptivity of movable insulation material
+                              // (supercedes that of the construction if interior movable insulation is present)
             HeatBalanceMovableInsulation::EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
         } else {
             Surface(SurfNum).MovInsulIntPresent = false;
@@ -551,9 +560,10 @@ namespace HeatBalanceIntRadExchange {
 
             if (ZoneNum == 1) {
                 if (DisplayAdvancedReportVariables)
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Surface View Factor Check Values>,Zone Name,Original Check Value,Calculated Fixed Check "
-                                                         "Value,Final Check Value,Number of Iterations,Fixed RowSum Convergence,Used RowSum "
-                                                         "Convergence";
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA)
+                        << "! <Surface View Factor Check Values>,Zone Name,Original Check Value,Calculated Fixed Check "
+                           "Value,Final Check Value,Number of Iterations,Fixed RowSum Convergence,Used RowSum "
+                           "Convergence";
             }
 
             ZoneInfo(ZoneNum).Name = Zone(ZoneNum).Name;
@@ -654,8 +664,8 @@ namespace HeatBalanceIntRadExchange {
 
             if (ViewFactorReport) { // Write to SurfInfo File
                 // Zone Surface Information Output
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Surface View Factor - Zone Information," + ZoneInfo(ZoneNum).Name + ',' +
-                                                         RoundSigDigits(NumOfZoneSurfaces);
+                ObjexxFCL::gio::write(OutputFileInits, fmtA)
+                    << "Surface View Factor - Zone Information," + ZoneInfo(ZoneNum).Name + ',' + RoundSigDigits(NumOfZoneSurfaces);
 
                 for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
                     ObjexxFCL::gio::write(OutputFileInits, "(A,',',A,$)")
@@ -673,7 +683,7 @@ namespace HeatBalanceIntRadExchange {
                 }
 
                 ObjexxFCL::gio::write(OutputFileInits, "(A,A,$)") << "Approximate or User Input ViewFactors"
-                                                       << ",To Surface,Surface Class,RowSum";
+                                                                  << ",To Surface,Surface Class,RowSum";
                 for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
                     ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name;
                 }
@@ -693,7 +703,7 @@ namespace HeatBalanceIntRadExchange {
 
             if (ViewFactorReport) {
                 ObjexxFCL::gio::write(OutputFileInits, "(A,A,$)") << "Final ViewFactors"
-                                                       << ",To Surface,Surface Class,RowSum";
+                                                                  << ",To Surface,Surface Class,RowSum";
                 for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
                     ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name;
                 }
@@ -717,12 +727,12 @@ namespace HeatBalanceIntRadExchange {
                         for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
                             if (!(SurfNum == NumOfZoneSurfaces && Findex == NumOfZoneSurfaces)) {
                                 ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                                                                         Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
-                                                                         RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ',';
+                                                                                    Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
+                                                                                    RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ',';
                             } else {
                                 ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                                                                         Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
-                                                                         RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ';';
+                                                                                    Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
+                                                                                    RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ';';
                             }
                         }
                     }
@@ -734,12 +744,12 @@ namespace HeatBalanceIntRadExchange {
                         for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
                             if (!(SurfNum == NumOfZoneSurfaces && Findex == NumOfZoneSurfaces)) {
                                 ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                                                                         Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
-                                                                         RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ',';
+                                                                                    Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
+                                                                                    RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ',';
                             } else {
                                 ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                                                                         Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
-                                                                         RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ';';
+                                                                                    Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
+                                                                                    RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ';';
                             }
                         }
                     }
@@ -749,7 +759,7 @@ namespace HeatBalanceIntRadExchange {
 
             if (ViewFactorReport) {
                 ObjexxFCL::gio::write(OutputFileInits, "(A,A,$)") << "Script F Factors"
-                                                       << ",X Surface";
+                                                                  << ",X Surface";
                 for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
                     ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name;
                 }
@@ -775,9 +785,9 @@ namespace HeatBalanceIntRadExchange {
             FixedRowSum = std::abs(FixedRowSum - NumOfZoneSurfaces);
             if (DisplayAdvancedReportVariables) {
                 ObjexxFCL::gio::write(OutputFileInits, "(8A)") << "Surface View Factor Check Values," + Zone(ZoneNum).Name + ',' +
-                                                           RoundSigDigits(CheckValue1, 6) + ',' + RoundSigDigits(CheckValue2, 6) + ',' +
-                                                           RoundSigDigits(FinalCheckValue, 6) + ',' + RoundSigDigits(NumIterations) + ',' +
-                                                           RoundSigDigits(FixedRowSum, 6) + ',' + RoundSigDigits(RowSum, 6);
+                                                                      RoundSigDigits(CheckValue1, 6) + ',' + RoundSigDigits(CheckValue2, 6) + ',' +
+                                                                      RoundSigDigits(FinalCheckValue, 6) + ',' + RoundSigDigits(NumIterations) + ',' +
+                                                                      RoundSigDigits(FixedRowSum, 6) + ',' + RoundSigDigits(RowSum, 6);
             }
         }
 
