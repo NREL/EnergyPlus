@@ -3712,7 +3712,8 @@ The following outputs are available for the Roof Vegetation surface.
 
 \subsubsection{Green Roof Soil Temperature {[}C{]}}\label{green-roof-soil-temperature-c}
 
-Temperature of the Soil layer temperature in C.
+Temperature of the Soil layer temperature in C. Note that \hyperref[surface-outside-face-temperature-c]{Surface Outside Face Temperature} of Roof, one of the surface output variables, is the temperature at the interface between the soil and the next material layer.
+
 
 \subsubsection{Green Roof Vegetation Temperature {[}C{]}}\label{green-roof-vegetation-temperature-c}
 
@@ -3898,22 +3899,6 @@ Construction, DOUBLE PANE WITH ROLL SHADE,  !- Material layer names follow:
         WinAirB1 - AIRSPACE RESISTANCE,
         GLASS - CLEAR SHEET 1 / 8 IN,
         ROLL SHADE - LIGHT
-\end{lstlisting}
-
-\subsection{Site:GroundTemperature:FCfactorMethod}\label{sitegroundtemperaturefcfactormethod-000}
-
-Site:GroundTemperature:FCfactorMethod is used only by the underground walls or slabs-on-grade or underground floors defined with C-factor (\hyperref[constructioncfactorundergroundwall]{Construction:CfactorUndergroundWall}) and F-factor (\hyperref[constructionffactorgroundfloor]{Construction:FfactorGroundFloor}) method for code compliance calculations where detailed construction layers are unknown. Only one such ground temperature object can be included. The monthly ground temperatures for this object are close to the monthly outside air temperatures delayed by three months. If user does not input this object in the IDF file, it will be defaulted to the 0.5m set of monthly ground temperatures from the weather file if they are available.
-
-\subsubsection{Inputs}\label{inputs-35-000}
-
-\paragraph{Field: Month Temperature(s) -- 12 fields in all}\label{field-month-temperatures-12-fields-in-all-000}
-
-Each numeric field is the monthly ground temperature (degrees Celsius) used for the indicated month (January = 1\(^{st}\) field, February = 2\(^{nd}\) field, etc.)
-
-And, the IDF example:
-
-\begin{lstlisting}
-Site:GroundTemperature:FCfactorMethod,  9.5,3.5,-0.7,-1.7,-0.6,3.6,9.3,14,18.2,22.7,21.2,16.8;
 \end{lstlisting}
 
 \subsection{Constructions - Modeling Underground Walls and Ground Floors Defined with C and F Factors for Building Energy Code Compliance}\label{constructions---modeling-underground-walls-and-ground-floors-defined-with-c-and-f-factors-for-building-energy-code-compliance}
