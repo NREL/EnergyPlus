@@ -915,3 +915,396 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     Real64 SlateAngleBlockBeamSolar = VB_CriticalSlatAngle(DataGlobals::RadToDeg * ProfAngVer);
     EXPECT_NEAR(SlateAngleBlockBeamSolar, DataSurfaces::SurfaceWindow(SurfNum).SlatAngThisTSDeg, 0.0001);
 }
+TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
+{
+    // GitHub issue 7345
+    std::string const idf_objects = delimited_string({
+
+        "  Version,9.2;",
+
+        "  Timestep,1;",
+
+        "  Building,",
+        "    Simple One Zone w Windows,  !- Name",
+        "    0,                       !- North Axis {deg}",
+        "    Suburbs,                 !- Terrain",
+        "    0.04,                    !- Loads Convergence Tolerance Value",
+        "    0.004,                   !- Temperature Convergence Tolerance Value {deltaC}",
+        "    MinimalShadowing,        !- Solar Distribution",
+        "    30,                      !- Maximum Number of Warmup Days",
+        "    6;                       !- Minimum Number of Warmup Days",
+
+        "  HeatBalanceAlgorithm,ConductionTransferFunction;",
+
+        "  SurfaceConvectionAlgorithm:Inside,TARP;",
+
+        "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
+
+        "  SimulationControl,",
+        "    No,                      !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    Yes,                     !- Run Simulation for Sizing Periods",
+        "    No;                      !- Run Simulation for Weather File Run Periods",
+
+        "  SizingPeriod:DesignDay,",
+        "    Denver Stapleton Intl Arpt Ann Clg 1% Condns DB=>MWB,  !- Name",
+        "    7,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    SummerDesignDay,         !- Day Type",
+        "    32.6,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    15.2,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    Wetbulb,                 !- Humidity Condition Type",
+        "    15.6,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    83411.,                  !- Barometric Pressure {Pa}",
+        "    4,                       !- Wind Speed {m/s}",
+        "    120,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAEClearSky,          !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "    1.00;                    !- Sky Clearness",
+
+        "  Site:Location,",
+        "    Denver Stapleton Intl Arpt CO USA WMO=724690,  !- Name",
+        "    39.77,                   !- Latitude {deg}",
+        "    -104.87,                 !- Longitude {deg}",
+        "    -7.00,                   !- Time Zone {hr}",
+        "    1611.00;                 !- Elevation {m}",
+
+        "  Material:NoMass,",
+        "    R13LAYER,                !- Name",
+        "    Rough,                   !- Roughness",
+        "    2.290965,                !- Thermal Resistance {m2-K/W}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "  Material:NoMass,",
+        "    R31LAYER,                !- Name",
+        "    Rough,                   !- Roughness",
+        "    5.456,                   !- Thermal Resistance {m2-K/W}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    C5 - 4 IN HW CONCRETE,   !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.1014984,               !- Thickness {m}",
+        "    1.729577,                !- Conductivity {W/m-K}",
+        "    2242.585,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.6500000,               !- Solar Absorptance",
+        "    0.6500000;               !- Visible Absorptance",
+
+        "  Construction,",
+        "    R13WALL,                 !- Name",
+        "    R13LAYER;                !- Outside Layer",
+
+        "  Construction,",
+        "    FLOOR,                   !- Name",
+        "    C5 - 4 IN HW CONCRETE;   !- Outside Layer",
+
+        "  Construction,",
+        "    ROOF31,                  !- Name",
+        "    R31LAYER;                !- Outside Layer",
+
+        "  Site:GroundTemperature:BuildingSurface,18.89,18.92,19.02,19.12,19.21,19.23,19.07,19.32,19.09,19.21,19.13,18.96;",
+
+        "  Zone,",
+        "    ZONE ONE,                !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
+
+        "  ScheduleTypeLimits,",
+        "    Fraction,                !- Name",
+        "    0.0,                     !- Lower Limit Value",
+        "    1.0,                     !- Upper Limit Value",
+        "    CONTINUOUS;              !- Numeric Type",
+
+        "  GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    World;                   !- Coordinate System",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall001,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,                 !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,4.572000,            !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,0,                   !- X,Y,Z ==> Vertex 2 {m}",
+        "    15.24000,0,0,            !- X,Y,Z ==> Vertex 3 {m}",
+        "    15.24000,0,4.572000;     !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall002,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,                 !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    15.24000,0,4.572000,     !- X,Y,Z ==> Vertex 1 {m}",
+        "    15.24000,0,0,            !- X,Y,Z ==> Vertex 2 {m}",
+        "    15.24000,15.24000,0,     !- X,Y,Z ==> Vertex 3 {m}",
+        "    15.24000,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall003,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,                 !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    15.24000,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    15.24000,15.24000,0,     !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,15.24000,0,            !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,15.24000,4.572000;     !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall004,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,                 !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,15.24000,4.572000,     !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,15.24000,0,            !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,0,0,                   !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,0,4.572000;            !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Flr001,            !- Name",
+        "    Floor,                   !- Surface Type",
+        "    FLOOR,                   !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn001:Flr001,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.000000,                !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    15.24000,0.000000,0.0,   !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.000000,0.000000,0.0,   !- X,Y,Z ==> Vertex 2 {m}",
+        "    0.000000,15.24000,0.0,   !- X,Y,Z ==> Vertex 3 {m}",
+        "    15.24000,15.24000,0.0;   !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Roof001,           !- Name",
+        "    Roof,                    !- Surface Type",
+        "    ROOF31,                  !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.000000,15.24000,4.572, !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.000000,0.000000,4.572, !- X,Y,Z ==> Vertex 2 {m}",
+        "    15.24000,0.000000,4.572, !- X,Y,Z ==> Vertex 3 {m}",
+        "    15.24000,15.24000,4.572; !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  FenestrationSurface:Detailed,",
+        "    Zn001:Wall001:Win001,    !- Name",
+        "    Window,                  !- Surface Type",
+        "    CON_WIN_EQL,             !- Construction Name",
+        "    Zn001:Wall001,           !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    0.548000,0,2.5000,       !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.548000,0,0.5000,       !- X,Y,Z ==> Vertex 2 {m}",
+        "    5.548000,0,0.5000,       !- X,Y,Z ==> Vertex 3 {m}",
+        "    5.548000,0,2.5000;       !- X,Y,Z ==> Vertex 4 {m}",
+
+        "    Construction:WindowEquivalentLayer,",
+        "      CON_WIN_EQL,             !- Name",
+        "      WMTEUQL_Glss_SC,         !- Outside Layer",
+        "      WMTEUQL_Gap_ARGON_16MM,  !- Layer 2",
+        "      WMTEUQL_Glss_Clr,        !- Layer 3",
+        "      WMTEUQL_Gap_AIR_65MM_VENTINDR,  !- Layer 4",
+        "      WMTEUQL_BLND_KINDV_RF80_T02_A18_Rb45;  !- Layer 5",
+
+        "    WindowMaterial:Glazing:EquivalentLayer,",
+        "      WMTEUQL_Glss_SC,         !- Name",
+        "      SpectralAverage,         !- Optical Data Type",
+        "      ,                        !- Window Glass Spectral Data Set Name",
+        "      0.300379,                !- Front Side Beam-Beam Solar Transmittance {dimensionless}",
+        "      0.300379,                !- Back Side Beam-Beam Solar Transmittance {dimensionless}",
+        "      4.448762e-001,           !- Front Side Beam-Beam Solar Reflectance {dimensionless}",
+        "      5.449085e-001,           !- Back Side Beam-Beam Solar Reflectance {dimensionless}",
+        "      0,                       !- Front Side Beam-Beam Visible Solar Transmittance {dimensionless}",
+        "      0,                       !- Back Side Beam-Beam Visible Solar Transmittance {dimensionless}",
+        "      0,                       !- Front Side Beam-Beam Visible Solar Reflectance {dimensionless}",
+        "      0,                       !- Back Side Beam-Beam Visible Solar Reflectance {dimensionless}",
+        "      0.0,                     !- Front Side Beam-Diffuse Solar Transmittance {dimensionless}",
+        "      0.0,                     !- Back Side Beam-Diffuse Solar Transmittance {dimensionless}",
+        "      0.0,                     !- Front Side Beam-Diffuse Solar Reflectance {dimensionless}",
+        "      0.0,                     !- Back Side Beam-Diffuse Solar Reflectance {dimensionless}",
+        "      0.0,                     !- Front Side Beam-Diffuse Visible Solar Transmittance {dimensionless}",
+        "      0.0,                     !- Back Side Beam-Diffuse Visible Solar Transmittance {dimensionless}",
+        "      0.0,                     !- Front Side Beam-Diffuse Visible Solar Reflectance {dimensionless}",
+        "      0.0,                     !- Back Side Beam-Diffuse Visible Solar Reflectance {dimensionless}",
+        "      0.263,                   !- Diffuse-Diffuse Solar Transmittance {dimensionless}",
+        "      0.470,                   !- Front Side Diffuse-Diffuse Solar Reflectance {dimensionless}",
+        "      0.564,                   !- Back Side Diffuse-Diffuse Solar Reflectance {dimensionless}",
+        "      0.0,                     !- Diffuse-Diffuse Visible Solar Transmittance {dimensionless}",
+        "      0.0,                     !- Front Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}",
+        "      0.0,                     !- Back Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}",
+        "      0.0,                     !- Infrared Transmittance (applies to front and back) {dimensionless}",
+        "      0.840000,                !- Front Side Infrared Emissivity {dimensionless}",
+        "      0.018410;                !- Back Side Infrared Emissivity {dimensionless}",
+
+        "    WindowMaterial:Gap:EquivalentLayer,",
+        "      WMTEUQL_Gap_ARGON_16MM,  !- Name",
+        "      Argon,                   !- Gas Type",
+        "      0.0160,                  !- Thickness {m}",
+        "      Sealed;                  !- Gap Vent Type",
+
+        "    WindowMaterial:Glazing:EquivalentLayer,",
+        "      WMTEUQL_Glss_Clr,        !- Name",
+        "      SpectralAverage,         !- Optical Data Type",
+        "      ,                        !- Window Glass Spectral Data Set Name",
+        "      0.770675,                !- Front Side Beam-Beam Solar Transmittance {dimensionless}",
+        "      0.770675,                !- Back Side Beam-Beam Solar Transmittance {dimensionless}",
+        "      6.997562e-002,           !- Front Side Beam-Beam Solar Reflectance {dimensionless}",
+        "      7.023712e-002,           !- Back Side Beam-Beam Solar Reflectance {dimensionless}",
+        "      0,                       !- Front Side Beam-Beam Visible Solar Transmittance {dimensionless}",
+        "      0,                       !- Back Side Beam-Beam Visible Solar Transmittance {dimensionless}",
+        "      0,                       !- Front Side Beam-Beam Visible Solar Reflectance {dimensionless}",
+        "      0,                       !- Back Side Beam-Beam Visible Solar Reflectance {dimensionless}",
+        "      0.0,                     !- Front Side Beam-Diffuse Solar Transmittance {dimensionless}",
+        "      0.0,                     !- Back Side Beam-Diffuse Solar Transmittance {dimensionless}",
+        "      0.0,                     !- Front Side Beam-Diffuse Solar Reflectance {dimensionless}",
+        "      0.0,                     !- Back Side Beam-Diffuse Solar Reflectance {dimensionless}",
+        "      0.0,                     !- Front Side Beam-Diffuse Visible Solar Transmittance {dimensionless}",
+        "      0.0,                     !- Back Side Beam-Diffuse Visible Solar Transmittance {dimensionless}",
+        "      0.0,                     !- Front Side Beam-Diffuse Visible Solar Reflectance {dimensionless}",
+        "      0.0,                     !- Back Side Beam-Diffuse Visible Solar Reflectance {dimensionless}",
+        "      0.689,                   !- Diffuse-Diffuse Solar Transmittance {dimensionless}",
+        "      0.128,                   !- Front Side Diffuse-Diffuse Solar Reflectance {dimensionless}",
+        "      0.128,                   !- Back Side Diffuse-Diffuse Solar Reflectance {dimensionless}",
+        "      0.0,                     !- Diffuse-Diffuse Visible Solar Transmittance {dimensionless}",
+        "      0.0,                     !- Front Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}",
+        "      0.0,                     !- Back Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}",
+        "      0.0,                     !- Infrared Transmittance (applies to front and back) {dimensionless}",
+        "      0.840000,                !- Front Side Infrared Emissivity {dimensionless}",
+        "      0.840000;                !- Back Side Infrared Emissivity {dimensionless}",
+
+        "    WindowMaterial:Gap:EquivalentLayer,",
+        "      WMTEUQL_Gap_AIR_65MM_VENTINDR,  !- Name",
+        "      Air,                     !- Gas Type",
+        "      0.065,                   !- Thickness {m}",
+        "      VentedIndoor;            !- Gap Vent Type",
+
+        "    WindowMaterial:Blind:EquivalentLayer,",
+        "      WMTEUQL_BLND_KINDV_RF80_T02_A18_Rb45,  !- Name",
+        "      Vertical,                !- Slat Orientation",
+        "      0.02,                    !- Slat Width {m}",
+        "      0.02,                    !- Slat Separation {m}",
+        "      0.0000,                  !- Slat Crown {m}",
+        "      45,                      !- Slat Angle {deg}",
+        "      0.02,                    !- Front Side Slat Beam-Diffuse Solar Transmittance",
+        "      0.02,                    !- Back Side Slat Beam-Diffuse Solar Transmittance {dimensionless}",
+        "      0.80,                    !- Front Side Slat Beam-Diffuse Solar Reflectance {dimensionless}",
+        "      0.45,                    !- Back Side Slat Beam-Diffuse Solar Reflectance {dimensionless}",
+        "      ,                        !- Front Side Slat Beam-Diffuse Visible Transmittance {dimensionless}",
+        "      ,                        !- Back Side Slat Beam-Diffuse Visible Transmittance {dimensionless}",
+        "      ,                        !- Front Side Slat Beam-Diffuse Visible Reflectance {dimensionless}",
+        "      ,                        !- Back Side Slat Beam-Diffuse Visible Reflectance {dimensionless}",
+        "      0.02,                    !- Slat Diffuse-Diffuse Solar Transmittance {dimensionless}",
+        "      0.80,                    !- Front Side Slat Diffuse-Diffuse Solar Reflectance {dimensionless}",
+        "      0.45,                    !- Back Side Slat Diffuse-Diffuse Solar Reflectance {dimensionless}",
+        "      ,                        !- Slat Diffuse-Diffuse Visible Transmittance",
+        "      ,                        !- Front Side Slat Diffuse-Diffuse Visible Reflectance {dimensionless}",
+        "      ,                        !- Back Side Slat Diffuse-Diffuse Visible Reflectance {dimensionless}",
+        "      ,                        !- Slat Infrared Transmittance",
+        "      0.9,                     !- Front Side Slat Infrared Emissivity {dimensionless}",
+        "      0.9,                     !- Back Side Slat Infrared Emissivity {dimensionless}",
+        "      FixedSlatAngle;          !- Slat Angle Control",
+
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    OutputProcessor::TimeValue.allocate(2);
+    SimulationManager::ManageSimulation();
+
+    int EQLNum(0);
+    int SurfNum(0);
+    int VBMatNum(0);
+    int ConstrNum(0);
+
+    for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
+        if (DataSurfaces::SurfaceWindow(iSurf).WindowModelType == DataSurfaces::WindowEQLModel) {
+            SurfNum = iSurf;
+            break;
+        }
+    }
+    // get venetian blind material index
+    for (int i = 1; i <= DataHeatBalance::TotMaterials; i++) {
+        if (DataHeatBalance::Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
+            VBMatNum = i;
+            break;
+        }
+    }
+    // get equivalent layer window contruction index
+    for (int ConstrPtr = 1; ConstrPtr <= DataHeatBalance::TotConstructs; ++ConstrPtr) {
+        if (DataHeatBalance::Construct(ConstrPtr).WindowTypeEQL) {
+            ConstrNum = ConstrPtr;
+        }
+    }
+    // check VB slat angle control for FixedSlatAngle
+    EXPECT_EQ(DataHeatBalance::Material(VBMatNum).SlatAngleType, WindowEquivalentLayer::lscNONE);
+
+    EQLNum = DataHeatBalance::Construct(ConstrNum).EQLConsPtr;
+    // check number of solid layers
+    EXPECT_EQ(CFS(EQLNum).NL, 3);
+    // check optical and thermal property of the VB layer (Inside Layer)
+    EXPECT_EQ(CFS(EQLNum).L(3).Name, "WMTEUQL_BLND_KINDV_RF80_T02_A18_RB45");
+    EXPECT_EQ(CFS(EQLNum).L(3).LWP_MAT.TAUL, 0.0);
+    EXPECT_EQ(CFS(EQLNum).L(3).LWP_MAT.EPSLF, 0.90);
+    EXPECT_EQ(CFS(EQLNum).L(3).LWP_MAT.EPSLB, 0.90);
+    // check inside face effective emissivity
+    EXPECT_NEAR(DataHeatBalance::Construct(ConstrNum).InsideAbsorpThermal, 0.91024, 0.00001);
+    // for fixed slate angle the emissivity remains the same
+    EXPECT_NEAR(EQLWindowInsideEffectiveEmiss(ConstrNum), 0.91024, 0.00001);
+}
