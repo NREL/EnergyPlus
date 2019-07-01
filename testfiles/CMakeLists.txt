@@ -310,6 +310,7 @@ ADD_SIMULATION_TEST(IDF_FILE HeatPumpVSAS.idf EPW_FILE USA_IL_Chicago-OHare.Intl
 ADD_SIMULATION_TEST(IDF_FILE HeatPumpWaterHeater.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE HeatPumpWaterHeaterStratified.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE HeatPumpWaterToAir.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE HeatPumpWaterToAirEquationFit_WaterHeatingDesuperheater_StratifiedTank.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE HeatPumpWaterToAirEquationFit.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE HeatPumpWaterToAirWithAntifreezeAndLatentModel.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE HeatPumpWaterToAirWithAntifreezeAndLatentModel2.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
