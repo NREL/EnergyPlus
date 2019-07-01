@@ -362,9 +362,9 @@ namespace UnitarySystems {
             this->reportUnitarySystem(AirLoopNum);
         }
 
-        CoolActive = false;
+        // CoolActive = false; // set in call from ZoneEquipmentManager
         if (this->m_CoolingPartLoadFrac * double(CompOn) > 0.0) CoolActive = true;
-        HeatActive = false;
+        // HeatActive = false; // set in call from ZoneEquipmentManager
         if (this->m_HeatingPartLoadFrac * double(CompOn) > 0.0 || this->m_SuppHeatPartLoadFrac * double(CompOn) > 0.0) HeatActive = true;
 
         // set econo lockout flag
