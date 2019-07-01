@@ -5785,16 +5785,16 @@ namespace HeatBalanceSurfaceManager {
         bool const PartialResimulate(present(ZoneToResimulate));
 
         if (!PartialResimulate) {
-            for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
-                ZoneWinHeatGain = 0.0;
-                ZoneWinHeatGainRep(zoneNum) = 0.0;
-                ZoneWinHeatGainRepEnergy(zoneNum) = 0.0;
-                ZoneWinHeatLossRep(zoneNum) = 0.0;
-                ZoneWinHeatLossRepEnergy(zoneNum) = 0.0;
-            }
+            // Zero window heat gains for all zones
+            ZoneWinHeatGain = 0.0;
+            ZoneWinHeatGainRep = 0.0;
+            ZoneWinHeatGainRepEnergy = 0.0;
+            ZoneWinHeatLossRep = 0.0;
+            ZoneWinHeatLossRepEnergy = 0.0;
 
             CalcHeatBalanceInsideSurf2(DataSurfaces::AllHTSurfaceList, DataSurfaces::AllIZSurfaceList);
 
+            // Sort window heat gain/loss
             for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
                 if (ZoneWinHeatGain(zoneNum) >= 0.0) {
                     ZoneWinHeatGainRep(zoneNum) = ZoneWinHeatGain(zoneNum);
@@ -5806,6 +5806,7 @@ namespace HeatBalanceSurfaceManager {
                 }
             }
         } else {
+            // Zero window heat gains for resimulate zone
             ZoneWinHeatGain(ZoneToResimulate) = 0.0;
             ZoneWinHeatGainRep(ZoneToResimulate) = 0.0;
             ZoneWinHeatGainRepEnergy(ZoneToResimulate) = 0.0;
@@ -5816,6 +5817,7 @@ namespace HeatBalanceSurfaceManager {
             auto const &zoneIZSurfList(Zone(ZoneToResimulate).ZoneIZSurfaceList);
             CalcHeatBalanceInsideSurf2(zoneHTSurfList, zoneIZSurfList, ZoneToResimulate);
 
+            // Sort window heat gain/loss
             if (ZoneWinHeatGain(ZoneToResimulate) >= 0.0) {
                 ZoneWinHeatGainRep(ZoneToResimulate) = ZoneWinHeatGain(ZoneToResimulate);
                 ZoneWinHeatGainRepEnergy(ZoneToResimulate) = ZoneWinHeatGainRep(ZoneToResimulate) * DataGlobals::TimeStepZoneSec;
@@ -5971,7 +5973,6 @@ namespace HeatBalanceSurfaceManager {
             int ZoneNum = Surface(SurfNum).Zone;
 
             // These conditions are not used in every SurfNum loop here so we don't use them to skip surfaces
-            if ((ZoneNum == 0) || !Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
             if (Surface(SurfNum).Class == SurfaceClass_TDD_Dome) continue;   // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
 
             {
