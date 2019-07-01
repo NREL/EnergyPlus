@@ -1939,13 +1939,30 @@ namespace SurfaceGeometry {
                 int const zoneNum(Surface(SurfNum).Zone);
                 auto &surfZone(Zone(zoneNum));
                 surfZone.ZoneHTSurfaceList.push_back(SurfNum);
+                // Sort window vs non-window surfaces
+                if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass_Window) {
+                    DataSurfaces::AllHTWindowSurfaceList.push_back(SurfNum);
+                    surfZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
+                }
+                else {
+                    DataSurfaces::AllHTNonWindowSurfaceList.push_back(SurfNum);
+                    surfZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
+                }
                 int const surfExtBoundCond(Surface(SurfNum).ExtBoundCond);
+                // Build zone and interzone surface lists
                 if ((surfExtBoundCond > 0) && (surfExtBoundCond != SurfNum)) {
                     DataSurfaces::AllIZSurfaceList.push_back(SurfNum);
                     surfZone.ZoneIZSurfaceList.push_back(SurfNum);
                     auto &adjZone(Zone(Surface(surfExtBoundCond).Zone));
                     adjZone.ZoneHTSurfaceList.push_back(SurfNum);
                     adjZone.ZoneIZSurfaceList.push_back(SurfNum);
+                    // Sort window vs non-window surfaces
+                    if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass_Window) {
+                        adjZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
+                    }
+                    else {
+                        adjZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
+                    }
                 }
             }
             // Exclude non-exterior heat transfer surfaces (but not OtherSideCondModeledExt = -4 CR7640)

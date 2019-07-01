@@ -477,8 +477,10 @@ namespace DataSurfaces {
     extern Array1D<Real64> WinGapConvHtFlowRepEnergy;     // Energy of WinGapConvHtFlowRep [J]
     extern Array1D<Real64> WinHeatTransferRepEnergy;      // Energy of WinHeatTransfer [J]
 
-    extern std::vector<int> AllHTSurfaceList;  // List of all heat transfer surfaces
-    extern std::vector<int> AllIZSurfaceList;  // List of all interzone heat transfer surfaces
+    extern std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
+    extern std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
+    extern std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
+    extern std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
 
     extern bool AnyHeatBalanceInsideSourceTerm;  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
     extern bool AnyHeatBalanceOutsideSourceTerm; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
