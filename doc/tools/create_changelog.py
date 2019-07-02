@@ -20,6 +20,7 @@ RepoName = "NREL/EnergyPlus"
 EPlusRepoPath = 'https://github.com/' + RepoName
 debug = False
 
+
 def usage():
     print("""Script should be called with 8 positional arguments:
  - the path to a repository
@@ -29,6 +30,7 @@ def usage():
  - a github token for performing authentication API requests
  - the commit SHA for the last major release
  - a program version identifier""")
+
 
 # command line arguments: repo base path, output markdown and html file paths, a git exe path, and a github token
 if len(sys.argv) == 7:
@@ -58,7 +60,7 @@ except CalledProcessError as ex:
     log_full = ''
     pass  # add error handling
 log_full_split = log_full.split('\n')
-log_merge_prs = [x for x in log_full_split if 'Merge pull request' in x]
+log_merge_prs = [x for x in log_full_split if 'Merge pull request' in x and not x.strip().startswith('Revert')]
 pr_tokens = [x.split(' ')[7] for x in log_merge_prs]
 pr_numbers = sorted([x[1:] for x in pr_tokens])
 
