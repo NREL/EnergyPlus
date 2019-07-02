@@ -444,7 +444,7 @@ void Context::setCameraMVP() {
 
 void Context::drawModel() {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClear(GL_DEPTH_BUFFER_BIT);
   glDepthFunc(GL_LESS);
   model.drawAll();
   glDepthFunc(GL_EQUAL);
@@ -452,7 +452,7 @@ void Context::drawModel() {
 
 void Context::drawExcept(const std::vector<SurfaceBuffer> &hiddenSurfaces) {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClear(GL_DEPTH_BUFFER_BIT);
   glDepthFunc(GL_LESS);
   model.drawExcept(hiddenSurfaces);
   glDepthFunc(GL_EQUAL);
@@ -554,10 +554,12 @@ void Context::bufferedQuery(const SurfaceBuffer &surfaceBuffer) {
 // }
 
 void Context::submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sunView) {
-  auto const pixelArea = setScene(sunView);
-  drawModel();
+  // auto const pixelArea = setScene(sunView);
+  // drawModel();
   for (auto const surfaceIndex : surfaceIndices) {
     auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
+    auto const pixelArea = setScene(surfaceBuffer, sunView);
+    drawModel();
     glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
     model.drawSurface(surfaceBuffer);
     glEndQuery(GL_SAMPLES_PASSED);
@@ -566,12 +568,14 @@ void Context::submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sun
 }
 
 void Context::submitPSSA(mat4x4 sunView) {
-  auto const pixelArea = setScene(sunView);
-  drawModel();
+  // auto const pixelArea = setScene(sunView);
+  // drawModel();
   for (auto const & surfaceBuffer : model.surfaceBuffers) {
-   glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
-   model.drawSurface(surfaceBuffer);
-   glEndQuery(GL_SAMPLES_PASSED);
+    auto const pixelArea = setScene(surfaceBuffer, sunView);
+    drawModel();
+    glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
+    model.drawSurface(surfaceBuffer);
+    glEndQuery(GL_SAMPLES_PASSED);
     // bufferedQuery(surfaceBuffer);
     pixelAreas.at(surfaceBuffer.index) = pixelArea;
   }
@@ -583,6 +587,12 @@ float Context::calculatePSSA(const unsigned surfaceIndex) {
   //   initOffScreenMode();
   //   isRenderMode = false;
   // }
+
+  // wait until the result is available
+  GLint ready(0);
+  while (!ready) {
+    glGetQueryObjectiv(queries[surfaceIndex], GL_QUERY_RESULT_AVAILABLE, &ready);
+  }
 
   // retrieve result
   // if (pixelCounts.at(surfaceIndex) < 0) {
