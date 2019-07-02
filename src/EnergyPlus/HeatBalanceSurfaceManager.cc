@@ -6130,13 +6130,10 @@ namespace HeatBalanceSurfaceManager {
 
                 int const ZoneNum = Surface(SurfNum).Zone;
                 auto &surface(Surface(SurfNum));
-                auto &zone(Zone(ZoneNum));
                 Real64 &TH11(TH(1, 1, SurfNum));
-                Real64 &TH12(TH(2, 1, SurfNum));
                 int const ConstrNum = surface.Construction;
                 auto const &construct(Construct(ConstrNum));
                 Real64 const MAT_zone(MAT(ZoneNum));
-                Real64 const ZoneAirHumRat_zone(max(ZoneAirHumRat(ZoneNum), 1.0e-5));
                 Real64 const HConvIn_surf(HConvInFD(SurfNum) = HConvIn(SurfNum));
 
                 if (surface.ExtBoundCond == SurfNum) {
