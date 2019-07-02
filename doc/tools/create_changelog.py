@@ -6,6 +6,7 @@ import sys
 import io
 from subprocess import check_output, CalledProcessError
 import json
+
 try:
     from urllib import urlencode
 except ImportError:
@@ -55,7 +56,7 @@ else:
 
 # get the pull request numbers
 try:
-    log_full = check_output([git_exe, 'log', last_commit+'..']).decode('utf-8')
+    log_full = check_output([git_exe, 'log', last_commit + '..']).decode('utf-8')
 except CalledProcessError as ex:
     log_full = ''
     pass  # add error handling
@@ -78,9 +79,7 @@ for pr_num in pr_numbers:
     # - a user wants to contribute a change to E+, so they create a fork/branch
     # - their operations result in a pull request into their own repo, so the counting starts at #1...
     # we're at like 5000+, so if we just skip anything less than 1000, we'll be good.
-    # And look, I am even using lambdas to prove I don't hate them
-    expected_good_num = lambda n : int(pr_num) < 1000
-    if expected_good_num(pr_num):
+    if int(pr_num) < 1000:
         continue
 
     # set the url for this pull request
@@ -92,7 +91,8 @@ for pr_num in pr_numbers:
         response = urlopen(req)
         the_page = response.read().decode('utf-8')
     except Exception as e:
-        print(str(e))
+        print("ERROR: " + str(e))
+        continue
 
     # read the json response
     j = json.loads(the_page)
@@ -113,14 +113,18 @@ with io.open(md_file, 'w') as f:
     def out(s):
         print(s, file=f)
 
+
     def out_pr_class(pr_type, descriptor):
         out('')
         out('## ' + descriptor)
         for pr in PRS[pr_type]:
             out(' - [#' + pr[0] + '](' + EPlusRepoPath + '/pull/' + pr[0] + ') : ' + pr[1])
 
+
     out('# Changelog for EnergyPlus ' + program_version)
-    out('Consists of pull requests merged in since the last release - starting with SHA [' + last_commit + '](https://github.com/' + RepoName + '/commit/' + last_commit + ')')
+    out('Consists of pull requests merged in this release - starting with SHA [%s](https://github.com/%s/commit/%s)' % (
+        last_commit, RepoName, last_commit
+    ))
     out_pr_class('NewFeature', 'New Features')
     out_pr_class('Performance', 'Performance Enhancements')
     out_pr_class('Defect', 'Defects Repaired')
@@ -131,6 +135,7 @@ with io.open(md_file, 'w') as f:
 with io.open(html_file, 'w') as f2:
     def out(s):
         print(s, file=f2)
+
 
     def out_pr_class(pr_type, descriptor):
         out('<h2>' + descriptor + '</h2>')
@@ -146,6 +151,7 @@ with io.open(html_file, 'w') as f2:
             out(' </tr>')
         out('</table>')
 
+
     out('<html>')
     out('<head><title>EnergyPlus ChangeLog</title></head>')
     out('<body>')
@@ -159,7 +165,10 @@ with io.open(html_file, 'w') as f2:
     out('}')
     out('</style>')
     out('<h1>ChangeLog for EnergyPlus ' + program_version + '</h1>')
-    out('<h1>Consists of pull requests merged in since the last release - starting with SHA <a href = "https://github.com/' + RepoName + '/commit/' + last_commit + '">' + last_commit + '</a>' + '</h1>')
+    out('<h1>Consists of pull requests merged in this release')
+    out('- starting with SHA <a href = "https://github.com/%s/commit/%s">%s</a></h1>' % (
+        RepoName, last_commit, last_commit
+    ))
     out_pr_class('NewFeature', 'New Features')
     out_pr_class('Performance', 'Performance Enhancements')
     out_pr_class('Defect', 'Defects Repaired')
