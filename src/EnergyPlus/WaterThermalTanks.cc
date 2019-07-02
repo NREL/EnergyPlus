@@ -8634,7 +8634,7 @@ namespace WaterThermalTanks {
         WaterInletNode = WaterHeaterDesuperheater(DesuperheaterNum).WaterInletNode;
         WaterOutletNode = WaterHeaterDesuperheater(DesuperheaterNum).WaterOutletNode;
 
-        if (DesuperheaterTimeElapsed != TimeElapsed) {
+        if (DesuperheaterTimeElapsed != TimeElapsed && WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_AIR_WATER_HEATPUMP_EQ) {
             DataHeatBalance::HeatReclaimSimple_WAHPCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum).DesuperheaterReclaimedHeat = 0;
             DesuperheaterTimeElapsed = TimeElapsed;
         }
@@ -8647,7 +8647,9 @@ namespace WaterThermalTanks {
             WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp;
             WaterHeaterDesuperheater(DesuperheaterNum).SaveMode = WaterHeaterDesuperheater(DesuperheaterNum).Mode;
             WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag = false;
-            DataHeatBalance::HeatReclaimSimple_WAHPCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum).DesuperheaterReclaimedHeat += WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
+            if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_AIR_WATER_HEATPUMP_EQ){
+                DataHeatBalance::HeatReclaimSimple_WAHPCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum).DesuperheaterReclaimedHeat += WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
+            }
         }
 
         else if (!FirstHVACIteration) {
