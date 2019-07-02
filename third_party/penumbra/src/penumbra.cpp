@@ -32,7 +32,11 @@ Penumbra::~Penumbra() {}
 
 unsigned Penumbra::addSurface(const Surface &surface) {
   penumbra->addSurface(surface);
-  return penumbra->surfaceCounter++;
+  return penumbra->surfaces.size() - 1u;
+}
+
+unsigned Penumbra::getNumSurfaces() {
+  return penumbra->surfaces.size();
 }
 
 int Penumbra::setModel() {
@@ -60,7 +64,6 @@ int Penumbra::setModel() {
 
 int Penumbra::clearModel() {
   penumbra->surfaces.clear();
-  penumbra->surfaceCounter = 0;
   penumbra->surfaceBuffers.clear();
   penumbra->model.clear();
   penumbra->context.clearModel();
@@ -201,7 +204,7 @@ void Penumbra::setMessageCallback(PenumbraCallbackFunction callBackFunction, voi
   messageCallbackContextPtr = contextPtr;
 }
 
-PenumbraPrivate::PenumbraPrivate(unsigned size) : context(size), surfaceCounter(0) {}
+PenumbraPrivate::PenumbraPrivate(unsigned size) : context(size) {}
 
 PenumbraPrivate::~PenumbraPrivate() {}
 

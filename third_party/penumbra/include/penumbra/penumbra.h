@@ -49,6 +49,7 @@ public:
   );
   float getSunAzimuth();
   float getSunAltitude();
+  unsigned getNumSurfaces();
   float calculatePSSA(unsigned surfaceIndex);
   std::map<unsigned, float> calculateInteriorPSSAs(std::vector<unsigned> transparentSurfaceIndices,
                                                    std::vector<unsigned> interiorSurfaceIndices);

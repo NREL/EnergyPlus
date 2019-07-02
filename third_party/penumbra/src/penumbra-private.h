@@ -26,7 +26,6 @@ public:
   Context context;
   Sun sun;
   std::vector<float> model;
-  unsigned surfaceCounter;
   std::vector<SurfacePrivate> surfaces;
   bool checkSurface(const unsigned index);
   std::vector<SurfaceBuffer> surfaceBuffers;
