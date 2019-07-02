@@ -623,7 +623,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    No;                      !- Run Simulation for Weather File Run Periods",
 
         "  RunPeriod,",
-        "    ,                        !- Name",
+        "    WinterDay,               !- Name",
         "    1,                       !- Begin Month",
         "    14,                      !- Begin Day of Month",
         "    ,                        !- Begin Year",
@@ -638,7 +638,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    Yes;                     !- Use Weather File Snow Indicators",
 
         "  RunPeriod,",
-        "    ,                        !- Name",
+        "    SummerDay,               !- Name",
         "    7,                       !- Begin Month",
         "    7,                       !- Begin Day of Month",
         "    ,                        !- Begin Year",
