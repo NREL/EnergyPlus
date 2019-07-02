@@ -3794,6 +3794,7 @@ namespace InternalHeatGains {
                 }
 
                 if (!lAlphaFieldBlanks(15)) {
+                    // If this field isn't blank, it must point to a valid curve
                     ZoneITEq(Loop).RecircFLTCurve = GetCurveIndex(AlphaName(15));
                     if (ZoneITEq(Loop).RecircFLTCurve == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
@@ -3801,10 +3802,12 @@ namespace InternalHeatGains {
                         ErrorsFound = true;
                     }
                 } else {
+                    // If this curve is left blank, then the curve is assumed to always equal 1.0.
                     ZoneITEq(Loop).RecircFLTCurve = 0;
                 }
 
                 if (!lAlphaFieldBlanks(16)) {
+                    // If this field isn't blank, it must point to a valid curve
                     ZoneITEq(Loop).UPSEfficFPLRCurve = GetCurveIndex(AlphaName(16));
                     if (ZoneITEq(Loop).UPSEfficFPLRCurve == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
@@ -3812,6 +3815,7 @@ namespace InternalHeatGains {
                         ErrorsFound = true;
                     }
                 } else {
+                    // If this curve is left blank, then the curve is assumed to always equal 1.0.
                     ZoneITEq(Loop).UPSEfficFPLRCurve = 0;
                 }
 
