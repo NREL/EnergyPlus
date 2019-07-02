@@ -245,6 +245,7 @@ namespace WaterThermalTanks {
     Real64 MdotAir(0.0);                     // mass flow rate of evaporator air, kg/s
     int NumWaterHeaterSizing(0);             // Number of sizing/design objects for water heaters.
     Array1D_bool AlreadyRated;               // control so we don't repeat again
+    Real64 DesuperheaterTimeElapsed = 0.0;   // local track of time elapsed for desuperheater
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -8625,12 +8626,33 @@ namespace WaterThermalTanks {
         Array1D<Real64> Par(5);     // Parameters passed to RegulaFalsi
         static Real64 MinTemp(0.0); // used for error messages, C
         std::string IterNum;        // Max number of iterations for warning message
+        Real64 TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
 
         // FLOW:
         DesuperheaterNum = WaterThermalTank(WaterThermalTankNum).DesuperheaterNum;
         AvailSchedule = GetCurrentScheduleValue(WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr);
         WaterInletNode = WaterHeaterDesuperheater(DesuperheaterNum).WaterInletNode;
         WaterOutletNode = WaterHeaterDesuperheater(DesuperheaterNum).WaterOutletNode;
+
+        if (DesuperheaterTimeElapsed != TimeElapsed) {
+            DataHeatBalance::HeatReclaimSimple_WAHPCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum).DesuperheaterReclaimedHeat = 0;
+            DesuperheaterTimeElapsed = TimeElapsed;
+        }
+
+        // store first iteration tank temperature and desuperheater mode of operation
+        if (FirstHVACIteration && !ShortenTimeStepSys && WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag) {
+            // Save conditions from end of previous system timestep
+            // Every iteration that does not advance time should reset to these values
+            WaterThermalTank(WaterThermalTankNum).SavedTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
+            WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp;
+            WaterHeaterDesuperheater(DesuperheaterNum).SaveMode = WaterHeaterDesuperheater(DesuperheaterNum).Mode;
+            WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag = false;
+            DataHeatBalance::HeatReclaimSimple_WAHPCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum).DesuperheaterReclaimedHeat += WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
+        }
+
+        else if (!FirstHVACIteration) {
+            WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag = true;
+        }
 
         // initialize variables before invoking any RETURN statement
         PartLoadRatio = 0.0;
@@ -8715,20 +8737,6 @@ namespace WaterThermalTanks {
         }
 
         Effic = WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff;
-
-        // store first iteration tank temperature and desuperheater mode of operation
-        if (FirstHVACIteration && !ShortenTimeStepSys && WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag) {
-            // Save conditions from end of previous system timestep
-            // Every iteration that does not advance time should reset to these values
-            WaterThermalTank(WaterThermalTankNum).SavedTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
-            WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp;
-            WaterHeaterDesuperheater(DesuperheaterNum).SaveMode = WaterHeaterDesuperheater(DesuperheaterNum).Mode;
-            WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag = false;
-        }
-
-        else if (!FirstHVACIteration) {
-            WaterHeaterDesuperheater(DesuperheaterNum).FirstTimeThroughFlag = true;
-        }
 
         TankTemp = WaterThermalTank(WaterThermalTankNum).SavedTankTemp;
         Node(WaterInletNode).Temp = WaterThermalTank(WaterThermalTankNum).SavedSourceOutletTemp;
@@ -9074,9 +9082,7 @@ namespace WaterThermalTanks {
             } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {
                 DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
             } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_AIR_WATER_HEATPUMP_EQ) {
-                DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
-                //  allow only one water heating desuperheater user for correct WAHPCoil heat reclaim calculation so far
-                DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).DesuperheaterReclaimedHeat = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;            
+                DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;           
             }
         }
     }
