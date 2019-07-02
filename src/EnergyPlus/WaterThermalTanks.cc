@@ -7939,7 +7939,7 @@ namespace WaterThermalTanks {
         static std::string const RoutineName("CalcWaterThermalTankStratified");
         const Real64 TemperatureConvergenceCriteria = 0.0001;
         const Real64 subTimestepMax = 60.0 * 10.0; // seconds
-        const Real64 subTimestepMin = 1.0; // seconds
+        const Real64 subTimestepMin = 10.0; // seconds
         Real64 dt = subTimestepMin;
 
         // Using/Aliasing
