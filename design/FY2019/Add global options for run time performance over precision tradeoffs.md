@@ -1,4 +1,4 @@
-# Add global options for run time performance over precision tradeoffs
+# Add Global Options for Run Time Performance over Precision Tradeoffs
 
 Xuan Luo, Tianzhen Hong
 
@@ -12,7 +12,7 @@ We propose a new global object “PerformancePrecisionTradeoffs” as one of the
 
 ## Overview
 
-The object is design to provide users with options for performance over precision tradeoffs for existing or future EnergyPlus features. Some techniques and algorithms used in EnergyPlus that help achieve run time performance gain may trigger some small differences in the reported results. For example, the options include using the caching techniques for some utility functions, such as psychrometric functions and glycols properties calculation. Table 1 summarizes the performance/precision tradeoffs of two psychrometric functions that currently uses the caching technique to save run time. The summary is based the regression test results with 623 EnergyPlus test files. The mas diff in annual energy report indicate the maximum error in the annual energy reports in the summary table, out of the total 623 tests. The math diffs indicate the differences in the reported variables and meters by hour or by time step. The tables diffs indicate the differences in the final report tables.
+The object is design to provide users with options for performance over precision tradeoffs for existing or future EnergyPlus features. Some techniques and algorithms used in EnergyPlus that help achieve run time performance gain may trigger some small differences in the reported results. The options may include using the caching techniques for some utility functions, such as psychrometric functions and glycols properties calculation. Table 1 summarizes the performance/precision tradeoffs of two psychrometric functions that currently use the caching technique to save run time. The summary is based the regression test results with 623 EnergyPlus test files. The max diff in annual energy report indicates the maximum error in the annual energy reports in the summary table, out of the total 623 tests. The math diffs indicate the differences in the reported variables and meters by hour or by time step. The tables diffs indicate the differences in the final report tables.
 
 **Table 1. Performance/precision tradeoffs of two psychrometric functions**
 
