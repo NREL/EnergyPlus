@@ -2518,6 +2518,7 @@ namespace ZoneEquipmentManager {
                                 CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).TimeStepNumAtHeatMax;
                             CalcFinalZoneSizing(CtrlZoneNum).DesHeatCoilInTemp = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatCoilInTemp;
                             CalcFinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRat = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesHeatCoilInHumRat;
+                            CalcFinalZoneSizing(CtrlZoneNum).HeatTstatTemp = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatTstatTemp;
                         }
                     }
                     // from all the design periods, choose the one needing the most Cooling and save all its design variables in CalcFinalZoneSizing
@@ -2570,6 +2571,7 @@ namespace ZoneEquipmentManager {
                                 CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).TimeStepNumAtCoolMax;
                             CalcFinalZoneSizing(CtrlZoneNum).DesCoolCoilInTemp = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolCoilInTemp;
                             CalcFinalZoneSizing(CtrlZoneNum).DesCoolCoilInHumRat = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DesCoolCoilInHumRat;
+                            CalcFinalZoneSizing(CtrlZoneNum).CoolTstatTemp = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolTstatTemp;
                         }
                     }
                 }
