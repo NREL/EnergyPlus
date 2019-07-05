@@ -52,6 +52,7 @@ public:
   void submitPSSA(unsigned surfaceIndex);
   void submitPSSA(const std::vector<unsigned> &surfaceIndices);
   void submitPSSA();
+  unsigned getNumSurfaces();
   float calculatePSSA(unsigned surfaceIndex);
   std::vector<float> calculatePSSA(const std::vector<unsigned> &surfaceIndices);
   std::vector<float> calculatePSSA();

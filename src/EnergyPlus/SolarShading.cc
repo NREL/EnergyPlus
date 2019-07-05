@@ -5264,7 +5264,7 @@ namespace SolarShading {
             TotalSevereErrors += TotalCastingNonConvexSurfaces;
         }
 
-        if (penumbra) {
+        if (penumbra && penumbra->getNumSurfaces() > 0) {
             penumbra->setModel();
         }
     }
