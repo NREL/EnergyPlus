@@ -3691,7 +3691,9 @@ namespace ZoneEquipmentManager {
                                        CoolingActive,
                                        OAUnitNum,
                                        OAUCoilOutTemp,
-                                       ZoneEquipFlag);
+                                       ZoneEquipFlag,
+                                       SysOutputProvided,
+                                       LatOutputProvided);
 
                     } else if (SELECT_CASE_var == ZoneDXDehumidifier_Num) { // 'ZoneHVAC:Dehumidifier:DX'
                         SimZoneDehumidifier(PrioritySimOrder(EquipTypeNum).EquipName,

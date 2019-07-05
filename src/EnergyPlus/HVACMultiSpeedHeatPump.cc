@@ -2027,10 +2027,10 @@ namespace HVACMultiSpeedHeatPump {
                 MSHeatPump(MSHeatPumpNum).ZoneSequenceHeatingNum = heatingPriority;
             }
             MyCheckFlag(MSHeatPumpNum) = false;
-            if (MSHeatPump(MSHeatPumpNum).ZoneSequenceCoolingNum == 0) {
-                ShowSevereError(
-                    "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, \"" + MSHeatPump(MSHeatPumpNum).Name +
-                    "\", No matching air terminal found in the zone equipment list for zone = " + MSHeatPump(MSHeatPumpNum).ControlZoneName + ".");
+            if (MSHeatPump(MSHeatPumpNum).ZoneSequenceCoolingNum == 0 || MSHeatPump(MSHeatPumpNum).ZoneSequenceHeatingNum == 0) {
+                ShowSevereError("AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, \"" + MSHeatPump(MSHeatPumpNum).Name +
+                                "\": Airloop air terminal in the zone equipment list for zone = " + MSHeatPump(MSHeatPumpNum).ControlZoneName +
+                                " not found or is not allowed Zone Equipment Cooling or Heating Sequence = 0.");
                 ShowFatalError("Subroutine InitMSHeatPump: Errors found in getting AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed input.  Preceding "
                                "condition(s) causes termination.");
             }
