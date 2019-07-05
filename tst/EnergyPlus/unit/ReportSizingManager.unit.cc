@@ -1411,14 +1411,19 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_SupplyAirTempLessThanZoneTStatTest
     SimulationManager::ManageSimulation();
 
     int CtrlZoneNum(1);
-    // peak design conditons and design supply air temperature
+    // design peak load conditons and design supply air temperature
     EXPECT_EQ(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).HeatTstatTemp, 21.0); // expects specified value
     EXPECT_EQ(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).HeatDesTemp, 12.0);   // less than zone air Temp
-    // actual zone air temperature at peal load
-    EXPECT_EQ(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak, 17.066706302699792);
-    // Check heating design volume flow rate, expected to be zero due the above condition
+    EXPECT_EQ(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).HeatDesDay, "PHOENIX SKY HARBOR INTL AP ANN HTG 99.6% CONDNS DB");
+    // actual zone air temperature at peak load
+    EXPECT_NEAR(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak, 17.07, 0.01);
+    EXPECT_NEAR(DataSizing::FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak, 17.07, 0.01);
+    // Check heating design flow rates, expected to be zero due the above conditions
     EXPECT_EQ(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow, 0.0);  // expects zero
     EXPECT_EQ(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).DesHeatMassFlow, 0.0); // expects zero
+    EXPECT_EQ(DataSizing::FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow, 0.0);      // expects zero
+    EXPECT_EQ(DataSizing::FinalZoneSizing(CtrlZoneNum).DesHeatMassFlow, 0.0);     // expects zero
     // expects non-zero peak heating load
-    EXPECT_EQ(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6947.9372702229666);
+    EXPECT_NEAR(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6947.94, 0.01);
+    EXPECT_NEAR(DataSizing::FinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6947.94, 0.01);
 }
