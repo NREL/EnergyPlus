@@ -812,8 +812,8 @@ namespace HVACFan {
                             localFanTotEff = m_fanTotalEff;
                             locHiSpeedFanRunTimeFrac = locRunTimeFraction * locFlowRatio;
                             m_fanRunTimeFractionAtSpeed[0] += locHiSpeedFanRunTimeFrac;
-                            m_fanPower +=
-                                locHiSpeedFanRunTimeFrac * m_maxAirMassFlowRate * localPressureRise[mode] / (localFanTotEff * m_rhoAirStdInit);
+                            m_fanPower += max(
+                                0.0, locHiSpeedFanRunTimeFrac * m_maxAirMassFlowRate * localPressureRise[mode] / (localFanTotEff * m_rhoAirStdInit));
                         } else if (m_numSpeeds > 1) { // multi speed
 
                             // find which two speed levels bracket flow ratios and calculate runtimefraction at each speed
@@ -826,7 +826,7 @@ namespace HVACFan {
                                 locHiSpeedFanRunTimeFrac = locFlowRatio * locRunTimeFraction / m_flowFractionAtSpeed[0];
                                 m_fanRunTimeFractionAtSpeed[0] += locHiSpeedFanRunTimeFrac;
                             } else {
-                                lowSideSpeed = 0;  // hush up cppcheck
+                                lowSideSpeed = 0; // hush up cppcheck
                                 hiSideSpeed = 0;  // hush up cppcheck
                                 for (auto loop = 0; loop < m_numSpeeds - 1; ++loop) {
                                     if ((m_flowFractionAtSpeed[loop] <= locFlowRatio) && (locFlowRatio <= m_flowFractionAtSpeed[loop + 1])) {
@@ -843,13 +843,15 @@ namespace HVACFan {
                                 m_fanRunTimeFractionAtSpeed[hiSideSpeed] += locHiSpeedFanRunTimeFrac;
                             }
                             if (lowSideSpeed != -1 && hiSideSpeed != -1) {
-                                m_fanPower += locLowSpeedFanRunTimeFrac * m_massFlowAtSpeed[lowSideSpeed] * localPressureRise[mode] /
-                                                  (m_totEfficAtSpeed[lowSideSpeed] * m_rhoAirStdInit) +
-                                              locHiSpeedFanRunTimeFrac * m_massFlowAtSpeed[hiSideSpeed] * localPressureRise[mode] /
-                                                  (m_totEfficAtSpeed[hiSideSpeed] * m_rhoAirStdInit);
+                                m_fanPower += max(0.0,
+                                                  locLowSpeedFanRunTimeFrac * m_massFlowAtSpeed[lowSideSpeed] * localPressureRise[mode] /
+                                                          (m_totEfficAtSpeed[lowSideSpeed] * m_rhoAirStdInit) +
+                                                      locHiSpeedFanRunTimeFrac * m_massFlowAtSpeed[hiSideSpeed] * localPressureRise[mode] /
+                                                          (m_totEfficAtSpeed[hiSideSpeed] * m_rhoAirStdInit));
                             } else if (lowSideSpeed == -1 && hiSideSpeed == 0) {
-                                m_fanPower += locHiSpeedFanRunTimeFrac * m_massFlowAtSpeed[hiSideSpeed] * localPressureRise[mode] /
-                                              (m_totEfficAtSpeed[hiSideSpeed] * m_rhoAirStdInit);
+                                m_fanPower += max(0.0,
+                                                  locHiSpeedFanRunTimeFrac * m_massFlowAtSpeed[hiSideSpeed] * localPressureRise[mode] /
+                                                      (m_totEfficAtSpeed[hiSideSpeed] * m_rhoAirStdInit));
                             }
                         }
                     } else {
@@ -866,8 +868,8 @@ namespace HVACFan {
                             localFanTotEff = m_fanTotalEff;
                             locHiSpeedFanRunTimeFrac = locFanRunTimeFraction;
                             m_fanRunTimeFractionAtSpeed[0] += locHiSpeedFanRunTimeFrac;
-                            m_fanPower +=
-                                locHiSpeedFanRunTimeFrac * m_maxAirMassFlowRate * localPressureRise[mode] / (localFanTotEff * m_rhoAirStdInit);
+                            m_fanPower += max(
+                                0.0, locHiSpeedFanRunTimeFrac * m_maxAirMassFlowRate * localPressureRise[mode] / (localFanTotEff * m_rhoAirStdInit));
                         } else if (m_numSpeeds > 1) { // multi speed
 
                             // find which two speed levels bracket flow fraction and calculate runtimefraction
@@ -879,7 +881,7 @@ namespace HVACFan {
                                 locHiSpeedFanRunTimeFrac = locFanRunTimeFraction / m_flowFractionAtSpeed[0];
                                 m_fanRunTimeFractionAtSpeed[0] += locHiSpeedFanRunTimeFrac;
                             } else {
-                                lowSideSpeed = 0;  // hush up cppcheck
+                                lowSideSpeed = 0; // hush up cppcheck
                                 hiSideSpeed = 0;  // hush up cppcheck
                                 for (auto loop = 0; loop < m_numSpeeds - 1; ++loop) {
                                     if ((m_flowFractionAtSpeed[loop] <= locFanRunTimeFraction) &&
@@ -897,13 +899,15 @@ namespace HVACFan {
                                 m_fanRunTimeFractionAtSpeed[hiSideSpeed] += locHiSpeedFanRunTimeFrac;
                             }
                             if (lowSideSpeed != -1 && hiSideSpeed != -1) {
-                                m_fanPower += locLowSpeedFanRunTimeFrac * m_massFlowAtSpeed[lowSideSpeed] * localPressureRise[mode] /
-                                                  (m_totEfficAtSpeed[lowSideSpeed] * m_rhoAirStdInit) +
-                                              locHiSpeedFanRunTimeFrac * m_massFlowAtSpeed[hiSideSpeed] * localPressureRise[mode] /
-                                                  (m_totEfficAtSpeed[hiSideSpeed] * m_rhoAirStdInit);
+                                m_fanPower += max(0.0,
+                                                  locLowSpeedFanRunTimeFrac * m_massFlowAtSpeed[lowSideSpeed] * localPressureRise[mode] /
+                                                          (m_totEfficAtSpeed[lowSideSpeed] * m_rhoAirStdInit) +
+                                                      locHiSpeedFanRunTimeFrac * m_massFlowAtSpeed[hiSideSpeed] * localPressureRise[mode] /
+                                                          (m_totEfficAtSpeed[hiSideSpeed] * m_rhoAirStdInit));
                             } else if (lowSideSpeed == -1 && hiSideSpeed == 0) {
-                                m_fanPower += locHiSpeedFanRunTimeFrac * m_massFlowAtSpeed[hiSideSpeed] * localPressureRise[mode] /
-                                              (m_totEfficAtSpeed[hiSideSpeed] * m_rhoAirStdInit);
+                                m_fanPower += max(0.0,
+                                                  locHiSpeedFanRunTimeFrac * m_massFlowAtSpeed[hiSideSpeed] * localPressureRise[mode] /
+                                                      (m_totEfficAtSpeed[hiSideSpeed] * m_rhoAirStdInit));
                             }
                         }
                     }
@@ -929,8 +933,9 @@ namespace HVACFan {
                     } else {
                         localPowerFraction = CurveManager::CurveValue(powerModFuncFlowFractionCurveIndex, localFlowFractionForPower);
                     }
-                    Real64 localfanPower = locFanRunTimeFraction * localPowerFraction * m_maxAirMassFlowRate * localPressureRise[mode] /
-                                           (localFanTotEff * m_rhoAirStdInit);
+                    Real64 localfanPower = max(0.0,
+                                               locFanRunTimeFraction * localPowerFraction * m_maxAirMassFlowRate * localPressureRise[mode] /
+                                                   (localFanTotEff * m_rhoAirStdInit));
                     Real64 fanShaftPower = m_motorEff * localfanPower;
                     Real64 localpowerLossToAir = fanShaftPower + (localfanPower - fanShaftPower) * m_motorInAirFrac;
                     m_outletAirEnthalpy = m_inletAirEnthalpy + localpowerLossToAir / localAirMassFlow[mode]; // this will get revised later
@@ -947,12 +952,12 @@ namespace HVACFan {
                             powerFractionAtLowMin = CurveManager::CurveValue(powerModFuncFlowFractionCurveIndex, minFlowFracLimitFanHeat);
                             fanPoweratLowMinimum =
                                 powerFractionAtLowMin * m_maxAirMassFlowRate * localPressureRise[mode] / (localFanTotEff * m_rhoAirStdInit);
-                            localfanPower = localFlowFractionForPower * fanPoweratLowMinimum / minFlowFracLimitFanHeat;
+                            localfanPower = max(0.0, localFlowFractionForPower * fanPoweratLowMinimum / minFlowFracLimitFanHeat);
                         } else if (locFlowRatio < minFlowFracLimitFanHeat) {
                             powerFractionAtLowMin = CurveManager::CurveValue(powerModFuncFlowFractionCurveIndex, minFlowFracLimitFanHeat);
                             fanPoweratLowMinimum =
                                 powerFractionAtLowMin * m_maxAirMassFlowRate * localPressureRise[mode] / (localFanTotEff * m_rhoAirStdInit);
-                            localfanPower = locFlowRatio * fanPoweratLowMinimum / minFlowFracLimitFanHeat;
+                            localfanPower = max(0.0, locFlowRatio * fanPoweratLowMinimum / minFlowFracLimitFanHeat);
                         }
                     }
                     m_fanPower += localfanPower;
