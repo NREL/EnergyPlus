@@ -41617,6 +41617,8 @@
     Floor 1 Anesthesia VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 1 Anesthesia Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
@@ -41733,6 +41735,8 @@
     Floor 1 Lobby Toilet VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 1 Lobby Toilet Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
@@ -41777,6 +41781,8 @@
     Floor 1 MRI Control Room VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 1 MRI Control Room Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
@@ -41797,6 +41803,8 @@
     Floor 1 MRI Room VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 1 MRI Room Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
@@ -41809,6 +41817,8 @@
     Floor 1 MRI Toilet VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 1 MRI Toilet Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
@@ -41853,6 +41863,8 @@
     Floor 1 Nurse Toilet VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 1 Nurse Toilet Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
@@ -41929,6 +41941,8 @@
     Floor 1 Pre-Op Toilet VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 1 Pre-Op Toilet Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
@@ -41989,6 +42003,8 @@
     Floor 1 Soil VAV Box,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 1 Soil Exhaust Fan,!- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
@@ -42001,6 +42017,8 @@
     Floor 1 Soil Hold VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 1 Soil Hold Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
@@ -42013,6 +42031,8 @@
     Floor 1 Soil Work VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 1 Soil Work Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
@@ -42105,6 +42125,8 @@
     Floor 2 Conference Toilet VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 2 Conference Toilet Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
@@ -42309,6 +42331,8 @@
     Floor 2 Reception Toilet VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 2 Reception Toilet Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
@@ -42385,6 +42409,8 @@
     Floor 2 Work Toilet VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 2 Work Toilet Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
@@ -42397,6 +42423,8 @@
     Floor 2 X-Ray VAV Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 2 X-Ray Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
@@ -42457,6 +42485,8 @@
     Floor 3 Lounge Toilet VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 3 Lounge Toilet Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
@@ -42501,6 +42531,8 @@
     Floor 3 Office Toilet VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 3 Office Toilet Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
@@ -42529,6 +42561,8 @@
     Floor 3 Physical Therapy Toilet VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 3 Physical Therapy Toilet Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
@@ -48330,14 +48364,6 @@
     AHU-1_HeatC-AHU-1_FanNode,  !- Fan Inlet Node Name
     AHU-1_Fan-AHU-1 HumidifierNode,  !- Fan Outlet Node Name
     AHU-1_ExtraElecHeatC-AHU-1_ExtraWaterHeatCNode;  !- Setpoint Node or NodeList Name
-
-  SetpointManager:MixedAir,
-    AHU-1_ExtraWaterHeatC Air Temp Manager,  !- Name
-    Temperature,             !- Control Variable
-    AHU-1 Supply Equipment Outlet Node,  !- Reference Setpoint Node Name
-    AHU-1_HeatC-AHU-1_FanNode,  !- Fan Inlet Node Name
-    AHU-1_Fan-AHU-1 HumidifierNode,  !- Fan Outlet Node Name
-    AHU-1 Supply Equipment Outlet Node;  !- Setpoint Node or NodeList Name
 
 ! This hot water heating coil intends to capture the heat gains from the preheat coil
 
