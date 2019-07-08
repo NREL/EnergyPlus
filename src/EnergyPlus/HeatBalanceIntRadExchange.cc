@@ -587,7 +587,8 @@ namespace HeatBalanceIntRadExchange {
                 int const SurfNum = ZoneInfo(ZoneNum).SurfacePtr(ZoneSurfNum);
 
                 //************************************************
-                if (!Construct(Surface(SurfNum).Construction).TypeIsIRT) {
+                if ((!Construct(Surface(SurfNum).Construction).TypeIsIRT) &&
+                    (!Construct(Surface(SurfNum).Construction).TypeIsAirBoundaryIRTSurface)) {
                     ZoneInfo(ZoneNum).Area(ZoneSurfNum) = Surface(SurfNum).Area;
                 } else {
                     // Double area for infrared transparent (IRT) surfaces

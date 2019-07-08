@@ -2036,7 +2036,8 @@ namespace SurfaceGeometry {
             for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (!Surface(SurfNum).HeatTransSurf) continue;                                               // ignore shading surfaces
                 if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum) continue; // interzone, not adiabatic surface
-                if (!Construct(Surface(SurfNum).Construction).TypeIsIRT) continue;
+                if (!Construct(Surface(SurfNum).Construction).TypeIsIRT && !Construct(Surface(SurfNum).Construction).TypeIsAirBoundaryIRTSurface)
+                    continue;
                 if (!DisplayExtraWarnings) {
                     ++iTmp1;
                 } else {

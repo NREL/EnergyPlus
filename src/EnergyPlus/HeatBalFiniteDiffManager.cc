@@ -767,7 +767,7 @@ namespace HeatBalFiniteDiffManager {
 
                     Alpha = kt / (Material(CurrentLayer).Density * Material(CurrentLayer).SpecHeat);
                     mAlpha = 0.0;
-                } else if (Construct(ConstrNum).TypeIsIRT) { // make similar to air? (that didn't seem to work well)
+                } else if (Construct(ConstrNum).TypeIsIRT || Construct(ConstrNum).TypeIsAirBoundaryIRTSurface) { // make similar to air? (that didn't seem to work well)
                     ShowSevereError("InitHeatBalFiniteDiff: Construction =\"" + Construct(ConstrNum).Name +
                                     "\" uses Material:InfraredTransparent. Cannot be used currently with finite difference calculations.");
                     if (Construct(ConstrNum).IsUsed) {
@@ -1258,6 +1258,7 @@ namespace HeatBalFiniteDiffManager {
 
                 if (Construct(ThisNum).TypeIsWindow) continue;
                 if (Construct(ThisNum).TypeIsIRT) continue;
+                if (Construct(ThisNum).TypeIsAirBoundaryIRTSurface) continue;
 
                 ObjexxFCL::gio::write(OutputFileInits, Format_700)
                     << Construct(ThisNum).Name << RoundSigDigits(ThisNum) << RoundSigDigits(Construct(ThisNum).TotLayers)
