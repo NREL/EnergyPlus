@@ -153,7 +153,8 @@ namespace EvaporativeCoolers {
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool InitEvapCoolerMyOneTimeFlag(true);
-    } // namespace
+        bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
+    }                                         // namespace
 
     // DERIVED TYPE DEFINITIONS
 
@@ -3652,8 +3653,6 @@ namespace EvaporativeCoolers {
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using DataGlobals::NumOfZones;
-        // using DataHVACGlobals::FanType_SimpleConstVolume;
-        // using DataHVACGlobals::FanType_SimpleOnOff;
         using DataSizing::ZoneHVACSizing;
         using DataZoneEquipment::ZoneEquipConfig;
         using Fans::GetFanAvailSchPtr;
@@ -4121,7 +4120,6 @@ namespace EvaporativeCoolers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         Real64 TimeElapsed;
 
         if (allocated(ZoneComp)) {
@@ -4544,32 +4542,8 @@ namespace EvaporativeCoolers {
                                 Real64 &LatentOutputProvided    // target cooling load
     )
     {
-
-        // PURPOSE OF THIS SUBROUTINE:
         // caculates zone evaporative cooler sensible and latent outputs
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataHVACGlobals::ZoneCompTurnFansOff;
-        using DataHVACGlobals::ZoneCompTurnFansOn;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MinHumRat; // minimum humidity ratio
 
         int const ZoneNodeNum = ZoneEvapUnit(UnitNum).ZoneNodeNum;
@@ -4617,10 +4591,15 @@ namespace EvaporativeCoolers {
             Node(FanOutletNodeNum).MassFlowRate = Node(OAInletNodeNum).MassFlowRate;
             Node(FanOutletNodeNum).MassFlowRateMaxAvail = Node(OAInletNodeNum).MassFlowRate;
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(
-                    ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents(ZoneEvapUnit(UnitNum).FanName,
+                                            false,
+                                            ZoneEvapUnit(UnitNum).FanIndex,
+                                            _,
+                                            DataHVACGlobals::ZoneCompTurnFansOn,
+                                            DataHVACGlobals::ZoneCompTurnFansOff);
             } else {
-                HVACFan::fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                HVACFan::fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(
+                    _, DataHVACGlobals::ZoneCompTurnFansOn, DataHVACGlobals::ZoneCompTurnFansOff, _);
             }
         }
 
@@ -4633,10 +4612,15 @@ namespace EvaporativeCoolers {
         }
         if (ZoneEvapUnit(UnitNum).FanLocation == DrawThruFan) {
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(
-                    ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents(ZoneEvapUnit(UnitNum).FanName,
+                                            false,
+                                            ZoneEvapUnit(UnitNum).FanIndex,
+                                            _,
+                                            DataHVACGlobals::ZoneCompTurnFansOn,
+                                            DataHVACGlobals::ZoneCompTurnFansOff);
             } else {
-                HVACFan::fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                HVACFan::fanObjs[ZoneEvapUnit(UnitNum).FanIndex]->simulate(
+                    _, DataHVACGlobals::ZoneCompTurnFansOn, DataHVACGlobals::ZoneCompTurnFansOff, _);
             }
         }
 
@@ -4653,11 +4637,6 @@ namespace EvaporativeCoolers {
     {
 
         // calculates unit cooling part load ratio using root solver numerical method
-
-        // Using/Aliasing
-        using DataGlobals::WarmupFlag;
-        using General::RoundSigDigits;
-        using General::SolveRoot;
 
         // local variables
         int const MaxIte(50);          // maximum number of iterations
@@ -4677,16 +4656,17 @@ namespace EvaporativeCoolers {
             Par(1) = UnitNum;
             Par(2) = ZoneCoolingLoad;
 
-            SolveRoot(Tol, MaxIte, SolFla, PartLoadRatio, ZoneEvapUnitLoadResidual, 0.0, 1.0, Par);
+            General::SolveRoot(Tol, MaxIte, SolFla, PartLoadRatio, ZoneEvapUnitLoadResidual, 0.0, 1.0, Par);
             if (SolFla == -1) {
                 if (ZoneEvapUnit(UnitNum).UnitLoadControlMaxIterErrorIndex == 0) {
                     ShowWarningError("Iteration limit exceeded calculating evap unit part load ratio, for unit=" + ZoneEvapUnit(UnitNum).Name);
                     ShowContinueErrorTimeStamp("");
-                    ShowContinueError("Unit part load ratio returned=" + RoundSigDigits(PartLoadRatio, 2));
+                    ShowContinueError("Unit part load ratio returned=" + General::RoundSigDigits(PartLoadRatio, 2));
                     ShowContinueError("Check input for Fan Placement.");
                 }
                 ShowRecurringWarningErrorAtEnd("Zone Evaporative Cooler unit part load ratio control failed (iteration limit [" +
-                                                   RoundSigDigits(MaxIte) + "]) for ZoneHVAC:EvaporativeCoolerUnit =\"" + ZoneEvapUnit(UnitNum).Name,
+                                                   General::RoundSigDigits(MaxIte) + "]) for ZoneHVAC:EvaporativeCoolerUnit =\"" +
+                                                   ZoneEvapUnit(UnitNum).Name,
                                                ZoneEvapUnit(UnitNum).UnitLoadControlMaxIterErrorIndex);
 
             } else if (SolFla == -2) {
@@ -4695,7 +4675,7 @@ namespace EvaporativeCoolers {
                                      ZoneEvapUnit(UnitNum).Name);
                     ShowContinueError("Check input for Fan Placement.");
                     ShowContinueErrorTimeStamp("");
-                    if (WarmupFlag) ShowContinueError("Error occurred during warmup days.");
+                    if (DataGlobals::WarmupFlag) ShowContinueError("Error occurred during warmup days.");
                 }
                 ShowRecurringWarningErrorAtEnd(
                     "Zone Evaporative Cooler unit part load ratio control failed (limits exceeded) for ZoneHVAC:EvaporativeCoolerUnit =\"" +
@@ -5028,7 +5008,10 @@ namespace EvaporativeCoolers {
     void clear_state()
     {
         NumEvapCool = 0;
+        EvapCond.clear();
         NumZoneEvapUnits = 0;
+        ZoneEvapUnit.clear();
+        ZoneEvapCoolerUnitFields.clear();
         GetInputEvapComponentsFlag = false;
         GetInputZoneEvapUnit = true;
         UniqueEvapCondNames.clear();
@@ -5036,6 +5019,7 @@ namespace EvaporativeCoolers {
         CheckEquipName.clear();
         CheckZoneEvapUnitName.clear();
         InitEvapCoolerMyOneTimeFlag = true;
+        ZoneEquipmentListChecked = false;
     }
 
 } // namespace EvaporativeCoolers

@@ -1442,7 +1442,7 @@ If \(\left[ {{T_{zone}} > \left( {{T_{set}} + 0.5*\Delta {T_{throttle}}} \right)
 
 If zone air temperature is within the throttling range, $\PB{T_{set}-0.5\Delta T_{throttle}} < T_{zone} < \PB{T_{set}+0.5\Delta T_{throttle}}$, then continue to operate the cooler if it was running during the previous timestep and do not operate the cooler if it was not running during the previous timestep.
 
-Whenever the unit is operating, it runs at the full design air mass flow rate regardless if the fan is constant or variable speed.
+Whenever the unit is operating, it runs at the full design air mass flow rate regardless if the fan is constant or variable speed but the unit cycles to meet the current cooling load.
 
 \textbf{ZoneCoolingLoadOnOffCycling.} This control method operates the cooler similar to how a thermostat would behave, but instead of using temperatures it uses the predicted zone load to cooling setpoint.~ The control uses input for the threshold value for a load that is considered a significant, \({\dot Q_{thresh}}\), and the result from the Predictor for the zone's load to cooling setpoint, \({\dot Q_{CoolLoad}}\). The following algorithm is used to determine if the unit will operate.
 
@@ -1450,7 +1450,7 @@ If \(\left[ {{{\dot Q}_{CoolLoad}} \le {{\dot Q}_{thresh}}} \right]\) is true, t
 
 If \(\left[ {{{\dot Q}_{CoolLoad}} > {{\dot Q}_{thresh}}} \right]\) is true, then operate the cooler unit (at full speed).
 
-Whenever the unit is operating, it runs at the full design air mass flow rate regardless if the fan is constant or variable speed.
+Whenever the unit is operating, it runs at the full design air mass flow rate regardless if the fan is constant or variable speed but the unit cycles to meet the current cooling load.
 
 \textbf{ZoneCoolingLoadVariableSpeedFan.} This control method also operates the cooler using the predicted zone load to cooling setpoint but instead of on/off cycling, it modulates the fan speed to meet the cooling load.~ This control method is only applicable to cooler units with variable speed supply fans. The control uses input for the threshold value for a load that is considered a significant, \({\dot Q_{thresh}}\), and the result from the Predictor for the zone's cooling load to setpoint, \({\dot Q_{CoolLoad}}\). The following algorithm is used to determine if the unit will operate.
 
