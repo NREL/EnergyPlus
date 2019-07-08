@@ -2487,8 +2487,8 @@ namespace WeatherManager {
 
         UpdateScheduleValues();
         
-		std::sprintf(time_stamp, "%2d/%2d %hu:", Month, DayOfMonth, (unsigned short)(HourOfDay - 1));
-        	
+		std::sprintf(time_stamp, "%02d/%02d %02hu", Month, DayOfMonth, (unsigned short)(HourOfDay - 1));
+		std::cout << "time-stamp: " << time_stamp << std::endl;	
         CurMnDyHr = time_stamp;
         std::sprintf(day_stamp, "%02d/%02d", Month, DayOfMonth);
         CurMnDy = day_stamp;
