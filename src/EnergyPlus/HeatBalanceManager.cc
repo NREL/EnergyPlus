@@ -4207,6 +4207,7 @@ namespace HeatBalanceManager {
         // Get the Total number of Constructions from the input
         TotRegConstructs = inputProcessor->getNumObjectsFound("Construction");
         TotSourceConstructs = inputProcessor->getNumObjectsFound("Construction:InternalSource");
+        int totAirBoundaryConstructs = inputProcessor->getNumObjectsFound("Construction:AirBoundary");
 
         TotFfactorConstructs = inputProcessor->getNumObjectsFound("Construction:FfactorGroundFloor");
         TotCfactorConstructs = inputProcessor->getNumObjectsFound("Construction:CfactorUndergroundWall");
@@ -4225,8 +4226,8 @@ namespace HeatBalanceManager {
 
         WConstructNames.allocate(TotWindow5Constructs);
 
-        TotConstructs =
-            TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + TotSourceConstructs + TotComplexFenStates + TotWinEquivLayerConstructs;
+        TotConstructs = TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + TotSourceConstructs + totAirBoundaryConstructs +
+                        TotComplexFenStates + TotWinEquivLayerConstructs;
 
         NominalRforNominalUCalculation.dimension(TotConstructs, 0.0);
         NominalU.dimension(TotConstructs, 0.0);
@@ -4348,6 +4349,14 @@ namespace HeatBalanceManager {
                 ShowSevereError("Errors found in creating the constructions defined with Ffactor or Cfactor method");
             }
             TotRegConstructs += TotFfactorConstructs + TotCfactorConstructs;
+        }
+
+        if (totAirBoundaryConstructs >= 1) {
+            CreateAirBoundaryConstructions(ConstrNum, ErrorsFound);
+            if (ErrorsFound) {
+                ShowSevereError("Errors found in creating the constructions defined with Construction:AirBoundary.");
+            }
+            TotRegConstructs += totAirBoundaryConstructs;
         }
 
         // Added BG 6/2010 for complex fenestration
@@ -7474,6 +7483,66 @@ namespace HeatBalanceManager {
             // Reff includes the wall itself and soil, but excluding thermal resistance of inside or outside air film
             // 1/Reff gets reported as the "U-Factor no Film" in the summary report Envelope Summary | Opaque Exterior
             NominalRforNominalUCalculation(ConstrNum) = Reff;
+        }
+    }
+
+    void CreateAirBoundaryConstructions(int &constrNum,   // Counter for Constructions
+                                        bool &errorsFound // If errors found in input
+    )
+    {
+        cCurrentModuleObject = "Construction:AirBoundary";
+        int numAirBoundaryConstructs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        if (numAirBoundaryConstructs > 0) {
+            auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
+            if (instances == inputProcessor->epJSON.end()) {
+                // Cannot imagine how you would have numAirBoundaryConstructs > 0 and yet the instances is empty
+                // this would indicate a major problem in the input processor, not a problem here
+                // I'll still catch this with errorsFound but I cannot make a unit test for it so excluding the line from coverage
+                ShowSevereError(                                                                             // LCOV_EXCL_LINE
+                    "Construction:AirBoundary: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+                errorsFound = true;                                                                          // LCOV_EXCL_LINE
+            }
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto thisObjectName = instance.key();
+                inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
+
+                if (GlobalNames::VerifyUniqueInterObjectName(UniqueConstructNames, thisObjectName, cCurrentModuleObject, "Name", errorsFound)) {
+                    continue;
+                }
+
+                ++constrNum;
+                auto &thisConstruct = Construct(constrNum);
+
+                thisConstruct.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+
+                // Solar and Daylighting Method
+                std::string const solarMethod = fields.at("solar_and_daylighting_method");
+                if (UtilityRoutines::SameString(solarMethod, "GroupedZones")) {
+                    thisConstruct.TypeIsAirBoundarySolar = true;
+                } else if (UtilityRoutines::SameString(solarMethod, "InteriorWindow")) {
+                    thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
+                }
+
+                // Radiant Exchange Method
+                std::string const radMethod = fields.at("radiant_exchange_method");
+                if (UtilityRoutines::SameString(radMethod, "GroupedZones")) {
+                    thisConstruct.TypeIsAirBoundaryRadiant = true;
+                } else if (UtilityRoutines::SameString(radMethod, "IRTSurface")) {
+                    thisConstruct.TypeIsAirBoundaryIRTSurface = true;
+                }
+
+                // Air Exchange Method
+                std::string const airMethod = fields.at("air_exchange_method");
+                if (UtilityRoutines::SameString(airMethod, "GroupedZones")) {
+                    thisConstruct.TypeIsAirBoundaryLumpedAirMass = true;
+                } else if (UtilityRoutines::SameString(airMethod, "SimpleMixing")) {
+                    thisConstruct.TypeIsAirBoundaryMixing = true;
+                    thisConstruct.AirBoundaryACH = fields.at("simple_mixing_air_changes_per_hour");
+                    thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(fields.at("simple_mixing_schedule_name"));
+                }
+            }
         }
     }
 
