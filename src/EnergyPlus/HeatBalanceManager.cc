@@ -4588,6 +4588,7 @@ namespace HeatBalanceManager {
         // set some (default) properties of the Construction Derived Type
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
 
+            if (Construct(ConstrNum).TypeIsAirBoundary) continue;
             if (NominalRforNominalUCalculation(ConstrNum) != 0.0) {
                 NominalU(ConstrNum) = 1.0 / NominalRforNominalUCalculation(ConstrNum);
             } else {
@@ -7512,6 +7513,8 @@ namespace HeatBalanceManager {
                 auto &thisConstruct = Construct(constrNum);
 
                 thisConstruct.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                thisConstruct.TypeIsAirBoundary = true;
+                thisConstruct.IsUsedCTF = false;
 
                 // Solar and Daylighting Method
                 std::string const solarMethod = fields.at("solar_and_daylighting_method");

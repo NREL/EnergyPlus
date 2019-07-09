@@ -344,11 +344,12 @@ namespace DataHeatBalance {
     extern int OverallHeatTransferSolutionAlgo; // UseCTF Solution, UseEMPD moisture solution, UseCondFD solution
  
    // Flags for HeatTransfer Algorithms Used
-    extern bool AnyCTF;    // CTF used
-    extern bool AnyEMPD;   // EMPD used
-    extern bool AnyCondFD; // CondFD used
-    extern bool AnyHAMT;   // HAMT used
-    extern bool AnyKiva;   // Kiva used
+    extern bool AnyCTF;         // CTF used
+    extern bool AnyEMPD;        // EMPD used
+    extern bool AnyCondFD;      // CondFD used
+    extern bool AnyHAMT;        // HAMT used
+    extern bool AnyKiva;        // Kiva used
+    extern bool AnyAirBoundary; // Construction:AirBoundary used
 
     extern int MaxNumberOfWarmupDays;     // Maximum number of warmup days allowed
     extern int MinNumberOfWarmupDays;     // Minimum number of warmup days allowed
@@ -1022,6 +1023,7 @@ namespace DataHeatBalance {
         Real64 TransDiffFrontEQL;        // Diffuse system front transmittance for EQL window
         Real64 TransDiffBackEQL;         // Diffuse system back transmittance for EQL window
         // Air boundary
+        bool TypeIsAirBoundary;               // true for Construction:AirBoundary
         bool TypeIsAirBoundarySolar;          // true for Construction:AirBoundary with grouped zones for solar and daylighting
         bool TypeIsAirBoundaryInteriorWindow; // true for Construction:AirBoundary with InteriorWindow for solar and daylighting
         bool TypeIsAirBoundaryRadiant;        // true for Construction:AirBoundary with grouped zones for radiant
@@ -1058,7 +1060,7 @@ namespace DataHeatBalance {
               WindowTypeBSDF(false), TypeIsEcoRoof(false), TypeIsIRT(false), TypeIsCfactorWall(false), TypeIsFfactorFloor(false), TCFlag(0),
               TCLayer(0), TCMasterConst(0), TCLayerID(0), TCGlassID(0), CFactor(0.0), Height(0.0), FFactor(0.0), Area(0.0), PerimeterExposed(0.0),
               ReverseConstructionNumLayersWarning(false), ReverseConstructionLayersOrderWarning(false), WindowTypeEQL(false), EQLConsPtr(0),
-              AbsDiffFrontEQL(CFSMAXNL, 0.0), AbsDiffBackEQL(CFSMAXNL, 0.0), TransDiffFrontEQL(0.0), TransDiffBackEQL(0.0),
+              AbsDiffFrontEQL(CFSMAXNL, 0.0), AbsDiffBackEQL(CFSMAXNL, 0.0), TransDiffFrontEQL(0.0), TransDiffBackEQL(0.0), TypeIsAirBoundary(false),
               TypeIsAirBoundarySolar(false), TypeIsAirBoundaryInteriorWindow(false), TypeIsAirBoundaryRadiant(false),
               TypeIsAirBoundaryIRTSurface(false), TypeIsAirBoundaryLumpedAirMass(false), TypeIsAirBoundaryMixing(false), AirBoundaryACH(0.0),
               AirBoundaryMixingSched(0)

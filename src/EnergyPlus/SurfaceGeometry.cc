@@ -1992,7 +1992,7 @@ namespace SurfaceGeometry {
             for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (!Surface(SurfNum).HeatTransSurf) continue;                                               // ignore shading surfaces
                 if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum) continue; // interzone, not adiabatic surface
-                if (!Construct(Surface(SurfNum).Construction).TypeIsIRT && !Construct(Surface(SurfNum).Construction).TypeIsAirBoundaryIRTSurface)
+                if (!Construct(Surface(SurfNum).Construction).TypeIsIRT)
                     continue;
                 if (!DisplayExtraWarnings) {
                     ++iTmp1;
@@ -2004,6 +2004,30 @@ namespace SurfaceGeometry {
             if (iTmp1 > 0) {
                 ShowWarningError(RoutineName + "Surfaces use InfraredTransparent constructions " + TrimSigDigits(iTmp1) +
                                  " in non-interzone surfaces. (illegal use)");
+                ShowContinueError("For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
+            }
+        }
+
+        // Check for Air Boundary surfaces in invalid places.
+        iTmp1 = 0;
+        if (std::any_of(Construct.begin(), Construct.end(), [](DataHeatBalance::ConstructionData const &e) { return e.TypeIsAirBoundary; })) {
+            for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                if (!Surface(SurfNum).HeatTransSurf) continue;                                               // ignore shading surfaces
+                if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum) continue; // interzone, not adiabatic surface
+                if (!Construct(Surface(SurfNum).Construction).TypeIsAirBoundary)
+                    continue;
+                ErrorsFound = true;
+                if (!DisplayExtraWarnings) {
+                    ++iTmp1;
+                }
+                else {
+                    ShowSevereError(RoutineName + ": Surface=\"" + Surface(SurfNum).Name +
+                        "\" uses Construction:AirBoundary in a non-interzone surface. (illegal use)");
+                }
+            }
+            if (iTmp1 > 0) {
+                ShowSevereError(RoutineName + ": " + TrimSigDigits(iTmp1) +
+                                 " surfaces use Construction:AirBoundary in non-interzone surfaces. (illegal use)");
                 ShowContinueError("For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
             }
         }
@@ -7025,15 +7049,19 @@ namespace SurfaceGeometry {
             }
         }
 
-        // Change algorithm for Kiva foundation surfaces
+        // Change algorithm for Kiva and air boundary foundation surfaces
         for (auto &surf : Surface) {
             if (surf.ExtBoundCond == KivaFoundation) {
                 surf.HeatTransferAlgorithm = HeatTransferModel_Kiva;
                 DataHeatBalance::AnyKiva = true;
             }
+            if (surf.HeatTransSurf && DataHeatBalance::Construct(surf.Construction).TypeIsAirBoundary) {
+                surf.HeatTransferAlgorithm = HeatTransferModel_AirBoundary;
+                DataHeatBalance::AnyAirBoundary = true;
+            }
         }
 
-        // Setup Kiva intances
+        // Setup Kiva instances
         if (DataHeatBalance::AnyKiva) {
             if (!ErrorsFound) ErrorsFound = kivaManager.setupKivaInstances();
         }

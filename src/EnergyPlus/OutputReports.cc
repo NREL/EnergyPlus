@@ -1975,6 +1975,8 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                         AlgoName = "Window7 Complex Fenestration";
                     } else if (SELECT_CASE_var == HeatTransferModel_TDD) {
                         AlgoName = "Tubular Daylighting Device";
+                    } else if (SELECT_CASE_var == HeatTransferModel_AirBoundary) {
+                        AlgoName = "Air Boundary";
                     }
                 }
                 // Default Convection Coefficient Calculation Algorithms
@@ -2220,6 +2222,8 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                         AlgoName = "Window7 Complex Fenestration";
                     } else if (SELECT_CASE_var == HeatTransferModel_TDD) {
                         AlgoName = "Tubular Daylighting Device";
+                    } else if (SELECT_CASE_var == HeatTransferModel_AirBoundary) {
+                        AlgoName = "Air Boundary";
                     }
                 }
                 *eiostream << "HeatTransfer Surface," << Surface(surf).Name << "," << cSurfaceClass(Surface(surf).Class) << "," << BaseSurfName << ","
