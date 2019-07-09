@@ -262,7 +262,12 @@ namespace SolarShading {
     Array1D<Real64> YTEMP1; // Temporary 'Y' values for HC vertices of the overlap
     int maxNumberOfFigures(0);
 
+#ifdef EP_NO_OPENGL
+    bool penumbra = false;
+#else
     std::unique_ptr<Pumbra::Penumbra> penumbra = nullptr;
+#endif
+
     const static bool compareShadingMethods = false;
 
     int const NPhi = 6;                      // Number of altitude angle steps for sky integration
@@ -661,7 +666,13 @@ namespace SolarShading {
                 if (NumNumbers >= 3) {
                     pixelRes = (unsigned)rNumericArgs(3);
                 }
+#ifdef EP_NO_OPENGL
+                ShowSevereError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
+                ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\"");
+                ShowFatalError("This version of EnergyPlus was not compiled to use OpenGL (required for PixelCounting)");
+#else
                 penumbra = std::unique_ptr<Pumbra::Penumbra>(new Pumbra::Penumbra(pixelRes));
+#endif
             } else {
                 ShowWarningError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
                 ShowContinueError("Value entered=\"" + cAlphaArgs(aNum) + "\", PolygonClipping will be used.");
@@ -4931,8 +4942,8 @@ namespace SolarShading {
             if (!ShadowingSurf && !Surface(GRSNR).HeatTransSurf) continue;
             HTS = GRSNR;
 
+#ifndef EP_NO_OPENGL
             if (penumbra) {
-
                 bool skipSurface = Surface(GRSNR).MirroredSurf;   // Penumbra doesn't need mirrored surfaces TODO: Don't bother creating them in the first place?
 
                 // Skip interior surfaces if the other side has already been added to penumbra
@@ -5026,6 +5037,7 @@ namespace SolarShading {
                     penumbraIDs.push_back(Surface(GRSNR).PenumbraID);
                 }
             }
+#endif
 
             if (!ShadowingSurf && !Surface(GRSNR).ExtSolar) continue; // Skip surfaces with no external solar
 
@@ -5264,9 +5276,11 @@ namespace SolarShading {
             TotalSevereErrors += TotalCastingNonConvexSurfaces;
         }
 
+#ifndef EP_NO_OPENGL
         if (penumbra && penumbra->getNumSurfaces() > 0) {
             penumbra->setModel();
         }
+#endif
     }
 
     void SHADOW(int const iHour, // Hour index
@@ -5345,15 +5359,14 @@ namespace SolarShading {
 
         SAREA = 0.0;
 
+#ifndef EP_NO_OPENGL
         if (penumbra) {
             Real64 ElevSun = PiOvr2 - std::acos(SUNCOS(3));
             Real64 AzimSun = std::atan2(SUNCOS(1), SUNCOS(2));
             penumbra->setSunPosition(AzimSun, ElevSun);
-        }
-
-        if (penumbra) {
             penumbra->submitPSSA();
         }
+#endif
 
         for (GRSNR = 1; GRSNR <= TotSurfaces; ++GRSNR) {
 
@@ -5383,6 +5396,7 @@ namespace SolarShading {
                 SAREA(HTS) = Surface(GRSNR).NetAreaShadowCalc;
             } else { // Surface in sun and either shading surfaces or subsurfaces present (or both)
 
+#ifndef EP_NO_OPENGL
                 auto id = Surface(HTS).PenumbraID;
                 if (penumbra && id >= 0 && !compareShadingMethods) {
                     // SAREA(HTS) = buildingPSSF.at(id) / CTHETA(HTS);
@@ -5401,7 +5415,9 @@ namespace SolarShading {
                         }
                     }
                 } else if (!penumbra || compareShadingMethods) {
-
+#else
+                {
+#endif
                     NGRS = Surface(GRSNR).BaseSurf;
                     if (Surface(GRSNR).ShadowingSurf) NGRS = GRSNR;
 
@@ -5448,6 +5464,7 @@ namespace SolarShading {
 
                 SAREA(HTS) = min(SAREA(HTS), SurfArea);
 
+#ifndef EP_NO_OPENGL
                 // if (penumbra && Surface(HTS).PenumbraID >= 0 && compareShadingMethods) {
 
                 //     Real64 pSAREA = penumbra->calculatePSSA(Surface(HTS).PenumbraID)/CTHETA(HTS);
@@ -5493,6 +5510,7 @@ namespace SolarShading {
                 //         }
                 //     }
                 // }
+#endif
             } // ...end of surface in sun/surface with shaders and/or subsurfaces IF-THEN block
 
             // NOTE:
@@ -6010,6 +6028,7 @@ namespace SolarShading {
 
                 std::map<unsigned, float> pssas;
 
+#ifndef EP_NO_OPENGL
                 if (penumbra) {
                     // Add back surfaces to array
                     std::vector<unsigned> pbBackSurfaces;
@@ -6034,8 +6053,9 @@ namespace SolarShading {
                     }
 
                 }
+#endif
 
-                if (!penumbra || (penumbra && compareShadingMethods)) {
+                if (!penumbra || compareShadingMethods) {
 
                     FINSHC = FSBSHC + NSBSHC;
 
@@ -6088,7 +6108,7 @@ namespace SolarShading {
 
                     } // End of loop over back surfaces
 
-
+#ifndef EP_NO_OPENGL
                     if (penumbra && compareShadingMethods) {
                         for (int IBKS = 1; IBKS <= MaxBkSurf; ++IBKS) {
                             BackSurfNum = BackSurfaces(TS, iHour, IBKS, HTSS);
@@ -6105,6 +6125,7 @@ namespace SolarShading {
                             OverlapAreas(TS, iHour, IBKS, HTSS) = penumbraOverlapArea;
                         }
                     }
+#endif
                 }
             }
         } // End of check that sunlit area > 0.

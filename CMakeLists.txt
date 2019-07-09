@@ -25,7 +25,6 @@ set( ENERGYPLUS_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_V
 
 set( CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number" )
 find_package(Git)
-find_package(OpenGL)
 
 if(NOT GIT_FOUND)
   find_program(GIT_EXECUTABLE git HINTS "$ENV{LOCALAPPDATA}/Programs/git/bin")
@@ -49,6 +48,12 @@ if(GIT_FOUND)
   get_filename_component(GIT_DIR "${GIT_EXECUTABLE}" PATH)
 else()
   set(GIT_DIR "")
+endif()
+
+find_package(OpenGL)
+if(NOT OPENGL_FOUND)
+  set(CMAKE_VERSION_BUILD "${CMAKE_VERSION_BUILD} (No OpenGL)" CACHE STRING "Build number" FORCE) # git sha
+  message(WARNING "OpenGL libraries were not found! EnergyPlus will be compiled without Pixel Counting functionality for shading calculations!")
 endif()
 
 # Set a default build type if none was specified

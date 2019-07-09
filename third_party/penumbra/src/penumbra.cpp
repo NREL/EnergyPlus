@@ -65,8 +65,6 @@ int Penumbra::setModel() {
 
 int Penumbra::clearModel() {
   penumbra->surfaces.clear();
-  penumbra->surfaceCounter = 0;
-  penumbra->surfaceBuffers.clear();
   penumbra->model.clear();
   penumbra->context.clearModel();
   return PN_SUCCESS;
