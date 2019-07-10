@@ -6277,7 +6277,20 @@ This is the name of the other node that connects the ice storage system to the p
 
 \paragraph{Field: Discharging Curve Variable Specifications}\label{field-discharging-curve-variable-specifications}
 
-The detailed ice storage model in EnergyPlus takes advantage of the Curve feature of the program.  The discharging curve can use any curve that has two independent variables.  This field controls which two parameters are the independent variables in modeling the performance of the detailed ice storage model during discharging. Currently, there are four different independent variable specifications: PercentChargedLMTD (where Percent Charged is the first independent variable and LMTD is the second independent variable), PercentDischargedLMTD (where Percent Disharged is the first independent variable and LMTD is the second independent variable), LMTDMassFlow (where LMTD is the first independent variable and Mass Flow rate is the second independent variable), and LMTDPercentCharged (where LMTD is the first independent variable and Percent Charged is the second independent variable). More information on curve types can be found in the section on Curves.  For additional information on how these curves are used in the Detailed Ice Storage model, please consult the Engineering Reference.
+The detailed ice storage model in EnergyPlus takes advantage of the Curve feature of the program.  The discharging curve can use any curve that has two independent variables.  This field controls which two parameters are the independent variables in modeling the performance of the detailed ice storage model during discharging. There are four different independent variable specifications:
+
+\begin{itemize}
+\item
+FractionChargedLMTD (where Fraction Charged is the first independent variable and LMTD is the second independent variable)
+\item 
+FractionDischargedLMTD (where Fraction Disharged is the first independent variable and LMTD is the second independent variable)
+\item
+LMTDMassFlow (where LMTD is the first independent variable and Mass Flow rate is the second independent variable)
+\item
+LMTDFractionCharged (where LMTD is the first independent variable and Fraction Charged is the second independent variable)
+\end{itemize}
+
+More information on curve types can be found in the section on Curves.  For additional information on how these curves are used in the Detailed Ice Storage model, please consult the Engineering Reference.
 
 \paragraph{Field: Discharging Curve Name}\label{field-discharging-curve-name}
 
@@ -6285,7 +6298,21 @@ This field specifies the name of the actual curve fit to be used to model the di
 
 \paragraph{Field: Charging Curve Variable Specifications}\label{field-charging-curve-variable-specifications}
 
-The detailed ice storage model in EnergyPlus takes advantage of the Curve feature of the program.  The charging curve can use any curve that has two independent variables.  This field controls which two parameters are the independent variables in modeling the performance of the detailed ice storage model during charging. Currently, there are four different independent variable specifications: PercentChargedLMTD (where Percent Charged is the first independent variable and LMTD is the second independent variable), PercentDischargedLMTD (where Percent Disharged is the first independent variable and LMTD is the second independent variable), LMTDMassFlow (where LMTD is the first independent variable and Mass Flow rate is the second independent variable), and LMTDPercentCharged (where LMTD is the first independent variable and Percent Charged is the second independent variable). More information on curve types can be found in the section on Curves.  For additional information on how these curves are used in the Detailed Ice Storage model, please consult the Engineering Reference.
+The detailed ice storage model in EnergyPlus takes advantage of the Curve feature of the program.  The charging curve can use any curve that has two independent variables.  This field controls which two parameters are the independent variables in modeling the performance of the detailed ice storage model during charging. There are four different independent variable specifications:
+
+
+\begin{itemize}
+\item
+FractionChargedLMTD (where Fraction Charged is the first independent variable and LMTD is the second independent variable)
+\item 
+FractionDischargedLMTD (where Fraction Disharged is the first independent variable and LMTD is the second independent variable)
+\item
+LMTDMassFlow (where LMTD is the first independent variable and Mass Flow rate is the second independent variable)
+\item
+LMTDFractionCharged (where LMTD is the first independent variable and Fraction Charged is the second independent variable)
+\end{itemize}
+
+More information on curve types can be found in the section on Curves.  For additional information on how these curves are used in the Detailed Ice Storage model, please consult the Engineering Reference.
 
 \paragraph{Field: Charging Curve Name}\label{field-charging-curve-name}
 

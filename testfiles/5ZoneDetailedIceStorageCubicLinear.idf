@@ -3058,9 +3058,9 @@
     0.5,                     !- Capacity {GJ}
     Ice Tank Inlet Node,     !- Inlet Node Name
     Ice Tank Outlet Node,    !- Outlet Node Name
-    LMTDMassFlow,            !- Discharging Curve Object Type
+    LMTDMassFlow,            !- Discharging Curve Variable Specifications
     DischargeCurve,          !- Discharging Curve Name
-    LMTDMassFlow,            !- Charging Curve Object Type
+    LMTDMassFlow,            !- Charging Curve Variable Specifications
     ChargeCurve,             !- Charging Curve Name
     1.0,                     !- Timestep of the Curve Data {hr}
     0.0001,                  !- Parasitic Electric Load During Discharging {dimensionless}

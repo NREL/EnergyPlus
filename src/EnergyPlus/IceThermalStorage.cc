@@ -214,6 +214,36 @@ namespace IceThermalStorage {
     //*************************************************************************
 
     // Functions
+    void clear_state()
+    {
+        ResetXForITSFlag = false;
+        ITSNomCap = 0.0;
+        InletNodeNum = 0;
+        OutletNodeNum = 0;
+        IceNum = 0;
+        NumIceStorages = 0;
+        IceStorageNotFound = false;
+        NumDetIceStorages = 0;
+        TotalIceStorages = 0;
+        UAIceCh = 0.0;
+        UAIceDisCh = 0.0;
+        HLoss = 0.0;
+        XCurIceFrac= 0.0;
+        U = 0.0;
+        Urate = 0.0;
+        ITSMassFlowRate = 0.0;
+        ITSInletTemp = 0.0;
+        ITSOutletTemp = 0.0;
+        ITSOutletSetPointTemp = 0.0;
+        ITSCoolingRate = 0.0;
+        ITSCoolingEnergy = 0.0;
+        ChillerOutletTemp = 0.0;
+        CheckEquipName.clear();
+        IceStorage.deallocate();
+        IceStorageReport.deallocate();
+        DetIceStor.deallocate();
+        IceStorageTypeMap.deallocate();
+    }
 
     void SimIceStorage(std::string const &IceStorageType,
                        std::string const &IceStorageName,
@@ -1097,20 +1127,26 @@ namespace IceThermalStorage {
             }
 
             int dischargeCurveDim = CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).NumDims;
-            if (dischargeCurveDim == 2 && cAlphaArgs(5) == "FRACTIONCHARGEDLMTD") {
-                DetIceStor(IceNum).DischargeCurveTypeNum = CurveVarsFracChargedLMTD;
-            } else if (dischargeCurveDim == 2 && cAlphaArgs(5) == "FRACTIONDISCHARGEDLMTD") {
-                DetIceStor(IceNum).DischargeCurveTypeNum = CurveVarsFracDischargedLMTD;
-            } else if (dischargeCurveDim == 2 && cAlphaArgs(5) == "LMTDMASSFLOW") {
-                DetIceStor(IceNum).DischargeCurveTypeNum = CurveVarsLMTDMassFlow;
-            } else if (dischargeCurveDim == 2 && cAlphaArgs(5) == "LMTDFRACTIONCHARGED") {
-                DetIceStor(IceNum).DischargeCurveTypeNum = CurveVarsLMTDFracCharged;
-            } else {
-                ShowSevereError(cCurrentModuleObject + ": Discharge curve independent variable options not valid, option=" + cAlphaArgs(5));
+            if (dischargeCurveDim != 2) {
+                ShowSevereError(cCurrentModuleObject + ": Discharge curve must have 2 independent variables");
                 ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                ShowContinueError("The curve referenced must have 2 independent variables and the valid options are:");
-                ShowContinueError("FractionChargedLMTD, FractionDischargedLMTD, LMTDMassFlow or LMTDFractionCharged");
+                ShowContinueError(cAlphaArgs(6) + " does not have 2 independent variables and thus cannot be used for detailed ice storage");
                 ErrorsFound = true;
+            } else {
+                if (cAlphaArgs(5) == "FRACTIONCHARGEDLMTD") {
+                    DetIceStor(IceNum).DischargeCurveTypeNum = CurveVarsFracChargedLMTD;
+                } else if (cAlphaArgs(5) == "FRACTIONDISCHARGEDLMTD") {
+                    DetIceStor(IceNum).DischargeCurveTypeNum = CurveVarsFracDischargedLMTD;
+                } else if (cAlphaArgs(5) == "LMTDMASSFLOW") {
+                    DetIceStor(IceNum).DischargeCurveTypeNum = CurveVarsLMTDMassFlow;
+                } else if (cAlphaArgs(5) == "LMTDFRACTIONCHARGED") {
+                    DetIceStor(IceNum).DischargeCurveTypeNum = CurveVarsLMTDFracCharged;
+                } else {
+                    ShowSevereError(cCurrentModuleObject + ": Discharge curve independent variable options not valid, option=" + cAlphaArgs(5));
+                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                    ShowContinueError("The valid options are: FractionChargedLMTD, FractionDischargedLMTD, LMTDMassFlow or LMTDFractionCharged");
+                    ErrorsFound = true;
+                }
             }
 
             ErrorsFound |= CurveManager::CheckCurveDims(
@@ -1130,20 +1166,26 @@ namespace IceThermalStorage {
             }
 
             int chargeCurveDim = CurveManager::PerfCurve(DetIceStor(IceNum).ChargeCurveNum).NumDims;
-            if (chargeCurveDim == 2 && cAlphaArgs(7) == "FRACTIONCHARGEDLMTD") {
-                DetIceStor(IceNum).ChargeCurveTypeNum = CurveVarsFracChargedLMTD;
-            } else if (chargeCurveDim == 2 && cAlphaArgs(7) == "FRACTIONDISCHARGEDLMTD") {
-                DetIceStor(IceNum).ChargeCurveTypeNum = CurveVarsFracDischargedLMTD;
-            } else if (chargeCurveDim == 2 && cAlphaArgs(7) == "LMTDMASSFLOW") {
-                DetIceStor(IceNum).ChargeCurveTypeNum = CurveVarsLMTDMassFlow;
-            } else if (chargeCurveDim == 2 && cAlphaArgs(7) == "LMTDFRACTIONCHARGED") {
-                DetIceStor(IceNum).ChargeCurveTypeNum = CurveVarsLMTDFracCharged;
-            } else {
-                ShowSevereError(cCurrentModuleObject + ": Charge curve independent variable options not valid, option=" + cAlphaArgs(7));
+            if (chargeCurveDim != 2) {
+                ShowSevereError(cCurrentModuleObject + ": Charge curve must have 2 independent variables");
                 ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                ShowContinueError("The curve referenced must have 2 independent variables and the valid options are:");
-                ShowContinueError("FractionChargedLMTD, FractionDischargedLMTD, LMTDMassFlow or LMTDFractionCharged");
+                ShowContinueError(cAlphaArgs(8) + " does not have 2 independent variables and thus cannot be used for detailed ice storage");
                 ErrorsFound = true;
+            } else {
+                if (cAlphaArgs(7) == "FRACTIONCHARGEDLMTD") {
+                    DetIceStor(IceNum).ChargeCurveTypeNum = CurveVarsFracChargedLMTD;
+                } else if (cAlphaArgs(7) == "FRACTIONDISCHARGEDLMTD") {
+                    DetIceStor(IceNum).ChargeCurveTypeNum = CurveVarsFracDischargedLMTD;
+                } else if (cAlphaArgs(7) == "LMTDMASSFLOW") {
+                    DetIceStor(IceNum).ChargeCurveTypeNum = CurveVarsLMTDMassFlow;
+                } else if (cAlphaArgs(7) == "LMTDFRACTIONCHARGED") {
+                    DetIceStor(IceNum).ChargeCurveTypeNum = CurveVarsLMTDFracCharged;
+                } else {
+                    ShowSevereError(cCurrentModuleObject + ": Charge curve independent variable options not valid, option=" + cAlphaArgs(7));
+                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                    ShowContinueError("The valid options are: FractionChargedLMTD, FractionDischargedLMTD, LMTDMassFlow or LMTDFractionCharged");
+                    ErrorsFound = true;
+                }
             }
 
             ErrorsFound |= CurveManager::CheckCurveDims(
