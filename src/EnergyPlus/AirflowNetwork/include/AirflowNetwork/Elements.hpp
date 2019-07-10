@@ -791,7 +791,7 @@ namespace AirflowNetwork {
         int OutletNode;            // Outlet node number
         Real64 MaxAirMassFlowRate; // Max Specified MAss Flow Rate of Damper [kg/s]
         int AirLoopNum;            // Air loop number
-        bool FanModelFlag;         // Ture, this fan is FAN:SYSTEMMODEL
+        bool FanModelFlag;         // True, this fan is FAN:SYSTEMMODEL
 
         // Default Constructor
         ConstantVolumeFan()
