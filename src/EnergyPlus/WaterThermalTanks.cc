@@ -7982,6 +7982,9 @@ namespace WaterThermalTanks {
         for (auto &e : Tank.Node)
             e.Temp = e.SavedTemp;
 
+        Tank.HeaterOn1 = Tank.SavedHeaterOn1;
+        Tank.HeaterOn2 = Tank.SavedHeaterOn2;
+
         // Condenser configuration of heat pump water heater
         const int HPWHCondenserConfig = Tank.HeatPumpNum > 0 ? HPWaterHeater(Tank.HeatPumpNum).TypeNum : 0;
 
