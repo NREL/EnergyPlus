@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -77,7 +77,6 @@
 #include <HVACDXSystem.hh>
 #include <HVACFan.hh>
 #include <HVACHXAssistedCoolingCoil.hh>
-#include <HVACUnitarySystem.hh>
 #include <HeatRecovery.hh>
 #include <HeatingCoils.hh>
 #include <InputProcessing/InputProcessor.hh>
@@ -89,7 +88,9 @@
 #include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
+#include <SimAirServingZones.hh>
 #include <SteamCoils.hh>
+#include <UnitarySystem.hh>
 #include <UtilityRoutines.hh>
 #include <WaterCoils.hh>
 
@@ -151,7 +152,7 @@ namespace OutdoorAirUnit {
     int const HeatXchngr(10);
     int const Desiccant(11);
     int const DXHeatPumpSystem(12);
-    int const UnitarySystem(13);
+    int const UnitarySystemModel(13);
 
     //  Control Types
     int const Neutral(1);       // Controls system using zone mean air temperature
@@ -319,7 +320,6 @@ namespace OutdoorAirUnit {
         auto &GetWaterCoilMaxFlowRate(WaterCoils::GetCoilMaxWaterFlowRate);
         using DataGlobals::ScheduleAlwaysOn;
         using DataHeatBalance::Zone;
-        using DataSizing::AutoSize;
         using FluidProperties::FindRefrigerant;
         using ScheduleManager::GetScheduleIndex;
         using SteamCoils::GetCoilAirInletNode;
@@ -355,7 +355,6 @@ namespace OutdoorAirUnit {
         using Fans::GetFanIndex;
         using Fans::GetFanType;
         using HVACDXSystem::CheckDXCoolingCoilInOASysExists;
-        using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetOutdoorAirUnitInputs: "); // include trailing blank space
@@ -854,8 +853,12 @@ namespace OutdoorAirUnit {
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = DXHeatPumpSystem;
 
                             } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
-                                OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = UnitarySystem;
-                                CheckUnitarySysCoilInOASysExists(OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName);
+                                OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = UnitarySystemModel;
+                                UnitarySystems::UnitarySys thisSys;
+                                OutAirUnit(OAUnitNum).OAEquip(CompNum).compPointer = thisSys.factory(
+                                    DataHVACGlobals::UnitarySys_AnyCoilType, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, false, OAUnitNum);
+                                UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
+                                                                                             OAUnitNum);
 
                                 // Heat recovery
                             } else if (SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:FLATPLATE") {
@@ -1112,7 +1115,6 @@ namespace OutdoorAirUnit {
         using PlantUtilities::ScanPlantLoopsForObject;
         using ScheduleManager::GetCurrentScheduleValue;
         auto &GetWaterCoilMaxFlowRate(WaterCoils::GetCoilMaxWaterFlowRate);
-        using DataSizing::AutoSize;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using SteamCoils::GetCoilMaxSteamFlowRate;
         using WaterCoils::SimulateWaterCoilComponents;
@@ -1188,12 +1190,12 @@ namespace OutdoorAirUnit {
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).LoopSideNum,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).BranchNum,
                                             OutAirUnit(OAUnitNum).OAEquip(compLoop).CompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitOutdoorAirUnit: Program terminated for previous conditions.");
                     }
@@ -1579,6 +1581,7 @@ namespace OutdoorAirUnit {
         ZoneEqSizing(CurZoneEqNum).HeatingAirFlow = true;
         ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow = OutAirUnit(OAUnitNum).OutAirVolFlow;
         ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow = OutAirUnit(OAUnitNum).OutAirVolFlow;
+        ZoneEqSizing(CurZoneEqNum).OAVolFlow = OutAirUnit(OAUnitNum).OutAirVolFlow;
 
         if (OutAirUnit(OAUnitNum).SFanMaxAirVolFlow == AutoSize) {
             if (OutAirUnit(OAUnitNum).SFanType != DataHVACGlobals::FanType_SystemModelObject) {
@@ -2107,7 +2110,6 @@ namespace OutdoorAirUnit {
         using ScheduleManager::GetCurrentScheduleValue;
         using WaterCoils::SimulateWaterCoilComponents;
         //		using SteamCoils::SimulateSteamCoilComponents;
-        using HVACUnitarySystem::SimUnitarySystem;
         //  Use TranspiredCollector, Only:SimTranspiredCollector
         //  Use EvaporativeCoolers, Only:SimEvapCooler
         //  USE PhotovoltaicThermalCollectors, ONLY:SimPVTcollectors, CalledFromOutsideAirSystem
@@ -2404,7 +2406,8 @@ namespace OutdoorAirUnit {
                     SimDXHeatPumpSystem(EquipName, FirstHVACIteration, -1, DXSystemIndex, UnitNum, Dxsystemouttemp);
                 }
 
-            } else if (SELECT_CASE_var == UnitarySystem) { // 'AirLoopHVAC:UnitarySystem'
+                // RAR need new AirLoopHVAC:UnitarySystem object here
+            } else if (SELECT_CASE_var == UnitarySystemModel) { // 'AirLoopHVAC:UnitarySystem'
                 if (Sim) {
                     // This may have to be done in the unitary system object since there can be both cooling and heating
                     if (((OpMode == NeutralMode) && (OutAirUnit(OAUnitNum).ControlType == Temperature)) && (OpMode == HeatingMode)) {
@@ -2414,7 +2417,10 @@ namespace OutdoorAirUnit {
                     } else {
                         Dxsystemouttemp = CompAirOutTemp - FanEffect;
                     }
-                    SimUnitarySystem(EquipName, FirstHVACIteration, -1, DXSystemIndex, HeatActive, CoolActive, UnitNum, Dxsystemouttemp);
+                    OutAirUnit(OAUnitNum)
+                        .OAEquip(SimCompNum)
+                        .compPointer->simulate(
+                            EquipName, FirstHVACIteration, -1, DXSystemIndex, HeatActive, CoolActive, UnitNum, Dxsystemouttemp, false);
                 }
 
             } else {

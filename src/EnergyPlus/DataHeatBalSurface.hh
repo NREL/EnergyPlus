@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -129,6 +129,9 @@ namespace DataHeatBalSurface {
     extern Array1D<Real64> QRadOutReport;        // Surface thermal radiation heat gain at Outside face [J]
     extern Array1D<Real64> QdotRadOutRep;        // Surface thermal radiation heat transfer outside face surface [W]
     extern Array1D<Real64> QdotRadOutRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at
+
+    extern Array1D<Real64> QAirExtReport;  // Surface Outside Face Thermal Radiation to Air Heat Transfer Rate [W]
+    extern Array1D<Real64> QHeatEmiReport; // Surface Outside Face Heat Emission to Air Rate [W]
     //      Outside face surf
 
     extern Array1D<Real64> OpaqSurfInsFaceCondGainRep; // Equals Opaq Surf Ins Face Cond
@@ -233,6 +236,7 @@ namespace DataHeatBalSurface {
     extern Array2D<Real64> FractDifShortZtoZ; // Fraction of diffuse short radiation in Zone 2 transmitted to Zone 1
     extern Array1D_bool RecDifShortFromZ;     // True if Zone gets short radiation from another
     extern bool InterZoneWindow;              // True if there is an interzone window
+    extern Real64 SumSurfaceHeatEmission;
 
     // Functions
 

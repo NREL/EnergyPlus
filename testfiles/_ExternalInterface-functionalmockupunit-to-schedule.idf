@@ -26,7 +26,7 @@
 !           Overhang depth also design parameter (for West and East window separately)
 !           Solar, visible, and thermal transmittance of shading device also design parameter
 
-  Version,9.0;
+  Version,9.2;
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
@@ -38,14 +38,14 @@
     190.0;                   !- Elevation {m}
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
     1,                       !- End Month
     2,                       !- End Day of Month
     ,                        !- End Year
-    Sunday,                  !- Day of Week for Start Day
+    ,                        !- Day of Week for Start Day
     yes,                     !- Use Weather File Holidays and Special Days
     yes,                     !- Use Weather File Daylight Saving Period
     no,                      !- Apply Weekend Holiday Rule

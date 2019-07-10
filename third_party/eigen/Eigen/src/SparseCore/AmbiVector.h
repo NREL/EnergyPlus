@@ -10,7 +10,7 @@
 #ifndef EIGEN_AMBIVECTOR_H
 #define EIGEN_AMBIVECTOR_H
 
-namespace Eigen {
+namespace Eigen { 
 
 namespace internal {
 
@@ -94,7 +94,7 @@ class AmbiVector
       Index allocSize = m_allocatedElements * sizeof(ListEl);
       allocSize = (allocSize + sizeof(Scalar) - 1)/sizeof(Scalar);
       Scalar* newBuffer = new Scalar[allocSize];
-      memcpy(newBuffer,  m_buffer,  copyElements * sizeof(ListEl));
+      std::memcpy(newBuffer,  m_buffer,  copyElements * sizeof(ListEl));
       delete[] m_buffer;
       m_buffer = newBuffer;
     }
@@ -267,7 +267,7 @@ _Scalar& AmbiVector<_Scalar,_StorageIndex>::coeff(Index i)
     else
     {
       Index elid = m_llStart;
-      while (elid >= 0 && (llElements[elid].index)<i)
+      while (elid >= 0 && llElements[elid].index<i)
         elid = llElements[elid].next;
 
       if (llElements[elid].index==i)

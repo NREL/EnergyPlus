@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -241,12 +241,14 @@ namespace DataPlant {
     extern int const TypeOf_FluidToFluidPlantHtExchg;
     extern int const TypeOf_WaterSource;
     extern int const TypeOf_CentralGroundSourceHeatPump;
-    extern int const TypeOf_UnitarySystemRecovery;
+    extern int const TypeOf_UnitarySysRecovery;
     extern int const TypeOf_PackagedTESCoolingCoil;
     extern int const TypeOf_CoolingTower_VarSpdMerkel;
     extern int const TypeOf_SwimmingPool_Indoor;
     extern int const TypeOf_GrndHtExchgSlinky;
     extern int const TypeOf_FourPipeBeamAirTerminal;
+    extern int const TypeOf_HeatPumpEIRCooling;
+    extern int const TypeOf_HeatPumpEIRHeating;
 
     // Parameters for General Equipment Types
     extern int const NumGeneralEquipTypes;

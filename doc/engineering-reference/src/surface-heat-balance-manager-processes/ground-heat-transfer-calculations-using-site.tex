@@ -8,7 +8,7 @@ This model is generalized to be able to handle a number of different slab and in
 
 Multiple horizontal surfaces can be coupled to each ground domain object. The model determines which surfaces are coupled to the ground domain and creates a surface of equivalent surface area within the ground domain as a representation of the horizontal surfaces coupled to the ground domain. This surface then interacts with the ground providing updated other side conditions model temperatures to the coupled surfaces for use in their surface heat balance calculations.
 
-\subsubsection{Boundary Conditions}\label{boudary-conditions}
+\subsubsection{Boundary Conditions}\label{boundary-conditions}
 
 At the interface surface, the average surface conduction heat flux from all surfaces connected to the ground domain is imposed as a GroundDomain boundary condition at the Surface/GroundDomain interface cells. Heat flux to each cell is weighted as was recommended by Pinel \& Beausoleil-Morrison 2012 which is shown in Equation \ref{eq:Pinel-Beausoleil-Morrison}.
 

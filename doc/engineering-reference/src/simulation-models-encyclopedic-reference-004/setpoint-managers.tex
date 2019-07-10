@@ -16,29 +16,24 @@ The input object SetpointManager:Scheduled provides the simplest setpoint manage
 {T_{set}} = {T_{sched}}
 \end{equation}
 
-where \({T_{set}}\) is the supply air temperature setpoint and \({T_{sched}}\) is the current value (°C) from the user input temperature schedule. In this case, \({T_{set}}\) will be applied to the node or nodes specified in the input object SetpointManager:Scheduled.~ There are a number of other types of setpoints that can be set, by choosing different control variables in the object, including:
+where \({T_{set}}\) is the supply air temperature setpoint and \({T_{sched}}\) is the current value (\(^{\circ})\)C) from the user input temperature schedule. In this case, \({T_{set}}\) will be applied to the node or nodes specified in the input object SetpointManager:Scheduled.~ There are a number of other types of setpoints that can be set, by choosing different control variables in the object, including:
 
-1)~~~Maximum temperature of fluid at node (°C)
-
-2)~~~Minimum temperature of fluid at node (°C)
-
-3)~~~Humidity ratio of fluid at node (kg water/ kg dry air)
-
-4)~~~Maximum humidity ratio of fluid at node (kg water/ kg dry air)
-
-5)~~~Minimum humidity ratio of fluid at node (kg water/ kg dry air)
-
-6)~~~Mass flow rate of fluid at node (kg/s)
-
-7)~~~Maximum mass flow rate of fluid at node (kg/s)
-
-8)~~~Minimum mass flow rate of fluid at node (kg/s)
+\begin{enumerate}
+\item Maximum temperature of fluid at node (\(^{\circ})\)C)
+\item Minimum temperature of fluid at node (\(^{\circ})\)C)
+\item Humidity ratio of fluid at node (kg water/ kg dry air)
+\item Maximum humidity ratio of fluid at node (kg water/ kg dry air)
+\item Minimum humidity ratio of fluid at node (kg water/ kg dry air)
+\item Mass flow rate of fluid at node (kg/s)
+\item Maximum mass flow rate of fluid at node (kg/s)
+\item Minimum mass flow rate of fluid at node (kg/s)
+\end{enumerate}
 
 \subsection{Outdoor Air Reset}\label{outdoor-air-reset}
 
-The input object SetpointManager:OutdoorAirReset provides a setpoint manager that implements an outdoor air reset strategy for system node setpoint temperature. The user defines a reset rule for this strategy by specifying two setpoint temperatures at two outside drybulb temperatures. Generally the lower setpoint temperature is matched with the higher outdoor air drybulb temperature and the higher setpoint temperature is matched with the lower outdoor air drybulb temperature. The user can specify two reset rules and schedule their usage. A schedule value of 1 indicates use of the 1st rule; 2 indicates use of the 2nd.
+The input object SetpointManager:OutdoorAirReset provides a setpoint manager that places a setpoint temperature on a system node according to the outdoor air temperature using a reset strategy. The user defines a reset rule for this strategy by specifying two setpoint temperatures at two outside drybulb temperatures. Generally the lower setpoint temperature is matched with the higher outdoor air drybulb temperature and the higher setpoint temperature is matched with the lower outdoor air drybulb temperature. The user can specify two reset rules and schedule their usage. A schedule value of 1 indicates use of the 1st rule; 2 indicates use of the 2nd. This setpoint manager can be used to place a setpoint temperature on air loop and plant loop system nodes.
 
-IF \emph{SchedVal = 2}
+IF \emph{SchedVal = 2}:
 
 \begin{equation}
 {T_{out,low}} = {T_{2,out,low}}
@@ -56,7 +51,7 @@ IF \emph{SchedVal = 2}
 {T_{set,atOAhigh}} = {T_{2,set,atOAhigh}}
 \end{equation}
 
-Otherwise
+Otherwise:
 
 \begin{equation}
 {T_{out,low}} = {T_{1,out,low}}
@@ -74,6 +69,7 @@ Otherwise
 {T_{set,atOAhigh}} = {T_{1,set,atOAhigh}}
 \end{equation}
 
+The parameter \(T_{set}\) is determined as per the following pseudo code:
  
 If \({T_{out,low}} < {T_{out,high}}\) ~then
 
@@ -113,49 +109,53 @@ where \({T_z}\) is the control zone temperature, \({\dot Q_z}\) is the zone load
 
 The input object SetpointManager:SingleZone:Heating provides a model that detects the control zone load to meet the current heating setpoint (Report Variable ``Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate {[}W{]}'', zone inlet node flow rate, and zone node temperature, and calculates a setpoint temperature for the supply air that will satisfy the zone heating load for the control zone.~ ``Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate {[}W{]}'' \textgreater{} 0 indicates a heating load.~ The following rules are applied:
 
-·~~~~~~~~If there is no zone heating load, then the setpoint is set at the specified minimum supply air temperature.
+\begin{itemize}
+\item If there is no zone heating load, then the setpoint is set at the specified minimum supply air temperature.
+\item If there is a zone heating load~ and the zone supply mass flow rate is less than 0.001 kg/s, then the setpoint is set at the specified maximum supply air temperature.
+\item If there is a zone heating load~ and the zone supply mass flow rate is greater than 0.001 kg/s, then the setpoint is set calculated as follows:
+\end{itemize}
 
-·~~~~~~~~If there is a zone heating load~ and the zone supply mass flow rate is less than 0.001 kg/s, then the setpoint is set at the specified maximum supply air temperature.
-
-·~~~~~~~~If there is a zone heating load~ and the zone supply mass flow rate is greater than 0.001 kg/s, then the setpoint is set calculated as follows:
-
-\emph{SetPoint = ZoneTemp + ZoneLoadtoHeatSP/(CpAir*ZoneMassFlow)}
+\begin{equation}
+SetPoint = ZoneTemp + ZoneLoadtoHeatSP/(CpAir*ZoneMassFlow)
+\end{equation}
 
 where:
 
-\emph{SetPoint =} Setpoint temperature applied to the specified setpoint node(s)
+\emph{SetPoint} is the setpoint temperature applied to the specified setpoint node(s)
 
-\emph{ZoneTemp =} Current zone temperature
+\emph{ZoneTemp} is the current zone temperature
 
-\emph{ZoneLoadtoHeatSP =} Zone heating load (Report Variable " Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate {[}W{]}``)
+\emph{ZoneLoadtoHeatSP} is the zone heating load (Report Variable " Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate {[}W{]}``)
 
-\emph{CpAir =} Specific heat of zone supply air
+\emph{CpAir} is the specific heat of zone supply air
 
-\emph{ZoneMassFlow =} Zone supply air mass flow rate
+\emph{ZoneMassFlow} is the zone supply air mass flow rate.
 
 \subsection{Single Zone Cooling Only}\label{single-zone-cooling-only}
 
 The input object SetpointManager:SingleZone:Cooling provides a model that detects the control zone load to meet the current cooling setpoint (Report Variable ``Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate {[}W{]}'', zone inlet node flow rate, and zone node temperature, and calculates a setpoint temperature for the supply air that will satisfy the zone cooling load for the control zone.~ ``Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate {[}W{]}'' \textless{} 0 indicates a cooling load.~ The following rules are applied:
 
-·~~~~~~~~If there is no zone cooling load, then the setpoint is set at the specified maximum supply air temperature.
+\begin{itemize}
+\item If there is no zone cooling load, then the setpoint is set at the specified maximum supply air temperature.
+\item If there is a zone cooling load~ and the zone supply mass flow rate is less than 0.001 kg/s, then the setpoint is set at the specified minimum supply air temperature.
+\item If there is a zone cooling load~ and the zone supply mass flow rate is greater than 0.001 kg/s, then the setpoint is set calculated as follows:
+\end{itemize}
 
-·~~~~~~~~If there is a zone cooling load~ and the zone supply mass flow rate is less than 0.001 kg/s, then the setpoint is set at the specified minimum supply air temperature.
-
-·~~~~~~~~If there is a zone cooling load~ and the zone supply mass flow rate is greater than 0.001 kg/s, then the setpoint is set calculated as follows:
-
-\emph{SetPoint = ZoneTemp + ZoneLoadtoCoolSP/(CpAir*ZoneMassFlow)}
+\begin{equation}
+SetPoint = ZoneTemp + ZoneLoadtoCoolSP/(CpAir*ZoneMassFlow)
+\end{equation}
 
 where:
 
-\emph{SetPoint} = Setpoint temperature applied to the specified setpoint node(s)
+\emph{SetPoint} is the setpoint temperature applied to the specified setpoint node(s)
 
-\emph{ZoneTemp} = Current zone temeprature
+\emph{ZoneTemp} is the current zone temeprature
 
-\emph{ZoneLoadtoCoolSP} = Zone cooling load (Report Variable ``Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate {[}W{]}'')
+\emph{ZoneLoadtoCoolSP} is the zone cooling load (Report Variable ``Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate {[}W{]}'')
 
-\emph{CpAir} = Specific heat of zone supply air
+\emph{CpAir} is the specific heat of zone supply air
 
-\emph{ZoneMassFlow} = Zone supply air mass flow rate
+\emph{ZoneMassFlow} is the zone supply air mass flow rate.
 
 \subsection{Single Zone Minimum Humidity}\label{single-zone-minimum-humidity}
 
@@ -172,34 +172,34 @@ The user must input the required information according to the IO Reference Manua
 This setpoint manager first converts the desired relative humidity setpoint for the control zone to humidity ratio based on the control zone dry-bulb temperature, the scheduled maximum relative humidity setpoint and outdoor barometric pressure.
 
 \begin{equation}
-{\omega_{sp}} = \,{\rm{PsyWFnTdbRhPb}}\left( {{T_{db}},R{H_{sp}},P} \right)
+{\omega_{sp}} = {PsyWFnTdbRhPb}\left( {{T_{db}},R{H_{sp}},P} \right)
 \end{equation}
 
 where:
 
-\({\omega_{sp}}\) ~ = humidity ratio setpoint, kg H\(_{2}\)O/kg air
+\({\omega_{sp}}\) is the humidity ratio setpoint (kg H\(_{2}\)O/kg air)
 
-PsyWFnTdbRHPb = EnergyPlus psychrometric function, returns humidity ratio as a function of dry-bulb temperature, relative humidity, and barometric pressure
+PsyWFnTdbRHPb is an EnergyPlus psychrometric function, returns humidity ratio as a function of dry-bulb temperature, relative humidity, and barometric pressure
 
-\({T_{db}}\) = dry-bulb temperature in the control zone, °C
+\({T_{db}}\) is the dry-bulb temperature in the control zone (\(^{\circ}\)C)
 
-\(R{H_{sp}}\) = maximum relative humidity setpoint, fraction
+\(R{H_{sp}}\) is the maximum relative humidity setpoint
 
-\(P\) ~ = outdoor barometric pressure, Pa
+\(P\) is the outdoor barometric pressure (Pa).
 
 The model then calculates the supply air humidity ratio required to reduce the control zone relative humidity to the desired level. Using the humidity ratio setpoint (\({\omega_{sp}}\) ) calculated above,
 
 \begin{equation}
-{\omega_{sa}} = \,{\omega_{sp}} + \frac{{{{\mathop Q\limits^ \bullet  }_l}}}{{\mathop m\limits^ \bullet  }}
+{\omega_{sa}} = {\omega_{sp}} + \frac{\dot{Q}_l}{\dot{m}}
 \end{equation}
 
 where:
 
-\({\omega_{sa}}\) ~ = maximum supply air humidity ratio setpoint, kg H\(_{2}\)O/kg air
+\({\omega_{sa}}\) is the maximum supply air humidity ratio setpoint (kg H\(_{2}\)O/kg air)
 
-\(\mathop {{Q_l}}\limits^ \bullet\) ~ = control zone latent load, kg H\(_{2}\)O/s (calculated by Zone Control:Humidistat)
+\({\dot{Q}_l}\) is the control zone latent load calculated by Zone Control:Humidistat (kg H\(_{2}\)O/s)
 
-\(\mathop m\limits^ \bullet\) ~ = control zone mass flow rate, kg/s
+\({\dot{m}}\) is the control zone mass flow rate (kg/s).
 
 All setpoint managers are executed at the beginning of the simulation time step. Therefore, the calculated setpoint is based on the resulting control zone air temperature and air mass flow rate for the previous simulation time step.
 
@@ -239,19 +239,22 @@ When the reference node is the unitary system outlet node:
 
 The input object SetpointManager:OutdoorAirPretreat provides a setpoint manager that is meant to be used in conjunction with an OutdoorAir:Mixer. The outdoor air pretreat setpoint manager is used to establish a temperature or humidity ratio setpoint in the outdoor air stream flowing into the outdoor air stream node of an outdoor air mixer. This setpoint manager determines the required setpoint in the outdoor air stream to produce the reference setpoint in the mixed air stream after mixing with return air. For example, if the temperature setpoint at the mixed air node is 15C, the return air temperature is 20C, and the outdoor air flow fraction is 0.5, the outdoor air pretreat setpoint would be set to 10C. This setpoint manager references four user-specified nodes to obtain the following values:
 
-·~~~~~~~~Reference setpoint node -- desired mixed flow condition = RefNodeSetPoint
-
-·~~~~~~~~Mixed air stream node -- mixed air flow rate = MixedOutNodeMassFlowRate
-
-·~~~~~~~~Outdoor air stream node -- outdoor air flow rate = OAInNodeMassFlowRate
-
-·~~~~~~~~Return air stream node -- return air condition = ReturnInValue
+\begin{itemize}
+\item Reference setpoint node -- desired mixed flow condition = RefNodeSetPoint
+\item Mixed air stream node -- mixed air flow rate = MixedOutNodeMassFlowRate
+\item Outdoor air stream node -- outdoor air flow rate = OAInNodeMassFlowRate
+\item Return air stream node -- return air condition = ReturnInValue
+\end{itemize}
 
 The following calculations are used to determine the new setpoint value (SetPoint):
 
-\emph{OAFraction = OAInNodeMassFlowRate / MixedOutNodeMassFlowRate}
+\begin{equation}
+OAFraction = OAInNodeMassFlowRate / MixedOutNodeMassFlowRate
+\end{equation}
 
-\emph{SetPoint = ReturnInValue + (RefNodeSetPoint - ReturnInValue)/OAFraction}
+\begin{equation}
+SetPoint = ReturnInValue + (RefNodeSetPoint - ReturnInValue)/OAFraction
+\end{equation}
 
 Depending on the specified control variable type, the setpoints and conditions may be humidity ratio (max or min) or temperature.~ Note that zero is not allowed as the computed setpoint humidity ratio, because zero is used as a special value to indicate that no humidification or dehumidification is needed.~ If the reference humidity ratio setpoint value is zero, the zero value will be passed directly to the setpoint Node(s).
 
@@ -263,7 +266,7 @@ The input object SetpointManager:Warmest provides a setpoint manager that attemp
 {T_{set,z}} = {T_z} + {\dot Q_z}/({C_{p,air}}\cdot {\dot m_{z,max}})
 \end{equation}
 
-Note that for cooling \({\dot Q_z} < 0.\) The lowest \({T_{set,z}}\) is chosen as \({T_{set}}\) . \({T_{set}}\) is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone cooling loads is very small, the setpoint temperature is set to the maximum. \({T_{set}}\) will be applied to the node or nodes specified in the SetpointManager:Warmest object input.
+Note that for cooling \({\dot Q_z} < 0\). The lowest \({T_{set,z}}\) is chosen as \({T_{set}}\). \({T_{set}}\) is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone cooling loads is very small, the setpoint temperature is set to the maximum. \({T_{set}}\) will be applied to the node or nodes specified in the SetpointManager:Warmest object input.
 
 \subsection{Coldest Zone Supply Air Reset}\label{coldest-zone-supply-air-reset}
 
@@ -273,7 +276,7 @@ The input object SetpointManager:Coldest provides a setpoint manager that attemp
 {T_{set,z}} = {T_z} + {\dot Q_z}/({C_{p,air}}\cdot {\dot m_{z,max}})
 \end{equation}
 
-Note that for heating \({\dot Q_z} > 0.\) The highest \({T_{set,z}}\) is chosen as \({T_{set}}\) . \({T_{set}}\) is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone heating loads is very small, the setpoint temperature is set to the minimum. \({T_{set}}\) will be applied to the node or nodes specified in the SetpointManager:Coldest object input.
+Note that for heating \({\dot Q_z} > 0\). The highest \({T_{set,z}}\) is chosen as \({T_{set}}\). \({T_{set}}\) is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone heating loads is very small, the setpoint temperature is set to the minimum. \({T_{set}}\) will be applied to the node or nodes specified in the SetpointManager:Coldest object input.
 
 \subsection{Return Air Bypass Flow}\label{return-air-bypass-flow}
 
@@ -293,7 +296,7 @@ Here \({T_{loop,out}}\) is the temperature at the air loop outlet node and \({T_
 {\dot m_{bypass}} = ({\dot m_{tot}}\cdot {T_{set,mod}} - {\dot m_{nonbypass}}\cdot {T_{nonbypass}})/{T_{bypass}}
 \end{equation}
 
-where \({\dot m_{tot}}\) is the total supply air flowrate in kg/s sent to the zones, \({\dot m_{nonbypass}}\) is the nonbypassed air flowrate (the conditioned air), \({T_{nonbypass}}\) is the corresponding temperature just before mixing with the bypassed air, and \({T_{bypass}}\) is the temperature of the bypassed (unconditioned) air. The resulting \({\dot m_{bypass}}\) ~is the mass flow rate setpoint for the bypass air branch.
+where \({\dot m_{tot}}\) is the total supply air flowrate in kg/s sent to the zones, \({\dot m_{nonbypass}}\) is the nonbypassed air flowrate (the conditioned air), \({T_{nonbypass}}\) is the corresponding temperature just before mixing with the bypassed air, and \({T_{bypass}}\) is the temperature of the bypassed (unconditioned) air. The resulting \({\dot m_{bypass}}\) is the mass flow rate setpoint for the bypass air branch.
 
 \subsection{Warmest Temp Flow}\label{warmest-temp-flow}
 
@@ -313,9 +316,9 @@ The algorithm loops over all the zones that the system can cool and calculates a
   T_{set,z} = T_z + \frac{\dot{Q}_z}{C_{p,air} \dot{m}_{z,max}}
 \end{equation}
 
-where \({\dot m_{z,\min }}\) is the minimum air flow rate to the zone produced by reducing the capacity of the supply fan or by reducing the opening of the damper in the terminal box, if present, and~ \({\dot m_{z,\max }}\) ~is the design air flow rate to the zone.
+where \({\dot m_{z,\min }}\) is the minimum air flow rate to the zone produced by reducing the capacity of the supply fan or by reducing the opening of the damper in the terminal box, if present, and~ \({\dot m_{z,\max }}\) is the design air flow rate to the zone.
 
-Note that for cooling \({\dot Q_z} < 0.\) ~The lowest \({T_{set,z}}\) is chosen as \({T_{set}}\) . \({T_{set}}\) is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the unconstrained value of \({T_{set}}\) is less than the minimum setpoint temperature and there are no VAV terminal boxes, the fan capacity is increased so as to meet the zone cooling loads with the constrained value of \({T_{set}}\) :
+Note that for cooling \({\dot Q_z} < 0\). ~The lowest \({T_{set,z}}\) is chosen as \({T_{set}}\). \({T_{set}}\) is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the unconstrained value of \({T_{set}}\) is less than the minimum setpoint temperature and there are no VAV terminal boxes, the fan capacity is increased so as to meet the zone cooling loads with the constrained value of \({T_{set}}\):
 
 \begin{equation}
 {\dot m_{fan}} = \sum\limits_z {{{\dot m}_{z,\min }}}  = \sum\limits_z {{{\dot Q}_z}/[{C_{p,air}} \cdot ({T_{set}} - {T_z})]}
@@ -327,7 +330,7 @@ Note that for cooling \({\dot Q_z} < 0.\) ~The lowest \({T_{set,z}}\) is chosen 
 
 The input object SetpointManager:MultiZone:Heating:Average provides a setpoint manager that attempts to establish a supply air heating setpoint that will meet the heating load of multiple zones served by an HVAC air loop. The algorithm aggregates the predicted heating loads for all controlled zones served by an air loop (i.e., zones that have a thermostat object), and calculates the multizone average supply air heating setpoint temperature as follows:
 
-IF ( \({\dot Q_{zj}}\) \textgreater{} 0 ) THEN
+IF ( \({\dot Q_{Zj}}\) \textgreater{} 0 ) THEN
 
 \begin{equation}
 \overline {{T_{SP}}}  = \overline {{T_Z}}  + \left( {\frac{{\sum\limits_{j = 1}^{NumControlZones} {{{\dot Q}_{Zi}}} }}{{\sum\limits_{j = 1}^{NumControlZones} {{{\dot m}_{Zi}}\cdot C{p_j}} }}} \right)
@@ -336,34 +339,34 @@ IF ( \({\dot Q_{zj}}\) \textgreater{} 0 ) THEN
 END IF
 
 \begin{equation}
-{\bar T_z} = {{\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{zj}} \bullet } C{p_j} \bullet {T_{zj}}} \right)} \mathord{\left/ {\vphantom {{\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{zj}} \bullet } C{p_j} \bullet {T_{zj}}} \right)} {\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{zj}} \bullet } C{p_j}} \right)}}} \right. } {\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{zj}} \bullet } C{p_j}} \right)}}
+{\overline{T_Z}} = {{\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j} \bullet {T_{Zj}}} \right)} \mathord{\left/ {\vphantom {{\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j} \bullet {T_{Zj}}} \right)} {\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j}} \right)}}} \right. } {\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j}} \right)}}
 \end{equation}
 
-where,
+where:
 
-\({\bar T_{SP}}\) ~~~~~~~~~~~~~~~~~ = average supply air setpoint temperature (°C)
+\({\overline{T_{SP}}}\) is the average supply air setpoint temperature (\(^{\circ}\)C)
 
-\(NumControlZones\) = number of controlled zones (i.e., zones that contain thermostat objects) served by the air loop (-)
+\(NumControlZones\) is the number of controlled zones (i.e., zones that contain thermostat objects) served by the air loop
 
-\({\dot Q_{Zj}}\) = sensible heating load required to reach the zone air temperature setpoint for the \emph{j}\(^{th}\) controlled zone at current time step (W)
+\({\dot Q_{Zj}}\) is the sensible heating load required to reach the zone air temperature setpoint for the \emph{j}\(^{th}\) controlled zone at current time step (W)
 
-\({\dot m_{Zj}}\) = air mass flow rate being supplied by the air loop to the \emph{j}\(^{th}\) controlled zone, lagged by one HVAC simulation time step (kg/s)
+\({\dot m_{Zj}}\) is the air mass flow rate being supplied by the air loop to the \emph{j}\(^{th}\) controlled zone, lagged by one HVAC simulation time step (kg/s)
 
-\(C{p_j}\) = specific heat of supply air for the j\(^{th}\) controlled zone (J/kg-K)
+\(C{p_j}\) is the specific heat of supply air for the j\(^{th}\) controlled zone (J/kg-K)
 
-\({T_{Zj}}\) = air node temperature for the \emph{j}\(^{th}\) controlled zone (°C)
+\({T_{Zj}}\) is the air node temperature for the \emph{j}\(^{th}\) controlled zone (\(^{\circ}\)C)
 
-\({\overline T_Z}\) = average zone air node temperature weighted by the heat capacity rate of the supply air streams for the controlled zones served by the air loop (°C)
+\({\overline{T_Z}}\) is the average zone air node temperature weighted by the heat capacity rate of the supply air streams for the controlled zones served by the air loop (\(^{\circ}\)C)
 
-\(TotZones\) = total number of zones served by the air loop (-)
+\(TotZones\) is the total number of zones served by the air loop.
 
-Note that for heating \({\dot Q_{Zj}} > 0.\) ~The average supply air setpoint temperature \({\bar T_{SP}}\) ~is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone sensible heating loads is extremely small (i.e., no heating load), the setpoint temperature is set to the minimum. \({\bar T_{SP}}\) will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Heating:Average object.
+Note that for heating \({\dot Q_{Zj}} > 0\). The average supply air setpoint temperature \({\bar T_{SP}}\) is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone sensible heating loads is extremely small (i.e., no heating load), the setpoint temperature is set to the minimum. \({\bar T_{SP}}\) will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Heating:Average object.
 
 \subsection{Multizone Cooling Average}\label{multizone-cooling-average}
 
 The input object SetpointManager:MultiZone:Cooling:Average provides a setpoint manager that attempts to establish a supply air cooling setpoint that will meet the cooling load of multiple zones served by an HVAC air loop. The algorithm aggregates the predicted cooling loads for all controlled zones served by an air loop (i.e., zones that have a thermostat object), and calculates the multizone average supply air cooling setpoint temperature as follows:
 
-IF ( \({\dot Q_{zj}}\) \textless{} 0 ) THEN
+IF ( \({\dot Q_{Zj}}\) \textless{} 0 ) THEN
 
 \begin{equation}
 \overline {{T_{SP}}}  = \overline {{T_Z}}  + \left( {\frac{{\sum\limits_{j = 1}^{NumControlZones} {{{\dot Q}_{Zi}}} }}{{\sum\limits_{j = 1}^{NumControlZones} {{{\dot m}_{Zi}}\cdot C{p_j}} }}} \right)
@@ -372,44 +375,44 @@ IF ( \({\dot Q_{zj}}\) \textless{} 0 ) THEN
 END IF
 
 \begin{equation}
-{\bar T_z} = {{\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j} \bullet {T_{zj}}} \right)} \mathord{\left/ {\vphantom {{\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j} \bullet {T_{zj}}} \right)} {\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j}} \right)}}} \right. } {\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j}} \right)}}
+{\overline{T_Z}} = {{\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j} \bullet {T_{Zj}}} \right)} \mathord{\left/ {\vphantom {{\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j} \bullet {T_{Zj}}} \right)} {\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j}} \right)}}} \right. } {\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j}} \right)}}
 \end{equation}
 
-Note that for cooling \({\dot Q_{Zj}} < 0.\) The average supply air setpoint temperature \({\bar T_{SP}}\) is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone sensible cooling loads is extremely small (i.e., no cooling load), the setpoint temperature is set to the maximum. \({\bar T_{SP}}\) will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Cooling:Average object.
+Note that for cooling \({\dot Q_{Zj}} < 0.\) The average supply air setpoint temperature \({\overline{T_{SP}}}\) is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone sensible cooling loads is extremely small (i.e., no cooling load), the setpoint temperature is set to the maximum. \({\overline{T_{SP}}}\) will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Cooling:Average object.
 
 \subsection{Multizone Minimum Humidity Average}\label{multizone-minimum-humidity-average}
 
 The input object SetpointManager:MultiZone:MinimumHumidity:Average provides a setpoint manager that attempts to establish a supply air minimum humidity ratio setpoint that will meet the humidification load of multiple zones served by an HVAC air loop.~ This setpoint manager, used in conjunction with object ZoneControl:Humidistat, detects the air humidity level for all controlled zones served by an air loop (i.e., zones that have a humidistat object with a humidifying setpoint schedule), and uses moisture mass balances to calculate the average supply air minimum humidity ratio setpoint as follows:
 
-IF ( \({\dot Q_{lzj}}\) \textgreater{} 0 ) THEN
+IF ( \({\dot Q_{lZj}}\) \textgreater{} 0 ) THEN
 
 \begin{equation}
-  \bar{\omega}_{SP} = \bar{\omega}_Z + \frac{\sum\limits_{j = 1}^{NumControlZones}\dot{Q}_{l,Zj}}{\sum\limits_{j = 1}^{NumControlZones}\dot{m}_{ZJ}}
+  \overline{{\omega}_{SP}} = \overline{{\omega}_Z} + \frac{\sum\limits_{j = 1}^{NumControlZones}\dot{Q}_{l,Zj}}{\sum\limits_{j = 1}^{NumControlZones}\dot{m}_{Zj}}
 \end{equation}
 
 END IF
 
 \begin{equation}
-  \bar{\omega}_{Z} = \frac{\sum\limits_{j = 1}^{TotZones}\dot{m}_{Zj}\omega_{Zj}}{\sum\limits_{j = 1}^{TotZones}\dot{m}_{ZJ}}
+  \overline{{\omega}_{Z}} = \frac{\sum\limits_{j = 1}^{TotZones}\dot{m}_{Zj}\omega_{Zj}}{\sum\limits_{j = 1}^{TotZones}\dot{m}_{Zj}}
 \end{equation}
 
-where,
+where:
 
-\({\bar \omega_{SP}}\) = average supply air minimum humidity ratio setpoint (kg H\(_{2}\)O/kg air)
+\({\overline{\omega_{SP}}}\) is the average supply air minimum humidity ratio setpoint (kg H\(_{2}\)O/kg air)
 
-\(NumControlZones\) = number of controlled zones (i.e., zones that contain humidistat objects with humidifying setpoint schedule) served by the air loop (-)
+\(NumControlZones\) is the number of controlled zones (i.e., zones that contain humidistat objects with humidifying setpoint schedule) served by the air loop
 
-\({\dot Q_{lZj}}\) = latent (humidification) load required to reach the zone air humidifying setpoint for the \emph{j}\(^{th}\) controlled zone at current time step (kg H\(_{2}\)O/s)
+\({\dot Q_{lZj}}\) is the latent (humidification) load required to reach the zone air humidifying setpoint for the \emph{j}\(^{th}\) controlled zone at current time step (kg H\(_{2}\)O/s)
 
-\({\dot m_{Zj}}\) = air mass flow rate being supplied by the air loop to the \emph{j}\(^{th}\) controlled zone, lagged by one HVAC simulation time step (kg/s)
+\({\dot m_{Zj}}\) is the air mass flow rate being supplied by the air loop to the \emph{j}\(^{th}\) controlled zone, lagged by one HVAC simulation time step (kg/s)
 
-\({\omega_{Zj}}\) = air node humidity ratio for the jth controlled zone (kg H\(_{2}\)O/kg air)
+\({\omega_{Zj}}\) is the air node humidity ratio for the jth controlled zone (kg H\(_{2}\)O/kg air)
 
-\({\bar \omega_Z}\) = average zone air node humidity ratio weighted by supply air mass flow rate for the controlled zones served by the air loop (kg H\(_{2}\)O/kg air)
+\({\overline{\omega_Z}}\) is the average zone air node humidity ratio weighted by supply air mass flow rate for the controlled zones served by the air loop (kg H\(_{2}\)O/kg air)
 
-\(TotZones\) = total number of zones served by the air loop (-)
+\(TotZones\) is the total number of zones served by the air loop.
 
-Note that a positive latent load means humidification is required. The average supply air minimum humidity ratio setpoint \({\bar \omega_{SP}}\) is constrained to be less than or equal to the maximum setpoint humidity ratio (user input) and greater than or equal to the minimum setpoint humidity ratio (user input). If the sum of the zone latent humidification loads is extremely small (i.e., no humidification load), the humidity ratio setpoint is set to the minimum. \({\bar \omega_{SP}}\) will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:MinimumHumidity:Average object. A humidification component (e.g., an electric humidifier) placed upstream of this node can then use the humidity ratio setpoint to control its moisture addition rate.
+Note that a positive latent load means humidification is required. The average supply air minimum humidity ratio setpoint \({\overline{\omega_{SP}}}\) is constrained to be less than or equal to the maximum setpoint humidity ratio (user input) and greater than or equal to the minimum setpoint humidity ratio (user input). If the sum of the zone latent humidification loads is extremely small (i.e., no humidification load), the humidity ratio setpoint is set to the minimum. \({\overline{\omega_{SP}}}\) will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:MinimumHumidity:Average object. A humidification component (e.g., an electric humidifier) placed upstream of this node can then use the humidity ratio setpoint to control its moisture addition rate.
 
 All setpoint managers are executed at the beginning of the simulation time step. Therefore, the calculated setpoint is based on the resulting zone air node humidity ratios and supply air mass flow rates for the previous simulation time step.
 
@@ -417,55 +420,55 @@ All setpoint managers are executed at the beginning of the simulation time step.
 
 The input object SetpointManager:MultiZone:MaximumHumidity:Average provides a setpoint manager that attempts to establish a supply air maximum humidity ratio setpoint that will meet the dehumidification load of multiple zones served by an HVAC air loop. This setpoint manager, used in conjunction with object ZoneControl:Humidistat, detects the air humidity level for all controlled zones served by an air loop (i.e., zones that have a humidistat object with a dehumidifying setpoint schedule), and uses moisture mass balances to calculate the average supply air maximum humidity ratio as follows:
 
-IF ( \({\dot Q_{lzj}}\) \textless{} 0 ) THEN
+IF ( \({\dot Q_{lZj}}\) \textless{} 0 ) THEN
 
 \begin{equation}
-  \bar{\omega}_{SP} = \bar{\omega}_Z + \frac{\sum\limits_{j = 1}^{NumControlZones}\dot{Q}_{l,Zj}}{\sum\limits_{j = 1}^{NumControlZones}\dot{m}_{ZJ}}
+  \overline{{\omega}_{SP}} = \bar{\omega}_Z + \frac{\sum\limits_{j = 1}^{NumControlZones}\dot{Q}_{l,Zj}}{\sum\limits_{j = 1}^{NumControlZones}\dot{m}_{Zj}}
 \end{equation}
 
 END IF
 
 \begin{equation}
-  \bar{\omega}_{Z} = \frac{\sum\limits_{j = 1}^{TotZones}\dot{m}_{Zj}\omega_{Zj}}{\sum\limits_{j = 1}^{TotZones}\dot{m}_{ZJ}}
+  \overline{{\omega}_{Z}} = \frac{\sum\limits_{j = 1}^{TotZones}\dot{m}_{Zj}\omega_{Zj}}{\sum\limits_{j = 1}^{TotZones}\dot{m}_{Zj}}
 \end{equation}
 
-Note that a negative latent load means dehumidification is required. The average supply air maximum humidity ratio setpoint \({\bar \omega_{SP}}\) is constrained to be less than or equal to the maximum setpoint humidity ratio (user input) and greater than or equal to the minimum setpoint humidity ratio (user input). If the sum of the zone latent dehumidification loads is extremely small (i.e., no dehumidification load), the humidity ratio setpoint is set to the maximum. \({\bar \omega_{SP}}\) will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:MaximumHumidity:Average object. A dehumidification component (e.g., an desiccant dehumidifier) placed upstream of this node can then use the humidity ratio setpoint to control its moisture removal rate. In the case of a chilled water coil which is used for both temperature and high humidity control, this setpoint manager works in conjunction with a Controller:WaterCoil object to determines the minimum supply air temperature required to meet both the temperature (sensible) and humidity (latent) load in the control zone (ref: Controller:WaterCoil).
+Note that a negative latent load means dehumidification is required. The average supply air maximum humidity ratio setpoint \({\overline{\omega_{SP}}}\) is constrained to be less than or equal to the maximum setpoint humidity ratio (user input) and greater than or equal to the minimum setpoint humidity ratio (user input). If the sum of the zone latent dehumidification loads is extremely small (i.e., no dehumidification load), the humidity ratio setpoint is set to the maximum. \({\overline{\omega_{SP}}}\) will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:MaximumHumidity:Average object. A dehumidification component (e.g., an desiccant dehumidifier) placed upstream of this node can then use the humidity ratio setpoint to control its moisture removal rate. In the case of a chilled water coil which is used for both temperature and high humidity control, this setpoint manager works in conjunction with a Controller:WaterCoil object to determines the minimum supply air temperature required to meet both the temperature (sensible) and humidity (latent) load in the control zone (ref: Controller:WaterCoil).
 
 \subsection{MultiZone Minimum Humidity Supply Air Reset}\label{multizone-minimum-humidity-supply-air-reset}
 
 The input object SetpointManager:MultiZone:Humidity:Minimum provides a setpoint manager that attempts to establish a supply air minimum humidity ratio setpoint that will meet the humidification load of zone with the critical humidification requirement at each time step served by an HVAC air loop at the zone actual supply air mass flow rate.~ This setpoint manager, used in conjunction with object ZoneControl:Humidistat, detects the air humidity level for all controlled zones served by an air loop (i.e., zones that have a humidistat object with a humidifying setpoint schedule), and uses moisture mass balances to calculate the supply air minimum humidity ratio setpoint.~ The algorithm loops over all the zones that the system can humidify and calculates the setpoint based on a zone with the highest humidity ratio setpoint requirement as follows:
 
-IF (\({\dot Q_{lzj}}\) \textgreater{} 0) THEN
+IF (\({\dot Q_{lZj}}\) \textgreater{} 0) THEN
 
 \begin{equation}
-{\omega_{SP\;Zj}} = {\omega_{Zj}} + {{{{\dot Q}_{lZj}}} \mathord{\left/ {\vphantom {{{{\dot Q}_{lZj}}} {{{\dot m}_{Zj}}}}} \right. } {{{\dot m}_{Zj}}}}
+{\omega_{SP~Zj}} = {\omega_{Zj}} + {{{\dot Q}_{lZj}} / {{\dot m}_{Zj}}}
 \end{equation}
 
 END IF
 
 \begin{equation}
-{\omega_{SP\;Zj}} = MAX\left( {{\omega_{SP\;Zj}},\;{\omega_{SP\;Min}}} \right)
+{\omega_{SP~Zj}} = MAX\left( {{\omega_{SP~Zj}},{\omega_{SP~Min}}} \right)
 \end{equation}
 
 \begin{equation}
-{\omega_{SP}} = MIN\left( {{\omega_{SP\;Zj}},\;{\omega_{SP\;Max}}} \right)
+{\omega_{SP}} = MIN\left( {{\omega_{SP~Zj}},{\omega_{SP~Max}}} \right)
 \end{equation}
 
-where,
+where:
 
-\({\omega_{SP}}\) = supply air humidity ratio setpoint (kg/kg)
+\({\omega_{SP}}\) is the supply air humidity ratio setpoint (kg/kg)
 
-\({\dot Q_{lzj}}\) = latent load required to reach the zone air setpoint for the \emph{j}\(^{th}\) controlled zone at current time step (kg H\(_{2}\)O/s)
+\({\dot Q_{lZj}}\) is the latent load required to reach the zone air setpoint for the \emph{j}\(^{th}\) controlled zone at current time step (kg H\(_{2}\)O/s)
 
-\({\dot m_{Zj}}\) = actual mass flow rate supplied by the air loop to the \emph{j}\(^{th}\) controlled zone, (kg/s)
+\({\dot m_{Zj}}\) is the actual mass flow rate supplied by the air loop to the \emph{j}\(^{th}\) controlled zone, (kg/s)
 
-\({\omega_{Zj}}\) = air node humidity ratio for the j\(^{th}\) controlled zone (kg/kg)
+\({\omega_{Zj}}\) is the air node humidity ratio for the j\(^{th}\) controlled zone (kg/kg)
 
-\({\omega_{SP\;Zj}}\) = supply air humidity ratio setpoint for the j\(^{th}\) controlled zones (kg/kg)
+\({\omega_{SP~Zj}}\) is the supply air humidity ratio setpoint for the j\(^{th}\) controlled zones (kg/kg)
 
-\({\omega_{SP\;Min}}\) = user-specified supply air minimum humidity ratio setpoint (kg/kg)
+\({\omega_{SP~Min}}\) is the user-specified supply air minimum humidity ratio setpoint (kg/kg)
 
-\({\omega_{SP\;Max}}\) = user-specified supply air maximum humidity ratio setpoint (kg/kg)
+\({\omega_{SP~Max}}\) is the user-specified supply air maximum humidity ratio setpoint (kg/kg).
 
 Note that a positive latent load means humidification is required. The supply air minimum humidity ratio setpoint \({\omega_{SP}}\) is constrained to be less than or equal to the maximum setpoint humidity ratio (user input) and greater than or equal to the minimum setpoint humidity ratio (user input). If the humidification load for all zones in the air loop is extremely small (i.e., no humidification load), the humidity ratio setpoint is set to the user input minimum value. \({\omega_{SP}}\) will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Humidity:Minimum object. A humidification component (e.g., an electric humidifier) placed upstream of this node can then use the humidity ratio setpoint to control its moisture addition rate.
 
@@ -473,20 +476,20 @@ Note that a positive latent load means humidification is required. The supply ai
 
 The input object SetpointManager:MultiZone:Humidity:Maximum provides a setpoint manager that attempts to establish a supply air maximum humidity ratio setpoint that will meet the dehumidification load of the zone with the critical dehumidification requirement at each time step served by an HVAC air loop at the zone actual supply air mass flow rate. This setpoint manager, used in conjunction with object ZoneControl:Humidistat, detects the air humidity level for all controlled zones served by an air loop (i.e., zones that have a humidistat object with a dehumidifying setpoint schedule), and uses moisture mass balances to calculate the supply air maximum humidity ratio setpoint.~ The algorithm loops over all the zones that the system can dehumidify and calculates the setpoint based on a zone with the lowest humidity ratio setpoint requirement as follows:
 
-IF (\({\dot Q_{lzj}}\) \textless{} 0) THEN
+IF (\({\dot Q_{lZj}}\) \textless{} 0) THEN
 
 \begin{equation}
-{\omega_{SP\;Zj}} = {\omega_{Zj}} + {{{{\dot Q}_{lZj}}} \mathord{\left/ {\vphantom {{{{\dot Q}_{lZj}}} {{{\dot m}_{Zj}}}}} \right. } {{{\dot m}_{Zj}}}}
+{\omega_{SP~Zj}} = {\omega_{Zj}} + {{{{\dot Q}_{lZj}}} / {{{\dot m}_{Zj}}}}
 \end{equation}
 
 END IF
 
 \begin{equation}
-{\omega_{SP\;Zj}} = MAX\left( {{\omega_{SP\;Zj}},\;{\omega_{SP\;Min}}} \right)
+{\omega_{SP~Zj}} = MAX\left( {{\omega_{SP~Zj}},{\omega_{SP~Min}}} \right)
 \end{equation}
 
 \begin{equation}
-{\omega_{SP}} = MIN\left( {{\omega_{SP\;Zj}},\;{\omega_{SP\;Max}}} \right)
+{\omega_{SP}} = MIN\left( {{\omega_{SP~Zj}},\;{\omega_{SP~Max}}} \right)
 \end{equation}
 
 Note that a negative latent load means dehumidification is required. The supply air maximum humidity ratio setpoint \({\omega_{SP}}\) is constrained to be less than or equal to the maximum setpoint humidity ratio (user input) and greater than or equal to the minimum setpoint humidity ratio (user input). If the dehumidification load for all zones in the air loop is extremely small (i.e., no dehumidification load), the humidity ratio setpoint is set to the user input maximum value. \({\omega_{SP}}\) will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Humidity:Maximum object. A dehumidification component (e.g., an desiccant dehumidifier) placed upstream of this node can then use the humidity ratio setpoint to control its moisture removal rate. In the case of a chilled water coil which is used for both temperature and high humidity control, this setpoint manager works in conjunction with a Controller:WaterCoil object to determines the minimum supply air temperature required to meet both the temperature (sensible) and dehumidification (latent) load in the control zone (ref: Controller:WaterCoil).
@@ -495,11 +498,11 @@ Note that a negative latent load means dehumidification is required. The supply 
 
 The input object SetpointManager:FollowOutdoorAirTemperature provides a setpoint manager that is used to place a temperature setpoint on a system node that is derived from the current outdoor air environmental conditions.~ The outdoor air conditions are obtained from the weather information during the simulation.
 
-IF (ReferenceTemperatureType = = OutdoorWetBulb)
+IF (ReferenceTemperatureType = OutdoorWetBulb)
 
 ~~~ Setpoint = OutdoorWetBulbTemp + OffSet
 
-ELSEIF (ReferenceTemperatureType = = OutdoorDryBulb)
+ELSEIF (ReferenceTemperatureType = OutdoorDryBulb)
 
 ~~~ Setpoint = OutdoorDryBulbTemp + OffSet
 
@@ -515,11 +518,11 @@ MinSetPoint, MaxSetPoint and Offset are specified by the user as the input in ob
 
 The input object SetpointManager:FollowSystemNodeTemperature provides a temperature setpoint on a system node that is derived from the current temperatures at a separate system node.~ The current value of the temperature at a reference node are obtained and used to generate setpoint on a second system node.~ If the reference node is also designated to be an outdoor air (intake) node, then this setpoint manager can be used to follow outdoor air conditions that are adjusted for altitude.
 
-IF (ReferenceTemperatureType = = NodeWetBulb)
+IF (ReferenceTemperatureType = NodeWetBulb)
 
 ~~~ Setpoint = NodeWetbulbTemp + OffSet
 
-ELSEIF (ReferenceTemperatureType = = NodeDryBulb)
+ELSEIF (ReferenceTemperatureType = NodeDryBulb)
 
 ~~~ Setpoint = NodeDrybulbTemp + OffSet
 
@@ -535,19 +538,19 @@ MinSetPoint, MaxSetPoint and Offset are specified by the user as the input in ob
 
 The input object SetpointManager:FollowGroundTemperature provides a temperature setpoint on a system node that is derived from a current ground temperature.~ The ground temperatures are specified in different Site:GroundTemperature:* objects and used during the simulation.~ This setpoint manager is primarily intended for condenser or plant loops using some type of ground heat exchanger.
 
-IF (ReferenceGroundTemperatureObjectType = = BuildingSurface)
+IF (ReferenceGroundTemperatureObjectType = BuildingSurface)
 
 ~~~ Setpoint = GroundTemp + OffSet
 
-ELSEIF (ReferenceGroundTemperatureObjectType = = Shallow)
+ELSEIF (ReferenceGroundTemperatureObjectType = Shallow)
 
 ~~~ Setpoint = GroundTemp\_Surface + OffSet
 
-ELSEIF (ReferenceGroundTemperatureObjectType = = Deep)
+ELSEIF (ReferenceGroundTemperatureObjectType = Deep)
 
 ~~~ Setpoint = GroundTemp\_Deep + OffSet
 
-ELSEIF (ReferenceTGroundTemperatureObjectType = = FCfactorMethod)
+ELSEIF (ReferenceTGroundTemperatureObjectType = FCfactorMethod)
 
 ~~~ Setpoint = GroundTemp\_FC + OffSet
 
@@ -559,23 +562,15 @@ Setpoint = MIN(Setpoint, MaxSetPoint)
 
 \emph{~}
 
-Where,
+where:
 
-GroundTemp = Current ground temperature (C)
+GroundTemp is the current ground temperature (Ref: Site:GroundTemperature:BuildingSurface) (C)
 
-(Ref: Site:GroundTemperature:BuildingSurface)
+GroundTemp\_Surface is the current surface ground temperature (Ref: Site:GroundTemperature:Shallow) (C)
 
-GroundTemp\_Surface = Current surface ground temperature~ (C)
+GroundTemp\_Deep~ = Current deep ground temperature (Ref: Site:GroundTemperature:Deep) (C)
 
-(Ref: Site:GroundTemperature:Shallow)
-
-GroundTemp\_Deep~ = Current deep ground temperature~ (C)
-
-(Ref: Site:GroundTemperature:Deep)
-
-GroundTemp\_FC = Current ground temperature defined F or C factor method (C)
-
-(Ref: Site:GroundTemperature:FCfactorMethod)
+GroundTemp\_FC = Current ground temperature defined F or C factor method (Ref: Site:GroundTemperature:FCfactorMethod) (C)
 
 MinSetPoint, MaxSetPoint and Offset are specified by the user as the input in object SetpointManager:FollowGroundTemperature.
 
@@ -583,25 +578,24 @@ MinSetPoint, MaxSetPoint and Offset are specified by the user as the input in ob
 
 The object resets the condenser entering water temperature to the optimal cooling tower water set point temperature that will result in minimum net energy consumption for the chiller and cooling tower plant. This chiller-tower optimization scheme uses one curve to determine the optimum condenser entering water temperature for a given time step and two other curves to place limit conditions on the ``optimized'' set point value. The optimized condenser entering water temperature may not be valid every timestep then will be limited algorithmically by two boundary curves. The first of these boundary curves is given by:
 
-\emph{MinDsnWB = C1 + C2*OaWb + C3*WPLR + C4*TwrDsnWB + C5*NF}
+\begin{equation}
+MinDsnWB = C1 + C2*OaWb + C3*WPLR + C4*TwrDsnWB + C5*NF
+\end{equation}
+
 
 where:
 
-\emph{C1-C5} = curve coefficients
+\emph{C1-C5} are the curve coefficients
 
-\emph{OaWb} = outside air wetbulb for current timestep, C
+\emph{OaWb} is the outside air wetbulb for current timestep (\(^{\circ}\)C)
 
-\emph{TwrDsnWB} = Tower design inlet Air Wet-Bulb Temperature, C
+\emph{TwrDsnWB} is the tower design inlet Air Wet-Bulb Temperature (\(^{\circ}\)C)
 
-\emph{WPLR} = Weighted PLR
+\emph{WPLR} is the weighted PLR which is equal to ChillerCoolingLoadThisTimestep / NominalChillerCapacity
 
-~~~ = ChillerCoolingLoadThisTimestep / NominalChillerCapacity
+NF is the normalized condenser water flow per unit of tower capacity (m\(^3\)/W-s) which is equal to Design Tower Flow Rate / Design Tower Capacity \emph{(typically at 5.382E-8 m\(^3\)/s, i.e., 3 gpm/ton)}
 
-NF = Normalized condenser water flow per unit of tower capacity, m3/W
-
-~~~~~ = Design Tower Flow Rate / Design Tower Capacity \emph{(typically 5.382E-8 m3/s, i.e., 3 gpm/ton)}
-
-MinDsnWB is compared against the design tower wetbulb. This curve is usually a function of Weighted PLR and NF. So if NF is constant at 5.382E-8 m3/s (3 gpm/ton), the curve can be depicted as follows:
+MinDsnWB is compared against the design tower wetbulb. This curve is usually a function of Weighted PLR and NF. So if NF is constant at 5.382E-8 m\(^3\)/s (3 gpm/ton), the curve can be depicted as follows:
 
 \begin{figure}[hbtp] % fig 292
 \centering
@@ -611,25 +605,23 @@ MinDsnWB is compared against the design tower wetbulb. This curve is usually a f
 
 The second boundary curve is given by:
 
-\emph{MinActualWb = C1 + C2*MinDsnWB + C3*WPLR + C4*TwrDsnWB + C5*NF}
+\begin{equation}
+MinActualWb = C1 + C2*MinDsnWB + C3*WPLR + C4*TwrDsnWB + C5*NF
+\end{equation}
 
-where,
+where:
 
-\emph{C1-C5 = curve coefficients}
+\emph{C1-C5} are the curve coefficients
 
-\emph{MinDsnWB = from first boundary equation, C}
+\emph{MinDsnWB} is from first boundary equation (\(^{\circ}\)C)
 
-\emph{TwrDsnWB = Tower design inlet Air Wet-Bulb Temperature, C}
+\emph{TwrDsnWB} is the tower design inlet Air Wet-Bulb Temperature (\(^{\circ}\)C)
 
-\emph{WPLR = Weighted PLR}
+\emph{WPLR} is the weighted PLR which is equal to ChillerCoolingLoadThisTimestep / NominalChillerCapacity
 
-\emph{~~~~~~~~~~ = ChillerCoolingLoadThisTimestep / NominalChillerCapacity}
+\emph{NF} is the normalized condenser water flow per unit of tower capacity (m\(^3\)/W-s) which is equal to Design Tower Flow Rate / Design Tower Capacity (typically at 5.382E-8 m\(^3\)/s, i.e., 3 gpm/ton)}
 
-\emph{NF = Normalized condenser water flow per unit of tower capacity, m3/W}
-
-\emph{~~~~~ = Design Tower Flow Rate / Design Tower Capacity (typically 5.382E-8 m3/s, i.e., 3 gpm/ton)}
-
-MinActualWb is compared against this time step's outside air wet bulb. This curve is usually a function of MinDesignWB, WeightedRatio and TwrDesignWB. So if TwrDesignWB is constant at 25.6 °C (78 °F), and NF = 5.382E-8 m3/s (3 gpm/ton), the curve can be depicted as follows:
+MinActualWb is compared against this time step's outside air wet bulb. This curve is usually a function of MinDesignWB, WeightedRatio and TwrDesignWB. So if TwrDesignWB is constant at 25.6\(^{\circ}\)C (78\(^{\circ}\)F), and NF = 5.382E-8 m\(^3\)/s (3 gpm/ton), the curve can be depicted as follows:
 
 \begin{figure}[hbtp] % fig 293
 \centering
@@ -639,25 +631,23 @@ MinActualWb is compared against this time step's outside air wet bulb. This curv
 
 The Optimized Condenser Entering Water Temperature is calculated with this equation:
 
-\emph{OptCondEntTemp = C1 + C2*OaWb + C3*WPLR + C4*TwrDsnWB + C5*NF}
+\begin{equation}
+OptCondEntTemp = C1 + C2*OaWb + C3*WPLR + C4*TwrDsnWB + C5*NF
+\end{equation}
 
-where,
+where:
 
-\emph{C1-C5 = curve coefficients}
+\emph{C1-C5} are curve coefficients
 
-\emph{OaWB = this timestep's outside air wetbulb, C}
+\emph{OaWB} is at this timestep's outside air wetbulb (\(^{\circ}\)C)
 
-\emph{TwrDsnWB = Tower design inlet Air Wet-Bulb Temperature, C}
+\emph{TwrDsnWB} is the tower design inlet Air Wet-Bulb Temperature (\(^{\circ}\)C)
 
-\emph{WPLR = Weighted PLR}
+\emph{WPLR} is the weighted PLR which is equal to ChillerCoolingLoadThisTimestep / NominalChillerCapacity
 
-\emph{~~~~~~~~~~ = ChillerCoolingLoadThisTimestep / NominalChillerCapacity}
+\emph{NF} is the normalized condenser water flow per unit of tower capacity (m\(^3\)/W-s) which is equal to Design Tower Flow Rate / Design Tower Capacity (typically 5.382E-8 m\(^3\)/s, i.e., 3 gpm/ton)
 
-\emph{NF = Normalized condenser water flow per unit of tower capacity, m3/W}
-
-\emph{~~~~~ = Design Tower Flow Rate / Design Tower Capacity (typically 5.382E-8 m3/s, i.e., 3 gpm/ton)}
-
-A graph of the curve can be depicted as follows:
+A graph of the curve can be seen in Figure~\ref{fig:optimum-ewt-vs-plr-oawb}.
 
 \begin{figure}[hbtp] % fig 294
 \centering
@@ -683,19 +673,15 @@ This control scheme is available for multiple towers by following two steps:
 
 The object determines a ``near-optimal'' condenser water entering set point at each time step that will result in minimum net energy consumption for the chiller and cooling tower plant. The ``ideal'' chiller-tower optimization scheme uses a search algorithm to find the ideal optimal setpoint at a given timestep. This requires resimulating HVAC systems at each timestep until finding an ``optimal'' condenser water entering setpoint (OptSetpoint) which gives the minimum total chiller, cooling tower, chilled water pump and condenser water pump power consumption (TEC). The OptSetpoint falls between realistic minimum and maximum boundaries, which are set by the user. The minimum boundary is determined based on the minimum lift (user input) and evaporator leaving water temperature. The maximum boundary is specified by the user. It is assumed that a single minimum point exists between these boundaries. The following steps are used to find ``optimal'' setpoint:
 
-1)~~~Set an initial setpoint value for the iteration to a user-defined maximum condenser entering water temperature (Toptset\(_{1}\)) and calculate TEC.
-
-2)~~~Decrease the setpoint value by 1˚C (Toptset\(_{2}\) = Toptset\(_{1}\)--1˚C) and calculate TEC.
-
-3)~~~Compare the TEC in Step 1 (TEC\(_{1}\)) and TEC in Step 2 (TEC\(_{2}\)), i.e., (dTEC\(_{1}\) = TEC\(_{1}\)--TEC\(_{2}\)).
-
-4)~~~If dTEC\(_{1}\) is negative, stop the iteration and set the ``optimal'' setpoint to Toptset\(_{1}\).
-
-5)~~~If dTEC\(_{1}\) is positive, Decrease the setpoint value by 1˚C and calculate TEC. Compare the TECs and repeat this step (i.e., dTEC\(_{N}\) = TEC\(_{N}\)--TEC\(_{N+1}\)) until either Toptset\(_{N+1}\) reaches to the minimum boundary value or dTEC\(_{N}\) becomes negative.
-
-6)~~~If Toptset\(_{N}\) reaches to the minimum boundary value and still dTEC\(_{N}\) is positive, set the ``optimal'' setpoint to Toptset\(_{N+1}\).
-
-7)~~~If TEC\(_{N}\) becomes negative, decrease Toptset\(_{N-1}\) by 0.2˚C and calculate TEC. Compare the TECs and repeat this step (i.e., dTEC\(_{M}\) = TEC\(_{M}\)--TEC\(_{M+1}\)) until dTEC\(_{M}\) becomes negative. Then set the ``optimal'' setpoint to Toptset\(_{M+1}\).
+\begin{enumerate}
+\item Set an initial setpoint value for the iteration to a user-defined maximum condenser entering water temperature (Toptset\(_{1}\)) and calculate TEC.
+\item Decrease the setpoint value by 1\(^{\circ}\)C (Toptset\(_{2}\) = Toptset\(_{1}\)--1\(^{\circ}\)C) and calculate TEC.
+\item Compare the TEC in Step 1 (TEC\(_{1}\)) and TEC in Step 2 (TEC\(_{2}\)), i.e., (dTEC\(_{1}\) = TEC\(_{1}\)--TEC\(_{2}\)).
+\item If dTEC\(_{1}\) is negative, stop the iteration and set the ``optimal'' setpoint to Toptset\(_{1}\).
+\item If dTEC\(_{1}\) is positive, Decrease the setpoint value by 1\(^{\circ}\)C and calculate TEC. Compare the TECs and repeat this step (i.e., dTEC\(_{N}\) = TEC\(_{N}\)--TEC\(_{N+1}\)) until either Toptset\(_{N+1}\) reaches to the minimum boundary value or dTEC\(_{N}\) becomes negative.
+\item If Toptset\(_{N}\) reaches to the minimum boundary value and still dTEC\(_{N}\) is positive, set the ``optimal'' setpoint to Toptset\(_{N+1}\).
+\item If TEC\(_{N}\) becomes negative, decrease Toptset\(_{N-1}\) by 0.2\(^{\circ}\)C and calculate TEC. Compare the TECs and repeat this step (i.e., dTEC\(_{M}\) = TEC\(_{M}\)--TEC\(_{M+1}\)) until dTEC\(_{M}\) becomes negative. Then set the ``optimal'' setpoint to Toptset\(_{M+1}\).
+\end{enumerate}
 
 \subsection{Plant Return Water Control Setpoint Reset}\label{plant-return-water-control-setpoint-reset}
 
@@ -745,32 +731,32 @@ For a chilled water loop, the user-specified minimum is the default setpoint use
 
 \subsubsection{Key control note}\label{key-control-note}
 
-The setpoint will be reset at the beginning of a system time step, and remain that way through that time step. The setpoint is calculated based on the latest known value of loop demand and loop flow rate. If the demand and flow rate remain the same for the currently calculated time step, the loop will maintain control well. However, if either changes, there will be a lag effect while the loop attempts to maintain control. Consider the following plot, with a short description following:
+The setpoint will be reset at the beginning of a system time step, and remain that way through that time step. The setpoint is calculated based on the latest known value of loop demand and loop flow rate. If the demand and flow rate remain the same for the currently calculated time step, the loop will maintain control well. However, if either changes, there will be a lag effect while the loop attempts to maintain control. Consider the following plot shown in Figure~\ref{fig:key-control-plot}.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/SetPointManager-ResetForReturnControl1.png}
-\caption{}
+\caption{Setpoint Manager Reset for Return Control Plot 1 \protect \label{fig:key-control-plot}}
 \end{figure}
 
 Throughout the day, the heat addition (green line) to the loop increases. Each time it increases, there is a small period of time where the loop attempts to regain control of the return temperature. The setpoint is only reset at the beginning of the system time step, so as the plant converges within a single time step, the load will vary and the return temperature may not be exactly on target.
 
-This isn't necessarily a big problem. However, some users may be especially interested in very tight control of the return temperature. This can be done very easily by simply reducing the simulation time step. For example, in the following plot, the time step was reduced from 10 minutes to 1 minute, with some description following the plot:
+This is not necessarily a big problem. However, some users may be especially interested in very tight control of the return temperature. This can be done very easily by simply reducing the simulation time step. For example, in the following plot (see Figure~\ref{fig:key-control-plot2}, the time step was reduced from 10 minutes to 1 minute.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/SetPointManager-ResetForReturnControl2.png}
-\caption{}
+\caption{Setpoint Manager Reset for Return Control Plot 2 \protect \label{fig:key-control-plot2}}
 \end{figure}
 
 With the smaller time step, the reporting frequency is higher. But more importantly, with the smaller time step, the setpoint can be corrected much more often. Because of this, the return temperature regains control much quicker than with the larger time step.
 
-However, these examples are for a jagged demand profile full of discontinuous step changes in loop demand. As a final example, this return water temperature control is applied to the large office reference building chilled water loop. Here is the response:
+However, these examples are for a jagged demand profile full of discontinuous step changes in loop demand. As a final example, this return water temperature control is applied to the large office reference building chilled water loop. This is shown in Figure~\ref{fig:key-control-plot3}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/SetPointManager-ResetForReturnControl3.png}
-\caption{}
+\caption{Setpoint Manager Reset for Return Control Plot 3 \protect \label{fig:key-control-plot3}}
 \end{figure}
 
 Note the control is working properly, maintaining a return temperature around the target of 12 degrees where possible. Since the load profile is a typical -smooth- profile, the control is also much smoother. This should be a good representation of the capabilities of this setpoint manager.

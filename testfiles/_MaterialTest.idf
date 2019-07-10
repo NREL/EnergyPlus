@@ -13,7 +13,7 @@
 ! 7/27/00 -- Restored 4-pane cases (had been set to 3-pane)
 ! 8/21/01 -- Add new fields to Material:WindowShade (FW)
 
-  Version,9.0;
+  Version,9.2;
 
   Timestep,4;
 
@@ -41,7 +41,7 @@
     No;                      !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year

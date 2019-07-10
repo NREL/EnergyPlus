@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -217,6 +217,8 @@ SQLite::SQLite(std::shared_ptr<std::ostream> errorStream,
         sqliteExecuteCommand("PRAGMA locking_mode = EXCLUSIVE;");
         sqliteExecuteCommand("PRAGMA journal_mode = OFF;");
         sqliteExecuteCommand("PRAGMA synchronous = OFF;");
+        sqliteExecuteCommand("PRAGMA encoding=\"UTF-8\";");
+
         // Turn this to ON for Foreign Key constraints.
         // This must be turned ON for every connection
         // Currently, inserting into daylighting tables does not work with this ON. The ZoneIndex referenced by DaylightMaps does not exist in

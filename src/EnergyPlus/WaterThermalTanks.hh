@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -652,6 +652,7 @@ namespace WaterThermalTanks {
         int IterLimitExceededNum2;   // Counter for recurring iteration limit warning messages
         int RegulaFalsiFailedIndex2; // Index for recurring RegulaFalsi failed warning messages
         int RegulaFalsiFailedNum2;   // Counter for recurring RegulaFalsi failed warning messages
+        bool FirstTimeThroughFlag;   // Flag for saving water heater status
 
         // Default Constructor
         WaterHeaterDesuperheaterData()
@@ -663,7 +664,7 @@ namespace WaterThermalTanks {
               OffCycParaFuelRate(0.0), Mode(0), SaveMode(0), SaveWHMode(0), BackupElementCapacity(0.0), DXSysPLR(0.0),
               ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(0), SetPointError(0), SetPointErrIndex1(0), IterLimitErrIndex1(0),
               IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0), RegulaFalsiFailedNum1(0), IterLimitErrIndex2(0), IterLimitExceededNum2(0),
-              RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0)
+              RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(true)
         {
         }
     };

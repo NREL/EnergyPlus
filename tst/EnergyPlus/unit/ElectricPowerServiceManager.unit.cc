@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -76,7 +76,6 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_BatteryDischargeTest)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
         "ElectricLoadCenter:Distribution,",
         "    PV Array Load Center,    !- Name",
         "    Generator List,          !- Generator List Name",
@@ -231,7 +230,6 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case1)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
 
         "  ElectricLoadCenter:Distribution,",
         "    Test Load Center,    !- Name",
@@ -295,7 +293,6 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case2)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
 
         "  ElectricLoadCenter:Distribution,",
         "    Test Load Center,        !- Name",
@@ -377,7 +374,6 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case3)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
 
         "  ElectricLoadCenter:Distribution,",
         "    Test Load Center,        !- Name",
@@ -471,7 +467,6 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case4)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
 
         "  ElectricLoadCenter:Distribution,",
         "    Test Load Center,        !- Name",
@@ -582,7 +577,6 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_UpdateLoadCenterRecords_Case5)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
 
         "  ElectricLoadCenter:Distribution,",
         "    Test Load Center,        !- Name",
@@ -708,7 +702,6 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_TransformerLossTest)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,8.4;",
 
         "  ElectricLoadCenter:Distribution,",
         "    Test Load Center,        !- Name",

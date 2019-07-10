@@ -20,9 +20,9 @@ A series of actuators is available for all the setpoints that can be placed on s
 \item
   Mass Flow Rate Setpoint (kg/s)
 \item
-  Mass Flow Rate Minimum Setpoint (kg/s)
+  Mass Flow Rate Minimum Available Setpoint (kg/s)
 \item
-  Mass Flow Rate Maximum Setpoint (units kg/s)
+  Mass Flow Rate Maximum Available Setpoint (kg/s)
 \end{itemize}
 
 Using these actuators is natural with an EMS. Typically, the controller would place the setpoint on the outlet node. Then the component's low-level controller should operate to meet the leaving setpoint. Setting the setpoints on nodes should be a common application for the EMS.
@@ -129,11 +129,22 @@ An actuator called ``Outdoor Air Controller'' is available with the control type
 
 \subsection{Plant Load Profile}\label{plant-load-profile}
 
-Actuators called ``Plant Load Profile'' are available with the control types called ``Mass Flow Rate'' (in kg/s) and ``Power'' (in W). The unique identifier is the name of the LoadProfile:Plant input object. These actuators provide override control over the loads placed on a plant system by a plant load profile.
+Actuators called ``Plant Load Profile'' are available with the control types called ``Mass Flow Rate'' (in \si{\massFlowRate}) and ``Power'' (in W). The unique identifier is the name of the LoadProfile:Plant input object. These actuators provide override control over the loads placed on a plant system by a plant load profile.
 
 \subsection{Pump}\label{pump}
 
-An actuator called ``Pump'' is available with the control type ``Pump Mass Flow Rate'' (in kg/s). This allows you to override the flow rate produced by a pump. The unique identifier is the name of Pump Input object.
+An actuator called ``Pump'' is available with the control type ``Pump Mass Flow Rate'' (in \si{\massFlowRate}). This allows you to override the flow rate produced by a pump.
+
+Another actuator called ``Pump'' is available with the control type ``Pump Pressure Rise'' (in \si{\pascal}). This allows you to override the pump pressurise rise and therefore the power consumption of the pump, which is calculated as:
+
+\begin{equation}
+    P = \frac{\dot{Q} \cdot \Delta P_{override}}{\eta_{total}}
+\end{equation}
+
+where $P$ is the pump power (\si{\watt}), $\dot{Q}$ is the volume flow rate (\si{\volumeFlowRate}), $\eta_{total}$ is the pump total efficiency (\%)
+and $\Delta P_{override}$ is your EMS-overriden pressure rise (\si{\pascal}).
+
+The unique identifier in both these actuator is the name of Pump Input object.
 
 \subsection{Window Air Conditioner}\label{window-air-conditioner}
 
@@ -141,7 +152,7 @@ An actuator called ``Window Air Conditioner'' is available with a control type c
 
 \subsection{Low Temperature Radiant Hydronic}\label{low-temperature-radiant-hydronic}
 
-Actuators called ``Hydronic Low Temp Radiant'' and ``Constant Flow Low Temp Radiant'' are available with the control type ``Water Mass Flow Rate'' (in kg/s). This allows you to override the flow of water through hydronic radiant systems. The unique identifier is the name of either the ZoneHVAC:LowTemperatureRadiant:VariableFlow or ZoneHVAC:LowTemperature\\
+Actuators called ``Hydronic Low Temp Radiant'' and ``Constant Flow Low Temp Radiant'' are available with the control type ``Water Mass Flow Rate'' (in \si{\massFlowRate}). This allows you to override the flow of water through hydronic radiant systems. The unique identifier is the name of either the ZoneHVAC:LowTemperatureRadiant:VariableFlow or ZoneHVAC:LowTemperature\\
 Radiant:ConstantFlow input objects.
 
 \subsection{Variable Refrigerant Flow Heat Pump Air Conditioner}\label{variable-refrigerant-flow-heat-pump-air-conditioner}

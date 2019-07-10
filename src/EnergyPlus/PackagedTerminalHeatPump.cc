@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1923,7 +1923,7 @@ namespace PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).ATMixerType == ATMixer_InletSide || PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
                 PTUnit(PTUnitNum).ATMixerExists = true;
             }
-            // check that air-conditioner doesn' have local outside air and DOA
+            // check that air-conditioner doesn't have local outside air and DOA
             if (PTUnit(PTUnitNum).ATMixerExists && OANodeNums(4) > 0) {
                 ShowSevereError(CurrentModuleObject + " = \"" + PTUnit(PTUnitNum).Name +
                                 "\". Air-conditioners has local as well as central outdoor air specified");
@@ -3809,12 +3809,12 @@ namespace PackagedTerminalHeatPump {
                                             PTUnit(PTUnitNum).HeatCoilLoopSide,
                                             PTUnit(PTUnitNum).HeatCoilBranchNum,
                                             PTUnit(PTUnitNum).HeatCoilCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowContinueError("Reference Unit=\"" + PTUnit(PTUnitNum).Name + "\", type=" + PTUnit(PTUnitNum).UnitType);
                         ShowFatalError("InitPTUnit: Program terminated for previous conditions.");
@@ -3842,12 +3842,12 @@ namespace PackagedTerminalHeatPump {
                                             PTUnit(PTUnitNum).HeatCoilLoopSide,
                                             PTUnit(PTUnitNum).HeatCoilBranchNum,
                                             PTUnit(PTUnitNum).HeatCoilCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowContinueError("Reference Unit=\"" + PTUnit(PTUnitNum).Name + "\", type=" + PTUnit(PTUnitNum).UnitType);
                         ShowFatalError("InitPTUnit: Program terminated for previous conditions.");
@@ -3882,12 +3882,12 @@ namespace PackagedTerminalHeatPump {
                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
                                             PTUnit(PTUnitNum).SuppCoilCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitPTUnit: Program terminated for previous conditions.");
                     }
@@ -3910,12 +3910,12 @@ namespace PackagedTerminalHeatPump {
                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
                                             PTUnit(PTUnitNum).SuppCoilCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitPTUnit: Program terminated for previous conditions.");
                     }
@@ -4860,6 +4860,21 @@ namespace PackagedTerminalHeatPump {
 
         if (CurZoneEqNum > 0) {
             if (PTUnit(PTUnitNum).HVACSizingIndex > 0) {
+                // initialize OA flow for sizing other inputs (e.g., capacity)
+                if (PTUnit(PTUnitNum).CoolOutAirVolFlow == AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
+                } else {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = PTUnit(PTUnitNum).CoolOutAirVolFlow;
+                }
+                if (PTUnit(PTUnitNum).HeatOutAirVolFlow != AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = max(ZoneEqSizing(CurZoneEqNum).OAVolFlow, PTUnit(PTUnitNum).HeatOutAirVolFlow);
+                }
+
+                if (PTUnit(PTUnitNum).ATMixerExists) {          // set up ATMixer conditions for scalable capacity sizing
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+                    SingleDuct::setATMixerSizingProperties(PTUnit(PTUnitNum).ATMixerIndex, PTUnit(PTUnitNum).ControlZoneNum, CurZoneEqNum);
+                }
+
                 zoneHVACIndex = PTUnit(PTUnitNum).HVACSizingIndex;
                 SizingMethod = CoolingAirflowSizing;
                 FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation
@@ -5032,8 +5047,19 @@ namespace PackagedTerminalHeatPump {
                     }
                 }
             } else {
-                // no scalble sizing method has been specified. Sizing proceeds using the method
+                // no scalable sizing method has been specified. Sizing proceeds using the method
                 // specified in the zoneHVAC object
+
+                // initialize OA flow for sizing other inputs (e.g., capacity)
+                if (PTUnit(PTUnitNum).CoolOutAirVolFlow == AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
+                } else {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = PTUnit(PTUnitNum).CoolOutAirVolFlow;
+                }
+                if (PTUnit(PTUnitNum).HeatOutAirVolFlow != AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = max(ZoneEqSizing(CurZoneEqNum).OAVolFlow, PTUnit(PTUnitNum).HeatOutAirVolFlow);
+                }
+
                 PrintFlag = false;
                 SizingMethod = CoolingAirflowSizing;
                 FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation
@@ -5120,6 +5146,11 @@ namespace PackagedTerminalHeatPump {
                 DataConstantUsedForSizing = 0.0;
                 DataFractionUsedForSizing = 0.0;
             }
+        }
+
+        if (PTUnit(PTUnitNum).ATMixerExists) {          // set up ATMixer conditions for use in component sizing
+            ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+            SingleDuct::setATMixerSizingProperties(PTUnit(PTUnitNum).ATMixerIndex, PTUnit(PTUnitNum).ControlZoneNum, CurZoneEqNum);
         }
 
         if (PTUnit(PTUnitNum).MaxCoolAirVolFlow > 0.0) {
@@ -5456,7 +5487,7 @@ namespace PackagedTerminalHeatPump {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500);    // maximum number of iterations
         Real64 const MinPLF(0.0); // minimum part load factor allowed
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -5609,7 +5640,7 @@ namespace PackagedTerminalHeatPump {
                         if (!FirstHVACIteration && !WarmupFlag) {
                             CalcPTUnit(PTUnitNum, FirstHVACIteration, PartLoadFrac, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
                             if (PTUnit(PTUnitNum).IterErrIndex == 0) {
-                                gio::write(IterNum, fmtLD) << MaxIte;
+                                ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
                                 strip(IterNum);
                                 ShowWarningError(PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                                 ShowContinueError(

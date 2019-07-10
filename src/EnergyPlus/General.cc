@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -130,6 +130,182 @@ namespace General {
                    Real64 const X_0,         // 1st bound of interval that contains the solution
                    Real64 const X_1,         // 2nd bound of interval that contains the solution
                    Array1<Real64> const &Par // array with additional parameters used for function evaluation
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Michael Wetter
+        //       DATE WRITTEN   March 1999
+        //       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
+        //                      L. Gu, May 2017 - allow both Bisection and RegulaFalsi
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Find the value of x between x0 and x1 such that f(x,Par)
+        // is equal to zero.
+
+        // METHODOLOGY EMPLOYED:
+        // Uses the Regula Falsi (false position) method (similar to secant method)
+
+        // REFERENCES:
+        // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
+        // 2nd edition, 1992. Page 347 ff.
+
+        // USE STATEMENTS:
+        // na
+
+        // Argument array dimensioning
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+        // = -2: f(x0) and f(x1) have the same sign
+        // = -1: no convergence
+        // >  0: number of iterations performed
+        // optional
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        Real64 const SMALL(1.e-10);
+
+        // INTERFACE BLOCK SPECIFICATIONS
+
+        // DERIVED TYPE DEFINITIONS
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        Real64 X0;       // present 1st bound
+        Real64 X1;       // present 2nd bound
+        Real64 XTemp;    // new estimate
+        Real64 Y0;       // f at X0
+        Real64 Y1;       // f at X1
+        Real64 YTemp;    // f at XTemp
+        Real64 DY;       // DY = Y0 - Y1
+        bool Conv;       // flag, true if convergence is achieved
+        bool StopMaxIte; // stop due to exceeding of maximum # of iterations
+        bool Cont;       // flag, if true, continue searching
+        int NIte;        // number of interations
+        int AltIte;      // an accounter used for Alternation choice
+
+        X0 = X_0;
+        X1 = X_1;
+        XTemp = X0;
+        Conv = false;
+        StopMaxIte = false;
+        Cont = true;
+        NIte = 0;
+        AltIte = 0;
+
+        Y0 = f(X0, Par);
+        Y1 = f(X1, Par);
+        // check initial values
+        if (Y0 * Y1 > 0) {
+            Flag = -2;
+            XRes = X0;
+            return;
+        }
+
+        while (Cont) {
+
+            DY = Y0 - Y1;
+            if (std::abs(DY) < SMALL) DY = SMALL;
+            if (std::abs(X1 - X0) < SMALL) {
+                break;
+            }
+            // new estimation
+            switch (HVACSystemRootFinding.HVACSystemRootSolver) {
+            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
+                XTemp = (Y0 * X1 - Y1 * X0) / DY;
+                break;
+            }
+            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection: {
+                XTemp = (X1 + X0) / 2.0;
+                break;
+            }
+            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
+                if (NIte > HVACSystemRootFinding.NumOfIter) {
+                    XTemp = (X1 + X0) / 2.0;
+                } else {
+                    XTemp = (Y0 * X1 - Y1 * X0) / DY;
+                }
+                break;
+            }
+            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
+                if (NIte <= HVACSystemRootFinding.NumOfIter) {
+                    XTemp = (X1 + X0) / 2.0;
+                } else {
+                    XTemp = (Y0 * X1 - Y1 * X0) / DY;
+                }
+                break;
+            }
+            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
+                if (AltIte > HVACSystemRootFinding.NumOfIter) {
+                    XTemp = (X1 + X0) / 2.0;
+                    if (AltIte >= 2 * HVACSystemRootFinding.NumOfIter) AltIte = 0;
+                } else {
+                    XTemp = (Y0 * X1 - Y1 * X0) / DY;
+                }
+                break;
+            }
+            default: {
+                XTemp = (Y0 * X1 - Y1 * X0) / DY;
+            }
+            }
+
+            YTemp = f(XTemp, Par);
+
+            ++NIte;
+            ++AltIte;
+
+            // check convergence
+            if (std::abs(YTemp) < Eps) Conv = true;
+
+            if (NIte > MaxIte) StopMaxIte = true;
+
+            if ((!Conv) && (!StopMaxIte)) {
+                Cont = true;
+            } else {
+                Cont = false;
+            }
+
+            if (Cont) {
+
+                // reassign values (only if further iteration required)
+                if (Y0 < 0.0) {
+                    if (YTemp < 0.0) {
+                        X0 = XTemp;
+                        Y0 = YTemp;
+                    } else {
+                        X1 = XTemp;
+                        Y1 = YTemp;
+                    }
+                } else {
+                    if (YTemp < 0.0) {
+                        X1 = XTemp;
+                        Y1 = YTemp;
+                    } else {
+                        X0 = XTemp;
+                        Y0 = YTemp;
+                    }
+                } // ( Y0 < 0 )
+
+            } // (Cont)
+
+        } // Cont
+
+        if (Conv) {
+            Flag = NIte;
+        } else {
+            Flag = -1;
+        }
+        XRes = XTemp;
+    }
+
+    void SolveRoot(Real64 const Eps, // required absolute accuracy
+                   int const MaxIte, // maximum number of allowed iterations
+                   int &Flag,        // integer storing exit status
+                   Real64 &XRes,     // value of x that solves f(x,Par) = 0
+                   std::function<Real64(Real64 const, std::vector<Real64> const &)> f,
+                   Real64 const X_0,         // 1st bound of interval that contains the solution
+                   Real64 const X_1,         // 2nd bound of interval that contains the solution
+                   std::vector<Real64> const &Par // array with additional parameters used for function evaluation
     )
     {
 
@@ -505,10 +681,6 @@ namespace General {
         int NIte;        // number of interations
         int AltIte;      // used for Alternation choice
 
-        static gio::Fmt OpticalFormat("(i3,',',f10.6,',',f10.6)"); // Format descriptor for environ stamp
-
-        static int fileNum(0);
-
         X0 = X_0;
         X1 = X_1;
         XTemp = X0;
@@ -613,13 +785,6 @@ namespace General {
 
             } // (Cont)
 
-            if (fileNum == 0) {
-                fileNum = GetNewUnitNumber();
-            }
-            if (fileNum > 0) {
-                gio::write(fileNum, OpticalFormat) << NIte << X0 << X1;
-            }
-
         } // Cont
 
         if (Conv) {
@@ -693,10 +858,6 @@ namespace General {
         bool Cont;       // flag, if true, continue searching
         int NIte;        // number of interations
 
-        static gio::Fmt OpticalFormat("(i3,',',f10.6,',',f10.6)"); // Format descriptor for environ stamp
-
-        static int fileNum(0);
-
         X0 = X_0;
         X1 = X_1;
         XTemp = X0;
@@ -766,13 +927,6 @@ namespace General {
                 } // ( Y0 < 0 )
 
             } // (Cont)
-
-            if (fileNum == 0) {
-                fileNum = GetNewUnitNumber();
-            }
-            if (fileNum > 0) {
-                gio::write(fileNum, OpticalFormat) << NIte << X0 << X1;
-            }
 
         } // Cont
 
@@ -1447,7 +1601,7 @@ namespace General {
         // FUNCTION PARAMETER DEFINITIONS:
         static std::string const NAN_string("NAN");
         static std::string const ZEROOOO("0.000000000000000000000000000");
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1461,7 +1615,7 @@ namespace General {
 
         std::string String; // Working string
         if (RealValue != 0.0) {
-            gio::write(String, fmtLD) << RealValue;
+            ObjexxFCL::gio::write(String, fmtLD) << RealValue;
         } else {
             String = ZEROOOO;
         }
@@ -1517,7 +1671,7 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1528,7 +1682,7 @@ namespace General {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         std::string String; // Working string
 
-        gio::write(String, fmtLD) << IntegerValue;
+        ObjexxFCL::gio::write(String, fmtLD) << IntegerValue;
         return stripped(String);
     }
 
@@ -1564,7 +1718,7 @@ namespace General {
         static std::string const DigitChar("01234567890");
         static std::string const NAN_string("NAN");
         static std::string const ZEROOOO("0.000000000000000000000000000");
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1578,7 +1732,7 @@ namespace General {
 
         std::string String; // Working string
         if (RealValue != 0.0) {
-            gio::write(String, fmtLD) << RealValue;
+            ObjexxFCL::gio::write(String, fmtLD) << RealValue;
         } else {
             String = ZEROOOO;
         }
@@ -1701,7 +1855,7 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1712,7 +1866,7 @@ namespace General {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         std::string String; // Working string
 
-        gio::write(String, fmtLD) << IntegerValue;
+        ObjexxFCL::gio::write(String, fmtLD) << IntegerValue;
         return stripped(String);
     }
 
@@ -2396,8 +2550,8 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static gio::Fmt TStmpFmt("(I2.2,':',F3.0)");
-        static gio::Fmt TStmpFmti("(I2.2,':',I2.2)");
+        static ObjexxFCL::gio::Fmt TStmpFmt("(I2.2,':',F3.0)");
+        static ObjexxFCL::gio::Fmt TStmpFmti("(I2.2,':',I2.2)");
         Real64 const FracToMin(60.0);
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -2428,9 +2582,9 @@ namespace General {
             ++ActualTimeHrS;
             ActualTimeMinS = 0;
         }
-        gio::write(TimeStmpS, TStmpFmti) << ActualTimeHrS << ActualTimeMinS;
+        ObjexxFCL::gio::write(TimeStmpS, TStmpFmti) << ActualTimeHrS << ActualTimeMinS;
 
-        gio::write(TimeStmpE, TStmpFmt) << int(ActualTimeE) << (ActualTimeE - int(ActualTimeE)) * FracToMin;
+        ObjexxFCL::gio::write(TimeStmpE, TStmpFmt) << int(ActualTimeE) << (ActualTimeE - int(ActualTimeE)) * FracToMin;
         if (TimeStmpE[3] == ' ') TimeStmpE[3] = '0';
         TimeStmpE[5] = ' ';
         strip(TimeStmpE);

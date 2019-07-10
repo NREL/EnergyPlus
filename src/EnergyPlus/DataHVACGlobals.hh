@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -182,7 +182,7 @@ namespace DataHVACGlobals {
     extern int const UnitarySys_HeatCool;
     extern int const UnitarySys_HeatPump_AirToAir;
     extern int const UnitarySys_HeatPump_WaterToAir;
-    extern int const UnitarySystem_AnyCoilType;
+    extern int const UnitarySys_AnyCoilType;
     extern Array1D_string const cFurnaceTypes;
 
     // parameters describing coil types

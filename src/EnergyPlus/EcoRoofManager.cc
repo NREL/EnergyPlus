@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -342,8 +342,8 @@ namespace EcoRoofManager {
         if (EcoRoofbeginFlag) {
             EcoRoofbeginFlag = false;
             if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CTF)
-                ShowWarningError("CalcEcoRoof: EcoRoof simulation but HeatBalanceAlgorithm is not ConductionTransferFunction(CTF). Has not been "
-                                 "tested under other solution approaches.");
+                ShowSevereError("CalcEcoRoof: EcoRoof simulation but HeatBalanceAlgorithm is not ConductionTransferFunction(CTF). EcoRoof model "
+                                "currently works only with CTF heat balance solution algorithm.");
             // ONLY READ ECOROOF PROPERTIES IN THE FIRST TIME
             Zf = Material(Construct(ConstrNum).LayerPoint(1)).HeightOfPlants;              // Plant height (m)
             LAI = Material(Construct(ConstrNum).LayerPoint(1)).LAI;                        // Leaf Area Index

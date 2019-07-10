@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -76,12 +76,15 @@ namespace DataZoneEnergyDemands {
     struct ZoneSystemDemandData // Sensible cooling/heating loads to be met (watts)
     {
         // Members
-        Real64 RemainingOutputRequired;
+        Real64 RemainingOutputRequired;       // The load each equipment sees as what is remaining with load fractions applied
+        Real64 UnadjRemainingOutputRequired;  // The total unadjusted load remaining to be met
         Real64 TotalOutputRequired;
         Real64 OutputRequiredToHeatingSP;  // Load required to meet heating setpoint (>0 is a heating load)
         Real64 OutputRequiredToCoolingSP;  // Load required to meet cooling setpoint (<0 is a cooling load)
-        Real64 RemainingOutputReqToHeatSP; // Remaining load required to meet heating setpoint (>0 is a heating load)
-        Real64 RemainingOutputReqToCoolSP; // Remaining load required to meet cooling setpoint (<0 is a cooling load)
+        Real64 RemainingOutputReqToHeatSP; // Remaining load required to meet heating setpoint with load fractions applied (>0 is a heating load)
+        Real64 RemainingOutputReqToCoolSP; // Remaining load required to meet cooling setpoint with load fractions applied (<0 is a cooling load)
+        Real64 UnadjRemainingOutputReqToHeatSP; // Remaining unadjusted load required to meet heating setpoint (>0 is a heating load)
+        Real64 UnadjRemainingOutputReqToCoolSP; // Remaining unadjusted load required to meet cooling setpoint (<0 is a cooling load)
         int NumZoneEquipment;              // count of zone equipment for this zone, from ZoneHVAC:EquipmentList
         Array1D<Real64> SequencedOutputRequired;
         Array1D<Real64> SequencedOutputRequiredToHeatingSP; // load required to meet heating setpoint by sequence
@@ -93,8 +96,8 @@ namespace DataZoneEnergyDemands {
 
         // Default Constructor
         ZoneSystemDemandData()
-            : RemainingOutputRequired(0.0), TotalOutputRequired(0.0), OutputRequiredToHeatingSP(0.0), OutputRequiredToCoolingSP(0.0),
-              RemainingOutputReqToHeatSP(0.0), RemainingOutputReqToCoolSP(0.0), NumZoneEquipment(0), SupplyAirAdjustFactor(1.0), StageNum(0)
+            : RemainingOutputRequired(0.0), UnadjRemainingOutputRequired(0.0), TotalOutputRequired(0.0), OutputRequiredToHeatingSP(0.0), OutputRequiredToCoolingSP(0.0),
+              RemainingOutputReqToHeatSP(0.0), RemainingOutputReqToCoolSP(0.0), UnadjRemainingOutputReqToHeatSP(0.0), UnadjRemainingOutputReqToCoolSP(0.0), NumZoneEquipment(0), SupplyAirAdjustFactor(1.0), StageNum(0)
         {
         }
     };
@@ -103,12 +106,17 @@ namespace DataZoneEnergyDemands {
     {
         // Members
         Real64 RemainingOutputRequired;
+        Real64 UnadjRemainingOutputRequired;  // The total unadjusted load remaining to be met
         Real64 TotalOutputRequired;
         Real64 OutputRequiredToHumidifyingSP;   // Load required to meet humidifying setpoint (>0 = a humidify load)
         Real64 OutputRequiredToDehumidifyingSP; // Load required to meet dehumidifying setpoint (<0 = a dehumidify load)
-        Real64 RemainingOutputReqToHumidSP;     // Remaining load required to meet humidifying setpoint
+        Real64 RemainingOutputReqToHumidSP;     // Remaining load required to meet humidifying setpoint with load fractions applied
         // (>0 is a humidify load)
-        Real64 RemainingOutputReqToDehumidSP; // Remaining load required to meet dehumidifying setpoint
+        Real64 RemainingOutputReqToDehumidSP; // Remaining load required to meet dehumidifying setpoint with load fractions applied
+        // (<0 is a dehumidify load)
+        Real64 UnadjRemainingOutputReqToHumidSP;     // Remaining unadjusted load required to meet humidifying setpoint
+        // (>0 is a humidify load)
+        Real64 UnadjRemainingOutputReqToDehumidSP; // Remaining unadjusted load required to meet dehumidifying setpoint
         // (<0 is a dehumidify load)
         int NumZoneEquipment; // count of zone equipment for this zone, from ZoneHVAC:EquipmentList
         Array1D<Real64> SequencedOutputRequired;
@@ -117,8 +125,8 @@ namespace DataZoneEnergyDemands {
 
         // Default Constructor
         ZoneSystemMoistureDemand()
-            : RemainingOutputRequired(0.0), TotalOutputRequired(0.0), OutputRequiredToHumidifyingSP(0.0), OutputRequiredToDehumidifyingSP(0.0),
-              RemainingOutputReqToHumidSP(0.0), RemainingOutputReqToDehumidSP(0.0), NumZoneEquipment(0)
+            : RemainingOutputRequired(0.0), UnadjRemainingOutputRequired(0.0), TotalOutputRequired(0.0), OutputRequiredToHumidifyingSP(0.0), OutputRequiredToDehumidifyingSP(0.0),
+              RemainingOutputReqToHumidSP(0.0), RemainingOutputReqToDehumidSP(0.0), UnadjRemainingOutputReqToHumidSP(0.0), UnadjRemainingOutputReqToDehumidSP(0.0), NumZoneEquipment(0)
         {
         }
     };

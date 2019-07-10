@@ -39,17 +39,17 @@ The model first calculates the approach temperature using the dry-bulb temperatu
 
 where:
 
-\({T_{approach}}\) = approach temperature, ˚C
+\({T_{approach}}\) is the approach temperature (\(^{\circ}\)C)
 
-\({\omega_{SA}}\) ~ = supply (outlet) air humidity ratio, kg/kg
+\({\omega_{SA}}\) is the supply (outlet) air humidity ratio (kg/kg)
 
-\(P\) ~~ = outdoor barometric pressure, Pa
+\(P\) is the outdoor barometric pressure (Pa)
 
-\({T_{dp}}\) ~ = supply (outlet) air dewpoint temperature, ˚C
+\({T_{dp}}\) is the supply (outlet) air dewpoint temperature (\(^{\circ}\)C)
 
-\({T_{SA}}\) ~ = supply (outlet) air dry-bulb temperature, ˚C
+\({T_{SA}}\) is the supply (outlet) air dry-bulb temperature (\(^{\circ}\)C)
 
-\({\rm{PsyTdpFnWPb}}\) = EnergyPlus psychrometric function, returns dewpoint temperature given humidity ratio and barometric pressure
+\({\rm{PsyTdpFnWPb}}\) is the EnergyPlus psychrometric function, returns dewpoint temperature given humidity ratio and barometric pressure.
 
 The supply air dewpoint temperature required to meet the humidity ratio setpoint (placed on the control node by SetpointManager:SingleZone:Humidity:Maximum, SetpointManager:MultiZone:MaximumHumidity:Average~ or SetpointManager:MultiZone:Humidity:Maximum) is then calculated as a function of the humidity ratio setpoint and barometric pressure as follows:
 
@@ -59,19 +59,17 @@ The supply air dewpoint temperature required to meet the humidity ratio setpoint
 
 where:
 
-\({T_{dp,SP}}\) = dewpoint temperature corresponding to \emph{w\(_{SP}\)}, ˚C
+\({T_{dp,SP}}\) is the dewpoint temperature corresponding to \emph{w\(_{SP}\)} (\(^{\circ}\)C)
 
-\({\omega_{SP}}\) = humidity ratio setpoint, kg/kg
+\({\omega_{SP}}\) is the humidity ratio setpoint (kg/kg).
 
-In order for the dewpoint temperature of the coil's supply (outlet) air to reach \({T_{dp,SP}}\) ~the dry-bulb temperature of air leaving the cooling coil must be at \({T_{dp,SP}} + {T_{approach}}\) :
+In order for the dewpoint temperature of the coil's supply (outlet) air to reach \({T_{dp,SP}}\) the dry-bulb temperature of air leaving the cooling coil must be at \({T_{dp,SP}} + {T_{approach}}\):
 
 \begin{equation}
 {T_{HR,SP}} = {T_{dp,SP}} + {T_{approach}}
 \end{equation}
 
-where:
-
-\({T_{HR,SP}}\) = supply air dry-bulb temperature setpoint required to achieve the specified humidity ratio setpoint, ˚C
+where: \({T_{HR,SP}}\) is the supply air dry-bulb temperature setpoint required to achieve the specified humidity ratio setpoint (\(^{\circ}\)C).
 
 The supply air temperature setpoint required to achieve the specified humidity ratio setpoint is then compared to the setpoint temperature required for zone temperature control, and the minimum of these two setpoint values is used as the setpoint temperature for controlling the chilled water coil.
 
@@ -81,19 +79,17 @@ The supply air temperature setpoint required to achieve the specified humidity r
 
 where:
 
-\({T_{SP}}\) = chilled water coil supply air temperature setpoint, ˚C
+\({T_{SP}}\) = chilled water coil supply air temperature setpoint (\(^{\circ}\)C)
 
-\({T_{Temp,SP}}\) = supply air temperature setpoint required for zone temperature control, ˚C
+\({T_{Temp,SP}}\) = supply air temperature setpoint required for zone temperature control (\(^{\circ}\)C).
 
 As described previously, the controller varies the chilled water flow rate through the coil using a root finding technique until the actual supply air temperature reaches \emph{T\(_{sp}\)}within the specified tolerance:
 
 \begin{equation}
-{T_{Actual}} - {T_{SP}}\,\, \le \,\,\,Controller\,Convergence\,Tolerance
+{T_{Actual}} - {T_{SP}} \le Controller~Convergence~Tolerance
 \end{equation}
 
-where:
-
-\({T_{Actual}}\) = actual air temperature leaving the cooling coil, ˚C
+where \({T_{Actual}}\) is the actual air temperature leaving the cooling coil (\(^{\circ}\)C).
 
 \subsection{Outdoor Air Damper Controller for Air Systems}\label{outdoor-air-damper-controller-for-air-systems}
 
@@ -113,23 +109,23 @@ When the heat exchanger assisted cooling coil is used with a furnace or unitary 
 \item
   Actuated node (the outside air inlet node)
 \item
-  Minimum outside air flow rate (at design) {[}m\(^{3}\)/s{]}
+  Minimum outside air flow rate (at design) (m\(^{3}\)/s)
 \item
-  Maximum outside air flow rate~ (\({\dot V_{oa,\max }}\) ) {[}m\(^{3}\)/s{]}
+  Maximum outside air flow rate~ (\({\dot V_{oa,max }}\)) (m\(^{3}\)/s)
 \item
-  EconomizerChoice: \emph{FixedDryBulbr} \textbar{} \emph{FixedEnthalpy} \textbar{} \emph{~DifferentialDryBulb~} \textbar{} \emph{~DifferentialEnthalpy} \textbar{} \emph{~~ElectronicEnthalpy} \textbar{} \emph{~~FixedDewPointAndDryBulb~~~} \textbar{} \emph{DifferentialDryBulbAndEnthalpy~} \textbar{} \emph{NoEconomizer}
+  EconomizerChoice: \emph{FixedDryBulb} \textbar{} \emph{FixedEnthalpy} \textbar{} \emph{~DifferentialDryBulb~} \textbar{} \emph{~DifferentialEnthalpy} \textbar{} \emph{~~ElectronicEnthalpy} \textbar{} \emph{~~FixedDewPointAndDryBulb~~~} \textbar{} \emph{DifferentialDryBulbAndEnthalpy~} \textbar{} \emph{NoEconomizer}
 \item
   Bypasschoice: \emph{MinimumFlowWithBypass} \textbar{} \emph{ModulateFlow}
 \item
-  High temperature limit (\({T_{high}}\) ) {[}C{]}
+  High temperature limit (\({T_{high}}\)) (\(^{\circ}\)C)
 \item
-  High specific enthalpy limit (\({h_{high}}\) ~) {[}J/kg{]}
+  High specific enthalpy limit (\({h_{high}}\)) (J/kg)
 \item
-  High dewpoint temperature limit (\({T_{DP,high}}\) ) {[}C{]}
+  High dewpoint temperature limit (\({T_{DP,high}}\)) (\(^{\circ}\)C)
 \item
   Electronic Enthalpy limit (quadratic or cubic curve object)
 \item
-  Low temperature limit (\({T_{low}}\) ) {[}C{]}
+  Low temperature limit (\({T_{low}}\)) (\(^{\circ}\)C)
 \item
   Lockout: \emph{LockoutWithHeating} \textbar{} \emph{LockoutWithCompressor}
 \item
@@ -160,7 +156,7 @@ When the heat exchanger assisted cooling coil is used with a furnace or unitary 
 
 Economizer limits may be used to create single-point or multi-point controllers. The figure below shows several examples of each type of controller. Single-point economizer controllers use a single independent variable to specify the operation of the economizer. In all cases, the economizer is disabled (OFF) when the outdoor weather condition exceeds the limit. However, when a low temperature limit is used the economizer is disabled when the outdoor temperature is \emph{below} the low dry-bulb temperature limit.
 
-Economizer limits may also be used to create multi-point controllers where two or more limits specify the economizer operating region. The economizer is disabled (OFF) if any single multi-point economizer limit is exceeded.
+Economizer limits may also be used to create multi-point controllers where two or more limits specify the economizer operating region. The economizer is disabled (OFF) if \emph{any single} multi-point economizer limit is exceeded.
 
 \begin{figure}[hbtp] % fig 192
 \centering
@@ -172,15 +168,15 @@ Economizer limits may also be used to create multi-point controllers where two o
 
 The simulation contains 4 steps.
 
-\subsubsection{Step 1: calculate the minimum outside air flow rate}\label{step-1-calculate-the-minimum-outside-air-flow-rate}
+\subsubsection{Step 1: Calculate the minimum outside air flow rate}\label{step-1-Calculate-the-minimum-outside-air-flow-rate}
 
-The user inputs the minimum outside air flow rate (or it is automatically calculated by the program from the user's design inputs). This is converted to a mass flow rate \({\dot m_{oa,\min ,des}}\) using the density of dry air at 20 degrees C. If the economizer is on an air loop then the minimum outside air flow fraction is initialized to:
+The user inputs the minimum outside air flow rate (or it is automatically calculated by the program from the user's design inputs). This is converted to a mass flow rate \({\dot m_{oa,\min ,des}}\) using the density of dry air at 20\(^{\circ}\)C. If the economizer is on an air loop then the minimum outside air flow fraction is initialized to:
 
 \begin{equation}
 {f_{oa,\min }} = {\dot m_{oa,\min ,des}}/{\dot m_{s,des}}
 \end{equation}
 
-Where \({\dot m_{s,des}}\) is the design supply air mass flow rate. If the economizer is not on an air loop the minimum outside air flow fraction is initialized to:
+where \({\dot m_{s,des}}\) is the design supply air mass flow rate. If the economizer is not on an air loop the minimum outside air flow fraction is initialized to:
 
 \begin{equation}
 {f_{oa,\min }} = {\dot m_{oa,\min ,des}}/{\dot m_{oa,\max ,des}}
@@ -188,146 +184,152 @@ Where \({\dot m_{s,des}}\) is the design supply air mass flow rate. If the econo
 
 where \({\dot m_{oa,\max ,des}}\) is the user input maximum outside air volumetric flow rate converted to mass flow rate in the same manner as for the minimum outside air flow rate. If a minimum outside air schedule has been input, \({f_{oa,\min }}\) is multiplied by the current schedule value.
 
-\subsubsection{Step 2: calculate an initial outside air signal}\label{step-2-calculate-an-initial-outside-air-signal}
+\subsubsection{Step 2: Calculate an initial outside air signal}\label{step-2-Calculate-an-initial-outside-air-signal}
 
 We now define an initial outside air signal \({S_{oa,init}}\) .
 
-If \(\left| {{T_{_r}} - {T_{in}}} \right| > \Delta {T_{small}}\) then:
+If \(\left| {{T_{_r}} - {T_{in}}} \right| > \Delta {T_{small}}\), then:
 
-\({S_{oa,init}} = ({T_r} - {T_{mix,set}})/({T_r} - {T_i})\) .
+\begin{equation}
+{S_{oa,init}} = ({T_r} - {T_{mix,set}})/({T_r} - {T_i})
+\end{equation}
 
 Otherwise:
 
-if \({T_r} < {T_{mix,set}}\) and \({T_r} \ge {T_i}\) ~, \({S_{oa,init}}\) is set to -1;
+if \({T_r} < {T_{mix,set}}\) and \({T_r} \ge {T_i}\), \({S_{oa,init}}\) is set to -1;
 
-if \({T_r} < {T_{mix,set}}\) ~and \({T_r} < {T_i}\) , \({S_{oa,init}}\) ~~is set to 1;
+if \({T_r} < {T_{mix,set}}\) and \({T_r} < {T_i}\), \({S_{oa,init}}\) is set to 1;
 
-if \({T_r} \ge {T_{mix,set}}\) and \({T_r} \ge {T_i}\) , \({S_{oa,init}}\) ~is set to 1;
+if \({T_r} \ge {T_{mix,set}}\) and \({T_r} \ge {T_i}\), \({S_{oa,init}}\) is set to 1;
 
-if \({T_r} \ge {T_{mix,set}}\) ~and \({T_r} < {T_i}\) , \({S_{oa,init}}\) ~is set to -1.
+if \({T_r} \ge {T_{mix,set}}\) and \({T_r} < {T_i}\), \({S_{oa,init}}\) is set to -1.
 
-Finally, \({S_{oa,init}}\) is constrained to be: \({f_{oa,\min }} \le {S_{oa,init}} \le 1\) . Basically, if the outside air can not accomplish cooling, \({S_{oa,init}}\) ~is set to \({f_{oa,\min }}\) . If it can do cooling, \({S_{oa,init}}\) ~is greater than the minimum outside air flow fraction but not greater than1. Here
+Finally, \({S_{oa,init}}\) is constrained to be: \({f_{oa,\min }} \le {S_{oa,init}} \le 1\). Basically, if the outside air can not accomplish cooling, \({S_{oa,init}}\) is set to \({f_{oa,\min }}\). If it can do cooling, \({S_{oa,init}}\) is greater than the minimum outside air flow fraction but not greater than 1. Here:
 
-~~~~~ \emph{T\(_{r}\)} ~is the return air temperature {[}C{]};
+\emph{T\(_{r}\)} is the return air temperature (\(^{\circ}\)C)
 
-\emph{~~~~~ T\(_{i}\)} is the outside air inlet temperature {[}C{]};
+\emph{T\(_{i}\)} is the outside air inlet temperature (\(^{\circ}\)C)
 
-\emph{~~~~~ T\(_{mix,set}\)} is the mixed air setpoint {[}C{]};
+\emph{T\(_{mix,set}\)} is the mixed air setpoint (\(^{\circ}\)C)
 
-\emph{~~~~~ \(\Delta {T_{small}}\)}is a small temperature difference {[}delta C{]}, equal to .00001.
+\emph{\(\Delta {T_{small}}\)} is a small temperature difference (\(\Delta^{\circ}\)C), equal to 0.00001.
 
-\subsubsection{Step 3: do the on/off and limit checks}\label{step-3-do-the-onoff-and-limit-checks}
+\subsubsection{Step 3: Do the on/off and limit checks}\label{step-3-Do-the-onoff-and-limit-checks}
 
-·~~~~~~~~If \emph{EconomizerChoice} = \emph{No Economizer}, \({S_{oa,init}} = {f_{oa,\min }}\) .
-
-·~~~~~~~~If \({\dot V_{oa,\max }} < {\dot V_{small}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; \({\dot V_{small}}\) is.001 m\(^{3}\)/s.
-
-·~~~~~~~~If the economizer is locked out, \({S_{oa,init}} = {f_{oa,\min }}\) .
+\begin{itemize}
+\item
+If \emph{EconomizerChoice} = \emph{No Economizer}, \({S_{oa,init}} = {f_{oa,\min }}\).
+\item
+If \({\dot V_{oa,\max }} < {\dot V_{small}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; \({\dot V_{small}}\) is.001 m\(^{3}\)/s.
+\item
+If the economizer is locked out, \({S_{oa,init}} = {f_{oa,\min }}\).
+\end{itemize}
 
 Note: the above three checks also set the \emph{EconomizerOperationFlag} and \emph{HighHumidityControlFlag} to \emph{false} (economizer and high humidity control not operating).
 
-·~~~~~~~~If \({T_i} > {T_{mix,set}}\) ~, \({S_{oa,init}} = 1\) .
-
-·~~~~~~~~If Differential dry-bulb was input as Economizer choiceand \({T_i} > {T_r}\) , then \({S_{oa,init}} = {f_{oa,\min }}\) .
-
-·~~~~~~~~If Differential Enthalpy was input as Economizer choiceand \({h_i} > {h_r}\) , then \({S_{oa,init}} = {f_{oa,\min }}\) , where \emph{h\(_{i}\)} and \emph{h\(_{r}\)}~are the outside air inlet and return air enthalpies.
+\begin{itemize}
+\item If \({T_i} > {T_{mix,set}}\), \({S_{oa,init}} = 1\).
+\item If Differential dry-bulb was input as Economizer choiceand \({T_i} > {T_r}\), then \({S_{oa,init}} = {f_{oa,\min }}\).
+\item If Differential Enthalpy was input as Economizer choiceand \({h_i} > {h_r}\) , then \({S_{oa,init}} = {f_{oa,\min }}\), where \emph{h\(_{i}\)} and \emph{h\(_{r}\)}~are the outside air inlet and return air enthalpies.
+\end{itemize}
 
 Setpoints are checked after this which include check for Fixed dry-bulb temperature~ limit, Enthalpy Limit, Dewpoint Limit and Humidity ratio limit if specified.
 
-·~~~~~~~~If Differential Enthalpy was input as Economizer choiceand \({h_i} > {h_r}\) , then \({S_{oa,init}} = {f_{oa,\min }}\) , where \emph{h\(_{i}\)} and \emph{h\(_{r}\)}~are the outside air inlet and return air enthalpies.
+\begin{itemize}
+\item If Differential Enthalpy was input as Economizer choiceand \({h_i} > {h_r}\) , then \({S_{oa,init}} = {f_{oa,\min }}\), where \emph{h\(_{i}\)} and \emph{h\(_{r}\)}~are the outside air inlet and return air enthalpies.
+\end{itemize}
 
 Setpoints are checked after this which include check for Fixed dry-bulb temperature limit, Enthalpy Limit, Dewpoint Limit and Humidity ratio limit if specified.
 
-·~~~~~~~~If a FixedDryBulb / FixedEnthalpy / FixedDewPointAndDryBulb / ElectronicEnthalpy was input as the economizer choice then the limits are checked as before.
+\begin{itemize}
+\item If a FixedDryBulb / FixedEnthalpy / FixedDewPointAndDryBulb / ElectronicEnthalpy was input as the economizer choice then the limits are checked as before.
+\item Limits are checked as follows:
+\begin{itemize}
+\item If a high temperature limit was input and \({T_{oa}} > {T_{high}}\), \({S_{oa,init}} = {f_{oa,\min }}\); where \emph{T\(_{oa}\)} is the outside air temperature.
+\item If an enthalpy limit was input and \({h_{oa}} > {h_{high}}\), \({S_{oa,init}} = {f_{oa,\min }}\); where \emph{h\(_{oa}\)} is the outside air specific enthalpy.
+\item If a dewpoint temperature limit was input and \({T_{DP,OA}} > {T_{DP,high}}\), \({S_{oa,init}} = {f_{oa,\min }}\); where T\(_{DP,OA}\) is the outside air dewpoint temperature and T\(_{DP,high}\) is the dewpoint temperature limit.
+\item If an electronic enthalpy curve was input and \({w_{OA}} > {w_{CurveOutput}}\), \({S_{oa,init}} = {f_{oa,\min }}\) ; where \emph{w}\(_{OA}\) is the outside air humidity ratio and \emph{w}\(_{CurveOutput}\) is the curve's humidity ratio output as a function of outdoor air dry-bulb temperature.
+\end{itemize}
+\item Another Economizer choice called DifferentialDryBulbAndEnthalpy checks the outside air temperature against return temperature and outside air enthalpy against return air enthalpy and also checks the setpoints.
+\item If a low temperature limit was input and \({T_{oa}} < {T_{low}}\), \({S_{oa,init}} = {f_{oa,\min }}\).
+\end{itemize}
 
-·~~~~~~~~Limits are checked as follows
+Note: the above nine cases set the \emph{EconomizerOperationFlag} to \emph{false} (economizer not operating), otherwise the economizer is active.
 
-o~~~If a high temperature limit was input and \({T_{oa}} > {T_{high}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where \emph{T\(_{oa}\)} is the outside air temperature.
-
-o~~~If an enthalpy limit was input and \({h_{oa}} > {h_{high}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where \emph{h\(_{oa}\)} is the outside air specific enthalpy.
-
-o~~~If a dewpoint temperature limit was input and \({T_{DP,OA}} > {T_{DP,high}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where T\(_{DP,OA}\) is the outside air dewpoint temperature and T\(_{DP,high}\) is dewpoint temperature limit.
-
-o~~~If an electronic enthalpy curve was input and \({w_{OA}} > {w_{CurveOutput}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) ; where \emph{w}\(_{OA}\) is the outside air humidity ratio and \emph{w}\(_{CurveOutput}\) is the curve's humidity ratio output as a function of outdoor air dry-bulb temperature.
-
-·~~~~~~~~Another Economizer choice called DifferentialDryBulbAndEnthalpy checks the outside air temperature against return temperature and outside air enthalpy against return air enthalpy and also checks the setpoints.
-
-·~~~~~~~~If a low temperature limit was input and \({T_{oa}} < {T_{low}}\) , \({S_{oa,init}} = {f_{oa,\min }}\) .
-
-Note: the above nine cases set the \emph{EconomizerOperationFlag} to \emph{false}~~~~~~ (economizer not operating), otherwise the economizer is active.
-
-·~~~~~~~~If high humidity control is specified and the zone humidistat indicates a moisture load (i.e.~zone relative humidity greater than the relative humidity setpoint), the \emph{HighHumidityOperationFlag} is set to \emph{true.} If high humidity control is based on the outdoor humidity ratio then the \emph{HighHumidityOperationFlag} is set to \emph{true} only when the outdoor air humidity ratio is less than the humidstat's zone humidity ratio. A \emph{true} HIghHumidityOperationFlag also enables economizer operation in the heat exchangers as if the economizer flag used here was also set to \emph{true} (Ref. HeatExchanger:* - field Economizer Lockout).
+\begin{itemize}
+\item If high humidity control is specified and the zone humidistat indicates a moisture load (i.e.~zone relative humidity greater than the relative humidity setpoint), the \emph{HighHumidityOperationFlag} is set to \emph{true.} If high humidity control is based on the outdoor humidity ratio then the \emph{HighHumidityOperationFlag} is set to \emph{true} only when the outdoor air humidity ratio is less than the humidstat's zone humidity ratio. A \emph{true} HIghHumidityOperationFlag also enables economizer operation in the heat exchangers as if the economizer flag used here was also set to \emph{true} (Ref. HeatExchanger:* - field Economizer Lockout).
+\end{itemize}
 
 The economizer schedule is then checked to determine if a ``push-button'' type economizer control is used. When schedule values are greater than 0, the economizer is active (\emph{EconomizerOperationFlag} = \emph{true)}. This test overrides the economizer limit checks described above in Step 3.
 
-\subsubsection{Step 4: calculate the final outside air signal}\label{step-4-calculate-the-final-outside-air-signal}
+\subsubsection{Step 4: Calculate the final outside air signal}\label{step-4-Calculate-the-final-outside-air-signal}
 
-If \emph{S\(_{oa,init}\)} is greater than \({f_{oa,\min }}\) and less than 1 and the mixed air mass flow rate is greater than \({\dot m_{verysmall}}\) (\({10^{ - 30}}\) ) and night venting is not occuring and \emph{HighHumidityOperationFlag} is false then
+If \emph{S\(_{oa,init}\)} is greater than \({f_{oa,\min }}\) and less than 1 and the mixed air mass flow rate is greater than \({\dot m_{verysmall}}\) (\({10^{ - 30}}\) ) and night venting is not occuring and \emph{HighHumidityOperationFlag} is false, then we calculate a final outside air signal \emph{S\(_{oa}\)} by using the root solver method routine \emph{SolveRegulaFalsi} to zero the residual \({T_{mix,set}} - {T_{mix}}\) by varying the outside air mass flow rate \({S_{oa}}\cdot {\dot m_{mix}}\) . Mass and energy balance are used to obtain the mixed air humidity ratio and enthalpy from the recirculated air and outside air inlet conditions. The psychrometric function \emph{PsyTdbFnHW} is used to obtain \emph{T\(_{mix}\)} from the mixed air enthalpy and humidity ratio.
 
-·~~~~~~~~we calculate a final outside air signal \emph{S\(_{oa}\)} by using the root solver method routine \emph{SolveRegulaFalsi} to zero the residual \({T_{mix,set}} - {T_{mix}}\) by varying the outside air mass flow rate \({S_{oa}}\cdot {\dot m_{mix}}\) . Mass and energy balance are used to obtain the mixed air humidity ratio and enthalpy from the recirculated air and outside air inlet conditions. The psychrometric function \emph{PsyTdbFnHW} is used to obtain \emph{T\(_{mix}\)} from the mixed air enthalpy and humidity ratio.
-
-Otherwise
-
-·~~~~~~~~\({S_{oa}} = {S_{oa,init}}\) .
+Otherwise, \({S_{oa}} = {S_{oa,init}}\).
 
 \subsubsection{Step 5: calculate the outside air flow rate and apply final constraints}\label{step-5-calculate-the-outside-air-flow-rate-and-apply-final-constraints}
 
-·~~~~~~~~If \emph{BypassChoice} = \emph{True and HighHumidityOperationFlag = false}, \({S_{oa}} = {f_{oa,\min }}\) .
+If \emph{BypassChoice} = \emph{True and HighHumidityOperationFlag = false}, \({S_{oa}} = {f_{oa,\min }}\).
 
-1)~~~If the \emph{HighHumidityOperationFlag} is \emph{true} then
+If the \emph{HighHumidityOperationFlag} is \emph{true}, then:
 
 \begin{equation}
   S_{oa} = \max\PB{f_{oa,min},OAFlowRatio_{HighRH}\frac{\dot{m}_{oa,max,des}}{\dot{m}_{mix}}}
 \end{equation}
 
-·~~~~~~~~If night ventilation is occuring, \({S_{oa}} = 1\) .(Night Ventilation has priority over the above constraints)
+If night ventilation is occuring, \({S_{oa}} = 1\).  Note that night ventilation has priority over the above constraints.
 
-Now the outside air flow rate is calculated:
+Now, the outside air flow rate is calculated:
 
 \begin{equation}
 {m_{oa}} = {S_{oa}}*{m_{mix}}
 \end{equation}
 
-Calculate the outside air mass flow rate:
+Next, calculate the outside air mass flow rate:
 
-If EconomizerOperationFlag is true and HighHumidityOperationFlag is false ~then
+If EconomizerOperationFlag is true and HighHumidityOperationFlag is false, then
 
 \begin{equation}
 {\dot m_{oa}} = {S_{oa}}\cdot {\dot m_{oa,\max ,des}}
 \end{equation}
 
-Otherwise
+Otherwise:
 
 \begin{equation}
 {\dot m_{oa}} = {S_{oa}}\cdot {\dot m_{mix}}
 \end{equation}
 
-Then the following constraints are applied.
+Then the following constraints are applied:
 
 \begin{itemize}
-\item  \({\dot m_{oa}}\) ~must be greater than or equal to the air primary loop total exhaust air mass flow rate (\({\dot m_{exhaust}}\) ).
+\item  \({\dot m_{oa}}\) ~must be greater than or equal to the air primary loop total exhaust air mass flow rate (\({\dot m_{exhaust}}\)).
 
-\item  If \emph{MinimumLimit} = \emph{Fixed Minimum}, \({\dot m_{oa}}\) ~must be greater than or equal to the minimum outside air mass flow rate.
+\item  If \emph{MinimumLimit} = \emph{Fixed Minimum}, \({\dot m_{oa}}\) must be greater than or equal to the minimum outside air mass flow rate.
 
-\item  If the Minimum Fraction of Outdoor Air Schedule or the Maximum Fraction of Outdoor Air Schedule is available , outside air fraction S\(_{oa}\) = \({\dot m_{oa}}\) / \({\dot m_{mix}}\) ~is checked against those fractions from the schedule.
+\item  If the Minimum Fraction of Outdoor Air Schedule or the Maximum Fraction of Outdoor Air Schedule is available, outside air fraction S\(_{oa}\) = \({\dot m_{oa}}\) / \({\dot m_{mix}}\) is checked against those fractions from the schedule.
 
-S\(_{oa}\) = Maximum( Minimum OA fraction, S\(_{oa}\))
+\begin{equation}
+S_{oa} = Maximum(Minimum~OA~fraction, S_{oa})
+\end{equation}
 
-S\(_{oa}\) = Minimum( Maximum OA fraction, S\(_{oa}\))
+\begin{equation}
+S_{oa} = Minimum(Maximum~OA~fraction, S_{oa})
+\end{equation}
 
-\item  \({\dot m_{oa}}\) ~must be \(\le\) ~the maximum outside air mass flow rate.
+\item  \({\dot m_{oa}}\) must be \(\le\) the maximum outside air mass flow rate.
 
 \item  If there is an EMS override set \({\dot m_{oa}}\) = EMS actuated OA mass flow rate.
 
 \item  If there is a demand limiting override set \({\dot m_{oa}}\) = Demand limiting OA mass flow rate.
 
-\item  \({\dot m_{oa}}\) ~must be \(\le {\dot m_{mix}}\) .
+\item  \({\dot m_{oa}}\) must be \(\le {\dot m_{mix}}\) .
 
 \end{itemize}
 
 If heat recovery bypass control is selected, the type of control determines how heat recovery is simulated. If BypassWhenWithinEconomizerLimits is selected, heat recovery is only active when the EconomizerOperationFlag is false. If BypassWhenOAFlowGreaterThanMinimum is selected \emph{and} the EconomizerOperationFlag is true \emph{and} the outside air mass flow rate is greater than the minimum flow rate, heat recovery is disabled, otherwise heat recovery is active. The heat recovery bypass control option is used to optimize heat recovery in heating mode. Heat recovery is commonly used to reduce the cooling load when outdoor conditions are higher than indoor conditions, however, when outdoor conditions are favorable the heat exchanger can be turned off and the economizer may be used to also reduce the cooling load. Economizer mode is typically involves increasing the outdoor air flow rate. At some point the outdoor air flow rate must be reduced and the heat exchanger should be turned back on to reduce or avoid an indoor heating requirement. This option will typically be used with some form of supply air temperature control used with the heat recovery equipment (Ref. HeatExchanger).
 
-\subsubsection{Step 6: set the relief air mass flow rate}\label{step-6-set-the-relief-air-mass-flow-rate}
+\subsubsection{Step 6: Set the relief air mass flow rate}\label{step-6-Set-the-relief-air-mass-flow-rate}
 
 \begin{equation}
 {\dot m_{relief}} = \max (0,{\dot m_{oa}} - {\dot m_{exhaust}})

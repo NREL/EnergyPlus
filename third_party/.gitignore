@@ -1,6 +1,5 @@
 # unused kiva repo directories/files
 kiva-ep/bin
-kiva-ep/cmake
 kiva-ep/docs
 kiva-ep/examples
 kiva-ep/scripts
@@ -9,7 +8,6 @@ kiva-ep/src/libgroundplot
 kiva-ep/templates
 kiva-ep/test/bestest
 kiva-ep/test/Rakefile
-kiva-ep/test/CMakeLists.txt
 kiva-ep/vendor/boost-1.61.0/CMakeLists.txt
 kiva-ep/vendor/boost-1.61.0/boost/date_time*
 kiva-ep/vendor/boost-1.61.0/boost/filesystem*
@@ -22,13 +20,10 @@ kiva-ep/vendor/libpng-1.6.23
 kiva-ep/vendor/mathgl-2.3.5.1
 kiva-ep/vendor/yaml-cpp-0.5.3
 kiva-ep/vendor/zlib-1.2.8
-kiva-ep/vendor/CMakeLists.txt
 kiva-ep/weather
 kiva-ep/.codecov.yml
 kiva-ep/.gitignore
 kiva-ep/.travis.yml
 kiva-ep/appveyor.yml
 kiva-ep/ChangeLog.md
-kiva-ep/CMakeLists.txt
-kiva-ep/LICENSE
 kiva-ep/README.md

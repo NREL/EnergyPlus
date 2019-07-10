@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,7 +53,7 @@
 // EnergyPlus Headers
 #include <BaseboardElectric.hh>
 #include <BaseboardRadiator.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataDefineEquip.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
@@ -267,9 +267,6 @@ namespace RoomAirModelAirflowNetwork {
         // Perform one-time checking and term calculations
 
         // Using/Aliasing
-        using DataAirflowNetwork::AirflowNetworkLinkageData;
-        using DataAirflowNetwork::AirflowNetworkLinkSimu;
-        using DataAirflowNetwork::AirflowNetworkNodeSimu;
         using DataEnvironment::OutBaroPress;
         using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::NumOfZones;
@@ -508,7 +505,7 @@ namespace RoomAirModelAirflowNetwork {
 
                     // Check fraction to ensure sum = 1.0 for every equipment
                     for (I = 1; I <= ZoneEquipList(LoopZone).NumOfEquipTypes; ++I) { // loop over all equip types
-                        if (abs(SupplyFrac(I) - 1.0) > 0.001) {
+                        if (std::abs(SupplyFrac(I) - 1.0) > 0.001) {
                             ShowSevereError("GetRoomAirflowNetworkData: Invalid, zone supply fractions do not sum to 1.0");
                             ShowContinueError("Entered in " + ZoneEquipList(LoopZone).EquipName(I) +
                                               " defined in RoomAir:Node:AirflowNetwork:HVACEquipment");
@@ -516,7 +513,7 @@ namespace RoomAirModelAirflowNetwork {
                             ShowContinueError("The sum of fractions entered = " + RoundSigDigits(SupplyFrac(I), 3));
                             ErrorsFound = true;
                         }
-                        if (abs(ReturnFrac(I) - 1.0) > 0.001) {
+                        if (std::abs(ReturnFrac(I) - 1.0) > 0.001) {
                             ShowSevereError("GetRoomAirflowNetworkData: Invalid, zone return fractions do not sum to 1.0");
                             ShowContinueError("Entered in " + ZoneEquipList(LoopZone).EquipName(I) +
                                               " defined in RoomAir:Node:AirflowNetwork:HVACEquipment");
@@ -597,17 +594,17 @@ namespace RoomAirModelAirflowNetwork {
         if (NodeNum > 0) {
             for (linkNum = 1; linkNum <= ThisRAFNNode.NumOfAirflowLinks; ++linkNum) {
                 Link = ThisRAFNNode.Link(linkNum).AirflowNetworkLinkSimuID;
-                if (AirflowNetworkLinkageData(Link).NodeNums(1) == NodeNum) { // incoming flow
-                    NodeIn = AirflowNetworkLinkageData(Link).NodeNums(2);
-                    ThisRAFNNode.Link(linkNum).TempIn = AirflowNetworkNodeSimu(NodeIn).TZ;
-                    ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetworkNodeSimu(NodeIn).WZ;
-                    ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetworkLinkSimu(Link).FLOW2;
+                if (AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[0] == NodeNum) { // incoming flow
+                    NodeIn = AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[1];
+                    ThisRAFNNode.Link(linkNum).TempIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).TZ;
+                    ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).WZ;
+                    ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetwork::AirflowNetworkLinkSimu(Link).FLOW2;
                 }
-                if (AirflowNetworkLinkageData(Link).NodeNums(2) == NodeNum) { // outgoing flow
-                    NodeIn = AirflowNetworkLinkageData(Link).NodeNums(1);
-                    ThisRAFNNode.Link(linkNum).TempIn = AirflowNetworkNodeSimu(NodeIn).TZ;
-                    ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetworkNodeSimu(NodeIn).WZ;
-                    ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetworkLinkSimu(Link).FLOW;
+                if (AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[1] == NodeNum) { // outgoing flow
+                    NodeIn = AirflowNetwork::AirflowNetworkLinkageData(Link).NodeNums[0];
+                    ThisRAFNNode.Link(linkNum).TempIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).TZ;
+                    ThisRAFNNode.Link(linkNum).HumRatIn = AirflowNetwork::AirflowNetworkNodeSimu(NodeIn).WZ;
+                    ThisRAFNNode.Link(linkNum).MdotIn = AirflowNetwork::AirflowNetworkLinkSimu(Link).FLOW;
                 }
             }
 
@@ -861,7 +858,6 @@ namespace RoomAirModelAirflowNetwork {
         // na
 
         // USE STATEMENTS:
-        using DataAirflowNetwork::AirflowNetworkZoneExhaustFan;
         using DataDefineEquip::AirDistUnit;
         using DataGlobals::NumOfZones;
         using DataGlobals::SecInHour;

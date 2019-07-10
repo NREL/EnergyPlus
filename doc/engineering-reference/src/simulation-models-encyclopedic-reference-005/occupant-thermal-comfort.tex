@@ -12,13 +12,13 @@ There are two personal variables that influence the condition of thermal comfort
 
 The thermal resistance of the clothing (I\(_{cl}\)) is measured in units of ``clo.'' The 1985 ASHRAE Handbook of Fundamentals (ASHRAE 1985) suggests multiplying the summation of the individual clothing items clo value by a factor of 0.82 to determine the overall clo value for clothing ensembles.
 
-The metabolic rate (H/A\(_{Du}\)) is a measure of the internal heat production rate of an occupant (H) in W/hr per unit of ``Dubois'' body surface area (A\(_{Du}\)) in units of m\(^{2}\). The DuBois body surface area is given by :
+The metabolic rate (H/A\(_{Du}\)) is a measure of the internal heat production rate of an occupant (H) in W/hr per unit of ``Dubois'' body surface area (A\(_{Du}\)) in units of m\(^{2}\). The DuBois body surface area is given by:
 
 \begin{equation}
 {A_{Du}} = 0.202{(weight)^{0.425}}{(height)^{0.725}}
 \end{equation}
 
-Using this equation, an area of 1.8 m\(^{2}\) represents the surface area of an average person of weight 70 kg. and height 1.73 m (Fanger 1967).  In EnergyPlus, this average person area of 1.8 m\(^{2}\) is used for the body surface area all thermal comfort models.  The metabolic rate is measured in mets, where 1 met = 58.2 W/m\(^{2}\).
+Using this equation, an area of 1.8 m\(^{2}\) represents the surface area of an average person of weight 70 kg and height 1.73 m (Fanger 1967).  In EnergyPlus, this average person area of 1.8 m\(^{2}\) is used for the body surface area all thermal comfort models.  The metabolic rate is measured in mets, where 1 met = 58.2 W/m\(^{2}\).
 
 The environmental variables that influence the conditions of thermal comfort include:
 
@@ -31,7 +31,7 @@ The environmental variables that influence the conditions of thermal comfort inc
 \item
   Relative air velocity (v),
 \item
-  Water vapor pressure in ambient air (P\(_{a}\))
+  Water vapor pressure in ambient air (P\(_{a}\)).
 \end{enumerate}
 
 The Air Temperature (T\(_{a}\)), a direct environmental index, is the dry-bulb temperature of the environment. It is calculated using either the mean air temperature for the zone in question or the air temperature calculated by some of the more detailed zone air models available in EnergyPlus. The Mean Radiant Temperature (T\(_{r}\)) is a rationally derived environmental index defined as the uniform black-body temperature that would result in the same radiant energy exchange as in the actual environment. This value can be calculated in several ways as outlined in the Mean Radiant Temperature Calculation section later in this document.  The Relative air velocity (v) a direct environmental index is a measure of the air motion obtainable via a hot wire or vane anemometers. The Water vapor pressure in ambient air (P\(_{a}\)) is a direct environmental index.
@@ -54,7 +54,7 @@ The physiological variables that influence the conditions of thermal comfort inc
 
 where the Skin Temperature (T\(_{sk}\)), the Core Temperature (T\(_{cr}\)) and the Sweat Rate are physiological indices. The Skin Wettedness (w) is a rationally derived physiological index defined as the ratio of the actual sweating rate to the maximum rate of sweating that would occur if the skin were completely wet.
 
-One more consideration is important in dealing with thermal comfort - the effect of asymmetrical heating or cooling. This could occur when there is a draft or when there is a radiant flux incident on a person (which is what is of primary interest to us here). Fanger (1967) noted that the human regulatory system is quite tolerant of asymmetrical radiant flux. A reasonable upper limit on the difference in mean radiant temperature (T\(_{r}\)) from one direction to the opposing direction is 15°C. (ASHRAE 1984). This limit is lower if there is a high air velocity in the zone.
+One more consideration is important in dealing with thermal comfort - the effect of asymmetrical heating or cooling. This could occur when there is a draft or when there is a radiant flux incident on a person (which is what is of primary interest to us here). Fanger (1967) noted that the human regulatory system is quite tolerant of asymmetrical radiant flux. A reasonable upper limit on the difference in mean radiant temperature (T\(_{r}\)) from one direction to the opposing direction is 15\(^{\circ}\)C. (ASHRAE 1984). This limit is lower if there is a high air velocity in the zone.
 
 % table 78
 \begin{longtable}[c]{p{1.2in}p{2.0in}p{0.8in}p{0.8in}p{1.2in}}
@@ -75,10 +75,10 @@ H & Internal heat production rate of an occupant per unit area = M – W & W/m\(
 I\(_{cl}\) & Thermal resistance of the clothing & clo & - & CloUnit \tabularnewline
 M & Metabolic rate per unit area & W/m\(^{2}\) & - & ActLevel \tabularnewline
 P\(_{a}\) & Water vapor pressure in ambient air & Torr & - & VapPress \tabularnewline
-T\(_{a}\) & Air temperature & °C & - & AirTemp \tabularnewline
-T\(_{cr}\) & Core or internal temperature & °C & - & CoreTemp \tabularnewline
-T\(_{r}\) & Mean radiant temperature & °C & - & RadTemp \tabularnewline
-T\(_{sk}\) & Skin temperature & °C & - & - \tabularnewline
+T\(_{a}\) & Air temperature & \(^{\circ}\)C & - & AirTemp \tabularnewline
+T\(_{cr}\) & Core or internal temperature & \(^{\circ}\)C & - & CoreTemp \tabularnewline
+T\(_{r}\) & Mean radiant temperature & \(^{\circ}\)C & - & RadTemp \tabularnewline
+T\(_{sk}\) & Skin temperature & \(^{\circ}\)C & - & - \tabularnewline
 v & Relative air velocity & m/s & - & AirVel \tabularnewline
 W & The rate of heat loss due to the performance of work & W/m\(^{2}\) & - & WorkEff \tabularnewline
 w & Skin wettedness & - & - & - \tabularnewline
@@ -174,7 +174,7 @@ E\(_{sk}\) & Total evaporative heat loss from skin & W/m\(^{2}\) & ~ & EvapHeatL
 f\(_{cl}\) & The ratio of clothed body & - & ~ & CloBodyRat \tabularnewline
 f\(_{eff}\) & The fraction of surface effective for radiation ( = 0.72) & - & - & RadSurfEff \tabularnewline
 H & Internal heat production rate of an occupant per unit area ( = M – W) & W/m\(^{2}\) & - & IntHeatProd \tabularnewline
-h\(_{c}\) & Convective heat transfer coefficient & W/m\(^{2}\)°C & - & Hc \tabularnewline
+h\(_{c}\) & Convective heat transfer coefficient & W/m\(^{2}\)-\(^{\circ}\)C & - & Hc \tabularnewline
 L & All the modes of energy loss from body & W/m\(^{2}\) & - & - \tabularnewline
 M & Metabolic rate per unit area & W/m\(^{2}\) & - & ActLevel \tabularnewline
 P\(_{a}\) & Water vapor pressure in ambient air & Torr & - & VapPress \tabularnewline
@@ -184,13 +184,13 @@ Q\(_{c}\) & The rate of convective heat loss & W/m\(^{2}\) & - & ConvHeatLoss \t
 Q\(_{dry}\) & Sensible heat flow from skin & W/m\(^{2}\) & ~ & DryHeatLoss \tabularnewline
 Q\(_{r}\) & The rate of radiative heat loss & W/m\(^{2}\) & - & RadHeatLoss \tabularnewline
 Q\(_{res}\) & The rate of respiratory heat loss & W/m\(^{2}\) & - & RespHeatLoss \tabularnewline
-T\(_{a}\) & Air temperature & °C & - & AirTemp \tabularnewline
-T\(_{cl}\) & Clothing surface temperature & °C & - & CloSurfTemp \tabularnewline
-T\(_{cla}\) & Clothing surface temperature (Absolute) & °K & - & AbsCloSurfTemp \tabularnewline
-T\(_{ra}\) & Mean radiant temperature & °K & - & AbsRadTemp \tabularnewline
+T\(_{a}\) & Air temperature & \(^{\circ}\)C & - & AirTemp \tabularnewline
+T\(_{cl}\) & Clothing surface temperature & \(^{\circ}\)C & - & CloSurfTemp \tabularnewline
+T\(_{cla}\) & Clothing surface temperature (Absolute) & K & - & AbsCloSurfTemp \tabularnewline
+T\(_{ra}\) & Mean radiant temperature & K & - & AbsRadTemp \tabularnewline
 W & The rate of heat loss due to the performance of work & W/m\(^{2}\) & - & WorkEff \tabularnewline
 $\varepsilon$ & The emissivity of clothing-skin surface & - & - & SkinEmiss \tabularnewline
-$\sigma$ & The Stefan-Boltzman constant ( = 5.67×10  ) & W/m\(^{2}\)K\(^{4}\) & - & StefanBoltz \tabularnewline
+$\sigma$ & The Stefan-Boltzman constant ( = 5.67×10\(^{-8}\)) & W/m\(^{2}\)K\(^{4}\) & - & StefanBoltz \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -227,7 +227,8 @@ DryRespHeatLoss = 0.0014*ActLevel*(34.- AirTemp)
 \end{equation}
 
 \begin{equation}
-{Q_{r}}=3.96*f\left(_{l}\right)*{[}(0.01*T\left(_{a}\right))\left(^{4}\right)-(0.01*T\left(_{a}\right))\left(^{4}\right){]}}
+{Q_{r}}=3.96*f\left(_{l}\right)*{[}(0.01*T\left(_{a}\right))\left(^{4}\right)-(0.01*T\left(_{a}\right))\left(^{4}\right){]}
+\label{eq:FangerQr}
 \end{equation}
 
 In the EnergyPlus source code, Q\(_{dry}\), Q\(_{c}\) and Q\(_{r}\) are calculated using the following equations, respectively:
@@ -239,15 +240,15 @@ ConvHeatLos = CloBodyRat*Hc*(CloSurfTemp - AirTemp)
 RadHeatLoss = 3.96*CloBodyRat*{[}(0.01*AbsCloSurfTemp)**4 - (0.01*AbsRadTemp)**4{]}
 
 \begin{equation}
-{E_{rsw}} = 0.42(H - 58.2) for \left(H > 58.2\right)
+{E_{rsw}} = 0.42(H - 58.2)~~~~for~\left(H > 58.2\right)
 \end{equation}
 
 \begin{equation}
-{E_{rsw}} = 0 for \left(H \le 58.2\right)
+{E_{rsw}} = 0~~~~for~\left(H \le 58.2\right)
 \end{equation}
 
 \begin{equation}
-{E_{f}}=0.00305*(5733.0-6.99H-P\left(_{a}\right))}
+{E_{f}}=0.00305*(5733.0-6.99H-P_{a})
 \end{equation}
 
 \begin{equation}
@@ -312,15 +313,15 @@ E\(_{sk}\) & Total evaporative heat loss from skin & W/m\(^{2}\) & ~ & EvapHeatL
 E\(_{res}\) & The rate of latent respiratory heat loss & W/m\(^{2}\) & - & LatRespHeatLoss \tabularnewline
 E\(_{rsw}\) & The rate of heat loss from the evaporation of regulatory sweating & W/m\(^{2}\) & - & EvapHeatLossRegSweat \tabularnewline
 E\(_{rsw,req}\) & The rate of heat loss from the evaporation of regulatory sweating at the state of comfort & W/m\(^{2}\) & ~ & EvapHeatLossRegComf \tabularnewline
-ET* & Effective Temperature & °C & - & ET \tabularnewline
+ET* & Effective Temperature & \(^{\circ}\)C & - & ET \tabularnewline
 f\(_{cl}\) & The ratio of clothed body & - & ~ & CloBodyRat \tabularnewline
 f\(_{eff}\) & The fraction of surface effective for radiation ( = 0.72) & - & - & RadSurfEff \tabularnewline
 H & Internal heat production rate of an occupant per unit area ( = M – W) & W/m\(^{2}\) & - & IntHeatProd \tabularnewline
-h & Combined heat transfer coefficient & W/m\(^{2}\)°C & ~ & H \tabularnewline
-h\(_{c}\) & Convective heat transfer coefficient & W/m\(^{2}\)°C & - & Hc \tabularnewline
+h & Combined heat transfer coefficient & W/m\(^{2}\)-\(^{\circ}\)C & ~ & H \tabularnewline
+h\(_{c}\) & Convective heat transfer coefficient & W/m\(^{2}\)-\(^{\circ}\)C & - & Hc \tabularnewline
 h\(_{e}\)’ & Combined evaporative heat transfer coefficient & W/(m\(^{2}\)kP\(_{a}\)) & ~ & - \tabularnewline
-h\(_{r}\) & Radiant heat transfer coefficient & W/m\(^{2}\)°C & - & Hr \tabularnewline
-I\(_{cl}\) & Clothing insulation & m\(^{2}\)°C/W & ~ & - \tabularnewline
+h\(_{r}\) & Radiant heat transfer coefficient & W/m\(^{2}\)-\(^{\circ}\)C & - & Hr \tabularnewline
+I\(_{cl}\) & Clothing insulation & m\(^{2}\)\(^{\circ}\)C/W & ~ & - \tabularnewline
 L & All the modes of energy loss from body & W/m\(^{2}\) & - & - \tabularnewline
 L\(_{ET*}\) & All the modes of energy loss from body at ET* & W/m\(^{2}\) & ~ & - \tabularnewline
 L\(_{SET*}\) & All the modes of energy loss from body at SET* & W/m\(^{2}\) & ~ & - \tabularnewline
@@ -329,7 +330,7 @@ M\(_{act}\) & Metabolic heat production due to activity & W/m\(^{2}\) & ~ & - \t
 M\(_{shiv}\) & Metabolic heat production due to shivering & W/m\(^{2}\) & ~ & ShivResponse \tabularnewline
 P\(_{a}\) & Water vapor pressure in ambient air & Torr & - & VapPress \tabularnewline
 PMV* & Predicted Mean Vote modified by ET* or SET* & - & (-4)-4 & PMVET PMVSET \tabularnewline
-P\(_{SET*}\) & Water vapor pressure at SET* & °C & ~ & StdVapPressSET \tabularnewline
+P\(_{SET*}\) & Water vapor pressure at SET* & \(^{\circ}\)C & ~ & StdVapPressSET \tabularnewline
 P\(_{sk}\) & Saturated water vapor pressure at required skin temperature & Torr & - & SatSkinVapPress \tabularnewline
 Q\(_{c}\) & The rate of convective heat loss & W/m\(^{2}\) & - & ConvHeatLoss \tabularnewline
 Q\(_{crsk}\) & Heat flow from core to skin & W/m\(^{2}\) & ~ & HeatFlow \tabularnewline
@@ -337,34 +338,34 @@ Q\(_{dry}\) & Sensible heat flow from skin & W/m\(^{2}\) & ~ & DryHeatLoss \tabu
 Q\(_{r}\) & The rate of radiative heat loss & W/m\(^{2}\) & - & RadHeatLoss \tabularnewline
 Q\(_{res}\) & The rate of respiratory heat loss & W/m\(^{2}\) & - & RespHeatLoss \tabularnewline
 S\(_{cr}\) & Heat storage in core compartment & W/m\(^{2}\) & ~ & CoreheatStorage \tabularnewline
-SET* & Standard Effective Temperature & °C & - & SET \tabularnewline
-SIG\(_{b}\) & Thermal signal of body & °C & ~ & BodyThermSigCold BodyThermSigWarm \tabularnewline
-SIG\(_{cr}\) & Thermal signal of core & °C & ~ & CoreThermSigCold CoreThermSigWarm \tabularnewline
-SIG\(_{sk}\) & Thermal signal of skin & °C & ~ & SkinThermSigCold SkinThermSigWarm \tabularnewline
+SET* & Standard Effective Temperature & \(^{\circ}\)C & - & SET \tabularnewline
+SIG\(_{b}\) & Thermal signal of body & \(^{\circ}\)C & ~ & BodyThermSigCold BodyThermSigWarm \tabularnewline
+SIG\(_{cr}\) & Thermal signal of core & \(^{\circ}\)C & ~ & CoreThermSigCold CoreThermSigWarm \tabularnewline
+SIG\(_{sk}\) & Thermal signal of skin & \(^{\circ}\)C & ~ & SkinThermSigCold SkinThermSigWarm \tabularnewline
 SKBF & Skin blood flow & L/m  hr & ~ & SkinBloodFlow \tabularnewline
 S\(_{sk}\) & Heat storage in skin compartment & W/m\(^{2}\) & ~ & SkinHeatStorage \tabularnewline
 S\(_{tr}\) & Constriction constant of skin blood flow for average person & ~ & ~ & Str \tabularnewline
 SW\(_{reg}\) & The rate of regulatory sweating & g/m\(^{2}\)hr & ~ & RegSweat \tabularnewline
-T\(_{a}\) & Air temperature & °C & - & AirTemp \tabularnewline
+T\(_{a}\) & Air temperature & \(^{\circ}\)C & - & AirTemp \tabularnewline
 T\(_{b}\) & Mean body temperature & ~ & ~ & AvgBodyTemp \tabularnewline
-T\(_{b-c}\) & Mean body temperature when DISC is zero (lower limit) & °C & ~ & AvgBodyTempLow \tabularnewline
-T\(_{b-h}\) & Mean body temperature when HSI is 100 (upper limit) & °C & ~ & AvgBodyTempHigh \tabularnewline
-T\(_{cl}\) & Clothing surface temperature & °C & - & CloSurfTemp \tabularnewline
-T\(_{cr}\) & Core or internal temperature & °C & - & CoreTemp \tabularnewline
-T\(_{r}\) & Mean radiant temperature & °C & - & RadTemp \tabularnewline
+T\(_{b-c}\) & Mean body temperature when DISC is zero (lower limit) & \(^{\circ}\)C & ~ & AvgBodyTempLow \tabularnewline
+T\(_{b-h}\) & Mean body temperature when HSI is 100 (upper limit) & \(^{\circ}\)C & ~ & AvgBodyTempHigh \tabularnewline
+T\(_{cl}\) & Clothing surface temperature & \(^{\circ}\)C & - & CloSurfTemp \tabularnewline
+T\(_{cr}\) & Core or internal temperature & \(^{\circ}\)C & - & CoreTemp \tabularnewline
+T\(_{r}\) & Mean radiant temperature & \(^{\circ}\)C & - & RadTemp \tabularnewline
 TSENS & Thermal sensation vote & - & (-5)-5 & TSENS \tabularnewline
-T\(_{sk}\) & Skin temperature & °C & ~ & SkinTemp \tabularnewline
+T\(_{sk}\) & Skin temperature & \(^{\circ}\)C & ~ & SkinTemp \tabularnewline
 W & The rate of heat loss due to the performance of work & W/m\(^{2}\) & - & WorkEff \tabularnewline
 w\(_{dif}\) & Skin wettedness due to diffusion trough the skin & ~ & ~ & SkinWetDiff \tabularnewline
 w\(_{rsw}\) & Skin wettedness due to regulatory sweating & ~ & ~ & SkinWetSweat \tabularnewline
 $\varepsilon$ & The emissivity of clothing-skin surface & - & - & SkinEmiss \tabularnewline
-$\sigma$ & The Stefan-Boltzman constant ( = 5.67×10  ) & W/m\(^{2}\)K\(^{4}\) & - & StefanBoltz \tabularnewline
+$\sigma$ & The Stefan-Boltzman constant ( = 5.67×10\(^{-8}\)) & W/m\(^{2}\)K\(^{4}\) & - & StefanBoltz \tabularnewline
 \bottomrule
 \end{longtable}
 
 \subsubsection{Description of the model and algorithm}\label{description-of-the-model-and-algorithm-1}
 
-The Pierce model thermally lumps the human body as two isothermal, concentric compartments, one representing the internal section or core (where all the metabolic heat is assumed to be generated) and the other representing the skin. This allows the passive heat conduction from the core compartment to the skin to be taken into account. The boundary line between the two compartments changes with the skin blood flow rate per unit skin surface area (SKBF in L/h•m\(^{2}\)) and is described by alpha -- the fraction of total body mass attributed to the skin compartment (Doherty and Arens 1988).
+The Pierce model thermally lumps the human body as two isothermal, concentric compartments, one representing the internal section or core (where all the metabolic heat is assumed to be generated) and the other representing the skin. This allows the passive heat conduction from the core compartment to the skin to be taken into account. The boundary line between the two compartments changes with the skin blood flow rate per unit skin surface area (SKBF in L/h•m\(^{2}\)) and is described by \(\alpha\) -- the fraction of total body mass attributed to the skin compartment (Doherty and Arens 1988).
 
 \begin{equation}
 \alpha  = 0.0417737 + 0.7451832/(SKBF + 0.585417)
@@ -427,9 +428,9 @@ RegSweat = SweatContConst*BodyThermSigWarm*EXP(SkinThermSigWarm/10.7)
 
 ShivResponse = 19.4*SkinThermSigCold*CoreThermSigCold
 
-The latest version of the Pierce model (Fountain and Huizenga 1997) discusses the concepts of SET* and ET*. The Pierce model converts the actual environment into a ``standard environment'' at a Standard Effective Temperature, SET*. SET* is the dry-bulb temperature of a hypothetical environment at 50\% relative humidity for subjects wearing clothing that would be standard for the given activity in the real environment. Furthermore, in this standard environment, the same physiological strain, i.e.~the same skin temperature, skin wettedness and heat loss to the environment, would exist as in the real environment. The Pierce model also converts the actual environment into a environment at an Effective Temperature, ET*, that is the dry-bulb temperature of a hypothetical environment at 50\% relative humidity and uniform temperature (Ta = MRT) where the subjects would experience the same physiological strain as in the real environment.
+The latest version of the Pierce model (Fountain and Huizenga 1997) discusses the concepts of SET* and ET*. The Pierce model converts the actual environment into a ``standard environment'' at a Standard Effective Temperature, SET*. SET* is the dry-bulb temperature of a hypothetical environment at 50\% relative humidity for subjects wearing clothing that would be standard for the given activity in the real environment. Furthermore, in this standard environment, the same physiological strain, i.e.~the same skin temperature, skin wettedness and heat loss to the environment, would exist as in the real environment. The Pierce model also converts the actual environment into a environment at an Effective Temperature, ET*, that is the dry-bulb temperature of a hypothetical environment at 50\% relative humidity and uniform temperature (T\(_a\) = MRT) where the subjects would experience the same physiological strain as in the real environment.
 
-In the latest version of the model, it is suggested that the classical Fanged PMV be modified by using ET* or SET* instead of the operative temperature. This gives a new index PMV* which is proposed for dry or humid environments. It is also suggested that PMV* is very responsive to the changes in vapor permeation efficiency of the occupants clothing.
+In the latest version of the model, it is suggested that the classical Fanger PMV be modified by using ET* or SET* instead of the operative temperature. This gives a new index PMV* which is proposed for dry or humid environments. It is also suggested that PMV* is very responsive to the changes in vapor permeation efficiency of the occupants clothing.
 
 \begin{equation}
 M = {M_{act}} + {M_{shiv}}
@@ -463,6 +464,7 @@ DryRespHeatLoss = 0.0014*ActLevel*(34.- AirTemp)
 
 \begin{equation}
 {Q_r} = {h_r} \times {f_{cl}}({T_{cl}} - {T_r})
+\label{eq:PierceQr}
 \end{equation}
 
 Q\(_{dry}\) or DryHeatLoss is calculated in the EnergyPlus code using the following equation:
@@ -603,7 +605,7 @@ PMVSET = ThermSensTransCoef*(IntHeatProd - EvapHeatLossDiff
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~- EvapRegHeatLossRegComf - RespHeatLoss - DryHeatLossSET)
 
-Besides PMV*, the Pierce Two Node Model uses the indices TSENS and DISC as predictors of thermal comfort. Where TSENS is the classical index used by the Pierce foundation and is a function of the mean body temperature. DISC is defined as the relative thermoregulatory strain that is needed to bring about a state of comfort and thermal equilibrium. DISC is a function of the heat stress and heat strain in hot environments and equal to TSENS in cold environments. In summary, the Pierce Model, for our purposes, uses four thermal comfort indices; PMVET-a function of ET*, PMVSET- a function of SET*, TSENS and DISC.
+Besides PMV*, the Pierce Two Node Model uses the indices TSENS and DISC as predictors of thermal comfort. Where TSENS is the classical index used by the Pierce foundation and is a function of the mean body temperature. DISC is defined as the relative thermoregulatory strain that is needed to bring about a state of comfort and thermal equilibrium. DISC is a function of the heat stress and heat strain in hot environments and equal to TSENS in cold environments. In summary, the Pierce Model, for our purposes, uses four thermal comfort indices; PMVET--a function of ET*, PMVSET--a function of SET*, TSENS and DISC.
 
 \begin{equation}
 {T_{b - c}} = (0.185/58.2)(M - W) + 36.313
@@ -665,8 +667,8 @@ Mathematical variable & Description & Units ~ & Range & Source Code Variable \ta
 \midrule
 \endhead
 
-C\(_{cr}\) & Specific heat of body core & Whr/kg°C & ~ & ~ \tabularnewline
-C\(_{sk}\) & Specific heat of skin & Whr/kg°C & ~ & ~ \tabularnewline
+C\(_{cr}\) & Specific heat of body core & W-hr/kg\(^{\circ}\)C & ~ & ~ \tabularnewline
+C\(_{sk}\) & Specific heat of skin & W-hr/kg\(^{\circ}\)C & ~ & ~ \tabularnewline
 C\(_{res}\) & The rate of dry respiratory heat loss & W/m\(^{2}\) & - & DryRespHeatLoss \tabularnewline
 E\(_{dif}\) & The rate of heat loss from the diffusion of water vapor through the skin & W/m\(^{2}\) & - & EvapHeatLossDiff \tabularnewline
 E\(_{max}\) & Maximum evaporative heat loss & W/m\(^{2}\) & ~ & EvapHeatLossMax \tabularnewline
@@ -677,12 +679,12 @@ E\(_{res}\) & The rate of latent respiratory heat loss & W/m\(^{2}\) & - & LatRe
 F\(_{cl}\) & The Burton thermal efficiency factor for clothing & ~ & - & CloThermEff \tabularnewline
 F\(_{pcl}\) & Permeation efficiency factor for clothing & ~ & - & CloPermeatEff \tabularnewline
 H & Internal heat production rate of an occupant per unit area = M - W & W/m\(^{2}\) & - & IntHeatProd \tabularnewline
-H & Combined heat transfer coefficient & W/m\(^{2}\)°C & ~ & H \tabularnewline
-h\(_{c}\) & Convective heat transfer coefficient & W/m\(^{2}\)°C & - & Hc \tabularnewline
-h\(_{r}\) & Radiant heat transfer coefficient & W/m\(^{2}\)°C & - & Hr \tabularnewline
-KS & Overall skin thermal conductance & W/m\(^{2}\)°C & ~ & ThermCndct \tabularnewline
-KS\(_{o}\) & Skin conductance at thermal neutrality & W/m\(^{2}\)°C & ~ & ThermCndctNeut \tabularnewline
-KS\(_{-4}\) & Skin conductance at thermal sensation very cold & W/m\(^{2}\)°C & ~ & ThermCndctMin \tabularnewline
+H & Combined heat transfer coefficient & W/m\(^{2}\)-\(^{\circ}\)C & ~ & H \tabularnewline
+h\(_{c}\) & Convective heat transfer coefficient & W/m\(^{2}\)-\(^{\circ}\)C & - & Hc \tabularnewline
+h\(_{r}\) & Radiant heat transfer coefficient & W/m\(^{2}\)-\(^{\circ}\)C & - & Hr \tabularnewline
+KS & Overall skin thermal conductance & W/m\(^{2}\)-\(^{\circ}\)C & ~ & ThermCndct \tabularnewline
+KS\(_{o}\) & Skin conductance at thermal neutrality & W/m\(^{2}\)-\(^{\circ}\)C & ~ & ThermCndctNeut \tabularnewline
+KS\(_{-4}\) & Skin conductance at thermal sensation very cold & W/m\(^{2}\)-\(^{\circ}\)C & ~ & ThermCndctMin \tabularnewline
 M & Metabolic rate per unit area & W/m\(^{2}\) & - & ActLevel \tabularnewline
 M\(_{shiv}\) & Metabolic heat production due to shivering & W/m\(^{2}\) & ~ & ShivResponse \tabularnewline
 P\(_{a}\) & Water vapor pressure in ambient air & Torr & - & VapPress \tabularnewline
@@ -693,11 +695,11 @@ Q\(_{dry}\) & Sensible heat flow from skin & W/m\(^{2}\) & ~ & DryHeatLoss \tabu
 Q\(_{r}\) & The rate of radiative heat loss & W/m\(^{2}\) & - & RadHeatLoss \tabularnewline
 Q\(_{res}\) & The rate of respiratory heat loss & W/m\(^{2}\) & - & RespHeatLoss \tabularnewline
 RH & Relative humidity & ~ & ~ & RelHum \tabularnewline
-T\(_{a}\) & Air temperature & °C & - & AirTemp \tabularnewline
-T\(_{cr}\) & Core or internal temperature & °C & - & CoreTemp \tabularnewline
-T\(_{o}\) & Operative temperature & °C & - & OpTemp \tabularnewline
-T\(_{r}\) & Mean radiant temperature & °C & - & RadTemp \tabularnewline
-T\(_{sk}\) & Skin temperature & °C & ~ & SkinTemp \tabularnewline
+T\(_{a}\) & Air temperature & \(^{\circ}\)C & - & AirTemp \tabularnewline
+T\(_{cr}\) & Core or internal temperature & \(^{\circ}\)C & - & CoreTemp \tabularnewline
+T\(_{o}\) & Operative temperature & \(^{\circ}\)C & - & OpTemp \tabularnewline
+T\(_{r}\) & Mean radiant temperature & \(^{\circ}\)C & - & RadTemp \tabularnewline
+T\(_{sk}\) & Skin temperature & \(^{\circ}\)C & ~ & SkinTemp \tabularnewline
 TSV & Thermal sensation vote & ~ & (-4)-4 & TSV \tabularnewline
 V & Relative air velocity & m/s & - & AirVel \tabularnewline
 W & The rate of heat loss due to the performance of work & W/m\(^{2}\) & - & WorkEff \tabularnewline
@@ -731,6 +733,7 @@ where Q\(_{res}\) and Q\(_{dry}\) are calculated using:
 
 \begin{equation}
 {Q_{dry}} = {Q_c} + {Q_r} = {h_{}}{f_{cl}}{F_{cl}}({T_{sk}} - {T_o})
+\label{eq:KSU2NodeQdry}
 \end{equation}
 
 The calculation of Q\(_{res}\) (RespHeatLoss) and Q\(_{dry}\) (DryHeatLoss) in the source code are accomplished through the following equations:
@@ -774,11 +777,11 @@ OpTemp = (Hc*AirTemp + Hr*RadTemp)/H
 In the KSU Two-Node Model, evaporative heat losses are defined by these equations:
 
 \begin{equation}
-For \left({E_{sw}} \le {E_{\max }}\right), {E_{sk}} = {E_{sw}} + (1 - {w_{rsw}}){E_{diff}}
+For \left({E_{sw}} \le {E_{\max }}\right),~{E_{sk}} = {E_{sw}} + (1 - {w_{rsw}}){E_{diff}}
 \end{equation}
 
 \begin{equation}
-For \left({E_{sw}} > {E_{\max }}\right), {E_{sk}} = {E_{\max }}
+For \left({E_{sw}} > {E_{\max }}\right),~{E_{sk}} = {E_{\max }}
 \end{equation}
 
 \begin{equation}
@@ -841,7 +844,7 @@ SweatSuppFac = 0.5 + 0.5*EXP(-5.6*SkinWetSignal) for \(w > 0.4\)
 
 ShivResponse = 20.*CoreSignalShivMax*SkinSignalShivMax + 5.*SkinSignalShivMax
 
-In the KSU model, two new parameters are introduced and used in correlating thermal sensations with their associated physiological responses. Instead of correlating warm thermal sensations with skin wettedness, it is correlated with a wettedness factor defined by
+In the KSU model, two new parameters are introduced and used in correlating thermal sensations with their associated physiological responses. Instead of correlating warm thermal sensations with skin wettedness, it is correlated with a wettedness factor defined by:
 
 \begin{equation}
 {\varepsilon_{wsw}} = ({w_{rsw}} - {w_{rsw - o}})/(1.0 - {w_{rsw - o}})
@@ -875,7 +878,7 @@ or in the source code:
 
 VasoconstrictFac=(ThermCndctNeut-ThermCndct)/(ThermCndctNeut-ThermCndctMin)
 
-Thus, for a cold environment, TSV is a function of a vasoconstriction factor (ε\(_{vc}\)):
+Thus, for a cold environment, TSV is a function of a vasoconstriction factor (\({\varepsilon_{vc}}\)):
 
 \begin{equation}
 TSV =  - 1.46 \times {\varepsilon_{vc}} + 3.75 \times {\varepsilon_{vc}}^2 - 6.17 \times {\varepsilon_{vc}}^3
@@ -919,11 +922,11 @@ The central line of the model (shown in red), or comfort temperature, is defined
 {T_{ot}} = 0.31\cdot {T_o} + 17.8
 \end{equation}
 
-Where
+where:
 
-T\(_{ot}\) -- operative temperature (°C), calculated as the average of the indoor air dry-bulb temperature and the mean radiant temperature of zone inside surfaces
+T\(_{ot}\) is the operative temperature (\(^{\circ}\)C), calculated as the average of the indoor air dry-bulb temperature and the mean radiant temperature of zone inside surfaces
 
-T\(_{o}\) -- monthly mean outdoor air dry-bulb temperature (°C).
+T\(_{o}\) is the monthly mean outdoor air dry-bulb temperature (\(^{\circ}\)C).
 
 If the .stat file is provided for the simulation, T\(_{o}\) is drawn directly from the daily average temperatures in the .stat file, which provides a value for each month.~ If no .stat file is provided, the monthly mean outdoor temperature is a simple running average of the previous thirty daily average temperatures, calculated directly from the weather file (.epw):
 
@@ -945,11 +948,19 @@ Note that the weather file must be a standard .epw containing a full year of dat
 
 The comfort regions for 80\% and 90\% acceptability are symmetric about the central line.
 
-90\% Acceptability Limits: T\(_{ot}\) = 0.31* T\(_{o}\) + 17.8± 2.5
+For 90\% Acceptability Limits:
 
-80\% Acceptability Limits: T\(_{ot}\) = 0.31* T\(_{o}\) + 17.8± 3.5
+\begin{equation}
+T_{ot} = 0.31* T_{o} + 17.8 ± 2.5
+\end{equation}
 
-If, using either method, T\(_{o}\) is less than 10°(C) or greater than 33.5°(C), the model is not applicable.
+80\% Acceptability Limits:
+
+\begin{equation}
+T_{ot} = 0.31* T_{o} + 17.8 ± 3.5
+\end{equation}
+
+If, using either method, T\(_{o}\) is less than 10\(^{\circ}\)C or greater than 33.5\(^{\circ}\)C, the model is not applicable.
 
 For a detailed description of this model, please see \emph{ASHRAE Standard 55-2010, Thermal Environmental Conditions for Human Occupancy}.
 
@@ -971,33 +982,67 @@ This weighted running average is calculated from a full annual weather file that
 \caption{Acceptable operative temperature ranges for naturally conditioned spaces (CEN EN15251-2007) \protect \label{fig:acceptable-operative-temperature-ranges-for-001}}
 \end{figure}
 
-Central line (shown as redFigure~\ref{fig:acceptable-operative-temperature-ranges-for-001}): Tot = 0.33*To + 18.8
+For the central line (shown as red in Figure~\ref{fig:acceptable-operative-temperature-ranges-for-001}):
 
-Category I, 90\% Acceptability Limits: Tot = 0.33*To + 18.8± 2.0
+\begin{equation}
+T_{ot} = 0.33*T_o + 18.8
+\end{equation}
 
-Category II, 80\% Acceptability Limits: Tot = 0.33*To + 18.8± 3.0
+For Category I, 90\% Acceptability Limits:
 
-Category III, 65\% Acceptability Limits: Tot = 0.33*To + 18.8± 4.0
+\begin{equation}
+T_{ot} = 0.33*T_o + 18.8 \pm 2.0
+\end{equation}
 
-For 10°(C) \textless{} T\(_{rm}\) \textless{} 15°(C), the comfort temperature of the lower boundaries of the comfort regions is T\(_{comf}\) = 23.75°(C). That is, the lower boundaries are constant according to the same ranges above:
+For Category II, 80\% Acceptability Limits:
 
-Category I, 90\% Acceptability Limits: Tot = 23.75- 2.0
+\begin{equation}
+T_{ot} = 0.33*T_o + 18.8 \pm 3.0
+\end{equation}
 
-Category II, 80\% Acceptability Limits: Tot = 23.75 - 3.0
+For Category III, 65\% Acceptability Limits:
 
-Category III, 65\% Acceptability Limits: Tot = 23.75 -4.0
+\begin{equation}
+T_{ot} = 0.33*T_o + 18.8 \pm 4.0
+\end{equation}
 
-Where
+For 10\(^{\circ}\)C \textless{} T\(_{rm}\) \textless{} 15\(^{\circ}\)C, the comfort temperature of the lower boundaries of the comfort regions is T\(_{comf}\) = 23.75\(^{\circ}\)C. That is, the lower boundaries are constant according to the same ranges above:
 
-Tot -- operative temperature (°C) , calculated as the average of the indoor air dry-bulb temperature and the mean radiant temperature of zone inside surfaces
+For Category I, 90\% Acceptability Limits:
 
-To -- mean outdoor air dry-bulb temperature (°C), calculated as the weighted mean of the previous 7-day daily mean outdoor air dry-bulb temperature (T\(_{od}\)):
+\begin{equation}
+T_{ot} = 23.75 - 2.0
+\end{equation}
 
-T\(_{o}\) = (1 - α)*\{T\(_{od-1}\) + α *T\(_{od-2}\) + α\(^{2}\) *T\(_{od-3}\) + α\(^{3}\) *T\(_{od-4}\) + α\(^{4}\) *T\(_{od-5}\) + α\(^{5}\) *T\(_{od-6}\) + α\(^{6}\) *T\(_{od-7}\)\}
+For Category II, 80\% Acceptability Limits:
 
-T\(_{o}\) = (1 - α)*T\(_{od-1}\) + α *T\(_{o-1}\)
+\begin{equation}
+T_{ot} = 23.75 - 3.0
+\end{equation}
 
-α~ = 0.8
+For Category III, 65\% Acceptability Limits:
+
+\begin{equation}
+T_{ot} = 23.75 - 4.0
+\end{equation}
+
+where:
+
+\({T_{ot}}\) is the operative temperature calculated as the average of the indoor air dry-bulb temperature and the mean radiant temperature of zone inside surfaces (\(^{\circ}\)C)
+
+\(T_o\) is the mean outdoor air dry-bulb temperature (\(^{\circ}\)C), calculated as the weighted mean of the previous 7-day daily mean outdoor air dry-bulb temperature (T\(_{od}\)) using:
+
+\begin{equation}
+T_{o} = (1 - \alpha) * \{T_{od-1} + \alpha * T_{od-2} + \alpha^{2} * T_{od-3} + \alpha^{3} * T_{od-4} + \alpha^{4} * T_{od-5} + \alpha^{5} * T_{od-6} + \alpha^{6} * T_{od-7}\}
+\end{equation}
+
+\begin{equation}
+T_{o} = (1 - \alpha) * T_{od-1} + \alpha * T_{o-1}
+\end{equation}
+
+\begin{equation}
+\alpha = 0.8
+\end{equation}
 
 \subsection{Dynamic Clothing Model}\label{dynamic-clothing-model}
 
@@ -1005,15 +1050,31 @@ In most building energy simulations, thermal comfort condition is calculated bas
 
 The model proposed to ASHRAE 55 is described below.
 
-For t\(_{a(out,6)}\) \textless{} -5°C, \({I_{cl}} = 1\) .00
+For t\(_{a(out,6)}\) \textless{} -5\(^{\circ}\)C:
 
-For -5°C ≤ t\(_{a(out,6)}\) \textless{} 5°C, \({I_{cl}} = 0.818 - 0.0364{\rm{*}}{t_{a\left( {out,6} \right)}}\)
+\begin{equation}
+{I_{cl}} = 1.00
+\end{equation}
 
-For 5°C ≤ t\(_{a(out,6)}\) \textless{} 26°C \({I_{cl}} = {10^{\left( { - 0.1635 - 0.0066{\rm{*}}{t_{a\left( {out,6} \right)}}} \right)}}\)
+For -5\(^{\circ}\)C \(\leq\) \(t_{a(out,6)}\) \textless{} 5\(^{\circ}\)C:
 
-or t\(_{a(out,6)}\) ≥ 26°C \({I_{cl}} = 0.46\)
+\begin{equation}
+{I_{cl}} = 0.818 - 0.0364{\rm{*}}{t_{a\left( {out,6} \right)}}
+\end{equation}
 
-Where, \emph{I\(_{cl}\)} is the clothing insulation value, \emph{t\(_{a(out,\, 6)}\)} is the outdoor air temperature measured at 6 o'clock in the morning. The following figure illustrates the proposed clothing insulation model.
+For 5\(^{\circ}\)C \(\leq\) t\(_{a(out,6)}\) \textless{} 26\(^{\circ}\)C:
+
+\begin{equation}
+{I_{cl}} = {10^{\left( { - 0.1635 - 0.0066{\rm{*}}{t_{a\left( {out,6} \right)}}} \right)}}
+\end{equation}
+
+Or for t\(_{a(out,6)}\) \(\geq\) 26\(^{\circ}\)C:
+
+\begin{equation}
+{I_{cl}} = 0.46
+\end{equation}
+
+where \(I_{cl}\) is the clothing insulation value and \(t_{a(out,6)}\) is the outdoor air temperature measured at 6 o'clock in the morning. Figure~\ref{fig:graphical-representation-of-the-proposed} illustrates the proposed clothing insulation model.
 
 \begin{figure}[hbtp] % fig 305
 \centering
@@ -1021,9 +1082,7 @@ Where, \emph{I\(_{cl}\)} is the clothing insulation value, \emph{t\(_{a(out,\, 6
 \caption{Clothing Schedule Illustration \protect \label{fig:clothing-schedule-illustration}}
 \end{figure}
 
-In the figure above, clothing insulation schedule for a fixed model (blue) typically used in energy simulation software and for the clothing model based on outdoor air temperature measured at 6 o'clock. Climate data for Chicago O'hare International Airport has been used.
-
-The following figure illustrates the new clothing insulation model.
+In Figure~\ref{fig:clothing-schedule-illustration}, clothing insulation schedule for a fixed model (blue) typically used in energy simulation software and for the clothing model based on outdoor air temperature measured at 6 o'clock. Climate data for Chicago O'hare International Airport has been used.
 
 \begin{figure}[hbtp] % fig 306
 \centering
@@ -1059,9 +1118,9 @@ Mathematical variable & Description & Units ~ & Range
 \midrule
 \endhead
 
-T\(_{r}\) & Mean radiant temperature & °C & - \tabularnewline
-T\(_{r-avg}\) & Zone averaged radiant temperature & °C & -  \tabularnewline
-T\(_{surf}\) & Surface temperature & °C & -  \tabularnewline
+T\(_{r}\) & Mean radiant temperature & \(^{\circ}\)C & - \tabularnewline
+T\(_{r-avg}\) & Zone averaged radiant temperature & \(^{\circ}\)C & -  \tabularnewline
+T\(_{surf}\) & Surface temperature & \(^{\circ}\)C & -  \tabularnewline
 F\(_{surf}\) & Angle factor between person and surface & - & 0-1  \tabularnewline
 A\(_{surf}\) & Area of the surface & m\(^{2}\) & - \tabularnewline
 \(\epsilon_{surf}\) & Emissivity of the surface & - & - \tabularnewline

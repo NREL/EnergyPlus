@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -87,6 +87,16 @@ namespace General {
     // PUBLIC  ErfFunction
 
     // Functions
+
+    void SolveRoot(Real64 const Eps, // required absolute accuracy
+                   int const MaxIte, // maximum number of allowed iterations
+                   int &Flag,        // integer storing exit status
+                   Real64 &XRes,     // value of x that solves f(x [,Par]) = 0
+                   std::function<Real64(Real64 const, std::vector<Real64> const &)> f,
+                   Real64 const X_0,         // 1st bound of interval that contains the solution
+                   Real64 const X_1,         // 2nd bound of interval that contains the solution
+                   std::vector<Real64> const &Par // array with additional parameters used for function evaluation
+    );
 
     void SolveRoot(Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations

@@ -57,21 +57,3 @@ LifeCycleCost:UseAdjustment,
   1.0026,               !- Year 6 Multiplier
   1.0027;               !- Year 7 Multiplier
 \end{lstlisting}
-
-\subsubsection{CurrencyType}\label{currencytype}
-
-By default, the predefined reports related to economics use the \$ symbol. If a different symbol should be shown in the predefined reports to represent the local currency this object can be used. If the object is not used, the \$ sign is used in the reports. Only one CurrencyType object is allowed in the input file.
-
-\paragraph{Field: Monetary Unit}\label{field-monetary-unit}
-
-The commonly used three letter currency code for the units of money for the country or region. Based on ISO 4217 currency codes. Common currency codes are USD for the U.S. Dollar represented with `\$' and EUR for Euros represented with `€'. The three letter currency codes can be seen at the following web sites (as of 2008):
-
-\url{http://www.iso.org/iso/support/faqs/faqs_widely_used_standards/widely_used_standards_other/currency_codes/currency_codes_list-1.htm}
-
-\url{http://www.xe.com/symbols.php}
-
-When a three letter currency code is specified, the HTML file will use either an ASCII character if available or one or more UNICODE characters. Since not all browsers and all fonts used by browsers completely support UNICODE, not all currency symbols may be rendered correctly. If a box or a box with four small letters appears, this indicates that the browser and its fonts do not support a specific UNICODE character.
-
-For text reports, an ASCII representation of the currency code will be used. Since ASCII is much more limited than UNICODE, many times the three letter currency code will be shown in the reports.
-
-Since forms of currency change, please contact EnergyPlus support if a new currency code and symbol are needed.

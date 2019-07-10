@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -69,7 +69,6 @@
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
 #include <HVACFan.hh>
-#include <HVACUnitarySystem.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutAirNodeManager.hh>
@@ -80,6 +79,7 @@
 #include <ReportCoilSelection.hh>
 #include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
+#include <UnitarySystem.hh>
 #include <VariableSpeedCoils.hh>
 #include <WaterManager.hh>
 
@@ -245,7 +245,8 @@ namespace VariableSpeedCoils {
           RatedPowerHeat(0.0), RatedCOPHeat(0.0), RatedCapCoolSens(0.0), RatedPowerCool(0.0), RatedCOPCool(0.0), AirInletNodeNum(0),
           AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0),
           FindCompanionUpStreamCoil(true), IsDXCoilInZone(false), CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0), FanDelayTime(0.0),
-          MSHPDesignSpecIndex(0), MSErrIndex(MaxSpedLevels, 0), MSRatedPercentTotCap(MaxSpedLevels, 0.0), MSRatedTotCap(MaxSpedLevels, 0.0),
+          // This one calls into a std::vector, so it's 0-indexed, so we initialize it to -1
+          MSHPDesignSpecIndex(-1), MSErrIndex(MaxSpedLevels, 0), MSRatedPercentTotCap(MaxSpedLevels, 0.0), MSRatedTotCap(MaxSpedLevels, 0.0),
           MSRatedSHR(MaxSpedLevels, 0.0), MSRatedCOP(MaxSpedLevels, 0.0), MSRatedAirVolFlowPerRatedTotCap(MaxSpedLevels, 0.0),
           MSRatedAirVolFlowRate(MaxSpedLevels, 0.0), MSRatedAirMassFlowRate(MaxSpedLevels, 0.0),
           MSRatedWaterVolFlowPerRatedTotCap(MaxSpedLevels, 0.0), MSRatedWaterVolFlowRate(MaxSpedLevels, 0.0),
@@ -541,6 +542,7 @@ namespace VariableSpeedCoils {
                                           cAlphaFields,
                                           cNumericFields);
 
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             VarSpeedCoil(DXCoilNum).bIsDesuperheater = false;
@@ -924,6 +926,7 @@ namespace VariableSpeedCoils {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             VarSpeedCoil(DXCoilNum).bIsDesuperheater = false;
@@ -1318,6 +1321,7 @@ namespace VariableSpeedCoils {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             VarSpeedCoil(DXCoilNum).bIsDesuperheater = false;
@@ -1671,6 +1675,7 @@ namespace VariableSpeedCoils {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             VarSpeedCoil(DXCoilNum).bIsDesuperheater = false;
@@ -2003,6 +2008,7 @@ namespace VariableSpeedCoils {
                                           lAlphaBlanks,
                                           cAlphaFields,
                                           cNumericFields);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             VarSpeedCoil(DXCoilNum).bIsDesuperheater = false;
@@ -3284,12 +3290,12 @@ namespace VariableSpeedCoils {
                                         VarSpeedCoil(DXCoilNum).LoopSide,
                                         VarSpeedCoil(DXCoilNum).BranchNum,
                                         VarSpeedCoil(DXCoilNum).CompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitVarSpeedCoil: Program terminated for previous conditions.");
                 }
@@ -3809,7 +3815,6 @@ namespace VariableSpeedCoils {
         using CurveManager::CurveValue;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-        using HVACUnitarySystem::DesignSpecMSHP;
 
         // Locals
         Real64 QLoadTotal; // placeholder for calculating SHR
@@ -4074,6 +4079,7 @@ namespace VariableSpeedCoils {
                         SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                     }
                     MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, OutBaroPress, RoutineName);
+                    // need to use OutTemp for air-cooled and RatedInletWaterTemp for water-cooled
                     TotCapTempModFac =
                         CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedInletWaterTemp);
 
@@ -4145,6 +4151,7 @@ namespace VariableSpeedCoils {
                     }
 
                     MixWetBulb = PsyTwbFnTdbWPb(MixTemp, MixHumRat, OutBaroPress, RoutineName);
+                    // need to use OutTemp for air-cooled and RatedInletWaterTemp for water-cooled
                     TotCapTempModFac =
                         CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(VarSpeedCoil(DXCoilNum).NormSpedLevel), MixWetBulb, RatedInletWaterTemp);
 
@@ -4409,47 +4416,55 @@ namespace VariableSpeedCoils {
             rhoA = PsyRhoAirFnPbTdbW(OutBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
             // HPWH, the mass flow rate will be updated by a revised entering air density
 
-            if (VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex > 0 && allocated(HVACUnitarySystem::DesignSpecMSHP)) {
+            if (VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex > -1 && UnitarySystems::designSpecMSHP.size() > 0) {
                 if (VarSpeedCoil(DXCoilNum).CoolHeatType == "COOLING") {
-                    if (HVACUnitarySystem::DesignSpecMSHP(VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex).NumOfSpeedCooling !=
+                    if (UnitarySystems::designSpecMSHP[VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex].numOfSpeedCooling !=
                         VarSpeedCoil(DXCoilNum).NumOfSpeeds) {
                         ShowFatalError("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix + " = " + VarSpeedCoil(DXCoilNum).Name +
                                        " number of speeds not equal to number of speed specified in UnitarySystemPerformance:Multispeed object.");
+                    } else {
+                        for (Mode = VarSpeedCoil(DXCoilNum).NumOfSpeeds; Mode >= 1; --Mode) {
+                            VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) =
+                                VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate *
+                                UnitarySystems::designSpecMSHP[VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex].coolingVolFlowRatio[Mode - 1];
+                            VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) =
+                                VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) / VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowPerRatedTotCap(Mode);
+                            VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(Mode) = VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) * rhoA;
+                            // EVAPORATIVE PRECOOLING CONDENSER AIR FLOW RATE
+                            VarSpeedCoil(DXCoilNum).EvapCondAirFlow(Mode) =
+                                VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) * VarSpeedCoil(DXCoilNum).MSRatedEvapCondVolFlowPerRatedTotCap(Mode);
+                        }
                     }
-                } else {
-                    if (HVACUnitarySystem::DesignSpecMSHP(VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex).NumOfSpeedHeating !=
+                } else if (VarSpeedCoil(DXCoilNum).CoolHeatType == "HEATING") {
+                    if (UnitarySystems::designSpecMSHP[VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex].numOfSpeedHeating !=
                         VarSpeedCoil(DXCoilNum).NumOfSpeeds) {
                         ShowFatalError("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix + " = " + VarSpeedCoil(DXCoilNum).Name +
                                        " number of speeds not equal to number of speed specified in UnitarySystemPerformance:Multispeed object.");
+                    } else {
+                        for (Mode = VarSpeedCoil(DXCoilNum).NumOfSpeeds; Mode >= 1; --Mode) {
+                            VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) =
+                                VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate *
+                                UnitarySystems::designSpecMSHP[VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex].heatingVolFlowRatio[Mode - 1];
+                            VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) =
+                                VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) / VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowPerRatedTotCap(Mode);
+                            VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(Mode) = VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) * rhoA;
+                            // EVAPORATIVE PRECOOLING CONDENSER AIR FLOW RATE
+                            VarSpeedCoil(DXCoilNum).EvapCondAirFlow(Mode) =
+                                VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) * VarSpeedCoil(DXCoilNum).MSRatedEvapCondVolFlowPerRatedTotCap(Mode);
+                        }
                     }
                 }
-            }
-
-            for (Mode = VarSpeedCoil(DXCoilNum).NumOfSpeeds; Mode >= 1; --Mode) {
-
-                if (VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex > 0 && VarSpeedCoil(DXCoilNum).CoolHeatType != "WATERHEATING") {
-                    if (VarSpeedCoil(DXCoilNum).CoolHeatType == "COOLING") {
-                        VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) =
-                            VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate *
-                            HVACUnitarySystem::DesignSpecMSHP(VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex).CoolingVolFlowRatio(Mode);
-                    } else {
-                        VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) =
-                            VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate *
-                            HVACUnitarySystem::DesignSpecMSHP(VarSpeedCoil(DXCoilNum).MSHPDesignSpecIndex).HeatingVolFlowRatio(Mode);
-                    }
-                    VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) =
-                        VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) / VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowPerRatedTotCap(Mode);
-                } else {
+            } else {
+                for (Mode = VarSpeedCoil(DXCoilNum).NumOfSpeeds; Mode >= 1; --Mode) {
                     VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) =
                         VarSpeedCoil(DXCoilNum).MSRatedTotCap(UpperSpeed) * VarSpeedCoil(DXCoilNum).MSRatedPercentTotCap(Mode);
                     VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) =
                         VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) * VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowPerRatedTotCap(Mode);
+                    VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(Mode) = VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) * rhoA;
+                    // EVAPORATIVE PRECOOLING CONDENSER AIR FLOW RATE
+                    VarSpeedCoil(DXCoilNum).EvapCondAirFlow(Mode) =
+                        VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) * VarSpeedCoil(DXCoilNum).MSRatedEvapCondVolFlowPerRatedTotCap(Mode);
                 }
-
-                VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(Mode) = VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) * rhoA;
-                // EVAPORATIVE PRECOOLING CONDENSER AIR FLOW RATE
-                VarSpeedCoil(DXCoilNum).EvapCondAirFlow(Mode) =
-                    VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) * VarSpeedCoil(DXCoilNum).MSRatedEvapCondVolFlowPerRatedTotCap(Mode);
             }
         }
 

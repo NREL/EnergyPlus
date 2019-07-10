@@ -20,7 +20,7 @@ The thermodynamic process is a simultaneous heat and mass transfer, or adiabatic
 \caption{Psychrometric Chart -- Constant Enthalpy \protect \label{fig:psychrometric-chart-constant-enthalpy}}
 \end{figure}
 
-If the direct evaporative process were 100\% efficient, the leaving dry-bulb temperature would equal the entering wet-bulb temperature.~ The efficiency of the direct evaporative process is less than 100\% and by defining saturation efficiency (ese) for the direct stage or evaporative pad, the leaving dry-bulb temperature can be expressed by the following equation.
+If the direct evaporative process were 100\% efficient, the leaving dry-bulb temperature would equal the entering wet-bulb temperature.~ The efficiency of the direct evaporative process is less than 100\% and by defining saturation efficiency (\(\varepsilon_{se}\)) for the direct stage or evaporative pad, the leaving dry-bulb temperature can be expressed by the following equation.
 
 \begin{equation}
 {T_{dbsupout}} - {T_{dbsupin}} = {\varepsilon_{se}} \cdot \left( {{T_{odb}} - {T_{owb}}} \right)
@@ -36,19 +36,18 @@ Since the evaporative process is not 100\% efficient the saturation efficiency i
 
 The saturation efficiency is determined from manufacturer's data, and the least squares curve fit is discussed in Curve Fitting Evaporative Media section.
 
-Using the saturation efficiency (ese) for the direct stage evaporative pad, the leaving dry-bulb temperature can be determined directly.~ The evaporative process approximately follows a constant wet-bulb line.~ Therefore, with the leaving dry-bulb temperature and assuming adiabatic heat transfer across the direct stage, the outlet conditions for the direct stage are known.
+Using the saturation efficiency (\(\varepsilon_{se}\)) for the direct stage evaporative pad, the leaving dry-bulb temperature can be determined directly.~ The evaporative process approximately follows a constant wet-bulb line.~ Therefore, with the leaving dry-bulb temperature and assuming adiabatic heat transfer across the direct stage, the outlet conditions for the direct stage are known.
 
 The saturation efficiency of the direct evaporative cooler is a function of the pad geometry and airflow rate.~ The pad geometry is constant throughout the simulation, but the airflow rate can change from hour to hour when the evaporative cooler is used with an air economizer.~ The saturation efficiency would then be determined from the flow for that hour with the geometry of the direct evaporative cooler.~ This gives the dry-bulb temperature leaving the evaporative cooler.~ Assuming adiabatic heat transfer across the direct stage, the evaporative process follows the constant wet-bulb line or the constant enthalpy line on the psychrometric chart, therefore the wet-bulb temperature is constant from inlet to outlet.
 
 Some things that can cause departure from the ideal adiabatic saturation process in the direct evaporative cooler are:
 
-·~~~~~~~~makeup water entering the sump,
-
-·~~~~~~~~friction from water re-circulation,
-
-·~~~~~~~~heat transfer from surroundings,
-
-·~~~~~~~~solar radiation (sun upon a cooler).
+\begin{itemize}
+\item makeup water entering the sump,
+\item friction from water re-circulation,
+\item heat transfer from surroundings,
+\item solar radiation (sun upon a cooler).
+\end{itemize}
 
 Thus, adiabatic saturation in evaporative cooling is only an approximation, however the adiabatic saturation assumption in the rigid-media cooler is good, since the water recirculates rapidly and approximates the wet-bulb temperature at steady state operation.
 
@@ -64,9 +63,17 @@ The saturation efficiency is usually reported as a function of airflow, pad face
 
 The curve fit for saturation efficiency was obtained using the functions listed below.~ The model uses the air velocity (Airvel) through the pad and the depth of the media (Depth).~ The least squares routine produced the following model that is used for the evaporative cooling rigid media pad.~ The least squares routine produced an eleven-term multi-variate fit using a third order quadratic.
 
-ese~ = 0.792714 + 0.958569 (Depth) - 0.25193 (Airvel) - 1.03215 (Depth\(^{2}\)) + 0.0262659~(Airvel\(^{2}\)) + 0.914869 (Depth * Airvel) - 1.48241 (Airvel * Depth\(^{2}\)) - 0.018992 (Airvel\(^{3}\) * Depth) + 1.13137 (Depth\(^{3}\) * Airvel) + 0.0327622~(Airvel\(^{3}\) * Depth\(^{2}\)) - 0.145384 (Depth\(^{3}\) * Airvel\(^{2}\))
+\begin{equation}
+\begin{array}{rl}
+\varepsilon_{se} = & 0.792714 + 0.958569(Depth) - 0.25193(Airvel) - 1.03215(Depth^{2}) \\
+ & + 0.0262659~(Airvel^{2}) + 0.914869 (Depth * Airvel) \\
+ & - 1.48241 (Airvel * Depth^{2}) - 0.018992 (Airvel^{3} * Depth) \\
+ & + 1.13137 (Depth^{3} * Airvel) + 0.0327622~(Airvel^{3} * Depth^{2}) \\
+ & - 0.145384 (Depth^{3} * Airvel^{2})
+\end{array}
+\end{equation}
 
-Where Airvel is in meters per second and Depth is in meters.~ This curve fit is used for the rigid media in the EvapCooler:Direct:CelDekPad and EvapCooler:InDirect:CelDekPad.
+where Airvel is in meters per second and Depth is in meters.~ This curve fit is used for the rigid media in the EvapCooler:Direct:CelDekPad and EvapCooler:InDirect:CelDekPad.
 
 \subsection{Dry Coil Indirect Evaporative Cooler}\label{dry-coil-indirect-evaporative-cooler}
 
@@ -90,13 +97,19 @@ The advantage of the dry coil heat exchanger is that the heat exchanger does not
 
 The following equations are used to determine the dry-bulb temperature leaving the evaporative media, given pad geometry and secondary airflow information.~ The heat transfer in the heat exchanger can be determined with the effectiveness of the heat exchanger according.
 
-Tdb sup out = Tdb sup in - ese*(Todb - Towb )
+\begin{equation}
+T_{db,sup,out} = T_{db,sup,in} - \varepsilon_{se}*(T_{odb} - T_{owb})
+\end{equation}
 
-QHx~ = eHx~* Min( CFMsec~, CFMsupply) * rair~* cp air~* ( Todb~- Tdb sec out)
+\begin{equation}
+Q_{Hx} = \varepsilon_{Hx} * Min( CFM_{sec}, CFM_{supply}) * \rho_{air} * c_{p,air} * ( T_{odb} - T_{db,sec,out})
+\end{equation}
 
 After the heat transfer for the heat exchanger has been determined, an energy balance is done on the supply airside to determine the dry-bulb temperature leaving the indirect evaporative cooler. ~This assumes all the energy for is provided by the primary air stream so the effectiveness value includes the air-to-air effectiveness of the heat exchanger.
 
-Tdb sup out = ~ Tdb sup in~~ -~ \(\frac{{{Q_{Hx}}}}{{{r_{air}}*{c_{pair}}*CF{M_{\sup ply}}}}\)
+\begin{equation}
+T_{db,sup,out} = T_{db,sup,in} - \frac{{{Q_{Hx}}}}{{{\rho_{air}}*{c_{p,air}}*CF{M_{supply}}}}
+\end{equation}
 
 The wet-bulb temperature is determined from psychrometric routines using the leaving dry-bulb temperature, humidity ratio, and barometric pressure, since humidity ratio is constant for the supply air across the indirect stage.~ The effectiveness of the heat exchanger is determined from a parameter estimation using manufacturer's performance data.~ For the indirect evaporative cooler it was found that a value of 0.67 represented reasonable default effectiveness.
 
@@ -122,39 +135,55 @@ The wet coil heat exchanger can have a higher stage efficiency than the dry coil
 
 \subsubsection{Efficiencies of the Indirect Stage}\label{efficiencies-of-the-indirect-stage}
 
-In an indirect stage of an evaporative cooler, the secondary or wet side air stream acts as a heat sink for the supply air.~ The efficiency of the indirect stage is given as the effectiveness of the sensible heat exchange, eHx, and the saturation efficiency on the wet streamside, ese.~ These are expressed as:
+In an indirect stage of an evaporative cooler, the secondary or wet side air stream acts as a heat sink for the supply air.~ The efficiency of the indirect stage is given as the effectiveness of the sensible heat exchange, \({\varepsilon_{Hx}}\), and the saturation efficiency on the wet streamside, \({\varepsilon_{se}}\).~ These are expressed as:
 
-eHx~ = \(\frac{q}{{{q_{max}}}}\) = ~ \(\frac{{{C_{sup}}({T_{supin}} - {T_{supout}})}}{{{C_{min}}({T_{secin}} - {T_{secout}})}}\) ,
+\begin{equation}
+{\varepsilon_{Hx}} = \frac{q}{{{q_{max}}}} = \frac{{{C_{sup}}({T_{sup,in}} - {T_{sup,out}})}}{{{C_{min}}({T_{sec,in}} - {T_{sec,out}})}}
+\end{equation}
 
-ese~ = ~ \(\frac{{{T_{dbsecin}} - {T_{dbsecout}}}}{{{T_{odb}} - {T_{owb}}}}\) ,
+\begin{equation}
+{\varepsilon_{se}} = \frac{{T_{dbsecin}} - {T_{dbsecout}}}{{T_{odb}} - {T_{owb}}}
+\end{equation}
 
-where Tdb sup in~ = Tdb sec in~ for the indirect cooler.~ The maximum heat transfer possible would be obtained if the supply stream was cooled all the way to the wet-bulb temperature.~ So the efficiency of the indirect evaporative cooler is defined by:
+where \(T_{db,sup,in} = T_{db,sec,in}\) for the indirect cooler.~ The maximum heat transfer possible would be obtained if the supply stream was cooled all the way to the wet-bulb temperature.~ So the efficiency of the indirect evaporative cooler is defined by:
 
-eind~ = ~ \(\frac{{({T_{dbsupin}} - {T_{dbsupout}})}}{{({T_{odb}} - {T_{owb}})}}\) .
+\begin{equation}
+{\varepsilon_{ind}} = \frac{{({T_{db,sup,in}} - {T_{db,sup,out}})}}{{({T_{odb}} - {T_{owb}})}}
+\end{equation}
 
 Using the combination of the effectiveness and saturation efficiency, the total efficiency of the indirect stage can be expressed by:
 
-eind~ = eHx~ ese~ \(\frac{{{C_{sup}}}}{{{C_{min}}}}\) .
+\begin{equation}
+{\varepsilon_{ind}} = {\varepsilon_{Hx}} {\varepsilon_{se}} \frac{C_{sup}}{C_{min}}
+\end{equation}
 
-In many cases Csup = Cmin and the efficiency of the indirect stage reduces to:
+In many cases, \(C_{sup} = C_{min}\) and the efficiency of the indirect stage reduces to:
 
-eind~ = eHx~ ese.
+\begin{equation}
+{\varepsilon_{ind}} = {\varepsilon_{Hx}} {\varepsilon_{se}}
+\end{equation}
 
 An intuitive model determining the performance of the wet coil indirect model was developed.~ This model can be used for all indirect models by curve fitting data from the evaporative cooler of interest.~ The model development starts with the total efficiency of the indirect evaporative cooler:
 
-eind~ = ~ \(\frac{{({T_{dbsupin}} - {T_{dbsupout}})}}{{({T_{odb}} - {T_{owb}})}}\)
+\begin{equation}
+{\varepsilon_{ind}} = \frac{({T_{dbsupin}} - {T_{dbsupout}})}{({T_{odb}} - {T_{owb}})}
+\end{equation}
 
-Solving for T db sup out~gives the leaving conditions of the supply air at a constant humidity ratio:
+Solving for \(T_{db,sup,out}\) gives the leaving conditions of the supply air at a constant humidity ratio:
 
-T db sup out = Tdb sup in - eind * (Todb - Towb)
+\begin{equation}
+{T_{db,sup,out}} = {T_{db,sup,in}} - \varepsilon * ({T_{odb}}-{T_{owb}})
+\end{equation}
 
 A form for the efficiency of the indirect stage was devised using a maximum efficiency with a coefficient to reduce the efficiency depending on the ratio of the airflows.
 
-eind~ = emax~- C1~* (\(\frac{{CF{M_{sup}}}}{{CF{M_{sec}}}}\) )
+\begin{equation}
+{\varepsilon_{ind}} = {\varepsilon_{max}} - C_1 * \frac{CFM_{sup}}{CFM_{sec}}
+\end{equation}
 
-C1~is the ``Flow Efficiency Ratio'' and is determined from performance data.
+where \(C_1\) is the ``Flow Efficiency Ratio'' and is determined from performance data.
 
-A check of limits will verify that it makes physical sense.~ As the magnitude of the secondary flow increases, the second term of equation above becomes smaller.~ This would make the efficiency tend to go to the maximum efficiency.~ Physically this would be true since the convective terms for heat and mass transfer would increase on the outside of the tube with the additional mass flow rate.~ Similarly, if the supply air flow goes to zero with a constant secondary air flow, the second term of the equation above again becomes small, and the overall efficiency of the stage would approach the maximum.~ The constant C1~tells how quickly the efficiency of the stage would decrease with a mismatch of the supply and secondary flows.
+A check of limits will verify that it makes physical sense.~ As the magnitude of the secondary flow increases, the second term of equation above becomes smaller.~ This would make the efficiency tend to go to the maximum efficiency.~ Physically this would be true since the convective terms for heat and mass transfer would increase on the outside of the tube with the additional mass flow rate.~ Similarly, if the supply air flow goes to zero with a constant secondary air flow, the second term of the equation above again becomes small, and the overall efficiency of the stage would approach the maximum.~ The constant \(C_1\) tells how quickly the efficiency of the stage would decrease with a mismatch of the supply and secondary flows.
 
 The maximum efficiency of the stage is a combination of the efficiency due to the simultaneous heat and mass transfer on the outside of the tube and the efficiency of the heat exchanger.~ This value can be higher than the dry coil overall efficiency since the convective coefficients on the outside of the tube are larger.~ For example, a least squares fit for the maximum efficiency showed this value was approximately 0.8 compared to the dry coil indirect value of approximately 0.65 (0.67 * 0.97).~ (The maximum efficiency for the dry coil indirect was determined at the condition where flow through the evaporative pad in the secondary air stream approached zero, for a 12-inch thick pad.)~ It should be noted again that over the operating life of the wet coil heat exchanger, the mineral deposits that are left can decrease the effectiveness of the heat exchanger unless appropriate maintenance has taken place.~ Therefore, if modeling an older system, the manufacturer's data may no longer describe the equipment effectiveness.
 
@@ -176,11 +205,11 @@ The thermodynamic process for the supply air is shown below, going from A to B t
 \caption{Thermodynamic Process for Supply Air Through Two Stage Evaporative Cooler \protect \label{fig:thermodynamic-process-for-supply-air-through}}
 \end{figure}
 
-Two stage evaporative coolers can be accomplished by putting the EvaporativeCooler:Direct:CelDekPad, EvaporativeCooler:Indirect:CelDekPad, EvaporativeCooler:Indirect:WetCoil in series in any combination the user desires in the supply air loop.
+Two stage evaporative coolers can be accomplished by putting the EvaporativeCooler:Direct:Cel-DekPad, EvaporativeCooler:Indirect:CelDekPad, EvaporativeCooler:Indirect:WetCoil in series in any combination the user desires in the supply air loop.
 
 \subsection{Indirect Evaporative Cooler Special Research Model}\label{indirect-evaporative-cooler-special-research-model}
 
-This section summarizes the model implemented in the component EvaporativeCooler:Indirect:ResearchSpecial.~ Examples of this evaporative cooler are shown in the following figures, without and with a relief valve. This model differs from the other indirect evaporative coolers in that, under part load conditions, it can modulate so that the air leaving the cooler just meets a drybulb temperature setpoint.
+This section summarizes the model implemented in the component EvaporativeCooler:Indirect:Re-searchSpecial.~ Examples of this evaporative cooler are shown in the following figures, without and with a relief valve. This model differs from the other indirect evaporative coolers in that, under part load conditions, it can modulate so that the air leaving the cooler just meets a drybulb temperature setpoint.
 
 The indirect research special evaporative cooler (IEC) machine provides improved modeling features needed for data center and other hybrid cooling applications. The new model includes performance curves for variable effectiveness, fan power, and pump power. It is intended to be able to model IEC machines that have 1) variable speed secondary fans, 2) variable speed pumps for water recirculation and spraying, and 3) ability to operate in a dry mode. Such IEC machines can modulate the cooling power during operation by varying either the secondary side fan speed or the intensity of water spray or both. To simplify the model it is assumed that the device's internal controls are such that, when it is operating as a ``Wet'' evaporative cooler, secondary fan and spray pump operation are linked together so that there is a one-to-one mapping between them at any given part load situation. This allows formulating the fan and pump power performance curves to be based on the same independent variable, secondary air flow fraction.
 
@@ -192,12 +221,12 @@ The indirect research special evaporative cooler (IEC) machine provides improved
 
 \subsubsection{Model Formulation}\label{model-formulation}
 
-Each time the model is called it takes the inputs on the left and produces the outputs on the right as shown in \protect\hyperlink{IndEvapCoolerFig2}{Figure}. ``sys'' is primary air stream and typically sits on an AirLoop HVAC branch. ``sec'' is secondary purge air stream and is typically outdoor air. The model will set node flow rates and ``out\_sec'' state variables on the secondary outlet.
+Each time the model is called it takes the inputs on the left and produces the outputs on the right as shown in Figure~\ref{fig:research-special-indirect-evaporative-cooler-input-output-model}. ``sys'' is primary air stream and typically sits on an AirLoop HVAC branch. ``sec'' is secondary purge air stream and is typically outdoor air. The model will set node flow rates and ``out\_sec'' state variables on the secondary outlet.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/image8005.png}
-\caption{}
+\caption{Research Special Indirect Evaporative Cooler Input/Output Model \protect \label{fig:research-special-indirect-evaporative-cooler-input-output-model}}
 \end{figure}
 
 Figure: Illustration of Inputs-Outputs of Indirect Evaporative Cooler Research Special
@@ -210,30 +239,27 @@ If running ``wet,'' use wet bulb effectiveness and wet bulb temperature depressi
 
 \begin{equation}
 \begin{array}{rl}
-  \epsilon_{wb,op} & = \epsilon_{wb,design}\cdot f_{wb,mod}\left(\text{flowRatio}\right) \\
+  \varepsilon_{wb,op} & = \varepsilon_{wb,design}\cdot f_{wb,mod}\left(\text{flowRatio}\right) \\
   \text{flowRatio} & = \frac{\dot{m}_{sec}}{\dot{m}_{sys}}
 \end{array}
 \end{equation}
 
-Where:
+where:
 
-\begin{itemize}
-\item
-  \(\epsilon_{wb,op}\) = current operation effectiveness with respect to wet bulb temperature depression.
-\item
-  \(\epsilon_{wb,design}\) = user input for effectiveness at design air flow rates and full spray power
-\item
-  \(f_{wb,mod}\) = normalized wet mode operation effectiveness modifier performance curve as a function of flow fraction. The curve value describes how effectiveness varies at different flow rates. When conditions are appropriate, this curve is numerically inverted to find a FlowRatio that just meets a setpoint.
-\item
-  \(\dot{m}_{sys}\) = primary air current time step mass flow rate in kg/s
-\item
-  \(\dot{m}_{sec}\) = secondary air current time step mass flow rate in kg/s
-\end{itemize}
+\(\varepsilon_{wb,op}\) is the current operation effectiveness with respect to wet bulb temperature depression
+
+\(\varepsilon_{wb,design}\) is the user input for effectiveness at design air flow rates and full spray power
+
+\(f_{wb,mod}\) is the normalized wet mode operation effectiveness modifier performance curve as a function of flow fraction. The curve value describes how effectiveness varies at different flow rates. When conditions are appropriate, this curve is numerically inverted to find a FlowRatio that just meets a setpoint.
+
+\(\dot{m}_{sys}\) is the primary air current time step mass flow rate (kg/s)
+
+\(\dot{m}_{sec}\) is the secondary air current time step mass flow rate (kg/s).
 
 The leaving primary air dry bulb temperature in wet operating mode is calculated as follows:
 
 \begin{equation}
-T_{db,out,sys} = T_{db,in,sys} - \epsilon_{wb,op} \left( T_{db,in,sys} - T_{wb,in,sec} \right)
+T_{db,out,sys} = T_{db,in,sys} - \varepsilon_{wb,op} \left( T_{db,in,sys} - T_{wb,in,sec} \right)
 \end{equation}
 
 Then check that there is sufficient heat capacitance flux (mcT) in the secondary air stream to provide the conditioning. The following steps are for checking and adjusting for non-physical outcomes that could happen with low secondary flow rates.
@@ -280,35 +306,33 @@ One approximation that can be made is the outlet condition of the temperature an
   \begin{array}{rl}
     T_{db,out,sec} & = T_{db,in,sec} \\
     \text{HumRat}_{out,sec} & = \text{PsyWFnTbH}\left(T_{db,out,sec},\text{enthalpy}_{out,sec}\right) \\
-    \dot{V}_{water} & = \frac{QHX / \left[ \left(\text{HumRat}_{out,sec}-\text{HumRat}_{in,sec}\right) \cdot h_{fg,in,sec}\right]}{\rho_{water,Tdb,in,sec}} \\
+    \dot{V}_{water} & = \frac{\dot{Q}_{HX} / \left[ \left(\text{HumRat}_{out,sec}-\text{HumRat}_{in,sec}\right) \cdot h_{fg,in,sec}\right]}{\rho_{water,Tdb,in,sec}} \\
     or & = \\
-    \dot{V}_{water} & = \frac{QHX / \left[ \left(\text{enthalpy}_{out,sec}-\text{enthalpy}_{in,sec}\right) \right]}{\rho_{water,Tdb,in,sec}}
+    \dot{V}_{water} & = \frac{\dot{Q}_{HX} / \left[ \left(\text{enthalpy}_{out,sec}-\text{enthalpy}_{in,sec}\right) \right]}{\rho_{water,Tdb,in,sec}}
   \end{array}
 \end{equation}
 
-Dry Operation Mode
+\subsubsection{Dry Mode Operation}\label{dry-mode-operation}
 
 Similarly, if running ``dry'' use dry bulb effectiveness and dry bulb based delta T
 
 \begin{equation}
-\epsilon_{db,op} = \epsilon_{db,design} \cdot f_{db,mod}\left(\text{flowRatio}\right)
+\varepsilon_{db,op} = \varepsilon_{db,design} \cdot f_{db,mod}\left(\text{flowRatio}\right)
 \end{equation}
 
-Where:
+where:
 
-\begin{itemize}
-\item
-  \(\epsilon_{db,op}\) = current operation effectiveness with respect to dry bulb temperature depression.
-\item
-  \(\epsilon_{db,design}\) = user input for effectiveness at design air flow rates and dry operation mode (no water spray on the secondary air side)
-\item
-  \(f_{db,mod}\) = normalized dry mode operation effectiveness modifier performance curve as a function of flow fraction. The curve value describes how the dry mode effectiveness varies with different flow rates. When conditions are appropriate, this curve is numerically inverted to find a FlowRatio that just meets a setpoint
-\end{itemize}
+\(\varepsilon_{db,op}\) is the current operation effectiveness with respect to dry bulb temperature depression
+
+\(\varepsilon_{db,design}\) is the user input for effectiveness at design air flow rates and dry operation mode (no water spray on the secondary air side)
+
+\(f_{db,mod}\) is the normalized dry mode operation effectiveness modifier performance curve as a function of flow fraction. The curve value describes how the dry mode effectiveness varies with different flow rates. When conditions are appropriate, this curve is numerically inverted to find a FlowRatio that just meets a setpoint.
 
 The leaving primary air dry bulb temperature in dry operating mode is calculated as follows:
 
 \begin{equation}
-T_{db,out,sys} = T_{db,in,sys} - \epsilon{db,op}\left(T_{db,in,sys}-T_{db,in,sec}\right)
+T_{db,out,sys} = T_{db,in,sys} - \varepsilon_{db,op}\left(T_{db,in,sys}-T_{db,in,sec}\right)
+\label{eq:leavingprimaryairdrybulbtemp}
 \end{equation}
 
 Then check that there is sufficient heat capacitance flux (mcT) in the secondary air stream to provide the conditioning. For dry operation, it should be sufficient to simply use inlet moist air properties for density and specific heat. The following steps are for checking and adjusting for non-physical outcomes that could happen with low secondary flow rates.
@@ -321,7 +345,8 @@ Then check that there is sufficient heat capacitance flux (mcT) in the secondary
 \end{enumerate}
 
 \begin{equation}
-\dot{Q}_{HX} = \left(\dot{m}c_{p}\right)_{sys,in} \left(T_{db,in,sys}-T_{db,out,sys}c\right)
+\dot{Q}_{HX} = \left(\dot{m}c_{p}\right)_{sys,in} \left(T_{db,in,sys}-T_{db,out,sys}\right)
+\label{eq:QdotHX}
 \end{equation}
 
 \begin{enumerate}
@@ -341,11 +366,11 @@ T_{db,out,sec} = T_{db,in,sec} + \frac{\dot{Q}_{HX}}{ \left(\dot{m}c_{p}\right)_
 \setcounter{enumi}{2}
 \tightlist
 \item
-  Check for energy imbalance and adjust if need
+  Check for energy imbalance and adjust if needed
 \end{enumerate}
 
 \begin{equation}
-\text{IF} \left(T_{db,out,sec}>T_{db,in,sys}\right) \text{THEN} T_{db,out,sec} = T_{db,in,sys}-0.2 C
+IF~\left(T_{db,out,sec}>T_{db,in,sys}\right),~THEN~T_{db,out,sec} = T_{db,in,sys}-0.2^{\circ}C
 \end{equation}
 
 \begin{enumerate}
@@ -392,15 +417,15 @@ The secondary air mass flow rate will either be set to or solved for numerically
 P_{sec,fan} = P_{sec,fan,design}\cdot f_{sec,fan,mod}\left(ff_{sec}\right)
 \end{equation}
 
-Where:
+where:
 
-\(P_{sec,fan}\) = secondary air fan electric power value at current secondary air flow rate in W.
+\(P_{sec,fan}\) is the secondary air fan electric power value at current secondary air flow rate (W)
 
-\(P_{sec,fan,design}\) = secondary air fan electric power value at design air flow rate in W.
+\(P_{sec,fan,design}\) is the secondary air fan electric power value at design air flow rate (W)
 
-\(f_{sec,fan,mod}\) = secondary air fan power modifier normalized performance curve as a function of secondary air flow fraction.
+\(f_{sec,fan,mod}\) is the secondary air fan power modifier normalized performance curve as a function of secondary air flow fraction
 
-\(\dot{m}_{sec,design}\) = secondary air design mass flow rate in kg/s
+\(\dot{m}_{sec,design}\) is the secondary air design mass flow rate (kg/s)
 
 Recirculation and spray pump electric power is calculated using design pump electric power and a normalized pump power modifier performance curve that describes how power varies as a function of the secondary air flow fraction is given by:
 
@@ -408,23 +433,23 @@ Recirculation and spray pump electric power is calculated using design pump elec
 P_{pump} = P_{pump,design}\cdot f_{pump,mod}\left(ff_{sec}\right)
 \end{equation}
 
-Where:
+where:
 
-\(P_{pump}\) = recirculation and spray pump power value at current operation in W.
+\(P_{pump}\) is the recirculation and spray pump power value at current operation (W)
 
-\(P_{pump,design}\) = recirculation and spray pump power value at design air flow rate in W.
+\(P_{pump,design}\) is the recirculation and spray pump power value at design air flow rate (W)
 
-\(f_{pump,mod}\) = recirculation and spray pump power modifier normalized performance curve as a function of secondary air flow fraction.
+\(f_{pump,mod}\) is the recirculation and spray pump power modifier normalized performance curve as a function of secondary air flow fraction.
 
-User specified three operating temperature limits are included in the model. These allow controlling when operation should shift from wet to dry and when the cooler should just be shut down because the outdoor conditions are too warm or too wet to do anything beneficial.
+Three user specified operating temperature limits are included in the model. These allow controlling when operation should shift from wet to dry and when the cooler should just be shut down because the outdoor conditions are too warm or too wet to do anything beneficial.  The three temperature limits are:
 
-\(T_{db,evapMinLimit}\) = Evaporative Operation Minimum Limit Outdoor Drybulb Temperature, user input. Shut down wet mode with outdoor temperature is lower than this limit, typically shifting to dry mode.
+\begin{itemize}
+\item \(T_{db,evapMinLimit}\) is the Evaporative Operation Minimum Limit Outdoor Drybulb Temperature, user input. Shut down wet mode with outdoor temperature is lower than this limit, typically shifting to dry mode.
+\item \(T_{wb,evapMaxLimit}\) is the Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature, user input. Shut down fan and pump and don't operate when outdoor Wetbulb is higher than this limit. The wet bulb is maybe warmer than the return air and attempting evaporative cooling is wasteful.
+\item \(T_{db,evapMaxLimit}\) is the Dry Operation Maximum Limit Outdoor Drybulb Temperature, user input. Shut down dry operation attempts and don't operate secondary fan when outdoor dry bulb is higher than this limit. The dry bulb is maybe warmer than the return air and attempting to do heat exchange is wasteful.
+\end{itemize}
 
-\(T_{wb,evapMaxLimit}\) = Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature, user input. Shut down fan and pump and don't operate when outdoor Wetbulb is higher than this limit. The wet bulb is maybe warmer than the return air and attempting evaporative cooling is wasteful.
-
-\(T_{db,evapMaxLimit}\) = Dry Operation Maximum Limit Outdoor Drybulb Temperature, user input. Shut down dry operation attempts and don't operate secondary fan when outdoor dry bulb is higher than this limit. The dry bulb is maybe warmer than the return air and attempting to do heat exchange is wasteful.
-
-Algorithm to determine cooler operation proceeds as follows
+Algorithm to determine cooler operation proceeds as follows:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -437,12 +462,33 @@ Algorithm to determine cooler operation proceeds as follows
 \item
   If dry limit not exceeded, then leaving dry bulb for max cooling power available at full secondary air flow rate for wet operation, \(T_{db,out,sys,wet,min}\)
 \item
-  Compare setpoint temperature needed to temperatures available, evaluate limits and choose which case for operation is called for. The following table outlines the five cases in order of increasing cooling power.
+  Compare setpoint temperature needed to temperatures available, evaluate limits and choose which case for operation is called for. The following table outlines the six cases in order of increasing cooling power.
 \end{enumerate}
 
-INSERT TABLE
+\begin{longtable}[c]{@{}lll@{}}
+\caption{Indirect Evaporative Cooler Operation \label{table:indirect-evaporative-cooler-operation}} \tabularnewline
+\toprule 
+Case & Criteria & Secondary Air Flow \tabularnewline
+\midrule
+\endfirsthead
 
-``Modulated'' cases solve for a secondary flow rate using numerical method, such as root solver. Residual is formulated by a difference between the dry bulb temperature leaving the cooler and the setpoint. As the solver progress it varies flow rate on the secondary side until the setpoint is met. For each iteration, a new effectiveness is calculated as a function of Flow Ratio. The new flow is used for the \(\left(\dot{m}c_{p}\right)_{min}\) term and the new effectiveness is used to calculate a result for leaving drybulb. The numerical method is the same for dry and wet operation, only the functions will use different curves and state variables to describe performance. The root solver solver can vary secondary flow rate, \(\dot{V}_{sec}\) , to drive the following residual to zero:
+\caption[]{Indirect Evaporative Cooler Operation} \tabularnewline
+\toprule 
+Case & Criteria & Secondary Air Flow \tabularnewline
+\midrule
+\endhead
+
+Off & \(T_{db,in,sec}<T_{db,out,setpoint}\) or (\(T_{db,in,sec}>T_{db,dryMaxLimit}\) and \(T_{wb,in,sec}>T_{wb,evapMaxLimit}\)) & None, no cooling needed or limit exceeded and is off \tabularnewline
+Dry Op Modulated & \(T_{db,in,sec}<T_{wb,evapMinLimit}\); \(T_{db,in,sec}<T_{db,dryMaxLimit}\) \(T_{db,out,sys,dry,min}<T_{db,out,setpoint}\) & Solve for secondary flow rate during dry operation that meets setpoint \tabularnewline
+Dry Op Max & \(T_{db,in,sec}>T_{db,evapMinLimit}\); \(T_{db,in,sec}<T_{db,dryMaxLimit}\) \(T_{db,out,setpoint}<T_{db,out,sys,dry,min}\) & Run at full speed in dry mode \tabularnewline
+Dry or Wet Op Modulated & \(T_{db,in,sec}>T_{evapMinLimit}\); \(T_{db,in,sec}<T_{db,dryMaxLimit}\) \(T_{wb,in,sec}<T_{wb,evapMaxLimit}\) \(T_{db,out,setpoint}<T_{db,out,sys,dry,min}\); \(T_{db,out,sys,wet,min}<T_{db,out,setpoint}\) & Solve for secondary flow rate during both dry operation and wet operation that meets setpoint, choose lowest power among 2 \tabularnewline
+Wet Op Modulated & \(T_{db,in,sec}>T_{db,evapMinLimit}\); \(T_{wb,in,sec}<T_{wb,evapMaxLimit}\) \(T_{db,out.sys,wet,min}<T_{db,out,setpoint}\) \(T_{db,out,setpoint}<T_{db,out,sys,dry,min}\) & Solve for secondary flow rate during wet operation that meets setpoint \tabularnewline
+Wet Op Max & \(T_{db,in,sec}>T_{db,evapMinLimit}\); \(T_{wb,in,sec}<T_{wb,evapMaxLimit}\) \(T_{db,out,setpoint}<T_{db,out,sys,dry,min}\) & Run at full speed in wet mode \tabularnewline
+\bottomrule
+\end{longtable}
+
+
+``Modulated'' cases solve for a secondary flow rate using numerical method, such as root solver. Residual is formulated by a difference between the dry bulb temperature leaving the cooler and the setpoint. As the solver progress it varies flow rate on the secondary side until the setpoint is met. For each iteration, a new effectiveness is calculated as a function of Flow Ratio. The new flow is used for the \(\left(\dot{m}c_{p}\right)_{min}\) term and the new effectiveness is used to calculate a result for leaving drybulb. The numerical method is the same for dry and wet operation, only the functions will use different curves and state variables to describe performance. The root solver solver can vary secondary flow rate, \(\dot{V}_{sec}\), to drive the following residual to zero:
 
 \begin{equation}
 \text{residual} = T_{db,out,sys} - T_{db,out,setpoint}
@@ -450,19 +496,20 @@ INSERT TABLE
 
 ``Dry or Wet Op Modulated'' is the most complex situation. There is an overlap and the cooler could deliver the setpoint air using either dry operation or wet operation. The model proceeds separately to calculate both wet and dry operation, with separate numerical solvers for modulation in each mode. Then the fan and pump power is calculated for each mode. Select the lowest power mode as the preferred choice. (This doesn't really count the value of water, could bring in a source factor but \ldots{}). Discard results for the unused mode.
 
-The purge air, or secondary airside, is the stream that evaporates water and indirectly cools the primary, or system air.~ The result from Equation is then compared to a lower bound, \({T_{db,out,bound}}\) , determined from the dewpoint of the incoming purge air using Equation .
+The purge air, or secondary airside, is the stream that evaporates water and indirectly cools the primary, or system air.~ The result from Equation~\ref{eq:leavingprimaryairdrybulbtemp} is then compared to a lower bound, \({T_{db,out,bound}}\), determined from the dewpoint of the incoming purge air using Equation~\ref{eq:TdboutboundfromTdewinpurge}.
 
 \begin{equation}
 {T_{db,out,bound}} = {T_{db,in,sys}} - \beta ({T_{db,in,sys}} - {T_{dew,in,purge}})
+\label{eq:TdboutboundfromTdewinpurge}
 \end{equation}
 
-where,
+where:
 
-\({T_{dew,in,purge}}\) ~ is the dewpoint of purge air entering the wet side of cooler {[}ºC{]}
+\({T_{dew,in,purge}}\) is the dewpoint of purge air entering the wet side of cooler {[}ºC{]}
 
-\(\beta\) ~~~~~~~~~~~~~ is a factor for how close to dewpoint is possible (eg. 0.9)
+\(\beta\) is a factor for how close to dewpoint is possible (eg. 0.9)
 
-The final result (for PLF = 1) is the larger of the results from Equations and .
+The final result (for PLF = 1) is the larger of the results from Equations~\ref{eq:leavingprimaryairdrybulbtemp} and~\ref{eq:TdboutboundfromTdewinpurge}.
 
 The indirect cooler has the ability to overcool the air and therefore needs some form of modulation.~ A Part Load Fraction, PLF, is used to model the implications of controlling the amount of cooling.~ It is assumed that through on/off cycling that the cooling power can be varied to exactly meet the desired temperature when PLF is less than unity.
 
@@ -478,11 +525,7 @@ The indirect cooler has the ability to overcool the air and therefore needs some
 PLF = \frac{{{{\dot Q}_{{\mathop{\rm Re}\nolimits} quired}}}}{{{{\dot Q}_{Full}}}}
 \end{equation}
 
-where,
-
-\(PLF\) ~~~~~~~~~~~~~~~~~~~~ is the Part Load Fraction
-
-When PLF is less than 1.0 it is assumed that the cooler will deliver the desired temperature air (as long as it is less than the inlet; it doesn't need heating).~ The PLF is used to modify the auxiliary fan power when the fan power modifier curve is not specified and find when the unit will overcool.
+where \(PLF\) is the Part Load Fraction.~ When PLF is less than 1.0, it is assumed that the cooler will deliver the desired temperature air (as long as it is less than the inlet; it doesn't need heating).~ The PLF is used to modify the auxiliary fan power when the fan power modifier curve is not specified and find when the unit will overcool.
 
 \begin{equation}
 {P_{fan}} = \Delta P\cdot \dot V\cdot e\cdot PLF
@@ -494,10 +537,11 @@ A third air stream input to the cooler was implemented in order to allow mixing 
 
 \subsubsection{Water Consumption}\label{water-consumption}
 
-Water consumption is an important consideration when evaluating evaporative coolers.~ Water consumption of the evaporative cooler is modeled using Equation .
+Water consumption is an important consideration when evaluating evaporative coolers.~ Water consumption of the evaporative cooler is modeled using Equation~\ref{eq:WaterConsumptionVwater}.
 
 \begin{equation}
 {\dot V_{water}} = {\dot V_{evap}} + {\dot V_{drift}} + {\dot V_{blowdown}}
+\label{eq:WaterConsumptionVwater}
 \end{equation}
 
 The three components of water consumption are evaporation, drift, and blowdown.~ Evaporation is the water evaporated as the normal part of the evaporative cooler thermodynamic process and is calculated using:
@@ -506,23 +550,23 @@ The three components of water consumption are evaporation, drift, and blowdown.~
 {\dot V_{evap}} = \frac{{{{\dot Q}_{IEC}}}}{{{\rho_{water}}{h_{fg}}}}
 \end{equation}
 
-where,
+where:
 
-\({\dot V_{evap}}\) ~is the volume flow rate of useful water evaporation {[}m\(^{3}\)/s{]}
+\({\dot V_{evap}}\) is the volume flow rate of useful water evaporation (m\(^{3}\)/s)
 
-\({h_{fg}}\) ~is the heat of vaporization of water (taken as 2,500,000 J/kg)
+\({h_{fg}}\) is the heat of vaporization of water (taken as 2,500,000 J/kg)
 
-\({\dot Q_{IEC}}\) ~is the rate of heat transfer calculated as by Equation or Equation {[}W{]}
+\({\dot Q_{IEC}}\) is the rate of heat transfer of the indirect evaporator cooler or \(\dot{Q}_{HX}\) as shown in Equation~\ref{eq:QdotHX} (W)
 
-\({\rho_{water}}\) ~is the density of water {[}kg/m3{]}
+\({\rho_{water}}\) is the density of water (kg/m\(^{3}\)).
 
-Drift is water that leaves the secondary side as droplets and does not contribute to the evaporative cooling process in a useful manner.~ It is calculated using a user input factor that describes drift as a fraction of \({\dot V_{evap}}\) .
+Drift is water that leaves the secondary side as droplets and does not contribute to the evaporative cooling process in a useful manner.~ It is calculated using a user input factor that describes drift as a fraction of \({\dot V_{evap}}\).
 
 \begin{equation}
 {\dot V_{drift}} = {\dot V_{evap}} * {f_{drift}}
 \end{equation}
 
-Blowdown is water drained from the sump to counter the build up of solids in the water that would otherwise occur because of evaporation.~ It is calculated using a user input factor for the blowdown concentration ratio ,\({R_{concentration}}\) ~, which is the ratio of solids in in the blowdown water compared to the solids in the fresh makeup water and is limited to values of 2 or higher.~ The make up water needed for blowdown is calculated using:
+Blowdown is water drained from the sump to counter the build up of solids in the water that would otherwise occur because of evaporation.~ It is calculated using a user input factor for the blowdown concentration ratio, \({R_{concentration}}\), which is the ratio of solids in in the blowdown water compared to the solids in the fresh makeup water and is limited to values of 2 or higher.~ The make up water needed for blowdown is calculated using:
 
 \begin{equation}
 {\dot V_{blowdown}} = \frac{{{{\dot V}_{evap}}}}{{\left( {{R_{concentration}} - 1.0} \right)}} - {\dot V_{drift}}
@@ -570,59 +614,47 @@ The Recirculating Water Design Pump Power is sized from secondary air design flo
 P_{pump,design} = \dot{V}_{sec,design}\cdot\text{PumpPowerScalingFactor}
 \end{equation}
 
-Where,
+where:
 
-\(\dot{V}_{sys,design}\) = primary air design volume flow rate in m3/s
+\(\dot{V}_{sys,design}\) is the primary air design volume flow rate in (m\(^{3}\)/s)
 
-\(\dot{V}_{sec,design}\) = secondary air design volume flow rate in m3/s
+\(\dot{V}_{sec,design}\) is the secondary air design volume flow rate in (m\(^{3}\)/s)
 
-\(\text{SecAirFlowScalingFactor}\) = user specified Secondary air flow sizing factor in units of W/(m3/s) for secondary design air flow rate calculation.
+\(\text{SecAirFlowScalingFactor}\) is the user specified secondary air flow sizing factor in units of W/(m\(^{3}\)/s) for secondary design air flow rate calculation
 
-\(\text{FanPowerScalingFactor}\) = user specified secondary air fan sizing specific power in units of W/(m3/s) for design fan power calculation.
+\(\text{FanPowerScalingFactor}\) is the user specified secondary air fan sizing specific power in units of W/(m\(^{3}\)/s) for design fan power calculation
 
-\(\text{PumpPowerScalingFactor}\) = user specified recirculating and spraying water pump power sizing factor in units of W/(m3/s) for design pump power calculation.
+\(\text{PumpPowerScalingFactor}\) is the user specified recirculating and spraying water pump power sizing factor in units of W/(m\(^{3}\)/s) for design pump power calculation.
 
 \subsection{Direct Evaporative Cooler Special Research Model}\label{direct-evaporative-cooler-special-research-model}
 
-This section summarizes the model implemented in the component EvaporativeCooler:Direct:ResearchSpecial.~ This model can use a simple constant effectiveness or a variable effectiveness model that, under part load conditions, can modulate so that the air leaving the cooler just meets a drybulb temperature setpoint.~ The algorithm used to determine the changes to the system air proceeds in four steps:
+This section summarizes the model implemented in the component EvaporativeCooler:Direct:Re-searchSpecial.~ This model can use a simple constant effectiveness or a variable effectiveness model that, under part load conditions, can modulate so that the air leaving the cooler just meets a drybulb temperature setpoint.~ The algorithm used to determine the changes to the system air proceeds in four steps:
 
 \begin{enumerate}
-\def\labelenumi{\arabic{enumi})}
-\tightlist
-\item
-  Calculate the current operation effectiveness using effectiveness modifying curve
+\item Calculate the current operation effectiveness using effectiveness modifying curve.
+\item Calculate full load performance using a part load fraction (PLF) = 1 and Equation~\ref{eq:IECFullLoadPerformance}.
+\item Calculate PLF using Equations~\ref{eq:IECFullOutput},~\ref{eq:IECRequiredOutput}, and~\ref{eq:IECPLF}.
+\item Recalculate cooler performance using the PLF.
 \end{enumerate}
 
-2)~Calculate full load performance using a part load fraction (PLF) = 1 and Equation .
-
-3)~Calculate PLF using Equations , , and .
-
-4)~Recalculate cooler performance using the PLF.
 
 \begin{equation}
  \begin{array}{rl}
-  \epsilon_{op} & = \epsilon_{design}\cdot f_{mod}\left(flowRatio\right) \\
-  T_{db,out,sys} & = T_{db,in,sys} - \epsilon_{op}\cdot\left(T_{db,in,sys}-T_{wb,in,sys}\right) \\
-  T_{db,out} & = T_{db,in}-\epsilon\left(T_{db,in}-T_{wb,in}\right)
+  \varepsilon_{op} & = \varepsilon_{design}\cdot f_{mod}\left(flowRatio\right) \\
+  T_{db,out,sys} & = T_{db,in,sys} - \varepsilon_{op}\cdot\left(T_{db,in,sys}-T_{wb,in,sys}\right) \\
+  T_{db,out} & = T_{db,in}-\varepsilon_{op}\left(T_{db,in}-T_{wb,in}\right)
  \end{array}
+\label{eq:IECFullLoadPerformance}
 \end{equation}
 
-where,
+where:
 
-\begin{itemize}
-\item
-  \({T_{db,out,sys}}\) ~is the drybub temperature of the air leaving the cooler {[}ºC{]},
-\item
-  \({T_{db,in,sys}}\) ~is the drybulb temperature of the air entering the cooler {[}ºC{]},
-\item
-  \({T_{wb,in,sys}}\) ~is the wetbulb temperature of the air entering the cooler {[}ºC{]}, and
-\item
-  \(\epsilon_{design}\) ~is the cooler design effectiveness.
-\item
-  \(\epsilon_{op}\) ~is the cooler current operation effectiveness.
-\item
-  \(f_{mod}\) ~is the effectiveness modifier curve as a function of system air flow fraction
-\end{itemize}
+\({T_{db,out,sys}}\) is the drybub temperature of the air leaving the cooler (\(^{\circ}\)C)
+\({T_{db,in,sys}}\) is the drybulb temperature of the air entering the cooler (\(^{\circ}\)C)
+\({T_{wb,in,sys}}\) is the wetbulb temperature of the air entering the cooler (\(^{\circ}\)C)
+\(\varepsilon_{design}\) is the cooler design effectiveness
+\(\varepsilon_{op}\) is the cooler current operation effectiveness
+\(f_{mod}\) is the effectiveness modifier curve as a function of system air flow fraction.
 
 The wetbulb temperature of air leaving a direct cooler is the same as the wetbulb temperature entering the cooler.~ The leaving humidity ratio of the air is calculated using psychrometric functions with leaving drybulb and wetbulb temperatures and outdoor air pressure as inputs.~ The leaving enthalpy of air is calculated using psychrometric functions with leaving drybulb temperature, leaving humidity ratio, and outdoor air pressure as inputs.
 
@@ -630,21 +662,24 @@ The direct cooler sometimes has the ability to overcool the air and therefore so
 
 \begin{equation}
 {\rm{FullOutput}} = {T_{db,out}} - {T_{db,in}}
+\label{eq:IECFullOutput}
 \end{equation}
 
 \begin{equation}
 {\rm{RequiredOutput}} = {T_{db,desired}} - {T_{db,in}}
+\label{eq:IECRequiredOutput}
 \end{equation}
 
 \begin{equation}
 PLF = \frac{{{\rm{RequiredOutput}}}}{{{\rm{FullOutput}}}}
+\label{eq:IECPLF}
 \end{equation}
 
 When PLF is less than 1.0 it is assumed that the cooler will deliver the desired temperature air (as long as it is less than the inlet; it doesn't need heating).~ Water pump power is also derated using the user specified pump modifier curve or using PLF when the pump modifier curve is not specified.
 
 \subsubsection{Water Consumption}\label{water-consumption-1}
 
-Water consumption is an important consideration when evaluating evaporative coolers.~ Water consumption of the evaporative cooler is modeled using Equation .
+Water consumption is an important consideration when evaluating evaporative coolers.~ Water consumption of the evaporative cooler is modeled using the following equation:
 
 \begin{equation}
 {\dot V_{water}} = {\dot V_{evap}} + {\dot V_{drift}} + {\dot V_{blowdown}}
@@ -656,25 +691,25 @@ The three components of water consumption are evaporation, drift, and blowdown.~
 {\dot V_{evap}} = \frac{{\dot m\left( {{w_{out}} - {w_{in}}} \right)}}{{{\rho_{water}}}}
 \end{equation}
 
-where,
+where:
 
-\({\dot V_{evap}}\) ~is the volume flow rate of useful water evaporation {[}m\(^{3}\)/s{]}
+\({\dot V_{evap}}\) is the volume flow rate of useful water evaporation (m\(^{3}\)/s)
 
-\({w_{out}}\) ~is the humidity ratio of the air leaving the cooler {[}kg/kg{]}
+\({w_{out}}\) is the humidity ratio of the air leaving the cooler (kg/kg)
 
-\({w_{in}}\) ~is the humidity ratio of air entering the cooler {[}kg/kg{]}
+\({w_{in}}\) is the humidity ratio of air entering the cooler (kg/kg)
 
-\(\dot m\) ~is the mass flow rate of air moving through the cooler {[}kg/s{]}
+\(\dot m\) is the mass flow rate of air moving through the cooler (kg/s)
 
-\({\rho_{water}}\) ~is the density of water {[}kg/m3{]}
+\({\rho_{water}}\) is the density of water (kg/m\(^{3}\)).
 
-Drift is water that leaves the cooler (and supply air duct) as droplets and does not contribute to the evaporative cooling process in a useful manner.~ It is calculated using a user input factor that describes drift as a fraction of \({\dot V_{evap}}\) .
+Drift is water that leaves the cooler (and supply air duct) as droplets and does not contribute to the evaporative cooling process in a useful manner.~ It is calculated using a user input factor that describes drift as a fraction of \({\dot V_{evap}}\).
 
 \begin{equation}
 {\dot V_{drift}} = {\dot V_{evap}} * {f_{drift}}
 \end{equation}
 
-Blowdown is water drained from the sump to counter the build up of solids in the water that would otherwise occur because of evaporation.~ It is calculated using a user input factor for the blowdown concentration ratio ,\({R_{concentration}}\) , which is the ratio of solids in the blowdown water compared to the solids in the fresh makeup water and is limited to values of 2 or higher.~ The make up water needed for blowdown is calculated using:
+Blowdown is water drained from the sump to counter the build up of solids in the water that would otherwise occur because of evaporation.~ It is calculated using a user input factor for the blowdown concentration ratio, \({R_{concentration}}\), which is the ratio of solids in the blowdown water compared to the solids in the fresh makeup water and is limited to values of 2 or higher.~ The make up water needed for blowdown is calculated using:
 
 \begin{equation}
 {\dot V_{blowdown}} = \frac{{{{\dot V}_{evap}}}}{{\left( {{R_{concentration}} - 1.0} \right)}} - {\dot V_{drift}}

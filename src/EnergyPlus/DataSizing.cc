@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -149,7 +149,7 @@ namespace DataSizing {
     Real64 const AutoSize(-99999.0);
 
     // parameter for (time-of-peak) sizing format
-    gio::Fmt PeakHrMinFmt("(I2.2,':',I2.2,':00')");
+    ObjexxFCL::gio::Fmt PeakHrMinFmt("(I2.2,':',I2.2,':00')");
 
     // Zone Outdoor Air Method
     int const ZOAM_FlowPerPerson(1); // set the outdoor air flow rate based on number of people in the zone
@@ -256,6 +256,7 @@ namespace DataSizing {
     bool ZoneEqUnitVent(false);                     // TRUE if a unit ventilator unit is being simulated
     bool ZoneEqVentedSlab(false);                   // TRUE if a ventilated slab is being simulated
     bool ZoneEqDXCoil(false);                       // TRUE if a ZoneHVAC DX coil is being simulated
+    bool ZoneEqUnitarySys(false);                   // TRUE if a zone UnitarySystem is being simulated
     bool ZoneCoolingOnlyFan(false);                 // TRUE if a ZoneHVAC DX cooling coil is only coil in parent
     bool ZoneHeatingOnlyFan(false);                 // TRUE if zone unit only does heating and contains a fam (such as Unit Heater)
     bool ZoneSizingRunDone(false);                  // True if a zone sizing run has been successfully completed.
@@ -268,7 +269,7 @@ namespace DataSizing {
     Real64 DataCoilSizingAirOutHumRat(0.0);         // saves sizing data for use in coil object reporting
     Real64 DataCoilSizingFanCoolLoad(0.0);          // saves sizing data for use in coil object reporting
     Real64 DataCoilSizingCapFT(1.0);                // saves sizing data for use in coil object reporting
-    Real64 DataDesAccountForFanHeat(true);          // include fan heat when true
+    bool DataDesAccountForFanHeat(true);            // include fan heat when true
     Real64 DataDesInletWaterTemp(0.0);              // coil inlet water temperture used for warning messages
     Real64 DataDesInletAirHumRat(0.0);              // coil inlet air humidity ratio used for warning messages
     Real64 DataDesInletAirTemp(0.0);                // coil inlet air temperature used for warning messages
@@ -361,6 +362,8 @@ namespace DataSizing {
     Array1D<Real64> PzSumBySys;      // sum of design people for system, Pz_sum
     Array1D<Real64> PsBySys;         // sum of peak concurrent people by system, Ps
     Array1D<Real64> DBySys;          // Population Diversity by system
+    Array1D<Real64> SumRpxPzBySys;   // Sum of per person OA times number of people by system, No D yet
+    Array1D<Real64> SumRaxAzBySys;   // sum of per area OA time zone area by system, does not get altered by D
     Array1D<std::string> PeakPsOccurrenceDateTimeStringBySys;    // string describing when Ps peak occurs
     Array1D<std::string> PeakPsOccurrenceEnvironmentStringBySys; // string describing Environment when Ps peak occurs
     Array1D<Real64> VouBySys;                                    // uncorrected system outdoor air requirement, for std 62.1 VRP
@@ -418,6 +421,7 @@ namespace DataSizing {
         ZoneEqUnitVent = false;
         ZoneEqVentedSlab = false;
         ZoneEqDXCoil = false;
+        ZoneEqUnitarySys = false;
         ZoneCoolingOnlyFan = false;
         ZoneHeatingOnlyFan = false;
         ZoneSizingRunDone = false;
@@ -547,6 +551,8 @@ namespace DataSizing {
         PzSumBySys.deallocate();
         PsBySys.deallocate();
         DBySys.deallocate();
+        SumRpxPzBySys.deallocate();
+        SumRaxAzBySys.deallocate();
         PeakPsOccurrenceDateTimeStringBySys.deallocate();
         PeakPsOccurrenceEnvironmentStringBySys.deallocate();
         VouBySys.deallocate();
@@ -643,6 +649,7 @@ namespace DataSizing {
         DataScalableCapSizingON = false;
         DataSysScalableFlowSizingON = false;
         DataSysScalableCapSizingON = false;
+        DataDesAccountForFanHeat = true;
 
         DataDesInletWaterTemp = 0.0;
         DataDesInletAirHumRat = 0.0;
@@ -706,6 +713,7 @@ namespace DataSizing {
             ZoneEqSizing(curZoneEqNum).CoolingAirVolFlow = 0.0;
             ZoneEqSizing(curZoneEqNum).HeatingAirVolFlow = 0.0;
             ZoneEqSizing(curZoneEqNum).SystemAirVolFlow = 0.0;
+            ZoneEqSizing(curZoneEqNum).DesignSizeFromParent = false;
         }
 
         if (curSysNum > 0) {

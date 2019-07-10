@@ -14,9 +14,11 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <type_traits>
 
 #include "util/util.h"
 #include "util/logging.h"
+#include "util/pod_array.h"
 #include "util/sparse_array.h"
 #include "util/sparse_set.h"
 #include "re2/re2.h"
@@ -59,7 +61,8 @@ class Prog {
   // Single instruction in regexp program.
   class Inst {
    public:
-    Inst() : out_opcode_(0), out1_(0) {}
+    // See the assertion below for why this is so.
+    Inst() = default;
 
     // Copyable.
     Inst(const Inst&) = default;
@@ -75,7 +78,7 @@ class Prog {
     void InitFail();
 
     // Getters
-    int id(Prog* p) { return static_cast<int>(this - p->inst_); }
+    int id(Prog* p) { return static_cast<int>(this - p->inst_.data()); }
     InstOp opcode() { return static_cast<InstOp>(out_opcode_&7); }
     int last()      { return (out_opcode_>>3)&1; }
     int out()       { return out_opcode_>>4; }
@@ -155,6 +158,11 @@ class Prog {
     friend struct PatchList;
     friend class Prog;
   };
+
+  // Inst must be trivial so that we can freely clear it with memset(3).
+  // Arrays of Inst are initialised by copying the initial elements with
+  // memmove(3) and then clearing any remaining elements with memset(3).
+  static_assert(std::is_trivial<Inst>::value, "Inst must be trivial");
 
   // Whether to anchor the search.
   enum Anchor {
@@ -388,8 +396,8 @@ class Prog {
   int list_count_;            // count of lists (see above)
   int inst_count_[kNumInst];  // count of instructions by opcode
 
-  Inst* inst_;              // pointer to instruction array
-  uint8_t* onepass_nodes_;  // data for OnePass nodes
+  PODArray<Inst> inst_;     // pointer to instruction array
+  PODArray<uint8_t> onepass_nodes_;  // data for OnePass nodes
 
   int64_t dfa_mem_;         // Maximum memory for DFAs.
   DFA* dfa_first_;          // DFA cached for kFirstMatch/kManyMatch

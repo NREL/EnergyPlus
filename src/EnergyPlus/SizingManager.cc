@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -186,10 +186,11 @@ namespace SizingManager {
         using OutputReportTabular::ComputeLoadComponentDecayCurve;
         using OutputReportTabular::DeallocateLoadComponentArrays;
         using OutputReportTabular::isCompLoadRepReq;
+        using OutputReportTabular::hasSizingPeriodsDays;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ManageSizing: ");
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool Available(false); // an environment is available to process
@@ -248,13 +249,21 @@ namespace SizingManager {
         // determine if the second set of zone sizing calculations should be performed
         // that include a pulse for the load component reporting
         isUserReqCompLoadReport = isCompLoadRepReq(); // check getinput structure if load component report is requested
-        if (DoZoneSizing && (NumZoneSizingInput > 0)) {
+        bool fileHasSizingPeriodDays =
+            hasSizingPeriodsDays(); // check getinput if SizingPeriod:DesignDays or SizingPeriod:WeatherFileDays are present
+        if (DoZoneSizing && (NumZoneSizingInput > 0) && fileHasSizingPeriodDays) {
             CompLoadReportIsReq = isUserReqCompLoadReport;
         } else { // produce a warning if the user asked for the report but it will not be generated because sizing is not done
             if (isUserReqCompLoadReport) {
-                ShowWarningError(
-                    RoutineName +
-                    "The ZoneComponentLoadSummary report was requested but no sizing objects were found so that report cannot be generated.");
+                if (fileHasSizingPeriodDays) {
+                    ShowWarningError(
+                        RoutineName +
+                        "The ZoneComponentLoadSummary report was requested but no sizing objects were found so that report cannot be generated.");
+                } else {
+                    ShowWarningError(
+                        RoutineName +
+                        "The ZoneComponentLoadSummary report was requested but no SizingPeriod:DesignDay or SizingPeriod:WeatherFileDays objects were found so that report cannot be generated.");
+                }
             }
         }
         if (CompLoadReportIsReq) { // if that report is created then zone sizing calculations are repeated
@@ -282,7 +291,7 @@ namespace SizingManager {
                 {
                     IOFlags flags;
                     flags.ACTION("write");
-                    gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszCsvFileName, flags);
+                    ObjexxFCL::gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszCsvFileName, flags);
                     write_stat = flags.ios();
                 }
                 if (write_stat != 0) {
@@ -292,7 +301,7 @@ namespace SizingManager {
                 {
                     IOFlags flags;
                     flags.ACTION("write");
-                    gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszTabFileName, flags);
+                    ObjexxFCL::gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszTabFileName, flags);
                     write_stat = flags.ios();
                 }
                 if (write_stat != 0) {
@@ -302,7 +311,7 @@ namespace SizingManager {
                 {
                     IOFlags flags;
                     flags.ACTION("write");
-                    gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszTxtFileName, flags);
+                    ObjexxFCL::gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszTxtFileName, flags);
                     write_stat = flags.ios();
                 }
                 if (write_stat != 0) {
@@ -361,7 +370,7 @@ namespace SizingManager {
                             ++CurEnvirNumSimDay;
                         }
 
-                        gio::write(DayOfSimChr, fmtLD) << DayOfSim;
+                        ObjexxFCL::gio::write(DayOfSimChr, fmtLD) << DayOfSim;
                         strip(DayOfSimChr);
                         BeginDayFlag = true;
                         EndDayFlag = false;
@@ -509,7 +518,7 @@ namespace SizingManager {
                 {
                     IOFlags flags;
                     flags.ACTION("write");
-                    gio::open(OutputFileSysSizing, DataStringGlobals::outputSszCsvFileName, flags);
+                    ObjexxFCL::gio::open(OutputFileSysSizing, DataStringGlobals::outputSszCsvFileName, flags);
                     write_stat = flags.ios();
                 }
                 if (write_stat != 0) {
@@ -519,7 +528,7 @@ namespace SizingManager {
                 {
                     IOFlags flags;
                     flags.ACTION("write");
-                    gio::open(OutputFileSysSizing, DataStringGlobals::outputSszTabFileName, flags);
+                    ObjexxFCL::gio::open(OutputFileSysSizing, DataStringGlobals::outputSszTabFileName, flags);
                     write_stat = flags.ios();
                 }
                 if (write_stat != 0) {
@@ -529,7 +538,7 @@ namespace SizingManager {
                 {
                     IOFlags flags;
                     flags.ACTION("write");
-                    gio::open(OutputFileSysSizing, DataStringGlobals::outputSszTxtFileName, flags);
+                    ObjexxFCL::gio::open(OutputFileSysSizing, DataStringGlobals::outputSszTxtFileName, flags);
                     write_stat = flags.ios();
                 }
                 if (write_stat != 0) {
@@ -575,7 +584,7 @@ namespace SizingManager {
                     if (!WarmupFlag && DayOfSim > 1) {
                         ++CurEnvirNumSimDay;
                     }
-                    gio::write(DayOfSimChr, fmtLD) << DayOfSim;
+                    ObjexxFCL::gio::write(DayOfSimChr, fmtLD) << DayOfSim;
                     strip(DayOfSimChr);
                     BeginDayFlag = true;
                     EndDayFlag = false;
@@ -1368,13 +1377,12 @@ namespace SizingManager {
                 } // end loop over zones on air loop to calculate Zdz values
 
                 // Sum Voz values for System Vou, in E+ the Vbz value has now been corrected to remove population Diversity, so we add the term back
-                // in here directly to get Vou
-                DataSizing::VouBySys(AirLoopNum) = 0.0;
+                // in here directly to get Vou, now corrected again to only apply D to the people part
+                DataSizing::VouBySys(AirLoopNum) = DataSizing::DBySys(AirLoopNum) * SumRpxPzBySys(AirLoopNum) + SumRaxAzBySys(AirLoopNum);
                 // redo VpzClgSumBySys( AirLoopNum ) with latest values, for reporting
                 DataSizing::VpzClgSumBySys(AirLoopNum) = 0.0;
                 for (int zoneNum = 1; zoneNum <= DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
                     int termUnitSizingIndex = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
-                    DataSizing::VouBySys(AirLoopNum) += VbzByZone(termUnitSizingIndex) * DataSizing::DBySys(AirLoopNum);
                     DataSizing::VpzClgSumBySys(AirLoopNum) += DataSizing::VdzClgByZone(termUnitSizingIndex);
                 }
                 for (int zoneNum = 1; zoneNum <= DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
@@ -1383,7 +1391,6 @@ namespace SizingManager {
                                                                           DataAirLoop::AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
                                                                           DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                     if (MatchingCooledZoneNum == 0) {
-                        DataSizing::VouBySys(AirLoopNum) += VbzByZone(termUnitSizingIndex) * DataSizing::DBySys(AirLoopNum);
                         DataSizing::VpzClgSumBySys(AirLoopNum) += DataSizing::VdzClgByZone(termUnitSizingIndex);
                     }
                 }
@@ -1566,7 +1573,7 @@ namespace SizingManager {
             OutputReportPredefined::PreDefTableEntry(
                 OutputReportPredefined::pdchS62svrClD, FinalSysSizing(AirLoopNum).AirPriLoopName, DBySys(AirLoopNum), 4); // D
             OutputReportPredefined::PreDefTableEntry(
-                OutputReportPredefined::pdchS62svrClVou, FinalSysSizing(AirLoopNum).AirPriLoopName, FinalSysSizing(AirLoopNum).SysUncOA, 4); // Vou
+                OutputReportPredefined::pdchS62svrClVou, FinalSysSizing(AirLoopNum).AirPriLoopName, VouBySys(AirLoopNum), 4); // Vou
             OutputReportPredefined::PreDefTableEntry(
                 OutputReportPredefined::pdchS62svrClVps, FinalSysSizing(AirLoopNum).AirPriLoopName, DataSizing::VpsClgBySys(AirLoopNum), 4); // Vps
             OutputReportPredefined::PreDefTableEntry(
@@ -1598,7 +1605,7 @@ namespace SizingManager {
             OutputReportPredefined::PreDefTableEntry(
                 OutputReportPredefined::pdchS62svrHtD, FinalSysSizing(AirLoopNum).AirPriLoopName, DBySys(AirLoopNum), 4); // D
             OutputReportPredefined::PreDefTableEntry(
-                OutputReportPredefined::pdchS62svrHtVou, FinalSysSizing(AirLoopNum).AirPriLoopName, FinalSysSizing(AirLoopNum).SysUncOA, 4); // Vou
+                OutputReportPredefined::pdchS62svrHtVou, FinalSysSizing(AirLoopNum).AirPriLoopName, DataSizing::VouBySys(AirLoopNum), 4); // Vou
             OutputReportPredefined::PreDefTableEntry(
                 OutputReportPredefined::pdchS62svrHtVps, FinalSysSizing(AirLoopNum).AirPriLoopName, DataSizing::VpsHtgBySys(AirLoopNum), 4); // Vps
             OutputReportPredefined::PreDefTableEntry(
@@ -2021,8 +2028,8 @@ namespace SizingManager {
                                 int DayOfMonth(0);
                                 General::InvOrdinalDay(DayLoop, Month, DayOfMonth, 1);
                                 std::string MonthDayString;
-                                static gio::Fmt MnDyFmt("(I2.2,'/',I2.2)");
-                                gio::write(MonthDayString, MnDyFmt) << Month << DayOfMonth;
+                                static ObjexxFCL::gio::Fmt MnDyFmt("(I2.2,'/',I2.2)");
+                                ObjexxFCL::gio::write(MonthDayString, MnDyFmt) << Month << DayOfMonth;
                                 Real64 TimeHrsFraction = (double(hrOfDay) - 1.0) + double(TS) * TSfraction;
                                 int TimeHrsInt = int(TimeHrsFraction);
                                 int TimeMinsInt = nint((TimeHrsFraction - TimeHrsInt) * 60.0);
@@ -2030,9 +2037,9 @@ namespace SizingManager {
                                     ++TimeHrsInt;
                                     TimeMinsInt = 0;
                                 }
-                                static gio::Fmt TStmpFmti("(I2.2,':',I2.2)");
+                                static ObjexxFCL::gio::Fmt TStmpFmti("(I2.2,':',I2.2)");
                                 std::string timeStamp;
-                                gio::write(timeStamp, TStmpFmti) << TimeHrsInt << TimeMinsInt;
+                                ObjexxFCL::gio::write(timeStamp, TStmpFmti) << TimeHrsInt << TimeMinsInt;
                                 DataSizing::PeakPsOccurrenceDateTimeStringBySys(AirLoopNum) = MonthDayString + ' ' + timeStamp;
                                 DataSizing::PeakPsOccurrenceEnvironmentStringBySys(AirLoopNum) = "Full Year Schedule";
                             }
@@ -2487,7 +2494,7 @@ namespace SizingManager {
         using General::RoundSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -2572,8 +2579,8 @@ namespace SizingManager {
                                  "\", Commas will be used to separate fields.");
                 cAlphaArgs(1) = "Comma";
             }
-            gio::write(OutputFileInits, fmtA) << "! <Sizing Output Files>,Style";
-            gio::write(OutputFileInits, "('Sizing Output Files,',A)") << cAlphaArgs(1);
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Sizing Output Files>,Style";
+            ObjexxFCL::gio::write(OutputFileInits, "('Sizing Output Files,',A)") << cAlphaArgs(1);
         }
     }
 
@@ -4051,18 +4058,18 @@ namespace SizingManager {
         static bool MyOneTimeFlag(true);
 
         // Formats
-        static gio::Fmt Format_990("('! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, ','Calc Des Air Flow "
+        static ObjexxFCL::gio::Fmt Format_990("('! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, ','Calc Des Air Flow "
                                    "Rate {m3/s}, ','User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, "
                                    "','Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, "
                                    "Calc DOAS Heat Addition Rate {W}')");
-        static gio::Fmt Format_991("(' Zone Sizing Information',14(', ',A))");
+        static ObjexxFCL::gio::Fmt Format_991("(' Zone Sizing Information',14(', ',A))");
 
         if (MyOneTimeFlag) {
-            gio::write(OutputFileInits, Format_990);
+            ObjexxFCL::gio::write(OutputFileInits, Format_990);
             MyOneTimeFlag = false;
         }
 
-        gio::write(OutputFileInits, Format_991) << ZoneName << LoadType << RoundSigDigits(CalcDesLoad, 5) << RoundSigDigits(UserDesLoad, 5)
+        ObjexxFCL::gio::write(OutputFileInits, Format_991) << ZoneName << LoadType << RoundSigDigits(CalcDesLoad, 5) << RoundSigDigits(UserDesLoad, 5)
                                                 << RoundSigDigits(CalcDesFlow, 5) << RoundSigDigits(UserDesFlow, 5) << DesDayName << PeakHrMin
                                                 << RoundSigDigits(PeakTemp, 5) << RoundSigDigits(PeakHumRat, 5) << RoundSigDigits(FloorArea, 5)
                                                 << RoundSigDigits(TotOccs, 5) << RoundSigDigits(MinOAVolFlow, 5)
@@ -4105,13 +4112,13 @@ namespace SizingManager {
         static bool MyOneTimeFlag(true);
 
         if (MyOneTimeFlag) {
-            gio::write(OutputFileInits,
+            ObjexxFCL::gio::write(OutputFileInits,
                        "('! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity, Calc Des Air "
                        "Flow Rate [m3/s], User Des Air Flow Rate [m3/s], Design Day Name, Date/Time of Peak')");
             MyOneTimeFlag = false;
         }
         std::string dateHrMin = DesDayDate + " " + TimeIndexToHrMinString(TimeStepIndex);
-        gio::write(OutputFileInits, "(' System Sizing Information, ',A, 7(', ',A))")
+        ObjexxFCL::gio::write(OutputFileInits, "(' System Sizing Information, ',A, 7(', ',A))")
             << SysName << LoadType << PeakLoadKind << RoundSigDigits(UserDesCap, 2) << RoundSigDigits(CalcDesVolFlow, 5)
             << RoundSigDigits(UserDesVolFlow, 5) << DesDayName << dateHrMin;
 
@@ -4128,7 +4135,7 @@ namespace SizingManager {
         int tMinOfDay = timeIndex * MinutesPerTimeStep;
         int tHr = int(tMinOfDay / 60.);
         int tMin = tMinOfDay - tHr * 60;
-        gio::write(hrMinString, PeakHrMinFmt) << tHr << tMin;
+        ObjexxFCL::gio::write(hrMinString, PeakHrMinFmt) << tHr << tMin;
         return hrMinString;
     }
 
@@ -4881,7 +4888,7 @@ namespace SizingManager {
                 Real64 curHeatLoad = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatLoadSeq(TimeStepInDay);
                 if (curHeatLoad > 0.0) {
                     sumHeatLoad += curHeatLoad;
-                    wghtdHeatZoneTemp += CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq(TimeStepInDay) * curCoolLoad;
+                    wghtdHeatZoneTemp += CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq(TimeStepInDay) * curHeatLoad;
                     wghtdHeatHumRat += CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneHumRatSeq(TimeStepInDay) * curHeatLoad;
                 }
             }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1036,7 +1036,12 @@ namespace TarcogShading {
                 H0 = (dens2 * cp2 * s * speed) / (4.0 * hc + 8.0 * speed);
 
                 P = -H / H0;
-                beta = std::pow(e, P);
+                if (P < -700.0) {
+                    beta = 0.0;
+                }
+                else {
+                    beta = std::pow(e, P);
+                }
                 Tgapout = Tav - (Tav - Tenv) * beta;
                 Tgap = Tav - (H0 / H) * (Tgapout - Tenv);
             } else {

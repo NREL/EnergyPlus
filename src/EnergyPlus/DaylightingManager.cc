@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -161,6 +161,17 @@ namespace DaylightingManager {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     static std::string const BlankString;
+    bool CalcDayltghCoefficients_firstTime(true);
+    bool refFirstTime(true);
+    bool DayltgInteriorIllum_firstTime(true); // true first time routine is called
+    bool FirstTimeDaylFacCalc(true);
+    bool VeryFirstTime(true);
+    bool mapFirstTime(true);
+    bool CheckTDDs_firstTime(true);
+    bool DayltgExtHorizIllum_firstTime(true); // flag for first time thru to initialize
+    bool DayltgInteriorMapIllum_FirstTimeFlag(true);
+    bool ReportIllumMap_firstTime(true);
+    bool SQFirstTime(true);
 
     // Surface count crossover for using octree algorithm
     // The octree gives lower computational complexity for much higher performance
@@ -176,17 +187,18 @@ namespace DaylightingManager {
     int const octreeCrossover(100); // Octree surface count crossover
 
     // MODULE VARIABLE DECLARATIONS:
-    int TotWindowsWithDayl(0);                    // Total number of exterior windows in all daylit zones
-    int OutputFileDFS(0);                         // Unit number for daylight factors
-    Array1D<Real64> DaylIllum(MaxRefPoints, 0.0); // Daylight illuminance at reference points (lux)
-    Real64 PHSUN(0.0);                            // Solar altitude (radians)
-    Real64 SPHSUN(0.0);                           // Sine of solar altitude
-    Real64 CPHSUN(0.0);                           // Cosine of solar altitude
-    Real64 THSUN(0.0);                            // Solar azimuth (rad) in Absolute Coordinate System (azimuth=0 along east)
-    Array1D<Real64> PHSUNHR(24, 0.0);             // Hourly values of PHSUN
-    Array1D<Real64> SPHSUNHR(24, 0.0);            // Hourly values of the sine of PHSUN
-    Array1D<Real64> CPHSUNHR(24, 0.0);            // Hourly values of the cosine of PHSUN
-    Array1D<Real64> THSUNHR(24, 0.0);             // Hourly values of THSUN
+    int TotWindowsWithDayl(0);         // Total number of exterior windows in all daylit zones
+    int OutputFileDFS(0);              // Unit number for daylight factors
+    Array1D<Real64> DaylIllum;         // Daylight illuminance at reference points (lux)
+    int maxNumRefPtInAnyZone(0);       // The most number of reference points that any single zone has
+    Real64 PHSUN(0.0);                 // Solar altitude (radians)
+    Real64 SPHSUN(0.0);                // Sine of solar altitude
+    Real64 CPHSUN(0.0);                // Cosine of solar altitude
+    Real64 THSUN(0.0);                 // Solar azimuth (rad) in Absolute Coordinate System (azimuth=0 along east)
+    Array1D<Real64> PHSUNHR(24, 0.0);  // Hourly values of PHSUN
+    Array1D<Real64> SPHSUNHR(24, 0.0); // Hourly values of the sine of PHSUN
+    Array1D<Real64> CPHSUNHR(24, 0.0); // Hourly values of the cosine of PHSUN
+    Array1D<Real64> THSUNHR(24, 0.0);  // Hourly values of THSUN
 
     // In the following I,J,K arrays:
     // I = 1 for clear sky, 2 for clear turbid, 3 for intermediate, 4 for overcast;
@@ -234,6 +246,41 @@ namespace DaylightingManager {
     {
         // this will need a lot more, but it is a start
         ZoneDaylight.deallocate();
+        CalcDayltghCoefficients_firstTime = true;
+        CheckTDDZone.deallocate();
+        TDDTransVisBeam.deallocate();
+        TDDFluxInc.deallocate();
+        TDDFluxTrans.deallocate();
+        RefErrIndex.deallocate();
+        refFirstTime = true;
+        ComplexWind.deallocate();
+        IllumMap.deallocate();
+        IllumMapCalc.deallocate();
+        DayltgInteriorIllum_firstTime = true;
+        FirstTimeDaylFacCalc = true;
+        VeryFirstTime = true;
+        mapFirstTime = true;
+        CheckTDDs_firstTime = true;
+        DayltgExtHorizIllum_firstTime = true;
+        DayltgInteriorMapIllum_FirstTimeFlag = true;
+        ReportIllumMap_firstTime = true;
+        SQFirstTime = true;
+        TotWindowsWithDayl = 0;
+        OutputFileDFS = 0;
+        DaylIllum.deallocate();
+        maxNumRefPtInAnyZone = 0;
+        PHSUN = 0.0;
+        SPHSUN = 0.0;
+        CPHSUN = 0.0;
+        THSUN = 0.0;
+        //PHSUNHR.deallocate(); et al, do not deallocate ArrayND where array size is specified in the declaration
+        TDDTransVisBeam.deallocate();
+        TDDFluxInc.deallocate();
+        TDDFluxTrans.deallocate();
+        MapErrIndex.deallocate();
+        RefErrIndex.deallocate();
+        CheckTDDZone.deallocate();
+        mapLine = "";
     }
 
     void DayltgAveInteriorReflectance(int &ZoneNum) // Zone number
@@ -508,7 +555,7 @@ namespace DaylightingManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -517,12 +564,10 @@ namespace DaylightingManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneNum; // Zone number
-        int IHR;     // Hour of day counter
-        int IWin;    // Window counter
-        int loop;    // DO loop indices
-        static bool firstTime(true);
-        static bool FirstTimeDaylFacCalc(true);
+        int ZoneNum;     // Zone number
+        int IHR;         // Hour of day counter
+        int IWin;        // Window counter
+        int loop;        // DO loop indices
         Real64 DaylFac1; // sky daylight factor at ref pt 1
         Real64 DaylFac2; // sky daylight factor at ref pt 2
 
@@ -544,15 +589,15 @@ namespace DaylightingManager {
         static bool doSkyReporting(true);
 
         // Formats
-        static gio::Fmt Format_700(
+        static ObjexxFCL::gio::Fmt Format_700(
             "('! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Daylight Fac: Ref Pt #1, Daylight Fac: Ref Pt #2')");
 
         // FLOW:
-        if (firstTime) {
+        if (CalcDayltghCoefficients_firstTime) {
             GetDaylightingParametersInput();
             CheckTDDsAndLightShelvesInDaylitZones();
             AssociateWindowShadingControlWithDaylighting();
-            firstTime = false;
+            CalcDayltghCoefficients_firstTime = false;
             if (allocated(CheckTDDZone)) CheckTDDZone.deallocate();
         } // End of check if firstTime
 
@@ -702,7 +747,7 @@ namespace DaylightingManager {
                     // Write the bare-window four sky daylight factors at noon time to the eio file; this is done only
                     // for first time that daylight factors are calculated and so is insensitive to possible variation
                     // due to change in ground reflectance from month to month, or change in storm window status.
-                    gio::write(OutputFileInits, Format_700);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_700);
                     for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                         if (ZoneDaylight(ZoneNum).NumOfDayltgExtWins == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
                         for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
@@ -714,7 +759,7 @@ namespace DaylightingManager {
                                 DaylFac1 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 1, 1, loop);
                                 DaylFac2 = 0.0;
                                 if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 1) DaylFac2 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 1, 2, loop);
-                                gio::write(OutputFileInits, fmtA) << " Clear Sky Daylight Factors," + CurMnDy + ',' + Zone(ZoneNum).Name + ',' +
+                                ObjexxFCL::gio::write(OutputFileInits, fmtA) << " Clear Sky Daylight Factors," + CurMnDy + ',' + Zone(ZoneNum).Name + ',' +
                                                                          Surface(IWin).Name + ',' + RoundSigDigits(DaylFac1, 4) + ',' +
                                                                          RoundSigDigits(DaylFac2, 4);
 
@@ -722,7 +767,7 @@ namespace DaylightingManager {
                                 DaylFac1 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 2, 1, loop);
                                 DaylFac2 = 0.0;
                                 if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 1) DaylFac2 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 2, 2, loop);
-                                gio::write(OutputFileInits, fmtA) << " Clear Turbid Sky Daylight Factors," + CurMnDy + ',' + Zone(ZoneNum).Name +
+                                ObjexxFCL::gio::write(OutputFileInits, fmtA) << " Clear Turbid Sky Daylight Factors," + CurMnDy + ',' + Zone(ZoneNum).Name +
                                                                          ',' + Surface(IWin).Name + ',' + RoundSigDigits(DaylFac1, 4) + ',' +
                                                                          RoundSigDigits(DaylFac2, 4);
 
@@ -730,7 +775,7 @@ namespace DaylightingManager {
                                 DaylFac1 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 3, 1, loop);
                                 DaylFac2 = 0.0;
                                 if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 1) DaylFac2 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 3, 2, loop);
-                                gio::write(OutputFileInits, fmtA) << " Intermediate Sky Daylight Factors," + CurMnDy + ',' + Zone(ZoneNum).Name +
+                                ObjexxFCL::gio::write(OutputFileInits, fmtA) << " Intermediate Sky Daylight Factors," + CurMnDy + ',' + Zone(ZoneNum).Name +
                                                                          ',' + Surface(IWin).Name + ',' + RoundSigDigits(DaylFac1, 4) + ',' +
                                                                          RoundSigDigits(DaylFac2, 4);
 
@@ -738,7 +783,7 @@ namespace DaylightingManager {
                                 DaylFac1 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 4, 1, loop);
                                 DaylFac2 = 0.0;
                                 if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 1) DaylFac2 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 4, 2, loop);
-                                gio::write(OutputFileInits, fmtA) << " Overcast Sky Daylight Factors," + CurMnDy + ',' + Zone(ZoneNum).Name + ',' +
+                                ObjexxFCL::gio::write(OutputFileInits, fmtA) << " Overcast Sky Daylight Factors," + CurMnDy + ',' + Zone(ZoneNum).Name + ',' +
                                                                          Surface(IWin).Name + ',' + RoundSigDigits(DaylFac1, 4) + ',' +
                                                                          RoundSigDigits(DaylFac2, 4);
                             }
@@ -779,16 +824,16 @@ namespace DaylightingManager {
             {
                 IOFlags flags;
                 flags.ACTION("write");
-                gio::open(OutputFileDFS, DataStringGlobals::outputDfsFileName, flags);
+                ObjexxFCL::gio::open(OutputFileDFS, DataStringGlobals::outputDfsFileName, flags);
                 write_stat = flags.ios();
             }
             if (write_stat != 0) {
                 ShowFatalError("CalcDayltgCoefficients: Could not open file " + DataStringGlobals::outputDfsFileName + " for output (write).");
             } else {
-                gio::write(OutputFileDFS, fmtA) << "This file contains daylight factors for all exterior windows of daylight zones.";
-                gio::write(OutputFileDFS, fmtA) << "If only one reference point the last 4 columns in the data will be zero.";
-                gio::write(OutputFileDFS, fmtA) << "MonthAndDay,Zone Name,Window Name,Window State";
-                gio::write(OutputFileDFS, fmtA) << "Hour,Daylight Factor for Clear Sky at Reference point 1,Daylight Factor for Clear Turbid Sky at "
+                ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "This file contains daylight factors for all exterior windows of daylight zones.";
+                ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "If only one reference point the last 4 columns in the data will be zero.";
+                ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "MonthAndDay,Zone Name,Window Name,Window State";
+                ObjexxFCL::gio::write(OutputFileDFS, fmtA) << "Hour,Daylight Factor for Clear Sky at Reference point 1,Daylight Factor for Clear Turbid Sky at "
                                                    "Reference point 1,Daylight Factor for Intermediate Sky at Reference point 1,Daylight Factor for "
                                                    "Overcast Sky at Reference point 1,Daylight Factor for Clear Sky at Reference point 2,Daylight "
                                                    "Factor for Clear Turbid Sky at Reference point 2,Daylight Factor for Intermediate Sky at "
@@ -822,14 +867,14 @@ namespace DaylightingManager {
                     for (ISlatAngle = 1; ISlatAngle <= ISA; ++ISlatAngle) {
                         if (ISlatAngle == 1) {
                             // base window without shades, screens, or blinds
-                            gio::write(OutputFileDFS, fmtA) << CurMnDy + ',' + Zone(ZoneNum).Name + ',' + Surface(IWin).Name + ",Base Window";
+                            ObjexxFCL::gio::write(OutputFileDFS, fmtA) << CurMnDy + ',' + Zone(ZoneNum).Name + ',' + Surface(IWin).Name + ",Base Window";
                         } else if (ISlatAngle == 2 && ISA == 2) {
                             // window shade or blind with fixed slat angle
-                            gio::write(OutputFileDFS, fmtA) << CurMnDy + ',' + Zone(ZoneNum).Name + ',' + Surface(IWin).Name + ", ";
+                            ObjexxFCL::gio::write(OutputFileDFS, fmtA) << CurMnDy + ',' + Zone(ZoneNum).Name + ',' + Surface(IWin).Name + ", ";
                         } else {
                             // blind with variable slat angle
                             SlatAngle = 180.0 / double(MaxSlatAngs - 1) * double(ISlatAngle - 2);
-                            gio::write(OutputFileDFS, fmtA)
+                            ObjexxFCL::gio::write(OutputFileDFS, fmtA)
                                 << CurMnDy + ',' + Zone(ZoneNum).Name + ',' + Surface(IWin).Name + ',' + RoundSigDigits(SlatAngle, 1);
                         }
 
@@ -854,7 +899,7 @@ namespace DaylightingManager {
                             }
 
                             // write daylight factors - 4 sky types for each daylight ref point
-                            gio::write(OutputFileDFS, fmtA)
+                            ObjexxFCL::gio::write(OutputFileDFS, fmtA)
                                 << RoundSigDigits(IHR) + ',' + RoundSigDigits(DFClrSky1, 5) + ',' + RoundSigDigits(DFClrTbSky1, 5) + ',' +
                                        RoundSigDigits(DFIntSky1, 5) + ',' + RoundSigDigits(DFOcSky1, 5) + ',' + RoundSigDigits(DFClrSky2, 5) + ',' +
                                        RoundSigDigits(DFClrTbSky2, 5) + ',' + RoundSigDigits(DFIntSky2, 5) + ',' + RoundSigDigits(DFOcSky2, 5);
@@ -908,7 +953,6 @@ namespace DaylightingManager {
         int IWin;    // Window counter
         int PipeNum; // TDD pipe object number
         int loopwin; // loop index for exterior windows associated with a daylit zone
-        static bool VeryFirstTime(true);
         int TZoneNum;
         bool ErrorsFound;
         int MapNum;
@@ -1052,7 +1096,6 @@ namespace DaylightingManager {
         Real64 DAXY;               // Area of window element
         Real64 SkyObstructionMult; // Ratio of obstructed to unobstructed sky diffuse at a ground point
         int ExtWinType;            // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
-        static bool refFirstTime(true);
         int BRef;
         int ILB;
         bool hitIntObs;        // True iff interior obstruction hit
@@ -1097,25 +1140,24 @@ namespace DaylightingManager {
             ZoneDaylight(ZoneNum).DaylBackFacSun = 0.0;
             ZoneDaylight(ZoneNum).DaylBackFacSunDisk = 0.0;
         } else {
-
+            int numRefPts = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
             ZoneDaylight(ZoneNum).DaylIllFacSky(
-                HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
             ZoneDaylight(ZoneNum).DaylSourceFacSky(
-                HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
             ZoneDaylight(ZoneNum).DaylBackFacSky(
-                HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-            ZoneDaylight(ZoneNum).DaylIllFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, 4}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+            ZoneDaylight(ZoneNum).DaylIllFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+            ZoneDaylight(ZoneNum).DaylIllFacSunDisk(HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
                 0.0;
-            ZoneDaylight(ZoneNum).DaylIllFacSunDisk(
-                HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-            ZoneDaylight(ZoneNum).DaylSourceFacSun(
-                HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+            ZoneDaylight(ZoneNum).DaylSourceFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
+                0.0;
             ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(
-                HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
-            ZoneDaylight(ZoneNum).DaylBackFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
+                HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+            ZoneDaylight(ZoneNum).DaylBackFacSun(HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
                 0.0;
-            ZoneDaylight(ZoneNum).DaylBackFacSunDisk(
-                HourOfDay, {1, MaxSlatAngs + 1}, {1, MaxRefPoints}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) = 0.0;
+            ZoneDaylight(ZoneNum).DaylBackFacSunDisk(HourOfDay, {1, MaxSlatAngs + 1}, {1, numRefPts}, {1, ZoneDaylight(ZoneNum).NumOfDayltgExtWins}) =
+                0.0;
         }
 
         NRF = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
@@ -1461,7 +1503,6 @@ namespace DaylightingManager {
         //		Array2D< Real64 > MapWindowSolidAngAtRefPt; //Inactive Only allocated and assigning to: Also only 1 value used at a time
         //		Array2D< Real64 > MapWindowSolidAngAtRefPtWtd; // Only 1 value used at a time: Replaced by below
         Real64 MapWindowSolidAngAtRefPtWtd;
-        static bool mapFirstTime(true);
         static bool MySunIsUpFlag(false);
         int WinEl; // window elements counter
 
@@ -4422,7 +4463,7 @@ namespace DaylightingManager {
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         // na
@@ -4471,24 +4512,29 @@ namespace DaylightingManager {
             DayltgSetupAdjZoneListsAndPointers();
         }
 
+        maxNumRefPtInAnyZone = 0;
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (Surface(SurfNum).Class != SurfaceClass_Window) continue;
             ZoneNum = Surface(SurfNum).Zone;
+            int numRefPoints = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
+            if (numRefPoints > maxNumRefPtInAnyZone) {
+                maxNumRefPtInAnyZone = numRefPoints;
+            }
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0) {
                 if (!SurfaceWindow(SurfNum).SurfDayLightInit) {
-                    SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(MaxRefPoints);
+                    SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(numRefPoints);
                     SurfaceWindow(SurfNum).SolidAngAtRefPt = 0.0;
-                    SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(MaxRefPoints);
+                    SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(numRefPoints);
                     SurfaceWindow(SurfNum).SolidAngAtRefPtWtd = 0.0;
-                    SurfaceWindow(SurfNum).IllumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                    SurfaceWindow(SurfNum).IllumFromWinAtRefPt.allocate(2, numRefPoints);
                     SurfaceWindow(SurfNum).IllumFromWinAtRefPt = 0.0;
-                    SurfaceWindow(SurfNum).BackLumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                    SurfaceWindow(SurfNum).BackLumFromWinAtRefPt.allocate(2, numRefPoints);
                     SurfaceWindow(SurfNum).BackLumFromWinAtRefPt = 0.0;
-                    SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                    SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt.allocate(2, numRefPoints);
                     SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt = 0.0;
-                    SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep.allocate(MaxRefPoints);
+                    SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep.allocate(numRefPoints);
                     SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
-                    SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(MaxRefPoints);
+                    SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(numRefPoints);
                     SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
                     SurfaceWindow(SurfNum).SurfDayLightInit = true;
                 }
@@ -4498,19 +4544,19 @@ namespace DaylightingManager {
                     ZoneNumAdj = Surface(SurfNumAdj).Zone;
                     if (ZoneDaylight(ZoneNumAdj).TotalDaylRefPoints > 0) {
                         if (!SurfaceWindow(SurfNum).SurfDayLightInit) {
-                            SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(MaxRefPoints);
+                            SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(numRefPoints);
                             SurfaceWindow(SurfNum).SolidAngAtRefPt = 0.0;
-                            SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(MaxRefPoints);
+                            SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(numRefPoints);
                             SurfaceWindow(SurfNum).SolidAngAtRefPtWtd = 0.0;
-                            SurfaceWindow(SurfNum).IllumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                            SurfaceWindow(SurfNum).IllumFromWinAtRefPt.allocate(2, numRefPoints);
                             SurfaceWindow(SurfNum).IllumFromWinAtRefPt = 0.0;
-                            SurfaceWindow(SurfNum).BackLumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                            SurfaceWindow(SurfNum).BackLumFromWinAtRefPt.allocate(2, numRefPoints);
                             SurfaceWindow(SurfNum).BackLumFromWinAtRefPt = 0.0;
-                            SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt.allocate(2, MaxRefPoints);
+                            SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt.allocate(2, numRefPoints);
                             SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt = 0.0;
-                            SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep.allocate(MaxRefPoints);
+                            SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep.allocate(numRefPoints);
                             SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
-                            SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(MaxRefPoints);
+                            SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(numRefPoints);
                             SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
                             SurfaceWindow(SurfNum).SurfDayLightInit = true;
                         }
@@ -4599,7 +4645,7 @@ namespace DaylightingManager {
                 {
                     IOFlags flags;
                     flags.ACTION("READWRITE");
-                    gio::open(iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags);
+                    ObjexxFCL::gio::open(iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags);
                 }
 
                 // Sequentially read lines in DElight Daylight Factors Error File
@@ -4611,7 +4657,7 @@ namespace DaylightingManager {
                 while (!bEndofErrFile) {
                     {
                         IOFlags flags;
-                        gio::read(iDElightErrorFile, fmtA, flags) >> cErrorLine;
+                        ObjexxFCL::gio::read(iDElightErrorFile, fmtA, flags) >> cErrorLine;
                         iReadStatus = flags.ios();
                     }
                     if (iReadStatus < GoodIOStatValue) {
@@ -4637,13 +4683,13 @@ namespace DaylightingManager {
                     {
                         IOFlags flags;
                         flags.DISPOSE("DELETE");
-                        gio::close(iDElightErrorFile, flags);
+                        ObjexxFCL::gio::close(iDElightErrorFile, flags);
                     }
                 } else {
                     {
                         IOFlags flags;
                         flags.DISPOSE("DELETE");
-                        gio::close(iDElightErrorFile, flags);
+                        ObjexxFCL::gio::close(iDElightErrorFile, flags);
                     }
                 }
                 // If any DElight Error occurred then ShowFatalError to terminate
@@ -4656,12 +4702,12 @@ namespace DaylightingManager {
                 {
                     IOFlags flags;
                     flags.ACTION("READWRITE");
-                    gio::open(iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags);
+                    ObjexxFCL::gio::open(iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags);
                 }
                 {
                     IOFlags flags;
                     flags.DISPOSE("DELETE");
-                    gio::close(iDElightErrorFile, flags);
+                    ObjexxFCL::gio::close(iDElightErrorFile, flags);
                 }
             }
         }
@@ -4703,7 +4749,7 @@ namespace DaylightingManager {
         using General::RoundSigDigits;
         using General::TrimSigDigits;
 
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         Array1D_int ZoneMapCount;
         int MapNum;
@@ -4851,11 +4897,11 @@ namespace DaylightingManager {
                     cAlphaArgs(1) = "COMMA";
                 }
             }
-            gio::write(OutputFileInits, fmtA) << "! <Daylighting:Illuminance Maps>,#Maps,Style";
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Daylighting:Illuminance Maps>,#Maps,Style";
             ConvertCaseToLower(cAlphaArgs(1), cAlphaArgs(2));
             cAlphaArgs(1).erase(1);
             cAlphaArgs(1) += cAlphaArgs(2).substr(1);
-            gio::write(OutputFileInits, "( 'Daylighting:Illuminance Maps,',A,',',A )") << TrimSigDigits(TotIllumMaps) << cAlphaArgs(1);
+            ObjexxFCL::gio::write(OutputFileInits, "( 'Daylighting:Illuminance Maps,',A,',',A )") << TrimSigDigits(TotIllumMaps) << cAlphaArgs(1);
         }
         for (Loop1 = 1; Loop1 <= NumOfZones; ++Loop1) {
             ZoneDaylight(Loop1).ZoneToMap.allocate(ZoneMapCount(Loop1));
@@ -5051,11 +5097,11 @@ namespace DaylightingManager {
         ZoneMsgDone.deallocate();
 
         if (TotIllumMaps > 0) {
-            gio::write(OutputFileInits, fmtA) << "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {m},XMax {m},Xinc {m},#X Points,YMin "
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {m},XMax {m},Xinc {m},#X Points,YMin "
                                                  "{m},YMax {m},Yinc {m},#Y Points,Z {m}";
         }
         for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
-            gio::write(OutputFileInits, "( 'Daylighting:Illuminance Maps:Detail',11( ',',A ) )")
+            ObjexxFCL::gio::write(OutputFileInits, "( 'Daylighting:Illuminance Maps:Detail',11( ',',A ) )")
                 << IllumMap(MapNum).Name << Zone(IllumMap(MapNum).Zone).Name << RoundSigDigits(IllumMap(MapNum).Xmin, 2)
                 << RoundSigDigits(IllumMap(MapNum).Xmax, 2) << RoundSigDigits(IllumMap(MapNum).Xinc, 2) << RoundSigDigits(IllumMap(MapNum).Xnum)
                 << RoundSigDigits(IllumMap(MapNum).Ymin, 2) << RoundSigDigits(IllumMap(MapNum).Ymax, 2) << RoundSigDigits(IllumMap(MapNum).Yinc, 2)
@@ -5324,7 +5370,7 @@ namespace DaylightingManager {
         using namespace OutputReportPredefined;
         using ScheduleManager::GetScheduleIndex;
 
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         int refPtNum;
         std::string refName;
@@ -5551,7 +5597,7 @@ namespace DaylightingManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -5564,11 +5610,10 @@ namespace DaylightingManager {
         int ShelfNum; // light shelf object number
         int SurfNum;  // daylight device surface number
         bool ErrorsFound;
-        static bool firstTime(true);
 
-        if (firstTime) {
+        if (CheckTDDs_firstTime) {
             CheckTDDZone.dimension(NumOfZones, true);
-            firstTime = false;
+            CheckTDDs_firstTime = false;
         }
 
         ErrorsFound = false;
@@ -5582,39 +5627,39 @@ namespace DaylightingManager {
                     ShowContinueError("A sufficient control is provided on the .dbg file.");
                     ErrorsFound = true;
                     if (CheckTDDZone(Surface(SurfNum).Zone)) {
-                        gio::write(OutputFileDebug, fmtA) << " ! Following control is to allow tubular reporting in this Zone";
-                        gio::write(OutputFileDebug, fmtA) << "Daylighting:Controls,  !- this control controls 0% of zone.";
-                        gio::write(OutputFileDebug, fmtA) << "   " + Zone(Surface(SurfNum).Zone).Name + ",  !- Zone Name";
-                        gio::write(OutputFileDebug, fmtA) << "     1,   !- Total Daylighting Reference Points";
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << " ! Following control is to allow tubular reporting in this Zone";
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "Daylighting:Controls,  !- this control controls 0% of zone.";
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "   " + Zone(Surface(SurfNum).Zone).Name + ",  !- Zone Name";
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "     1,   !- Total Daylighting Reference Points";
                         if (DaylRefWorldCoordSystem) {
                             // world coordinates, use zone origin for ref pt
-                            gio::write(OutputFileDebug, fmtA) << "   " + RoundSigDigits(Zone(Surface(SurfNum).Zone).OriginX, 2) +
+                            ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "   " + RoundSigDigits(Zone(Surface(SurfNum).Zone).OriginX, 2) +
                                                                      ",   !- X-Coordinate of First Reference Point {m}";
-                            gio::write(OutputFileDebug, fmtA) << "   " + RoundSigDigits(Zone(Surface(SurfNum).Zone).OriginY, 2) +
+                            ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "   " + RoundSigDigits(Zone(Surface(SurfNum).Zone).OriginY, 2) +
                                                                      ",   !- Y-Coordinate of First Reference Point {m}";
-                            gio::write(OutputFileDebug, fmtA) << "   " + RoundSigDigits(Zone(Surface(SurfNum).Zone).OriginZ, 2) +
+                            ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "   " + RoundSigDigits(Zone(Surface(SurfNum).Zone).OriginZ, 2) +
                                                                      ",   !- Z-Coordinate of First Reference Point {m}";
                         } else {
                             // relative coordinates, use 0,0,0 for ref pt
-                            gio::write(OutputFileDebug, fmtA) << "   0.0,   !- X-Coordinate of First Reference Point {m}";
-                            gio::write(OutputFileDebug, fmtA) << "   0.0,   !- Y-Coordinate of First Reference Point {m}";
-                            gio::write(OutputFileDebug, fmtA) << "   0.0,   !- Z-Coordinate of First Reference Point {m}";
+                            ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "   0.0,   !- X-Coordinate of First Reference Point {m}";
+                            ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "   0.0,   !- Y-Coordinate of First Reference Point {m}";
+                            ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "   0.0,   !- Z-Coordinate of First Reference Point {m}";
                         }
-                        gio::write(OutputFileDebug, fmtA) << "      ,   !- X-Coordinate of Second Reference Point";
-                        gio::write(OutputFileDebug, fmtA) << "      ,   !- Y-Coordinate of Second Reference Point";
-                        gio::write(OutputFileDebug, fmtA) << "      ,   !- Z-Coordinate of Second Reference Point";
-                        gio::write(OutputFileDebug, fmtA) << "   0.0,   !- Fraction of Zone Controlled by First Reference Point";
-                        gio::write(OutputFileDebug, fmtA) << "   0.0,   !- Fraction of Zone Controlled by Second Reference Point";
-                        gio::write(OutputFileDebug, fmtA) << "   0.0,   !- Illuminance Setpoint at First Reference Point";
-                        gio::write(OutputFileDebug, fmtA) << "   0.0,   !- Illuminance Setpoint at Second Reference Point";
-                        gio::write(OutputFileDebug, fmtA) << "     3,   !- Lighting Control Type";
-                        gio::write(OutputFileDebug, fmtA)
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "      ,   !- X-Coordinate of Second Reference Point";
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "      ,   !- Y-Coordinate of Second Reference Point";
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "      ,   !- Z-Coordinate of Second Reference Point";
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "   0.0,   !- Fraction of Zone Controlled by First Reference Point";
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "   0.0,   !- Fraction of Zone Controlled by Second Reference Point";
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "   0.0,   !- Illuminance Setpoint at First Reference Point";
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "   0.0,   !- Illuminance Setpoint at Second Reference Point";
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "     3,   !- Lighting Control Type";
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA)
                             << "   0.0,   !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis";
-                        gio::write(OutputFileDebug, fmtA) << "      ,   !- Maximum Allowable Discomfort Glare Index";
-                        gio::write(OutputFileDebug, fmtA) << "   0.0,   !- Minimum Input Power Fraction for Continuous Dimming Control";
-                        gio::write(OutputFileDebug, fmtA) << "   0.0,   !- Minimum Light Output Fraction for Continuous Dimming Control";
-                        gio::write(OutputFileDebug, fmtA) << "     0,   !- Number of Stepped Control Steps";
-                        gio::write(OutputFileDebug, fmtA) << "   0.0;   !- Probability Lighting will be Reset When Needed in Manual Stepped Control";
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "      ,   !- Maximum Allowable Discomfort Glare Index";
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "   0.0,   !- Minimum Input Power Fraction for Continuous Dimming Control";
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "   0.0,   !- Minimum Light Output Fraction for Continuous Dimming Control";
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "     0,   !- Number of Stepped Control Steps";
+                        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "   0.0;   !- Probability Lighting will be Reset When Needed in Manual Stepped Control";
 
                         CheckTDDZone(Surface(SurfNum).Zone) = false;
                     }
@@ -5819,7 +5864,9 @@ namespace DaylightingManager {
         for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
             IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
             IS = 1;
-            if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+            if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                IS = 2;
             // Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
             // below, which is (0.2936)**0.6
             GTOT1 = 0.4794 * (std::pow(ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, IS, IL), 1.6)) *
@@ -5885,7 +5932,7 @@ namespace DaylightingManager {
         // Calculate background luminance including effect of inter-reflected illuminance from light
         // entering zone through its interior windows
 
-        RefPoints = min(2, ZoneDaylight(ZoneNum).TotalDaylRefPoints);
+        RefPoints = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
         for (IL = 1; IL <= RefPoints; ++IL) {
             BacLum = ZoneDaylight(ZoneNum).BacLum(IL) + ZoneDaylight(ZoneNum).InterReflIllFrIntWins * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi;
             BacLum = max(ZoneDaylight(ZoneNum).IllumSetPoint(IL) * ZoneDaylight(ZoneNum).AveVisDiffReflect / Pi, BacLum);
@@ -5894,7 +5941,9 @@ namespace DaylightingManager {
             for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                 IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
                 IS = 1;
-                if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+                if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                    ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                    IS = 2;
                 // Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
                 // below, which is (0.2936)**0.6
                 GTOT1 = 0.4794 * (std::pow(ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, IS, IL), 1.6)) *
@@ -5963,7 +6012,6 @@ namespace DaylightingManager {
         static Array1D<Real64> TH(NTH);     // Azimuth of sky element (radians)
         int ISky;                           // Sky type index
         static Array1D<Real64> SPHCPH(NPH); // Sine times cosine of altitude of sky element
-        static bool firstTime(true);        // flag for first time thru to initialize
 
         // FLOW:
         // Integrate to obtain illuminance from sky.
@@ -5971,7 +6019,7 @@ namespace DaylightingManager {
         // is L(TH,PH)*SIN(PH)*COS(PH)*DTH*DPH, where L(TH,PH) is the luminance
         // of the patch in cd/m2.
         //  Init
-        if (firstTime) {
+        if (DayltgExtHorizIllum_firstTime) {
             for (IPH = 1; IPH <= NPH; ++IPH) {
                 PH(IPH) = (IPH - 0.5) * DPH;
                 SPHCPH(IPH) = std::sin(PH(IPH)) * std::cos(PH(IPH)); // DA = COS(PH)*DTH*DPH
@@ -5979,7 +6027,7 @@ namespace DaylightingManager {
             for (ITH = 1; ITH <= NTH; ++ITH) {
                 TH(ITH) = (ITH - 0.5) * DTH;
             }
-            firstTime = false;
+            DayltgExtHorizIllum_firstTime = false;
         }
 
         HISK = 0.0;
@@ -6343,7 +6391,7 @@ namespace DaylightingManager {
         int ISky;   // Sky type index
         int ISky1;  // Sky type index values for averaging two sky types
         int ISky2;
-        static Vector2<Real64> SetPnt;       // Illuminance setpoint at reference points (lux)
+        static Array1D<Real64> SetPnt;       // Illuminance setpoint at reference points (lux)
         static Array2D<Real64> DFSKHR(2, 4); // Sky daylight factor for sky type (second index),
         //   bare/shaded window (first index)
         static Vector2<Real64> DFSUHR;       // Sun daylight factor for bare/shaded window
@@ -6353,8 +6401,8 @@ namespace DaylightingManager {
         static Array2D<Real64> SFSKHR(2, 4); // Sky source luminance factor for sky type (second index),
         //   bare/shaded window (first index)
         static Vector2<Real64> SFSUHR; // Sun source luminance factor for bare/shaded window
-        static Vector2<Real64> GLRNDX; // Glare index at reference point
-        static Vector2<Real64> GLRNEW; // New glare index at reference point
+        static Array1D<Real64> GLRNDX; // Glare index at reference point
+        static Array1D<Real64> GLRNEW; // New glare index at reference point
         int IL;                        // Reference point index
         int IWin;                      // Window index
         int IS;                        // IS=1 for unshaded window, =2 for shaded window
@@ -6393,29 +6441,35 @@ namespace DaylightingManager {
         static Array3D<Real64> tmpIllumFromWinAtRefPt;
         static Array3D<Real64> tmpBackLumFromWinAtRefPt;
         static Array3D<Real64> tmpSourceLumFromWinAtRefPt;
-        static bool firstTime(true); // true first time routine is called
 
         static bool blnCycle(false);
+        bool breakOuterLoop(false);
+        bool continueOuterLoop(false);
 
         if (ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) return;
 
+        NREFPT = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
+
         // Three arrays to save original clear and dark (fully switched) states'
         //  zone/window daylighting properties.
-        if (firstTime) {
+        if (DayltgInteriorIllum_firstTime) {
             int const d1(max(maxval(Zone, &ZoneData::NumSubSurfaces), maxval(ZoneDaylight, &ZoneDaylightCalc::NumOfDayltgExtWins)));
-            tmpIllumFromWinAtRefPt.allocate(d1, 2, 2);
-            tmpBackLumFromWinAtRefPt.allocate(d1, 2, 2);
-            tmpSourceLumFromWinAtRefPt.allocate(d1, 2, 2);
-            firstTime = false;
+            tmpIllumFromWinAtRefPt.allocate(d1, 2, maxNumRefPtInAnyZone);
+            tmpBackLumFromWinAtRefPt.allocate(d1, 2, maxNumRefPtInAnyZone);
+            tmpSourceLumFromWinAtRefPt.allocate(d1, 2, maxNumRefPtInAnyZone);
+
+            SetPnt.allocate(maxNumRefPtInAnyZone);
+            DaylIllum.allocate(maxNumRefPtInAnyZone);
+            GLRNDX.allocate(maxNumRefPtInAnyZone);
+            GLRNEW.allocate(maxNumRefPtInAnyZone);
+
+            DayltgInteriorIllum_firstTime = false;
         }
         tmpIllumFromWinAtRefPt = 0.0;
         tmpBackLumFromWinAtRefPt = 0.0;
         tmpSourceLumFromWinAtRefPt = 0.0;
 
         // FLOW:
-        // Limit the number of control reference points to 2
-        NREFPT = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
-        if (NREFPT > 2) NREFPT = 2;
 
         // Initialize reference point illuminance and window background luminance
         for (IL = 1; IL <= NREFPT; ++IL) {
@@ -6494,7 +6548,8 @@ namespace DaylightingManager {
                                                WeightPreviousHour * (ZoneDaylight(ZoneNum).DaylSourceFacSun(PreviousHour, 1, IL, loop) +
                                                                      ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(PreviousHour, 1, IL, loop)));
 
-                    if (SurfaceWindow(IWin).ShadingFlag >= 1 || SurfaceWindow(IWin).SolarDiffusing) {
+                    if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                        (SurfaceWindow(IWin).ShadingFlag >= 1 || SurfaceWindow(IWin).SolarDiffusing)) {
 
                         // ===Shaded window or window with diffusing glass===
                         if (!SurfaceWindow(IWin).MovableSlats) {
@@ -6665,6 +6720,7 @@ namespace DaylightingManager {
                 HorIllSkyFac = HISKF / ((1 - SkyWeight) * HorIllSky(ISky2) + SkyWeight * HorIllSky(ISky1));
 
                 for (IS = 1; IS <= 2; ++IS) {
+                    if (IS == 2 && (SurfaceWindow(IWin).WindowModelType == WindowBSDFModel)) break;
                     if (IS == 2 && SurfaceWindow(IWin).ShadingFlag <= 0 && !SurfaceWindow(IWin).SolarDiffusing) break;
 
                     ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL) =
@@ -6716,7 +6772,9 @@ namespace DaylightingManager {
             //   the window is initialized at clear state: IS = 1
             //  For other windows with glare control, the shading flag is initialized at >10, to be determined
             IS = 1;
-            if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+            if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                IS = 2;
 
             for (IL = 1; IL <= NREFPT; ++IL) {
                 DaylIllum(IL) += ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL);
@@ -6759,7 +6817,9 @@ namespace DaylightingManager {
 
                     ICtrl = Surface(IWin).WindowShadingControlPtr;
                     IS = 1;
-                    if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+                    if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                        ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                        IS = 2;
                     if (Surface(IWin).HasShadeControl) {
                         if (SurfaceWindow(IWin).ShadingFlag == GlassConditionallyLightened &&
                             WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp && !previously_shaded(loop)) {
@@ -6789,6 +6849,8 @@ namespace DaylightingManager {
             // Fourth loop over windows to determine which to switch
             // iterate in the order that the shades are specified in WindowShadeControl
             count = 0;
+            breakOuterLoop = false;
+            continueOuterLoop = false;
             for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
 
                 std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
@@ -6800,11 +6862,15 @@ namespace DaylightingManager {
                     if (ASETIL(igroup) < 1.0) {
 
                         ICtrl = Surface(IWin).WindowShadingControlPtr;
-                        if (!Surface(IWin).HasShadeControl) continue;
-
-                        if (SurfaceWindow(IWin).ShadingFlag != GlassConditionallyLightened ||
-                            WindowShadingControl(ICtrl).ShadingControlType != WSCT_MeetDaylIlumSetp)
+                        if (!Surface(IWin).HasShadeControl) {
+                            continueOuterLoop = true;
                             continue;
+                        }
+                        if (SurfaceWindow(IWin).ShadingFlag != GlassConditionallyLightened ||
+                            WindowShadingControl(ICtrl).ShadingControlType != WSCT_MeetDaylIlumSetp) {
+                            continueOuterLoop = true;
+                            continue;
+                        }
 
                         IConst = Surface(IWin).Construction;
                         if (SurfaceWindow(IWin).StormWinFlag == 1) IConst = Surface(IWin).StormWinConstruction;
@@ -6853,13 +6919,14 @@ namespace DaylightingManager {
                             ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpSourceLumFromWinAtRefPt(loop, IS, IL);
                         } // IL
                     }     // ASETIL < 1
+                    // If new daylight does not exceed the illuminance setpoint, done, no more checking other groups of switchable glazings
+                    if (DaylIllum(1) <= SetPnt(1)) {
+                        breakOuterLoop = true;
+                        break;
+                    }
                 }
-
-                // If new daylight does not exceed the illuminance setpoint, done, no more checking other groups of switchable glazings
-                if (DaylIllum(1) <= SetPnt(1)) {
-                    break;
-                }
-
+                if (breakOuterLoop) break;
+                if (continueOuterLoop) continue;
             } // End of fourth window loop
 
         } // ISWFLG /= 0 .AND. DaylIllum(1) > SETPNT(1)
@@ -6885,20 +6952,22 @@ namespace DaylightingManager {
         }
 
         Array3D<Real64> WDAYIL(
-            2, 2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Illuminance from window at reference point (second index)
+            2, NREFPT, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Illuminance from window at reference point (second index)
         //   for shade open/closed (first index), the number of shade deployment groups (third index)
         Array3D<Real64> WBACLU(
-            2, 2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Background illuminance from window at reference point (second index)
+            2, NREFPT, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Background illuminance from window at reference point (second index)
         //   for shade open/closed (first index), the number of shade deployment groups (third index)
         Array2D<Real64> RDAYIL(
-            2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Illuminance from window at reference point after closing shade
+            NREFPT, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Illuminance from window at reference point after closing shade
         Array2D<Real64> RBACLU(
-            2, ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Background illuminance from window at reference point after closing shade
+            NREFPT,
+            ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Background illuminance from window at reference point after closing shade
 
         if (GlareFlag) {
             // Glare is too high at a ref pt.  Loop through windows.
             int count = 0;
 
+            continueOuterLoop = false;
             for (std::size_t igroup = 1; igroup <= ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size(); igroup++) {
 
                 std::vector<int> listOfExtWin = ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins[igroup - 1];
@@ -6914,10 +6983,15 @@ namespace DaylightingManager {
                     // Check if window is eligible for glare control
                     // TH 1/21/2010. Switchable glazings already in partially switched state
                     //  should be allowed to further dim to control glare
-                    if (SurfaceWindow(IWin).ShadingFlag < 10 && SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) continue;
-
+                    if (SurfaceWindow(IWin).ShadingFlag < 10 && SurfaceWindow(IWin).ShadingFlag != SwitchableGlazing) {
+                        continueOuterLoop = false;
+                        continue;
+                    }
                     ICtrl = Surface(IWin).WindowShadingControlPtr;
-                    if (!Surface(IWin).HasShadeControl) continue;
+                    if (!Surface(IWin).HasShadeControl) {
+                        continueOuterLoop = false;
+                        continue;
+                    }
                     if (WindowShadingControl(ICtrl).GlareControlIsActive) {
                         atLeastOneGlareControlIsActive = true;
 
@@ -6967,6 +7041,7 @@ namespace DaylightingManager {
                         }
                     }
                 }
+                if (continueOuterLoop) continue;
 
                 if (atLeastOneGlareControlIsActive) {
 
@@ -6977,31 +7052,43 @@ namespace DaylightingManager {
                         DayltgGlare(IL, BACL, GLRNEW(IL), ZoneNum);
                     }
 
-                    blnCycle = false;
-                    if (NREFPT == 1 && GLRNEW(1) > GLRNDX(1)) {
-                        // One ref pt;  go to next window if glare has increased.
-                        blnCycle = true;
-                    } else if (NREFPT > 1) {
-                        // Two ref pts.  There are three cases depending on glare values.
-                        if (GLRNDX(1) > ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNDX(2) > ZoneDaylight(ZoneNum).MaxGlareallowed) {
-                            // (1) Initial glare too high at both ref pts.  Deploy shading on
-                            //     this window if this decreases glare at both ref pts.
-                            if (GLRNEW(1) > GLRNDX(1) || GLRNEW(2) > GLRNDX(2)) blnCycle = true;
-                        } else if (GLRNDX(1) > ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNDX(2) <= ZoneDaylight(ZoneNum).MaxGlareallowed) {
-                            // (2) Initial glare too high only at first ref pt.  Deploy shading
-                            //     on this window if glare at first ref pt decreases and
-                            //     glare at second ref pt stays below max.
-                            if (GLRNEW(1) > GLRNDX(1) || GLRNEW(2) > ZoneDaylight(ZoneNum).MaxGlareallowed) blnCycle = true;
-                        } else {
-                            // (3) Initial glare too high at second ref pt.  Deploy shading if glare
-                            //     at second ref pt decreases and glare at first ref pt stays below max.
-                            if (GLRNEW(2) > GLRNDX(2) || GLRNEW(1) > ZoneDaylight(ZoneNum).MaxGlareallowed) blnCycle = true;
-                        }
+                    // Check if the shading did not improve the glare conditions
+                    //
+                    // blnCycle when true resets the specific window to its non-shaded condition. A later comment says
+                    //      Shading this window has not improved the glare situation.
+                    //      Reset shading flag to no shading condition, go to next window.
+                    //
+                    // If the original glare was too high at all reference points and the new glare is lower at all reference points it is good, don't
+                    // reset it. For each reference point, if the original glare was too high but ok at other reference points and the glare gets
+                    // lower at the reference and stays ok at the other reference points it is good, don't reset it.
+                    //
+                    // The old comments when there were only two reference points were:
+                    //     One ref pt;  go to next window if glare has increased.
+                    //     Two ref pts.  There are three cases depending on glare values.
+                    //         (1) Initial glare too high at both ref pts.  Deploy shading on
+                    //             this window if this decreases glare at both ref pts.
+                    //         (2) Initial glare too high only at first ref pt.  Deploy shading
+                    //             on this window if glare at first ref pt decreases and
+                    //             glare at second ref pt stays below max.
+                    //         (3) Initial glare too high at second ref pt.  Deploy shading if glare
+                    //             at second ref pt decreases and glare at first ref pt stays below max.
+                    //
+                    // The approach taken is just to count the number of reference points that fulfill the individual requirements and see if it
+                    // covers all the reference points.
+                    int numRefPtOldAboveMaxNewBelowOld = 0;
+                    int numRefPtOldBelowMaxNewBelowMax = 0;
+                    for (IL = 1; IL <= NREFPT; ++IL) {
+                        if (GLRNDX(IL) > ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNEW(IL) <= GLRNDX(IL)) ++numRefPtOldAboveMaxNewBelowOld;
+                        if (GLRNDX(IL) <= ZoneDaylight(ZoneNum).MaxGlareallowed && GLRNEW(IL) <= ZoneDaylight(ZoneNum).MaxGlareallowed)
+                            ++numRefPtOldBelowMaxNewBelowMax;
                     }
+                    blnCycle = true;
+                    if ((numRefPtOldAboveMaxNewBelowOld + numRefPtOldBelowMaxNewBelowMax) == NREFPT) blnCycle = false;
                 }
 
                 // restore the count to the value prior to the last loop through the group of exterior windows
                 count = countBeforeListOfExtWinLoop;
+                breakOuterLoop = false;
 
                 for (auto IWin : listOfExtWin) {
                     ++count;
@@ -7125,11 +7212,13 @@ namespace DaylightingManager {
                                             continue;
                                         } else {
                                             // Glare still OK but glazing already in clear state, no more lighten
+                                            breakOuterLoop = true;
                                             break;
                                         }
                                     } else {
                                         // Glare too high, exit and use previous switching state
                                         tmpSWFactor += tmpSWIterStep;
+                                        breakOuterLoop = true;
                                         break;
                                     }
                                 }
@@ -7171,14 +7260,16 @@ namespace DaylightingManager {
                             } else {
                                 // For un-switchable glazing or switchable glazing but not MeetDaylightIlluminaceSetpoint control,
                                 // it is in shaded state and glare is ok - job is done, exit the window loop - IWin
+                                breakOuterLoop = true;
                                 break;
                             }
                         }
 
                     } // End of check if window glare control is active
                 }     // end of for(auto IWin : listOfExtWin)
-            }         // for group
-        }             // GlareFlag
+                if (breakOuterLoop) break;
+            } // for group
+        }     // GlareFlag
 
         // Loop again over windows and reset remaining shading flags that
         // are 10 or higher (i.e., conditionally off) to off
@@ -7349,10 +7440,10 @@ namespace DaylightingManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TotReduction; // Electric lighting power reduction factor for a zone
         //  due to daylighting
-        int NREFPT;   // Number of daylighting reference points in a zone
-        Real64 ZFTOT; // Fraction of zone's floor area that has daylighting controls
-        int IL;       // Reference point index
-        int LSYSTP;   // Lighting control type: 1=continuous dimming, 2=stepped,
+        int NREFPT;        // Number of daylighting reference points in a zone
+        Real64 ZFTOT = 0.; // Fraction of zone's floor area that has daylighting controls
+        int IL;            // Reference point index
+        int LSYSTP;        // Lighting control type: 1=continuous dimming, 2=stepped,
         //  3=continuous dimming then off
         Real64 ZFRAC; // Fraction of zone controlled by a reference point
         Real64 FL;    // Fraction electric lighting output required to meet setpoint
@@ -7379,16 +7470,14 @@ namespace DaylightingManager {
         //  ENDIF
 
         if (ScheduledAvailable) {
-            // Limit the number of control reference points to 2
             NREFPT = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
-            if (NREFPT > 2) NREFPT = 2;
-
-            // Total fraction of zone that is daylit
-            ZFTOT = ZoneDaylight(ZoneNum).FracZoneDaylit(1);
-            if (NREFPT > 1) ZFTOT += ZoneDaylight(ZoneNum).FracZoneDaylit(2);
 
             // Loop over reference points
             for (IL = 1; IL <= NREFPT; ++IL) {
+
+                // Total fraction of zone that is daylit
+                ZFTOT += ZoneDaylight(ZoneNum).FracZoneDaylit(IL);
+
                 DaylIllum(IL) = ZoneDaylight(ZoneNum).DaylIllumAtRefPt(IL);
                 if (DaylIllum(IL) >= ZoneDaylight(ZoneNum).IllumSetPoint(IL)) {
                     FL = 0.0;
@@ -9542,7 +9631,6 @@ namespace DaylightingManager {
         Real64 GTOT2;
         static Array1D<Real64> BACLUM;
         static Array1D<Real64> GLRNDX;
-        static bool FirstTimeFlag(true);
         int ILB;
 
         int IConst;
@@ -9556,11 +9644,11 @@ namespace DaylightingManager {
         int MapNum;
         int ILM;
 
-        if (FirstTimeFlag) {
+        if (DayltgInteriorMapIllum_FirstTimeFlag) {
             daylight_illum.allocate(MaxMapRefPoints);
             BACLUM.allocate(MaxMapRefPoints);
             GLRNDX.allocate(MaxMapRefPoints);
-            FirstTimeFlag = false;
+            DayltgInteriorMapIllum_FirstTimeFlag = false;
         }
 
         if (WarmupFlag) return;
@@ -9648,7 +9736,8 @@ namespace DaylightingManager {
                                                                          IllumMapCalc(MapNum).DaylSourceFacSunDisk(PreviousHour, 1, ILB, loop)));
                         }
 
-                        if (SurfaceWindow(IWin).ShadingFlag >= 1 || SurfaceWindow(IWin).SolarDiffusing) {
+                        if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                            (SurfaceWindow(IWin).ShadingFlag >= 1 || SurfaceWindow(IWin).SolarDiffusing)) {
 
                             //                                 ===Shaded window===
                             if (!SurfaceWindow(IWin).MovableSlats) {
@@ -9857,7 +9946,9 @@ namespace DaylightingManager {
                 IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
 
                 IS = 1;
-                if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+                if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                    ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                    IS = 2;
 
                 // CR 8057. 3/17/2010.
                 // Switchable windows may be in partially switched state rather than fully dark state
@@ -9893,7 +9984,9 @@ namespace DaylightingManager {
                 for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                     IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
                     IS = 1;
-                    if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+                    if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                        ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                        IS = 2;
 
                     // CR 8057. 3/17/2010
                     VTMULT = 1.0;
@@ -9963,8 +10056,8 @@ namespace DaylightingManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt FmtA("(A)");
-        static gio::Fmt HrFmt("(I2.2)");
+        static ObjexxFCL::gio::Fmt FmtA("(A)");
+        static ObjexxFCL::gio::Fmt HrFmt("(I2.2)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -9981,7 +10074,6 @@ namespace DaylightingManager {
         //  REAL(r64)           :: NumOut
         int IllumOut;
 
-        static bool firstTime(true);
         static Array1D_bool FirstTimeMaps;
         static Array1D_bool EnvrnPrint;
         static Array1D_string SavedMnDy;
@@ -9997,13 +10089,12 @@ namespace DaylightingManager {
         int SQMonth;
         int SQDayOfMonth;
         int IllumIndex;
-        static bool SQFirstTime(true);
         //		static bool CommaDelimited( true ); //Unused Set but never used
         // BSLLC Finish
 
         // FLOW:
-        if (firstTime) {
-            firstTime = false;
+        if (ReportIllumMap_firstTime) {
+            ReportIllumMap_firstTime = false;
             FirstTimeMaps.dimension(TotIllumMaps, true);
             EnvrnPrint.dimension(TotIllumMaps, true);
             RefPts.allocate(NumOfZones, MaxRefPoints);
@@ -10020,7 +10111,7 @@ namespace DaylightingManager {
                     IOFlags flags;
                     flags.ACTION("readwrite");
                     flags.STATUS("UNKNOWN");
-                    gio::open(IllumMap(MapNum).UnitNo, DataStringGlobals::outputMapTabFileName + MapNoString, flags);
+                    ObjexxFCL::gio::open(IllumMap(MapNum).UnitNo, DataStringGlobals::outputMapTabFileName + MapNoString, flags);
                     if (flags.err()) goto Label901;
                 }
                 //				CommaDelimited = false; //Unused Set but never used
@@ -10029,7 +10120,7 @@ namespace DaylightingManager {
                     IOFlags flags;
                     flags.ACTION("readwrite");
                     flags.STATUS("UNKNOWN");
-                    gio::open(IllumMap(MapNum).UnitNo, DataStringGlobals::outputMapCsvFileName + MapNoString, flags);
+                    ObjexxFCL::gio::open(IllumMap(MapNum).UnitNo, DataStringGlobals::outputMapCsvFileName + MapNoString, flags);
                     if (flags.err()) goto Label902;
                 }
                 //				CommaDelimited = true; //Unused Set but never used
@@ -10038,7 +10129,7 @@ namespace DaylightingManager {
                     IOFlags flags;
                     flags.ACTION("readwrite");
                     flags.STATUS("UNKNOWN");
-                    gio::open(IllumMap(MapNum).UnitNo, DataStringGlobals::outputMapTxtFileName + MapNoString, flags);
+                    ObjexxFCL::gio::open(IllumMap(MapNum).UnitNo, DataStringGlobals::outputMapTxtFileName + MapNoString, flags);
                     if (flags.err()) goto Label903;
                 }
                 //				CommaDelimited = false; //Unused Set but never used
@@ -10079,7 +10170,7 @@ namespace DaylightingManager {
             if (TimeStep == NumOfTimeStepInHour) { // Report only hourly
 
                 // Write X scale column header
-                gio::write(HrString, HrFmt) << HourOfDay;
+                ObjexxFCL::gio::write(HrString, HrFmt) << HourOfDay;
                 mapLine = ' ' + SavedMnDy(MapNum) + ' ' + HrString + ":00";
                 if (IllumMap(MapNum).HeaderXLineLengthNeeded) linelen = int(len(mapLine));
                 RefPt = 1;
@@ -10103,7 +10194,7 @@ namespace DaylightingManager {
                     IllumMap(MapNum).HeaderXLineLengthNeeded = false;
                 }
 
-                gio::write(IllumMap(MapNum).UnitNo, FmtA) << mapLine;
+                ObjexxFCL::gio::write(IllumMap(MapNum).UnitNo, FmtA) << mapLine;
 
                 // Write Y scale prefix and illuminance values
                 RefPt = 1;
@@ -10121,7 +10212,7 @@ namespace DaylightingManager {
                         mapLine += MapColSep + String;
                     }
 
-                    gio::write(IllumMap(MapNum).UnitNo, FmtA) << mapLine;
+                    ObjexxFCL::gio::write(IllumMap(MapNum).UnitNo, FmtA) << mapLine;
 
                     RefPt += IllumMap(MapNum).Xnum;
                 } // X
@@ -10203,7 +10294,7 @@ namespace DaylightingManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt FmtA("(A)");
+        static ObjexxFCL::gio::Fmt FmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -10227,7 +10318,7 @@ namespace DaylightingManager {
                     IOFlags flags;
                     flags.ACTION("write");
                     flags.STATUS("UNKNOWN");
-                    gio::open(MapOutputFile, DataStringGlobals::outputMapTabFileName, flags);
+                    ObjexxFCL::gio::open(MapOutputFile, DataStringGlobals::outputMapTabFileName, flags);
                     if (flags.err()) goto Label901;
                 }
             } else if (MapColSep == CharComma) {
@@ -10235,7 +10326,7 @@ namespace DaylightingManager {
                     IOFlags flags;
                     flags.ACTION("write");
                     flags.STATUS("UNKNOWN");
-                    gio::open(MapOutputFile, DataStringGlobals::outputMapCsvFileName, flags);
+                    ObjexxFCL::gio::open(MapOutputFile, DataStringGlobals::outputMapCsvFileName, flags);
                     if (flags.err()) goto Label902;
                 }
             } else {
@@ -10243,7 +10334,7 @@ namespace DaylightingManager {
                     IOFlags flags;
                     flags.ACTION("write");
                     flags.STATUS("UNKNOWN");
-                    gio::open(MapOutputFile, DataStringGlobals::outputMapTxtFileName, flags);
+                    ObjexxFCL::gio::open(MapOutputFile, DataStringGlobals::outputMapTxtFileName, flags);
                     if (flags.err()) goto Label903;
                 }
             }
@@ -10251,12 +10342,12 @@ namespace DaylightingManager {
             for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
                 if (IllumMap(MapNum).UnitNo == 0) continue; // fatal error processing
                 NumLines = 0;
-                gio::rewind(IllumMap(MapNum).UnitNo);
+                ObjexxFCL::gio::rewind(IllumMap(MapNum).UnitNo);
                 ios = 0;
                 while (ios == 0) {
                     {
                         IOFlags flags;
-                        gio::read(IllumMap(MapNum).UnitNo, FmtA, flags) >> mapLine;
+                        ObjexxFCL::gio::read(IllumMap(MapNum).UnitNo, FmtA, flags) >> mapLine;
                         ios = flags.ios();
                     }
                     if (ios > 0) { // usually a read error
@@ -10268,22 +10359,22 @@ namespace DaylightingManager {
                         break;
                     }
                     ++NumLines;
-                    gio::write(MapOutputFile, FmtA) << mapLine;
+                    ObjexxFCL::gio::write(MapOutputFile, FmtA) << mapLine;
                 }
                 {
                     IOFlags flags;
                     flags.DISPOSE("DELETE");
-                    gio::close(IllumMap(MapNum).UnitNo, flags);
+                    ObjexxFCL::gio::close(IllumMap(MapNum).UnitNo, flags);
                 }
             }
 
             if (!mapResultsReported && !AbortProcessing) {
                 ShowSevereError("CloseReportIllumMaps: Illuminance maps requested but no data ever reported. Likely cause is no solar.");
-                gio::write(MapOutputFile, FmtA)
+                ObjexxFCL::gio::write(MapOutputFile, FmtA)
                     << "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. Likely cause is no solar.";
             }
 
-            gio::close(MapOutputFile);
+            ObjexxFCL::gio::close(MapOutputFile);
         }
 
         return;
@@ -10337,7 +10428,7 @@ namespace DaylightingManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        if (OutputFileDFS > 0) gio::close(OutputFileDFS);
+        if (OutputFileDFS > 0) ObjexxFCL::gio::close(OutputFileDFS);
     }
 
     void DayltgSetupAdjZoneListsAndPointers()
@@ -10400,13 +10491,13 @@ namespace DaylightingManager {
         int MapNum;
 
         // Formats
-        static gio::Fmt Format_700("('! <Zone/Window Adjacency Daylighting Counts>, Zone Name, ','Number of Exterior Windows, Number of Exterior "
+        static ObjexxFCL::gio::Fmt Format_700("('! <Zone/Window Adjacency Daylighting Counts>, Zone Name, ','Number of Exterior Windows, Number of Exterior "
                                    "Windows in Adjacent Zones')");
-        static gio::Fmt Format_701("('Zone/Window Adjacency Daylighting Counts, ',A,',',A,',',A)");
-        static gio::Fmt Format_702("('! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,','Adjacent "
+        static ObjexxFCL::gio::Fmt Format_701("('Zone/Window Adjacency Daylighting Counts, ',A,',',A,',',A)");
+        static ObjexxFCL::gio::Fmt Format_702("('! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,','Adjacent "
                                    "Zone Names - 1st 100 (max)')");
-        static gio::Fmt Format_703("('Zone/Window Adjacency Daylighting Matrix, ',A,',',A,$)");
-        static gio::Fmt fmtCommaA("(',',A,$)");
+        static ObjexxFCL::gio::Fmt Format_703("('Zone/Window Adjacency Daylighting Matrix, ',A,',',A,$)");
+        static ObjexxFCL::gio::Fmt fmtCommaA("(',',A,$)");
 
         // FLOW:
         // Count number of exterior Windows (use to allocate arrays)
@@ -10663,7 +10754,7 @@ namespace DaylightingManager {
 
                 ZoneDaylight(ZoneNum).NumOfDayltgExtWins = ZoneExtWin(ZoneNum);
                 WinSize = ZoneExtWin(ZoneNum);
-                RefSize = 2;
+                RefSize = ZoneDaylight(ZoneNum).TotalDaylRefPoints;
                 ZoneDaylight(ZoneNum).DaylIllFacSky.allocate(24, MaxSlatAngs + 1, 4, RefSize, WinSize);
                 ZoneDaylight(ZoneNum).DaylSourceFacSky.allocate(24, MaxSlatAngs + 1, 4, RefSize, WinSize);
                 ZoneDaylight(ZoneNum).DaylBackFacSky.allocate(24, MaxSlatAngs + 1, 4, RefSize, WinSize);
@@ -10697,22 +10788,22 @@ namespace DaylightingManager {
 
         } // End of primary zone loop
 
-        gio::write(OutputFileInits, Format_700);
+        ObjexxFCL::gio::write(OutputFileInits, Format_700);
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
-            gio::write(OutputFileInits, Format_701)
+            ObjexxFCL::gio::write(OutputFileInits, Format_701)
                 << Zone(ZoneNum).Name << RoundSigDigits(ZoneDaylight(ZoneNum).TotalExtWindows)
                 << RoundSigDigits(ZoneDaylight(ZoneNum).NumOfDayltgExtWins - ZoneDaylight(ZoneNum).TotalExtWindows);
         }
 
-        gio::write(OutputFileInits, Format_702);
+        ObjexxFCL::gio::write(OutputFileInits, Format_702);
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
-            gio::write(OutputFileInits, Format_703) << Zone(ZoneNum).Name << RoundSigDigits(ZoneDaylight(ZoneNum).NumOfIntWinAdjZones);
+            ObjexxFCL::gio::write(OutputFileInits, Format_703) << Zone(ZoneNum).Name << RoundSigDigits(ZoneDaylight(ZoneNum).NumOfIntWinAdjZones);
             for (int loop = 1, loop_end = min(ZoneDaylight(ZoneNum).NumOfIntWinAdjZones, 100); loop <= loop_end; ++loop) {
-                gio::write(OutputFileInits, fmtCommaA) << Zone(ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop)).Name;
+                ObjexxFCL::gio::write(OutputFileInits, fmtCommaA) << Zone(ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop)).Name;
             }
-            gio::write(OutputFileInits);
+            ObjexxFCL::gio::write(OutputFileInits);
         }
 
         ZoneExtWin.deallocate();
@@ -10759,7 +10850,8 @@ namespace DaylightingManager {
         // J. Glazer - 2018
         // Allow a way to map back to the original "loop" index that is used in many other places in the
         // ZoneDayLight data structure when traversing the list in the order of the window shaded deployment
-        if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 && ZoneDaylight(ZoneNum).NumOfDayltgExtWins > 0 && ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size() > 0) {
+        if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 && ZoneDaylight(ZoneNum).NumOfDayltgExtWins > 0 &&
+            ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size() > 0) {
             int count = 0;
             for (auto listOfExtWin : ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins) {
                 for (auto IWinShdOrd : listOfExtWin) {
@@ -11082,14 +11174,14 @@ namespace DaylightingManager {
         // The purpose of the routine is to allow the daylighting map data to be written in various formats
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt FmtA("(A)");
+        static ObjexxFCL::gio::Fmt FmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string fullmapName; // for output to map units as well as SQL
 
         // must add correct number of commas at end
         fullmapName = Zone(ZoneNum).Name + ':' + environmentName + ':' + mapName + " Illuminance [lux] (Hourly)";
-        gio::write(unitNo, FmtA) << "Date/Time," + fullmapName + MapColSep + refPt1 + MapColSep + refPt2 + MapColSep + MapColSep;
+        ObjexxFCL::gio::write(unitNo, FmtA) << "Date/Time," + fullmapName + MapColSep + refPt1 + MapColSep + refPt2 + MapColSep + MapColSep;
 
         if (sqlite) {
             sqlite->createSQLiteDaylightMapTitle(mapNum, fullmapName, environmentName, ZoneNum, refPt1, refPt2, zcoord);

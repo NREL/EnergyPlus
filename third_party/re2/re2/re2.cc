@@ -99,8 +99,8 @@ static RE2::ErrorCode RegexpErrorToRE2(re2::RegexpStatusCode code) {
 
 static string trunc(const StringPiece& pattern) {
   if (pattern.size() < 100)
-    return pattern.ToString();
-  return pattern.substr(0, 100).ToString() + "...";
+    return string(pattern);
+  return string(pattern.substr(0, 100)) + "...";
 }
 
 
@@ -172,15 +172,15 @@ void RE2::Init(const StringPiece& pattern, const Options& options) {
     empty_group_names = new std::map<int, string>;
   });
 
-  pattern_ = pattern.ToString();
+  pattern_ = string(pattern);
   options_.Copy(options);
   entire_regexp_ = NULL;
   suffix_regexp_ = NULL;
   prog_ = NULL;
+  num_captures_ = -1;
   rprog_ = NULL;
   error_ = empty_string;
   error_code_ = NoError;
-  num_captures_ = -1;
   named_groups_ = NULL;
   group_names_ = NULL;
 
@@ -196,7 +196,7 @@ void RE2::Init(const StringPiece& pattern, const Options& options) {
     }
     error_ = new string(status.Text());
     error_code_ = RegexpErrorToRE2(status.code());
-    error_arg_ = status.error_arg().ToString();
+    error_arg_ = string(status.error_arg());
     return;
   }
 
@@ -217,6 +217,11 @@ void RE2::Init(const StringPiece& pattern, const Options& options) {
     error_code_ = RE2::ErrorPatternTooLarge;
     return;
   }
+
+  // We used to compute this lazily, but it's used during the
+  // typical control flow for a match call, so we now compute
+  // it eagerly, which avoids the overhead of std::once_flag.
+  num_captures_ = suffix_regexp_->NumCaptures();
 
   // Could delay this until the first match call that
   // cares about submatch information, but the one-pass
@@ -262,16 +267,23 @@ int RE2::ProgramSize() const {
   return prog_->size();
 }
 
-int RE2::ProgramFanout(std::map<int, int>* histogram) const {
+int RE2::ReverseProgramSize() const {
   if (prog_ == NULL)
     return -1;
-  SparseArray<int> fanout(prog_->size());
-  prog_->Fanout(&fanout);
+  Prog* prog = ReverseProg();
+  if (prog == NULL)
+    return -1;
+  return prog->size();
+}
+
+static int Fanout(Prog* prog, std::map<int, int>* histogram) {
+  SparseArray<int> fanout(prog->size());
+  prog->Fanout(&fanout);
   histogram->clear();
   for (SparseArray<int>::iterator i = fanout.begin(); i != fanout.end(); ++i) {
     // TODO(junyer): Optimise this?
     int bucket = 0;
-    while (1 << bucket < i->second) {
+    while (1 << bucket < i->value()) {
       bucket++;
     }
     (*histogram)[bucket]++;
@@ -279,14 +291,19 @@ int RE2::ProgramFanout(std::map<int, int>* histogram) const {
   return histogram->rbegin()->first;
 }
 
-// Returns num_captures_, computing it if needed, or -1 if the
-// regexp wasn't valid on construction.
-int RE2::NumberOfCapturingGroups() const {
-  std::call_once(num_captures_once_, [](const RE2* re) {
-    if (re->suffix_regexp_ != NULL)
-      re->num_captures_ = re->suffix_regexp_->NumCaptures();
-  }, this);
-  return num_captures_;
+int RE2::ProgramFanout(std::map<int, int>* histogram) const {
+  if (prog_ == NULL)
+    return -1;
+  return Fanout(prog_, histogram);
+}
+
+int RE2::ReverseProgramFanout(std::map<int, int>* histogram) const {
+  if (prog_ == NULL)
+    return -1;
+  Prog* prog = ReverseProg();
+  if (prog == NULL)
+    return -1;
+  return Fanout(prog, histogram);
 }
 
 // Returns named_groups_, computing it if needed.
@@ -345,9 +362,9 @@ bool RE2::FindAndConsumeN(StringPiece* input, const RE2& re,
   }
 }
 
-bool RE2::Replace(string *str,
-                 const RE2& re,
-                 const StringPiece& rewrite) {
+bool RE2::Replace(string* str,
+                  const RE2& re,
+                  const StringPiece& rewrite) {
   StringPiece vec[kVecSize];
   int nvec = 1 + MaxSubmatch(rewrite);
   if (nvec > arraysize(vec))
@@ -365,9 +382,9 @@ bool RE2::Replace(string *str,
   return true;
 }
 
-int RE2::GlobalReplace(string *str,
-                      const RE2& re,
-                      const StringPiece& rewrite) {
+int RE2::GlobalReplace(string* str,
+                       const RE2& re,
+                       const StringPiece& rewrite) {
   StringPiece vec[kVecSize];
   int nvec = 1 + MaxSubmatch(rewrite);
   if (nvec > arraysize(vec))
@@ -393,11 +410,10 @@ int RE2::GlobalReplace(string *str,
     if (vec[0].begin() == lastend && vec[0].size() == 0) {
       // Disallow empty match at end of last match: skip ahead.
       //
-      // fullrune() takes int, not size_t. However, it just looks
+      // fullrune() takes int, not ptrdiff_t. However, it just looks
       // at the leading byte and treats any length >= 4 the same.
       if (re.options().encoding() == RE2::Options::EncodingUTF8 &&
-          fullrune(p, static_cast<int>(std::min(static_cast<ptrdiff_t>(4),
-                                                ep - p)))) {
+          fullrune(p, static_cast<int>(std::min(ptrdiff_t{4}, ep - p)))) {
         // re is in UTF-8 mode and there is enough left of str
         // to allow us to advance by up to UTFmax bytes.
         Rune r;
@@ -437,10 +453,10 @@ int RE2::GlobalReplace(string *str,
   return count;
 }
 
-bool RE2::Extract(const StringPiece &text,
-                 const RE2& re,
-                 const StringPiece &rewrite,
-                 string *out) {
+bool RE2::Extract(const StringPiece& text,
+                  const RE2& re,
+                  const StringPiece& rewrite,
+                  string* out) {
   StringPiece vec[kVecSize];
   int nvec = 1 + MaxSubmatch(rewrite);
   if (nvec > arraysize(vec))
@@ -535,7 +551,7 @@ bool RE2::PossibleMatchRange(string* min, string* max, int maxlen) const {
 // Avoid possible locale nonsense in standard strcasecmp.
 // The string a is known to be all lowercase.
 static int ascii_strcasecmp(const char* a, const char* b, size_t len) {
-  const char *ae = a + len;
+  const char* ae = a + len;
 
   for (; a < ae; a++, b++) {
     uint8_t x = *a;
@@ -557,7 +573,7 @@ bool RE2::Match(const StringPiece& text,
                 Anchor re_anchor,
                 StringPiece* submatch,
                 int nsubmatch) const {
-  if (!ok() || suffix_regexp_ == NULL) {
+  if (!ok()) {
     if (options_.log_errors())
       LOG(ERROR) << "Invalid RE2: " << *error_;
     return false;
@@ -668,9 +684,9 @@ bool RE2::Match(const StringPiece& text,
                            Prog::kLongestMatch, &match, &dfa_failed, NULL)) {
         if (dfa_failed) {
           if (options_.log_errors())
-            LOG(ERROR) << "DFA out of memory: size " << prog_->size() << ", "
-                       << "bytemap range " << prog_->bytemap_range() << ", "
-                       << "list count " << prog_->list_count();
+            LOG(ERROR) << "DFA out of memory: size " << prog->size() << ", "
+                       << "bytemap range " << prog->bytemap_range() << ", "
+                       << "list count " << prog->list_count();
           // Fall back to NFA below.
           skipped_test = true;
           break;
@@ -774,13 +790,18 @@ bool RE2::Match(const StringPiece& text,
 
 // Internal matcher - like Match() but takes Args not StringPieces.
 bool RE2::DoMatch(const StringPiece& text,
-                  Anchor anchor,
+                  Anchor re_anchor,
                   size_t* consumed,
                   const Arg* const* args,
                   int n) const {
   if (!ok()) {
     if (options_.log_errors())
       LOG(ERROR) << "Invalid RE2: " << *error_;
+    return false;
+  }
+
+  if (NumberOfCapturingGroups() < n) {
+    // RE has fewer capturing groups than number of Arg pointers passed in.
     return false;
   }
 
@@ -802,7 +823,7 @@ bool RE2::DoMatch(const StringPiece& text,
     heapvec = vec;
   }
 
-  if (!Match(text, 0, text.size(), anchor, vec, nvec)) {
+  if (!Match(text, 0, text.size(), re_anchor, vec, nvec)) {
     delete[] heapvec;
     return false;
   }
@@ -814,13 +835,6 @@ bool RE2::DoMatch(const StringPiece& text,
     // We are not interested in results
     delete[] heapvec;
     return true;
-  }
-
-  int ncap = NumberOfCapturingGroups();
-  if (ncap < n) {
-    // RE has fewer capturing groups than number of arg pointers passed in
-    delete[] heapvec;
-    return false;
   }
 
   // If we got here, we must have matched the whole pattern.
@@ -896,8 +910,10 @@ int RE2::MaxSubmatch(const StringPiece& rewrite) {
 
 // Append the "rewrite" string, with backslash subsitutions from "vec",
 // to string "out".
-bool RE2::Rewrite(string* out, const StringPiece& rewrite,
-                  const StringPiece* vec, int veclen) const {
+bool RE2::Rewrite(string* out,
+                  const StringPiece& rewrite,
+                  const StringPiece* vec,
+                  int veclen) const {
   for (const char *s = rewrite.data(), *end = s + rewrite.size();
        s < end; s++) {
     if (*s != '\\') {

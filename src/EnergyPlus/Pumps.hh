@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -204,6 +204,7 @@ namespace Pumps {
         int ZoneNum;                  // index for zone surrounding pump
         Real64 SkinLossRadFraction;   // radiative split for skin losses to zone
         bool LoopSolverOverwriteFlag; // loop solver overwrite for determining pump minimum flow rate
+        std::string EndUseSubcategoryName;
 
         // Default Constructor
         PumpSpecs()

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -175,34 +175,34 @@ namespace DElightManagerF {
         Real64 Ytrans;
 
         // Formats
-        static gio::Fmt Format_901("(\"Version EPlus : DElight input generated from EnergyPlus processed input \",A)");
-        static gio::Fmt Format_902("(,/,\"Building_Name \",A,/,\"Site_Latitude  \",f12.4,/,\"Site_Longitude \",f12.4,/,\"Site_Altitude  "
+        static ObjexxFCL::gio::Fmt Format_901("(\"Version EPlus : DElight input generated from EnergyPlus processed input \",A)");
+        static ObjexxFCL::gio::Fmt Format_902("(,/,\"Building_Name \",A,/,\"Site_Latitude  \",f12.4,/,\"Site_Longitude \",f12.4,/,\"Site_Altitude  "
                                    "\",f12.4,/,\"Bldg_Azimuth   \",f12.4,/,\"Site_Time_Zone \",f12.4,/,\"Atm_Moisture  0.07 0.07 0.07 0.07 0.07 0.07 "
                                    "0.07 0.07 0.07 0.07 0.07 0.07\",/,\"Atm_Turbidity 0.12 0.12 0.12 0.12 0.12 0.12 0.12 0.12 0.12 0.12 0.12 "
                                    "0.12\")");
-        static gio::Fmt Format_903("(,/,\"ZONES\",/,\"N_Zones \",I4)");
-        static gio::Fmt Format_904("(,/,\"ZONE DATA\",/,\"Zone \",A,/,\"BldgSystem_Zone_Origin \",f12.4,f12.4,f12.4,/,\"Zone_Azimuth    "
+        static ObjexxFCL::gio::Fmt Format_903("(,/,\"ZONES\",/,\"N_Zones \",I4)");
+        static ObjexxFCL::gio::Fmt Format_904("(,/,\"ZONE DATA\",/,\"Zone \",A,/,\"BldgSystem_Zone_Origin \",f12.4,f12.4,f12.4,/,\"Zone_Azimuth    "
                                    "\",f12.4,/,\"Zone_Multiplier \",I5,/,\"Zone_Floor_Area \",f12.4,/,\"Zone_Volume     "
                                    "\",f12.4,/,\"Zone_Installed_Lighting \",f12.4,/,\"Min_Input_Power    \",f12.4,/,\"Min_Light_Fraction "
                                    "\",f12.4,/,\"Light_Ctrl_Steps   \",I3,/,\"Light_Ctrl_Prob    \",f12.4,/,\"View_Azimuth  "
                                    "0.0\",/,\"Max_Grid_Node_Area \",f12.4)");
-        static gio::Fmt Format_905("(,/,\"ZONE LIGHTING SCHEDULES\",/,\"N_Lt_Scheds 0\")");
-        static gio::Fmt Format_906("(,/,\"ZONE SURFACES\",/,\"N_Surfaces \",I4)");
-        static gio::Fmt Format_907("(,/,\"ZONE SURFACE DATA\",/,\"Surface \",A,/,\"WCS_Azimuth \",f12.4,/,\"WCS_Tilt    \",f12.4,/,\"Vis_Refl    "
+        static ObjexxFCL::gio::Fmt Format_905("(,/,\"ZONE LIGHTING SCHEDULES\",/,\"N_Lt_Scheds 0\")");
+        static ObjexxFCL::gio::Fmt Format_906("(,/,\"ZONE SURFACES\",/,\"N_Surfaces \",I4)");
+        static ObjexxFCL::gio::Fmt Format_907("(,/,\"ZONE SURFACE DATA\",/,\"Surface \",A,/,\"WCS_Azimuth \",f12.4,/,\"WCS_Tilt    \",f12.4,/,\"Vis_Refl    "
                                    "\",f12.4,/,\"Ext_Refl    \",f12.4,/,\"Gnd_Refl     0.2\",/,\"N_WCS_Vertices \",I6)");
-        static gio::Fmt Format_908("(\"Vertex \",f12.4,f12.4,f12.4)");
-        static gio::Fmt Format_909("(,/,\"SURFACE WINDOWS\",/,\"N_Windows \",I6)");
-        static gio::Fmt Format_910("(,/,\"SURFACE WINDOW DATA\",/,\"Window     \",A,/,\"Glass_Type \",I8,/,\"Shade_Flag   0\",/,\"Overhang_Fin_Depth "
+        static ObjexxFCL::gio::Fmt Format_908("(\"Vertex \",f12.4,f12.4,f12.4)");
+        static ObjexxFCL::gio::Fmt Format_909("(,/,\"SURFACE WINDOWS\",/,\"N_Windows \",I6)");
+        static ObjexxFCL::gio::Fmt Format_910("(,/,\"SURFACE WINDOW DATA\",/,\"Window     \",A,/,\"Glass_Type \",I8,/,\"Shade_Flag   0\",/,\"Overhang_Fin_Depth "
                                    "   0.0 0.0 0.0\",/,\"Overhang_Fin_Distance 0.0 0.0 0.0\",/,\"N_WCS_Vertices \",I4)");
-        static gio::Fmt Format_911("(,/,\"SURFACE CFS\",/,\"N_CFS \",I6)");
-        static gio::Fmt Format_915(
+        static ObjexxFCL::gio::Fmt Format_911("(,/,\"SURFACE CFS\",/,\"N_CFS \",I6)");
+        static ObjexxFCL::gio::Fmt Format_915(
             "(,/,\"COMPLEX FENESTRATION DATA\",/,\"CFS_Name   \",A,/,\"CFS_Type   \",A,/,\"Fenestration_Rotation \",f12.4,/,\"N_WCS_Vertices \",I4)");
-        static gio::Fmt Format_912("(,/,\"ZONE REFERENCE POINTS\",/,\"N_Ref_Pts \",I4)");
-        static gio::Fmt Format_913("(,/,\"ZONE REFERENCE POINT DATA\",/,\"Reference_Point \",A,/,\"RefPt_WCS_Coords "
+        static ObjexxFCL::gio::Fmt Format_912("(,/,\"ZONE REFERENCE POINTS\",/,\"N_Ref_Pts \",I4)");
+        static ObjexxFCL::gio::Fmt Format_913("(,/,\"ZONE REFERENCE POINT DATA\",/,\"Reference_Point \",A,/,\"RefPt_WCS_Coords "
                                    "\",f12.4,f12.4,f12.4,/,\"Zone_Fraction \",f12.4,/,\"Light_Set_Pt \",f12.4,/,\"Light_Ctrl_Type \",I4)");
-        static gio::Fmt Format_914("(,/,\"BUILDING SHADES\",/,\"N_BShades 0\")");
-        static gio::Fmt Format_920("(,/,\"LIBRARY DATA\",/,\"GLASS TYPES\",/,\"N_Glass_Types \",I4)");
-        static gio::Fmt Format_921("(,/,\"GLASS TYPE DATA\",/,\"Name \",I6,/,\"EPlusDiffuse_Transmittance   "
+        static ObjexxFCL::gio::Fmt Format_914("(,/,\"BUILDING SHADES\",/,\"N_BShades 0\")");
+        static ObjexxFCL::gio::Fmt Format_920("(,/,\"LIBRARY DATA\",/,\"GLASS TYPES\",/,\"N_Glass_Types \",I4)");
+        static ObjexxFCL::gio::Fmt Format_921("(,/,\"GLASS TYPE DATA\",/,\"Name \",I6,/,\"EPlusDiffuse_Transmittance   "
                                    "\",f12.4,/,\"EPlusDiffuse_Int_Reflectance \",f12.4,/,\"EPlus_Vis_Trans_Coeff_1 "
                                    "\",f17.9,/,\"EPlus_Vis_Trans_Coeff_2 \",f17.9,/,\"EPlus_Vis_Trans_Coeff_3 \",f17.9,/,\"EPlus_Vis_Trans_Coeff_4 "
                                    "\",f17.9,/,\"EPlus_Vis_Trans_Coeff_5 \",f17.9,/,\"EPlus_Vis_Trans_Coeff_6 \",f17.9)");
@@ -227,19 +227,19 @@ namespace DElightManagerF {
         {
             IOFlags flags;
             flags.ACTION("write");
-            gio::open(unit, outputDelightInFileName, flags);
+            ObjexxFCL::gio::open(unit, outputDelightInFileName, flags);
             if (flags.err()) {
                 ShowFatalError("DElightInputGenerator: Could not open file \"" + outputDelightInFileName + "\" for output (write).");
             }
         }
 
         // Start of DElight input file
-        gio::write(unit, Format_901) << CurrentDateTime;
+        ObjexxFCL::gio::write(unit, Format_901) << CurrentDateTime;
 
         // Building Data Section retrieved from DataHeatBalance and DataEnvironment modules
         // Remove any blanks from the Building Name for ease of input to DElight
         cNameWOBlanks = ReplaceBlanksWithUnderscores(BuildingName);
-        gio::write(unit, Format_902) << cNameWOBlanks << Latitude << Longitude << Elevation * M2FT << BuildingAzimuth << TimeZoneNumber;
+        ObjexxFCL::gio::write(unit, Format_902) << cNameWOBlanks << Latitude << Longitude << Elevation * M2FT << BuildingAzimuth << TimeZoneNumber;
 
         // Calc cos and sin of Building Relative North values for later use in transforming Reference Point coordinates
         CosBldgRelNorth = std::cos(-BuildingAzimuth * DegToRadians);
@@ -278,7 +278,7 @@ namespace DElightManagerF {
         } // traverse ZoneDaylight array
 
         // Zone Data Section
-        gio::write(unit, Format_903) << iNumDElightZones;
+        ObjexxFCL::gio::write(unit, Format_903) << iNumDElightZones;
 
         // Loop through the Daylighting:DElight objects searching for a match to the current Zone
 
@@ -294,7 +294,7 @@ namespace DElightManagerF {
                     // Write this Zone to the DElight input file
                     // Remove any blanks from the Zone Name for ease of input to DElight
                     cNameWOBlanks = ReplaceBlanksWithUnderscores(zn.Name);
-                    gio::write(unit, Format_904) << cNameWOBlanks << zn.OriginX * M2FT << zn.OriginY * M2FT << zn.OriginZ * M2FT << zn.RelNorth
+                    ObjexxFCL::gio::write(unit, Format_904) << cNameWOBlanks << zn.OriginX * M2FT << zn.OriginY * M2FT << zn.OriginZ * M2FT << zn.RelNorth
                                                  << zn.Multiplier * zn.ListMultiplier << zn.FloorArea * M22FT2 << zn.Volume * M32FT3
                                                  << rLightLevel / (zn.FloorArea * M22FT2 + 0.00001) << znDayl.MinPowerFraction
                                                  << znDayl.MinLightFraction << znDayl.LightControlSteps << znDayl.LightControlProbability
@@ -306,7 +306,7 @@ namespace DElightManagerF {
 
                     // Zone Lighting Schedule Data Section
                     // NOTE: Schedules are not required since hourly values are retrieved from EnergyPlus as needed
-                    gio::write(unit, Format_905);
+                    ObjexxFCL::gio::write(unit, Format_905);
 
                     // Zone Surface Data Section
                     // Count the number of opaque surfaces bounding the current zone
@@ -321,7 +321,7 @@ namespace DElightManagerF {
                         if (surf.Class == SurfaceClass_Floor) ++iNumOpaqueSurfs;
                     } // Zone Opaque Surface loop
 
-                    gio::write(unit, Format_906) << iNumOpaqueSurfs;
+                    ObjexxFCL::gio::write(unit, Format_906) << iNumOpaqueSurfs;
 
                     // Write each opaque bounding Surface to the DElight input file
                     for (int isurf = iSurfaceFirst; isurf <= iSurfaceLast; ++isurf) {
@@ -347,13 +347,13 @@ namespace DElightManagerF {
 
                             // Remove any blanks from the Surface Name for ease of input to DElight
                             cNameWOBlanks = ReplaceBlanksWithUnderscores(surf.Name);
-                            gio::write(unit, Format_907) << cNameWOBlanks << surf.Azimuth << surf.Tilt << Construct(iconstruct).ReflectVisDiffBack
+                            ObjexxFCL::gio::write(unit, Format_907) << cNameWOBlanks << surf.Azimuth << surf.Tilt << Construct(iconstruct).ReflectVisDiffBack
                                                          << rExtVisRefl << surf.Sides;
 
                             // Write out the vertex coordinates for each vertex
                             int const iNumVertices = surf.Sides; // Counter for surface vertices
                             for (int ivert = 1; ivert <= iNumVertices; ++ivert) {
-                                gio::write(unit, Format_908)
+                                ObjexxFCL::gio::write(unit, Format_908)
                                     << surf.Vertex(ivert).x * M2FT << surf.Vertex(ivert).y * M2FT << surf.Vertex(ivert).z * M2FT;
                             }
 
@@ -399,7 +399,7 @@ namespace DElightManagerF {
                                 }     // Window test
                             }         // Window loop
 
-                            gio::write(unit, Format_909) << iNumWindows;
+                            ObjexxFCL::gio::write(unit, Format_909) << iNumWindows;
 
                             // If the current opaque bounding Surface hosts Windows,
                             // then write each hosted Window to the DElight input file
@@ -446,14 +446,14 @@ namespace DElightManagerF {
                                                 // Write this Window to the DElight input file
                                                 // Remove any blanks from the Window Surface Name for ease of input to DElight
                                                 cNameWOBlanks = ReplaceBlanksWithUnderscores(wndo2.Name);
-                                                gio::write(unit, Format_910) << cNameWOBlanks << iconstruct + 10000 << wndo2.Sides;
+                                                ObjexxFCL::gio::write(unit, Format_910) << cNameWOBlanks << iconstruct + 10000 << wndo2.Sides;
                                                 // Use WndoConstIndex + 10000 as the Glass Type Name
                                                 // to differentiate EPlus glass types within DElight
 
                                                 // Write out the vertex coordinates for each vertex
                                                 int const iNumVertices = wndo2.Sides; // Counter for surface vertices
                                                 for (int ivert = 1; ivert <= iNumVertices; ++ivert) {
-                                                    gio::write(unit, Format_908) << wndo2.Vertex(ivert).x * M2FT << wndo2.Vertex(ivert).y * M2FT
+                                                    ObjexxFCL::gio::write(unit, Format_908) << wndo2.Vertex(ivert).x * M2FT << wndo2.Vertex(ivert).y * M2FT
                                                                                  << wndo2.Vertex(ivert).z * M2FT;
                                                 }
                                             } //! lWndoIsDoppelganger
@@ -475,7 +475,7 @@ namespace DElightManagerF {
                                 }
                             } // CFS object loop 1
 
-                            gio::write(unit, Format_911) << iHostedCFS;
+                            ObjexxFCL::gio::write(unit, Format_911) << iHostedCFS;
 
                             // Now write each of the hosted CFS data
                             // Loop through the input CFS objects searching for a match to the current Opaque Bounding Surface
@@ -509,11 +509,11 @@ namespace DElightManagerF {
                                         // Remove any blanks from the CFS Name for ease of input to DElight
                                         cNameWOBlanks = ReplaceBlanksWithUnderscores(cfs.Name);
                                         int const iNumVertices = doppelgangerSurf.Sides; // Counter for surface vertices
-                                        gio::write(unit, Format_915) << cNameWOBlanks << cfs.ComplexFeneType << cfs.feneRota << iNumVertices;
+                                        ObjexxFCL::gio::write(unit, Format_915) << cNameWOBlanks << cfs.ComplexFeneType << cfs.feneRota << iNumVertices;
 
                                         // Write out the vertex coordinates for each vertex
                                         for (int ivert = 1; ivert <= iNumVertices; ++ivert) {
-                                            gio::write(unit, Format_908)
+                                            ObjexxFCL::gio::write(unit, Format_908)
                                                 << doppelgangerSurf.Vertex(ivert).x * M2FT << doppelgangerSurf.Vertex(ivert).y * M2FT
                                                 << doppelgangerSurf.Vertex(ivert).z * M2FT;
                                         }
@@ -529,7 +529,7 @@ namespace DElightManagerF {
                     }             // Zone Surface loop
 
                     // Write ZONE REFERENCE POINTS
-                    gio::write(unit, Format_912) << znDayl.TotalDaylRefPoints;
+                    ObjexxFCL::gio::write(unit, Format_912) << znDayl.TotalDaylRefPoints;
 
                     // Loop through the Daylighting:DElight:Reference Point objects checking for the current DElight Zone host
                     for (auto &refPt : DaylRefPt) {
@@ -595,7 +595,7 @@ namespace DElightManagerF {
                                 // Remove any blanks from the RefPt Name for ease of input to DElight
                                 cNameWOBlanks = ReplaceBlanksWithUnderscores(refPt.Name);
                                 if (refPt.indexToFracAndIllum != 0) {
-                                    gio::write(unit, Format_913)
+                                    ObjexxFCL::gio::write(unit, Format_913)
                                         << cNameWOBlanks << RefPt_WCS_Coord(1) * M2FT << RefPt_WCS_Coord(2) * M2FT << RefPt_WCS_Coord(3) * M2FT
                                         << znDayl.FracZoneDaylit(refPt.indexToFracAndIllum)
                                         << znDayl.IllumSetPoint(refPt.indexToFracAndIllum) * LUX2FC << znDayl.LightControlType;
@@ -607,7 +607,7 @@ namespace DElightManagerF {
                                                         "Average",
                                                         refPt.Name);
                                 } else {
-                                    gio::write(unit, Format_913)
+                                    ObjexxFCL::gio::write(unit, Format_913)
                                         << cNameWOBlanks << RefPt_WCS_Coord(1) * M2FT << RefPt_WCS_Coord(2) * M2FT << RefPt_WCS_Coord(3) * M2FT << 0.0
                                         << 0.0 * LUX2FC
                                         << znDayl.LightControlType; // should never happen but just in case send zero fraction and illuminance
@@ -620,16 +620,16 @@ namespace DElightManagerF {
         }                     // traverse ZoneDayLight object loop
 
         // Write BUILDING SHADES
-        gio::write(unit, Format_914);
+        ObjexxFCL::gio::write(unit, Format_914);
 
         // Write LIBRARY DATA
-        gio::write(unit, Format_920) << iNumWndoConsts;
+        ObjexxFCL::gio::write(unit, Format_920) << iNumWndoConsts;
 
         // Write GLASS TYPES
         // VisBeamCoeffs are processed in EPlus by POLYF() function
         // Use WndoConstIndex + 10000 as the Glass Type Name to differentiate EPlus glass types within DElight
         for (int iconst = 1; iconst <= iNumWndoConsts; ++iconst) {
-            gio::write(unit, Format_921) << iWndoConstIndexes(iconst) + 10000 << Construct(iWndoConstIndexes(iconst)).TransDiffVis
+            ObjexxFCL::gio::write(unit, Format_921) << iWndoConstIndexes(iconst) + 10000 << Construct(iWndoConstIndexes(iconst)).TransDiffVis
                                          << Construct(iWndoConstIndexes(iconst)).ReflectVisDiffBack
                                          << Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(1)
                                          << Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(2)
@@ -642,7 +642,7 @@ namespace DElightManagerF {
 
         if (ErrorsFound) ShowFatalError("Problems with Daylighting:DElight input, see previous error messages");
 
-        gio::close(unit);
+        ObjexxFCL::gio::close(unit);
 
         return;
     }

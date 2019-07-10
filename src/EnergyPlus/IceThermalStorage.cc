@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1414,13 +1414,15 @@ namespace IceThermalStorage {
         }
 
         if (MyPlantScanFlag(IceNum)) {
+            bool errFlag = false;
             ScanPlantLoopsForObject(DetIceStor(IceNum).Name,
                                     TypeOf_TS_IceDetailed,
                                     DetIceStor(IceNum).PlantLoopNum,
                                     DetIceStor(IceNum).PlantLoopSideNum,
                                     DetIceStor(IceNum).PlantBranchNum,
-                                    DetIceStor(IceNum).PlantCompNum);
-
+                                    DetIceStor(IceNum).PlantCompNum,
+                                    errFlag);
+            // if errFlag then do something...
             MyPlantScanFlag(IceNum) = false;
         }
 
@@ -1546,12 +1548,12 @@ namespace IceThermalStorage {
                                     IceStorage(IceNum).LoopSideNum,
                                     IceStorage(IceNum).BranchNum,
                                     IceStorage(IceNum).CompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitSimpleIceStorage: Program terminated due to previous condition(s).");
             }

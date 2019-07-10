@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -231,7 +231,7 @@ namespace DaylightingDevices {
 
         // DERIVED TYPE DEFINITIONS:
 
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PipeNum;   // TDD pipe object number
@@ -443,11 +443,11 @@ namespace DaylightingDevices {
 
                 // Report calculated view factor so that user knows what to make the view factor to ground
                 if (!ShelfReported) {
-                    gio::write(OutputFileInits, fmtA)
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA)
                         << "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground";
                     ShelfReported = true;
                 }
-                gio::write(OutputFileInits, fmtA) << Shelf(ShelfNum).Name + ',' + RoundSigDigits(Shelf(ShelfNum).ViewFactor, 2) + ',' +
+                ObjexxFCL::gio::write(OutputFileInits, fmtA) << Shelf(ShelfNum).Name + ',' + RoundSigDigits(Shelf(ShelfNum).ViewFactor, 2) + ',' +
                                                          Surface(WinSurf).Name + ',' + RoundSigDigits(Surface(WinSurf).ViewFactorSky, 2) + ',' +
                                                          RoundSigDigits(Surface(WinSurf).ViewFactorGround, 2);
                 //      CALL SetupOutputVariable('View Factor To Outside Shelf []', &

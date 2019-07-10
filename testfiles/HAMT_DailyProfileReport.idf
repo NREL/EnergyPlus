@@ -124,7 +124,7 @@
 !
 !
 
-  Version,9.0;
+  Version,9.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -224,14 +224,14 @@
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     7,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
     7,                       !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
-    Sunday,                  !- Day of Week for Start Day
+    ,                        !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     Yes,                     !- Apply Weekend Holiday Rule
@@ -239,14 +239,14 @@
     No;                      !- Use Weather File Snow Indicators
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 2,            !- Name
     2,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
     2,                       !- End Month
     28,                      !- End Day of Month
     ,                        !- End Year
-    Sunday,                  !- Day of Week for Start Day
+    ,                        !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     Yes,                     !- Apply Weekend Holiday Rule

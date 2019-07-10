@@ -17,7 +17,7 @@ In response to the need for green roof design tools a computational model of the
   heat conduction (and storage) in the soil layer
 \end{itemize}
 
-The ability to track moisture-dependent thermal properties is not implemented yet due to stability issues in the CTF scheme, but is under development for use with the finite difference solution scheme made available in EnergyPlus starting in version 2.
+The ability to track moisture-dependent thermal properties is not implemented yet due to stability issues in the Conduction Transfer Function (CTF) scheme. Finite difference solution scheme currently is not supported in EnergyPlus Green Roof (EcoRoof) Model.
 
 As implemented in EnergyPlus the green roof module allows the user to specify ``ecoroof'' as the outer layer of a rooftop construction using a ``Material:RoofVegetation'' object. The user can then specify various aspects of the green roof construction including growing media depth, thermal properties, plant canopy density, plant height, stomatal conductance (ability to transpire moisture), and soil moisture conditions (including irrigation).
 
@@ -239,7 +239,7 @@ Removal of water vapor from the soil surface depends on the difference between t
 {L_R} = C_e^g{l_g}{W_{af}}{\rho_{ag}}\left( {{q_{af}} - {q_g}} \right)
 \end{equation}
 
-Here\(C_e^g\) is the bulk transfer coefficient, l\(_{g}\) is the latent heat of vaporization at the ground surface temperature, q\(_{af}\) is the mixing ratio at the foliage-atmosphere interface, and q\(_{f}\) is the mixing ratio at the ground surface, given by:
+Here \(C_e^g\) is the bulk transfer coefficient, l\(_{g}\) is the latent heat of vaporization at the ground surface temperature, q\(_{af}\) is the mixing ratio at the foliage-atmosphere interface, and q\(_{f}\) is the mixing ratio at the ground surface, given by:
 
 \begin{equation}
 {q_g} = {M_g}{q_{g,sat}} + \left( {1 - {M_g}} \right){q_{af}}

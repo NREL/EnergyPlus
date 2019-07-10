@@ -4,7 +4,7 @@
 
 The air-to-air flat plate heat exchanger is an HVAC component typically used for exhaust or relief air heat recovery. The user can choose the flow arrangement type: counter flow, parallel flow, or cross flow with both streams unmixed. The input requires no geometric data. Performance is defined by specifying primary outlet air temperature at nominal (user specified) inlet conditions. In addition, the ratio (h\(^{.}\)A)\(_{p}\) / (h\(^{.}\)A)\(_{s}\) at nominal flow needs to be input, where h is the convective heat transfer coefficient, A is the surface area, p stands for primary side, s for secondary side.
 
-If the heat exchanger is operated in conjunction with an outdoor air economizer (economizer lockout set to \emph{Yes}), the nominal supply air flow rate should be set equal to the minimum outdoor air flow rate specified in the Controller:OutdoorAir. The heat exchanger detects that the economizer is operating by the fact that its inlet air flow rate is greater than its nominal supply air flow rate.
+If the heat exchanger is operated in conjunction with an outdoor air economizer (economizer lockout set to \emph{Yes}), the nominal supply air flow rate should be set equal to the minimum outdoor air flow rate specified in the \hyperref[controlleroutdoorair]{Controller:OutdoorAir}. The heat exchanger detects that the economizer is operating by the fact that its inlet air flow rate is greater than its nominal supply air flow rate.
 
 \subsubsection{Inputs}\label{inputs-021}
 
@@ -22,7 +22,7 @@ The user specified flow arrangement of the heat exchanger. The possible inputs a
 
 \paragraph{Field: Economizer Lockout}\label{field-economizer-lockout}
 
-This input denotes whether the heat exchanger unit is locked out (bypassed) when the air-side economizer is operating. Both the economizer and high humidity control (Ref. Controller:OutdoorAir) activate the heat exchanger lockout as specified by this input. The input choices are \emph{Yes} (meaning locked out) or \emph{No}. The default input for this field is Yes.
+This input denotes whether the heat exchanger unit is locked out (bypassed) when the air-side economizer is operating. Both the economizer and high humidity control (Ref. \hyperref[controlleroutdoorair]{Controller:OutdoorAir}) activate the heat exchanger lockout as specified by this input. The input choices are \emph{Yes} (meaning locked out) or \emph{No}. The default input for this field is Yes.
 
 \paragraph{Field: Ratio of Supply to Secondary hA Values}\label{field-ratio-of-supply-to-secondary-ha-values}
 
@@ -215,7 +215,7 @@ Wet-bulb: & 14°C (58°F) & 17C (63F) \tabularnewline
 
 Note: Conditions consistent with the Air-Conditioning and Refrigeration Institute s (ARI) Standard 1060-2001.
 
-This object models the basic operation of an air-to-air heat exchanger. Heat exchange between the supply and exhaust air streams occurs whenever the unit is scheduled to be available (Availability schedule) and supply/exhaust air flow is present. This heat exchanger object can be used in conjunction with a conventional air-side economizer (i.e., specify ModulateFlow in the Controller:OutdoorAir object), whereby heat exchange is suspended whenever the air-side economizer (or high humidity control) is active (i.e., air flow is fully bypassed around a fixed-plate heat exchanger or the rotation of a rotary heat exchanger is stopped). This object is also able to suspend heat exchange for the purpose of providing free cooling operation in the absence of a conventional air-side economizer (i.e., specify MinimumFlowWithBypass in the Controller:OutdoorAir object).
+This object models the basic operation of an air-to-air heat exchanger. Heat exchange between the supply and exhaust air streams occurs whenever the unit is scheduled to be available (Availability schedule) and supply/exhaust air flow is present. This heat exchanger object can be used in conjunction with a conventional air-side economizer (i.e., specify ModulateFlow in the \hyperref[controlleroutdoorair]{Controller:OutdoorAir} object), whereby heat exchange is suspended whenever the air-side economizer (or high humidity control) is active (i.e., air flow is fully bypassed around a fixed-plate heat exchanger or the rotation of a rotary heat exchanger is stopped). This object is also able to suspend heat exchange for the purpose of providing free cooling operation in the absence of a conventional air-side economizer (i.e., specify MinimumFlowWithBypass in the \hyperref[controlleroutdoorair]{Controller:OutdoorAir} object).
 
 During winter weather, humid exhaust air entering the heat exchanger can form frost on the cold heat exchanger surfaces, which can reduce air flow and the amount of energy recovery. Several methods are used to control or eliminate frost formation, and the following types can be modeled for this heat exchanger object: supply air preheat, minimum exhaust air temperature, exhaust air recirculation and exhaust only. For preheat frost control, a separate heating coil object must be placed in the supply inlet air stream to keep the air temperature above the frost threshold temperature. The other frost control types are modeled within this object itself (i.e., do not require a separate object to be defined) based on alpha and numeric inputs to this heat exchanger object.
 
@@ -225,20 +225,20 @@ To model a sensible and latent air-to-air heat exchanger located in an air loop,
 
 \begin{itemize}
 \item
-  AirLoopHVAC:OutdoorAirSystem
+  \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem}
 \item
-  Controller:OutdoorAir
+  \hyperref[controlleroutdoorair]{Controller:OutdoorAir}
 \item
-  OutdoorAir:Mixer
+  \hyperref[outdoorairmixer]{OutdoorAir:Mixer}
 \item
   HeatExchanger:AirToAir:SensibleAndLatent
 \item
-  Coil:Heating:Water, Coil:Heating:Electric or Coil:Heating:Fuel (if preheat frost control is to be modeled)
+  \hyperref[coilheatingwater]{Coil:Heating:Water}, \hyperref[coilheatingelectric]{Coil:Heating:Electric} or \hyperref[coilheatinggas-000]{Coil:Heating:Fuel} (if preheat frost control is to be modeled)
 \item
-  SetpointManager:Scheduled (if supply air outlet temperature control is used)
+  \hyperref[setpointmanagerscheduled]{SetpointManager:Scheduled} (if supply air outlet temperature control is used)
 \end{itemize}
 
-The sensible and latent air-to-air heat exchanger can also be used in a number of other applications, including conditioning outdoor ventilation air and supplying it directly to a zone without an air loop. See object ZoneHVAC:EnergyRecoveryVentilator for further details on this specific application.
+The sensible and latent air-to-air heat exchanger can also be used in a number of other applications, including conditioning outdoor ventilation air and supplying it directly to a zone without an air loop. See object \hyperref[zonehvacenergyrecoveryventilator]{ZoneHVAC:EnergyRecoveryVentilator} for further details on this specific application.
 
 A description of each input field for this object is provided below.
 
@@ -310,7 +310,7 @@ The electric consumption rate of the unit in watts. Electric power is considered
 
 \paragraph{Field: Supply Air Outlet Temperature Control}\label{field-supply-air-outlet-temperature-control}
 
-This alpha field determines if the heat exchanger's supply air outlet is controlled to a temperature set point when the heat exchanger is actively conditioning the supply (primary) air. The choices for this input field are Yes or No, with the default being No. When supply air outlet temperature control is used, the wheel rotational speed modulates or supply air is bypassed around the plate heat exchanger to maintain the desired setpoint temperature. A setpoint manager object is required to establish the desired set point at the supply air outlet node (reference: SetpointManager:Scheduled). When an air-side economizer is also being modeled for this air system, the heat exchanger is deactivated during economizer operation. Additionally, the set point for the supply air outlet temperature control should be equal to the economizer outdoor air temperature lower limit (reference: Controller:OutdoorAir, field Economizer Minimum Limit Dry-Bulb Temperature), however, any temperature set point may be used.
+This alpha field determines if the heat exchanger's supply air outlet is controlled to a temperature set point when the heat exchanger is actively conditioning the supply (primary) air. The choices for this input field are Yes or No, with the default being No. When supply air outlet temperature control is used, the wheel rotational speed modulates or supply air is bypassed around the plate heat exchanger to maintain the desired setpoint temperature. A setpoint manager object is required to establish the desired set point at the supply air outlet node (reference: \hyperref[setpointmanagerscheduled]{SetpointManager:Scheduled}). When an air-side economizer is also being modeled for this air system, the heat exchanger is deactivated during economizer operation. Additionally, the set point for the supply air outlet temperature control should be equal to the economizer outdoor air temperature lower limit (reference: \hyperref[controlleroutdoorair]{Controller:OutdoorAir}, field Economizer Minimum Limit Dry-Bulb Temperature), however, any temperature set point may be used.
 
 \paragraph{Field: Heat Exchanger Type}\label{field-heat-exchanger-type}
 
@@ -392,7 +392,7 @@ The model does not allow the total defrost time fraction to exceed 1.0 or be les
 
 \paragraph{Field: Economizer Lockout}\label{field-economizer-lockout-1}
 
-This input denotes whether the heat exchanger unit is locked out (bypassed for plate type heat exchangers or the rotation is suspended for rotary type heat exchangers) when the air-side economizer is operating. Both the economizer and high humidity control (Ref. Controller:OutdoorAir) activate the heat exchanger lockout as specified by this input. The input choices are \emph{Yes} (meaning locked out) or \emph{No}. The default input for this field is Yes.
+This input denotes whether the heat exchanger unit is locked out (bypassed for plate type heat exchangers or the rotation is suspended for rotary type heat exchangers) when the air-side economizer is operating. Both the economizer and high humidity control (Ref. \hyperref[controlleroutdoorair]{Controller:OutdoorAir}) activate the heat exchanger lockout as specified by this input. The input choices are \emph{Yes} (meaning locked out) or \emph{No}. The default input for this field is Yes.
 
 Following is an example input for this heat exchanger object:
 
@@ -539,7 +539,7 @@ This output is the average fraction of the reporting timestep when frost control
 
 \subsection{HeatExchanger:Desiccant:BalancedFlow}\label{heatexchangerdesiccantbalancedflow}
 
-This desiccant heat exchanger object is an HVAC component used to model both temperature (sensible) and moisture (latent) heat exchange between two air streams (Figure~\ref{fig:schematic-of-the-balanced-flow-desiccant-heat}). The model assumes balanced air flow through the regeneration and process sides of the heat exchanger (i.e., regeneration and process air volume flow rates and face velocities are the same). Heat exchanger performance is specified through a performance data type object (e.g., HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1).
+This desiccant heat exchanger object is an HVAC component used to model both temperature (sensible) and moisture (latent) heat exchange between two air streams (Figure~\ref{fig:schematic-of-the-balanced-flow-desiccant-heat}). The model assumes balanced air flow through the regeneration and process sides of the heat exchanger (i.e., regeneration and process air volume flow rates and face velocities are the same). Heat exchanger performance is specified through a performance data type object (e.g., \hyperref[heatexchangerdesiccantbalancedflowperformancedatatype1]{HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1}).
 
 \begin{figure}[hbtp] % fig 151
 \centering
@@ -547,9 +547,9 @@ This desiccant heat exchanger object is an HVAC component used to model both tem
 \caption{Schematic of the Balanced Flow Desiccant Heat Exchanger \protect \label{fig:schematic-of-the-balanced-flow-desiccant-heat}}
 \end{figure}
 
-Currently, this desiccant heat exchanger model can be referenced by two compound objects: CoilSystem:Cooling:DX:HeatExchangerAssisted and Dehumidifier:Desiccant:System, both of which are used to provide enhanced dehumidification over conventional systems. If this heat exchanger is referenced by a compound object, the compound object will control heat exchanger operation (i.e., tell the heat exchanger if heat exchange is needed or not for each simulation timestep).
+Currently, this desiccant heat exchanger model can be referenced by two compound objects: \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted} and \hyperref[dehumidifierdesiccantsystem]{Dehumidifier:Desiccant:System}, both of which are used to provide enhanced dehumidification over conventional systems. If this heat exchanger is referenced by a compound object, the compound object will control heat exchanger operation (i.e., tell the heat exchanger if heat exchange is needed or not for each simulation timestep).
 
-This desiccant heat exchanger object may also be specified directly in an AirLoopHVAC (air loop BranchList) or in an AirLoopHVAC:OutdoorAirSystem (AirLoopHVAC:OutdoorAirSystem:EquipmentList) without being referenced by a compound object. If specified directly in an AirLoopHVAC or AirLoopHVAC:OutdoorAirSystem, then the heat exchanger can be controlled to provide heat exchange based on a maximum and/or minimum humidity set point placed on the process air outlet node (ref. Setpoint Managers). If no humidity set points are provided on this node, then heat exchange will be provided whenever the heat exchanger is available to operate (via its availability schedule) and there is a temperature and/or humidity ratio difference between the two air streams.
+This desiccant heat exchanger object may also be specified directly in an \hyperref[airloophvac]{AirLoopHVAC} (air loop \hyperref[branchlist]{BranchList}) or in an \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem} (\hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList}) without being referenced by a compound object. If specified directly in an \hyperref[airloophvac]{AirLoopHVAC} or \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem}, then the heat exchanger can be controlled to provide heat exchange based on a maximum and/or minimum humidity set point placed on the process air outlet node (ref. Setpoint Managers). If no humidity set points are provided on this node, then heat exchange will be provided whenever the heat exchanger is available to operate (via its availability schedule) and there is a temperature and/or humidity ratio difference between the two air streams.
 
 Inputs to this model include an availability schedule name, inlet and outlet air node names, and the type and name of the heat exchanger performance data object. A description of each input field for this object is provided below.
 
@@ -581,15 +581,15 @@ The name of the HVAC system node to which the unit sends its process outlet air.
 
 \paragraph{Field: Heat Exchanger Performance Object Type}\label{field-heat-exchanger-performance-object-type}
 
-This alpha field contains the type of model used to simulate the desiccant heat exchanger s thermal performance and electrical energy use. Currently, the only valid choice is HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1.
+This alpha field contains the type of model used to simulate the desiccant heat exchanger s thermal performance and electrical energy use. Currently, the only valid choice is \hyperref[heatexchangerdesiccantbalancedflowperformancedatatype1]{HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1}.
 
 \paragraph{Field: Heat Exchanger Performance Name}\label{field-heat-exchanger-performance-name}
 
-This alpha field contains the identifying name of the specific heat exchanger performance type object (e.g., HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1) that defines the performance for this heat exchanger. A single heat exchanger performance type object may be used to define performance for many HeatExchanger:Desiccant:BalancedFlow objects (i.e., the same name may be used in this input field for more than one balanced flow desiccant heat exchanger).
+This alpha field contains the identifying name of the specific heat exchanger performance type object (e.g., \hyperref[heatexchangerdesiccantbalancedflowperformancedatatype1]{HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1}) that defines the performance for this heat exchanger. A single heat exchanger performance type object may be used to define performance for many HeatExchanger:Desiccant:BalancedFlow objects (i.e., the same name may be used in this input field for more than one balanced flow desiccant heat exchanger).
 
 \paragraph{Field: Economizer Lockout}\label{field-economizer-lockout-2}
 
-This input denotes whether the heat exchanger unit is locked out (heat exchanger rotation is suspended) when the air-side economizer is operating. Both the economizer and high humidity control (Ref. Controller:OutdoorAir) activate the heat exchanger lockout as specified by this input. The input choices are \emph{Yes} (meaning locked out) or \emph{No}. Economizer lockout is typically \emph{not} used for this type of heat exchanger. For this reason, the default input for this field is No.
+This input denotes whether the heat exchanger unit is locked out (heat exchanger rotation is suspended) when the air-side economizer is operating. Both the economizer and high humidity control (Ref. \hyperref[controlleroutdoorair]{Controller:OutdoorAir}) activate the heat exchanger lockout as specified by this input. The input choices are \emph{Yes} (meaning locked out) or \emph{No}. Economizer lockout is typically \emph{not} used for this type of heat exchanger. For this reason, the default input for this field is No.
 
 Following is an example input for this heat exchanger object:
 
@@ -697,7 +697,7 @@ This output is the electric consumption of the unit in Joules for the timestep b
 
 \subsection{HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1}\label{heatexchangerdesiccantbalancedflowperformancedatatype1}
 
-This object specifies a performance model and model coefficients for a balanced flow desiccant heat exchanger. A HeatExchanger:Desiccant:BalancedFlow object will reference a HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1 object. This performance data object is used to specify the thermal performance and electric consumption of the heat exchanger. Some representative inputs for this object are provided in the EnergyPlus Reference DataSets (PerfCurves.idf and AllDataSets.idf).
+This object specifies a performance model and model coefficients for a balanced flow desiccant heat exchanger. A \hyperref[heatexchangerdesiccantbalancedflow]{HeatExchanger:Desiccant:BalancedFlow} object will reference a HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1 object. This performance data object is used to specify the thermal performance and electric consumption of the heat exchanger. Some representative inputs for this object are provided in the EnergyPlus Reference DataSets (PerfCurves.idf and AllDataSets.idf).
 
 This model predicts the regeneration air stream outlet temperature and humidity ratio values based on the entering regeneration and process air stream temperature, humidity ratio and face velocity. The process air stream outlet humidity ratio and temperatures are calculated based on a simple heat and moisture balance. The model requires that the user enter the nominal volumetric flow rate and a nominal face velocity, electric power consumption, empirical model coefficients for the regeneration outlet air temperature and humidity ratio equations, and the applicable minimum and maximum values for both the independent and dependent variables for the empirical model coefficients provided. This model is based on the following equations:
 
@@ -751,7 +751,7 @@ A description of each input field for this object is provided below.
 
 \paragraph{Field: Name}\label{field-name-3-014}
 
-This alpha field contains the identifying name for this set of desiccant heat exchanger performance data. Any reference to this performance data set by another object (e.g., HeatExchanger:Desiccant:BalancedFlow) will use this name.
+This alpha field contains the identifying name for this set of desiccant heat exchanger performance data. Any reference to this performance data set by another object (e.g., \hyperref[heatexchangerdesiccantbalancedflow]{HeatExchanger:Desiccant:BalancedFlow}) will use this name.
 
 \paragraph{Field: Nominal Air Flow Rate}\label{field-nominal-air-flow-rate}
 

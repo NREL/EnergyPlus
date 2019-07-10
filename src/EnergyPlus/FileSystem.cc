@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -101,7 +101,8 @@ namespace FileSystem {
         int pathCharPosition = tempPath.find_last_of(pathChar);
         tempPath = tempPath.substr(0, pathCharPosition + 1);
 
-        if (tempPath == "") tempPath = ".";
+        // If empty, then current dir, but with trailing separator too: eg `./`
+        if (tempPath == "") tempPath = {'.', pathChar};
 
         return tempPath;
     }
@@ -247,7 +248,16 @@ namespace FileSystem {
 
     int systemCall(std::string const &command)
     {
+#ifdef _WIN32
+        // Wrap in double quotes and pass that to system
+        // Note: on Windows, system(command) will already send the command through "cmd /C command"
+        // cf C:\Program Files (x86)\Windows Kits\10\Source\10.0.17763.0\ucrt\exec
+        // Ends up calling something that looks like the following:
+        // cmd /C ""C:\path\to\ReadVarsESO.exe" "A folder with spaces\1ZoneUncontrolled.mvi" unlimited"
+        return system(("\"" + command + "\"").c_str());
+#else
         return system(command.c_str());
+#endif
     }
 
     void removeFile(std::string const &fileName)

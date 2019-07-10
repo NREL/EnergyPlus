@@ -14,13 +14,13 @@ EnergyPlus does all the above. However, some nuances are different from the usua
 
 3)~~~~The data dictionary has the capability to do ``automatic'' range checking on numeric fields as well as fill in numeric defaults. Both filling in defaults and ``automatic'' range checking are done when the data is read. Other checks may need a combination of fields and won't be done until the data is ``processed'' (after the simulation starts).
 
-4)~~~~A couple of other differences that might not be true in other programs:~ Blanks are significant in alpha fields \textbf{SO} DesignDay is not the same as Design Day (1 space between Design and Day) nor Design~ Day (2 spaces between Design and Day). Alpha objects, however, \emph{are} case insensitive SO DesignDay is the same as `designday' or `SizingPeriod:DesignDay'.
+4)~~~~A couple of other differences that might not be true in other programs:~ Blanks are significant in alpha fields \textbf{SO} DesignDay is not the same as Design Day (1 space between Design and Day) nor Design~ Day (2 spaces between Design and Day). Alpha objects, however, \emph{are} case insensitive SO DesignDay is the same as `designday' or `\hyperref[sizingperioddesignday]{SizingPeriod:DesignDay}'.
 
 \subsection{General Input Rules}\label{general-input-rules}
 
 Rules shown here are for the input data files. Rules about the Input Data Dictionary are shown in the Interface Developer's Guide (there is much similarity and overlap) but most users don't need to touch the IDD (Input Data Dictionary).
 
-The input data file is the primary file that EnergyPlus uses to create the building simulation. The only additional files are referenced by certain objects (such as the Schedule:File object). The input is order-independent; data can appear in any order and will be retrieved and sorted as necessary by the EnergyPlus simulation modules.~ In addition, EnergyPlus allocates everything dynamically, so there are no limitations as to number of zones, surfaces, etc.
+The input data file is the primary file that EnergyPlus uses to create the building simulation. The only additional files are referenced by certain objects (such as the \hyperref[schedulefile]{Schedule:File} object). The input is order-independent; data can appear in any order and will be retrieved and sorted as necessary by the EnergyPlus simulation modules.~ In addition, EnergyPlus allocates everything dynamically, so there are no limitations as to number of zones, surfaces, etc.
 
 \begin{itemize}
 \item
@@ -49,7 +49,7 @@ The input data file is the primary file that EnergyPlus uses to create the build
 
 \begin{enumerate}
   \item
-    Unlike the usual formatted output text formatted reports, EnergyPlus usual output is either at the summary or at the detailed (variable) level. Summary reports exist for many inputs as well as sizing results. The more detailed variable level reporting is produced as ``stream of consciousness'' (as the simulation happens) and must be post-processed for more sensible viewing. Note that the terms ``output variable'' and ``output variable'' (accessed by the Output:Variable and/or Output:Meter objects) are used interchangeably in this document.
+    Unlike the usual formatted output text formatted reports, EnergyPlus usual output is either at the summary or at the detailed (variable) level. Summary reports exist for many inputs as well as sizing results. The more detailed variable level reporting is produced as ``stream of consciousness'' (as the simulation happens) and must be post-processed for more sensible viewing. Note that the terms ``output variable'' and ``output variable'' (accessed by the \hyperref[outputvariable]{Output:Variable} and/or \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects) are used interchangeably in this document.
   \item
     Most EnergyPlus reporting can be readily viewed in current spreadsheet programs -- or other software that can process ``delimited variable'' reports. In these kind of reports, each ``column'' is separated from the next by a ``delimiter''. Typical delimiters are ``comma'' and ``tab''. Gradually, EnergyPlus reporting is moving from all comma separated reports to allow the user to select the delimiter via ``style'' objects.
   \item

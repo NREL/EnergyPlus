@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -186,7 +186,7 @@ namespace DataHVACGlobals {
     int const UnitarySys_HeatCool(4);
     int const UnitarySys_HeatPump_AirToAir(5);
     int const UnitarySys_HeatPump_WaterToAir(6);
-    int const UnitarySystem_AnyCoilType(7);
+    int const UnitarySys_AnyCoilType(7);
     Array1D_string const cFurnaceTypes(NumUnitarySystemTypes,
                                        {"AirLoopHVAC:Unitary:Furnace:HeatOnly",
                                         "AirLoopHVAC:Unitary:Furnace:HeatCool",
@@ -503,8 +503,7 @@ namespace DataHVACGlobals {
     bool SimZoneEquipmentFlag;     // True when zone equipment components need to be (re)simulated
     bool SimNonZoneEquipmentFlag;  // True when non-zone equipment components need to be (re)simulated
     bool ZoneMassBalanceHVACReSim; // True when zone air mass flow balance and air loop needs (re)simulated
-    int MinAirLoopIterationsAfterFirst(
-        1); // minimum number of HVAC iterations after FirstHVACIteration (must be at least 2 for sequenced loads to operate on air loops)
+    int MinAirLoopIterationsAfterFirst(1); // minimum number of HVAC iterations after FirstHVACIteration
 
     int const NumZoneHVACTerminalTypes(38);
 

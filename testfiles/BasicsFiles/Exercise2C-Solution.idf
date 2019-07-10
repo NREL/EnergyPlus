@@ -426,7 +426,7 @@
 !
 !
 
-  Version,9.0;
+  Version,9.2;
 
   Building,
     Exercise 2C,             !- Name
@@ -462,7 +462,7 @@
     Yes;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year

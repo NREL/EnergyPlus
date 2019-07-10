@@ -2,20 +2,20 @@
 
 This group of objects is used to describe the water systems in the building. EnergyPlus offers water modeling capabilities than include not only hot water systems but also the overall water systems including cold water uses, on-site water collection (e.g., from rain, condensate, or well), and storage. HVAC components may consume or collect a significant portion of the water making it appropriate to include water modeling in EnergyPlus.
 
-All water systems are collected into an end use category called Water Systems . This category includes hot and cold water. Water consumed by an HVAC component will be assigned to the end use category for that component. End use subcategories are available to separate hot water from cold water if desired. Simple hot water systems can be configured as stand-alone or use a PlantLoop. The Water Systems can be connected to PlantLoops for modeling heated water end uses. However PlantLoops are not used to model cold water and the WaterUse:Storages portions of the water system. Cold water systems are connected together using WaterUse:Storage objects. WaterUse:Connections are used at the zone level to connect to both cold and hot water.
+All water systems are collected into an end use category called Water Systems . This category includes hot and cold water. Water consumed by an HVAC component will be assigned to the end use category for that component. End use subcategories are available to separate hot water from cold water if desired. Simple hot water systems can be configured as stand-alone or use a \hyperref[plantloop]{PlantLoop}. The Water Systems can be connected to \hyperref[plantloop]{PlantLoop}s for modeling heated water end uses. However \hyperref[plantloop]{PlantLoop}s are not used to model cold water and the \hyperref[waterusestorage]{WaterUse:Storage}s portions of the water system. Cold water systems are connected together using \hyperref[waterusestorage]{WaterUse:Storage} objects. \hyperref[wateruseconnections]{WaterUse:Connections} are used at the zone level to connect to both cold and hot water.
 
 In addition to the input objects described in this section below, there are a variety of HVAC components that can be configured to interact with the water systems. These component input objects include optional fields that allow describing how the water systems are connected to them by providing the name of a storage tank. The following table lists EnergyPlus input objects that include provisions for connecting to the water systems but are described elsewhere in this document:
 
 % table 34
 \begin{longtable}[c]{p{2.49in}p{3.5in}}
 \caption{Water Systems Objects \label{table:water-systems-objects}} \tabularnewline
-\toprule 
+\toprule
 Input Object Name & Type of Water Interactions \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Water Systems Objects} \tabularnewline
-\toprule 
+\toprule
 Input Object Name & Type of Water Interactions \tabularnewline
 \midrule
 \endhead
@@ -47,15 +47,15 @@ EvaporativeCooler:Indirect:ResearchSpecial & Evaporation water supplied by Water
 
 \subsection{WaterUse:Equipment}\label{wateruseequipment}
 
-The WaterUse:Equipment object is a generalized object for simulating all water end uses. Hot and cold water uses are included, as well as controlled mixing of hot and cold water at the tap. The WaterUse:Equipment object can be used stand-alone, or coupled into a plant loop using the WaterUse:Connections object (see below). The WaterUse:Connections object allows water uses to be linked to WaterUse:Storage objects to store and draw reclaimed water. The WaterUse:Connections object can also simulate drainwater heat recovery.
+The WaterUse:Equipment object is a generalized object for simulating all water end uses. Hot and cold water uses are included, as well as controlled mixing of hot and cold water at the tap. The WaterUse:Equipment object can be used stand-alone, or coupled into a plant loop using the \hyperref[wateruseconnections]{WaterUse:Connections} object (see below). The \hyperref[wateruseconnections]{WaterUse:Connections} object allows water uses to be linked to \hyperref[waterusestorage]{WaterUse:Storage} objects to store and draw reclaimed water. The \hyperref[wateruseconnections]{WaterUse:Connections} object can also simulate drainwater heat recovery.
 
-The WaterUse:Equipment object serves all of the same purposes as the existing objects: Exterior:WaterEquipment, and HotWaterEquipment.
+The WaterUse:Equipment object serves all of the same purposes as the existing objects: \hyperref[exteriorwaterequipment]{Exterior:WaterEquipment}, and \hyperref[hotwaterequipment]{HotWaterEquipment}.
 
 The WaterUse:Equipment object does a better job of modeling domestic hot water by allowing mixing at the tap in order to account for both hot \textbf{and cold} water used at sinks, showers, etc. It also improves on the stand-alone energy modeling of domestic hot water. Because all of the temperatures and flow rates can be solved, the energy usage can be accounted for as ``Purchased Heating''.
 
-In either stand-alone mode or used with the WaterUse:Connections object, the WaterUse:Equipment object will attempt to meet a scheduled target temperature at the tap by mixing hot and cold water flows. If the hot water flow is not hot enough, or if the flow is limited by plant loop constraints, the result is a cooler mixed water temperature and the target temperature will not be met. In stand-alone mode the hot and cold water temperatures are specified by schedules. However, if the cold water schedule is omitted, the water temperature will be calculated by the Site:WaterMainsTemperature object. If the hot water schedule or target temperature schedule are omitted, all water is delivered as cold water. If only using cold water, the WaterUse:Equipment object is similar to the Exterior:WaterEquipment object.
+In either stand-alone mode or used with the \hyperref[wateruseconnections]{WaterUse:Connections} object, the WaterUse:Equipment object will attempt to meet a scheduled target temperature at the tap by mixing hot and cold water flows. If the hot water flow is not hot enough, or if the flow is limited by plant loop constraints, the result is a cooler mixed water temperature and the target temperature will not be met. In stand-alone mode the hot and cold water temperatures are specified by schedules. However, if the cold water schedule is omitted, the water temperature will be calculated by the \hyperref[sitewatermainstemperature]{Site:WaterMainsTemperature} object. If the hot water schedule or target temperature schedule are omitted, all water is delivered as cold water. If only using cold water, the WaterUse:Equipment object is similar to the \hyperref[exteriorwaterequipment]{Exterior:WaterEquipment} object.
 
-The WaterUse:Equipment object improves on the internal gains object HotWaterEquipment by associating actual water usage with a sensible and latent gain to a zone. Equipment, such as showers, that generate a significant heat gain can be modeled using the Sensible Fraction Schedule and Latent Fraction Schedule fields. The schedules are used to set the fraction of the maximum possible heat gain (based on inlet water conditions and ambient zone conditions) that should be added to the zone. The split between sensible and latent will vary depending on the type of equipment that is to be modeled. Typically, both fractions should be small numbers.
+The WaterUse:Equipment object improves on the internal gains object \hyperref[hotwaterequipment]{HotWaterEquipment} by associating actual water usage with a sensible and latent gain to a zone. Equipment, such as showers, that generate a significant heat gain can be modeled using the Sensible Fraction Schedule and Latent Fraction Schedule fields. The schedules are used to set the fraction of the maximum possible heat gain (based on inlet water conditions and ambient zone conditions) that should be added to the zone. The split between sensible and latent will vary depending on the type of equipment that is to be modeled. Typically, both fractions should be small numbers.
 
 \subsubsection{Inputs}\label{inputs-053}
 
@@ -65,7 +65,7 @@ The unique object name for reference by other objects.
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-005}
 
-Allows you to specify a user-defined end-use subcategory, e.g., ``Laundry'', ``Dish Washing'', etc. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table under the ``Water Systems'' end-use category and also appear in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the water use will be assigned to the ``General'' end-use subcategory.
+Allows you to specify a user-defined end-use subcategory, e.g., ``Laundry'', ``Dish Washing'', etc. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Subcategories are also reported in the ABUPS table under the ``Water Systems'' end-use category and also appear in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the water use will be assigned to the ``General'' end-use subcategory.
 
 \paragraph{Field: Peak Flow Rate}\label{field-peak-flow-rate-000}
 
@@ -81,11 +81,11 @@ Reference to the schedule object specifying the target water temperature {[}C{]}
 
 \paragraph{Field: Hot Water Supply Temperature Schedule Name}\label{field-hot-water-supply-temperature-schedule-name}
 
-Reference to the schedule object specifying the hot water temperature {[}C{]}. The hot water temperature is used to calculate the ``Purchased Heating'' energy usage in stand-alone mode. If blank in stand-alone mode, the hot water supply temperature defaults to the cold water supply temperature. This field is ignored if the object is used with the WaterUse:Connections object.
+Reference to the schedule object specifying the hot water temperature {[}C{]}. The hot water temperature is used to calculate the ``Purchased Heating'' energy usage in stand-alone mode. If blank in stand-alone mode, the hot water supply temperature defaults to the cold water supply temperature. This field is ignored if the object is used with the \hyperref[wateruseconnections]{WaterUse:Connections} object.
 
 \paragraph{Field: Cold Water Supply Temperature Schedule Name}\label{field-cold-water-supply-temperature-schedule-name-000}
 
-Reference to the Schedule object specifying the cold water temperature {[}C{]} from the supply mains that provides the cold water to the tap and makes up for all water lost down the drain. If blank, water temperatures are calculated by the Site:WaterMainsTemperature object. This field is ignored if the object is used with the WaterUse:Connections object.
+Reference to the Schedule object specifying the cold water temperature {[}C{]} from the supply mains that provides the cold water to the tap and makes up for all water lost down the drain. If blank, water temperatures are calculated by the \hyperref[sitewatermainstemperature]{Site:WaterMainsTemperature} object. This field is ignored if the object is used with the \hyperref[wateruseconnections]{WaterUse:Connections} object.
 
 \paragraph{Field: Zone Name}\label{field-zone-name-013}
 
@@ -249,7 +249,7 @@ The heating rate defined by the hot water flow and the temperature difference be
 
 \paragraph{Water Use Equipment Heating Energy {[}J{]}}\label{water-use-equipment-heating-energy-j}
 
-The heating energy accumulated by the heating rate above, in units of Joules (J). This output is also added to a meter with End Use Key = WaterSystems, Group Key = Plant. If both of the node names specified in the WaterUse:Equipment object are blank, then this output is reported with Resource Type = DistrictHeating. If either of the node names are entered, then this output is reported with Resource Type = EnergyTransfer. The sub-categories may be entered as any type (e.g., Laundry, Dish Washing, etc. defined in WaterUse:Equipment object input for End-Use Subcategory) with General being the default sub-category (ref. Output Meter)
+The heating energy accumulated by the heating rate above, in units of Joules (J). This output is also added to a meter with End Use Key = WaterSystems, Group Key = Plant. If the WaterUse:Equipment object is not included in WaterUse:Connections or modeled as stand-alone, then this output is reported with Resource Type = DistrictHeating, or else if the WaterUse:Equipment object is included in WaterUse:Connections (e.g., as part of plant loop), then this output is reported with Resource Type = EnergyTransfer. The sub-categories may be entered as any type (e.g., Laundry, Dish Washing, etc. defined in WaterUse:Equipment object input for End-Use Subcategory) with General being the default sub-category (ref. Output Meter).
 
 \paragraph{Water Use Equipment Zone Sensible Heat Gain Rate {[}W{]}}\label{water-use-equipment-zone-sensible-heat-gain-rate-w}
 
@@ -277,13 +277,13 @@ The moisture mass accumulated by the moisture rate above, in units of kilograms 
 
 \subsection{WaterUse:Connections}\label{wateruseconnections}
 
-The WaterUse:Connections object can be thought of as a subsystem that groups together multiple WaterUse:Equipment components. As its name suggests, the object provides connections that are shared by these components, including:
+The WaterUse:Connections object can be thought of as a subsystem that groups together multiple \hyperref[wateruseequipment]{WaterUse:Equipment} components. As its name suggests, the object provides connections that are shared by these components, including:
 
 \begin{itemize}
 \item
   Inlet node and outlet node connections to a plant loop
 \item
-  Connections to WaterUse:Storage objects to store and draw reclaimed water
+  Connections to \hyperref[waterusestorage]{WaterUse:Storage} objects to store and draw reclaimed water
 \item
   Internal connections to simulate drainwater heat recovery.
 \end{itemize}
@@ -294,7 +294,7 @@ The WaterUse:Connections object can be thought of as a subsystem that groups tog
 \caption{Diagram of internal connections for WaterUse:Connections \protect \label{fig:diagram-of-internal-connections-for-wateruse}}
 \end{figure}
 
-The WaterUse:Connections object can be used stand-alone or coupled into a plant loop. In stand-alone mode, the Hot and Cold Water Supply Temperature Schedules override the values for the listed WaterUse:Equipment objects. When coupled to the plant, the Hot Water Supply Temperature Schedule is overridden by the actual plant loop inlet water temperature. When coupled to the plant, the WaterUse:Connections object should be on a Branch object whose control type is set to Active.
+The WaterUse:Connections object can be used stand-alone or coupled into a plant loop. In stand-alone mode, the Hot and Cold Water Supply Temperature Schedules override the values for the listed \hyperref[wateruseequipment]{WaterUse:Equipment} objects. When coupled to the plant, the Hot Water Supply Temperature Schedule is overridden by the actual plant loop inlet water temperature. When coupled to the plant, the WaterUse:Connections object should be on a \hyperref[branch]{Branch} object whose control type is set to Active.
 
 \subsubsection{Inputs}\label{inputs-1-050}
 
@@ -304,7 +304,7 @@ The unique object name for reference by other objects.
 
 \paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-008}
 
-The hot water inlet node when connected to a plant loop. The hot water supplies all of the WaterUse:Equipment objects that demand hot water. Insufficient supply temperature or flow results in cooler water at the tap.
+The hot water inlet node when connected to a plant loop. The hot water supplies all of the \hyperref[wateruseequipment]{WaterUse:Equipment} objects that demand hot water. Insufficient supply temperature or flow results in cooler water at the tap.
 
 \paragraph{Field: Outlet Node Name}\label{field-outlet-node-name-009}
 
@@ -312,21 +312,21 @@ The cold water outlet node, i.e.~the cold water supply mains, when connected to 
 
 \paragraph{Field: Supply Water Storage Tank Name}\label{field-supply-water-storage-tank-name-002}
 
-Reference to the WaterUse:Storage object that supplies cold water to the listed WaterUse:Equipment objects. If the field is blank, or the tank is empty, fresh water is supplied from the water mains.
+Reference to the \hyperref[waterusestorage]{WaterUse:Storage} object that supplies cold water to the listed \hyperref[wateruseequipment]{WaterUse:Equipment} objects. If the field is blank, or the tank is empty, fresh water is supplied from the water mains.
 
 \paragraph{Field: Reclamation Water Storage Tank Name}\label{field-reclamation-water-storage-tank-name}
 
-Reference to the WaterUse:Storage object that stores the resulting graywater from the listed WaterUse:Equipment objects. If the field is blank, the graywater is not reclaimed.
+Reference to the \hyperref[waterusestorage]{WaterUse:Storage} object that stores the resulting graywater from the listed \hyperref[wateruseequipment]{WaterUse:Equipment} objects. If the field is blank, the graywater is not reclaimed.
 
 \paragraph{Field: Hot Water Supply Temperature Schedule Name}\label{field-hot-water-supply-temperature-schedule-name-1}
 
-Reference to the schedule object specifying the hot water temperature {[}C{]}. If blank in stand-alone mode, the hot water supply temperature defaults to the cold water supply temperature. This field (even if blank) overrides the Hot Water Supply Temperature Schedule in all of the listed WaterUse:Equipment objects.
+Reference to the schedule object specifying the hot water temperature {[}C{]}. If blank in stand-alone mode, the hot water supply temperature defaults to the cold water supply temperature. This field (even if blank) overrides the Hot Water Supply Temperature Schedule in all of the listed \hyperref[wateruseequipment]{WaterUse:Equipment} objects.
 
 \paragraph{Field: Cold Water Supply Temperature Schedule Name}\label{field-cold-water-supply-temperature-schedule-name-1-000}
 
-Reference to the schedule object specifying the cold water temperature {[}C{]} from the supply mains that provides the cold water to the tap and makes up for all water lost down the drain. If blank, water temperatures are calculated by the Site:WaterMainsTemperature object.
+Reference to the schedule object specifying the cold water temperature {[}C{]} from the supply mains that provides the cold water to the tap and makes up for all water lost down the drain. If blank, water temperatures are calculated by the \hyperref[sitewatermainstemperature]{Site:WaterMainsTemperature} object.
 
-This field (even if blank) overrides the Cold Water Supply Temperature Schedule in all of the listed WaterUse:Equipment objects.
+This field (even if blank) overrides the Cold Water Supply Temperature Schedule in all of the listed \hyperref[wateruseequipment]{WaterUse:Equipment} objects.
 
 \paragraph{Field: Drain Water Heat Exchanger Type}\label{field-drain-water-heat-exchanger-type}
 
@@ -340,9 +340,9 @@ The heat exchanger configuration to be used for drainwater heat recovery. The co
 
 Plant indicates that the all of the recovered heat will be sent to the return flow at the outlet node of the WaterUse:Connections object to preheat the make-up cold water from the water mains.
 
-Equipment indicates that the all of the recovered heat will be used to preheat the cold water flow side of the WaterUse:Equipment objects listed \emph{in this} WaterUse:Connections object
+Equipment indicates that the all of the recovered heat will be used to preheat the cold water flow side of the \hyperref[wateruseequipment]{WaterUse:Equipment} objects listed \emph{in this} WaterUse:Connections object
 
-PlantAndEquipment indicates the recovered heat will be divided between the plant and the WaterUse:Equipment objects, as described above. This is the only option where the flow rates are equal in the drain and the heat exchanger.
+PlantAndEquipment indicates the recovered heat will be divided between the plant and the \hyperref[wateruseequipment]{WaterUse:Equipment} objects, as described above. This is the only option where the flow rates are equal in the drain and the heat exchanger.
 
 \paragraph{Field: Drain Water Heat Exchanger U-Factor Times Area}\label{field-drain-water-heat-exchanger-u-factor-times-area}
 
@@ -350,7 +350,7 @@ The UA is the heat transfer coefficient {[}W/K{]} for the heat exchanger and is 
 
 \paragraph{Field: Water Use Equipment 1-10 Name}\label{field-water-use-equipment-1-10-name}
 
-References to WaterUse:Equipment objects.
+References to \hyperref[wateruseequipment]{WaterUse:Equipment} objects.
 
 IDF examples:
 
@@ -690,7 +690,7 @@ This the temperature of overflow water leaving the tank.
 
 \subsection{WaterUse:RainCollector}\label{wateruseraincollector}
 
-The WaterUse:RainCollector object is used for harvesting rainwater falling on building surfaces. The rainwater is sent to a WaterUse:Storage object. In order to use this object it is necessary to also include a Site:Precipitation object to describe the rates of rainfall.
+The WaterUse:RainCollector object is used for harvesting rainwater falling on building surfaces. The rainwater is sent to a \hyperref[waterusestorage]{WaterUse:Storage} object. In order to use this object it is necessary to also include a \hyperref[siteprecipitation]{Site:Precipitation} object to describe the rates of rainfall.
 
 \subsubsection{Inputs}\label{inputs-3-041}
 
@@ -700,7 +700,7 @@ The unique object name for reference by other objects.
 
 \paragraph{Field: Storage Tank Name}\label{field-storage-tank-name}
 
-A reference to a WaterUse:Storage object where the rainwater will be collected and stored for later use.
+A reference to a \hyperref[waterusestorage]{WaterUse:Storage} object where the rainwater will be collected and stored for later use.
 
 \paragraph{Field: Loss Factor Mode}\label{field-loss-factor-mode}
 
@@ -758,7 +758,7 @@ This output variable provides the volume of water collected by the WaterUse:Rain
 
 \subsection{WaterUse:Well}\label{waterusewell}
 
-The WaterUse:Well object is for simulating on-site water supply from a well. Well water is pumped out of the ground and into a WaterUse:Storage. The operation of the ground water well is controlled by the associated WaterUse:Storage which is assumed to be operated as a vented cistern with no pressure tank. The current implementation is very simple and only requires two numeric inputs: the rated pump flow and power. A more elaborate well model may be added and many input fields are reserved for this future expansion.
+The WaterUse:Well object is for simulating on-site water supply from a well. Well water is pumped out of the ground and into a \hyperref[waterusestorage]{WaterUse:Storage}. The operation of the ground water well is controlled by the associated \hyperref[waterusestorage]{WaterUse:Storage} which is assumed to be operated as a vented cistern with no pressure tank. The current implementation is very simple and only requires two numeric inputs: the rated pump flow and power. A more elaborate well model may be added and many input fields are reserved for this future expansion.
 
 \subsubsection{Inputs}\label{inputs-4-038}
 
@@ -768,7 +768,7 @@ Unique name of this well.
 
 \paragraph{Field: Storage Tank Name}\label{field-storage-tank-name-1}
 
-A reference to a WaterUse:Storage object where the rainwater will be collected and stored for later use.
+A reference to a \hyperref[waterusestorage]{WaterUse:Storage} object where the rainwater will be collected and stored for later use.
 
 \paragraph{Field: Pump Depth}\label{field-pump-depth}
 
@@ -804,7 +804,7 @@ Reserved for future use. Two options available: Constant or Scheduled
 
 \paragraph{Field: Water Table Depth}\label{field-water-table-depth}
 
-Reserved for future use. Depth of water table from WaterUse:Storage
+Reserved for future use. Depth of water table from \hyperref[waterusestorage]{WaterUse:Storage}
 
 \paragraph{Field: Water Table Depth Schedule Name}\label{field-water-table-depth-schedule-name}
 

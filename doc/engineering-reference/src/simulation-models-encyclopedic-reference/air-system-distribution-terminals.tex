@@ -17,7 +17,7 @@ This object can be configured with a water, steam, electric or gas reheat coil. 
 \begin{figure}[hbtp] % fig 153
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image2788.png}
-\caption{Schematic of AirTerminal:SingleDuct:ConstantVolume:Reheat Unit \protect \label{fig:schematic-of-airterminal-singleduct}}
+\caption{Schematic of AirTerminal:SingleDuct:ConstantVolume:Reheat Unit \protect \label{fig:schematic-of-airterminal-singleduct1}}
 \end{figure}
 
 
@@ -115,29 +115,29 @@ DeltaCpT = \left( {C{p_{inlet}}} \right)\left( {{T_{inlet}}} \right) - \left( {C
   \dot{m} = \min \PB{ \dot{m}_{max}, \max \PB{ \dot{m}_{max}\times MinAirFlowFrac,\frac{\dot{Q}_{zone}}{DeltaCpT} } }
 \end{equation}
 
-where
+where:
 
-\(C{p_{zone}}\) ~ = Specific heat of zone air, J/kg-K
+\(C{p_{zone}}\) = Specific heat of zone air, J/kg-K
 
-\(C{p_{inlet}}\) ~ = Specific heat of terminal unit inlet air, J/kg-K
+\(C{p_{inlet}}\) = Specific heat of terminal unit inlet air, J/kg-K
 
-\({\omega_{zone}}\) ~~~ = Zone air humidity ratio, kg/kg
+\({\omega_{zone}}\) = Zone air humidity ratio, kg/kg
 
-\({T_{zone}}\) ~~~~ = Zone air dry-bulb temperature, °C
+\({T_{zone}}\) = Zone air dry-bulb temperature, °C
 
-\({\omega_{inlet}}\) ~~~ = Terminal unit inlet air humidity ratio, kg/kg
+\({\omega_{inlet}}\) = Terminal unit inlet air humidity ratio, kg/kg
 
-\({T_{inlet}}\) ~~~~ = Terminal unit inlet air dry-bulb temperature, °C
+\({T_{inlet}}\) = Terminal unit inlet air dry-bulb temperature, °C
 
-\({\dot Q_{zone}}\) ~~~ = Zone load, W (positive values denote heating, negative values denote cooling)
+\({\dot Q_{zone}}\) = Zone load, W (positive values denote heating, negative values denote cooling)
 
-\(\dot m\) ~~~~~~~ = Terminal unit air mass flow rate, kg/s
+\(\dot m\) = Terminal unit air mass flow rate, kg/s
 
-\(PsyCpAirFnWTdb\) ~ = Psychrometric function calculating air specific heat given air humidity ratio and dry-bulb temperature
+\(PsyCpAirFnWTdb\) = Psychrometric function calculating air specific heat given air humidity ratio and dry-bulb temperature
 
-\(MinAirFlowFrac\) ~~~ = User-specified zone minimum air flow fraction
+\(MinAirFlowFrac\) = User-specified zone minimum air flow fraction
 
-\({\dot m_{max}}\) ~~~~~~~~~~~~~ = Terminal unit maximum air mass flow rate, kg/s
+\({\dot m_{max}}\) = Terminal unit maximum air mass flow rate, kg/s.
 
 The outdoor air input fields, if entered, are then used to adjust the terminal unit air mass flow rate to ensure the correct amount of outdoor air enters the zone (within the constraints of the terminal unit maximum and minimum flow rate inputs). The amount of outdoor air is calculated per the outdoor air requirements and is adjusted by the fraction of outdoor air entering the air loop outdoor air system.
 
@@ -147,9 +147,9 @@ The outdoor air input fields, if entered, are then used to adjust the terminal u
 
 where:
 
-\({\mathop m\limits^\cdot_{OA}}\) ~ = zone outdoor air flow rate, kg/s
+\(\dot m_{OA}\) = zone outdoor air flow rate, kg/s
 
-\(OAFrac\) ~ = fraction of outdoor air entering the air loop outside air system
+\(OAFrac\) = fraction of outdoor air entering the air loop outside air system.
 
 If the terminal unit is in reheat mode (i.e., the central air loop cooling coil is active, the supply air was overcooled, and the zone thermostat is requesting heating) the maximum air flow rate allowed during reheat mode is adjusted as necessary.
 
@@ -157,9 +157,7 @@ If the terminal unit is in reheat mode (i.e., the central air loop cooling coil 
 \mathop m\limits^\cdot  \, = \,MIN\left( {\mathop m\limits^\cdot  ,\,{{\mathop m\limits^\cdot  }_{reheat}}} \right)
 \end{equation}
 
-where:
-
-\({\mathop m\limits^\cdot_{reheat}}\) ~ = maximum air mass flow rate during reheat, kg/s
+where \(\dot m_{reheat}\) = maximum air mass flow rate during reheat, kg/s
 
 The damper position is then calculated as:
 
@@ -167,17 +165,17 @@ The damper position is then calculated as:
 FRAC_{damper} = \frac{\dot m}{\dot m_{max}}
 \end{equation}
 
-And the amount of outdoor air entering the zone is:
+and the amount of outdoor air entering the zone is:
 
 \begin{equation}
 \dot V_{OA} = \dot m (OAFrac)
 \end{equation}
 
-where
+where:
 
-\(FRAC_{damper}\) ~ = Output variable `Zone Air Terminal VAV Damper Position', fraction of maximum flow
+\(FRAC_{damper}\) = Output variable `Zone Air Terminal VAV Damper Position', fraction of maximum flow
 
-\({\mathop V\limits^\cdot_{OA}}\) ~ = Output variable ``Zone Air Terminal Outdoor Air Volume Flow Rate'' entering the zone, m3/s
+\(\dot V_{OA}\) = Output variable ``Zone Air Terminal Outdoor Air Volume Flow Rate'' entering the zone, m\(^3\)/s.
 
 Simulation of the reheat coil occurs next when applicable. The heating demand required to maintain the thermostat heating setpoint temperature and the heating capacity of air flowing through the terminal unit are used to determine the amount of reheat required.
 
@@ -185,11 +183,11 @@ Simulation of the reheat coil occurs next when applicable. The heating demand re
 {\dot Q_{reheat}} = {\dot Q_{heatSP}} + \dot m C_{p,zone}(T_{inlet}-T_{zone})
 \end{equation}
 
-~where
+where:
 
-\({\dot Q_{reheat}}\) ~ = Reheat coil load, W (positive values denote heating)
+\({\dot Q_{reheat}}\) = Reheat coil load, W (positive values denote heating)
 
-\({\dot Q_{heatSP}}\) = Load to heating setpoint temperature, W (positive values denote heating)
+\({\dot Q_{heatSP}}\) = Load to heating setpoint temperature, W (positive values denote heating).
 
 \subsubsection{References}\label{references-001}
 
@@ -215,7 +213,7 @@ The user describes the terminal unit by inputting the name and type of the heati
 {\dot m_{air,sec}} = {R_{induc}}\cdot {\dot m_{air,pri}}
 \end{equation}
 
-so
+so:
 
 \begin{equation}
 {\dot m_{air,pri}} = {\dot m_{air,tot}}/(1 + {R_{induc}})
@@ -231,7 +229,7 @@ All input data for the four pipe induction terminal units is stored in the array
 
 \subsubsection{Calculation}\label{calculation}
 
-Given the needed inputs, the output is calculated in subroutine \emph{CalcFourPipeIndUnit}. The temperature, humidity ratio and flow rate of the primary and secondary air streams are taken from the inlet air nodes. The inlet hot and chilled water flow rates are passed in as parameters -- temperatures are taken from the inlet water nodes. Then
+Given the needed inputs, the output is calculated in subroutine \emph{CalcFourPipeIndUnit}. The temperature, humidity ratio and flow rate of the primary and secondary air streams are taken from the inlet air nodes. The inlet hot and chilled water flow rates are passed in as parameters -- temperatures are taken from the inlet water nodes. Then:
 
 The hot water coil is simulated (Call \emph{SimulateWaterCoilComponents);}
 
@@ -249,17 +247,17 @@ Note that data is never explicitly passed between the sub-components. This is al
 
 \subsubsection{Simulation and Control}\label{simulation-and-control-1}
 
-From the result of the zone simulation we have the heating/cooling demand on the terminal unit \({\dot Q_{z,req}}\) . For a given hot and cold water flow \emph{CalcFourPipeIndUnit} will give us the terminal unit heating/cooling output. We need to vary the hot or cold water flow to make the unit output match the demand. To do this we need to numerically invert \emph{CalcFourPipeIndUnit}: given the output, we want one of the inputs -- the hot or cold water flow. The numerical inversion is carried out by calling subroutine \emph{SolveRegulaFalsi}. This is a general utility routine for finding the zero of a function (the \emph{residual} function) of a single independent variable. In this case the residual function calculates \(({\dot Q_{z,req}} - {\dot Q_{out}})/{\dot Q_{z,req}}\) . \emph{SolveRegulaFalsi} varies either the hot water or cold water mass flow rate to zero the residual.
+From the result of the zone simulation, we have the heating/cooling demand on the terminal unit \({\dot Q_{z,req}}\). For a given hot and cold water flow \emph{CalcFourPipeIndUnit} will give us the terminal unit heating/cooling output. We need to vary the hot or cold water flow to make the unit output match the demand. To do this we need to numerically invert \emph{CalcFourPipeIndUnit}: given the output, we want one of the inputs -- the hot or cold water flow. The numerical inversion is carried out by calling subroutine \emph{SolveRegulaFalsi}. This is a general utility routine for finding the zero of a function (the \emph{residual} function) of a single independent variable. In this case, the residual function calculates \(({\dot Q_{z,req}} - {\dot Q_{out}})/{\dot Q_{z,req}}\). \emph{SolveRegulaFalsi} varies either the hot water or cold water mass flow rate to zero the residual.
 
 Decide whether the unit is on or off. The unit is off if: a) it is scheduled off; b) the inlet air mass flow rate is zero; c) the zone thermostat is in the deadband; d) or the zone heating/cooling demand is very small.
 
 If the unit is off, call \emph{CalcFourPipeIndUnit} with the hot and cold water flow rates set to their minimum flows and return.
 
-If the unit is on, check whether active heating or cooling by the hydronic coils is needed. Call \emph{CalcFourPipeIndUnit} with minimum water flows to see what how much cooling (or possibly heating) the unit is doing with primary air only. The output for this case is \({\dot Q_{pri}}\) .
+If the unit is on, check whether active heating or cooling by the hydronic coils is needed. Call \emph{CalcFourPipeIndUnit} with minimum water flows to see what how much cooling (or possibly heating) the unit is doing with primary air only. The output for this case is \({\dot Q_{pri}}\).
 
-If \({\dot Q_{z,req}} > {\dot Q_{pri}}\) ~we need active heating. Set the cold water flow rate to the minimum. Check that the terminal unit can meet the load by setting the hot water flow rate to the maximum and calling \emph{CalcFourPipeIndUnit}. If the output is less than the zone demand we are done -- all the outputs have been calculated. Otherwise call \emph{SolveRegulaFalsi} to obtain the hot water flow rate that will make the unit output match the zone demand. This ends the unit simulation.
+If \({\dot Q_{z,req}} > {\dot Q_{pri}}\), we need active heating. Set the cold water flow rate to the minimum. Check that the terminal unit can meet the load by setting the hot water flow rate to the maximum and calling \emph{CalcFourPipeIndUnit}. If the output is less than the zone demand we are done -- all the outputs have been calculated. Otherwise call \emph{SolveRegulaFalsi} to obtain the hot water flow rate that will make the unit output match the zone demand. This ends the unit simulation.
 
-If \({\dot Q_{z,req}} < {\dot Q_{pri}}\) we need active cooling. We set the hot water flow rate to the minimum. We check whether the terminal unit can supply the needed output by setting the cold water flow rate to the maximum and calling \emph{CalcFourPipeIndUnit.} If this maximum cooling output is not able to meet the zone cooling demand we are done. Otherwise call \emph{SolveRegulaFalsi} to obtain the cold water flow rate that will make the unit output match the zone demand. This ends the unit simulation.
+If \({\dot Q_{z,req}} < {\dot Q_{pri}}\), we need active cooling. We set the hot water flow rate to the minimum. We check whether the terminal unit can supply the needed output by setting the cold water flow rate to the maximum and calling \emph{CalcFourPipeIndUnit.} If this maximum cooling output is not able to meet the zone cooling demand we are done. Otherwise call \emph{SolveRegulaFalsi} to obtain the cold water flow rate that will make the unit output match the zone demand. This ends the unit simulation.
 
 Note that the terminal unit output is never explicitly passed to another routine. Instead the output is saved as the outlet conditions on the terminal unit outlet air node. The node data is accessed when the terminal unit output is needed elsewhere in the program (in \emph{SimZoneAirLoopEquipment} for instance).
 
@@ -275,21 +273,21 @@ The input objects AirTerminal:SingleDuct:SeriesPIU:Reheat and \\ AirTerminal:Sin
 
 \subsubsection{Model}\label{model-1}
 
-Both types of PIU are modeled as compound components. The series unit, in sequence from its inlet, consists of an air mixer, a constant volume fan, and a heating coil. In terms of EnergyPlus objects this is:
+Both types of PIU are modeled as compound components. The series unit, in sequence from its inlet, consists of an air mixer, a constant volume fan, and a heating coil. In terms of EnergyPlus objects, this is:
 
-1.~~~~AirLoopHVAC:ZoneMixer
+\begin{enumerate}
+\item AirLoopHVAC:ZoneMixer
+\item Fan:SystemModel or Fan:ConstantVolume
+\item Coil:Heating:Water, Coil:Heating:Electric, Coil:Heating:Fuel or Coil:Heating:Steam
+\end{enumerate}
 
-2.~~~~Fan:SystemModel or Fan:ConstantVolume
+The parallel unit contains a fan (in the secondary air stream, an air mixer, and a heating coil. In terms of EnergyPlus objects, this is:
 
-3.~~~~Coil:Heating:Water, Coil:Heating:Electric, Coil:Heating:Fuel or Coil:Heating:Steam
-
-The parallel unit contains a fan (in the secondary air stream, an air mixer, and a heating coil. In terms of EnergyPlus objects this is:
-
-1.~~~~Fan:SystemModel or Fan:ConstantVolume
-
-2.~~~~AirLoopHVAC:ZoneMixer
-
-3.~~~~Coil:Heating:Water, Coil:Heating:Electric, Coil:Heating:Fuel or Coil:Heating:Steam
+\begin{enumerate}
+\item Fan:SystemModel or Fan:ConstantVolume
+\item AirLoopHVAC:ZoneMixer
+\item Coil:Heating:Water, Coil:Heating:Electric, Coil:Heating:Fuel or Coil:Heating:Steam
+\end{enumerate}
 
 Both units are forward models: their inputs are defined by the state of their inlets: namely the air inlet and the hot water~ inlet. The outputs of the models are the conditions of the outlet air stream: flow rate, temperature and humidity ratio. The PIUs data and simulation are encapsulated in the module \emph{PoweredInductionUnits}. The main simulation routine for the units within the module are \emph{CalcSeriesPIU} and \emph{CalcParallelPIU}.
 
@@ -307,7 +305,7 @@ The calculation is performed by simulating the sub-components in the order given
 
 \emph{Series}
 
-From the result of the zone simulation we have the heating/cooling demand on the terminal unit \({\dot Q_{tot}}\) . The subroutine \emph{CalcSeriesPIU} needs to determine the flow rates that will allow the unit to meet this load. The first step is to determine the on/off state of the unit and determine the air flow rates.
+From the result of the zone simulation we have the heating/cooling demand on the terminal unit \({\dot Q_{tot}}\). The subroutine \emph{CalcSeriesPIU} needs to determine the flow rates that will allow the unit to meet this load. The first step is to determine the on/off state of the unit and determine the air flow rates.
 
 \begin{itemize}
   \item
@@ -322,18 +320,20 @@ From the result of the zone simulation we have the heating/cooling demand on the
       \item 
         We determine the fan temperature rise: the secondary air flow is set to the max total air flow, primary air flow to zero, and the mixer and fan are simulated. The fan delta T is the difference between the temperature at the fan's outlet node and inlet node.
       \item
-        We calculate the unit air outlet temperature needed to meet the zone cooling load: \({T_{out}} = C{p_h} + {\dot Q_{z,req}}/({\dot m_{air,tot}}\cdot {c_{p,air,z}})\)
+        We calculate the unit air outlet temperature needed to meet the zone cooling load: \({T_{out}} = {T_{z}} + {\dot Q_{z,req}}/({\dot m_{air,tot}}\cdot {c_{p,air,z}})\)
       \item
         The temperature needed at the outlet of the mixer is then: \({T_{mix}} = {T_{out}} - \Delta {T_{fan}}\)
       \item
         We can then set the primary air flow rate.
+        \begin{itemize}
+          \item
+            If \({T_{mix}} \le {T_{in,pri}}\), then \({\dot m_{pri}} = {\dot m_{pri,max}}\)
+          \item
+            Else if \({T_{mix}} \ge {T_{in,pri}}\) and \({T_{mix}} \ge {T_{in,sec}}\), then \({\dot m_{pri}} = {\dot m_{pri,min}}\)
+          \item
+            Otherwise \({\dot m_{pri}} = {\dot m_{air,tot}}\cdot ({T_{in,sec}} - {T_{mix}})/({T_{in,sec}} - {T_{in,pri}})\), subject to the constraints that the flow rate can't be bigger than the max and min allowed.
+        \end{itemize}
     \end{itemize}
-  \item
-    If \({T_{mix}} \le {T_{in,pri}}\) then \({\dot m_{pri}} = {\dot m_{pri,max}}\)
-  \item
-    else if \({T_{mix}} \ge {T_{in,pri}}\) and \({T_{mix}} \ge {T_{in,sec}}\) then \({\dot m_{pri}} = {\dot m_{pri,min}}\)
-  \item
-    otherwise \({\dot m_{pri}} = {\dot m_{air,tot}}\cdot ({T_{in,sec}} - {T_{mix}})/({T_{in,sec}} - {T_{in,pri}})\), subject to the constraints that the flow rate can't be bigger than the max and min allowed.
 \end{itemize}
 
 The air flow rates are now determined and we can fire the air mixer (Call \emph{SimAir-Mixer}) and fan (Call \emph{SimulateFanComponents}) component simulations. Finally we simulate the heating coil:
@@ -361,7 +361,7 @@ where \emph{PsyHFnTdb} is the EnergyPlus function giving enthalpy as a function 
 
 \emph{Parallel}
 
-From the result of the zone simulation we have the heating/cooling demand on the terminal unit \({\dot Q_{tot}}\) . The subroutine \emph{CalcParallelPIU} needs to determine the flow rates that will allow the unit to meet this load. The first step is to determine the on/off state of the unit and determine the air flow rates.
+From the result of the zone simulation we have the heating/cooling demand on the terminal unit \({\dot Q_{tot}}\). The subroutine \emph{CalcParallelPIU} needs to determine the flow rates that will allow the unit to meet this load. The first step is to determine the on/off state of the unit and determine the air flow rates.
 
 \begin{itemize}
   \item
@@ -396,7 +396,7 @@ The air flow rates are now determined and we can fire the fan (Call \emph{Simula
 
 \begin{itemize}
   \item
-    for a hot water coil, if the coil is off (no flow, deadband, no load) just fire the coil simulation once (Call \emph{SimulateWaterCoilComponents}). Otherwise call \emph{ControlCompOutput}; \emph{ControlCompOutput} is a general component control routine. In this case it calls \emph{SimulateWaterCoilComponents} repeatedly while varying the hot water flow rate and minimizing
+    For a hot water coil, if the coil is off (no flow, deadband, no load) just fire the coil simulation once (Call \emph{SimulateWaterCoilComponents}). Otherwise call \emph{ControlCompOutput}; \emph{ControlCompOutput} is a general component control routine. In this case it calls \emph{SimulateWaterCoilComponents} repeatedly while varying the hot water flow rate and minimizing
 
 \begin{equation}
 ({c_{p,air}}\cdot {\dot m_{air,tot}}\cdot ({T_{out}} - {T_z}) - {\dot Q_{z,req}})/{\dot Q_{z,req}}
@@ -405,7 +405,7 @@ The air flow rates are now determined and we can fire the fan (Call \emph{Simula
 to within the heating convergence tolerance.
 
   \item
-    For gas, electric or steam coils, the required coil output is set to \({\dot Q_{coil,req}} = {\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{air,coil}}({T_{air,coil,in}} - {T_z})\) . Then the coil simulation is fired (Call \emph{SimulateHeatingCoilComponent} or \emph{SimulateSteamCoilCompo-nents}).
+    For gas, electric or steam coils, the required coil output is set to \({\dot Q_{coil,req}} = {\dot Q_{z,req}} - {c_{p,air}}\cdot {\dot m_{air,coil}}({T_{air,coil,in}} - {T_z})\) . Then the coil simulation is fired (Call \emph{SimulateHeatingCoilComponent} or \emph{SimulateSteamCoilComponents}).
 \end{itemize}
 
 Finally the unit sensible output is calculated:
@@ -454,7 +454,7 @@ Note that data is never explicitly passed between the sub-components. This is al
 
 \subsubsection{Simulation and Control}\label{simulation-and-control-3}
 
-From the result of the zone simulation we have the heating/cooling demand on the terminal unit \({\dot Q_{tot}}\) . For the given inlet conditions \emph{CalcVAVVS} will give us the terminal unit heating/cooling output. We need to vary the air or hot water flow rate or the heating coil power (for gas or electric coils) to make the unit output match the demand. To do this we need to numerically invert \emph{CalcVAVVS}: given the output, we want one of the inputs -- the air or hot water flow rate or the heating coil power. The numerical inversion is carried out by calling subroutine \emph{SolveRegulaFalsi}. This is a general utility routine for finding the zero of a function (the \emph{residual} function) of a single independent variable. In this case the residual function calculates \(({\dot Q_{tot}} - {\dot Q_{out}})/{\dot Q_{tot}}\) . \emph{SolveRegulaFalsi} varies either the air mass flow rate, the hot water mass flow rate or the heating coil power to zero the residual.
+From the result of the zone simulation we have the heating/cooling demand on the terminal unit \({\dot Q_{tot}}\). For the given inlet conditions \emph{CalcVAVVS} will give us the terminal unit heating/cooling output. We need to vary the air or hot water flow rate or the heating coil power (for gas or electric coils) to make the unit output match the demand. To do this we need to numerically invert \emph{CalcVAVVS}: given the output, we want one of the inputs -- the air or hot water flow rate or the heating coil power. The numerical inversion is carried out by calling subroutine \emph{SolveRegulaFalsi}. This is a general utility routine for finding the zero of a function (the \emph{residual} function) of a single independent variable. In this case the residual function calculates \(({\dot Q_{tot}} - {\dot Q_{out}})/{\dot Q_{tot}}\). \emph{SolveRegulaFalsi} varies either the air mass flow rate, the hot water mass flow rate or the heating coil power to zero the residual.
 
 The unit is simulated in the following sequence.
 
@@ -464,12 +464,11 @@ If the unit is off, call \emph{CalcVAVVS} with flow rates set to their minimum f
 
 If the unit is on, we need to establish the boundaries of 4 conditioning regions: a) active cooling with fan on; b) active heating with fan on; c) active heating with fan off; d) passive cooling with fan off. The heating/cooling demand will fall into one of these regions. Once the correct region is determined, we will know which model input to vary for control and thus how to invert the calculation.
 
-To establish the boundaries of region a) we call \emph{CalcVAVVS} twice: once with the supply air flow rate set to the cooling maximum, once with the cooling air flow rate set to the minimum. In both cases the heating coil output is at the minimum and the fan is on. Call the 2 cooling outputs \({\dot Q_{cool,max,fanon}}\) and \({\dot Q_{cool,min,fanon}}\) . Remembering that EnergyPlus convention is that cooling loads are negative, then if \({\dot Q_{tot}} < {\dot Q_{cool,max,fanon}}\) the terminal unit can not meet the demand. Set the air mass flow rate to the cooling maximum and call \emph{CalcVAVV} again. This concludes the simulation. If~ \({\dot Q_{cool,max,fanon}} < {\dot Q_{tot}} < {\dot Q_{cool,min,fanon}}\) the cooling demand is in the active cooling region. We hold the heating at the minimum, allow the supply air flow to vary between the cooling maximum and the minimum with the fan on, and call \emph{SolveRegulaFalsi} to obtain the supply air flow rate that will produce the unit sensible cooling output that matches the demand. This concludes the simulation.
+To establish the boundaries of region a) we call \emph{CalcVAVVS} twice: once with the supply air flow rate set to the cooling maximum, once with the cooling air flow rate set to the minimum. In both cases the heating coil output is at the minimum and the fan is on. Call the 2 cooling outputs \({\dot Q_{cool,max,fanon}}\) and \({\dot Q_{cool,min,fanon}}\). Remembering that EnergyPlus convention is that cooling loads are negative, then if \({\dot Q_{tot}} < {\dot Q_{cool,max,fanon}}\) the terminal unit can not meet the demand. Set the air mass flow rate to the cooling maximum and call \emph{CalcVAVV} again. This concludes the simulation. If~ \({\dot Q_{cool,max,fanon}} < {\dot Q_{tot}} < {\dot Q_{cool,min,fanon}}\) the cooling demand is in the active cooling region. We hold the heating at the minimum, allow the supply air flow to vary between the cooling maximum and the minimum with the fan on, and call \emph{SolveRegulaFalsi} to obtain the supply air flow rate that will produce the unit sensible cooling output that matches the demand. This concludes the simulation.
 
-To establish the boundaries of region b) call \emph{CalcVAVVS} twice: once with the supply air flow rate set to the heating maximum, once with the supply air flow rate set to the minimum. In both calls, if the heating coil is a hot water coil, the hot water flow rate is at the maximum. For electric and gas coils, the heating power is set to the maximum at maximum supply air flow and to zero at the minimum supply air flow. In both calls the fan is set to be on. Call the 2 heating outputs returned from the two calls to \emph{CalcVAVVS} \({\dot Q_{heat,max,fanon}}\) and \({\dot Q_{heat,min,fanon}}\) . If \({\dot Q_{heat,max,fanon}} < {\dot Q_{tot}}\) the terminal unit can not meet the load. Set the air flow rate to the heating maximum and the hot water flow rate or heating coil power to the maximum and call \emph{CalcVAVVS} again. This concludes the simulation for this case. If \({\dot Q_{heat,min,fanon}} < {\dot Q_{tot}} < {\dot Q_{heat,max,fanon}}\) the heating demand is in the active heating, fan on region. For a hot water coil we call \emph{SolveRegulaFalsi} with the supply air flow rate as the input that is varied and the hot water flow rate set to the maximum. For electric and gas coils the coil power and the supply air flow rate are both varied together from their minimum to maximum in a call to \emph{SolveRegulaFalsi}.~ The call to \emph{SolveRegulaFalsi} concludes the simulation for this case.
+To establish the boundaries of region b) call \emph{CalcVAVVS} twice: once with the supply air flow rate set to the heating maximum, once with the supply air flow rate set to the minimum. In both calls, if the heating coil is a hot water coil, the hot water flow rate is at the maximum. For electric and gas coils, the heating power is set to the maximum at maximum supply air flow and to zero at the minimum supply air flow. In both calls the fan is set to be on. Call the 2 heating outputs returned from the two calls to \emph{CalcVAVVS} \({\dot Q_{heat,max,fanon}}\) and \({\dot Q_{heat,min,fanon}}\). If \({\dot Q_{heat,max,fanon}} < {\dot Q_{tot}}\) the terminal unit can not meet the load. Set the air flow rate to the heating maximum and the hot water flow rate or heating coil power to the maximum and call \emph{CalcVAVVS} again. This concludes the simulation for this case. If \({\dot Q_{heat,min,fanon}} < {\dot Q_{tot}} < {\dot Q_{heat,max,fanon}}\) the heating demand is in the active heating, fan on region. For a hot water coil we call \emph{SolveRegulaFalsi} with the supply air flow rate as the input that is varied and the hot water flow rate set to the maximum. For electric and gas coils the coil power and the supply air flow rate are both varied together from their minimum to maximum in a call to \emph{SolveRegulaFalsi}.~ The call to \emph{SolveRegulaFalsi} concludes the simulation for this case.
 
-This region only applies to terminal units with a hot water coil. To establish the boundaries of region c) the fan is set to off, the supply air flow rate is set to minimum flow and \emph{CalcVAVVS} is called twice: once with the hot water flow at maximum and once with the hot water flow at minimum. Call the two heating outputs \({\dot Q_{heat,max,fanoff}}\)\\
-and \({\dot Q_{tot}}\) . If \({\dot Q_{tot}}\) ~is between these values, the supply air flow rate is set to its minimum, the fan is set to off, and in the call to \emph{SolveRegulaFalsi} the hot water flow rate is varied to meet the load. This concludes the simulation for this case.
+This region only applies to terminal units with a hot water coil. To establish the boundaries of region c) the fan is set to off, the supply air flow rate is set to minimum flow and \emph{CalcVAVVS} is called twice: once with the hot water flow at maximum and once with the hot water flow at minimum. Call the two heating outputs \({\dot Q_{heat,max,fanoff}}\) and \({\dot Q_{tot}}\). If \({\dot Q_{tot}}\) is between these values, the supply air flow rate is set to its minimum, the fan is set to off, and in the call to \emph{SolveRegulaFalsi} the hot water flow rate is varied to meet the load. This concludes the simulation for this case.
 
 If the cooling demand does not fall into cases a) -- c), the unit is assumed to be in the passive cooling state: heating is off or at the minimum, the fan is off, and the minimum supply air flow is delivered to the zone.
 
@@ -481,23 +480,23 @@ No specific references.
 
 \subsection{Four Pipe Beam Unit (AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam)}\label{four-pipe-beam-unit-airterminalsingleductconstantvolumefourpipebeam}
 
-The four pipe beam air terminal units are ceiling-mounted, beam-type units that are provided with primary air from a central system and additional heating or cooling by inducing room air to flow over a hydronic convector. They are called \emph{four pipe} because the units are connected with two pipes for chilled water supply and return and another two pipes for hot water supply and return. A simple empirical model is used to enable using input data derived from manufacturer's catalog data.
+The four pipe beam air terminal units (\emph{AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam}) are ceiling-mounted, beam-type units that are provided with primary air from a central system and additional heating or cooling by inducing room air to flow over a hydronic convector. They are called \emph{four pipe} because the units are connected with two pipes for chilled water supply and return and another two pipes for hot water supply and return. A simple empirical model is used to enable using input data derived from manufacturer's catalog data.
 
 \subsubsection{Model Description}\label{model-description-1-000}
 
-The model assumes that the total conditioning power, \({\dot Q_{Tot}}\) , is the sum of the conditioning provided by the primary air, \({\dot Q_{SA}}\) , and the conditioning provided by the beam convector, \({\dot Q_{Beam}}\) .
+The model assumes that the total conditioning power, \({\dot Q_{Tot}}\), is the sum of the conditioning provided by the primary air, \({\dot Q_{SA}}\), and the conditioning provided by the beam convector, \({\dot Q_{Beam}}\).
 
 \begin{equation}
 {\dot Q_{Tot}} = {{\dot Q_{SA}} + {\dot Q_{Beam}}}
 \end{equation}
 
-The primary air contribution is easily determined using
+The primary air contribution is easily determined using:
 
 \begin{equation}
 {\dot Q_{SA}} = {{\dot m_{SA}}\cdot ({c_{p,SA}} \cdot {T_{SA}} - {c_{p,Z}} \cdot {T_{Z}})}
 \end{equation}
 
-The convector power \({\dot Q_{Beam}}\) is coupled directly to the zone air heat balance (using a source code term called \emph{NonAirSysOutput}) in a way that provides only sensible heat transfer directly to the zone air node. We therefore assume that the air terminal's convector is always dry during cooling. Many of the terms used in the performance calculations are normalized by the total length of beam in zones, \({L}\) .
+The convector power \({\dot Q_{Beam}}\) is coupled directly to the zone air heat balance (using a source code term called \emph{NonAirSysOutput}) in a way that provides only sensible heat transfer directly to the zone air node. We therefore assume that the air terminal's convector is always dry during cooling. Many of the terms used in the performance calculations are normalized by the total length of beam in zones, \({L}\).
 
 When the unit is operated in cooling mode, the convector power is determined using the rated normalized cooling capacity that is modified by three separate functions.
 
@@ -505,7 +504,7 @@ When the unit is operated in cooling mode, the convector power is determined usi
 {\dot Q_{Beam, cool}} = { \dot q_{cool,rated} \cdot f_{ \Delta T_{cool,mod} }() \cdot f_{\dot m_{SA,cool,mod}}() \cdot f_{\dot m_{CW,mod}}() \cdot L }
 \end{equation}
 
-The modification factor \({f_{ \Delta T_{cool,mod} }() }\) describes how the cooling capacity is adjusted to account for the temperature difference between the zone air and the chilled water entering the convector. This empirical correction factor is intended to account for how heat transfer between the chilled water and induced room air flow depends on the temperature difference, both in terms of surface convection heat transfer and the rate of induced air flow. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current temperature difference, \({\Delta T_{air-CW}}\) , and the temperature difference used to rate beam performance, \({\Delta T_{air-CW,rated}}\) .
+The modification factor \({f_{ \Delta T_{cool,mod} }() }\) describes how the cooling capacity is adjusted to account for the temperature difference between the zone air and the chilled water entering the convector. This empirical correction factor is intended to account for how heat transfer between the chilled water and induced room air flow depends on the temperature difference, both in terms of surface convection heat transfer and the rate of induced air flow. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current temperature difference, \({\Delta T_{air-CW}}\), and the temperature difference used to rate beam performance, \({\Delta T_{air-CW,rated}}\).
 
 \begin{equation}
 {f_{ \Delta T_{cool,mod} }() } = f_{ \Delta T_{cool,mod} }\left(\frac{\Delta T_{air-CW}}{\Delta T_{air-CW,rated}}\right)
@@ -515,7 +514,7 @@ The modification factor \({f_{ \Delta T_{cool,mod} }() }\) describes how the coo
 {\Delta T_{air-CW}} = {T_{Z}}-{T_{CW,in}}
 \end{equation}
 
-The modification factor \({f_{\dot m_{SA,cool,mod}}()}\) describes how the cooling capacity is adjusted to account for the primary air flow rate. This empirical correction factor is intended to account for how varying primary air flow rates will impact the rate that room air is induced to flow across the convector. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current normalized primary air flow rate, \({\dot m_{SA}}\) , and the normalized flow rate used to rate beam performance, \({\dot m_{SA,rated}}\) . Flow rates are normalized by dividing the total length of all the beam units in the zone. The ratio is calculated using air mass flow rates with the rated flow rate assumed to be for standard temperature and pressure at sea level so that elevation effects appear only in the numerator when the function is evaluated.
+The modification factor \({f_{\dot m_{SA,cool,mod}}()}\) describes how the cooling capacity is adjusted to account for the primary air flow rate. This empirical correction factor is intended to account for how varying primary air flow rates will impact the rate that room air is induced to flow across the convector. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current normalized primary air flow rate, \({\dot m_{SA}}\), and the normalized flow rate used to rate beam performance, \({\dot m_{SA,rated}}\). Flow rates are normalized by dividing the total length of all the beam units in the zone. The ratio is calculated using air mass flow rates with the rated flow rate assumed to be for standard temperature and pressure at sea level so that elevation effects appear only in the numerator when the function is evaluated.
 
 \begin{equation}
   {f_{\dot m_{SA,cool,mod}}()} = f_{\dot m_{SA,cool,mod}}\left(\frac{{\dot m_{SA}}}{{\dot m_{SA,rated}} }\right)
@@ -529,7 +528,7 @@ The modification factor \({f_{\dot m_{SA,cool,mod}}()}\) describes how the cooli
   {\dot m_{SA,rated}} = {\dot v_{SA,rated}} \cdot {\rho_{air,STP}}
 \end{equation}
 
-The modification factor \(f_{\dot m_{CW,mod}}()\) describes how the cooling capacity is adjusted to account for the flow rate of chilled water through the convector. This empirical correction factor is intended to account for how varying chilled water flow rates will impact the velocity of fluid inside the pipes and the corresponding impact on the rate of surface convection heat transfer inside the convector. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current normalized chilled water flow rate, \({\dot m_{CW}}\) , and the normalized chilled water flow rate at the rating point, \({\dot m_{CW,rated}}\) .
+The modification factor \(f_{\dot m_{CW,mod}}()\) describes how the cooling capacity is adjusted to account for the flow rate of chilled water through the convector. This empirical correction factor is intended to account for how varying chilled water flow rates will impact the velocity of fluid inside the pipes and the corresponding impact on the rate of surface convection heat transfer inside the convector. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current normalized chilled water flow rate, \({\dot m_{CW}}\), and the normalized chilled water flow rate at the rating point, \({\dot m_{CW,rated}}\).
 
 \begin{equation}
   {f_{\dot m_{CW,mod}}()} = f_{\dot m_{CW,mod}}\left(\frac{{\dot m_{CW}}}{{\dot m_{CW,rated}}}\right)
@@ -549,7 +548,7 @@ The model for when the unit is operated in heating mode is very similar. The con
 {\dot Q_{Beam, heat}} = {\dot q_{heat,rated}}\cdot f_{ \Delta T_{heat,mod} }() \cdot f_{\dot m_{SA,heat,mod}}()\cdot f_{\dot m_{HW,mod}}() \cdot L
 \end{equation}
 
-The modification factor \(f_{ \Delta T_{heat,mod} }()\) describes how the heating capacity is adjusted to account for the temperature difference between the hot water and the zone air entering the convector. Notice that for heating the temperature difference is defined different from cooling operation so that positive difference values are the result. This empirical correction factor is intended to account for how heat transfer between the hot water and induced room air flow depends on the temperature difference, both in terms of surface convection heat transfer and induced air flow rates. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current temperature difference, \(\Delta T_{HW-air}\) , and the temperature difference used to rate beam performance, \(\Delta T_{HW-air,rated}\) .
+The modification factor \(f_{ \Delta T_{heat,mod} }()\) describes how the heating capacity is adjusted to account for the temperature difference between the hot water and the zone air entering the convector. Notice that for heating the temperature difference is defined different from cooling operation so that positive difference values are the result. This empirical correction factor is intended to account for how heat transfer between the hot water and induced room air flow depends on the temperature difference, both in terms of surface convection heat transfer and induced air flow rates. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current temperature difference, \(\Delta T_{HW-air}\), and the temperature difference used to rate beam performance, \(\Delta T_{HW-air,rated}\).
 
 \begin{equation}
 {f_{ \Delta T_{heat,mod} }()} = f_{ \Delta T_{heat,mod} }\left(\frac{\Delta T_{HW-air}}{\Delta T_{HW-air,rated}}\right)
@@ -565,7 +564,7 @@ The modification factor \(f_{\dot m_{SA,heat,mod}}()\) describes how the heating
 {f_{\dot m_{SA,heat,mod}}()} = f_{\dot m_{SA,heat,mod}}\left(\frac{{\dot m_{SA}}}{{\dot m_{SA,rated}} }\right)
 \end{equation}
 
-The modification factor \(f_{\dot m_{HW,mod}}()\) describes how the heating capacity is adjusted to account for the flow rate of hot water through the convector. This empirical correction factor is intended to account for how varying hot water flow rates will impact the velocity of fluid inside the pipes and the corresponding impact on the rate of surface convection heat transfer inside the convector. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current normalized hot water flow rate, \({\dot m_{HW}}\) , and the normalized hot water flow rate at the rating point, \({\dot m_{HW,rated}}\) .
+The modification factor \(f_{\dot m_{HW,mod}}()\) describes how the heating capacity is adjusted to account for the flow rate of hot water through the convector. This empirical correction factor is intended to account for how varying hot water flow rates will impact the velocity of fluid inside the pipes and the corresponding impact on the rate of surface convection heat transfer inside the convector. The function can be described using any of the single-variable curves or a lookup table. The single independent variable is the ratio between the current normalized hot water flow rate, \({\dot m_{HW}}\), and the normalized hot water flow rate at the rating point, \({\dot m_{HW,rated}}\).
 
 \begin{equation}
   f_{\dot m_{HW,mod}}() = f_{\dot m_{HW,mod}}\left(\frac{{\dot m_{HW}}}{{\dot m_{HW,rated}}}\right)
@@ -579,81 +578,81 @@ The modification factor \(f_{\dot m_{HW,mod}}()\) describes how the heating capa
   {\dot m_{HW,rated}} = {\dot v_{HW,rated}} \cdot {\rho_{HW}}
 \end{equation} 
 
-Where,
+where:
 
-\({c_{p,SA}}\) Specific heat of primary air entering through the air terminal unit, in J/kg-K.
+\({c_{p,SA}}\) is the specific heat of primary air entering through the air terminal unit, in J/kg-K.
 
-\({c_{p,Z}}\) Specific heat of zone air, in J/kg-K.
+\({c_{p,Z}}\) is the specific heat of zone air, in J/kg-K.
 
-\({c_{p,CW}}\) Specific heat of zone air, in J/kg-K.
+\({c_{p,CW}}\) is the specific heat of zone air, in J/kg-K.
 
-\({f_{\dot m_{CW,mod}}()}\) Cooling capacity modification factor function of chilled water flow rate
+\({f_{\dot m_{CW,mod}}()}\) is the cooling capacity modification factor function of chilled water flow rate
 
-\({f_{ \Delta T_{cool,mod} }()}\) Cooling capacity modification factor function of air-water temperature difference
+\({f_{ \Delta T_{cool,mod} }()}\) is the cooling capacity modification factor function of air-water temperature difference
 
-\({f_{\dot m_{SA,cool,mod}}()}\) Cooling capacity modification factor function of primary air flow rate
+\({f_{\dot m_{SA,cool,mod}}()}\) is the cooling capacity modification factor function of primary air flow rate
 
-\({f_{\dot m_{HW,mod}}()}\) Heating capacity modification factor function of hot water flow rate
+\({f_{\dot m_{HW,mod}}()}\) is the heating capacity modification factor function of hot water flow rate
 
-\({f_{ \Delta T_{heat,mod} }()}\) Heating capacity modification factor function of water - air temperature difference
+\({f_{ \Delta T_{heat,mod} }()}\) is the heating capacity modification factor function of water - air temperature difference
 
-\({f_{\dot m_{SA,heat,mod}}()}\) Heating capacity modification factor function of primary air flow rate
+\({f_{\dot m_{SA,heat,mod}}()}\) is the heating capacity modification factor function of primary air flow rate
 
-\({L}\) Total length of all beam units serving the zone, in m
+\({L}\) is the total length of all beam units serving the zone, in m
 
-\({\dot m_{CW}}\) Mass flow rate of chilled water per meter of length, in kg/s-m
+\({\dot m_{CW}}\) is the mass flow rate of chilled water per meter of length, in kg/s-m
 
-\({\dot m_{CW,rated}}\) Mass flow rate of chilled water per meter of length at rating point, in kg/s-m
+\({\dot m_{CW,rated}}\) is the mass flow rate of chilled water per meter of length at rating point, in kg/s-m
 
-\({\dot m_{HW}}\) Mass flow rate of hot water per meter of length, in kg/s-m
+\({\dot m_{HW}}\) is the mass flow rate of hot water per meter of length, in kg/s-m
 
-\({\dot m_{HW,rated}}\) Mass flow rate of hot water per meter of length at rating point, in kg/s-m
+\({\dot m_{HW,rated}}\) is the mass flow rate of hot water per meter of length at rating point, in kg/s-m
 
-\({\dot m_{SA}}\) Mass flow rate of primary air per meter of length, in kg/s-m
+\({\dot m_{SA}}\) is the mass flow rate of primary air per meter of length, in kg/s-m
 
-\({\dot m_{SA,rated}}\) Mass flow rate of primary air per meter of length at rating point, kg/s-m
+\({\dot m_{SA,rated}}\) is the mass flow rate of primary air per meter of length at rating point, kg/s-m
 
-\({\dot M_{SA}}\) Mass flow rate of primary air entering the zone through the air terminal unit, in kg/s
+\({\dot M_{SA}}\) is the mass flow rate of primary air entering the zone through the air terminal unit, in kg/s
 
-\({\dot M_{CW}}\) Mass flow rate of chilled water, kg/s
+\({\dot M_{CW}}\) is the mass flow rate of chilled water, kg/s
 
-\({\dot M_{HW}}\) Mass flow rate of hot water, kg/s
+\({\dot M_{HW}}\) is the mass flow rate of hot water, kg/s
 
-\({\dot q_{cool,rated}}\) Rated beam cooling capacity per meter of length, in W/m.
+\({\dot q_{cool,rated}}\) is the rated beam cooling capacity per meter of length, in W/m.
 
-\({\dot q_{heat,rated}}\) Rated beam heating capacity per meter of length, in W/m.
+\({\dot q_{heat,rated}}\) is the rated beam heating capacity per meter of length, in W/m.
 
-\({\dot Q_{Beam}}\) Conditioning power delivered to the zone by the beam convector, in W.
+\({\dot Q_{Beam}}\) is the conditioning power delivered to the zone by the beam convector, in W.
 
-\({\dot Q_{SA}}\) Conditioning power delivered to the zone by the primary air mass flow, in W.
+\({\dot Q_{SA}}\) is the conditioning power delivered to the zone by the primary air mass flow, in W.
 
-\({\dot Q_{Tot}}\) Total (net) conditioning power delivered to zone by the air terminal unit, in W.
+\({\dot Q_{Tot}}\) is the total (net) conditioning power delivered to zone by the air terminal unit, in W.
 
-\({\rho_{air,STP}}\) Density of air at standard conditions (sea level), in kg/m\(^{3}\)
+\({\rho_{air,STP}}\) is the density of air at standard conditions (sea level), in kg/m\(^{3}\)
 
-\({\rho_{air}}\) Density of air at standard conditions adjusted for elevation), in kg/m\(^{3}\)
+\({\rho_{air}}\) is the density of air at standard conditions adjusted for elevation), in kg/m\(^{3}\)
 
-\({\rho_{CW}}\) Density of chilled water, in kg/m\(^{3}\)
+\({\rho_{CW}}\) is the density of chilled water, in kg/m\(^{3}\)
 
-\({T_{SA}}\) Dryblub temperature of the (central) primary air entering the air terminal unit, in degrees C.
+\({T_{SA}}\) is the dryblub temperature of the (central) primary air entering the air terminal unit, in degrees C.
 
-\({T_{Z}}\) Dryblub temperature of the zone air, in degrees C.
+\({T_{Z}}\) is the dryblub temperature of the zone air, in  \(^{\circ}\)C.
 
-\({T_{CW,in}}\) Temperature of chilled water entering the convector, in degrees C.
+\({T_{CW,in}}\) is the temperature of chilled water entering the convector, in \(^{\circ}\)C.
 
-\({\Delta T_{air-CW}}\) Difference between the zone air temperature and chilled water entering the convector, delta degrees C.
+\({\Delta T_{air-CW}}\) is the difference between the zone air temperature and chilled water entering the convector, \(\Delta^{\circ}\)C.
 
-\({\Delta T_{HW-air}}\) Difference between the water and zone air temperature entering the convector, delta degrees C.
+\({\Delta T_{HW-air}}\) is the difference between the water and zone air temperature entering the convector, \(\Delta^{\circ}\)C.
 
-\({\Delta T_{air-CW,rated}}\) Value of \({\Delta T_{air-CW}}\) at rating conditions for cooling performance, delta degrees C.
+\({\Delta T_{air-CW,rated}}\) is the value of \({\Delta T_{air-CW}}\) at rating conditions for cooling performance, \(\Delta^{\circ}\)C.
 
-\({\Delta T_{HW-air,rated}}\) Value of \({\Delta T_{HW-air}}\) at rating conditions for heating performance, delta degrees C.
+\({\Delta T_{HW-air,rated}}\) is the value of \({\Delta T_{HW-air}}\) at rating conditions for heating performance, \(\Delta^{\circ}\)C.
 
-\({\dot v_{SA,rated}}\) Volume flow rate of air per meter length at rating point, in m\(^{3}\)/s-m.
+\({\dot v_{SA,rated}}\) is the volume flow rate of air per meter length at rating point, in m\(^{3}\)/s-m.
 
-\({\dot v_{CW,rated}}\) Volume flow rate of chilled water per meter length at rating point, in m\(^{3}\)/s-m.
+\({\dot v_{CW,rated}}\) is the volume flow rate of chilled water per meter length at rating point, in m\(^{3}\)/s-m.
 
-\({\dot v_{HW,rated}}\) Volume flow rate of hot water per meter length at rating point, in m\(^{3}\)/s-m.
+\({\dot v_{HW,rated}}\) is the volume flow rate of hot water per meter length at rating point, in m\(^{3}\)/s-m.
 
 The performance capacity model described above is controlled to modulate water flow through the beam's convector using the non-linear numerical solver in EnergyPlus called Solve root solver. The predicted zone load to setpoint \({\dot Q_{Zone, Required}}\) is adjusted by \({\dot Q_{SA}}\) to determine the required beam load.
 
@@ -661,15 +660,15 @@ The performance capacity model described above is controlled to modulate water f
 {\dot Q_{Beam, Required}} = {\dot Q_{Zone, Required}} - {\dot Q_{SA}}
 \end{equation}
 
-When \({\dot Q_{Zone, Required}}\) is negative the beams need to provide cooling and when it is positive the beams need to provide heating. The the solver iterates the water flow rate to find a flow rate that will meet the load.
+When \({\dot Q_{Zone, Required}}\) is negative, the beams need to provide cooling and when it is positive the beams need to provide heating. The the solver iterates the water flow rate to find a flow rate that will meet the load.
 
-When cooling, the result for beam capacity (negative for cooling) is used to calculate the leaving temperature of the chilled water using,
+When cooling, the result for beam capacity (negative for cooling) is used to calculate the leaving temperature of the chilled water using:
 
 \begin{equation}
 {T_{CW,out}} = {T_{CW,in}} - \frac{{\dot Q_{Beam}}}{{\dot m_{CW}} \cdot {c_{p,CW}} }
 \end{equation}
 
-However, to protect from a non-physical result the leaving chilled water temperature is constrained to be no warmer than a 1.0 C approach temperature compared to the zone air or the primary supply air. If the above result is too warm the leaving temperature and beam cooling capacity are adjusted using the following equations, and a recurring warning is issued to alert the user that there may be a problem with the cooliong performance input data.
+However, to protect from a non-physical result the leaving chilled water temperature is constrained to be no warmer than a 1.0\(^{\circ}\)C approach temperature compared to the zone air or the primary supply air. If the above result is too warm the leaving temperature and beam cooling capacity are adjusted using the following equations, and a recurring warning is issued to alert the user that there may be a problem with the cooliong performance input data.
 
 \begin{equation}
   {T_{CW,out}} = { max( {T_{SA}} , {T_{Z}}) - 1.0 }
@@ -685,7 +684,7 @@ Similarly when heating, the result for beam capacity (positive for heating) is u
 {T_{HW,out}} = {T_{HW,in}} - \frac{{\dot Q_{Beam}}}{{\dot m_{HW}} \cdot {c_{p,HW}} }
 \end{equation}
 
-To protect from a non-physical result the leaving hot water temperature is constrained to be no cooler than a 1.0 C approach temperature compared to the zone air or the primary supply air. If the above result is too cool the leaving temperature and beam heating capacity are adjusted using the following equations, and a recurring warning is issued to alert the user that there may be a problem with the heating performance input data.
+To protect from a non-physical result the leaving hot water temperature is constrained to be no cooler than a 1.0\(^{\circ}\)C approach temperature compared to the zone air or the primary supply air. If the above result is too cool the leaving temperature and beam heating capacity are adjusted using the following equations, and a recurring warning is issued to alert the user that there may be a problem with the heating performance input data.
 
 \begin{equation}
   {T_{HW,out}} = { min( {T_{SA}} , {T_{Z}}) + 1.0 }
@@ -699,15 +698,14 @@ To protect from a non-physical result the leaving hot water temperature is const
 
 The four pipe beam model has four inputs that can be autosized:
 
-\({L}\) Total length of all beam units serving the zone, in m
+\begin{itemize}
+\item \({L}\) is the total length of all beam units serving the zone, in m
+\item \({\dot V_{SA,Des}}\) is the design primary supply air volume flow rate, in m\(^{3}\)/s
+\item \({\dot V_{CW,Des}}\) is the design chilled water volume flow rate, in m\(^{3}\)/s
+\item \({\dot V_{HW,Des}}\) is the design hot water volume flow rate, in m\(^{3}\)/s
+\end{itemize}
 
-\({\dot V_{SA,Des}}\) Design primary supply air volume flow rate, in m\(^{3}\)/s
-
-\({\dot V_{CW,Des}}\) Design chilled water volume flow rate, in m\(^{3}\)/s
-
-\({\dot V_{HW,Des}}\) Design hot water volume flow rate, in m\(^{3}\)/s
-
-Because of the way the model is formulated with defaulted inputs for rated, normalized performance data, we can link the four inputs together to ensure an internally consistent set of sizes. If any one of these four inputs is not autosized (given a fixed value at input) then the other three can be computed using the normalized, rated performance data which are either input or have default values. If the total beam length is input, then the following equations are used
+Because of the way the model is formulated with defaulted inputs for rated, normalized performance data, we can link the four inputs together to ensure an internally consistent set of sizes. If any one of these four inputs is not autosized (given a fixed value at input) then the other three can be computed using the normalized, rated performance data which are either input or have default values. If the total beam length is input, then the following equations are used:
 
 \begin{equation}
   {\dot V_{SA,Des}} = {{\dot v_{SA,rated}} \cdot {L}}
@@ -727,13 +725,13 @@ If the design primary supply air flow rate is input then the beam length can be 
 {L} = {\frac{{\dot V_{SA,Des}}}{{\dot v_{SA,rated}}}  }
 \end{equation}
 
-If the chilled water flow rate is input, then the beam length can be determined as follows and the other values evaluated as above,
+If the chilled water flow rate is input, then the beam length can be determined as follows and the other values evaluated as above:
 
 \begin{equation}
 {L} = {\frac{{\dot V_{CW,Des}}}{{\dot v_{CW,rated}}}  }
 \end{equation}
 
-If the hot water flow rate is input, then the beam length can be determined as follows and the other values evaluated as above,
+If the hot water flow rate is input, then the beam length can be determined as follows and the other values evaluated as above:
 
 \begin{equation}
 {L} = {\frac{{\dot V_{HW,Des}}}{{\dot v_{HW,rated}}}  }
@@ -741,35 +739,35 @@ If the hot water flow rate is input, then the beam length can be determined as f
 
 When all four inputs are autosized, which is the usual case, there is no simple way to anchor the sizes and we need to use the results from the zone and system sizing calculations to determine sizes for the four pipe beam unit. The following design data from the zone and system sizing calculations are used when sizing the four pipe beam:
 
-\({\dot V_{TU,Z,final,cool} }\) Final zone terminal unit design volume flow rate for cooling, in m\(^{3}\)/s
+\({\dot V_{TU,Z,final,cool} }\) is the final zone terminal unit design volume flow rate for cooling, in m\(^{3}\)/s
 
-\({\dot V_{TU,Z,final,heat} }\) Final zone terminal unit design volume flow rate for heating, in m\(^{3}\)/s
+\({\dot V_{TU,Z,final,heat} }\) is the final zone terminal unit design volume flow rate for heating, in m\(^{3}\)/s
 
-\({\dot V_{Z,final,OA} }\) Final zone design volume flow rate for minimum outdoor air mechanical ventilation, in m\(^{3}\)/s.
+\({\dot V_{Z,final,OA} }\) is the final zone design volume flow rate for minimum outdoor air mechanical ventilation, in m\(^{3}\)/s.
 
-\({T_{SA,cool,design } }\) Final design zone terminal unit inlet supply air temperature at cooling peak, in degrees C.
+\({T_{SA,cool,design } }\) is the final design zone terminal unit inlet supply air temperature at cooling peak, in \(^{\circ}\)C.
 
-\({w_{SA,cool,design } }\) Final design zone terminal unit inlet supply air humidity ratio at cooling peak, in kg\_H2O/kg\_dryair.
+\({w_{SA,cool,design } }\) is the final design zone terminal unit inlet supply air humidity ratio at cooling peak, in \(kg_{H2O}/kg_{dryair}\).
 
-\({T_{Z,cool,design } }\) Final design zone air temperature at cooling peak, in degrees C.
+\({T_{Z,cool,design } }\) is the final design zone air temperature at cooling peak, in \(^{\circ}\)C.
 
-\({w_{Z,cool,design } }\) Final design zone air humidity ratio at cooling peak, in kg\_H2O/kg\_dryair.
+\({w_{Z,cool,design } }\) is the final design zone air humidity ratio at cooling peak, in \(kg_{H2O}/kg_{dryair}\).
 
-\({\dot Q_{Z,cool,design } }\) Final design zone cooling load at cooling peak, in W.
+\({\dot Q_{Z,cool,design } }\) is the final design zone cooling load at cooling peak, in W.
 
-\({T_{CW,design}}\) Chilled water plant loop supply side design exit temperature, in degrees C.
+\({T_{CW,design}}\) is the chilled water plant loop supply side design exit temperature, in \(^{\circ}\)C.
 
-\({T_{SA,heat,design } }\) Final design zone terminal unit inlet supply air temperature at heating peak, in degrees C.
+\({T_{SA,heat,design } }\) the the final design zone terminal unit inlet supply air temperature at heating peak, in \(^{\circ}\)C.
 
-\({w_{SA,heat,design } }\) Final design zone terminal unit inlet supply air humidity ratio at heating peak, in kg\_H2O/kg\_dryair.
+\({w_{SA,heat,design } }\) is the final design zone terminal unit inlet supply air humidity ratio at heating peak, in \(kg_{H2O}/kg_{dryair}\).
 
-\({T_{Z,heat,design } }\) Final design zone air temperature at heating peak, in degrees C.
+\({T_{Z,heat,design } }\) is the final design zone air temperature at heating peak, in \(^{\circ}\)C.
 
-\({w_{Z,heat,design } }\) Final design zone air humidity ratio at heating peak, in kg\_H2O/kg\_dryair.
+\({w_{Z,heat,design } }\) is the final design zone air humidity ratio at heating peak, in \(kg_{H2O}/kg_{dryair}\).
 
-\({\dot Q_{Z,heat,design } }\) Final design zone heating load at heating peak, in W.
+\({\dot Q_{Z,heat,design } }\) is the final design zone heating load at heating peak, in W.
 
-\({T_{HW,design}}\) Hot water plant loop supply side design exit temperature, in degrees C.
+\({T_{HW,design}}\) is the hot water plant loop supply side design exit temperature, in \(^{\circ}\)C.
 
 Overhead beam type air terminals induce room air to flow over the convector by the directing primary supply air through special nozzles. Therefore, the cooling and heating capacity of the beam's convector is not separable from the primary flow rate, varying the primary flow rate varies the beam capacity. The design primary flow rate is chosen to be largest value that satisfies three requirements: (1) the ventilation requirement, (2) the design cooling load (if cooling is present), (3) and the design heating load (if heating is present).
 
@@ -809,7 +807,7 @@ When sizing for the cooling design load, the following design values are set for
   {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,cool,design } }}{{c_{p,SA}} \cdot {( {T_{Z,cool,design } } - {T_{SA,cool,design } } )}}  \right) }
 \end{equation}  
   
-or if \(({T_{Z,cool,design }} - {T_{SA,cool,design}}) < 2.0\) then
+or if \(({T_{Z,cool,design }} - {T_{SA,cool,design}}) < 2.0\) then:
 
 \begin{equation}
   {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,cool,design } }}{{c_{p,SA}} \cdot 2.0 } \right) }
@@ -853,7 +851,7 @@ When sizing for the heating design load, the following design values are set for
   {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,heat,design } }}{{c_{p,SA}} \cdot ( {T_{SA,heat,design } } - {T_{Z,heat,design }} ) } \right) }
 \end{equation}
 
-or if \(( {T_{SA,heat,design } } - {T_{Z,heat,design } }) < 2.0\) then
+or if \(( {T_{SA,heat,design } } - {T_{Z,heat,design } }) < 2.0\) then:
 
 \begin{equation}
   {\dot m_{SA,max limit}} = { \left(\frac{{\dot Q_{Z,heat,design } }}{{c_{p,SA}} \cdot 2.0 } \right) }
@@ -901,7 +899,8 @@ An example is presented showing how manufacturer's data can be converted into th
 
 Snippet of catalog data for capacity and primary air flow rate dependence (Trox DID632A)
 
-Choosing a 6 foot beam (with Nozzle type H) at 140 CFM as the rating point, we get 3726 Btu/h = 1092 W, 6 ft = 1.83 m, and 1092/1.83 = 597 W/m for normalized beam cooling capacity at rating point. The associated primary air flow rate of 140 ft\(^{3}\)/min = 0.066 m\^{}3/s and 0.066/1.83 = 0.036 m\(^{2}\)/s is the normalized beam primary air flow rate at the rating point. Note that because the flow rate is normalized by beam length, the units are m\(^{3}\)/s/m (which reduces to m\(^{2}\)/s). The rating heating capacity is listed as a ``net'' heating rate but since this is not well defined in the catalog we go ahead and assume that this represents the beam heating rate where the associated cooling provided by the primary air has already been subtracted. The net heating capacity is 7411 Btu/h = 2172 W. This value need to be increased by the primary cooling provided by 55 F = 12.7 C air entering a zone at 70 F = 21 C. The catalog does not completely define the moist air state of the zone nor the primary air so we assume nominal average moist air density of 1.2 kg/m\(^{3}\) and a specific heat of 1000.0 J/kg-C so that the primary air cooling rate is (21 -- 12.7) * 0.066 * 1.2 * 1000 = 660 W. The beam heating rate is therefore 2172 + 660 = 2832 W. Then normalizing for beam length 2832/1.83 = 1548 W/m is the rated beam heating capacity.\\
+Choosing a 6 foot beam (with Nozzle type H) at 140 CFM as the rating point, we get 3726 Btu/h = 1092 W, 6 ft = 1.83 m, and 1092/1.83 = 597 W/m for normalized beam cooling capacity at rating point. The associated primary air flow rate of 140 ft\(^{3}\)/min = 0.066 m\(^{3}\)/s and 0.066/1.83 = 0.036 m\(^{2}\)/s is the normalized beam primary air flow rate at the rating point. Note that because the flow rate is normalized by beam length, the units are m\(^{3}\)/s/m (which reduces to m\(^{2}\)/s). The rating heating capacity is listed as a ``net'' heating rate but since this is not well defined in the catalog we go ahead and assume that this represents the beam heating rate where the associated cooling provided by the primary air has already been subtracted. The net heating capacity is 7411 Btu/h = 2172 W. This value need to be increased by the primary cooling provided by 55\(^{\circ}\)F = 12.7\(^{\circ}\)C air entering a zone at 70\(^{\circ}\)F = 21\(^{\circ}\)C. The catalog does not completely define the moist air state of the zone nor the primary air so we assume nominal average moist air density of 1.2 kg/m\(^{3}\) and a specific heat of 1000.0 J/kg-K so that the primary air cooling rate is (21 -- 12.7) * 0.066 * 1.2 * 1000 = 660 W. The beam heating rate is therefore 2172 + 660 = 2832 W. Then normalizing for beam length 2832/1.83 = 1548 W/m is the rated beam heating capacity.
+
 The catalog includes two more data points for capacity at different flow rates, one for 100 ft\(^{3}\)/min and the other for 180 ft\(^{3}\)/min. These are processed in the same way as the rating point data and used to create the modification curves that describe performance as a function of primary air flow rate.
 
 \subsection{Cooled Beam Unit (AirTerminal:SingleDuct:ConstantVolume:CooledBeam)}\label{cooled-beam-unit-airterminalsingleductconstantvolumecooledbeam}
@@ -912,63 +911,80 @@ Heating is accomplished separately from the cooled beam system -- usually basebo
 
 \subsubsection{Model}\label{model-3}
 
-The chilled beam system is modeled as an EnergyPlus terminal unit. In terms of configuration within the overall HVAC system it will resemble a 4 pipe induction terminal unit. The user describes the system as a typical single duct constant volume system (with outside air mixer, fan, heating and cooling coils) on the air loop side, and with cooled beam terminal units on the zone equipment side.
+The chilled beam system is modeled as an EnergyPlus terminal unit. In terms of configuration within the overall HVAC system, it resembles a 4 pipe induction terminal unit. The user describes the system as a typical single duct constant volume system (with outside air mixer, fan, heating and cooling coils) on the air loop side, and with cooled beam terminal units on the zone equipment side.
 
 The model is an empirical model developed at the equipment manufacturer Halton Oy. It consists of the following relationships.
 
-\emph{P\(_{beam}\)} = \emph{A·K·DT~~~~~~~} ~~~~~~~~~~~~~~~~~~~~~~~ beam cooling output per unit length W/m
+The beam cooling output per unit length in W/m is:
 
-\emph{K = a·DT\(^{n1}\)·vr\(^{n2}\)·w\(^{n3}\)}~~~~~~~~~~~~~~~~~~~~~~~~~~~ coil heat transfer coefficient W/(m\(^{2}\)K)
+\begin{equation}
+P_{beam} = A·K·\Delta T
+\end{equation}
 
-\emph{vr = (q\(_{in}\)}/a\emph{\(_{0}\))·r\(_{air}\)}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ room air mass flow rate across coil kg/(m\(^{2}\)s)
+The coil heat transfer coefficient in W/(m\(^{2}\)K) is:
 
-\emph{q\(_{in}\) = K\(_{1}\)·DT\(^{n}\)+K\(_{in}\)·q\(_{pr}\)}~~~~~~~~~~~~~~~~ ~~~~~~~~~~~ room air volumetric flow rate across coil per
+\begin{equation}
+K = \alpha·\Delta T^{n1}·v_{\rho}^{n2}·\omega^{n3}
+\end{equation}
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ unit length m\(^{3}\)/(s-m)
+The room air mass flow rate across coil in kg/(m\(^{2}\)s) is:
+\begin{equation}
+v_{\rho} = (q_{in} / \alpha_{0})·\rho_{air}
+\end{equation}
 
-DT is the room air --water temperature difference (average water temperature is used) in degrees C.
+The room air volumetric flow rate across coil per unit length in m\(^{3}\)/(s-m) is:
 
-w is the water velocity in m/s.
+\begin{equation}
+q_{in} = K_{1}·\Delta T^{n} + K_{in}·q_{pr}
+\end{equation}
+ 
+where:
+ 
+\(\Delta\)T is the room air--water temperature difference (average water temperature is used) in \(^{\circ}\)C
 
-q\(_{pr}\) is the supply air flow rate per unit length m\(^{3}\)/(s-m)
+\(\omega\) is the water velocity in m/s
+
+q\(_{pr}\) is the supply air flow rate per unit length m\(^{3}\)/(s-m).
 
 The other symbols are the model parameters input by the user (see the IO Ref for descriptions).
 
 \subsubsection{Inputs and Data}\label{inputs-and-data-3}
 
-The user describes the unit by inputting the name, referencing an availability schedule, and choosing a type (\emph{active} or \emph{passive}). The user must also specify the connectivity of the component by naming the inlet and outlet air and water nodes. The maximum water and fixed air flow rates need to be specified (although these can be autosized). The design inlet and outlet water temperatures are inputs. Generally the inlet water temperature is quite warm (15C is the default) and the temperature rise is small (design outlet water temperature defaults to 17C). Two key inputs are the number of beams (in the zone) and the beam length. It is generally wise to let these inputs autosize.
+The user describes the unit by inputting the name, referencing an availability schedule, and choosing a type (\emph{active} or \emph{passive}). The user must also specify the connectivity of the component by naming the inlet and outlet air and water nodes. The maximum water and fixed air flow rates need to be specified (although these can be autosized). The design inlet and outlet water temperatures are inputs. Generally the inlet water temperature is quite warm (15\(^{\circ}\)C is the default) and the temperature rise is small (design outlet water temperature defaults to 17\(^{\circ}\)C). Two key inputs are the number of beams (in the zone) and the beam length. It is generally wise to let these inputs autosize.
 
 The remaining inputs are parameters specific to the product model. Good defaults are supplied and they should not be changed without information from the manufacturer.
 
 \subsubsection{Sizing}\label{sizing}
 
-The Cooled Beam sizing calculations generally follow the procedures used for other terminal units (see \emph{Loop Equipment Sizing}). One difference is that the Cooled Beams use the Cooled Beam inputs \emph{Design Inlet Water Temperature} and \emph{Design Outlet Water Temperature} for the chilled water DT rather than the DT from Plant Sizing. There are also two inputs unique to the Cooled Beam units that are autosized and will be described here.
+The Cooled Beam sizing calculations generally follow the procedures used for other terminal units (see \emph{Loop Equipment Sizing}). One difference is that the Cooled Beams use the Cooled Beam inputs \emph{Design Inlet Water Temperature} and \emph{Design Outlet Water Temperature} for the chilled water \(\Delta\)T rather than the \(\Delta\)T from Plant Sizing. There are also two inputs unique to the Cooled Beam units that are autosized and will be described here.
 
 The input \emph{Number of individual beam units in the zone} is autosized by dividing the beam system zone design chilled water flow rate (either input by the user or autosized) by a nominal chilled water beam flow rate: 0.07 kg/s.
 
 The input \emph{Length of an individual beam unit} is autosized by using the model equations to calculate the length. The inputs to the equations are:
 
-1)~~~~the design load per beam. The design load is calculated from the design water mass flow rate and the design water inlet and outlet temperatures. The design load is divided by the number of beams to obtain the design load per beam.
-
-2)~~~~The design air supply air flow per beam -- obtained by dividing the design supply air flow by the number of beams.
-
-3)~~~~The design water flow per beam (m\(^{3}\)/s) -- obtained by dividing the design water flow by the number of beams.
-
-4)~~~~The design water velocity -- obtained by dividing the design water flow per beam by the cross sectional inside area of a water tube (pD\(^{2}\)/4, where D is the input \emph{Pipe inside diameter}.
-
-5)~~~~Average air to water \emph{DT = T\(_{z,\, cool\, peak}\)} - \emph{0.5(T\(_{w,des\, inlet}\)} \emph{+ T\(_{w,des\, outlet}\))}; where~~~~~~~ \emph{T\(_{z,\, cool\, peak}\)} is the zone air temperature at the cooling peak and the \emph{T\(_{w,des}\)} `s are the water design inlet and outlet temperatures.
+\begin{enumerate}
+\item The design load per beam. The design load is calculated from the design water mass flow rate and the design water inlet and outlet temperatures. The design load is divided by the number of beams to obtain the design load per beam.
+\item The design air supply air flow per beam -- obtained by dividing the design supply air flow by the number of beams.
+\item The design water flow per beam (m\(^{3}\)/s) -- obtained by dividing the design water flow by the number of beams.
+\item The design water velocity -- obtained by dividing the design water flow per beam by the cross sectional inside area of a water tube (\(\pi\)D\(^{2}\)/4, where D is the input \emph{Pipe inside diameter}.
+\item Average air to water \emph{\(\Delta\)T = T\(_{z,\, cool\, peak}\)} - \emph{0.5(T\(_{w,des\, inlet}\)} \emph{+ T\(_{w,des\, outlet}\))}; where \emph{T\(_{z,\, cool\, peak}\)} is the zone air temperature at the cooling peak and the \emph{T\(_{w,des}\)}'s are the water design inlet and outlet temperatures.
+\end{enumerate}
 
 With these inputs the model equations can be solve directly for beam length for passive cooled beams, and iteratively for active cooled beams.
 
 \subsubsection{Calculation}\label{calculation-3}
 
-The subroutine \emph{CalcCoolBeam} ~uses the model equations to calculate the cooling power \emph{P\(_{beams,out}\)} delivered to the room air and the outlet water temperature given the water flow rate (and the room air temperature and water inlet temperature). Since the model equations are nonlinear they must be solved iteratively. The subroutine does this by varying the outlet water temperature \emph{T\(_{w,out}\)} and calculating the water-side cooling power
+The subroutine \emph{CalcCoolBeam} uses the model equations to calculate the cooling power \emph{P\(_{beams,out}\)} delivered to the room air and the outlet water temperature given the water flow rate (and the room air temperature and water inlet temperature). Since the model equations are nonlinear they must be solved iteratively. The subroutine does this by varying the outlet water temperature \emph{T\(_{w,out}\)} and calculating the water-side cooling power:
 
-P\(_{w}\) = q\(_{w,beam}\)·c\(_{p,w}\)·(T\(_{w,out}\)-T\(_{w,in}\))
+\begin{equation}
+P_{w} = q_{w,beam}·c_{p,w}·(T_{w,out}-T_{w,in})
+\end{equation}
 
-and comparing it to the air-side cooling power
+and comparing it to the air-side cooling power:
 
-P\(_{air}\) = K·A·DT·L\(_{beam}\)
+\begin{equation}
+P_{air} = K·A·\Delta T·L_{beam}
+\end{equation}
 
 where \emph{q\(_{w,beam}\)} is the water mass flow rate (kg/s) per beam and \emph{L\(_{beam}\)} is the length of a beam (m). When \emph{P}\(_{w}\) ~and \emph{P\(_{air}\)} match to within 0.1 W the subroutine terminates the iteration.
 
@@ -976,15 +992,21 @@ where \emph{q\(_{w,beam}\)} is the water mass flow rate (kg/s) per beam and \emp
 
 From the result of the zone simulation we have the heating/cooling demand for the zone equipment. For the cooling demand, we use the load to cooling set point \emph{P\(_{c}\)}. Part of the demand may be satisfied by the zone supply air:
 
-P\(_{sup}\) = q\(_{air}\)·(c\(_{p,air,sys}\)·T\(_{sys}\) - c\(_{p,air,z}\)·T\(_{z}\))
+\begin{equation}
+P_{sup} = q_{air}·(c_{p,air,sys}·T_{sys} - c_{p,air,z}·T_{z})
+\end{equation}
 
-The demand on the actual beams is then
+The demand on the actual beams is then:
 
-P\(_{beams,dem}\) = P\(_{c}\) - P\(_{sup}\)
+\begin{equation}
+P_{beams,dem} = P_{c} - P_{sup}
+\end{equation}
 
-We want to know the chilled water flow rate that will give a beam cooling output of \emph{P\(_{beams}\)}. To obtain this we need to numerically invert \emph{CalcCoolBeam}: given its desired output, we want to know the chilled water flow rate. This numerical inversion is carried out by calling the subroutine \emph{SolveRegulaFalsi}. This is a general utility routine for finding the zero of a function (the \emph{residual} function) of a single independent variable. In this case the residual function is basically
+We want to know the chilled water flow rate that will give a beam cooling output of \emph{P\(_{beams}\)}. To obtain this we need to numerically invert \emph{CalcCoolBeam}: given its desired output, we want to know the chilled water flow rate. This numerical inversion is carried out by calling the subroutine \emph{SolveRegulaFalsi}. This is a general utility routine for finding the zero of a function (the \emph{residual} function) of a single independent variable. In this case the residual function is basically:
 
-(P\(_{beams,out}\)-P\(_{beams,dem}\))/P\(_{beams,out,max}\)
+\begin{equation}
+(P_{beams,out}-P_{beams,dem})/P_{beams,out,max}
+\end{equation}
 
 \emph{SolveRegulaFalsi} varies the cold water mass flow rate to zero the residual. The water inlet and outlet node flow rates are set to the flow rate found by \emph{SolveRegulaFalsi} and the water outlet node temperature is set to the outlet water temperature from \emph{SolveRegulaFalsi}.
 
@@ -1010,27 +1032,27 @@ The DDCAV model will attempt to meet all of the thermostatic loads of a particul
 \dot m_d = \dot m_c + \dot m_h
 \end{equation}
 
-Where:
+where:
 
-\(\dot Q_{zone}\) = Zone load, W (positive = heating, negative = cooling)
+\(\dot Q_{zone}\) is the zone load, W (positive = heating, negative = cooling)
 
-\(C{p_z}\) = Specific heat of zone air, J/kg-K
+\(C_{p,zz}\) is the specific heat of zone air, J/kg-K
 
-\(C{p_c}\) = Specific heat of cold deck air, J/kg-K
+\(C_{p,c}\) is the specific heat of cold deck air, J/kg-K
 
-\(C{p_h}\) = Specific heat of hot deck air, J/kg-K
+\(C_{p,h}\) is the specific heat of hot deck air, J/kg-K
 
-\({T_z}\) = Zone air dry-bulb temperature, °C
+\({T_z}\) is the zone air dry-bulb temperature, °C
 
-\({T_c}\) = Cold deck air dry-bulb temperature, °C
+\({T_c}\) is the cold deck air dry-bulb temperature, °C
 
-\({T_h}\) = Hot deck air dry-bulb temperature, °C
+\({T_h}\) is the hot deck air dry-bulb temperature, °C
 
-\({\dot m_d}\) = System design air mass flow rate through both heating or cooling duct, kg/s
+\({\dot m_d}\) is the system design air mass flow rate through both heating or cooling duct, kg/s
 
-\({\dot m_c}\) = Cold deck air mass flow rate, kg/s
+\({\dot m_c}\) is the cold deck air mass flow rate, kg/s
 
-\({\dot m_h}\) = Hot deck air mass flow rate, kg/s
+\({\dot m_h}\) is the hot deck air mass flow rate, kg/s.
 
 \subsubsection{Simulation and Control}\label{simulation-and-control-5}
 
@@ -1065,44 +1087,44 @@ This dual duct air terminal may also be used to provide a minimum outdoor air qu
 The simulation begins by determining the air mass flow rate required to satisfy the heating/cooling demand using either the heating duct or cooling duct.
 
 \begin{equation}
-C{p_{zone}} = \dot m\left( {C{p_{inlet}},{T_{zone}}} \right)
+C_{p,zone} = PsyCpAirFnWTdb\left( {\omega_{zone}},{T_{zone}} \right)
 \end{equation}
 
 \begin{equation}
-C{p_{zone}} = PsyCpAirFnWTdb\left( {{T_{zone}},{T_{inlet}}} \right)
+C_{p,inlet} = PsyCpAirFnWTdb\left( {\omega_{inlet}},{T_{inlet}} \right)
 \end{equation}
 
 \begin{equation}
-DeltaCpT = \left( {C{p_{inlet}}} \right)\left( {{T_{inlet}}} \right) - \left( {C{p_{zone}}} \right)\left( {{T_{zone}}} \right)
+\Delta C_p T = \left( {C_{p,inlet}} \right)\left( {{T_{inlet}}} \right) - \left( {C_{p,zone}} \right)\left( {{T_{zone}}} \right)
 \end{equation}
 
 \begin{equation}
-\dot m = \min \left( \dot m_{max}, \max \left( \dot m_{max}\cdot MinAirFlowFrac,\frac{\dot Q_{zone}}{DeltaCpT} \right) \right)
+\dot m = \min \left( \dot m_{max}, \max \left( \dot m_{max}\cdot MinAirFlowFrac,\frac{\dot Q_{zone}}{\Delta C_p T} \right) \right)
 \end{equation}
 
 where
 
-\(C{p_{zone}}\) ~ = Specific heat of zone air, J/kg-K
+\(C_{p,zone}\) is the specific heat of zone air, J/kg-K
 
-\(C{p_{inlet}}\) ~ = Specific heat of terminal unit inlet air, J/kg-K
+\(C_{p,inlet}\) is the specific heat of terminal unit inlet air, J/kg-K
 
-\({\omega_{zone}}\) ~~~ = Zone air humidity ratio, kg/kg
+\({\omega_{zone}}\) is the zone air humidity ratio, kg/kg
 
-\({T_{zone}}\) ~~~~ = Zone air dry-bulb temperature, °C
+\({T_{zone}}\) is the zone air dry-bulb temperature, °C
 
-\({\omega_{inlet}}\) ~~~ = Terminal unit inlet air humidity ratio, kg/kg
+\({\omega_{inlet}}\) is the terminal unit inlet air humidity ratio, kg/kg
 
-\({T_{inlet}}\) ~~~~ = Terminal unit inlet air dry-bulb temperature, °C
+\({T_{inlet}}\) is the terminal unit inlet air dry-bulb temperature, °C
 
-\(\dot m\) ~~~ = Zone load, W (positive values denote heating, negative values denote cooling)
+\(\dot Q_{zone}\) is the zone load, W (positive values denote heating, negative values denote cooling)
 
-\(PsyCpAirFnWTdb\) ~~~~~~~ = Terminal unit air mass flow rate through either heating or cooling duct, kg/s
+\(\dot m\) is the terminal unit air mass flow rate through either heating or cooling duct, kg/s
 
-\(MinAirFlowFrac\) ~~~~~~~~~~ = Psychrometric function calculating air specific heat given air humidity ratio and dry-bulb temperature
+\(PsyCpAirFnWTdb\) is the psychrometric function calculating air specific heat given air humidity ratio and dry-bulb temperature
 
-\(MinAirFlowFrac\) ~~~ = User-specified zone minimum air flow fraction
+\(MinAirFlowFrac\) is the user-specified zone minimum air flow fraction
 
-\({\dot m_{max}}\) ~~~~~~~~~~~~~ = Terminal unit maximum air mass flow rate, kg/s
+\({\dot m_{max}}\) is the terminal unit maximum air mass flow rate, kg/s.
 
 The outdoor air input requirements, if entered, are then used to adjust the terminal unit air mass flow rate to ensure the correct amount of outdoor air enters the zone (within the constraints of the terminal unit maximum and minimum flow rate inputs). The amount of outdoor air is calculated per the outdoor air requirements and is adjusted by the fraction of outdoor air entering the air loop outdoor air system.
 
@@ -1112,9 +1134,9 @@ The outdoor air input requirements, if entered, are then used to adjust the term
 
 where:
 
-\({\mathop m\limits^\cdot_{OA}}\) ~ = zone outdoor air flow rate, kg/s
+\(\dot m_{OA}\) is the zone outdoor air flow rate, kg/s
 
-\(OAFrac\) ~ = fraction of outdoor air entering the air loop outside air system
+\(OAFrac\) is the fraction of outdoor air entering the air loop outside air system.
 
 The damper position is then calculated as:
 
@@ -1122,9 +1144,7 @@ The damper position is then calculated as:
   FRAC_{damper} = \frac{\dot{m}}{\dot{m}_{max}}
 \end{equation}
 
-where
-
-\(FRA{C_{damper}}\) ~ = Output variable `Zone Air Terminal VAV Damper Position', fraction of maximum flow
+where \(FRA{C_{damper}}\) is the output variable `Zone Air Terminal VAV Damper Position' in fraction of maximum flow.
 
 If the flow rate was between the maximum flow rate and the minimum flow rate for the terminal unit, then no other calculations are needed.~ However, if the flow was reset to either the maximum or minimum flow rate, then flow through the active duct must be balanced by flow through the other duct to achieve the proper conditioning.
 
@@ -1160,55 +1180,53 @@ The recirculated cool air flow rate is controlled to meet the zone cooling loads
 {c_{p,RC}} = PsyCpAirFnWTdb\left( {{\omega_{RC}},{T_{RC}}} \right)
 \end{equation}
 
-where,
+where:
 
-\(c_{p,zone}\) = \$ ~specific heat of zone air being served by the terminal unit, J/kg-K
+\(c_{p,zone}\) is the specific heat of zone air being served by the terminal unit, J/kg-K
 
-\(c_{p,OA}\) = \$ ~specific heat of outdoor air entering the terminal unit, J/kg-K
+\(c_{p,OA}\) is the specific heat of outdoor air entering the terminal unit, J/kg-K
 
-\(c_{p,RC}\) = \$ ~specific heat of the recirculated (cool) air entering the terminal unit (if present), J/kg-K
+\(c_{p,RC}\) is the specific heat of the recirculated (cool) air entering the terminal unit (if present), J/kg-K
 
-\(\omega_{zone}\) = \$ humidity ratio of the zone air, kg/kg
+\(\omega_{zone}\) is the humidity ratio of the zone air, kg/kg
 
-\(\omega_{OA}\) = \$ humidity ratio of the outdoor air entering the terminal unit, kg/kg
+\(\omega_{OA}\) is the humidity ratio of the outdoor air entering the terminal unit, kg/kg
 
-\(\omega_{RC}\) = \$ humidity ratio of the recirculated air entering the terminal unit, kg/kg
+\(\omega_{RC}\) is the humidity ratio of the recirculated air entering the terminal unit, kg/kg
 
-\(T_{zone}\) = \$ air drybulb temperature of the zone, ºC
+\(T_{zone}\) is the air drybulb temperature of the zone, \(^{\circ}\)C
 
-\(T_{OA}\) = \$ air drybulb temperature of the outdoor air entering the terminal unit, ºC
+\(T_{OA}\) is the air drybulb temperature of the outdoor air entering the terminal unit, \(^{\circ}\)C
 
-\(T_{RC}\) = \$ air drybulb temperature of the recirculated cool air entering the terminal unit, ºC
+\(T_{RC}\) is the air drybulb temperature of the recirculated cool air entering the terminal unit, \(^{\circ}\)C
 
-\(PsyCpAirFnWTdb\) ~is a psychrometric function for calculating the specific heat of moist air as a function of humidity ratio and drybulb temperature.
+\(PsyCpAirFnWTdb\) is a psychrometric function for calculating the specific heat of moist air as a function of humidity ratio and drybulb temperature.
 
-The contribution to zone load provided by the outdoor air toward meeting the cooling setpoint, \({\dot Q_{OA}}\) ~(W), is then calculated using:
+The contribution to zone load provided by the outdoor air toward meeting the cooling setpoint, \({\dot Q_{OA}}\) (W), is then calculated using:
 
 \begin{equation}
 {\dot Q_{OA}} = {\dot m_{OA}}\left( {{c_{p,OA}}{T_{OA}} - {c_{p,zone}}{T_{zonesetpoint}}} \right)
 \end{equation}
 
-where,
+where:
 
-$\dot{m}_{OA} =$ is the mass flow rate of outdoor air determined by the outdoor air requirement, kg/s
+\(\dot{m}_{OA}\) is the mass flow rate of outdoor air determined by the outdoor air requirement, kg/s
 
-$T_{zonesetpoint} =$ is the zone cooling setpoint drybulb temperature, ºC
+\(T_{zonesetpoint}\) is the zone cooling setpoint drybulb temperature, \(^{\circ}\)C.
 
-This is then used to calculate the load that the recirculated cool air should deliver, \({Q_{RC}}\) ~(W):
+This is then used to calculate the load that the recirculated cool air should deliver, \({Q_{RC}}\) (W):
 
 \begin{equation}
 {\dot Q_{RC}} = {\dot Q_{ToCoolSetpointRemain - }}{\dot Q_{OA}}
 \end{equation}
 
-where,
-
-\({\dot Q_{ToCoolSetpointRemain = }}\) ~is the remaining load to cooling setpoint as determined by Predictor and including the impacts of any other zone equipment sequenced before this terminal. Then the recirculated cool air mass flow rate, \({\dot m_{RC}}\) ~(kg/s), is calculated using:
+where \({\dot Q_{ToCoolSetpointRemain = }}\) is the remaining load to cooling setpoint as determined by Predictor and including the impacts of any other zone equipment sequenced before this terminal. Then the recirculated cool air mass flow rate, \({\dot m_{RC}}\) (kg/s), is calculated using:
 
 \begin{equation}
 {\dot m_{RC}} = \frac{{{{\dot Q}_{RC}}}}{{\left( {{c_{p,RC}}{T_{RC}} - {c_{p,zone}}{T_{zone}}} \right)}}
 \end{equation}
 
-The model also includes a form of damping where the last three values for \({\dot m_{RC}}\) ~are stored and used to detect if the solution is oscillating from one iteration to the next and if it is then the new value is not used but rather the value from the previous iteration is used.~ Once the two mass flows are known, the moist air properties of the outlet node are calculated using mass flow weighting.
+The model also includes a form of damping where the last three values for \({\dot m_{RC}}\) are stored and used to detect if the solution is oscillating from one iteration to the next and if it is then the new value is not used but rather the value from the previous iteration is used.~ Once the two mass flows are known, the moist air properties of the outlet node are calculated using mass flow weighting.
 
 \subsubsection{References}\label{references-6}
 

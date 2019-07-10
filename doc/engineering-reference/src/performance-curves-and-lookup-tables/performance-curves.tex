@@ -12,7 +12,7 @@ A polynomial in two independent variables (multi-variate) is given by:
 z = {a_{00}} + {a_{10}}x + {a_{01}}y + {a_{11}}xy + {a_{21}}{x^2}y + {a_{12}}x{y^2} + {a_{22}}{x^2}{y^2}... + {a_{nm}}{x^n}{y^m}
 \end{equation}
 
-In Energyplus, the result of an equation, the dependent variable, represents the response a system or component has given an input (the independent variable) to the system or component model. This response represents the equipment performance related to the mechanism that causes this change (e.g., the change in capacity or power based on a conditional change in temperature, part-load ratio, or other phenomenon). A variety of performance curves are available to describe the most common forms of engineering equations. The coefficients (a-z) in the following equations are entered in the associated curve object to define a specific phenomenon. Minimum and maximum limits may be applied to both the independent and the dependent variables as necessary.
+In EnergyPlus, the result of an equation, the dependent variable, represents the response a system or component has given an input (the independent variable) to the system or component model. This response represents the equipment performance related to the mechanism that causes this change (e.g., the change in capacity or power based on a conditional change in temperature, part-load ratio, or other phenomenon). A variety of performance curves are available to describe the most common forms of engineering equations. The coefficients (a-z) in the following equations are entered in the associated curve object to define a specific phenomenon. Minimum and maximum limits may be applied to both the independent and the dependent variables as necessary.
 
 \subsection{Curves based on a single independent variable}\label{curves-based-on-a-single-independent-variable}
 
@@ -100,18 +100,18 @@ Calulating performance curve coefficients in a spreadsheet is a simple matter of
 TotCapTempModFac = a + b\left( {{T_{wb,i}}} \right) + c{\left( {{T_{wb,i}}} \right)^2} + d\left( {{T_{c,i}}} \right) + e{\left( {{T_{c,i}}} \right)^2} + f\left( {{T_{wb,i}}} \right)\left( {{T_{c,i}}} \right)
 \end{equation}
 
-where
+where:
 
-Twb,i = wet-bulb temperature of the air entering the cooling coil, °C
+\(T_{wb,i}\) is the wet-bulb temperature of the air entering the cooling coil (\(^{\circ}\)C)
 
-Tc,i (or Tdb,i) = dry-bulb temperature of the air entering an air-cooled condenser, °C
+\(T_{c,i}\) (or \(T_{db,i}\)) is the dry-bulb temperature of the air entering an air-cooled condenser (\(^{\circ}\)C).
 
-Given the data set shown in the table below, each of the independent variables would be calculated according to the fundamental equation above (i.e., the T, T\(^{2}\), and cross-product terms would be multiplied out). The data would be converted to degrees celcius and the cooling capacity would be converted to Watts. The data would also be normalized using the ARI rating point shown as highlighted in the table.
+Given the data set shown in Figure~\ref{fig:dx-cooling-data-table}, each of the independent variables would be calculated according to the fundamental equation above (i.e., the T, T\(^{2}\), and cross-product terms would be multiplied out). The data would be converted to degrees celcius and the cooling capacity would be converted to Watts. The data would also be normalized using the ARI rating point shown as highlighted in Figure~\ref{fig:dx-cooling-data-normalized}.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/image7865.png}
-\caption{DataTable}
+\caption{Data Table for Example \protect \label{fig:dx-cooling-data-table}}
 \end{figure}
 
 The fundamental equation would be used to determine the number of independent variables and also the form of the equation. Given the example described here, the spreadsheet would be set up to look like the equation as shown in the following table. A regression analysis could then be performed on the data set. The first five columns are the independent variables and the last column is the dependent variable. A spreadsheet tool is selected to perform the regression analysis, and the coefficients are calculated and displayed in the spreadsheet.
@@ -119,7 +119,7 @@ The fundamental equation would be used to determine the number of independent va
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/image7866.png}
-\caption{RegressionAnalysis}
+\caption{Regression Analysis for Example \protect \label{fig:dx-cooling-data-normalized}}
 \end{figure}
 
 The regression analysis and summary statistical output is shown below. The equation coefficients are shown highlighted. In this example, the equation coefficents are: a = 0.757382, b = 0.014666, c = 0.000459, d = -0.00095, e = -6.7E-05, and f = -0.00015. These coefficients would be entered in a Curve:BiQuadratic object and used to describe the cooling capacity as a function of temperature for the DX cooling coil model. Minimum and Maximum values from the tabular data are entered as Min/Max values for the curve object. The values may be relaxed slightly with care to allow extrapolation as needed. A performance table may be used to automatically perform the regression analysis as described in the following section.
@@ -127,7 +127,7 @@ The regression analysis and summary statistical output is shown below. The equat
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/image7867.png}
-\caption{RegressionSummaryOutput}
+\caption{Regression Summary Output for Example}
 \end{figure}
 
 \begin{lstlisting}
@@ -161,7 +161,7 @@ A performance curve having an order or degree of 2 in three independent variable
 
 \begin{equation}
 \begin{array}{ll}
-Output &= a + bx^2 + cx + dy^2 + ey + fz^2 + gz + hx^2y^2 + ixy + jxy^2 + kx^2y \\
+Output =& a + bx^2 + cx + dy^2 + ey + fz^2 + gz + hx^2y^2 + ixy + jxy^2 + kx^2y \\
        &+ lx^2z^2 + mxz + nxz^2 + ox^2z + py^2z^2 + qyz + ryz^2 + sy^2z + tx^2y^2z^2 \\
        &+ ux^2y^2z + ux^2yz^2 + vxy^2z^2 + wx^2yz + x\PB{xy^2z} + y\PB{xyz^2} + z\PB{xyz}
 \end{array}

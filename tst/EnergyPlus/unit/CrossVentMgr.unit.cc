@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,7 +54,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
-#include <EnergyPlus/DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -84,11 +84,11 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
     AirflowNetworkSurfaceUCSDCV(0, 1) = 1;
     AirflowNetworkSurfaceUCSDCV(0, 2) = 2;
 
-    EnergyPlus::DataAirflowNetwork::MultizoneSurfaceData.allocate(MaxSurf);
-    EnergyPlus::DataAirflowNetwork::MultizoneSurfaceData(1).SurfNum = 6;
-    EnergyPlus::DataAirflowNetwork::MultizoneSurfaceData(1).OpenFactor = 1.;
-    EnergyPlus::DataAirflowNetwork::MultizoneSurfaceData(2).SurfNum = 9;
-    EnergyPlus::DataAirflowNetwork::MultizoneSurfaceData(2).OpenFactor = 1.;
+    EnergyPlus::AirflowNetwork::MultizoneSurfaceData.allocate(MaxSurf);
+    EnergyPlus::AirflowNetwork::MultizoneSurfaceData(1).SurfNum = 6;
+    EnergyPlus::AirflowNetwork::MultizoneSurfaceData(1).OpenFactor = 1.;
+    EnergyPlus::AirflowNetwork::MultizoneSurfaceData(2).SurfNum = 9;
+    EnergyPlus::AirflowNetwork::MultizoneSurfaceData(2).OpenFactor = 1.;
 
     EnergyPlus::DataSurfaces::Surface.allocate(10);
     EnergyPlus::DataSurfaces::Surface(6).Zone = 1;
@@ -115,24 +115,24 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
     EnergyPlus::DataHeatBalance::Zone(1).Volume = 996.75300003839993;
     EnergyPlus::DataHeatBalance::Zone(1).FloorArea = 297.28972800000003;
 
-    EnergyPlus::DataAirflowNetwork::AirflowNetworkLinkSimu.allocate(1);
-    EnergyPlus::DataAirflowNetwork::AirflowNetworkLinkSimu(1).VolFLOW2 = 27.142934345451458;
+    EnergyPlus::AirflowNetwork::AirflowNetworkLinkSimu.allocate(1);
+    EnergyPlus::AirflowNetwork::AirflowNetworkLinkSimu(1).VolFLOW2 = 27.142934345451458;
 
     EnergyPlus::DataEnvironment::WindDir = 271.66666666666669;
 
     EnergyPlus::DataRoomAirModel::AirModel.allocate(NumOfZones);
 
-    EnergyPlus::DataAirflowNetwork::AirflowNetworkLinkageData.allocate(2);
-    EnergyPlus::DataAirflowNetwork::AirflowNetworkLinkageData(1).CompNum = 1;
-    EnergyPlus::DataAirflowNetwork::AirflowNetworkLinkageData(2).CompNum = 1;
+    EnergyPlus::AirflowNetwork::AirflowNetworkLinkageData.allocate(2);
+    EnergyPlus::AirflowNetwork::AirflowNetworkLinkageData(1).CompNum = 1;
+    EnergyPlus::AirflowNetwork::AirflowNetworkLinkageData(2).CompNum = 1;
 
-    EnergyPlus::DataAirflowNetwork::AirflowNetworkCompData.allocate(3);
-    EnergyPlus::DataAirflowNetwork::AirflowNetworkCompData(1).TypeNum = 1;
-    EnergyPlus::DataAirflowNetwork::AirflowNetworkCompData(1).CompTypeNum = 1;
-    EnergyPlus::DataAirflowNetwork::AirflowNetworkCompData(2).TypeNum = 1;
-    EnergyPlus::DataAirflowNetwork::AirflowNetworkCompData(2).CompTypeNum = 3;
-    EnergyPlus::DataAirflowNetwork::AirflowNetworkCompData(3).TypeNum = 2;
-    EnergyPlus::DataAirflowNetwork::AirflowNetworkCompData(3).CompTypeNum = 2;
+    EnergyPlus::AirflowNetwork::AirflowNetworkCompData.allocate(3);
+    EnergyPlus::AirflowNetwork::AirflowNetworkCompData(1).TypeNum = 1;
+    EnergyPlus::AirflowNetwork::AirflowNetworkCompData(1).CompTypeNum = 1;
+    EnergyPlus::AirflowNetwork::AirflowNetworkCompData(2).TypeNum = 1;
+    EnergyPlus::AirflowNetwork::AirflowNetworkCompData(2).CompTypeNum = 3;
+    EnergyPlus::AirflowNetwork::AirflowNetworkCompData(3).TypeNum = 2;
+    EnergyPlus::AirflowNetwork::AirflowNetworkCompData(3).CompTypeNum = 2;
 
     EnergyPlus::DataRoomAirModel::SurfParametersCVDV.allocate(2);
     EnergyPlus::DataRoomAirModel::SurfParametersCVDV(1).Width = 22.715219999999999;

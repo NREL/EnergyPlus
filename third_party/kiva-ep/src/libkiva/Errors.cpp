@@ -1,5 +1,5 @@
-/* Copyright (c) 2012-2017 Big Ladder Software LLC. All rights reserved.
-* See the LICENSE file for additional terms and conditions. */
+/* Copyright (c) 2012-2018 Big Ladder Software LLC. All rights reserved.
+ * See the LICENSE file for additional terms and conditions. */
 
 #include <iostream>
 
@@ -8,22 +8,14 @@
 namespace Kiva {
 
 KivaCallbackFunction kivaCallbackFunction;
-void* messageCallbackContextPtr;
+void *messageCallbackContextPtr;
 
-void setMessageCallback(
-  KivaCallbackFunction callBackFunction,
-  void* contextPtr
-)
-{
+void setMessageCallback(KivaCallbackFunction callBackFunction, void *contextPtr) {
   kivaCallbackFunction = callBackFunction;
   messageCallbackContextPtr = contextPtr;
 }
 
-void showMessage(
-  const int messageType,
-  const std::string message
-)
-{
+void showMessage(const int messageType, const std::string message) {
   if (kivaCallbackFunction != NULL) {
     (*kivaCallbackFunction)(messageType, message, messageCallbackContextPtr);
   } else {
@@ -38,4 +30,4 @@ void showMessage(
   }
 }
 
-}
+} // namespace Kiva

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1343,12 +1343,12 @@ namespace UnitVentilator {
                                         UnitVent(UnitVentNum).HWLoopSide,
                                         UnitVent(UnitVentNum).HWBranchNum,
                                         UnitVent(UnitVentNum).HWCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowContinueError("Reference Unit=\"" + UnitVent(UnitVentNum).Name + "\", type=ZoneHVAC:UnitVentilator");
                     ShowFatalError("InitUnitVentilator: Program terminated due to previous condition(s).");
@@ -1369,12 +1369,12 @@ namespace UnitVentilator {
                                         UnitVent(UnitVentNum).CWLoopSide,
                                         UnitVent(UnitVentNum).CWBranchNum,
                                         UnitVent(UnitVentNum).CWCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowContinueError("Reference Unit=\"" + UnitVent(UnitVentNum).Name + "\", type=ZoneHVAC:UnitVentilator");
                     ShowFatalError("InitUnitVentilator: Program terminated due to previous condition(s).");
@@ -1732,8 +1732,19 @@ namespace UnitVentilator {
         }
 
         if (CurZoneEqNum > 0) {
-
             if (UnitVent(UnitVentNum).HVACSizingIndex > 0) {
+
+                // initialize OA flow for sizing other inputs (e.g., inlet temp, capacity, etc.)
+                if (UnitVent(UnitVentNum).OutAirVolFlow == AutoSize) {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
+                } else {
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = UnitVent(UnitVentNum).OutAirVolFlow;
+                }
+                if (UnitVent(UnitVentNum).ATMixerExists) {      // set up ATMixer conditions for scalable capacity sizing
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+                    SingleDuct::setATMixerSizingProperties(UnitVent(UnitVentNum).ATMixerIndex, UnitVent(UnitVentNum).ZonePtr, CurZoneEqNum);
+                }
+
                 zoneHVACIndex = UnitVent(UnitVentNum).HVACSizingIndex;
                 // N1 , \field Maximum Supply Air Flow Rate
                 FieldNum = 1;
@@ -2004,6 +2015,12 @@ namespace UnitVentilator {
                         }
                     }
                 }
+            }
+            ZoneEqSizing(CurZoneEqNum).OAVolFlow = UnitVent(UnitVentNum).OutAirVolFlow;
+
+            if (UnitVent(UnitVentNum).ATMixerExists) {      // set up ATMixer conditions for use in component sizing
+                ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+                SingleDuct::setATMixerSizingProperties(UnitVent(UnitVentNum).ATMixerIndex, UnitVent(UnitVentNum).ZonePtr, CurZoneEqNum);
             }
         }
 

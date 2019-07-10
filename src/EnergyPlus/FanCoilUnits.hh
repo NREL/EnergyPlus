@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -307,19 +307,12 @@ namespace FanCoilUnits {
 
     void GetFanCoilUnits();
 
-    void InitFanCoilUnits(int const FanCoilNum, // number of the current fan coil unit being simulated
-                          int const ZoneNum     // number of zone being served
-    );
+    void InitFanCoilUnits(int const FanCoilNum,         // number of the current fan coil unit being simulated
+                          int const ZoneNum,            // number of zone being served
+                          int const ControlledZoneNum); // index into ZoneEquipConfig array; may not be equal to ZoneNum
 
-    void SizeFanCoilUnit(int const FanCoilNum);
-
-    void SizeCoilWaterFlowRate(std::string const &WaterCoilType,
-                               std::string const &WaterCoilName,
-                               int const WaterCoilType_Num,
-                               int const WLoopNum,
-                               Real64 &MaxWaterVolFlowDes,
-                               Real64 &DesignLoad,
-                               bool &ErrorsFound);
+    void SizeFanCoilUnit(int const FanCoilNum,
+                         int const ControlledZoneNum); // index into ZoneEquipConfig array; may not be equal to ZoneNum
 
     void Sim4PipeFanCoil(int &FanCoilNum,               // number of the current fan coil unit being simulated
                          int const ZoneNum,             // number of zone being served
