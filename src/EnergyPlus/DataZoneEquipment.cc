@@ -597,7 +597,7 @@ namespace DataZoneEquipment {
                     if ((thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) < 0) ||
                         (thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) > thisZoneEquipList.NumOfEquipTypes)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
-                        ShowContinueError("invalid " + cNumericFields(2 * ZoneEquipTypeNum - 1) + "=[" +
+                        ShowContinueError("invalid " + cNumericFields(4 * ZoneEquipTypeNum - 3) + "=[" +
                                           RoundSigDigits(thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum)) + "].");
                         ShowContinueError("equipment sequence must be > 0 and <= number of equipments in the list.");
                         if (thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) > 0)
@@ -609,7 +609,7 @@ namespace DataZoneEquipment {
                     if ((thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) < 0) ||
                         (thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) > thisZoneEquipList.NumOfEquipTypes)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
-                        ShowContinueError("invalid " + cNumericFields(2 * ZoneEquipTypeNum) + "=[" +
+                        ShowContinueError("invalid " + cNumericFields(4 * ZoneEquipTypeNum - 2) + "=[" +
                                           RoundSigDigits(thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum)) + "].");
                         ShowContinueError("equipment sequence must be > 0 and <= number of equipments in the list.");
                         if (thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) > 0)
@@ -750,7 +750,7 @@ namespace DataZoneEquipment {
                         GetZoneEquipmentDataErrorsFound = true;
                     } else if (count_eq(thisZoneEquipList.CoolingPriority, ZoneEquipTypeNum) == 0) {
                         ShowWarningError(RoutineName + CurrentModuleObject + " = " + thisZoneEquipList.Name);
-                        ShowContinueError("...zero assignments for Zone Equipment Cooling Sequence=" + RoundSigDigits(ZoneEquipTypeNum) +
+                        ShowContinueError("...zero assigned to Zone Equipment Cooling Sequence=" + RoundSigDigits(ZoneEquipTypeNum) +
                                           ", apparent gap in sequence assignments in this equipment list.");
                     }
                     if (count_eq(thisZoneEquipList.HeatingPriority, ZoneEquipTypeNum) > 1) {
@@ -761,7 +761,7 @@ namespace DataZoneEquipment {
                         GetZoneEquipmentDataErrorsFound = true;
                     } else if (count_eq(thisZoneEquipList.HeatingPriority, ZoneEquipTypeNum) == 0) {
                         ShowWarningError(RoutineName + CurrentModuleObject + " = " + thisZoneEquipList.Name);
-                        ShowContinueError("...zero assignments for Zone Equipment Heating or No-Load Sequence=" + RoundSigDigits(ZoneEquipTypeNum) +
+                        ShowContinueError("...zero assigned to Zone Equipment Heating or No-Load Sequence=" + RoundSigDigits(ZoneEquipTypeNum) +
                                           ", apparent gap in sequence assignments in this equipment list.");
                     }
                 }
