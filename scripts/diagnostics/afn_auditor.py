@@ -60,6 +60,16 @@ class AFN_Auditor(auditor.Auditor):
         self.wpcs = {}
         self.refconds = {}
         self.afes = {}
+        self.relative_geometry = False
+        self.vertex_ccw = True
+        # Figure out what is what
+        if 'GlobalGeometryRules' in self.model:
+            obj = next(iter(self.model['GlobalGeometryRules'].values()))
+            if 'coordinate_system' in obj:
+                if obj['coordinate_system'] == 'Relative':
+                    self.relative_geometry = True
+            if 'vertex_entry_direction' == 'ClockWise':
+                self.vertex_ccw = False
         if self.__extract():
             self.__connect_multizone()
     def __extract(self):
@@ -132,14 +142,22 @@ class AFN_Auditor(auditor.Auditor):
             fp.write('%s -- %s\n' % (surf.nodes[0]['display_name'],
                                      surf.nodes[1]['display_name']))
         fp.write('}\n')
+    def __compute_azimuths(self):
+        if self.relative_geometry:
+            for surf in self.surfs:
+                htsurf = self.model['BuildingSurface:Detailed'][surf['building_surface_name']]
+                
+            
     def __connect_multizone(self):
         # Link surfaces to nodes, need to automate this better at some point
         for name, node in self.nodes.items():
             node['link_count'] = 0
             node['external_connections'] = 0
+            node['neighbors'] = {}
 
         for name, node in self.external_nodes.items():
             node['link_count'] = 0
+            node['neighbors'] = {}
 
         heat_transfer_surface_names = ['BuildingSurface:Detailed',
                                        'FenestrationSurface:Detailed']
@@ -178,6 +196,14 @@ class AFN_Auditor(auditor.Auditor):
                         afnzone = node
                         node['link_count'] += 1
                         node['external_connections'] += 1
+                        if surf['external_node_name'] in node['neighbors']:
+                            node['neighbors'][surf['external_node_name']] += 1
+                        else:
+                            node['neighbors'][surf['external_node_name']] = 1
+                        if zone_name in external_node['neighbors']:
+                            external_node['neighbors'][zone_name] += 1
+                        else:
+                            external_node['neighbors'][zone_name] = 1
                         break
                 if afnzone == None:
                     raise 'Blam!'
@@ -195,16 +221,25 @@ class AFN_Auditor(auditor.Auditor):
                     raise 'Blam!1'
                 linked_nodes = [afnzone]
                 adjhtsurf = htsurfs[htsurf['outside_boundary_condition_object']]
-                zone_name = adjhtsurf['zone_name']
-                afnzone = None
+                adj_zone_name = adjhtsurf['zone_name']
+                adj_afnzone = None
                 for name,node in self.nodes.items():
-                    if node['zone_name'] == zone_name:
-                        afnzone = node
+                    if node['zone_name'] == adj_zone_name:
+                        adj_afnzone = node
                         node['link_count'] += 1
                         break
-                if afnzone == None:
+                if adj_afnzone == None:
                     raise 'Blam!2'
-                linked_nodes.append(afnzone)
+                linked_nodes.append(adj_afnzone)
+                if adj_zone_name in afnzone['neighbors']:
+                    afnzone['neighbors'][adj_zone_name] += 1
+                else:
+                    afnzone['neighbors'][adj_zone_name] = 1
+                if zone_name in adj_afnzone['neighbors']:
+                    adj_afnzone['neighbors'][zone_name] += 1
+                else:
+                    adj_afnzone['neighbors'][zone_name] = 1
+                
             surf['nodes'] = linked_nodes
         return True
     def audit(self, **kwargs):
