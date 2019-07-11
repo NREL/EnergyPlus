@@ -53,7 +53,7 @@ endif()
 find_package(OpenGL)
 if(NOT OPENGL_FOUND)
   set(CMAKE_VERSION_BUILD "${CMAKE_VERSION_BUILD} (No OpenGL)" CACHE STRING "Build number" FORCE) # git sha
-  message(WARNING "OpenGL libraries were not found! EnergyPlus will be compiled without Pixel Counting functionality for shading calculations!")
+  message(WARNING "OpenGL libraries were not found. EnergyPlus will be compiled without GPU acceleration capabilities.")
 endif()
 
 # Set a default build type if none was specified
@@ -150,7 +150,9 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
 INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/CLI/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/eigen/ )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/penumbra/include )
+if( OPENGL_FOUND )
+  INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/penumbra/include )
+endif()
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Chromogenics/include)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Common/include)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Gases/include)
@@ -166,7 +168,11 @@ INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/src/EnergyPlus)  # so that any source c
 # target_include_directories( ModernJSON INTERFACE "${CMAKE_SOURCE_DIR}/third_party/nlohmann" "${CMAKE_SOURCE_DIR}/third_party/doj" )
 
 set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
-set(BUILD_PENUMBRA_TESTING ${BUILD_TESTING} CACHE BOOL "" FORCE)
+
+
+if( OPENGL_FOUND )
+  set(BUILD_PENUMBRA_TESTING ${BUILD_TESTING} CACHE BOOL "" FORCE)
+endif()
 
 if( BUILD_TESTING )
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -199,7 +205,9 @@ endif()
 # Kiva
 INCLUDE(third_party/cmake/kiva.cmake)
 
-ADD_SUBDIRECTORY(third_party/penumbra)
+if( OPENGL_FOUND )
+  ADD_SUBDIRECTORY(third_party/penumbra)
+endif()
 
 execute_process( COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${CMAKE_SOURCE_DIR}" TIMEOUT 30 RESULT_VARIABLE generate_epJSON_schema_result)
 if( ${generate_epJSON_schema_result} MATCHES ".*timeout.*" )
