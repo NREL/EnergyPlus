@@ -129,9 +129,8 @@ namespace AirLoopHVACDOAS {
         numAirLoopDOAS = 0;
     }
 
-    void AirLoopDOAS::SimAirLoopHVACDOAS(std::string const &Name, bool const FirstHVACIteration, int &CompIndex)
+    void AirLoopDOAS::SimAirLoopHVACDOAS(bool const FirstHVACIteration, int &CompIndex)
     {
-        static bool SizingOnceFlag(true);
 
         // Obtains and Allocates unitary system related parameters from input file
         if (GetInputOnceFlag) {
@@ -1269,7 +1268,7 @@ namespace AirLoopHVACDOAS {
         }
     }
 
-    void AirLoopHVACDOAS::CheckConvergence()
+    void CheckConvergence()
     {
 
         Real64 maxDiff;

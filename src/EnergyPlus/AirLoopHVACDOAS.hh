@@ -186,7 +186,7 @@ namespace AirLoopHVACDOAS {
 
         static void getAirLoopDOASInput();
 
-        void SimAirLoopHVACDOAS(std::string const &Name, bool const firstHVACIteration, int &CompIndex);
+        void SimAirLoopHVACDOAS(bool const firstHVACIteration, int &CompIndex);
 
         void initAirLoopDOAS(bool const FirstHVACIteration);
 

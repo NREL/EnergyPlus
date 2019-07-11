@@ -2641,7 +2641,7 @@ namespace SimAirServingZones {
                 } else {
                     index = -1;
                 }
-                thisAirLoopDOASObjec->SimAirLoopHVACDOAS(thisAirLoopDOASObjec->Name, FirstHVACIteration, index);
+                thisAirLoopDOASObjec->SimAirLoopHVACDOAS(FirstHVACIteration, index);
                 OAMassFLowrate += thisAirLoopDOASObjec->SumMassFlowRate;
             }
 
