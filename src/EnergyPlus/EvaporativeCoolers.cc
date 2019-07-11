@@ -5032,6 +5032,79 @@ namespace EvaporativeCoolers {
         CheckZoneEvapUnitName.clear();
     }
 
+    int GetInletNodeNum(std::string const &EvapCondName,
+        bool &ErrorsFound
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given EvapCond and returns the air inlet node number.
+        // If incorrect EvapCond name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichEvapCond;
+
+        if (GetInputEvapComponentsFlag) { // First time subroutine has been entered
+            GetEvapInput();
+            GetInputEvapComponentsFlag = false;
+        }
+
+        WhichEvapCond = UtilityRoutines::FindItemInList(EvapCondName, EvapCond, &EvapConditions::EvapCoolerName, NumEvapCool);
+        if (WhichEvapCond != 0) {
+            NodeNum = EvapCond(WhichEvapCond).InletNode;
+        } else {
+            ShowSevereError("GetInletNodeNum: Could not find EvaporativeCooler = \"" + EvapCondName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
+    }
+
+    int GetOutletNodeNum(std::string const &EvapCondName,
+        bool &ErrorsFound
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given EvapCond and returns the air outlet node number.
+        // If incorrect EvapCond name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichEvapCond;
+
+        if (GetInputEvapComponentsFlag) { // First time subroutine has been entered
+            GetEvapInput();
+            GetInputEvapComponentsFlag = false;
+        }
+        WhichEvapCond = UtilityRoutines::FindItemInList(EvapCondName, EvapCond, &EvapConditions::EvapCoolerName, NumEvapCool);
+        if (WhichEvapCond != 0) {
+            NodeNum = EvapCond(WhichEvapCond).OutletNode;
+        } else {
+            ShowSevereError("GetOutletNodeNum: Could not find EvaporativeCooler = \"" + EvapCondName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
+    }
+
 } // namespace EvaporativeCoolers
 
 } // namespace EnergyPlus

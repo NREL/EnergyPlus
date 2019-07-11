@@ -449,6 +449,14 @@ namespace EvaporativeCoolers {
     // Used to clear global data between Unit Tests, should not be normally called
     void clear_state();
 
+    int GetInletNodeNum(std::string const &EvapCondName,
+        bool &ErrorsFound
+    );
+
+    int GetOutletNodeNum(std::string const &EvapCondName,
+        bool &ErrorsFound
+    );
+
 } // namespace EvaporativeCoolers
 
 } // namespace EnergyPlus

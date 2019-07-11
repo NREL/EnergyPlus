@@ -117,7 +117,10 @@ extension_renaming = {
     'Schedule:Year': 'schedule_weeks',
     'WindowShadingControl': 'fenestration_surfaces',
     'PlantEquipmentList': 'equipment',
-    'CondenserEquipmentList': 'equipment'
+    'CondenserEquipmentList': 'equipment',
+    'AirLoopHVAC:Mixer': 'nodes',
+    'AirLoopHVAC:Splitter': 'nodes',
+    'AirLoopHVAC:DedicatedOutdoorAirSystem': 'airloophvacs'
 }
 remaining_objects = [
     'Site:SpectrumData',
