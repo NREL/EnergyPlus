@@ -6,6 +6,10 @@ This was previously an Excel workbook that made for very difficult version contr
 
 # Object Change: `RunPeriod`
 Field A1 "Name" is now a required field. If blank, add a name. If the old idf has more than one RunPeriod object, all of the Name fields must be unique.
+# Object Change: `Schedule:File`
+
+The only change is for Field A4 (Column Separator). Replace "Fixed" with "Space". Field A1-A3, A5, and N1-N4 remain the same.
+
 
 # Object Change: `ThermalStorage:Ice:Detailed`
 Fields A5 and A7 change description to Discharging Curve Variable Specifications and Charging Curve Variable Specifications, respectively.  The old options for these fields were either QuadraticLinear or CubicLinear.  
