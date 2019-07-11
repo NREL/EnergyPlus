@@ -587,14 +587,14 @@ namespace MixedAir {
         using DataAirLoop::AirLoopInputsFilled;
         using DesiccantDehumidifiers::SimDesiccantDehumidifier;
         using EvaporativeCoolers::SimEvapCooler;
+        using HeatingCoils::SimulateHeatingCoilComponents;
+        using HeatRecovery::SimHeatRecovery;
+        using Humidifiers::SimHumidifier;
         using HVACControllers::ControllerProps;
         using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
         using HVACDXSystem::SimDXCoolingSystem;
         using HVACHXAssistedCoolingCoil::HXAssistedCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-        using HeatRecovery::SimHeatRecovery;
-        using HeatingCoils::SimulateHeatingCoilComponents;
-        using Humidifiers::SimHumidifier;
         using PhotovoltaicThermalCollectors::CalledFromOutsideAirSystem;
         using PhotovoltaicThermalCollectors::SimPVTcollectors;
         using SimAirServingZones::SolveWaterCoilController;
@@ -1344,9 +1344,10 @@ namespace MixedAir {
         int i;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_700("('!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
-                                   "{Yes/No},','System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
-                                   "Name,DSZAD Name')");
+        static ObjexxFCL::gio::Fmt Format_700(
+            "('!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
+            "{Yes/No},','System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
+            "Name,DSZAD Name')");
         static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // First, call other get input routines in this module to make sure data is filled during this routine.
@@ -1949,8 +1950,9 @@ namespace MixedAir {
                 {
                     IOFlags flags;
                     flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << " Controller:MechanicalVentilation," + VentilationMechanical(VentMechNum).Name + ',' +
-                                                                    VentilationMechanical(VentMechNum).SchName + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << " Controller:MechanicalVentilation," +
+                                                                               VentilationMechanical(VentMechNum).Name + ',' +
+                                                                               VentilationMechanical(VentMechNum).SchName + ',';
                 }
                 if (VentilationMechanical(VentMechNum).DCVFlag) {
                     {
@@ -2023,26 +2025,29 @@ namespace MixedAir {
                 {
                     IOFlags flags;
                     flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(VentilationMechanical(VentMechNum).ZoneMaxOAFraction, 2) + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
+                        << RoundSigDigits(VentilationMechanical(VentMechNum).ZoneMaxOAFraction, 2) + ',';
                 }
                 {
                     IOFlags flags;
                     flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(VentilationMechanical(VentMechNum).NumofVentMechZones) + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
+                        << RoundSigDigits(VentilationMechanical(VentMechNum).NumofVentMechZones) + ',';
                 }
                 for (jZone = 1; jZone <= VentilationMechanical(VentMechNum).NumofVentMechZones; ++jZone) {
                     if (jZone < VentilationMechanical(VentMechNum).NumofVentMechZones) {
                         {
                             IOFlags flags;
                             flags.ADVANCE("NO");
-                            ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name + ',' +
-                                                                            VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
-                                                                            VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone) + ',';
+                            ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
+                                << Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name + ',' +
+                                       VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
+                                       VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone) + ',';
                         }
                     } else {
                         ObjexxFCL::gio::write(OutputFileInits, fmtA) << VentilationMechanical(VentMechNum).VentMechZoneName(jZone) + ',' +
-                                                                 VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
-                                                                 VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone);
+                                                                            VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
+                                                                            VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone);
                     }
                 }
             }
@@ -3299,7 +3304,11 @@ namespace MixedAir {
                     // if flow rate has been specified by a manager, set it to the specified value
                     thisOAController.MixMassFlow = AirLoopFlow(AirLoopNum).ReqSupplyFrac * AirLoopFlow(AirLoopNum).DesSupply;
                 } else {
-                    thisOAController.MixMassFlow = Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow;
+                    // found this equation results in flow that exceeds the design flow rate when there is exhaust flow rate is greater than
+                    // the design supply air flow rate. Capped the mixed air flow rate at design supply air flow rate, issue #77379
+                    // thisOAController.MixMassFlow = Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow;
+                    thisOAController.MixMassFlow =
+                        min(Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow, AirLoopFlow(AirLoopNum).DesSupply);
                 }
             } else {
                 thisOAController.ExhMassFlow = 0.0;
@@ -4704,8 +4713,8 @@ namespace MixedAir {
                     this->HeatRecoveryBypassStatus = 1;
                 } else if (this->HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum) {
                     Real64 OAMassFlowMin = OutAirMinFrac * AirLoopFlow(AirLoopNum).DesSupply;
-                    Real64 OAMassFlowActual = OASignal * this->MixMassFlow;
-                    if (OAMassFlowActual > OAMassFlowMin) {
+                    Real64 OAMassFlowActual = min(OASignal * this->MixMassFlow, AirLoopFlow(AirLoopNum).DesSupply);
+                    if (OAMassFlowActual > (OAMassFlowMin + DataHVACGlobals::SmallMassFlow)) {
                         AirLoopControlInfo(AirLoopNum).HeatRecoveryBypass = true;
                         this->HeatRecoveryBypassStatus = 1;
                     }
