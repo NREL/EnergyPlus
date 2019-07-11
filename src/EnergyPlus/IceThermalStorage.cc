@@ -124,8 +124,10 @@ namespace IceThermalStorage {
     int const IceStorageType_Simple(1);
     int const IceStorageType_Detailed(2);
 
-    int const CurveQuadraticLinear(1);
-    int const CurveCubicLinear(2);
+    int const CurveVarsFracChargedLMTD(1);
+    int const CurveVarsFracDischargedLMTD(2);
+    int const CurveVarsLMTDMassFlow(3);
+    int const CurveVarsLMTDFracCharged(4);
 
     int const DetIceInsideMelt(1);  // Inside melt system--charge starting with bare coil
     int const DetIceOutsideMelt(2); // Outside melt system--charge from existing ice layer on coil
@@ -212,6 +214,36 @@ namespace IceThermalStorage {
     //*************************************************************************
 
     // Functions
+    void clear_state()
+    {
+        ResetXForITSFlag = false;
+        ITSNomCap = 0.0;
+        InletNodeNum = 0;
+        OutletNodeNum = 0;
+        IceNum = 0;
+        NumIceStorages = 0;
+        IceStorageNotFound = false;
+        NumDetIceStorages = 0;
+        TotalIceStorages = 0;
+        UAIceCh = 0.0;
+        UAIceDisCh = 0.0;
+        HLoss = 0.0;
+        XCurIceFrac= 0.0;
+        U = 0.0;
+        Urate = 0.0;
+        ITSMassFlowRate = 0.0;
+        ITSInletTemp = 0.0;
+        ITSOutletTemp = 0.0;
+        ITSOutletSetPointTemp = 0.0;
+        ITSCoolingRate = 0.0;
+        ITSCoolingEnergy = 0.0;
+        ChillerOutletTemp = 0.0;
+        CheckEquipName.clear();
+        IceStorage.deallocate();
+        IceStorageReport.deallocate();
+        DetIceStor.deallocate();
+        IceStorageTypeMap.deallocate();
+    }
 
     void SimIceStorage(std::string const &IceStorageType,
                        std::string const &IceStorageName,
@@ -597,6 +629,7 @@ namespace IceThermalStorage {
 
                 ToutOld = TempSetPt;
                 LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, DetIceStor(IceNum).FreezingTemp);
+                MassFlowstar = DetIceStor(IceNum).MassFlowRate / SIEquiv100GPMinMassFlowRate;
 
                 // Find initial guess at average fraction charged during time step
                 ChargeFrac = LocalLoad * TimeStepSys / DetIceStor(IceNum).NomCapacity;
@@ -609,12 +642,7 @@ namespace IceThermalStorage {
                     AvgFracCharged = DetIceStor(IceNum).IceFracRemaining + (ChargeFrac / 2.0);
                 }
 
-                if (DetIceStor(IceNum).ChargeCurveTypeNum == CurveQuadraticLinear) {
-                    Qstar = std::abs(CurveValue(DetIceStor(IceNum).ChargeCurveNum, AvgFracCharged, LMTDstar));
-                } else { // ( DetIceStor( IceNum ).ChargeCurveTypeNum == CurveCubicLinear )
-                    MassFlowstar = DetIceStor(IceNum).MassFlowRate / SIEquiv100GPMinMassFlowRate;
-                    Qstar = std::abs(CurveValue(DetIceStor(IceNum).ChargeCurveNum, LMTDstar, MassFlowstar));
-                }
+                Qstar = std::abs(CalcQstar(DetIceStor(IceNum).ChargeCurveNum,DetIceStor(IceNum).ChargeCurveTypeNum,AvgFracCharged,LMTDstar,MassFlowstar));
 
                 ActualLoad = Qstar * DetIceStor(IceNum).NomCapacity / DetIceStor(IceNum).CurveFitTimeStep;
 
@@ -638,12 +666,8 @@ namespace IceThermalStorage {
                             // Calculate new values for LMTDstar and Qstar based on updated outlet temperature
                             ToutOld = ToutNew;
                             LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, DetIceStor(IceNum).FreezingTemp);
-                            if (DetIceStor(IceNum).DischargeCurveTypeNum == CurveQuadraticLinear) {
-                                Qstar = std::abs(CurveValue(DetIceStor(IceNum).ChargeCurveNum, AvgFracCharged, LMTDstar));
-                            } else { // ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveCubicLinear )
-                                MassFlowstar = DetIceStor(IceNum).MassFlowRate / SIEquiv100GPMinMassFlowRate;
-                                Qstar = std::abs(CurveValue(DetIceStor(IceNum).ChargeCurveNum, LMTDstar, MassFlowstar));
-                            }
+                            MassFlowstar = DetIceStor(IceNum).MassFlowRate / SIEquiv100GPMinMassFlowRate;
+                            Qstar = std::abs(CalcQstar(DetIceStor(IceNum).ChargeCurveNum,DetIceStor(IceNum).ChargeCurveTypeNum,AvgFracCharged,LMTDstar,MassFlowstar));
 
                             // Now make sure that we don't go above 100% charged and calculate the new average fraction
                             ChargeFrac = Qstar * (TimeStepSys / DetIceStor(IceNum).CurveFitTimeStep);
@@ -748,17 +772,14 @@ namespace IceThermalStorage {
 
                 ToutOld = TempSetPt;
                 LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, DetIceStor(IceNum).FreezingTemp);
+                MassFlowstar = DetIceStor(IceNum).MassFlowRate / SIEquiv100GPMinMassFlowRate;
 
                 // Find initial guess at average fraction charged during time step
                 ChargeFrac = LocalLoad * TimeStepSys / DetIceStor(IceNum).NomCapacity;
                 if ((DetIceStor(IceNum).IceFracRemaining - ChargeFrac) < 0.0) ChargeFrac = DetIceStor(IceNum).IceFracRemaining;
                 AvgFracCharged = DetIceStor(IceNum).IceFracRemaining - (ChargeFrac / 2.0);
 
-                if (DetIceStor(IceNum).DischargeCurveTypeNum == CurveQuadraticLinear) {
-                    Qstar = std::abs(CurveValue(DetIceStor(IceNum).DischargeCurveNum, (1.0 - AvgFracCharged), LMTDstar));
-                } else { // ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveCubicLinear )
-                    Qstar = std::abs(CurveValue(DetIceStor(IceNum).DischargeCurveNum, LMTDstar, AvgFracCharged));
-                }
+                Qstar = std::abs(CalcQstar(DetIceStor(IceNum).DischargeCurveNum,DetIceStor(IceNum).DischargeCurveTypeNum,AvgFracCharged,LMTDstar,MassFlowstar));
 
                 ActualLoad = Qstar * DetIceStor(IceNum).NomCapacity / DetIceStor(IceNum).CurveFitTimeStep;
 
@@ -783,11 +804,7 @@ namespace IceThermalStorage {
                             ToutOld = ToutNew;
                             LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, DetIceStor(IceNum).FreezingTemp);
 
-                            if (DetIceStor(IceNum).DischargeCurveTypeNum == CurveQuadraticLinear) {
-                                Qstar = std::abs(CurveValue(DetIceStor(IceNum).DischargeCurveNum, (1.0 - AvgFracCharged), LMTDstar));
-                            } else { // ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveCubicLinear )
-                                Qstar = std::abs(CurveValue(DetIceStor(IceNum).DischargeCurveNum, LMTDstar, AvgFracCharged));
-                            }
+                            Qstar = std::abs(CalcQstar(DetIceStor(IceNum).DischargeCurveNum,DetIceStor(IceNum).DischargeCurveTypeNum,AvgFracCharged,LMTDstar,MassFlowstar));
 
                             // Now make sure that we don't go below 100% discharged and calculate the new average fraction
                             ChargeFrac = Qstar * (TimeStepSys / DetIceStor(IceNum).CurveFitTimeStep);
@@ -1109,16 +1126,27 @@ namespace IceThermalStorage {
                 ErrorsFound = true;
             }
 
-            std::string dischargeCurveType = CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).ObjectType;
-            if (dischargeCurveType == "Curve:QuadraticLinear" && cAlphaArgs(5) == "QUADRATICLINEAR") {
-                DetIceStor(IceNum).DischargeCurveTypeNum = CurveQuadraticLinear;
-            } else if (dischargeCurveType == "Curve:CubicLinear" && cAlphaArgs(5) == "CUBICLINEAR") {
-                DetIceStor(IceNum).DischargeCurveTypeNum = CurveCubicLinear;
-            } else {
-                ShowSevereError(cCurrentModuleObject + ": Discharge curve type not valid, type=" + cAlphaArgs(5));
+            int dischargeCurveDim = CurveManager::PerfCurve(DetIceStor(IceNum).DischargeCurveNum).NumDims;
+            if (dischargeCurveDim != 2) {
+                ShowSevereError(cCurrentModuleObject + ": Discharge curve must have 2 independent variables");
                 ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                ShowContinueError("Type does not match type for curve name or type does not equal QuadraticLinear or CubicLinear");
+                ShowContinueError(cAlphaArgs(6) + " does not have 2 independent variables and thus cannot be used for detailed ice storage");
                 ErrorsFound = true;
+            } else {
+                if (cAlphaArgs(5) == "FRACTIONCHARGEDLMTD") {
+                    DetIceStor(IceNum).DischargeCurveTypeNum = CurveVarsFracChargedLMTD;
+                } else if (cAlphaArgs(5) == "FRACTIONDISCHARGEDLMTD") {
+                    DetIceStor(IceNum).DischargeCurveTypeNum = CurveVarsFracDischargedLMTD;
+                } else if (cAlphaArgs(5) == "LMTDMASSFLOW") {
+                    DetIceStor(IceNum).DischargeCurveTypeNum = CurveVarsLMTDMassFlow;
+                } else if (cAlphaArgs(5) == "LMTDFRACTIONCHARGED") {
+                    DetIceStor(IceNum).DischargeCurveTypeNum = CurveVarsLMTDFracCharged;
+                } else {
+                    ShowSevereError(cCurrentModuleObject + ": Discharge curve independent variable options not valid, option=" + cAlphaArgs(5));
+                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                    ShowContinueError("The valid options are: FractionChargedLMTD, FractionDischargedLMTD, LMTDMassFlow or LMTDFractionCharged");
+                    ErrorsFound = true;
+                }
             }
 
             ErrorsFound |= CurveManager::CheckCurveDims(
@@ -1137,16 +1165,27 @@ namespace IceThermalStorage {
                 ErrorsFound = true;
             }
 
-            std::string chargeCurveType = CurveManager::PerfCurve(DetIceStor(IceNum).ChargeCurveNum).ObjectType;
-            if (chargeCurveType == "Curve:QuadraticLinear" && cAlphaArgs(7) == "QUADRATICLINEAR") {
-                DetIceStor(IceNum).ChargeCurveTypeNum = CurveQuadraticLinear;
-            } else if (chargeCurveType == "Curve:CubicLinear" && cAlphaArgs(7) == "CUBICLINEAR") {
-                DetIceStor(IceNum).ChargeCurveTypeNum = CurveCubicLinear;
-            } else {
-                ShowSevereError(cCurrentModuleObject + ": Charge curve type not valid, type=" + cAlphaArgs(7));
+            int chargeCurveDim = CurveManager::PerfCurve(DetIceStor(IceNum).ChargeCurveNum).NumDims;
+            if (chargeCurveDim != 2) {
+                ShowSevereError(cCurrentModuleObject + ": Charge curve must have 2 independent variables");
                 ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                ShowContinueError("Type does not match type for curve name or type does not equal QuadraticLinear or CubicLinear");
+                ShowContinueError(cAlphaArgs(8) + " does not have 2 independent variables and thus cannot be used for detailed ice storage");
                 ErrorsFound = true;
+            } else {
+                if (cAlphaArgs(7) == "FRACTIONCHARGEDLMTD") {
+                    DetIceStor(IceNum).ChargeCurveTypeNum = CurveVarsFracChargedLMTD;
+                } else if (cAlphaArgs(7) == "FRACTIONDISCHARGEDLMTD") {
+                    DetIceStor(IceNum).ChargeCurveTypeNum = CurveVarsFracDischargedLMTD;
+                } else if (cAlphaArgs(7) == "LMTDMASSFLOW") {
+                    DetIceStor(IceNum).ChargeCurveTypeNum = CurveVarsLMTDMassFlow;
+                } else if (cAlphaArgs(7) == "LMTDFRACTIONCHARGED") {
+                    DetIceStor(IceNum).ChargeCurveTypeNum = CurveVarsLMTDFracCharged;
+                } else {
+                    ShowSevereError(cCurrentModuleObject + ": Charge curve independent variable options not valid, option=" + cAlphaArgs(7));
+                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
+                    ShowContinueError("The valid options are: FractionChargedLMTD, FractionDischargedLMTD, LMTDMassFlow or LMTDFractionCharged");
+                    ErrorsFound = true;
+                }
             }
 
             ErrorsFound |= CurveManager::CheckCurveDims(
@@ -2360,6 +2399,33 @@ namespace IceThermalStorage {
         return CalcDetIceStorLMTDstar;
     }
 
+    Real64 CalcQstar(int const CurveIndex,      // curve index
+                     int const CurveIndVarType, // independent variable type for ice storage
+                     Real64 const FracCharged,  // fraction charged for ice storage unit
+                     Real64 const LMTDstar,     // normalized log mean temperature difference across the ice storage unit
+                     Real64 const MassFlowstar  // normalized mass flow rate through the ice storage unit
+    )
+    {
+
+        Real64 CalcQstar;
+        
+        if (CurveIndVarType == CurveVarsFracChargedLMTD) {
+            CalcQstar = std::abs(CurveValue(CurveIndex, FracCharged, LMTDstar));
+        } else if (CurveIndVarType == CurveVarsFracDischargedLMTD) {
+            CalcQstar = std::abs(CurveValue(CurveIndex, (1.0-FracCharged), LMTDstar));
+        } else if (CurveIndVarType == CurveVarsLMTDMassFlow) {
+            CalcQstar = std::abs(CurveValue(CurveIndex, LMTDstar, MassFlowstar));
+        } else if (CurveIndVarType == CurveVarsLMTDFracCharged) {
+            CalcQstar = std::abs(CurveValue(CurveIndex, LMTDstar, FracCharged));
+        } else { // should never get here as this is checked on input
+            CalcQstar = 0.0;
+        }
+        
+        return CalcQstar;
+
+    }
+
+    
     // *****************************************************************************
 
     Real64 TempSItoIP(Real64 const Temp)
