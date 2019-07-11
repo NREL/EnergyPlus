@@ -304,8 +304,8 @@ namespace GeneratorFuelSupply {
         // unused  REAL(r64) :: LHV
 
         // Formats
-        static gio::Fmt fmtA("(A)");
-        static gio::Fmt Format_501("(' Fuel Supply, ',A,',',G13.6E2,',',G13.6E2,',',G13.6E2,',',G13.6E2)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt Format_501("(' Fuel Supply, ',A,',',G13.6E2,',',G13.6E2,',',G13.6E2,',',G13.6E2)");
 
         NumHardCodedConstituents = 14;
 
@@ -705,9 +705,9 @@ namespace GeneratorFuelSupply {
         }
 
         // report Heating Values in EIO.
-        gio::write(OutputFileInits, fmtA) << "! <Fuel Supply>, Fuel Supply Name, Lower Heating Value [J/kmol], Lower Heating Value [kJ/kg], Higher "
+        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Fuel Supply>, Fuel Supply Name, Lower Heating Value [J/kmol], Lower Heating Value [kJ/kg], Higher "
                                              "Heating Value [KJ/kg],  Molecular Weight [g/mol] ";
-        gio::write(OutputFileInits, Format_501) << FuelSupply(FuelSupplyNum).Name << FuelSupply(FuelSupplyNum).LHV * 1000000.0
+        ObjexxFCL::gio::write(OutputFileInits, Format_501) << FuelSupply(FuelSupplyNum).Name << FuelSupply(FuelSupplyNum).LHV * 1000000.0
                                                 << FuelSupply(FuelSupplyNum).LHVJperkg / 1000.0 << FuelSupply(FuelSupplyNum).HHV / 1000.0
                                                 << FuelSupply(FuelSupplyNum).MW;
     }

@@ -33,7 +33,7 @@ public:
        const std::size_t &j, const std::size_t &k, std::size_t *stepsize,
        const Foundation &foundation, Surface *surfacePtr, Block *blockPtr, Mesher *mesh);
 
-  virtual ~Cell() {};
+  virtual ~Cell(){};
 
   std::size_t coords[3], index;
   std::size_t *stepsize;
@@ -181,32 +181,20 @@ public:
 private:
   inline void zfCellADI(const int &dim, const int &sdim, const int &sign, double &A, double &Alt,
                         double &bVal);
-  inline void ifCellADI(const int &dim, const int &sdim, const int &dir,
-                        const Foundation &foundation, const BoundaryConditions &bcs, double &A,
-                        double &Alt, double &bVal);
-  inline void efCellADI(const int &dim, const int &sdim, const int &sign,
-                        const Foundation &foundation, const BoundaryConditions &bcs, double &A,
-                        double &Alt, double &bVal);
+  inline void ifCellADI(const int &dim, const int &sdim, const int &dir, double &A, double &Alt, double &bVal);
+  inline void efCellADI(const int &dim, const int &sdim, const int &sign, double &A, double &Alt, double &bVal);
   inline void zfCellMatrix(double &A, double &Alt, double &bVal);
-  inline void ifCellMatrix(const int &dim, const int &dir, const Foundation &foundation,
-                           const BoundaryConditions &bcs, double &A, double &Alt, double &bVal);
-  inline void efCellMatrix(const int &dim, const int &dir, const Foundation &foundation,
-                           const BoundaryConditions &bcs, double &A, double &Alt, double &bVal);
+  inline void ifCellMatrix(const int &dim, const int &dir, double &A, double &Alt, double &bVal);
+  inline void efCellMatrix(const int &dim, const int &dir, double &A, double &Alt, double &bVal);
   inline void zfCellADEUp(const std::size_t &dim, const std::size_t &dir, double &U);
-  inline void ifCellADEUp(const int &dim, const int &dir, const Foundation &foundation,
-                          const BoundaryConditions &bcs, double &U);
-  inline void efCellADEUp(const int &dim, const int &dir, const Foundation &foundation,
-                          const BoundaryConditions &bcs, double &U);
+  inline void ifCellADEUp(const int &dim, const int &dir, double &U);
+  inline void efCellADEUp(const int &dim, const int &dir, double &U);
   inline void zfCellADEDown(const std::size_t &dim, const std::size_t &dir, double &V);
-  inline void ifCellADEDown(const int &dim, const int &dir, const Foundation &foundation,
-                            const BoundaryConditions &bcs, double &V);
-  inline void efCellADEDown(const int &dim, const int &dir, const Foundation &foundation,
-                            const BoundaryConditions &bcs, double &V);
+  inline void ifCellADEDown(const int &dim, const int &dir, double &V);
+  inline void efCellADEDown(const int &dim, const int &dir, double &V);
   inline double zfCellExplicit(const std::size_t &dim, const std::size_t &dir);
-  inline double ifCellExplicit(const std::size_t &dim, const std::size_t &dir,
-                               const Foundation &foundation, const BoundaryConditions &bcs);
-  inline double efCellExplicit(const std::size_t &dim, const std::size_t &dir,
-                               const Foundation &foundation, const BoundaryConditions &bcs);
+  inline double ifCellExplicit(const std::size_t &dim, const std::size_t &dir);
+  inline double efCellExplicit(const std::size_t &dim, const std::size_t &dir);
 };
 
 class ZeroThicknessCell : public Cell {

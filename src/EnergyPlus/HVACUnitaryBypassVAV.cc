@@ -1306,10 +1306,11 @@ namespace HVACUnitaryBypassVAV {
                             CBVAV(CBVAVNum).ZoneSequenceCoolingNum(AirLoopZoneNum) = coolingPriority;
                             CBVAV(CBVAVNum).ZoneSequenceHeatingNum(AirLoopZoneNum) = heatingPriority;
                         }
-                        if (CBVAV(CBVAVNum).ZoneSequenceCoolingNum(AirLoopZoneNum) == 0) {
+                        if (CBVAV(CBVAVNum).ZoneSequenceCoolingNum(AirLoopZoneNum) == 0 ||
+                            CBVAV(CBVAVNum).ZoneSequenceHeatingNum(AirLoopZoneNum) == 0) {
                             ShowSevereError("AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass, \"" + CBVAV(CBVAVNum).Name +
-                                            "\", No matching air terminal found in the zone equipment list for zone = " +
-                                            ZoneEquipConfig(zoneNum).ZoneName + ".");
+                                            "\": Airloop air terminal in the zone equipment list for zone = " + ZoneEquipConfig(zoneNum).ZoneName +
+                                            " not found or is not allowed Zone Equipment Cooling or Heating Sequence = 0.");
                             ErrorsFound = true;
                         }
                     } else {
@@ -3509,11 +3510,12 @@ namespace HVACUnitaryBypassVAV {
         CBVAV(CBVAVNum).HeatCoolMode = 0;
 
         for (ZoneNum = 1; ZoneNum <= CBVAV(CBVAVNum).NumControlledZones; ++ZoneNum) {
-            if ((CBVAV(CBVAVNum).ZoneSequenceCoolingNum(ZoneNum) > 0) && (CBVAV(CBVAVNum).ZoneSequenceHeatingNum(ZoneNum) > 0)) {
-                ZoneLoadToCoolSPSequenced = ZoneSysEnergyDemand(CBVAV(CBVAVNum).ControlledZoneNum(ZoneNum))
-                                                .SequencedOutputRequiredToCoolingSP(CBVAV(CBVAVNum).ZoneSequenceCoolingNum(ZoneNum));
-                ZoneLoadToHeatSPSequenced = ZoneSysEnergyDemand(CBVAV(CBVAVNum).ControlledZoneNum(ZoneNum))
-                                                .SequencedOutputRequiredToHeatingSP(CBVAV(CBVAVNum).ZoneSequenceHeatingNum(ZoneNum));
+            int actualZoneNum = CBVAV(CBVAVNum).ControlledZoneNum(ZoneNum);
+            int coolSeqNum = CBVAV(CBVAVNum).ZoneSequenceCoolingNum(ZoneNum);
+            int heatSeqNum = CBVAV(CBVAVNum).ZoneSequenceHeatingNum(ZoneNum);
+            if ((coolSeqNum > 0) && (heatSeqNum > 0)) {
+                ZoneLoadToCoolSPSequenced = ZoneSysEnergyDemand(actualZoneNum).SequencedOutputRequiredToCoolingSP(coolSeqNum);
+                ZoneLoadToHeatSPSequenced = ZoneSysEnergyDemand(actualZoneNum).SequencedOutputRequiredToHeatingSP(heatSeqNum);
                 if (ZoneLoadToHeatSPSequenced > 0.0 && ZoneLoadToCoolSPSequenced > 0.0) {
                     ZoneLoad = ZoneLoadToHeatSPSequenced;
                 } else if (ZoneLoadToHeatSPSequenced < 0.0 && ZoneLoadToCoolSPSequenced < 0.0) {
@@ -3522,10 +3524,10 @@ namespace HVACUnitaryBypassVAV {
                     ZoneLoad = 0.0;
                 }
             } else {
-                ZoneLoad = ZoneSysEnergyDemand(CBVAV(CBVAVNum).ControlledZoneNum(ZoneNum)).RemainingOutputRequired;
+                ZoneLoad = ZoneSysEnergyDemand(actualZoneNum).RemainingOutputRequired;
             }
 
-            if (!CurDeadBandOrSetback(ZoneNum)) {
+            if (!CurDeadBandOrSetback(actualZoneNum)) {
                 if (ZoneLoad > 0.0 && std::abs(ZoneLoad) > SmallLoad) {
                     QZoneReqHeat += ZoneLoad;
                     ++CBVAV(CBVAVNum).NumZonesHeated;

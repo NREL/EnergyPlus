@@ -16,6 +16,8 @@ public:
   void add_instance(Ground *grnd, double weight);
   std::size_t size();
   void calc_weighted_results();
+  std::pair<Ground *, double> get_instance(std::size_t index);
+
 
   struct Results {
     double hconv, hrad, qtot, qconv, qrad, Tconv, Tavg, Trad;

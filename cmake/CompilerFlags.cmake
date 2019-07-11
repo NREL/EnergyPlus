@@ -96,6 +96,7 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     ADD_CXX_DEFINITIONS("-Wno-unknown-pragmas")
     ADD_CXX_DEFINITIONS("-Wno-attributes") # Don't warn on attributes Clang doesn't know
     ADD_CXX_DEFINITIONS("-Wno-delete-non-virtual-dtor")
+    ADD_CXX_DEFINITIONS("-Wno-missing-braces")
     if ( CMAKE_COMPILER_IS_GNUCXX ) # g++
       ADD_CXX_DEFINITIONS("-Wno-unused-but-set-parameter -Wno-unused-but-set-variable") # Suppress unused-but-set warnings until more serious ones are addressed
       ADD_CXX_DEFINITIONS("-Wno-maybe-uninitialized")
@@ -223,7 +224,12 @@ macro(AddFlagIfSupported flag test)
   CHECK_CXX_COMPILER_FLAG(${flag} ${test})
   if( ${${test}} )
     message(STATUS "Adding ${flag}")
-    add_compile_options("${flag}")
+    # On Mac with Ninja (kitware binary for fortran support) and brew gfortran, I get build errors due to this flag.
+    if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") AND BUILD_FORTRAN)
+      add_compile_options($<$<NOT:$<COMPILE_LANGUAGE:Fortran>>:${flag}>)
+    else()
+      add_compile_options("${flag}")
+    endif()
   else()
     message(STATUS "Flag ${flag} isn't supported")
   endif()

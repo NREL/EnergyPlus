@@ -83,8 +83,8 @@ namespace HysteresisPhaseChange {
     {
         // Looks up the enthalpy on the characteristic curve defined by the parameters Tc, tau1, and tau2,
         // and the position on that curve defined by T.
-        Real64 eta1 = (this->totalLatentHeat / 2) * exp(-2 * abs(T - Tc) / tau1);
-        Real64 eta2 = (this->totalLatentHeat / 2) * exp(-2 * abs(T - Tc) / tau2);
+        Real64 eta1 = (this->totalLatentHeat / 2) * exp(-2 * std::abs(T - Tc) / tau1);
+        Real64 eta2 = (this->totalLatentHeat / 2) * exp(-2 * std::abs(T - Tc) / tau2);
         if (T <= Tc) {
             return (this->specificHeatSolid * T) + eta1;
         } else {
@@ -279,15 +279,15 @@ namespace HysteresisPhaseChange {
         Real64 T = temperatureCurrent;
 
         if (T < criticalTemperature) {
-            Real64 DEta1 = -(this->totalLatentHeat * (T - criticalTemperature) * exp(-2 * abs(T - criticalTemperature) / tau1)) /
-                           (tau1 * abs(T - criticalTemperature));
+            Real64 DEta1 = -(this->totalLatentHeat * (T - criticalTemperature) * exp(-2 * std::abs(T - criticalTemperature) / tau1)) /
+                           (tau1 * std::abs(T - criticalTemperature));
             Real64 Cp1 = this->specificHeatSolid;
             return (Cp1 + DEta1);
         } else if (T == criticalTemperature) {
             return (EnthalpyNew - EnthalpyOld) / (temperatureCurrent - temperaturePrev);
         } else if (T > criticalTemperature) {
-            Real64 DEta2 = (this->totalLatentHeat * (T - criticalTemperature) * exp(-2 * abs(T - criticalTemperature) / tau2)) /
-                           (tau2 * abs(T - criticalTemperature));
+            Real64 DEta2 = (this->totalLatentHeat * (T - criticalTemperature) * exp(-2 * std::abs(T - criticalTemperature) / tau2)) /
+                           (tau2 * std::abs(T - criticalTemperature));
             Real64 Cp2 = this->specificHeatLiquid;
             return Cp2 + DEta2;
         } else {

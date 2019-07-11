@@ -361,6 +361,12 @@ namespace EvaporativeCoolers {
                                                        Real64 const InletDewPointTempSec,
                                                        Real64 const InletHumRatioSec);
 
+    int IndirectResearchSpecialEvapCoolerOperatingMode(int const EvapCoolNum,
+                                                       Real64 const InletDryBulbTempSec,
+                                                       Real64 const InletWetBulbTempSec,
+                                                       Real64 const TdbOutSysWetMin,
+                                                       Real64 const TdbOutSysDryMin);
+
     void CalcSecondaryAirOutletCondition(int const EvapCoolNum,
                                          int const OperatingMode,
                                          Real64 const AirMassFlowSec,

@@ -196,12 +196,12 @@ namespace AirflowNetwork {
         int n;
 
         // Formats
-        static gio::Fmt Format_900("(1X,i2)");
-        static gio::Fmt Format_901("(1X,2I4,4F9.4)");
-        static gio::Fmt Format_902("(1X,2I4,4F9.4)");
-        static gio::Fmt Format_903("(9X,4F9.4)");
-        static gio::Fmt Format_904("(1X,2I4,1F9.4)");
-        static gio::Fmt Format_910("(1X,I4,2(I4,F9.4),I4,2F4.1)");
+        static ObjexxFCL::gio::Fmt Format_900("(1X,i2)");
+        static ObjexxFCL::gio::Fmt Format_901("(1X,2I4,4F9.4)");
+        static ObjexxFCL::gio::Fmt Format_902("(1X,2I4,4F9.4)");
+        static ObjexxFCL::gio::Fmt Format_903("(9X,4F9.4)");
+        static ObjexxFCL::gio::Fmt Format_904("(1X,2I4,1F9.4)");
+        static ObjexxFCL::gio::Fmt Format_910("(1X,I4,2(I4,F9.4),I4,2F4.1)");
 
         // Assume a network to simulate multizone airflow is a subset of the network to simulate air distribution system.
         // Network array size is allocated based on the network of air distribution system.
@@ -278,12 +278,12 @@ namespace AirflowNetwork {
         /*
         if (LIST >= 5) {
             Unit11 = GetNewUnitNumber();
-            gio::open(Unit11, DataStringGlobals::eplusADSFileName);
+            ObjexxFCL::gio::open(Unit11, DataStringGlobals::eplusADSFileName);
             for (i = 1; i <= NetworkNumOfNodes; ++i) {
-                gio::write(Unit11, Format_901) << i << AirflowNetworkNodeData(i).NodeTypeNum << AirflowNetworkNodeData(i).NodeHeight << TZ(i)
+                ObjexxFCL::gio::write(Unit11, Format_901) << i << AirflowNetworkNodeData(i).NodeTypeNum << AirflowNetworkNodeData(i).NodeHeight << TZ(i)
                                                << PZ(i);
             }
-            gio::write(Unit11, Format_900) << 0;
+            ObjexxFCL::gio::write(Unit11, Format_900) << 0;
             for (i = 1; i <= AirflowNetworkNumOfComps; ++i) {
                 j = AirflowNetworkCompData(i).TypeNum;
                 {
@@ -292,7 +292,7 @@ namespace AirflowNetwork {
                         //              WRITE(Unit11,902) AirflowNetworkCompData(i)%CompNum,1,DisSysCompLeakData(j)%FlowCoef, &
                         //                  DisSysCompLeakData(j)%FlowCoef,DisSysCompLeakData(j)%FlowCoef,DisSysCompLeakData(j)%FlowExpo
                     } else if (SELECT_CASE_var == CompTypeNum_SCR) { //'SCR'  Surface crack component
-                        gio::write(Unit11, Format_902) << AirflowNetworkCompData(i).CompNum << 1 << MultizoneSurfaceCrackData(j).FlowCoef
+                        ObjexxFCL::gio::write(Unit11, Format_902) << AirflowNetworkCompData(i).CompNum << 1 << MultizoneSurfaceCrackData(j).FlowCoef
                                                        << MultizoneSurfaceCrackData(j).FlowCoef << MultizoneSurfaceCrackData(j).FlowCoef
                                                        << MultizoneSurfaceCrackData(j).FlowExpo;
                     } else if (SELECT_CASE_var == CompTypeNum_DWC) { //'DWC' Duct component
@@ -303,18 +303,18 @@ namespace AirflowNetwork {
                         //           CASE (CompTypeNum_CVF) ! 'CVF' Constant volume fan component
                         //              WRITE(Unit11,904) AirflowNetworkCompData(i)%CompNum,4,DisSysCompCVFData(j)%FlowRate
                     } else if (SELECT_CASE_var == CompTypeNum_EXF) { // 'EXF' Zone exhaust fan
-                        gio::write(Unit11, Format_904) << AirflowNetworkCompData(i).CompNum << 4 << MultizoneCompExhaustFanData(j).FlowRate;
+                        ObjexxFCL::gio::write(Unit11, Format_904) << AirflowNetworkCompData(i).CompNum << 4 << MultizoneCompExhaustFanData(j).FlowRate;
                     } else {
                     }
                 }
             }
-            gio::write(Unit11, Format_900) << 0;
+            ObjexxFCL::gio::write(Unit11, Format_900) << 0;
             for (i = 1; i <= NetworkNumOfLinks; ++i) {
                 gio::write(Unit11, Format_910) << i << AirflowNetworkLinkageData(i).NodeNums[0] << AirflowNetworkLinkageData(i).NodeHeights[0]
                                                << AirflowNetworkLinkageData(i).NodeNums[1] << AirflowNetworkLinkageData(i).NodeHeights[1]
                                                << AirflowNetworkLinkageData(i).CompNum << 0 << 0;
             }
-            gio::write(Unit11, Format_900) << 0;
+            ObjexxFCL::gio::write(Unit11, Format_900) << 0;
         }
         */
 
@@ -503,11 +503,11 @@ namespace AirflowNetwork {
         int ITER;
 
         // Formats
-        static gio::Fmt Format_900("(,/,11X,'i    n    m       DP',12x,'F1',12X,'F2')");
-        static gio::Fmt Format_901("(1X,A6,3I5,3F14.6)");
-        static gio::Fmt Format_902("(,/,11X,'n       P',12x,'sumF')");
-        static gio::Fmt Format_903("(1X,A6,I5,3F14.6)");
-        static gio::Fmt Format_907("(,/,' CPU seconds for ',A,F12.3)");
+        static ObjexxFCL::gio::Fmt Format_900("(,/,11X,'i    n    m       DP',12x,'F1',12X,'F2')");
+        static ObjexxFCL::gio::Fmt Format_901("(1X,A6,3I5,3F14.6)");
+        static ObjexxFCL::gio::Fmt Format_902("(,/,11X,'n       P',12x,'sumF')");
+        static ObjexxFCL::gio::Fmt Format_903("(1X,A6,I5,3F14.6)");
+        static ObjexxFCL::gio::Fmt Format_907("(,/,' CPU seconds for ',A,F12.3)");
 
         // FLOW:
 
@@ -528,7 +528,7 @@ namespace AirflowNetwork {
             }
             properties[n].sqrtDensity = std::sqrt(properties[n].density);
             properties[n].viscosity = 1.71432e-5 + 4.828e-8 * properties[n].temperature;
-            if (LIST >= 2) gio::write(Unit21, Format_903) << "D,V:" << n << properties[n].density << properties[n].viscosity;
+            //if (LIST >= 2) ObjexxFCL::gio::write(Unit21, Format_903) << "D,V:" << n << properties[n].density << properties[n].viscosity;
         }
         // Compute stack pressures.
         for (i = 1; i <= NetworkNumOfLinks; ++i) {
@@ -556,7 +556,7 @@ namespace AirflowNetwork {
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
             SUMAF(n) = 0.0;
         }
-        if (LIST >= 1) gio::write(Unit21, Format_900);
+        if (LIST >= 1) ObjexxFCL::gio::write(Unit21, Format_900);
         for (i = 1; i <= NetworkNumOfLinks; ++i) {
             n = AirflowNetworkLinkageData(i).NodeNums[0];
             m = AirflowNetworkLinkageData(i).NodeNums[1];
@@ -651,7 +651,7 @@ namespace AirflowNetwork {
         // REAL(r64), INTENT(INOUT) :: AU(IK(NetworkNumOfNodes+1)-1) ! the upper triangle of [A] before and after factoring
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -689,14 +689,14 @@ namespace AirflowNetwork {
         Array1D<Real64> CCF(NetworkNumOfNodes);
 
         // Formats
-        static gio::Fmt Format_901("(A5,I3,2E14.6,0P,F8.4,F24.14)");
+        static ObjexxFCL::gio::Fmt Format_901("(A5,I3,2E14.6,0P,F8.4,F24.14)");
 
         // FLOW:
         ACC1 = 0.0;
         ACCEL = 0;
         NSYM = 0;
         NNZE = IK(NetworkNumOfNodes + 1) - 1;
-        if (LIST >= 2) gio::write(Unit21, fmtLD) << "Initialization" << NetworkNumOfNodes << NetworkNumOfLinks << NNZE;
+        if (LIST >= 2) ObjexxFCL::gio::write(Unit21, fmtLD) << "Initialization" << NetworkNumOfNodes << NetworkNumOfLinks << NNZE;
         ITER = 0;
 
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
@@ -733,7 +733,7 @@ namespace AirflowNetwork {
         while (ITER < AirflowNetworkSimu.MaxIteration) {
             LFLAG = false;
             ++ITER;
-            if (LIST >= 2) gio::write(Unit21, fmtLD) << "Begin iteration " << ITER;
+            if (LIST >= 2) ObjexxFCL::gio::write(Unit21, fmtLD) << "Begin iteration " << ITER;
             // Set up the Jacobian matrix.
             FILJAC(NNZE, LFLAG);
             // Data dump.
@@ -803,7 +803,7 @@ namespace AirflowNetwork {
             if (LIST >= 2) {
                 for (n = 1; n <= NetworkNumOfNodes; ++n) {
                     if (AirflowNetworkNodeData(n).NodeTypeNum == 0)
-                        gio::write(Unit21, Format_901) << " Rev:" << n << SUMF(n) << CCF(n) << CEF(n) << PZ(n);
+                        ObjexxFCL::gio::write(Unit21, Format_901) << " Rev:" << n << SUMF(n) << CCF(n) << CEF(n) << PZ(n);
                 }
             }
         }
@@ -889,7 +889,7 @@ namespace AirflowNetwork {
         std::array<Real64, 2> DF{{0.0, 0.0}};
 
         // Formats
-        static gio::Fmt Format_901("(A5,3I3,4E16.7)");
+        static ObjexxFCL::gio::Fmt Format_901("(A5,3I3,4E16.7)");
 
         // FLOW:
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
@@ -915,7 +915,7 @@ namespace AirflowNetwork {
             } else {
                 DP = PZ(n) - PZ(m) + DpL(i, 1) + PW(i);
             }
-            if (LIST >= 4) gio::write(Unit21, Format_901) << "PS:" << i << n << m << PS(i) << PW(i) << AirflowNetworkLinkSimu(i).DP;
+            //if (LIST >= 4) ObjexxFCL::gio::write(Unit21, Format_901) << "PS:" << i << n << M << PS(i) << PW(i) << AirflowNetworkLinkSimu(i).DP;
             j = AirflowNetworkLinkageData(i).CompNum;
             {
                 auto const SELECT_CASE_var(AirflowNetworkCompData(j).CompTypeNum);
@@ -971,7 +971,7 @@ namespace AirflowNetwork {
             if (AirflowNetworkCompData(j).CompTypeNum == CompTypeNum_DOP) {
                 AFLOW2(i) = F[1];
             }
-            if (LIST >= 3) gio::write(Unit21, Format_901) << " NRi:" << i << n << m << AirflowNetworkLinkSimu(i).DP << F[0] << DF[0];
+            //if (LIST >= 3) ObjexxFCL::gio::write(Unit21, Format_901) << " NRi:" << i << n << M << AirflowNetworkLinkSimu(i).DP << F[0] << DF[0];
             FLAG = 1;
             if (AirflowNetworkNodeData(n).NodeTypeNum == 0) {
                 ++FLAG;
@@ -990,7 +990,7 @@ namespace AirflowNetwork {
             if (FLAG != 1) FILSKY(X, AirflowNetworkLinkageData(i).NodeNums, IK, AU, AD, FLAG);
             if (NF == 1) continue;
             AFLOW2(i) = F[1];
-            if (LIST >= 3) gio::write(Unit21, Format_901) << " NRj:" << i << n << m << AirflowNetworkLinkSimu(i).DP << F[1] << DF[1];
+            //if (LIST >= 3) ObjexxFCL::gio::write(Unit21, Format_901) << " NRj:" << i << n << m << AirflowNetworkLinkSimu(i).DP << F[1] << DF[1];
             FLAG = 1;
             if (AirflowNetworkNodeData(n).NodeTypeNum == 0) {
                 ++FLAG;
@@ -1143,7 +1143,7 @@ namespace AirflowNetwork {
         Real64 FlowExpo;
 
         // Formats
-        static gio::Fmt Format_901("(A5,I3,5E14.6)");
+        static ObjexxFCL::gio::Fmt Format_901("(A5,I3,5E14.6)");
 
         // FLOW:
         CompNum = AirflowNetworkCompData(JA).TypeNum;
@@ -1161,13 +1161,12 @@ namespace AirflowNetwork {
         } else {
             PRISE = -PDROP * (DisSysCompDetFanData(CompNum).RhoAir / propN.density) / (DisSysCompDetFanData(CompNum).TranRat * AFECTL(i));
         }
-        if (LIST >= 4) gio::write(Unit21, Format_901) << " fan:" << i << PDROP << PRISE << AFECTL(i) << DisSysCompDetFanData(CompNum).TranRat;
+        //if (LIST >= 4) ObjexxFCL::gio::write(Unit21, Format_901) << " fan:" << i << PDROP << PRISE << AFECTL(i) << DisSysCompDetFanData(CompNum).TranRat;
         if (LFLAG) {
             // Initialization by linear approximation.
             F[0] = -DisSysCompDetFanData(CompNum).Qfree * AFECTL(i) * (1.0 - PRISE / DisSysCompDetFanData(CompNum).Pshut);
             DPDF = -DisSysCompDetFanData(CompNum).Pshut / DisSysCompDetFanData(CompNum).Qfree;
-            if (LIST >= 4)
-                gio::write(Unit21, Format_901) << " fni:" << JA << DisSysCompDetFanData(CompNum).Qfree << DisSysCompDetFanData(CompNum).Pshut;
+            //if (LIST >= 4) ObjexxFCL::gio::write(Unit21, Format_901) << " fni:" << JA << DisSysCompDetFanData(CompNum).Qfree << DisSysCompDetFanData(CompNum).Pshut;
         } else {
             // Solution of the fan performance curve.
             // Determine curve fit range.
@@ -1186,7 +1185,7 @@ namespace AirflowNetwork {
                      DX * (DisSysCompDetFanData(CompNum).Coeff(k + 2) +
                            DX * (DisSysCompDetFanData(CompNum).Coeff(k + 3) + DX * DisSysCompDetFanData(CompNum).Coeff(k + 5))) -
                      PRISE;
-                if (LIST >= 4) gio::write(Unit21, Format_901) << " fp0:" << j << BX << BY << DX << DY;
+                //if (LIST >= 4) ObjexxFCL::gio::write(Unit21, Format_901) << " fp0:" << j << BX << BY << DX << DY;
                 if (BY * DY <= 0.0) break;
                 ++j;
                 if (j > NumCur) ShowFatalError("Out of range, too high (FAN) in ADS simulation");
@@ -1217,7 +1216,7 @@ namespace AirflowNetwork {
             BY = CY;
             if (CY * CCY > 0.0) DY *= 0.5;
         Label70:;
-            if (LIST >= 4) gio::write(Unit21, Format_901) << " fpi:" << j << BX << CX << DX << BY << DY;
+            //if (LIST >= 4) ObjexxFCL::gio::write(Unit21, Format_901) << " fpi:" << j << BX << CX << DX << BY << DY;
             if (DX - BX < TOL * CX) goto Label80;
             if (DX - BX < TOL) goto Label80;
             goto Label40;
@@ -1493,7 +1492,7 @@ namespace AirflowNetwork {
         Real64 RhoCor;
 
         // Formats
-        static gio::Fmt Format_901("(A5,6X,4E16.7)");
+        static ObjexxFCL::gio::Fmt Format_901("(A5,6X,4E16.7)");
 
         // FLOW:
         // Calculate normal density and viscocity at Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
@@ -1549,7 +1548,7 @@ namespace AirflowNetwork {
                 }
             }
             // Select laminar or turbulent flow.
-            if (LIST >= 4) gio::write(Unit21, Format_901) << " generic crack: " << PDROP << FL << FT;
+            if (LIST >= 4) ObjexxFCL::gio::write(Unit21, Format_901) << " generic crack: " << PDROP << FL << FT;
             if (std::abs(FL) <= std::abs(FT)) {
                 F[0] = FL;
                 DF[0] = CDM;
@@ -1606,7 +1605,7 @@ namespace AirflowNetwork {
         Real64 RE;
 
         // Formats
-        static gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
+        static ObjexxFCL::gio::Fmt Format_901("(A5,I3,6X,4E16.7)");
 
         // FLOW:
         // Get component properties
@@ -2075,16 +2074,16 @@ namespace AirflowNetwork {
         int i;
 
         // Formats
-        static gio::Fmt Format_901("(1X,A,$)");
-        static gio::Fmt Format_902("(1X,5E15.07,$)");
+        static ObjexxFCL::gio::Fmt Format_901("(1X,A,$)");
+        static ObjexxFCL::gio::Fmt Format_902("(1X,5E15.07,$)");
 
         // FLOW:
         // Write values for debug
-        gio::write(UOUT, Format_901) << S;
+        ObjexxFCL::gio::write(UOUT, Format_901) << S;
         for (i = 1; i <= n; ++i) {
-            gio::write(UOUT, Format_902) << V(i);
+            ObjexxFCL::gio::write(UOUT, Format_902) << V(i);
         }
-        gio::write(UOUT);
+        ObjexxFCL::gio::write(UOUT);
     }
 
     void DUMPVR(std::string const &S,    // Description
@@ -2133,15 +2132,15 @@ namespace AirflowNetwork {
         int i;
 
         // Formats
-        static gio::Fmt Format_901("(1X,A,$)");
-        static gio::Fmt Format_902("(1X,5E15.07,$)");
+        static ObjexxFCL::gio::Fmt Format_901("(1X,A,$)");
+        static ObjexxFCL::gio::Fmt Format_902("(1X,5E15.07,$)");
 
         // FLOW:
-        gio::write(UOUT, Format_901) << S;
+        ObjexxFCL::gio::write(UOUT, Format_901) << S;
         for (i = 1; i <= n; ++i) {
-            gio::write(UOUT, Format_902) << V(i);
+            ObjexxFCL::gio::write(UOUT, Format_902) << V(i);
         }
-        gio::write(UOUT);
+        ObjexxFCL::gio::write(UOUT);
     }
 
     int AFEDOP(int const j,                           // Component number

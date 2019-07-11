@@ -95,7 +95,7 @@ namespace DataPlant {
         {
             Real64 load(0.0); // Return value
             for (int i = Comp.l(), e = Comp.u(); i <= e; ++i) {
-                load = max(load, abs(Comp(i).MyLoad));
+                load = max(load, std::abs(Comp(i).MyLoad));
             }
             return load;
         }

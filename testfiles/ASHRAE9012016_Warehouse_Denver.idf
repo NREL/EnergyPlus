@@ -134,7 +134,7 @@
 !    semiheated_skylight_frame = Skylight_Frame_Semiheated
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  VERSION,9.1;
+  Version,9.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -176,7 +176,7 @@
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year

@@ -1010,7 +1010,7 @@ namespace EnergyPlus {
                                 UtilityRoutines::MakeUPPERCase(capFtName));
                         if (thisWWHP.capFuncTempCurveIndex == 0) {
                             ShowSevereError("Invalid curve name for EIR WWHP (name=" + thisWWHP.name +
-                                            "; entered curve name: " + capFtName);
+                                            "; entered curve name: " + capFtName.get<std::string>());
                             errorsFound = true;
                         }
                         auto &capEIRtName = fields.at(
@@ -1019,7 +1019,7 @@ namespace EnergyPlus {
                                 UtilityRoutines::MakeUPPERCase(capEIRtName));
                         if (thisWWHP.capFuncTempCurveIndex == 0) {
                             ShowSevereError("Invalid curve name for EIR WWHP (name=" + thisWWHP.name +
-                                            "; entered curve name: " + capEIRtName);
+                                            "; entered curve name: " + capEIRtName.get<std::string>());
                             errorsFound = true;
                         }
                         auto &capEIRplrName = fields.at(
@@ -1028,7 +1028,7 @@ namespace EnergyPlus {
                                 UtilityRoutines::MakeUPPERCase(capEIRplrName));
                         if (thisWWHP.capFuncTempCurveIndex == 0) {
                             ShowSevereError("Invalid curve name for EIR WWHP (name=" + thisWWHP.name +
-                                            "; entered curve name: " + capEIRplrName);
+                                            "; entered curve name: " + capEIRplrName.get<std::string>());
                             errorsFound = true;
                         }
 

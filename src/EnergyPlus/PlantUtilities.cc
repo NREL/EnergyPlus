@@ -402,6 +402,12 @@ namespace PlantUtilities {
         // Set flow on node and branch while honoring constraints on actuated node
 
         auto &a_node(DataLoopNode::Node(ActuatedNode));
+        if (LoopNum == 0 || LoopSideNum == 0) {
+            // early in simulation before plant loops are setup and found
+            a_node.MassFlowRate = CompFlow;
+            return;
+        }
+
         auto &loop_side(DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum));
 
         // store original flow
@@ -495,10 +501,6 @@ namespace PlantUtilities {
                 DataLoopNode::Node(NodeNum).MassFlowRate = a_node_MasFlowRate;
                 DataLoopNode::Node(NodeNum).MassFlowRateRequest = a_node_MasFlowRateRequest;
             }
-
-        } else {
-            // early in simulation before plant loops are setup and found
-            a_node.MassFlowRate = CompFlow;
         }
     }
 
@@ -2277,7 +2279,7 @@ namespace PlantUtilities {
                            std::string const &CompName,      // user name of component
                            int const NodeNumIn,              // component water inlet node
                            int const EP_UNUSED(NodeNumOut),  // component water outlet node
-                           bool &ErrorsFound,                // set to true if there's an error
+                           bool &ErrorsFound,                // set to true if there's an error, unchanged otherwise
                            Optional_bool_const SupressErrors // used for WSHP's where condenser loop may not be on a plant loop
     )
     {
@@ -2316,7 +2318,6 @@ namespace PlantUtilities {
 
         MyPltLoopNum = 0;
         MyPltSizNum = 0;
-        ErrorsFound = false;
         if (present(SupressErrors)) {
             PrintErrorFlag = SupressErrors;
         } else {

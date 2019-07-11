@@ -97,7 +97,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,9.1;",
+        "Version,9.2;",
 
         "  Construction:WindowEquivalentLayer,",
         "  CLR CLR VB,                !- Name",
@@ -209,7 +209,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.1;",
+        "  Version,9.2;",
 
         "  Timestep,1;",
 
@@ -566,7 +566,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.1;",
+        "  Version,9.2;",
 
         "  Timestep,1;",
 

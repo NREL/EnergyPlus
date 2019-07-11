@@ -19,10 +19,10 @@
 ! System:   Ideal Loads
 ! Plant:    None (simple ideal loads)
 
-  Version,9.1;
+  Version,9.2;
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     4,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year

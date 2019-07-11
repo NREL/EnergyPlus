@@ -22,9 +22,7 @@ public:
 
     bcs.localWindSpeed = 0;
     bcs.outdoorTemp = 283.15;
-    bcs.indoorTemp = 310.15;
-    bcs.slabRadiantTemp = 310.15;
-    bcs.wallRadiantTemp = 310.15;
+    bcs.slabConvectiveTemp = bcs.wallConvectiveTemp = bcs.slabRadiantTemp = bcs.wallRadiantTemp = 310.15;
 
     for (auto &instance : instances) {
       Foundation::NumericalScheme tempNS = instance.ground->foundation.numericalScheme;

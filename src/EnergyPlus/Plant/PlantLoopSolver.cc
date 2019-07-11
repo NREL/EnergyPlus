@@ -247,7 +247,7 @@ namespace EnergyPlus {
                         totalDispatchedLoadOnBranch += component.MyLoad;
                     }
                 }
-                if (abs(totalDispatchedLoadOnBranch) < 0.001) {
+                if (std::abs(totalDispatchedLoadOnBranch) < 0.001) {
                     branch.disableOverrideForCSBranchPumping = true;
                 }
             }
