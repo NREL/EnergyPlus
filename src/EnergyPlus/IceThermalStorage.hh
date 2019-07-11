@@ -69,6 +69,11 @@ namespace IceThermalStorage {
     extern int const IceStorageType_Simple;
     extern int const IceStorageType_Detailed;
 
+    extern int const CurveVarsFracChargedLMTD;
+    extern int const CurveVarsFracDischargedLMTD;
+    extern int const CurveVarsLMTDMassFlow;
+    extern int const CurveVarsLMTDFracCharged;
+    
     extern int const DetIceInsideMelt;  // Inside melt system--charge starting with bare coil
     extern int const DetIceOutsideMelt; // Outside melt system--charge from existing ice layer on coil
 
@@ -286,6 +291,8 @@ namespace IceThermalStorage {
     extern Array1D<IceStorageMapping> IceStorageTypeMap;
 
     // Functions
+
+    void clear_state();
 
     void SimIceStorage(std::string const &IceStorageType,
                        std::string const &IceStorageName,
