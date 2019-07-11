@@ -96,6 +96,7 @@ set( test_src
   HVACVariableRefrigerantFlow.unit.cc
   HWBaseboardRadiator.unit.cc
   HybridModel.unit.cc
+  IceThermalStorage.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
