@@ -188,7 +188,7 @@ namespace FluidProperties {
         GlyRawData.deallocate();
         GlycolData.deallocate();
         GlycolErrorTracking.deallocate();
-        cached_t_sh.deallocate();
+        if (DataGlobals::UseGlycCache) cached_t_sh.deallocate();
     }
 
     void DefaultEthGlyCpData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
@@ -581,7 +581,7 @@ namespace FluidProperties {
         cNumericFieldNames = "";
         lNumericFieldBlanks = false;
 
-        cached_t_sh.allocate({0, t_sh_cache_size});
+        if (DataGlobals::UseGlycCache) cached_t_sh.allocate({0, t_sh_cache_size});
 
         // Check to see if there is any FluidName input.  If not, this is okay as
         // long as the user only desires to simulate loops with water.  More than

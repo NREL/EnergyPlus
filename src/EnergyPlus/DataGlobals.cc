@@ -260,6 +260,8 @@ namespace DataGlobals {
     bool AnySlabsInModel(false);         // true if there are any zone-coupled ground domains in the input file
     bool AnyBasementsInModel(false);     // true if there are any basements in the input file
 
+    bool UseGlycCache(true);
+
     int Progress(0); // current progress (0-100)
     void (*fProgressPtr)(int const);
     void (*fMessagePtr)(std::string const &);
@@ -356,6 +358,7 @@ namespace DataGlobals {
         ShowDecayCurvesInEIO = false;
         AnySlabsInModel = false;
         AnyBasementsInModel = false;
+        UseGlycCache = true;
         Progress = 0;
         eso_stream = nullptr;
         mtr_stream = nullptr;

@@ -509,21 +509,24 @@ namespace FluidProperties {
                                         std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
+        if (DataGlobals::UseGlycCache) {
+            Int64 const Grid_Shift(28);                         // Tuned This is a hot spot
+            assert(Grid_Shift == 64 - 12 - t_sh_precision_bits); // Force Grid_Shift updates when precision bits changes
 
-        Int64 const Grid_Shift(28);                         // Tuned This is a hot spot
-        assert(Grid_Shift == 64 - 12 - t_sh_precision_bits); // Force Grid_Shift updates when precision bits changes
+            Int64 const T_tag(bit_shift(bit_transfer(Temperature + 1000 * GlycolIndex, Grid_Shift), -Grid_Shift));
 
-        Int64 const T_tag(bit_shift(bit_transfer(Temperature + 1000 * GlycolIndex, Grid_Shift), -Grid_Shift));
+            Int64 const hash(T_tag & t_sh_cache_mask);
+            auto &cTsh(cached_t_sh(hash));
 
-        Int64 const hash(T_tag & t_sh_cache_mask);
-        auto &cTsh(cached_t_sh(hash));
+            if (cTsh.iT != T_tag) {
+                cTsh.iT = T_tag;
+                cTsh.sh = GetSpecificHeatGlycol_raw(Glycol, Temperature, GlycolIndex, CalledFrom);
+            }
 
-        if (cTsh.iT != T_tag) {
-            cTsh.iT = T_tag;
-            cTsh.sh = GetSpecificHeatGlycol_raw(Glycol, Temperature, GlycolIndex, CalledFrom);
+            return cTsh.sh; // saturation pressure {Pascals}
+        } else {
+            return GetSpecificHeatGlycol_raw(Glycol, Temperature, GlycolIndex, CalledFrom);
         }
-
-        return cTsh.sh; // saturation pressure {Pascals}
     }
 
     //*****************************************************************************
