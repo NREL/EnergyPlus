@@ -223,6 +223,7 @@ IF EXIST eplusout.edd  DEL eplusout.edd
 IF EXIST eplusout.dfs  DEL eplusout.dfs
 IF EXIST slab.int DEL slab.int
 IF EXIST BasementGHTIn.idf DEL BasementGHTIn.idf
+IF EXIST eplusshading.csv DEL eplusshading.csv
 :if %pausing%==Y pause
 
 :  2. Copy input data file to working directory
@@ -400,6 +401,7 @@ IF EXIST "%epout%.edd" DEL "%epout%.edd"
 IF EXIST "%epout%DFS.csv" DEL "%epout%DFS.csv"
 : IF EXIST "%epout%*.mat" DEL "%epout%*.mat"
 IF EXIST "%epout%.epJSONout" DEL "%epout%.epJSONout"
+IF EXIST "%epout%Shading.csv" DEL "%epout%Shading.csv"
 
 IF EXIST eplusout.eso MOVE eplusout.eso "%epout%.eso"
 IF EXIST eplusout.rdd MOVE eplusout.rdd "%epout%.rdd"
@@ -447,6 +449,7 @@ IF EXIST eplusout.sql MOVE eplusout.sql "%epout%.sql"
 IF EXIST eplusout.edd MOVE eplusout.edd "%epout%.edd"
 IF EXIST eplusout.dfs MOVE eplusout.dfs "%epout%DFS.csv"
 IF EXIST in.epJSON MOVE in.epJSON "%epout%.epJSONout"
+IF EXIST eplusshading.csv MOVE eplusshading.csv "%epout%Shading.csv"
 
 : Determine whether FMUImport or FMUExport -- Added for FMI
 IF NOT EXIST tmp-fmus GOTO :CSVproc

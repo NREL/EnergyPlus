@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -340,7 +340,6 @@ namespace BaseboardRadiator {
         int NumNums;
         int IOStat;
         static bool ErrorsFound(false); // If errors detected in input
-        bool errFlag;
 
         cCurrentModuleObject = cCMO_BBRadiator_Water;
 
@@ -376,10 +375,10 @@ namespace BaseboardRadiator {
                 if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
                 }
-                VerifyUniqueBaseboardName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-                if (errFlag) {
-                    ErrorsFound = true;
-                }
+
+                // ErrorsFound will be set to True if problem was found, left untouched otherwise
+                VerifyUniqueBaseboardName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+
                 ++BaseboardNum;
                 Baseboard(BaseboardNum).EquipID = cAlphaArgs(1); // name of this baseboard
                 Baseboard(BaseboardNum).EquipType = TypeOf_Baseboard_Conv_Water;
@@ -628,12 +627,12 @@ namespace BaseboardRadiator {
                                     Baseboard(BaseboardNum).LoopSideNum,
                                     Baseboard(BaseboardNum).BranchNum,
                                     Baseboard(BaseboardNum).CompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitBaseboard: Program terminated for previous conditions.");
             }

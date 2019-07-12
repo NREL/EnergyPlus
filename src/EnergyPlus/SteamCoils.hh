@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -298,16 +298,6 @@ namespace SteamCoils {
                                        std::string const &CoilName, // must match coil names for the coil type
                                        bool &ErrorsFound            // set to true if problem
     );
-
-    //// register that a coil is used as a regeneration air heating coil in
-    //// desiccant dehumidification system
-    // void
-    // SetSteamCoilAsDesicRegenCoil(
-    //	std::string const & CoilType, // must match coil types in this module
-    //	std::string const & CoilName, // must match coil names for the coil type
-    //	int & DesiccantDehumIndex, // index of desiccant dehumidifier
-    //	bool & ErrorsFound // set to true if problem
-    //);
 
     // sets data to a coil that is used as a regeneration air heating coil in
     // desiccant dehumidification system

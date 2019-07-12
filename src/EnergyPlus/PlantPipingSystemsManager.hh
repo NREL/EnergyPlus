@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,9 +51,9 @@
 // C++ Headers
 #include <map>
 #include <memory>
+#include <utility>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Optional.hh>
@@ -62,1160 +62,944 @@
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
-namespace PlantPipingSystemsManager {
+    namespace PlantPipingSystemsManager {
 
-    // MODULE PARAMETER DEFINITIONS:
-    extern std::string const ObjName_ug_GeneralDomain;
-    extern std::string const ObjName_Circuit;
-    extern std::string const ObjName_Segment;
-    extern std::string const ObjName_HorizTrench;
-    extern std::string const ObjName_ZoneCoupled_Slab;
-    extern std::string const ObjName_ZoneCoupled_Basement;
+        // MODULE PARAMETER DEFINITIONS:
+        extern std::string const ObjName_ug_GeneralDomain;
+        extern std::string const ObjName_Circuit;
+        extern std::string const ObjName_Segment;
+        extern std::string const ObjName_HorizTrench;
+        extern std::string const ObjName_ZoneCoupled_Slab;
+        extern std::string const ObjName_ZoneCoupled_Basement;
 
-    // Using/Aliasing
-    using namespace GroundTemperatureManager;
+        // Using/Aliasing
+        using namespace GroundTemperatureManager;
 
-    enum class SegmentFlow
-    {
-        IncreasingZ,
-        DecreasingZ
-    };
-    enum class MeshDistribution
-    {
-        Uniform,
-        SymmetricGeometric,
-        Geometric
-    };
-    enum class RegionType
-    {
-        Pipe,
-        BasementWall,
-        BasementFloor,
-        XDirection,
-        YDirection,
-        ZDirection,
-        XSide,
-        XSideWall,
-        ZSide,
-        ZSideWall,
-        FloorInside,
-        UnderFloor,
-        HorizInsXSide,
-        HorizInsZSide,
-        VertInsLowerEdge
-    };
-    enum class Direction
-    {
-        PositiveY,
-        NegativeY,
-        PositiveX,
-        NegativeX,
-        PositiveZ,
-        NegativeZ
-    };
-    enum class PartitionType
-    {
-        BasementWall,
-        BasementFloor,
-        Pipe,
-        Slab,
-        XSide,
-        XSideWall,
-        ZSide,
-        ZSideWall,
-        FloorInside,
-        UnderFloor,
-        HorizInsXSide,
-        VertInsLowerEdge,
-        HorizInsZSide
-    };
-    enum class CellType
-    {
-        Unknown,
-        Pipe,
-        GeneralField,
-        GroundSurface,
-        FarfieldBoundary,
-        BasementWall,
-        BasementFloor,
-        BasementCorner,
-        BasementCutaway,
-        Slab,
-        HorizInsulation,
-        VertInsulation,
-        ZoneGroundInterface
-    };
+        enum class SegmentFlow {
+            IncreasingZ,
+            DecreasingZ
+        };
 
-    extern Array1D<Direction> NeighborFieldCells;
-    extern Array1D<Direction> NeighborBoundaryCells;
+        enum class MeshDistribution {
+            Uniform,
+            SymmetricGeometric,
+            Geometric
+        };
 
-    struct BaseThermalPropertySet
-    {
-        // Members
-        Real64 Conductivity; // W/mK
-        Real64 Density;      // kg/m3
-        Real64 SpecificHeat; // J/kgK
+        enum class RegionType {
+            Pipe,
+            BasementWall,
+            BasementFloor,
+            XDirection,
+            YDirection,
+            ZDirection,
+            XSide,
+            XSideWall,
+            ZSide,
+            ZSideWall,
+            FloorInside,
+            UnderFloor,
+            HorizInsXSide,
+            HorizInsZSide,
+            VertInsLowerEdge
+        };
 
-        // Default Constructor
-        BaseThermalPropertySet() : Conductivity(0.0), Density(0.0), SpecificHeat(0.0)
+        enum class Direction {
+            PositiveY,
+            NegativeY,
+            PositiveX,
+            NegativeX,
+            PositiveZ,
+            NegativeZ
+        };
+
+        enum class PartitionType {
+            BasementWall,
+            BasementFloor,
+            Pipe,
+            Slab,
+            XSide,
+            XSideWall,
+            ZSide,
+            ZSideWall,
+            FloorInside,
+            UnderFloor,
+            HorizInsXSide,
+            VertInsLowerEdge,
+            HorizInsZSide
+        };
+
+        enum class CellType {
+            Unknown,
+            Pipe,
+            GeneralField,
+            GroundSurface,
+            FarfieldBoundary,
+            BasementWall,
+            BasementFloor,
+            BasementCorner,
+            BasementCutaway,
+            Slab,
+            HorizInsulation,
+            VertInsulation,
+            ZoneGroundInterface
+        };
+
+        struct BaseThermalPropertySet {
+            // Members
+            Real64 Conductivity = 0.0; // W/mK
+            Real64 Density = 0.0;      // kg/m3
+            Real64 SpecificHeat = 0.0; // J/kgK
+
+            // Default Constructor
+            BaseThermalPropertySet() = default;
+
+            Real64 inline diffusivity() const {
+                return this->Conductivity / (this->Density * this->SpecificHeat);
+            }
+        };
+
+        struct ExtendedFluidProperties : BaseThermalPropertySet {
+            // Members
+            Real64 Viscosity = 0.0; // kg/m-s
+            Real64 Prandtl = 0.0;   // -
+
+            // Default Constructor
+            ExtendedFluidProperties() = default;
+
+        };
+
+        struct BaseCell {
+            // Members
+            Real64 Temperature = 0.0;               // C
+            Real64 Temperature_PrevIteration = 0.0; // C
+            Real64 Temperature_PrevTimeStep = 0.0;  // C
+            Real64 Beta = 0.0;                      // K/W
+            BaseThermalPropertySet Properties;
+
+            // Default Constructor
+            BaseCell() = default;
+        };
+
+        struct RadialSizing {
+            // Members
+            Real64 InnerDia = 0.0;
+            Real64 OuterDia = 0.0;
+
+            // Default Constructor
+            RadialSizing() = default;
+
+            Real64 inline thickness() const {
+                return (this->OuterDia - this->InnerDia) / 2.0;
+            }
+        };
+
+        struct RadialCellInformation : BaseCell {
+            // Members
+            Real64 RadialCentroid = 0.0;
+            Real64 InnerRadius = 0.0;
+            Real64 OuterRadius = 0.0;
+
+            // Default Constructor
+            RadialCellInformation() = default;
+
+            // Member Constructor
+            RadialCellInformation(Real64 const m_RadialCentroid, Real64 const m_MinRadius, Real64 const m_MaxRadius) {
+                RadialCentroid = m_RadialCentroid;
+                InnerRadius = m_MinRadius;
+                OuterRadius = m_MaxRadius;
+            }
+
+            // Get the XY cross sectional area of the radial cell
+            Real64 inline XY_CrossSectArea() const {
+                return DataGlobals::Pi * (pow_2(this->OuterRadius) - pow_2(this->InnerRadius));
+            }
+        };
+
+        struct FluidCellInformation : BaseCell {
+            // Members
+            Real64 Volume = 0.0;
+            ExtendedFluidProperties Properties;
+
+            // Default Constructor
+            FluidCellInformation() = default;
+
+            // Member Constructor
+            FluidCellInformation(Real64 const m_PipeInnerRadius, Real64 const m_CellDepth) {
+                this->Volume = DataGlobals::Pi * pow_2(m_PipeInnerRadius) * m_CellDepth;
+            }
+        };
+
+        struct CartesianPipeCellInformation // Specialized cell information only used by cells which contain pipes
         {
+            // Members
+            std::vector<RadialCellInformation> Soil;
+            RadialCellInformation Insulation;
+            RadialCellInformation Pipe;
+            FluidCellInformation Fluid;
+            Real64 RadialSliceWidth = 0.0;
+            Real64 InterfaceVolume = 0.0;
+
+            // Default Constructor
+            CartesianPipeCellInformation() = default;
+
+            CartesianPipeCellInformation(Real64 GridCellWidth,
+                             RadialSizing const &PipeSizes,
+                             int NumRadialNodes,
+                             Real64 CellDepth,
+                             Real64 InsulationThickness,
+                             Real64 RadialGridExtent,
+                             bool SimHasInsulation);
+        };
+
+        struct Point {
+            // Members
+            int X = 0;
+            int Y = 0;
+
+            // Default Constructor
+            Point() = default;
+
+            // Member Constructor
+            Point(int const X, int const Y) : X(X), Y(Y) {
+            }
+        };
+
+        struct PointF {
+            // Members
+            Real64 X = 0.0;
+            Real64 Y = 0.0;
+
+            // Default Constructor
+            PointF() = default;
+
+            // Member Constructor
+            PointF(Real64 const X, Real64 const Y) : X(X), Y(Y) {
+            }
+        };
+
+        struct Point3DInteger {
+            // Members
+            int X = 0;
+            int Y = 0;
+            int Z = 0;
+
+            // Default Constructor
+            Point3DInteger() = default;
+
+            // Member Constructor
+            Point3DInteger(int const X, int const Y, int const Z) : X(X), Y(Y), Z(Z) {
+            }
+        };
+
+        struct Point3DReal {
+            // Members
+            Real64 X = 0.0;
+            Real64 Y = 0.0;
+            Real64 Z = 0.0;
+
+            // Default Constructor
+            Point3DReal() = default;
+
+            // Member Constructor
+            Point3DReal(Real64 const X, Real64 const Y, Real64 const Z) : X(X), Y(Y), Z(Z) {
+            }
+        };
+
+        struct MeshPartition {
+            // Members
+            Real64 rDimension = 0.0;
+            PartitionType partitionType = PartitionType::Pipe;
+            Real64 TotalWidth = 0.0;
+
+            // Default Constructor
+            MeshPartition() = default;
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
+            // Member Constructor -- shows unused but it's actually implied in emplace_back calls in createPartitionCenterList
+            MeshPartition(Real64 const rDimension,
+                          PartitionType const partitionType, // From Enum: ParitionType
+                          Real64 const TotalWidth)
+                    : rDimension(rDimension), partitionType(partitionType), TotalWidth(TotalWidth) {
+            }
+#pragma clang diagnostic pop
+
+            // used to allow std::find to see if a MeshPartition matches a float (rDimension) value
+            bool operator==(Real64 a) {
+                return this->rDimension == a;
+            }
+
+        };
+
+        struct GridRegion {
+            // Members
+            Real64 Min = 0.0;
+            Real64 Max = 0.0;
+            RegionType thisRegionType = RegionType::Pipe;
+            std::vector<Real64> CellWidths;
+
+            // Default Constructor
+            GridRegion() = default;
+
+            // Member Constructor
+            GridRegion(Real64 Min, Real64 Max, RegionType thisRegionType, std::vector<Real64> CellWidths)
+                    : Min(Min), Max(Max), thisRegionType(thisRegionType), CellWidths(std::move(CellWidths)) {
+            }
+        };
+
+        struct RectangleF {
+            // Members
+            Real64 X_min = 0.0;
+            Real64 Y_min = 0.0;
+            Real64 Width = 0.0;
+            Real64 Height = 0.0;
+
+            // Default Constructor
+            RectangleF() = default;
+
+            // Member Constructor
+            RectangleF(Real64 const X_min, Real64 const Y_min, Real64 const Width, Real64 const Height)
+                    : X_min(X_min), Y_min(Y_min), Width(Width), Height(Height) {
+            }
+
+            bool inline contains(PointF const &p) const {
+                return ((this->X_min <= p.X) && (p.X < (this->X_min + this->Width)) && (this->Y_min <= p.Y) &&
+                        (p.Y < (this->Y_min + this->Height)));
+            }
+        };
+
+        struct NeighborInformation {
+            // Members
+            Real64 ThisCentroidToNeighborWall = 0.0;
+            Real64 ThisWallToNeighborCentroid = 0.0;
+            Real64 adiabaticMultiplier = 1.0;
+            Direction direction = Direction::NegativeX;
+
+            // Default Constructor
+            NeighborInformation() = default;
+        };
+
+        struct CartesianCell : BaseCell {
+            // Members
+            int X_index = 0;
+            int Y_index = 0;
+            int Z_index = 0;
+            Real64 X_min = 0.0;
+            Real64 X_max = 0.0;
+            Real64 Y_min = 0.0;
+            Real64 Y_max = 0.0;
+            Real64 Z_min = 0.0;
+            Real64 Z_max = 0.0;
+            Point3DReal Centroid;
+            CellType cellType = CellType::Unknown;
+            std::map<Direction, NeighborInformation> NeighborInfo;
+            CartesianPipeCellInformation PipeCellData;
+
+            // Default Constructor
+            CartesianCell() = default;
+
+            Real64 inline width() const {
+                return this->X_max - this->X_min;
+            }
+
+            Real64 inline height() const {
+                return this->Y_max - this->Y_min;
+            }
+
+            Real64 inline depth() const {
+                return this->Z_max - this->Z_min;
+            }
+
+            Real64 inline XNormalArea() const {
+                return this->depth() * this->height();
+            }
+
+            Real64 inline YNormalArea() const {
+                return this->depth() * this->width();
+            }
+
+            Real64 inline ZNormalArea() const {
+                return this->width() * this->height();
+            }
+
+            Real64 inline volume() const {
+                return this->width() * this->depth() * this->height();
+            }
+
+            Real64 normalArea(Direction direction) const;
+
+            void EvaluateNeighborCoordinates(Direction CurDirection, int &NX, int &NY, int &NZ);
+
+        };
+
+        struct MeshExtents {
+            // Members
+            Real64 xMax = 0.0;
+            Real64 yMax = 0.0;
+            Real64 zMax = 0.0;
+
+            // Default Constructor
+            MeshExtents() = default;
+
+            // Member Constructor
+            MeshExtents(Real64 const xMax, Real64 const yMax, Real64 const zMax) : xMax(xMax), yMax(yMax), zMax(zMax) {
+            }
+        };
+
+        struct CellExtents : MeshExtents {
+            // Members
+            Real64 Xmin;
+            Real64 Ymin;
+            Real64 Zmin;
+
+            // Member Constructor
+            CellExtents(Real64 const Xmax, Real64 const Ymax, Real64 const Zmax, Real64 const Xmin,
+                         Real64 const Ymin, Real64 const Zmin)
+                    : MeshExtents(Xmax, Ymax, Zmax), Xmin(Xmin), Ymin(Ymin), Zmin(Zmin) {
+            }
+        };
+
+        struct DistributionStructure {
+            // Members
+            MeshDistribution thisMeshDistribution = MeshDistribution::Uniform;
+            int RegionMeshCount = 0;
+            Real64 GeometricSeriesCoefficient = 0.0;
+
+            // Default Constructor
+            DistributionStructure() = default;
+        };
+
+        struct MeshProperties {
+            // Members
+            DistributionStructure X;
+            DistributionStructure Y;
+            DistributionStructure Z;
+
+            // Default Constructor
+            MeshProperties() = default;
+        };
+
+        struct SimulationControl {
+            // Members
+            Real64 MinimumTemperatureLimit = -1000;
+            Real64 MaximumTemperatureLimit = 1000;
+            Real64 Convergence_CurrentToPrevIteration = 0.0;
+            int MaxIterationsPerTS = 0;
+
+            // Default Constructor
+            SimulationControl() = default;
+        };
+
+        struct BasementZoneInfo {
+            // Members
+            Real64 Depth = 0;  // m
+            Real64 Width = 0;  // m
+            Real64 Length = 0; // m
+            bool ShiftPipesByWidth = false;
+            std::string WallBoundaryOSCMName = "";
+            int WallBoundaryOSCMIndex = 0;
+            std::string FloorBoundaryOSCMName = "";
+            int FloorBoundaryOSCMIndex = 0;
+            std::vector<int> WallSurfacePointers;
+            std::vector<int> FloorSurfacePointers;
+            int BasementWallXIndex = -1;
+            int BasementFloorYIndex = -1;
+
+            // Default Constructor
+            BasementZoneInfo() = default;
+        };
+
+        struct MeshPartitions {
+            // Members
+            std::vector<MeshPartition> X;
+            std::vector<MeshPartition> Y;
+            std::vector<MeshPartition> Z;
+
+            // Default Constructor
+            MeshPartitions() = default;
+        };
+
+        struct MoistureInfo {
+            // Members
+            Real64 Theta_liq = 0.3; // volumetric moisture content of the soil
+            Real64 Theta_sat = 0.5; // volumetric moisture content of soil at saturation
+            Real64 GroundCoverCoefficient = 0.408;
+            Real64 rhoCP_soil_liq = 0.0;
+            Real64 rhoCP_soil_transient = 0.0;
+            Real64 rhoCP_soil_ice = 0.0;
+            Real64 rhoCp_soil_liq_1 = 0.0;
+
+            // Default Constructor
+            MoistureInfo() = default;
+        };
+
+        struct CurSimConditionsInfo {
+            // Members
+            // Simulation conditions
+            Real64 PrevSimTimeSeconds = -1.0;
+            Real64 CurSimTimeSeconds = 0.0;
+            Real64 CurSimTimeStepSize = 0.0;
+            // Environmental conditions
+            Real64 CurAirTemp = 10.0;
+            Real64 CurWindSpeed = 2.6;
+            Real64 CurIncidentSolar = 0.0;
+            Real64 CurRelativeHumidity = 100.0;
+
+            // Default Constructor
+            CurSimConditionsInfo() = default;
+        };
+
+        struct Segment {
+            // Members
+            // ID
+            std::string Name = "";
+            // Misc inputs
+            PointF PipeLocation;
+            Point PipeCellCoordinates;
+            SegmentFlow FlowDirection = SegmentFlow::IncreasingZ;
+            // Reporting variables
+            Real64 InletTemperature = 0.0;
+            Real64 OutletTemperature = 0.0;
+            Real64 FluidHeatLoss = 0.0;
+            // Error handling flags
+            bool PipeCellCoordinatesSet = false;
+            // Other flags
+            bool IsActuallyPartOfAHorizontalTrench = false;
+
+            // Default Constructor
+            Segment() = default;
+
+            void initPipeCells(int x, int y);
+
+            bool operator==(std::string const & a) {
+                return this->Name == a;
+            }
+
+            static Segment *factory(std::string segmentName);
+        };
+
+        struct Circuit : public PlantComponent {
+
+            // Members
+            // ID
+            std::string Name = "";
+            // Inlet and outlet information
+            std::string InletNodeName = "";
+            std::string OutletNodeName = "";
+            int InletNodeNum = 0;
+            int OutletNodeNum = 0;
+            Point3DInteger CircuitInletCell;
+            Point3DInteger CircuitOutletCell;
+            // Names and pointers to pipe segments found in this pipe circuit
+            std::vector<Segment *> pipeSegments;
+            // Pointer to the domain which contains this pipe circuit
+            int ParentDomainIndex = 0;
+            // Misc inputs
+            RadialSizing PipeSize;
+            RadialSizing InsulationSize;
+            Real64 RadialMeshThickness = 0.0;
+            bool HasInsulation = false;
+            Real64 DesignVolumeFlowRate = 0.0;
+            Real64 DesignMassFlowRate = 0.0;
+            Real64 Convergence_CurrentToPrevIteration = 0.0;
+            int MaxIterationsPerTS = 0;
+            int NumRadialCells = 0;
+            BaseThermalPropertySet PipeProperties;
+            BaseThermalPropertySet InsulationProperties;
+            // Flags
+            bool NeedToFindOnPlantLoop = true;
+            bool IsActuallyPartOfAHorizontalTrench = false;
+            // Location of this pipe circuit in the PlantLoop topology
+            int LoopNum = 0;
+            int LoopSideNum = 0;
+            int BranchNum = 0;
+            int CompNum = 0;
+            ExtendedFluidProperties CurFluidPropertySet; // is_used
+            // Variables used to pass information from INIT-type routines to CALC-type routines
+            Real64 CurCircuitInletTemp = 23.0;
+            Real64 CurCircuitFlowRate = 0.1321;
+            Real64 CurCircuitConvectionCoefficient = 0.0;
+            // Reporting variables
+            Real64 InletTemperature = 0.0;
+            Real64 OutletTemperature = 0.0;
+            Real64 FluidHeatLoss = 0.0;
+
+            // Default Constructor
+            Circuit() = default;
+
+            virtual ~Circuit() = default;
+
+            void initInOutCells(CartesianCell const &in, CartesianCell const &out);
+
+            static PlantComponent *factory(int objectType, std::string objectName);
+
+            void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+                          bool RunFlag) override;
+
+            bool operator==(std::string const & a) {
+                return this->Name == a;
+            }
+
+            static Circuit *factory(std::string circuit, bool & errorsFound);
+        };
+
+        struct ZoneCoupledSurfaceData {
+            // Members
+            // ID
+            std::string Name;
+            // Surface data
+            int IndexInSurfaceArray;
+            Real64 SurfaceArea;
+            Real64 Width;
+            Real64 Length;
+            Real64 Depth;
+            Real64 Conductivity;
+            Real64 Density;
+            Real64 InsulationConductivity;
+            Real64 InsulationDensity;
+            int Zone;
+
+            // Default Constructor
+            ZoneCoupledSurfaceData()
+                    : IndexInSurfaceArray(0), SurfaceArea(0.0), Width(0.0), Length(0.0), Depth(0.0), Conductivity(0.0),
+                      Density(0.0),
+                      InsulationConductivity(0.0), InsulationDensity(0.0), Zone(0) {
+            }
+        };
+
+        struct Domain {
+            // Members
+            // ID
+            std::string Name;
+            // Names and pointers to circuits found in this domain
+            std::vector<Circuit *> circuits;
+            int MaxIterationsPerTS;
+            // Flag variables
+            bool OneTimeInit;
+            bool BeginSimInit;
+            bool BeginSimEnvironment;
+            bool DomainNeedsSimulation;
+            bool DomainNeedsToBeMeshed;
+            bool IsActuallyPartOfAHorizontalTrench;
+            bool HasAPipeCircuit;
+            bool HasZoneCoupledSlab;
+            bool HasZoneCoupledBasement;
+            // "Input" data structure variables
+            MeshExtents Extents;
+            MeshProperties Mesh;
+            BaseThermalPropertySet GroundProperties;
+            BaseThermalPropertySet SlabProperties;
+            BaseThermalPropertySet BasementInterfaceProperties;
+            BaseThermalPropertySet HorizInsProperties;
+            BaseThermalPropertySet VertInsProperties;
+            SimulationControl SimControls;
+            std::shared_ptr<BaseGroundTempsModel> groundTempModel;
+            BasementZoneInfo BasementZone;
+            MoistureInfo Moisture;
+            // "Internal" data structure variables
+            MeshPartitions Partitions;
+            CurSimConditionsInfo Cur;
+            bool HasBasement;
+            // Zone coupled variables
+            std::vector<ZoneCoupledSurfaceData> ZoneCoupledSurfaces;
+            int ZoneCoupledOSCMIndex;
+            Real64 PerimeterOffset;
+            bool SlabInGradeFlag;
+            int SlabMaterialNum;
+            Real64 SlabArea;
+            Real64 SlabWidth;
+            Real64 SlabLength;
+            Real64 SlabThickness;
+            int XIndex;
+            int YIndex;
+            int ZIndex;
+            int x_max_index;
+            int y_max_index;
+            int z_max_index;
+            bool HorizInsPresentFlag;
+            int HorizInsMaterialNum;
+            Real64 HorizInsThickness;
+            Real64 HorizInsWidth;
+            Real64 HeatFlux;
+            Real64 WallHeatFlux;
+            Real64 FloorHeatFlux;
+            Real64 AggregateHeatFlux;
+            Real64 AggregateWallHeatFlux;
+            Real64 AggregateFloorHeatFlux;
+            int NumHeatFlux;
+            bool ResetHeatFluxFlag;
+            Real64 ConvectionCoefficient;
+            bool FullHorizInsPresent;
+            bool VertInsPresentFlag;
+            int VertInsMaterialNum;
+            Real64 VertInsThickness;
+            Real64 VertInsDepth;
+            int XWallIndex;
+            int YFloorIndex;
+            int ZWallIndex;
+            int InsulationXIndex;
+            int InsulationYIndex;
+            int InsulationZIndex;
+            bool SimTimeStepFlag;
+            bool SimHourlyFlag;
+            bool SimDailyFlag;
+            Real64 ZoneCoupledSurfaceTemp;
+            Real64 BasementWallTemp;
+            Real64 BasementFloorTemp;
+            int NumDomainCells;
+            int NumGroundSurfCells;
+            int NumInsulationCells;
+            int NumSlabCells;
+            Array2D<Real64> WeightingFactor;
+            Array2D<Real64> WeightedHeatFlux;
+            Real64 TotalEnergyUniformHeatFlux = 0.0;
+            Real64 TotalEnergyWeightedHeatFlux = 0.0;
+            Real64 HeatFluxWeightingFactor = 0.0;
+            std::vector<GridRegion> XRegions;
+            std::vector<GridRegion> YRegions;
+            std::vector<GridRegion> ZRegions;
+
+            // Main 3D cells array
+            Array3D<CartesianCell> Cells;
+
+            // Dynamic indexes to available neighbor directions for a particular cell
+            std::vector<Direction> NeighborFieldCells;
+            std::vector<Direction> NeighborBoundaryCells;
+
+            // Default Constructor
+            Domain()
+                    : MaxIterationsPerTS(10), OneTimeInit(true), BeginSimInit(true), BeginSimEnvironment(true),
+                      DomainNeedsSimulation(true),
+                      DomainNeedsToBeMeshed(true), IsActuallyPartOfAHorizontalTrench(false), HasAPipeCircuit(true),
+                      HasZoneCoupledSlab(false),
+                      HasZoneCoupledBasement(false), HasBasement(false), ZoneCoupledOSCMIndex(0), PerimeterOffset(0.0),
+                      SlabInGradeFlag(false),
+                      SlabMaterialNum(0), SlabArea(0.0), SlabWidth(0.0), SlabLength(0.0), SlabThickness(0.0), XIndex(0),
+                      YIndex(0), ZIndex(0), x_max_index(0),
+                      y_max_index(0), z_max_index(0), HorizInsPresentFlag(false), HorizInsMaterialNum(0),
+                      HorizInsThickness(0.0254), HorizInsWidth(0.0),
+                      HeatFlux(0.0), WallHeatFlux(0.0), FloorHeatFlux(0.0), AggregateHeatFlux(0.0),
+                      AggregateWallHeatFlux(0.0), AggregateFloorHeatFlux(0.0),
+                      NumHeatFlux(0), ResetHeatFluxFlag(true), ConvectionCoefficient(0.0), FullHorizInsPresent(false),
+                      VertInsPresentFlag(false), VertInsMaterialNum(0),
+                      VertInsThickness(0.0254), VertInsDepth(0.0), XWallIndex(0), YFloorIndex(0), ZWallIndex(0),
+                      InsulationXIndex(0), InsulationYIndex(0),
+                      InsulationZIndex(0), SimTimeStepFlag(false), SimHourlyFlag(false), SimDailyFlag(false),
+                      ZoneCoupledSurfaceTemp(0.0),
+                      BasementWallTemp(0.0), BasementFloorTemp(0.0), NumDomainCells(0), NumGroundSurfCells(0),
+                      NumInsulationCells(0), NumSlabCells(0) {
+                NeighborFieldCells.resize(6);
+                NeighborBoundaryCells.resize(6);
+            }
+
+            void developMesh();
+
+            void createPartitionCenterList();
+
+            std::vector<GridRegion> createPartitionRegionList(std::vector<MeshPartition> const &ThesePartitionCenters,
+                                                              bool PartitionsExist,
+                                                              Real64 DirExtentMax);
+
+            void createRegionList(std::vector<GridRegion> &Regions,
+                                  std::vector<GridRegion> const &ThesePartitionRegions,
+                                  Real64 DirExtentMax,
+                                  RegionType DirDirection,
+                                  bool PartitionsExist,
+                                  Optional_int BasementWallXIndex = _,
+                                  Optional_int BasementFloorYIndex = _,
+                                  Optional_int XIndex = _,
+                                  Optional_int XWallIndex = _,
+                                  Optional_int InsulationXIndex = _,
+                                  Optional_int YIndex = _,
+                                  Optional_int YFloorIndex = _,
+                                  Optional_int InsulationYIndex = _,
+                                  Optional_int ZIndex = _,
+                                  Optional_int ZWallIndex = _,
+                                  Optional_int InsulationZIndex = _);
+
+            void createCellArray(std::vector<Real64> const &XBoundaryPoints, std::vector<Real64> const &YBoundaryPoints,
+                                 std::vector<Real64> const &ZBoundaryPoints);
+
+            void setupCellNeighbors();
+
+            void setupPipeCircuitInOutCells();
+
+            int getCellWidthsCount(RegionType dir);
+
+            void getCellWidths(GridRegion &g, RegionType direction);
+
+            void addNeighborInformation(int X,
+                                        int Y,
+                                        int Z,
+                                        Direction direction,
+                                        Real64 ThisCentroidToNeighborWall,
+                                        Real64 ThisWallToNeighborCentroid,
+                                        Real64 ThisAdiabaticMultiplier);
+
+            Real64 GetBasementWallHeatFlux();
+
+            Real64 GetBasementFloorHeatFlux();
+
+            void UpdateBasementSurfaceTemperatures();
+
+            Real64 GetZoneInterfaceHeatFlux();
+
+            void UpdateZoneSurfaceTemperatures();
+
+            Real64 GetAverageTempByType(CellType cellType);
+
+            void InitializeSoilMoistureCalcs();
+
+            void EvaluateSoilRhoCp(Real64 CellTemp, Real64 &rhoCp);
+
+            void ShiftTemperaturesForNewTimeStep();
+
+            void ShiftTemperaturesForNewIteration();
+
+            bool IsConverged_CurrentToPrevIteration();
+
+            bool CheckForOutOfRangeTemps();
+
+            void EvaluateNeighborCharacteristics(CartesianCell &ThisCell,
+                                                 Direction CurDirection,
+                                                 Real64 &NeighborTemp,
+                                                 Real64 &Resistance,
+                                                 Real64 &AdiabaticMultiplier);
+
+            void EvaluateCellNeighborDirections(CartesianCell const &cell, int &NumFieldCells, int &NumBoundaryCells);
+
+            void DoEndOfIterationOperations(bool &Finished);
+
+            void DoOneTimeInitializations(Circuit * thisCircuit);
+
+            void DoStartOfTimeStepInitializations();
+
+            void DoStartOfTimeStepInitializations(Circuit * thisCircuit);
+
+            Real64 GetFarfieldTemp(CartesianCell const &cell);
+
+            void PreparePipeCircuitSimulation(Circuit * thisCircuit);
+
+            void PerformPipeCircuitSimulation(Circuit * thisCircuit);
+
+            void
+            PerformPipeCellSimulation(Circuit * thisCircuit, CartesianCell &ThisCell, Real64 FlowRate, Real64 EnteringTemp);
+
+            void SimulateRadialToCartesianInterface(CartesianCell &ThisCell);
+
+            void PerformTemperatureFieldUpdate();
+
+            Real64 EvaluateFieldCellTemperature(CartesianCell &ThisCell);
+
+            Real64 EvaluateGroundSurfaceTemperature(CartesianCell &cell);
+
+            Real64 EvaluateBasementCellTemperature(CartesianCell &cell);
+
+            Real64 EvaluateZoneInterfaceTemperature(CartesianCell &cell);
+
+            Real64 EvaluateFarfieldBoundaryTemperature(CartesianCell &cell);
+
+            void EvaluateFarfieldCharacteristics(CartesianCell &cell, Direction direction, Real64 &neighbortemp,
+                                                 Real64 &resistance, Real64 &adiabaticMultiplier);
+
+            void PerformIterationLoop();
+
+            void PerformIterationLoop(Circuit * thisCircuit);
+
+            void InitPipingSystems(Circuit * thisCircuit);
+
+            void UpdatePipingSystems(Circuit * thisCircuit);
+
+            void SetupZoneCoupledOutputVariables();
+
+        };
+
+        // Object Data
+        extern std::vector<Domain> domains;
+        extern std::vector<Circuit> circuits;
+        extern std::vector<Segment> segments;
+
+        void clear_state();
+
+        void SimulateGroundDomains(bool initOnly);
+
+        void CheckIfAnySlabs();
+
+        void CheckIfAnyBasements();
+
+        void GetPipingSystemsAndGroundDomainsInput();
+
+        void ReadGeneralDomainInputs(int IndexStart, int NumGeneralizedDomains, bool &ErrorsFound);
+
+        void ReadZoneCoupledDomainInputs(int StartingDomainNumForZone, int NumZoneCoupledDomains, bool &ErrorsFound);
+
+        void ReadBasementInputs(int StartingDomainNumForBasement, int NumBasements, bool &ErrorsFound);
+
+        void ReadPipeCircuitInputs(bool &ErrorsFound);
+
+        void ReadPipeSegmentInputs(bool &ErrorsFound);
+
+        void ReadHorizontalTrenchInputs(int StartingDomainNumForHorizontal,
+                                        int StartingCircuitNumForHorizontal,
+                                        bool &ErrorsFound);
+
+        void SetupPipingSystemOutputVariables();
+
+        void IssueSevereInputFieldError(std::string const &RoutineName,
+                                        std::string const &ObjectName,
+                                        std::string const &InstanceName,
+                                        std::string const &FieldName,
+                                        std::string const &FieldEntry,
+                                        std::string const &Condition,
+                                        bool &ErrorsFound);
+
+        void IssueSevereInputFieldError(std::string const &RoutineName,
+                                        std::string const &ObjectName,
+                                        std::string const &InstanceName,
+                                        std::string const &FieldName,
+                                        Real64 FieldEntry,
+                                        std::string const &Condition,
+                                        bool &ErrorsFound);
+
+        int GetSurfaceCountForOSCM(int OSCMIndex);
+
+        std::vector<int> GetSurfaceIndecesForOSCM(int OSCMIndex);
+
+        std::vector<ZoneCoupledSurfaceData> GetSurfaceDataForOSCM(int OSCMIndex);
+
+        bool inline IsInRangeReal(Real64 const r, Real64 const lower, Real64 const upper) {
+            return ((r >= lower) && (r <= upper));
         }
 
-        // Member Constructor
-        BaseThermalPropertySet(Real64 const Conductivity, // W/mK
-                               Real64 const Density,      // kg/m3
-                               Real64 const SpecificHeat  // J/kgK
-                               )
-            : Conductivity(Conductivity), Density(Density), SpecificHeat(SpecificHeat)
-        {
+        bool inline IsInRange_BasementModel(Real64 const r, Real64 const lower, Real64 const upper) {
+            return ((r >= lower) && (r < upper));
         }
 
-        Real64 inline diffusivity()
-        {
-            return this->Conductivity / (this->Density * this->SpecificHeat);
-        }
-    };
+        void ShiftPipeTemperaturesForNewIteration(CartesianCell &ThisPipeCell);
 
-    struct ExtendedFluidProperties : BaseThermalPropertySet
-    {
-        // Members
-        Real64 Viscosity; // kg/m-s
-        Real64 Prandtl;   // -
+        std::vector<Real64>
+        CreateBoundaryList(std::vector<GridRegion> const &RegionList, Real64 DirExtentMax, RegionType DirDirection);
 
-        // Default Constructor
-        ExtendedFluidProperties()
-        {
-        }
+        void SimulateOuterMostRadialSoilSlice(Circuit * thisCircuit, CartesianCell &ThisCell);
 
-        // Member Constructor
-        ExtendedFluidProperties(Real64 const Conductivity, // W/mK
-                                Real64 const Density,      // kg/m3
-                                Real64 const SpecificHeat, // J/kgK
-                                Real64 const Viscosity,    // kg/m-s
-                                Real64 const Prandtl       // -
-                                )
-            : BaseThermalPropertySet(Conductivity, Density, SpecificHeat), Viscosity(Viscosity), Prandtl(Prandtl)
-        {
-        }
-    };
+        void SimulateAllInteriorRadialSoilSlices(CartesianCell &ThisCell);
 
-    struct BaseCell
-    {
-        // Members
-        Real64 Temperature;               // C
-        Real64 Temperature_PrevIteration; // C
-        Real64 Temperature_PrevTimeStep;  // C
-        Real64 Beta;                      // K/W
-        BaseThermalPropertySet Properties;
+        void SimulateInnerMostRadialSoilSlice(Circuit * thisCircuit, CartesianCell &ThisCell);
 
-        // Default Constructor
-        BaseCell() : Temperature(0.0), Temperature_PrevIteration(0.0), Temperature_PrevTimeStep(0.0), Beta(0.0)
-        {
-        }
-    };
+        void SimulateRadialInsulationCell(CartesianCell &ThisCell);
 
-    struct RadialSizing
-    {
-        // Members
-        Real64 InnerDia;
-        Real64 OuterDia;
+        void SimulateRadialPipeCell(Circuit * thisCircuit, CartesianCell &ThisCell);
 
-        // Default Constructor
-        RadialSizing()
-        {
-        }
+        void SimulateFluidCell(Circuit * thisCircuit, CartesianCell &ThisCell, Real64 FlowRate, Real64 EnteringFluidTemp);
 
-        Real64 inline thickness()
-        {
-            return (this->OuterDia - this->InnerDia) / 2.0;
-        }
-    };
+        bool IsConverged_PipeCurrentToPrevIteration(Circuit * thisCircuit, CartesianCell const &CellToCheck);
 
-    struct RadialCellInformation : BaseCell
-    {
-        // Members
-        Real64 RadialCentroid;
-        Real64 InnerRadius;
-        Real64 OuterRadius;
-
-        // Default Constructor
-        RadialCellInformation()
-        {
-        }
-
-        // Member Constructor
-        RadialCellInformation(Real64 const m_RadialCentroid, Real64 const m_MinRadius, Real64 const m_MaxRadius)
-        {
-            RadialCentroid = m_RadialCentroid;
-            InnerRadius = m_MinRadius;
-            OuterRadius = m_MaxRadius;
-        }
-
-        // Get the XY cross sectional area of the radial cell
-        Real64 inline XY_CrossSectArea()
-        {
-            return DataGlobals::Pi * (pow_2(this->OuterRadius) - pow_2(this->InnerRadius));
-        }
-    };
-
-    struct FluidCellInformation : BaseCell
-    {
-        // Members
-        Real64 PipeInnerRadius;
-        Real64 Volume;
-        ExtendedFluidProperties Properties;
-
-        // Default Constructor
-        FluidCellInformation()
-        {
-        }
-
-        // Member Constructor
-        FluidCellInformation(Real64 const m_PipeInnerRadius, Real64 const m_CellDepth)
-        {
-            this->PipeInnerRadius = m_PipeInnerRadius;
-            this->Volume = DataGlobals::Pi * pow_2(m_PipeInnerRadius) * m_CellDepth;
-        }
-    };
-
-    struct CartesianPipeCellInformation // Specialized cell information only used by cells which contain pipes
-    {
-        // Members
-        Array1D<RadialCellInformation> Soil;
-        RadialCellInformation Insulation;
-        RadialCellInformation Pipe;
-        FluidCellInformation Fluid;
-        Real64 RadialSliceWidth;
-        Real64 InterfaceVolume;
-
-        // Default Constructor
-        CartesianPipeCellInformation()
-        {
-        }
-
-        // Eventually this should be the real constructor
-        static void ctor(CartesianPipeCellInformation &c,
-                         Real64 const GridCellWidth,
-                         RadialSizing const &PipeSizes,
-                         int const NumRadialNodes,
-                         Real64 const CellDepth,
-                         Real64 const InsulationThickness,
-                         Real64 const RadialGridExtent,
-                         bool const SimHasInsulation);
-    };
-
-    struct Point
-    {
-        // Members
-        int X;
-        int Y;
-
-        // Default Constructor
-        Point()
-        {
-        }
-
-        // Member Constructor
-        Point(int const X, int const Y) : X(X), Y(Y)
-        {
-        }
-    };
-
-    struct PointF
-    {
-        // Members
-        Real64 X;
-        Real64 Y;
-
-        // Default Constructor
-        PointF()
-        {
-        }
-
-        // Member Constructor
-        PointF(Real64 const X, Real64 const Y) : X(X), Y(Y)
-        {
-        }
-    };
-
-    struct Point3DInteger
-    {
-        // Members
-        int X;
-        int Y;
-        int Z;
-
-        // Default Constructor
-        Point3DInteger()
-        {
-        }
-
-        // Member Constructor
-        Point3DInteger(int const X, int const Y, int const Z) : X(X), Y(Y), Z(Z)
-        {
-        }
-    };
-
-    struct Point3DReal
-    {
-        // Members
-        Real64 X;
-        Real64 Y;
-        Real64 Z;
-
-        // Default Constructor
-        Point3DReal()
-        {
-        }
-
-        // Member Constructor
-        Point3DReal(Real64 const X, Real64 const Y, Real64 const Z) : X(X), Y(Y), Z(Z)
-        {
-        }
-    };
-
-    struct DomainRectangle
-    {
-        // Members
-        int XMin;
-        int XMax;
-        int YMin;
-        int YMax;
-
-        // Default Constructor
-        DomainRectangle()
-        {
-        }
-
-        // Member Constructor
-        DomainRectangle(int const XMin, int const XMax, int const YMin, int const YMax) : XMin(XMin), XMax(XMax), YMin(YMin), YMax(YMax)
-        {
-        }
-    };
-
-    struct MeshPartition
-    {
-        // Members
-        Real64 rDimension;
-        PartitionType partitionType; // From Enum: ParitionType
-        Real64 TotalWidth;
-
-        // Default Constructor
-        MeshPartition()
-        {
-        }
-
-        // Member Constructor
-        MeshPartition(Real64 const rDimension,
-                      PartitionType const partitionType, // From Enum: ParitionType
-                      Real64 const TotalWidth)
-            : rDimension(rDimension), partitionType(partitionType), TotalWidth(TotalWidth)
-        {
-        }
-    };
-
-    struct GridRegion
-    {
-        // Members
-        Real64 Min;
-        Real64 Max;
-        RegionType thisRegionType; // From Enum: RegionType
-        Array1D<Real64> CellWidths;
-
-        // Default Constructor
-        GridRegion()
-        {
-        }
-
-        // Member Constructor
-        GridRegion(Real64 Min, Real64 Max, RegionType thisRegionType, Array1D<Real64> CellWidths)
-            : Min(Min), Max(Max), thisRegionType(thisRegionType), CellWidths(CellWidths)
-        {
-        }
-    };
-
-    struct TempGridRegionData
-    {
-        // Members
-        Real64 Min;
-        Real64 Max;
-        RegionType thisRegionType;
-
-        // Default Constructor
-        TempGridRegionData()
-        {
-        }
-
-        // Member Constructor
-        TempGridRegionData(Real64 const Min, Real64 const Max, RegionType const thisRegionType) : Min(Min), Max(Max), thisRegionType(thisRegionType)
-        {
-        }
-    };
-
-    struct RectangleF
-    {
-        // Members
-        Real64 X_min;
-        Real64 Y_min;
-        Real64 Width;
-        Real64 Height;
-
-        // Default Constructor
-        RectangleF()
-        {
-        }
-
-        // Member Constructor
-        RectangleF(Real64 const X_min, Real64 const Y_min, Real64 const Width, Real64 const Height)
-            : X_min(X_min), Y_min(Y_min), Width(Width), Height(Height)
-        {
-        }
-
-        bool inline contains(PointF const &p)
-        {
-            return ((this->X_min <= p.X) && (p.X < (this->X_min + this->Width)) && (this->Y_min <= p.Y) && (p.Y < (this->Y_min + this->Height)));
-        }
-    };
-
-    struct NeighborInformation
-    {
-        // Members
-        Real64 ThisCentroidToNeighborCentroid;
-        Real64 ThisCentroidToNeighborWall;
-        Real64 ThisWallToNeighborCentroid;
-        Real64 ConductionResistance;
-        Real64 adiabaticMultiplier;
-        Direction direction;
-        Point3DInteger NeighborCellIndeces;
-
-        // Default Constructor
-        NeighborInformation() : adiabaticMultiplier(1.0)
-        {
-        }
-    };
-
-    struct CartesianCell : BaseCell
-    {
-        // Members
-        int X_index;
-        int Y_index;
-        int Z_index;
-        Real64 X_min;
-        Real64 X_max;
-        Real64 Y_min;
-        Real64 Y_max;
-        Real64 Z_min;
-        Real64 Z_max;
-        Point3DReal Centroid;
-        CellType cellType;
-        int PipeIndex;
-        std::map<Direction, NeighborInformation> NeighborInfo;
-        CartesianPipeCellInformation PipeCellData;
-
-        // Default Constructor
-        CartesianCell()
-        {
-        }
-
-        Real64 inline width() const
-        {
-            return this->X_max - this->X_min;
-        }
-
-        Real64 inline height() const
-        {
-            return this->Y_max - this->Y_min;
-        }
-
-        Real64 inline depth() const
-        {
-            return this->Z_max - this->Z_min;
-        }
-
-        Real64 inline XNormalArea() const
-        {
-            return this->depth() * this->height();
-        }
-
-        Real64 inline YNormalArea() const
-        {
-            return this->depth() * this->width();
-        }
-
-        Real64 inline ZNormalArea() const
-        {
-            return this->width() * this->height();
-        }
-
-        Real64 inline volume() const
-        {
-            return this->width() * this->depth() * this->height();
-        }
-
-        Real64 normalArea(Direction const direction) const;
-    };
-
-    struct MeshExtents
-    {
-        // Members
-        Real64 Xmax;
-        Real64 Ymax;
-        Real64 Zmax;
-
-        // Default Constructor
-        MeshExtents() : Xmax(0.0), Ymax(0.0), Zmax(0.0)
-        {
-        }
-
-        // Member Constructor
-        MeshExtents(Real64 const Xmax, Real64 const Ymax, Real64 const Zmax) : Xmax(Xmax), Ymax(Ymax), Zmax(Zmax)
-        {
-        }
-    };
-
-    struct DistributionStructure
-    {
-        // Members
-        MeshDistribution thisMeshDistribution;
-        int RegionMeshCount;
-        Real64 GeometricSeriesCoefficient;
-
-        // Default Constructor
-        DistributionStructure() : thisMeshDistribution(MeshDistribution::Uniform), RegionMeshCount(0), GeometricSeriesCoefficient(0.0)
-        {
-        }
-    };
-
-    struct MeshProperties
-    {
-        // Members
-        DistributionStructure X;
-        DistributionStructure Y;
-        DistributionStructure Z;
-
-        // Default Constructor
-        MeshProperties()
-        {
-        }
-    };
-
-    struct SimulationControl
-    {
-        // Members
-        Real64 MinimumTemperatureLimit;
-        Real64 MaximumTemperatureLimit;
-        Real64 Convergence_CurrentToPrevIteration;
-        int MaxIterationsPerTS;
-
-        // Default Constructor
-        SimulationControl()
-            : MinimumTemperatureLimit(-1000.0), MaximumTemperatureLimit(1000.0), Convergence_CurrentToPrevIteration(0.0), MaxIterationsPerTS(0)
-        {
-        }
-    };
-
-    struct FarfieldInfo
-    {
-        std::shared_ptr<BaseGroundTempsModel> groundTempModel;
-    };
-
-    struct BasementZoneInfo
-    {
-        // Members
-        Real64 Depth;  // m
-        Real64 Width;  // m
-        Real64 Length; // m
-        bool ShiftPipesByWidth;
-        std::string WallBoundaryOSCMName;
-        int WallBoundaryOSCMIndex;
-        std::string FloorBoundaryOSCMName;
-        int FloorBoundaryOSCMIndex;
-        Array1D_int WallSurfacePointers;
-        Array1D_int FloorSurfacePointers;
-        int BasementWallXIndex;
-        int BasementFloorYIndex;
-
-        // Default Constructor
-        BasementZoneInfo()
-            : Depth(0.0), Width(0.0), Length(0.0), ShiftPipesByWidth(false), WallBoundaryOSCMIndex(0), FloorBoundaryOSCMIndex(0),
-              BasementWallXIndex(-1), BasementFloorYIndex(-1)
-        {
-        }
-    };
-
-    struct DirectionReal_Dictionary
-    {
-        // Members
-        int Direction; // From Enum: Direction
-        Real64 Value;
-
-        // Default Constructor
-        DirectionReal_Dictionary() : Direction(0), Value(0.0)
-        {
-        }
-    };
-
-    struct ReportingInformation
-    {
-        // Members
-        Array1D<DirectionReal_Dictionary> SurfaceHeatTransfer;
-        Real64 TotalBoundaryHeatTransfer;
-        Real64 EnergyStoredInCells;
-        Real64 AverageSurfaceTemperature;
-        Real64 PipeCircuitHeatTransferMCpDT;
-        Real64 PipeCircuitHeatTransferUADT;
-        Real64 BasementWallHeatTransfer;
-        Real64 BasementFloorHeatTransfer;
-        Real64 AverageBasementFloorTemperature;
-        Real64 AverageBasementWallTemperature;
-
-        // Default Constructor
-        ReportingInformation()
-            : TotalBoundaryHeatTransfer(0.0), EnergyStoredInCells(0.0), AverageSurfaceTemperature(0.0), PipeCircuitHeatTransferMCpDT(0.0),
-              PipeCircuitHeatTransferUADT(0.0), BasementWallHeatTransfer(0.0), BasementFloorHeatTransfer(0.0), AverageBasementFloorTemperature(0.0),
-              AverageBasementWallTemperature(0.0)
-        {
-        }
-    };
-
-    struct MeshPartitions
-    {
-        // Members
-        Array1D<MeshPartition> X;
-        Array1D<MeshPartition> Y;
-        Array1D<MeshPartition> Z;
-
-        // Default Constructor
-        MeshPartitions()
-        {
-        }
-    };
-
-    struct MoistureInfo
-    {
-        // Members
-        Real64 Theta_liq; // volumetric moisture content of the soil
-        Real64 Theta_sat; // volumetric moisture content of soil at saturation
-        Real64 GroundCoverCoefficient;
-        Real64 rhoCP_soil_liq;
-        Real64 rhoCP_soil_transient;
-        Real64 rhoCP_soil_ice;
-        Real64 rhoCp_soil_liq_1;
-
-        // Default Constructor
-        MoistureInfo()
-            : Theta_liq(0.3), Theta_sat(0.5), GroundCoverCoefficient(0.408), rhoCP_soil_liq(0.0), rhoCP_soil_transient(0.0), rhoCP_soil_ice(0.0),
-              rhoCp_soil_liq_1(0.0)
-        {
-        }
-    };
-
-    struct CurSimConditionsInfo
-    {
-        // Members
-        // Simulation conditions
-        Real64 PrevSimTimeSeconds;
-        Real64 CurSimTimeSeconds;
-        Real64 CurSimTimeStepSize;
-        // Environmental conditions
-        Real64 CurAirTemp;
-        Real64 CurWindSpeed;
-        Real64 CurIncidentSolar;
-        Real64 CurRelativeHumidity;
-
-        // Default Constructor
-        CurSimConditionsInfo()
-            : PrevSimTimeSeconds(-1.0), CurSimTimeSeconds(0.0), CurSimTimeStepSize(0.0), CurAirTemp(10.0), CurWindSpeed(2.6), CurIncidentSolar(0.0),
-              CurRelativeHumidity(100.0)
-        {
-        }
-    };
-
-    struct PipeSegmentInfo
-    {
-        // Members
-        // ID
-        std::string Name;
-        // Misc inputs
-        PointF PipeLocation;
-        Point PipeCellCoordinates;
-        SegmentFlow FlowDirection;
-        // Pointer to parent pipe circuit
-        int ParentCircuitIndex;
-        // Reporting variables
-        Real64 InletTemperature;
-        Real64 OutletTemperature;
-        Real64 FluidHeatLoss;
-        // Error handling flags
-        bool PipeCellCoordinatesSet;
-        // Other flags
-        bool IsActuallyPartOfAHorizontalTrench;
-
-        // Default Constructor
-        PipeSegmentInfo()
-            : FlowDirection(SegmentFlow::IncreasingZ), ParentCircuitIndex(0), InletTemperature(0.0), OutletTemperature(0.0), FluidHeatLoss(0.0),
-              PipeCellCoordinatesSet(false), IsActuallyPartOfAHorizontalTrench(false)
-        {
-        }
-
-        void initPipeCells(int const x, int const y);
-    };
-
-    struct PipeCircuitInfo
-    {
-        // Members
-        // ID
-        std::string Name;
-        // Inlet and outlet information
-        std::string InletNodeName;
-        std::string OutletNodeName;
-        int InletNodeNum;
-        int OutletNodeNum;
-        Point3DInteger CircuitInletCell;
-        Point3DInteger CircuitOutletCell;
-        // Names and pointers to pipe segments found in this pipe circuit
-        Array1D_string PipeSegmentNames;
-        Array1D_int PipeSegmentIndeces;
-        // Pointer to the domain which contains this pipe circuit
-        int ParentDomainIndex;
-        // Misc inputs
-        RadialSizing PipeSize;
-        RadialSizing InsulationSize;
-        Real64 RadialMeshThickness;
-        bool HasInsulation;
-        Real64 DesignVolumeFlowRate;
-        Real64 DesignMassFlowRate;
-        Real64 Convergence_CurrentToPrevIteration;
-        int MaxIterationsPerTS;
-        int NumRadialCells;
-        BaseThermalPropertySet PipeProperties;
-        BaseThermalPropertySet InsulationProperties;
-        // A list of 3d cell indices that span the entire length of this pipe circuit (useful for reporting)
-        Array1D<Point3DInteger> ListOfCircuitPoints;
-        // Flags
-        bool CheckEquipName;
-        bool NeedToFindOnPlantLoop;
-        bool IsActuallyPartOfAHorizontalTrench;
-        // Location of this pipe circuit in the PlantLoop topology
-        int LoopNum;
-        int LoopSideNum;
-        int BranchNum;
-        int CompNum;
-        // Current fluid property values
-        Real64 CurFluidDensity;
-        Real64 CurFluidViscosity;
-        Real64 CurFluidConductivity;
-        Real64 CurFluidPrandtl;
-        Real64 CurFluidSpecificHeat;
-        ExtendedFluidProperties CurFluidPropertySet;
-        // Variables used to pass information from INIT-type routines to CALC-type routines
-        Real64 CurCircuitInletTemp;
-        Real64 CurCircuitFlowRate;
-        Real64 CurCircuitConvectionCoefficient;
-        // Reporting variables
-        Real64 InletTemperature;
-        Real64 OutletTemperature;
-        Real64 FluidHeatLoss;
-
-        // Default Constructor
-        PipeCircuitInfo()
-            : InletNodeNum(0), OutletNodeNum(0), ParentDomainIndex(0), RadialMeshThickness(0.0), HasInsulation(false), DesignVolumeFlowRate(0.0),
-              DesignMassFlowRate(0.0), Convergence_CurrentToPrevIteration(0.0), MaxIterationsPerTS(0), NumRadialCells(0), CheckEquipName(true),
-              NeedToFindOnPlantLoop(true), IsActuallyPartOfAHorizontalTrench(false), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
-              CurFluidDensity(998.0), CurFluidViscosity(0.0015), CurFluidConductivity(0.58), CurFluidPrandtl(7.0), CurFluidSpecificHeat(4190.0),
-              CurCircuitInletTemp(23.0), CurCircuitFlowRate(0.1321), CurCircuitConvectionCoefficient(0.0), InletTemperature(0.0),
-              OutletTemperature(0.0), FluidHeatLoss(0.0)
-        {
-        }
-
-        void initInOutCells(CartesianCell const &in, CartesianCell const &out);
-    };
-
-    struct ZoneCoupledSurfaceData
-    {
-        // Members
-        // ID
-        std::string Name;
-        // Surface data
-        int IndexInSurfaceArray;
-        Real64 SurfaceArea;
-        Real64 Width;
-        Real64 Length;
-        Real64 Depth;
-        Real64 Conductivity;
-        Real64 Density;
-        Real64 InsulationConductivity;
-        Real64 InsulationDensity;
-        int Zone;
-
-        // Default Constructor
-        ZoneCoupledSurfaceData()
-            : IndexInSurfaceArray(0), SurfaceArea(0.0), Width(0.0), Length(0.0), Depth(0.0), Conductivity(0.0), Density(0.0),
-              InsulationConductivity(0.0), InsulationDensity(0.0), Zone(0)
-        {
-        }
-    };
-
-    struct FullDomainStructureInfo
-    {
-        // Members
-        // ID
-        std::string Name;
-        // Names and pointers to circuits found in this domain
-        Array1D_string CircuitNames;
-        Array1D_int CircuitIndeces;
-        int MaxIterationsPerTS;
-        // Flag variables
-        bool OneTimeInit;
-        bool BeginSimInit;
-        bool BeginSimEnvrn;
-        bool DomainNeedsSimulation;
-        bool DomainNeedsToBeMeshed;
-        bool IsActuallyPartOfAHorizontalTrench;
-        bool HasAPipeCircuit;
-        bool HasZoneCoupledSlab;
-        bool HasZoneCoupledBasement;
-        // "Input" data structure variables
-        MeshExtents Extents;
-        MeshProperties Mesh;
-        BaseThermalPropertySet GroundProperties;
-        BaseThermalPropertySet SlabProperties;
-        BaseThermalPropertySet BasementInterfaceProperties;
-        BaseThermalPropertySet HorizInsProperties;
-        BaseThermalPropertySet VertInsProperties;
-        SimulationControl SimControls;
-        FarfieldInfo Farfield;
-        BasementZoneInfo BasementZone;
-        MoistureInfo Moisture;
-        // "Internal" data structure variables
-        MeshPartitions Partitions;
-        CurSimConditionsInfo Cur;
-        ReportingInformation Reporting;
-        bool HasBasement;
-        // Zone coupled variables
-        Array1D<ZoneCoupledSurfaceData> ZoneCoupledSurfaces;
-        int ZoneCoupledOSCMIndex;
-        Real64 PerimeterOffset;
-        bool SlabInGradeFlag;
-        int SlabMaterialNum;
-        Real64 SlabArea;
-        Real64 SlabWidth;
-        Real64 SlabLength;
-        Real64 SlabThickness;
-        Real64 XIndex;
-        Real64 YIndex;
-        Real64 ZIndex;
-        int x_max_index;
-        int y_max_index;
-        int z_max_index;
-        bool HorizInsPresentFlag;
-        int HorizInsMaterialNum;
-        Real64 HorizInsThickness;
-        Real64 HorizInsWidth;
-        Real64 HeatFlux;
-        Real64 WallHeatFlux;
-        Real64 FloorHeatFlux;
-        Real64 AggregateHeatFlux;
-        Real64 AggregateWallHeatFlux;
-        Real64 AggregateFloorHeatFlux;
-        int NumHeatFlux;
-        bool ResetHeatFluxFlag;
-        Real64 ConvCoeff;
-        bool FullHorizInsPresent;
-        bool VertInsPresentFlag;
-        int VertInsMaterialNum;
-        Real64 VertInsThickness;
-        Real64 VertInsDepth;
-        int XWallIndex;
-        int YFloorIndex;
-        int ZWallIndex;
-        int InsulationXIndex;
-        int InsulationYIndex;
-        int InsulationZIndex;
-        bool SimTimestepFlag;
-        bool SimHourlyFlag;
-        bool SimDailyFlag;
-        Real64 ZoneCoupledSurfaceTemp;
-        Real64 BasementWallTemp;
-        Real64 BasementFloorTemp;
-        int NumDomainCells;
-        int NumGroundSurfCells;
-        int NumInsulationCells;
-        int NumSlabCells;
-        Array2D<Real64> WeightingFactor;
-        Array2D<Real64> WeightedHeatFlux;
-        Real64 TotalEnergyUniformHeatFlux = 0.0;
-        Real64 TotalEnergyWeightedHeatFlux = 0.0;
-        Real64 HeatFluxWeightingFactor = 0.0;
-        Array1D<GridRegion> XRegions;
-        Array1D<GridRegion> YRegions;
-        Array1D<GridRegion> ZRegions;
-
-        // Main 3D cells array
-        Array3D<CartesianCell> Cells;
-
-        // Default Constructor
-        FullDomainStructureInfo()
-            : MaxIterationsPerTS(10), OneTimeInit(true), BeginSimInit(true), BeginSimEnvrn(true), DomainNeedsSimulation(true),
-              DomainNeedsToBeMeshed(true), IsActuallyPartOfAHorizontalTrench(false), HasAPipeCircuit(true), HasZoneCoupledSlab(false),
-              HasZoneCoupledBasement(false), HasBasement(false), ZoneCoupledOSCMIndex(0), PerimeterOffset(0.0), SlabInGradeFlag(false),
-              SlabMaterialNum(0), SlabWidth(0.0), SlabLength(0.0), SlabThickness(0.0), XIndex(0), YIndex(0), ZIndex(0), x_max_index(0),
-              y_max_index(0), z_max_index(0), HorizInsPresentFlag(false), HorizInsMaterialNum(0), HorizInsThickness(0.0254), HorizInsWidth(0.0),
-              HeatFlux(0.0), WallHeatFlux(0.0), FloorHeatFlux(0.0), AggregateHeatFlux(0.0), AggregateWallHeatFlux(0.0), AggregateFloorHeatFlux(0.0),
-              NumHeatFlux(0), ResetHeatFluxFlag(true), ConvCoeff(0.0), FullHorizInsPresent(false), VertInsPresentFlag(false), VertInsMaterialNum(0),
-              VertInsThickness(0.0254), VertInsDepth(0.0), XWallIndex(0), YFloorIndex(0), ZWallIndex(0), InsulationXIndex(0), InsulationYIndex(0),
-              InsulationZIndex(0), SimTimestepFlag(false), SimHourlyFlag(false), SimDailyFlag(false), ZoneCoupledSurfaceTemp(0.0),
-              BasementWallTemp(0.0), BasementFloorTemp(0.0), NumDomainCells(0), NumGroundSurfCells(0), NumInsulationCells(0), NumSlabCells(0),
-              XRegions({0, -1}), YRegions({0, -1}), ZRegions({0, -1})
-        {
-        }
-
-        void developMesh();
-
-        void createPartitionCenterList();
-
-        Array1D<GridRegion> createPartitionRegionList(Array1D<MeshPartition> const &ThesePartitionCenters,
-                                                      bool const PartitionsExist,
-                                                      Real64 const DirExtentMax,
-                                                      int const PartitionsUBound);
-
-        void createRegionList(Array1D<GridRegion> &Regions,
-                              Array1D<GridRegion> const &ThesePartitionRegions,
-                              Real64 const DirExtentMax,
-                              RegionType const DirDirection,
-                              bool const PartitionsExist,
-                              Optional_int BasementWallXIndex = _,
-                              Optional_int BasementFloorYIndex = _,
-                              Optional_int XIndex = _,
-                              Optional_int XWallIndex = _,
-                              Optional_int InsulationXIndex = _,
-                              Optional_int YIndex = _,
-                              Optional_int YFloorIndex = _,
-                              Optional_int InsulationYIndex = _,
-                              Optional_int ZIndex = _,
-                              Optional_int ZWallIndex = _,
-                              Optional_int InsulationZIndex = _);
-
-        void createCellArray(Array1D<Real64> const &XBoundaryPoints, Array1D<Real64> const &YBoundaryPoints, Array1D<Real64> const &ZBoundaryPoints);
-
-        void setupCellNeighbors();
-
-        void setupPipeCircuitInOutCells();
-
-        int getCellWidthsCount(RegionType const dir);
-
-        void getCellWidths(GridRegion &g, RegionType const direction);
-
-        void addNeighborInformation(int const X,
-                                    int const Y,
-                                    int const Z,
-                                    Direction const direction,
-                                    Real64 const ThisCentroidToNeighborCentroid,
-                                    Real64 const ThisCentroidToNeighborWall,
-                                    Real64 const ThisWallToNeighborCentroid,
-                                    Real64 const ThisAdiabaticMultiplier);
-
-        Real64 GetBasementWallHeatFlux();
-
-        Real64 GetBasementFloorHeatFlux();
-
-        void UpdateBasementSurfaceTemperatures();
-
-        Real64 GetZoneInterfaceHeatFlux();
-
-        void UpdateZoneSurfaceTemperatures();
-
-        Real64 GetAverageTempByType(CellType const cellType);
-
-        void InitializeSoilMoistureCalcs();
-
-        void EvaluateSoilRhoCp(Real64 const CellTemp, Real64 &rhoCp);
-
-        void ShiftTemperaturesForNewTimeStep();
-
-        void ShiftTemperaturesForNewIteration();
-
-        bool IsConverged_CurrentToPrevIteration();
-
-        bool CheckForOutOfRangeTemps();
-    };
-
-    // Object Data
-    extern Array1D<FullDomainStructureInfo> PipingSystemDomains;
-    extern Array1D<PipeCircuitInfo> PipingSystemCircuits;
-    extern Array1D<PipeSegmentInfo> PipingSystemSegments;
-
-    void clear_state();
-
-    void clear_state();
-
-    void SimPipingSystemCircuit(std::string const &EquipName,  // name of the Pipe Heat Transfer.
-                                int &EqNum,                    // index in local derived types for external calling
-                                bool const FirstHVACIteration, // component number
-                                bool const InitLoopEquip);
-
-    void SimulateGroundDomains(bool initOnly);
-
-    void CheckIfAnySlabs();
-
-    void CheckIfAnyBasements();
-
-    void GetPipingSystemsAndGroundDomainsInput();
-
-    int GetNumSegmentsForHorizontalTrenches(int const NumHorizontalTrenches);
-
-    void ReadGeneralDomainInputs(int const IndexStart, int const NumGeneralizedDomains, bool &ErrorsFound);
-
-    void ReadZoneCoupledDomainInputs(int const StartingDomainNumForZone, int const NumZoneCoupledDomains, bool &ErrorsFound);
-
-    void ReadBasementInputs(int const StartingDomainNumForBasement, int const NumBasements, bool &ErrorsFound);
-
-    void ReadPipeCircuitInputs(int const NumPipeCircuits, bool &ErrorsFound);
-
-    void ReadPipeSegmentInputs(int const NumPipeSegmentsInInput, bool &ErrorsFound);
-
-    void ReadHorizontalTrenchInputs(int const StartingDomainNumForHorizontal,
-                                    int const StartingCircuitNumForHorizontal,
-                                    int const StartingSegmentNumForHorizontal,
-                                    int const NumHorizontalTrenchesInInput,
-                                    bool &ErrorsFound);
-
-    void SetupPipingSystemOutputVariables(int const TotalNumSegments, int const TotalNumCircuits);
-
-    void SetupZoneCoupledOutputVariables(int const DomainNum);
-
-    void InitPipingSystems(int const DomainNum, int const CircuitNum);
-
-    void UpdatePipingSystems(int const DomainNum, int const CircuitNum);
-
-    void IssueSevereInputFieldErrorStringEntry(std::string const &RoutineName,
-                                               std::string const &ObjectName,
-                                               std::string const &InstanceName,
-                                               std::string const &FieldName,
-                                               std::string const &FieldEntry,
-                                               std::string const &Condition,
-                                               bool &ErrorsFound);
-
-    void IssueSevereInputFieldErrorRealEntry(std::string const &RoutineName,
-                                             std::string const &ObjectName,
-                                             std::string const &InstanceName,
-                                             std::string const &FieldName,
-                                             Real64 const FieldEntry,
-                                             std::string const &Condition,
-                                             bool &ErrorsFound);
-
-    int GetSurfaceCountForOSCM(int const OSCMIndex);
-
-    Array1D_int GetSurfaceIndecesForOSCM(int const OSCMIndex, int const SurfCount);
-
-    Array1D<ZoneCoupledSurfaceData> GetSurfaceDataForOSCM(int const OSCMIndex, int const SurfCount);
-
-    bool inline IsInRangeReal(Real64 const r, Real64 const lower, Real64 const upper)
-    {
-        return ((r >= lower) && (r <= upper));
-    }
-
-    bool inline IsInRange_BasementModel(Real64 const r, Real64 const lower, Real64 const upper)
-    {
-        return ((r >= lower) && (r < upper));
-    }
-
-    Real64 inline Real_ConstrainTo(Real64 const r, Real64 const MinVal, Real64 const MaxVal)
-    {
-        return min(max(r, MinVal), MaxVal);
-    }
-
-    bool MeshPartitionArray_Contains(Array1D<MeshPartition> const &meshes, Real64 const value);
-
-    bool DomainRectangle_Contains(DomainRectangle const &Rect, Point const &p);
-
-    void MeshPartition_SelectionSort(Array1<MeshPartition> &X);
-
-    bool IsConverged_PipeCurrentToPrevIteration(int const CircuitNum, CartesianCell const &CellToCheck);
-
-    void ShiftPipeTemperaturesForNewIteration(CartesianCell &ThisPipeCell);
-
-    int CreateRegionListCount(Array1D<GridRegion> const &ThesePartitionRegions, Real64 const DirExtentMax, bool const PartitionsExist);
-
-    int CreateBoundaryListCount(Array1D<GridRegion> const &RegionList, RegionType const DirDirection);
-
-    Array1D<Real64> CreateBoundaryList(Array1D<GridRegion> const &RegionList,
-                                       Real64 const DirExtentMax,
-                                       RegionType const DirDirection,
-                                       int const RetValLbound,
-                                       int const RetValUBound);
-
-    void PerformIterationLoop(int const DomainNum, Optional<int const> CircuitNum);
-
-    void PerformTemperatureFieldUpdate(int const DomainNum);
-
-    Real64 EvaluateFieldCellTemperature(int const DomainNum, CartesianCell &ThisCell);
-
-    Real64 EvaluateGroundSurfaceTemperature(int const DomainNum, CartesianCell &cell);
-
-    Real64 EvaluateBasementCellTemperature(int const DomainNum, CartesianCell &cell);
-
-    Real64 EvaluateZoneInterfaceTemperature(int const DomainNum, CartesianCell &cell);
-
-    Real64 GetAverageInterfaceTemp(int const DomainNum, int const CellType, int const CellType2);
-
-    Real64 EvaluateFarfieldBoundaryTemperature(int const DomainNum, CartesianCell &cell);
-
-    void EvaluateFarfieldCharacteristics(
-        int const DomainNum, CartesianCell &cell, Direction const direction, Real64 &neighbortemp, Real64 &resistance, Real64 &adiabaticMultiplier);
-
-    Real64 GetFarfieldTemp(int const DomainNum, CartesianCell const &cell);
-
-    void PreparePipeCircuitSimulation(int const DomainNum, int const CircuitNum);
-
-    void PerformPipeCircuitSimulation(int const DomainNum, int const CircuitNum);
-
-    void
-    PerformPipeCellSimulation(int const DomainNum, int const CircuitNum, CartesianCell &ThisCell, Real64 const FlowRate, Real64 const EnteringTemp);
-
-    void SimulateRadialToCartesianInterface(int const DomainNum, CartesianCell &ThisCell);
-
-    void SimulateOuterMostRadialSoilSlice(int const CircuitNum, CartesianCell &ThisCell);
-
-    void SimulateAllInteriorRadialSoilSlices(CartesianCell &ThisCell);
-
-    void SimulateInnerMostRadialSoilSlice(int const CircuitNum, CartesianCell &ThisCell);
-
-    void SimulateRadialInsulationCell(CartesianCell &ThisCell);
-
-    void SimulateRadialPipeCell(int const CircuitNum, CartesianCell &ThisCell, Real64 const ConvectionCoefficient);
-
-    void SimulateFluidCell(CartesianCell &ThisCell, Real64 const FlowRate, Real64 const ConvectionCoefficient, Real64 const EnteringFluidTemp);
-
-    void DoOneTimeInitializations(int const DomainNum, Optional<int const> CircuitNum);
-
-    void DoStartOfTimeStepInitializations(int const DomainNum, Optional<int const> CircuitNum);
-
-    void DoEndOfIterationOperations(int const DomainNum, bool &Finished);
-
-    void SetAdditionalNeighborData(int const DomainNum,
-                                   int const X,
-                                   int const Y,
-                                   int const Z,
-                                   Direction const direction,
-                                   Real64 const Resistance,
-                                   CartesianCell const &NeighborCell);
-
-    void EvaluateNeighborCoordinates(CartesianCell const &ThisCell, Direction const CurDirection, int &NX, int &NY, int &NZ);
-
-    void EvaluateNeighborCharacteristics(int const DomainNum,
-                                         CartesianCell &ThisCell,
-                                         Direction const CurDirection,
-                                         Real64 &NeighborTemp,
-                                         Real64 &Resistance,
-                                         Real64 &AdiabaticMultiplier);
-
-    void EvaluateCellNeighborDirections(int const DomainNum, CartesianCell const &cell, int &NumFieldCells, int &NumBoundaryCells);
-
-} // namespace PlantPipingSystemsManager
+    } // namespace PlantPipingSystemsManager
 
 } // namespace EnergyPlus
 

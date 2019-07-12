@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3809,12 +3809,12 @@ namespace PackagedTerminalHeatPump {
                                             PTUnit(PTUnitNum).HeatCoilLoopSide,
                                             PTUnit(PTUnitNum).HeatCoilBranchNum,
                                             PTUnit(PTUnitNum).HeatCoilCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowContinueError("Reference Unit=\"" + PTUnit(PTUnitNum).Name + "\", type=" + PTUnit(PTUnitNum).UnitType);
                         ShowFatalError("InitPTUnit: Program terminated for previous conditions.");
@@ -3842,12 +3842,12 @@ namespace PackagedTerminalHeatPump {
                                             PTUnit(PTUnitNum).HeatCoilLoopSide,
                                             PTUnit(PTUnitNum).HeatCoilBranchNum,
                                             PTUnit(PTUnitNum).HeatCoilCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowContinueError("Reference Unit=\"" + PTUnit(PTUnitNum).Name + "\", type=" + PTUnit(PTUnitNum).UnitType);
                         ShowFatalError("InitPTUnit: Program terminated for previous conditions.");
@@ -3882,12 +3882,12 @@ namespace PackagedTerminalHeatPump {
                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
                                             PTUnit(PTUnitNum).SuppCoilCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitPTUnit: Program terminated for previous conditions.");
                     }
@@ -3910,12 +3910,12 @@ namespace PackagedTerminalHeatPump {
                                             PTUnit(PTUnitNum).SuppCoilLoopSide,
                                             PTUnit(PTUnitNum).SuppCoilBranchNum,
                                             PTUnit(PTUnitNum).SuppCoilCompNum,
+                                            errFlag,
                                             _,
                                             _,
                                             _,
                                             _,
-                                            _,
-                                            errFlag);
+                                            _);
                     if (errFlag) {
                         ShowFatalError("InitPTUnit: Program terminated for previous conditions.");
                     }
@@ -5487,7 +5487,7 @@ namespace PackagedTerminalHeatPump {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500);    // maximum number of iterations
         Real64 const MinPLF(0.0); // minimum part load factor allowed
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -5640,7 +5640,7 @@ namespace PackagedTerminalHeatPump {
                         if (!FirstHVACIteration && !WarmupFlag) {
                             CalcPTUnit(PTUnitNum, FirstHVACIteration, PartLoadFrac, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
                             if (PTUnit(PTUnitNum).IterErrIndex == 0) {
-                                gio::write(IterNum, fmtLD) << MaxIte;
+                                ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
                                 strip(IterNum);
                                 ShowWarningError(PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                                 ShowContinueError(

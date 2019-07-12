@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -103,7 +103,6 @@ namespace WindowManager {
 
     std::pair<Real64, Real64> getSunWCEAngles(const int t_SurfNum, const BSDFHemisphere t_Direction)
     {
-        std::pair<Real64, Real64> Angles;
         return getWCECoordinates(t_SurfNum, DataBSDFWindow::SUNCOSTS(TimeStep, HourOfDay, {1, 3}), t_Direction);
     }
 

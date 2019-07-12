@@ -123,7 +123,7 @@ protected: // Creation
 	{
 		assert( star == '*' );
 #ifdef NDEBUG
-		static_cast< void const >( star ); // Suppress unused warning
+		static_cast< void >( star ); // Suppress unused warning
 #endif
 	}
 

@@ -74,7 +74,7 @@
 ! HVAC:                       single duct VAV with hot water reheat, single boiler, chiller and
 !                             cooling tower, supply air temperature = 19C
 
-  Version,9.0;
+  Version,9.2;
 
   Building,
     Building,                !- Name
@@ -2003,7 +2003,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     ZONE1 AHU,               !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   ZoneHVAC:AirDistributionUnit,
     ZONE1 AHU,               !- Name

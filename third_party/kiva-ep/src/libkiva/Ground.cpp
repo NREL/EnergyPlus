@@ -325,14 +325,14 @@ void Ground::calculateSurfaceAverages() {
     double TA = 0;
     double hA = 0.0, hcA = 0.0, hrA = 0.0;
     double totalArea = 0.0;
-
-    double &Tair = bcs.indoorTemp;
+    double TAconv = 0.0;
 
     if (foundation.hasSurface[surfaceType]) {
       // Find surface(s)
       for (auto &surface : foundation.surfaces) {
         if (surface.type == surfaceType) {
           double Trad = surface.radiantTemperature;
+          double Tair = surface.temperature;
 
 #ifdef PRNTSURF
           std::ofstream output;
@@ -342,9 +342,8 @@ void Ground::calculateSurfaceAverages() {
 
           for (auto index : surface.indices) {
             auto this_cell = domain.cell[index];
-            double hc =
-                foundation.getConvectionCoeff(TNew[index], Tair, surface.hfGlass,
-                                              surface.propPtr->roughness, false, surface.cosTilt);
+            double hc = surface.convectionAlgorithm(TNew[index], Tair, surface.hfTerm,
+                                                    surface.propPtr->roughness, surface.cosTilt);
             double hr = getSimpleInteriorIRCoeff(surface.propPtr->emissivity, TNew[index], Trad);
             double q = this_cell->heatGain;
 
@@ -367,6 +366,7 @@ void Ground::calculateSurfaceAverages() {
             totalQ += Qc + Qr + q * A;
 
             TA += TNew[index] * A;
+            TAconv += Tair * A;
 
 #ifdef PRNTSURF
             output << domain.mesh[0].centers[i] << ", " << TNew[index] << ", " << h << ", "
@@ -382,7 +382,8 @@ void Ground::calculateSurfaceAverages() {
     }
 
     if (totalArea > 0.0) {
-      double Tavg = Tair - totalQc / hcA;
+      double Tconv = TAconv / totalArea;
+      double Tavg = Tconv - totalQc / hcA;
       double hcAvg = hcA / totalArea;
       double hrAvg = hrA / totalArea;
       double hAvg = hA / totalArea;
@@ -391,21 +392,22 @@ void Ground::calculateSurfaceAverages() {
       groundOutput.outputValues[{surfaceType, GroundOutput::OT_AVG_TEMP}] = TA / totalArea;
       groundOutput.outputValues[{surfaceType, GroundOutput::OT_FLUX}] = totalQ / totalArea;
       groundOutput.outputValues[{surfaceType, GroundOutput::OT_RATE}] =
-          totalQ / totalArea * surfaceArea;
+        totalQ / totalArea * surfaceArea;
       groundOutput.outputValues[{surfaceType, GroundOutput::OT_CONV}] = hcAvg;
       groundOutput.outputValues[{surfaceType, GroundOutput::OT_RAD}] = hrAvg;
 
       groundOutput.outputValues[{surfaceType, GroundOutput::OT_EFF_TEMP}] =
-          Tair - (totalQ / totalArea) * (constructionRValue + 1 / hAvg) - 273.15;
+        Tconv - (totalQ / totalArea) * (constructionRValue + 1 / hAvg) - 273.15;
     } else {
-      groundOutput.outputValues[{surfaceType, GroundOutput::OT_TEMP}] = Tair;
-      groundOutput.outputValues[{surfaceType, GroundOutput::OT_AVG_TEMP}] = Tair;
+      double Tconv = bcs.slabConvectiveTemp;
+      groundOutput.outputValues[{surfaceType, GroundOutput::OT_TEMP}] = Tconv;
+      groundOutput.outputValues[{surfaceType, GroundOutput::OT_AVG_TEMP}] = Tconv;
       groundOutput.outputValues[{surfaceType, GroundOutput::OT_FLUX}] = 0.0;
       groundOutput.outputValues[{surfaceType, GroundOutput::OT_RATE}] = 0.0;
       groundOutput.outputValues[{surfaceType, GroundOutput::OT_CONV}] = 0.0;
       groundOutput.outputValues[{surfaceType, GroundOutput::OT_RAD}] = 0.0;
 
-      groundOutput.outputValues[{surfaceType, GroundOutput::OT_EFF_TEMP}] = Tair - 273.15;
+      groundOutput.outputValues[{surfaceType, GroundOutput::OT_EFF_TEMP}] = Tconv - 273.15;
     }
   }
 }
@@ -421,9 +423,7 @@ void Ground::calculateBoundaryLayer() {
   BoundaryConditions preBCs;
   preBCs.localWindSpeed = 0;
   preBCs.outdoorTemp = 273.15;
-  preBCs.indoorTemp = 293.15;
-  preBCs.slabRadiantTemp = 293.15;
-  preBCs.wallRadiantTemp = 293.15;
+  preBCs.slabConvectiveTemp = preBCs.wallConvectiveTemp = preBCs.slabRadiantTemp = preBCs.wallRadiantTemp = 293.15;
   fd.coordinateSystem = Foundation::CS_CARTESIAN;
   fd.numberOfDimensions = 2;
   fd.reductionStrategy = Foundation::RS_AP;
@@ -609,6 +609,7 @@ void Ground::setBoundaryConditions() {
 
   for (auto &surface : foundation.surfaces) {
     if (surface.type == Surface::ST_GRADE || surface.type == Surface::ST_WALL_EXT) {
+      bool isWall = surface.type == Surface::ST_WALL_EXT;
 
       // Short wave
       double pssf;
@@ -699,14 +700,16 @@ void Ground::setBoundaryConditions() {
       }
 
       // convection
-      if (isWindward(surface.cosTilt, surface.azimuth, bcs.windDirection)) {
-        surface.hfGlass = Memo::pow089(3.26 * bcs.localWindSpeed);
-      } else {
-        surface.hfGlass = Memo::pow0617(3.55 * bcs.localWindSpeed);
-      }
+      ForcedConvectionTerm hfFunc = isWall ? bcs.extWallForcedTerm : bcs.gradeForcedTerm;
+      surface.hfTerm = hfFunc(surface.cosTilt, surface.azimuth, bcs.windDirection, bcs.localWindSpeed);
+
+      surface.convectionAlgorithm =
+          isWall ? bcs.extWallConvectionAlgorithm : bcs.gradeConvectionAlgorithm;
 
       surface.effectiveLWViewFactorQtr =
           std::sqrt(std::sqrt(getEffectiveExteriorViewFactor(bcs.skyEmissivity, surface.tilt)));
+
+      surface.temperature = bcs.outdoorTemp;
 
     } else if (surface.type == Surface::ST_SLAB_CORE || surface.type == Surface::ST_SLAB_PERIM ||
                surface.type == Surface::ST_WALL_INT) {
@@ -718,9 +721,13 @@ void Ground::setBoundaryConditions() {
         this_cell->heatGain = absRadiation;
       }
 
+      surface.temperature = isWall ? bcs.wallConvectiveTemp : bcs.slabConvectiveTemp;
       surface.radiantTemperature = isWall ? bcs.wallRadiantTemp : bcs.slabRadiantTemp;
 
-      surface.hfGlass = 0.0; // Assume no air movement inside
+      // convection
+      surface.hfTerm = 0.0; // Assume no air movement inside
+      surface.convectionAlgorithm =
+          isWall ? bcs.intWallConvectionAlgorithm : bcs.slabConvectionAlgorithm;
 
     } else if (surface.type == Surface::ST_DEEP_GROUND) {
       surface.temperature = bcs.deepGroundTemperature;

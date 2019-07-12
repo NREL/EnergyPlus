@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -210,6 +210,7 @@ namespace OutputReportTabular {
     extern bool displayLifeCycleCostReport;
     extern bool displayTariffReport;
     extern bool displayEconomicResultSummary;
+    extern bool displayHeatEmissionsSummary;
     extern bool displayEioSummary;
 
     // BEPS Report Related Variables
@@ -743,6 +744,8 @@ namespace OutputReportTabular {
 
     void GatherHeatGainReport(int const IndexTypeKey); // What kind of data to update (Zone, HVAC)
 
+    void GatherHeatEmissionReport(int const IndexTypeKey);
+
     //======================================================================================================================
     //======================================================================================================================
 
@@ -780,6 +783,8 @@ namespace OutputReportTabular {
     void WriteVeriSumTable();
 
     void WriteAdaptiveComfortTable();
+
+    void WriteHeatEmissionTable();
 
     void WritePredefinedTables();
 

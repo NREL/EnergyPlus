@@ -95,7 +95,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.0;
+  Version,9.2;
 
   Timestep,6;
 
@@ -116,7 +116,7 @@
   SurfaceConvectionAlgorithm:Outside,DOE-2;
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
     ,                        !- Begin Year
@@ -131,7 +131,7 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 2,            !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -1742,7 +1742,9 @@
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 1 Object Type
     Zone1FanCoil,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   NodeList,
     Zone1Inlets,             !- Name
@@ -1844,7 +1846,9 @@
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 1 Object Type
     Zone2FanCoil,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   NodeList,
     Zone2Inlets,             !- Name
@@ -1946,7 +1950,9 @@
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 1 Object Type
     Zone3FanCoil,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   NodeList,
     Zone3Inlets,             !- Name

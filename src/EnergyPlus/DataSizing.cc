@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -149,7 +149,7 @@ namespace DataSizing {
     Real64 const AutoSize(-99999.0);
 
     // parameter for (time-of-peak) sizing format
-    gio::Fmt PeakHrMinFmt("(I2.2,':',I2.2,':00')");
+    ObjexxFCL::gio::Fmt PeakHrMinFmt("(I2.2,':',I2.2,':00')");
 
     // Zone Outdoor Air Method
     int const ZOAM_FlowPerPerson(1); // set the outdoor air flow rate based on number of people in the zone
@@ -269,7 +269,7 @@ namespace DataSizing {
     Real64 DataCoilSizingAirOutHumRat(0.0);         // saves sizing data for use in coil object reporting
     Real64 DataCoilSizingFanCoolLoad(0.0);          // saves sizing data for use in coil object reporting
     Real64 DataCoilSizingCapFT(1.0);                // saves sizing data for use in coil object reporting
-    Real64 DataDesAccountForFanHeat(true);          // include fan heat when true
+    bool DataDesAccountForFanHeat(true);            // include fan heat when true
     Real64 DataDesInletWaterTemp(0.0);              // coil inlet water temperture used for warning messages
     Real64 DataDesInletAirHumRat(0.0);              // coil inlet air humidity ratio used for warning messages
     Real64 DataDesInletAirTemp(0.0);                // coil inlet air temperature used for warning messages
@@ -649,6 +649,7 @@ namespace DataSizing {
         DataScalableCapSizingON = false;
         DataSysScalableFlowSizingON = false;
         DataSysScalableCapSizingON = false;
+        DataDesAccountForFanHeat = true;
 
         DataDesInletWaterTemp = 0.0;
         DataDesInletAirHumRat = 0.0;

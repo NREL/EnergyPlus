@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -259,7 +259,6 @@ namespace BaseboardElectric {
         int NumNums;
         int IOStat;
         static bool ErrorsFound(false); // If errors detected in input
-        bool errFlag;
 
         int CtrlZone;         // index to constrolled zone number
         int ZoneEquipTypeNum; // index to zone equipment in a zone equipment list
@@ -299,10 +298,10 @@ namespace BaseboardElectric {
                 if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
                 }
-                VerifyUniqueBaseboardName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-                if (errFlag) {
-                    ErrorsFound = true;
-                }
+
+                // ErrorsFound will be set to True if problem was found, left untouched otherwise
+                VerifyUniqueBaseboardName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+
                 ++BaseboardNum;
                 Baseboard(BaseboardNum).EquipName = cAlphaArgs(1);                                        // name of this baseboard
                 Baseboard(BaseboardNum).EquipType = UtilityRoutines::MakeUPPERCase(cCurrentModuleObject); // the type of baseboard-rename change

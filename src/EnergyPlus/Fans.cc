@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,7 +55,7 @@
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DataAirLoop.hh>
-#include <DataAirflowNetwork.hh>
+#include <AirflowNetwork/Elements.hpp>
 #include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
 #include <DataLoopNode.hh>
@@ -2506,7 +2506,6 @@ namespace Fans {
         // na
 
         // Using/Aliasing
-        using DataAirflowNetwork::AirflowNetworkNumOfExhFan;
         using DataContaminantBalance::Contaminant;
 
         // Locals
@@ -2543,7 +2542,7 @@ namespace Fans {
 
         if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
             Node(InletNode).MassFlowRate = Fan(FanNum).InletAirMassFlowRate;
-            if (AirflowNetworkNumOfExhFan == 0) {
+            if (AirflowNetwork::AirflowNetworkNumOfExhFan == 0) {
                 UnbalExhMassFlow = Fan(FanNum).InletAirMassFlowRate;
                 if (Fan(FanNum).BalancedFractSchedNum > 0) {
                     BalancedExhMassFlow = UnbalExhMassFlow * GetCurrentScheduleValue(Fan(FanNum).BalancedFractSchedNum);

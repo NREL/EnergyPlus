@@ -1,13 +1,43 @@
 \section{Daylighting Calculations}\label{daylighting-calculations}
 
-The EnergyPlus daylighting model using the SplitFlux method, in conjunction with the thermal analysis, determines the energy impact of daylighting strategies based on analysis of daylight availability, site conditions, window management in response to solar gain and glare, and various lighting control strategies.
+The EnergyPlus daylighting model using the SplitFlux method, in conjunction with the thermal analysis,
+determines the energy impact of daylighting strategies based on analysis of daylight availability,
+site conditions, window management in response to solar gain and glare, and various lighting control strategies.
 
 The daylighting calculation has three main steps:
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\item
+    \emph{Daylight factors}, which are ratios of interior illuminance or luminance to exterior horizontal illuminance, are calculated and stored.
+    The user specifies the coordinates of one or more reference points in each daylit zone.
+    EnergyPlus then integrates over the area of each exterior window in the zone to obtain the contribution of direct light from the window to the illuminance at the reference points,
+    and the contribution of light that reflects from the walls, floor and ceiling before reaching the reference points.
+    Window luminance and window background luminance, which are used to determine glare, are also calculated.
+    Taken into account are such factors as sky luminance distribution, window size and orientation, glazing transmittance, inside surface reflectances,
+    sun control devices such as movable window shades, and external obstructions. Dividing daylight illuminance or luminance by exterior illuminance yields daylight factors.
+    These factors are calculated for the hourly sun positions on sun-paths for representative days of the run period.
+    To avoid the spikes of daylight and glare factors calculated during some sunrise and/or sunset hours when exterior horizontal illuminance is very low,
+    the daylight and glare factors for those hours are reset to 0.
 
-1.~~~~\emph{Daylight factors}, which are ratios of interior illuminance or luminance to exterior horizontal illuminance, are calculated and stored. The user specifies the coordinates of one or two reference points in each daylit zone. EnergyPlus then integrates over the area of each exterior window in the zone to obtain the contribution of direct light from the window to the illuminance at the reference points, and the contribution of light that reflects from the walls, floor and ceiling before reaching the reference points. Window luminance and window background luminance, which are used to determine glare, are also calculated. Taken into account are such factors as sky luminance distribution, window size and orientation, glazing transmittance, inside surface reflectances, sun control devices such as movable window shades, and external obstructions. Dividing daylight illuminance or luminance by exterior illuminance yields daylight factors. These factors are calculated for the hourly sun positions on sun-paths for representative days of the run period. To avoid the spikes of daylight and glare factors calculated during some sunrise and/or sunset hours when exterior horizontal illuminance is very low, the daylight and glare factors for those hours are reset to 0.
+\item
+    A daylighting calculation is performed each heat-balance time step when the sun is up.
+    In this calculation the illuminance at the reference points in each zone is found by interpolating the stored daylight factors using the current time step's sun position
+    and sky condition, then multiplying by the exterior horizontal illuminance. If glare control has been specified, the program will automatically deploy window shading,
+    if available, to decrease glare below a specified comfort level. A similar option uses window shades to automatically control solar gain.
 
-2.~~~~A daylighting calculation is performed each heat-balance time step when the sun is up. In this calculation the illuminance at the reference points in each zone is found by interpolating the stored daylight factors using the current time step's sun position and sky condition, then multiplying by the exterior horizontal illuminance. If glare control has been specified, the program will automatically deploy window shading, if available, to decrease glare below a specified comfort level. A similar option uses window shades to automatically control solar gain.
+\item
+    The electric lighting control system is simulated to determine the lighting energy needed to make up the difference between the daylighting illuminance level and the design illuminance.
+    Finally, the zone lighting electric reduction factor is passed to the thermal calculation, which uses this factor to reduce the heat gain from lights.
+\end{enumerate}
 
-3.~~~~The electric lighting control system is simulated to determine the lighting energy needed to make up the difference between the daylighting illuminance level and the design illuminance. Finally, the zone lighting electric reduction factor is passed to the thermal calculation, which uses this factor to reduce the heat gain from lights.
+The EnergyPlus daylighting calculation is derived from the daylighting calculation in DOE-2.1E, which is described in {[}Winkelmann, 1983{]} and {[}Winkelmann and Selkowitz, 1985{]}.
+There are two major differences between the two implementations:
 
-The EnergyPlus daylighting calculation is derived from the daylighting calculation in DOE-2.1E, which is described in {[}Winkelmann, 1983{]} and {[}Winkelmann and Selkowitz, 1985{]}. There are two major differences between the two implementations: (1) In EnergyPlus daylight factors are calculated for four different sky types---clear, clear turbid, intermediate, and overcast; in DOE-2 only two sky types are used---clear and overcast. (2) In EnergyPlus the clear-sky daylight factors are calculated for hourly sun-path sun positions several times a year whereas in DOE-2 these daylight factors are calculated for a set of 20 sun positions that span the annual range of sun positions for a given geographical location.
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\item
+    In EnergyPlus daylight factors are calculated for four different sky types---clear, clear turbid, intermediate, and overcast; in DOE-2 only two sky types are used---clear and overcast.
+\item
+    In EnergyPlus the clear-sky daylight factors are calculated for hourly sun-path sun positions several times a year
+    whereas in DOE-2 these daylight factors are calculated for a set of 20 sun positions that span the annual range of sun positions for a given geographical location.
+\end{enumerate}

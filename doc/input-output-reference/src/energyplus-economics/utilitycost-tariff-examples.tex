@@ -12,7 +12,7 @@ Customer Charge: \$2.51 per month
 
 Energy Charge:~~~ 5.5342 cents/kWh
 
-This tariff would use a single UtilityCost:Charge:Simple object. The monthly charge is part of the UtilityCost:Tariff object.
+This tariff would use a single \hyperref[utilitycostchargesimple]{UtilityCost:Charge:Simple} object. The monthly charge is part of the \hyperref[utilitycosttariff]{UtilityCost:Tariff} object.
 
 \begin{lstlisting}
 
@@ -50,7 +50,7 @@ Energy Charge:~~~~~~~ 7.231 cents/kWh for first 200 kWh
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 5.876 cents/kWh for over 1200 kWh
 
-This tariff would use a single UtilityCost:Charge:Block object. The monthly charge is part of the UtilityCost:Tariff object. Note that the block sizes are every other field at the bottom of the object and the that final block size references a built in variable called ``remaining'' that contains a very large number.
+This tariff would use a single \hyperref[utilitycostchargeblock]{UtilityCost:Charge:Block} object. The monthly charge is part of the \hyperref[utilitycosttariff]{UtilityCost:Tariff} object. Note that the block sizes are every other field at the bottom of the object and the that final block size references a built in variable called ``remaining'' that contains a very large number.
 
 \begin{lstlisting}
 
@@ -99,7 +99,7 @@ Demand Charge:~~~~~ 5.38 dollars per kW for first 20 kW
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 3.60 dollars per kW for additional kW
 
-This tariff would use two UtilityCost:Charge:Block objects. No monthly charge is shown so the UtilityCost:Tariff object can include just the first four fields. Note that the block sizes are every other field at the bottom of the object and the that final block size references a built in variable called ``remaining'' that contains a very large number.
+This tariff would use two \hyperref[utilitycostchargeblock]{UtilityCost:Charge:Block} objects. No monthly charge is shown so the \hyperref[utilitycosttariff]{UtilityCost:Tariff} object can include just the first four fields. Note that the block sizes are every other field at the bottom of the object and the that final block size references a built in variable called ``remaining'' that contains a very large number.
 
 \begin{lstlisting}
 
@@ -163,7 +163,7 @@ Energy Charge:~~~~~~~ 8.385 cents/kWh for first 650 kWh
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 7.103 cents/kWh for over 1000 kWh
 
-This tariff would use two UtilityCost:Charge:Block objects. The monthly charge is part of the UtilityCost:Tariff object. Note that the block sizes are every other field at the bottom of the object and the that final block size references a built in variable called ``remaining'' that contains a very large number.
+This tariff would use two \hyperref[utilitycostchargeblock]{UtilityCost:Charge:Block} objects. The monthly charge is part of the \hyperref[utilitycosttariff]{UtilityCost:Tariff} object. Note that the block sizes are every other field at the bottom of the object and the that final block size references a built in variable called ``remaining'' that contains a very large number.
 
 \begin{lstlisting}
 
@@ -231,7 +231,7 @@ Energy Charge:~~ 8.756 cents/kWh for all consumption not greater than 200 hours 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~ 5.029 cents/kWh for all consumption in excess of 400 hours times the demand.
 
-This tariff would use a single ~UtilityCost:Charge:Block object. The monthly charge is part of the ~UtilityCost:Tariff object. In this case the Block Size Multiplier Value (or Variable) is set to the totalDemand variable.
+This tariff would use a single ~\hyperref[utilitycostchargeblock]{UtilityCost:Charge:Block} object. The monthly charge is part of the ~\hyperref[utilitycosttariff]{UtilityCost:Tariff} object. In this case the Block Size Multiplier Value (or Variable) is set to the totalDemand variable.
 
 \begin{lstlisting}
 
@@ -286,7 +286,7 @@ The on-peak period is defined as the hours starting at 10am and ending at 7pm, M
 
 The tariff is only applicable for customers that use 50KW for at least one month of the year.
 
-This tariff uses four different UtilityCost:Charge:Simple objects to capture the variation with time of the energy cost. The monthly charge is part of the UtilityCost:Tariff object.
+This tariff uses four different \hyperref[utilitycostchargesimple]{UtilityCost:Charge:Simple} objects to capture the variation with time of the energy cost. The monthly charge is part of the \hyperref[utilitycosttariff]{UtilityCost:Tariff} object.
 
 \begin{lstlisting}
 
@@ -388,7 +388,7 @@ Energy Charge:~~~ For all consumption not greater than 200 hours times the deman
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 5.03 cents/kWh for all consumption in excess of 400 hours times the demand.
 
-To set up this ``block within a block'' a UtilityCost:Charge:Block is first used to separate out the first 200 kWh/kW. The ``EnergyFirst200kWhPerkW'' charge performs this. It uses demand to multiply the first block size by 200 and the ``cost'' for the block is simply 1 since it passes through the energy to the variable ``EnergyFirst200kWhPerkW''. The remaining energy goes into the ``restOfEnergy'' variable as specified as the ``Remaining Into Variable'' field. After this is evaluated we have two new variables that hold energy. Each of these variables are then separately used in UtilityCost:Charge:Block objects to evaluate the different parts of the example tariff. By using the ``Remaining Into Variable'' along with the concept of variables, many very complex tariffs may be modeled.
+To set up this ``block within a block'' a \hyperref[utilitycostchargeblock]{UtilityCost:Charge:Block} is first used to separate out the first 200 kWh/kW. The ``EnergyFirst200kWhPerkW'' charge performs this. It uses demand to multiply the first block size by 200 and the ``cost'' for the block is simply 1 since it passes through the energy to the variable ``EnergyFirst200kWhPerkW''. The remaining energy goes into the ``restOfEnergy'' variable as specified as the ``Remaining Into Variable'' field. After this is evaluated we have two new variables that hold energy. Each of these variables are then separately used in \hyperref[utilitycostchargeblock]{UtilityCost:Charge:Block} objects to evaluate the different parts of the example tariff. By using the ``Remaining Into Variable'' along with the concept of variables, many very complex tariffs may be modeled.
 
 \begin{lstlisting}
 
@@ -451,9 +451,9 @@ To set up this ``block within a block'' a UtilityCost:Charge:Block is first used
 
 \subsubsection{Example H -- Real Time Pricing}\label{example-h-real-time-pricing}
 
-Some utilities have tariffs that can have different prices every hour of the year called Real Time Pricing tariffs. Often the utility will inform the customer of the prices for each hour of the day just one day in advance. To model this type of utility rate a normal schedule is used that contains the prices on an hourly basis.~ The ``Charge Schedule'' field is where the Schedule object containing the prices is referenced.~ In addition, the ``Baseline Use Schedule'' field is used to set the schedule for the customer baseline load. Not all utilities use a customer baseline load so the field can be left blank if none is needed. The Period, Season and Month Schedules are not needed for these tariffs unless UtilityCost:Charge's are used.~ The Schedule:File object can be especially useful to input a complex schedule that changes throughout the year.
+Some utilities have tariffs that can have different prices every hour of the year called Real Time Pricing tariffs. Often the utility will inform the customer of the prices for each hour of the day just one day in advance. To model this type of utility rate a normal schedule is used that contains the prices on an hourly basis.~ The ``Charge Schedule'' field is where the Schedule object containing the prices is referenced.~ In addition, the ``Baseline Use Schedule'' field is used to set the schedule for the customer baseline load. Not all utilities use a customer baseline load so the field can be left blank if none is needed. The Period, Season and Month Schedules are not needed for these tariffs unless UtilityCost:Charge's are used.~ The \hyperref[schedulefile]{Schedule:File} object can be especially useful to input a complex schedule that changes throughout the year.
 
-Example H, shown below, is an example of how to use the UtilityCost:Tariff object with a schedule to calculate a utility tariff using real time prices.~ The example real time pricing schedule results in the same energy cost as Example F -- Seasonal Time of Use Energy. This is only an example and usually for real time pricing the schedule values would vary throughout the year.
+Example H, shown below, is an example of how to use the \hyperref[utilitycosttariff]{UtilityCost:Tariff} object with a schedule to calculate a utility tariff using real time prices.~ The example real time pricing schedule results in the same energy cost as Example F -- Seasonal Time of Use Energy. This is only an example and usually for real time pricing the schedule values would vary throughout the year.
 
 !~ EXAMPLE H - Real Time Pricing (RTP)
 
@@ -510,9 +510,9 @@ Example H, shown below, is an example of how to use the UtilityCost:Tariff objec
 
 When the building contains a generator, photovoltaics, or other sources of electrical power, there is an opportunity for the building generator to produce more power than the building uses. The excess power can either be sold to the utility or offset the energy purchased.
 
-When the excess power is sold, two utility rates need to be defined. The first can be defined just as in any of the previous examples. Since the ``Buy or Sell'' field of the UtilityCost:Tariff object defaults to ``buyFromUtility'' it does not even need to be specified. The meter specified in the ``Output Meter'' is usually set to ``ElectricityPurchased:Facility.''
+When the excess power is sold, two utility rates need to be defined. The first can be defined just as in any of the previous examples. Since the ``Buy or Sell'' field of the \hyperref[utilitycosttariff]{UtilityCost:Tariff} object defaults to ``buyFromUtility'' it does not even need to be specified. The meter specified in the ``Output Meter'' is usually set to ``ElectricityPurchased:Facility.''
 
-The second tariff needs to be defined with the ``Buy or Sell'' field set to ``sellToUtility.'' The ``Output Meter'' is usually set to ``ElectricitySurplusSold:Facility.'' It is important to set the appropriate meters that correspond with the ``Buy or Sell'' field.~ The example below shows an tariff that sells the excess electricity back to utility. The UtilityCost:Charge:Simple object contains a ``Cost Per Value'' with a negative number. A negative number is critical if a credit for selling this electricity is expected.
+The second tariff needs to be defined with the ``Buy or Sell'' field set to ``sellToUtility.'' The ``Output Meter'' is usually set to ``ElectricitySurplusSold:Facility.'' It is important to set the appropriate meters that correspond with the ``Buy or Sell'' field.~ The example below shows an tariff that sells the excess electricity back to utility. The \hyperref[utilitycostchargesimple]{UtilityCost:Charge:Simple} object contains a ``Cost Per Value'' with a negative number. A negative number is critical if a credit for selling this electricity is expected.
 
 !~ EXAMPLE I - Selling
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1343,12 +1343,12 @@ namespace UnitVentilator {
                                         UnitVent(UnitVentNum).HWLoopSide,
                                         UnitVent(UnitVentNum).HWBranchNum,
                                         UnitVent(UnitVentNum).HWCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowContinueError("Reference Unit=\"" + UnitVent(UnitVentNum).Name + "\", type=ZoneHVAC:UnitVentilator");
                     ShowFatalError("InitUnitVentilator: Program terminated due to previous condition(s).");
@@ -1369,12 +1369,12 @@ namespace UnitVentilator {
                                         UnitVent(UnitVentNum).CWLoopSide,
                                         UnitVent(UnitVentNum).CWBranchNum,
                                         UnitVent(UnitVentNum).CWCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowContinueError("Reference Unit=\"" + UnitVent(UnitVentNum).Name + "\", type=ZoneHVAC:UnitVentilator");
                     ShowFatalError("InitUnitVentilator: Program terminated due to previous condition(s).");

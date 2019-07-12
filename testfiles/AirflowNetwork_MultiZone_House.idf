@@ -101,7 +101,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.0;
+  Version,9.2;
 
   Building,
     House with AirflowNetwork simulation,  !- Name
@@ -131,7 +131,7 @@
     No;                      !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
     ,                        !- Begin Year
@@ -146,7 +146,7 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 2,            !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -1831,7 +1831,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     ZoneDirectAir,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
 
   AirLoopHVAC:UnitaryHeatPump:AirToAir,
     DXAC Heat Pump 1,        !- Name

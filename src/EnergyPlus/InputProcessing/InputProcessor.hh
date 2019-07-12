@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <map>
 #include <string>
 #include <unordered_map>
+#include <set>
 #include <vector>
 
 // ObjexxFCL Headers
@@ -107,6 +108,8 @@ public:
 
     void initializeMaps();
 
+    void markObjectAsUsed(const std::string &objectType, const std::string &objectName);
+
     void processInput();
 
     int getNumSectionsFound(std::string const &SectionWord);
@@ -116,6 +119,10 @@ public:
     bool findDefault(std::string &default_value, json const &schema_field_obj);
 
     bool findDefault(Real64 &default_value, json const &schema_field_obj);
+
+    bool getDefaultValue(std::string const &objectWord, std::string const &fieldName, Real64 &value);
+
+    bool getDefaultValue(std::string const &objectWord, std::string const &fieldName, std::string &value);
 
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
@@ -183,6 +190,15 @@ private:
         {
         }
 
+        bool operator<(const ObjectInfo& rhs) const
+        {
+            int cmp = this->objectType.compare(rhs.objectType);
+            if(cmp == 0) {
+                return this->objectName < rhs.objectName;
+            }
+            return cmp < 0;
+        }
+
         std::string objectType = "";
         std::string objectName = "";
     };
@@ -213,13 +229,15 @@ private:
 
     std::vector<std::string> const &validationWarnings();
 
-    void checkVersionMatch();
+    bool checkVersionMatch();
 
     bool processErrors();
 
     json const &getFields(std::string const &objectType, std::string const &objectName);
 
     json const &getFields(std::string const &objectType);
+
+    json const &getPatternProperties(json const &schema_obj);
 
     inline std::string convertToUpper(std::string s)
     {
@@ -235,7 +253,7 @@ private:
 
     using UnorderedObjectTypeMap = std::unordered_map<std::string, std::string>;
     using UnorderedObjectCacheMap = std::unordered_map<std::string, ObjectCache>;
-    using UnorderedUnusedObjectMap = std::map<const json::object_t *const, ObjectInfo>;
+    using UnusedObjectSet = std::set<ObjectInfo>;
 
     std::unique_ptr<IdfParser> idf_parser;
     std::unique_ptr<Validation> validation;
@@ -246,7 +264,7 @@ private:
     private:
     UnorderedObjectTypeMap caseInsensitiveObjectMap;
     UnorderedObjectCacheMap objectCacheMap;
-    UnorderedUnusedObjectMap unusedInputs;
+    UnusedObjectSet unusedInputs;
     char s[129] = {0};
 
 }; // InputProcessor

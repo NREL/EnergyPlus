@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -177,7 +177,7 @@ namespace GlobalNames {
     }
 
     void
-    VerifyUniqueChillerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay)
+    VerifyUniqueChillerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
 
         // SUBROUTINE INFORMATION:
@@ -190,12 +190,11 @@ namespace GlobalNames {
         // This subroutine verifys that a new name will be unique in the list of
         // chillers.  If not found in the list, it is added before returning.
 
-        ErrorFound = false;
         auto const iter = ChillerNames.find(NameToVerify);
         if (iter != ChillerNames.end()) {
             ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", Chiller Type=\"" + iter->second + "\".");
             ShowContinueError("...Current entry is Chiller Type=\"" + TypeToVerify + "\".");
-            ErrorFound = true;
+            ErrorsFound = true;
         } else {
             ChillerNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
             NumChillers = static_cast<int>(ChillerNames.size());
@@ -203,7 +202,7 @@ namespace GlobalNames {
     }
 
     void
-    VerifyUniqueBaseboardName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay)
+    VerifyUniqueBaseboardName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
 
         // SUBROUTINE INFORMATION:
@@ -216,12 +215,11 @@ namespace GlobalNames {
         // This subroutine verifys that a new name will be unique in the list of
         // Baseboards.  If not found in the list, it is added before returning.
 
-        ErrorFound = false;
         auto const iter = BaseboardNames.find(NameToVerify);
         if (iter != BaseboardNames.end()) {
             ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + iter->second + "\".");
             ShowContinueError("...Current entry is Baseboard Type=\"" + TypeToVerify + "\".");
-            ErrorFound = true;
+            ErrorsFound = true;
         } else {
             BaseboardNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
             NumBaseboards = static_cast<int>(BaseboardNames.size());
@@ -229,7 +227,7 @@ namespace GlobalNames {
     }
 
     void
-    VerifyUniqueBoilerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay)
+    VerifyUniqueBoilerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
 
         // SUBROUTINE INFORMATION:
@@ -242,19 +240,18 @@ namespace GlobalNames {
         // This subroutine verifys that a new name will be unique in the list of
         // Boilers.  If not found in the list, it is added before returning.
 
-        ErrorFound = false;
         auto const iter = BoilerNames.find(NameToVerify);
         if (iter != BoilerNames.end()) {
             ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + iter->second + "\".");
             ShowContinueError("...Current entry is Boiler Type=\"" + TypeToVerify + "\".");
-            ErrorFound = true;
+            ErrorsFound = true;
         } else {
             BoilerNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
             NumBoilers = static_cast<int>(BoilerNames.size());
         }
     }
 
-    void VerifyUniqueCoilName(std::string const &TypeToVerify, std::string &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay)
+    void VerifyUniqueCoilName(std::string const &TypeToVerify, std::string &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
 
         // SUBROUTINE INFORMATION:
@@ -269,31 +266,29 @@ namespace GlobalNames {
 
         if (NameToVerify.empty()) {
             ShowSevereError("\"" + TypeToVerify + "\" cannot have a blank field");
-            ErrorFound = true;
+            ErrorsFound = true;
             NameToVerify = "xxxxx";
             return;
         }
 
-        ErrorFound = false;
         auto const iter = CoilNames.find(NameToVerify);
         if (iter != CoilNames.end()) {
             ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + iter->second + "\".");
             ShowContinueError("...Current entry is Coil Type=\"" + TypeToVerify + "\".");
-            ErrorFound = true;
+            ErrorsFound = true;
         } else {
             CoilNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
             NumCoils = static_cast<int>(CoilNames.size());
         }
     }
 
-    void VerifyUniqueADUName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay)
+    void VerifyUniqueADUName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorsFound, std::string const &StringToDisplay)
     {
-        ErrorFound = false;
         auto const iter = aDUNames.find(NameToVerify);
         if (iter != aDUNames.end()) {
             ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify + ", ADU Type=\"" + iter->second + "\".");
             ShowContinueError("...Current entry is Air Distribution Unit Type=\"" + TypeToVerify + "\".");
-            ErrorFound = true;
+            ErrorsFound = true;
         } else {
             aDUNames.emplace(NameToVerify, UtilityRoutines::MakeUPPERCase(TypeToVerify));
             numAirDistUnits = static_cast<int>(aDUNames.size());

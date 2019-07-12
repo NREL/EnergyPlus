@@ -6,22 +6,22 @@ The components
 
 \begin{itemize}
 \item
-  AirLoopHVAC:UnitarySystem
+  \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem}
 \item
-  AirLoopHVAC:Unitary:Furnace:HeatOnly
+  \hyperref[airloophvacunitaryfurnaceheatonly]{AirLoopHVAC:Unitary:Furnace:HeatOnly}
 \item
-  AirLoopHVAC:Unitary:Furnace:HeatCool
+  \hyperref[airloophvacunitaryfurnaceheatcool]{AirLoopHVAC:Unitary:Furnace:HeatCool}
 \item
-  AirLoopHVAC:UnitaryHeatOnly
+  \hyperref[airloophvacunitaryheatonly]{AirLoopHVAC:UnitaryHeatOnly}
 \item
-  AirLoopHVAC:UnitaryHeatCool
+  \hyperref[airloophvacunitaryheatcool]{AirLoopHVAC:UnitaryHeatCool}
 \item
-  AirLoopHVAC:UnitaryHeatPump:AirToAir
+  \hyperref[airloophvacunitaryheatpumpairtoair]{AirLoopHVAC:UnitaryHeatPump:AirToAir}
 \item
-  AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed
+  \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed}
 \end{itemize}
 
-are compound components usually placed in the primary air loop as the sole component. On the zone equipment side they are usually connected to one or more zones through uncontrolled terminal units (i.e., AirTerminal:SingleDuct:Uncontrolled objects). The maximum or design air flow rate through the furnace or unitary system should usually be set equal to the sum of the maximum air flow rates through the terminal unit objects. However, the simulation program can usually account for unequal air flows if the user wishes to model this scenario.
+are compound components usually placed in the primary air loop as the sole component. On the zone equipment side they are usually connected to one or more zones through uncontrolled terminal units (i.e., \hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled} objects). The maximum or design air flow rate through the furnace or unitary system should usually be set equal to the sum of the maximum air flow rates through the terminal unit objects. However, the simulation program can usually account for unequal air flows if the user wishes to model this scenario.
 
 The following HVAC equipment types are allowed in the air loop. The component matrix shows which coils and fans are allowed with which equipment models.
 
@@ -33,9 +33,9 @@ The following HVAC equipment types are allowed in the air loop. The component ma
 
 \subsection{AirLoopHVAC:UnitarySystem}\label{airloophvacunitarysystem}
 
-The AirloopHVAC:UnitarySystem object is intended to replace all other air loop equipment, although other system types are still available. This system is unique in that it can accommodate all fan and coil types whereas other system types are specific to the type of fan and coil available for simulation. Additionally, although the AirloopHVAC:UnitarySystem is intended for use in the primary airloop, this object can be modeled as zone equipment (i.e., listed in a ZoneHVAC:EquipmentList) or as an outside air system component (i.e., listed in a AirLoopHVAC:OutdoorAirSystem:EquipmentList). Water coil controllers are not required when these coil types are used with the AirloopHVAC:UnitarySystem object (i.e., leave the controller list name blank in the AirLoopHVAC object if water coils are used exclusively within the Unitary System).
+The AirloopHVAC:UnitarySystem object is intended to replace all other air loop equipment, although other system types are still available. This system is unique in that it can accommodate all fan and coil types whereas other system types are specific to the type of fan and coil available for simulation. Additionally, although the AirloopHVAC:UnitarySystem is intended for use in the primary airloop, this object can be modeled as zone equipment (i.e., listed in a \hyperref[zonehvacequipmentlist]{ZoneHVAC:EquipmentList}) or as an outside air system component (i.e., listed in a \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList}). Water coil controllers are not required when these coil types are used with the AirloopHVAC:UnitarySystem object (i.e., leave the controller list name blank in the \hyperref[airloophvac]{AirLoopHVAC} object if water coils are used exclusively within the Unitary System).
 
-The AirLoopHVAC:UnitarySystem object is a ``virtual'' component that consists of a fan component (OnOff, ConstantVolume, VariableVolume, or ComponentModel), a cooling coil component, a heating coil component, and a reheat coil as shown in Figure~\ref{fig:schematic-of-the-energyplus-unitary-system}. When a draw through configuration is desired, the fan is placed directly after the heating coil. If dehumidification control is selected, a reheat coil component is also required. If the reheat coil is present and the dehumidification control type input is not specified as CoolReheat, the reheat coil will not be active. All of the fan and coil components are optional which allows the AirLoopHVAC:UnitarySystem object to be configured for fan-only, heating-only, cooling-only, or both heating and cooling. It may also be applied without a fan, controlling one or more coils, similar to the function of CoilSystem:Cooling:DX. 
+The AirLoopHVAC:UnitarySystem object is a ``virtual'' component that consists of a fan component (OnOff, ConstantVolume, VariableVolume, or ComponentModel), a cooling coil component, a heating coil component, and a reheat coil as shown in Figure~\ref{fig:schematic-of-the-energyplus-unitary-system}. When a draw through configuration is desired, the fan is placed directly after the heating coil. If dehumidification control is selected, a reheat coil component is also required. If the reheat coil is present and the dehumidification control type input is not specified as CoolReheat, the reheat coil will not be active. All of the fan and coil components are optional which allows the AirLoopHVAC:UnitarySystem object to be configured for fan-only, heating-only, cooling-only, or both heating and cooling. It may also be applied without a fan, controlling one or more coils, similar to the function of \hyperref[coilsystemcoolingdx]{CoilSystem:Cooling:DX}.
 
 \begin{figure}[hbtp] % fig 1
 \centering
@@ -49,7 +49,7 @@ Links to the fan, cooling coil, heating coil and reheat coil specifications are 
 
 For unitary systems, don't use the night cycle manager. Use a scheduled availability manager and let the system be always on. Then use the Supply Air Fan Operating Mode Schedule Name in the unitary system to switch between continuous fan (for ventilation) during occupied periods and switch to cycling fan for unoccupied. The system will cycle on as the thermostat requests, and this way it will run just enough to meet the load - no need for a minimum cycle time.
 
-Multi-speed fan chilled and hot water coils Air Handling Unit (AHU) can be modeled using Airloop Unitary System HVAC object (AirloopHVAC:UnitarySystem). AHU with chilled and hot water coils is setup by specifying Fan:OnOff and DesignSpecificationPerformance:MultiSpeed objects in Unitary System. The design specification performance object allows running the chilled and hot water coils capacity control using a multi-speed supply air fan. The multi-speed fan capacity control for chilled and hot water coil AHU is performed by modulating the supply air flow rate while maintaining a constant water flow rate. The chilled or hot water flow rates is set at maximum fixed flow rate when there is cooling or heating load and the water flow rate is set to zero when there is no load. Such control strategy is called two-position cooling or heating coil control. The fan speed selection depends on the current load, at lower load the fan is operated at minimum speed (Speed = 1) and the fan speed level increases progressively as the load increases until it reaches the maximum speed level specified. The multi-speed fan operation is modulated between the speeds to meet the current load. When the supply air fan is cycling between consecutive speeds levels, the speed ratio is calculated that indicates what fraction of the time step that the system run at the higher of the two speeds. At lower load, the fan may cycle on-off or run continuously depending the fan operating schedule specified. When the fan is cycling a part-load ratio is calculated to reflect the proportion of the system timestep the fan and coils were operating. In continuous fan operating mode only the coil cycles on-off and the part-load ratio applies to the coil only. Multi-speed fan capacity control is allowed with load based control type only.
+Multi-speed fan chilled and hot water coils Air Handling Unit (AHU) can be modeled using Airloop Unitary System HVAC object (AirloopHVAC:UnitarySystem). AHU with chilled and hot water coils is setup by specifying \hyperref[fanonoff]{Fan:OnOff} and DesignSpecificationPerformance:MultiSpeed objects in Unitary System. The design specification performance object allows running the chilled and hot water coils capacity control using a multi-speed supply air fan. The multi-speed fan capacity control for chilled and hot water coil AHU is performed by modulating the supply air flow rate while maintaining a constant water flow rate. The chilled or hot water flow rates is set at maximum fixed flow rate when there is cooling or heating load and the water flow rate is set to zero when there is no load. Such control strategy is called two-position cooling or heating coil control. The fan speed selection depends on the current load, at lower load the fan is operated at minimum speed (Speed = 1) and the fan speed level increases progressively as the load increases until it reaches the maximum speed level specified. The multi-speed fan operation is modulated between the speeds to meet the current load. When the supply air fan is cycling between consecutive speeds levels, the speed ratio is calculated that indicates what fraction of the time step that the system run at the higher of the two speeds. At lower load, the fan may cycle on-off or run continuously depending the fan operating schedule specified. When the fan is cycling a part-load ratio is calculated to reflect the proportion of the system timestep the fan and coils were operating. In continuous fan operating mode only the coil cycles on-off and the part-load ratio applies to the coil only. Multi-speed fan capacity control is allowed with load based control type only.
 
 \subsubsection{Inputs}\label{inputs-049}
 
@@ -59,7 +59,7 @@ This alpha field contains the identifying name for the unitary system.
 
 \paragraph{Field: Control Type}\label{field-control-type-004}
 
-This alpha field contains control type i.e.~load based or setpoint based for the unitary system. Valid choices are \textbf{Load}, \textbf{SetPoint} and \textbf{SingleZoneVAV}. Load and SingleZoneVAV control requires a Controlling Zone name. SetPoint control requires set points at each coil outlet node. A single set point at the outlet of the system is allowed but not recommended. If setpoint control is used and the system represents a heat pump (i.e., cooling and heating coils are both DX coils) then only one of these coils may operate at a time. SingleZoneVAV requires two distinct fan flow rates, namely the Cooling and Heating Supply Air Flow Rate and a lower No Load Supply Air Flow Rate which is used during times of reduced cooling or heating loads. SingleZoneVAV allows load control at low speed fan until the load exceeds available capacity or the outlet air temperature exceeds the specified limits where the fan speed is then increased. For the SingleZoneVAV control type, temperature limits are identified in the input fields for Minimum and Maximum Supply Air Temperature. Additionally, specific coil types are required for the SingleZoneVAV control type. The cooling coil types are Coil:Cooling:Water, Coil:Cooling:Water:DetailedGeometry and Coil:Cooling:DX:SingleSpeed while the heating coil types are Coil:Heating:Water, Coil:Heating:Fuel, Coil:Heating:Electric and Coil:Heating:DX:SingleSpeed. If alternate coil types are used they are modeled using the load based control method. 
+This alpha field contains control type i.e.~load based or setpoint based for the unitary system. Valid choices are \textbf{Load}, \textbf{SetPoint} and \textbf{SingleZoneVAV}. Load and SingleZoneVAV control requires a Controlling Zone name. SetPoint control requires set points at each coil outlet node. A single set point at the outlet of the system is allowed but not recommended. If setpoint control is used and the system represents a heat pump (i.e., cooling and heating coils are both DX coils) then only one of these coils may operate at a time. SingleZoneVAV requires two distinct fan flow rates, namely the Cooling and Heating Supply Air Flow Rate and a lower No Load Supply Air Flow Rate which is used during times of reduced cooling or heating loads. SingleZoneVAV allows load control at low speed fan until the load exceeds available capacity or the outlet air temperature exceeds the specified limits where the fan speed is then increased. For the SingleZoneVAV control type, temperature limits are identified in the input fields for Minimum and Maximum Supply Air Temperature. Additionally, specific coil types are required for the SingleZoneVAV control type. The cooling coil types are \hyperref[coilcoolingwater]{Coil:Cooling:Water}, \hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry} and \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} while the heating coil types are \hyperref[coilheatingwater]{Coil:Heating:Water}, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingelectric]{Coil:Heating:Electric} and \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed}. If alternate coil types are used they are modeled using the load based control method.
 
 \paragraph{Field: Controlling Zone or Thermostat Location}\label{field-controlling-zone-or-thermostat-location}
 
@@ -71,11 +71,11 @@ This alpha field contains the type of dehumidification control. The following op
 
 \textbf{None} - meet sensible load only, no active dehumidification control. None is required when Control Type = SingleZoneVAV.
 
-\textbf{Multimode} - activate enhanced dehumidification mode as needed and meet sensible load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted.
+\textbf{Multimode} - activate enhanced dehumidification mode as needed and meet sensible load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}.
 
-\textbf{CoolReheat} - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. If cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted, then the heat exchanger is assumed to always transfer energy between the cooling coil's inlet and outlet airstreams when the cooling coil is operating.
+\textbf{CoolReheat} - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. If cooling coil type = \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}, then the heat exchanger is assumed to always transfer energy between the cooling coil's inlet and outlet airstreams when the cooling coil is operating.
 
-The default is \textbf{None}. For the other dehumidification control modes, the maximum humidity setpoint is used. This must be set using a \textbf{ZoneControl:Humidistat} object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. If the dehumidification control type is specified as \textbf{CoolReheat}, then two additional inputs (reheat coil type and name) are also required as shown below. Although the reheat coil is required only when \textbf{CoolReheat} is selected, the optional reheat coil may be present for any of the allowed Dehumidification Control Types. If the reheat coil is present and the dehumidification control type is not specified as \textbf{CoolReheat}, the reheat coil will not be active,
+The default is \textbf{None}. For the other dehumidification control modes, the maximum humidity setpoint is used. This must be set using a \textbf{\hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat}} object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. If the dehumidification control type is specified as \textbf{CoolReheat}, then two additional inputs (reheat coil type and name) are also required as shown below. Although the reheat coil is required only when \textbf{CoolReheat} is selected, the optional reheat coil may be present for any of the allowed Dehumidification Control Types. If the reheat coil is present and the dehumidification control type is not specified as \textbf{CoolReheat}, the reheat coil will not be active,
 
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-017}
 
@@ -91,7 +91,7 @@ This alpha field contains the unitary system air outlet node name.
 
 \paragraph{Field: Supply Fan Object Type}\label{field-supply-fan-object-type-000}
 
-This alpha field contains the identifying type of supply air fan specified for the unitary system. Fan type must be \textbf{Fan:OnOff,} \textbf{Fan:ConstantVolume, Fan:VariableVolume, or Fan:ComponentModel}. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0). Fan:VariableVolume is used for variable air volume systems or multi- or variable-speed coils. The Fan:ComponentModel may be used in place of the ConstantVolume or VariableVolume fan types to more accurately represent fan performance.
+This alpha field contains the identifying type of supply air fan specified for the unitary system. Fan type must be \textbf{\hyperref[fanonoff]{Fan:OnOff},} \textbf{\hyperref[fanconstantvolume]{Fan:ConstantVolume}, \hyperref[fanvariablevolume]{Fan:VariableVolume}, or \hyperref[fancomponentmodel]{Fan:ComponentModel}}. \hyperref[fanconstantvolume]{Fan:ConstantVolume} is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. \hyperref[fanonoff]{Fan:OnOff} is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0). \hyperref[fanvariablevolume]{Fan:VariableVolume} is used for variable air volume systems or multi- or variable-speed coils. The \hyperref[fancomponentmodel]{Fan:ComponentModel} may be used in place of the ConstantVolume or VariableVolume fan types to more accurately represent fan performance.
 
 \paragraph{Field: Supply Fan Name}\label{field-supply-fan-name}
 
@@ -111,35 +111,35 @@ This alpha field contains the identifying type of heating coil specified in the 
 
 \begin{itemize}
 \item
-  Coil:Heating:DX:SingleSpeed
+  \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed}
 \item
   Coil:Heating:DX:TwoSpeed
 \item
-  Coil:Heating:DX:MultiSpeed
+  \hyperref[coilheatingdxmultispeed]{Coil:Heating:DX:MultiSpeed}
 \item
-  Coil:Heating:DX:VariableSpeed
+  \hyperref[coilheatingdxvariablespeed]{Coil:Heating:DX:VariableSpeed}
 \item
-  Coil:Heating:WaterToAirHeatPump:ParameterEstimation
+  \hyperref[coilheatingwatertoairheatpumpparameterestimation]{Coil:Heating:WaterToAirHeatPump:ParameterEstimation}
 \item
-  Coil:Heating:WaterToAirHeatPump:EquationFit
+  \hyperref[coilheatingwatertoairheatpumpequationfit]{Coil:Heating:WaterToAirHeatPump:EquationFit}
 \item
-  Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit
+  \hyperref[coilheatingwatertoairheatpumpvariablespeedequationfit]{Coil:Heating:WaterToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Gas:MultiStage
+  \hyperref[coilheatinggasmultistage]{Coil:Heating:Gas:MultiStage}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Electric:MultiStage
+  \hyperref[coilheatingelectricmultistage]{Coil:Heating:Electric:MultiStage}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \item
-  Coil:Heating:Desuperheater
+  \hyperref[coilheatingdesuperheater]{Coil:Heating:Desuperheater}
 \item
-  Coil:UserDefined
+  \hyperref[coiluserdefined]{Coil:UserDefined}
 \end{itemize}
 
 \paragraph{Field: Heating Coil Name}\label{field-heating-coil-name-002}
@@ -156,33 +156,33 @@ This alpha field contains the identifying type of cooling coil specified in the 
 
 \begin{itemize}
 \item
-  Coil:Cooling:DX:SingleSpeed
+  \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}
 \item
-  Coil:Cooling:DX:SingleSpeed:ThermalStorage
+  \hyperref[coilcoolingdxsinglespeedthermalstorage]{Coil:Cooling:DX:SingleSpeed:ThermalStorage}
 \item
-  Coil:Cooling:DX:TwoSpeed
+  \hyperref[coilcoolingdxtwospeed]{Coil:Cooling:DX:TwoSpeed}
 \item
-  Coil:Cooling:DX:MultiSpeed
+  \hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:MultiSpeed}
 \item
-  Coil:Cooling:DX:VariableSpeed
+  \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}
 \item
-  Coil:Cooling:DX:TwoStageWithHumidityControlMode
+  \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode}
 \item
-  CoilSystem:Cooling:DX:HeatExchangerAssisted
+  \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}
 \item
-  Coil:Cooling:WaterToAirHeatPump:ParameterEstimation
+  \hyperref[coilcoolingwatertoairheatpumpparameterestimation]{Coil:Cooling:WaterToAirHeatPump:ParameterEstimation}
 \item
-  Coil:Cooling:WaterToAirHeatPump:EquationFit
+  \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit}
 \item
-  Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit
+  \hyperref[coilcoolingwatertoairheatpumpvariablespeedequationfit]{Coil:Cooling:WaterToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
 \item
-  Coil:Cooling:Water
+  \hyperref[coilcoolingwater]{Coil:Cooling:Water}
 \item
-  Coil:Cooling:Water:DetailedGeometry
+  \hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry}
 \item
-  CoilSystem:Cooling:Water:HeatExchangerAssisted
+  \hyperref[coilsystemcoolingwaterheatexchangerassisted]{CoilSystem:Cooling:Water:HeatExchangerAssisted}
 \item
-  Coil:UserDefined
+  \hyperref[coiluserdefined]{Coil:UserDefined}
 \end{itemize}
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-002}
@@ -204,21 +204,21 @@ This alpha field defines the latent load control method. Available choices are S
 
 \paragraph{Field: Supplemental Heating Coil Object Type}\label{field-supplemental-heating-coil-object-type}
 
-This alpha field contains the identifying type of supplemental heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plant loop. The Coil:UserDefined object must be configured as a heating coil. Supplemental heating type must be one of:
+This alpha field contains the identifying type of supplemental heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plant loop. The \hyperref[coiluserdefined]{Coil:UserDefined} object must be configured as a heating coil. Supplemental heating type must be one of:
 
 \begin{itemize}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Desuperheater
+  \hyperref[coilheatingdesuperheater]{Coil:Heating:Desuperheater}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \item
-  Coil:UserDefined
+  \hyperref[coiluserdefined]{Coil:UserDefined}
 \end{itemize}
 
 \paragraph{Field: Supplemental Heating Coil Name}\label{field-supplemental-heating-coil-name}
@@ -304,7 +304,7 @@ This numeric field defines the outdoor air dry-bulb temperature above which the 
 
 \paragraph{Field: Outdoor Dry-Bulb Temperature Sensor Node Name}\label{field-outdoor-dry-bulb-temperature-sensor-node-name}
 
-This alpha field specifies the name of the outdoor node which controls the operation of the supplemental heating coil. If this field is left blank, the outdoor temperature is based solely on the weather data. If this field is not blank, the node name specified must also be listed in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor temperature from the weather data. Alternately, the node name must be specified in an OutdoorAir:NodeList object where the outdoor temperature is taken directly from the weather data.
+This alpha field specifies the name of the outdoor node which controls the operation of the supplemental heating coil. If this field is left blank, the outdoor temperature is based solely on the weather data. If this field is not blank, the node name specified must also be listed in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor temperature from the weather data. Alternately, the node name must be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor temperature is taken directly from the weather data.
 
 \paragraph{Field: Maximum Cycling Rate}\label{field-maximum-cycling-rate-001}
 
@@ -379,7 +379,7 @@ As shown in the example below, correct specification of the heat/cool unitary sy
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
 \item
-  Fan (Fan:OnOff or Fan:ConstantVolume)
+  Fan (\hyperref[fanonoff]{Fan:OnOff} or \hyperref[fanconstantvolume]{Fan:ConstantVolume})
 \item
   Cooling coil
 \item
@@ -387,7 +387,7 @@ As shown in the example below, correct specification of the heat/cool unitary sy
 \item
   Reheat coil
 \item
-  Direct air unit (AirTerminal:SingleDuct:Uncontrolled) for each zone served by the unitary system when used in an air loop
+  Direct air unit (\hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled}) for each zone served by the unitary system when used in an air loop
 \end{enumerate}
 
 \begin{lstlisting}
@@ -705,7 +705,7 @@ This field specifies the coil operation mode for multiple speed DX cooling and h
 
 The allowed cooling and heating coil types are restricted to the following combinations:
 
-Coil:Cooling:DX:MultiSpeed and Coil:Heating:DX:MultiSpeed or Coil:Cooling:DX:MultiSpeed and Coil:Heating:Fuel. 
+\hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:MultiSpeed} and \hyperref[coilheatingdxmultispeed]{Coil:Heating:DX:MultiSpeed} or \hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:MultiSpeed} and \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}.
 
 \paragraph{Field: No Load Supply Air Flow Rate Ratio}\label{field-no-load-supply-air-flow-rate-ratio}
 
@@ -782,7 +782,7 @@ This alpha field contains the identifying zone name where the thermostat control
 
 \paragraph{Field: Supply Fan Object Type}\label{field-supply-fan-object-type-1}
 
-This alpha field contains the identifying type of supply air fan specified for the furnace. Fan type must be \textbf{Fan:OnOff} or \textbf{Fan:ConstantVolume}. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0).
+This alpha field contains the identifying type of supply air fan specified for the furnace. Fan type must be \textbf{\hyperref[fanonoff]{Fan:OnOff}} or \textbf{\hyperref[fanconstantvolume]{Fan:ConstantVolume}}. \hyperref[fanconstantvolume]{Fan:ConstantVolume} is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. \hyperref[fanonoff]{Fan:OnOff} is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0).
 
 \paragraph{Field: Supply Fan Name}\label{field-supply-fan-name-1}
 
@@ -794,17 +794,17 @@ This alpha field has two choices: \textbf{BlowThrough} or \textbf{DrawThrough}. 
 
 \paragraph{Field: Heating Coil Object Type}\label{field-heating-coil-object-type-1-000}
 
-This alpha field contains the identifying type of heating coil specified in the furnace. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the heating coil does not require additional controller or Controller:WaterCoil object. The parent object (Unitary Heat and Cool Furnace) itself provides the ``controller'' function of modulating water flow. Allowable coil types are:
+This alpha field contains the identifying type of heating coil specified in the furnace. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the heating coil does not require additional controller or \hyperref[controllerwatercoil]{Controller:WaterCoil} object. The parent object (Unitary Heat and Cool Furnace) itself provides the ``controller'' function of modulating water flow. Allowable coil types are:
 
 \begin{itemize}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
 \paragraph{Field: Heating Coil Name}\label{field-heating-coil-name-1-000}
@@ -817,11 +817,11 @@ This alpha field contains the identifying type of cooling coil specified in the 
 
 \begin{itemize}
 \item
-  Coil:Cooling:DX:SingleSpeed
+  \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}
 \item
-  CoilSystem:Cooling:DX:HeatExchangerAssisted
+  \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}
 \item
-  Coil:Cooling:DX:VariableSpeed
+  \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}
 \end{itemize}
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-1-000}
@@ -836,28 +836,28 @@ This alpha field contains the type of dehumidification control. The following op
 \item
   \textbf{None} - meet sensible load only, no active dehumidification control
 \item
-  \textbf{Multimode} - activate enhanced dehumidification mode as needed and meet sensible load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted.
+  \textbf{Multimode} - activate enhanced dehumidification mode as needed and meet sensible load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}.
 \item
-  \textbf{CoolReheat} - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. If cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted, then the heat exchanger is assumed to always transfer energy between the cooling coil's inlet and outlet airstreams when the cooling coil is operating.
+  \textbf{CoolReheat} - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. If cooling coil type = \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}, then the heat exchanger is assumed to always transfer energy between the cooling coil's inlet and outlet airstreams when the cooling coil is operating.
 \end{itemize}
 
-The default is \textbf{None}. For the other dehumidification control modes, the maximum humidity setpoint is used. This must be set using a \textbf{ZoneControl:Humidistat} object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. If the dehumidification control type is specified as \textbf{CoolReheat}, then two additional inputs (reheat coil type and name) are also required as shown below. Although the reheat coil is required only when \textbf{CoolRheat} is selected, the optional reheat coil may be present for any of the allowed Dehumidification Control Types. If the reheat coil is present and the dehumidification control type is not specified as \textbf{CoolReheat}, the reheat coil will not be active,
+The default is \textbf{None}. For the other dehumidification control modes, the maximum humidity setpoint is used. This must be set using a \textbf{\hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat}} object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. If the dehumidification control type is specified as \textbf{CoolReheat}, then two additional inputs (reheat coil type and name) are also required as shown below. Although the reheat coil is required only when \textbf{CoolRheat} is selected, the optional reheat coil may be present for any of the allowed Dehumidification Control Types. If the reheat coil is present and the dehumidification control type is not specified as \textbf{CoolReheat}, the reheat coil will not be active,
 
 \paragraph{Field: Reheat Coil Object Type}\label{field-reheat-coil-object-type-000}
 
-This alpha field contains the identifying type of reheat coil specified in the furnace. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the reheat coil does not require additional controller or Controller:WaterCoil object. The parent object (Unitary Heat and Cool Furnace) itself provides the ``controller'' function of modulating water flow. Reheat coil type must be one of:
+This alpha field contains the identifying type of reheat coil specified in the furnace. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the reheat coil does not require additional controller or \hyperref[controllerwatercoil]{Controller:WaterCoil} object. The parent object (Unitary Heat and Cool Furnace) itself provides the ``controller'' function of modulating water flow. Reheat coil type must be one of:
 
 \begin{itemize}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Desuperheater
+  \hyperref[coilheatingdesuperheater]{Coil:Heating:Desuperheater}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
 \paragraph{Field: Reheat Coil Name}\label{field-reheat-coil-name-000}
@@ -869,15 +869,15 @@ As shown in the example below, correct specification of the heat/cool furnace re
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi})}
 \item
-  fan (Fan:OnOff or Fan:ConstantVolume)
+  fan (\hyperref[fanonoff]{Fan:OnOff} or \hyperref[fanconstantvolume]{Fan:ConstantVolume})
 \item
-  cooling coil (Coil:Cooling:DX:SingleSpeed or CoilSystem:Cooling:DX:HeatExchangerAssisted)
+  cooling coil (\hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} or \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted})
 \item
-  heating coil (Coil:Heating:Fuel or Coil:Heating:Electric)
+  heating coil (\hyperref[coilheatinggas-000]{Coil:Heating:Fuel} or \hyperref[coilheatingelectric]{Coil:Heating:Electric})
 \item
-  reheat coil (optional, Coil:Heating:Fuel, Coil:Heating:Electric, or Coil:Heating:Desuperheater)
+  reheat coil (optional, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingelectric]{Coil:Heating:Electric}, or \hyperref[coilheatingdesuperheater]{Coil:Heating:Desuperheater})
 \item
-  terminal unit (AirTerminal:SingleDuct:Uncontrolled) for each zone served by the furnace
+  terminal unit (\hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled}) for each zone served by the furnace
 \end{enumerate}
 
 Note: the furnace's fan, cooling coil, heating coil and optional reheat coil must be connected in the air loop according to the configuration shown above (Figure~\ref{fig:schematic-of-energyplus-heatcool-furnace}) when CoolReheat is selected as the dehujmidificaiton control type. In addition, the volumetric air flow rate specified in the terminal air unit for the controlling zone should properly reflect the fractional volumetric air flow rate specified in the furnace object.
@@ -974,7 +974,7 @@ This output variable is the ratio of actual air mass flow rate through the furna
 
 Unitary System Compressor Part Load Ratio {[]}
 
-\subsection{~AirLoopHVAC:UnitaryHeatCool}\label{airloophvacunitaryheatcool}
+\subsection{AirLoopHVAC:UnitaryHeatCool}\label{airloophvacunitaryheatcool}
 
 The AirLoopHVAC:UnitaryHeatCool object is the identical model to the AirLoopHAVC:Unitary:Furnace:HeatCool object. The heat/cool unitary system is a ``virtual'' component that consists of a fan component (OnOff or ConstantVolume), a DX cooling coil component and a Gas or Electric heating coil component as shown in Figure~\ref{fig:schematic-of-blow-through-heatcool-unitary}. When a draw through configuration is desired, the fan is placed directly after the heating coil. If dehumidification control is selected, a reheat coil component is also required. If the reheat coil is present and the dehumidification control type input is not specified as CoolReheat, the reheat coil will not be active,
 
@@ -1030,7 +1030,7 @@ This alpha field contains the identifying zone name where the thermostat control
 
 \subsubsection{Field: Supply Fan Object Type}\label{field-supply-fan-object-type-2}
 
-This alpha field contains the identifying type of supply air fan specified for the unitary system. Fan type must be \textbf{Fan:OnOff} or \textbf{Fan:ConstantVolume}. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0).
+This alpha field contains the identifying type of supply air fan specified for the unitary system. Fan type must be \textbf{\hyperref[fanonoff]{Fan:OnOff}} or \textbf{\hyperref[fanconstantvolume]{Fan:ConstantVolume}}. \hyperref[fanconstantvolume]{Fan:ConstantVolume} is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. \hyperref[fanonoff]{Fan:OnOff} is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0).
 
 \subsubsection{Field: Supply Fan Name}\label{field-supply-fan-name-2}
 
@@ -1042,17 +1042,17 @@ This alpha field has two choices: \textbf{BlowThrough} or \textbf{DrawThrough}. 
 
 \subsubsection{Field: Heating Coil Object Type}\label{field-heating-coil-object-type-2}
 
-This alpha field contains the identifying type of heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the heating coil does not require additional controller or Controller:WaterCoil object. The parent object (Unitary Heat and Cool System) itself provides the ``controller'' function of modulating water flow. Allowable coil types are:
+This alpha field contains the identifying type of heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the heating coil does not require additional controller or \hyperref[controllerwatercoil]{Controller:WaterCoil} object. The parent object (Unitary Heat and Cool System) itself provides the ``controller'' function of modulating water flow. Allowable coil types are:
 
 \begin{itemize}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
 \subsubsection{Field: Heating Coil Name}\label{field-heating-coil-name-2}
@@ -1065,11 +1065,11 @@ This alpha field contains the identifying type of cooling coil specified in the 
 
 \begin{itemize}
 \item
-  Coil:Cooling:DX:SingleSpeed
+  \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}
 \item
-  CoilSystem:Cooling:DX:HeatExchangerAssisted
+  \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}
 \item
-  Coil:Cooling:DX:VariableSpeed
+  \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}
 \end{itemize}
 
 \subsubsection{Field: Cooling Coil Name}\label{field-cooling-coil-name-2-000}
@@ -1084,28 +1084,28 @@ This alpha field contains the type of dehumidification control. The following op
 \item
   \textbf{None} - meet sensible load only, no active dehumidification control
 \item
-  \textbf{Multimode} - activate enhanced dehumidification mode as needed and meet sensible load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted.
+  \textbf{Multimode} - activate enhanced dehumidification mode as needed and meet sensible load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}.
 \item
-  \textbf{CoolReheat} - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. If cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted, then the heat exchanger is assumed to always transfer energy between the cooling coil's inlet and outlet airstreams when the cooling coil is operating.
+  \textbf{CoolReheat} - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. If cooling coil type = \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}, then the heat exchanger is assumed to always transfer energy between the cooling coil's inlet and outlet airstreams when the cooling coil is operating.
 \end{itemize}
 
-The default is \textbf{None}. For the other dehumidification control modes, the maximum humidity setpoint is used. This must be set using a \textbf{ZoneControl:Humidistat} object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. If the dehumidification control type is specified as \textbf{CoolReheat}, then two additional inputs (reheat coil type and name) are also required as shown below. Although the reheat coil is required only when \textbf{CoolReheat} is selected, the optional reheat coil may be present for any of the allowed Dehumidification Control Types. If the reheat coil is present and the dehumidification control type is not specified as \textbf{CoolReheat}, the reheat coil will not be active,
+The default is \textbf{None}. For the other dehumidification control modes, the maximum humidity setpoint is used. This must be set using a \textbf{\hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat}} object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. If the dehumidification control type is specified as \textbf{CoolReheat}, then two additional inputs (reheat coil type and name) are also required as shown below. Although the reheat coil is required only when \textbf{CoolReheat} is selected, the optional reheat coil may be present for any of the allowed Dehumidification Control Types. If the reheat coil is present and the dehumidification control type is not specified as \textbf{CoolReheat}, the reheat coil will not be active,
 
 \subsubsection{Field: Reheat Coil Object Type}\label{field-reheat-coil-object-type-1-000}
 
-This alpha field contains the identifying type of reheat coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the reheat coil does not require additional controller or Controller:WaterCoil object. The parent object (Unitary Heat and Cool System) itself provides the ``controller'' function of modulating water flow. Reheat coil type must be one of:
+This alpha field contains the identifying type of reheat coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the reheat coil does not require additional controller or \hyperref[controllerwatercoil]{Controller:WaterCoil} object. The parent object (Unitary Heat and Cool System) itself provides the ``controller'' function of modulating water flow. Reheat coil type must be one of:
 
 \begin{itemize}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Desuperheater
+  \hyperref[coilheatingdesuperheater]{Coil:Heating:Desuperheater}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
 \subsubsection{Field: Reheat Coil Name}\label{field-reheat-coil-name-1-000}
@@ -1114,15 +1114,15 @@ This alpha field contains the identifying name given to the unitary system rehea
 
 As shown in the example below, correct specification of the heat/cool unitary system requires specification of the following objects in addition to the unitary system object:
 
-1)~~~Fan (Fan:OnOff or Fan:ConstantVolume)
+1)~~~Fan (\hyperref[fanonoff]{Fan:OnOff} or \hyperref[fanconstantvolume]{Fan:ConstantVolume})
 
-2)~~~Cooling coil (Coil:Cooling:DX:SingleSpeed or CoilSystem:Cooling:DX:HeatExchangerAssisted)
+2)~~~Cooling coil (\hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} or \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted})
 
-3)~~~Heating coil (Coil:Heating:Fuel or Coil:Heating:Electric)
+3)~~~Heating coil (\hyperref[coilheatinggas-000]{Coil:Heating:Fuel} or \hyperref[coilheatingelectric]{Coil:Heating:Electric})
 
-4)~~~Reheat coil (optional, Coil:Heating:Fuel, Coil:Heating:Electric, or Coil:Heating:Desuperheater)
+4)~~~Reheat coil (optional, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingelectric]{Coil:Heating:Electric}, or \hyperref[coilheatingdesuperheater]{Coil:Heating:Desuperheater})
 
-5)~~~Direct air unit (AirTerminal:SingleDuct:Uncontrolled) for each zone served by the unitary system
+5)~~~Direct air unit (\hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled}) for each zone served by the unitary system
 
 Note: the unitary system's fan, cooling coil, heating coil and optional reheat coil must be connected in the air loop according to the configuration shown above (Figure~\ref{fig:schematic-of-blow-through-heatcool-unitary}). In addition, the volumetric air flow rate specified in the direct air unit for the controlling zone should properly reflect the fractional volumetric air flow rate specified in the unitary system object.
 
@@ -1218,7 +1218,7 @@ Example of Heat/Cool Unitary System Specification
 
 \subsubsection{Unitary System Fan Part Load Ratio {[]}}\label{unitary-system-fan-part-load-ratio-2}
 
-This output variable is the ratio of actual air mass flow rate through the unitary system to the system's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate). For continuous fan operation mode, this variable is always 1.0 when the unitary system is available (based on the availability schedule). For cycling fan/cycling coil operation mode, the actual air mass flow rate is calculated based on the ratio of the sensible heating (or cooling) load to the steady-state unitary system heating (or cooling) capacity. For the cycling fan mode, the runtime fraction for the unitary system fan may be different from the fan part-load ratio reported here due the part-load performance of the system's heating (or cooling) coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate (e.g., Fan:OnOff).
+This output variable is the ratio of actual air mass flow rate through the unitary system to the system's design air mass flow rate (i.e., design volumetric flow rate converted to dry air mass flow rate). For continuous fan operation mode, this variable is always 1.0 when the unitary system is available (based on the availability schedule). For cycling fan/cycling coil operation mode, the actual air mass flow rate is calculated based on the ratio of the sensible heating (or cooling) load to the steady-state unitary system heating (or cooling) capacity. For the cycling fan mode, the runtime fraction for the unitary system fan may be different from the fan part-load ratio reported here due the part-load performance of the system's heating (or cooling) coil (delay at start-up to reach steady-state output). In general, runtime fractions are reported by individual components where appropriate (e.g., \hyperref[fanonoff]{Fan:OnOff}).
 
 \subsubsection{Unitary System Compressor Part Load Ratio {[]}}\label{unitary-system-compressor-part-load-ratio-1}
 
@@ -1272,7 +1272,7 @@ This alpha field contains the identifying zone name where the thermostat control
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type}
 
-This alpha field contains the identifying type of supply air fan specified for the heat pump. Fan type must be \textbf{Fan:OnOff} or \textbf{Fan:ConstantVolume}. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0).
+This alpha field contains the identifying type of supply air fan specified for the heat pump. Fan type must be \textbf{\hyperref[fanonoff]{Fan:OnOff}} or \textbf{\hyperref[fanconstantvolume]{Fan:ConstantVolume}}. \hyperref[fanconstantvolume]{Fan:ConstantVolume} is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. \hyperref[fanonoff]{Fan:OnOff} is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0).
 
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name}
 
@@ -1280,7 +1280,7 @@ This alpha field contains the identifying name given to the heat pump supply air
 
 \paragraph{Field: Heating Coil Object Type}\label{field-heating-coil-object-type-3}
 
-This alpha field contains the identifying type of heating coil specified in the heat pump. Heating coil type must be either Coil:Heating:DX:SingleSpeed or Coil:Heating:DX:VariableSpeed.
+This alpha field contains the identifying type of heating coil specified in the heat pump. Heating coil type must be either \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed} or \hyperref[coilheatingdxvariablespeed]{Coil:Heating:DX:VariableSpeed}.
 
 \paragraph{Field: Heating Coil Name}\label{field-heating-coil-name-3}
 
@@ -1292,11 +1292,11 @@ This alpha field contains the identifying type of cooling coil specified in the 
 
 \begin{itemize}
 \item
-  Coil:Cooling:DX:SingleSpeed
+  \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}
 \item
-  CoilSystem:Cooling:DX:HeatExchangerAssisted
+  \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}
 \item
-  Coil:Cooling:DX:VariableSpeed
+  \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}
 \end{itemize}
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-3}
@@ -1305,17 +1305,17 @@ This alpha field contains the identifying name given to the heat pump cooling co
 
 \paragraph{Field: Supplemental Heating Coil Object Type}\label{field-supplemental-heating-coil-object-type-1}
 
-This alpha field contains the identifying type of supplemental heating coil specified in the heat pump. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the supplemental heating coil does not require additional controller or Controller:WaterCoil object. The parent object (Airloop Air to Air Heat Pump) itself provides the ``controller'' function of modulating water flow. Heating coil type must be:
+This alpha field contains the identifying type of supplemental heating coil specified in the heat pump. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the supplemental heating coil does not require additional controller or \hyperref[controllerwatercoil]{Controller:WaterCoil} object. The parent object (Airloop Air to Air Heat Pump) itself provides the ``controller'' function of modulating water flow. Heating coil type must be:
 
 \begin{itemize}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
 \paragraph{Field: Supplemental Heating Coil Name}\label{field-supplemental-heating-coil-name-1}
@@ -1340,15 +1340,15 @@ This alpha field specifies the name of the supply air fan operating mode schedul
 
 As shown in the example below, correct specification of the air-to-air heat pump requires specification of the following objects in addition to the heat pump object:
 
-1)~~~Fan (Fan:OnOff or Fan:ConstantVolume)
+1)~~~Fan (\hyperref[fanonoff]{Fan:OnOff} or \hyperref[fanconstantvolume]{Fan:ConstantVolume})
 
-2)~~~Heating coil (Coil:Heating:DX:SingleSpeed)
+2)~~~Heating coil (\hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed})
 
-3)~~~Cooling coil (Coil:Cooling:DX:SingleSpeed or CoilSystem:Cooling:DX:HeatExchangerAssisted)
+3)~~~Cooling coil (\hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} or \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted})
 
-4)~~~Supplemental heating coil (Coil:Heating:Fuel or Coil:Heating:Electric)
+4)~~~Supplemental heating coil (\hyperref[coilheatinggas-000]{Coil:Heating:Fuel} or \hyperref[coilheatingelectric]{Coil:Heating:Electric})
 
-5)~~~Direct air unit (AirTerminal:SingleDuct:Uncontrolled)for each zone served by the unitary system
+5)~~~Direct air unit (\hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled})for each zone served by the unitary system
 
 \paragraph{Field: Dehumidification Control Type}\label{field-dehumidification-control-type-3-000}
 
@@ -1358,12 +1358,12 @@ This alpha input field contains the type of dehumidification control. The follow
 \item
   \textbf{None} - meet sensible load only, no active dehumidification control
 \item
-  \textbf{Multimode} - activate enhanced dehumidification mode as needed and meet sensible cooling load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted.
+  \textbf{Multimode} - activate enhanced dehumidification mode as needed and meet sensible cooling load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}.
 \item
-  \textbf{CoolReheat} - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. The excess cooling beyond the cooling set point temperature is offset by the supplemental heating coil. If cooling coil type = CoilSystem:Cooling:DX:HeatExchangerAssisted, then the heat exchanger is assumed to always transfer energy between the cooling coil's inlet and outlet airstreams when the cooling coil is operating.
+  \textbf{CoolReheat} - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. The excess cooling beyond the cooling set point temperature is offset by the supplemental heating coil. If cooling coil type = \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}, then the heat exchanger is assumed to always transfer energy between the cooling coil's inlet and outlet airstreams when the cooling coil is operating.
 \end{itemize}
 
-The default is \textbf{None}. For the other dehumidification control modes, the maximum humidity setpoint is required. This must be set using a \textbf{ZoneControl:Humidistat} object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. Supplemental heating coil (supplemental heating coil type and name) is a required input in AirToAir HeatPumps. The supplemental heating coil capacity must be adequate enough to meet the heating coil load and offset the excess cooling load due to extra dehumidification required to meet the high relative humidity setpoint.
+The default is \textbf{None}. For the other dehumidification control modes, the maximum humidity setpoint is required. This must be set using a \textbf{\hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat}} object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. Supplemental heating coil (supplemental heating coil type and name) is a required input in AirToAir HeatPumps. The supplemental heating coil capacity must be adequate enough to meet the heating coil load and offset the excess cooling load due to extra dehumidification required to meet the high relative humidity setpoint.
 
 Note: the air-to-air heat pump's fan, cooling coil, heating coil and supplementary heating coil must be connected in the air loop according to the configuration shown above (Figure 118) for the blow-through fan configuration. The only other valid configuration is with a draw-through fan placement, where the fan is located between the DX heating coil and the supplementary heating coil.
 
@@ -1504,7 +1504,7 @@ The main difference between this heat pump object and other EnergyPlus heat pump
 
 Links to the fan, DX multispeed cooling coil, DX multispeed heating coil, and supplementary heating coil specifications are provided in the heat pump's input data syntax. In addition, the control zone name and airflow rates at the corresponding compressor speeds are specified by the heat pump syntax.
 
-If the ZoneControl:Thermostat:StagedDualSetpoint object and other zone control thermostat and humidistat are assigned to the same controlled zone in the Controlling Zone or Thermostat Location field, the ZoneControl:Thermostat:StagedDualSetpoint object takes precedence and the stage number provided by the the ZoneControl:Thermostat:StagedDualSetpoint object is used to set the speed number.
+If the \hyperref[zonecontrolthermostatstageddualsetpoint]{ZoneControl:Thermostat:StagedDualSetpoint} object and other zone control thermostat and humidistat are assigned to the same controlled zone in the Controlling Zone or Thermostat Location field, the \hyperref[zonecontrolthermostatstageddualsetpoint]{ZoneControl:Thermostat:StagedDualSetpoint} object takes precedence and the stage number provided by the the \hyperref[zonecontrolthermostatstageddualsetpoint]{ZoneControl:Thermostat:StagedDualSetpoint} object is used to set the speed number.
 
 \begin{figure}[hbtp] % fig 119
 \centering
@@ -1536,7 +1536,7 @@ This alpha field contains the identifying zone name where the thermostat control
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-1}
 
-This alpha field contains the identifying type of supply air fan specified for the heat pump. Fan type must be Fan:OnOff or Fan:ConstantVolume. Fan:ConstantVolume can only be used when the supply air fan operating mode is continuous (see field `Supply air fan operating mode schedule name).
+This alpha field contains the identifying type of supply air fan specified for the heat pump. Fan type must be \hyperref[fanonoff]{Fan:OnOff} or \hyperref[fanconstantvolume]{Fan:ConstantVolume}. \hyperref[fanconstantvolume]{Fan:ConstantVolume} can only be used when the supply air fan operating mode is continuous (see field `Supply air fan operating mode schedule name).
 
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-1}
 
@@ -1554,7 +1554,7 @@ This alpha field contains the schedule name (ref. Schedule objects) that contain
 
 \paragraph{Field: Heating Coil Object Type}\label{field-heating-coil-object-type-4}
 
-This alpha field contains the identifying type of heating coil specified in the heat pump.~ Allowable choices for Heating coil type~ are \textbf{Coil:Heating:DX:MultiSpeed}, \textbf{Coil:Heating:Electric:MultiStage}, \textbf{Coil:Heating:Gas:MultiStage}, \textbf{Coil:Heating:Water}, and~ \textbf{Coil:Heating:Steam}.
+This alpha field contains the identifying type of heating coil specified in the heat pump.~ Allowable choices for Heating coil type~ are \textbf{\hyperref[coilheatingdxmultispeed]{Coil:Heating:DX:MultiSpeed}}, \textbf{\hyperref[coilheatingelectricmultistage]{Coil:Heating:Electric:MultiStage}}, \textbf{\hyperref[coilheatinggasmultistage]{Coil:Heating:Gas:MultiStage}}, \textbf{\hyperref[coilheatingwater]{Coil:Heating:Water}}, and~ \textbf{\hyperref[coilheatingsteam]{Coil:Heating:Steam}}.
 
 \paragraph{Field: Heating Coil Name}\label{field-heating-coil-name-4}
 
@@ -1562,11 +1562,11 @@ This alpha field contains the identifying name given to the DX heating coil, and
 
 \paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation-000}
 
-This numeric field defines the outdoor air dry-bulb temperature below which the DX heating coil turns off.~ If this input field is left blank, the default value is -8 C. This temperature should match the minimum compressor operating temperature specified for the multispeed heat pump's DX heating coil. This field is only needed when Heating Coil Object Type above is \textbf{Coil:Heating:DX:MultiSpeed}.
+This numeric field defines the outdoor air dry-bulb temperature below which the DX heating coil turns off.~ If this input field is left blank, the default value is -8 C. This temperature should match the minimum compressor operating temperature specified for the multispeed heat pump's DX heating coil. This field is only needed when Heating Coil Object Type above is \textbf{\hyperref[coilheatingdxmultispeed]{Coil:Heating:DX:MultiSpeed}}.
 
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-4}
 
-This alpha field contains the identifying type of cooling coil specified in the heat pump.~ Cooling coil type must be Coil:Cooling:DX:MultiSpeed.
+This alpha field contains the identifying type of cooling coil specified in the heat pump.~ Cooling coil type must be \hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:MultiSpeed}.
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-4}
 
@@ -1574,17 +1574,17 @@ This alpha field contains the identifying name given to the heat pump cooling co
 
 \paragraph{Field: Supplemental Heating Coil Object Type}\label{field-supplemental-heating-coil-object-type-2}
 
-This alpha field contains the identifying type of supplemental heating coil specified in the heat pump. The hot water and steam heating coils require specifying plant loop, branches, and connectors objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the supplemental heating coil does not require additional controller or Controller:WaterCoil object. The parent object (Unitary MultiSpeed Air to Air Heat Pump) itself provides the ``controller'' function of modulating water flow. Heating coil type must be:
+This alpha field contains the identifying type of supplemental heating coil specified in the heat pump. The hot water and steam heating coils require specifying plant loop, branches, and connectors objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the supplemental heating coil does not require additional controller or \hyperref[controllerwatercoil]{Controller:WaterCoil} object. The parent object (Unitary MultiSpeed Air to Air Heat Pump) itself provides the ``controller'' function of modulating water flow. Heating coil type must be:
 
 \begin{itemize}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
 \paragraph{Field: Supplemental Heating Coil Name}\label{field-supplemental-heating-coil-name-2}
@@ -1631,7 +1631,7 @@ This numeric field defines the supply air flow rate leaving the heat pump in cub
 
 \paragraph{Field: Number of Speeds for Heating}\label{field-number-of-speeds-for-heating-1}
 
-This field defines the number of heating speeds for the heat pump, and must match the number of heating speeds defined in the associated heating coil. The value for this input field defines the number of airflow rates that must be defined for heating in the field below. The minimum value for this field is one and the maximum value is four. If the Heating Coil Object Type above are \textbf{Coil:Heating:Water} or \textbf{Coil:Heating:Steam}, then this field should be 1.
+This field defines the number of heating speeds for the heat pump, and must match the number of heating speeds defined in the associated heating coil. The value for this input field defines the number of airflow rates that must be defined for heating in the field below. The minimum value for this field is one and the maximum value is four. If the Heating Coil Object Type above are \textbf{\hyperref[coilheatingwater]{Coil:Heating:Water}} or \textbf{\hyperref[coilheatingsteam]{Coil:Heating:Steam}}, then this field should be 1.
 
 \paragraph{Field: Number of Speeds for Cooling}\label{field-number-of-speeds-for-cooling-1}
 
@@ -2081,7 +2081,7 @@ This alpha field contains the identifying zone name where the thermostat control
 
 \paragraph{Field: Supply Fan Object Type}\label{field-supply-fan-object-type-3}
 
-This alpha field contains the identifying type of supply air fan specified for the furnace. Fan type must be \textbf{Fan:OnOff} or \textbf{Fan:ConstantVolume}. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0).
+This alpha field contains the identifying type of supply air fan specified for the furnace. Fan type must be \textbf{\hyperref[fanonoff]{Fan:OnOff}} or \textbf{\hyperref[fanconstantvolume]{Fan:ConstantVolume}}. \hyperref[fanconstantvolume]{Fan:ConstantVolume} is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. \hyperref[fanonoff]{Fan:OnOff} is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0).
 
 \paragraph{Field: Supply Fan Name}\label{field-supply-fan-name-3}
 
@@ -2093,17 +2093,17 @@ This alpha field has two choices: \textbf{BlowThrough} or \textbf{DrawThrough}. 
 
 \paragraph{Field: Heating Coil Object Type}\label{field-heating-coil-object-type-5}
 
-This alpha field contains the identifying type of heating coil specified in the furnace. The hot water and steam heating coils require specifying plant loop, branches, and connectors objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the heating coil does not require additional controller or Controller:WaterCoil object. The parent object (Unitary Heat Only Furnace) itself provides the ``controller'' function of modulating water flow. Heating coil type must be:
+This alpha field contains the identifying type of heating coil specified in the furnace. The hot water and steam heating coils require specifying plant loop, branches, and connectors objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the heating coil does not require additional controller or \hyperref[controllerwatercoil]{Controller:WaterCoil} object. The parent object (Unitary Heat Only Furnace) itself provides the ``controller'' function of modulating water flow. Heating coil type must be:
 
 \begin{itemize}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
 \paragraph{Field: Heating Coil Name}\label{field-heating-coil-name-5}
@@ -2112,11 +2112,11 @@ This alpha field contains the identifying name given to the furnace heating coil
 
 As shown in the example below, correct specification of the furnace requires specification of the following objects in addition to the furnace object:
 
-1)~~~fan (Fan:OnOff or Fan:ConstantVolume)
+1)~~~fan (\hyperref[fanonoff]{Fan:OnOff} or \hyperref[fanconstantvolume]{Fan:ConstantVolume})
 
-2)~~~heating coil (Coil:Heating:Fuel or Coil:Heating:Electric)
+2)~~~heating coil (\hyperref[coilheatinggas-000]{Coil:Heating:Fuel} or \hyperref[coilheatingelectric]{Coil:Heating:Electric})
 
-3)~~~direct air unit (AirTerminal:SingleDuct:Uncontrolled) for each zone served by the furnace
+3)~~~direct air unit (\hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled}) for each zone served by the furnace
 
 Note: the furnace's fan and heating coil must be connected in the air loop according to the configuration shown above (Figure~\ref{fig:schematic-of-blow-through-furnace-model}) when a blow through fan configuration is specified. If a draw through fan is used, the fan is located down stream of the heating coil. In addition, the volumetric air flow rate specified in the direct air unit for the controlling zone should properly reflect the fractional volumetric air flow rate specified in the furnace object.
 
@@ -2211,7 +2211,7 @@ This output variable is the ratio of actual air mass flow rate through the furna
 
 \subsection{AirLoopHVAC:UnitaryHeatOnly}\label{airloophvacunitaryheatonly}
 
-The AirLoopHVAC:UnitaryHeatOnly is identical to the AirLoopHVAC:Unitary:Furnace:HeatOnly model. The heat-only unitary system is a ``virtual'' component that consists of a fan component (OnOff or ConstantVolume) and a Gas or Electric heating coil component. The blow through unitary system configuraion is shown in the Figure below.
+The AirLoopHVAC:UnitaryHeatOnly is identical to the \hyperref[airloophvacunitaryfurnaceheatonly]{AirLoopHVAC:Unitary:Furnace:HeatOnly} model. The heat-only unitary system is a ``virtual'' component that consists of a fan component (OnOff or ConstantVolume) and a Gas or Electric heating coil component. The blow through unitary system configuraion is shown in the Figure below.
 
 \begin{figure}[hbtp] % fig 121
 \centering
@@ -2257,7 +2257,7 @@ This alpha field contains the identifying zone name where the thermostat control
 
 \paragraph{Field: Supply Fan Object Type}\label{field-supply-fan-object-type-4}
 
-This alpha field contains the identifying type of supply air fan specified for the unitary system. Fan type must be \textbf{Fan:OnOff} or \textbf{Fan:ConstantVolume}. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0).
+This alpha field contains the identifying type of supply air fan specified for the unitary system. Fan type must be \textbf{\hyperref[fanonoff]{Fan:OnOff}} or \textbf{\hyperref[fanconstantvolume]{Fan:ConstantVolume}}. \hyperref[fanconstantvolume]{Fan:ConstantVolume} is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. \hyperref[fanonoff]{Fan:OnOff} is used when the fan cycles on and off with the cooling or heating coil (i.e.~Supply Air Fan Operating Mode Schedule values are at times 0).
 
 \paragraph{Field: Supply Fan Name}\label{field-supply-fan-name-4}
 
@@ -2269,17 +2269,17 @@ This alpha field has two choices: \textbf{BlowThrough} or \textbf{DrawThrough}. 
 
 \paragraph{Field: Heating Coil Object Type}\label{field-heating-coil-object-type-6}
 
-This alpha field contains the identifying type of heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connectors objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the heating coil does not require additional controller or Controller:WaterCoil object. The parent object (Unitary Heat Only) itself provides the ``controller'' function of modulating water flow. Heating coil type must be:
+This alpha field contains the identifying type of heating coil specified in the unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connectors objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the heating coil does not require additional controller or \hyperref[controllerwatercoil]{Controller:WaterCoil} object. The parent object (Unitary Heat Only) itself provides the ``controller'' function of modulating water flow. Heating coil type must be:
 
 \begin{itemize}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
 \paragraph{Field: Heating Coil Name}\label{field-heating-coil-name-6}
@@ -2288,11 +2288,11 @@ This alpha field contains the identifying name given to the unitary system heati
 
 As shown in the example below, correct specification of the heat-only unitary system requires specification of the following objects in addition to the unitary system object:
 
-1)~~~fan (Fan:OnOff or Fan:ConstantVolume)
+1)~~~fan (\hyperref[fanonoff]{Fan:OnOff} or \hyperref[fanconstantvolume]{Fan:ConstantVolume})
 
-2)~~~heating coil (Coil:Heating:Fuel or Coil:Heating:Electric)
+2)~~~heating coil (\hyperref[coilheatinggas-000]{Coil:Heating:Fuel} or \hyperref[coilheatingelectric]{Coil:Heating:Electric})
 
-3)~~~direct air unit (AirTerminal:SingleDuct:Uncontrolled) for each zone served by the furnace
+3)~~~direct air unit (\hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled}) for each zone served by the furnace
 
 Note: the unitary system's fan and heating coil must be connected in the air loop according to the configuration shown above (Figure~\ref{fig:schematic-of-blow-through-heat-only-unitary}) when a blow through fan configuration is specified. If a draw through fan is used, the fan is located down stream of the heating coil. In addition, the volumetric air flow rate specified in the direct air unit for the controlling zone should properly reflect the fractional volumetric air flow rate specified in the unitary system object.
 
@@ -2393,17 +2393,17 @@ There are three type of WaterToAirHeatPump coil models available:
 
 \begin{itemize}
 \item
-  Coil:Cooling:WaterToAirHeatPump:ParameterEstimation
+  \hyperref[coilcoolingwatertoairheatpumpparameterestimation]{Coil:Cooling:WaterToAirHeatPump:ParameterEstimation}
 \item
-  Coil:Heating:WaterToAirHeatPump:ParameterEstimation
+  \hyperref[coilheatingwatertoairheatpumpparameterestimation]{Coil:Heating:WaterToAirHeatPump:ParameterEstimation}
 \item
-  Coil:Cooling:WaterToAirHeatPump:EquationFit
+  \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit}
 \item
-  Coil:Heating:WaterToAirHeatPump:EquationFit
+  \hyperref[coilheatingwatertoairheatpumpequationfit]{Coil:Heating:WaterToAirHeatPump:EquationFit}
 \item
-  Coil:Cooling:WatertoAirHeatPump:VariableSpeedEquationFit
+  \hyperref[coilcoolingwater]{Coil:Cooling:Water}toAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit
 \item
-  Coil:Heating:WatertoAirHeatPump:VariableSpeedEquationFit
+  \hyperref[coilheatingwater]{Coil:Heating:Water}toAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit
 \end{itemize}
 
 \begin{figure}[hbtp] % fig 122
@@ -2442,7 +2442,7 @@ This alpha field contains the identifying zone name where the thermostat control
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-2}
 
-This alpha field contains the identifying type of supply air fan specified in the heat pump. Fan type must be Fan:OnOff.
+This alpha field contains the identifying type of supply air fan specified in the heat pump. Fan type must be \hyperref[fanonoff]{Fan:OnOff}.
 
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-2}
 
@@ -2454,11 +2454,11 @@ This alpha field contains the identifying type of heating coil specified in the 
 
 \begin{itemize}
 \item
-  Coil:Heating:WaterToAirHeatPump:ParameterEstimation
+  \hyperref[coilheatingwatertoairheatpumpparameterestimation]{Coil:Heating:WaterToAirHeatPump:ParameterEstimation}
 \item
-  Coil:Heating:WaterToAirHeatPump:EquationFit
+  \hyperref[coilheatingwatertoairheatpumpequationfit]{Coil:Heating:WaterToAirHeatPump:EquationFit}
 \item
-  Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit
+  \hyperref[coilheatingwatertoairheatpumpvariablespeedequationfit]{Coil:Heating:WaterToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
 \end{itemize}
 
 \paragraph{Field: Heating Coil Name}\label{field-heating-coil-name-7}
@@ -2475,11 +2475,11 @@ This alpha field contains the identifying type of cooling coil specified in the 
 
 \begin{itemize}
 \item
-  Coil:Cooling:WaterToAirHeatPump:ParameterEstimation
+  \hyperref[coilcoolingwatertoairheatpumpparameterestimation]{Coil:Cooling:WaterToAirHeatPump:ParameterEstimation}
 \item
-  Coil:Cooling:WaterToAirHeatPump:EquationFit
+  \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit}
 \item
-  Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit
+  \hyperref[coilcoolingwatertoairheatpumpvariablespeedequationfit]{Coil:Cooling:WaterToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
 \end{itemize}
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-5}
@@ -2526,17 +2526,17 @@ This numeric field contains the time delay for the heat pump supply air fan to s
 
 \paragraph{Field: Supplemental Heating Coil Object Type}\label{field-supplemental-heating-coil-object-type-3}
 
-This is the object type of the supplemental heating coil. The hot water and steam heating coils require specifying plant loop, branches, and connectors objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the supplemental heating coil does not require additional controller or Controller:WaterCoil object. The parent object (AirLoop Unitary Water to Air Heat Pump) itself provides the ``controller'' function of modulating water flow. The valid choices are:
+This is the object type of the supplemental heating coil. The hot water and steam heating coils require specifying plant loop, branches, and connectors objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the supplemental heating coil does not require additional controller or \hyperref[controllerwatercoil]{Controller:WaterCoil} object. The parent object (AirLoop Unitary Water to Air Heat Pump) itself provides the ``controller'' function of modulating water flow. The valid choices are:
 
 \begin{itemize}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
 \paragraph{Field: Supplemental Heating Coil Name}\label{field-supplemental-heating-coil-name-3}
@@ -2553,7 +2553,7 @@ This numeric field defines the outdoor air dry-bulb temperature in degrees Celsi
 
 \paragraph{Field: Outdoor Dry-Bulb Temperature Sensor Node Name}\label{field-outdoor-dry-bulb-temperature-sensor-node-name-1}
 
-This alpha field specifies the name of the outdoor node which controls the operation of the supplemental heating coil. If this field is left blank, the outdoor temperature is based solely on the weather data. If this field is not blank, the node name specified must also be listed in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor temperature from the weather data. Alternately, the node name must be specified in an OutdoorAir:NodeList object where the outdoor temperature is taken directly from the weather data.
+This alpha field specifies the name of the outdoor node which controls the operation of the supplemental heating coil. If this field is left blank, the outdoor temperature is based solely on the weather data. If this field is not blank, the node name specified must also be listed in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor temperature from the weather data. Alternately, the node name must be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor temperature is taken directly from the weather data.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement-6}
 
@@ -2590,7 +2590,7 @@ This alpha input field contains the type of dehumidification control. The follow
 
 \textbf{CoolReheat} - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. The excess cooling beyond the cooling set point temperature is offset by the supplemental heating coil.
 
-The default is \textbf{None}. For \textbf{CoolReheat} dehumidification control modes, the maximum humidity setpoint is required. This must be set using a \textbf{ZoneControl:Humidistat} object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. Supplemental heating coil (supplemental heating coil type and name) is a required input in WaterToAir HeatPumps. When dehumidification control is active the heating and the reheat load due to extra dehumidification are met with supplemetal heating coil. The supplemental heating coil capacity must be adequate enough to meet the heating coil load and offset the excess cooling load due to~ extra dehumidification. The dehumidification control type CoolReheat works only with Coil:Cooling:WaterToAirHeatPump:EquationFit cooling coil type.
+The default is \textbf{None}. For \textbf{CoolReheat} dehumidification control modes, the maximum humidity setpoint is required. This must be set using a \textbf{\hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat}} object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. Supplemental heating coil (supplemental heating coil type and name) is a required input in WaterToAir HeatPumps. When dehumidification control is active the heating and the reheat load due to extra dehumidification are met with supplemetal heating coil. The supplemental heating coil capacity must be adequate enough to meet the heating coil load and offset the excess cooling load due to~ extra dehumidification. The dehumidification control type CoolReheat works only with \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit} cooling coil type.
 
 \paragraph{Field: Heat Pump Coil Water Flow Mode}\label{field-heat-pump-coil-water-flow-mode-000}
 
@@ -2829,7 +2829,7 @@ This output variable is the additional heating demand rate of the supplemental h
 
 \subsection{AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass}\label{airloophvacunitaryheatcoolvavchangeoverbypass}
 
-The changeover-bypass variable air volume (CBVAV) unitary system is a compound object made up of other components. Each CBVAV system consists of an outdoor air mixer, direct expansion (DX) cooling coil, heating coil, and a supply air fan as shown in the figures below. Zone thermostats and terminal units are required in each zone served by this system. The terminal units are specific to this system type and are either AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat or AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat. A zone humidistat and single zone max humidity set point manager may also be specified to help control high humidity levels. These individual components are described elsewhere in this document. The CBVAV unitary system object coordinates the operation of these components and is modeled as a type of air loop equipment (Ref. AirLoopHVAC).
+The changeover-bypass variable air volume (CBVAV) unitary system is a compound object made up of other components. Each CBVAV system consists of an outdoor air mixer, direct expansion (DX) cooling coil, heating coil, and a supply air fan as shown in the figures below. Zone thermostats and terminal units are required in each zone served by this system. The terminal units are specific to this system type and are either \hyperref[airterminalsingleductvavheatandcoolreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat} or \hyperref[airterminalsingleductvavheatandcoolnoreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat}. A zone humidistat and single zone max humidity set point manager may also be specified to help control high humidity levels. These individual components are described elsewhere in this document. The CBVAV unitary system object coordinates the operation of these components and is modeled as a type of air loop equipment (Ref. \hyperref[airloophvac]{AirLoopHVAC}).
 
 \begin{figure}[hbtp] % fig 123
 \centering
@@ -2889,7 +2889,7 @@ This alpha field defines the name of the HVAC system node from which the system 
 
 \paragraph{Field: Bypass Duct Mixer Node Name}\label{field-bypass-duct-mixer-node-name}
 
-This alpha field defines the name of the HVAC system node where the bypass air mixes with the unitary system's inlet air. This name should match the name of the Return Air Stream Node Name for the OutdoorAir:Mixer associated with this system. This node name must be different from the system's air inlet node name.
+This alpha field defines the name of the HVAC system node where the bypass air mixes with the unitary system's inlet air. This name should match the name of the Return Air Stream Node Name for the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} associated with this system. This node name must be different from the system's air inlet node name.
 
 \paragraph{Field: Bypass Duct Splitter Node Name}\label{field-bypass-duct-splitter-node-name}
 
@@ -2906,7 +2906,7 @@ This field specifies the type of outdoor air mixer used by this CBVAV unitary sy
 \begin{itemize}
 \tightlist
 \item
-  OutdoorAir:Mixer
+  \hyperref[outdoorairmixer]{OutdoorAir:Mixer}
 \end{itemize}
 
 \paragraph{Field: Outdoor Air Mixer Name}\label{field-outdoor-air-mixer-name}
@@ -2915,7 +2915,7 @@ This alpha field defines the name of an outdoor air mixer component that compose
 
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-3}
 
-This alpha field defines the type of fan used by this unitary system. The only valid choices are \textbf{Fan:SystemModel}, \textbf{Fan:OnOff}, and \textbf{Fan:ConstantVolume}. The input requirements for these fan objects are described elsewhere in this document.
+This alpha field defines the type of fan used by this unitary system. The only valid choices are \textbf{\hyperref[fansystemmodel]{Fan:SystemModel}}, \textbf{\hyperref[fanonoff]{Fan:OnOff}}, and \textbf{\hyperref[fanconstantvolume]{Fan:ConstantVolume}}. The input requirements for these fan objects are described elsewhere in this document.
 
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-3}
 
@@ -2935,13 +2935,13 @@ This alpha field defines the type of cooling coil used by this unitary system. T
 
 \begin{itemize}
 \item
-  Coil:Cooling:DX:SingleSpeed
+  \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}
 \item
-  Coil:Cooling:DX:VariableSpeed
+  \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}
 \item
-  CoilSystem:Cooling:DX:HeatExchangerAssisted
+  \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}
 \item
-  Coil:Cooling:DX:TwoStageWithHumidityControlMode
+  \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode}
 \end{itemize}
 
 The input requirements for these cooling coil objects are described elsewhere in this document.
@@ -2952,21 +2952,21 @@ This alpha field defines the name of the cooling coil used by this unitary syste
 
 \paragraph{Field: Heating Coil Object Type}\label{field-heating-coil-object-type-8}
 
-This alpha field defines the type of heating coil used by this unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the heating coil does not require additional controller or Controller:WaterCoil object. The parent object (CBVAV Unitary System) itself provides the ``controller'' function of modulating water flow. The valid choices are:
+This alpha field defines the type of heating coil used by this unitary system. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the heating coil does not require additional controller or \hyperref[controllerwatercoil]{Controller:WaterCoil} object. The parent object (CBVAV Unitary System) itself provides the ``controller'' function of modulating water flow. The valid choices are:
 
 \begin{itemize}
 \item
-  Coil:Heating:Electric
+  \hyperref[coilheatingelectric]{Coil:Heating:Electric}
 \item
-  Coil:Heating:Fuel
+  \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}
 \item
-  Coil:Heating:DX:SingleSpeed
+  \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed}
 \item
-  Coil:Heating:DX:VariableSpeed
+  \hyperref[coilheatingdxvariablespeed]{Coil:Heating:DX:VariableSpeed}
 \item
-  Coil:Heating:Water
+  \hyperref[coilheatingwater]{Coil:Heating:Water}
 \item
-  Coil:Heating:Steam
+  \hyperref[coilheatingsteam]{Coil:Heating:Steam}
 \end{itemize}
 
 The input requirements for these heating coil objects are described elsewhere in this document.
@@ -3004,34 +3004,34 @@ This alpha field contains the type of dehumidification control. The following op
 
 \textbf{None} - meet sensible load only, no active dehumidification control
 
-\textbf{Multimode} - activate enhanced dehumidification mode as needed and meet sensible load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = Coil:Cooling:DX:TwoStageWithHumidityControlMode.
+\textbf{Multimode} - activate enhanced dehumidification mode as needed and meet sensible load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode}.
 
-\textbf{CoolReheat} - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. It is valid only with cooling coil type = Coil:Cooling:DX:TwoStageWithHumidityControlMode.
+\textbf{CoolReheat} - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. It is valid only with cooling coil type = \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode}.
 
-The default is \textbf{None}. For the other dehumidification control modes, the maximum humidity setpoint on the CBVAV system's air outlet node is used. This must be set using a \textbf{ZoneControl:Humidistat} and one of:
+The default is \textbf{None}. For the other dehumidification control modes, the maximum humidity setpoint on the CBVAV system's air outlet node is used. This must be set using a \textbf{\hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat}} and one of:
 
 \begin{itemize}
 \item
-  \textbf{SetpointManager:SingleZone:Humidity:Maximum}
+  \textbf{\hyperref[setpointmanagersinglezonehumiditymaximum]{SetpointManager:SingleZone:Humidity:Maximum}}
 \item
-  \textbf{SetpointManager:MultiZone:Humidity:Maximum}
+  \textbf{\hyperref[setpointmanagermultizonehumiditymaximum]{SetpointManager:MultiZone:Humidity:Maximum}}
 \item
-  \textbf{SetpointManager:MultiZone:MaximumHumidity:Average}
+  \textbf{\hyperref[setpointmanagermultizonemaximumhumidityaverage]{SetpointManager:MultiZone:MaximumHumidity:Average}}
 \end{itemize}
 
 objects. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate.
 
 As shown in the example below, correct specification of the CBVAV unitary system requires specification of the following objects in addition to the AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass object:
 
-1)~~~outdoor air mixer (OutdoorAir:Mixer)
+1)~~~outdoor air mixer (\hyperref[outdoorairmixer]{OutdoorAir:Mixer})
 
-2)~~~fan (Fan:SystemModel, Fan:OnOff, or Fan:ConstantVolume)
+2)~~~fan (\hyperref[fansystemmodel]{Fan:SystemModel}, \hyperref[fanonoff]{Fan:OnOff}, or \hyperref[fanconstantvolume]{Fan:ConstantVolume})
 
-3)~~~cooling coil (Coil:Cooling:DX:SingleSpeed, CoilSystem:Cooling:DX:HeatExchangerAssisted, or Coil:Cooling:DX:TwoStageWithHumidityControlMode)
+3)~~~cooling coil (\hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}, \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}, or \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode})
 
-4)~~~heating coil (Coil:Heating:Fuel, Coil:Heating:Electric, or Coil:Heating:DX:SingleSpeed)
+4)~~~heating coil (\hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingelectric]{Coil:Heating:Electric}, or \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed})
 
-5)~~~terminal unit for each zone being served by this system (AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat or AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat)
+5)~~~terminal unit for each zone being served by this system (\hyperref[airterminalsingleductvavheatandcoolreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat} or \hyperref[airterminalsingleductvavheatandcoolnoreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat})
 
 Note: The fan, heating coil, cooling coil, and outdoor air mixer must be connected in the air loop according to the configurations shown above (Figure~\ref{fig:schematic-of-a-cbvav-unitary-system-draw} and Figure~\ref{fig:schematic-of-a-cbvav-unitary-system-blow}).
 

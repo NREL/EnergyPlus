@@ -239,9 +239,9 @@ p\(_{i}\)(n) is the polynomial (table) output.
 
 The lookup table is interpolated using the interpolation polynomial shown above. If the table input value (interpolation point) is near the bottom edge or exceeds the table boundaries, a linear extrapolation is used (2-point extrapolation). The interpolation order is determined by the user entered number of interpolation points.
 
-A regression analysis may be performed on any lookup table having one or two indpenedent variables. As with performance tables, the resulting performance curve coefficients are calculated and used in the simulation only when the interpolation method is selected as EvaluateCurveToLimits. In addition, the performance curve is only written to the eio file when the output diagnostics flag is set to DisplayAdvancedReportVariables (ref. Output:Diagnostics, DisplayAdvancedReportVariables).
+A regression analysis may be performed on any lookup table having one or two independent variables. As with performance tables, the resulting performance curve coefficients are calculated and used in the simulation only when the interpolation method is selected as EvaluateCurveToLimits. In addition, the performance curve is only written to the eio file when the output diagnostics flag is set to DisplayAdvancedReportVariables (ref. Output:Diagnostics, DisplayAdvancedReportVariables).
 
-Using the example provided in the section above for Tables based on two indpendent variables, the lookup table object would be defined as follows:
+Using the example provided in the section above for Tables based on two independent variables, the lookup table object would be defined as follows:
 
 \begin{lstlisting}
 
