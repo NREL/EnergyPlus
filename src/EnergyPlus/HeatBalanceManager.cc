@@ -1602,6 +1602,10 @@ namespace HeatBalanceManager {
             TotMaterials += 1 + TotFfactorConstructs + TotCfactorConstructs;
         }
 
+        // Add an internally generated Material:InfraredTransparent if there are any Construction:AirBoundary objects
+        int totAirBoundaryConstructs = inputProcessor->getNumObjectsFound("Construction:AirBoundary");
+        if (totAirBoundaryConstructs > 0) TotMaterials += 1;
+
         Material.allocate(TotMaterials); // Allocate the array Size to the number of materials
         UniqueMaterialNames.reserve(static_cast<unsigned>(TotMaterials));
 
@@ -1854,6 +1858,28 @@ namespace HeatBalanceManager {
             }
 
             NominalR(MaterNum) = Material(MaterNum).Resistance;
+        }
+
+        // Add an internally generated Material:InfraredTransparent if there are any Construction:AirBoundary objects
+        if (totAirBoundaryConstructs > 0) {
+            ++MaterNum;
+            Material(MaterNum).Group = IRTMaterial;
+            Material(MaterNum).Name = "~AirBoundary-IRTMaterial";
+            Material(MaterNum).ROnly = true;
+            Material(MaterNum).Resistance = 0.01;
+            Material(MaterNum).AbsorpThermal = 0.9999;
+            Material(MaterNum).AbsorpThermalInput = 0.9999;
+            // Air boundaries should not participate in solar or daylighting
+            Material(MaterNum).AbsorpSolar = 0.0;
+            Material(MaterNum).AbsorpSolarInput = 0.0;
+            Material(MaterNum).AbsorpVisible = 0.0;
+            Material(MaterNum).AbsorpVisibleInput = 0.0;
+            HeatBalanceManager::NominalR(MaterNum) = Material(MaterNum).Resistance;
+            if (GlobalNames::VerifyUniqueInterObjectName(
+                UniqueMaterialNames, Material(MaterNum).Name, CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
+                ShowContinueError("...All Material names must be unique regardless of subtype.");
+                ShowContinueError("...\"~AirBoundary-IRTMaterial\" is a reserved name used internally by Construction:AirBoundary.");
+            }
         }
 
         // Glass materials, regular input: transmittance and front/back reflectance
@@ -7530,6 +7556,10 @@ namespace HeatBalanceManager {
                     thisConstruct.TypeIsAirBoundaryRadiant = true;
                 } else if (UtilityRoutines::SameString(radMethod, "IRTSurface")) {
                     thisConstruct.TypeIsAirBoundaryIRTSurface = true;
+                    thisConstruct.TotLayers = 1;
+                    // Find the auto-generated special IRT material for air boundaries
+                    int materNum = UtilityRoutines::FindItemInList("~AirBoundary-IRTMaterial", DataHeatBalance::Material);
+                    thisConstruct.LayerPoint(1) = materNum;
                 }
 
                 // Air Exchange Method
