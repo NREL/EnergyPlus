@@ -141,6 +141,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER zeqNum
   CHARACTER(len=20) :: zeqNumStr
   CHARACTER(len=7) :: zeqHeatingOrCooling
+  LOGICAL :: writeScheduleTypeObj = .true.
 
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
@@ -523,9 +524,24 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   END IF
                   IF (InArgs(CurField) /= Blank .AND. (zeqHeatingOrCooling == 'Cooling' .OR. zeqheatingOrCooling == 'Heating')) THEN
                     zeqNum = (CurField - 3) / 6 + 1
-                    WRITE(zeqNumStr, *) zeqNum
+                    zeqNumStr = RoundSigDigits(zeqNum,0)
+                    ! Write ScheduleTypeLimits objects once
+                    IF (writeScheduleTypeObj) THEN
+                      CALL GetNewObjectDefInIDD('ScheduleTypeLimits',PNumArgs,PAOrN,PReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                      POutArgs(1) = 'ZoneEqList ScheduleTypeLimts'
+                      POutArgs(2) = '0.0'
+                      POutArgs(3) = '1.0'
+                      POutArgs(4) = 'Continuous'
+                      CALL WriteOutIDFLines(DifLfn,'ScheduleTypeLimits',4,POutArgs,PFldNames,PFldUnits)
+                      writeScheduleTypeObj = .false.
+                    END IF
                     OutArgs(CurField) = TRIM(InArgs(1)) // ' ' // zeqHeatingOrCooling // 'Frac' // TRIM(ADJUSTL(zeqNumStr))
-                    CALL WriteOutIDFLines(DifLfn,'Schedule:Constant',3,[OutArgs(CurField), '', InArgs(CurField)],['Name                     ', 'Schedule Type Limits Name', 'Hourly Value             '],['', '', ''])
+                    ! Write Schedule:Constant objects as needed
+                    CALL GetNewObjectDefInIDD('Schedule:Constant',PNumArgs,PAOrN,PReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                    POutArgs(1) = OutArgs(CurField)
+                    POutArgs(2) = 'ZoneEqList ScheduleTypeLimts'
+                    POutArgs(3) = InArgs(CurField)
+                    CALL WriteOutIDFLines(DifLfn,'Schedule:Constant',PNumArgs,POutArgs,PFldNames,PFldUnits)
                   ELSE
                     OutArgs(CurField) = InArgs(CurField)
                   END IF
