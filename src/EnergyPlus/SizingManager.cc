@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -190,7 +190,7 @@ namespace SizingManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ManageSizing: ");
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool Available(false); // an environment is available to process
@@ -291,7 +291,7 @@ namespace SizingManager {
                 {
                     IOFlags flags;
                     flags.ACTION("write");
-                    gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszCsvFileName, flags);
+                    ObjexxFCL::gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszCsvFileName, flags);
                     write_stat = flags.ios();
                 }
                 if (write_stat != 0) {
@@ -301,7 +301,7 @@ namespace SizingManager {
                 {
                     IOFlags flags;
                     flags.ACTION("write");
-                    gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszTabFileName, flags);
+                    ObjexxFCL::gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszTabFileName, flags);
                     write_stat = flags.ios();
                 }
                 if (write_stat != 0) {
@@ -311,7 +311,7 @@ namespace SizingManager {
                 {
                     IOFlags flags;
                     flags.ACTION("write");
-                    gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszTxtFileName, flags);
+                    ObjexxFCL::gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszTxtFileName, flags);
                     write_stat = flags.ios();
                 }
                 if (write_stat != 0) {
@@ -370,7 +370,7 @@ namespace SizingManager {
                             ++CurEnvirNumSimDay;
                         }
 
-                        gio::write(DayOfSimChr, fmtLD) << DayOfSim;
+                        ObjexxFCL::gio::write(DayOfSimChr, fmtLD) << DayOfSim;
                         strip(DayOfSimChr);
                         BeginDayFlag = true;
                         EndDayFlag = false;
@@ -518,7 +518,7 @@ namespace SizingManager {
                 {
                     IOFlags flags;
                     flags.ACTION("write");
-                    gio::open(OutputFileSysSizing, DataStringGlobals::outputSszCsvFileName, flags);
+                    ObjexxFCL::gio::open(OutputFileSysSizing, DataStringGlobals::outputSszCsvFileName, flags);
                     write_stat = flags.ios();
                 }
                 if (write_stat != 0) {
@@ -528,7 +528,7 @@ namespace SizingManager {
                 {
                     IOFlags flags;
                     flags.ACTION("write");
-                    gio::open(OutputFileSysSizing, DataStringGlobals::outputSszTabFileName, flags);
+                    ObjexxFCL::gio::open(OutputFileSysSizing, DataStringGlobals::outputSszTabFileName, flags);
                     write_stat = flags.ios();
                 }
                 if (write_stat != 0) {
@@ -538,7 +538,7 @@ namespace SizingManager {
                 {
                     IOFlags flags;
                     flags.ACTION("write");
-                    gio::open(OutputFileSysSizing, DataStringGlobals::outputSszTxtFileName, flags);
+                    ObjexxFCL::gio::open(OutputFileSysSizing, DataStringGlobals::outputSszTxtFileName, flags);
                     write_stat = flags.ios();
                 }
                 if (write_stat != 0) {
@@ -584,7 +584,7 @@ namespace SizingManager {
                     if (!WarmupFlag && DayOfSim > 1) {
                         ++CurEnvirNumSimDay;
                     }
-                    gio::write(DayOfSimChr, fmtLD) << DayOfSim;
+                    ObjexxFCL::gio::write(DayOfSimChr, fmtLD) << DayOfSim;
                     strip(DayOfSimChr);
                     BeginDayFlag = true;
                     EndDayFlag = false;
@@ -2028,8 +2028,8 @@ namespace SizingManager {
                                 int DayOfMonth(0);
                                 General::InvOrdinalDay(DayLoop, Month, DayOfMonth, 1);
                                 std::string MonthDayString;
-                                static gio::Fmt MnDyFmt("(I2.2,'/',I2.2)");
-                                gio::write(MonthDayString, MnDyFmt) << Month << DayOfMonth;
+                                static ObjexxFCL::gio::Fmt MnDyFmt("(I2.2,'/',I2.2)");
+                                ObjexxFCL::gio::write(MonthDayString, MnDyFmt) << Month << DayOfMonth;
                                 Real64 TimeHrsFraction = (double(hrOfDay) - 1.0) + double(TS) * TSfraction;
                                 int TimeHrsInt = int(TimeHrsFraction);
                                 int TimeMinsInt = nint((TimeHrsFraction - TimeHrsInt) * 60.0);
@@ -2037,9 +2037,9 @@ namespace SizingManager {
                                     ++TimeHrsInt;
                                     TimeMinsInt = 0;
                                 }
-                                static gio::Fmt TStmpFmti("(I2.2,':',I2.2)");
+                                static ObjexxFCL::gio::Fmt TStmpFmti("(I2.2,':',I2.2)");
                                 std::string timeStamp;
-                                gio::write(timeStamp, TStmpFmti) << TimeHrsInt << TimeMinsInt;
+                                ObjexxFCL::gio::write(timeStamp, TStmpFmti) << TimeHrsInt << TimeMinsInt;
                                 DataSizing::PeakPsOccurrenceDateTimeStringBySys(AirLoopNum) = MonthDayString + ' ' + timeStamp;
                                 DataSizing::PeakPsOccurrenceEnvironmentStringBySys(AirLoopNum) = "Full Year Schedule";
                             }
@@ -2494,7 +2494,7 @@ namespace SizingManager {
         using General::RoundSigDigits;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -2579,8 +2579,8 @@ namespace SizingManager {
                                  "\", Commas will be used to separate fields.");
                 cAlphaArgs(1) = "Comma";
             }
-            gio::write(OutputFileInits, fmtA) << "! <Sizing Output Files>,Style";
-            gio::write(OutputFileInits, "('Sizing Output Files,',A)") << cAlphaArgs(1);
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Sizing Output Files>,Style";
+            ObjexxFCL::gio::write(OutputFileInits, "('Sizing Output Files,',A)") << cAlphaArgs(1);
         }
     }
 
@@ -4058,18 +4058,18 @@ namespace SizingManager {
         static bool MyOneTimeFlag(true);
 
         // Formats
-        static gio::Fmt Format_990("('! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, ','Calc Des Air Flow "
+        static ObjexxFCL::gio::Fmt Format_990("('! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, ','Calc Des Air Flow "
                                    "Rate {m3/s}, ','User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, "
                                    "','Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, "
                                    "Calc DOAS Heat Addition Rate {W}')");
-        static gio::Fmt Format_991("(' Zone Sizing Information',14(', ',A))");
+        static ObjexxFCL::gio::Fmt Format_991("(' Zone Sizing Information',14(', ',A))");
 
         if (MyOneTimeFlag) {
-            gio::write(OutputFileInits, Format_990);
+            ObjexxFCL::gio::write(OutputFileInits, Format_990);
             MyOneTimeFlag = false;
         }
 
-        gio::write(OutputFileInits, Format_991) << ZoneName << LoadType << RoundSigDigits(CalcDesLoad, 5) << RoundSigDigits(UserDesLoad, 5)
+        ObjexxFCL::gio::write(OutputFileInits, Format_991) << ZoneName << LoadType << RoundSigDigits(CalcDesLoad, 5) << RoundSigDigits(UserDesLoad, 5)
                                                 << RoundSigDigits(CalcDesFlow, 5) << RoundSigDigits(UserDesFlow, 5) << DesDayName << PeakHrMin
                                                 << RoundSigDigits(PeakTemp, 5) << RoundSigDigits(PeakHumRat, 5) << RoundSigDigits(FloorArea, 5)
                                                 << RoundSigDigits(TotOccs, 5) << RoundSigDigits(MinOAVolFlow, 5)
@@ -4112,13 +4112,13 @@ namespace SizingManager {
         static bool MyOneTimeFlag(true);
 
         if (MyOneTimeFlag) {
-            gio::write(OutputFileInits,
+            ObjexxFCL::gio::write(OutputFileInits,
                        "('! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity, Calc Des Air "
                        "Flow Rate [m3/s], User Des Air Flow Rate [m3/s], Design Day Name, Date/Time of Peak')");
             MyOneTimeFlag = false;
         }
         std::string dateHrMin = DesDayDate + " " + TimeIndexToHrMinString(TimeStepIndex);
-        gio::write(OutputFileInits, "(' System Sizing Information, ',A, 7(', ',A))")
+        ObjexxFCL::gio::write(OutputFileInits, "(' System Sizing Information, ',A, 7(', ',A))")
             << SysName << LoadType << PeakLoadKind << RoundSigDigits(UserDesCap, 2) << RoundSigDigits(CalcDesVolFlow, 5)
             << RoundSigDigits(UserDesVolFlow, 5) << DesDayName << dateHrMin;
 
@@ -4135,7 +4135,7 @@ namespace SizingManager {
         int tMinOfDay = timeIndex * MinutesPerTimeStep;
         int tHr = int(tMinOfDay / 60.);
         int tMin = tMinOfDay - tHr * 60;
-        gio::write(hrMinString, PeakHrMinFmt) << tHr << tMin;
+        ObjexxFCL::gio::write(hrMinString, PeakHrMinFmt) << tHr << tMin;
         return hrMinString;
     }
 

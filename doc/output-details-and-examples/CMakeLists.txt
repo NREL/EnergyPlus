@@ -31,7 +31,7 @@ SET( INCLUDED_TEX
   ${CMAKE_SOURCE_DIR}/doc/output-details-and-examples/src/data-sets.tex
   ${CMAKE_SOURCE_DIR}/doc/output-details-and-examples/src/data-sets/simple-list-data-sets.tex
   ${CMAKE_SOURCE_DIR}/doc/output-details-and-examples/src/data-sets/macro-data-sets.tex
-  ${CMAKE_BINARY_DIR}/doc-build/title.tex
+  ${CMAKE_SOURCE_DIR}/doc/title.tex
 )
 
 # to get the list of included images, go to the root of the document folder and:
@@ -55,13 +55,11 @@ SET( INCLUDED_IMAGES
 SET( SOURCE_FILENAME "output-details-and-examples" )
 SET( OUTPUT_FILENAME "OutputDetailsAndExamples" )
 
-FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/doc-build/${SOURCE_FILENAME})
-
-add_custom_command( OUTPUT ${CMAKE_BINARY_DIR}/doc-build/${OUTPUT_FILENAME}.pdf
+add_custom_command( OUTPUT ${CMAKE_BINARY_DIR}/doc/${OUTPUT_FILENAME}.pdf
 	COMMAND ${CMAKE_COMMAND} -DXELATEX=${XELATEX} -DINNAME=${SOURCE_FILENAME} -DOUTNAME=${OUTPUT_FILENAME} -DORIGINAL_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DORIGINAL_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR} -DTEX_INTERACTION=${TEX_INTERACTION} -P ${CMAKE_SOURCE_DIR}/cmake/BuildDocumentation.cmake
-		    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc-build/${SOURCE_FILENAME}
+		    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/doc/${SOURCE_FILENAME}
 		    DEPENDS ${INCLUDED_TEX} ${INCLUDED_IMAGES}
                  )
 add_custom_target( zPDF_${OUTPUT_FILENAME} ALL
-                   DEPENDS ${CMAKE_BINARY_DIR}/doc-build/${OUTPUT_FILENAME}.pdf
+                   DEPENDS ${CMAKE_BINARY_DIR}/doc/${OUTPUT_FILENAME}.pdf
                  )

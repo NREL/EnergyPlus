@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -379,6 +379,7 @@ namespace SteamBaseboardRadiator {
             SteamBaseboardNumericFields(BaseboardNum).FieldNames = "";
             SteamBaseboardNumericFields(BaseboardNum).FieldNames = cNumericFieldNames;
 
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueBaseboardName(cCMO_BBRadiator_Steam, cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Steam + " Name");
 
             SteamBaseboard(BaseboardNum).EquipID = cAlphaArgs(1);                     // Name of the baseboard
@@ -798,12 +799,12 @@ namespace SteamBaseboardRadiator {
                                         SteamBaseboard(BaseboardNum).LoopSideNum,
                                         SteamBaseboard(BaseboardNum).BranchNum,
                                         SteamBaseboard(BaseboardNum).CompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         _,
-                                        _,
-                                        errFlag);
+                                        _);
                 SetLoopIndexFlag(BaseboardNum) = false;
                 if (errFlag) {
                     ShowFatalError("InitSteamBaseboard: Program terminated for previous conditions.");

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -102,6 +102,14 @@ namespace ZoneContaminantPredictorCorrector {
     void PushSystemTimestepHistories();
 
     void RevertZoneTimestepHistories();
+
+    void InverseModelCO2(int const ZoneNum,           // Zone number
+                         Real64 &CO2Gain,             // Zone total CO2 gain
+                         Real64 &CO2GainExceptPeople, // ZOne total CO2 gain from sources except for people
+                         Real64 &ZoneMassFlowRate,    // Zone air mass flow rate
+                         Real64 &CO2MassFlowRate,     // Zone air CO2 mass flow rate
+                         Real64 &RhoAir               // Air density
+    );
 
     void CorrectZoneContaminants(bool const ShortenTimeStepSys,
                                  bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history

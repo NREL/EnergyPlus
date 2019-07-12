@@ -217,7 +217,7 @@ Five load distribution schemes are employed in EnergyPlus. The figure below illu
     The \textbf{OPTIMAL} scheme first loads each component to its optimal part load ratio (specified in input). Any remaining loop demand is distributed evenly to all the components.
 \item
     The \textbf{UNIFORMLOAD} scheme first divides the load evenly among all available components.
-    If some components do not have the capacity to meet the uniformly distributed load, the remaining load is divided among the remaining components.
+    If some components do not have the capacity to meet the uniformly distributed load, the remaining load is distributed sequentially to the other available components.
 \item
     The \textbf{SEQUENTIALLOAD} scheme loads each component one at a time to capacity until the loop demand is met.
     The components are loaded up in the order that they appear in the equipment list specified in input.
@@ -397,8 +397,8 @@ Plant Load      & A             & B            &                               &
 25              & 25            & 0            & 0                             & 0.625      & -           \\ \hline
 50              & 40            & 10           & 0                             & 1 **       & 0.15 *      \\ \hline
 100             & 40            & 60           & 0                             & 1 **       & 0.6         \\ \hline
-150             & 40           & 100           & 0                             & 1 **       & 1 **        \\ \hline
-200             & 40           & 100           & 50                            & 1 **       & 1 **        \\ \hline
+150             & 40           & 100           & 10                            & 1 **       & 1 **        \\ \hline
+200             & 40           & 100           & 60                            & 1 **       & 1 **        \\ \hline
 \end{longtable}
 
 
@@ -416,7 +416,7 @@ The \textbf{UniformPLR} Load Distribution occurs in three steps:
 \item
     While the load to be met is below the LargestMinCompPLR equipment still in consideration, remove the last equipment in the Plant Equipment List. Always keep one equipment.
 \item
-    Divide the Plant Load accross the remaining equipment
+    Divide the Plant Load across the remaining equipment
 \end{enumerate}
 
 
@@ -428,7 +428,7 @@ The \textbf{UniformPLR} Load Distribution occurs in three steps:
 \hline
 Equipment Considered: & A & A \& B \\ \hline
 PlantCapacity & 40 & 140 \\ \hline
-LargestMinCompPLR & 0.2 & 0.15 \\ \hline
+LargestMinCompPLR & 0.2 & 0.2 \\ \hline
 \end{tabular}
 \end{table}
 
@@ -444,9 +444,9 @@ Plant Load & Plant PLR             & B         & Plant PLR       & A            
 Plant Load & Plant PLR             & B         & Plant PLR       & A               & B                & A              & B             \\ \hline
 \endhead
 
-5          & 0.04                  & OFF       & 0.125           & 0.125           & -                & 0.2 *          & -             \\ \hline
-10         & 0.07                  & OFF       & 0.25            & 0.25            & -                & 0.2 *          & -             \\ \hline
-25         & 0.18                  & ON        & N/A             & 7.14            & 17.86            & 0.2 *          & 0.18          \\ \hline
+5          & 0.04                  & OFF       & 0.125           & 5.0           & -                  & 0.2 *          & -             \\ \hline
+10         & 0.07                  & OFF       & 0.25            & 10.0            & -                & 0.25           & -             \\ \hline
+25         & 0.18                  & OFF       & 0.625           & 25.0            & -                & 0.625          & -             \\ \hline
 50         & 0.36                  & ON        & N/A             & 14.29           & 35.71            & 0.36           & 0.36          \\ \hline
 100        & 0.71                  & ON        & N/A             & 28.57           & 71.43            & 0.71           & 0.71          \\ \hline
 150        & 1.07                  & ON        & N/A             & 40.00           & 100.00           & 1 **           & 1 **          \\ \hline

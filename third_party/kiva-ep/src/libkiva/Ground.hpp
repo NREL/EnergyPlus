@@ -53,6 +53,7 @@ public:
 private:
   double timestep; // in seconds
 
+  friend class Aggregator;
   BoundaryConditions bcs;
   // Data structures
 

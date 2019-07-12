@@ -2,9 +2,9 @@
 
 \subsection{Creating Charts and Spreadsheet files from Output Variables}\label{creating-charts-and-spreadsheet-files-from-output-variables}
 
-The ReadVarsESO program is distributed with EnergyPlus as a simple approach to converting the standard output files (\textbf{eplusout.eso, eplusout.mtr}) into files that can be put directly into a spreadsheet program and then used to create graphs or do other statistical operations. ReadVarsESO can read the complex output files and sort the data into time-based form, it is a very quick application but does not have a lot of features.~ Note that all the \textbf{Output:Meter} and \textbf{Output:Meter:Cumulative} objects are included on the \textbf{eplusout.eso} file as well as the \textbf{eplusout.mtr} file.~ You can choose the \textbf{Output:Meter:MeterFileOnly} or \textbf{Output:Meter:Cumulative:MeterFileOnly} objects if you do not want a particular meter to show up on the \textbf{eplusout.eso} file. If you wish to see only the metered outputs, the \textbf{eplusout.mtr} file will typically be a lot smaller than the \textbf{eplusout.eso} file.
+The ReadVarsESO program is distributed with EnergyPlus as a simple approach to converting the standard output files (\textbf{eplusout.eso, eplusout.mtr}) into files that can be put directly into a spreadsheet program and then used to create graphs or do other statistical operations. ReadVarsESO can read the complex output files and sort the data into time-based form, it is a very quick application but does not have a lot of features.~ Note that all the \textbf{\hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter}} and \textbf{\hyperref[outputmetercumulative-and-outputmetercumulativemeterfileonly]{Output:Meter:Cumulative}} objects are included on the \textbf{eplusout.eso} file as well as the \textbf{eplusout.mtr} file.~ You can choose the \textbf{\hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter:MeterFileOnly}} or \textbf{\hyperref[outputmetercumulative-and-outputmetercumulativemeterfileonly]{Output:Meter:Cumulative:MeterFileOnly}} objects if you do not want a particular meter to show up on the \textbf{eplusout.eso} file. If you wish to see only the metered outputs, the \textbf{eplusout.mtr} file will typically be a lot smaller than the \textbf{eplusout.eso} file.
 
-The ReadVarsESO program has a very simple set of inputs. By default, you will get all the variables listed in the Output:Variable (\textbf{eplusout.eso}) or Output:Meter (\textbf{eplusout.mtr}) objects into the appropriate output files, and the outputs will be limited to 255 variables (a legacy Microsoft Excel™ limit). You can tailor how many variables to list by specifying variables for the ReadVarsESO runs.
+The ReadVarsESO program has a very simple set of inputs. By default, you will get all the variables listed in the \hyperref[outputvariable]{Output:Variable} (\textbf{eplusout.eso}) or \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} (\textbf{eplusout.mtr}) objects into the appropriate output files, and the outputs will be limited to 255 variables (a legacy Microsoft Excel\textsuperscript{TM} limit). You can tailor how many variables to list by specifying variables for the ReadVarsESO runs.
 
 You can override the 255 variable limit by specifying an argument on the command line (\textbf{EP-Launch} has a special option for this). You use ``unlimited'' or ``nolimit'' on the command line to get as many variables into your output file as desired. Again, this will be limited either by the number of variables in the \textbf{eplusout.eso} or \textbf{eplusout.mtr} files or the contents of the ``rvi'' file. If you want to use this option, you must include two arguments to the command line of the ReadVars program -- 1) the ``rvi'' file and 2) the ``unlimited'' argument.
 
@@ -13,13 +13,13 @@ By default, ReadVarsESO also included a trailing space on the header line, which
 % table 41
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
 \caption{ReadVarsESO Command Line Options \label{table:readvarseso-command-line-options}} \tabularnewline
-\toprule 
+\toprule
 Option & Description \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{ReadVarsESO Command Line Options} \tabularnewline
-\toprule 
+\toprule
 Option & Description \tabularnewline
 \midrule
 \endhead
@@ -42,13 +42,13 @@ The program is run automatically from the \textbf{EP-Launch} program or the \tex
 % table 42
 \begin{longtable}[c]{p{2.1in}p{3.9in}}
 \caption{"RVI" file contents \label{table:rvi-file-contents}} \tabularnewline
-\toprule 
+\toprule
 .rvi line description & Actual .rvi File Contents \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{"RVI" file contents} \tabularnewline
-\toprule 
+\toprule
 .rvi line description & Actual .rvi File Contents \tabularnewline
 \midrule
 \endhead
@@ -78,7 +78,7 @@ Note that the first two lines of the file are ``input file'' (where to read the 
 
 ReadVarsESO takes the input stream but recognizes the date/time information and appropriately places the required data onto the ``output file''. Following these lines are a list of variables to be culled from the ``input file'' and placed onto the output file. ``Variable Name'' will take all variables matching that description whereas ``Specific Variable Name'' will only match the full description of the variable. So, in the above example, ``Zone Air Temperature'' will report air temperatures for all the zones (but available at the HVAC timestep if you choose the ``detailed'' reporting frequency in your input file) but ``AIR LOOP OUTLET NODE'' and ``COOLING COIL AIR OUTLET NODE'' will be the only values reported for the ``System Node Temperature'' variable (the node temperature is available for all nodes used in the simulation). The termination line (0) is included to terminate the input to the ReadVarsESO program and begin the scanning.
 
-The output from ReadVarsESO is in the form commonly called ``comma de-limited'' or ``comma separated variable''. This format can be read easily in spreadsheet programs, such as Excel™.
+The output from ReadVarsESO is in the form commonly called ``comma de-limited'' or ``comma separated variable''. This format can be read easily in spreadsheet programs, such as Excel\textsuperscript{TM}.
 
 Note as described in the ``Input for Output'' above, only variables as listed on the \textbf{eplusout.rdd} file are available for reporting. If you request others, they will become ``Warning'' messages in the \textbf{eplusout.err} file.
 
@@ -93,13 +93,13 @@ The above message was generated from an IDF that requested reporting of the ``SY
 % table 43
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
 \caption{Example ReadVarsESO command lines and results \label{table:example-readvarseso-command-lines-and-results}} \tabularnewline
-\toprule 
+\toprule
 Command Line & Description/Result \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Example ReadVarsESO command lines and results} \tabularnewline
-\toprule 
+\toprule
 Command Line & Description/Result \tabularnewline
 \midrule
 \endhead

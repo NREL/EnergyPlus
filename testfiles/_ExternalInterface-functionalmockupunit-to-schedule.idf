@@ -26,7 +26,7 @@
 !           Overhang depth also design parameter (for West and East window separately)
 !           Solar, visible, and thermal transmittance of shading device also design parameter
 
-  Version,9.0;
+  Version,9.2;
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
@@ -38,7 +38,7 @@
     190.0;                   !- Elevation {m}
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year

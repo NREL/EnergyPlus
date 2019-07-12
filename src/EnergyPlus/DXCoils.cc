@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1059,6 +1059,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -1500,6 +1501,7 @@ namespace DXCoils {
 
             ++DXCoilNum;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -2021,6 +2023,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
             DXCoil(DXCoilNum).Name = Alphas(1);
             DXCoil(DXCoilNum).DXCoilType = CurrentModuleObject;
@@ -2440,6 +2443,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -2974,6 +2978,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -3418,6 +3423,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -3764,6 +3770,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
             DXCoil(DXCoilNum).Name = Alphas(1);
             // Initialize DataHeatBalance heat reclaim variable name for use by heat reclaim coils
@@ -4287,6 +4294,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -4755,6 +4763,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -4877,6 +4886,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -4990,6 +5000,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -5088,6 +5099,7 @@ namespace DXCoils {
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames.allocate(MaxNumbers);
             DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrorsFound);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
 
             DXCoil(DXCoilNum).Name = Alphas(1);
@@ -9523,6 +9535,11 @@ namespace DXCoils {
         DXCoilFanOpMode(DXCoilNum) = FanOpMode;
         DXCoil(DXCoilNum).CondInletTemp = CondInletTemp;
 
+        // set outlet node conditions
+        int airOutletNode = DXCoil(DXCoilNum).AirOutNode;
+        Node(airOutletNode).Temp = DXCoil(DXCoilNum).OutletAirTemp;
+        Node(airOutletNode).HumRat = DXCoil(DXCoilNum).OutletAirHumRat;
+
         // calc secondary coil if specified
         if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
             CalcSecondaryDXCoils(DXCoilNum);
@@ -10181,6 +10198,11 @@ namespace DXCoils {
         DXCoil(DXCoilNum).CondInletTemp = CondInletTemp;
         DXCoilTotalCooling(DXCoilNum) = DXCoil(DXCoilNum).TotalCoolingEnergyRate;
         DXCoilCoolInletAirWBTemp(DXCoilNum) = PsyTwbFnTdbWPb(InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure);
+
+        // set outlet node conditions
+        int airOutletNode = DXCoil(DXCoilNum).AirOutNode;
+        Node(airOutletNode).Temp = DXCoil(DXCoilNum).OutletAirTemp;
+        Node(airOutletNode).HumRat = DXCoil(DXCoilNum).OutletAirHumRat;
     }
 
     void CalcDXHeatingCoil(int const DXCoilNum,                      // the number of the DX heating coil to be simulated
@@ -10642,6 +10664,11 @@ namespace DXCoils {
         DXCoilTotalHeating(DXCoilNum) = DXCoil(DXCoilNum).TotalHeatingEnergyRate;
         DXCoilHeatInletAirDBTemp(DXCoilNum) = InletAirDryBulbTemp;
         DXCoilHeatInletAirWBTemp(DXCoilNum) = InletAirWetBulbC;
+
+        // set outlet node conditions
+        int airOutletNode = DXCoil(DXCoilNum).AirOutNode;
+        Node(airOutletNode).Temp = DXCoil(DXCoilNum).OutletAirTemp;
+        Node(airOutletNode).HumRat = DXCoil(DXCoilNum).OutletAirHumRat;
 
         // calc secondary coil if specified
         if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
@@ -11148,6 +11175,11 @@ namespace DXCoils {
         DXCoilOutletHumRat(DXCoilNum) = DXCoil(DXCoilNum).OutletAirHumRat;
         DXCoil(DXCoilNum).CondInletTemp = CondInletTemp; // Save condenser inlet temp in the data structure
 
+        // set outlet node conditions
+        int airOutletNode = DXCoil(DXCoilNum).AirOutNode;
+        Node(airOutletNode).Temp = DXCoil(DXCoilNum).OutletAirTemp;
+        Node(airOutletNode).HumRat = DXCoil(DXCoilNum).OutletAirHumRat;
+
         // calc secondary coil if specified
         if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
             CalcSecondaryDXCoils(DXCoilNum);
@@ -11428,7 +11460,7 @@ namespace DXCoils {
                     DeltaADPTemp = -DeltaADPTemp / 2.0;
                 } else if ((Error < 0.0) && (ErrorLast > 0.0)) {
                     DeltaADPTemp = -DeltaADPTemp / 2.0;
-                } else if (abs(Error) > abs(ErrorLast)) {
+                } else if (std::abs(Error) > std::abs(ErrorLast)) {
                     DeltaADPTemp = -DeltaADPTemp / 2.0;
                 }
                 ErrorLast = Error;
@@ -12339,7 +12371,9 @@ namespace DXCoils {
                 HeatReclaimDXCoil(DXCoilNum).AvailCapacity = DXCoil(DXCoilNum).TotalCoolingEnergyRate + DXCoil(DXCoilNum).ElecCoolingPower;
 
                 // Waste heat calculation
-                if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                // TODO: waste heat not considered even if defined in Cooling:DX:MultiSpeed, N16, \field Speed 1 Rated Waste Heat Fraction of Power
+                // Input
+                if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS) == 0) {
                         WasteHeatLS = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumLS);
                     } else {
@@ -12352,7 +12386,11 @@ namespace DXCoils {
                         WasteHeatHS = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNumHS), OutdoorDryBulb, InletAirDryBulbTemp) *
                                       DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumHS);
                     }
-                    MSHPWasteHeat = (SpeedRatio * WasteHeatHS + (1.0 - SpeedRatio) * WasteHeatLS) * DXCoil(DXCoilNum).ElecCoolingPower;
+                    DXCoil(DXCoilNum).MSFuelWasteHeat =
+                        (SpeedRatio * WasteHeatHS + (1.0 - SpeedRatio) * WasteHeatLS) * DXCoil(DXCoilNum).ElecCoolingPower;
+                    if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                        MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
+                    }
                 }
 
                 // Energy use for other fuel types
@@ -12569,10 +12607,13 @@ namespace DXCoils {
                 // Waste heat
                 if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNum) == 0) {
-                        MSHPWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
                     } else {
-                        MSHPWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
-                                        DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
+                                                            DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
+                    }
+                    if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                        MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
                     }
                 }
                 // Energy use for other fuel types
@@ -12649,6 +12690,11 @@ namespace DXCoils {
         DXCoilPartLoadRatio(DXCoilNum) = DXCoil(DXCoilNum).PartLoadRatio;
         DXCoilFanOpMode(DXCoilNum) = FanOpMode;
         DXCoil(DXCoilNum).CondInletTemp = CondInletTemp; // Save condenser inlet temp in the data structure
+
+        // set outlet node conditions
+        int airOutletNode = DXCoil(DXCoilNum).AirOutNode;
+        Node(airOutletNode).Temp = DXCoil(DXCoilNum).OutletAirTemp;
+        Node(airOutletNode).HumRat = DXCoil(DXCoilNum).OutletAirHumRat;
 
         // calc secondary coil if specified
         if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
@@ -13074,7 +13120,7 @@ namespace DXCoils {
                 }
 
                 // Waste heat calculation
-                if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS) == 0) {
                         WasteHeatLS = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumLS);
                     } else {
@@ -13087,7 +13133,11 @@ namespace DXCoils {
                         WasteHeatHS = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNumHS), OutdoorDryBulb, InletAirDryBulbTemp) *
                                       DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumHS);
                     }
-                    MSHPWasteHeat = (SpeedRatio * WasteHeatHS + (1.0 - SpeedRatio) * WasteHeatLS) * DXCoil(DXCoilNum).ElecHeatingPower;
+                    DXCoil(DXCoilNum).MSFuelWasteHeat =
+                        (SpeedRatio * WasteHeatHS + (1.0 - SpeedRatio) * WasteHeatLS) * DXCoil(DXCoilNum).ElecCoolingPower;
+                    if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                        MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
+                    }
                 }
                 if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
 
@@ -13300,12 +13350,15 @@ namespace DXCoils {
                     OutletAirEnthalpy = InletAirEnthalpy + DXCoil(DXCoilNum).TotalHeatingEnergyRate / DXCoil(DXCoilNum).InletAirMassFlowRate;
                     OutletAirTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
                 }
-                if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                if (DXCoil(DXCoilNum).MSHPHeatRecActive || DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNum) == 0) {
-                        MSHPWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
                     } else {
-                        MSHPWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
-                                        DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
+                                                            DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
+                    }
+                    if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
+                        MSHPWasteHeat = DXCoil(DXCoilNum).MSFuelWasteHeat;
                     }
                 }
                 if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
@@ -13354,6 +13407,11 @@ namespace DXCoils {
         DXCoil(DXCoilNum).MSSpeedNumHS = SpeedNumHS;
         DXCoil(DXCoilNum).MSSpeedRatio = SpeedRatio;
         DXCoil(DXCoilNum).MSCycRatio = CycRatio;
+
+        // set outlet node conditions
+        int airOutletNode = DXCoil(DXCoilNum).AirOutNode;
+        Node(airOutletNode).Temp = DXCoil(DXCoilNum).OutletAirTemp;
+        Node(airOutletNode).HumRat = DXCoil(DXCoilNum).OutletAirHumRat;
 
         // calc secondary coil if specified
         if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
@@ -13637,14 +13695,16 @@ namespace DXCoils {
         int index;
 
         // Formats
-        static gio::Fmt Format_890("('! <VAV DX Cooling Coil Standard Rating Information>, DX Coil Type, DX Coil Name, Fan Type, Fan Name, "
-                                   "','Standard Net Cooling Capacity {W}, Standard Net Cooling Capacity {Btu/h}, IEER {Btu/W-h}, ','COP 100% "
-                                   "Capacity {W/W}, COP 75% Capacity {W/W}, COP 50% Capacity {W/W}, COP 25% Capacity {W/W}, ','EER 100% Capacity "
-                                   "{Btu/W-h}, EER 75% Capacity {Btu/W-h}, EER 50% Capacity {Btu/W-h}, EER 25% Capacity {Btu/W-h}, ','Supply Air "
-                                   "Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}')");
-        static gio::Fmt Format_891("(' VAV DX Cooling Coil Standard Rating Information, "
-                                   "',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,'"
-                                   ",',A)");
+        static ObjexxFCL::gio::Fmt Format_890(
+            "('! <VAV DX Cooling Coil Standard Rating Information>, DX Coil Type, DX Coil Name, Fan Type, Fan Name, "
+            "','Standard Net Cooling Capacity {W}, Standard Net Cooling Capacity {Btu/h}, IEER {Btu/W-h}, ','COP 100% "
+            "Capacity {W/W}, COP 75% Capacity {W/W}, COP 50% Capacity {W/W}, COP 25% Capacity {W/W}, ','EER 100% Capacity "
+            "{Btu/W-h}, EER 75% Capacity {Btu/W-h}, EER 50% Capacity {Btu/W-h}, EER 25% Capacity {Btu/W-h}, ','Supply Air "
+            "Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}')");
+        static ObjexxFCL::gio::Fmt Format_891(
+            "(' VAV DX Cooling Coil Standard Rating Information, "
+            "',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,'"
+            ",',A)");
 
         // Get fan index and name if not already available
         if (DXCoil(DXCoilNum).SupplyFanIndex == -1)
@@ -13925,7 +13985,7 @@ namespace DXCoils {
 
         // begin output
         if (OneTimeEIOHeaderWrite) {
-            gio::write(OutputFileInits, Format_890);
+            ObjexxFCL::gio::write(OutputFileInits, Format_890);
             OneTimeEIOHeaderWrite = false;
             pdstVAVDXCoolCoil = newPreDefSubTable(pdrEquip, "VAV DX Cooling Standard Rating Details");
             pdchVAVDXCoolCoilType = newPreDefColumn(pdstVAVDXCoolCoil, "DX Cooling Coil Type");
@@ -13968,7 +14028,7 @@ namespace DXCoils {
         }
 
         if (DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject) {
-            gio::write(OutputFileInits, Format_891)
+            ObjexxFCL::gio::write(OutputFileInits, Format_891)
                 << "Coil:Cooling:DX:TwoSpeed" << DXCoil(DXCoilNum).Name << "Fan:VariableVolume" << DXCoil(DXCoilNum).SupplyFanName
                 << RoundSigDigits(NetCoolingCapRated, 2) << RoundSigDigits((NetCoolingCapRated * ConvFromSIToIP), 2) << RoundSigDigits(IEER, 2)
                 << RoundSigDigits(EER_TestPoint_SI(1), 2) << RoundSigDigits(EER_TestPoint_SI(2), 2) << RoundSigDigits(EER_TestPoint_SI(3), 2)
@@ -13977,7 +14037,7 @@ namespace DXCoils {
                 << RoundSigDigits(SupAirMdot_TestPoint(2), 4) << RoundSigDigits(SupAirMdot_TestPoint(3), 4)
                 << RoundSigDigits(SupAirMdot_TestPoint(4), 4);
         } else {
-            gio::write(OutputFileInits, Format_891)
+            ObjexxFCL::gio::write(OutputFileInits, Format_891)
                 << "Coil:Cooling:DX:TwoSpeed" << DXCoil(DXCoilNum).Name << "N/A"
                 << "N/A" << RoundSigDigits(NetCoolingCapRated, 2) << RoundSigDigits((NetCoolingCapRated * ConvFromSIToIP), 2)
                 << RoundSigDigits(IEER, 2) << RoundSigDigits(EER_TestPoint_SI(1), 2) << RoundSigDigits(EER_TestPoint_SI(2), 2)
@@ -13988,10 +14048,12 @@ namespace DXCoils {
         }
 
         PreDefTableEntry(pdchDXCoolCoilType, DXCoil(DXCoilNum).Name, "Coil:Cooling:DX:TwoSpeed");
-        PreDefTableEntry(pdchDXCoolCoilNetCapSI, DXCoil(DXCoilNum).Name, RoundSigDigits(NetCoolingCapRated, 1));
-        PreDefTableEntry(pdchDXCoolCoilCOP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_SI(1), 2));
-        PreDefTableEntry(pdchDXCoolCoilEERIP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_IP(1), 2));
-        PreDefTableEntry(pdchDXCoolCoilIEERIP, DXCoil(DXCoilNum).Name, RoundSigDigits(IEER, 2));
+        // W to tons
+        PreDefTableEntry(pdchDXCoolCoilNetCapSI, DXCoil(DXCoilNum).Name, NetCoolingCapRated, 1);
+        // These will convert with a factor of 1 which is ok
+        PreDefTableEntry(pdchDXCoolCoilCOP, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(1), 2);
+        PreDefTableEntry(pdchDXCoolCoilEERIP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(1), 2);
+        PreDefTableEntry(pdchDXCoolCoilIEERIP, DXCoil(DXCoilNum).Name, IEER, 2);
         PreDefTableEntry(pdchDXCoolCoilSEERIP, DXCoil(DXCoilNum).Name, "N/A");
         addFootNoteSubTable(pdstDXCoolCoil, "ANSI/AHRI ratings include supply fan");
 
@@ -14001,20 +14063,20 @@ namespace DXCoils {
         } else {
             PreDefTableEntry(pdchVAVDXFanName, DXCoil(DXCoilNum).Name, "None");
         }
-        PreDefTableEntry(pdchVAVDXCoolCoilNetCapSI, DXCoil(DXCoilNum).Name, RoundSigDigits(NetCoolingCapRated, 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilCOP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_SI(1), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilIEERIP, DXCoil(DXCoilNum).Name, RoundSigDigits(IEER, 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilEERIP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_IP(1), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilMdotA, DXCoil(DXCoilNum).Name, RoundSigDigits(SupAirMdot_TestPoint(1), 4));
-        PreDefTableEntry(pdchVAVDXCoolCoilCOP_B, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_SI(2), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilEER_B_IP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_IP(2), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilMdotB, DXCoil(DXCoilNum).Name, RoundSigDigits(SupAirMdot_TestPoint(2), 4));
-        PreDefTableEntry(pdchVAVDXCoolCoilCOP_C, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_SI(3), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilEER_C_IP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_IP(3), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilMdotC, DXCoil(DXCoilNum).Name, RoundSigDigits(SupAirMdot_TestPoint(3), 4));
-        PreDefTableEntry(pdchVAVDXCoolCoilCOP_D, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_SI(4), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilEER_D_IP, DXCoil(DXCoilNum).Name, RoundSigDigits(EER_TestPoint_IP(4), 2));
-        PreDefTableEntry(pdchVAVDXCoolCoilMdotD, DXCoil(DXCoilNum).Name, RoundSigDigits(SupAirMdot_TestPoint(4), 4));
+        PreDefTableEntry(pdchVAVDXCoolCoilNetCapSI, DXCoil(DXCoilNum).Name, NetCoolingCapRated, 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilCOP, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(1), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilIEERIP, DXCoil(DXCoilNum).Name, IEER, 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilEERIP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(1), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilMdotA, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(1), 4);
+        PreDefTableEntry(pdchVAVDXCoolCoilCOP_B, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(2), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilEER_B_IP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(2), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilMdotB, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(2), 4);
+        PreDefTableEntry(pdchVAVDXCoolCoilCOP_C, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(3), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilEER_C_IP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(3), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilMdotC, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(3), 4);
+        PreDefTableEntry(pdchVAVDXCoolCoilCOP_D, DXCoil(DXCoilNum).Name, EER_TestPoint_SI(4), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilEER_D_IP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(4), 2);
+        PreDefTableEntry(pdchVAVDXCoolCoilMdotD, DXCoil(DXCoilNum).Name, SupAirMdot_TestPoint(4), 4);
     }
 
     void GetFanIndexForTwoSpeedCoil(int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum)
@@ -16339,7 +16401,12 @@ namespace DXCoils {
             EIR = DXCoil(DXCoilNum).RatedEIR(Mode) * EIRTempModFac * EIRFlowModFac;
 
             // Calculate PLRHeating: modified PartLoadRatio due to defrost ( reverse-cycle defrost only )
-            PLRHeating = min(1.0, (PartLoadRatio + LoadDueToDefrost / TotCap));
+            if (TotCap > 0.0) {
+                PLRHeating = min(1.0, (PartLoadRatio + LoadDueToDefrost / TotCap));
+            } else {
+                PLRHeating = min(1.0, PartLoadRatio);
+            }
+
             if (DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_Heating && DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating) {
                 PLF = CurveValue(DXCoil(DXCoilNum).PLFFPLR(Mode), PLRHeating); // Calculate part-load factor
             } else {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -239,8 +239,8 @@ void ManageHVACSizingSimulation(bool &ErrorsFound)
 
     bool Available; // an environment is available to process
     int HVACSizingIterCount;
-    static gio::Fmt Format_700("('Environment:WarmupDays,',I3)");
-    static gio::Fmt fmtLD("*");
+    static ObjexxFCL::gio::Fmt Format_700("('Environment:WarmupDays,',I3)");
+    static ObjexxFCL::gio::Fmt fmtLD("*");
 
     hvacSizingSimulationManager->DetermineSizingAnalysesNeeded();
 
@@ -305,7 +305,7 @@ void ManageHVACSizingSimulation(bool &ErrorsFound)
                     if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
                 }
                 ++DayOfSim;
-                gio::write(DayOfSimChr, fmtLD) << DayOfSim;
+                ObjexxFCL::gio::write(DayOfSimChr, fmtLD) << DayOfSim;
                 strip(DayOfSimChr);
                 if (!WarmupFlag) {
                     ++CurrentOverallSimDay;
@@ -322,7 +322,7 @@ void ManageHVACSizingSimulation(bool &ErrorsFound)
                     DisplayString("Warming up {" + cWarmupDay + '}');
                 } else if (DayOfSim == 1) {
                     DisplayString("Starting HVAC Sizing Simulation at " + CurMnDy + " for " + EnvironmentName);
-                    gio::write(OutputFileInits, Format_700) << NumOfWarmupDays;
+                    ObjexxFCL::gio::write(OutputFileInits, Format_700) << NumOfWarmupDays;
                 } else if (DisplayPerfSimulationFlag) {
                     DisplayString("Continuing Simulation at " + CurMnDy + " for " + EnvironmentName);
                     DisplayPerfSimulationFlag = false;

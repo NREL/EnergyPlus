@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -854,12 +854,12 @@ namespace SwimmingPool {
                                         Pool(PoolNum).HWLoopSide,
                                         Pool(PoolNum).HWBranchNum,
                                         Pool(PoolNum).HWCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         Pool(PoolNum).WaterInletNode,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError(RoutineName + ": Program terminated due to previous condition(s).");
                 }
@@ -997,7 +997,7 @@ namespace SwimmingPool {
         ZoneNum = Surface(SurfNum).Zone;
 
         // Convection coefficient calculation
-        HConvIn = 0.22 * std::pow(abs(Pool(PoolNum).PoolWaterTemp - MAT(ZoneNum)), 1.0 / 3.0) * Pool(PoolNum).CurCoverConvFac;
+        HConvIn = 0.22 * std::pow(std::abs(Pool(PoolNum).PoolWaterTemp - MAT(ZoneNum)), 1.0 / 3.0) * Pool(PoolNum).CurCoverConvFac;
 
         CalcSwimmingPoolEvap(EvapRate, PoolNum, SurfNum, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
         Pool(PoolNum).MakeUpWaterMassFlowRate = EvapRate;

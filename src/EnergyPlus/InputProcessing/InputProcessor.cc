@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -159,6 +159,23 @@ json const &InputProcessor::getFields(std::string const &objectType)
     return it2.value();
 }
 
+json const & InputProcessor::getPatternProperties(json const &schema_obj)
+{
+    std::string pattern_property;
+    auto const & pattern_properties = schema_obj["patternProperties"];
+    int dot_star_present = pattern_properties.count(".*");
+    int no_whitespace_present = pattern_properties.count(R"(^.*\S.*$)");
+    if (dot_star_present) {
+        pattern_property = ".*";
+    } else if (no_whitespace_present) {
+        pattern_property = R"(^.*\S.*$)";
+    } else {
+        ShowFatalError(R"(The patternProperties value is not a valid choice (".*", "^.*\S.*$"))");
+    }
+    auto const &schema_obj_props = pattern_properties[pattern_property]["properties"];
+    return schema_obj_props;
+}
+
 // Functions
 
 void InputProcessor::clear_state()
@@ -210,6 +227,14 @@ void InputProcessor::initializeMaps()
         auto const schema_iter = schema_properties.find(objectType);
         objectCache.schemaIterator = schema_iter;
         objectCacheMap.emplace(schema_iter.key(), objectCache);
+    }
+}
+
+void InputProcessor::markObjectAsUsed(const std::string &objectType, const std::string &objectName)
+{
+    auto const find_unused = unusedInputs.find({objectType, objectName});
+    if (find_unused != unusedInputs.end()) {
+        unusedInputs.erase(find_unused);
     }
 }
 
@@ -463,6 +488,42 @@ bool InputProcessor::findDefault(Real64 &default_value, json const &schema_field
     return false;
 }
 
+bool InputProcessor::getDefaultValue(std::string const &objectWord, std::string const &fieldName, Real64 &value)
+{
+    auto find_iterators = objectCacheMap.find(objectWord);
+    if (find_iterators == objectCacheMap.end()) {
+        auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(objectWord));
+        if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
+            return false;
+        }
+        find_iterators = objectCacheMap.find(tmp_umit->second);
+    }
+    auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
+    auto const &epJSON_schema_it_val = epJSON_schema_it.value();
+    auto const &schema_obj_props = getPatternProperties(epJSON_schema_it_val);
+    auto const &sizing_factor_schema_field_obj = schema_obj_props.at(fieldName);
+    bool defaultFound = findDefault(value, sizing_factor_schema_field_obj);
+    return defaultFound;
+}
+
+bool InputProcessor::getDefaultValue(std::string const &objectWord, std::string const &fieldName, std::string &value)
+{
+    auto find_iterators = objectCacheMap.find(objectWord);
+    if (find_iterators == objectCacheMap.end()) {
+        auto const tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(objectWord));
+        if (tmp_umit == caseInsensitiveObjectMap.end() || epJSON.find(tmp_umit->second) == epJSON.end()) {
+            return false;
+        }
+        find_iterators = objectCacheMap.find(tmp_umit->second);
+    }
+    auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
+    auto const &epJSON_schema_it_val = epJSON_schema_it.value();
+    auto const &schema_obj_props = getPatternProperties(epJSON_schema_it_val);
+    auto const &sizing_factor_schema_field_obj = schema_obj_props.at(fieldName);
+    bool defaultFound = findDefault(value, sizing_factor_schema_field_obj);
+    return defaultFound;
+}
+
 std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string const &field_value, json const &schema_field_obj)
 {
     std::pair<std::string, bool> output;
@@ -471,7 +532,7 @@ std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string cons
         output.second = true;
     } else {
         output.first = field_value;
-        output.second = field_value.empty();
+        output.second = false;
     }
     if (schema_field_obj.find("retaincase") == schema_field_obj.end()) {
         output.first = UtilityRoutines::MakeUPPERCase(output.first);
@@ -529,7 +590,7 @@ void InputProcessor::getObjectItem(std::string const &Object,
     auto const &epJSON_schema_it_val = epJSON_schema_it.value();
 
     // Locations in JSON schema relating to normal fields
-    auto const &schema_obj_props = epJSON_schema_it_val["patternProperties"][".*"]["properties"];
+    auto const &schema_obj_props = getPatternProperties(epJSON_schema_it_val);
 
     // Locations in JSON schema storing the positional aspects from the IDD format, legacy prefixed
     auto const &legacy_idd = epJSON_schema_it_val["legacy_idd"];
@@ -1478,7 +1539,7 @@ void InputProcessor::preScanReportingVariables()
                 try {
                     addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_name"));
                 } catch (...) {
-                    continue;  // blank or erroneous fields are handled at the get input function for the object
+                    continue; // blank or erroneous fields are handled at the get input function for the object
                 }
             }
         }
@@ -1498,7 +1559,7 @@ void InputProcessor::preScanReportingVariables()
                 try {
                     addRecordToOutputVariableStructure("*", extensions.at("variable_or_meter_or_ems_variable_or_field_name"));
                 } catch (...) {
-                    continue;  // blank or erroneous fields are handled at the get input function for the object
+                    continue; // blank or erroneous fields are handled at the get input function for the object
                 }
             }
         }
@@ -1525,7 +1586,7 @@ void InputProcessor::preScanReportingVariables()
                         addVariablesForMonthlyReport(report_name);
                     }
                 } catch (...) {
-                    continue;  // blank or erroneous fields should be warned about during actual get input routines
+                    continue; // blank or erroneous fields should be warned about during actual get input routines
                 }
             }
         }
@@ -1875,6 +1936,13 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION HEATING LOAD DECREASE ENERGY");
         addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION AIR CHANGES PER HOUR");
 
+    } else if (reportName == "HEATEMISSIONSREPORTMONTHLY") {
+        // Place holder
+        addRecordToOutputVariableStructure("*", "Site Total Surface Heat Emission to Air");
+        addRecordToOutputVariableStructure("*", "Site Total Zone Exfiltration Heat Loss");
+        addRecordToOutputVariableStructure("*", "Site Total Zone Exhaust Air Heat Loss");
+        addRecordToOutputVariableStructure("*", "Air System Relief Air Total Heat Loss Energy");
+        addRecordToOutputVariableStructure("*", "HVAC System Total Heat Rejection Energy");
     } else {
     }
 }
@@ -1900,11 +1968,16 @@ void InputProcessor::addRecordToOutputVariableStructure(std::string const &KeyVa
     } else {
         vnameLen = len_trim(VariableName.substr(0, rbpos));
     }
+
     std::string const VarName(VariableName.substr(0, vnameLen));
 
     auto const found = DataOutputs::OutputVariablesForSimulation.find(VarName);
     if (found == DataOutputs::OutputVariablesForSimulation.end()) {
-        std::unordered_map<std::string, DataOutputs::OutputReportingVariables> data;
+        std::unordered_map<std::string,
+                           DataOutputs::OutputReportingVariables,
+                           UtilityRoutines::case_insensitive_hasher,
+                           UtilityRoutines::case_insensitive_comparator>
+            data;
         data.reserve(32);
         data.emplace(KeyValue, DataOutputs::OutputReportingVariables(KeyValue, VarName));
         DataOutputs::OutputVariablesForSimulation.emplace(VarName, std::move(data));

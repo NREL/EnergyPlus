@@ -1,6 +1,6 @@
 \section{UtilityCost:Charge:Block}\label{utilitycostchargeblock}
 
-The UtilityCost:Charge:Block objects is also used extensively for tariff calculation. It is used to compute energy and demand charges that are structured in blocks of charges. It may also be used for taxes, surcharges and any other charges that occur on a utility bill but those are more commonly simple flat charges so UtilityCost:Charge:Simple ~is more commonly used for those functions. As many UtilityCost:Charge:Block objects as needed may be defined for a single tariff and they will be added together. Blocks are a structure used by almost all utilities for calculating energy and demand charges and they allow the utility to charge more or less per unit of energy or demand if more units are used.
+The UtilityCost:Charge:Block objects is also used extensively for tariff calculation. It is used to compute energy and demand charges that are structured in blocks of charges. It may also be used for taxes, surcharges and any other charges that occur on a utility bill but those are more commonly simple flat charges so \hyperref[utilitycostchargesimple]{UtilityCost:Charge:Simple} ~is more commonly used for those functions. As many UtilityCost:Charge:Block objects as needed may be defined for a single tariff and they will be added together. Blocks are a structure used by almost all utilities for calculating energy and demand charges and they allow the utility to charge more or less per unit of energy or demand if more units are used.
 
 \subsection{Inputs}\label{inputs-067}
 
@@ -18,7 +18,7 @@ The name of the source used by the UtilityCost:Charge:Block. This is usually the
 
 \paragraph{Field: Season}\label{field-season}
 
-This is the name (or number) of a season for which the ~UtilityCost:Charge:Block is calculated. If this is set to annual, the calculations are performed for the UtilityCost:Charge:Block for the entire year (all months) otherwise it is calculated only for those months in the season defined. The season is defined by the Season Schedule in the UtilityCost:Tariff object. The choices for seasons are the following names or numbers may be used:
+This is the name (or number) of a season for which the ~UtilityCost:Charge:Block is calculated. If this is set to annual, the calculations are performed for the UtilityCost:Charge:Block for the entire year (all months) otherwise it is calculated only for those months in the season defined. The season is defined by the Season Schedule in the \hyperref[utilitycosttariff]{UtilityCost:Tariff} object. The choices for seasons are the following names or numbers may be used:
 
 \begin{itemize}
 \item

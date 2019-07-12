@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -135,7 +135,6 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
     InitializePsychRoutines();
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.3;",
         "	Zone,",
         "	EAST ZONE, !- Name",
         "	0, !- Direction of Relative North { deg }",
@@ -447,7 +446,6 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
     InitializePsychRoutines();
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.3;",
         "	Zone,",
         "	EAST ZONE, !- Name",
         "	0, !- Direction of Relative North { deg }",
@@ -761,7 +759,6 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     InitializePsychRoutines();
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.3;",
         "	Zone,",
         "	EAST ZONE, !- Name",
         "	0, !- Direction of Relative North { deg }",
@@ -1149,7 +1146,6 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     InitializePsychRoutines();
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.3;",
         "	Zone,",
         "	EAST ZONE, !- Name",
         "	0, !- Direction of Relative North { deg }",
@@ -1458,7 +1454,6 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     InitializePsychRoutines();
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.3;",
         "	Zone,",
         "	EAST ZONE, !- Name",
         "	0, !- Direction of Relative North { deg }",
@@ -1812,7 +1807,6 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     InitializePsychRoutines();
 
     std::string const idf_objects = delimited_string({
-        "	Version,8.3;",
         "	Zone,",
         "	EAST ZONE, !- Name",
         "	0, !- Direction of Relative North { deg }",

@@ -15,7 +15,7 @@
 ! Both the supply and the demand side will be modelled in this section of the template
 ! ******************************VERSION IDENTIFIER********************************************
 
-  Version,9.0;
+  Version,9.2;
 
 ! ********************************DEFINE THE CHILLED WATER(CW) LOOP***************************
 
@@ -920,7 +920,7 @@
 ! This simulation is run for 1 year
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year

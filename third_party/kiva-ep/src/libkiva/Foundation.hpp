@@ -135,7 +135,9 @@ public:
   // Environment
   double temperature;
   double radiantTemperature;
-  double hfGlass; // calculate once per time step to speed up convection calculations
+  ConvectionAlgorithm convectionAlgorithm;
+
+  double hfTerm; // calculate once per time step to speed up convection calculations
   double effectiveLWViewFactorQtr; // F^0.25, calculate once per time step to speed up long wave
                                    // calculations
 
@@ -240,12 +242,6 @@ public:
 
   double tolerance;
   int maxIterations;
-
-  double interiorConvectiveCoefficient;
-  double exteriorConvectiveCoefficient;
-  enum ConvectionCalculationMethod { CCM_AUTO, CCM_CONSTANT_COEFFICIENT };
-
-  ConvectionCalculationMethod convectionCalculationMethod;
 
   // Derived variables
   MeshData xMeshData;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -94,8 +94,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Constructor)
 TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputs)
 {
     using namespace PVWatts;
-    const std::string idfTxt = delimited_string({"Version, 8.9;",
-                                                 "Generator:PVWatts,",
+    const std::string idfTxt = delimited_string({"Generator:PVWatts,",
                                                  "PVWattsArray1,",
                                                  "5,",
                                                  "4000,",
@@ -148,7 +147,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputs)
 TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputsFailure)
 {
     using namespace PVWatts;
-    const std::string idfTxt = delimited_string({"Version, 8.9;", "Generator:PVWatts,", "PVWattsArray1,", "5,", "4000,",
+    const std::string idfTxt = delimited_string({"Generator:PVWatts,", "PVWattsArray1,", "5,", "4000,",
                                                  "Primo,",          // misspelled
                                                  "FixedRoofMount,", // misspelled
                                                  ",", "asdf,", ",", ";", "Output:Variable,*,Generator Produced DC Electric Power,timestep;"});
@@ -244,8 +243,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
 
 TEST_F(EnergyPlusFixture, PVWattsInverter_Constructor)
 {
-    const std::string idfTxt = delimited_string({"Version, 8.9;",
-                                                 "ElectricLoadCenter:Distribution,",
+    const std::string idfTxt = delimited_string({"ElectricLoadCenter:Distribution,",
                                                  "ELC1,",
                                                  "GeneratorList1,",
                                                  "Baseload,",

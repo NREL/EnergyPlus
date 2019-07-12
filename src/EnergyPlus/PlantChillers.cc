@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -661,7 +661,6 @@ namespace PlantChillers {
         //  CHARACTER(len=MaxNameLength),DIMENSION(9)   :: AlphArray !character string data
         //  REAL(r64),                        DIMENSION(22)  :: NumArray  !numeric data
         static bool ErrorsFound(false);
-        bool errFlag;
         bool Okay;
         //  CHARACTER(len=MaxNameLength) :: cCurrentModuleObject  ! for ease in renaming.
 
@@ -696,10 +695,9 @@ namespace PlantChillers {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+
             ElectricChiller(ChillerNum).Base.Name = cAlphaArgs(1);
 
             if (cAlphaArgs(2) == "AIRCOOLED") {
@@ -1222,7 +1220,6 @@ namespace PlantChillers {
         int NumNums;    // Number of elements in the numeric array
         int IOStat;     // IO Status when calling get input subroutine
         static bool ErrorsFound(false);
-        bool errFlag;
         bool Okay;
 
         // FLOW
@@ -1255,10 +1252,9 @@ namespace PlantChillers {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise 
+            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+            
             EngineDrivenChiller(ChillerNum).Base.Name = cAlphaArgs(1);
 
             EngineDrivenChiller(ChillerNum).Base.NomCap = rNumericArgs(1);
@@ -1915,7 +1911,6 @@ namespace PlantChillers {
         int NumNums;    // Number of elements in the numeric array
         int IOStat;     // IO Status when calling get input subroutine
         static bool ErrorsFound(false);
-        bool errFlag;
         bool Okay;
 
         // FLOW
@@ -1947,10 +1942,9 @@ namespace PlantChillers {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise 
+            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+            
             GTChiller(ChillerNum).Base.Name = cAlphaArgs(1);
 
             GTChiller(ChillerNum).Base.NomCap = rNumericArgs(1);
@@ -2536,7 +2530,6 @@ namespace PlantChillers {
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
         static bool ErrorsFound(false);
-        bool errFlag;
         bool Okay;
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
@@ -2569,10 +2562,9 @@ namespace PlantChillers {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise 
+            VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+            
             ConstCOPChiller(ChillerNum).Base.Name = cAlphaArgs(1);
             ConstCOPChiller(ChillerNum).Base.NomCap = rNumericArgs(1);
             if (ConstCOPChiller(ChillerNum).Base.NomCap == AutoSize) {
@@ -2994,12 +2986,12 @@ namespace PlantChillers {
                                     ElectricChiller(ChillNum).Base.CWLoopSideNum,
                                     ElectricChiller(ChillNum).Base.CWBranchNum,
                                     ElectricChiller(ChillNum).Base.CWCompNum,
+                                    errFlag,
                                     ElectricChiller(ChillNum).TempLowLimitEvapOut,
                                     _,
                                     _,
                                     ElectricChiller(ChillNum).Base.EvapInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (ElectricChiller(ChillNum).Base.CondenserType != AirCooled && ElectricChiller(ChillNum).Base.CondenserType != EvapCooled) {
                 ScanPlantLoopsForObject(ElectricChiller(ChillNum).Base.Name,
                                         TypeOf_Chiller_Electric,
@@ -3007,12 +2999,12 @@ namespace PlantChillers {
                                         ElectricChiller(ChillNum).Base.CDLoopSideNum,
                                         ElectricChiller(ChillNum).Base.CDBranchNum,
                                         ElectricChiller(ChillNum).Base.CDCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         ElectricChiller(ChillNum).Base.CondInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(ElectricChiller(ChillNum).Base.CWLoopNum,
                                               ElectricChiller(ChillNum).Base.CWLoopSideNum,
                                               ElectricChiller(ChillNum).Base.CDLoopNum,
@@ -3027,12 +3019,12 @@ namespace PlantChillers {
                                         ElectricChiller(ChillNum).HRLoopSideNum,
                                         ElectricChiller(ChillNum).HRBranchNum,
                                         ElectricChiller(ChillNum).HRCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         ElectricChiller(ChillNum).HeatRecInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(ElectricChiller(ChillNum).Base.CWLoopNum,
                                               ElectricChiller(ChillNum).Base.CWLoopSideNum,
                                               ElectricChiller(ChillNum).HRLoopNum,
@@ -3391,12 +3383,12 @@ namespace PlantChillers {
                                     EngineDrivenChiller(ChillNum).Base.CWLoopSideNum,
                                     EngineDrivenChiller(ChillNum).Base.CWBranchNum,
                                     EngineDrivenChiller(ChillNum).Base.CWCompNum,
+                                    errFlag,
                                     EngineDrivenChiller(ChillNum).TempLowLimitEvapOut,
                                     _,
                                     _,
                                     EngineDrivenChiller(ChillNum).Base.EvapInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (EngineDrivenChiller(ChillNum).Base.CondenserType != AirCooled && EngineDrivenChiller(ChillNum).Base.CondenserType != EvapCooled) {
                 ScanPlantLoopsForObject(EngineDrivenChiller(ChillNum).Base.Name,
                                         TypeOf_Chiller_EngineDriven,
@@ -3404,12 +3396,12 @@ namespace PlantChillers {
                                         EngineDrivenChiller(ChillNum).Base.CDLoopSideNum,
                                         EngineDrivenChiller(ChillNum).Base.CDBranchNum,
                                         EngineDrivenChiller(ChillNum).Base.CDCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         EngineDrivenChiller(ChillNum).Base.CondInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(EngineDrivenChiller(ChillNum).Base.CWLoopNum,
                                               EngineDrivenChiller(ChillNum).Base.CWLoopSideNum,
                                               EngineDrivenChiller(ChillNum).Base.CDLoopNum,
@@ -3424,12 +3416,12 @@ namespace PlantChillers {
                                         EngineDrivenChiller(ChillNum).HRLoopSideNum,
                                         EngineDrivenChiller(ChillNum).HRBranchNum,
                                         EngineDrivenChiller(ChillNum).HRCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         EngineDrivenChiller(ChillNum).HeatRecInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(EngineDrivenChiller(ChillNum).Base.CWLoopNum,
                                               EngineDrivenChiller(ChillNum).Base.CWLoopSideNum,
                                               EngineDrivenChiller(ChillNum).HRLoopNum,
@@ -3735,12 +3727,12 @@ namespace PlantChillers {
                                     GTChiller(ChillNum).Base.CWLoopSideNum,
                                     GTChiller(ChillNum).Base.CWBranchNum,
                                     GTChiller(ChillNum).Base.CWCompNum,
+                                    errFlag,
                                     GTChiller(ChillNum).TempLowLimitEvapOut,
                                     _,
                                     _,
                                     GTChiller(ChillNum).Base.EvapInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (GTChiller(ChillNum).Base.CondenserType != AirCooled && GTChiller(ChillNum).Base.CondenserType != EvapCooled) {
                 ScanPlantLoopsForObject(GTChiller(ChillNum).Base.Name,
                                         TypeOf_Chiller_CombTurbine,
@@ -3748,12 +3740,12 @@ namespace PlantChillers {
                                         GTChiller(ChillNum).Base.CDLoopSideNum,
                                         GTChiller(ChillNum).Base.CDBranchNum,
                                         GTChiller(ChillNum).Base.CDCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         GTChiller(ChillNum).Base.CondInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(GTChiller(ChillNum).Base.CWLoopNum,
                                               GTChiller(ChillNum).Base.CWLoopSideNum,
                                               GTChiller(ChillNum).Base.CDLoopNum,
@@ -3768,12 +3760,12 @@ namespace PlantChillers {
                                         GTChiller(ChillNum).HRLoopSideNum,
                                         GTChiller(ChillNum).HRBranchNum,
                                         GTChiller(ChillNum).HRCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         GTChiller(ChillNum).HeatRecInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(GTChiller(ChillNum).Base.CWLoopNum,
                                               GTChiller(ChillNum).Base.CWLoopSideNum,
                                               GTChiller(ChillNum).HRLoopNum,
@@ -4062,12 +4054,12 @@ namespace PlantChillers {
                                     ConstCOPChiller(ChillNum).Base.CWLoopSideNum,
                                     ConstCOPChiller(ChillNum).Base.CWBranchNum,
                                     ConstCOPChiller(ChillNum).Base.CWCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     ConstCOPChiller(ChillNum).Base.EvapInletNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (ConstCOPChiller(ChillNum).Base.CondenserType != AirCooled && ConstCOPChiller(ChillNum).Base.CondenserType != EvapCooled) {
                 ScanPlantLoopsForObject(ConstCOPChiller(ChillNum).Base.Name,
                                         TypeOf_Chiller_ConstCOP,
@@ -4075,12 +4067,12 @@ namespace PlantChillers {
                                         ConstCOPChiller(ChillNum).Base.CDLoopSideNum,
                                         ConstCOPChiller(ChillNum).Base.CDBranchNum,
                                         ConstCOPChiller(ChillNum).Base.CDCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         ConstCOPChiller(ChillNum).Base.CondInletNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 InterConnectTwoPlantLoopSides(ConstCOPChiller(ChillNum).Base.CWLoopNum,
                                               ConstCOPChiller(ChillNum).Base.CWLoopSideNum,
                                               ConstCOPChiller(ChillNum).Base.CDLoopNum,
@@ -5653,7 +5645,7 @@ namespace PlantChillers {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
 
-        static gio::Fmt OutputFormat("(F6.2)");
+        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcElectricChillerModel");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -5863,7 +5855,7 @@ namespace PlantChillers {
             //  Warn user if entering condenser temperature falls below 0C
             if (Node(CondInletNode).Temp < 0.0 && !WarmupFlag) {
                 ElectricChiller(ChillNum).Base.PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 ElectricChiller(ChillNum).Base.MsgBuffer1 = "CalcElectricChillerModel - Chiller:Electric \"" + ElectricChiller(ChillNum).Base.Name +
                                                             "\" - Air Cooled Condenser Inlet Temperature below 0C";
                 ElectricChiller(ChillNum).Base.MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar +
@@ -5880,7 +5872,7 @@ namespace PlantChillers {
             //  Warn user if evap condenser wet bulb temperature falls below 10C
             if (Node(CondInletNode).Temp < 10.0 && !WarmupFlag) {
                 ElectricChiller(ChillNum).Base.PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 ElectricChiller(ChillNum).Base.MsgBuffer1 = "CalcElectricChillerModel - Chiller:Electric \"" + ElectricChiller(ChillNum).Base.Name +
                                                             "\" - Evap Cooled Condenser Inlet Temperature below 10C";
                 ElectricChiller(ChillNum).Base.MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar +
@@ -6367,7 +6359,7 @@ namespace PlantChillers {
         Real64 const ReferenceTemp(25.0); // Reference temperature by which lower heating
         // value is reported.  This should be subtracted
         // off of when calculated exhaust energies.
-        static gio::Fmt OutputFormat("(F6.2)");
+        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcEngineDrivenChillerModel");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -6547,7 +6539,7 @@ namespace PlantChillers {
             //  Warn user if entering condenser temperature falls below 0C
             if (Node(CondInletNode).Temp < 0.0 && !WarmupFlag) {
                 EngineDrivenChiller(ChillerNum).Base.PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 EngineDrivenChiller(ChillerNum).Base.MsgBuffer1 = "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"" +
                                                                   EngineDrivenChiller(ChillerNum).Base.Name +
                                                                   "\" - Air Cooled Condenser Inlet Temperature below 0C";
@@ -6563,7 +6555,7 @@ namespace PlantChillers {
             //  Warn user if evap condenser wet bulb temperature falls below 10C
             if (Node(CondInletNode).Temp < 10.0 && !WarmupFlag) {
                 EngineDrivenChiller(ChillerNum).Base.PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 EngineDrivenChiller(ChillerNum).Base.MsgBuffer1 = "CalcEngineDrivenChillerModel - Chiller:EngineDriven \"" +
                                                                   EngineDrivenChiller(ChillerNum).Base.Name +
                                                                   "\" - Evap Cooled Condenser Inlet Temperature below 10C";
@@ -7139,7 +7131,7 @@ namespace PlantChillers {
         // SUBROUTINE PARAMETER DEFINITIONS:
 
         Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat
-        static gio::Fmt OutputFormat("(F6.2)");
+        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcGTChillerModel");
         static std::string const RoutineNameHeatRecovery("ChillerHeatRecovery");
 
@@ -7313,7 +7305,7 @@ namespace PlantChillers {
             //  Warn user if entering condenser temperature falls below 0C
             if (Node(CondInletNode).Temp < 0.0 && !WarmupFlag) {
                 GTChiller(ChillerNum).Base.PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 GTChiller(ChillerNum).Base.MsgBuffer1 = "CalcGasTurbineChillerModel - Chiller:CombustionTurbine \"" +
                                                         GTChiller(ChillerNum).Base.Name + "\" - Air Cooled Condenser Inlet Temperature below 0C";
                 GTChiller(ChillerNum).Base.MsgBuffer2 = "... Outdoor Dry-bulb Condition = " + OutputChar +
@@ -7328,7 +7320,7 @@ namespace PlantChillers {
             //  Warn user if evap condenser wet bulb temperature falls below 10C
             if (Node(CondInletNode).Temp < 10.0 && !WarmupFlag) {
                 GTChiller(ChillerNum).Base.PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 GTChiller(ChillerNum).Base.MsgBuffer1 = "CalcGasTurbineChillerModel - Chiller:CombustionTurbine \"" +
                                                         GTChiller(ChillerNum).Base.Name + "\" - Evap Cooled Condenser Inlet Temperature below 10C";
                 GTChiller(ChillerNum).Base.MsgBuffer2 = "... Outdoor Wet-bulb Condition = " + OutputChar +
@@ -7990,7 +7982,7 @@ namespace PlantChillers {
         // SUBROUTINE PARAMETER DEFINITIONS:
 
         Real64 const DeltaTempTol(0.0001); // C - minimum significant mass flow rate
-        static gio::Fmt OutputFormat("(F6.2)");
+        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcConstCOPChillerModel");
 
         // DERIVED TYPE DEFINITIONS
@@ -8178,7 +8170,7 @@ namespace PlantChillers {
             //  Warn user if entering condenser temperature falls below 0C
             if (Node(CondInletNode).Temp < 0.0 && !WarmupFlag) {
                 ConstCOPChiller(ChillNum).Base.PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 ConstCOPChiller(ChillNum).Base.MsgBuffer1 = "CalcConstCOPChillerModel - Chiller:ConstantCOP \"" +
                                                             ConstCOPChiller(ChillNum).Base.Name +
                                                             "\" - Air Cooled Condenser Inlet Temperature below 0C";
@@ -8194,7 +8186,7 @@ namespace PlantChillers {
             //  Warn user if evap condenser wet bulb temperature falls below 10C
             if (Node(CondInletNode).Temp < 10.0 && !WarmupFlag) {
                 ConstCOPChiller(ChillNum).Base.PrintMessage = true;
-                gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
+                ObjexxFCL::gio::write(OutputChar, OutputFormat) << Node(CondInletNode).Temp;
                 ConstCOPChiller(ChillNum).Base.MsgBuffer1 = "CalcConstCOPChillerModel - Chiller:ConstantCOP \"" +
                                                             ConstCOPChiller(ChillNum).Base.Name +
                                                             "\" - Evap Cooled Condenser Inlet Temperature below 10C";

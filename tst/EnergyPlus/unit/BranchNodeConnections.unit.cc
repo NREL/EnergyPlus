@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -122,11 +122,8 @@ TEST_F(EnergyPlusFixture, BranchNodeErrorCheck11Test)
 
 TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
 {
-    // AUTHOR: R. Raustad, FSEC
-    // DATE WRITTEN: Nov 2015
 
     std::string const idf_objects = delimited_string({
-        " Version,8.3;",
         " Output:Diagnostics, DisplayExtraWarnings;",
         " Timestep, 4;",
         " BUILDING, BranchNodeConnections_ReturnPlenumNodeCheckFailure, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",
@@ -1133,11 +1130,8 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
 
 TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
 {
-    // AUTHOR: R. Raustad, FSEC
-    // DATE WRITTEN: Nov 2015
 
     std::string const idf_objects = delimited_string({
-        " Version,8.3;",
         " Output:Diagnostics, DisplayExtraWarnings;",
         " Timestep, 4;",
         " BUILDING, BranchNodeConnections_ReturnPlenumNodeCheck, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",

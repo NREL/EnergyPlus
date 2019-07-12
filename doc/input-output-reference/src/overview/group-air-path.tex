@@ -2,19 +2,19 @@
 
 \subsection{AirLoopHVAC:SupplyPath, AirLoopHVAC:ReturnPath}\label{airloophvacsupplypath-airloophvacreturnpath}
 
-The zone supply and return air paths are used to describe the configuration of the flow path that the supply air takes in moving from the main air handler to the zone terminal units and that the return air takes on leaving the zones and returning to the central return air duct. The air paths consist of a group of components AirLoopHVAC:ZoneSplitters and AirLoopHVAC:SupplyPlenums for the supply path and AirLoopHVAC:ReturnPlenums and AirLoopHVAC:ZoneMixers for the return path. The connectivity of the paths is established by the components node connections. There are no branches defined in the zone air path constructs.
+The zone supply and return air paths are used to describe the configuration of the flow path that the supply air takes in moving from the main air handler to the zone terminal units and that the return air takes on leaving the zones and returning to the central return air duct. The air paths consist of a group of components \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter}s and \hyperref[airloophvacsupplyplenum]{AirLoopHVAC:SupplyPlenum}s for the supply path and \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum}s and \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer}s for the return path. The connectivity of the paths is established by the components node connections. There are no branches defined in the zone air path constructs.
 
-For a typical single duct air system there will be one AirLoopHVAC:SupplyPath and one AirLoopHVAC:ReturnPath. A typical dual duct system would have 2 AirLoopHVAC:SupplyPaths one for the hot air and one for the cold air and 1 AirLoopHVAC:ReturnPath.
+For a typical single duct air system there will be one \hyperref[airloophvacsupplypath]{AirLoopHVAC:SupplyPath} and one \hyperref[airloophvacreturnpath]{AirLoopHVAC:ReturnPath}. A typical dual duct system would have 2 \hyperref[airloophvacsupplypath]{AirLoopHVAC:SupplyPath}s one for the hot air and one for the cold air and 1 \hyperref[airloophvacreturnpath]{AirLoopHVAC:ReturnPath}.
 
-The AirLoopHVAC:SupplyPlenum component provides the capability to have supply air distributed to the conditioned zones through one or more plenum zones such as would occur in an underfloor air distribution system (UFAD). The AirLoopHVAC:ReturnPlenum component allows the program to model return air plenums. Of course plenums are always optional. The simplest AirLoopHVAC:SupplyPath would consist of only an AirLoopHVAC:ZoneSplitter; similarly the simplest return air path consists of a single AirLoopHVAC:ZoneMixer. A UFAD system supply air path might consist of a single AirLoopHVAC:ZoneSplitter connecting to multiple AirLoopHVAC:SupplyPlenums which in turn could each supply one or more conditioned zones. A system with return plenums would have an AirLoopHVAC:ReturnPath in which the conditioned zones connect to the return plenum inlets and the return plenum s outlets connect to a single AirLoopHVAC:ZoneMixer.
+The \hyperref[airloophvacsupplyplenum]{AirLoopHVAC:SupplyPlenum} component provides the capability to have supply air distributed to the conditioned zones through one or more plenum zones such as would occur in an underfloor air distribution system (UFAD). The \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} component allows the program to model return air plenums. Of course plenums are always optional. The simplest \hyperref[airloophvacsupplypath]{AirLoopHVAC:SupplyPath} would consist of only an \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter}; similarly the simplest return air path consists of a single \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer}. A UFAD system supply air path might consist of a single \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter} connecting to multiple \hyperref[airloophvacsupplyplenum]{AirLoopHVAC:SupplyPlenum}s which in turn could each supply one or more conditioned zones. A system with return plenums would have an \hyperref[airloophvacreturnpath]{AirLoopHVAC:ReturnPath} in which the conditioned zones connect to the return plenum inlets and the return plenum s outlets connect to a single \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer}.
 
 Both the zone supply and return plenums are solved in the heat balance as thermal zones which couple through heat conduction with adjacent zones. Since they are solved as thermal zones the solution scheme involves the zone predictor-corrector technique which will lag the temperature at the system timestep in every zone. See Summary of Predictor-Corrector Procedure in the EnergyPlus Engineering Reference.
 
-Below are the descriptions of the zone supply and return path statements. Note that each statement type has an identifying name, a single inlet/outlet node name, and a list of component type/name pairs. For a single zone being served by an air loop, the inlet to its air distribution unit and the zone return air outlet can be the zone equipment inlet and outlet nodes directly, thus eliminating the need to specify an AirLoopHVAC:SupplyPath and an AirLoopHVAC:ReturnPath.
+Below are the descriptions of the zone supply and return path statements. Note that each statement type has an identifying name, a single inlet/outlet node name, and a list of component type/name pairs. For a single zone being served by an air loop, the inlet to its air distribution unit and the zone return air outlet can be the zone equipment inlet and outlet nodes directly, thus eliminating the need to specify an \hyperref[airloophvacsupplypath]{AirLoopHVAC:SupplyPath} and an \hyperref[airloophvacreturnpath]{AirLoopHVAC:ReturnPath}.
 
 \subsection{AirLoopHVAC:SupplyPath}\label{airloophvacsupplypath}
 
-The AirLoopHVAC:SupplyPath lists one or more AirLoopHVAC:ZoneSplitter and AirLoopHVAC:SupplyPlenum components comprising the path. The components are listed in flow order: upstream to downstream and may be in series, parallel, or both. Connectivity is established by means of the individual component inlet and outlet nodes.
+The AirLoopHVAC:SupplyPath lists one or more \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter} and \hyperref[airloophvacsupplyplenum]{AirLoopHVAC:SupplyPlenum} components comprising the path. The components are listed in flow order: upstream to downstream and may be in series, parallel, or both. Connectivity is established by means of the individual component inlet and outlet nodes.
 
 \subsubsection{Inputs}\label{inputs-003}
 
@@ -24,7 +24,7 @@ Unique name to identify the supply air path..
 
 \paragraph{Field: Supply Air Path Inlet Node Name}\label{field-supply-air-path-inlet-node-name}
 
-The name of an inlet node for the zone equipment half of the air loop. This should be one of the nodes named in the AirLoopHVAC field: Demand Side Inlet Node Names.
+The name of an inlet node for the zone equipment half of the air loop. This should be one of the nodes named in the \hyperref[airloophvac]{AirLoopHVAC} field: Demand Side Inlet Node Names.
 
 \paragraph{Field Set Component Type and Name}\label{field-set-component-type-and-name}
 
@@ -32,15 +32,15 @@ The remaining fields are sets of two repeated times: a component type and a name
 
 \paragraph{Field: Component \textless{}\#\textgreater{} Object Type}\label{field-component-object-type}
 
-Start of the component list for the AirLoopHVAC:SupplyPath. This field should contain either \emph{AirLoopHVAC:SupplyPlenum} or \emph{AirLoopHVAC:ZoneSplitter}.
+Start of the component list for the AirLoopHVAC:SupplyPath. This field should contain either \emph{\hyperref[airloophvacsupplyplenum]{AirLoopHVAC:SupplyPlenum}} or \emph{\hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter}}.
 
 \paragraph{Field: Component \textless{}\#\textgreater{} Name}\label{field-component-name}
 
-Unique name of the AirLoopHVAC:SupplyPlenum or AirLoopHVAC:ZoneSplitter component.
+Unique name of the \hyperref[airloophvacsupplyplenum]{AirLoopHVAC:SupplyPlenum} or \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter} component.
 
 \subsection{AirLoopHVAC:ReturnPath}\label{airloophvacreturnpath}
 
-The AirLoopHVAC:ReturnPath lists one or more AirLoopHVAC:ZoneMixer and AirLoopHVAC:ReturnPlenum components comprising the path. The components are listed in flow order: upstream to downstream and may be in series, parallel, or both. Connectivity is established by means of the individual component inlet and outlet nodes. At this time there can only be 1 AirLoopHVAC:ZoneMixer in an AirLoopHVAC:ReturnPath.
+The AirLoopHVAC:ReturnPath lists one or more \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer} and \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} components comprising the path. The components are listed in flow order: upstream to downstream and may be in series, parallel, or both. Connectivity is established by means of the individual component inlet and outlet nodes. At this time there can only be 1 \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer} in an AirLoopHVAC:ReturnPath.
 
 \subsubsection{Inputs}\label{inputs-1-003}
 
@@ -50,7 +50,7 @@ Unique name to identify the return air path.
 
 \paragraph{Field: Return Air Path Outlet Node Name}\label{field-return-air-path-outlet-node-name}
 
-The name of the node that is the outlet to the air loop from the AirLoopHVAC:ReturnPath. This should be the same node named in the AirLoopHVAC field: Demand Side Outlet Node Name.
+The name of the node that is the outlet to the air loop from the AirLoopHVAC:ReturnPath. This should be the same node named in the \hyperref[airloophvac]{AirLoopHVAC} field: Demand Side Outlet Node Name.
 
 \paragraph{Field Set Component Type and Name}\label{field-set-component-type-and-name-1}
 
@@ -58,11 +58,11 @@ The remaining fields are sets of two repeated times: a component type and a name
 
 \paragraph{Field: Component \textless{}\#\textgreater{} Object Type}\label{field-component-object-type-1}
 
-Start of the component list for the AirLoopHVAC:ReturnPath. This field should contain either \emph{AirLoopHVAC:ReturnPlenum} or \emph{AirLoopHVAC:ZoneMixer}.
+Start of the component list for the AirLoopHVAC:ReturnPath. This field should contain either \emph{\hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum}} or \emph{\hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer}}.
 
 \paragraph{Field: Component \textless{}\#\textgreater{} Name}\label{field-component-name-1}
 
-Unique name of the AirLoopHVAC:ReturnPlenum or AirLoopHVAC:ZoneMixer.
+Unique name of the \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} or \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer}.
 
 Example inputs are shown below
 
@@ -94,7 +94,7 @@ The simple building shown in the figure below consists of a controlled zone and 
 \caption{Illustration of Zone Return Plenum \protect \label{fig:illustration-of-zone-return-plenum}}
 \end{figure}
 
-After all the building zone attributes are specified, the AirLoopHVAC:ReturnPlenum object is specified and included as one of the named components in an AirLoopHVAC:ReturnPath.
+After all the building zone attributes are specified, the AirLoopHVAC:ReturnPlenum object is specified and included as one of the named components in an \hyperref[airloophvacreturnpath]{AirLoopHVAC:ReturnPath}.
 
 \subsubsection{Inputs}\label{inputs-2-003}
 
@@ -108,7 +108,7 @@ The zone name specified in the heat balance portion of the input. This piece of 
 
 \paragraph{Field: Zone Node Name}\label{field-zone-node-name}
 
-The name of the zone node. The zone node name connects the heat balance data structure to the system airflow data structure through this node. This node name must be unique otherwise a warning is reported. Do not use the Zone Air Node Name specified in any ZoneHVAC:EquipmentConnections object, and since this zone is a plenum a ZoneHVAC:EquipmentConnections object is not required for the zone named in the previous field.
+The name of the zone node. The zone node name connects the heat balance data structure to the system airflow data structure through this node. This node name must be unique otherwise a warning is reported. Do not use the Zone Air Node Name specified in any \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object, and since this zone is a plenum a \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object is not required for the zone named in the previous field.
 
 \paragraph{Field: Outlet Node Name}\label{field-outlet-node-name-000}
 
@@ -116,7 +116,7 @@ The name of the return plenum outlet node. For the zone return plenum there is o
 
 \paragraph{Field: Induced Air Outlet Node or NodeList Name}\label{field-induced-air-outlet-node-or-nodelist-name}
 
-The name of an induced air outlet node or the name of a NodeList of such nodes. These nodes are to be used as the secondary inlet air nodes of powered induction terminal units (See \textbf{AirTerminal:SingleDuct:SeriesPIU:Reheat} and \textbf{AirTerminal:SingleDuct:ParallelPIU:Reheat}).
+The name of an induced air outlet node or the name of a \hyperref[nodelist]{NodeList} of such nodes. These nodes are to be used as the secondary inlet air nodes of powered induction terminal units (See \textbf{\hyperref[airterminalsingleductseriespiureheat]{AirTerminal:SingleDuct:SeriesPIU:Reheat}} and \textbf{\hyperref[airterminalsingleductparallelpiureheat]{AirTerminal:SingleDuct:ParallelPIU:Reheat}}).
 
 \paragraph{Field: Inlet \textless{}\#\textgreater{} Node Name}\label{field-inlet-node-name}
 
@@ -147,7 +147,7 @@ AirLoopHVAC:ReturnPlenum,
   SPACE4-1 ATU Sec Node;      !- Node 4 Name
 \end{lstlisting}
 
-Below is an example of the AirLoopHVAC:ReturnPath for the simple case shown above.
+Below is an example of the \hyperref[airloophvacreturnpath]{AirLoopHVAC:ReturnPath} for the simple case shown above.
 
 \begin{lstlisting}
 
@@ -170,7 +170,7 @@ The building shown in the figure below consists of three controlled zones served
 
 The AirLoopHVAC:SupplyPlenum has a heat balance connection and building description, and a system airflow connection which transfers the airflow from the supply plenum zone to the controlled zones in the system simulation. The input described in this section is mainly just for the system airflow connections in the HVAC algorithms. In addition the supply plenum zone must be fully input in the building zone description. The supply plenum zone description needs to contain the wall descriptions, the interzone ceiling and floor, and the ground connection. All the other attributes of a zone that can be specified in the building description can be utilized with a supply plenum zone if necessary, i.e.~scheduled loads, windows, etc.
 
-After all the building zone attributes are specified, the AirLoopHVAC:SupplyPlenum object is specified and included as one of the named components in an AirLoopHVAC:SupplyPath.
+After all the building zone attributes are specified, the AirLoopHVAC:SupplyPlenum object is specified and included as one of the named components in an \hyperref[airloophvacsupplypath]{AirLoopHVAC:SupplyPath}.
 
 \subsubsection{Inputs}\label{inputs-3-002}
 
@@ -184,7 +184,7 @@ The zone name specified in the heat balance portion of the input. This piece of 
 
 \paragraph{Field: Zone Node Name}\label{field-zone-node-name-1}
 
-The name of the zone node. The zone node name connects the heat balance data structure to the system airflow data structure through this node. This node name is defined by the user in the field Zone Air Node Name in the ZoneHVAC:EquipmentConnections object for the zone named in the previous field.
+The name of the zone node. The zone node name connects the heat balance data structure to the system airflow data structure through this node. This node name is defined by the user in the field Zone Air Node Name in the \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object for the zone named in the previous field.
 
 \paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-1}
 
@@ -206,7 +206,7 @@ AirLoopHVAC:SupplyPlenum,
   Supply Plenum 1 Outlet Node; ! Outlet 1 Node Name
 \end{lstlisting}
 
-Below is an example of the AirLoopHVAC:SupplyPath for the building shown above.
+Below is an example of the \hyperref[airloophvacsupplypath]{AirLoopHVAC:SupplyPath} for the building shown above.
 
 \begin{lstlisting}
 
@@ -221,7 +221,7 @@ AirLoopHVAC:SupplyPath,
 
 \subsection{AirLoopHVAC:ZoneSplitter}\label{airloophvaczonesplitter}
 
-The AirLoopHVAC:ZoneSplitter is a component that splits airflow from a single inlet to multiple outlets. This component must be referenced in an AirLoopHVAC:SupplyPath object. The input contains only node connection information.
+The AirLoopHVAC:ZoneSplitter is a component that splits airflow from a single inlet to multiple outlets. This component must be referenced in an \hyperref[airloophvacsupplypath]{AirLoopHVAC:SupplyPath} object. The input contains only node connection information.
 
 \subsubsection{Inputs}\label{inputs-4-002}
 
@@ -251,7 +251,7 @@ AirLoopHVAC:ZoneSplitter,
 
 \subsection{AirLoopHVAC:ZoneMixer}\label{airloophvaczonemixer}
 
-The AirLoopHVAC:ZoneMixer takes the air from multiple inlets and mixes the streams together to be sent out of a single outlet node. This is a simple process of summing flows and averaging the air properties. This compoment may be part of an air loop return path or part of an induction terminal unit. When used as a return air mixer, this component must be listed in an AirLoopHVAC:ReturnPath object, and the inlets may be zone return air nodes or AirLoopHVAC:ReturnPlenum outlet nodes. When used in an induction terminal unit (ref. AirTerminal:SingleDuct:SeriesPIU:Reheat, AirTerminal:SingleDuct:ParallelPIU:Reheat, and AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction), one inlet node is the supply (primary) air inlet from the central air handler, and the second inlet node is the induced (secondary) air inlet. These node names should match equivalent node names in the terminal unit.
+The AirLoopHVAC:ZoneMixer takes the air from multiple inlets and mixes the streams together to be sent out of a single outlet node. This is a simple process of summing flows and averaging the air properties. This compoment may be part of an air loop return path or part of an induction terminal unit. When used as a return air mixer, this component must be listed in an \hyperref[airloophvacreturnpath]{AirLoopHVAC:ReturnPath} object, and the inlets may be zone return air nodes or \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} outlet nodes. When used in an induction terminal unit (ref. \hyperref[airterminalsingleductseriespiureheat]{AirTerminal:SingleDuct:SeriesPIU:Reheat}, \hyperref[airterminalsingleductparallelpiureheat]{AirTerminal:SingleDuct:ParallelPIU:Reheat}, and \hyperref[airterminalsingleductconstantvolumefourpipeinduction]{AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction}), one inlet node is the supply (primary) air inlet from the central air handler, and the second inlet node is the induced (secondary) air inlet. These node names should match equivalent node names in the terminal unit.
 
 \subsubsection{Inputs}\label{inputs-5-002}
 

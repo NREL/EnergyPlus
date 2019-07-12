@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -167,16 +167,16 @@ namespace DataSurfaces {
     int const SurfaceClass_TDD_Diffuser(18);
 
     Array1D_string const HeatTransferModelNames(10,
-        { "CTF - ConductionTransferFunction",
-        "EMPD - MoisturePenetrationDepthConductionTransferFunction",
-        "",
-        "",
-        "CondFD - ConductionFiniteDifference",
-        "HAMT - CombinedHeatAndMoistureFiniteElement",
-        "Window - Detailed layer-by-layer",
-        "Window - ComplexFenestration",
-        "Tubular daylighting device",
-        "KivaFoundation - TwoDimensionalFiniteDifference"});
+                                                {"CTF - ConductionTransferFunction",
+                                                 "EMPD - MoisturePenetrationDepthConductionTransferFunction",
+                                                 "",
+                                                 "",
+                                                 "CondFD - ConductionFiniteDifference",
+                                                 "HAMT - CombinedHeatAndMoistureFiniteElement",
+                                                 "Window - Detailed layer-by-layer",
+                                                 "Window - ComplexFenestration",
+                                                 "Tubular daylighting device",
+                                                 "KivaFoundation - TwoDimensionalFiniteDifference"});
 
     // Parameters to indicate heat transfer model to use for surface
     int const HeatTransferModel_NotSet(-1);
@@ -516,6 +516,7 @@ namespace DataSurfaces {
     Array1D<FenestrationSolarAbsorbed> FenLayAbsSSG;
     Array1D<SurfaceLocalEnvironment> SurfLocalEnvironment;
     Array1D<SurroundingSurfacesProperty> SurroundingSurfsProperty;
+    Array1D<IntMassObject> IntMassObjects;
 
     // Class Methods
 
@@ -1013,7 +1014,7 @@ namespace DataSurfaces {
         Real64 const &caz(CosAzim);
         for (Vertices::size_type i = 0; i < n; ++i) {
             Vector const &v(Vertex[i]);
-            v2d[i] = Vertex2D((v.x - xRef)*caz + (v.y - yRef)*saz, v.z);
+            v2d[i] = Vertex2D(-(v.x - xRef) * caz + (v.y - yRef) * saz, v.z);
         }
 
         // piecewise linear integration
@@ -1027,6 +1028,12 @@ namespace DataSurfaces {
         }
         Real64 totalWidth = maxX - minX;
 
+        if (totalWidth == 0.0) {
+            // This should never happen, but if it does, print a somewhat meaningful fatal error
+            // (instead of allowing a divide by zero).
+            ShowFatalError("Calculated projected surface width is zero for surface=\"" + Name + "\"");
+        }
+
         Real64 averageHeight = 0.0;
         for (Vertices::size_type i = 0; i < n; ++i) {
             Vertex2D const &v(v2d[i]);
@@ -1035,11 +1042,11 @@ namespace DataSurfaces {
             if (i == n - 1) {
                 v2 = &v2d[0];
             } else {
-                v2 = &v2d[i+1];
+                v2 = &v2d[i + 1];
             }
-            averageHeight += 0.5*(v.y + v2->y)*(v2->x - v.x)/totalWidth;
+            averageHeight += 0.5 * (v.y + v2->y) * (v2->x - v.x) / totalWidth;
         }
-        return std::abs(averageHeight)/SinTilt;
+        return std::abs(averageHeight) / SinTilt;
     }
 
     // Functions
@@ -1156,6 +1163,7 @@ namespace DataSurfaces {
         FenLayAbsSSG.deallocate();
         SurfLocalEnvironment.deallocate();
         SurroundingSurfsProperty.deallocate();
+        IntMassObjects.deallocate();
     }
 
     void SetSurfaceOutBulbTempAt()

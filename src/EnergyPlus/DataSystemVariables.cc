@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -227,7 +227,7 @@ namespace DataSystemVariables {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const blank;
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -261,76 +261,76 @@ namespace DataSystemVariables {
 
         {
             IOFlags flags;
-            gio::inquire(InputFileName, flags);
+            ObjexxFCL::gio::inquire(InputFileName, flags);
             FileExist = flags.exists();
         }
         if (FileExist) {
             FileFound = true;
             CheckedFileName = InputFileName;
-            gio::write(EchoInputFile, fmtA) << "found (user input)=" + getAbsolutePath(CheckedFileName);
+            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "found (user input)=" + getAbsolutePath(CheckedFileName);
             return;
         } else {
-            gio::write(EchoInputFile, fmtA) << "not found (user input)=" + getAbsolutePath(InputFileName);
+            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "not found (user input)=" + getAbsolutePath(InputFileName);
         }
 
         // Look relative to input file path
         {
             IOFlags flags;
-            gio::inquire(DataStringGlobals::inputDirPathName + InputFileName, flags);
+            ObjexxFCL::gio::inquire(DataStringGlobals::inputDirPathName + InputFileName, flags);
             FileExist = flags.exists();
         }
         if (FileExist) {
             FileFound = true;
             CheckedFileName = DataStringGlobals::inputDirPathName + InputFileName;
-            gio::write(EchoInputFile, fmtA) << "found (input file)=" + getAbsolutePath(CheckedFileName);
+            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "found (input file)=" + getAbsolutePath(CheckedFileName);
             return;
         } else {
-            gio::write(EchoInputFile, fmtA) << "not found (input file)=" + getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName);
+            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "not found (input file)=" + getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName);
         }
 
         // Look relative to input path
         {
             IOFlags flags;
-            gio::inquire(envinputpath1 + InputFileName, flags);
+            ObjexxFCL::gio::inquire(envinputpath1 + InputFileName, flags);
             FileExist = flags.exists();
         }
         if (FileExist) {
             FileFound = true;
             CheckedFileName = envinputpath1 + InputFileName;
-            gio::write(EchoInputFile, fmtA) << "found (epin)=" + getAbsolutePath(CheckedFileName);
+            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "found (epin)=" + getAbsolutePath(CheckedFileName);
             return;
         } else {
-            gio::write(EchoInputFile, fmtA) << "not found (epin)=" + getAbsolutePath(envinputpath1 + InputFileName);
+            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "not found (epin)=" + getAbsolutePath(envinputpath1 + InputFileName);
         }
 
         // Look relative to input path
         {
             IOFlags flags;
-            gio::inquire(envinputpath2 + InputFileName, flags);
+            ObjexxFCL::gio::inquire(envinputpath2 + InputFileName, flags);
             FileExist = flags.exists();
         }
         if (FileExist) {
             FileFound = true;
             CheckedFileName = envinputpath2 + InputFileName;
-            gio::write(EchoInputFile, fmtA) << "found (input_path)=" + getAbsolutePath(CheckedFileName);
+            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "found (input_path)=" + getAbsolutePath(CheckedFileName);
             return;
         } else {
-            gio::write(EchoInputFile, fmtA) << "not found (input_path)=" + getAbsolutePath(envinputpath2 + InputFileName);
+            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "not found (input_path)=" + getAbsolutePath(envinputpath2 + InputFileName);
         }
 
         // Look relative to program path
         {
             IOFlags flags;
-            gio::inquire(envprogrampath + InputFileName, flags);
+            ObjexxFCL::gio::inquire(envprogrampath + InputFileName, flags);
             FileExist = flags.exists();
         }
         if (FileExist) {
             FileFound = true;
             CheckedFileName = envprogrampath + InputFileName;
-            gio::write(EchoInputFile, fmtA) << "found (program_path)=" + getAbsolutePath(CheckedFileName);
+            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "found (program_path)=" + getAbsolutePath(CheckedFileName);
             return;
         } else {
-            gio::write(EchoInputFile, fmtA) << "not found (program_path)=" + getAbsolutePath(envprogrampath + InputFileName);
+            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "not found (program_path)=" + getAbsolutePath(envprogrampath + InputFileName);
         }
 
         if (!TestAllPaths) return;
@@ -338,31 +338,31 @@ namespace DataSystemVariables {
         // Look relative to current working folder
         {
             IOFlags flags;
-            gio::inquire(CurrentWorkingFolder + InputFileName, flags);
+            ObjexxFCL::gio::inquire(CurrentWorkingFolder + InputFileName, flags);
             FileExist = flags.exists();
         }
         if (FileExist) {
             FileFound = true;
             CheckedFileName = CurrentWorkingFolder + InputFileName;
-            gio::write(EchoInputFile, fmtA) << "found (CWF)=" + getAbsolutePath(CheckedFileName);
+            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "found (CWF)=" + getAbsolutePath(CheckedFileName);
             return;
         } else {
-            gio::write(EchoInputFile, fmtA) << "not found (CWF)=" + getAbsolutePath(CurrentWorkingFolder + InputFileName);
+            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "not found (CWF)=" + getAbsolutePath(CurrentWorkingFolder + InputFileName);
         }
 
         // Look relative to program path
         {
             IOFlags flags;
-            gio::inquire(ProgramPath + InputFileName, flags);
+            ObjexxFCL::gio::inquire(ProgramPath + InputFileName, flags);
             FileExist = flags.exists();
         }
         if (FileExist) {
             FileFound = true;
             CheckedFileName = ProgramPath + InputFileName;
-            gio::write(EchoInputFile, fmtA) << "found (program path - ini)=" + getAbsolutePath(CheckedFileName);
+            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "found (program path - ini)=" + getAbsolutePath(CheckedFileName);
             return;
         } else {
-            gio::write(EchoInputFile, fmtA) << "not found (program path - ini)=" + getAbsolutePath(ProgramPath + InputFileName);
+            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "not found (program path - ini)=" + getAbsolutePath(ProgramPath + InputFileName);
         }
     }
 

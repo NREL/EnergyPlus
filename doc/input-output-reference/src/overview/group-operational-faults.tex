@@ -25,35 +25,34 @@ The objects used by EnergyPlus to model the faults are as follows:
 
 \begin{itemize}
 \item
-  FaultModel:TemperatureSensorOffset:OutdoorAir
+  \hyperref[faultmodeltemperaturesensoroffsetoutdoorair]{FaultModel:TemperatureSensorOffset:OutdoorAir}
 \item
-  FaultModel:HumiditySensorOffset:OutdoorAir
+  \hyperref[faultmodelhumiditysensoroffsetoutdoorair]{FaultModel:HumiditySensorOffset:OutdoorAir}
 \item
-  FaultModel:EnthalpySensorOffset:OutdoorAir
+  \hyperref[faultmodelenthalpysensoroffsetoutdoorair]{FaultModel:EnthalpySensorOffset:OutdoorAir}
 \item
-  FaultModel:TemperatureSensorOffset:ReturnAir
+  \hyperref[faultmodeltemperaturesensoroffsetreturnair]{FaultModel:TemperatureSensorOffset:ReturnAir}
 \item
-  FaultModel:EnthalpySensorOffset:ReturnAir
+  \hyperref[faultmodelenthalpysensoroffsetreturnair]{FaultModel:EnthalpySensorOffset:ReturnAir}
 \item
-  FaultModel:TemperatureSensorOffset:ChillerSupplyWater
+  \hyperref[faultmodelfoulingcoil]{FaultModel:Fouling:Coil}
 \item
-  FaultModel:TemperatureSensorOffset:CondenserSupplyWater
+  \hyperref[faultmodelthermostatoffset]{FaultModel:ThermostatOffset}
 \item
-  FaultModel:TemperatureSensorOffset:CoilSupplyAir
+  \hyperref[faultmodelhumidistatoffset]{FaultModel:HumidistatOffset}
 \item
-  FaultModel:ThermostatOffset
+  \hyperref[faultmodelfoulingairfilter]{FaultModel:Fouling:AirFilter}
 \item
-  FaultModel:HumidistatOffset
+  \hyperref[faultmodeltemperaturesensoroffsetchillersupplywater]{FaultModel:TemperatureSensorOffset:ChillerSupplyWater}
 \item
-  FaultModel:Fouling:AirFilter
-\item
+  \hyperref[faultmodeltemperaturesensoroffsetcondensersupplywater]{FaultModel:TemperatureSensorOffset:CondenserSupplyWater}
   FaultModel:Fouling:Boiler
 \item
   FaultModel:Fouling:Chiller
 \item
-  FaultModel:Fouling:Coil
+  \hyperref[faultmodelfoulingcoolingtower]{FaultModel:Fouling:CoolingTower}
 \item
-  FaultModel:Fouling:CoolingTower
+  \hyperref[faultmodeltemperaturesensoroffsetcoilsupplyair]{FaultModel:TemperatureSensorOffset:CoilSupplyAir}
 \item
   FaultModel:Fouling:EvaporativeCooler
 \end{itemize}
@@ -78,7 +77,7 @@ This field provides the name of a schedule that represents severity of a fault. 
 
 \paragraph{Field: Controller Object Type}\label{field-controller-object-type}
 
-This field defines the controller object type that this fault is associated with. Choices are from a list of applicable controller types. Current implementation supports air economizer the choice is Controller:OutdoorAir.
+This field defines the controller object type that this fault is associated with. Choices are from a list of applicable controller types. Current implementation supports air economizer the choice is \hyperref[controlleroutdoorair]{Controller:OutdoorAir}.
 
 \paragraph{Field: Controller Object Name}\label{field-controller-object-name}
 
@@ -108,7 +107,7 @@ This field provides the name of a schedule that represents severity of a fault. 
 
 \paragraph{Field: Controller Object Type}\label{field-controller-object-type-1}
 
-This field defines the controller object type that this fault is associated with. Choices are from a list of applicable controller types. Current implementation supports air economizer the choice is Controller:OutdoorAir.
+This field defines the controller object type that this fault is associated with. Choices are from a list of applicable controller types. Current implementation supports air economizer the choice is \hyperref[controlleroutdoorair]{Controller:OutdoorAir}.
 
 \paragraph{Field: Controller Object Name}\label{field-controller-object-name-1}
 
@@ -138,7 +137,7 @@ This field provides the name of a schedule that represents severity of a fault. 
 
 \paragraph{Field: Controller Object Type}\label{field-controller-object-type-2}
 
-This field defines the controller object type that this fault is associated with. Choices are from a list of applicable controller types. Current implementation supports air economizer the choice is Controller:OutdoorAir.
+This field defines the controller object type that this fault is associated with. Choices are from a list of applicable controller types. Current implementation supports air economizer the choice is \hyperref[controlleroutdoorair]{Controller:OutdoorAir}.
 
 \paragraph{Field: Controller Object Name}\label{field-controller-object-name-2}
 
@@ -168,7 +167,7 @@ This field provides the name of a schedule that represents severity of a fault. 
 
 \paragraph{Field: Controller Object Type}\label{field-controller-object-type-3}
 
-This field defines the controller object type that this fault is associated with. Choices are from a list of applicable controller types. Current implementation supports air economizer the choice is Controller:OutdoorAir.
+This field defines the controller object type that this fault is associated with. Choices are from a list of applicable controller types. Current implementation supports air economizer the choice is \hyperref[controlleroutdoorair]{Controller:OutdoorAir}.
 
 \paragraph{Field: Controller Object Name}\label{field-controller-object-name-3}
 
@@ -198,7 +197,7 @@ This field provides the name of a schedule that represents severity of a fault. 
 
 \paragraph{Field: Controller Object Type}\label{field-controller-object-type-4}
 
-This field defines the controller object type that this fault is associated with. Choices are from a list of applicable controller types. Current implementation supports air economizer the choice is Controller:OutdoorAir.
+This field defines the controller object type that this fault is associated with. Choices are from a list of applicable controller types. Current implementation supports air economizer the choice is \hyperref[controlleroutdoorair]{Controller:OutdoorAir}.
 
 \paragraph{Field: Controller Object Name}\label{field-controller-object-name-4}
 
@@ -322,7 +321,7 @@ This is the user-defined name of the fault.
 
 \paragraph{Field: Thermostat Name}\label{field-thermostat-name}
 
-This field defines the name of the thermostat object associated with the fault. It should be the name of a ZoneControl:Thermostat object.
+This field defines the name of the thermostat object associated with the fault. It should be the name of a \hyperref[zonecontrolthermostat]{ZoneControl:Thermostat} object.
 
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-6-002}
 
@@ -348,7 +347,7 @@ This is the user-defined name of the fault.
 
 \paragraph{Field: Humidistat Name}\label{field-humidistat-name}
 
-This field defines the name of the humidistat object associated with the fault. It should be the name of a ZoneControl:Humidistat object.
+This field defines the name of the humidistat object associated with the fault. It should be the name of a \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} object.
 
 \paragraph{Field: Humidistat Offset Type}\label{field-humidistat-offset-type}
 
@@ -368,7 +367,7 @@ This field defines the reference offset value of the humidistat. This field is r
 
 \paragraph{Field: Related Thermostat Offset Fault Name}\label{field-related-thermostat-offset-fault-name}
 
-This field provides the name of a Thermostat Offset Fault object that causes the humidistat offset fault. It should be the name of a FaultModel:ThermostatOffset object. This field is required for the Type ThermostatOffsetDependent. This is used as a multiplier to the reference humidistat offset value. This schedule should be set to a non-zero value when a fault is applicable and ``0.0'' when it is not. If this field is blank, the schedule has values of 1.0 for all time periods.
+This field provides the name of a Thermostat Offset Fault object that causes the humidistat offset fault. It should be the name of a \hyperref[faultmodelthermostatoffset]{FaultModel:ThermostatOffset} object. This field is required for the Type ThermostatOffsetDependent. This is used as a multiplier to the reference humidistat offset value. This schedule should be set to a non-zero value when a fault is applicable and ``0.0'' when it is not. If this field is blank, the schedule has values of 1.0 for all time periods.
 
 \paragraph{IDF Examples}\label{an-example-of-idf-codes-for-the-thermostathumidistat-offset-fault-models}
 
@@ -383,7 +382,7 @@ FaultModel:ThermostatOffset,
   AlwaysOne,           !- Severity Schedule Name
   2.0;                 !- Reference Thermostat Offset
 
-  FaultModel:HumidistatOffset, 
+  FaultModel:HumidistatOffset,
   Humi_Offset_Zone1,   !- Name
   Zone 1 Humidistat,   !- Humidistat Name
   ThermostatOffsetDependent, !- Humidistat Offset Type
@@ -392,7 +391,7 @@ FaultModel:ThermostatOffset,
   ,                    !- Reference Humidistat Offset
   Ther_Offset_Zone1;   !- Related Thermostat Offset Fault Name
 
-  FaultModel:HumidistatOffset, 
+  FaultModel:HumidistatOffset,
   Humi_Offset_Zone2,   !- Name
   Zone 2 Humidistat,   !- Humidistat Name
   ThermostatOffsetIndependent, !- Humidistat Offset Type
@@ -414,11 +413,11 @@ This is the user-defined name of the fault.
 
 \paragraph{Field: Fan Name}\label{field-fan-name-002}
 
-This field defines the name of a fan object associated with the fault. It should be the name of a fan object (Fan:ConstantVolume, Fan:OnOff, or Fan:VariableVolume).
+This field defines the name of a fan object associated with the fault. It should be the name of a fan object (\hyperref[fanconstantvolume]{Fan:ConstantVolume}, \hyperref[fanonoff]{Fan:OnOff}, or \hyperref[fanvariablevolume]{Fan:VariableVolume}).
 
 \paragraph{Field: Fan Object Type}\label{field-fan-object-type-000}
 
-This choice field defines the type of fan. The valid choices are Fan:OnOff, Fan:ConstantVolume, and Fan:VariableVolume. Both cycling and continuous fan operating modes are allowed for Fan:OnOff. Only the continuous fan operating mode is allowed for Fan:ConstantVolume. The variable airflow rate is allowed for Fan:VariableVolume.
+This choice field defines the type of fan. The valid choices are \hyperref[fanonoff]{Fan:OnOff}, \hyperref[fanconstantvolume]{Fan:ConstantVolume}, and \hyperref[fanvariablevolume]{Fan:VariableVolume}. Both cycling and continuous fan operating modes are allowed for \hyperref[fanonoff]{Fan:OnOff}. Only the continuous fan operating mode is allowed for \hyperref[fanconstantvolume]{Fan:ConstantVolume}. The variable airflow rate is allowed for \hyperref[fanvariablevolume]{Fan:VariableVolume}.
 
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-8-002}
 
@@ -436,7 +435,7 @@ This field provides the name of a fan curve for the fan associated with the faul
 
 \begin{lstlisting}
 ! IDF examples:
-! example faults for the fouling air filter 
+! example faults for the fouling air filter
 
 FaultModel:Fouling:AirFilter,
   DF_VAV_1_Fan,             !- Name
@@ -453,14 +452,14 @@ FaultModel:Fouling:AirFilter,
   For: AllDays,            !- Field 2
   Until: 24:00,1.1;        !- Field 3
 
-  Curve:Cubic,        
-  VAV_1_Fan_Curve,         ! name     
-  1263.1,                  ! Coefficient1 Constant        
-  33.773,                  ! Coefficient2 x       
-  -5.6906,                  ! Coefficient3 x**2        
-  -0.2023,                  ! Coefficient4 x**3        
-  4.0,                     ! Minimum Value of x       
-  15.0;                    ! Maximum Value of x       
+  Curve:Cubic,
+  VAV_1_Fan_Curve,         ! name
+  1263.1,                  ! Coefficient1 Constant
+  33.773,                  ! Coefficient2 x
+  -5.6906,                  ! Coefficient3 x**2
+  -0.2023,                  ! Coefficient4 x**3
+  4.0,                     ! Minimum Value of x
+  15.0;                    ! Maximum Value of x
 
   Fan:VariableVolume,
   VAV_1_Fan,               !- Name
@@ -503,7 +502,7 @@ This field provides the name of a schedule that represents severity of a fault. 
 
 \paragraph{Field: Chiller Object Type}\label{field-chiller-object-type}
 
-This field defines the chiller object type that this fault is associated with. Choices are from a list of applicable chiller types, including Chiller:Electric, Chiller:Electric:EIR, Chiller:Electric:ReformulatedEIR,  Chiller:ConstantCOP, Chiller:EngineDriven, Chiller:CombustionTurbine, Chiller:Absorption, Chiller:Absorption:Indirect.
+This field defines the chiller object type that this fault is associated with. Choices are from a list of applicable chiller types, including \hyperref[chillerelectric]{Chiller:Electric}, \hyperref[chillerelectriceir]{Chiller:Electric:EIR}, \hyperref[chillerelectricreformulatedeir]{Chiller:Electric:ReformulatedEIR},  \hyperref[chillerconstantcop]{Chiller:ConstantCOP}, \hyperref[chillerenginedriven]{Chiller:EngineDriven}, \hyperref[chillercombustionturbine]{Chiller:CombustionTurbine}, \hyperref[chillerabsorption]{Chiller:Absorption}, \hyperref[chillerabsorptionindirect]{Chiller:Absorption:Indirect}.
 
 \paragraph{Field: Chiller Object Name}\label{field-chiller-object-name}
 
@@ -578,7 +577,7 @@ This field provides the name of a schedule that represents severity of a fault. 
 
 \paragraph{Field: Cooling Tower Object Type}\label{field-tower-object-type}
 
-This field defines the cooling tower object type that this fault is associated with. Choices are from a list of applicable tower types, including CoolingTower:SingleSpeed, CoolingTower:TwoSpeed, CoolingTower:VariableSpeed, and CoolingTower:VariableSpeed:MERKEL.
+This field defines the cooling tower object type that this fault is associated with. Choices are from a list of applicable tower types, including \hyperref[coolingtowersinglespeed]{CoolingTower:SingleSpeed}, \hyperref[coolingtowertwospeed]{CoolingTower:TwoSpeed}, \hyperref[coolingtowervariablespeed]{CoolingTower:VariableSpeed}, and CoolingTower:VariableSpeed:MERKEL.
 
 \paragraph{Field: Cooling Tower Object Name}\label{field-tower-object-name}
 
@@ -619,7 +618,7 @@ This field defines the reference offset of the temperature sensor. A positive va
     ,                        !- Low Speed Nominal Capacity Sizing Factor
     2000.0,                  !- Free Convection Nominal Capacity {W}
     ;                        !- Free Convection Nominal Capacity Sizing Factor
-  
+
   FaultModel:TemperatureSensorOffset:CondenserSupplyWater,
     Fault_SWT_CoolTower,     !- Name
     ,                        !- Availability Schedule Name
@@ -652,7 +651,7 @@ This is used to increase or decrease the fouling by a percentage. For example, i
 
 \paragraph{Field: Cooling Tower Object Type}\label{field-tower-object-type}
 
-This field defines the cooling tower object type that this fault is associated with. Choices are from a list of applicable tower types, including CoolingTower:SingleSpeed, CoolingTower:TwoSpeed, and CoolingTower:VariableSpeed:MERKEL.
+This field defines the cooling tower object type that this fault is associated with. Choices are from a list of applicable tower types, including \hyperref[coolingtowersinglespeed]{CoolingTower:SingleSpeed}, \hyperref[coolingtowertwospeed]{CoolingTower:TwoSpeed}, and CoolingTower:VariableSpeed:MERKEL.
 
 \paragraph{Field: Cooling Tower Object Name}\label{field-tower-object-name}
 
@@ -718,7 +717,7 @@ This is used to increase or decrease the fouling by a percentage. For example, i
 
 \paragraph{Field: Boiler Object Type}\label{field-boiler-object-type}
 
-This field defines the boiler object type that this fault is associated with. Choices are the boiler types with water-based heat exchangers. 
+This field defines the boiler object type that this fault is associated with. Choices are the boiler types with water-based heat exchangers.
 
 \paragraph{Field: Boiler Object Name}\label{field-boiler-object-name}
 
@@ -784,7 +783,7 @@ This is used to increase or decrease the fouling by a percentage. For example, i
 
 \paragraph{Field: Chiller Object Type}\label{field-chiller-object-type}
 
-This field defines the chiller object type that this fault is associated with. Choices are the chiller types with water-cooled condensers. 
+This field defines the chiller object type that this fault is associated with. Choices are the chiller types with water-cooled condensers.
 
 \paragraph{Field: Chiller Object Name}\label{field-chiller-object-name}
 
@@ -860,7 +859,7 @@ This is used to increase or decrease the fouling by a percentage. For example, i
 
 \paragraph{Field: Evaporative Cooler Object Type}\label{field-evaporative cooler-object-type}
 
-This field defines the evaporative cooler object type that this fault is associated with. Choices are the wetted coil evaporative coolers. 
+This field defines the evaporative cooler object type that this fault is associated with. Choices are the wetted coil evaporative coolers.
 
 \paragraph{Field: Evaporative Cooler Object Name}\label{field-evaporative cooler-object-name}
 
@@ -922,7 +921,7 @@ This field provides the name of a schedule that represents severity of a fault. 
 
 \paragraph{Field: Coil Object Type}\label{field-coil-object-type}
 
-This field defines the coil object type that this fault is associated with. Choices are from a list of applicable coils with temperature-based control, including Coil:Heating:Electric, Coil:Heating:Gas, Coil:Heating:Steam, Coil:Heating:Desuperheater, Coil:Heating:Water, Coil:Cooling:Water, Coil:Cooling:Water:DetailedGeometry and AirloopHVAC:UnitarySystem using set point control.
+This field defines the coil object type that this fault is associated with. Choices are from a list of applicable coils with temperature-based control, including \hyperref[coilheatingelectric]{Coil:Heating:Electric}, Coil:Heating:Gas, \hyperref[coilheatingsteam]{Coil:Heating:Steam}, \hyperref[coilheatingdesuperheater]{Coil:Heating:Desuperheater}, \hyperref[coilheatingwater]{Coil:Heating:Water}, \hyperref[coilcoolingwater]{Coil:Cooling:Water}, \hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry} and AirloopHVAC:UnitarySystem using set point control.
 
 \paragraph{Field: Coil Object Name}\label{field-coil-object-name}
 
@@ -930,7 +929,7 @@ This field defines the name of the coil associated with the fault. It should be 
 
 \paragraph{Field: Water Coil Controller Name}\label{field-water-coil-controller-name}
 
-This field defines the name of the water coil controller associated with the faulty water coil. This field is only required for the water coils, i.e., the coil type is Coil:Heating:Water, Coil:Cooling:Water, or Coil:Cooling:Water:Detailedgeometry.
+This field defines the name of the water coil controller associated with the faulty water coil. This field is only required for the water coils, i.e., the coil type is \hyperref[coilheatingwater]{Coil:Heating:Water}, \hyperref[coilcoolingwater]{Coil:Cooling:Water}, or Coil:Cooling:Water:Detailedgeometry.
 
 \paragraph{Field: Reference Sensor Offset}\label{field-reference-sensor-offset}
 

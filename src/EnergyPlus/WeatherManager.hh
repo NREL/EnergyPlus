@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -741,7 +741,7 @@ namespace WeatherManager {
     );
 
     void InterpretWeatherDataLine(std::string &Line,
-                                  bool &ErrorFound,
+                                  bool &ErrorFound,      // True if an error is found, false otherwise
                                   int &WYear,
                                   int &WMonth,
                                   int &WDay,
@@ -878,7 +878,10 @@ namespace WeatherManager {
 
     Real64 GetSTM(Real64 const Longitude); // Longitude from user input
 
-    void ProcessEPWHeader(std::string const &HeaderString, std::string &Line, bool &ErrorsFound);
+    void ProcessEPWHeader(std::string const &HeaderString,
+                          std::string &Line,
+                          bool &ErrorsFound         // Set to true when errors were found, unchanged otherwise
+    );
 
     void SkipEPlusWFHeader();
 

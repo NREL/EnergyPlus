@@ -44,9 +44,9 @@ endif()
 set(SKIP_BUILD_RPATH TRUE)
 add_executable( AppGPostProcess ${SRC} )
 
-install( TARGETS AppGPostProcess DESTINATION "./PostProcess/" )
+install( TARGETS AppGPostProcess DESTINATION PostProcess )
 if(NOT ${STATIC_EXE})
   include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-  install_target_prereqs( AppGPostProcess "./PostProcess/" ${STATIC_EXE} )
+  install_target_prereqs( AppGPostProcess PostProcess )
 endif()
 

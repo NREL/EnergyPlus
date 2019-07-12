@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -95,9 +95,9 @@ namespace DataHeatBalSurface {
     Array1D<Real64> TempSurfIn;                   // Temperature of the Inside Surface for each heat transfer surface
     Array1D<Real64> TempSurfInTmp;                // Inside Surface Temperature Of Each Heat Transfer Surface
     Array1D<Real64> HcExtSurf;                    // Outside Convection Coefficient
-    Array1D<Real64> HAirExtSurf;                  // Outside Convection Coefficient
-    Array1D<Real64> HSkyExtSurf;                  // Outside Convection Coefficient
-    Array1D<Real64> HGrdExtSurf;                  // Outside Convection Coefficient
+    Array1D<Real64> HAirExtSurf;                  // Outside Convection Coefficient to Air
+    Array1D<Real64> HSkyExtSurf;                  // Outside Convection Coefficient to Sky
+    Array1D<Real64> HGrdExtSurf;                  // Outside Convection Coefficient to Ground
     Array1D<Real64> TempSource;                   // Temperature at the source location for each heat transfer surface
     Array1D<Real64> TempUserLoc;                  // Temperature at the user specified location for each heat transfer surface
     Array1D<Real64> TempSurfInRep;                // Temperature of the Inside Surface for each heat transfer surface
@@ -143,6 +143,8 @@ namespace DataHeatBalSurface {
     Array1D<Real64> QdotRadOutRep;        // Surface thermal radiation heat transfer outside face surface [W]
     Array1D<Real64> QdotRadOutRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at
     //      Outside face surf
+    Array1D<Real64> QAirExtReport;  // Surface Outside Face Thermal Radiation to Air Heat Transfer Rate [W]
+    Array1D<Real64> QHeatEmiReport; // Surface Outside Face Heat Emission to Air Rate [W]
 
     Array1D<Real64> OpaqSurfInsFaceCondGainRep; // Equals Opaq Surf Ins Face Cond
     // when Opaq Surf Ins Face Cond >= 0
@@ -247,6 +249,8 @@ namespace DataHeatBalSurface {
     Array1D_bool RecDifShortFromZ;     // True if Zone gets short radiation from another
     bool InterZoneWindow(false);       // True if there is an interzone window
 
+    Real64 SumSurfaceHeatEmission(0.0); // Heat emission from all surfaces
+
     // Functions
 
     // Clears the global data in DataHeatBalSurface.
@@ -342,6 +346,7 @@ namespace DataHeatBalSurface {
         FractDifShortZtoZ.deallocate();
         RecDifShortFromZ.deallocate();
         InterZoneWindow = false;
+        SumSurfaceHeatEmission = 0;
     }
 
 } // namespace DataHeatBalSurface

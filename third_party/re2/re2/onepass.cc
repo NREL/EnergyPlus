@@ -59,6 +59,7 @@
 
 #include "util/util.h"
 #include "util/logging.h"
+#include "util/pod_array.h"
 #include "util/sparse_set.h"
 #include "util/strutil.h"
 #include "util/utf.h"
@@ -243,7 +244,7 @@ bool Prog::SearchOnePass(const StringPiece& text,
   if (anchor_end())
     kind = kFullMatch;
 
-  uint8_t* nodes = onepass_nodes_;
+  uint8_t* nodes = onepass_nodes_.data();
   int statesize = sizeof(OneState) + bytemap_range()*sizeof(uint32_t);
   // start() is always mapped to the zeroth OneState.
   OneState* state = IndexToNode(nodes, statesize, 0);
@@ -382,7 +383,7 @@ struct InstCond {
 // Constructs and saves corresponding one-pass NFA on success.
 bool Prog::IsOnePass() {
   if (did_onepass_)
-    return onepass_nodes_ != NULL;
+    return onepass_nodes_.data() != NULL;
   did_onepass_ = true;
 
   if (start() == 0)  // no match
@@ -403,11 +404,11 @@ bool Prog::IsOnePass() {
   int stacksize = inst_count(kInstCapture) +
                   inst_count(kInstEmptyWidth) +
                   inst_count(kInstNop) + 1;  // + 1 for start inst
-  InstCond* stack = new InstCond[stacksize];
+  PODArray<InstCond> stack(stacksize);
 
   int size = this->size();
-  int* nodebyid = new int[size];  // indexed by ip
-  memset(nodebyid, 0xFF, size*sizeof nodebyid[0]);
+  PODArray<int> nodebyid(size);  // indexed by ip
+  memset(nodebyid.data(), 0xFF, size*sizeof nodebyid[0]);
 
   // Originally, nodes was a uint8_t[maxnodes*statesize], but that was
   // unnecessarily optimistic: why allocate a large amount of memory
@@ -611,16 +612,11 @@ bool Prog::IsOnePass() {
   }
 
   dfa_mem_ -= nalloc*statesize;
-  onepass_nodes_ = new uint8_t[nalloc*statesize];
-  memmove(onepass_nodes_, nodes.data(), nalloc*statesize);
-
-  delete[] stack;
-  delete[] nodebyid;
+  onepass_nodes_ = PODArray<uint8_t>(nalloc*statesize);
+  memmove(onepass_nodes_.data(), nodes.data(), nalloc*statesize);
   return true;
 
 fail:
-  delete[] stack;
-  delete[] nodebyid;
   return false;
 }
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -339,6 +339,8 @@ namespace ChillerGasAbsorption {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, Get_ErrorsFound);
+
+            // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), Get_ErrorsFound, cCurrentModuleObject + " Name");
 
             GasAbsorber(AbsorberNum).Name = cAlphaArgs(1);
@@ -838,12 +840,12 @@ namespace ChillerGasAbsorption {
                                     GasAbsorber(ChillNum).CWLoopSideNum,
                                     GasAbsorber(ChillNum).CWBranchNum,
                                     GasAbsorber(ChillNum).CWCompNum,
+                                    errFlag,
                                     GasAbsorber(ChillNum).CHWLowLimitTemp,
                                     _,
                                     _,
                                     GasAbsorber(ChillNum).ChillReturnNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitGasAbsorber: Program terminated due to previous condition(s).");
             }
@@ -854,12 +856,12 @@ namespace ChillerGasAbsorption {
                                     GasAbsorber(ChillNum).HWLoopSideNum,
                                     GasAbsorber(ChillNum).HWBranchNum,
                                     GasAbsorber(ChillNum).HWCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     GasAbsorber(ChillNum).HeatReturnNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitGasAbsorber: Program terminated due to previous condition(s).");
             }
@@ -871,12 +873,12 @@ namespace ChillerGasAbsorption {
                                         GasAbsorber(ChillNum).CDLoopSideNum,
                                         GasAbsorber(ChillNum).CDBranchNum,
                                         GasAbsorber(ChillNum).CDCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         GasAbsorber(ChillNum).CondReturnNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitGasAbsorber: Program terminated due to previous condition(s).");
                 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -127,7 +127,7 @@ namespace BranchNodeConnections {
 
     void GetComponentData(std::string const &ComponentType,
                           std::string const &ComponentName,
-                          bool &IsParent,
+                          bool &IsParent,                    // true or false
                           int &NumInlets,
                           Array1D_string &InletNodeNames,
                           Array1D_int &InletNodeNums,
@@ -136,7 +136,8 @@ namespace BranchNodeConnections {
                           Array1D_string &OutletNodeNames,
                           Array1D_int &OutletNodeNums,
                           Array1D_int &OutletFluidStreams,
-                          bool &ErrorsFound);
+                          bool &ErrorsFound                  // set to true if errors found, unchanged otherwise
+    );
 
     void GetChildrenData(std::string const &ComponentType,
                          std::string const &ComponentName,
