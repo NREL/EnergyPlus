@@ -5,12 +5,15 @@ Enhanced Load Aggregation Method for Ground Heat Exchangers
 
 - Original Date: 2018-10-03
 - Revised Date: 2018-10-24
+- Revised Date: 2019-07-12
 
 ## Justification for New Feature ##
 
 The EnergyPlus ground heat exchanger (GHE) model is based on a response factor approach which relies on a series of pre-computed response factors--a.k.a. "g-functions"--to compute the GHE temperature response. To compute the the GHE temperature response at any given timestep, the response factors along with the GHE load history are combined together as indicated in the equation below.
 
-$T_f = T_g + \sum_{i=1}^n \frac{q_{i} - q_{i-1}}{2 \cdot \pi \cdot k_g} \cdot g\left(\frac{t_n - t_{i-1}}{t_s}\right) +  q_n \cdot R_b$
+$$
+T_f = T_g + \sum_{i=1}^n \frac{q_{i} - q_{i-1}}{2 \cdot \pi \cdot k_g} \cdot g\left(\frac{t_n - t_{i-1}}{t_s}\right) +  q_n \cdot R_b
+$$
 
 where:
 
@@ -124,13 +127,15 @@ Figures 1 and 2 below show the single-year balanced and imbalanced simulation re
 
 In both cases, the dynamic method out-performs the static method in terms of simulation time reduction and in terms of accuracy. 
 
-![1-Year Balanced Load Results](balanced_1_fraction.png)
+
+
+![](Load_Aggregation_Figures/balanced_1_fraction.png)
 
 Figure 1: 1-year balanced load parametric results.
 
 
 
-![1-Year Imbalanced Load Results](imbalanced_1_fraction.png)
+![](Load_Aggregation_Figures/imbalanced_1_fraction.png)
 
 Figure 2: 1-year imbalanced load parametric results.
 
@@ -138,13 +143,13 @@ Figure 2: 1-year imbalanced load parametric results.
 
 Figures 3 and 4 show the results for the balanced and imbalanced load parametric studies using for a 5-year simulation.
 
-![](balanced_5_fraction.png)
+![](Load_Aggregation_Figures\balanced_5_fraction.png)
 
 Figure 3: 5-year balanced parametric results
 
 
 
-![imbalanced_5_fraction](imbalanced_5_fraction.png)
+![](Load_Aggregation_Figures/imbalanced_5_fraction.png)
 
 Figure 4: 5-year imbalanced load parametric results
 
@@ -153,6 +158,8 @@ Figure 4: 5-year imbalanced load parametric results
 In all cases, the dynamic method outperforms the static method. Based on the above results, implementation of the dynamic method is proposed. The specific parameters for the dynamic method have yet to be determined. However, in any case, these are three integer-valued parameters which can be altered easily after implementation. 
 
 Further description of how the parameters are being chosen is given in the draft paper related to this work. Contact me if you are interested and I can provide a working copy of the paper.
+
+Update: this paper has been accepted for publication, and can be found [here.](https://www.dropbox.com/s/15n6xp43ai6dt94/Main_Document_Final_Submission.docx?dl=0)
 
 ## I/O Reference Documentation
 
@@ -165,6 +172,77 @@ A few paragraphs describing the selected enhanced load aggregation procedure. A 
 ## Transition/Changes
 
 None
+
+## Update: 2019-07-11 --- Model Changes
+
+Issue [#6777](<https://github.com/NREL/EnergyPlus/pull/6777>) is not related to this work, but will required the GHE model be refactored to correct the problem. As a result, this load aggregation work will be implemented at the same time as the correction to that issue. The following is a report which summarizes the changes required to correct the issue.
+
+### Introduction
+
+The ground heat exchanger model (GHE) in EnergyPlus is known to produce non-physical behavior when
+simulating sudden loads at short time steps. An example of this is seen in Figure 5, where the GHE exiting fluid temperature (ExFT) is shown to dip below the undisturbed ground temperature (UGT) for a simulation using 60 time steps per hour after a step load is applied. The same behavior is not observed for the simulation with 4 time steps per hour.
+
+
+![](Load_Aggregation_Figures/non_physical_ghe.png)
+
+Figure 5: current EnergyPlus GHE temperature response to step load.
+
+Testing revealed that the fundamental assumptions upon which the current EnergyPlus model is based
+requires quasi-steady conditions for the current response factor model to produce physical results. This cannot be accomplished at time steps which approach or that are smaller than the transit time of the GHE. The GHE transit time is the time required for the circulating fluid to pass from the GHE inlet to its outlet. Several corrections have been proposed and tested. Models for more accurately predicting the GHE mean fluid temperature will correct for short-circuiting effects, but the non-physical, sub-transit time effects cannot be corrected by this method alone. The addition of pipe models has also been tested, but the results have not been acceptable up to this point. Therefore, in order to correct for this behavior, a dynamic model needs to be implemented.
+
+### Method
+
+Two approaches were proposed to address this. These are outlined here.
+
+**Direct Simulation using a Thermal Resistance-Capacity Model**: TRCM are dynamic  heat transfer models of borehole heat exchangers. The models are formulated in a fashion which is analogous to an RC-electric circuit network. The resulting differential equations for each temperature node are solved simultaneously
+using a time integration scheme. The model can be used to directly simulate the GHE at short time steps, and could potentially be used to simulate at long time steps as well, though numerical stability must be ensured. The because the TRCM is only a model of the borehole itself, the model relies on a borehole wall
+boundary temperature which is set by the response factor model periodically. 
+
+**Exiting Fluid Temperature Response Factor Generation:** The TRCM can be used to generate a different type of response factor (commonly referred to as “g-function”) which computes the GHE exiting fluid temperature directly. Once these g-functions have been generated, they can be reused for subsequent simulations without needing to be regenerated, provided the GHE configuration has not changed.
+
+### Recommendation
+
+Both approaches described above have been investigated and tested, and the second approach is
+recommended. TRCM models will produce accurate dynamic results, however, they suffer from a few significant disadvantages. The models are relatively slow to compute since they likely will need short time steps in order to ensure numerical stability. A recent paper was published claiming accurate results
+with time steps of up to 1 hour, however, this has not been tested. TRCM are also quite complicated to implement, and they often require spare matrix solvers to compute a solution efficiently. Additionally, no data from previous simulation can be reused for subsequent simulations to speed up the computations, as do the response factor-type models.
+
+Therefore, the exiting fluid temperature response factor approach is recommended. The approach also relies on a TRCM to compute EWT g-function values. However, it has been shown that using the EWT g-function approach using a simple four-node TRCM can give results that are generally around 5% error
+when compare to experimental data. Figure 6 shows results from the proposed EWT response factor model compared against experimental temperature response test data. The error shown is the GHE exiting fluid temperature error compared to the experimental exiting fluid temperature. The simulation was driven with the GHE inlet conditions from the experiment and simulated with a 1-hour time step.
+
+
+![](Load_Aggregation_Figures/MFRTRT_1hr_temps.png)
+
+Figure 6: Multi-flow rate thermal response test data for 1-hour time step.
+
+
+![](Load_Aggregation_Figures/MFRTRT_60s_step.png)
+
+Figure 7: dynamic response of multi-flow rate thermal response test for 60 s. time step.
+
+Figure 7  shows the dynamic response of the exiting fluid temperature prediction using the enhanced
+model with a 60-second time step. In the figure, a step change in flow is shown which results in a step change in the temperature difference. The model shows a good dynamic response and the errors remain quite low. Additionally, note that no non-physical behavior is observed as occurred when using the previous
+response factor model.
+
+The current GHE response factor model is well-suited for EnergyPlus due to its computational efficiency.
+The proposed model requires that the current model be modified slightly to account for the dynamic response. One of the results of this is that all the enhancements which have been added to the EnergyPlus GHE model recently (such as the ability to generate g-functions, or improvements to the load aggregation algorithms) will all be preserved and utilized in the updated model.
+
+Another major benefit is that g-function values computed from one simulation can be reused for
+subsequent simulations, assuming the GHE configuration has not changed. g-function values must be computed once, but once that has occurred the computational expense does not need to happen again. This would not occur if the model were to use a TRCM for the entire simulation, and thus would need to perform all computations over again.
+
+
+![](Load_Aggregation_Figures/Times.png)
+
+Figure 8: simulation time for the direct simulation and exiting fluid temperature methods.
+
+Run time results comparing the methods is given in Figure 8. The “DS 30” method is the direct
+simulation method using a TRCM with a 30 second time step. The “EFT” methods are the exiting fluid temperature response factor approach for time steps of 60, 900, and 3600 s. “g Gen” and “gb Gen” data show the run time required for computing the standard g-function values, and the exiting fluid temperature
+g-function values, respectively.
+
+The plot is intended to show simulation time trends, and not focus on the absolute values of the
+simulation time. The model is currently in a prototype state and programmed in the Python programming language. Therefore absolute values for simulation run time are expected to decrease significantly once implemented in EnergyPlus, since the updated response factor model is very similar to the one currently
+implemented in EnergyPlus.
+
+Additional details regarding the method can be found in the Chapter 3 of the author's draft dissertation, [here.](https://www.dropbox.com/s/h7htfc2kgqlzt45/_3_Final_Draft.pdf?dl=0)
 
 ## References
 
