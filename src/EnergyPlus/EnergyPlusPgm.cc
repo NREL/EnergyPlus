@@ -206,6 +206,7 @@
 #include <EnergyPlusPgm.hh>
 #include <FileSystem.hh>
 #include <FluidProperties.hh>
+#include <Globals.hh>
 #include <InputProcessing/DataStorage.hh>
 #include <InputProcessing/IdfParser.hh>
 #include <InputProcessing/InputProcessor.hh>

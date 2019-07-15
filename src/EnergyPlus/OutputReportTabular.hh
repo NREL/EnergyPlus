@@ -62,6 +62,7 @@
 
 // EnergyPlus Headers
 #include <DataGlobals.hh>
+#include <Globals.hh>
 #include <EnergyPlus.hh>
 #include <OutputProcessor.hh>
 

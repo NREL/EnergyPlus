@@ -53,6 +53,7 @@
 #include <ExteriorEnergyUse.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
+#include <Globals.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -118,7 +119,7 @@ namespace ExteriorEnergyUse {
     // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
-    int NumExteriorLights; // Number of Exterior Light Inputs
+    //int NumExteriorLights; // Number of Exterior Light Inputs
     int NumExteriorEqs;    // Number of Exterior Equipment Inputs
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>
@@ -136,7 +137,7 @@ namespace ExteriorEnergyUse {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        NumExteriorLights = 0;
+        ep_globals.NumExteriorLights = 0;
         NumExteriorEqs = 0;
         ExteriorLights.deallocate();
         ExteriorEquipment.deallocate();
@@ -203,8 +204,8 @@ namespace ExteriorEnergyUse {
         Real64 SchMin;                     // Min value of schedule for item
         static Real64 sumDesignLevel(0.0); // for predefined report of design level total
 
-        NumExteriorLights = inputProcessor->getNumObjectsFound("Exterior:Lights");
-        ExteriorLights.allocate(NumExteriorLights);
+		ep_globals.NumExteriorLights = inputProcessor->getNumObjectsFound("Exterior:Lights");
+        ExteriorLights.allocate(ep_globals.NumExteriorLights);
 
         NumFuelEq = inputProcessor->getNumObjectsFound("Exterior:FuelEquipment");
         NumWtrEq = inputProcessor->getNumObjectsFound("Exterior:WaterEquipment");
@@ -217,7 +218,7 @@ namespace ExteriorEnergyUse {
         // =================================  Get Exterior Lights
 
         cCurrentModuleObject = "Exterior:Lights";
-        for (Item = 1; Item <= NumExteriorLights; ++Item) {
+        for (Item = 1; Item <= ep_globals.NumExteriorLights; ++Item) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           Item,
                                           cAlphaArgs,
@@ -631,7 +632,7 @@ namespace ExteriorEnergyUse {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item; // Loop Control
 
-        for (Item = 1; Item <= NumExteriorLights; ++Item) {
+        for (Item = 1; Item <= ep_globals.NumExteriorLights; ++Item) {
             {
                 auto const SELECT_CASE_var(ExteriorLights(Item).ControlMode);
 

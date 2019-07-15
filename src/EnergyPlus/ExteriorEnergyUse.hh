@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <DataGlobals.hh>
+#include <Globals.hh>
 #include <EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -84,7 +85,7 @@ namespace ExteriorEnergyUse {
     // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int NumExteriorLights; // Number of Exterior Light Inputs
+    //extern int NumExteriorLights; // Number of Exterior Light Inputs
     extern int NumExteriorEqs;    // Number of Exterior Equipment Inputs
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>

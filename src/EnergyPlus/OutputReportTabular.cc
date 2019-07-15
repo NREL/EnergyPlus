@@ -99,6 +99,7 @@
 #include <ExteriorEnergyUse.hh>
 #include <FluidCoolers.hh>
 #include <General.hh>
+#include <Globals.hh>
 #include <HVACVariableRefrigerantFlow.hh>
 #include <HeatingCoils.hh>
 #include <HybridModel.hh>
@@ -6515,7 +6516,7 @@ namespace OutputReportTabular {
         using DataOutputs::iTotalAutoSizableFields;
         using DataOutputs::iTotalFieldsWithDefaults;
         using ExteriorEnergyUse::ExteriorLights;
-        using ExteriorEnergyUse::NumExteriorLights;
+		//using ExteriorEnergyUse::NumExteriorLights;
         using General::RoundSigDigits;
         using ScheduleManager::GetScheduleName;
         using ScheduleManager::ScheduleAverageHoursPerWeek;
@@ -6600,7 +6601,7 @@ namespace OutputReportTabular {
 
         // Exterior Lighting
         consumptionTotal = 0.0;
-        for (iLight = 1; iLight <= NumExteriorLights; ++iLight) {
+        for (iLight = 1; iLight <= ep_globals.NumExteriorLights; ++iLight) {
             if (ExteriorLights(iLight).ControlMode == 1) { // photocell/schedule
                 PreDefTableEntry(pdchExLtAvgHrSchd,
                                  ExteriorLights(iLight).Name,
@@ -10262,7 +10263,7 @@ namespace OutputReportTabular {
         using DataSurfaces::SurfaceClass_Window;
         using DataSurfaces::TotSurfaces;
         using ExteriorEnergyUse::ExteriorLights;
-        using ExteriorEnergyUse::NumExteriorLights;
+        //using ExteriorEnergyUse::NumExteriorLights;
         using General::RoundSigDigits;
         using General::SafeDivide;
         using ScheduleManager::GetScheduleName;
@@ -15405,7 +15406,7 @@ namespace OutputReportTabular {
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZonePreDefRep;
         using ExteriorEnergyUse::ExteriorLights;
-        using ExteriorEnergyUse::NumExteriorLights;
+        //using ExteriorEnergyUse::NumExteriorLights;
 
         Real64 const bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
         int iLight;
@@ -15415,7 +15416,7 @@ namespace OutputReportTabular {
             Lights(iLight).SumTimeNotZeroCons = 0.;
             Lights(iLight).SumConsumption = 0.;
         }
-        for (iLight = 1; iLight <= NumExteriorLights; ++iLight) {
+        for (iLight = 1; iLight <= ep_globals.NumExteriorLights; ++iLight) {
             ExteriorLights(iLight).SumTimeNotZeroCons = 0.;
             ExteriorLights(iLight).SumConsumption = 0.;
         }
