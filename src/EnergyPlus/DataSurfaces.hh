@@ -477,6 +477,14 @@ namespace DataSurfaces {
     extern Array1D<Real64> WinGapConvHtFlowRepEnergy;     // Energy of WinGapConvHtFlowRep [J]
     extern Array1D<Real64> WinHeatTransferRepEnergy;      // Energy of WinHeatTransfer [J]
 
+    extern std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
+    extern std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
+    extern std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
+    extern std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
+
+    extern bool AnyHeatBalanceInsideSourceTerm;  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
+    extern bool AnyHeatBalanceOutsideSourceTerm; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
     // Types
@@ -688,7 +696,7 @@ namespace DataSurfaces {
         Plane plane;         // Plane
         Surface2D surface2d; // 2D projected surface for efficient intersection testing
         // Window Parameters (when surface is Window)
-        int WindowShadingControlPtr; // Pointer to shading control (windows only)
+        int WindowShadingControlPtr;    // Pointer to shading control (windows only)
         bool HasShadeControl;           // True if the surface is listed in a WindowShadingControl object
         int ShadedConstruction;         // Shaded construction (windows only)
         int StormWinConstruction;       // Construction with storm window (windows only)
@@ -781,10 +789,10 @@ namespace DataSurfaces {
               MovInsulIntPresent(false), MovInsulIntPresentPrevTS(false), Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0),
               lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0),
               CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0),
-              WindowShadingControlPtr(0), HasShadeControl(false), ShadedConstruction(0), StormWinConstruction(0), StormWinShadedConstruction(0), FrameDivider(0),
-              Multiplier(1.0), Shelf(0), TAirRef(ZoneMeanAirTemp), OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false),
+              WindowShadingControlPtr(0), HasShadeControl(false), ShadedConstruction(0), StormWinConstruction(0), StormWinShadedConstruction(0),
+              FrameDivider(0), Multiplier(1.0), Shelf(0), TAirRef(ZoneMeanAirTemp), OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false),
               OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0), OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0),
-              WindSpeed(0.0), WindSpeedEMSOverrideOn(false), WindSpeedEMSOverrideValue(0.0), 
+              WindSpeed(0.0), WindSpeedEMSOverrideOn(false), WindSpeedEMSOverrideValue(0.0),
 
               WindDir(0.0), WindDirEMSOverrideOn(false), WindDirEMSOverrideValue(0.0),
 
@@ -1093,6 +1101,8 @@ namespace DataSurfaces {
         int WindowModelType;           // if set to WindowBSDFModel, then uses BSDF methods
         BSDFWindowDescript ComplexFen; // Data for complex fenestration, see DataBSDFWindow.cc for declaration
 
+        int TDDPipeNum; // Tubular daylighting device pipe number for TDD domes and diffusers
+
         // Default Constructor
         SurfaceWindowCalc()
             : ShadingFlag(ShadeOff), ShadingFlagEMSOn(false), ShadingFlagEMSValue(0), StormWinFlag(-1), StormWinFlagPrevDay(-1),
@@ -1126,7 +1136,7 @@ namespace DataSurfaces {
               GndSolarInc(0.0), SkyGndSolarInc(0.0), BmGndSolarInc(0.0), ZoneAreaMinusThisSurf(3, 0.0), ZoneAreaReflProdMinusThisSurf(3, 0.0),
               LightWellEff(1.0), SolarDiffusing(false), BmSolRefldInsRevealRepEnergy(0.0), BmSolRefldOutsRevealRepEnergy(0.0),
               BmSolTransThruIntWinRepEnergy(0.0), FrameHeatGain(0.0), DividerHeatGain(0.0), FrameHeatLoss(0.0), DividerHeatLoss(0.0),
-              TCLayerTemp(0.0), SpecTemp(0.0), WindowModelType(Window5DetailedModel)
+              TCLayerTemp(0.0), SpecTemp(0.0), WindowModelType(Window5DetailedModel), TDDPipeNum(0)
         {
         }
 
@@ -1358,8 +1368,8 @@ namespace DataSurfaces {
 
         // Default Constructor
         WindowShadingControlData()
-            : ZoneIndex(0), SequenceNumber(0), ShadingType(WSC_ST_NoShade), ShadedConstruction(0), ShadingDevice(0), ShadingControlType(0), Schedule(0),
-              SetPoint(0.0), SetPoint2(0.0), ShadingControlIsScheduled(false), GlareControlIsActive(false), SlatAngleSchedule(0),
+            : ZoneIndex(0), SequenceNumber(0), ShadingType(WSC_ST_NoShade), ShadedConstruction(0), ShadingDevice(0), ShadingControlType(0),
+              Schedule(0), SetPoint(0.0), SetPoint2(0.0), ShadingControlIsScheduled(false), GlareControlIsActive(false), SlatAngleSchedule(0),
               SlatAngleControlForBlinds(0), DaylightControlIndex(0), MultiSurfaceCtrlIsGroup(false)
         {
         }
@@ -1577,6 +1587,23 @@ namespace DataSurfaces {
         }
     };
 
+    struct IntMassObject
+    {
+        // Members
+        std::string Name;
+        std::string ZoneOrZoneListName; // zone or zone list name
+        int ZoneOrZoneListPtr;          // pointer to a zone list
+        int NumOfZones;                 // number of zones in a zone list
+        int Construction;               // pointer to contruction object
+        Real64 GrossArea;               // internal surface area, [m2]
+        bool ZoneListActive;            // flag to a list
+
+        // Default Constructor
+        IntMassObject() : ZoneOrZoneListPtr(0), NumOfZones(0), Construction(0), GrossArea(0.0), ZoneListActive(false)
+        {
+        }
+    };
+
     // Object Data
     extern Array1D<SurfaceData> Surface;
     extern Array1D<SurfaceWindowCalc> SurfaceWindow;
@@ -1593,6 +1620,7 @@ namespace DataSurfaces {
     extern Array1D<FenestrationSolarAbsorbed> FenLayAbsSSG;
     extern Array1D<SurfaceLocalEnvironment> SurfLocalEnvironment;
     extern Array1D<SurroundingSurfacesProperty> SurroundingSurfsProperty;
+    extern Array1D<IntMassObject> IntMassObjects;
 
     // Functions
 

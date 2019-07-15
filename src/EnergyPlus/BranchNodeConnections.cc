@@ -1100,7 +1100,7 @@ namespace BranchNodeConnections {
 
     void GetComponentData(std::string const &ComponentType,
                           std::string const &ComponentName,
-                          bool &IsParent,
+                          bool &IsParent,                    // true or false
                           int &NumInlets,
                           Array1D_string &InletNodeNames,
                           Array1D_int &InletNodeNums,
@@ -1109,7 +1109,8 @@ namespace BranchNodeConnections {
                           Array1D_string &OutletNodeNames,
                           Array1D_int &OutletNodeNums,
                           Array1D_int &OutletFluidStreams,
-                          bool &ErrorsFound)
+                          bool &ErrorsFound                  // set to true if errors found, unchanged otherwise
+    )
     {
 
         // SUBROUTINE INFORMATION:

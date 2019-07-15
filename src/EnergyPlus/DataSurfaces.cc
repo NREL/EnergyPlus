@@ -167,16 +167,16 @@ namespace DataSurfaces {
     int const SurfaceClass_TDD_Diffuser(18);
 
     Array1D_string const HeatTransferModelNames(10,
-        { "CTF - ConductionTransferFunction",
-        "EMPD - MoisturePenetrationDepthConductionTransferFunction",
-        "",
-        "",
-        "CondFD - ConductionFiniteDifference",
-        "HAMT - CombinedHeatAndMoistureFiniteElement",
-        "Window - Detailed layer-by-layer",
-        "Window - ComplexFenestration",
-        "Tubular daylighting device",
-        "KivaFoundation - TwoDimensionalFiniteDifference"});
+                                                {"CTF - ConductionTransferFunction",
+                                                 "EMPD - MoisturePenetrationDepthConductionTransferFunction",
+                                                 "",
+                                                 "",
+                                                 "CondFD - ConductionFiniteDifference",
+                                                 "HAMT - CombinedHeatAndMoistureFiniteElement",
+                                                 "Window - Detailed layer-by-layer",
+                                                 "Window - ComplexFenestration",
+                                                 "Tubular daylighting device",
+                                                 "KivaFoundation - TwoDimensionalFiniteDifference"});
 
     // Parameters to indicate heat transfer model to use for surface
     int const HeatTransferModel_NotSet(-1);
@@ -498,6 +498,14 @@ namespace DataSurfaces {
     Array1D<Real64> WinGapConvHtFlowRepEnergy;     // Energy of WinGapConvHtFlowRep [J]
     Array1D<Real64> WinHeatTransferRepEnergy;      // Energy of WinHeatTransfer [J]
 
+    std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
+    std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
+    std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
+    std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
+
+    bool AnyHeatBalanceInsideSourceTerm(false);  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
+    bool AnyHeatBalanceOutsideSourceTerm(false); // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
     // Object Data
@@ -516,6 +524,7 @@ namespace DataSurfaces {
     Array1D<FenestrationSolarAbsorbed> FenLayAbsSSG;
     Array1D<SurfaceLocalEnvironment> SurfLocalEnvironment;
     Array1D<SurroundingSurfacesProperty> SurroundingSurfsProperty;
+    Array1D<IntMassObject> IntMassObjects;
 
     // Class Methods
 
@@ -1013,7 +1022,7 @@ namespace DataSurfaces {
         Real64 const &caz(CosAzim);
         for (Vertices::size_type i = 0; i < n; ++i) {
             Vector const &v(Vertex[i]);
-            v2d[i] = Vertex2D(-(v.x - xRef)*caz + (v.y - yRef)*saz, v.z);
+            v2d[i] = Vertex2D(-(v.x - xRef) * caz + (v.y - yRef) * saz, v.z);
         }
 
         // piecewise linear integration
@@ -1041,11 +1050,11 @@ namespace DataSurfaces {
             if (i == n - 1) {
                 v2 = &v2d[0];
             } else {
-                v2 = &v2d[i+1];
+                v2 = &v2d[i + 1];
             }
-            averageHeight += 0.5*(v.y + v2->y)*(v2->x - v.x)/totalWidth;
+            averageHeight += 0.5 * (v.y + v2->y) * (v2->x - v.x) / totalWidth;
         }
-        return std::abs(averageHeight)/SinTilt;
+        return std::abs(averageHeight) / SinTilt;
     }
 
     // Functions
@@ -1147,6 +1156,12 @@ namespace DataSurfaces {
         WinShadingAbsorbedSolarEnergy.deallocate();
         WinGapConvHtFlowRepEnergy.deallocate();
         WinHeatTransferRepEnergy.deallocate();
+        AllHTSurfaceList.clear();
+        AllIZSurfaceList.clear();
+        AllHTNonWindowSurfaceList.clear();
+        AllHTWindowSurfaceList.clear();
+        AnyHeatBalanceInsideSourceTerm = false;
+        AnyHeatBalanceOutsideSourceTerm = false;
         Surface.deallocate();
         SurfaceWindow.deallocate();
         FrameDivider.deallocate();
@@ -1162,6 +1177,7 @@ namespace DataSurfaces {
         FenLayAbsSSG.deallocate();
         SurfLocalEnvironment.deallocate();
         SurroundingSurfsProperty.deallocate();
+        IntMassObjects.deallocate();
     }
 
     void SetSurfaceOutBulbTempAt()
