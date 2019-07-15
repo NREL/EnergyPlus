@@ -173,13 +173,13 @@ class AFN_Auditor(auditor.Auditor):
             try:
                 htsurf = htsurfs[surf['surface_name']]
             except KeyError:
-                raise 'BOOM!'
+                raise auditor.BadModel('Failed to find heat transfer surface for AirflowNetwork surface "' + name + '"')
             if 'building_surface_name' in htsurf:
                 window = htsurf
                 try:
                     htsurf = htsurfs[window['building_surface_name']]
                 except KeyError:
-                    raise 'kaBOOM!'
+                    raise auditor.BadModel('Failed to find window heat transfer surface for AirflowNetwork surface "' + name + '"')
 
             bc = htsurf['outside_boundary_condition']
 
@@ -206,7 +206,7 @@ class AFN_Auditor(auditor.Auditor):
                             external_node['neighbors'][zone_name] = 1
                         break
                 if afnzone == None:
-                    raise 'Blam!'
+                    raise auditor.BadModel('Failed to find AirflowNetwork zone for thermal zone "' + zone_name + '"')
                 linked_nodes = [afnzone, external_node]
             elif bc == 'Surface':
                 zone_name = htsurf['zone_name']
@@ -218,7 +218,7 @@ class AFN_Auditor(auditor.Auditor):
                         node['link_count'] += 1
                         break
                 if afnzone == None:
-                    raise 'Blam!1'
+                    raise auditor.BadModel('Failed to find AirflowNetwork zone for thermal zone "' + zone_name + '"')
                 linked_nodes = [afnzone]
                 adjhtsurf = htsurfs[htsurf['outside_boundary_condition_object']]
                 adj_zone_name = adjhtsurf['zone_name']
@@ -229,7 +229,7 @@ class AFN_Auditor(auditor.Auditor):
                         node['link_count'] += 1
                         break
                 if adj_afnzone == None:
-                    raise 'Blam!2'
+                    raise auditor.BadModel('Failed to find AirflowNetwork zone for adjacent thermal zone "' + adj_zone_name + '"')
                 linked_nodes.append(adj_afnzone)
                 if adj_zone_name in afnzone['neighbors']:
                     afnzone['neighbors'][adj_zone_name] += 1

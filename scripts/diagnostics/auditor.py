@@ -1,4 +1,7 @@
-# Base class of model auditors
+# Base class of model auditors and exceptions
+
+class BadModel(Exception):
+    pass
 
 class Auditor:
     def __init__(self, model):
