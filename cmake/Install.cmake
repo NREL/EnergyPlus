@@ -350,7 +350,7 @@ cpack_add_component(ExampleFiles
 
 cpack_add_component(WeatherData
   DISPLAY_NAME "Weather Data"
-  DESCRIPTION "A few EPW files"
+  DESCRIPTION "EPW Weather Files"
 )
 
 # This stuff actually requires admin privileges since touched system locations
