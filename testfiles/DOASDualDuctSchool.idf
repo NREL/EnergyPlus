@@ -1647,14 +1647,14 @@
     Corner_Class_1_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type
     Corner_Class_1_Pod_1 Fan Coil,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Corner_Class_1_Pod_1 Dual Duct Box,  !- Name
@@ -2512,14 +2512,14 @@
     Mult_Class_1_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type
     Mult_Class_1_Pod_1 Fan Coil,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Mult_Class_1_Pod_1 Dual Duct Box,  !- Name
@@ -2889,14 +2889,14 @@
     Corridor_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type
     Corridor_Pod_1 Fan Coil, !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Corridor_Pod_1 Dual Duct Box,  !- Name
@@ -3374,14 +3374,14 @@
     Corner_Class_2_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type
     Corner_Class_2_Pod_1 Fan Coil,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Corner_Class_2_Pod_1 Dual Duct Box,  !- Name
@@ -4039,14 +4039,14 @@
     Mult_Class_2_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type
     Mult_Class_2_Pod_1 Fan Coil,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Mult_Class_2_Pod_1 Dual Duct Box,  !- Name
@@ -4577,14 +4577,14 @@
     Main_Corridor Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Main_Corridor Baseboard Heater,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Main_Corridor Dual Duct Box,  !- Name
@@ -5049,14 +5049,14 @@
     Lobby Dual Duct Box,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Lobby Baseboard Heater,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Lobby Dual Duct Box,     !- Name
@@ -5486,14 +5486,14 @@
     Mech Dual Duct Box,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Mech Baseboard Heater,   !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Mech Dual Duct Box,      !- Name
@@ -5882,20 +5882,20 @@
     Bathrooms Dual Duct Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Bathrooms Baseboard Heater,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
     Fan:ZoneExhaust,         !- Zone Equipment 3 Object Type
     Bathrooms Exhaust Fan 1, !- Zone Equipment 3 Name
     3,                       !- Zone Equipment 3 Cooling Sequence
     3,                       !- Zone Equipment 3 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 3 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 3 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 3 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 3 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Bathrooms Dual Duct Box, !- Name
@@ -6740,14 +6740,14 @@
     Offices Dual Duct Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Offices Baseboard Heater,!- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Offices Dual Duct Box,   !- Name
@@ -7392,14 +7392,14 @@
     Media_Center Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Media_Center Baseboard Heater,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Media_Center Dual Duct Box,  !- Name
