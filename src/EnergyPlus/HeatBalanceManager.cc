@@ -85,6 +85,7 @@
 #include <EconomicTariff.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
+#include <Globals.hh>
 #include <HVACSizingSimulationManager.hh>
 #include <HeatBalanceManager.hh>
 #include <HeatBalanceSurfaceManager.hh>
@@ -380,7 +381,7 @@ namespace HeatBalanceManager {
             CheckWarmupConvergence();
             if (!WarmupFlag) {
                 DayOfSim = 0; // Reset DayOfSim if Warmup converged
-                DayOfSimChr = "0";
+                ep_globals.DayOfSimChr = "0";
 
                 ManageEMS(emsCallFromBeginNewEvironmentAfterWarmUp, anyRan); // calling point
             }

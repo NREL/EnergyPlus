@@ -59,6 +59,7 @@
 #include <DataIPShortCuts.hh>
 #include <DataReportingFlags.hh>
 #include <General.hh>
+#include <Globals.hh>
 #include <GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
@@ -210,7 +211,7 @@ void FiniteDiffGroundTempsModel::getWeatherData()
     bool EndMonthFlag_reset = EndMonthFlag;
     bool WarmupFlag_reset = WarmupFlag;
     int DayOfSim_reset = DayOfSim;
-    std::string DayOfSimChr_reset = DayOfSimChr;
+    std::string DayOfSimChr_reset = ep_globals.DayOfSimChr;
     int NumOfWarmupDays_reset = NumOfWarmupDays;
     bool BeginDayFlag_reset = BeginDayFlag;
     bool EndDayFlag_reset = EndDayFlag;
@@ -258,7 +259,7 @@ void FiniteDiffGroundTempsModel::getWeatherData()
     EndMonthFlag = false;
     WarmupFlag = false;
     DayOfSim = 0;
-    DayOfSimChr = "0";
+    ep_globals.DayOfSimChr = "0";
     NumOfWarmupDays = 0;
 
     annualAveAirTemp_num = 0.0;
@@ -366,7 +367,7 @@ void FiniteDiffGroundTempsModel::getWeatherData()
     EndMonthFlag = EndMonthFlag_reset;
     WarmupFlag = WarmupFlag_reset;
     DayOfSim = DayOfSim_reset;
-    DayOfSimChr = DayOfSimChr_reset;
+    ep_globals.DayOfSimChr = DayOfSimChr_reset;
     NumOfWarmupDays = NumOfWarmupDays_reset;
     BeginDayFlag = BeginDayFlag_reset;
     EndDayFlag = EndDayFlag_reset;

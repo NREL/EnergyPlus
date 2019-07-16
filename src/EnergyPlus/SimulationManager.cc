@@ -105,6 +105,7 @@ extern "C" {
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <Globals.hh>
 #include <HVACControllers.hh>
 #include <HVACManager.hh>
 #include <HVACSizingSimulationManager.hh>
@@ -500,7 +501,7 @@ namespace SimulationManager {
             EndMonthFlag = false;
             WarmupFlag = true;
             DayOfSim = 0;
-            DayOfSimChr = "0";
+            ep_globals.DayOfSimChr = "0";
             NumOfWarmupDays = 0;
             if (NumOfDayInEnvrn <= 365) {
                 isFinalYear = true;
@@ -516,13 +517,13 @@ namespace SimulationManager {
                 if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
 
                 ++DayOfSim;
-                ObjexxFCL::gio::write(DayOfSimChr, fmtLD) << DayOfSim;
-                strip(DayOfSimChr);
+                ObjexxFCL::gio::write(ep_globals.DayOfSimChr, fmtLD) << DayOfSim;
+                strip(ep_globals.DayOfSimChr);
                 if (!WarmupFlag) {
                     ++CurrentOverallSimDay;
                     DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);
                 } else {
-                    DayOfSimChr = "0";
+                    ep_globals.DayOfSimChr = "0";
                 }
                 BeginDayFlag = true;
                 EndDayFlag = false;
@@ -549,7 +550,7 @@ namespace SimulationManager {
                 }
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
                 if ((DayOfSim > 365) && ((NumOfDayInEnvrn - DayOfSim) == 364) && !WarmupFlag) {
-                    DisplayString("Starting last  year of environment at:  " + DayOfSimChr);
+                    DisplayString("Starting last  year of environment at:  " + ep_globals.DayOfSimChr);
                     ResetTabularReports();
                 }
 

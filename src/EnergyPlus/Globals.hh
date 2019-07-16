@@ -51,6 +51,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 
+#include <string>
+
 struct Globals
 {
     // Data
@@ -65,6 +67,8 @@ struct Globals
 
     // Parameters for EMS Calling Points
     int const emsCallFromBeginNewEvironment = 3;  // Identity where EMS called from
+
+    std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
 };
 
 extern Globals ep_globals;

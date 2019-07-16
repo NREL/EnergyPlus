@@ -361,7 +361,7 @@ namespace SizingManager {
                     EndMonthFlag = false;
                     WarmupFlag = true;
                     DayOfSim = 0;
-                    DayOfSimChr = "0";
+                    ep_globals.DayOfSimChr = "0";
                     CurEnvirNumSimDay = 1;
                     ++CurOverallSimDay;
                     while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
@@ -371,8 +371,8 @@ namespace SizingManager {
                             ++CurEnvirNumSimDay;
                         }
 
-                        ObjexxFCL::gio::write(DayOfSimChr, fmtLD) << DayOfSim;
-                        strip(DayOfSimChr);
+                        ObjexxFCL::gio::write(ep_globals.DayOfSimChr, fmtLD) << DayOfSim;
+                        strip(ep_globals.DayOfSimChr);
                         BeginDayFlag = true;
                         EndDayFlag = false;
 
@@ -575,7 +575,7 @@ namespace SizingManager {
                 EndEnvrnFlag = false;
                 WarmupFlag = false;
                 DayOfSim = 0;
-                DayOfSimChr = "0";
+                ep_globals.DayOfSimChr = "0";
                 CurEnvirNumSimDay = 1;
                 ++CurOverallSimDay;
 
@@ -585,8 +585,8 @@ namespace SizingManager {
                     if (!WarmupFlag && DayOfSim > 1) {
                         ++CurEnvirNumSimDay;
                     }
-                    ObjexxFCL::gio::write(DayOfSimChr, fmtLD) << DayOfSim;
-                    strip(DayOfSimChr);
+                    ObjexxFCL::gio::write(ep_globals.DayOfSimChr, fmtLD) << DayOfSim;
+                    strip(ep_globals.DayOfSimChr);
                     BeginDayFlag = true;
                     EndDayFlag = false;
 
