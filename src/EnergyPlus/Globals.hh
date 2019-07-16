@@ -62,6 +62,9 @@ struct Globals
     // MODULE VARIABLE DECLARATIONS:
     int NumExteriorLights = 0; // Number of Exterior Light Inputs
     int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
+
+    // Parameters for EMS Calling Points
+    int const emsCallFromBeginNewEvironment = 3;  // Identity where EMS called from
 };
 
 extern Globals ep_globals;

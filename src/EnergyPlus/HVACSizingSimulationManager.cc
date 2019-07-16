@@ -297,7 +297,7 @@ void ManageHVACSizingSimulation(bool &ErrorsFound)
             NumOfWarmupDays = 0;
 
             bool anyEMSRan;
-            ManageEMS(emsCallFromBeginNewEvironment, anyEMSRan); // calling point
+            ManageEMS(ep_globals.emsCallFromBeginNewEvironment, anyEMSRan); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 

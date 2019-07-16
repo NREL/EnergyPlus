@@ -143,7 +143,7 @@ namespace DataGlobals {
     // Parameters for EMS Calling Points
     int const emsCallFromZoneSizing(1);                           // Identity where EMS called from
     int const emsCallFromSystemSizing(2);                         // Identity where EMS called from
-    int const emsCallFromBeginNewEvironment(3);                   // Identity where EMS called from
+    //!$int const emsCallFromBeginNewEvironment(3);                   // Identity where EMS called from
     int const emsCallFromBeginNewEvironmentAfterWarmUp(4);        // Identity where EMS called from
     int const emsCallFromBeginTimestepBeforePredictor(5);         // Identity where EMS called from
     int const emsCallFromBeforeHVACManagers(6);                   // Identity where EMS called from
