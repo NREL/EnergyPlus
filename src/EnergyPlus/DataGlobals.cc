@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <DataGlobals.hh>
+#include <Globals.hh>
 
 namespace EnergyPlus {
 
@@ -87,7 +88,7 @@ namespace DataGlobals {
     // Thus, all variables in this module must be PUBLIC.
     bool runReadVars(false);
     bool DDOnlySimulation(false);
-    bool AnnualSimulation(false);
+    //!$bool AnnualSimulation(false);
     bool outputEpJSONConversion(false);
     bool isEpJSON(false);
     bool isCBOR(false);
@@ -270,7 +271,7 @@ namespace DataGlobals {
     {
         runReadVars = false;
         DDOnlySimulation = false;
-        AnnualSimulation = false;
+        ep_globals.AnnualSimulation = false;
         outputEpJSONConversion = false;
         isEpJSON = false;
         isCBOR = false;

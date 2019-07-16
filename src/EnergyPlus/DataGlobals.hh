@@ -65,7 +65,7 @@ namespace DataGlobals {
 
     extern bool runReadVars;
     extern bool DDOnlySimulation;
-    extern bool AnnualSimulation;
+    //!$extern bool AnnualSimulation;
     extern bool outputEpJSONConversion;
     extern bool isEpJSON;
     extern bool isCBOR;
