@@ -1306,10 +1306,11 @@ namespace HVACUnitaryBypassVAV {
                             CBVAV(CBVAVNum).ZoneSequenceCoolingNum(AirLoopZoneNum) = coolingPriority;
                             CBVAV(CBVAVNum).ZoneSequenceHeatingNum(AirLoopZoneNum) = heatingPriority;
                         }
-                        if (CBVAV(CBVAVNum).ZoneSequenceCoolingNum(AirLoopZoneNum) == 0) {
+                        if (CBVAV(CBVAVNum).ZoneSequenceCoolingNum(AirLoopZoneNum) == 0 ||
+                            CBVAV(CBVAVNum).ZoneSequenceHeatingNum(AirLoopZoneNum) == 0) {
                             ShowSevereError("AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass, \"" + CBVAV(CBVAVNum).Name +
-                                            "\", No matching air terminal found in the zone equipment list for zone = " +
-                                            ZoneEquipConfig(zoneNum).ZoneName + ".");
+                                            "\": Airloop air terminal in the zone equipment list for zone = " + ZoneEquipConfig(zoneNum).ZoneName +
+                                            " not found or is not allowed Zone Equipment Cooling or Heating Sequence = 0.");
                             ErrorsFound = true;
                         }
                     } else {
