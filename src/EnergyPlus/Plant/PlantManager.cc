@@ -55,6 +55,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <Boilers.hh>
 #include <BranchInputManager.hh>
 #include <DataBranchAirLoopPlant.hh>
 #include <DataConvergParams.hh>
@@ -66,6 +67,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <EMSManager.hh>
+#include <FluidCoolers.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GroundHeatExchangers.hh>
@@ -170,20 +172,10 @@ namespace EnergyPlus {
             // Calls half loop sides to be simulated in predetermined order.
             // Reset the flags as necessary
 
-            // REFERENCES:
-            // na
-
-            // USE STATEMENTS: NA
-
             // Using/Aliasing
             using DataConvergParams::MaxPlantSubIterations;
             using DataConvergParams::MinPlantSubIterations;
             using PlantUtilities::LogPlantConvergencePoints;
-
-            // SUBROUTINE ARGUMENT DEFINITIONS
-
-            // Locals
-            // SUBROUTINE PARAMETER DEFINITIONS
 
             // SUBROUTINE VARIABLE DEFINITIONS
             int IterPlant;
@@ -300,7 +292,7 @@ namespace EnergyPlus {
             using namespace DataIPShortCuts; // Data for field names, blank numerics
             using ScheduleManager::GetScheduleIndex;
             using SetPointManager::IsNodeOnSetPtManager;
-            auto &TempSetPt(SetPointManager::iCtrlVarType_Temp);
+            auto &localTempSetPt(SetPointManager::iCtrlVarType_Temp);
             using NodeInputManager::GetOnlySingleNode;
             using namespace BranchInputManager;
             using DataConvergParams::PlantConvergence;
@@ -330,7 +322,6 @@ namespace EnergyPlus {
             std::string CurrentModuleObject; // for ease in renaming.
             bool MatchedPressureString;
             int PressSimAlphaIndex;
-            //  INTEGER :: OpSchemeFound
 
             // FLOW:
             CurrentModuleObject = "PlantLoop";
@@ -339,7 +330,6 @@ namespace EnergyPlus {
             CurrentModuleObject = "CondenserLoop";
             NumCondLoops = inputProcessor->getNumObjectsFound(CurrentModuleObject); // Get the number of Condenser loops
             TotNumLoops = NumPlantLoops + NumCondLoops;
-            ErrFound = false;
 
             if (TotNumLoops > 0) {
                 PlantLoop.allocate(TotNumLoops);
@@ -477,10 +467,10 @@ namespace EnergyPlus {
                         Alpha(11), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
                         NodeConnectionType_Outlet, 1, ObjectIsParent);
 
-                this_demand_side.InletNodeSetPt = IsNodeOnSetPtManager(this_demand_side.NodeNumIn, TempSetPt);
-                this_demand_side.OutletNodeSetPt = IsNodeOnSetPtManager(this_demand_side.NodeNumOut, TempSetPt);
-                this_supply_side.InletNodeSetPt = IsNodeOnSetPtManager(this_supply_side.NodeNumIn, TempSetPt);
-                this_supply_side.OutletNodeSetPt = IsNodeOnSetPtManager(this_supply_side.NodeNumOut, TempSetPt);
+                this_demand_side.InletNodeSetPt = IsNodeOnSetPtManager(this_demand_side.NodeNumIn, localTempSetPt);
+                this_demand_side.OutletNodeSetPt = IsNodeOnSetPtManager(this_demand_side.NodeNumOut, localTempSetPt);
+                this_supply_side.InletNodeSetPt = IsNodeOnSetPtManager(this_supply_side.NodeNumIn, localTempSetPt);
+                this_supply_side.OutletNodeSetPt = IsNodeOnSetPtManager(this_supply_side.NodeNumOut, localTempSetPt);
                 this_loop.TempSetPointNodeNum = GetOnlySingleNode(
                         Alpha(5), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
                         NodeConnectionType_Sensor, 1, ObjectIsParent);
@@ -617,9 +607,8 @@ namespace EnergyPlus {
 
                     // if we made it this far and didn't get a match, check for blank
                     if (!MatchedPressureString) {
-                        if (Alpha(PressSimAlphaIndex) == "") {
+                        if (Alpha(PressSimAlphaIndex).empty()) {
                             this_loop.PressureSimType = Press_NoPressure;
-                            MatchedPressureString = true;
                             break;
                         }
                     }
@@ -745,16 +734,13 @@ namespace EnergyPlus {
             using namespace BranchInputManager;
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-            int NumHalfLoops;
             int LoopNum; // DO loop counter for loops
             int HalfLoopNum;
             int NumOfPipesInLoop;
-            int SysPipeNum;
             int LoopSideNum;
             int BranchNum; // DO loop counter for branches
             int CompNum;   // DO loop counter for components
             int NodeNum;   // DO loop counter for nodes
-            //		int PipeNum; // Counter for pipes
             int Outlet;
             int Inlet;
             int NumParams;
@@ -767,12 +753,10 @@ namespace EnergyPlus {
             std::string::size_type Pos;
             int TotCompsOnBranch;
             int MaxNumAlphas;
-            int MaxNumNumbers;
 
             bool SplitInBranch;
             bool MixerOutBranch;
             static bool ErrorsFound(false);
-            bool DemandSideHasPump;
             bool ASeriesBranchHasPump;
             bool AParallelBranchHasPump;
 
@@ -795,20 +779,15 @@ namespace EnergyPlus {
 
             inputProcessor->getObjectDefMaxArgs("Connector:Splitter", NumParams, NumAlphas, NumNumbers);
             MaxNumAlphas = NumAlphas;
-            MaxNumNumbers = NumNumbers;
             inputProcessor->getObjectDefMaxArgs("Connector:Mixer", NumParams, NumAlphas, NumNumbers);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
-            MaxNumNumbers = max(MaxNumNumbers, NumNumbers);
-            NumHalfLoops = 2 * TotNumLoops; // Will be NumLoops when condenser added
             NumPipes = 0;
             NumPlantPipes = 0;
             NumCondPipes = 0;
             HalfLoopNum = 0;
-            SysPipeNum = 0;
 
             for (LoopNum = 1; LoopNum <=
                               TotNumLoops; ++LoopNum) { // Begin demand side loops ... When condenser is added becomes NumLoops
-                DemandSideHasPump = false;
                 TempLoop.LoopHasConnectionComp = false;
                 TempLoop.Name = PlantLoop(LoopNum).Name;
 
@@ -934,7 +913,6 @@ namespace EnergyPlus {
                                 }
                                 this_comp.GeneralEquipType = GenEquipTypes_Pump;
                                 this_comp.CurOpSchemeType = PumpOpSchemeType;
-                                if (LoopSideNum == DemandSide) DemandSideHasPump = true;
                                 if (BranchNum == 1 || BranchNum == TempLoop.TotalBranches) {
                                     ASeriesBranchHasPump = true;
                                 } else {
@@ -1107,6 +1085,7 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_Boiler_Simple;
                                 this_comp.GeneralEquipType = GenEquipTypes_Boiler;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                                this_comp.compPtr = Boilers::BoilerSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Boiler:Steam")) {
                                 this_comp.TypeOf_Num = TypeOf_Boiler_Steam;
                                 this_comp.GeneralEquipType = GenEquipTypes_Boiler;
@@ -1304,9 +1283,14 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "Fluidcooler:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_FluidCooler_SingleSpd;
                                 this_comp.GeneralEquipType = GenEquipTypes_FluidCooler;
+                                this_comp.compPtr = FluidCoolers::FluidCoolerspecs::factory(
+                                        TypeOf_FluidCooler_SingleSpd, CompNames(CompNum));
+                                //
                             } else if (UtilityRoutines::SameString(this_comp_type, "Fluidcooler:TwoSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_FluidCooler_TwoSpd;
                                 this_comp.GeneralEquipType = GenEquipTypes_FluidCooler;
+                                this_comp.compPtr = FluidCoolers::FluidCoolerspecs::factory(
+                                        TypeOf_FluidCooler_TwoSpd, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "EvaporativeFluidcooler:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_EvapFluidCooler_SingleSpd;
@@ -1509,7 +1493,7 @@ namespace EnergyPlus {
                     }
 
                     // Obtain the Splitter and Mixer information
-                    if (TempLoop.ConnectList == "") {
+                    if (TempLoop.ConnectList.empty()) {
                         NumofSplitters = 0;
                         NumofMixers = 0;
                     } else {
@@ -2307,12 +2291,6 @@ namespace EnergyPlus {
             // It also reinitializes loop temperatures if loop setpoint
             // temperature changes. Branch levels for all branches are also set.
 
-            // METHODOLOGY EMPLOYED:
-            // Needs description, as appropriate.
-
-            // REFERENCES:
-            // na
-
             // Using/Aliasing
             using ScheduleManager::GetCurrentScheduleValue;
             using namespace DataSizing;
@@ -2327,17 +2305,6 @@ namespace EnergyPlus {
             using PlantLoopEquip::SimPlantEquip;
             using PlantUtilities::SetAllFlowLocks;
 
-            // Locals
-            // SUBROUTINE ARGUMENT DEFINITIONS:
-
-            // SUBROUTINE PARAMETER DEFINITIONS:
-
-            // INTERFACE BLOCK SPECIFICATIONS
-            // na
-
-            // DERIVED TYPE DEFINITIONS
-            // na
-
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int LoopNum; // plant loop counter
             int LoopSideNum;
@@ -2345,13 +2312,10 @@ namespace EnergyPlus {
             int CompNum;   // plant side component counter
             int SensedNode;
 
-            Real64 LoopSetPointTemp; // the loop control or setpoint temperature
-
             static bool ErrorsFound(false);
             bool FinishSizingFlag;
 
             static bool SupplyEnvrnFlag(true);
-            //  LOGICAL,SAVE  :: MySizeFlag = .TRUE.
             static bool MySetPointCheckFlag(true);
 
             static Array1D_bool PlantLoopSetPointInitFlag;
@@ -2388,7 +2352,6 @@ namespace EnergyPlus {
 
                 // check for missing setpoints
                 for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
-                    LoopSetPointTemp = Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint;
 
                     SensedNode = PlantLoop(LoopNum).TempSetPointNodeNum;
                     if (SensedNode > 0) {
@@ -2668,19 +2631,12 @@ namespace EnergyPlus {
 
             // METHODOLOGY EMPLOYED:
             // called from SimHVAC to reset mass flow rate requests
-            // this contains all the initializ
-
-            // REFERENCES:
-            // na
+            // this contains all the initializations
 
             // Using/Aliasing
             using DataEnvironment::StdBaroPress;
             using HVACInterfaceManager::PlantCommonPipe;
             using ScheduleManager::GetCurrentScheduleValue;
-
-            // Locals
-            // SUBROUTINE ARGUMENT DEFINITIONS:
-            // na
 
             // SUBROUTINE PARAMETER DEFINITIONS:
             Real64 const StartQuality(1.0);
@@ -2688,15 +2644,8 @@ namespace EnergyPlus {
             static std::string const RoutineNameAlt("InitializeLoops");
             static std::string const RoutineName("PlantManager:InitializeLoop");
 
-            // INTERFACE BLOCK SPECIFICATIONS:
-            // na
-
-            // DERIVED TYPE DEFINITIONS:
-            // na
-
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int LoopNum; // plant loop counter
-            int LoopIn;
             Real64 LoopMaxMassFlowRate;       // maximum allowable loop mass flow rate
             Real64 LoopSetPointTemp;          // the loop control or setpoint temperature
             Real64 LoopMaxTemp;               // maximum allowable loop temperature
@@ -2892,7 +2841,6 @@ namespace EnergyPlus {
 
             // FirstHVACiteration inits
             for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
-                LoopIn = PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumIn; // DSU? Demand/Supply side inlet??
                 // UPDATE LOOP FLOW SETPOINT
                 //    Node(LoopIn)%MassFlowRateSetPoint =  LoopMaxMassFlowRate !DSU? this is suspect, may not be set?
                 // UPDATE LOOP TEMPERATURE SETPOINTS
@@ -2980,11 +2928,7 @@ namespace EnergyPlus {
 
                 for (OpNum = 1; OpNum <= PlantLoop(LoopNum).NumOpSchemes; ++OpNum) {
                     // If the operating scheme is scheduled "OFF", go to next scheme
-                    if (GetCurrentScheduleValue(PlantLoop(LoopNum).OpScheme(OpNum).SchedPtr) <= 0.0) {
-                        PlantLoop(LoopNum).OpScheme(OpNum).Available = false;
-                    } else {
-                        PlantLoop(LoopNum).OpScheme(OpNum).Available = true;
-                    }
+                    PlantLoop(LoopNum).OpScheme(OpNum).Available = GetCurrentScheduleValue(PlantLoop(LoopNum).OpScheme(OpNum).SchedPtr) > 0.0;
                 }
             }
         }
@@ -3271,7 +3215,7 @@ namespace EnergyPlus {
             using ReportSizingManager::ReportSizingOutput;
 
             // Locals
-            bool InitLoopEquip(true);
+            bool localInitLoopEquip(true);
 
             // SUBROUTINE PARAMETER DEFINITIONS:
             static std::string const RoutineName("SizePlantLoop");
@@ -3283,9 +3227,6 @@ namespace EnergyPlus {
             int SupNodeNum;          // component inlet water node number
             int WaterCompNum;        // DO loop counter for cycling through all the components that demand water
             bool ErrorsFound(false); // If errors detected in input
-            // bool SimNestedLoop( false );
-            bool ReSize(false);
-            bool AllSizFac(true);
             Real64 LoopSizFac(0.0);
             Real64 AvLoopSizFac;
             Real64 PlantSizFac(1.0);
@@ -3296,7 +3237,6 @@ namespace EnergyPlus {
             bool Finalize(OkayToFinish);
 
             if (PlantLoop(LoopNum).PlantSizNum > 0) {
-                ReSize = true;
                 PlantSizNum = PlantLoop(LoopNum).PlantSizNum;
                 // PlantSizData(PlantSizNum)%DesVolFlowRate = 0.0D0 ! DSU2
             } else {
@@ -3322,7 +3262,7 @@ namespace EnergyPlus {
                             continue;
                         for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(SupplySide).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            SimPlantEquip(LoopNum, SupplySide, BranchNum, CompNum, true, InitLoopEquip, GetCompSizFac);
+                            SimPlantEquip(LoopNum, SupplySide, BranchNum, CompNum, true, localInitLoopEquip, GetCompSizFac);
                             BranchSizFac = max(BranchSizFac,
                                                PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(
                                                        CompNum).SizFac);
@@ -3332,8 +3272,6 @@ namespace EnergyPlus {
                         if (BranchSizFac > 0.0) {
                             PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).PumpSizFac = BranchSizFac;
                             ++NumBrSizFac;
-                        } else {
-                            AllSizFac = false;
                         }
                     }
                     AvLoopSizFac = LoopSizFac / max(1.0, NumBrSizFac);
@@ -3362,14 +3300,13 @@ namespace EnergyPlus {
 
                 } else {
                     // fill PlantSizFac from data structure
-                    for (BranchNum = 1;
-                         BranchNum <= PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches; ++BranchNum) {
-                        if (PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumIn ==
-                            PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).NodeNumIn) {
-                            PlantSizFac = PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).PumpSizFac;
-                            break;
-                        }
-                    }
+//                    for (BranchNum = 1;
+//                         BranchNum <= PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches; ++BranchNum) {
+//                        if (PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumIn ==
+//                            PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).NodeNumIn) {
+//                            break;
+//                        }
+//                    }
                 }
 
                 // sum up contributions from CompDesWaterFlow, demand side size request (non-coincident)
@@ -3515,7 +3452,6 @@ namespace EnergyPlus {
             using DataPlant::PlantLoop;
             using FluidProperties::GetDensityGlycol;
             using General::RoundSigDigits;
-            using PlantLoopEquip::SimPlantEquip;
             using ReportSizingManager::ReportSizingOutput;
 
             // SUBROUTINE PARAMETER DEFINITIONS:
@@ -3528,14 +3464,10 @@ namespace EnergyPlus {
             int SupNodeNum;          // component inlet water node number
             int WaterCompNum;        // DO loop counter for cycling through all the components that demand water
             bool ErrorsFound(false); // If errors detected in input
-            // bool SimNestedLoop( false );
-            bool ReSize;
 
             Real64 FluidDensity(0.0); // local value from glycol routine
 
-            Real64 PlantSizeFac;
-
-            ReSize = false;
+            Real64 PlantSizeFac = 0.0;
 
             PlantSizNum = PlantLoop(LoopNum).PlantSizNum;
 
