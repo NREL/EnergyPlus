@@ -61,9 +61,12 @@ struct Globals
     // MODULE PARAMETER DEFINITIONS
     int const EndZoneSizingCalc = 4;
 
-    // MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS: ExteriorEnergyUse
     int NumExteriorLights = 0; // Number of Exterior Light Inputs
     int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
+
+    //MODULE VARIABLE DECLARATION: Fans
+    int NumFans = 0;
 
     // Parameters for EMS Calling Points
     int const emsCallFromBeginNewEvironment = 3;  // Identity where EMS called from

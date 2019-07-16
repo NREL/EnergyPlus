@@ -58,6 +58,7 @@
 #include <EvaporativeCoolers.hh>
 #include <Fans.hh>
 #include <FaultsManager.hh>
+#include <Globals.hh>
 #include <HVACControllers.hh>
 #include <HVACDXHeatPumpSystem.hh>
 #include <HVACDXSystem.hh>
@@ -1471,7 +1472,7 @@ namespace FaultsManager {
             }
 
             // Assign fault index to the fan object
-            for (int FanNum = 1; FanNum <= Fans::NumFans; ++FanNum) {
+            for (int FanNum = 1; FanNum <= ep_globals.NumFans; ++FanNum) {
                 if (UtilityRoutines::SameString(Fans::Fan(FanNum).FanName, cAlphaArgs(3))) {
                     Fans::Fan(FanNum).FaultyFilterFlag = true;
                     Fans::Fan(FanNum).FaultyFilterIndex = jFault_AirFilter;
@@ -2009,7 +2010,7 @@ namespace FaultsManager {
 
         FanFound = false;
 
-        for (int FanNum = 1; FanNum <= NumFans; ++FanNum) {
+        for (int FanNum = 1; FanNum <= ep_globals.NumFans; ++FanNum) {
             if (UtilityRoutines::SameString(Fan(FanNum).FanName, FanName)) {
                 FanMaxAirFlowRate = Fan(FanNum).MaxAirFlowRate;
                 FanDeltaPress = Fan(FanNum).DeltaPress;

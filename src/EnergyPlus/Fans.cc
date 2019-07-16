@@ -68,6 +68,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
+#include <Globals.hh>
 #include <HVACFan.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -148,7 +149,7 @@ namespace Fans {
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-    int NumFans(0);               // The Number of Fans found in the Input
+    //!$int NumFans(0);               // The Number of Fans found in the Input
     int NumNightVentPerf(0);      // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
     bool GetFanInputFlag(true);   // Flag set to make sure you get input once
     bool LocalTurnFansOn(false);  // If True, overrides fan schedule and cycles ZoneHVAC component fans on
@@ -233,9 +234,9 @@ namespace Fans {
             CompIndex = FanNum;
         } else {
             FanNum = CompIndex;
-            if (FanNum > NumFans || FanNum < 1) {
+            if (FanNum > ep_globals.NumFans || FanNum < 1) {
                 ShowFatalError("SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits(FanNum) +
-                               ", Number of Fans=" + TrimSigDigits(NumFans) + ", Fan name=" + CompName);
+                               ", Number of Fans=" + TrimSigDigits(ep_globals.NumFans) + ", Fan name=" + CompName);
             }
             if (CheckEquipName(FanNum)) {
                 if (!CompName.empty() && CompName != Fan(FanNum).FanName) {
@@ -394,13 +395,13 @@ namespace Fans {
         lNumericFieldBlanks.dimension(MaxNumbers, false);
         rNumericArgs.dimension(MaxNumbers, 0.0);
 
-        NumFans = NumSimpFan + NumVarVolFan + NumZoneExhFan + NumOnOff + NumCompModelFan; // cpw1Mar2010 Add NumCompModelFan
-        if (NumFans > 0) {
-            Fan.allocate(NumFans);
-            FanNumericFields.allocate(NumFans);
-            UniqueFanNames.reserve(NumFans);
+        ep_globals.NumFans = NumSimpFan + NumVarVolFan + NumZoneExhFan + NumOnOff + NumCompModelFan; // cpw1Mar2010 Add NumCompModelFan
+        if (ep_globals.NumFans > 0) {
+            Fan.allocate(ep_globals.NumFans);
+            FanNumericFields.allocate(ep_globals.NumFans);
+            UniqueFanNames.reserve(ep_globals.NumFans);
         }
-        CheckEquipName.dimension(NumFans, true);
+        CheckEquipName.dimension(ep_globals.NumFans, true);
 
         for (SimpFanNum = 1; SimpFanNum <= NumSimpFan; ++SimpFanNum) {
             FanNum = SimpFanNum;
@@ -795,7 +796,7 @@ namespace Fans {
             NightVentPerf(NVPerfNum).MotInAirFrac = rNumericArgs(5);
             // find the corresponding fan
             NVPerfFanFound = false;
-            for (FanNum = 1; FanNum <= NumFans; ++FanNum) {
+            for (FanNum = 1; FanNum <= ep_globals.NumFans; ++FanNum) {
                 if (NightVentPerf(NVPerfNum).FanName == Fan(FanNum).FanName) {
                     NVPerfFanFound = true;
                     Fan(FanNum).NVPerfNum = NVPerfNum;
@@ -921,8 +922,8 @@ namespace Fans {
         rNumericArgs.deallocate();
 
         // Check Fans
-        for (FanNum = 1; FanNum <= NumFans; ++FanNum) {
-            for (checkNum = FanNum + 1; checkNum <= NumFans; ++checkNum) {
+        for (FanNum = 1; FanNum <= ep_globals.NumFans; ++FanNum) {
+            for (checkNum = FanNum + 1; checkNum <= ep_globals.NumFans; ++checkNum) {
                 if (Fan(FanNum).InletNodeNum == Fan(checkNum).InletNodeNum) {
                     ErrorsFound = true;
                     ShowSevereError("GetFanInput, duplicate fan inlet node names, must be unique for fans.");
@@ -944,7 +945,7 @@ namespace Fans {
             ShowFatalError(RoutineName + "Errors found in input.  Program terminates.");
         }
 
-        for (FanNum = 1; FanNum <= NumFans; ++FanNum) {
+        for (FanNum = 1; FanNum <= ep_globals.NumFans; ++FanNum) {
             // Setup Report variables for the Fans  CurrentModuleObject='Fans'
             SetupOutputVariable("Fan Electric Power", OutputProcessor::Unit::W, Fan(FanNum).FanPower, "System", "Average", Fan(FanNum).FanName);
             SetupOutputVariable(
@@ -1012,7 +1013,7 @@ namespace Fans {
 
         bool anyRan;
         ManageEMS(emsCallFromComponentGetInput, anyRan);
-        MySizeFlag.dimension(NumFans, true);
+        MySizeFlag.dimension(ep_globals.NumFans, true);
     }
 
     // End of Get Input subroutines for the HB Module
@@ -1069,7 +1070,7 @@ namespace Fans {
 
         if (MyOneTimeFlag) {
 
-            MyEnvrnFlag.dimension(NumFans, true);
+            MyEnvrnFlag.dimension(ep_globals.NumFans, true);
 
             MyOneTimeFlag = false;
         }
@@ -1077,7 +1078,7 @@ namespace Fans {
         // need to check all fans to see if they are on Zone Equipment List or issue warning
         if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
             ZoneEquipmentListChecked = true;
-            for (Loop = 1; Loop <= NumFans; ++Loop) {
+            for (Loop = 1; Loop <= ep_globals.NumFans; ++Loop) {
                 if (!UtilityRoutines::SameString(Fan(Loop).FanType, "Fan:ZoneExhaust")) continue;
                 if (CheckZoneEquipmentList(Fan(Loop).FanType, Fan(Loop).FanName)) continue;
                 ShowSevereError("InitFans: Fan=[" + Fan(Loop).FanType + ',' + Fan(Loop).FanName +
@@ -1525,7 +1526,7 @@ namespace Fans {
             }
         }
 
-        if (++NumFansSized == NumFans) FanNumericFields.deallocate(); // remove temporary array for field names at end of sizing
+        if (++NumFansSized == ep_globals.NumFans) FanNumericFields.deallocate(); // remove temporary array for field names at end of sizing
     }
 
     // End Initialization Section of the Module
@@ -3062,7 +3063,7 @@ namespace Fans {
             WhichFan = FanNum;
         }
 
-        if (WhichFan <= 0 || WhichFan > NumFans) {
+        if (WhichFan <= 0 || WhichFan > ep_globals.NumFans) {
             ShowSevereError("SetFanData: Could not find fan = \"" + FanName + "\"");
             ErrorsFound = true;
             return;
@@ -3259,7 +3260,7 @@ namespace Fans {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        NumFans = 0;
+        ep_globals.NumFans = 0;
         NumNightVentPerf = 0;
         GetFanInputFlag = true;
         LocalTurnFansOn = false;

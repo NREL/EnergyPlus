@@ -56,6 +56,7 @@
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <EnergyPlus.hh>
+#include <Globals.hh>
 
 namespace EnergyPlus {
 
@@ -77,7 +78,7 @@ namespace Fans {
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int NumFans;           // The Number of Fans found in the Input
+    //!$extern int NumFans;           // The Number of Fans found in the Input
     extern int NumNightVentPerf;  // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
     extern bool GetFanInputFlag;  // Flag set to make sure you get input once
     extern bool LocalTurnFansOn;  // If True, overrides fan schedule and cycles ZoneHVAC component fans on
