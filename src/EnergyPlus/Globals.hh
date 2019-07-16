@@ -54,11 +54,11 @@
 struct Globals
 {
     // Data
-    bool AnnualSimulation;
+    bool AnnualSimulation = false;
 
     // MODULE VARIABLE DECLARATIONS:
-    int NumExteriorLights; // Number of Exterior Light Inputs
-    int NumExteriorEqs;    // Number of Exterior Equipment Inputs
+    int NumExteriorLights = 0; // Number of Exterior Light Inputs
+    int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
 };
 
 extern Globals ep_globals;
