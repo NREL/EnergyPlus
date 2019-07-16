@@ -97,12 +97,16 @@ AirLoopHVAC,
 This field is the availability status of an AirLoopHVAC. This status flag is a result of the calculations made by the System Availability Manager(s) listed in a System Availability Manager List. When a single availability manager is used in a System Availability Manager List, this is also the availability status reported by the specific availability manager (Ref. System Availability Manager Outputs). When multiple availability managers are used in a System Availability Manager List, the loop availability status is determine by the rules associated with AirLoopHVACs (see rules described for Group -- System Availability Managers). The control status outputs are represented using integers 0 through 3.. These integers represent \emph{NoAction} (0), \emph{ForceOff} (1), \emph{CycleOn} (2), and \emph{CycleOnZoneFansOnly} (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
 \paragraph{HVAC System Solver Iteration Count {[]}}\label{hvac-system-solver-iteration-count}
+This field reports the total number of HVAC System solver iterations in the current system time step or the maximum iterations possible for this solver if the simulation has not yet converged before it reached the maximum iterations.
 
 \paragraph{Air System Solver Iteration Count {[]}}\label{air-system-solver-iteration-count}
+This field reports the total number of Air System solver iterations in the current system time step or the maximum iterations possible for this solver if the simulation has not yet converged before it reached the maximum iterations.
 
 \paragraph{Air System Simulation Maximum Iteration Count {[]}}\label{air-system-simulation-maximum-iteration-count}
+This field reports the maximum number of iterations possible for an Air System simulation.
 
 \paragraph{Air System Simulation Iteration Count {[]}}\label{air-system-simulation-iteration-count}
+This field reports the total number of Air System iterations in the current system time step or the maximum iterations possible for this solver if the simulation has not yet converged before it reached the maximum iterations.
 
 \paragraph{Air System Component Model Simulation Calls {[]}}\label{air-system-component-model-simulation-calls}
 
