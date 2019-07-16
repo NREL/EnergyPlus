@@ -76,7 +76,7 @@ namespace DataGlobals {
     extern int const BeginDay;
     extern int const DuringDay;
     extern int const EndDay;
-    extern int const EndZoneSizingCalc;
+    //!$extern int const EndZoneSizingCalc;
     extern int const EndSysSizingCalc;
 
     // Parameters for KindOfSim

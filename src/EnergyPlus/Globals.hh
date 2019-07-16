@@ -56,6 +56,9 @@ struct Globals
     // Data
     bool AnnualSimulation = false;
 
+    // MODULE PARAMETER DEFINITIONS
+    int const EndZoneSizingCalc = 4;
+
     // MODULE VARIABLE DECLARATIONS:
     int NumExteriorLights = 0; // Number of Exterior Light Inputs
     int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs

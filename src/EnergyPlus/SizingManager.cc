@@ -74,6 +74,7 @@
 #include <DualDuct.hh>
 #include <EMSManager.hh>
 #include <General.hh>
+#include <Globals.hh>
 #include <HVACCooledBeam.hh>
 #include <HVACFourPipeBeam.hh>
 #include <HVACSingleDuctInduc.hh>
@@ -473,8 +474,8 @@ namespace SizingManager {
                 } // ... End environment loop
 
                 if (NumSizingPeriodsPerformed > 0) {
-                    UpdateZoneSizing(EndZoneSizingCalc);
-                    UpdateFacilitySizing(EndZoneSizingCalc);
+                    UpdateZoneSizing(ep_globals.EndZoneSizingCalc);
+                    UpdateFacilitySizing(ep_globals.EndZoneSizingCalc);
                     ZoneSizingRunDone = true;
                 } else {
                     ShowSevereError(RoutineName + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
@@ -4919,7 +4920,7 @@ namespace SizingManager {
                 }
             }
 
-        } else if (CallIndicator == EndZoneSizingCalc) {
+        } else if (CallIndicator == ep_globals.EndZoneSizingCalc) {
             for (int DDNum = 1; DDNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DDNum) {
                 if (CalcFacilitySizing(DDNum).DesCoolLoad > CalcFinalFacilitySizing.DesCoolLoad) {
                     CalcFinalFacilitySizing.DesCoolLoad = CalcFacilitySizing(DDNum).DesCoolLoad;
