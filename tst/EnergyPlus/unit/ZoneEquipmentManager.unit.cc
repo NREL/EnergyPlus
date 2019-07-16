@@ -1972,6 +1972,33 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
          " Space Node,               !- Zone Air Node Name",
          " Space Ret Node;           !- Zone Return Air Node Name",
 
+         "ScheduleTypeLimits,",
+         "Fraction,       !- Name",
+         "0.0,            !- Lower limit value",
+         "1.0,            !- Upper limit value",
+         "Continuous,     !- Numeric Type",
+         "Dimensionless;  !- Unit Type",
+
+         "Schedule:Constant,",
+         "Air Terminal 1 ADU Cooling Fraction,",
+         "Fraction,",
+         "0.3;",
+
+         "Schedule:Constant,",
+         "Air Terminal 1 ADU Heating Fraction,",
+         "Fraction,",
+         "0.4;",
+
+         "Schedule:Constant,",
+         "Ideal System A Cooling Fraction,",
+         "Fraction,",
+         "0.5;",
+
+         "Schedule:Constant,",
+         "Ideal System A Heating Fraction,",
+         "Fraction,",
+         "0.6;",
+
          "ZoneHVAC:EquipmentList,",
          " Space Equipment,          !- Name",
          " SequentialLoad,           !- Load Distribution Scheme",
@@ -1979,14 +2006,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
          " Air Terminal 1 ADU,       !- Zone Equipment 1 Name",
          " 1,                        !- Zone Equipment 1 Cooling Sequence",
          " 1,                        !- Zone Equipment 1 Heating or No-Load Sequence",
-         " 0.3,                         !- Zone Equipment 1 Sequential Cooling Fraction",
-         " 0.4,                         !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
+         " Air Terminal 1 ADU Cooling Fraction,        !- Zone Equipment 1 Sequential Cooling Fraction",
+         " Air Terminal 1 ADU Heating Fraction,        !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
          " ZoneHVAC:IdealLoadsAirSystem,",
          " Ideal System A,           !- Name",
          " 2,                        !- Zone Equipment 2 Cooling Sequence",
          " 2,                        !- Zone Equipment 2 Heating or No-Load Sequence",
-         " 0.5,                         !- Zone Equipment 2 Sequential Cooling Fraction",
-         " 0.6,                         !- Zone Equipment 2 Sequential Heating or No-Load Fraction",
+         " Ideal System A Cooling Fraction,                         !- Zone Equipment 2 Sequential Cooling Fraction",
+         " Ideal System A Heating Fraction,                         !- Zone Equipment 2 Sequential Heating or No-Load Fraction",
          " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
          " Air Terminal 3 ADU,       !- Zone Equipment 3 Name",
          " 3,                        !- Zone Equipment 3 Cooling Sequence",
@@ -2079,6 +2106,11 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).SequencedOutputRequiredToDehumidSP.allocate(NumEquip);
     auto &energy(DataZoneEnergyDemands::ZoneSysEnergyDemand(ZoneNum));
     ZoneEquipmentManager::PrioritySimOrder.allocate(NumEquip);
+
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("AIR TERMINAL 1 ADU COOLING FRACTION")).CurrentValue = 0.3;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("AIR TERMINAL 1 ADU HEATING FRACTION")).CurrentValue = 0.4;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("IDEAL SYSTEM A COOLING FRACTION")).CurrentValue = 0.5;
+    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex("IDEAL SYSTEM A HEATING FRACTION")).CurrentValue = 0.6;
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
     energy.TotalOutputRequired = 1000.0;
