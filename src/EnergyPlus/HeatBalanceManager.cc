@@ -4614,7 +4614,8 @@ namespace HeatBalanceManager {
         // set some (default) properties of the Construction Derived Type
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
 
-            if (Construct(ConstrNum).TypeIsAirBoundary) continue;
+            // For air boundaries, skip TypeIsAirBoundaryRadiant, process TypeIsAirBoundaryIRTSurface
+            if (Construct(ConstrNum).TypeIsAirBoundaryRadiant) continue;
             if (NominalRforNominalUCalculation(ConstrNum) != 0.0) {
                 NominalU(ConstrNum) = 1.0 / NominalRforNominalUCalculation(ConstrNum);
             } else {
@@ -7560,6 +7561,7 @@ namespace HeatBalanceManager {
                     // Find the auto-generated special IRT material for air boundaries
                     int materNum = UtilityRoutines::FindItemInList("~AirBoundary-IRTMaterial", DataHeatBalance::Material);
                     thisConstruct.LayerPoint(1) = materNum;
+                    NominalRforNominalUCalculation(constrNum) = NominalR(materNum);
                 }
 
                 // Air Exchange Method

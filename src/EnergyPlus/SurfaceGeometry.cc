@@ -12600,6 +12600,7 @@ namespace SurfaceGeometry {
             int errorCount = 0;
             for (int surfNum = 1; surfNum <= DataSurfaces::TotSurfaces; ++surfNum) {
                 auto &surf(Surface(surfNum));
+                if (!surf.HeatTransSurf) continue;
                 auto const &constr(Construct(surf.Construction));
                 if (!constr.TypeIsAirBoundary) continue;
 
@@ -12617,6 +12618,7 @@ namespace SurfaceGeometry {
                     if (constr.TypeIsAirBoundaryIRTSurface) {
                         surf.HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_AirBoundary;
                         surf.HeatTransSurf = true;
+                        // Interior convection coefficient set to low H limit in ConvectionCoefficients::GetUserConvectionCoefficients
                     } else {
                         surf.HeatTransSurf = false;
                     }
