@@ -425,6 +425,7 @@ namespace WaterThermalTanks {
         int DesuperheaterNum;          // Index to desuperheating coil
         bool ShowSetPointWarning;      // Warn when set point is greater than max tank temp limit
         int MaxCycleErrorIndex;        // recurring error index
+        int FreezingErrorIndex;        // recurring error index for freeze conditions
         WaterHeaterSizingData Sizing;  // ancillary data for autosizing
 
         // Default Constructor
