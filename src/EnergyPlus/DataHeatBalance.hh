@@ -2183,10 +2183,11 @@ namespace DataHeatBalance {
     struct HeatReclaimHPCoilData : HeatReclaimDataBase // inherited from base struct
     {
         // Customized Members
-        Real64 DesuperheaterReclaimedHeat; // Reclaimed heat from WAHP coil
+        Real64 WaterHeatingDesuperheaterReclaimedHeatTotal;    // total reclaimed heat by water heating desuperheater coils
+        Array1D<Real64> WaterHeatingDesuperheaterReclaimedHeat; // heat reclaimed by water heating desuperheater coils
 
         // Default Constructor
-        HeatReclaimHPCoilData() : DesuperheaterReclaimedHeat(0.0)
+        HeatReclaimHPCoilData() : WaterHeatingDesuperheaterReclaimedHeatTotal(0.0)
         {
         }
     };

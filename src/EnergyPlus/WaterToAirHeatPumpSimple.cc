@@ -2381,7 +2381,13 @@ namespace WaterToAirHeatPumpSimple {
         DXElecCoolingPower = Winput;
 
         ReportingConstant = TimeStepSys * SecInHour;
-        QSource -= DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).DesuperheaterReclaimedHeat;
+        DataHeatBalance::HeatReclaimHPCoilData &HeatReclaim = HeatReclaimSimple_WAHPCoil(HPNum);
+        HeatReclaim.WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
+        if (allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)) {
+            for (auto& num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat) HeatReclaim.WaterHeatingDesuperheaterReclaimedHeatTotal += num;
+        }
+        QSource -= HeatReclaim.WaterHeatingDesuperheaterReclaimedHeatTotal;
+
         // Update heat pump data structure
         SimpleWatertoAirHP(HPNum).Power = Winput;
         SimpleWatertoAirHP(HPNum).QLoadTotal = QLoadTotal;

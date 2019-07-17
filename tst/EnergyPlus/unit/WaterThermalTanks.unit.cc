@@ -2685,7 +2685,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     //Coil source side heat successfully passed to HeatReclaimSimple_WAHPCoil(1).AvailCapacity
     EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity,SimpleWatertoAirHP(1).QSource);
     //Reclaimed heat successfully returned to reflect the plant impact
-    DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).DesuperheaterReclaimedHeat = 100.0;
+    DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).WaterHeatingDesuperheaterReclaimedHeat(1) = 100.0;
     WaterToAirHeatPumpSimple::CalcHPCoolingSimple(HPNum,CyclingScheme,1.0,10.0,10.0,1,PLR,1.0);
     EXPECT_EQ(SimpleWatertoAirHP(1).QSource, DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity-100);
 
@@ -2730,7 +2730,9 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     }
 
     Tank.TankTemp = 39;
+    Tank.SavedTankTemp = 39;
     Tank.SourceOutletTemp = 39;
+    Tank.SavedSourceOutletTemp = 39;
     Tank.SourceMassFlowRate = 0.003;
     Tank.TimeElapsed = 0.0;
     Node(Desuperheater.WaterInletNode).Temp = Tank.SourceOutletTemp;
@@ -2738,6 +2740,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).PartLoadRatio = 0.8;
     WaterThermalTanks::InitWaterThermalTank(TankNum,true);
     Desuperheater.Mode = 1;
+    Desuperheater.SaveMode = 1;
     WaterThermalTanks::CalcDesuperheaterWaterHeater(TankNum,true);
     //The HVAC part load ratio is successfully passed to waterthermaltank desuperheater data struct
     EXPECT_EQ(Desuperheater.DXSysPLR, 0.8);
