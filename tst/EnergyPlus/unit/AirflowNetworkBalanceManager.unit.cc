@@ -15332,13 +15332,13 @@ TEST_F(EnergyPlusFixture, AFN_CheckMultiZoneNodes_NoZoneNode)
     ASSERT_THROW(ValidateDistributionSystem(), std::runtime_error);
 
     std::string const error_string = delimited_string({
-        "   ** Severe  ** ValidateDistributionSystem: ATTIC ZONE AIR NODE is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
         "   **   ~~~   ** This Node is the zone air node for Zone 'ATTIC ZONE'.",
-        "   ** Severe  ** ValidateDistributionSystem: ATTIC ZONE AIR NODE is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
         "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=2",
-        "   ..... Last severe error=ValidateDistributionSystem: ATTIC ZONE AIR NODE is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ..... Last severe error=ValidateDistributionSystem: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
@@ -15416,8 +15416,7 @@ TEST_F(EnergyPlusFixture, AFN_CheckMultiZoneNodes_NoInletNode)
 
 
     // MixedAir::NumOAMixers.allocate(1);
-
-    ASSERT_NO_THROW(ValidateDistributionSystem());
+    ValidateDistributionSystem();
 
     EXPECT_TRUE(compare_err_stream("", true));
 }

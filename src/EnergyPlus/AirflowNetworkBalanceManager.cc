@@ -9106,8 +9106,8 @@ namespace AirflowNetworkBalanceManager {
                         AFNMass = AirflowNetworkLinkSimu(i).FLOW;
                         if (NodeMass > 0.0 && AFNMass > NodeMass + 0.01) {
                             ShowWarningError(
-                                "The mass flow rate difference is found between System Node = " + NodeID(AirflowNetworkNodeData(Node3).EPlusNodeNum) +
-                                " and AFN Link = " + AirflowNetworkLinkageData(i).Name + '.');
+                                "The mass flow rate difference is found between System Node = '" + NodeID(AirflowNetworkNodeData(Node3).EPlusNodeNum) +
+                                "' and AFN Link = '" + AirflowNetworkLinkageData(i).Name + "'.");
                             ShowContinueError("The system node max mass flow rate = " + RoundSigDigits(NodeMass, 3) +
                                               " kg/s. The AFN node mass flow rate = " + RoundSigDigits(AFNMass, 3) + " kg.s.");
                             WriteFlag = true;
@@ -9755,7 +9755,7 @@ namespace AirflowNetworkBalanceManager {
                     if (!ZoneEquipConfig(j).IsControlled) continue;
                     if (ZoneEquipConfig(j).ZoneNode == i) {
                         if (ZoneEquipConfig(j).ActualZoneNum > AirflowNetworkNumOfNodes) {
-                            ShowSevereError(RoutineName + NodeID(i) + " is not defined as an AirflowNetwork:Distribution:Node object.");
+                            ShowSevereError(RoutineName + "'" + NodeID(i) + "' is not defined as an AirflowNetwork:Distribution:Node object.");
                             ShowContinueError("This Node is the zone air node for Zone '" + ZoneEquipConfig(j).ZoneName + "'.");
                             ErrorsFound = true;
                         } else {
@@ -9833,13 +9833,13 @@ namespace AirflowNetworkBalanceManager {
                                 break;
                             } else {
                                 if (OAMixerNum == GetNumOAMixers()) {
-                                    ShowSevereError(RoutineName + NodeID(i) + " is not defined as an AirflowNetwork:Distribution:Node object.");
+                                    ShowSevereError(RoutineName + "'" + NodeID(i) + "' is not defined as an AirflowNetwork:Distribution:Node object.");
                                     ErrorsFound = true;
                                 }
                             }
                         }
                     } else if (GetNumOAMixers() == 0) {
-                        ShowSevereError(RoutineName + NodeID(i) + " is not defined as an AirflowNetwork:Distribution:Node object.");
+                        ShowSevereError(RoutineName + "'" + NodeID(i) + "' is not defined as an AirflowNetwork:Distribution:Node object.");
                         ErrorsFound = true;
                     } else {
                         // TODO: I fail to see how you could enter this block given than NumOAMixers (returned by GetNumOAMixers())
@@ -9855,7 +9855,7 @@ namespace AirflowNetworkBalanceManager {
                         } else if (i == GetOAMixerInletNodeNumber(1)) {
                             NodeFound(i) = true;
                         } else {
-                            ShowSevereError(RoutineName + NodeID(i) + " is not defined as an AirflowNetwork:Distribution:Node object.");
+                            ShowSevereError(RoutineName + "'" + NodeID(i) + "' is not defined as an AirflowNetwork:Distribution:Node object.");
                             ErrorsFound = true;
                         }
                     }
