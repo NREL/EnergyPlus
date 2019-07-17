@@ -174,12 +174,6 @@ namespace DataHeatBalance {
     extern int const Isotropic;
     extern int const Anisotropic;
 
-    // Parameters for HeatTransferAlgosUsed
-    extern int const UseCTF;
-    extern int const UseEMPD;
-    extern int const UseCondFD;
-    extern int const UseHAMT;
-
     // Parameters for ZoneAirSolutionAlgo
     extern int const Use3rdOrder;
     extern int const UseAnalyticalSolution;
@@ -348,13 +342,18 @@ namespace DataHeatBalance {
     extern int SolarDistribution;               // Solar Distribution Algorithm
     extern int InsideSurfIterations;            // Counts inside surface iterations
     extern int OverallHeatTransferSolutionAlgo; // UseCTF Solution, UseEMPD moisture solution, UseCondFD solution
-    extern int NumberOfHeatTransferAlgosUsed;
-    extern Array1D_int HeatTransferAlgosUsed;
+ 
+   // Flags for HeatTransfer Algorithms Used
+    extern bool AnyCTF;    // CTF used
+    extern bool AnyEMPD;   // EMPD used
+    extern bool AnyCondFD; // CondFD used
+    extern bool AnyHAMT;   // HAMT used
+    extern bool AnyKiva;   // Kiva used
+
     extern int MaxNumberOfWarmupDays;     // Maximum number of warmup days allowed
     extern int MinNumberOfWarmupDays;     // Minimum number of warmup days allowed
     extern Real64 CondFDRelaxFactor;      // Relaxation factor, for looping across all the surfaces.
     extern Real64 CondFDRelaxFactorInput; // Relaxation factor, for looping across all the surfaces, user input value
-    // LOGICAL ::  CondFDVariableProperties = .FALSE. ! if true, then variable conductivity or enthalpy in Cond FD.
 
     extern int ZoneAirSolutionAlgo;              // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
     extern Real64 BuildingRotationAppendixG;     // Building Rotation for Appendix G
@@ -1133,6 +1132,10 @@ namespace DataHeatBalance {
         Real64 MaximumY;           // Maximum Y value for entire zone
         Real64 MinimumZ;           // Minimum Z value for entire zone
         Real64 MaximumZ;           // Maximum Z value for entire zone
+        std::vector<int> ZoneHTSurfaceList;          // List of HT surfaces related to this zone (includes adjacent interzone surfaces)
+        std::vector<int> ZoneIZSurfaceList;          // List of interzone surfaces in this zone
+        std::vector<int> ZoneHTNonWindowSurfaceList; // List of non-window HT surfaces related to this zone (includes adjacent interzone surfaces)
+        std::vector<int> ZoneHTWindowSurfaceList;    // List of window surfaces related to this zone (includes adjacent interzone surfaces)
 
         Real64 OutDryBulbTemp;                 // Zone outside dry bulb air temperature (C)
         bool OutDryBulbTempEMSOverrideOn;      // if true, EMS is calling to override the surface's outdoor air temp

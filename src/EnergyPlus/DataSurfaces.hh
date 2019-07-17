@@ -477,6 +477,14 @@ namespace DataSurfaces {
     extern Array1D<Real64> WinGapConvHtFlowRepEnergy;     // Energy of WinGapConvHtFlowRep [J]
     extern Array1D<Real64> WinHeatTransferRepEnergy;      // Energy of WinHeatTransfer [J]
 
+    extern std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
+    extern std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
+    extern std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
+    extern std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
+
+    extern bool AnyHeatBalanceInsideSourceTerm;  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
+    extern bool AnyHeatBalanceOutsideSourceTerm; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
     // Types
@@ -1093,6 +1101,8 @@ namespace DataSurfaces {
         int WindowModelType;           // if set to WindowBSDFModel, then uses BSDF methods
         BSDFWindowDescript ComplexFen; // Data for complex fenestration, see DataBSDFWindow.cc for declaration
 
+        int TDDPipeNum; // Tubular daylighting device pipe number for TDD domes and diffusers
+
         // Default Constructor
         SurfaceWindowCalc()
             : ShadingFlag(ShadeOff), ShadingFlagEMSOn(false), ShadingFlagEMSValue(0), StormWinFlag(-1), StormWinFlagPrevDay(-1),
@@ -1126,7 +1136,7 @@ namespace DataSurfaces {
               GndSolarInc(0.0), SkyGndSolarInc(0.0), BmGndSolarInc(0.0), ZoneAreaMinusThisSurf(3, 0.0), ZoneAreaReflProdMinusThisSurf(3, 0.0),
               LightWellEff(1.0), SolarDiffusing(false), BmSolRefldInsRevealRepEnergy(0.0), BmSolRefldOutsRevealRepEnergy(0.0),
               BmSolTransThruIntWinRepEnergy(0.0), FrameHeatGain(0.0), DividerHeatGain(0.0), FrameHeatLoss(0.0), DividerHeatLoss(0.0),
-              TCLayerTemp(0.0), SpecTemp(0.0), WindowModelType(Window5DetailedModel)
+              TCLayerTemp(0.0), SpecTemp(0.0), WindowModelType(Window5DetailedModel), TDDPipeNum(0)
         {
         }
 
