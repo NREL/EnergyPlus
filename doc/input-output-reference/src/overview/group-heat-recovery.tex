@@ -213,7 +213,7 @@ Wet-bulb: & 14°C (58°F) & 17C (63F) \tabularnewline
 \bottomrule
 \end{longtable}
 
-Note: Conditions consistent with the Air-Conditioning and Refrigeration Institute s (ARI) Standard 1060-2001.
+Note: Conditions consistent with the Air-Conditioning and Refrigeration Institute's (ARI) Standard 1060-2001.
 
 This object models the basic operation of an air-to-air heat exchanger. Heat exchange between the supply and exhaust air streams occurs whenever the unit is scheduled to be available (Availability schedule) and supply/exhaust air flow is present. This heat exchanger object can be used in conjunction with a conventional air-side economizer (i.e., specify ModulateFlow in the \hyperref[controlleroutdoorair]{Controller:OutdoorAir} object), whereby heat exchange is suspended whenever the air-side economizer (or high humidity control) is active (i.e., air flow is fully bypassed around a fixed-plate heat exchanger or the rotation of a rotary heat exchanger is stopped). This object is also able to suspend heat exchange for the purpose of providing free cooling operation in the absence of a conventional air-side economizer (i.e., specify MinimumFlowWithBypass in the \hyperref[controlleroutdoorair]{Controller:OutdoorAir} object).
 
@@ -330,7 +330,7 @@ This alpha field has four choices: None, ExhaustAirRecirculation, ExhaustOnly an
 
 This numeric field defines the dry-bulb temperature of air which is used to initiate frost control. The default value is 1.7 °C. For ExhaustAirRecirculation and ExhaustOnly frost control, the threshold temperature defines the supply (outdoor) air inlet temperature below which frost control is active. For MinimumExhaustTemperature frost control, heat exchanger effectiveness is controlled to keep the exhaust air outlet temperature from falling below this threshold temperature value.
 
-The appropriate threshold temperature varies with exhaust (inlet) air temperature and humidity, frost control type, heat exchanger type, and whether the heat exchanger transfers sensible energy alone or both sensible and latent energy (enthalpy). Typical threshold temperatures are provided in Table~\ref{table:typical-threshold-temperatures} below. However, it is recommended that the user consult manufacturer s information for the specific air-to-air heat exchanger being modeled.
+The appropriate threshold temperature varies with exhaust (inlet) air temperature and humidity, frost control type, heat exchanger type, and whether the heat exchanger transfers sensible energy alone or both sensible and latent energy (enthalpy). Typical threshold temperatures are provided in Table~\ref{table:typical-threshold-temperatures} below. However, it is recommended that the user consult manufacturer's information for the specific air-to-air heat exchanger being modeled.
 
 % table 31
 \begin{longtable}[c]{>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}>{\raggedright}p{1.5in}}
@@ -382,11 +382,9 @@ This numeric field defines the rate of increase in the defrost time fraction as 
 
 This value is used to determine the total defrost time fraction as follows:
 
-Total defrost time fraction = Initial Defrost Time Fraction +
 
-\begin{lstlisting}
-       Rate of Defrost Time Fraction Increase \* (T$_{threshold}$     T$_{supply\\ air\\ inlet}$)
-\end{lstlisting}
+Total defrost time fraction = Initial Defrost Time Fraction +
+Rate of Defrost Time Fraction Increase * (\(T_{threshold}\) - \(T_{supply air inlet}\))
 
 The model does not allow the total defrost time fraction to exceed 1.0 or be less than 0.
 
@@ -581,7 +579,7 @@ The name of the HVAC system node to which the unit sends its process outlet air.
 
 \paragraph{Field: Heat Exchanger Performance Object Type}\label{field-heat-exchanger-performance-object-type}
 
-This alpha field contains the type of model used to simulate the desiccant heat exchanger s thermal performance and electrical energy use. Currently, the only valid choice is \hyperref[heatexchangerdesiccantbalancedflowperformancedatatype1]{HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1}.
+This alpha field contains the type of model used to simulate the desiccant heat exchanger's thermal performance and electrical energy use. Currently, the only valid choice is \hyperref[heatexchangerdesiccantbalancedflowperformancedatatype1]{HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1}.
 
 \paragraph{Field: Heat Exchanger Performance Name}\label{field-heat-exchanger-performance-name}
 
@@ -649,7 +647,7 @@ This output is the sensible heating energy added to the process air by the heat 
 
 \paragraph{Heat Exchanger Latent Gain Rate {[}W{]}}\label{heat-exchanger-latent-gain-rate-w-2}
 
-This output is the latent heating rate (humidification) of the process air by the heat exchanger in Watts. This rate is determined by taking the difference between the heat exchanger s total heat recovery rate and the sensible heat recovery rate. A positive value is reported if the process air is humidified by the heat exchanger, else the rate is set to zero.
+This output is the latent heating rate (humidification) of the process air by the heat exchanger in Watts. This rate is determined by taking the difference between the heat exchanger's total heat recovery rate and the sensible heat recovery rate. A positive value is reported if the process air is humidified by the heat exchanger, else the rate is set to zero.
 
 \paragraph{Heat Exchanger Latent Gain Energy {[}J{]}}\label{heat-exchanger-latent-gain-energy-j-1}
 
@@ -673,7 +671,7 @@ This output is the sensible cooling energy added to the process air by the heat 
 
 \paragraph{Heat Exchanger Latent Cooling Rate {[}W{]}}\label{heat-exchanger-latent-cooling-rate-w-2}
 
-This output is the latent cooling rate (dehumidification) of the process air by the heat exchanger in Watts. This rate is determined by taking the difference between the heat exchanger s total heat recovery rate and the sensible heat recovery rate. A positive value is reported if the process air is dehumidified by the heat exchanger, else the rate is set to zero.
+This output is the latent cooling rate (dehumidification) of the process air by the heat exchanger in Watts. This rate is determined by taking the difference between the heat exchanger's total heat recovery rate and the sensible heat recovery rate. A positive value is reported if the process air is dehumidified by the heat exchanger, else the rate is set to zero.
 
 \paragraph{Heat Exchanger Latent Cooling Energy {[}J{]}}\label{heat-exchanger-latent-cooling-energy-j-2}
 
