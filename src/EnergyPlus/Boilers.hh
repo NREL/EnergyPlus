@@ -54,15 +54,11 @@
 // EnergyPlus Headers
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
 namespace Boilers {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
 
     // Boiler normalized efficiency curve types
     extern int const Linear;
@@ -72,7 +68,6 @@ namespace Boilers {
     extern int const Cubic;
     extern int const QuadraticLinear;
     extern int const BiCubic;
-    extern int const TriQuadratic;
 
     // water temperature evaluation method
     extern int const BoilerTempModeNotSet;
@@ -85,25 +80,11 @@ namespace Boilers {
     extern int const NotModulated;
     extern int const LeavingSetPointModulated;
 
-    // DERIVED TYPE DEFINITIONS
-
     // MODULE VARIABLE DECLARATIONS:
-    extern int NumBoilers;            // Number of boilers
-    extern Real64 FuelUsed;           // W - Boiler fuel used
-    extern Real64 ParasiticElecPower; // W - Parasitic electrical power (e.g. forced draft fan)
-    extern Real64 BoilerLoad;         // W - Boiler Load
-    extern Real64 BoilerMassFlowRate; // kg/s - Boiler mass flow rate
-    extern Real64 BoilerOutletTemp;   // W - Boiler outlet temperature
-    extern Real64 BoilerPLR;          // Boiler operating part-load ratio
-    extern bool GetBoilerInputFlag;   // Boiler input flag, false if input is processed
+    extern int NumBoilers;          // Number of boilers
+    extern bool GetBoilerInputFlag; // Boiler input flag, false if input is processed
 
-    extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
-
-    // Types
-
-    struct BoilerSpecs
+    struct BoilerSpecs : PlantComponent
     {
         // Members
         std::string Name;             // user identifier
@@ -147,6 +128,22 @@ namespace Boilers {
         int FaultyBoilerFoulingIndex;     // Index of the fault object corresponding to the boiler
         Real64 FaultyBoilerFoulingFactor; // Boiler fouling factor
         std::string EndUseSubcategory;    // identifier use for the end use subcategory
+        bool MyEnvrnFlag;
+        bool MyFlag;
+
+        Real64 FuelUsed;           // W - Boiler fuel used
+        Real64 ParasiticElecPower; // W - Parasitic electrical power (e.g. forced draft fan)
+        Real64 BoilerLoad;         // W - Boiler Load
+        Real64 BoilerMassFlowRate; // kg/s - Boiler mass flow rate
+        Real64 BoilerOutletTemp;   // W - Boiler outlet temperature
+        Real64 BoilerPLR;          // Boiler operating part-load ratio
+
+        Real64 BoilerEnergy;             // J - Boiler energy integrated over time
+        Real64 FuelConsumed;             // J - Boiler Fuel consumed integrated over time
+        Real64 BoilerInletTemp;          // C - Boiler inlet temperature
+        Real64 ParasiticElecConsumption; // J - Parasitic Electrical Consumption (e.g. forced draft fan)
+
+        std::string BoilerFuelTypeForOutputVariable;
 
         // Default Constructor
         BoilerSpecs()
@@ -154,79 +151,45 @@ namespace Boilers {
               NomCapWasAutoSized(false), Effic(0.0), TempDesBoilerOut(0.0), FlowMode(FlowModeNotSet), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), VolFlowRate(0.0), VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0), MassFlowRate(0.0), SizFac(0.0),
               BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0),
-              CurveTempMode(BoilerTempModeNotSet), EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0),
-              EffCurveOutputError(0), EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), IsThisSized(false),
-              FaultyBoilerFoulingFlag(false), FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0)
+              CurveTempMode(BoilerTempModeNotSet), EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0), EffCurveOutputError(0),
+              EffCurveOutputIndex(0), CalculatedEffError(0), CalculatedEffIndex(0), IsThisSized(false), FaultyBoilerFoulingFlag(false),
+              FaultyBoilerFoulingIndex(0), FaultyBoilerFoulingFactor(1.0), MyEnvrnFlag(true), MyFlag(true), FuelUsed(0.0), ParasiticElecPower(0.0),
+              BoilerLoad(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0), BoilerPLR(0.0), BoilerEnergy(0.0), FuelConsumed(0.0),
+              BoilerInletTemp(0.0), ParasiticElecConsumption(0.0), BoilerFuelTypeForOutputVariable("")
         {
         }
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+        void getSizingFactor(Real64 &SizFac) override;
+
+        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+
+        void SetupOutputVars();
+
+        void InitBoiler(); // number of the current boiler being simulated
+
+        void SizeBoiler();
+
+        void CalcBoilerModel(Real64 MyLoad,    // W - hot water demand to be met by boiler
+                             bool RunFlag,     // TRUE if boiler operating
+                             int EquipFlowCtrl // Flow control mode for the equipment
+        );
+
+        void UpdateBoilerRecords(Real64 MyLoad, // boiler operating load
+                                 bool RunFlag   // boiler on when TRUE
+        );
+
+        static PlantComponent *factory(std::string const &objectName);
     };
 
-    struct ReportVars
-    {
-        // Members
-        Real64 BoilerLoad;               // W - Boiler operating load
-        Real64 BoilerEnergy;             // J - Boiler energy integrated over time
-        Real64 FuelUsed;                 // W - Boiler fuel used
-        Real64 FuelConsumed;             // J - Boiler Fuel consumed integrated over time
-        Real64 BoilerInletTemp;          // C - Boiler inlet temperature
-        Real64 BoilerOutletTemp;         // C - Boiler outlet temperature
-        Real64 Mdot;                     // kg/s - Boiler mass flow rate
-        Real64 ParasiticElecPower;       // W - Parasitic Electrical Power (e.g. forced draft fan)
-        Real64 ParasiticElecConsumption; // J - Parasitic Electrical Consumption (e.g. forced draft fan)
-        Real64 BoilerPLR;                // Boiler operating part-load ratio
-
-        // Default Constructor
-        ReportVars()
-            : BoilerLoad(0.0), BoilerEnergy(0.0), FuelUsed(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), BoilerOutletTemp(0.0), Mdot(0.0),
-              ParasiticElecPower(0.0), ParasiticElecConsumption(0.0), BoilerPLR(0.0)
-        {
-        }
-    };
-
-    // Object Data
-    extern Array1D<BoilerSpecs> Boiler;      // boiler data - dimension to number of machines
-    extern Array1D<ReportVars> BoilerReport; // report vars - dimension to number of machines
-
-    // Functions
+    extern Array1D<BoilerSpecs> Boiler; // boiler data - dimension to number of machines
 
     void clear_state();
 
-    void SimBoiler(std::string const &BoilerType, // boiler type (used in CASE statement)
-                   std::string const &BoilerName, // boiler identifier
-                   int const EquipFlowCtrl,       // Flow control mode for the equipment
-                   int &CompIndex,                // boiler counter/identifier
-                   bool const RunFlag,            // if TRUE run boiler simulation--boiler is ON
-                   bool &InitLoopEquip,           // If not zero, calculate the max load for operating conditions
-                   Real64 &MyLoad,                // W - Actual demand boiler must satisfy--calculated by load dist. routine
-                   Real64 &MaxCap,                // W - maximum boiler operating capacity
-                   Real64 &MinCap,                // W - minimum boiler operating capacity
-                   Real64 &OptCap,                // W - optimal boiler operating capacity
-                   bool const GetSizingFactor,    // TRUE when just the sizing factor is requested
-                   Real64 &SizingFactor           // sizing factor
-    );
-
     void GetBoilerInput();
-
-    void InitBoiler(int const BoilerNum); // number of the current boiler being simulated
-
-    void SizeBoiler(int const BoilerNum);
-
-    void CalcBoilerModel(int &BoilerNum,         // boiler identifier
-                         Real64 const MyLoad,    // W - hot water demand to be met by boiler
-                         bool const RunFlag,     // TRUE if boiler operating
-                         int const EquipFlowCtrl // Flow control mode for the equipment
-    );
-
-    // Beginning of Record Keeping subroutines for the BOILER:HOTWATER Module
-    // *****************************************************************************
-
-    void UpdateBoilerRecords(Real64 const MyLoad, // boiler operating load
-                             bool const RunFlag,  // boiler on when TRUE
-                             int const Num        // boiler number
-    );
-
-    // End of Record Keeping subroutines for the BOILER:HOTWATER Module
-    // *****************************************************************************
 
 } // namespace Boilers
 

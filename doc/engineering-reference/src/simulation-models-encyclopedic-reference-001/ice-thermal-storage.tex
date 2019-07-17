@@ -103,7 +103,11 @@ The following section describes how the detailed ice storage model works in Ener
 
 \subsubsection{Charging and Discharging Equation}\label{charging-and-discharging-equation}
 
-The actual performance of the ice storage unit depends on the physical geometry, materials, and characteristics of the ice storage unit.~ In analyzing performance data trends from ice storage manufacturers, it was determined that the following equation would work well for the discharging process:
+The actual performance of the ice storage unit depends on the physical geometry, materials, and characteristics of the ice storage unit. Modeling both the charging and discharging performance of a particular ice storage unit is accomplished in EnergyPlus using Curve objects that establish the relationships between various parameters of the unit and the output of the unit itself. The input that controls what curve objects are used and what parameters are the independent variables in those curves are: Discharging Curve Variable Specifications, Discharging Curve Name, Charging Curve Variable Specifications, and Charging Curve Name.
+
+The Variable Specifications input fields determine which parameters are used as the independent variables in the curves referenced by the Curve Name inputs.  There are four options for the Variable Specifications fields: FractionChargedLMTD, FractionDischargedLMTD, LMTDMassFlow, and LMTDFractionCharged.  Each option defines which two variables are the independent variables in the curve equation as well as the order.  For example, FractionChargedLMTD uses the fraction of full charge of the storage component as the first variable and the normalized LMTD (or LMTD*) as the second variable.  Note that using options that use either LMTD or MassFlow actually use normalized values LMTD* and MassFlow*.  LMTD is normalized by dividing the actual value by 10\(^{\circ}\)C while MassFlow is normalized by dividing the actual mass flow rate by the equivalent of 100 gallons per minute.  
+
+One equation that might be used to characterize the discharging performance of an ice storage component is a QuadraticLinear Curve.  If the discharging equation referenced in the detailed ice storage unit is a QuadraticLinear equation that uses FractionDischargedLMTD for the variable specification, then this would result in the following equation for characterizing the ice storage component's discharging process:
 
 \begin{equation}
 {q^*} = \left[ {C1 + C2\left( {1 - {P_c}} \right) + C3{{\left( {1 - {P_c}} \right)}^2}} \right] + \left[ {C4 + C5\left( {1 - {P_c}} \right) + C6{{\left( {1 - {P_c}} \right)}^2}} \right]\Delta T_{lm}^*
@@ -122,7 +126,7 @@ where:
 \end{equation}
 
 \begin{equation}
-\Delta T_{lm}^* \equiv \frac{{\Delta {T_{lm}}}}{{\Delta {T_{no\min al}}}}
+\Delta T_{lm}^* \equiv \frac{{\Delta {T_{lm}}}}{{\Delta {T_{nominal}}}}
 \end{equation}
 
 \begin{equation}
@@ -133,9 +137,9 @@ q is the instantaneous heat transfer rate
 
 Q\(_{stor}\) is the total latent storage capacity
 
-Dt is a time step used in the curve fit (usually one hour)
+\(\Delta\)t is a time step used in the curve fit (usually one hour)
 
-DT\(_{nominal}\) is a nominal temperature difference (18\(^{\circ}\)F = 10\(^{\circ}\)C)
+\(\Delta\)T\(_{nominal}\) is a nominal temperature difference (18\(^{\circ}\)F = 10\(^{\circ}\)C)
 
 T\(_{brine,in}\) is the tank brine inlet temperature
 
@@ -147,25 +151,19 @@ P\(_{c}\) is the fraction charged
 
 P\(_{d}\) is the fraction discharged.
 
-Likewise, the charging process of the ice storage device can be characterized by the following equation that is similar in form to the discharging equation:
+Likewise, if the charging equation referenced in the detailed ice storage unit is a QuadraticLinear equation that uses FractionChargedLMTD for the variable specification, then this would result in the following equation for characterizing the ice storage component's charging process:
 
 \begin{equation}
 {q^*} = \left[ {C1 + C2\left( {{P_c}} \right) + C3{{\left( {{P_c}} \right)}^2}} \right] + \left[ {C4 + C5\left( {{P_c}} \right) + C6{{\left( {{P_c}} \right)}^2}} \right]\Delta T_{lm}^*
 \end{equation}
 
-Note that the time step might differ from the time step used within the EnergyPlus simulation.~ These are actually two separate time steps and are kept separate.
+Note that the time step used for the curve fit of performance data might differ from the time step used within the EnergyPlus simulation.~ These are actually two separate time steps and are kept separate.
 
 \subsubsection{Charging Algorithm}\label{charging-algorithm}
 
 During charging, manufacturers have stated that they attempt to charge the unit at the maximum rate until the unit is completely charged.~ This, of course, occurs during off-peak electric hours.~ Thus, once the setpoint has been scheduled for charging, the unit will charge at the maximum possible rate.~ This means that the flow rate through the ice storage device equals the flow to the component (or no bypass).~ The only time flow to the ice storage unit would be reduced is at the end of the charge cycle when more ice making capacity is available in a particular time step than is needed to fully charge the tank.~ In this case, the flow to the tank would be reduced appropriately to top off the tank storage capacity. ~We also have a setpoint goal for the outlet temperature of the ice storage device as defined by the setpoint schedule.
 
-In solving the performance of the ice storage unit, we have effectively two equations (one of which is non-linear) and two unknowns.~ The equations are:
-
-\begin{equation}
-{q^*} = \left[ {C1 + C2\left( {{P_c}} \right) + C3{{\left( {{P_c}} \right)}^2}} \right] + \left[ {C4 + C5\left( {{P_c}} \right) + C6{{\left( {{P_c}} \right)}^2}} \right]\Delta T_{lm}^*
-\end{equation}
-
-from which we can obtain the component load (q) and
+In solving the performance of the ice storage unit, we have effectively two equations.  One of these equations is determined by the user input and characterizes the output of the unit (\(q^*\)) as a function of LMTD* and fraction charged/discharged or normalized mass flow rate. The other equation is:
 
 \begin{equation}
 q = \dot m{C_p}\left( {{T_i} - {T_o}} \right)
@@ -194,13 +192,7 @@ During discharging, we cannot assume that all of the flow is sent through the ic
 
 While we cannot assume that all of the flow is sent through the ice storage unit, we can use that as an initial guess in order to determine the current performance of the ice storage system. Most of the discharging algorithm then becomes very similar to the charging process.
 
-In solving the performance of the ice storage unit, we have effectively two equations (one of which is non-linear) and two unknowns. The equations are:
-
-\begin{equation}
-{q^*} = \left[ {C1 + C2\left( {{P_d}} \right) + C3{{\left( {{P_d}} \right)}^2}} \right] + \left[ {C4 + C5\left( {{P_d}} \right) + C6{{\left( {{P_d}} \right)}^2}} \right]\Delta T_{lm}^*
-\end{equation}
-
-from which we can obtain the component load (q) and
+In solving the performance of the ice storage unit, we have effectively two equations.  One of these equations is determined by the user input and characterizes the output of the unit (\(q^*\)) as a function of LMTD* and fraction charged/discharged or normalized mass flow rate. The other equation is:
 
 \begin{equation}
 q = \dot m{C_p}\left( {{T_i} - {T_o}} \right)

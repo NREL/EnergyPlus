@@ -28,7 +28,7 @@ The following diagram shows some of the devices and arrangements that can be mod
 
 This object is used to model the energy losses of transformers when they are used to transfer electricity from the grid to a building (as distribution transformers) or transfer electricity from onsite generators to the grid. Distribution transformers reduce the voltage on utility distribution lines (34.5 kV or less) to a lower secondary voltage (600 V or less) suitable for customer equipment. According to the medium used for cooling and insulation, distribution transformers can be classified into liquid-immersed and dry type transformers. According to the input voltages, distribution transformers can be classified into medium-voltage (between 600 V and 34.5kV) and low-voltage transformer (less than 600 V). The transformers used to output the surplus electricity from onsite generators to the grid usually match the cogeneration voltage to the grid. This object can be used for all types of distribution transformers and the transformers used to output electricity from onsite generators to the grid, but the model defaults applies to the low-voltage dry type transformers because they are the most common type found in commercial and industrial facilities.
 
-Energy losses in transformers consist of the no load (core) loss and the load (winding) loss. The no load loss comes primarily from the switching of the magnetic fields in the core material. It is roughly constant and exists continuously in the core material as long as the transformer is energized. The load loss comes from the electrical resistance in the windings when there is a load on the transformer. The load loss is proportional to the load squared with a small temperature correction. The energy losses at a given load depend on the transformer s performance. This object provides the user two alternative ways to indicate the transformer s performance. First, the user can provide the no load loss and load loss at rated conditions. Second, the user can provide the nameplate efficiency and the corresponding reference conditions. The detailed algorithms to calculate the energy losses are described in the Engineering Reference.
+Energy losses in transformers consist of the no load (core) loss and the load (winding) loss. The no load loss comes primarily from the switching of the magnetic fields in the core material. It is roughly constant and exists continuously in the core material as long as the transformer is energized. The load loss comes from the electrical resistance in the windings when there is a load on the transformer. The load loss is proportional to the load squared with a small temperature correction. The energy losses at a given load depend on the transformer's performance. This object provides the user two alternative ways to indicate the transformer's performance. First, the user can provide the no load loss and load loss at rated conditions. Second, the user can provide the nameplate efficiency and the corresponding reference conditions. The detailed algorithms to calculate the energy losses are described in the Engineering Reference.
 
 The user needs to specify which loads are connected to the transformer. This is achieved in different manners depending on the transformer usage. For a distribution transformer, the user needs to provide a number of electric meters wired to that transformer. The input object can currently accommodate up to ten meters, but it is extensible by modifying the Energy+.idd entry. For a transformer used to output electricity from onsite generators to the grid, the user needs to indicate the transformer name in the served electric load center.
 
@@ -44,11 +44,11 @@ This field indicates one of the three supported transformer application types: P
 
 \paragraph{Field: Zone Name}\label{field-zone-name-005}
 
-This field contains the name of the thermal zone where the transformer is located. Entering a valid name of zone here will direct EnergyPlus to include the transformer s losses as heat gains to the named thermal zone. If the transformer is not within a thermal zone, this field can be left blank and the thermal energy associated with transformer losses is removed from the building model.
+This field contains the name of the thermal zone where the transformer is located. Entering a valid name of zone here will direct EnergyPlus to include the transformer's losses as heat gains to the named thermal zone. If the transformer is not within a thermal zone, this field can be left blank and the thermal energy associated with transformer losses is removed from the building model.
 
 \paragraph{Field: Radiative Fraction}\label{field-radiative-fraction}
 
-This field contains the fraction of transformer s losses that enter the zone as long-wave thermal radiation. This numeric filed should have a value between 0.0 and 1.0. The balance of the losses is convective. This field is not used if the previous field for zone name is left blank.
+This field contains the fraction of transformer's losses that enter the zone as long-wave thermal radiation. This numeric filed should have a value between 0.0 and 1.0. The balance of the losses is convective. This field is not used if the previous field for zone name is left blank.
 
 \paragraph{Field: Rated Capacity}\label{field-rated-capacity}
 
@@ -630,7 +630,7 @@ This field contains the name of a schedule that describes when the inverter is a
 
 \paragraph{Field: Zone Name}\label{field-zone-name-1-003}
 
-This field contains the name of the thermal zone where the inverter is located. Entering a valid name of zone here will direct EnergyPlus to include the inverter s losses as heat gains to the named thermal zone. If the inverter is not within a thermal zone, then this field can be left blank (and the thermal energy associated with inverter losses is removed from the building model).
+This field contains the name of the thermal zone where the inverter is located. Entering a valid name of zone here will direct EnergyPlus to include the inverter's losses as heat gains to the named thermal zone. If the inverter is not within a thermal zone, then this field can be left blank (and the thermal energy associated with inverter losses is removed from the building model).
 
 \paragraph{Field: Radiative Fraction}\label{field-radiative-fraction-1}
 
@@ -668,7 +668,7 @@ This field contains the name of a schedule that describes when the inverter is a
 
 \paragraph{Field: Zone Name}\label{field-zone-name-2-001}
 
-This field contains the name of the thermal zone where the inverter is located. Entering a valid name of zone here will direct EnergyPlus to include the inverter s losses as heat gains to the named thermal zone. If the inverter is not within a thermal zone, then this field can be left blank (and the thermal energy associated with inverter losses is removed from the building model).
+This field contains the name of the thermal zone where the inverter is located. Entering a valid name of zone here will direct EnergyPlus to include the inverter's losses as heat gains to the named thermal zone. If the inverter is not within a thermal zone, then this field can be left blank (and the thermal energy associated with inverter losses is removed from the building model).
 
 \paragraph{Field: Radiative Fraction}\label{field-radiative-fraction-2}
 
@@ -676,7 +676,7 @@ This field contains the fraction of inverter thermal losses that enter the zone 
 
 \paragraph{Field: Efficiency Function of Power Curve Name}\label{field-efficiency-function-of-power-curve-name}
 
-This field contains the name of curve representing the relationship between DC power input into the inverter and the efficiency with which that power is converted to AC. The curve can be either a \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, or \hyperref[curvecubic]{Curve:Cubic}. The curve s x value is DC power input normalized by the following field. The result of the curve should be power conversion efficiency expressed as a fraction between 0.0 and 1.0.
+This field contains the name of curve representing the relationship between DC power input into the inverter and the efficiency with which that power is converted to AC. The curve can be either a \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, or \hyperref[curvecubic]{Curve:Cubic}. The curve's x value is DC power input normalized by the following field. The result of the curve should be power conversion efficiency expressed as a fraction between 0.0 and 1.0.
 
 \paragraph{Field: Rated Maximum Continuous Input Power}\label{field-rated-maximum-continuous-input-power}
 
@@ -684,11 +684,11 @@ This field contains the rated power input in watts. This is value used to normal
 
 \paragraph{Field: Minimum Efficiency}\label{field-minimum-efficiency}
 
-This field contains a minimum bound on the inverter efficiency. This value will be used as a limit on the curve s result.
+This field contains a minimum bound on the inverter efficiency. This value will be used as a limit on the curve's result.
 
 \paragraph{Field: Maximum Efficiency}\label{field-maximum-efficiency}
 
-This field contains a maximum bound on the inverter efficiency. This value will be used as a limit on the curve s result.
+This field contains a maximum bound on the inverter efficiency. This value will be used as a limit on the curve's result.
 
 \paragraph{Field: Minimum Power Output}\label{field-minimum-power-output}
 
@@ -738,7 +738,7 @@ This field contains the name of a schedule that describes when the inverter is a
 
 \paragraph{Field: Zone Name}\label{field-zone-name-3-000}
 
-This field contains the name of the thermal zone where the inverter is located. Entering a valid name of zone here will direct EnergyPlus to include the inverter s losses as heat gains to the named thermal zone. If the inverter is not within a thermal zone, then this field can be left blank (and the thermal energy associated with inverter losses is removed from the building model).
+This field contains the name of the thermal zone where the inverter is located. Entering a valid name of zone here will direct EnergyPlus to include the inverter's losses as heat gains to the named thermal zone. If the inverter is not within a thermal zone, then this field can be left blank (and the thermal energy associated with inverter losses is removed from the building model).
 
 \paragraph{Field: Radiative Fraction}\label{field-radiative-fraction-3}
 
@@ -918,7 +918,7 @@ These outputs are the thermal power or energy losses in the inverter that stem f
 
 \paragraph{Inverter Ancillary AC Electric Energy {[}J{]}}\label{inverter-ancillary-ac-electric-energy-j}
 
-These outputs are the Alternating Current electricity consumed by the inverter. These are ancillary, or night tare loss, power uses by the inverter and modeled as if powered by the building s grid connection. These ancillary power draws generally occur when the inverter is not generating power but waiting in a standby mode ready to begin generating power.
+These outputs are the Alternating Current electricity consumed by the inverter. These are ancillary, or night tare loss, power uses by the inverter and modeled as if powered by the building's grid connection. These ancillary power draws generally occur when the inverter is not generating power but waiting in a standby mode ready to begin generating power.
 
 \subsection{ElectricLoadCenter:Storage:Converter}\label{electricloadcenterstorageconverter}
 
@@ -1159,7 +1159,7 @@ These outputs are the thermal power or energy losses from both charging and draw
 
 This object uses the kinetic battery model (KiBaM) to simulate rechargeable battery banks in an electrical load center. This model is intended to represent technologies such as lead-acid that encounter significant rate or kinetic limitations. The battery bank is a collection of one or more individual battery modules. Given the surplus or deficit power from the electrical system and the state of charge from the previous time step, this object can model the voltage, current, and energy losses with charging and discharging during each time step. The cumulative battery damage can be also modeled and reported at the end of each simulation run.
 
-The kinetic battery model assumes that part of the battery s energy storage capacity is immediately available in discharging or charging while the rest is chemically bound. As a function of constant current, the battery capacity is related to three parameters: the maximum capacity at infinitesimal current, the capacity ratio of available charges, and the conversion ratio between available charges and bound charges. These parameters are usually obtained via curve fitting based on battery data sheets or test data.
+The kinetic battery model assumes that part of the battery's energy storage capacity is immediately available in discharging or charging while the rest is chemically bound. As a function of constant current, the battery capacity is related to three parameters: the maximum capacity at infinitesimal current, the capacity ratio of available charges, and the conversion ratio between available charges and bound charges. These parameters are usually obtained via curve fitting based on battery data sheets or test data.
 
 Each individual battery module is modeled as a voltage source in series with an electrical resistance. KiBaM assumes that the internal resistance is constant and the open circuit voltage varies with the electric current, the state of charge and the operation mode (charging or discharging). For an individual battery module, the open circuit voltage at any time is correlated to the voltage at fully charged/discharged state and three other regression coefficients. These regression coefficients are usually obtained via curve fitting based on battery test data.
 
@@ -1528,11 +1528,11 @@ Design water volumetric flow rate through heat recovery loop in m\(^{3}\)/sec.
 
 \paragraph{Field: Heat Recovery Inlet Node Name}\label{field-heat-recovery-inlet-node-name}
 
-This alpha field contains the identifying name for the generator s heat recovery side inlet node.
+This alpha field contains the identifying name for the generator's heat recovery side inlet node.
 
 \paragraph{Field: Heat Recovery Outlet Node Name}\label{field-heat-recovery-outlet-node-name}
 
-This alpha field contains the identifying name for the generator s heat recovery side outlet node.
+This alpha field contains the identifying name for the generator's heat recovery side outlet node.
 
 \paragraph{Field: Fuel Type}\label{field-fuel-type}
 
@@ -1698,7 +1698,7 @@ These outputs are the heat recovery inlet and outlet temperatures and flow rate 
 
 \paragraph{Generator Fuel HHV Basis Energy {[}J{]}}\label{generator-fuel-hhv-basis-energy-j}
 
-These outputs are the generator s fuel energy and use rate. The energy content of the fuel is based on the higher heating value (HHV).
+These outputs are the generator's fuel energy and use rate. The energy content of the fuel is based on the higher heating value (HHV).
 
 \paragraph{Generator \textless{}Fuel Type\textgreater{} Rate {[}W{]}}\label{generator-fuel-type-rate-w}
 
@@ -2004,11 +2004,11 @@ This numeric field specifies the full-load electrical power output of the microt
 
 \paragraph{Field: Minimum Full Load Electrical Power Output}\label{field-minimum-full-load-electrical-power-output}
 
-This numeric field specifies the minimum electrical power output in Watts at full-load conditions. The electrical power output of the generator is determined by multiplying the Reference Electrical Power Output by the Electrical Power Function of Temperature and Elevation modifier curve. If the result is less than the numeric value specified in this input field, then the generator s electrical power output is reset to the minimum full-load value specified in this input field. The value entered in this field must be greater than or equal to zero. If this field is left blank, the default value of 0.0 will be used.
+This numeric field specifies the minimum electrical power output in Watts at full-load conditions. The electrical power output of the generator is determined by multiplying the Reference Electrical Power Output by the Electrical Power Function of Temperature and Elevation modifier curve. If the result is less than the numeric value specified in this input field, then the generator's electrical power output is reset to the minimum full-load value specified in this input field. The value entered in this field must be greater than or equal to zero. If this field is left blank, the default value of 0.0 will be used.
 
 \paragraph{Field: Maximum Full Load Electrical Power Output}\label{field-maximum-full-load-electrical-power-output}
 
-This numeric field specifies the maximum electrical power output in Watts at full-load conditions. The electrical power output of the generator is determined by multiplying the Reference Electrical Power Output by the Electrical Power Function of Temperature and Elevation Modifier curve. If the result is greater than the numeric value specified in this input field, then the generator s electrical power output is reset to the maximum full-load value specified in this input field. The value entered in this field must be greater than zero. If this field is left blank, then the value entered for the Reference Electrical Power Output field (above) will be used as the Maximum Full Load Electrical Power Output.
+This numeric field specifies the maximum electrical power output in Watts at full-load conditions. The electrical power output of the generator is determined by multiplying the Reference Electrical Power Output by the Electrical Power Function of Temperature and Elevation Modifier curve. If the result is greater than the numeric value specified in this input field, then the generator's electrical power output is reset to the maximum full-load value specified in this input field. The value entered in this field must be greater than zero. If this field is left blank, then the value entered for the Reference Electrical Power Output field (above) will be used as the Maximum Full Load Electrical Power Output.
 
 \paragraph{Field: Reference Electrical Efficiency Using Lower Heating Value}\label{field-reference-electrical-efficiency-using-lower-heating-value}
 
@@ -2036,7 +2036,7 @@ This alpha field specifies the name of a quadratic or cubic performance curve (r
 
 \paragraph{Field: Electrical Efficiency Function of Part Load Ratio Curve Name}\label{field-electrical-efficiency-function-of-part-load-ratio-curve-name}
 
-This alpha field specifies the name of a quadratic or cubic performance curve (ref: Performance Curves) that parameterizes the variation of electrical efficiency as a function of the generator s part-load ratio (part-load ratio is the actual electrical power output divided by the full-load electrical power output at the current operating conditions). The output of this curve is multiplied by the Reference Electrical Efficiency Using Lower Heating Value and the output of the Electrical Efficiency Function of Temperature modifier curve to give the electrical efficiency at specific part-load and combustion air inlet (temperature) conditions. This curve should be normalized to have a value of 1.0 when the generator s part-load ratio is 1.0, and the curve should be valid for the range of part-load ratios anticipated for the simulation period.
+This alpha field specifies the name of a quadratic or cubic performance curve (ref: Performance Curves) that parameterizes the variation of electrical efficiency as a function of the generator's part-load ratio (part-load ratio is the actual electrical power output divided by the full-load electrical power output at the current operating conditions). The output of this curve is multiplied by the Reference Electrical Efficiency Using Lower Heating Value and the output of the Electrical Efficiency Function of Temperature modifier curve to give the electrical efficiency at specific part-load and combustion air inlet (temperature) conditions. This curve should be normalized to have a value of 1.0 when the generator's part-load ratio is 1.0, and the curve should be valid for the range of part-load ratios anticipated for the simulation period.
 
 \paragraph{Field: Fuel Type}\label{field-fuel-type-2}
 
@@ -2056,19 +2056,19 @@ This numeric field specifies the standby electric power consumed by the generato
 
 \paragraph{Field: Ancillary Power}\label{field-ancillary-power}
 
-This numeric field specifies the ancillary electric power consumed by the generator in Watts. The ancillary power is the electrical power consumed by other associated equipment (e.g., external fuel pressurization pumps) when the generator is operating. Specify this input as 0.0 if the Reference Electrical Power Output and Reference Electrical Efficiency Using Lower Heating Value input fields and associated modifier curves reflect the net electrical power output from the generator (i.e., ancillary power already deducted from the generator s gross electrical power output). A value greater than zero indicates that this electrical power is consumed whenever the generator is operating and will be deducted from the generator s overall electrical power output (Generator Produced Electric Power). The value specified for this field must be greater than or equal to zero. If this field is left blank, the default value of 0.0 W will be used.
+This numeric field specifies the ancillary electric power consumed by the generator in Watts. The ancillary power is the electrical power consumed by other associated equipment (e.g., external fuel pressurization pumps) when the generator is operating. Specify this input as 0.0 if the Reference Electrical Power Output and Reference Electrical Efficiency Using Lower Heating Value input fields and associated modifier curves reflect the net electrical power output from the generator (i.e., ancillary power already deducted from the generator's gross electrical power output). A value greater than zero indicates that this electrical power is consumed whenever the generator is operating and will be deducted from the generator's overall electrical power output (Generator Produced Electric Power). The value specified for this field must be greater than or equal to zero. If this field is left blank, the default value of 0.0 W will be used.
 
 \paragraph{Field: Ancillary Power Function of Fuel Input Curve Name}\label{field-ancillary-power-function-of-fuel-input-curve-name}
 
-This alpha field specifies the name of a quadratic performance curve (ref: Performance Curves) that parameterizes the variation of ancillary power as a function of the generator s input fuel mass flow rate (kg/s). The output of this curve is multiplied by the ancillary power to give the ancillary power at a specific fuel mass flow rate. If this field is left blank, the model assumes that the modifier curve is 1.0 for the entire simulation (i.e., the ancillary power is constant whenever the generator operates).
+This alpha field specifies the name of a quadratic performance curve (ref: Performance Curves) that parameterizes the variation of ancillary power as a function of the generator's input fuel mass flow rate (kg/s). The output of this curve is multiplied by the ancillary power to give the ancillary power at a specific fuel mass flow rate. If this field is left blank, the model assumes that the modifier curve is 1.0 for the entire simulation (i.e., the ancillary power is constant whenever the generator operates).
 
 \paragraph{Field: Heat Recovery Water Inlet Node Name}\label{field-heat-recovery-water-inlet-node-name}
 
-This alpha field specifies the identifying name for the generator s heat recovery water inlet node.
+This alpha field specifies the identifying name for the generator's heat recovery water inlet node.
 
 \paragraph{Field: Heat Recovery Water Outlet Node Name}\label{field-heat-recovery-water-outlet-node-name}
 
-This alpha field specifies the identifying name for the generator s heat recovery water outlet node.
+This alpha field specifies the identifying name for the generator's heat recovery water outlet node.
 
 \paragraph{Field: Reference Thermal Efficiency Using Lower Heat Value}\label{field-reference-thermal-efficiency-using-lower-heat-value}
 
@@ -2096,7 +2096,7 @@ This alpha field specifies the name of a bi-quadratic performance curve (ref: Pe
 
 \paragraph{Field: Heat Recovery Rate Function of Part Load Ratio Curve Name}\label{field-heat-recovery-rate-function-of-part-load-ratio-curve-name}
 
-This alpha field specifies the name of a quadratic or cubic performance curve (ref: Performance Curves) that parameterizes the variation of heat recovery to water (thermal power output) as a function of the generator s part-load ratio (part-load ratio is the actual electrical power output divided by the full-load electrical power output at the current operating conditions). The output of this curve is multiplied by the steady-state heat recovery at the current combustion inlet air temperature and elevation to give the heat recovery rate (thermal power output) at specific part-load operating conditions. This curve should be normalized to have a value of 1.0 when the generator s part-load ratio is 1.0, and the curve should be valid for the range of part-load ratios anticipated for the simulation period. If this field is left blank, the model assumes that the modifier curve is 1.0 for the entire simulation.
+This alpha field specifies the name of a quadratic or cubic performance curve (ref: Performance Curves) that parameterizes the variation of heat recovery to water (thermal power output) as a function of the generator's part-load ratio (part-load ratio is the actual electrical power output divided by the full-load electrical power output at the current operating conditions). The output of this curve is multiplied by the steady-state heat recovery at the current combustion inlet air temperature and elevation to give the heat recovery rate (thermal power output) at specific part-load operating conditions. This curve should be normalized to have a value of 1.0 when the generator's part-load ratio is 1.0, and the curve should be valid for the range of part-load ratios anticipated for the simulation period. If this field is left blank, the model assumes that the modifier curve is 1.0 for the entire simulation.
 
 \paragraph{Field: Heat Recovery Rate Function of Inlet Water Temperature Curve Name}\label{field-heat-recovery-rate-function-of-inlet-water-temperature-curve-name}
 
@@ -2118,7 +2118,7 @@ This numeric field specifies the maximum (volumetric) water flow rate through th
 
 This field sets the maximum water temperature, in degrees Celsius, that this generator can produce via heat recovery. This temperature limit puts an upper bound on the recovered heat and limits the max temperatures leaving the component.
 
-As temperatures in the water loop approach this maximum temperature, the temperature difference between the entering water and the surfaces in generator s heat recovery heat exchanger becomes smaller. For the given heat recovery flow rate and that temperature difference the amount of heat recovered will be reduced, and eventually there will be no heat recovered when the entering water temperature is equal to the maximum temperature specified by the user in this field. The amount of heat recovered will diminish if the inlet water temperature approaches the maximum temperature, and this will show up in the reporting.
+As temperatures in the water loop approach this maximum temperature, the temperature difference between the entering water and the surfaces in generator's heat recovery heat exchanger becomes smaller. For the given heat recovery flow rate and that temperature difference the amount of heat recovered will be reduced, and eventually there will be no heat recovered when the entering water temperature is equal to the maximum temperature specified by the user in this field. The amount of heat recovered will diminish if the inlet water temperature approaches the maximum temperature, and this will show up in the reporting.
 
 \paragraph{Field: Combustion Air Inlet Node Name}\label{field-combustion-air-inlet-node-name}
 
@@ -2138,7 +2138,7 @@ This alpha field specifies the name of a quadratic or cubic performance curve (r
 
 \paragraph{Field: Exhaust Air Flow Rate Function of Part Load Ratio Curve Name}\label{field-exhaust-air-flow-rate-function-of-part-load-ratio-curve-name}
 
-This alpha field specifies the name of a quadratic or cubic performance curve (ref: Performance Curves) that parameterizes the variation of exhaust air flow rate as a function of the generator s part-load ratio (part-load ratio is the actual electrical power output divided by the full-load electrical power output at the current operating conditions). The output of this curve is multiplied by the Reference Exhaust Air Mass Flow Rate to give the exhaust air mass flow rate at specific part-load operating conditions. This curve should be normalized to have a value of 1.0 when the generator s part-load ratio is 1.0, and the curve should be valid for the range of part-load ratios anticipated for the simulation period. If this field is left blank, the model assumes that the modifier curve is 1.0 for the entire simulation.
+This alpha field specifies the name of a quadratic or cubic performance curve (ref: Performance Curves) that parameterizes the variation of exhaust air flow rate as a function of the generator's part-load ratio (part-load ratio is the actual electrical power output divided by the full-load electrical power output at the current operating conditions). The output of this curve is multiplied by the Reference Exhaust Air Mass Flow Rate to give the exhaust air mass flow rate at specific part-load operating conditions. This curve should be normalized to have a value of 1.0 when the generator's part-load ratio is 1.0, and the curve should be valid for the range of part-load ratios anticipated for the simulation period. If this field is left blank, the model assumes that the modifier curve is 1.0 for the entire simulation.
 
 \paragraph{Field: Nominal Exhaust Air Outlet Temperature}\label{field-nominal-exhaust-air-outlet-temperature}
 
@@ -2150,7 +2150,7 @@ This alpha field specifies the name of a quadratic or cubic performance curve (r
 
 \paragraph{Field: Exhaust Air Temperature Function of Part Load Ratio Curve Name}\label{field-exhaust-air-temperature-function-of-part-load-ratio-curve-name}
 
-This alpha field specifies the name of a quadratic or cubic performance curve (ref: Performance Curves) that parameterizes the variation of exhaust air outlet temperature as a function of the generator s part-load ratio (part-load ratio is the actual electrical power output divided by the full-load electrical power output at the current operating conditions). The output of this curve is multiplied by the Nominal Exhaust Air Outlet Temperature to give the exhaust air temperature at specific part-load operating conditions. This curve should be normalized to have a value of 1.0 when the generator s part-load ratio is 1.0, and the curve should be valid for the range of part-load ratios anticipated for the simulation period. If this field is left blank, the model assumes that the modifier curve is 1.0 for the entire simulation.
+This alpha field specifies the name of a quadratic or cubic performance curve (ref: Performance Curves) that parameterizes the variation of exhaust air outlet temperature as a function of the generator's part-load ratio (part-load ratio is the actual electrical power output divided by the full-load electrical power output at the current operating conditions). The output of this curve is multiplied by the Nominal Exhaust Air Outlet Temperature to give the exhaust air temperature at specific part-load operating conditions. This curve should be normalized to have a value of 1.0 when the generator's part-load ratio is 1.0, and the curve should be valid for the range of part-load ratios anticipated for the simulation period. If this field is left blank, the model assumes that the modifier curve is 1.0 for the entire simulation.
 
 An example IDF showing how this object is used is provided below:
 
@@ -2318,7 +2318,7 @@ This output variable is the electric energy produced by the generator in Joules 
 
 \paragraph{Generator LHV Basis Electric Efficiency {[]}}\label{generator-lhv-basis-electric-efficiency}
 
-This output variable is the average electric efficiency of the generator (lower heating value basis) for the timestep being reported. The electric efficiency is the Generator Produced Electric Power in Watts divided by the generator s fuel energy consumption rate in Watts (lower heating value basis).
+This output variable is the average electric efficiency of the generator (lower heating value basis) for the timestep being reported. The electric efficiency is the Generator Produced Electric Power in Watts divided by the generator's fuel energy consumption rate in Watts (lower heating value basis).
 
 \paragraph{Generator \textless{}Fuel Type\textgreater{} HHV Basis Rate {[}W{]}}\label{generator-fuel-type-hhv-basis-rate-w}
 
@@ -2366,7 +2366,7 @@ This output variable is the thermal energy produced (i.e., exhaust energy recove
 
 \paragraph{Generator Thermal Efficiency LHV Basis {[}-{]}}\label{generator-thermal-efficiency-lhv-basis--}
 
-This output variable is the average thermal efficiency of the generator (lower heating value basis) for the timestep being reported. The thermal efficiency is the Generator Produced Thermal Rate in Watts divided by the generator s fuel energy consumption rate in Watts (lower heating value basis).
+This output variable is the average thermal efficiency of the generator (lower heating value basis) for the timestep being reported. The thermal efficiency is the Generator Produced Thermal Rate in Watts divided by the generator's fuel energy consumption rate in Watts (lower heating value basis).
 
 \paragraph{Generator Heat Recovery Inlet Temperature {[}C{]}}\label{generator-heat-recovery-inlet-temperature-c-1}
 
@@ -2498,7 +2498,7 @@ The associated \hyperref[curvetriquadratic]{Curve:Triquadratic} object should be
 
 \paragraph{Field: Cooling Water Flow Rate Mode}\label{field-cooling-water-flow-rate-mode}
 
-This field is used to choose between different modes of controlling the mass flow rate of cooling water. There are two options available for this field: PlantControl or InternalControl. The PlantControl option indicates that the cooling water flow rate through the CHP device is determined externally (by the wider balance of plant). The InternalControl option indicates the flow of cooling water is controlled inside the CHP device (e.g., like an automobile s thermostat).
+This field is used to choose between different modes of controlling the mass flow rate of cooling water. There are two options available for this field: PlantControl or InternalControl. The PlantControl option indicates that the cooling water flow rate through the CHP device is determined externally (by the wider balance of plant). The InternalControl option indicates the flow of cooling water is controlled inside the CHP device (e.g., like an automobile's thermostat).
 
 For internal control, the following field is used to define a Biquadratic curve that will determine the cooling water flow rate. For internal control, the CHP device should (probably) include a bypass branch when connecting to the plant loop.
 
@@ -2540,7 +2540,7 @@ This field describes the aggregated thermal mass of the heat recovery portion of
 
 \paragraph{Field: Standby Power}\label{field-standby-power-1}
 
-This field describes the power used by the CHP unit s control systems while in standby operation. Standby operation mode occurs whenever the unit is available but not being called upon to produce power. Power is entered as a positive value but indicates negative generation.
+This field describes the power used by the CHP unit's control systems while in standby operation. Standby operation mode occurs whenever the unit is available but not being called upon to produce power. Power is entered as a positive value but indicates negative generation.
 
 \paragraph{Field: Warm Up Mode}\label{field-warm-up-mode}
 
@@ -2578,7 +2578,7 @@ Enter the time between activation and power generation in seconds.
 
 \paragraph{Field: Cool Down Power}\label{field-cool-down-power}
 
-This field describes the power used by the CHP unit s ancillary systems while in cool down operation mode. Cool down operation mode occurs whenever the unit has recently been told to stop producing power. Power here is consumed and entered as a positive value that indicates negative generation. For example, a component such as a cooling fan might continue to run during cool down.
+This field describes the power used by the CHP unit's ancillary systems while in cool down operation mode. Cool down operation mode occurs whenever the unit has recently been told to stop producing power. Power here is consumed and entered as a positive value that indicates negative generation. For example, a component such as a cooling fan might continue to run during cool down.
 
 \paragraph{Field: Cool Down Delay Time}\label{field-cool-down-delay-time}
 
@@ -3167,19 +3167,19 @@ This variable provides the results for state of charge of the electrical storage
 
 \paragraph{Generator Produced DC Electric Power {[}W{]}}\label{generator-produced-dc-electric-power-w-1}
 
-This variable provides the rate at which power was stored into the fuel cell s electrical storage subsystem.
+This variable provides the rate at which power was stored into the fuel cell's electrical storage subsystem.
 
 \paragraph{Generator DC Storage Charging Energy {[}J{]}}\label{generator-dc-storage-charging-energy-j}
 
-This variable provides the energy stored into the fuel cell s electrical storage subsystem.
+This variable provides the energy stored into the fuel cell's electrical storage subsystem.
 
 \paragraph{Generator DC Storage Discharging Power {[}W{]}}\label{generator-dc-storage-discharging-power-w}
 
-This variable provides the rate at which power was drawn from the fuel cell s electrical storage subsystem.
+This variable provides the rate at which power was drawn from the fuel cell's electrical storage subsystem.
 
 \paragraph{Generator DC Storage Discharging Energy {[}J{]}}\label{generator-dc-storage-discharging-energy-j}
 
-This variable provides the energy drawn from the fuel cell s electrical storage subsystem.
+This variable provides the energy drawn from the fuel cell's electrical storage subsystem.
 
 \paragraph{Generator Ancillary AC Electric Power {[}W{]}}\label{generator-ancillary-ac-electric-power-w}
 
@@ -3195,7 +3195,7 @@ This variable provides information on the numerical method used to calculate the
 
 \paragraph{Generator Root Solver Iteration Count {[]}}\label{generator-regula-falsi-iteration-count}
 
-This variable provides information on the numerical method used to calculate product gas temperature as a function of the product gas s enthalpy. A root solver numerical method is used to invert the Shomate equation for enthalpy as a function of temperature. This output variable indicates the number of iterations needed for the root solver method to converge.
+This variable provides information on the numerical method used to calculate product gas temperature as a function of the product gas's enthalpy. A root solver numerical method is used to invert the Shomate equation for enthalpy as a function of temperature. This output variable indicates the number of iterations needed for the root solver method to converge.
 
 \paragraph{Generator Heat Recovery Exit Gas Temperature {[}C{]}}\label{generator-heat-recovery-exit-gas-temperature-c}
 
@@ -3319,7 +3319,7 @@ This field is used to describe the linear term, \(an{c_1}\) , in the relation sh
 
 \paragraph{Field: Skin Loss Calculation Mode}\label{field-skin-loss-calculation-mode}
 
-This field is used to select the mode for how skin losses are modeled. Skin losses are heat energy lost from the power module and transferred to the surrounding thermal zone named in the following field. There are three alpha options to choose from: ConstantRate , UAForProcessGasTemperature , or QuadraticFunctionOfFuelRate. Enter ConstantRate in this field to model skin losses using a constant rate, e.g.~100 watts. Enter UAForProcessGasTemperature to model skin losses using a UA-Delta-T calculation method with the temperature difference determined by the power module s product gas temperature and the surrounding zone. Enter QuadraticFunctionOfFuelRate to model skin losses as a function of the rate of fuel use.
+This field is used to select the mode for how skin losses are modeled. Skin losses are heat energy lost from the power module and transferred to the surrounding thermal zone named in the following field. There are three alpha options to choose from: ConstantRate , UAForProcessGasTemperature , or QuadraticFunctionOfFuelRate. Enter ConstantRate in this field to model skin losses using a constant rate, e.g.~100 watts. Enter UAForProcessGasTemperature to model skin losses using a UA-Delta-T calculation method with the temperature difference determined by the power module's product gas temperature and the surrounding zone. Enter QuadraticFunctionOfFuelRate to model skin losses as a function of the rate of fuel use.
 
 \paragraph{Field: Zone Name}\label{field-zone-name-8-000}
 
@@ -3499,7 +3499,7 @@ This field is the fraction of the pump power consumption that is lost to the sur
 
 \subsubsection{Field: Stack Air Cooler Fan Coefficient f0}\label{field-stack-air-cooler-fan-coefficient-f0}
 
-This field and the next two are used to define coefficients for the following relation for the power used by the air-cooler s fan to dump excess heat into the surrounding zone:
+This field and the next two are used to define coefficients for the following relation for the power used by the air-cooler's fan to dump excess heat into the surrounding zone:
 
 \begin{equation}
 {P_{s - air - el}} = {f_0} + {f_1} \cdot {q_{s - air}} + {f_2} \cdot q_{s - air}^2
@@ -3756,7 +3756,7 @@ This field describes the excess air ratio beyond stoichiometric air supply for t
 
 \paragraph{Field: Ancillary Power Constant Term}\label{field-ancillary-power-constant-term}
 
-This field describes the constant term, \({x_0}\) , used to model the auxiliary burner s ancillary devices such as fans and ignition controls. The electrical power for ancillaries is calculated using,
+This field describes the constant term, \({x_0}\) , used to model the auxiliary burner's ancillary devices such as fans and ignition controls. The electrical power for ancillaries is calculated using,
 
 \begin{equation}
 {P_{el,aux - ancillaries}} = {x_0} + {x_1} \cdot {\dot N_{aux - fuel}}
@@ -3764,7 +3764,7 @@ This field describes the constant term, \({x_0}\) , used to model the auxiliary 
 
 \paragraph{Field: Ancillary Power Linear Term}\label{field-ancillary-power-linear-term}
 
-This field describes the linear term, \({x_1}\) , used to model the auxiliary burner s ancillary devices.
+This field describes the linear term, \({x_1}\) , used to model the auxiliary burner's ancillary devices.
 
 \paragraph{Field: Skin Loss U-Factor Times Area Value}\label{field-skin-loss-u-factor-times-area-value-1}
 
@@ -3778,7 +3778,7 @@ where, \({T_{aux - mix}}\) is temperature of product gases leaving the auxiliary
 
 \paragraph{Field: Skin Loss Destination}\label{field-skin-loss-destination}
 
-This field describes the user s choice for what happens to the skin losses. There are two options: SurroundingZone and AirInletForFuelCell . Entering SurroundingZone will direct the model to put the lost energy into the surrounding thermal Zone named in the next field. Entering AirInletForFuelCell will direct the model to put the lost energy into the air inlet stream for the fuel cell to preheat that air.
+This field describes the user's choice for what happens to the skin losses. There are two options: SurroundingZone and AirInletForFuelCell . Entering SurroundingZone will direct the model to put the lost energy into the surrounding thermal Zone named in the next field. Entering AirInletForFuelCell will direct the model to put the lost energy into the air inlet stream for the fuel cell to preheat that air.
 
 \paragraph{Field: Zone Name to Receive Skin Losses}\label{field-zone-name-to-receive-skin-losses}
 
@@ -3786,7 +3786,7 @@ This field is used to determine the zone that will receive the skin losses. Ente
 
 \paragraph{Field: Heating Capacity Units}\label{field-heating-capacity-units}
 
-This field describes the user s choice for how the capacity of the auxiliary heater will be defined. There are two options: Watts or kmol/s. Entering Watts will direct the program to use the next two fields to determine the maximum and minimum heating capacity. Entering kmol/s will direct the program to use the last two fields to determine the maximum and minimum heating capacities.
+This field describes the user's choice for how the capacity of the auxiliary heater will be defined. There are two options: Watts or kmol/s. Entering Watts will direct the program to use the next two fields to determine the maximum and minimum heating capacity. Entering kmol/s will direct the program to use the last two fields to determine the maximum and minimum heating capacities.
 
 \paragraph{Field: Maximum Heating Capacity in Watts}\label{field-maximum-heating-capacity-in-watts}
 
@@ -3833,11 +3833,11 @@ This field contains a unique name for the fuel cell power module subsystem.
 
 \paragraph{Field: Heat Recovery Water Inlet Node Name}\label{field-heat-recovery-water-inlet-node-name-2}
 
-This field contains the name of the node that connects the heat exchanger s inlet to the plant loop. This water is used for heat recovery.
+This field contains the name of the node that connects the heat exchanger's inlet to the plant loop. This water is used for heat recovery.
 
 \paragraph{Field: Heat Recovery Water Outlet Node Name}\label{field-heat-recovery-water-outlet-node-name-1}
 
-This field contains the name of the node that connects the heat exchanger s outlet to the plant loop.
+This field contains the name of the node that connects the heat exchanger's outlet to the plant loop.
 
 \paragraph{Field: Heat Recovery Water Maximum Flow Rate}\label{field-heat-recovery-water-maximum-flow-rate}
 
@@ -4501,7 +4501,7 @@ This field is the heat loss coefficient (in W/m\(^{2}\).K) for the array. The he
 
 \subsubsection{Field: Total Heat Capacity}\label{field-total-heat-capacity}
 
-This field is the heat capacity (in J/m\(^{2}\).K) of the modules in the array. It describes the module s ability to store incident solar radiation internally. Such energy storage is manifested as a temperature increase in the modules that is considered to be undesirable. The total heat capacity value is used only if the Integration and Cell Temperature Mode is set to Decoupled Ulleberg Dynamic.
+This field is the heat capacity (in J/m\(^{2}\).K) of the modules in the array. It describes the module's ability to store incident solar radiation internally. Such energy storage is manifested as a temperature increase in the modules that is considered to be undesirable. The total heat capacity value is used only if the Integration and Cell Temperature Mode is set to Decoupled Ulleberg Dynamic.
 
 An IDF example:
 
@@ -4534,19 +4534,19 @@ PhotovoltaicPerformance:EquivalentOne-Diode,
 
 This PhotovoltaicPerformance:Sandia object describes the performance of a single type of module. The model used with this object for predicting the electricity generated by photovoltaics is referred to as the Sandia model. This model is based on work done at Sandia National Lab, Albuquerque, NM by David King -- with the help of many others.
 
-This object describes performance input data needed for specific makes and models of production PV panels using the empirical coefficients assembled by Sandia National Laboratory. There are a large number of empirical coefficients required to use the Sandia model. These data are obtained after extensive measurements and data reduction. This testing has been performed for some types of production panels and Sandia publishes a database of module and array performance parameters on the web at www.sandia.gov/pv. The entries in the database as of January 15, 2004 were converted to idf segments and are included with the EnergyPlus release in the library file SandiaPVData.imf. There are more than hundred different module types included in the library and identified by the manufacturer s model names listed at the beginning of the file SandiaPVData.imf. This data library file is arranged for use with EpMacro but the user can also copy .idf segments directly from the macro data set.
+This object describes performance input data needed for specific makes and models of production PV panels using the empirical coefficients assembled by Sandia National Laboratory. There are a large number of empirical coefficients required to use the Sandia model. These data are obtained after extensive measurements and data reduction. This testing has been performed for some types of production panels and Sandia publishes a database of module and array performance parameters on the web at www.sandia.gov/pv. The entries in the database as of January 15, 2004 were converted to idf segments and are included with the EnergyPlus release in the library file SandiaPVData.imf. There are more than hundred different module types included in the library and identified by the manufacturer's model names listed at the beginning of the file SandiaPVData.imf. This data library file is arranged for use with EpMacro but the user can also copy .idf segments directly from the macro data set.
 
 The Sandia model itself can aggregate multiple PV modules. Therefore, an instance of a PhotovoltaicPerformance:Sandia object could actually represent an array of modules as well as the more usual single module. These can be can be thought of as simple larger modules and used by Generator:PV:Sandia objects in the usual manner.
 
 The many empirical coefficients for the model are listed below and are described in more more detail in the EnergyPlus engineering documentation EngineeringDoc.pdf.
 
-The field descriptions below focus on providing the parameter s variable name as identified in the Sandia database. See the the EngineeringDoc.pdf for details on how the input fields are used in the correlations. The user generally would not need to worry about the details of the fields since he/she is not likely to generate the data on their own.
+The field descriptions below focus on providing the parameter's variable name as identified in the Sandia database. See the the EngineeringDoc.pdf for details on how the input fields are used in the correlations. The user generally would not need to worry about the details of the fields since he/she is not likely to generate the data on their own.
 
 \subsubsection{Inputs}\label{inputs-22}
 
 \paragraph{Field: Name}\label{field-name-26}
 
-This field provides a unique name for the PV module. This is often the manufacturer s identifier for a particular model of a PV module.
+This field provides a unique name for the PV module. This is often the manufacturer's identifier for a particular model of a PV module.
 
 \paragraph{Field: Active Area}\label{field-active-area-1}
 
