@@ -17,7 +17,15 @@ For A5 (field 6), if the field previously had QuadraticLinear, it should be chan
 
 For A7 (field 7), if the field had previously been QuadraticLinear, it should now say FractionChargedLMTD.  If A7 was CubicLinear, it should be changed to LMTDMassFlow.
 
-# Object Change: `ObjectNameB`
+# Object Change: `ZoneHVAC:EquipmentList`
+Zone Equipment <n></n> Sequential Cooling/Heating Fraction fields are now schedules.
+
+Fields 7 & 8 (old N3 and N4) change from a numeric input to a schedule name.
+If the field is blank, then leave it blank.
+If the fied is not blank, then add a Schedule:Constant object using the old numeric value and replace the fraction with the new schedule name.
+To avoid warnings, add a ScheduleTypeLimits object and reference it in the new schedule objects.
+
+Repeat this for each equipment group of 6 fields; fields 13 & 14, 19 & 20, etc.
 
 # Object Change: `ObjectNameC`
 
