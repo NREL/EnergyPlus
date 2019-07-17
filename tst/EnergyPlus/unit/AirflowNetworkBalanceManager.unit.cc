@@ -5582,8 +5582,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodes)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::HeatTransferAlgosUsed.allocate(1);
-    DataHeatBalance::HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
@@ -6193,8 +6192,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithTables)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::HeatTransferAlgosUsed.allocate(1);
-    DataHeatBalance::HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
@@ -6817,8 +6815,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithNoInput)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::HeatTransferAlgosUsed.allocate(1);
-    DataHeatBalance::HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
@@ -7420,8 +7417,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricTable)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::HeatTransferAlgosUsed.allocate(1);
-    DataHeatBalance::HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
@@ -8055,8 +8051,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricCurve)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::HeatTransferAlgosUsed.allocate(1);
-    DataHeatBalance::HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
@@ -8757,8 +8752,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
     EXPECT_FALSE(ErrorsFound);
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::HeatTransferAlgosUsed.allocate(1);
-    DataHeatBalance::HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
     SurfaceGeometry::GetSurfaceData(errors); // setup zone geometry and get zone data
@@ -9226,8 +9220,7 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::HeatTransferAlgosUsed.allocate(1);
-    DataHeatBalance::HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
@@ -13272,8 +13265,7 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::HeatTransferAlgosUsed.allocate(1);
-    DataHeatBalance::HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 

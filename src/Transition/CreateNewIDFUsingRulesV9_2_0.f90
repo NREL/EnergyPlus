@@ -137,6 +137,12 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: CurrentRunPeriodNames
   CHARACTER(len=20) :: PotentialRunPeriodName
 
+  ! Only needed for ZoneHVAC:EquipmentList translation
+  INTEGER zeqNum
+  CHARACTER(len=20) :: zeqNumStr
+  CHARACTER(len=7) :: zeqHeatingOrCooling
+  LOGICAL :: writeScheduleTypeObj = .true.
+
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -470,6 +476,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ENDIF
 
               ! If your original object starts with S, insert the rules here
+              CASE('SCHEDULE:FILE')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs = InArgs
+                IF (SameString(TRIM(InArgs(7)), 'FIXED')) THEN
+                  nodiff = .false.
+                  OutArgs(7) = 'SPACE'
+                END IF
 
               ! If your original object starts with T, insert the rules here
 
@@ -503,6 +516,43 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with W, insert the rules here
 
               ! If your original object starts with Z, insert the rules here
+              CASE('ZONEHVAC:EQUIPMENTLIST')
+                nodiff = .false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                DO CurField = 1, CurArgs
+                  IF (CurField < 3) THEN
+                    zeqHeatingOrCooling = 'Neither'
+                  ELSE IF (MOD((CurField - 2) - 5, 6) == 0) THEN
+                    zeqHeatingOrCooling = 'Cooling'
+                  ELSE IF (MOD((CurField - 2) - 6, 6) == 0) THEN
+                    zeqHeatingOrCooling = 'Heating'
+                  ELSE
+                    zeqHeatingOrCooling = 'Neither'
+                  END IF
+                  IF (InArgs(CurField) /= Blank .AND. (zeqHeatingOrCooling == 'Cooling' .OR. zeqheatingOrCooling == 'Heating')) THEN
+                    zeqNum = (CurField - 3) / 6 + 1
+                    zeqNumStr = RoundSigDigits(zeqNum,0)
+                    ! Write ScheduleTypeLimits objects once
+                    IF (writeScheduleTypeObj) THEN
+                      CALL GetNewObjectDefInIDD('ScheduleTypeLimits',PNumArgs,PAOrN,PReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                      POutArgs(1) = 'ZoneEqList ScheduleTypeLimts'
+                      POutArgs(2) = '0.0'
+                      POutArgs(3) = '1.0'
+                      POutArgs(4) = 'Continuous'
+                      CALL WriteOutIDFLines(DifLfn,'ScheduleTypeLimits',4,POutArgs,PFldNames,PFldUnits)
+                      writeScheduleTypeObj = .false.
+                    END IF
+                    OutArgs(CurField) = TRIM(InArgs(1)) // ' ' // zeqHeatingOrCooling // 'Frac' // TRIM(ADJUSTL(zeqNumStr))
+                    ! Write Schedule:Constant objects as needed
+                    CALL GetNewObjectDefInIDD('Schedule:Constant',PNumArgs,PAOrN,PReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                    POutArgs(1) = OutArgs(CurField)
+                    POutArgs(2) = 'ZoneEqList ScheduleTypeLimts'
+                    POutArgs(3) = InArgs(CurField)
+                    CALL WriteOutIDFLines(DifLfn,'Schedule:Constant',PNumArgs,POutArgs,PFldNames,PFldUnits)
+                  ELSE
+                    OutArgs(CurField) = InArgs(CurField)
+                  END IF
+                END DO
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
