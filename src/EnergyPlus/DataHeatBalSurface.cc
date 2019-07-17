@@ -78,6 +78,7 @@ namespace DataHeatBalSurface {
     Real64 const MinSurfaceTempLimit(-100.0);            // Lowest inside surface temperature allowed in Celsius
     Real64 const MinSurfaceTempLimitBeforeFatal(-250.0); // 2.5 times MinSurfaceTempLimit
     Real64 const DefaultSurfaceTempLimit(200.0);         // Highest inside surface temperature allowed in Celsius
+    std::vector<bool> Zone_has_mixed_HT_models;          // True if any surfaces in zone use CondFD, HAMT, or Kiva
 
     // DERIVED TYPE DEFINITIONS
 
@@ -260,6 +261,7 @@ namespace DataHeatBalSurface {
         SUMH.deallocate();
         MaxSurfaceTempLimit = 200.0;
         MaxSurfaceTempLimitBeforeFatal = 500.0;
+        Zone_has_mixed_HT_models.clear();
         CTFConstInPart.deallocate();
         CTFConstOutPart.deallocate();
         TempSurfIn.deallocate();
