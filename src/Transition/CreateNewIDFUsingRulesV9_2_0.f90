@@ -476,6 +476,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ENDIF
 
               ! If your original object starts with S, insert the rules here
+              CASE('SCHEDULE:FILE')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs = InArgs
+                IF (SameString(TRIM(InArgs(7)), 'FIXED')) THEN
+                  nodiff = .false.
+                  OutArgs(7) = 'SPACE'
+                END IF
 
               ! If your original object starts with T, insert the rules here
 
