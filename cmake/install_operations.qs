@@ -60,15 +60,15 @@ function Component()
       // LastAnchor, REG_SZ, #9.1.0-mqjdfsiojf
 
       // REG ADD KeyName /v ValueName, /d Data, /f = force overwrite
-      component.addElevatedOperation("Execute", "cmd /C REG ADD \"KEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"AutoCheck\" /d \"True\" /f",
-        "UNDOEXECUTE", "cmd /C REG ADD \"KEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"AutoCheck\ /f");
+      component.addElevatedOperation("Execute", "cmd /C REG ADD \"HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"AutoCheck\" /d \"True\" /f",
+        "UNDOEXECUTE", "cmd /C REG ADD \"HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"AutoCheck\ /f");
 
-      component.addElevatedOperation("Execute", "cmd /C REG ADD \"KEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"CheckURL\" /d \"http://nrel.github.io/EnergyPlus/epupdate.htm\" /f",
-        "UNDOEXECUTE", "cmd /C REG ADD \"KEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"CheckURL\ /f");
+      component.addElevatedOperation("Execute", "cmd /C REG ADD \"HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"CheckURL\" /d \"http://nrel.github.io/EnergyPlus/epupdate.htm\" /f",
+        "UNDOEXECUTE", "cmd /C REG ADD \"HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"CheckURL\ /f");
 
       // @Version@ = CPACK_PACKAGE_VERSION
-      component.addElevatedOperation("Execute", "cmd /C REG ADD \"KEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"LastAnchor\" /d \"#@Version@\" /f",
-        "UNDOEXECUTE", "cmd /C REG ADD \"KEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"LastAnchor\ /f");
+      component.addElevatedOperation("Execute", "cmd /C REG ADD \"HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"LastAnchor\" /d \"#@Version@\" /f",
+        "UNDOEXECUTE", "cmd /C REG ADD \"HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"LastAnchor\ /f");
 
       // And weirder still, to copy and register DLLs
       var systemArray = ["MSCOMCTL.OCX", "ComDlg32.OCX", "Msvcrtd.dll", "Dforrt.dll", "Gswdll32.dll", "Gsw32.exe", "Graph32.ocx", "MSINET.OCX", "Vsflex7L.ocx", "Msflxgrd.ocx"];
@@ -81,7 +81,7 @@ function Component()
       for (i = 0; i < systemArray.length; i++) {
         var sourceFile = "@TargetDir@/temp/" + systemArray[i];
         var targetFile = systemTargetDir + systemArray[i];
-        if (!installer.fleExists(targetFile)) {
+        if (!installer.fileExists(targetFile)) {
           component.addElevatedOperation("Move", sourceFile, targetFile);
         }
       }
