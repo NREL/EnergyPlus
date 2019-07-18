@@ -10921,7 +10921,7 @@ namespace WaterThermalTanks {
                 }
 
                 if (WaterThermalTankSide == SourceSide) { // temperature dependent controls for indirect heating/cooling
-                    NeedsHeatOrCool = SourceHeatNeed(WaterThermalTank(WaterThermalTankNum),OutletTemp, DeadBandTemp,SetPointTemp);
+                    NeedsHeatOrCool = SourceHeatNeed(WaterThermalTank(WaterThermalTankNum), OutletTemp, DeadBandTemp, SetPointTemp);
                     if (MassFlowRequest > 0.0) {
                         if (NeedsHeatOrCool) {
                             FlowResult = MassFlowRequest;

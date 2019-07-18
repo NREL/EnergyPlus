@@ -797,7 +797,7 @@ namespace WaterThermalTanks {
 
     Real64 PLRResidualHPWH(Real64 const HPPartLoadRatio, Array1<Real64> const &Par);
 
-    bool SourceHeatNeed(int const WaterThermalTankNum,
+    bool SourceHeatNeed(WaterThermalTankData const WaterThermalTank,
                         Real64 const OutletTemp,
                         Real64 const DeadBandTemp,
                         Real64 const SetPointTemp);

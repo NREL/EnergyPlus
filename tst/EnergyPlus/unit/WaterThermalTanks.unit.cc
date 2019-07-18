@@ -2563,10 +2563,11 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule){
     int DemandSide(1);
     Real64 rho; 
     int WaterIndex(1);
+    bool NeedsHeatOrCool;
     WaterThermalTanks::WaterThermalTankData &Tank = WaterThermalTank(TankNum);
 
-    //set tank temp between 55 to 70 to enable alternate setpoint control
-    Tank.TankTemp = 60.0;
+    //set tank temp to be alternate setpoint
+    Tank.TankTemp = 70.0;
     Tank.SetPointTemp = 55.0;
 
     //Source side is in the demand side of the plant loop
@@ -2578,6 +2579,14 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule){
     Tank.PlantSourceMassFlowRateMax = Tank.SourceDesignVolFlowRate * rho;
     DataLoopNode::Node(1).MassFlowRateMax = Tank.PlantSourceMassFlowRateMax;
     DataLoopNode::Node(1).MassFlowRateMaxAvail = Tank.PlantSourceMassFlowRateMax;
+
+    NeedsHeatOrCool = WaterThermalTanks::SourceHeatNeed(Tank, 70.0, Tank.SetPointTemp - 2.0, Tank.SetPointTemp);
+    EXPECT_FALSE(NeedsHeatOrCool);
+
+    //set tank temp between 55 to 70 to enable alternate setpoint control
+    Tank.TankTemp = 60.0;
+    NeedsHeatOrCool = WaterThermalTanks::SourceHeatNeed(Tank, 60.0, Tank.SetPointTemp - 2.0, Tank.SetPointTemp);
+    EXPECT_TRUE(NeedsHeatOrCool);
 
     //plant mass flow rate logic for firstHVAC mode not crashed
     WaterThermalTanks::InitWaterThermalTank(TankNum,true);
