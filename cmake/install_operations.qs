@@ -94,10 +94,11 @@ function Component()
         var sourceFile = "@TargetDir@/temp/" + systemArray[i];
         var targetFile = systemTargetDir + systemArray[i];
         if (!installer.fileExists(targetFile)) {
-          component.addElevatedOperation("Move", sourceFile, targetFile);
+          component.addElevatedOperation("Copy", sourceFile, targetFile);
         }
       }
-      // Delete this temp directory
+      // Delete this temp directory: TODO use execute to avoid uninstall create
+      // the opposite (= Mkdir)
       component.addElevatedOperation("Rmdir", "@TargetDir@/temp/");
 
     }
