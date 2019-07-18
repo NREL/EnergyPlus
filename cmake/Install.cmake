@@ -1,6 +1,11 @@
+include(CPackIFW)
+
 set(CPACK_PACKAGE_VENDOR "US Department of Energy" )
+set(CPACK_IFW_PACKAGE_PUBLISHER "${CPACK_PACKAGE_VENDOR}")
+
 set(CPACK_PACKAGE_CONTACT "Edwin Lee <edwin.lee@nrel.gov>")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "EnergyPlus is a whole building energy simulation program that engineers, architects, and researchers use to model both energy consumption and water use in buildings.")
+set(CPACK_PACKAGE_DESCRIPTION "EnergyPlus is a whole building energy simulation program that engineers, architects, and researchers use to model both energy consumption and water use in buildings.")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "EnergyPlus is a whole building energy simulation program.")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}/Modules")
 
@@ -12,6 +17,8 @@ set(CPACK_PACKAGE_VERSION_BUILD "${CMAKE_VERSION_BUILD}" )
 set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-${CPACK_PACKAGE_VERSION_BUILD}")
 # Default the debian package name to include version to allow several versions to be installed concurrently instead of overwriting any existing one
 # set(CPACK_DEBIAN_PACKAGE_NAME "energyplus-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+
+set(CPACK_IFW_PRODUCT_URL "https://www.energyplus.net")
 # set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://www.energyplus.net")
 
 include(cmake/TargetArch.cmake)
@@ -250,6 +257,13 @@ if( WIN32 )
   INSTALL(PROGRAMS "${CMAKE_SOURCE_DIR}/bin/System/Vsflex7L.ocx" DESTINATION "./temp/")
 endif()
 
+# The group, which will be used to configure the root package
+# set(CPACK_IFW_PACKAGE_GROUP "EnergyPlus")
+set(CPACK_IFW_PACKAGE_WIZARD_DEFAULT_WIDTH 640)
+set(CPACK_IFW_PACKAGE_WIZARD_DEFAULT_HEIGHT 480)
+set(CPACK_IFW_PACKAGE_WINDOW_ICON "${CMAKE_SOURCE_DIR}/release/ep.gif")
+
+
 if( APPLE )
   set(CPACK_PACKAGE_DEFAULT_LOCATION "/Applications")
   set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
@@ -267,9 +281,23 @@ if( APPLE )
   install(PROGRAMS scripts/runreadvars DESTINATION "./")
 
   install(CODE "MESSAGE(\"Creating symlinks.\")" COMPONENT Symlinks)
+
+  # Custom installer icon. Has to be .icns on mac, .ico on windows, not supported on Unix
+  set(CPACK_IFW_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/bin/EP-Compare/Run-Mac/EP-Compare.app/Contents/Resources/EnergyPlus.icns")
 elseif(WIN32)
-  set( CPACK_PACKAGE_INSTALL_DIRECTORY "EnergyPlusV${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}" )
-  set( CPACK_IFW_TARGET_DIRECTORY "C:/${CPACK_PACKAGE_INSTALL_DIRECTORY}" )
+
+  # TODO: TEMP
+  set(CPACK_IFW_VERBOSE ON)
+
+  # Will also set CPACK_IFW_PACKAGE_START_MENU_DIRECTORY (name of default program group in Windows start menu)
+  set(CPACK_IFW_PACKAGE_NAME "EnergyPlusV${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}")
+
+  set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_IFW_PACKAGE_NAME}" )
+  set(CPACK_IFW_TARGET_DIRECTORY "C:/${CPACK_PACKAGE_INSTALL_DIRECTORY}" )
+
+    # Custom installer icon. Has to be .icns on mac, .ico on windows, not supported on Unix
+  set(CPACK_IFW_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/release/RunEP.ico")
+
 endif()
 
 if(UNIX)
@@ -320,8 +348,8 @@ if ( BUILD_DOCS )
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/UsingEnergyPlusForCompliance.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
 endif ()
 
-include(CPack)
-include(CPackIFW)
+
+include(CPackComponent)
 
 #cpack_add_component(EnergyPlus
   #DISPLAY_NAME "EnergyPlus"
@@ -361,9 +389,16 @@ cpack_add_component(Symlinks
   DESCRIPTION "This will symlink the executable to /usr/local/bin and copy the man page"
 )
 
+# Could add any upstream library license to this
+cpack_add_component(licenses
+  DISPLAY_NAME "Licenses"
+  DESCRIPTION "License files for EnergyPlus"
+  REQUIRED)
+
 # Regular stuff, like chmod +x
 cpack_ifw_configure_component(Unspecified
     SCRIPT cmake/install_operations.qs
+    LICENSES
 )
 
 cpack_ifw_configure_component(Symlinks
@@ -371,9 +406,16 @@ cpack_ifw_configure_component(Symlinks
     REQUIRES_ADMIN_RIGHTS
 )
 
+cpack_ifw_configure_component(licenses FORCED_INSTALLATION
+  LICENSES
+    "EnergyPlus" ${CPACK_RESOURCE_FILE_LICENSE}
+)
+
+
 SET(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
 
 INCLUDE(InstallRequiredSystemLibraries)
 
 INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./" COMPONENT Libraries)
 
+include(CPack)
