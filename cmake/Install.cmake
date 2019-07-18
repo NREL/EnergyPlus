@@ -16,9 +16,6 @@ if( BUILD_FORTRAN )
   list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/AppGPostProcess/;AppGPostProcess;ALL;/")
 endif()
 
-include(CPackComponent)
-include(CPackIFW)
-
 set(CPACK_PACKAGE_VENDOR "US Department of Energy" )
 set(CPACK_IFW_PACKAGE_PUBLISHER "${CPACK_PACKAGE_VENDOR}")
 
@@ -369,8 +366,10 @@ if ( BUILD_DOCS )
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/UsingEnergyPlusForCompliance.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
 endif ()
 
-
-include(CPackComponent)
+# Careful: the position (and what you include) matters a lot!
+include(CPack)
+include(CPackIFW)
+# include(CPackComponent)
 
 #cpack_add_component(EnergyPlus
   #DISPLAY_NAME "EnergyPlus"
@@ -431,11 +430,6 @@ cpack_ifw_configure_component(Licenses FORCED_INSTALLATION
     "EnergyPlus" ${CPACK_RESOURCE_FILE_LICENSE}
 )
 
-
 SET(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
-
 INCLUDE(InstallRequiredSystemLibraries)
-
 INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./" COMPONENT Libraries)
-
-include(CPack)
