@@ -1,3 +1,4 @@
+include(CPackComponent)
 include(CPackIFW)
 
 set(CPACK_PACKAGE_VENDOR "US Department of Energy" )
@@ -59,7 +60,7 @@ if( BUILD_FORTRAN )
   list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/AppGPostProcess/;AppGPostProcess;;ALL;/")
 endif()
 
-install(FILES "${CMAKE_SOURCE_DIR}/LICENSE.txt" DESTINATION "./")
+install(FILES "${CMAKE_SOURCE_DIR}/LICENSE.txt" DESTINATION "./" COMPONENT Licenses)
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE.txt")
 
 install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION ./ )
@@ -178,6 +179,8 @@ set( RULES_XLS Rules9-1-0-to-9-2-0.md )
 install(FILES "${CMAKE_SOURCE_DIR}/release/Bugreprt.txt" DESTINATION "./")
 install(FILES "${CMAKE_SOURCE_DIR}/release/ep.gif" DESTINATION "./")
 install(FILES "${CMAKE_SOURCE_DIR}/release/readme.html" DESTINATION "./")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/release/readme.html")
+
 install(FILES "${CMAKE_SOURCE_DIR}/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
 install(FILES "${CMAKE_SOURCE_DIR}/idd/V9-1-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V9-2-0-Energy+.idd" )
@@ -277,8 +280,8 @@ endif()
 
 # The group, which will be used to configure the root package
 # set(CPACK_IFW_PACKAGE_GROUP "EnergyPlus")
-set(CPACK_IFW_PACKAGE_WIZARD_DEFAULT_WIDTH 640)
-set(CPACK_IFW_PACKAGE_WIZARD_DEFAULT_HEIGHT 480)
+#set(CPACK_IFW_PACKAGE_WIZARD_DEFAULT_WIDTH 640)
+#set(CPACK_IFW_PACKAGE_WIZARD_DEFAULT_HEIGHT 480)
 set(CPACK_IFW_PACKAGE_WINDOW_ICON "${CMAKE_SOURCE_DIR}/release/ep_nobg.png")
 
 
@@ -408,7 +411,7 @@ cpack_add_component(Symlinks
 )
 
 # Could add any upstream library license to this
-cpack_add_component(licenses
+cpack_add_component(Licenses
   DISPLAY_NAME "Licenses"
   DESCRIPTION "License files for EnergyPlus"
   REQUIRED)
@@ -416,7 +419,6 @@ cpack_add_component(licenses
 # Regular stuff, like chmod +x
 cpack_ifw_configure_component(Unspecified
     SCRIPT cmake/install_operations.qs
-    LICENSES
 )
 
 cpack_ifw_configure_component(Symlinks
@@ -424,7 +426,7 @@ cpack_ifw_configure_component(Symlinks
     REQUIRES_ADMIN_RIGHTS
 )
 
-cpack_ifw_configure_component(licenses FORCED_INSTALLATION
+cpack_ifw_configure_component(Licenses FORCED_INSTALLATION
   LICENSES
     "EnergyPlus" ${CPACK_RESOURCE_FILE_LICENSE}
 )
