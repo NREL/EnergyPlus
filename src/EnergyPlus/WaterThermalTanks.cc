@@ -1324,7 +1324,7 @@ namespace WaterThermalTanks {
                         WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = COIL_DX_COOLING;
                         GetDXCoilIndex(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName, WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum, errFlag, cCurrentModuleObject);
                         if (allocated(HeatReclaimDXCoil)) ValidSourceType(DesuperheaterNum) = true;
-                    } else if (UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:TwoSpeed")) {
+                    } else if (UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:TwoSpeed") || UtilityRoutines::SameString(cAlphaArgs(9), "Coil:Cooling:DX:MultiSpeed")) {
                         WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = COIL_DX_MULTISPEED;
                         GetDXCoilIndex(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName, WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum, errFlag, cCurrentModuleObject);
                         if (allocated(HeatReclaimDXCoil)) ValidSourceType(DesuperheaterNum) = true;
@@ -1351,7 +1351,7 @@ namespace WaterThermalTanks {
                         ShowSevereError(cCurrentModuleObject + " = " + WaterHeaterDesuperheater(DesuperheaterNum).Name + ':');
                         ShowContinueError(" desuperheater can only be used with Coil:Cooling:DX:SingleSpeed, ");
                         ShowContinueError(
-                            " Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:TwoStageWithHumidityControlMode, Coil:Cooling:DX:VariableSpeed, "
+                            " Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:MultiSpeed, Coil:Cooling:DX:TwoStageWithHumidityControlMode, Coil:Cooling:DX:VariableSpeed, "
                             "Coil:Cooling:WaterToAirHeatPump:EquationFit, Refrigeration:CompressorRack,");
                         ShowContinueError(" Refrigeration:Condenser:AirCooled ,Refrigeration:Condenser:EvaporativeCooled, ");
                         ShowContinueError(" or Refrigeration:Condenser:WaterCooled.");
