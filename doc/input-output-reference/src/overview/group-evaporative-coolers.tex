@@ -200,7 +200,7 @@ This field is optional and can be used to model additional water consumed by the
 
 \paragraph{Field: Blowdown Concentration Ratio}\label{field-blowdown-concentration-ratio-000}
 
-This field is optional and can be used to model additional water consumed by the cooler from blowdown. Blowdown is water that is intentionally drained from the cooler s sump to offset the build up of solids in the water that would otherwise occur because of evaporation. The value entered here is dimensionless. It can be characterized as the ratio of solids in the blowdown water to solids in the make up water. Typical values are 3 to 5. The default is 3.0.
+This field is optional and can be used to model additional water consumed by the cooler from blowdown. Blowdown is water that is intentionally drained from the cooler's sump to offset the build up of solids in the water that would otherwise occur because of evaporation. The value entered here is dimensionless. It can be characterized as the ratio of solids in the blowdown water to solids in the make up water. Typical values are 3 to 5. The default is 3.0.
 
 \paragraph{Field: Evaporative Cooler Operation Minimum Drybulb Temperature}\label{field-evaporative-cooler-operation-minimum-drybulb-temperature}
 
@@ -348,11 +348,11 @@ This field is used to specify the effectiveness of the indirect heat exchanger b
 
 \paragraph{Field: Primary Air Inlet Node Name}\label{field-primary-air-inlet-node-name-000}
 
-The name of the evaporative cooler s primary air inlet node from the Air Loop Simulation. This is the air flow being cooled indirectly.
+The name of the evaporative cooler's primary air inlet node from the Air Loop Simulation. This is the air flow being cooled indirectly.
 
 \paragraph{Field: Primary Air Outlet Node Name}\label{field-primary-air-outlet-node-name-000}
 
-The name of the evaporative cooler s primary air outlet node from the Air Loop Simulation.
+The name of the evaporative cooler's primary air outlet node from the Air Loop Simulation.
 
 \paragraph{Field: Control Type}\label{field-control-type-1}
 
@@ -520,14 +520,6 @@ This field is optional. It is used to describe where the cooler obtains water us
 
 This field is optional. It is used to explicitly define an outdoor air node for the inlet for secondary air stream. Defining an outdoor air node here allows using the height-dependent model for outdoor air conditions.
 
-\paragraph{Field: Drift Loss Fraction}\label{field-drift-loss-fraction-1}
-
-This field is optional and can be used to model additional water consumed by the cooler from drift. Drift is water that leaves the cooling media as droplets and does not evaporate into the process air stream. For example, water may get blown off the evaporative media by winds and escape the air system. The value entered here is a simple fraction of the water consumed by the cooler for normal process evaporation. The amount of drift is this fraction times the water evaporated for the normal cooling process. This field can be left blank and then there will be no added water consumption from drift.
-
-\paragraph{Field: Blowdown Concentration Ratio}\label{field-blowdown-concentration-ratio-1-000}
-
-This field is optional and can be used to model additional water consumed by the cooler from blowdown. Blowdown is water that is intentionally drained from the cooler s sump to offset the build up of solids in the water that would otherwise occur because of evaporation. The value entered here is dimensionless. It can be characterized as the ratio of solids in the blowdown water to solids in the make up water. Typical values are 3 to 5. The default is 3.0.
-
 And an IDF example showing how this object is specified:
 
 \begin{lstlisting}
@@ -643,11 +635,11 @@ This numeric input field value is recirculating water pump sizing factor in \si{
 
 \paragraph{Field: Water Pump Power Modifier Curve Name}\label{field-water-pump-power-modifier-curve-name-1}
 
-This alpha input field is the name of a dimensionless normalized pump power modifying curve. This curve modifies the pump electric power in the previous field by multiplying the design power by the result of this curve. The normalized curve is a function of the secondary side flow fraction as independent variable. The curve shall yield a value of 1.0 at a flow fraction of 1.0. The flow fraction is the secondary air flow rate during operation divided by Secondary Design Air Flow Rate. If this input field is left blank, the pump power is assumed to be constant. Any curve or table with one independent variable can be used: \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curvequartic]{Curve:Quartic}, \hyperref[curveexponent]{Curve:Exponent}, \hyperref[curveexponentialskewnormal]{Curve:ExponentialSkewNormal}, \hyperref[curvesigmoid]{Curve:Sigmoid}, Curve:RectuangularHyperbola1, \hyperref[curverectangularhyperbola2]{Curve:RectangularHyperbola2}, \hyperref[curveexponentialdecay]{Curve:ExponentialDecay}, \hyperref[curvedoubleexponentialdecay]{Curve:DoubleExponentialDecay}, and \hyperref[tableoneindependentvariable]{Table:OneIndependentVariable}.
+This alpha input field is the name of a dimensionless normalized pump power modifying curve. This curve modifies the pump electric power in the previous field by multiplying the design power by the result of this curve. The normalized curve is a function of the secondary side flow fraction as independent variable. The curve shall yield a value of 1.0 at a flow fraction of 1.0. The flow fraction is the secondary air flow rate during operation divided by Secondary Design Air Flow Rate. If this input field is left blank, the pump power is assumed to vary linearly with the load. Any curve or table with one independent variable can be used: \hyperref[curvelinear]{Curve:Linear}, \hyperref[curvequadratic]{Curve:Quadratic}, \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curvequartic]{Curve:Quartic}, \hyperref[curveexponent]{Curve:Exponent}, \hyperref[curveexponentialskewnormal]{Curve:ExponentialSkewNormal}, \hyperref[curvesigmoid]{Curve:Sigmoid}, Curve:RectuangularHyperbola1, \hyperref[curverectangularhyperbola2]{Curve:RectangularHyperbola2}, \hyperref[curveexponentialdecay]{Curve:ExponentialDecay}, \hyperref[curvedoubleexponentialdecay]{Curve:DoubleExponentialDecay}, and \hyperref[tableoneindependentvariable]{Table:OneIndependentVariable}.
 
 \paragraph{Field: Secondary Air Design Flow Rate}\label{field-secondary-air-design-flow-rate}
 
-This field is used to specify the secondary air fan flow rate and is specified in \si{\volumeFlowRate}. This flow rate would typically be similar in magnitude to the flow through the primary side. This field can be autosized. When it is autosized, the program detects if the component is in the main air loop or on an outdoor air path. If it is on the main air loop, then the flow rate is set to the \hyperref[airloophvac]{AirLoopHVAC} system s design supply air flow rate (which is the maximum required for heating and cooling). If it is on the outdoor air path, then the flow rate is set to the larger of either the design minimum outdoor air flow rate or one-half of the main air loop design flow rate. The flow rate is used to determine parasitic fan energy and cooler effectiveness. The flow rate (and fan power) is effectively reduced by cycling when the amount of cooling needs to be restricted for control purpose. This field can be autosized. When this input is autosized, the program calculates by scaling the Primary Air Design Flow Rate using secondary air scaling factor specified in the input field below.
+This field is used to specify the secondary air fan flow rate and is specified in \si{\volumeFlowRate}. This flow rate would typically be similar in magnitude to the flow through the primary side. This field can be autosized. When it is autosized, the program detects if the component is in the main air loop or on an outdoor air path. If it is on the main air loop, then the flow rate is set to the \hyperref[airloophvac]{AirLoopHVAC} system's design supply air flow rate (which is the maximum required for heating and cooling). If it is on the outdoor air path, then the flow rate is set to the larger of either the design minimum outdoor air flow rate or one-half of the main air loop design flow rate. The flow rate is used to determine parasitic fan energy and cooler effectiveness. The flow rate (and fan power) is effectively reduced by cycling when the amount of cooling needs to be restricted for control purpose. This field can be autosized. When this input is autosized, the program calculates by scaling the Primary Air Design Flow Rate using secondary air scaling factor specified in the input field below.
 
 \paragraph{Field: Secondary Air Flow Scaling Factor}\label{field-secondary-air-flow-scaling-factor}
 
