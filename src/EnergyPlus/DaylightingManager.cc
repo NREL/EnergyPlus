@@ -545,7 +545,6 @@ namespace DaylightingManager {
 
         // Using/Aliasing
         using DataSystemVariables::DetailedSolarTimestepIntegration;
-        using DaylightingDevices::FindTDDPipe;
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
         using General::RoundSigDigits;
@@ -931,7 +930,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using DaylightingDevices::FindTDDPipe;
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
         using General::RoundSigDigits;
@@ -965,7 +963,7 @@ namespace DaylightingManager {
                     IWin = ZoneDaylight(TZoneNum).DayltgExtWinSurfNums(loopwin);
                     if (SurfaceWindow(IWin).OriginalClass != SurfaceClass_TDD_Diffuser) continue;
                     // Look up the TDD:DOME object
-                    PipeNum = FindTDDPipe(IWin);
+                    PipeNum = SurfaceWindow(IWin).TDDPipeNum;
                     if (PipeNum == 0) {
                         ShowSevereError("GetTDDInput: Surface=" + Surface(IWin).Name +
                                         ", TDD:Dome object does not reference a valid Diffuser object.");
@@ -1019,7 +1017,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using DaylightingDevices::FindTDDPipe;
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
         using General::RoundSigDigits;
@@ -1415,7 +1412,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using DaylightingDevices::FindTDDPipe;
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
         using General::RoundSigDigits;
@@ -1848,7 +1844,6 @@ namespace DaylightingManager {
         // Using/Aliasing
         using namespace Vectors;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
-        using DaylightingDevices::FindTDDPipe;
         using General::BlindBeamBeamTrans;
         using General::POLYF;
         using General::RoundSigDigits;
@@ -2098,7 +2093,7 @@ namespace DaylightingManager {
         if (SurfaceWindow(IWin).OriginalClass == SurfaceClass_TDD_Diffuser) {
 
             // Look up the TDD:DOME object
-            PipeNum = FindTDDPipe(IWin);
+            PipeNum = SurfaceWindow(IWin).TDDPipeNum;
             IWin2 = TDDPipe(PipeNum).Dome;
 
             // Calculate reference point coords relative to the diffuser coordinate system
@@ -2302,7 +2297,6 @@ namespace DaylightingManager {
         // switch as need to serve both reference points and map points based on calledFrom
 
         // Using/Aliasing
-        using DaylightingDevices::FindTDDPipe;
         using DaylightingDevices::TransTDD;
         using General::POLYF;
         using namespace Vectors;
@@ -2419,7 +2413,7 @@ namespace DaylightingManager {
 
             if (SurfaceWindow(IWin).OriginalClass == SurfaceClass_TDD_Diffuser) {
                 // Look up the TDD:DOME object
-                PipeNum = FindTDDPipe(IWin);
+                PipeNum = SurfaceWindow(IWin).TDDPipeNum;
                 // Unshaded visible transmittance of TDD for a single ray from sky/ground element
                 TVISB = TransTDD(PipeNum, COSB, VisibleBeam) * SurfaceWindow(IWin).GlazedFrac;
 
@@ -7697,7 +7691,6 @@ namespace DaylightingManager {
 
         // Using/Aliasing
         using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
-        using DaylightingDevices::FindTDDPipe;
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
         using General::InterpProfAng;
@@ -7880,7 +7873,7 @@ namespace DaylightingManager {
         ScreenOn = false;
 
         if (SurfaceWindow(IWin).OriginalClass == SurfaceClass_TDD_Dome) {
-            PipeNum = FindTDDPipe(IWin);
+            PipeNum = SurfaceWindow(IWin).TDDPipeNum;
         }
 
         ShelfNum = Surface(IWin).Shelf;
@@ -10086,6 +10079,7 @@ namespace DaylightingManager {
         static Array1D<Real64> XValue;
         static Array1D<Real64> YValue;
         static Array2D<Real64> IllumValue;
+        int SQYear;
         int SQMonth;
         int SQDayOfMonth;
         int IllumIndex;
@@ -10227,6 +10221,9 @@ namespace DaylightingManager {
                         SQFirstTime = false;
                     }
 
+                    // We need DataGlobals::CalendarYear, and not DataEnvironment::Year because
+                    // otherwise if you run a TMY file, you'll get for eg 1977, 1981, etc
+                    SQYear = DataGlobals::CalendarYear;
                     SQMonth = Month;
                     SQDayOfMonth = DayOfMonth;
 
@@ -10243,7 +10240,7 @@ namespace DaylightingManager {
                     }     // Y Loop
 
                     sqlite->createSQLiteDaylightMap(
-                        MapNum, SQMonth, SQDayOfMonth, HourOfDay, IllumMap(MapNum).Xnum, XValue, IllumMap(MapNum).Ynum, YValue, IllumValue);
+                        MapNum, SQYear, SQMonth, SQDayOfMonth, HourOfDay, IllumMap(MapNum).Xnum, XValue, IllumMap(MapNum).Ynum, YValue, IllumValue);
 
                 } // WriteOutputToSQLite
             }     // end time step

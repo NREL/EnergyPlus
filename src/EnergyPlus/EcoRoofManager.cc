@@ -169,8 +169,6 @@ namespace EcoRoofManager {
         using namespace DataHeatBalance;
         using namespace DataHeatBalSurface;
         using namespace DataSurfaces;
-        //  USE DataDaylightingDevices
-        //  USE DaylightingDevices,        ONLY: FindTDDPipe
         using namespace Psychrometrics;
         using ConvectionCoefficients::InitExteriorConvectionCoeff;
         using ConvectionCoefficients::SetExtConvectionCoeff;
