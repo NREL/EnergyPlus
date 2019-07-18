@@ -10639,7 +10639,7 @@ namespace WaterThermalTanks {
         return PLRResidualHPWH;
     }
 
-    bool SourceHeatNeed(int const WaterThermalTankNum,
+    bool SourceHeatNeed(WaterThermalTankData const Tank,
                         Real64 const OutletTemp,
                         Real64 const DeadBandTemp,
                         Real64 const SetPointTemp
@@ -10653,55 +10653,44 @@ namespace WaterThermalTanks {
         // PURPOSE OF THIS FUNCTION:
         // Determine by tank type, tank temperature and control mode if source side flow is needed
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using ScheduleManager::GetCurrentScheduleValue;
 
         //return value initialization
         bool NeedsHeatOrCool = false;
 
-        Real64 AltSetpointTemp;
-        Real64 AltDeadBandTemp;
-
-        if (!WaterThermalTank(WaterThermalTankNum).IsChilledWaterTank) {
-            if (WaterThermalTank(WaterThermalTankNum).SourceSideControlMode == SourceSideIndirectHeatPrimarySetpoint) {
+        if (!Tank.IsChilledWaterTank) {
+            if (Tank.SourceSideControlMode == SourceSideIndirectHeatPrimarySetpoint) {
                 if (OutletTemp < DeadBandTemp) {
                     NeedsHeatOrCool = true;
                 } else if ((OutletTemp >= DeadBandTemp) && (OutletTemp < SetPointTemp)) {
                     // inside the deadband, use saved mode from water heater calcs
-                    if (WaterThermalTank(WaterThermalTankNum).SavedMode == HeatMode) {
+                    if (Tank.SavedMode == HeatMode) {
                         NeedsHeatOrCool = true;
-                    } else if (WaterThermalTank(WaterThermalTankNum).SavedMode == FloatMode) {
+                    } else if (Tank.SavedMode == FloatMode) {
                         NeedsHeatOrCool = false;
                     }
 
                 } else if (OutletTemp >= SetPointTemp) {
                     NeedsHeatOrCool = false;
                 }
-            } else if (WaterThermalTank(WaterThermalTankNum).SourceSideControlMode == SourceSideIndirectHeatAltSetpoint) {
+            } else if (Tank.SourceSideControlMode == SourceSideIndirectHeatAltSetpoint) {
                 // get alternate setpoint
-                AltSetpointTemp = GetCurrentScheduleValue(WaterThermalTank(WaterThermalTankNum).SourceSideAltSetpointSchedNum);
-                AltDeadBandTemp = AltSetpointTemp - WaterThermalTank(WaterThermalTankNum).DeadBandDeltaTemp;
+                Real64 const AltSetpointTemp = ScheduleManager::GetCurrentScheduleValue(Tank.SourceSideAltSetpointSchedNum);
+                Real64 const AltDeadBandTemp = AltSetpointTemp - Tank.DeadBandDeltaTemp;
                 if (OutletTemp < AltDeadBandTemp) {
                     NeedsHeatOrCool = true;
                 } else if ((OutletTemp >= AltDeadBandTemp) && (OutletTemp < AltSetpointTemp)) {
                     // inside the deadband, use saved mode from water heater calcs
-                    if (WaterThermalTank(WaterThermalTankNum).SavedMode == HeatMode) {
+                    if (Tank.SavedMode == HeatMode) {
                         NeedsHeatOrCool = true;
-                    } else if (WaterThermalTank(WaterThermalTankNum).SavedMode == FloatMode) {
+                    } else if (Tank.SavedMode == FloatMode) {
                         NeedsHeatOrCool = false;
                     }
 
                 } else if (OutletTemp >= AltSetpointTemp) {
                     NeedsHeatOrCool = false;
                 }
-            } else if (WaterThermalTank(WaterThermalTankNum).SourceSideControlMode == SourceSideStorageTank) {
-                if (OutletTemp < WaterThermalTank(WaterThermalTankNum).TankTempLimit) {
+            } else if (Tank.SourceSideControlMode == SourceSideStorageTank) {
+                if (OutletTemp < Tank.TankTempLimit) {
                     NeedsHeatOrCool = true;
                 } else {
                     NeedsHeatOrCool = false;
@@ -10712,13 +10701,13 @@ namespace WaterThermalTanks {
                 NeedsHeatOrCool = true;
             } else if ((OutletTemp <= DeadBandTemp) && (OutletTemp > SetPointTemp)) {
                 // inside the deadband, use saved mode from water thermal tank calcs (modes only for mixed)
-                if (WaterThermalTank(WaterThermalTankNum).TypeNum == MixedChilledWaterStorage) {
-                    if (WaterThermalTank(WaterThermalTankNum).SavedMode == CoolMode) {
+                if (Tank.TypeNum == MixedChilledWaterStorage) {
+                    if (Tank.SavedMode == CoolMode) {
                         NeedsHeatOrCool = true;
-                    } else if (WaterThermalTank(WaterThermalTankNum).SavedMode == FloatMode) {
+                    } else if (Tank.SavedMode == FloatMode) {
                         NeedsHeatOrCool = false;
                     }
-                } else if (WaterThermalTank(WaterThermalTankNum).TypeNum == StratifiedChilledWaterStorage) {
+                } else if (Tank.TypeNum == StratifiedChilledWaterStorage) {
                     NeedsHeatOrCool = true;
                 }
 
@@ -10881,7 +10870,7 @@ namespace WaterThermalTanks {
                 }
 
                 // next determine if tank temperature is such that source side flow might be requested
-                NeedsHeatOrCool = SourceHeatNeed(WaterThermalTankNum,OutletTemp, DeadBandTemp,SetPointTemp);
+                NeedsHeatOrCool = SourceHeatNeed(WaterThermalTank(WaterThermalTankNum), OutletTemp, DeadBandTemp, SetPointTemp);
 
                 if (MassFlowRequest > 0.0) {
                     if (WaterThermalTankSide == UseSide) {
@@ -10932,7 +10921,7 @@ namespace WaterThermalTanks {
                 }
 
                 if (WaterThermalTankSide == SourceSide) { // temperature dependent controls for indirect heating/cooling
-                    NeedsHeatOrCool = SourceHeatNeed(WaterThermalTankNum,OutletTemp, DeadBandTemp,SetPointTemp);
+                    NeedsHeatOrCool = SourceHeatNeed(WaterThermalTank(WaterThermalTankNum),OutletTemp, DeadBandTemp,SetPointTemp);
                     if (MassFlowRequest > 0.0) {
                         if (NeedsHeatOrCool) {
                             FlowResult = MassFlowRequest;
