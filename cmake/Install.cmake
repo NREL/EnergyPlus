@@ -319,6 +319,8 @@ elseif(WIN32)
 
   # You need at least one "install(..." command for it to be registered as a component
   install(CODE "MESSAGE(\"Registering filetypes.\")" COMPONENT RegisterFileType)
+  install(CODE "MESSAGE(\"Copying and Registering DLLs\")" COMPONENT CopyAndRegisterSystemDLLs)
+
 
 endif()
 
@@ -424,6 +426,12 @@ cpack_add_component(RegisterFileType
   DESCRIPTION "Associate *.idf, *.imf, and *.epg files with EP-Launch"
 )
 
+cpack_add_component(CopyAndRegisterSystemDLLs
+  DISPLAY_NAME "Copy and Register DLLs"
+  DESCRIPTION "This will copy and register system DLLs such as Fortran if they don't already exist"
+  REQUIRED
+)
+
 # Regular stuff, like chmod +x
 cpack_ifw_configure_component(Unspecified
     SCRIPT cmake/qtifw/install_operations.qs
@@ -439,7 +447,13 @@ cpack_ifw_configure_component(RegisterFileType
     REQUIRES_ADMIN_RIGHTS
 )
 
-cpack_ifw_configure_component(Licenses FORCED_INSTALLATION
+cpack_ifw_configure_component(CopyAndRegisterSystemDLLs
+    SCRIPT cmake/qtifw/install_win_copydll.qs
+    REQUIRES_ADMIN_RIGHTS
+)
+
+cpack_ifw_configure_component(Licenses
+  FORCED_INSTALLATION
   LICENSES
     "EnergyPlus" ${CPACK_RESOURCE_FILE_LICENSE}
 )

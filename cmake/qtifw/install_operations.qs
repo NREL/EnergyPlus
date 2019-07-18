@@ -40,7 +40,7 @@ function Component()
       component.addOperation("CreateShortcut", "@TargetDir@/PreProcess/WeatherConverter/Weather.exe", "@StartMenuDir@/Weather Statistics and Conversions.lnk");
 
 
-      // Note: Associate file types is done somewhere else
+      // Note: Associate file types: done separately (optional)
 
       // Here's what stuff gets weird. We need to write stuff to the registry apparently for EP-Launch
       // In the registry under KEY_CURRENT_USER\Software\VB and VBA Program Settings\EP-Launch\UpdateCheck:
@@ -74,26 +74,7 @@ function Component()
       // Delete the entire keyName upon uninstallation
       component.addOperation("Execute", "cmd", "/C", "echo do nothing", "UNDOEXECUTE", reg, "DELETE", keyName);
 
-      // And weirder still, to copy and register DLLs
-      var systemArray = ["MSCOMCTL.OCX", "ComDlg32.OCX", "Msvcrtd.dll", "Dforrt.dll", "Gswdll32.dll", "Gsw32.exe", "Graph32.ocx", "MSINET.OCX", "Vsflex7L.ocx", "Msflxgrd.ocx"];
-      var systemTargetDir = installer.environmentVariable("WINDIR");
-      if( systemInfo.currentCpuArchitecture == "x86_64") {
-        systemTargetDir += "/SysWOW64/";
-      } else {
-        systemTargetDir += "/System32/";
-      }
-      for (i = 0; i < systemArray.length; i++) {
-        var sourceFile = "@TargetDir@/temp/" + systemArray[i];
-        var targetFile = systemTargetDir + systemArray[i];
-        if (!installer.fileExists(targetFile)) {
-          component.addElevatedOperation("Copy", sourceFile, targetFile);
-        }
-      }
-      // Delete this temp directory: use execute to avoid uninstall create
-      // the opposite (= Mkdir), plus it doesn't delete an empty directory anyways and we use copy (not move) above...
-      // component.addElevatedOperation("Rmdir", "@TargetDir@/temp");
-      component.addElevatedOperation("Execute", "cmd" , "/C",  "rmdir", "/S", "@TargetDir@\\temp");
-
+      // And weirder still, to copy and register DLLs: done separately
     }
   }
 }
