@@ -4504,8 +4504,9 @@ namespace HeatBalanceManager {
                           (MaterialLayerGroup == ScreenEquivalentLayer) || (MaterialLayerGroup == GapEquivalentLayer))) {
                         ShowSevereError("Invalid material layer type in window " + CurrentModuleObject + " = " +
                                         Construct(TotRegConstructs + ConstrNum).Name);
-                        ShowContinueError("...Window layer material type = " + ConstructAlphas(Layer) +
+                        ShowContinueError("...Window layer = " + ConstructAlphas(Layer) +
                                           " is not allowed in Construction:WindowEquivalentLayer window object.");
+                        ShowContinueError("Only materials of type Material:*:EquivalentLayer are allowed");
                         ErrorsFound = true;
                     }
 
