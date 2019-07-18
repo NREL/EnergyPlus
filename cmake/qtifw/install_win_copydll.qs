@@ -15,15 +15,25 @@ function Component()
       var systemArray = ["MSCOMCTL.OCX", "ComDlg32.OCX", "Msvcrtd.dll", "Dforrt.dll", "Gswdll32.dll", "Gsw32.exe", "Graph32.ocx", "MSINET.OCX", "Vsflex7L.ocx", "Msflxgrd.ocx"];
       var systemTargetDir = installer.environmentVariable("WINDIR");
       if( systemInfo.currentCpuArchitecture == "x86_64") {
-        systemTargetDir += "/SysWOW64/";
+        // This is where the 32-bit stuff is stored on 64-bit systems
+        // (despite the name...)
+        systemTargetDir += "\\SysWOW64\\";
       } else {
-        systemTargetDir += "/System32/";
+        // This is 32-bit on a 32-bit system
+        systemTargetDir += "\\System32\\";
       }
+
+      var regdll = systemTargetDir + "regsvr32.exe";
+
       for (i = 0; i < systemArray.length; i++) {
-        var sourceFile = "@TargetDir@/temp/" + systemArray[i];
+        var sourceFile = "@TargetDir@\\temp\\" + systemArray[i];
         var targetFile = systemTargetDir + systemArray[i];
         if (!installer.fileExists(targetFile)) {
+          // Copy the DLL
           component.addElevatedOperation("Copy", sourceFile, targetFile);
+          // Register it
+          component.addElevatedOperation("Execute", regdll, targetFile,
+             "UNDOEXECUTE", regdll, "/u", targetFile);
         }
       }
       // Delete this temp directory: use execute to avoid uninstall create
