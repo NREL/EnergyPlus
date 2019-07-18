@@ -510,6 +510,7 @@ namespace EconomicLifeCycleCost {
             //      \minimum 1900
             //      \maximum 2100
             serviceDateYear = int(NumArray(5));
+	    
             if (serviceDateYear > 2100) {
                 ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(5) +
                                  ".  Value greater than 2100 yet it is representing a year. ");
@@ -676,13 +677,13 @@ namespace EconomicLifeCycleCost {
             }
             //   N1,  \field Cost
             //        \type real
-            RecurringCosts(iInObj).cost = NumArray(1);
+            RecurringCosts(iInObj).cost = NumArray(1); 
             //   A3,  \field Start of Costs
             //        \type choice
             //        \key ServicePeriod
             //        \key BasePeriod
             //        \default ServicePeriod
-            if (UtilityRoutines::SameString(AlphaArray(3), "ServicePeriod")) {
+	    if (UtilityRoutines::SameString(AlphaArray(3), "ServicePeriod")) {
                 RecurringCosts(iInObj).startOfCosts = startServicePeriod;
             } else if (UtilityRoutines::SameString(AlphaArray(3), "BasePeriod")) {
                 RecurringCosts(iInObj).startOfCosts = startBasePeriod;
@@ -711,6 +712,7 @@ namespace EconomicLifeCycleCost {
             //        \minimum 0
             //        \maximum 1200
             RecurringCosts(iInObj).monthsFromStart = int(NumArray(3));
+
             if (RecurringCosts(iInObj).monthsFromStart > 1200) {
                 ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(3) +
                                  ".  This value is the number of months from the start so a value greater than 1200 is not reasonable for an "
@@ -769,7 +771,7 @@ namespace EconomicLifeCycleCost {
             // express the years and months fields in total months
             RecurringCosts(iInObj).totalMonthsFromStart = RecurringCosts(iInObj).yearsFromStart * 12 + RecurringCosts(iInObj).monthsFromStart;
             RecurringCosts(iInObj).totalRepeatPeriodMonths =
-                RecurringCosts(iInObj).repeatPeriodYears * 12 + RecurringCosts(iInObj).repeatPeriodMonths;
+                RecurringCosts(iInObj).repeatPeriodYears * 12 + RecurringCosts(iInObj).repeatPeriodMonths  ;
         }
     }
 
@@ -1353,12 +1355,12 @@ namespace EconomicLifeCycleCost {
             CashFlow(offset + jCost).Category = RecurringCosts(jCost).category;
             CashFlow(offset + jCost).orginalCost = RecurringCosts(jCost).cost;
             if (RecurringCosts(jCost).startOfCosts == startServicePeriod) {
-                firstMonth = RecurringCosts(jCost).totalMonthsFromStart + monthsBaseToService + 1;
+                firstMonth = RecurringCosts(jCost).totalMonthsFromStart + monthsBaseToService + 1 ;
             } else if (RecurringCosts(jCost).startOfCosts == startBasePeriod) {
                 firstMonth = RecurringCosts(jCost).totalMonthsFromStart + 1;
             }
             if ((firstMonth >= 1) && (firstMonth <= lengthStudyTotalMonths)) {
-                month = firstMonth;
+                month = firstMonth + 1;
                 if (RecurringCosts(jCost).totalRepeatPeriodMonths >= 1) {
                     for (iLoop = 1; iLoop <= 10000; ++iLoop) { // add a limit to the loop to prevent runaway condition
                         CashFlow(offset + jCost).mnAmount(month) = RecurringCosts(jCost).cost * monthlyInflationFactor(month);
@@ -1597,6 +1599,7 @@ namespace EconomicLifeCycleCost {
                 }
             }
         }
+	
         for (iCashFlow = 1; iCashFlow <= numCashFlow; ++iCashFlow) {
             {
                 auto const SELECT_CASE_var(CashFlow(iCashFlow).pvKind);
