@@ -40,25 +40,24 @@ set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE.txt")
 install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION ./ )
 install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON" DESTINATION ./ )
 
-# THIS IS ONLY COMMENTED TEMPORARILY
-## Some docs are generated on the fly here, create a dir for the 'built' files
-#set( DOCS_OUT "${CMAKE_BINARY_DIR}/autodocs" )
-#install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E make_directory \"${DOCS_OUT}\")")
-#
-## the output variables listing
-#install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/parse_output_variables.py\" \"${CMAKE_SOURCE_DIR}/src/EnergyPlus\" \"${DOCS_OUT}/SetupOutputVariables.csv\" \"${DOCS_OUT}/SetupOutputVariables.md\")")
-#install(FILES "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.csv" DESTINATION "./")
-#
-## the example file summary
-#install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/example_file_summary.py\" \"${CMAKE_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles.html\")"
-#   COMPONENT ExampleFiles)
-#install(FILES "${DOCS_OUT}/ExampleFiles.html" DESTINATION "./ExampleFiles/" COMPONENT ExampleFiles)
-#
-## the example file objects link
-#install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/example_file_objects.py\"
-#\"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd\" \"${CMAKE_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles-ObjectsLink.html\")"
-#  COMPONENT ExampleFiles)
-#install(FILES "${DOCS_OUT}/ExampleFiles-ObjectsLink.html" DESTINATION "./ExampleFiles/" COMPONENT ExampleFiles)
+# Some docs are generated on the fly here, create a dir for the 'built' files
+set( DOCS_OUT "${CMAKE_BINARY_DIR}/autodocs" )
+install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E make_directory \"${DOCS_OUT}\")")
+
+# the output variables listing
+install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/parse_output_variables.py\" \"${CMAKE_SOURCE_DIR}/src/EnergyPlus\" \"${DOCS_OUT}/SetupOutputVariables.csv\" \"${DOCS_OUT}/SetupOutputVariables.md\")")
+install(FILES "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.csv" DESTINATION "./")
+
+# the example file summary
+install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/example_file_summary.py\" \"${CMAKE_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles.html\")"
+   COMPONENT ExampleFiles)
+install(FILES "${DOCS_OUT}/ExampleFiles.html" DESTINATION "./ExampleFiles/" COMPONENT ExampleFiles)
+
+# the example file objects link
+install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/example_file_objects.py\"
+\"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd\" \"${CMAKE_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles-ObjectsLink.html\")"
+  COMPONENT ExampleFiles)
+install(FILES "${DOCS_OUT}/ExampleFiles-ObjectsLink.html" DESTINATION "./ExampleFiles/" COMPONENT ExampleFiles)
 
 # the change log, only if we do have a github token in the environment
 # Watch out! GITHUB_TOKEN could go out of scope by the time install target is run.
