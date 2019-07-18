@@ -105,19 +105,8 @@ namespace CurveManager {
     extern int const ChillerPartLoadWithLift;
 
     // Interpolation Types
-    extern int const LinearInterpolationOfTable;
-    extern int const LagrangeInterpolationLinearExtrapolation;
     extern int const EvaluateCurveToLimits;
     extern int const BtwxtMethod;
-
-    // Data Format
-    extern int const SINGLELINEINDEPENDENTVARIABLEWITHMATRIX;
-
-    // Sort Order
-    extern int const ASCENDING;
-    extern int const DESCENDING;
-
-    // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
 
@@ -165,33 +154,6 @@ namespace CurveManager {
             : CoeffA0(0.0), CoeffA1(0.0), CoeffA2(0.0), CoeffA3(0.0), CoeffA4(0.0), CoeffA5(0.0), CoeffA6(0.0), CoeffA7(0.0), CoeffA8(0.0),
               CoeffA9(0.0), CoeffA10(0.0), CoeffA11(0.0), CoeffA12(0.0), CoeffA13(0.0), CoeffA14(0.0), CoeffA15(0.0), CoeffA16(0.0), CoeffA17(0.0),
               CoeffA18(0.0), CoeffA19(0.0), CoeffA20(0.0), CoeffA21(0.0), CoeffA22(0.0), CoeffA23(0.0), CoeffA24(0.0), CoeffA25(0.0), CoeffA26(0.0)
-        {
-        }
-    };
-
-    struct TableDataStruct
-    {
-        // Members
-        Real64 NormalPoint;
-        Array1D<Real64> X1;
-        Array1D<Real64> X2;
-        Array1D<Real64> Y;
-
-        // Default Constructor
-        TableDataStruct() : NormalPoint(1.0)
-        {
-        }
-    };
-
-    struct PerfCurveTableDataStruct
-    {
-        // Members
-        Array1D<Real64> X1;
-        Array1D<Real64> X2;
-        Array2D<Real64> Y;
-
-        // Default Constructor
-        PerfCurveTableDataStruct()
         {
         }
     };
@@ -255,8 +217,6 @@ namespace CurveManager {
         Array1D<TriQuadraticCurveDataStruct> Tri2ndOrder; // structure for triquadratic curve data
         bool EMSOverrideOn;                               // if TRUE, then EMS is calling to override curve value
         Real64 EMSOverrideCurveValue;                     // Value of curve result EMS is directing to use
-        bool OpticalProperty;                             // if TRUE, this table is used to store optical property
-        // report variables
         Real64 CurveOutput; // curve output or result
         Real64 CurveInput1; // curve input #1 (e.g., x or X1 variable)
         Real64 CurveInput2; // curve input #2 (e.g., y or X2 variable)
@@ -274,33 +234,8 @@ namespace CurveManager {
               CurveMax(0.0), CurveMinPresent(false), CurveMaxPresent(false), Var1MinPresent(false), Var1MaxPresent(false), Var2MinPresent(false),
               Var2MaxPresent(false), Var3MinPresent(false), Var3MaxPresent(false), Var4MinPresent(false), Var4MaxPresent(false),
               Var5MinPresent(false), Var5MaxPresent(false), Var6MinPresent(false), Var6MaxPresent(false), EMSOverrideOn(false),
-              EMSOverrideCurveValue(0.0), OpticalProperty(false), CurveOutput(0.0), CurveInput1(0.0), CurveInput2(0.0), CurveInput3(0.0),
+              EMSOverrideCurveValue(0.0), CurveOutput(0.0), CurveInput1(0.0), CurveInput2(0.0), CurveInput3(0.0),
               CurveInput4(0.0), CurveInput5(0.0), CurveInput6(0.0)
-        {
-        }
-    };
-
-    struct TableLookupData
-    {
-        // Members
-        int InterpolationOrder; // number of points to interpolate (table data only)
-        int NumX1Vars;          // Number of variables for independent variable #1
-        Array1D<Real64> X1Var;
-        int NumX2Vars; // Number of variables for independent variable #2
-        Array1D<Real64> X2Var;
-        int NumX3Vars; // Number of variables for independent variable #3
-        Array1D<Real64> X3Var;
-        int NumX4Vars; // Number of variables for independent variable #4
-        Array1D<Real64> X4Var;
-        int NumX5Vars; // Number of variables for independent variable #5
-        Array1D<Real64> X5Var;
-        int NumX6Vars; // Number of variables for independent variable #6
-        Array1D<Real64> X6Var;
-        Array6D<Real64> TableLookupZData;
-
-        // Default Constructor
-        TableLookupData()
-            : InterpolationOrder(4), NumX1Vars(0), NumX2Vars(0), NumX3Vars(0), NumX4Vars(0), NumX5Vars(0), NumX6Vars(0)
         {
         }
     };
@@ -330,9 +265,10 @@ namespace CurveManager {
         static std::map<std::string, Btwxt::Method> interpMethods;
         static std::map<std::string, Btwxt::Method> extrapMethods;
         // Map RGI collection to string name of independent variable list
-        void addGrid(std::string indVarListName, Btwxt::GriddedData grid) {
+        int addGrid(std::string indVarListName, Btwxt::GriddedData grid) {
             grids.emplace_back(Btwxt::RegularGridInterpolator(grid));
-            gridMap.emplace(indVarListName,grids.size() -1 );
+            gridMap.emplace(indVarListName,grids.size() - 1 );
+            return grids.size() - 1;
         };
         void normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target);
         int addOutputValues(int gridIndex, std::vector<double> values);
@@ -349,11 +285,6 @@ namespace CurveManager {
 
     // Object Data
     extern Array1D<PerfomanceCurveData> PerfCurve;
-    extern Array1D<PerfCurveTableDataStruct> PerfCurveTableData;
-    extern Array1D<TableDataStruct> TableData;
-    extern Array1D<TableDataStruct> TempTableData;
-    extern Array1D<TableDataStruct> Temp2TableData;
-    extern Array1D<TableLookupData> TableLookup;
     extern BtwxtManager btwxtManager;
     // Functions
 
@@ -378,46 +309,12 @@ namespace CurveManager {
 
     void InitCurveReporting();
 
-    void ReadTableData(int const CurveNum,
-                       std::string &CurrentModuleObject,
-                       bool const ReadFromFile,
-                       std::string &FileName,
-                       Array1S_string Alphas,
-                       Array1S<Real64> Numbers,
-                       int const NumNumbers,
-                       bool &ErrorsFound);
-
-    Real64 DLAG(Real64 const XX,
-                Real64 const YY,
-                Array1S<Real64> X,
-                Array1S<Real64> Y,
-                Array2S<Real64> Z,
-                int const NX,
-                int const NY,
-                int const M,
-                int &IEXTX,
-                int &IEXTY);
-
     Real64 PerformanceCurveObject(int const CurveIndex,            // index of curve in curve array
                                   Real64 const Var1,               // 1st independent variable
                                   Optional<Real64 const> Var2 = _, // 2nd independent variable
                                   Optional<Real64 const> Var3 = _, // 3rd independent variable
                                   Optional<Real64 const> Var4 = _  // 4th independent variable
     );
-
-    Real64 PerformanceTableObject(int const CurveIndex,            // index of curve in curve array
-                                  Real64 const Var1,               // 1st independent variable
-                                  Optional<Real64 const> Var2 = _, // 2nd independent variable
-                                  Optional<Real64 const> Var3 = _  // 3rd independent variable
-    );
-
-    Real64 TableLookupObject(int const CurveIndex,            // index of curve in curve array
-                             Real64 const Var1,               // 1st independent variable
-                             Optional<Real64 const> Var2 = _, // 2nd independent variable
-                             Optional<Real64 const> Var3 = _, // 3rd independent variable
-                             Optional<Real64 const> Var4 = _, // 4th independent variable
-                             Optional<Real64 const> Var5 = _, // 5th independent variable
-                             Optional<Real64 const> Var6 = _);
 
     Real64 BtwxtTableInterpolation(int const CurveIndex,            // index of curve in curve array
                                    Real64 const Var1,               // 1st independent variable
@@ -426,22 +323,6 @@ namespace CurveManager {
                                    Optional<Real64 const> Var4 = _, // 4th independent variable
                                    Optional<Real64 const> Var5 = _, // 5th independent variable
                                    Optional<Real64 const> Var6 = _);
-
-    void SolveRegression(int &CurveNum,                          // index to performance curve
-                         std::string &TableType,                 // tabular data object type
-                         std::string &CurveName,                 // performance curve name
-                         Array1S<Real64> RawDataX,               // table data X values (1st independent variable)
-                         Array1S<Real64> RawDataY,               // table data Y values (dependent variables)
-                         Optional<Array1S<Real64>> RawDataX2 = _ // table data X2 values (2nd independent variable)
-    );
-
-    void Interpolate_Lagrange(Real64 const DataPoint,        // point used for interpolating output (x)
-                              Array1S<Real64> FunctionArray, // array of output data (Y's)
-                              Array1S<Real64> Ordinate,      // array of input data (X's)
-                              int const ISPT,                // the starting point in the interpolated array
-                              int const IEPT,                // the ending point in the interpolated array
-                              Real64 &ALAG                   // the interpolated output (y or F(x) in equation above)
-    );
 
     bool IsCurveInputTypeValid(std::string const &InInputType); // index of curve in curve array
 
@@ -503,19 +384,6 @@ namespace CurveManager {
                                      Optional<Real64 const> Var3 = _,     // 3rd independent variable
                                      Optional<Real64 const> Var4 = _,     // 4th independent variable
                                      Optional<Real64 const> Var5 = _      // 5th independent variable
-    );
-
-    int GetCurveInterpolationMethodNum(int const CurveIndex); // index of curve in curve array
-
-    void ReadTwoVarTableDataFromFile(int const CurveNum, std::string &FileName, int &lineNum);
-
-    void SetSameIndeVariableValues(int const TransCurveIndex, int const FRefleCurveIndex, int const BRefleCurveIndex);
-
-    void SetCommonIncidentAngles(
-        int const ConstrNum,     // Construction number
-        int const NGlass,        // The number of glass layers in the construction with index = ConstrNum
-        int &TotalIPhi,          // The number of incident angles
-        Array1A_int const Tables // Store construction layer number for SpectralAndAngleGlassLayer glass only. Otherwise = 0 for other layers.
     );
 
     //=================================================================================================!

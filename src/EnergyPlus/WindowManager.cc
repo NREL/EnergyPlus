@@ -471,9 +471,6 @@ namespace WindowManager {
         // Using/Aliasing
         using namespace Vectors;
         using CurveManager::PerfCurve;
-        using CurveManager::SetCommonIncidentAngles;
-        using CurveManager::TableData;
-        using CurveManager::TableLookup;
         using General::TrimSigDigits;
         using WindowEquivalentLayer::InitEquivalentLayerWindowCalculations;
 
@@ -877,9 +874,8 @@ namespace WindowManager {
                 }
                 if (Material(LayPtr).GlassSpectralAndAngle) {
                     if (!BGFlag) AllGlassIsSpectralAverage = false;
-                    numptDAT = TableLookup(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).NumX2Vars;
+                    numptDAT = wle.size();
                     numpt(IGlass) = numptDAT;
-                    TotalIPhi = TableLookup(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).NumX1Vars;
                     if (BGFlag) {
                         // 5/16/2012 CR 8793. Add warning message for the glazing defined with full spectral data.
                         ShowWarningError("Window glazing material \"" + Material(LayPtr).Name +
@@ -892,12 +888,12 @@ namespace WindowManager {
                                           "material) using the full spectral data.");
                         // calc Trans, TransVis, ReflectSolBeamFront, ReflectSolBeamBack, ReflectVisBeamFront, ReflectVisBeamBack
                         //  assuming wlt same as wle
-                        int NumX2 = TableLookup(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).NumX2Vars;
-                        for (ILam = 1; ILam <= NumX2; ++ILam) {
-                            wlt(IGlass, ILam) = TableData(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).X2(ILam);
-                            t(IGlass, ILam) = TableData(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).Y(ILam);
-                            rff(IGlass, ILam) = TableData(PerfCurve(Material(LayPtr).GlassSpecAngFRefleDataPtr).TableIndex).Y(ILam);
-                            rbb(IGlass, ILam) = TableData(PerfCurve(Material(LayPtr).GlassSpecAngBRefleDataPtr).TableIndex).Y(ILam);
+                        for (ILam = 1; ILam <= (int)wle.size(); ++ILam) {
+                            auto lam = wle(ILam);
+                            wlt(IGlass, ILam) = lam;
+                            t(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngTransDataPtr,0.0,lam);
+                            rff(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngFRefleDataPtr,0.0,lam);
+                            rbb(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngBRefleDataPtr,0.0,lam);
                         }
                         SolarSprectrumAverage(t, tmpTrans);
                         SolarSprectrumAverage(rff, tmpReflectSolBeamFront);
@@ -928,7 +924,6 @@ namespace WindowManager {
                     AngleNum(IGlass) = LayerNum(IGlass);
                 }
             }
-            SetCommonIncidentAngles(ConstrNum, NGlass, TotalIPhi, AngleNum);
             if (TotalIPhi > MaxNumOfIncidentAngles) {
                 ShowSevereError("WindowManage::InitGlassOpticalCalculations = " + Construct(ConstrNum).Name +
                                 ", Invalid maximum value of common incidet angles = " + TrimSigDigits(TotalIPhi) + ".");
@@ -939,14 +934,6 @@ namespace WindowManager {
 
             for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                 LayPtr = Construct(ConstrNum).LayerPoint(LayerNum(IGlass));
-                if (Material(LayPtr).GlassSpectralAndAngle) {
-                    CosPhiIndepVar = 0.0;
-                    for (IPhi = 1; IPhi <= TotalIPhi; ++IPhi) {
-                        Phi = TableLookup(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).X1Var(IPhi);
-                        CosPhiIndepVar(IPhi) = std::cos(Phi * DegToRadians);
-                    }
-                    break;
-                }
             }
 
             // Loop over incidence angle from 0 to 90 deg in 10 deg increments.
@@ -959,10 +946,6 @@ namespace WindowManager {
                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                     // Override 10 degree increment for incident angle for a construction with a layer = SpectralAndAngle
                     LayPtr = Construct(ConstrNum).LayerPoint(LayerNum(IGlass));
-                    if (Material(LayPtr).GlassSpectralAndAngle) {
-                        Phi = TableLookup(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).X1Var(IPhi);
-                        break;
-                    }
                 }
                 CosPhi = std::cos(Phi * DegToRadians);
                 if (std::abs(CosPhi) < 0.0001) CosPhi = 0.0;
@@ -985,16 +968,12 @@ namespace WindowManager {
                                               SimpleGlazingU);
                         }
                     } else {
-                        int NumX2 = TableLookup(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).NumX2Vars;
-                        for (ILam = 1; ILam <= NumX2; ++ILam) {
-                            wlt(IGlass, ILam) =
-                                TableData(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).X2((IPhi - 1) * NumX2 + ILam);
-                            tPhi(IGlass, ILam) =
-                                TableData(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).Y((IPhi - 1) * NumX2 + ILam);
-                            rfPhi(IGlass, ILam) =
-                                TableData(PerfCurve(Material(LayPtr).GlassSpecAngFRefleDataPtr).TableIndex).Y((IPhi - 1) * NumX2 + ILam);
-                            rbPhi(IGlass, ILam) =
-                                TableData(PerfCurve(Material(LayPtr).GlassSpecAngBRefleDataPtr).TableIndex).Y((IPhi - 1) * NumX2 + ILam);
+                        for (ILam = 1; ILam <= (int)wle.size(); ++ILam) {
+                            auto lam = wle(ILam);
+                            wlt(IGlass, ILam) = lam;
+                            tPhi(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
+                            rfPhi(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
+                            rbPhi(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
                         }
                     }
                     // For use with between-glass shade/blind, save angular properties of isolated glass
@@ -1148,7 +1127,7 @@ namespace WindowManager {
                     }
                 }
                 if (Material(LayPtr).GlassSpectralAndAngle) {
-                    numptDAT = TableLookup(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).NumX2Vars;
+                    numptDAT = wle.size();
                     numpt(IGlass) = numptDAT;
                 }
             } // End of loop over glass layers in the construction for back calculation
@@ -1162,10 +1141,6 @@ namespace WindowManager {
                 Phi = double(IPhi - 1) * 10.0;
                 for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
                     LayPtr = Construct(ConstrNum).LayerPoint(LayerNum(IGlass));
-                    if (Material(LayPtr).GlassSpecAngTransDataPtr) {
-                        Phi = TableLookup(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).X1Var(IPhi);
-                        break;
-                    }
                 }
                 CosPhi = std::cos(Phi * DegToRadians);
                 if (std::abs(CosPhi) < 0.0001) CosPhi = 0.0;
@@ -1189,16 +1164,12 @@ namespace WindowManager {
                                               SimpleGlazingU);
                         }
                     } else {
-                        int NumX2 = TableLookup(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).NumX2Vars;
-                        for (ILam = 1; ILam <= NumX2; ++ILam) {
-                            wlt(IGlass, ILam) =
-                                TableData(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).X2((IPhi - 1) * NumX2 + ILam);
-                            tPhi(IGlass, ILam) =
-                                TableData(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).Y((IPhi - 1) * NumX2 + ILam);
-                            rfPhi(IGlass, ILam) =
-                                TableData(PerfCurve(Material(LayPtr).GlassSpecAngFRefleDataPtr).TableIndex).Y((IPhi - 1) * NumX2 + ILam);
-                            rbPhi(IGlass, ILam) =
-                                TableData(PerfCurve(Material(LayPtr).GlassSpecAngBRefleDataPtr).TableIndex).Y((IPhi - 1) * NumX2 + ILam);
+                        for (ILam = 1; ILam <= (int)wle.size(); ++ILam) {
+                            auto lam = wle(ILam);
+                            wlt(IGlass, ILam) = lam;
+                            tPhi(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
+                            rfPhi(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
+                            rbPhi(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
                         }
                     }
                 }
@@ -1759,13 +1730,6 @@ namespace WindowManager {
                     tvisPhiFit(IPhi) = 0.0;
 
                     Phi = double(IPhi - 1) * 10.0;
-                    for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                        LayPtr = Construct(ConstrNum).LayerPoint(LayerNum(IGlass));
-                        if (Material(LayPtr).GlassSpecAngTransDataPtr) {
-                            Phi = TableLookup(PerfCurve(Material(LayPtr).GlassSpecAngTransDataPtr).TableIndex).X1Var(IPhi);
-                            break;
-                        }
-                    }
                     CosPhi = std::cos(Phi * DegToRadians);
                     if (std::abs(CosPhi) < 0.0001) CosPhi = 0.0;
                     Real64 cos_pow(1.0);
