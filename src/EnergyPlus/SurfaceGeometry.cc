@@ -8895,6 +8895,14 @@ namespace SurfaceGeometry {
                 auto &fnd = fndInput.foundation;
                 fnd = kivaManager.defaultFoundation.foundation;
 
+                // Indoor temperature
+                if (!lNumericFieldBlanks(numF)) {
+                    fndInput.assumedIndoorTemperature = rNumericArgs(numF);
+                } else {
+                    fndInput.assumedIndoorTemperature = -9999;
+                }
+                numF++;
+
                 // Interior horizontal insulation
                 if (!lAlphaFieldBlanks(alpF)) {
                     int index = UtilityRoutines::FindItemInList(cAlphaArgs(alpF), Material);
