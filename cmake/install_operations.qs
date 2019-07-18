@@ -66,44 +66,18 @@ function Component()
 
       // Note by passing arguments separately to the (reg) command in addElevatedOperation (supports up to 10 args),
       // Qt will escape each argument, so do not include double quote (eg: "\"AutoCheck\"") or they'll be interpreted literally
-      // For some reason I can't make it work, I end up with extra quotes in there...
       var valueName = "AutoCheck";
       var data = "True";
-      // Thinks everything is a KeyName = Computer\HKEY_CURRENT_USER\Software\VB and VBA Program Settings\EP-Launch\UpdateCheck" /v AutoCheck /d "True" /f
-      //component.addElevatedOperation("Execute", reg, "ADD", [keyName, "/v", valueName, "/d", data, "/f"].join(" "),
-      //                               "UNDOEXECUTE", reg, "DELETE", [keyName, "/v", valueName, "/f"].join(" "));
-      // fails
-      //var keyName = "HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck";
-
-      //component.addElevatedOperation("Execute", [reg, "ADD", keyName, "/v", valueName, "/d", data, "/f"].join(" "),
-      //                               "UNDOEXECUTE", [reg, "DELETE", keyName, "/v", valueName, "/f"].join(" "));
       component.addElevatedOperation("Execute", reg, "ADD", keyName, "/v", valueName, "/d", data, "/f",
                                      "UNDOEXECUTE", reg, "DELETE", keyName, "/v", valueName, "/f");
 
       var valueName = "CheckURL";
       var data = "http://nrel.github.io/EnergyPlus/epupdate.htm";
-      // fails
-      //var data = "\"http://nrel.github.io/EnergyPlus/epupdate.htm\"";
-      //var keyName = "\"HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\"";
-
-      //component.addElevatedOperation("Execute", "cmd", "/C", [reg, "ADD", keyName, "/v", valueName, "/d", data, "/f"].join(" "),
-      //                               "UNDOEXECUTE", "cmd", "/C", [reg, "DELETE", keyName, "/v", valueName, "/f"].join(" "));
       component.addElevatedOperation("Execute", reg, "ADD", keyName, "/v", valueName, "/d", data, "/f",
                                      "UNDOEXECUTE", reg, "DELETE", keyName, "/v", valueName, "/f");
 
-      // fails
-      //component.addElevatedOperation("Execute", reg, ["ADD", keyName, "/v", valueName, "/d", data, "/f"].join(" "),
-      //                               "UNDOEXECUTE", reg, ["DELETE", keyName, "/v", valueName, "/f"].join(" "));
-
       var valueName = "LastAnchor";
       var data = "#@Version@";
-
-      // This creates the value and data fine, but the KeyName has an extra trailing quote:
-      // var keyName = "\"HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\"";
-      //component.addElevatedOperation("Execute", reg, "ADD", keyName, "/v", valueName, "/d", data, "/f",
-      //                               "UNDOEXECUTE", reg, "DELETE", keyName, "/v", valueName, "/f");
-
-      var keyName = "HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck";
       component.addElevatedOperation("Execute", reg, "ADD", keyName, "/v", valueName, "/d", data, "/f",
                                      "UNDOEXECUTE", reg, "DELETE", keyName, "/v", valueName, "/f");
 
