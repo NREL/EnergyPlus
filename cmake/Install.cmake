@@ -298,6 +298,7 @@ if( APPLE )
   install(PROGRAMS scripts/runepmacro DESTINATION "./")
   install(PROGRAMS scripts/runreadvars DESTINATION "./")
 
+  # You need at least one "install(..." command for it to be registered as a component
   install(CODE "MESSAGE(\"Creating symlinks.\")" COMPONENT Symlinks)
 
   # Custom installer icon. Has to be .icns on mac, .ico on windows, not supported on Unix
@@ -315,6 +316,9 @@ elseif(WIN32)
 
     # Custom installer icon. Has to be .icns on mac, .ico on windows, not supported on Unix
   set(CPACK_IFW_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/release/ep.ico")
+
+  # You need at least one "install(..." command for it to be registered as a component
+  install(CODE "MESSAGE(\"Registering filetypes.\")" COMPONENT RegisterFileType)
 
 endif()
 
@@ -415,13 +419,23 @@ cpack_add_component(Licenses
   DESCRIPTION "License files for EnergyPlus"
   REQUIRED)
 
+cpack_add_component(RegisterFileType
+  DISPLAY_NAME "Associate with EP-Launch"
+  DESCRIPTION "Associate *.idf, *.imf, and *.epg files with EP-Launch"
+)
+
 # Regular stuff, like chmod +x
 cpack_ifw_configure_component(Unspecified
-    SCRIPT cmake/install_operations.qs
+    SCRIPT cmake/qtifw/install_operations.qs
 )
 
 cpack_ifw_configure_component(Symlinks
-    SCRIPT cmake/create_symlinks.qs
+    SCRIPT cmake/qtifw/install_mac_createsymlinks.qs
+    REQUIRES_ADMIN_RIGHTS
+)
+
+cpack_ifw_configure_component(RegisterFileType
+    SCRIPT cmake/qtifw/install_registerfiletype.qs
     REQUIRES_ADMIN_RIGHTS
 )
 

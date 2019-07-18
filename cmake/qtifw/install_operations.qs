@@ -28,29 +28,19 @@ function Component()
     if( kernel == "winnt" ) {
 
       // Create Shortcuts in the Windows Start Menu
-      component.addElevatedOperation("CreateShortcut", "@TargetDir@/Documentation/index.html", "@StartMenuDir@/EnergyPlus Documentation.lnk")
-      component.addElevatedOperation("CreateShortcut", "@TargetDir@/PostProcess/EP-Compare/EP-Compare.exe", "@StartMenuDir@/EP-Compare.lnk")
-      component.addElevatedOperation("CreateShortcut", "@TargetDir@/PreProcess/EPDraw/EPDrawGUI.exe", "@StartMenuDir@/EPDrawGUI.lnk")
-      component.addElevatedOperation("CreateShortcut", "@TargetDir@/EP-Launch.exe", "@StartMenuDir@/EP-Launch.lnk")
-      component.addElevatedOperation("CreateShortcut", "@TargetDir@/ExampleFiles/ExampleFiles.html", "@StartMenuDir@/Example Files Summary.lnk")
-      component.addElevatedOperation("CreateShortcut", "@TargetDir@/ExampleFiles/ExampleFiles-ObjectsLink.html", "@StartMenuDir@/ExampleFiles Link to Objects.lnk")
-      component.addElevatedOperation("CreateShortcut", "@TargetDir@/PreProcess/IDFEditor/IDFEditor.exe", "@StartMenuDir@/IDFEditor.lnk")
-      component.addElevatedOperation("CreateShortcut", "@TargetDir@/PreProcess/IDFVersionUpdater/IDFVersionUpdater.exe", "@StartMenuDir@/IDFVersionUpdater.lnk")
-      component.addElevatedOperation("CreateShortcut", "@TargetDir@/readme.html", "@StartMenuDir@/Readme Notes.lnk")
-      component.addElevatedOperation("CreateShortcut", "@TargetDir@/PreProcess/WeatherConverter/Weather.exe", "@StartMenuDir@/Weather Statistics and Conversions.lnk")
+      component.addOperation("CreateShortcut", "@TargetDir@/Documentation/index.html", "@StartMenuDir@/EnergyPlus Documentation.lnk");
+      component.addOperation("CreateShortcut", "@TargetDir@/PostProcess/EP-Compare/EP-Compare.exe", "@StartMenuDir@/EP-Compare.lnk");
+      component.addOperation("CreateShortcut", "@TargetDir@/PreProcess/EPDraw/EPDrawGUI.exe", "@StartMenuDir@/EPDrawGUI.lnk");
+      component.addOperation("CreateShortcut", "@TargetDir@/EP-Launch.exe", "@StartMenuDir@/EP-Launch.lnk");
+      component.addOperation("CreateShortcut", "@TargetDir@/ExampleFiles/ExampleFiles.html", "@StartMenuDir@/Example Files Summary.lnk");
+      component.addOperation("CreateShortcut", "@TargetDir@/ExampleFiles/ExampleFiles-ObjectsLink.html", "@StartMenuDir@/ExampleFiles Link to Objects.lnk");
+      component.addOperation("CreateShortcut", "@TargetDir@/PreProcess/IDFEditor/IDFEditor.exe", "@StartMenuDir@/IDFEditor.lnk");
+      component.addOperation("CreateShortcut", "@TargetDir@/PreProcess/IDFVersionUpdater/IDFVersionUpdater.exe", "@StartMenuDir@/IDFVersionUpdater.lnk");
+      component.addOperation("CreateShortcut", "@TargetDir@/readme.html", "@StartMenuDir@/Readme Notes.lnk");
+      component.addOperation("CreateShortcut", "@TargetDir@/PreProcess/WeatherConverter/Weather.exe", "@StartMenuDir@/Weather Statistics and Conversions.lnk");
 
 
-      // Associate file types
-      // TODO: should I Add a "Associate Files" checkbox to the installer options?
-      // "Associate *.idf, *.imf, and *.epg files with EP-Launch"
-
-      // Note JM: you have to quote the %1 which represents the file path, otherwise any space in the path will think there are multiple args
-      component.addElevatedOperation("RegisterFileType", "idf", "@TargetDir@/EP-Launch.exe \"%1\"", "EnergyPlus Input Data File", "text/plain", "@TargetDir@/EP-Launch.exe,1");
-      component.addElevatedOperation("RegisterFileType", "imf", "@TargetDir@/EP-Launch.exe \"%1\"", "EnergyPlus Input Macro File", "text/plain", "@TargetDir@/EP-Launch.exe,1");
-      component.addElevatedOperation("RegisterFileType", "epg", "@TargetDir@/EP-Launch.exe \"%1\"", "EnergyPlus Group File", "text/plain", "@TargetDir@/EP-Launch.exe,1");
-
-      component.addElevatedOperation("RegisterFileType", "ddy", "@TargetDir@/IDFEditor.exe \"%1\"", "EnergyPlus Location and Design Day Data", "text/plain", "@TargetDir@/IDFEditor.exe,1");
-      component.addElevatedOperation("RegisterFileType", "expidf", "@TargetDir@/IDFEditor.exe \"%1\"", "EnergyPlus Expand Objects Input Data File", "text/plain", "@TargetDir@/IDFEditor.exe,1");
+      // Note: Associate file types is done somewhere else
 
       // Here's what stuff gets weird. We need to write stuff to the registry apparently for EP-Launch
       // In the registry under KEY_CURRENT_USER\Software\VB and VBA Program Settings\EP-Launch\UpdateCheck:
@@ -68,18 +58,21 @@ function Component()
       // Qt will escape each argument, so do not include double quote (eg: "\"AutoCheck\"") or they'll be interpreted literally
       var valueName = "AutoCheck";
       var data = "True";
-      component.addElevatedOperation("Execute", reg, "ADD", keyName, "/v", valueName, "/d", data, "/f",
+      component.addOperation("Execute", reg, "ADD", keyName, "/v", valueName, "/d", data, "/f",
                                      "UNDOEXECUTE", reg, "DELETE", keyName, "/v", valueName, "/f");
 
       var valueName = "CheckURL";
       var data = "http://nrel.github.io/EnergyPlus/epupdate.htm";
-      component.addElevatedOperation("Execute", reg, "ADD", keyName, "/v", valueName, "/d", data, "/f",
+      component.addOperation("Execute", reg, "ADD", keyName, "/v", valueName, "/d", data, "/f",
                                      "UNDOEXECUTE", reg, "DELETE", keyName, "/v", valueName, "/f");
 
       var valueName = "LastAnchor";
       var data = "#@Version@";
-      component.addElevatedOperation("Execute", reg, "ADD", keyName, "/v", valueName, "/d", data, "/f",
+      component.addOperation("Execute", reg, "ADD", keyName, "/v", valueName, "/d", data, "/f",
                                      "UNDOEXECUTE", reg, "DELETE", keyName, "/v", valueName, "/f");
+
+      // Delete the entire keyName upon uninstallation
+      component.addOperation("Execute", "cmd", "/C", "echo do nothing", "UNDOEXECUTE", reg, "DELETE", keyName);
 
       // And weirder still, to copy and register DLLs
       var systemArray = ["MSCOMCTL.OCX", "ComDlg32.OCX", "Msvcrtd.dll", "Dforrt.dll", "Gswdll32.dll", "Gsw32.exe", "Graph32.ocx", "MSINET.OCX", "Vsflex7L.ocx", "Msflxgrd.ocx"];
@@ -96,9 +89,10 @@ function Component()
           component.addElevatedOperation("Copy", sourceFile, targetFile);
         }
       }
-      // Delete this temp directory: TODO use execute to avoid uninstall create
-      // the opposite (= Mkdir)
-      component.addElevatedOperation("Rmdir", "@TargetDir@/temp/");
+      // Delete this temp directory: use execute to avoid uninstall create
+      // the opposite (= Mkdir), plus it doesn't delete an empty directory anyways and we use copy (not move) above...
+      // component.addElevatedOperation("Rmdir", "@TargetDir@/temp");
+      component.addElevatedOperation("Execute", "cmd" , "/C",  "rmdir", "/S", "@TargetDir@\\temp");
 
     }
   }
