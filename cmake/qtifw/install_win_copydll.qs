@@ -9,6 +9,7 @@ function Component()
 
     // ... add custom operations
 
+    var kernel = systemInfo.kernelType;
     // On Windows
     if( kernel == "winnt" ) {
 
