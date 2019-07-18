@@ -60,15 +60,27 @@ function Component()
       // LastAnchor, REG_SZ, #9.1.0-mqjdfsiojf
 
       // REG ADD KeyName /v ValueName, /d Data, /f = force overwrite
-      component.addElevatedOperation("Execute", "cmd /C REG ADD \"HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"AutoCheck\" /d \"True\" /f",
-        "UNDOEXECUTE", "cmd /C REG ADD \"HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"AutoCheck\ /f");
+      var reg = installer.environmentVariable("SystemRoot") + "\\System32\\reg.exe";
 
-      component.addElevatedOperation("Execute", "cmd /C REG ADD \"HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"CheckURL\" /d \"http://nrel.github.io/EnergyPlus/epupdate.htm\" /f",
-        "UNDOEXECUTE", "cmd /C REG ADD \"HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"CheckURL\ /f");
+      var keyName = "\"HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\"";
 
-      // @Version@ = CPACK_PACKAGE_VERSION
-      component.addElevatedOperation("Execute", "cmd /C REG ADD \"HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"LastAnchor\" /d \"#@Version@\" /f",
-        "UNDOEXECUTE", "cmd /C REG ADD \"HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" /v \"LastAnchor\ /f");
+      // Note by passing arguments separately to the (reg) command in addElevatedOperation (supports up to 10 args),
+      // Qt will escape each argument, so do not include double quote (eg: "\"AutoCheck\"") or they'll be interpreted literally
+      // For some reason I can't make it work, I end up with extra quotes in there...
+      var valueName = "AutoCheck";
+      var data = "\"True\"";
+      component.addElevatedOperation("Execute", reg, "ADD", [keyName, "/v", valueName, "/d", data, "/f"].join(" "),
+                                     "UNDOEXECUTE", reg, "DELETE", [keyName, "/v", valueName, "/f"].join(" "));
+
+      var valueName = "CheckURL";
+      var data = "\"http://nrel.github.io/EnergyPlus/epupdate.htm\"";
+      component.addElevatedOperation("Execute", reg, ["ADD", keyName, "/v", valueName, "/d", data, "/f"].join(" "),
+                                     "UNDOEXECUTE", reg, ["DELETE", keyName, "/v", valueName, "/f"].join(" "));
+
+      var valueName = "LastAnchor";
+      var data = "#@Version@";
+      component.addElevatedOperation("Execute", reg, "ADD", keyName, "/v", valueName, "/d", data, "/f",
+                                     "UNDOEXECUTE", reg, "DELETE", keyName, "/v", valueName, "/f");
 
       // And weirder still, to copy and register DLLs
       var systemArray = ["MSCOMCTL.OCX", "ComDlg32.OCX", "Msvcrtd.dll", "Dforrt.dll", "Gswdll32.dll", "Gsw32.exe", "Graph32.ocx", "MSINET.OCX", "Vsflex7L.ocx", "Msflxgrd.ocx"];
