@@ -261,7 +261,7 @@ endif()
 # set(CPACK_IFW_PACKAGE_GROUP "EnergyPlus")
 set(CPACK_IFW_PACKAGE_WIZARD_DEFAULT_WIDTH 640)
 set(CPACK_IFW_PACKAGE_WIZARD_DEFAULT_HEIGHT 480)
-set(CPACK_IFW_PACKAGE_WINDOW_ICON "${CMAKE_SOURCE_DIR}/release/ep.gif")
+set(CPACK_IFW_PACKAGE_WINDOW_ICON "${CMAKE_SOURCE_DIR}/release/ep_nobg.png")
 
 
 if( APPLE )
@@ -283,7 +283,7 @@ if( APPLE )
   install(CODE "MESSAGE(\"Creating symlinks.\")" COMPONENT Symlinks)
 
   # Custom installer icon. Has to be .icns on mac, .ico on windows, not supported on Unix
-  set(CPACK_IFW_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/bin/EP-Compare/Run-Mac/EP-Compare.app/Contents/Resources/EnergyPlus.icns")
+  set(CPACK_IFW_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/release/ep.icns")
 elseif(WIN32)
 
   # TODO: TEMP
@@ -296,7 +296,7 @@ elseif(WIN32)
   set(CPACK_IFW_TARGET_DIRECTORY "C:/${CPACK_PACKAGE_INSTALL_DIRECTORY}" )
 
     # Custom installer icon. Has to be .icns on mac, .ico on windows, not supported on Unix
-  set(CPACK_IFW_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/release/RunEP.ico")
+  set(CPACK_IFW_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/release/ep.ico")
 
 endif()
 
