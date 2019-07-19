@@ -397,7 +397,7 @@ namespace HVACUnitaryBypassVAV {
         OnOffFanPartLoadFraction = 1.0;
 
         if (UnitOn) {
-            ControlCBVAVOutput(CBVAVNum, FirstHVACIteration, QZnReq, PartLoadFrac, OnOffAirFlowRatio, HXUnitOn);
+            ControlCBVAVOutput(CBVAVNum, FirstHVACIteration, PartLoadFrac, OnOffAirFlowRatio, HXUnitOn);
         } else {
             CalcCBVAV(CBVAVNum, FirstHVACIteration, PartLoadFrac, QSensUnitOut, OnOffAirFlowRatio, HXUnitOn);
         }
@@ -531,7 +531,6 @@ namespace HVACUnitaryBypassVAV {
         std::string HXDXCoolCoilName;       // Name of DX cooling coil used with Heat Exchanger Assisted Cooling Coil
         std::string MixerInletNodeName;     // Name of mixer inlet node
         std::string SplitterOutletNodeName; // Name of splitter outlet node
-        bool FoundTstatZone;                // TRUE if thermostat found in controlled zone
         bool OANodeErrFlag;                 // TRUE if DX Coil condenser node is not found
         bool DXCoilErrFlag;                 // used in warning messages
 
@@ -1184,11 +1183,6 @@ namespace HVACUnitaryBypassVAV {
             } else {
                 ShowSevereError("Invalid " + cAlphaFields(19) + " =" + Alphas(19));
                 ShowContinueError("In " + CurrentModuleObject + " \"" + CBVAV(CBVAVNum).Name + "\".");
-            }
-
-            if (CBVAV(CBVAVNum).DXCoolCoilType_Num > 0) {
-                int ControlNodeNum = GetOnlySingleNode(
-                    Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsParent);
             }
 
             //   Initialize last mode of compressor operation
@@ -2194,7 +2188,6 @@ namespace HVACUnitaryBypassVAV {
 
     void ControlCBVAVOutput(int const CBVAVNum,            // Index to CBVAV system
                             bool const FirstHVACIteration, // Flag for 1st HVAC iteration
-                            Real64 &QZnReq,                // Cooling or heating output needed by zone [W]
                             Real64 &PartLoadFrac,          // Unit part load fraction
                             Real64 &OnOffAirFlowRatio,     // Ratio of compressor ON airflow to AVERAGE airflow over timestep
                             bool &HXUnitOn                 // flag to enable heat exchanger
