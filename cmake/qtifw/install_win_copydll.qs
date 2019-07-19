@@ -30,11 +30,13 @@ function Component()
         var sourceFile = "@TargetDir@\\temp\\" + systemArray[i];
         var targetFile = systemTargetDir + systemArray[i];
         if (!installer.fileExists(targetFile)) {
+          console.log("Copying DLL: " + targetFile);
           // Copy the DLL
           component.addElevatedOperation("Copy", sourceFile, targetFile);
           // Register it
           // Mind the "/s" flag which avoids displaying a [Yes/No] prompt
           // that you can't answer and making the installer freeze
+          console.log("Registering DLL: " + [regdll, "/s", targetFile].join(" "));
           component.addElevatedOperation("Execute", regdll, "/s", targetFile,
              "UNDOEXECUTE", regdll, "/u", "/s", targetFile);
         }
