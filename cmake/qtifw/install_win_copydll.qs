@@ -33,13 +33,16 @@ function Component()
           // Copy the DLL
           component.addElevatedOperation("Copy", sourceFile, targetFile);
           // Register it
-          component.addElevatedOperation("Execute", regdll, targetFile,
-             "UNDOEXECUTE", regdll, "/u", targetFile);
+          // Mind the "/s" flag which avoids displaying a [Yes/No] prompt
+          // that you can't answer and making the installer freeze
+          component.addElevatedOperation("Execute", regdll, "/s", targetFile,
+             "UNDOEXECUTE", regdll, "/u", "/s", targetFile);
         }
       }
       // Delete this temp directory: use execute to avoid uninstall create
       // the opposite (= Mkdir), plus it doesn't delete an empty directory anyways and we use copy (not move) above...
       // component.addElevatedOperation("Rmdir", "@TargetDir@/temp");
+      // /S = silent
       component.addElevatedOperation("Execute", "cmd" , "/C",  "rmdir", "/S", "@TargetDir@\\temp");
 
     }

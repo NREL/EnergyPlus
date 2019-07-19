@@ -56,6 +56,8 @@ function Component()
 
       // Note by passing arguments separately to the (reg) command in addElevatedOperation (supports up to 10 args),
       // Qt will escape each argument, so do not include double quote (eg: "\"AutoCheck\"") or they'll be interpreted literally
+      // Mind the "/f" flag which avoids displaying a [Yes/No] prompt that you
+      // can't answer and making the installer freeze
       var valueName = "AutoCheck";
       var data = "True";
       component.addOperation("Execute", reg, "ADD", keyName, "/v", valueName, "/d", data, "/f",
@@ -72,7 +74,7 @@ function Component()
                                      "UNDOEXECUTE", reg, "DELETE", keyName, "/v", valueName, "/f");
 
       // Delete the entire keyName upon uninstallation
-      component.addOperation("Execute", "cmd", "/C", "echo do nothing", "UNDOEXECUTE", reg, "DELETE", keyName);
+      component.addOperation("Execute", "cmd", "/C", "echo do nothing", "UNDOEXECUTE", reg, "DELETE", keyName, "/f");
 
       // And weirder still, to copy and register DLLs: done separately
     }
