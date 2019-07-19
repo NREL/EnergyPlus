@@ -62,7 +62,7 @@ enum class ScheduleType
     UNKNOWN
 };
 
-// Each schedule type will hold a vector of their own types, ultimately components will hold references to these instances directly
+// Each schedule type file will hold a vector of their own types, hopefully ultimately components will hold references to these instances directly
 // To enable gradual transition from index-based operations to references, we need to be able to still be able to call by index.
 // In addition, index = 0 is currently still recognized as a sentinel value, so we can't return zero as a valid index for current components.
 // This struct will contain enough information to map a single index call into this manager into its own location in its own type's array

@@ -45,60 +45,53 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus.hh>
-#include <Scheduling/ScheduleConstant.hh>
+#include <Scheduling/ScheduleTypeLimits.hh>
 #include <InputProcessing/InputProcessor.hh>
-#include <GlobalNames.hh>
 #include <UtilityRoutines.hh>
-#include <DataGlobals.hh>
 
 namespace Scheduling {
+std::vector<ScheduleTypeData> scheduleTypeLimits;
 
-    std::vector<ScheduleConstant> scheduleConstants;
+ScheduleTypeData *ScheduleTypeData::factory(std::string name)
+{
+    return nullptr;
+}
 
-    Real64 ScheduleConstant::getCurrentValue()
-    {
-        if (this->emsActuatedOn) {
-            return this->emsActuatedValue;
-        } else {
-            return this->value;
-        }
+void ScheduleTypeData::processInput() {
+    std::string const thisObjectType = "ScheduleTypeLimits";
+    auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
+    if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
+        return; // no schedule type limits to process
     }
-
-    void ScheduleConstant::processInput()
-    {
-        std::string const thisObjectType = "Schedule:Constant";
-        auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
-        if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
-            return; // no constant schedules to process
-        }
-        auto &instancesValue = instances.value();
-        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-            auto const &fields = instance.value();
-            auto const &thisObjectName = instance.key();
-            // do any pre-construction checks
-            EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
-            //EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
-            // then just add it to the vector via the constructor
-            scheduleConstants.emplace_back(thisObjectName, fields);
-        }
+    auto &instancesValue = instances.value();
+    for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+        auto const &fields = instance.value();
+        auto const &thisObjectName = instance.key();
+        // do any pre-construction checks
+        EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+        //EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+        // then just add it to the vector via the constructor
+        scheduleTypeLimits.emplace_back(thisObjectName, fields);
     }
+}
 
-    void ScheduleConstant::clear_state()
-    {
-        scheduleConstants.clear();
+void ScheduleTypeData::clear_state() {
+    scheduleTypeLimits.clear();
+}
+ScheduleTypeData::ScheduleTypeData(std::string const &objectName, nlohmann::json const &fields) {
+    this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
+    if (fields.find("lower_limit_value") != fields.end()) {
+        this->minimum = fields.at("lower_limit_value");
     }
-
-    ScheduleConstant::ScheduleConstant(std::string const &objectName, nlohmann::json const &fields) {
-        this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
-        // get a schedule type limits reference directly and store that
-        if (fields.find("schedule_type_limits_name") != fields.end()) {
-            this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
-        }
-        this->value = fields.at("hourly_value");
-        if (EnergyPlus::DataGlobals::AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-//            SetupEMSActuator("Schedule:Constant", this->name, "Schedule Value", "[ ]", this->emsActuatedOn, this->emsActuatedValue);
-        }
+    if (fields.find("upper_limit_value") != fields.end()) {
+        this->maximum = fields.at("upper_limit_value");
     }
+    if (fields.find("numeric_type") != fields.end()) {
+        std::string thisType = fields.at("numeric_type");
+        this->isContinuous = thisType == "DISCRETE";
+        // TODO: Other options to consider besides discrete?
+        // TODO: Capitalize thisType first?
+    }
+}
 
 }

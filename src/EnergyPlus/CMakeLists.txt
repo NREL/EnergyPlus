@@ -493,6 +493,8 @@ SET( SRC
   Scheduling/ScheduleBase.hh
   Scheduling/ScheduleConstant.cc
   Scheduling/ScheduleConstant.hh
+  Scheduling/ScheduleTypeLimits.cc
+  Scheduling/ScheduleTypeLimits.cc
   Scheduling/Manager.cc
   Scheduling/Manager.hh
   SetPointManager.cc

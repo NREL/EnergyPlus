@@ -97,6 +97,9 @@ void processAllSchedules() {
     // first off, we'll want to add a dummy item to the zeroth indexToSubtypeMap vector because many components treat zero as invalid schedule index
     indexToSubtypeMap.emplace_back();
 
+    // call type limits first so we don't have to check each time we call the type limits factory from each schedule input
+    ScheduleTypeData::processInput();
+
     // then we'll go through and call each subtype factory and accumulate index values into our map
     ScheduleConstant::processInput();
     for (unsigned int subTypeIndex = 0; subTypeIndex < scheduleConstants.size(); subTypeIndex++) {

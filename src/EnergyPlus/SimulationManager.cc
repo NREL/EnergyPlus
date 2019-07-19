@@ -140,6 +140,7 @@ extern "C" {
 #include <ZoneContaminantPredictorCorrector.hh>
 #include <ZoneEquipmentManager.hh>
 #include <ZoneTempPredictorCorrector.hh>
+#include <Scheduling/Manager.hh>
 
 namespace EnergyPlus {
 namespace SimulationManager {
@@ -325,6 +326,9 @@ namespace SimulationManager {
 
         // FLOW:
         PostIPProcessing();
+
+        // to be removed, obviously
+        Scheduling::processAllSchedules();
 
         InitializePsychRoutines();
 
