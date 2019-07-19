@@ -47,7 +47,10 @@ function Component()
           console.log("Copying DLL: " + targetFile);
           // Copy the DLL
           component.addElevatedOperation("Copy", sourceFile, targetFile);
-
+          // Copy without deleting on uninstall (technically the "/Y"
+          // (=overwrite with no prompt) isn't needed since we tested target
+          // didn't exist already
+          component.addElevatedOperation("Execute", "cmd", "/C", "copy", sourceFile, targetFile, "/Y");
           // Register it: Only for "OCX"
           // If it's a .ocx (case insensitive), we save it to be registered
           if (systemArray[i].toLowerCase().indexOf(".ocx") !== -1) {
@@ -61,8 +64,9 @@ function Component()
         // Mind the "/s" flag which avoids displaying a [Yes/No] prompt
         // that you can't answer and making the installer freeze
         console.log("Registering DLL: " + [regdll, "/s", targetFile].join(" "));
-        component.addElevatedOperation("Execute", regdll, "/s", targetFile,
-           "UNDOEXECUTE", regdll, "/u", "/s", targetFile);
+        component.addElevatedOperation("Execute", regdll, "/s", targetFile);
+          // We do not undo
+          // "UNDOEXECUTE", regdll, "/u", "/s", targetFile);
 
       }
       // Delete this temp directory: use execute to avoid uninstall create
