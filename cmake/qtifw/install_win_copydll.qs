@@ -13,7 +13,15 @@ function Component()
     // On Windows
     if( kernel == "winnt" ) {
 
-      var systemArray = ["MSCOMCTL.OCX", "ComDlg32.OCX", "Msvcrtd.dll", "Dforrt.dll", "Gswdll32.dll", "Gsw32.exe", "Graph32.ocx", "MSINET.OCX", "Vsflex7L.ocx", "Msflxgrd.ocx"];
+      var systemArray = [
+        // OCX: needs copy AND registration
+        "MSCOMCTL.OCX", "ComDlg32.OCX", "Graph32.ocx",
+        "MSINET.OCX", "Vsflex7L.ocx", "Msflxgrd.ocx",
+
+        // DLL and exe: just copy
+        "Msvcrtd.dll", "Dforrt.dll", "Gswdll32.dll", "Gsw32.exe"
+      ];
+
       var systemTargetDir = installer.environmentVariable("SystemRoot");
       // Note: all dlls in ./bin/System are 32-bits
       if( systemInfo.currentCpuArchitecture == "x86_64") {
@@ -34,12 +42,17 @@ function Component()
           console.log("Copying DLL: " + targetFile);
           // Copy the DLL
           component.addElevatedOperation("Copy", sourceFile, targetFile);
-          // Register it
-          // Mind the "/s" flag which avoids displaying a [Yes/No] prompt
-          // that you can't answer and making the installer freeze
-          console.log("Registering DLL: " + [regdll, "/s", targetFile].join(" "));
-          component.addElevatedOperation("Execute", regdll, "/s", targetFile,
-             "UNDOEXECUTE", regdll, "/u", "/s", targetFile);
+
+          // Register it: Only for "OCX"
+
+          // If it's a .ocx (case insensitive)
+          if (systemArray[i].toLowerCase().indexOf(".ocx") !== 1) {
+            // Mind the "/s" flag which avoids displaying a [Yes/No] prompt
+            // that you can't answer and making the installer freeze
+            console.log("Registering DLL: " + [regdll, "/s", targetFile].join(" "));
+            component.addElevatedOperation("Execute", regdll, "/s", targetFile,
+               "UNDOEXECUTE", regdll, "/u", "/s", targetFile);
+          }
         }
       }
       // Delete this temp directory: use execute to avoid uninstall create
