@@ -65,7 +65,8 @@ install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON" DESTINA
 
 # Some docs are generated on the fly here, create a dir for the 'built' files
 set( DOCS_OUT "${CMAKE_BINARY_DIR}/autodocs" )
-install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E make_directory \"${DOCS_OUT}\")")
+# This is NOT an install command, we actually want it to be performed so we can generate the package, so do it at build system generation
+file(MAKE_DIRECTORY ${DOCS_OUT})
 
 # the output variables listing
 install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/parse_output_variables.py\" \"${CMAKE_SOURCE_DIR}/src/EnergyPlus\" \"${DOCS_OUT}/SetupOutputVariables.csv\" \"${DOCS_OUT}/SetupOutputVariables.md\")")
