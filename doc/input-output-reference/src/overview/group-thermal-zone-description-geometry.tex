@@ -248,7 +248,7 @@ This output variable represents the sensible heating energy in Joules that is ac
 \begin{callout}
 Zone Air System Sensible Heating (and Cooling) Energy (and Rate) all report the heating or cooling delivered by the HVAC system to a zone. These values are calculated by multiplying the supply air mass flow rate by the difference between the supply air temperature and the zone air temperature. This does not always indicate the operation of heating or cooling coils. For example, cooling will be reported if the supply air is cooled due to the introduction of outside air, even if all coils are off.
 
-Note that these variables are calculated at the system timestep. When reported at the ``detailed'' reporting frequency, these variable will never show heating and cooling both in the same system timestep. If reported at a frequency less than ``Detailed'' (for example, Hourly) values may appear in both the heating and cooling variable for the same hour if the system cooled the zone for part of the reporting period and heated the zone for another part of the reporting period.
+Note that these variables are calculated at the system timestep. When reported at the ``detailed'' reporting frequency, these variables will never show heating and cooling both in the same system timestep. If reported at a frequency less than ``Detailed'' (for example, Hourly) values may appear in both the heating and cooling variable for the same hour if the system cooled the zone for part of the reporting period and heated the zone for another part of the reporting period.
 \end{callout}
 
 \subsubsection{Zone Air System Sensible Cooling Energy {[}J{]}}\label{zone-air-system-sensible-cooling-energy-j}
@@ -3718,11 +3718,11 @@ Fins shade either side of windows/doors in a building. This object allows for sp
 
 \paragraph{Field: Name}\label{field-name-26-003}
 
-This is the name of the overhang. It must be different from other surface names.
+This is the name of the fin. It must be different from other surface names.
 
 \paragraph{Field: Window or Door Name}\label{field-window-or-door-name-2}
 
-The name of a window or door that this overhang shades.
+The name of a window or door that this fin shades.
 
 \paragraph{Field: Left Fin Extension from Window/Door}\label{field-left-fin-extension-from-windowdoor}
 
@@ -3766,17 +3766,17 @@ This field is the depth (meters) of the right fin (projecting out from the wall)
 
 \subsection{Shading:Fin:Projection}\label{shadingfinprojection}
 
-Fins shade either side of windows/doors in a building. This object allows for specification of both fins for the window. This object allows for specifying the depth of the overhang as a fraction of the window or door's width. Fin placement is relative to the edge of the glass and user must include the frame width when a frame is present.
+Fins shade either side of windows/doors in a building. This object allows for specification of both fins for the window. This object allows for specifying the depth of the fin as a fraction of the window or door's width. Fin placement is relative to the edge of the glass and user must include the frame width when a frame is present.
 
 \subsubsection{Inputs}\label{inputs-29-002}
 
 \paragraph{Field: Name}\label{field-name-27-003}
 
-This is the name of the overhang. It must be different from other surface names.
+This is the name of the fin. It must be different from other surface names.
 
 \paragraph{Field: Window or Door Name}\label{field-window-or-door-name-3}
 
-The name of a window or door that this overhang shades.
+The name of a window or door that this fin shades.
 
 \paragraph{Field: Left Fin Extension from Window/Door}\label{field-left-fin-extension-from-windowdoor-1}
 
@@ -3817,8 +3817,6 @@ This field is the tilt angle from the window / door for the right fin. Typically
 \paragraph{Field: Right Fin Depth as Fraction of Window/Door Width}\label{field-right-fin-depth-as-fraction-of-windowdoor-width}
 
 This field is the fraction of the window/door width to specify as the depth of the right fin (meters) projecting out from the wall.
-
-zone.
 
 Examples of these (can be found in example files 4ZoneWithShading\_Simple\_1.idf and 4ZoneWithShading\_Simple\_2.idf)
 

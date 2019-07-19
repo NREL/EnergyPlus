@@ -416,7 +416,11 @@
             ignorethisone=.true.
             pos=index(line,'[')
             if (pos /= 0) then
-              line=line(2:pos-1)
+              ! Without the indexes on the LHS, the compiler is complaining that we are squeezing a character position out
+              ! We add these and it works, but it could potentially leave a trailing character from the prior string
+              ! So we'll add a space to that trailing point
+              line(1:pos-2)=line(2:pos-1)
+              line(pos-1:len(line)) = ' '
             else
               line=line(2:)
             endif
@@ -659,7 +663,10 @@
               line=line(i:)
               i=index(line,'!')
               if (i /= 0) then
-                stovar(nstore)=line(1:i-1)
+                ! Without the array bounds on the LHS, the compiler warns about mismatched sizes
+                ! Adding them forces both LHS and RHS to be the same size
+                ! stovar should be blank coming into this section, so trailing blanks should persist
+                stovar(nstore)(1:i-1)=line(1:i-1)
                 stovar(nstore)=trim(stovar(nstore))//'('
                 i=i+1
                 line=line(i:)
@@ -704,7 +711,10 @@
             line=line(i:)
             i=index(line,'!')
             if (i /= 0) then
-              trackvar(ij)=line(1:i-1)
+              ! The compiler warns if you try to take part of the line and apply it to the entire trackvar
+              ! Adding explicit indeces seems unnecessary, but it hushes up the compiler
+              ! The trackvar should be blank at this point, so this should be fine
+              trackvar(ij)(1:i-1)=line(1:i-1)
               trackvar(ij)=trim(trackvar(ij))//'('
               i=i+1
               line=line(i:)
@@ -790,7 +800,10 @@
             ! Check frequency part -- after !
             i=index(line,'!')
             if (i /= 0) then
-              trackvar(ij)=line(1:i-1)
+              ! The compiler warns if you try to take part of the line and apply it to the entire trackvar
+              ! Adding explicit indeces seems unnecessary, but it hushes up the compiler
+              ! The trackvar should be blank at this point, so this should be fine
+              trackvar(ij)(1:i-1)=line(1:i-1)
               trackvar(ij)=trim(trackvar(ij))//'('
               i=i+1
               line=line(i:)
