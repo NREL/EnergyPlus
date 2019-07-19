@@ -1930,9 +1930,6 @@ namespace SurfaceGeometry {
             }
         }
 
-        // Process Air Boundaries if any
-        SetupAirBoundaries(ErrorsFound);
-
         // Set flag that determines whether a surface can be an exterior obstruction
         // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
@@ -1982,7 +1979,7 @@ namespace SurfaceGeometry {
             // Exclude duplicate shading surfaces
             if (Surface(SurfNum).MirroredSurf) continue;
             // Exclude air boundary surfaces
-            if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel_AirBoundary) continue;
+            if (Surface(SurfNum).HeatTransSurf && Construct(Surface(SurfNum).Construction).TypeIsAirBoundary) continue;
 
             Surface(SurfNum).ShadowSurfPossibleObstruction = true;
         }
@@ -2057,6 +2054,9 @@ namespace SurfaceGeometry {
         exposedFoundationPerimeter.getData(ErrorsFound);
 
         GetSurfaceHeatTransferAlgorithmOverrides(ErrorsFound);
+
+        // Process Air Boundaries if any
+        SetupAirBoundaries(ErrorsFound);
 
         GetSurfaceSrdSurfsData(ErrorsFound);
 
@@ -7032,10 +7032,19 @@ namespace SurfaceGeometry {
                 surf.HeatTransferAlgorithm = HeatTransferModel_Kiva;
                 DataHeatBalance::AnyKiva = true;
             }
-            if (surf.HeatTransSurf && DataHeatBalance::Construct(surf.Construction).TypeIsAirBoundary) {
-                surf.HeatTransferAlgorithm = HeatTransferModel_AirBoundary;
-                DataHeatBalance::AnyAirBoundary = true;
-            }
+            //if (surf.HeatTransSurf) {
+            //    if (DataHeatBalance::Construct(surf.Construction).TypeIsAirBoundaryIRTSurface) {
+            //        // IRT air boundaries use CTF algorithm
+            //        surf.HeatTransferAlgorithm = HeatTransferModel_CTF;
+            //        DataHeatBalance::AnyAirBoundary = true;
+            //    } else if (DataHeatBalance::Construct(surf.Construction).TypeIsAirBoundaryInteriorWindow) {
+            //        surf.HeatTransferAlgorithm = HeatTransferModel_AirBoundaryIntWin;
+            //        DataHeatBalance::AnyAirBoundary = true;
+            //    } else if (DataHeatBalance::Construct(surf.Construction).TypeIsAirBoundary) {
+            //        surf.HeatTransferAlgorithm = HeatTransferModel_AirBoundaryNoHT;
+            //        DataHeatBalance::AnyAirBoundary = true;
+            //    }
+            //}
         }
 
         // Setup Kiva instances
@@ -12616,7 +12625,8 @@ namespace SurfaceGeometry {
                     // Process air boundary - set surface properties and set up enclosures
                     // Radiant exchange
                     if (constr.TypeIsAirBoundaryIRTSurface) {
-                        surf.HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_AirBoundary;
+                        // IRT air boundaries use CTF algorithm
+                        surf.HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
                         surf.HeatTransSurf = true;
                         // Interior convection coefficient set to low H limit in ConvectionCoefficients::GetUserConvectionCoefficients
                     } else {

@@ -167,7 +167,8 @@ namespace DataSurfaces {
     extern int const HeatTransferModel_ComplexFenestration; // BSDF
     extern int const HeatTransferModel_TDD;                 // tubular daylighting device
     extern int const HeatTransferModel_Kiva;                // Kiva ground calculations
-    extern int const HeatTransferModel_AirBoundary;         // Construction:AirBoundary
+    extern int const HeatTransferModel_AirBoundaryNoHT;     // Construction:AirBoundary - not IRT or interior window
+    extern int const HeatTransferModel_AirBoundaryIntWin;   // Construction:AirBoundary - interior window for solar/daylighting
 
     // Parameters for classification of outside face of surfaces
     extern int const OutConvClass_WindwardVertWall;

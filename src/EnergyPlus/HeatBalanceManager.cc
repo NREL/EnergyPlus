@@ -1834,6 +1834,7 @@ namespace HeatBalanceManager {
                 Material(MaterNum).ROnly = true;
             } else {
                 Material(MaterNum).Resistance = 0.01;
+                Material(MaterNum).ROnly = true;
             }
             if (MaterialNumProp >= 2) {
                 Material(MaterNum).AbsorpThermal = MaterialProps(2);
@@ -4614,8 +4615,8 @@ namespace HeatBalanceManager {
         // set some (default) properties of the Construction Derived Type
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
 
-            // For air boundaries, skip TypeIsAirBoundaryRadiant, process TypeIsAirBoundaryIRTSurface
-            if (Construct(ConstrNum).TypeIsAirBoundaryRadiant) continue;
+            // For air boundaries, skip TypeIsAirBoundaryGroupedRadiant, process TypeIsAirBoundaryIRTSurface
+            if (Construct(ConstrNum).TypeIsAirBoundaryGroupedRadiant) continue;
             if (NominalRforNominalUCalculation(ConstrNum) != 0.0) {
                 NominalU(ConstrNum) = 1.0 / NominalRforNominalUCalculation(ConstrNum);
             } else {
@@ -7554,8 +7555,9 @@ namespace HeatBalanceManager {
                 // Radiant Exchange Method
                 std::string const radMethod = fields.at("radiant_exchange_method");
                 if (UtilityRoutines::SameString(radMethod, "GroupedZones")) {
-                    thisConstruct.TypeIsAirBoundaryRadiant = true;
+                    thisConstruct.TypeIsAirBoundaryGroupedRadiant = true;
                 } else if (UtilityRoutines::SameString(radMethod, "IRTSurface")) {
+                    thisConstruct.IsUsedCTF = true;
                     thisConstruct.TypeIsAirBoundaryIRTSurface = true;
                     thisConstruct.TotLayers = 1;
                     // Find the auto-generated special IRT material for air boundaries

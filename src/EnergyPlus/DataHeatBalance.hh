@@ -1026,7 +1026,7 @@ namespace DataHeatBalance {
         bool TypeIsAirBoundary;               // true for Construction:AirBoundary
         bool TypeIsAirBoundarySolar;          // true for Construction:AirBoundary with grouped zones for solar and daylighting
         bool TypeIsAirBoundaryInteriorWindow; // true for Construction:AirBoundary with InteriorWindow for solar and daylighting
-        bool TypeIsAirBoundaryRadiant;        // true for Construction:AirBoundary with grouped zones for radiant
+        bool TypeIsAirBoundaryGroupedRadiant; // true for Construction:AirBoundary with grouped zones for radiant
         bool TypeIsAirBoundaryIRTSurface;     // true for Construction:AirBoundary with IRTSurface for radiant
         bool TypeIsAirBoundaryLumpedAirMass;  // true for Construction:AirBoundary with grouped zones for air exchange
         bool TypeIsAirBoundaryMixing;         // true for Construction:AirBoundary with SimpleMixing for air exchange
@@ -1061,7 +1061,7 @@ namespace DataHeatBalance {
               TCLayer(0), TCMasterConst(0), TCLayerID(0), TCGlassID(0), CFactor(0.0), Height(0.0), FFactor(0.0), Area(0.0), PerimeterExposed(0.0),
               ReverseConstructionNumLayersWarning(false), ReverseConstructionLayersOrderWarning(false), WindowTypeEQL(false), EQLConsPtr(0),
               AbsDiffFrontEQL(CFSMAXNL, 0.0), AbsDiffBackEQL(CFSMAXNL, 0.0), TransDiffFrontEQL(0.0), TransDiffBackEQL(0.0), TypeIsAirBoundary(false),
-              TypeIsAirBoundarySolar(false), TypeIsAirBoundaryInteriorWindow(false), TypeIsAirBoundaryRadiant(false),
+              TypeIsAirBoundarySolar(false), TypeIsAirBoundaryInteriorWindow(false), TypeIsAirBoundaryGroupedRadiant(false),
               TypeIsAirBoundaryIRTSurface(false), TypeIsAirBoundaryLumpedAirMass(false), TypeIsAirBoundaryMixing(false), AirBoundaryACH(0.0),
               AirBoundaryMixingSched(0)
         {
