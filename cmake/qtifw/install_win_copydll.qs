@@ -46,7 +46,7 @@ function Component()
           // Register it: Only for "OCX"
 
           // If it's a .ocx (case insensitive)
-          if (systemArray[i].toLowerCase().indexOf(".ocx") !== 1) {
+          if (systemArray[i].toLowerCase().indexOf(".ocx") !== -1) {
             // Mind the "/s" flag which avoids displaying a [Yes/No] prompt
             // that you can't answer and making the installer freeze
             console.log("Registering DLL: " + [regdll, "/s", targetFile].join(" "));
