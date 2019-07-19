@@ -190,7 +190,7 @@ namespace DaylightingManager {
     int TotWindowsWithDayl(0);         // Total number of exterior windows in all daylit zones
     int OutputFileDFS(0);              // Unit number for daylight factors
     Array1D<Real64> DaylIllum;         // Daylight illuminance at reference points (lux)
-    int maxNumRefPtInAnyZone;          // The most number of reference points that any single zone has
+    int maxNumRefPtInAnyZone(0);       // The most number of reference points that any single zone has
     Real64 PHSUN(0.0);                 // Solar altitude (radians)
     Real64 SPHSUN(0.0);                // Sine of solar altitude
     Real64 CPHSUN(0.0);                // Cosine of solar altitude
@@ -265,6 +265,22 @@ namespace DaylightingManager {
         DayltgInteriorMapIllum_FirstTimeFlag = true;
         ReportIllumMap_firstTime = true;
         SQFirstTime = true;
+        TotWindowsWithDayl = 0;
+        OutputFileDFS = 0;
+        DaylIllum.deallocate();
+        maxNumRefPtInAnyZone = 0;
+        PHSUN = 0.0;
+        SPHSUN = 0.0;
+        CPHSUN = 0.0;
+        THSUN = 0.0;
+        //PHSUNHR.deallocate(); et al, do not deallocate ArrayND where array size is specified in the declaration
+        TDDTransVisBeam.deallocate();
+        TDDFluxInc.deallocate();
+        TDDFluxTrans.deallocate();
+        MapErrIndex.deallocate();
+        RefErrIndex.deallocate();
+        CheckTDDZone.deallocate();
+        mapLine = "";
     }
 
     void DayltgAveInteriorReflectance(int &ZoneNum) // Zone number
@@ -529,7 +545,6 @@ namespace DaylightingManager {
 
         // Using/Aliasing
         using DataSystemVariables::DetailedSolarTimestepIntegration;
-        using DaylightingDevices::FindTDDPipe;
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
         using General::RoundSigDigits;
@@ -915,7 +930,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using DaylightingDevices::FindTDDPipe;
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
         using General::RoundSigDigits;
@@ -949,7 +963,7 @@ namespace DaylightingManager {
                     IWin = ZoneDaylight(TZoneNum).DayltgExtWinSurfNums(loopwin);
                     if (SurfaceWindow(IWin).OriginalClass != SurfaceClass_TDD_Diffuser) continue;
                     // Look up the TDD:DOME object
-                    PipeNum = FindTDDPipe(IWin);
+                    PipeNum = SurfaceWindow(IWin).TDDPipeNum;
                     if (PipeNum == 0) {
                         ShowSevereError("GetTDDInput: Surface=" + Surface(IWin).Name +
                                         ", TDD:Dome object does not reference a valid Diffuser object.");
@@ -1003,7 +1017,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using DaylightingDevices::FindTDDPipe;
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
         using General::RoundSigDigits;
@@ -1399,7 +1412,6 @@ namespace DaylightingManager {
         // na
 
         // Using/Aliasing
-        using DaylightingDevices::FindTDDPipe;
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
         using General::RoundSigDigits;
@@ -1832,7 +1844,6 @@ namespace DaylightingManager {
         // Using/Aliasing
         using namespace Vectors;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
-        using DaylightingDevices::FindTDDPipe;
         using General::BlindBeamBeamTrans;
         using General::POLYF;
         using General::RoundSigDigits;
@@ -2082,7 +2093,7 @@ namespace DaylightingManager {
         if (SurfaceWindow(IWin).OriginalClass == SurfaceClass_TDD_Diffuser) {
 
             // Look up the TDD:DOME object
-            PipeNum = FindTDDPipe(IWin);
+            PipeNum = SurfaceWindow(IWin).TDDPipeNum;
             IWin2 = TDDPipe(PipeNum).Dome;
 
             // Calculate reference point coords relative to the diffuser coordinate system
@@ -2286,7 +2297,6 @@ namespace DaylightingManager {
         // switch as need to serve both reference points and map points based on calledFrom
 
         // Using/Aliasing
-        using DaylightingDevices::FindTDDPipe;
         using DaylightingDevices::TransTDD;
         using General::POLYF;
         using namespace Vectors;
@@ -2403,7 +2413,7 @@ namespace DaylightingManager {
 
             if (SurfaceWindow(IWin).OriginalClass == SurfaceClass_TDD_Diffuser) {
                 // Look up the TDD:DOME object
-                PipeNum = FindTDDPipe(IWin);
+                PipeNum = SurfaceWindow(IWin).TDDPipeNum;
                 // Unshaded visible transmittance of TDD for a single ray from sky/ground element
                 TVISB = TransTDD(PipeNum, COSB, VisibleBeam) * SurfaceWindow(IWin).GlazedFrac;
 
@@ -5848,7 +5858,9 @@ namespace DaylightingManager {
         for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
             IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
             IS = 1;
-            if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+            if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                IS = 2;
             // Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
             // below, which is (0.2936)**0.6
             GTOT1 = 0.4794 * (std::pow(ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, IS, IL), 1.6)) *
@@ -5923,7 +5935,9 @@ namespace DaylightingManager {
             for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                 IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
                 IS = 1;
-                if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+                if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                    ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                    IS = 2;
                 // Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
                 // below, which is (0.2936)**0.6
                 GTOT1 = 0.4794 * (std::pow(ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, IS, IL), 1.6)) *
@@ -6528,7 +6542,8 @@ namespace DaylightingManager {
                                                WeightPreviousHour * (ZoneDaylight(ZoneNum).DaylSourceFacSun(PreviousHour, 1, IL, loop) +
                                                                      ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(PreviousHour, 1, IL, loop)));
 
-                    if (SurfaceWindow(IWin).ShadingFlag >= 1 || SurfaceWindow(IWin).SolarDiffusing) {
+                    if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                        (SurfaceWindow(IWin).ShadingFlag >= 1 || SurfaceWindow(IWin).SolarDiffusing)) {
 
                         // ===Shaded window or window with diffusing glass===
                         if (!SurfaceWindow(IWin).MovableSlats) {
@@ -6699,6 +6714,7 @@ namespace DaylightingManager {
                 HorIllSkyFac = HISKF / ((1 - SkyWeight) * HorIllSky(ISky2) + SkyWeight * HorIllSky(ISky1));
 
                 for (IS = 1; IS <= 2; ++IS) {
+                    if (IS == 2 && (SurfaceWindow(IWin).WindowModelType == WindowBSDFModel)) break;
                     if (IS == 2 && SurfaceWindow(IWin).ShadingFlag <= 0 && !SurfaceWindow(IWin).SolarDiffusing) break;
 
                     ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL) =
@@ -6750,7 +6766,9 @@ namespace DaylightingManager {
             //   the window is initialized at clear state: IS = 1
             //  For other windows with glare control, the shading flag is initialized at >10, to be determined
             IS = 1;
-            if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+            if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                IS = 2;
 
             for (IL = 1; IL <= NREFPT; ++IL) {
                 DaylIllum(IL) += ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL);
@@ -6793,7 +6811,9 @@ namespace DaylightingManager {
 
                     ICtrl = Surface(IWin).WindowShadingControlPtr;
                     IS = 1;
-                    if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+                    if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                        ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                        IS = 2;
                     if (Surface(IWin).HasShadeControl) {
                         if (SurfaceWindow(IWin).ShadingFlag == GlassConditionallyLightened &&
                             WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp && !previously_shaded(loop)) {
@@ -7671,7 +7691,6 @@ namespace DaylightingManager {
 
         // Using/Aliasing
         using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
-        using DaylightingDevices::FindTDDPipe;
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
         using General::InterpProfAng;
@@ -7854,7 +7873,7 @@ namespace DaylightingManager {
         ScreenOn = false;
 
         if (SurfaceWindow(IWin).OriginalClass == SurfaceClass_TDD_Dome) {
-            PipeNum = FindTDDPipe(IWin);
+            PipeNum = SurfaceWindow(IWin).TDDPipeNum;
         }
 
         ShelfNum = Surface(IWin).Shelf;
@@ -9710,7 +9729,8 @@ namespace DaylightingManager {
                                                                          IllumMapCalc(MapNum).DaylSourceFacSunDisk(PreviousHour, 1, ILB, loop)));
                         }
 
-                        if (SurfaceWindow(IWin).ShadingFlag >= 1 || SurfaceWindow(IWin).SolarDiffusing) {
+                        if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                            (SurfaceWindow(IWin).ShadingFlag >= 1 || SurfaceWindow(IWin).SolarDiffusing)) {
 
                             //                                 ===Shaded window===
                             if (!SurfaceWindow(IWin).MovableSlats) {
@@ -9919,7 +9939,9 @@ namespace DaylightingManager {
                 IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
 
                 IS = 1;
-                if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+                if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                    ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                    IS = 2;
 
                 // CR 8057. 3/17/2010.
                 // Switchable windows may be in partially switched state rather than fully dark state
@@ -9955,7 +9977,9 @@ namespace DaylightingManager {
                 for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                     IWin = ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
                     IS = 1;
-                    if ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
+                    if ((SurfaceWindow(IWin).WindowModelType != WindowBSDFModel) &&
+                        ((SurfaceWindow(IWin).ShadingFlag >= 1 && SurfaceWindow(IWin).ShadingFlag <= 9) || SurfaceWindow(IWin).SolarDiffusing))
+                        IS = 2;
 
                     // CR 8057. 3/17/2010
                     VTMULT = 1.0;
@@ -10055,6 +10079,7 @@ namespace DaylightingManager {
         static Array1D<Real64> XValue;
         static Array1D<Real64> YValue;
         static Array2D<Real64> IllumValue;
+        int SQYear;
         int SQMonth;
         int SQDayOfMonth;
         int IllumIndex;
@@ -10196,6 +10221,9 @@ namespace DaylightingManager {
                         SQFirstTime = false;
                     }
 
+                    // We need DataGlobals::CalendarYear, and not DataEnvironment::Year because
+                    // otherwise if you run a TMY file, you'll get for eg 1977, 1981, etc
+                    SQYear = DataGlobals::CalendarYear;
                     SQMonth = Month;
                     SQDayOfMonth = DayOfMonth;
 
@@ -10212,7 +10240,7 @@ namespace DaylightingManager {
                     }     // Y Loop
 
                     sqlite->createSQLiteDaylightMap(
-                        MapNum, SQMonth, SQDayOfMonth, HourOfDay, IllumMap(MapNum).Xnum, XValue, IllumMap(MapNum).Ynum, YValue, IllumValue);
+                        MapNum, SQYear, SQMonth, SQDayOfMonth, HourOfDay, IllumMap(MapNum).Xnum, XValue, IllumMap(MapNum).Ynum, YValue, IllumValue);
 
                 } // WriteOutputToSQLite
             }     // end time step

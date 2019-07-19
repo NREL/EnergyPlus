@@ -146,7 +146,11 @@ namespace HeatBalanceIntRadExchange {
                                  int const SurfIterations,            // Number of iterations in calling subroutine
                                  Array1<Real64> &NetLWRadToSurf,      // Net long wavelength radiant exchange from other surfaces
                                  Optional_int_const ZoneToResimulate, // if passed in, then only calculate for this zone
-                                 std::string const &EP_UNUSED(CalledFrom))
+#ifdef EP_Count_Calls
+        std::string const &CalledFrom)
+#else
+        std::string const &EP_UNUSED(CalledFrom))
+#endif
     {
 
         // SUBROUTINE INFORMATION:
@@ -473,17 +477,18 @@ namespace HeatBalanceIntRadExchange {
         MovableInsulationChange = false;
         if (Surface(SurfNum).MaterialMovInsulInt > 0) {
             Real64 HMovInsul; // "Resistance" value of movable insulation (if present)
-            Real64
-                AbsInt; // Absorptivity of movable insulation material (supercedes that of the construction if interior movable insulation is present)
+            Real64 AbsInt; // Absorptivity of movable insulation material
+                           // (supercedes that of the construction if interior movable insulation is present)
             HeatBalanceMovableInsulation::EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
         } else {
             Surface(SurfNum).MovInsulIntPresent = false;
         }
         if ((Surface(SurfNum).MovInsulIntPresent != Surface(SurfNum).MovInsulIntPresentPrevTS)) {
             auto const &thissurf(Surface(SurfNum));
-            Real64 AbsorpDiff;
-            AbsorpDiff = std::abs(Construct(thissurf.Construction).InsideAbsorpThermal - Material(thissurf.MaterialMovInsulInt).AbsorpThermal);
-            if (AbsorpDiff > 0.01) MovableInsulationChange = true;
+            Real64 AbsorpDiff = std::abs(Construct(thissurf.Construction).InsideAbsorpThermal - Material(thissurf.MaterialMovInsulInt).AbsorpThermal);
+            if (AbsorpDiff > 0.01) {
+                MovableInsulationChange = true;
+            }
         }
     }
 

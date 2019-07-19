@@ -129,6 +129,21 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER PNumArgs   ! Number of Arguments in a definition
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: POutArgs
 
+
+  ! For Defaulting now-required RunPeriod Name
+  INTEGER :: TotRunPeriods = 0
+  INTEGER :: runPeriodNum = 0
+  INTEGER :: iterateRunPeriod = 0
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: CurrentRunPeriodNames
+  CHARACTER(len=20) :: PotentialRunPeriodName
+
+  ! Only needed for ZoneHVAC:EquipmentList translation
+  INTEGER zeqNum
+  CHARACTER(len=20) :: zeqNumStr
+  CHARACTER(len=7) :: zeqHeatingOrCooling
+  LOGICAL :: writeScheduleTypeObj = .true.
+
+
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
   EndIf
@@ -269,6 +284,35 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               Write(DifLfn,fmta) '! Deleting: '//TRIM(IDFRecords(Num)%Name)//'="'//TRIM(IDFRecords(Num)%Alphas(1))//'".'
             ENDIF
           ENDDO
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                                                    P R E P R O C E S S I N G                                                     !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+     ! Begin Pre-process RunPeriod to avoid having duplicated names. If the user has one named 'RUNPERIOD 1',
+        ! we do not want to default the first blank to 'RUNPERIOD 1', but rather 'RUNPERIOD 2'
+          CALL DisplayString('Processing IDF -- RunPeriod preprocessing . . .')
+
+          ! Clean up from any previous passes, then re-allocate
+          IF(ALLOCATED(CurrentRunPeriodNames)) DEALLOCATE(CurrentRunPeriodNames)
+          iterateRunPeriod = 0
+          TotRunPeriods = GetNumObjectsFound('RUNPERIOD')
+          ALLOCATE(CurrentRunPeriodNames(TotRunPeriods))
+
+          ! First pass to get all current run period names, ensure we get unique ones in the end
+          DO runPeriodNum=1,TotRunPeriods
+            CALL GetObjectItem('RUNPERIOD',runPeriodNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            CurrentRunPeriodNames(runPeriodNum) = TRIM(Alphas(1));
+          ENDDO
+          CALL DisplayString('Processing IDF -- RunPeriod preprocessing complete.')
+     ! End Pre-process RunPeriod
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                                                       P R O C E S S I N G                                                        !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
           CALL DisplayString('Processing IDF -- Processing idf objects . . .')
           DO Num=1,NumIDFRecords
@@ -411,10 +455,59 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with P, insert the rules here
 
               ! If your original object starts with R, insert the rules here
+              CASE('RUNPERIOD')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+
+                ! Copy all Args here
+                OutArgs = InArgs
+
+                ! If the now-required RunPeriod Name is blank, then create it
+                IF (SameString(TRIM(InArgs(1)), '')) THEN
+                  ! If at least one, then need diff
+                  nodiff = .false.
+                  iterateRunPeriod = iterateRunPeriod + 1
+                  PotentialRunPeriodName='RUNPERIOD '//TrimSigDigits(iterateRunPeriod)
+                  ! While we can find another RunPeriod named like this, increment the number
+                  DO WHILE (FindItemInList(PotentialRunPeriodName,CurrentRunPeriodNames,TotRunPeriods) /= 0)
+                    iterateRunPeriod = iterateRunPeriod + 1
+                    PotentialRunPeriodName='RUNPERIOD '//TrimSigDigits(iterateRunPeriod)
+                  ENDDO
+                  OutArgs(1) = PotentialRunPeriodName
+                ENDIF
 
               ! If your original object starts with S, insert the rules here
+              CASE('SCHEDULE:FILE')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs = InArgs
+                IF (SameString(TRIM(InArgs(7)), 'FIXED')) THEN
+                  nodiff = .false.
+                  OutArgs(7) = 'SPACE'
+                END IF
 
               ! If your original object starts with T, insert the rules here
+
+              CASE('THERMALSTORAGE:ICE:DETAILED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:5)=InArgs(1:5)
+                IF (SameString(TRIM(InArgs(6)), 'QUADRATICLINEAR')) THEN
+                  OutArgs(6) = 'FractionDischargedLMTD'
+                ELSEIF (SameString(TRIM(InArgs(6)), 'CUBICLINEAR')) THEN
+                  OutArgs(6) = 'LMTDMassFlow'
+                ELSE
+                  OutArgs(6) = InArgs(6)
+                ENDIF
+                OutArgs(7)=InArgs(7)
+                IF (SameString(TRIM(InArgs(8)), 'QUADRATICLINEAR')) THEN
+                  OutArgs(8) = 'FractionChargedLMTD'
+                ELSEIF (SameString(TRIM(InArgs(8)), 'CUBICLINEAR')) THEN
+                  OutArgs(8) = 'LMTDMassFlow'
+                ELSE
+                  OutArgs(8) = InArgs(8)
+                ENDIF
+                
+                 OutArgs(9:CurArgs)=InArgs(9:CurArgs)
+                 NoDiff = .false.
 
               ! If your original object starts with U, insert the rules here
 
@@ -423,6 +516,43 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with W, insert the rules here
 
               ! If your original object starts with Z, insert the rules here
+              CASE('ZONEHVAC:EQUIPMENTLIST')
+                nodiff = .false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                DO CurField = 1, CurArgs
+                  IF (CurField < 3) THEN
+                    zeqHeatingOrCooling = 'Neither'
+                  ELSE IF (MOD((CurField - 2) - 5, 6) == 0) THEN
+                    zeqHeatingOrCooling = 'Cooling'
+                  ELSE IF (MOD((CurField - 2) - 6, 6) == 0) THEN
+                    zeqHeatingOrCooling = 'Heating'
+                  ELSE
+                    zeqHeatingOrCooling = 'Neither'
+                  END IF
+                  IF (InArgs(CurField) /= Blank .AND. (zeqHeatingOrCooling == 'Cooling' .OR. zeqheatingOrCooling == 'Heating')) THEN
+                    zeqNum = (CurField - 3) / 6 + 1
+                    zeqNumStr = RoundSigDigits(zeqNum,0)
+                    ! Write ScheduleTypeLimits objects once
+                    IF (writeScheduleTypeObj) THEN
+                      CALL GetNewObjectDefInIDD('ScheduleTypeLimits',PNumArgs,PAOrN,PReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                      POutArgs(1) = 'ZoneEqList ScheduleTypeLimts'
+                      POutArgs(2) = '0.0'
+                      POutArgs(3) = '1.0'
+                      POutArgs(4) = 'Continuous'
+                      CALL WriteOutIDFLines(DifLfn,'ScheduleTypeLimits',4,POutArgs,PFldNames,PFldUnits)
+                      writeScheduleTypeObj = .false.
+                    END IF
+                    OutArgs(CurField) = TRIM(InArgs(1)) // ' ' // zeqHeatingOrCooling // 'Frac' // TRIM(ADJUSTL(zeqNumStr))
+                    ! Write Schedule:Constant objects as needed
+                    CALL GetNewObjectDefInIDD('Schedule:Constant',PNumArgs,PAOrN,PReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                    POutArgs(1) = OutArgs(CurField)
+                    POutArgs(2) = 'ZoneEqList ScheduleTypeLimts'
+                    POutArgs(3) = InArgs(CurField)
+                    CALL WriteOutIDFLines(DifLfn,'Schedule:Constant',PNumArgs,POutArgs,PFldNames,PFldUnits)
+                  ELSE
+                    OutArgs(CurField) = InArgs(CurField)
+                  END IF
+                END DO
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')

@@ -592,7 +592,7 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
 {
     std::string const idf(delimited_string({
         "  RunPeriod,",
-        "    ,                        !- Name",
+        "    WinterDay,               !- Name",
         "    1,                       !- Begin Month",
         "    1,                       !- Begin Day of Month",
         "    ,                        !- Begin Year",
@@ -607,7 +607,7 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
         "    Yes;                     !- Use Weather File Snow Indicators",
         "",
         "  RunPeriod,",
-        "    ,                        !- Name",
+        "    SummerDay,               !- Name",
         "    7,                       !- Begin Month",
         "    1,                       !- Begin Day of Month",
         "    ,                        !- Begin Year",
@@ -623,7 +623,7 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
     }));
 
     json expected = {{"RunPeriod",
-                      {{"RunPeriod 1",
+                      {{"WinterDay",
                         {{"apply_weekend_holiday_rule", "No"},
                          {"begin_day_of_month", 1},
                          {"begin_month", 1},
@@ -634,7 +634,7 @@ TEST_F(InputProcessorFixture, parse_two_RunPeriod)
                          {"use_weather_file_holidays_and_special_days", "Yes"},
                          {"use_weather_file_rain_indicators", "Yes"},
                          {"use_weather_file_snow_indicators", "Yes"}}},
-                       {"RunPeriod 2",
+                       {"SummerDay",
                         {{"apply_weekend_holiday_rule", "No"},
                          {"begin_day_of_month", 1},
                          {"begin_month", 7},
@@ -2911,8 +2911,8 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
         "  GasHeat DXAC Furnace 1,          !- Zone Equipment 1 Name",
         "  1,                       !- Zone Equipment 1 Cooling Sequence",
         "  1,                       !- Zone Equipment 1 Heating or No - Load Sequence",
-        "  ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
-        "  ;                        !- Zone Equipment 1 Sequential Heating Fraction",
+        "  ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        "  ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
 
     });
 
@@ -2990,14 +2990,14 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
                                   cAlphaFields2,
                                   cNumericFields2);
 
-    EXPECT_EQ(4, NumAlphas2);
+    EXPECT_EQ(6, NumAlphas2);
     EXPECT_TRUE(compare_containers(
-        std::vector<std::string>({"ZONE2EQUIPMENT", "SEQUENTIALLOAD", "AIRLOOPHVAC:UNITARYSYSTEM", "GASHEAT DXAC FURNACE 1"}), Alphas2));
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false}), lAlphaBlanks2));
+        std::vector<std::string>({"ZONE2EQUIPMENT", "SEQUENTIALLOAD", "AIRLOOPHVAC:UNITARYSYSTEM", "GASHEAT DXAC FURNACE 1", "", ""}), Alphas2));
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, true, true}), lAlphaBlanks2));
 
-    EXPECT_EQ(4, NumNumbers2);
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, true, true}), lNumericBlanks2));
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 1, 1, 1}), Numbers2));
+    EXPECT_EQ(2, NumNumbers2);
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false, false}), lNumericBlanks2));
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 1}), Numbers2));
     EXPECT_EQ(1, IOStatus);
 }
 

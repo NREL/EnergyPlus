@@ -101,7 +101,7 @@ namespace FuelCellElectricGenerator {
     void ManageElectStorInteractions(int const Num, // Generator number, index for structure
                                      Real64 const Pdemand,
                                      Real64 const PpcuLosses,
-                                     bool &Constrained,
+                                     bool &Constrained,  // TODO: This one is never used anywhere in the code
                                      Real64 &Pstorage,
                                      Real64 &PgridOverage // electricity that can't be stored and needs to go out
     );
@@ -170,7 +170,7 @@ namespace FuelCellElectricGenerator {
 
     void FigureTransientConstraints(int const GeneratorNum, // index number for accessing correct generator
                                     Real64 &Pel,            // DC power control setting for power module
-                                    bool &Constrained,      // true if transient constraints kick in
+                                    bool &Constrained,      // true if transient constraints kick in (TODO: never used anywhere)
                                     Real64 &PelDiff         // if constrained then this is the difference, positive
     );
 

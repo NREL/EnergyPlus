@@ -69,9 +69,11 @@ namespace IceThermalStorage {
     extern int const IceStorageType_Simple;
     extern int const IceStorageType_Detailed;
 
-    extern int const CurveType_QuadraticLinear;
-    extern int const CurveType_CubicLinear;
-
+    extern int const CurveVarsFracChargedLMTD;
+    extern int const CurveVarsFracDischargedLMTD;
+    extern int const CurveVarsLMTDMassFlow;
+    extern int const CurveVarsLMTDFracCharged;
+    
     extern int const DetIceInsideMelt;  // Inside melt system--charge starting with bare coil
     extern int const DetIceOutsideMelt; // Outside melt system--charge from existing ice layer on coil
 
@@ -211,10 +213,10 @@ namespace IceThermalStorage {
         int MapNum;                     // Number to Map structure
         std::string DischargeCurveName; // Curve name for discharging (used to find the curve index)
         int DischargeCurveNum;          // Curve index for discharging
-        int DischargeCurveTypeNum;      // Integer version of discharging curve type
+        int DischargeCurveTypeNum;      // Integer version of discharging curve independent variables type
         std::string ChargeCurveName;    // Curve name for charging (used to find the curve index)
         int ChargeCurveNum;             // Curve index for charging
-        int ChargeCurveTypeNum;         // Integer version of charging curve type
+        int ChargeCurveTypeNum;         // Integer version of charging curve independent variables type
         Real64 CurveFitTimeStep;        // Time step used to generate performance data [hours]
         Real64 DischargeParaElecLoad;   // Parasitic electric load duing discharging [dimensionless]
         // (This is multiplied by the tank capacity to obtain elec consump)
@@ -290,6 +292,8 @@ namespace IceThermalStorage {
 
     // Functions
 
+    void clear_state();
+
     void SimIceStorage(std::string const &IceStorageType,
                        std::string const &IceStorageName,
                        int &CompIndex,
@@ -358,6 +362,13 @@ namespace IceThermalStorage {
                                   Real64 const Tfr   // freezing temperature
     );
 
+    Real64 CalcQstar(int const CurveIndex,      // curve index
+                     int const CurveIndVarType, // independent variable type for ice storage
+                     Real64 const FracCharged,  // fraction charged for ice storage unit
+                     Real64 const LMTDstar,     // normalized log mean temperature difference across the ice storage unit
+                     Real64 const MassFlowstar  // normalized mass flow rate through the ice storage unit
+    );
+    
     // *****************************************************************************
 
     Real64 TempSItoIP(Real64 const Temp);

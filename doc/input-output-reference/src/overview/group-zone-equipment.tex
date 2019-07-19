@@ -221,7 +221,7 @@ The Load Distribution Scheme selects the algorithm used to allocate the current 
 \item
   SequentialUniformPLR determines how many of the available components are required to meet the current load, then distributes the load at a uniform part load ratio (PLR).
 \end{itemize}
-\paragraph{Field Set (Zone Equipment: Object Type, Name, Cooling Sequence, Heating or No-Load Sequence, Sequential Cooling Fraction, Sequential Heating Fraction)}\label{field-set-zone-equipment-object-type-name-cooling-sequence-heating-or-no-load-sequence}
+\paragraph{Field Set (Zone Equipment: Object Type, Name, Cooling Sequence, Heating or No-Load Sequence, Sequential Cooling Fraction Schedule, Sequential Heating Fraction Schedule)}\label{field-set-zone-equipment-object-type-name-cooling-sequence-heating-or-no-load-sequence}
 
 This set is used together in order to sequence the equipment for heating and cooling. The \#1 sequence equipment will try to meet the entire demand with its capacity and then pass the results on to the \#2 and so on for both heating and cooling. This field set is extensible by duplicating the last four fields.
 
@@ -287,34 +287,42 @@ Specifies the zone equipment simulation order when the zone thermostat requests 
 
 Specifies the zone equipment simulation order when the zone thermostat requests heating or no load.
 
-\paragraph{Field: Zone Equipment \textless{}x\textgreater{} Sequential Cooling Fraction}\label{field-zone-equipment-x-sequential-cooling-fraction}
+\paragraph{Field: Zone Equipment \textless{}x\textgreater{} Sequential Cooling Fraction Schedule Name}\label{field-zone-equipment-x-sequential-cooling-fraction}
 
-Specifies the fraction of the remaining cooling load this equipment will attempt to serve. Only applies if the load distribution scheme is SequentialLoad. 
+References a schedule that specifies the fraction of the remaining cooling load this equipment will attempt to serve. Only applies if the load distribution scheme is SequentialLoad. Leaving this blank indicates a constant schedule of 1.0.
 
-\paragraph{Field: Zone Equipment \textless{}x\textgreater{} Sequential Heating Fraction}\label{field-zone-equipment-x-sequential-heating-fraction}
+\paragraph{Field: Zone Equipment \textless{}x\textgreater{} Sequential Heating Fraction Schedule Name}\label{field-zone-equipment-x-sequential-heating-fraction}
 
-Specifies the fraction of the remaining heating load this equipment will attempt to serve. Only applies if the load distribution scheme is SequentialLoad.
+References a schedule that specifies the fraction of the remaining heating load this equipment will attempt to serve. Only applies if the load distribution scheme is SequentialLoad. Leaving this blank indicates a constant schedule of 1.0.
 
 Examples of this statement in an IDF are:
 
 \begin{lstlisting}
 
-  ZoneHVAC:EquipmentList,
-      Zone1Equipment,          !- Name
+    ZoneHVAC:EquipmentList,
+      Zone1Equipment,                !- Name
+      SequentialLoad,                !- Load Distribution Scheme
       ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-      Zone1TermReheat,         !- Zone Equipment 1 Name
-      1,                       !- Zone Equipment 1 Cooling Sequence
-      1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+      Zone1TermReheat,               !- Zone Equipment 1 Name
+      1,                             !- Zone Equipment 1 Cooling Sequence
+      1,                             !- Zone Equipment 1 Heating or No-Load Sequence
+      ,                              !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+      ;                              !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
 
     ZoneHVAC:EquipmentList,
-      Zone1Equipment,          !- Name
+      Zone1Equipment,                       !- Name
+      SequentialLoad,                       !- Load Distribution Scheme
       AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-      Zone1DirectAir,          !- Zone Equipment 1 Name
-      1,                       !- Zone Equipment 1 Cooling Sequence
-      1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+      Zone1DirectAir,                       !- Zone Equipment 1 Name
+      1,                                    !- Zone Equipment 1 Cooling Sequence
+      1,                                    !- Zone Equipment 1 Heating or No-Load Sequence
+      0.5,                                  !- Zone Equipment 1 Sequential Cooling Fraction
+      0.5,                                  !- Zone Equipment 1 Sequential Heating Fraction
       ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
-      Zone1WTAHP,              !- Zone Equipment 2 Name
-      2,                       !- Zone Equipment 2 Cooling Sequence
-      2;                       !- Zone Equipment 2 Heating or No-Load Sequence
+      Zone1WTAHP,                           !- Zone Equipment 2 Name
+      2,                                    !- Zone Equipment 2 Cooling Sequence
+      2,                                    !- Zone Equipment 2 Heating or No-Load Sequence
+      0.5,                                  !- Zone Equipment 2 Sequential Cooling Fraction
+      0.5;                                  !- Zone Equipment 2 Sequential Heating Fraction
 \end{lstlisting}
