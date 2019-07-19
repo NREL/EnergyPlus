@@ -13,13 +13,13 @@ function Component()
     // On Windows
     if( kernel == "winnt" ) {
 
+      // OCX: needs copy AND registration
+      // DLL and exe: just copy
+      // Note: the order of ocx/dll in the array matters for registering the ocx!
       var systemArray = [
-        // OCX: needs copy AND registration
-        "MSCOMCTL.OCX", "ComDlg32.OCX", "Graph32.ocx",
-        "MSINET.OCX", "Vsflex7L.ocx", "Msflxgrd.ocx",
-
-        // DLL and exe: just copy
-        "Msvcrtd.dll", "Dforrt.dll", "Gswdll32.dll", "Gsw32.exe"
+        "MSCOMCTL.OCX", "ComDlg32.OCX", "Msvcrtd.dll", "Dforrt.dll",
+        "Gswdll32.dll", "Gsw32.exe", "Graph32.ocx",
+        "MSINET.OCX", "Vsflex7L.ocx", "Msflxgrd.ocx"
       ];
 
       var systemTargetDir = installer.environmentVariable("SystemRoot");
