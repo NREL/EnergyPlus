@@ -14,7 +14,8 @@ function Component()
     if( kernel == "winnt" ) {
 
       var systemArray = ["MSCOMCTL.OCX", "ComDlg32.OCX", "Msvcrtd.dll", "Dforrt.dll", "Gswdll32.dll", "Gsw32.exe", "Graph32.ocx", "MSINET.OCX", "Vsflex7L.ocx", "Msflxgrd.ocx"];
-      var systemTargetDir = installer.environmentVariable("WINDIR");
+      var systemTargetDir = installer.environmentVariable("SystemRoot");
+      // Note: all dlls in ./bin/System are 32-bits
       if( systemInfo.currentCpuArchitecture == "x86_64") {
         // This is where the 32-bit stuff is stored on 64-bit systems
         // (despite the name...)
