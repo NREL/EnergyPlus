@@ -42,8 +42,8 @@ function Component()
       // Delete this temp directory: use execute to avoid uninstall create
       // the opposite (= Mkdir), plus it doesn't delete an empty directory anyways and we use copy (not move) above...
       // component.addElevatedOperation("Rmdir", "@TargetDir@/temp");
-      // /S = silent
-      component.addElevatedOperation("Execute", "cmd" , "/C",  "rmdir", "/S", "@TargetDir@\\temp");
+      // /S = recursive, /Q = quiet
+      component.addElevatedOperation("Execute", "cmd" , "/C",  "rmdir", "/S", "/Q", "@TargetDir@\\temp");
 
     }
   }
