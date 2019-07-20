@@ -271,7 +271,6 @@ namespace HVACUnitaryBypassVAV {
         int CBVAVNum;             // Index of CBVAV system being simulated
         Real64 OnOffAirFlowRatio; // Ratio of compressor ON airflow to average airflow over timestep
         Real64 QUnitOut;          // Sensible capacity delivered by this air loop system
-        Real64 QZnLoad;           // Zone load required by all zones served by this air loop system
         bool HXUnitOn;            // flag to enable heat exchanger
 
         // FLOW
@@ -308,10 +307,10 @@ namespace HVACUnitaryBypassVAV {
         HXUnitOn = true;
 
         // Initialize the changeover-bypass VAV system
-        InitCBVAV(CBVAVNum, FirstHVACIteration, AirLoopNum, QZnLoad, OnOffAirFlowRatio, HXUnitOn);
+        InitCBVAV(CBVAVNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
 
         // Simulate the unit
-        SimCBVAV(CBVAVNum, FirstHVACIteration, QZnLoad, QUnitOut, OnOffAirFlowRatio, HXUnitOn);
+        SimCBVAV(CBVAVNum, FirstHVACIteration, QUnitOut, OnOffAirFlowRatio, HXUnitOn);
 
         // Report the result of the simulation
         ReportCBVAV(CBVAVNum);
@@ -319,7 +318,6 @@ namespace HVACUnitaryBypassVAV {
 
     void SimCBVAV(int const CBVAVNum,            // Index of the current CBVAV system being simulated
                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-                  Real64 &QZnReq,                // Zone load for all zones served by this air loop system
                   Real64 &QSensUnitOut,          // Sensible delivered capacity [W]
                   Real64 &OnOffAirFlowRatio,     // Ratio of compressor ON airflow to AVERAGE airflow over timestep
                   bool &HXUnitOn                 // flag to enable heat exchanger
@@ -1445,7 +1443,6 @@ namespace HVACUnitaryBypassVAV {
     void InitCBVAV(int const CBVAVNum,            // Index of the current CBVAV unit being simulated
                    bool const FirstHVACIteration, // TRUE if first HVAC iteration
                    int const AirLoopNum,          // air loop index
-                   Real64 &QZnReq,                // Heating/Cooling load for all zones
                    Real64 &OnOffAirFlowRatio,     // Ratio of compressor ON airflow to average airflow over timestep
                    bool &HXUnitOn                 // flag to enable heat exchanger
     )
@@ -1808,7 +1805,7 @@ namespace HVACUnitaryBypassVAV {
         }
 
         // Returns load only for zones requesting cooling (heating). If in deadband, Qzoneload = 0.
-        GetZoneLoads(CBVAVNum, QZnReq);
+        GetZoneLoads(CBVAVNum);
 
         if (CBVAV(CBVAVNum).OutAirSchPtr > 0) {
             OutsideAirMultiplier = GetCurrentScheduleValue(CBVAV(CBVAVNum).OutAirSchPtr);
@@ -2002,7 +1999,6 @@ namespace HVACUnitaryBypassVAV {
         }     // from IF( FirstHVACIteration ) THEN
 
         if ((CBVAV(CBVAVNum).HeatCoolMode == 0 && CBVAV(CBVAVNum).OpMode == CycFanCycCoil) || CompOnMassFlow == 0.0) {
-            QZnReq = 0.0;
             PartLoadFrac = 0.0;
             Node(CBVAV(CBVAVNum).AirInNode).MassFlowRate = 0.0;
             Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRateMaxAvail = 0.0;
@@ -3477,8 +3473,7 @@ namespace HVACUnitaryBypassVAV {
         LoadMet = Node(OutletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, MinHumRat) - PsyHFnTdbW(Node(InletNode).Temp, MinHumRat));
     }
 
-    void GetZoneLoads(int const CBVAVNum, // Index to CBVAV unit being simulated
-                      Real64 &QZoneReq    // Total zone load served by this air loop
+    void GetZoneLoads(int const CBVAVNum // Index to CBVAV unit being simulated
     )
     {
 
@@ -3561,57 +3556,36 @@ namespace HVACUnitaryBypassVAV {
             auto const SELECT_CASE_var(CBVAV(CBVAVNum).PriorityControl);
             if (SELECT_CASE_var == CoolingPriority) {
                 if (QZoneReqCool < 0.0) {
-                    QZoneReq = QZoneReqCool;
                     CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
                 } else if (QZoneReqHeat > 0.0) {
-                    QZoneReq = QZoneReqHeat;
                     CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                } else {
-                    QZoneReq = 0.0;
                 }
             } else if (SELECT_CASE_var == HeatingPriority) {
                 if (QZoneReqHeat > 0.0) {
-                    QZoneReq = QZoneReqHeat;
                     CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
                 } else if (QZoneReqCool < 0.0) {
-                    QZoneReq = QZoneReqCool;
                     CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                } else {
-                    QZoneReq = 0.0;
                 }
             } else if (SELECT_CASE_var == ZonePriority) {
                 if (CBVAV(CBVAVNum).NumZonesHeated > CBVAV(CBVAVNum).NumZonesCooled) {
                     if (QZoneReqHeat > 0.0) {
-                        QZoneReq = QZoneReqHeat;
                         CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
                     } else if (QZoneReqCool < 0.0) {
-                        QZoneReq = QZoneReqCool;
                         CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                    } else {
-                        QZoneReq = 0.0;
                     }
                 } else if (CBVAV(CBVAVNum).NumZonesCooled > CBVAV(CBVAVNum).NumZonesHeated) {
                     if (QZoneReqCool < 0.0) {
-                        QZoneReq = QZoneReqCool;
                         CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
                     } else if (QZoneReqHeat > 0.0) {
-                        QZoneReq = QZoneReqHeat;
                         CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
-                    } else {
-                        QZoneReq = 0.0;
                     }
                 } else {
                     if (std::abs(QZoneReqCool) > std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
-                        QZoneReq = QZoneReqCool;
                         CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
                     } else if (std::abs(QZoneReqCool) < std::abs(QZoneReqHeat) && QZoneReqHeat != 0.0) {
-                        QZoneReq = QZoneReqHeat;
                         CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
                     } else if (std::abs(QZoneReqCool) == std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
-                        QZoneReq = QZoneReqCool;
                         CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
-                    } else {
-                        QZoneReq = 0.0;
                     }
                 }
             }

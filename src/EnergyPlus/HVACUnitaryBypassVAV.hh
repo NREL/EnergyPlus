@@ -307,7 +307,6 @@ namespace HVACUnitaryBypassVAV {
 
     void SimCBVAV(int const CBVAVNum,            // Index of the current CBVAV system being simulated
                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-                  Real64 &QZnReq,                // Zone load for all zones served by this air loop system
                   Real64 &QSensUnitOut,          // Sensible delivered capacity [W]
                   Real64 &OnOffAirFlowRatio,     // Ratio of compressor ON airflow to AVERAGE airflow over timestep
                   bool &HXUnitOn                 // flag to enable heat exchanger
@@ -318,7 +317,6 @@ namespace HVACUnitaryBypassVAV {
     void InitCBVAV(int const CBVAVNum,            // Index of the current CBVAV unit being simulated
                    bool const FirstHVACIteration, // TRUE if first HVAC iteration
                    int const AirLoopNum,          // air loop index
-                   Real64 &QZnReq,                // Heating/Cooling load for all zones
                    Real64 &OnOffAirFlowRatio,     // Ratio of compressor ON airflow to average airflow over timestep
                    bool &HXUnitOn                 // flag to enable heat exchanger
     );
@@ -340,8 +338,7 @@ namespace HVACUnitaryBypassVAV {
                    bool const HXUnitOn            // flag to enable heat exchanger
     );
 
-    void GetZoneLoads(int const CBVAVNum, // Index to CBVAV unit being simulated
-                      Real64 &QZoneReq    // Total zone load served by this air loop
+    void GetZoneLoads(int const CBVAVNum // Index to CBVAV unit being simulated
     );
 
     Real64 CalcSetPointTempTarget(int const CBVAVNumber); // Index to changeover-bypass VAV system
