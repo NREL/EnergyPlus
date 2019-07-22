@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 
 using namespace EnergyPlus::HeatBalanceIntRadExchange;
@@ -98,11 +99,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
 
     DataHeatBalance::Zone.allocate(ZoneNum);
     DataHeatBalance::Zone(ZoneNum).Name = "Test";
+    DataViewFactorInformation::ZoneInfo.allocate(ZoneNum);
+    DataViewFactorInformation::ZoneInfo(ZoneNum).Name = DataHeatBalance::Zone(ZoneNum).Name;
 
     FixViewFactors(N, A, F, ZoneNum, OriginalCheckValue, FixedCheckValue, FinalCheckValue, NumIterations, RowSum);
 
     std::string const error_string = delimited_string({
-        "   ** Warning ** Surfaces in Zone=\"Test\" do not define an enclosure.",
+        "   ** Warning ** Surfaces in Zone/Enclosure=\"Test\" do not define an enclosure.",
         "   **   ~~~   ** Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness.",
         "   **   ~~~   ** Reciprocity means that radiant exchange between two surfaces will match and not lead to an energy loss.",
         "   **   ~~~   ** Completeness means that all of the view factors between a surface and the other surfaces in a zone add up to unity.",
