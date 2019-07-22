@@ -452,9 +452,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
 
     // test zone indexing for loads 
     Real64 QZoneReq = 0.0;
-    HVACUnitaryBypassVAV::GetZoneLoads(CBVAVNum, QZoneReq);
-    // should return cooling load for zone 2
-    EXPECT_EQ(-1000.0, QZoneReq);
+    HVACUnitaryBypassVAV::GetZoneLoads(CBVAVNum);
     // only 1 conditioned zone
     EXPECT_EQ(1, cbvav.NumZonesCooled);
     EXPECT_EQ(HVACUnitaryBypassVAV::CoolingMode, cbvav.HeatCoolMode);
