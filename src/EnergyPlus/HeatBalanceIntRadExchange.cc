@@ -251,7 +251,7 @@ namespace HeatBalanceIntRadExchange {
         if (PartialResimulate) {
             startEnclosure = endEnclosure = Zone(ZoneToResimulate).RadiantEnclosureNum;
             auto const &enclosure(ZoneInfo(startEnclosure));
-            for (int i = 1; i <= enclosure.NumOfSurfaces; ++i) {
+            for (int i : enclosure.SurfacePtr) {
                 NetLWRadToSurf(i) = 0.0;
                 SurfaceWindow(i).IRfromParentZone = 0.0;
             }
@@ -611,7 +611,7 @@ namespace HeatBalanceIntRadExchange {
                 thisEnclosure.F = 0.0;
                 thisEnclosure.ScriptF = 0.0;
                 if (DisplayAdvancedReportVariables)
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Surface View Factor Check Values," + Zone(enclosureNum).Name + ",0,0,0,-1,0,0";
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Surface View Factor Check Values," + thisEnclosure.Name + ",0,0,0,-1,0,0";
                 continue; // Go to the next enclosure in the loop
             }
 
@@ -780,7 +780,7 @@ namespace HeatBalanceIntRadExchange {
             RowSum = std::abs(RowSum - thisEnclosure.NumOfSurfaces);
             FixedRowSum = std::abs(FixedRowSum - thisEnclosure.NumOfSurfaces);
             if (DisplayAdvancedReportVariables) {
-                ObjexxFCL::gio::write(OutputFileInits, "(8A)") << "Surface View Factor Check Values," + Zone(enclosureNum).Name + ',' +
+                ObjexxFCL::gio::write(OutputFileInits, "(8A)") << "Surface View Factor Check Values," + thisEnclosure.Name + ',' +
                                                            RoundSigDigits(CheckValue1, 6) + ',' + RoundSigDigits(CheckValue2, 6) + ',' +
                                                            RoundSigDigits(FinalCheckValue, 6) + ',' + RoundSigDigits(NumIterations) + ',' +
                                                            RoundSigDigits(FixedRowSum, 6) + ',' + RoundSigDigits(RowSum, 6);
@@ -1076,7 +1076,7 @@ namespace HeatBalanceIntRadExchange {
     void FixViewFactors(int const N,                // NUMBER OF SURFACES
                         Array1A<Real64> const A,    // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
                         Array2A<Real64> F,          // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
-                        int const ZoneNum,          // Zone number being fixe
+                        int const enclNum,          // Enclosure number being fixed
                         Real64 &OriginalCheckValue, // check of SUM(F) - N
                         Real64 &FixedCheckValue,    // check after fixed of SUM(F) - N
                         Real64 &FinalCheckValue,    // the one to go with
@@ -1190,7 +1190,7 @@ namespace HeatBalanceIntRadExchange {
                 }
             }
 
-            ShowWarningError("Surfaces in Zone=\"" + Zone(ZoneNum).Name + "\" do not define an enclosure.");
+            ShowWarningError("Surfaces in Zone/Enclosure=\"" + ZoneInfo(enclNum).Name + "\" do not define an enclosure.");
             ShowContinueError("Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness.");
             ShowContinueError("Reciprocity means that radiant exchange between two surfaces will match and not lead to an energy loss.");
             ShowContinueError("Completeness means that all of the view factors between a surface and the other surfaces in a zone add up to unity.");
@@ -1229,7 +1229,9 @@ namespace HeatBalanceIntRadExchange {
             }
             FinalCheckValue = FixedCheckValue = std::abs(RowSum - N);
             F = FixedF;
-            Zone(ZoneNum).EnforcedReciprocity = true;
+            for (int zoneNum : ZoneInfo(enclNum).ZoneNums) {
+                Zone(zoneNum).EnforcedReciprocity = true;
+            }
             return; // Do not iterate, stop with reciprocity satisfied.
 
         } //  N <= 3 Case
@@ -1283,7 +1285,7 @@ namespace HeatBalanceIntRadExchange {
                 FinalCheckValue = FixedCheckValue = CheckConvergeTolerance = std::abs(sum_FixedF - N);
                 if (CheckConvergeTolerance > 0.005) {
                     ShowWarningError("FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" +
-                                     Zone(ZoneNum).Name + "\".");
+                                     ZoneInfo(enclNum).Name + "\".");
                     ShowContinueError("Enforced reciprocity has tolerance (ideal is 0)=[" + RoundSigDigits(CheckConvergeTolerance, 6) +
                                       "], Row Sum (ideal is " + RoundSigDigits(N) + ")=[" + RoundSigDigits(RowSum, 2) + "].");
                     ShowContinueError("If zone is unusual, or tolerance is on the order of 0.001, view factors are probably OK.");
@@ -1308,7 +1310,7 @@ namespace HeatBalanceIntRadExchange {
                 FinalCheckValue = FixedCheckValue;
             } else {
                 ShowWarningError("FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" +
-                                 Zone(ZoneNum).Name + "\".");
+                                 ZoneInfo(enclNum).Name + "\".");
             }
         }
     }
