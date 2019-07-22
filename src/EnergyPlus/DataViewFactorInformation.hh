@@ -86,6 +86,8 @@ namespace DataViewFactorInformation {
 
     extern Array1D<ZoneViewFactorInformation> ZoneInfo;
 
+    void clear_state();
+
 } // namespace DataViewFactorInformation
 
 } // namespace EnergyPlus

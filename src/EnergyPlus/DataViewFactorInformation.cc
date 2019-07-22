@@ -83,6 +83,12 @@ namespace DataViewFactorInformation {
 
     Array1D<ZoneViewFactorInformation> ZoneInfo;
 
+    void clear_state()
+    {
+        NumOfRadiantEnclosures = 0;
+        ZoneInfo.deallocate();
+    }
+
 } // namespace DataViewFactorInformation
 
 } // namespace EnergyPlus
