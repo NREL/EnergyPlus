@@ -1259,7 +1259,7 @@ namespace SimAirServingZones {
                         } else if (componentType == "FAN:SYSTEMMODEL") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Fan_System_Object;
                             // Construct fan object
-                            if (HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name) < 0) {
+                            if (HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, true) < 0) {
                                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name));
                             }
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompIndex =

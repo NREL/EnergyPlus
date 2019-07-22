@@ -90,7 +90,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
 {
     // unit test for a new feature to model a central DOAS to serve multiple AirLoops
     std::string const idf_objects = delimited_string({
-        "  Version,9.1;",
+        "  Version,9.2;",
 
         "  SimulationControl,",
         "    YES,                     !- Do Zone Sizing Calculation",
@@ -4621,17 +4621,6 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "    OutsideAirInletNodes,    !- Name",
         "    Outside Air Inlet Node 1;!- Node 1 Name",
 
-        "  BranchList,",
-        "    AirLoopDOAS Branches,  !- Name",
-        "    AirLoopDOAS Main Branch;  !- Branch 1 Name",
-
-        "  Branch,",
-        "    AirLoopDOAS Main Branch,  !- Name",
-        "    ,                        !- Pressure Drop Curve Name",
-        "    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type",
-        "    AirLoopDOAS OA system,             !- Component 1 Name",
-        "    Outside Air Inlet Node 1,  !- Component 1 Inlet Node Name",
-        "    AirLoopDOASSplitterInlet;  !- Component 1 Outlet Node Name",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -4689,17 +4678,17 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     DataLoopNode::Node(80).MassFlowRate = 0.1;
     DataLoopNode::Node(81).MassFlowRate = 0.1;
     DataLoopNode::Node(82).MassFlowRate = 0.1;
-    DataLoopNode::Node(83).MassFlowRate = 0.1;
+    DataLoopNode::Node(78).MassFlowRate = 0.1;
     DataLoopNode::Node(79).MassFlowRate = 0.1;
     DataLoopNode::Node(80).Temp = 23.0;
     DataLoopNode::Node(81).Temp = 23.0;
     DataLoopNode::Node(82).Temp = 23.0;
-    DataLoopNode::Node(83).Temp = 23.0;
+    DataLoopNode::Node(78).Temp = 23.0;
     DataLoopNode::Node(79).Temp = 23.0;
     DataLoopNode::Node(80).HumRat = 0.001;
     DataLoopNode::Node(81).HumRat = 0.001;
     DataLoopNode::Node(82).HumRat = 0.001;
-    DataLoopNode::Node(83).HumRat = 0.001;
+    DataLoopNode::Node(78).HumRat = 0.001;
     DataLoopNode::Node(79).HumRat = 0.001;
 
     AirLoopHVACDOAS::AirLoopDOAS *thisAirLoopDOASObjec = &AirLoopHVACDOAS::airloopDOAS[0];
@@ -4707,18 +4696,18 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     thisAirLoopDOASObjec->SizingOnceFlag = false;
     DataLoopNode::Node(11).Temp = -10.0;
     DataLoopNode::Node(11).HumRat = 0.0008;
-    DataLoopNode::Node(73).TempSetPoint = 4.5;
+    DataLoopNode::Node(86).TempSetPoint = 4.5;
     Schedule(1).CurrentValue = 1.0; // set availability and fan schedule to 1
     thisAirLoopDOASObjec->SimAirLoopHVACDOAS(true, index);
 
     // Mixer outlet
-    EXPECT_NEAR(23.0, DataLoopNode::Node(85).Temp, 0.0001);
-    EXPECT_NEAR(0.5, DataLoopNode::Node(85).MassFlowRate, 0.0001);
+    EXPECT_NEAR(23.0, DataLoopNode::Node(84).Temp, 0.0001);
+    EXPECT_NEAR(0.5, DataLoopNode::Node(84).MassFlowRate, 0.0001);
     // Outlet of HX 
-    EXPECT_NEAR(-8.0710884, DataLoopNode::Node(84).Temp, 0.0001);
+    EXPECT_NEAR(-8.0710884, DataLoopNode::Node(83).Temp, 0.0001);
     // Outlet of Central DOAS
-    EXPECT_NEAR(4.5, DataLoopNode::Node(73).Temp, 0.0001);
-    EXPECT_NEAR(0.5, DataLoopNode::Node(73).MassFlowRate, 0.0001);
+    EXPECT_NEAR(4.5, DataLoopNode::Node(86).Temp, 0.0001);
+    EXPECT_NEAR(0.5, DataLoopNode::Node(86).MassFlowRate, 0.0001);
     // Outlet of splitter
     EXPECT_NEAR(4.5, DataLoopNode::Node(2).Temp, 0.0001);
     EXPECT_NEAR(4.5, DataLoopNode::Node(3).Temp, 0.0001);

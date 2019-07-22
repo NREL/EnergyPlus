@@ -36,7 +36,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 6
 
-  Version,9.1;
+  Version,9.2;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -4732,18 +4732,6 @@
   NodeList,
     OutsideAirInletNodes,    !- Name
     Outside Air Inlet Node 1;!- Node 1 Name
-
-  BranchList,
-    AirLoopDOAS Branches,  !- Name
-    AirLoopDOAS Main Branch;  !- Branch 1 Name
-
-  Branch,
-    AirLoopDOAS Main Branch,  !- Name
-    ,                        !- Pressure Drop Curve Name
-    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
-    AirLoopDOAS OA system,             !- Component 1 Name
-    Outside Air Inlet Node 1,  !- Component 1 Inlet Node Name
-    AirLoopDOASSplitterInlet;  !- Component 1 Outlet Node Name
 
   PlantLoop,
     Hot Water Loop,          !- Name
