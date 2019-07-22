@@ -427,8 +427,8 @@ cpack_add_component(Licenses
   REQUIRED)
 
 cpack_add_component(RegisterFileType
-  DISPLAY_NAME "Associate with EP-Launch"
-  DESCRIPTION "Associate *.idf, *.imf, and *.epg files with EP-Launch"
+  DISPLAY_NAME "Associate with EP-Launch and IDFEditor"
+  DESCRIPTION "Associate *.idf, *.imf, and *.epg files with EP-Launch, *.ddy and *.expidf with IDFEditor.exe"
 )
 
 cpack_add_component(CopyAndRegisterSystemDLLs
