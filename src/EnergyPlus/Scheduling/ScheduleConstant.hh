@@ -54,14 +54,12 @@
 
 #include <EnergyPlus.hh>
 #include <Scheduling/ScheduleBase.hh>
-#include <Scheduling/ScheduleTypeLimits.hh>
 #include <nlohmann/json.hpp>
 
 namespace Scheduling {
 
 struct ScheduleConstant : ScheduleBase
 {
-    ScheduleTypeData * typeLimits = nullptr;
     bool emsActuatedOn = false;
     Real64 emsActuatedValue = 0.0;
     ScheduleConstant(std::string const &objectName, nlohmann::json const &fields);
@@ -71,6 +69,7 @@ struct ScheduleConstant : ScheduleBase
     ~ScheduleConstant() = default;
     void updateValue();
     static void setupOutputVariables();
+    bool valuesInBounds() override;
 };
 extern std::vector<ScheduleConstant> scheduleConstants;
 

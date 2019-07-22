@@ -50,6 +50,7 @@
 
 #include <string>
 #include <EnergyPlus.hh>
+#include <Scheduling/ScheduleTypeLimits.hh>
 
 namespace Scheduling {
 
@@ -59,6 +60,8 @@ struct ScheduleBase
     Real64 value = 0.0;
     virtual Real64 getCurrentValue() = 0;
     static void clear_state();
+    virtual bool valuesInBounds() = 0;
+    ScheduleTypeData * typeLimits = nullptr;
 };
 
 }

@@ -47,13 +47,13 @@
 
 #include <gtest/gtest.h>
 
-#include <Fixtures/EnergyPlusFixture.hh>
+#include <Scheduling/SchedulingFixture.hh>
 
 #include <EnergyPlus/Scheduling/ScheduleBase.hh>
 
 namespace EnergyPlus {
 
-TEST_F(EnergyPlusFixture, ScheduleBase_TestClearState)
+TEST_F(SchedulingTestFixture, ScheduleBase_TestClearState)
 {
     // as of right now there's really not much to test here, but I can at least confirm that it does have a clear_state method
     Scheduling::ScheduleBase::clear_state();

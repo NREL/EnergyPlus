@@ -97,6 +97,9 @@ ScheduleConstant::ScheduleConstant(std::string const &objectName, nlohmann::json
     if (EnergyPlus::DataGlobals::AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
         //            SetupEMSActuator("Schedule:Constant", this->name, "Schedule Value", "[ ]", this->emsActuatedOn, this->emsActuatedValue);
     }
+    if (!this->valuesInBounds()) {
+        // ShowFatalError("Schedule bounds error causes program termination")
+    }
 }
 
 void ScheduleConstant::updateValue()
@@ -115,6 +118,20 @@ void ScheduleConstant::setupOutputVariables()
         EnergyPlus::SetupOutputVariable(
             "NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
     }
+}
+
+bool ScheduleConstant::valuesInBounds()
+{
+    if (this->typeLimits) {
+        if (this->value > this->typeLimits->maximum) {
+            // ShowSevereError("Value out of bounds")
+            return false;
+        } else if (this->value < this->typeLimits->minimum) {
+            // ShowSevereError("Value out of bounds")
+            return false;
+        }
+    }
+    return true;
 }
 
 } // namespace Scheduling

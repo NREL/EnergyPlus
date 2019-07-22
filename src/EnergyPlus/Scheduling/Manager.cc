@@ -115,6 +115,8 @@ void processAllSchedules() {
 
     // once complete we can go through and add report variables for all the schedules
 
+
+    scheduleInputProcessed = true;
 }
 
 Real64 GetScheduleValue(int scheduleIndex) {

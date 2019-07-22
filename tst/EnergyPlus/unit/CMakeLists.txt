@@ -142,6 +142,7 @@ set( test_src
   RunPeriod.unit.cc
   RuntimeLanguageProcessor.unit.cc
   ScheduleManager.unit.cc
+  Scheduling/SchedulingFixture.hh
   Scheduling/Manager.unit.cc
   Scheduling/ScheduleBase.unit.cc
   Scheduling/ScheduleConstant.unit.cc

@@ -48,29 +48,28 @@
 #include <gtest/gtest.h>
 
 #include <EnergyPlus/Scheduling/ScheduleConstant.hh>
-#include <Fixtures/EnergyPlusFixture.hh>
+#include <Scheduling/SchedulingFixture.hh>
 
 namespace EnergyPlus {
 
-TEST_F(EnergyPlusFixture, ScheduleConstant_TestProcessInput)
+TEST_F(SchedulingTestFixture, ScheduleConstant_TestProcessInput)
 {
     Scheduling::ScheduleConstant::processInput();
-    EXPECT_EQ(1u, Scheduling::scheduleConstants.size());
+    EXPECT_EQ(3u, Scheduling::scheduleConstants.size());
 }
 
-TEST_F(EnergyPlusFixture, ScheduleConstant_TestGetCurrentValue)
+TEST_F(SchedulingTestFixture, ScheduleConstant_TestGetScheduleIndex)
 {
     Scheduling::ScheduleConstant::processInput();
-    EXPECT_EQ(1u, Scheduling::scheduleConstants.size());
-    EXPECT_EQ(0, Scheduling::scheduleConstants[0].getCurrentValue());
+    EXPECT_EQ("ALWAYS OFF", Scheduling::scheduleConstants[0].name); // will be upper case, and lexicographically ordered
+    EXPECT_NEAR(0.0, Scheduling::scheduleConstants[0].getCurrentValue(), 0.0001);
 }
 
-TEST_F(EnergyPlusFixture, ScheduleConstant_TestClearState)
+TEST_F(SchedulingTestFixture, ScheduleConstant_TestClearState)
 {
     Scheduling::ScheduleConstant::processInput();
-    EXPECT_EQ(1u, Scheduling::scheduleConstants.size());
     Scheduling::ScheduleConstant::clear_state();
     EXPECT_EQ(0u, Scheduling::scheduleConstants.size());
 }
 
-}
+} // namespace EnergyPlus

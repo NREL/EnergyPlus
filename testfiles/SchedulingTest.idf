@@ -9,10 +9,17 @@
     Limits 0-10 Discrete,
     5.6;
 
-  Schedule:Constant,
-    Constant Schedule With Limits Bounded,
+! Enabling this should cause a severe out of bounds error
+!  Schedule:Constant,
+!    Constant Schedule With Limits Bounded,
+!    Limits 0-10 Discrete,
+!    11;
+
+  ScheduleTypeLimits,
     Limits 0-10 Discrete,
-    11;
+    0,
+    10,
+    Discrete;
 
   Version,9.2;
 

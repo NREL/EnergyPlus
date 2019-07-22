@@ -48,30 +48,34 @@
 #include <gtest/gtest.h>
 
 #include <Scheduling/Manager.hh>
-
-#include <Fixtures/EnergyPlusFixture.hh>
+#include <Scheduling/SchedulingFixture.hh>
 
 namespace EnergyPlus {
 
-TEST_F(EnergyPlusFixture, SchedulingManager_TestClearState)
+TEST_F(SchedulingTestFixture, SchedulingManager_TestClearState)
 {
     // as of right now there's really not much to test here, but I can at least confirm that it does have a clear_state method
     Scheduling::clear_state();
 }
 
-TEST_F(EnergyPlusFixture, SchedulingManager_TestGetScheduleIndex)
+TEST_F(SchedulingTestFixture, SchedulingManager_TestGetScheduleIndex)
 {
-    EXPECT_EQ(1, Scheduling::GetScheduleIndex("my_schedule"));
+    Scheduling::processAllSchedules();
+    EXPECT_EQ(-1, Scheduling::GetScheduleIndex("my_missing_schedule"));
+    EXPECT_EQ(-1, Scheduling::GetScheduleIndex("always on")); // must be capitalized
+    EXPECT_EQ(2, Scheduling::GetScheduleIndex("ALWAYS ON")); // must be capitalized
 }
 
-TEST_F(EnergyPlusFixture, SchedulingManager_TestGetScheduleValue)
+TEST_F(SchedulingTestFixture, SchedulingManager_TestGetScheduleValue)
 {
-    EXPECT_EQ(1, Scheduling::GetScheduleIndex("my_schedule"));
-    EXPECT_EQ(0.0, Scheduling::GetScheduleValue(1));
+    Scheduling::processAllSchedules();
+    EXPECT_EQ(2, Scheduling::GetScheduleIndex("ALWAYS ON"));
+    EXPECT_EQ(1.0, Scheduling::GetScheduleValue(2));
 }
 
-TEST_F(EnergyPlusFixture, SchedulingManager_TestGetScheduleReference) {
-    std::string schedName = "my_schedule";
+TEST_F(SchedulingTestFixture, SchedulingManager_TestGetScheduleReference) {
+    Scheduling::processAllSchedules();
+    std::string schedName = "ALWAYS ON";
     Scheduling::ScheduleBase *thisReference = Scheduling::getScheduleReference(schedName);
     EXPECT_NE(thisReference, nullptr);
 }
