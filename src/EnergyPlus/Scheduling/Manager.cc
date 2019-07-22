@@ -93,6 +93,12 @@ ScheduleBase *getScheduleReference(const std::string& scheduleName) {
     return nullptr;
 }
 
+void updateAllSchedules() {
+    for (auto & thisSchedule : scheduleConstants) {
+        thisSchedule.updateValue();
+    }
+}
+
 void processAllSchedules() {
     // first off, we'll want to add a dummy item to the zeroth indexToSubtypeMap vector because many components treat zero as invalid schedule index
     indexToSubtypeMap.emplace_back();
@@ -102,9 +108,13 @@ void processAllSchedules() {
 
     // then we'll go through and call each subtype factory and accumulate index values into our map
     ScheduleConstant::processInput();
+    ScheduleConstant::setupOutputVariables();
     for (unsigned int subTypeIndex = 0; subTypeIndex < scheduleConstants.size(); subTypeIndex++) {
         indexToSubtypeMap.emplace_back(scheduleConstants[subTypeIndex].name, ScheduleType::CONSTANT, subTypeIndex);
     }
+
+    // once complete we can go through and add report variables for all the schedules
+
 }
 
 Real64 GetScheduleValue(int scheduleIndex) {

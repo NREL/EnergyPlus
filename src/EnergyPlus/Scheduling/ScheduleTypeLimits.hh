@@ -66,7 +66,7 @@ struct ScheduleTypeData
     static void processInput();
     static void clear_state();
     // factory method and constructor
-    static ScheduleTypeData * factory(std::string name);
+    static ScheduleTypeData * factory(const std::string& name);
     ScheduleTypeData(std::string const &objectName, nlohmann::json const &fields);
 };
 

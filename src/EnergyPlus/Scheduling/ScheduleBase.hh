@@ -56,6 +56,7 @@ namespace Scheduling {
 struct ScheduleBase
 {
     std::string name = "";
+    Real64 value = 0.0;
     virtual Real64 getCurrentValue() = 0;
     static void clear_state();
 };

@@ -64,12 +64,13 @@ struct ScheduleConstant : ScheduleBase
     ScheduleTypeData * typeLimits = nullptr;
     bool emsActuatedOn = false;
     Real64 emsActuatedValue = 0.0;
-    Real64 value = 0.0;
     ScheduleConstant(std::string const &objectName, nlohmann::json const &fields);
     Real64 getCurrentValue() override;
     static void processInput();
     static void clear_state();
     ~ScheduleConstant() = default;
+    void updateValue();
+    static void setupOutputVariables();
 };
 extern std::vector<ScheduleConstant> scheduleConstants;
 

@@ -45,60 +45,76 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus.hh>
-#include <Scheduling/ScheduleConstant.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <GlobalNames.hh>
-#include <UtilityRoutines.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
+#include <GlobalNames.hh>
+#include <InputProcessing/InputProcessor.hh>
+#include <OutputProcessor.hh>
+#include <Scheduling/ScheduleConstant.hh>
+#include <UtilityRoutines.hh>
 
 namespace Scheduling {
 
-    std::vector<ScheduleConstant> scheduleConstants;
+std::vector<ScheduleConstant> scheduleConstants;
 
-    Real64 ScheduleConstant::getCurrentValue()
-    {
-        if (this->emsActuatedOn) {
-            return this->emsActuatedValue;
-        } else {
-            return this->value;
-        }
-    }
-
-    void ScheduleConstant::processInput()
-    {
-        std::string const thisObjectType = "Schedule:Constant";
-        auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
-        if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
-            return; // no constant schedules to process
-        }
-        auto &instancesValue = instances.value();
-        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-            auto const &fields = instance.value();
-            auto const &thisObjectName = instance.key();
-            // do any pre-construction checks
-            EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
-            //EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
-            // then just add it to the vector via the constructor
-            scheduleConstants.emplace_back(thisObjectName, fields);
-        }
-    }
-
-    void ScheduleConstant::clear_state()
-    {
-        scheduleConstants.clear();
-    }
-
-    ScheduleConstant::ScheduleConstant(std::string const &objectName, nlohmann::json const &fields) {
-        this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
-        // get a schedule type limits reference directly and store that
-        if (fields.find("schedule_type_limits_name") != fields.end()) {
-            this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
-        }
-        this->value = fields.at("hourly_value");
-        if (EnergyPlus::DataGlobals::AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-//            SetupEMSActuator("Schedule:Constant", this->name, "Schedule Value", "[ ]", this->emsActuatedOn, this->emsActuatedValue);
-        }
-    }
-
+Real64 ScheduleConstant::getCurrentValue()
+{
+    return this->value;
 }
+
+void ScheduleConstant::processInput()
+{
+    std::string const thisObjectType = "Schedule:Constant";
+    auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
+    if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
+        return; // no constant schedules to process
+    }
+    auto &instancesValue = instances.value();
+    for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+        auto const &fields = instance.value();
+        auto const &thisObjectName = instance.key();
+        // do any pre-construction checks
+        EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+        // EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+        // then just add it to the vector via the constructor
+        scheduleConstants.emplace_back(thisObjectName, fields);
+    }
+}
+
+void ScheduleConstant::clear_state()
+{
+    scheduleConstants.clear();
+}
+
+ScheduleConstant::ScheduleConstant(std::string const &objectName, nlohmann::json const &fields)
+{
+    this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
+    // get a schedule type limits reference directly and store that
+    if (fields.find("schedule_type_limits_name") != fields.end()) {
+        this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
+    }
+    this->value = fields.at("hourly_value");
+    if (EnergyPlus::DataGlobals::AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
+        //            SetupEMSActuator("Schedule:Constant", this->name, "Schedule Value", "[ ]", this->emsActuatedOn, this->emsActuatedValue);
+    }
+}
+
+void ScheduleConstant::updateValue()
+{
+    if (this->emsActuatedOn) {
+        this->value = this->emsActuatedValue;
+    } else {
+        // this->value = this->value;
+    }
+}
+
+void ScheduleConstant::setupOutputVariables()
+{
+    for (auto &thisSchedule : scheduleConstants) {
+        // Set Up Reporting
+        EnergyPlus::SetupOutputVariable(
+            "NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
+    }
+}
+
+} // namespace Scheduling

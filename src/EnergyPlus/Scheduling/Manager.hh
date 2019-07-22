@@ -90,5 +90,7 @@ void processAllSchedules();
 
 Real64 GetScheduleValue(int scheduleIndex);
 
+void updateAllSchedules();
+
 }
 #endif // SRC_ENERGYPLUS_SCHEDULING_MANAGER_HH

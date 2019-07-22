@@ -82,6 +82,7 @@
 #include <OutputReportTabular.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
+#include <Scheduling/Manager.hh>
 #include <SurfaceGeometry.hh>
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
@@ -2495,6 +2496,7 @@ namespace WeatherManager {
         }
 
         UpdateScheduleValues();
+        Scheduling::updateAllSchedules();
 
         std::sprintf(time_stamp, "%02d/%02d %02hu", Month, DayOfMonth, (unsigned short)(HourOfDay - 1));
 

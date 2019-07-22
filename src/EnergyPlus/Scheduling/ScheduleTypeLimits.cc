@@ -51,9 +51,19 @@
 
 namespace Scheduling {
 std::vector<ScheduleTypeData> scheduleTypeLimits;
+bool needToGetInput = true;
 
-ScheduleTypeData *ScheduleTypeData::factory(std::string name)
+ScheduleTypeData *ScheduleTypeData::factory(const std::string& name)
 {
+    if (needToGetInput) {
+        ScheduleTypeData::processInput();
+    }
+    for (auto & thisTypeLimit : scheduleTypeLimits) {
+        if (thisTypeLimit.name == name) {
+            return &thisTypeLimit;
+        }
+    }
+    // ShowFatalError("Could not find type limits object with name: " + name);
     return nullptr;
 }
 
@@ -77,7 +87,9 @@ void ScheduleTypeData::processInput() {
 
 void ScheduleTypeData::clear_state() {
     scheduleTypeLimits.clear();
+    needToGetInput = true;
 }
+
 ScheduleTypeData::ScheduleTypeData(std::string const &objectName, nlohmann::json const &fields) {
     this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
     if (fields.find("lower_limit_value") != fields.end()) {
