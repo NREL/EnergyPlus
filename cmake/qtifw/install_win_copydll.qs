@@ -45,8 +45,9 @@ function Component()
         var targetFile = systemTargetDir + systemArray[i];
         if (!installer.fileExists(targetFile)) {
           console.log("Copying DLL: " + targetFile);
-          // Copy the DLL
-          component.addElevatedOperation("Copy", sourceFile, targetFile);
+          // Copy the DLL (includes reverting on uninstall)
+          // component.addElevatedOperation("Copy", sourceFile, targetFile);
+
           // Copy without deleting on uninstall (technically the "/Y"
           // (=overwrite with no prompt) isn't needed since we tested target
           // didn't exist already
