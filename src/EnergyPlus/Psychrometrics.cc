@@ -72,8 +72,8 @@ namespace EnergyPlus {
 #else
 #define EP_cache_PsyTwbFnTdbWPb
 #define EP_cache_PsyPsatFnTemp
-#undef EP_cache_PsyTsatFnPb
-#undef EP_cache_PsyTsatFnHPb
+#define EP_cache_PsyTsatFnPb
+#define EP_cache_PsyTsatFnHPb
 #endif
 #define EP_psych_errors
 
@@ -1114,6 +1114,8 @@ namespace Psychrometrics {
         switch(CaseIndex) {
             case 0 :
                 HH = -4.24e4; //HH < -4.24e4, Peg to minimum
+                T = F6(HH, -19.44, 8.53675e-4, -5.12637e-9, -9.85546e-14, -1.00102e-18, -4.2705e-24);
+                break;
             case 1 : // -2.2138e4 > HH > -4.24e4
                 T = F6(HH, -19.44, 8.53675e-4, -5.12637e-9, -9.85546e-14, -1.00102e-18, -4.2705e-24);
                 break;
@@ -1138,9 +1140,11 @@ namespace Psychrometrics {
             case 8 :
                 T = F6(HH, 4.88446e1, 3.85534e-5, -1.78805e-11, 4.87224e-18, -7.15283e-25, 4.36246e-32);
                 break;
+            case 9 :
+                T = F7(HH, 7.60565e11, 5.80534e4, -7.36433e-3, 5.11531e-10, -1.93619e-17, 3.70511e-25, -2.77313e-33);
+                break;
             case 10 :
                 HH = 4.5866e7;
-            case 9 :
                 T = F7(HH, 7.60565e11, 5.80534e4, -7.36433e-3, 5.11531e-10, -1.93619e-17, 3.70511e-25, -2.77313e-33);
                 break;
         }
