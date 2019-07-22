@@ -2508,6 +2508,10 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
     //  Do all detached shading surfaces first
     for (surf = 1; surf <= TotSurfaces; ++surf) {
         if (Surface(surf).HeatTransSurf) continue;
+        int constrNum = Surface(surf).Construction;
+        if (constrNum > 0) {
+            if (DataHeatBalance::Construct(constrNum).TypeIsAirBoundary) continue;
+        }
         if (Surface(surf).Class == SurfaceClass_Shading) continue;
         if (Surface(surf).Sides == 0) continue;
         if (Surface(surf).Class == SurfaceClass_Detached_F) colorindex = 3;

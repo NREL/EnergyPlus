@@ -772,6 +772,9 @@ namespace DataSurfaces {
         bool PartOfVentSlabOrRadiantSurface; // surface cannot be part of both a radiant surface & ventilated slab group
         // LG added 1/6/12
         Real64 GenericContam; // [ppm] Surface generic contaminant as a storage term for
+        // Air boundaries
+        int RadEnclIndex;     // Pointer to Radiant enclosure this surface is part of
+        int RadEnclSurfIndex; //  Pointer Radiant enclosure surface data, ZoneInfo(n).SurfacePtr(RadEnclSurfIndex) points to this surface
 
         std::vector<int> DisabledShadowingZoneList; // Array of all disabled shadowing zone number to the current surface
                                                     // the surface diffusion model
@@ -806,7 +809,7 @@ namespace DataSurfaces {
               OutConvClassification(0), OutConvHfModelEq(0), OutConvHfUserCurveIndex(0), OutConvHnModelEq(0), OutConvHnUserCurveIndex(0),
               OutConvFaceArea(0.0), OutConvFacePerimeter(0.0), OutConvFaceHeight(0.0), IntConvZoneWallHeight(0.0), IntConvZonePerimLength(0.0),
               IntConvZoneHorizHydrDiam(0.0), IntConvWindowWallRatio(0.0), IntConvWindowLocation(InConvWinLoc_NotSet),
-              IntConvSurfGetsRadiantHeat(false), IntConvSurfHasActiveInIt(false), PartOfVentSlabOrRadiantSurface(false), GenericContam(0.0)
+              IntConvSurfGetsRadiantHeat(false), IntConvSurfHasActiveInIt(false), PartOfVentSlabOrRadiantSurface(false), GenericContam(0.0), RadEnclIndex(0), RadEnclSurfIndex(0)
         {
         }
 

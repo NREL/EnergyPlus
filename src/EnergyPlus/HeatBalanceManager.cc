@@ -77,6 +77,7 @@
 #include <DataStringGlobals.hh>
 #include <DataSurfaces.hh>
 #include <DataSystemVariables.hh>
+#include <DataViewFactorInformation.hh>
 #include <DataWindowEquivalentLayer.hh>
 #include <DaylightingDevices.hh>
 #include <DaylightingManager.hh>
@@ -4738,7 +4739,7 @@ namespace HeatBalanceManager {
         NumOfZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
         Zone.allocate(NumOfZones);
-
+        DataViewFactorInformation::ZoneInfo.allocate(NumOfZones);
         ZoneDaylight.allocate(NumOfZones);
 
         ZoneLoop = 0;

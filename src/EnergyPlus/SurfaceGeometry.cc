@@ -69,6 +69,7 @@
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataReportingFlags.hh>
+#include <DataViewFactorInformation.hh>
 #include <DataWindowEquivalentLayer.hh>
 #include <DataZoneEquipment.hh>
 #include <DaylightingManager.hh>
@@ -12614,13 +12615,15 @@ namespace SurfaceGeometry {
 
     void SetupAirBoundaries(bool &ErrorsFound)
     {
+        bool anyRadiantGroupedZones = false;
+        int enclosureNum = 0;
         if (std::any_of(Construct.begin(), Construct.end(), [](DataHeatBalance::ConstructionData const &e) { return e.TypeIsAirBoundary; })) {
             std::string RoutineName = "SetupAirBoundaries";
             int errorCount = 0;
             for (int surfNum = 1; surfNum <= DataSurfaces::TotSurfaces; ++surfNum) {
                 auto &surf(Surface(surfNum));
                 if (!surf.HeatTransSurf) continue;
-                auto const &constr(Construct(surf.Construction));
+                auto &constr(Construct(surf.Construction));
                 if (!constr.TypeIsAirBoundary) continue;
 
                 // Check for invalid air boundary surfaces - valid only on non-adiabatic interzone surfaces
@@ -12640,7 +12643,39 @@ namespace SurfaceGeometry {
                         surf.HeatTransSurf = true;
                         // Interior convection coefficient set to low H limit in ConvectionCoefficients::GetUserConvectionCoefficients
                     } else {
+                        // Boundary is grouped - assign radiant enclosure
+                        constr.IsUsedCTF = false;
                         surf.HeatTransSurf = false;
+                        surf.HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_AirBoundaryNoHT;
+                        anyRadiantGroupedZones = true;
+                        auto & thisSideEnclosureNum(Zone(surf.Zone).RadiantEnclosureNum);
+                        auto & otherSideEnclosureNum(Zone(Surface(surf.ExtBoundCond).Zone).RadiantEnclosureNum);
+                        if ((thisSideEnclosureNum == 0) && (otherSideEnclosureNum == 0)) {
+                            // Neither zone is assigned to an enclosure, so increment the counter and assign to both
+                            ++enclosureNum;
+                            DataViewFactorInformation::ZoneInfo(enclosureNum).Name = "Enclosure " + General::RoundSigDigits(enclosureNum);
+                            thisSideEnclosureNum = enclosureNum;
+                            DataViewFactorInformation::ZoneInfo(enclosureNum).ZoneNames.push_back(surf.ZoneName);
+                            DataViewFactorInformation::ZoneInfo(enclosureNum).ZoneNums.push_back(surf.Zone);
+                            otherSideEnclosureNum = enclosureNum;
+                            DataViewFactorInformation::ZoneInfo(enclosureNum).ZoneNames.push_back(Surface(surf.ExtBoundCond).ZoneName);
+                            DataViewFactorInformation::ZoneInfo(enclosureNum).ZoneNums.push_back(Surface(surf.ExtBoundCond).Zone);
+                        } else if (thisSideEnclosureNum == 0){
+                            // Other side is assigned, so use that one for both
+                            thisSideEnclosureNum = otherSideEnclosureNum;
+                            DataViewFactorInformation::ZoneInfo(otherSideEnclosureNum).ZoneNames.push_back(surf.ZoneName);
+                            DataViewFactorInformation::ZoneInfo(otherSideEnclosureNum).ZoneNums.push_back(surf.Zone);
+                        } else if (otherSideEnclosureNum == 0) {
+                            // This side is assigned, so use that one for both
+                            otherSideEnclosureNum = thisSideEnclosureNum;
+                            DataViewFactorInformation::ZoneInfo(thisSideEnclosureNum).ZoneNames.push_back(Surface(surf.ExtBoundCond).ZoneName);
+                            DataViewFactorInformation::ZoneInfo(thisSideEnclosureNum).ZoneNums.push_back(Surface(surf.ExtBoundCond).Zone);
+                        } else if (thisSideEnclosureNum != otherSideEnclosureNum) {
+                            // This should never happen
+                            ShowSevereError(RoutineName + ": Radiant enclosure grouping error for Surface=\"" + surf.Name + "\"." +
+                                            "This surface enclosure num=" + General::RoundSigDigits(thisSideEnclosureNum) +
+                                            ". Other side enclosure num=" + General::RoundSigDigits(otherSideEnclosureNum));
+                        }
                     }
                 }
             }
@@ -12649,6 +12684,28 @@ namespace SurfaceGeometry {
                                 " surfaces use Construction:AirBoundary in non-interzone surfaces.");
                 ShowContinueError("For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
             }
+        }
+        if (anyRadiantGroupedZones) {
+            // All grouped radiant zones have been assigned to an enclosure, now assign remaining zones
+            for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+                if(Zone(zoneNum).RadiantEnclosureNum == 0) {
+                    ++enclosureNum;
+                    DataViewFactorInformation::ZoneInfo(enclosureNum).Name = "Enclosure "+General::RoundSigDigits(enclosureNum);
+                    Zone(zoneNum).RadiantEnclosureNum = enclosureNum;
+                    DataViewFactorInformation::ZoneInfo(enclosureNum).ZoneNames.push_back(Zone(zoneNum).Name);
+                    DataViewFactorInformation::ZoneInfo(enclosureNum).ZoneNums.push_back(zoneNum);
+                }
+            }
+            DataViewFactorInformation::NumOfRadiantEnclosures = enclosureNum;
+        } else {
+            // There are no grouped radiant air boundaries, assign each zone to it's own radiant enclosure
+            for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+                Zone(zoneNum).RadiantEnclosureNum = zoneNum;
+                DataViewFactorInformation::ZoneInfo(zoneNum).Name = Zone(zoneNum).Name;
+                DataViewFactorInformation::ZoneInfo(zoneNum).ZoneNames.push_back(Zone(zoneNum).Name);
+                DataViewFactorInformation::ZoneInfo(zoneNum).ZoneNums.push_back(zoneNum);
+            }
+            DataViewFactorInformation::NumOfRadiantEnclosures = DataGlobals::NumOfZones;
         }
     }
 

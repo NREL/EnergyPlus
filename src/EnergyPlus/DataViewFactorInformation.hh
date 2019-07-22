@@ -60,31 +60,23 @@ namespace EnergyPlus {
 
 namespace DataViewFactorInformation {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // Types
+    extern int NumOfRadiantEnclosures; // Number of radiant enclosures
 
     struct ZoneViewFactorInformation
     {
         // Members
-        std::string Name;           // Zone name
-        int NumOfSurfaces;          // Number of surfaces in the zone
-        Array2D<Real64> F;          // View Factors
-        Array2D<Real64> ScriptF;    // Hottel's Script F //Tuned Transposed
-        Array1D<Real64> Area;       // Surface area
-        Array1D<Real64> Emissivity; // Surface emissivity
-        Array1D<Real64> Azimuth;    // Azimuth angle of the surface (in degrees)
-        Array1D<Real64> Tilt;       // Tilt angle of the surface (in degrees)
-        Array1D_int SurfacePtr;     // Surface ALLOCATABLE (to Surface derived type)
-        Array1D_string Class;       // Class of surface (Wall, Roof, etc.)
+        std::string Name;                   // Enclosure name
+        std::vector<std::string> ZoneNames; // Zone names which are part of this enclosure
+        std::vector<int> ZoneNums;          // Zones which are part of this enclosure
+        int NumOfSurfaces;                  // Number of surfaces in the enclosure
+        Array2D<Real64> F;                  // View Factors
+        Array2D<Real64> ScriptF;            // Hottel's Script F //Tuned Transposed
+        Array1D<Real64> Area;               // Surface area
+        Array1D<Real64> Emissivity;         // Surface emissivity
+        Array1D<Real64> Azimuth;            // Azimuth angle of the surface (in degrees)
+        Array1D<Real64> Tilt;               // Tilt angle of the surface (in degrees)
+        Array1D_int SurfacePtr;             // Surface ALLOCATABLE (to Surface derived type)
+        Array1D_string Class;               // Class of surface (Wall, Roof, etc.)
 
         // Default Constructor
         ZoneViewFactorInformation() : NumOfSurfaces(0)
@@ -92,7 +84,6 @@ namespace DataViewFactorInformation {
         }
     };
 
-    // Object Data
     extern Array1D<ZoneViewFactorInformation> ZoneInfo;
 
 } // namespace DataViewFactorInformation

@@ -11444,7 +11444,11 @@ namespace SolarShading {
                     if (Surface(HeatTransSurfNum).Class == SurfaceClass_TDD_Dome) continue;
 
                     // View factor from current (sending) window DifTransSurfNum to current (receiving) surface HeatTransSurfNum
-                    ViewFactor = ZoneInfo(ZoneNum).F(HeatTransSurfNum - FirstZoneSurf + 1, DifTransSurfNum - FirstZoneSurf + 1);
+                    int HTenclosureSurfNum = Surface(HeatTransSurfNum).RadEnclSurfIndex; // for now using Radiant enclosure
+                    int enclosureNum = Surface(HeatTransSurfNum).RadEnclIndex; // for now using Radiant enclosure
+                    int DTenclSurfNum = Surface(DifTransSurfNum).RadEnclSurfIndex; // for now using Radiant enclosure
+
+                    ViewFactor = ZoneInfo(enclosureNum).F(HTenclosureSurfNum, DTenclSurfNum);
                     // debug ViewFactorTotal
                     ViewFactorTotal += ViewFactor; // debug
 
@@ -11994,7 +11998,11 @@ namespace SolarShading {
             if (Surface(HeatTransSurfNum).Class == SurfaceClass_TDD_Dome) continue;
 
             // View factor from current (sending) window IntWinSurfNum to current (receiving) surface HeatTransSurfNum
-            ViewFactor = ZoneInfo(ZoneNum).F(HeatTransSurfNum - FirstZoneSurf + 1, IntWinSurfNum - FirstZoneSurf + 1);
+            int HTenclosureSurfNum = Surface(HeatTransSurfNum).RadEnclSurfIndex; // for now using Radiant enclosure
+            int enclosureNum = Surface(HeatTransSurfNum).RadEnclIndex; // for now using Radiant enclosure
+            int IntWinEnclSurfNum = Surface(IntWinSurfNum).RadEnclSurfIndex; // for now using Radiant enclosure
+
+            ViewFactor = ZoneInfo(enclosureNum).F(HTenclosureSurfNum, IntWinEnclSurfNum);
             // debug ViewFactorTotal
             ViewFactorTotal += ViewFactor; // debug
 

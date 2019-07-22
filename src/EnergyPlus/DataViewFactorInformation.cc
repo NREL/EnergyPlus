@@ -79,17 +79,8 @@ namespace DataViewFactorInformation {
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
 
-    // <use statements for access to subroutines in other modules>
+    int NumOfRadiantEnclosures(0); // Number of radiant enclosures
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // Object Data
     Array1D<ZoneViewFactorInformation> ZoneInfo;
 
 } // namespace DataViewFactorInformation
