@@ -327,9 +327,6 @@ namespace SimulationManager {
         // FLOW:
         PostIPProcessing();
 
-        // to be removed, obviously
-        Scheduling::processAllSchedules();
-
         InitializePsychRoutines();
 
         BeginSimFlag = true;
@@ -396,6 +393,9 @@ namespace SimulationManager {
         CheckAndReadFaults();
 
         InitCurveReporting();
+
+        // to be removed, obviously
+        Scheduling::processAllSchedules();
 
         AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
         KickOffSimulation = false;
