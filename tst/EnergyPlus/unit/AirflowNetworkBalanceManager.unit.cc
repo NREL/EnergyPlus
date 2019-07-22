@@ -56,6 +56,7 @@
 #include <AirflowNetwork/Solver.hpp>
 #include <AirflowNetwork/Elements.hpp>
 #include <DataSurfaces.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 
@@ -68,6 +69,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -5580,8 +5582,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodes)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::HeatTransferAlgosUsed.allocate(1);
-    DataHeatBalance::HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
@@ -6191,8 +6192,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithTables)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::HeatTransferAlgosUsed.allocate(1);
-    DataHeatBalance::HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
@@ -6815,8 +6815,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithNoInput)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::HeatTransferAlgosUsed.allocate(1);
-    DataHeatBalance::HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
@@ -7418,8 +7417,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricTable)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::HeatTransferAlgosUsed.allocate(1);
-    DataHeatBalance::HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
@@ -8053,8 +8051,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricCurve)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::HeatTransferAlgosUsed.allocate(1);
-    DataHeatBalance::HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
@@ -8755,8 +8752,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
     EXPECT_FALSE(ErrorsFound);
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::HeatTransferAlgosUsed.allocate(1);
-    DataHeatBalance::HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
     SurfaceGeometry::GetSurfaceData(errors); // setup zone geometry and get zone data
@@ -9224,8 +9220,7 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::HeatTransferAlgosUsed.allocate(1);
-    DataHeatBalance::HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
@@ -13270,8 +13265,7 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::HeatTransferAlgosUsed.allocate(1);
-    DataHeatBalance::HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
@@ -15245,14 +15239,14 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
     for (i = 1; i <= 21; ++i) {
         AirflowNetwork::AirflowNetworkNodeSimu(i).TZ = 23.0;
         AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = 0.0008400;
-        if ((i >= 4 && i <= 7)) { 
+        if ((i >= 4 && i <= 7)) {
             AirflowNetwork::AirflowNetworkNodeSimu(i).TZ =
                 DataEnvironment::OutDryBulbTempAt(AirflowNetwork::AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
             AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = DataEnvironment::OutHumRat;
         }
     }
     DataAirLoop::AirLoopAFNInfo.allocate(1);
-    DataAirLoop::AirLoopAFNInfo(1).LoopFanOperationMode = 1;   
+    DataAirLoop::AirLoopAFNInfo(1).LoopFanOperationMode = 1;
     DataAirLoop::AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
     DataAirLoop::AirLoopAFNInfo(1).LoopSystemOnMassFlowrate = 1.23;
     AirflowNetwork::AirflowNetworkLinkageData(17).AirLoopNum = 1;
@@ -15278,6 +15272,153 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
     EXPECT_NEAR(1.23, AirflowNetwork::AirflowNetworkLinkSimu(20).FLOW, 0.0001);
 
     DataAirLoop::AirLoopAFNInfo.deallocate();
+}
+
+
+
+// Missing an AirflowNetwork:Distribution:Node for the Zone Air Node
+TEST_F(EnergyPlusFixture, AFN_CheckMultiZoneNodes_NoZoneNode)
+{
+    DataGlobals::NumOfZones = 1;
+    DataHeatBalance::Zone.allocate(1);
+    DataHeatBalance::Zone(1).Name = "ATTIC ZONE";
+
+    DataSurfaces::Surface.allocate(1);
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF001";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ATTIC ZONE";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF002";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ATTIC ZONE";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+
+    DataSurfaces::SurfaceWindow.allocate(1);
+    DataSurfaces::SurfaceWindow(1).OriginalClass = DataSurfaces::SurfaceClass_Window;
+
+    DataAirSystems::PrimaryAirSystem.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
+    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    DataLoopNode::NumOfNodes = 1;
+    DataLoopNode::Node.allocate(1);
+    DataLoopNode::Node(1).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::NodeID.allocate(1);
+    DataLoopNode::NodeID(1) = "ATTIC ZONE AIR NODE";
+    bool errFlag{false};
+    BranchNodeConnections::RegisterNodeConnection(1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    EXPECT_FALSE(errFlag);
+
+    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
+    DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "ATTIC ZONE";
+    DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum = 1;
+    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;
+    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
+
+    ASSERT_THROW(ValidateDistributionSystem(), std::runtime_error);
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** ValidateDistributionSystem: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   **   ~~~   ** This Node is the zone air node for Zone 'ATTIC ZONE'.",
+        "   ** Severe  ** ValidateDistributionSystem: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=2",
+        "   ..... Last severe error=ValidateDistributionSystem: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+// Can't find an inlet node for a Zone referenced in AirflowNetwork:MultiZone:Zone object
+TEST_F(EnergyPlusFixture, AFN_CheckMultiZoneNodes_NoInletNode)
+{
+    DataGlobals::NumOfZones = 1;
+    DataHeatBalance::Zone.allocate(1);
+    DataHeatBalance::Zone(1).Name = "ATTIC ZONE";
+
+    DataSurfaces::Surface.allocate(1);
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF001";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ATTIC ZONE";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF002";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ATTIC ZONE";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+
+    DataSurfaces::SurfaceWindow.allocate(1);
+    DataSurfaces::SurfaceWindow(1).OriginalClass = DataSurfaces::SurfaceClass_Window;
+
+    DataAirSystems::PrimaryAirSystem.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
+    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    DataLoopNode::NumOfNodes = 1;
+    DataLoopNode::Node.allocate(2);
+    DataLoopNode::Node(1).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::NodeID.allocate(1);
+    DataLoopNode::NodeID(1) = "ATTIC ZONE AIR NODE";
+    bool errFlag{false};
+    BranchNodeConnections::RegisterNodeConnection(1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    EXPECT_FALSE(errFlag);
+
+    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
+    DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "ATTIC ZONE";
+    DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum = 1;
+    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;
+    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
+
+    // One AirflowNetwork:MultiZone:Zone object
+    AirflowNetwork::AirflowNetworkNumOfZones = 1;
+    AirflowNetwork::MultizoneZoneData.allocate(1);
+    AirflowNetwork::MultizoneZoneData(1).ZoneNum = 1;
+    AirflowNetwork::MultizoneZoneData(1).ZoneName = "ATTIC ZONE";
+
+
+    // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
+    AirflowNetwork::AirflowNetworkNumOfNodes = 1;
+    AirflowNetwork::AirflowNetworkNodeData.allocate(1);
+    AirflowNetwork::AirflowNetworkNodeData(1).Name = "ATTIC ZONE";
+    AirflowNetwork::AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+
+    AirflowNetworkBalanceManager::SplitterNodeNumbers.allocate(2);
+    AirflowNetworkBalanceManager::SplitterNodeNumbers(1) = 0;
+    AirflowNetworkBalanceManager::SplitterNodeNumbers(2) = 0;
+
+
+    // MixedAir::NumOAMixers.allocate(1);
+    ValidateDistributionSystem();
+
+    EXPECT_TRUE(compare_err_stream("", true));
 }
 
 } // namespace EnergyPlus
