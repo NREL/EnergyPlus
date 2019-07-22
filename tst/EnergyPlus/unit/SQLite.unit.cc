@@ -482,7 +482,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_DaylightMaping)
     EnergyPlus::sqlite->createZoneExtendedOutput();
     EnergyPlus::sqlite->createSQLiteDaylightMapTitle(1, "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", 1, "RefPt1=(2.50:2.00:0.80)",
                                                      "RefPt2=(2.50:18.00:0.80)", 0.8);
-    EnergyPlus::sqlite->createSQLiteDaylightMap(1, 7, 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue);
+    EnergyPlus::sqlite->createSQLiteDaylightMap(1, 2005, 7, 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue);
 
     auto zones = queryResult("SELECT * FROM Zones;", "Zones");
     auto daylightMaps = queryResult("SELECT * FROM DaylightMaps;", "DaylightMaps");
@@ -501,7 +501,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_DaylightMaping)
     EXPECT_EQ(daylightMap0, daylightMaps[0]);
 
     ASSERT_EQ(1ul, daylightMapHourlyReports.size());
-    std::vector<std::string> daylightMapHourlyReport0{"1", "1", "7", "21", "5"};
+    std::vector<std::string> daylightMapHourlyReport0{"1", "1", "2005", "7", "21", "5"};
     EXPECT_EQ(daylightMapHourlyReport0, daylightMapHourlyReports[0]);
 
     ASSERT_EQ(4ul, daylightMapHourlyData.size());
@@ -520,7 +520,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_DaylightMaping)
     // this should fail due to duplicate primary key
     EnergyPlus::sqlite->createSQLiteDaylightMapTitle(1, "test", "test", 1, "test", "test", 0.8);
     // this should fail due to missing foreign key
-    EnergyPlus::sqlite->createSQLiteDaylightMap(2, 7, 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue);
+    EnergyPlus::sqlite->createSQLiteDaylightMap(2, 2005, 7, 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue);
     daylightMaps = queryResult("SELECT * FROM DaylightMaps;", "DaylightMaps");
     daylightMapHourlyData = queryResult("SELECT * FROM DaylightMapHourlyData;", "DaylightMapHourlyData");
     daylightMapHourlyReports = queryResult("SELECT * FROM DaylightMapHourlyReports;", "DaylightMapHourlyReports");

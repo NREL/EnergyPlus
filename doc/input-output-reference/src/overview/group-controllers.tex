@@ -287,7 +287,7 @@ This input is the ratio of the modified outdoor air flow rate to the maximum out
 
 \paragraph{Field: Control High Indoor Humidity Based on Outdoor Humidity Ratio}\label{field-control-high-indoor-humidity-based-on-outdoor-humidity-ratio}
 
-This choice field determines if high humidity control is activated based on high indoor relative humidity alone or is activated only when the indoor relative humidity is above the humidstat setpoint \emph{and} the indoor humidity ratio is greater than the outdoor humidity ratio. Valid choices are \textbf{Yes} and \textbf{No}. If No is selected, high humidity control is active any time the zone humidistat senses a moisture load. If Yes is selected, the model also verifies that the outdoor humidity ratio is less than the humidistat s zone air humidity ratio. This field is used only when the input field High Humidity Control is specified as Yes. The default value is \textbf{Yes}.
+This choice field determines if high humidity control is activated based on high indoor relative humidity alone or is activated only when the indoor relative humidity is above the humidstat setpoint \emph{and} the indoor humidity ratio is greater than the outdoor humidity ratio. Valid choices are \textbf{Yes} and \textbf{No}. If No is selected, high humidity control is active any time the zone humidistat senses a moisture load. If Yes is selected, the model also verifies that the outdoor humidity ratio is less than the humidistat's zone air humidity ratio. This field is used only when the input field High Humidity Control is specified as Yes. The default value is \textbf{Yes}.
 
 \paragraph{Field: Heat Recovery Bypass Control Type}\label{field-heat-recovery-bypass-control-type}
 
@@ -384,11 +384,11 @@ Reports the operating status of any heating coil in the air loop. If the heating
 
 \paragraph{Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature {[}C{]}}\label{air-system-outdoor-air-heat-recovery-bypass-minimum-outdoor-air-mixed-air-temperature-c}
 
-Reports the outdoor air mixer s mixed air node temperature at minimum outdoor air flow rate when the heat exchanger is disabled (off). This temperature is calculated as the return air temperature multiplied by the return air mass flow rate plus the mixer s inlet node temperature multipled by the minimum outdoor air flow rate. This quantity is then divided by the mixed air mass flow rate. If this temperature is less than the outdoor air mixer s mixed air node set point temperature, and the Heat Recovery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum, the outdoor air flow rate is set to the minimum. This output variable is only available when using Heat Recvoery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum.
+Reports the outdoor air mixer's mixed air node temperature at minimum outdoor air flow rate when the heat exchanger is disabled (off). This temperature is calculated as the return air temperature multiplied by the return air mass flow rate plus the mixer's inlet node temperature multipled by the minimum outdoor air flow rate. This quantity is then divided by the mixed air mass flow rate. If this temperature is less than the outdoor air mixer's mixed air node set point temperature, and the Heat Recovery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum, the outdoor air flow rate is set to the minimum. This output variable is only available when using Heat Recvoery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum.
 
 \paragraph{Air System Outdoor Air High Humidity Control Status {[]}}\label{air-system-outdoor-air-high-humidity-control-status}
 
-Reports the average operating status of the controller s high humidity control over the reporting interval. The high humidity control status is set to 1 when the controller determines that a zone high humidity condition exists \emph{according to the settings specified in the controller}. This variable is set to 0 if conditions disable high humidity control operation or High Humidity Control is specified as No.
+Reports the average operating status of the controller's high humidity control over the reporting interval. The high humidity control status is set to 1 when the controller determines that a zone high humidity condition exists \emph{according to the settings specified in the controller}. This variable is set to 0 if conditions disable high humidity control operation or High Humidity Control is specified as No.
 
 \paragraph{Air System Outdoor Air Flow Fraction {[]}}\label{air-system-outdoor-air-flow-fraction}
 
@@ -438,7 +438,7 @@ The unique user assigned name for an instance of mechanical ventilation. Any oth
 
 \paragraph{Field: AvailabilitySchedule Name}\label{field-availabilityschedule-name}
 
-The name of a schedule whose values are greater than 0 when mechanical ventilation, as calculated by this object, is desired. If the schedule s value is 0.0, then mechanical ventilation is not available and flow will not be requested. If the schedule s value is \textgreater{} 0.0 (usually 1 is used), mechanical ventilation is available. If this field is blank, the schedule has values of 1 for all time periods. This schedule is useful for purging the building of contaminants prior to occupancy (i.e., ventilation rate per unit floor area will be provided even if the occupancy is zero).
+The name of a schedule whose values are greater than 0 when mechanical ventilation, as calculated by this object, is desired. If the schedule's value is 0.0, then mechanical ventilation is not available and flow will not be requested. If the schedule's value is \textgreater{} 0.0 (usually 1 is used), mechanical ventilation is available. If this field is blank, the schedule has values of 1 for all time periods. This schedule is useful for purging the building of contaminants prior to occupancy (i.e., ventilation rate per unit floor area will be provided even if the occupancy is zero).
 
 \paragraph{Field: Demand Controlled Ventilation}\label{field-demand-controlled-ventilation}
 
@@ -525,7 +525,7 @@ Controller:MechanicalVentilation,
 
 This controller object is used exclusively by the stand alone energy recovery ventilator (\hyperref[zonehvacenergyrecoveryventilator]{ZoneHVAC:EnergyRecoveryVentilator}, see Figure~\ref{fig:schematic-of-the-zonehvac}). The purpose of this controller is to simulate economizer operation for the stand alone ERV and provide free cooling whenever possible or modify the outdoor air flow rate during high indoor humidity conditions. During economizer operation, if all of the limits are satisfied, the controller activates economizer mode (fully bypassing the fixed-plate air-to-air heat exchanger or stopping the rotation of a rotary heat exchanger). If any of the selected limits are exceeded, economizer operation is terminated. A time-of-day schedule may also be used to simulate a push-button type economizer controller.
 
-In addition, the outdoor air flow rate may be modified and heat exchange suspended in response to high indoor relative humidities. When the indoor relative humidity exceeds the zone humidistat s relative humidity set point, high humidity control is activated. When activated, if high humidity control is based on the outdoor air humidity ratio and the outdoor humidity ratio is greater than the indoor humidity ratio, high humidity control is terminated.
+In addition, the outdoor air flow rate may be modified and heat exchange suspended in response to high indoor relative humidities. When the indoor relative humidity exceeds the zone humidistat's relative humidity set point, high humidity control is activated. When activated, if high humidity control is based on the outdoor air humidity ratio and the outdoor humidity ratio is greater than the indoor humidity ratio, high humidity control is terminated.
 
 \begin{figure}[hbtp] % fig 143
 \centering
@@ -557,7 +557,7 @@ Input for this field is the outdoor air dewpoint limit ( °C) for economizer ope
 
 \paragraph{Field: Electronic Enthalpy Limit Curve Name}\label{field-electronic-enthalpy-limit-curve-name-1}
 
-Input for this field is the name of a quadratic or cubic curve which provides the maximum outdoor air humidity ratio (function of outdoor air dry-bulb temperature) for economizer operation. If the outdoor air humidity ratio is greater than the curve s maximum humidity ratio (evaluated at the outdoor air dry-bulb temperature), the outdoor air flow rate will be set to the minimum. This limit applies to the conditions at the Actuated Node regardless of whether or not there are any other components on the outdoor air path upstream of the mixer. No input (blank) in this field means that there is no electronic enthalpy limit control.
+Input for this field is the name of a quadratic or cubic curve which provides the maximum outdoor air humidity ratio (function of outdoor air dry-bulb temperature) for economizer operation. If the outdoor air humidity ratio is greater than the curve's maximum humidity ratio (evaluated at the outdoor air dry-bulb temperature), the outdoor air flow rate will be set to the minimum. This limit applies to the conditions at the Actuated Node regardless of whether or not there are any other components on the outdoor air path upstream of the mixer. No input (blank) in this field means that there is no electronic enthalpy limit control.
 
 \paragraph{Field: Exhaust Air Temperature Limit}\label{field-exhaust-air-temperature-limit}
 
@@ -585,7 +585,7 @@ This optional input is the ratio of the modified supply (outdoor) air flow rate 
 
 \paragraph{Field: Control High Indoor Humidity based on Outdoor Humidity Ratio}\label{field-control-high-indoor-humidity-based-on-outdoor-humidity-ratio-1}
 
-This optional choice field determines if high humidity control is activated based on high indoor relative humidity alone or is activated only when the indoor relative humidity is above the humidstat set point \emph{and} the outdoor humidity ratio is less than the indoor humidity ratio. Valid choices are Yes and No. If No is selected, high humidity control is active any time the zone humidistat senses a moisture load. If yes is selected, the model also verifies that the outdoor humidity ratio is less than the humidistat s zone air humidity ratio. This field is used only when the High Humidity Control Flag is specified as Yes. The default value is Yes.
+This optional choice field determines if high humidity control is activated based on high indoor relative humidity alone or is activated only when the indoor relative humidity is above the humidstat set point \emph{and} the outdoor humidity ratio is less than the indoor humidity ratio. Valid choices are Yes and No. If No is selected, high humidity control is active any time the zone humidistat senses a moisture load. If yes is selected, the model also verifies that the outdoor humidity ratio is less than the humidistat's zone air humidity ratio. This field is used only when the High Humidity Control Flag is specified as Yes. The default value is Yes.
 
 Following is an example input for this stand alone ERV controller object:
 
