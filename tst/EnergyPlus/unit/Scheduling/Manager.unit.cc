@@ -66,6 +66,12 @@ TEST_F(SchedulingTestFixture, SchedulingManager_TestGetScheduleIndex)
     EXPECT_EQ(2, Scheduling::GetScheduleIndex("ALWAYS ON")); // must be capitalized
 }
 
+TEST_F(SchedulingTestFixture, SchedulingManager_TestZeroIndexScheduleValue)
+{
+    Scheduling::processAllSchedules();
+    EXPECT_EQ(0.0, Scheduling::GetScheduleValue(0));
+}
+
 TEST_F(SchedulingTestFixture, SchedulingManager_TestGetScheduleValue)
 {
     Scheduling::processAllSchedules();

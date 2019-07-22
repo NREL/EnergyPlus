@@ -55,14 +55,20 @@ namespace EnergyPlus {
 TEST_F(SchedulingTestFixture, ScheduleConstant_TestProcessInput)
 {
     Scheduling::ScheduleConstant::processInput();
-    EXPECT_EQ(3u, Scheduling::scheduleConstants.size());
+    EXPECT_EQ(4u, Scheduling::scheduleConstants.size()); // there's an extra hidden constant schedule to account for here.
 }
 
 TEST_F(SchedulingTestFixture, ScheduleConstant_TestGetScheduleIndex)
 {
     Scheduling::ScheduleConstant::processInput();
-    EXPECT_EQ("ALWAYS OFF", Scheduling::scheduleConstants[0].name); // will be upper case, and lexicographically ordered
-    EXPECT_NEAR(0.0, Scheduling::scheduleConstants[0].getCurrentValue(), 0.0001);
+    EXPECT_EQ("ALWAYS OFF", Scheduling::scheduleConstants[1].name); // will be upper case, and lexicographically ordered
+    EXPECT_NEAR(0.0, Scheduling::scheduleConstants[1].getCurrentValue(), 0.0001);
+}
+
+TEST_F(SchedulingTestFixture, ScheduleConstant_TestZeroethSchedule)
+{
+    Scheduling::ScheduleConstant::processInput();
+    EXPECT_EQ(0.0, Scheduling::scheduleConstants[1].getCurrentValue());
 }
 
 TEST_F(SchedulingTestFixture, ScheduleConstant_TestClearState)

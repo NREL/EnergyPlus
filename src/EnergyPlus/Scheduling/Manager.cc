@@ -100,8 +100,13 @@ void updateAllSchedules() {
 }
 
 void processAllSchedules() {
-    // first off, we'll want to add a dummy item to the zeroth indexToSubtypeMap vector because many components treat zero as invalid schedule index
-    indexToSubtypeMap.emplace_back();
+    // This function will process all schedule related inputs.  Start with type limits, then call each derived type.
+    // ok, so a zero schedule index is a magic value for always returning zero from schedule manager for some reason
+    // To make this work efficiently, we're going to add a simple unnamed constant schedule that always returns zero
+    // It shouldn't be accessible to overriding with EMS or any other voodoo since it will be unnamed, and
+    //  it shouldn't need any type limits since it will just return zero
+    // The only gotcha is that constant schedules need to be processed before all other types so that the zero schedule
+    //  gets the zeroeth index in the mapping vector
 
     // call type limits first so we don't have to check each time we call the type limits factory from each schedule input
     ScheduleTypeData::processInput();
@@ -113,7 +118,6 @@ void processAllSchedules() {
         indexToSubtypeMap.emplace_back(scheduleConstants[subTypeIndex].name, ScheduleType::CONSTANT, subTypeIndex);
     }
 
-    // once complete we can go through and add report variables for all the schedules
 
 
     scheduleInputProcessed = true;

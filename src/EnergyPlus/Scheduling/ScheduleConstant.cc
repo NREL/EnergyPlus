@@ -64,6 +64,15 @@ Real64 ScheduleConstant::getCurrentValue()
 
 void ScheduleConstant::processInput()
 {
+    // We are going to play nice with the schedule manager assumptions, which include that a component model can call
+    // the schedule value functions with an index of zero and always get zero back.  Weird but ok.  To accommodate that,
+    // we agree that the constant schedules must be the first type read in first, and that we will include an unnamed
+    // constant schedule that always returns zero with no type limits or anything.
+    ScheduleConstant c;
+    c.value = 0;
+    c.name = "";
+    scheduleConstants.push_back(c);
+    // Now we'll go through normal processing operations
     std::string const thisObjectType = "Schedule:Constant";
     auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
     if (instances == EnergyPlus::inputProcessor->epJSON.end()) {

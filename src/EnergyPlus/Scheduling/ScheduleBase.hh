@@ -56,12 +56,14 @@ namespace Scheduling {
 
 struct ScheduleBase
 {
+    // members common to all schedules
     std::string name = "";
     Real64 value = 0.0;
-    virtual Real64 getCurrentValue() = 0;
-    static void clear_state();
-    virtual bool valuesInBounds() = 0;
     ScheduleTypeData * typeLimits = nullptr;
+
+    // abstract functions that must be implemented by derived classes
+    virtual Real64 getCurrentValue() = 0;
+    virtual bool valuesInBounds() = 0;
 };
 
 }

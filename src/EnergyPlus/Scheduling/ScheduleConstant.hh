@@ -62,6 +62,7 @@ struct ScheduleConstant : ScheduleBase
 {
     bool emsActuatedOn = false;
     Real64 emsActuatedValue = 0.0;
+    ScheduleConstant() = default;
     ScheduleConstant(std::string const &objectName, nlohmann::json const &fields);
     Real64 getCurrentValue() override;
     static void processInput();

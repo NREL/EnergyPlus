@@ -45,14 +45,37 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus.hh>
-#include <Scheduling/ScheduleBase.hh>
+#ifndef EPLUS6_DATASCHEDULES_HH
+#define EPLUS6_DATASCHEDULES_HH
 
-namespace Scheduling {
+#include <string>
+#include <vector>
 
-void ScheduleBase::clear_state()
-{
-    // nothing for now
-}
+std::vector<std::string> const allValidDayTypes({"Sunday",
+                                                 "Monday",
+                                                 "Tuesday",
+                                                 "Wednesday",
+                                                 "Thursday",
+                                                 "Friday",
+                                                 "Saturday",
+                                                 "Holiday",
+                                                 "SummerDesignDay",
+                                                 "WinterDesignDay",
+                                                 "CustomDay1",
+                                                 "CustomDay2"});
 
-}
+std::vector<std::string> const typeLimitUnitTypes({"Dimensionless",
+                                                   "Temperature",
+                                                   "DeltaTemperature",
+                                                   "PrecipitationRate",
+                                                   "Angle",
+                                                   "ConvectionCoefficient",
+                                                   "ActivityLevel",
+                                                   "Velocity",
+                                                   "Capacity",
+                                                   "Power",
+                                                   "Availability",
+                                                   "Percent",
+                                                   "Control",
+                                                   "Mode"});
+#endif // EPLUS6_DATASCHEDULES_HH

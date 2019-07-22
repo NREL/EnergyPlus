@@ -144,7 +144,6 @@ set( test_src
   ScheduleManager.unit.cc
   Scheduling/SchedulingFixture.hh
   Scheduling/Manager.unit.cc
-  Scheduling/ScheduleBase.unit.cc
   Scheduling/ScheduleConstant.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc

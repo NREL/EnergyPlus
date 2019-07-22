@@ -489,7 +489,6 @@ SET( SRC
   SQLiteProcedures.hh
   ScheduleManager.cc
   ScheduleManager.hh
-  Scheduling/ScheduleBase.cc
   Scheduling/ScheduleBase.hh
   Scheduling/ScheduleConstant.cc
   Scheduling/ScheduleConstant.hh

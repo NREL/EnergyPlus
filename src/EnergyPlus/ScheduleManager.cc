@@ -156,8 +156,8 @@ namespace ScheduleManager {
 
     // Logical Variables for Module
     bool ScheduleInputProcessed(false); // This is false until the Schedule Input has been processed.
-    bool ScheduleDSTSFileWarningIssued(false);
-    bool ScheduleFileShadingProcessed(false);
+    bool ScheduleDSTSFileWarningIssued(false); // TODO: SCHEDULE REFACTOR
+    bool ScheduleFileShadingProcessed(false); // TODO: SCHEDULE REFACTOR
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
