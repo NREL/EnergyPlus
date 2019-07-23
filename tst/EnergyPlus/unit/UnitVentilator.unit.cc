@@ -53,6 +53,8 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <UnitVentilator.hh>
 #include <DataEnvironment.hh>
+#include <DataLoopNode.hh>
+#include <DataHVACGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -65,8 +67,27 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     Real64 Toutdoor;
     Real64 OAMassFlowRate;
     Real64 ExpectedOAMassFlowRate;
+    Real64 UnitVentNum;
     
+    DataLoopNode::clear_state();
+    UnitVentilator::clear_state();
+    
+    DataLoopNode::Node.allocate(4);
+    UnitVentilator::UnitVent.allocate(1);
+    
+    UnitVentilator::UnitVent(1).ATMixerExists = false;
+    UnitVentilator::UnitVent(1).ATMixerType = DataHVACGlobals::ATMixer_InletSide;
+    UnitVentilator::UnitVent(1).FanOutletNode = 1;
+    UnitVentilator::UnitVent(1).OAMixerOutNode = 2;
+    UnitVentilator::UnitVent(1).ATMixerOutNode = 3;
+    UnitVentilator::UnitVent(1).AirInNode = 4;
+    DataLoopNode::Node(1).Enthalpy = 0.0;
+    DataLoopNode::Node(2).Enthalpy = 0.0;
+    DataLoopNode::Node(3).Enthalpy = 0.0;
+    DataLoopNode::Node(4).Enthalpy = 0.0;
+
     // Test 1: Tinlet <= Toutdoor
+    UnitVentNum = 1;
     Tinlet = 20.0;
     Toutdoor = 23.0;
     MinOA = 0.1;
@@ -75,7 +96,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     UnitVentilator::QZnReq = 2345.6;
     DataEnvironment::OutHumRat = 0.008;
     
-    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
+    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(UnitVentNum,MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
     ExpectedOAMassFlowRate = 0.1234;
     
     EXPECT_NEAR(ExpectedOAMassFlowRate,OAMassFlowRate, 0.0001);
@@ -89,7 +110,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     UnitVentilator::QZnReq = 1.5678;
     DataEnvironment::OutHumRat = 0.008;
     
-    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
+    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(UnitVentNum,MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
     ExpectedOAMassFlowRate = 0.1234;
     
     EXPECT_NEAR(ExpectedOAMassFlowRate,OAMassFlowRate, 0.0001);
@@ -103,7 +124,7 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     UnitVentilator::QZnReq = 4567.89;
     DataEnvironment::OutHumRat = 0.010;
     
-    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
+    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(UnitVentNum,MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
     ExpectedOAMassFlowRate = 1.1106;
     
     EXPECT_NEAR(ExpectedOAMassFlowRate,OAMassFlowRate, 0.0001);
@@ -117,11 +138,69 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     UnitVentilator::QZnReq = 15678.9;
     DataEnvironment::OutHumRat = 0.010;
     
-    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
+    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(UnitVentNum,MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
     ExpectedOAMassFlowRate = 1.02133;
     
     EXPECT_NEAR(ExpectedOAMassFlowRate,OAMassFlowRate, 0.0001);
+
+    // Test 5: Toutdoor < Tinlet, OA between OAMin and OAMax, with fan heat, no AT mixer
+    Tinlet = 23.0;
+    Toutdoor = 8.0;
+    MinOA = 0.1;
+    MaxOA = 0.9;
+    MassFlowRate = 1.234;
+    UnitVentilator::QZnReq = 15678.9-12.34;
+    DataEnvironment::OutHumRat = 0.010;
+    DataLoopNode::Node(1).Enthalpy = 11.0;
+    DataLoopNode::Node(2).Enthalpy = 1.0;
+    DataLoopNode::Node(3).Enthalpy = 0.0;
+    DataLoopNode::Node(4).Enthalpy = 0.0;
     
+    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(UnitVentNum,MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
+    ExpectedOAMassFlowRate = 1.02133;
+    
+    EXPECT_NEAR(ExpectedOAMassFlowRate,OAMassFlowRate, 0.0001);
+
+    // Test 6: Toutdoor < Tinlet, OA between OAMin and OAMax, with fan heat, with AT mixer inlet side
+    Tinlet = 23.0;
+    Toutdoor = 8.0;
+    MinOA = 0.1;
+    MaxOA = 0.9;
+    MassFlowRate = 1.234;
+    UnitVentilator::QZnReq = 15678.9-12.34;
+    DataEnvironment::OutHumRat = 0.010;
+    DataLoopNode::Node(1).Enthalpy = 11.0;
+    DataLoopNode::Node(2).Enthalpy = 0.0;
+    DataLoopNode::Node(3).Enthalpy = 1.0;
+    DataLoopNode::Node(4).Enthalpy = 0.0;
+    UnitVentilator::UnitVent(1).ATMixerExists = true;
+    UnitVentilator::UnitVent(1).ATMixerType = DataHVACGlobals::ATMixer_InletSide;
+    
+    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(UnitVentNum,MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
+    ExpectedOAMassFlowRate = 1.02133;
+    
+    EXPECT_NEAR(ExpectedOAMassFlowRate,OAMassFlowRate, 0.0001);
+
+    // Test 7: Toutdoor < Tinlet, OA between OAMin and OAMax, with fan heat, with AT mixer inlet side
+    Tinlet = 23.0;
+    Toutdoor = 8.0;
+    MinOA = 0.1;
+    MaxOA = 0.9;
+    MassFlowRate = 1.234;
+    UnitVentilator::QZnReq = 15678.9-12.34;
+    DataEnvironment::OutHumRat = 0.010;
+    DataLoopNode::Node(1).Enthalpy = 11.0;
+    DataLoopNode::Node(2).Enthalpy = 0.0;
+    DataLoopNode::Node(3).Enthalpy = 0.0;
+    DataLoopNode::Node(4).Enthalpy = 1.0;
+    UnitVentilator::UnitVent(1).ATMixerExists = true;
+    UnitVentilator::UnitVent(1).ATMixerType = DataHVACGlobals::ATMixer_SupplySide;
+    
+    OAMassFlowRate = UnitVentilator::SetOAMassFlowRateForCoolingVariablePercent(UnitVentNum,MinOA,MassFlowRate,MaxOA,Tinlet,Toutdoor);
+    ExpectedOAMassFlowRate = 1.02133;
+    
+    EXPECT_NEAR(ExpectedOAMassFlowRate,OAMassFlowRate, 0.0001);
+
 }
 
 } // namespace EnergyPlus

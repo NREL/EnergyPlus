@@ -309,7 +309,8 @@ namespace UnitVentilator {
                                       Array1<Real64> const &Par   // Function parameters
     );
     
-    Real64 SetOAMassFlowRateForCoolingVariablePercent(Real64 const MinOAFrac,       // Minimum Outside Air Fraction
+    Real64 SetOAMassFlowRateForCoolingVariablePercent(int const UnitVentNum,        // Unit Ventilator index number
+                                                      Real64 const MinOAFrac,       // Minimum Outside Air Fraction
                                                       Real64 const MassFlowRate,    // Design Outside Air Mass Flow Rate
                                                       Real64 const MaxOAFrac,       // Maximum Outside Air Fraction
                                                       Real64 const Tinlet,          // Inlet Temperature to Unit or Zone Temperature
