@@ -4818,7 +4818,7 @@ namespace OutputReportTabular {
         // the output variables and data structures shown.
 
         // Using/Aliasing
-        using Boilers::BoilerReport;
+        using Boilers::Boiler;
         using Boilers::NumBoilers;
         using ChillerElectricEIR::ElectricEIRChiller;
         using ChillerElectricEIR::ElectricEIRChillerReport;
@@ -4848,8 +4848,7 @@ namespace OutputReportTabular {
         using EvaporativeCoolers::NumEvapCool;
         using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
         using EvaporativeFluidCoolers::SimpleEvapFluidCoolerReport;
-        using FluidCoolers::NumSimpleFluidCoolers;
-        using FluidCoolers::SimpleFluidCoolerReport;
+        using FluidCoolers::SimpleFluidCooler;
         using HeatingCoils::HeatingCoil;
         using HeatingCoils::NumHeatingCoils;
         using HVACVariableRefrigerantFlow::NumVRFCond;
@@ -4910,7 +4909,7 @@ namespace OutputReportTabular {
         }
         BuildingPreDefRep.emiHVACRelief += SysTotalHVACReliefHeatLoss * convertJtoGJ;
 
-        // Consendor water loop
+        // Condenser water loop
         for (iCooler = 1; iCooler <= NumSimpleTowers; ++iCooler) {
             SysTotalHVACRejectHeatLoss += SimpleTowerReport(iCooler).Qactual * TimeStepSysSec + SimpleTowerReport(iCooler).FanEnergy +
                                           SimpleTowerReport(iCooler).BasinHeaterConsumption;
@@ -4919,8 +4918,8 @@ namespace OutputReportTabular {
             SysTotalHVACRejectHeatLoss +=
                 SimpleEvapFluidCoolerReport(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCoolerReport(iCooler).FanEnergy;
         }
-        for (iCooler = 1; iCooler <= NumSimpleFluidCoolers; ++iCooler) {
-            SysTotalHVACRejectHeatLoss += SimpleFluidCoolerReport(iCooler).Qactual * TimeStepSysSec + SimpleFluidCoolerReport(iCooler).FanEnergy;
+        for (auto & cooler : SimpleFluidCooler) {
+            SysTotalHVACRejectHeatLoss += cooler.Qactual * TimeStepSysSec + cooler.FanEnergy;
         }
 
         // Air- and Evap-cooled chiller
@@ -4958,7 +4957,7 @@ namespace OutputReportTabular {
         // Water / steam boiler
         for (iBoiler = 1; iBoiler <= NumBoilers; ++iBoiler) {
             SysTotalHVACRejectHeatLoss +=
-                BoilerReport(iBoiler).FuelConsumed + BoilerReport(iBoiler).ParasiticElecConsumption - BoilerReport(iBoiler).BoilerEnergy;
+                Boiler(iBoiler).FuelConsumed + Boiler(iBoiler).ParasiticElecConsumption - Boiler(iBoiler).BoilerEnergy;
         }
 
         // DX Coils air to air
