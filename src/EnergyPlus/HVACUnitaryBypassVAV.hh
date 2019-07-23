@@ -79,7 +79,8 @@ namespace HVACUnitaryBypassVAV {
     // Priority control mode (prioritized thermostat signal)
     extern int const CoolingPriority; // Controls CBVAV system based on cooling priority
     extern int const HeatingPriority; // Controls CBVAV system based on heating priority
-    extern int const ZonePriority;    // Controls CBVAV system based on zone priority
+    extern int const ZonePriority;    // Controls CBVAV system based on number of zones priority
+    extern int const LoadPriority;    // Controls CBVAV system based on total load priority
 
     // Airflow control for contant fan mode
     extern int const UseCompressorOnFlow;  // Set compressor OFF air flow rate equal to compressor ON air flow rate
@@ -208,7 +209,7 @@ namespace HVACUnitaryBypassVAV {
         Array1D_int CBVAVBoxOutletNode;          // Outlet node of CBVAV Box in controlled zone
         Array1D_int ZoneSequenceCoolingNum;      // Index to cooling sequence/priority for this zone
         Array1D_int ZoneSequenceHeatingNum;      // Index to heating sequence/priority for this zone
-        int PriorityControl;                     // Control mode - CoolingPriority, HeatingPriority, or ZonePriority
+        int PriorityControl;                     // Control mode - CoolingPriority, HeatingPriority, ZonePriority or LoadPriority
         int NumZonesCooled;                      // Number of zones requesting cooling
         int NumZonesHeated;                      // Number of zones requesting heating
         int PLRMaxIter;                          // Counter for recurring warning message

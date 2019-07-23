@@ -176,7 +176,8 @@ namespace HVACUnitaryBypassVAV {
     // Priority control mode (prioritized thermostat signal)
     int const CoolingPriority(1); // Controls CBVAV system based on cooling priority
     int const HeatingPriority(2); // Controls CBVAV system based on heating priority
-    int const ZonePriority(3);    // Controls CBVAV system based on zone priority
+    int const ZonePriority(3);    // Controls CBVAV system based on number of zones priority
+    int const LoadPriority(4);    // Controls CBVAV system based on total load priority
 
     // Airflow control for contant fan mode
     int const UseCompressorOnFlow(1);  // Set compressor OFF air flow rate equal to compressor ON air flow rate
@@ -1127,10 +1128,12 @@ namespace HVACUnitaryBypassVAV {
                 CBVAV(CBVAVNum).PriorityControl = HeatingPriority;
             } else if (UtilityRoutines::SameString(Alphas(18), "ZonePriority")) {
                 CBVAV(CBVAVNum).PriorityControl = ZonePriority;
+            } else if ( UtilityRoutines::SameString(Alphas(18), "LoadPriority") ) {
+                CBVAV(CBVAVNum).PriorityControl = LoadPriority;
             } else {
                 ShowSevereError(CurrentModuleObject + " illegal " + cAlphaFields(18) + " = " + Alphas(18));
                 ShowContinueError("Occurs in " + CurrentModuleObject + " = " + CBVAV(CBVAVNum).Name);
-                ShowContinueError("Valid choices are CoolingPriority, HeatingPriority, or ZonePriority.");
+                ShowContinueError("Valid choices are CoolingPriority, HeatingPriority, ZonePriority or LoadPriority.");
                 ErrorsFound = true;
             }
 
@@ -3586,6 +3589,30 @@ namespace HVACUnitaryBypassVAV {
                         CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
                     } else if (std::abs(QZoneReqCool) == std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
                         CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                    }
+                }
+            } else if (SELECT_CASE_var == LoadPriority) {
+                if (std::abs(QZoneReqCool) > std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                } else if (std::abs(QZoneReqCool) < std::abs(QZoneReqHeat) && QZoneReqHeat != 0.0) {
+                    CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                } else if (CBVAV(CBVAVNum).NumZonesHeated > CBVAV(CBVAVNum).NumZonesCooled) {
+                    if (QZoneReqHeat > 0.0) {
+                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                    } else if (QZoneReqCool < 0.0) {
+                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                    }
+                } else if (CBVAV(CBVAVNum).NumZonesHeated < CBVAV(CBVAVNum).NumZonesCooled) {
+                    if (QZoneReqCool < 0.0) {
+                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                    } else if (QZoneReqHeat > 0.0) {
+                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                    }
+                } else {
+                    if (QZoneReqCool < 0.0) {
+                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                    } else {
+                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
                     }
                 }
             }
