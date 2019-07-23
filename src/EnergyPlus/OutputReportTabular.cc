@@ -117,6 +117,7 @@
 #include <RefrigeratedCase.hh>
 #include <ReportCoilSelection.hh>
 #include <ResultsSchema.hh>
+#include <Scheduling/Manager.hh>
 #include <SQLiteProcedures.hh>
 #include <ScheduleManager.hh>
 #include <ThermalComfort.hh>
@@ -6902,7 +6903,7 @@ namespace OutputReportTabular {
         // LEED schedule sub table
         for (long iSch = 1; iSch <= ScheduleManager::NumSchedules; ++iSch) {
             std::string curSchName = ScheduleManager::Schedule(iSch).Name;
-            std::string curSchType = ScheduleManager::GetScheduleType(iSch);
+            std::string curSchType = Scheduling::scheduleType(iSch);
             if (UtilityRoutines::SameString(curSchType, "FRACTION")) {
                 PreDefTableEntry(
                     pdchLeedEflhEflh, curSchName, ScheduleManager::ScheduleAnnualFullLoadHours(iSch, StartOfWeek, CurrentYearIsLeapYear), 0);

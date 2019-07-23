@@ -204,8 +204,6 @@ namespace ScheduleManager {
 
     int GetScheduleIndex(std::string const &ScheduleName);
 
-    std::string GetScheduleType(int ScheduleIndex);
-
     int GetDayScheduleIndex(std::string &ScheduleName);
 
     void
