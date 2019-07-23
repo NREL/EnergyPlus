@@ -51,12 +51,20 @@ elseif(WIN32)
   set(CPACK_BINARY_IFW    ON CACHE BOOL "Enable to build IFW package, which is the recommend method")
   set(CPACK_BINARY_ZIP    ON CACHE BOOL "Enable to build a ZIP package, recommended for an official release")
 
-  # We want to force update the cache to avoid user suddenly getting build errors
-  set(CPACK_BINARY_NSIS    OFF CACHE BOOL "This was the legacy method on Windows, superseeded by IFW" FORCE)
-
+  set(CPACK_BINARY_NSIS  OFF CACHE BOOL "This was the legacy method on Windows, superseeded by IFW")
   set(CPACK_BINARY_7Z    OFF CACHE BOOL "Recommended OFF")
   set(CPACK_BINARY_NUGET OFF CACHE BOOL "Recommended OFF")
   set(CPACK_BINARY_WIX   OFF CACHE BOOL "Recommended OFF")
+
+
+  # TODO: the "FORCE" is temporary to avoid people having an existing build directory build IFW, remove after next release
+  # We want to force update the cache to avoid user suddenly getting build errors
+  if(CPACK_BINARY_NSIS)
+    set(CPACK_BINARY_NSIS  OFF CACHE BOOL "This was the legacy method on Windows, superseeded by IFW" FORCE)
+    set(CPACK_BINARY_IFW    ON CACHE BOOL "Enable to build IFW package, which is the recommend method" FORCE)
+    message("Switching from NSIS to IFW as the supported generator has changed on Windows")
+  endif()
+
 endif()
 
 
