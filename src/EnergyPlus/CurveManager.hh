@@ -278,6 +278,7 @@ namespace CurveManager {
         double getGridValue(int gridIndex, int outputIndex, const std::vector<double> target);
         std::map<std::string, const json&> independentVarRefs;
         std::map<std::string, TableFile> tableFiles;
+        void clear();
     private:
         std::map<std::string, std::size_t> gridMap;
         std::vector<Btwxt::RegularGridInterpolator> grids;

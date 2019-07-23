@@ -6179,12 +6179,6 @@ namespace AirflowNetworkBalanceManager {
         CurveManager::PerfCurve(CurveNum).Var1Max = 360.0;
         CurveManager::PerfCurve(CurveNum).Var1MaxPresent = true;
 
-        CurveManager::PerfCurve(CurveNum).CurveMin = -1.0;
-        CurveManager::PerfCurve(CurveNum).CurveMinPresent = true;
-
-        CurveManager::PerfCurve(CurveNum).CurveMax = 1.0;
-        CurveManager::PerfCurve(CurveNum).CurveMaxPresent = true;
-
         CurveManager::PerfCurve(CurveNum).TableIndex = gridIndex;
         CurveManager::PerfCurve(CurveNum).GridValueIndex = CurveManager::btwxtManager.addOutputValues(gridIndex, y);
 
@@ -6352,7 +6346,7 @@ namespace AirflowNetworkBalanceManager {
 
         std::vector<Real64> dirs30 = {0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360};
         std::vector<Btwxt::GridAxis> dirs30Axes;
-        dirs30Axes.emplace_back(dirs30, Btwxt::Method::CUBIC, Btwxt::Method::CUBIC, std::pair<double, double> {0.0, 360.0});
+        dirs30Axes.emplace_back(dirs30, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double> {0.0, 360.0});
 
         auto dirs30GridIndex = CurveManager::btwxtManager.addGrid("30 Degree Increments", Btwxt::GriddedData(dirs30Axes));
 
@@ -6498,7 +6492,7 @@ namespace AirflowNetworkBalanceManager {
                                           190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360};
 
             std::vector<Btwxt::GridAxis> dirs10Axes;
-            dirs10Axes.emplace_back(dirs10, Btwxt::Method::CUBIC, Btwxt::Method::CUBIC, std::pair<double, double> {0.0, 360.0});
+            dirs10Axes.emplace_back(dirs10, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double> {0.0, 360.0});
 
             auto dirs10GridIndex = CurveManager::btwxtManager.addGrid("10 Degree Increments", Btwxt::GriddedData(dirs10Axes));
 

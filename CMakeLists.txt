@@ -175,10 +175,6 @@ endif()
 # E+ required libraries
 ADD_SUBDIRECTORY(idd)
 
-set(BUILD_BTWXT_TESTING ${BUILD_TESTING} CACHE BOOL "" FORCE)
-ADD_SUBDIRECTORY(third_party/btwxt)
-INCLUDE_DIRECTORIES( ${gtest_SOURCE_DIR}/include/ SYSTEM )
-
 ADD_SUBDIRECTORY(third_party/SQLite)
 ADD_SUBDIRECTORY(third_party/ObjexxFCL)
 ADD_SUBDIRECTORY(third_party/BCVTB)
@@ -193,9 +189,11 @@ IF( NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
 ENDIF()
 ADD_SUBDIRECTORY(third_party/Windows-CalcEngine)
-if( BUILD_TESTING )
-  ADD_SUBDIRECTORY(third_party/gtest)
-endif()
+
+# Btwxt
+INCLUDE_DIRECTORIES( ${gtest_SOURCE_DIR}/include/ SYSTEM )
+set(BUILD_BTWXT_TESTING ${BUILD_TESTING} CACHE BOOL "" FORCE)
+ADD_SUBDIRECTORY(third_party/btwxt)
 
 # Kiva
 INCLUDE(third_party/cmake/kiva.cmake)

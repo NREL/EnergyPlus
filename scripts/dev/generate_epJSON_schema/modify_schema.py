@@ -83,9 +83,6 @@ extension_renaming = {
     'Table:IndependentVariable': 'values',
     'Table:IndependentVariableList': 'independent_variables',
     'Table:Lookup': 'values',
-    'Table:MultiVariableLookup': 'values',
-    'Table:OneIndependentVariable': 'values',
-    'Table:TwoIndependentVariables': 'values',
     'Matrix:TwoDimension': 'values',
     'WindowMaterial:GlazingGroup:Thermochromic': 'temperature_data',
     'Schedule:Compact': 'data',
@@ -269,7 +266,7 @@ def change_89_release_issues(schema):
         'Curve:Linear', 'Curve:Quadratic', 'Curve:Cubic', 'Curve:Quartic', 'Curve:Exponent',
         'Curve:Bicubic', 'Curve:Biquadratic', 'Curve:QuadraticLinear', 'Curve:CubicLinear', 'Curve:Triquadratic',
         'Curve:ExponentialSkewNormal', 'Curve:Sigmoid', 'Curve:RectangularHyperbola1', 'Curve:RectangularHyperbola2', 'Curve:ExponentialDecay',
-        'Curve:DoubleExponentialDecay', 'Curve:ChillerPartLoadWithLift', 'Table:OneIndependentVariable', 'Table:TwoIndependentVariables', 'Table:MultiVariableLookup'
+        'Curve:DoubleExponentialDecay', 'Curve:ChillerPartLoadWithLift', 'Table:Lookup'
     ]
     for curve in curves:
         get_schema_object(schema, curve)['properties']['output_unit_type']['enum'] = [

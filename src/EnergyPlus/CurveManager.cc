@@ -91,13 +91,7 @@ namespace CurveManager {
     //                      August 2010, Richard Raustad, FSEC, added Table:* objects
     //                      August 2014, Rick Strand, added a curve type (cubic-linear)
     //                      Future Improvements:
-    //                       1) Merge TableData and TableLookup arrays. Care is needed here since the
-    //                          Table:OneIndependentVariable (and Two) use different data patterns.
-    //                          For Table:One - a one-to-one correspondence between X and Z
-    //                          For Table:Multi - not a one-to-one correspondence between X and Z
-    //                          Code does show examples of the translation so each Table object can use
-    //                          either interpolation technique.
-    //                       2) Subroutine PerformanceTableObject is not really needed (and is probably slower)
+    //                          Subroutine PerformanceTableObject is not really needed (and is probably slower)
     //                          since Subroutine TableLookupObject can do the same thing. The difference
     //                          is that Sub PerformanceTableObject does a linear interpolation without extrapolation.
     //                          More math is also involved. Sub TableLookupObject can also do this if a) the limits
@@ -216,6 +210,7 @@ namespace CurveManager {
         GetCurvesInputFlag = true;
         UniqueCurveNames.clear();
         PerfCurve.deallocate();
+        btwxtManager.clear();
     }
 
     void ResetPerformanceCurveOutput()
@@ -403,9 +398,7 @@ namespace CurveManager {
         int NumBicubic;                  // Number of bicubic curve objects in the input data file
         int NumTriQuad;                  // Number of triquadratic curve objects in the input file
         int NumExponent;                 // Number of exponent curve objects in the input file
-        int NumOneVarTab;                // Number of one variable table objects in the input file
         int NumWPCValTab;                // Number of wind pressure coefficient value table objects in the input file
-        int NumTwoVarTab;                // Number of two variable table objects in the input file
         int NumChillerPartLoadWithLift;  // Number of ChillerPartLoadWithLift curve objects in the input data file
         int NumMultVarLookup;            // Number of multivariable tables
         int NumFanPressRise;             // cpw22Aug2010 Number of fan pressure rise curve objects in the input file
@@ -441,7 +434,6 @@ namespace CurveManager {
         NumBicubic = inputProcessor->getNumObjectsFound("Curve:Bicubic");
         NumTriQuad = inputProcessor->getNumObjectsFound("Curve:Triquadratic");
         NumExponent = inputProcessor->getNumObjectsFound("Curve:Exponent");
-        NumMultVarLookup = inputProcessor->getNumObjectsFound("Table:MultiVariableLookup");
         int NumTableLookup = inputProcessor->getNumObjectsFound("Table:Lookup");
         NumFanPressRise = inputProcessor->getNumObjectsFound("Curve:FanPressureRise");                    // cpw22Aug2010
         NumExpSkewNorm = inputProcessor->getNumObjectsFound("Curve:ExponentialSkewNormal");               // cpw22Aug2010
@@ -452,12 +444,10 @@ namespace CurveManager {
         NumDoubleExpDecay = inputProcessor->getNumObjectsFound("Curve:DoubleExponentialDecay");           // ykt July 2011
         NumChillerPartLoadWithLift = inputProcessor->getNumObjectsFound("Curve:ChillerPartLoadWithLift"); // zrp_Aug2014
 
-        NumOneVarTab = inputProcessor->getNumObjectsFound("Table:OneIndependentVariable");
         NumWPCValTab = inputProcessor->getNumObjectsFound("AirflowNetwork:MultiZone:WindPressureCoefficientValues");
-        NumTwoVarTab = inputProcessor->getNumObjectsFound("Table:TwoIndependentVariables");
 
         NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
-                    NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumTableLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
+                    NumTableLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
                     NumExpDecay + NumDoubleExpDecay + NumQLinear + NumChillerPartLoadWithLift + NumWPCValTab;
 
         // allocate the data structure
@@ -1786,7 +1776,7 @@ namespace CurveManager {
                         lookupValues.push_back(Numbers(1));
 
                         std::vector<Btwxt::GridAxis> gridAxes;
-                        gridAxes.emplace_back(axis, Btwxt::Method::CUBIC, Btwxt::Method::CUBIC, std::pair<double, double> {0.0, 360.0});
+                        gridAxes.emplace_back(axis, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double> {0.0, 360.0});
 
                         auto gridIndex = btwxtManager.addGrid(Alphas(1), Btwxt::GriddedData(gridAxes));
                         PerfCurve(CurveNum).TableIndex = gridIndex;
@@ -2127,6 +2117,13 @@ namespace CurveManager {
 
     void BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target) {
         grids[gridIndex].normalize_values_at_target(outputIndex, target);
+    }
+
+    void BtwxtManager::clear() {
+        grids.clear();
+        gridMap.clear();
+        independentVarRefs.clear();
+        tableFiles.clear();
     }
 
     TableFile::TableFile(std::string path) {
