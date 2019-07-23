@@ -233,7 +233,6 @@ namespace WaterManager {
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
         using General::RoundSigDigits;
-        using ScheduleManager::CheckScheduleValue;
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
         using ScheduleManager::GetScheduleMaxValue;

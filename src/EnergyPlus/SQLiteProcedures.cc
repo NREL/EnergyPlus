@@ -59,7 +59,7 @@
 #include "DataSystemVariables.hh"
 #include "General.hh"
 #include "InputProcessing/InputProcessor.hh"
-#include "ScheduleManager.hh"
+#include "Scheduling/Manager.hh"
 #include "UtilityRoutines.hh"
 
 #include <sstream>
@@ -133,13 +133,13 @@ void CreateSQLiteZoneExtendedOutput()
         for (int groupNum = 1; groupNum <= DataHeatBalance::NumOfZoneGroups; ++groupNum) {
             sqlite->addZoneGroupData(groupNum, DataHeatBalance::ZoneGroup(groupNum));
         }
-        for (int scheduleNumber = 1, numberOfSchedules = ScheduleManager::GetNumberOfSchedules(); scheduleNumber <= numberOfSchedules;
+        for (int scheduleNumber = 1, numberOfSchedules = Scheduling::numSchedules(); scheduleNumber <= numberOfSchedules;
              ++scheduleNumber) {
             sqlite->addScheduleData(scheduleNumber,
-                                    ScheduleManager::GetScheduleName(scheduleNumber),
-                                    ScheduleManager::GetScheduleType(scheduleNumber),
-                                    ScheduleManager::GetScheduleMinValue(scheduleNumber),
-                                    ScheduleManager::GetScheduleMaxValue(scheduleNumber));
+                                    Scheduling::scheduleName(scheduleNumber),
+                                    Scheduling::scheduleType(scheduleNumber),
+                                    Scheduling::scheduleMinValue(scheduleNumber),
+                                    Scheduling::scheduleMaxValue(scheduleNumber));
         }
         for (int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber) {
             auto const &surface = DataSurfaces::Surface(surfaceNumber);

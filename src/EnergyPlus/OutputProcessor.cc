@@ -81,6 +81,7 @@
 #include <ResultsSchema.hh>
 #include <SQLiteProcedures.hh>
 #include <ScheduleManager.hh>
+#include <Scheduling/Manager.hh>
 #include <SortAndStringUtilities.hh>
 #include <UtilityRoutines.hh>
 #include <milo/dtoa.h>
@@ -8206,7 +8207,6 @@ void GetVariableKeyCountandType(std::string const &varName,            // Standa
     using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
     using ScheduleManager::GetScheduleIndex;
-    using ScheduleManager::GetScheduleType;
     using SortAndStringUtilities::SetupAndSort;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -8348,7 +8348,7 @@ void GetVariableKeyCountandType(std::string const &varName,            // Standa
             Found = true;
             numKeys = 1;
             varType = VarType_Schedule;
-            varUnits = unitStringToEnum(GetScheduleType(keyVarIndexes(1)));
+            varUnits = unitStringToEnum(Scheduling::scheduleType(keyVarIndexes(1)));
             varAvgSum = StoreType::Averaged;
             varStepType = ZoneVar;
         }

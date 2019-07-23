@@ -53,12 +53,14 @@ namespace Scheduling {
 std::vector<IndexBasedScheduleData> indexToSubtypeMap;
 bool scheduleInputProcessed = false;
 
-void clear_state() {
+void clear_state()
+{
     scheduleInputProcessed = false;
     indexToSubtypeMap.clear();
 }
 
-int GetScheduleIndex(const std::string& scheduleName) {
+int GetScheduleIndex(const std::string &scheduleName)
+{
     // check if input has been processed yet for schedules, if not then call it now
     if (!scheduleInputProcessed) {
         processAllSchedules();
@@ -69,16 +71,17 @@ int GetScheduleIndex(const std::string& scheduleName) {
             return mappingIndex;
         }
     }
-    return -1;  // should this be zero?  Fatal error?
+    return -1; // should this be zero?  Fatal error?
 }
 
-ScheduleBase *getScheduleReference(const std::string& scheduleName) {
+ScheduleBase *getScheduleReference(const std::string &scheduleName)
+{
     // check if input has been processed yet for schedules, if not then call it now
     if (!scheduleInputProcessed) {
         processAllSchedules();
     }
     // then just look through each of the types and return a direct reference
-    for (auto const & mapping : indexToSubtypeMap) {
+    for (auto const &mapping : indexToSubtypeMap) {
         if (mapping.name == scheduleName) {
             switch (mapping.thisType) {
             case ScheduleType::CONSTANT:
@@ -93,13 +96,15 @@ ScheduleBase *getScheduleReference(const std::string& scheduleName) {
     return nullptr;
 }
 
-void updateAllSchedules() {
-    for (auto & thisSchedule : scheduleConstants) {
+void updateAllSchedules()
+{
+    for (auto &thisSchedule : scheduleConstants) {
         thisSchedule.updateValue();
     }
 }
 
-void processAllSchedules() {
+void processAllSchedules()
+{
     // This function will process all schedule related inputs.  Start with type limits, then call each derived type.
     // ok, so a zero schedule index is a magic value for always returning zero from schedule manager for some reason
     // To make this work efficiently, we're going to add a simple unnamed constant schedule that always returns zero
@@ -118,14 +123,13 @@ void processAllSchedules() {
         indexToSubtypeMap.emplace_back(scheduleConstants[subTypeIndex].name, ScheduleType::CONSTANT, subTypeIndex);
     }
 
-
-
     scheduleInputProcessed = true;
 }
 
-Real64 GetScheduleValue(int scheduleIndex) {
+Real64 GetScheduleValue(int scheduleIndex)
+{
     // the scheduleIndex is actually the index into the map vector, so get that mapping item
-    auto const & mapping(indexToSubtypeMap[scheduleIndex]);
+    auto const &mapping(indexToSubtypeMap[scheduleIndex]);
     switch (mapping.thisType) {
     case ScheduleType::CONSTANT:
         return scheduleConstants[mapping.indexInTypeArray].getCurrentValue();
@@ -133,6 +137,39 @@ Real64 GetScheduleValue(int scheduleIndex) {
         return -1;
     }
     return -1;
+}
+
+int numSchedules()
+{
+    return indexToSubtypeMap.size() - 1; // don't report the zeroeth item
+}
+
+std::string scheduleName(int const scheduleIndex) {
+    auto const &mapping(indexToSubtypeMap[scheduleIndex]);
+    switch (mapping.thisType) {
+    case ScheduleType::CONSTANT:
+        return scheduleConstants[mapping.indexInTypeArray].name;
+    case ScheduleType::UNKNOWN:
+        return "";
+    }
+}
+
+std::string scheduleType(int const scheduleIndex) {
+    auto const &mapping(indexToSubtypeMap[scheduleIndex]);
+    switch (mapping.thisType) {
+    case ScheduleType::CONSTANT:
+        return "Schedule:Constant";
+    case ScheduleType::UNKNOWN:
+        return "";
+    }
+}
+
+Real64 scheduleMinValue(int const scheduleIndex) {
+    return -999;
+}
+
+Real64 scheduleMaxValue(int const scheduleIndex) {
+    return 999;
 }
 
 }

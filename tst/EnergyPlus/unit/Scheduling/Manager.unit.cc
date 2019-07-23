@@ -80,10 +80,16 @@ TEST_F(SchedulingTestFixture, SchedulingManager_TestGetScheduleValue)
 }
 
 TEST_F(SchedulingTestFixture, SchedulingManager_TestGetScheduleReference) {
+    std::string schedName;
+    Scheduling::ScheduleBase *thisReference;
     Scheduling::processAllSchedules();
-    std::string schedName = "ALWAYS ON";
-    Scheduling::ScheduleBase *thisReference = Scheduling::getScheduleReference(schedName);
+
+    schedName = "ALWAYS ON";
+    thisReference = Scheduling::getScheduleReference(schedName);
     EXPECT_NE(thisReference, nullptr);
+    schedName = "missing_schedule";
+    thisReference = Scheduling::getScheduleReference(schedName);
+    EXPECT_EQ(thisReference, nullptr);
 }
 
 }

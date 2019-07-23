@@ -109,9 +109,13 @@ ScheduleTypeData::ScheduleTypeData(std::string const &objectName, nlohmann::json
     if (fields.find("numeric_type") != fields.end()) {
         std::string thisType = fields.at("numeric_type");
         toUpper(thisType);
-        this->isContinuous = thisType == "DISCRETE";
-        // TODO: Other options to consider besides discrete?
-        // TODO: Capitalize thisType first?
+        if (thisType == "DISCRETE" || thisType == "INTEGER") {
+            this->isContinuous = false;
+        } else if (thisType == "CONTINUOUS" || thisType == "REAL") {
+            this->isContinuous = true;
+        } else {
+            //ShowSevereError - bad inputs
+        }
     }
 }
 

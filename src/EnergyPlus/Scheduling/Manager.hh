@@ -73,18 +73,18 @@ struct IndexBasedScheduleData
     unsigned int indexInTypeArray = -1;
 
     IndexBasedScheduleData() = default;
-    IndexBasedScheduleData(std::string &_scheduleName, ScheduleType _scheduleType, unsigned int _indexInTypeArray) :
-        name(_scheduleName), thisType(_scheduleType), indexInTypeArray(_indexInTypeArray)
-    {}
+    IndexBasedScheduleData(std::string &_scheduleName, ScheduleType _scheduleType, unsigned int _indexInTypeArray)
+        : name(_scheduleName), thisType(_scheduleType), indexInTypeArray(_indexInTypeArray)
+    {
+    }
     ~IndexBasedScheduleData() = default;
-
 };
 
 void clear_state();
 
-int GetScheduleIndex(const std::string& scheduleName);
+int GetScheduleIndex(const std::string &scheduleName);
 
-ScheduleBase *getScheduleReference(const std::string& scheduleName);
+ScheduleBase *getScheduleReference(const std::string &scheduleName);
 
 void processAllSchedules();
 
@@ -92,5 +92,12 @@ Real64 GetScheduleValue(int scheduleIndex);
 
 void updateAllSchedules();
 
-}
+// some simple data mining functions
+int numSchedules();
+std::string scheduleName(int scheduleIndex);
+std::string scheduleType(int scheduleIndex);
+Real64 scheduleMinValue(int scheduleIndex);
+Real64 scheduleMaxValue(int scheduleIndex);
+
+} // namespace Scheduling
 #endif // SRC_ENERGYPLUS_SCHEDULING_MANAGER_HH

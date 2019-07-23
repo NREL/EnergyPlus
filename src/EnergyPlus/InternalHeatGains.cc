@@ -923,7 +923,7 @@ namespace InternalHeatGains {
                                                 ErrorsFound = true;
                                             }
                                         }
-                                        if (CheckScheduleValue(People(Loop).ClothingMethodPtr, 1)) {
+                                        if (GetCurrentScheduleValue(People(Loop).ClothingMethodPtr) == 1) {
                                             People(Loop).ClothingPtr = GetScheduleIndex(AlphaName(12));
                                             if (People(Loop).ClothingPtr == 0) {
                                                 if (Item1 == 1) {

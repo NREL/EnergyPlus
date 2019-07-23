@@ -2888,7 +2888,6 @@ namespace HVACManager {
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
         using DataSurfaces::SurfaceWindow;
         using DataZoneEquipment::ZoneEquipConfig;
-        using ScheduleManager::CheckScheduleValue;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleMaxValue;
 
@@ -2957,7 +2956,11 @@ namespace HVACManager {
                     AirLoopNum = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                     if (AirLoopNum > 0) {
                         if (AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
-                            CyclingFan = CheckScheduleValue(AirLoopControlInfo(AirLoopNum).CycFanSchedPtr, 0.0);
+                            if (AirLoopControlInfo(AirLoopNum).CycFanSchedPtr == 0 || GetCurrentScheduleValue(AirLoopControlInfo(AirLoopNum).CycFanSchedPtr) == 0.0) {
+                                CyclingFan = true;
+                            } else {
+                                CyclingFan = false;
+                            }
                         }
                     }
                 }

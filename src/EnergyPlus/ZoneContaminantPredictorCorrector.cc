@@ -252,7 +252,6 @@ namespace ZoneContaminantPredictorCorrector {
         using General::FindNumberInList;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
-        using ScheduleManager::CheckScheduleValue;
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
         using ScheduleManager::GetScheduleMaxValue;
@@ -1130,7 +1129,6 @@ namespace ZoneContaminantPredictorCorrector {
         // Using/Aliasing
         using namespace DataIPShortCuts;
         using General::TrimSigDigits;
-        using ScheduleManager::CheckScheduleValue;
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
         using ScheduleManager::GetScheduleMaxValue;

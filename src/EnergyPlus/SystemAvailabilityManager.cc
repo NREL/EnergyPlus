@@ -4595,8 +4595,8 @@ namespace SystemAvailabilityManager {
                                     HybridVentSysAvailMgrData(SysAvailNum).Name);
             }
 
-            if (CheckScheduleValue(HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr, HybridVentMode_OperT80) ||
-                CheckScheduleValue(HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr, HybridVentMode_OperT90)) {
+            auto tmpSchedVal = GetCurrentScheduleValue(HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr);
+            if (tmpSchedVal == HybridVentMode_OperT80 || tmpSchedVal == HybridVentMode_OperT90) {
                 SetupOutputVariable("Hybrid Ventilation Operative Temperature",
                                     OutputProcessor::Unit::C,
                                     HybridVentSysAvailMgrData(SysAvailNum).OperativeTemp,
@@ -4617,7 +4617,7 @@ namespace SystemAvailabilityManager {
                                     HybridVentSysAvailMgrData(SysAvailNum).Name);
             }
 
-            if (CheckScheduleValue(HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr, HybridVentMode_CO2)) {
+            if (tmpSchedVal == HybridVentMode_CO2) {
                 SetupOutputVariable("Hybrid Ventilation CO2 Concentration",
                                     OutputProcessor::Unit::ppm,
                                     HybridVentSysAvailMgrData(SysAvailNum).CO2,
@@ -4756,8 +4756,8 @@ namespace SystemAvailabilityManager {
                     ErrorsFound = true;
                 }
                 // check schedule value for adaptive temperature control
-                if (CheckScheduleValue(HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr, 5.0) ||
-                    CheckScheduleValue(HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr, 6.0)) {
+                Real64 curValue = GetCurrentScheduleValue(HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr);
+                if (curValue == 5.0 || curValue == 6.0) {
                     if (!AdaptiveComfortRequested_ASH55) {
                         ShowSevereError("GetHybridVentilationInputs: AvailabilityManager:HybridVentilation =\"" +
                                         HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");

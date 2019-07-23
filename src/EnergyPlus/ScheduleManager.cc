@@ -2898,39 +2898,6 @@ namespace ScheduleManager {
         return GetScheduleIndex;
     }
 
-    std::string GetScheduleType(int const ScheduleIndex)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Jason Glazer
-        //       DATE WRITTEN   July 2007
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function returns the internal pointer to Schedule "ScheduleName".
-
-        // Return value
-        std::string TypeOfSchedule;
-
-        if (!ScheduleInputProcessed) {
-            ProcessScheduleInput();
-            ScheduleInputProcessed = true;
-        }
-
-        if ((ScheduleIndex > 0) && (ScheduleIndex <= NumSchedules)) {
-            int curSchType = Schedule(ScheduleIndex).ScheduleTypePtr;
-            if ((curSchType > 0) && (curSchType <= NumScheduleTypes)) {
-                TypeOfSchedule = ScheduleType(curSchType).Name;
-            } else {
-                TypeOfSchedule = "";
-            }
-        } else {
-            TypeOfSchedule = "";
-        }
-        return TypeOfSchedule;
-    }
-
     int GetDayScheduleIndex(std::string &ScheduleName)
     {
 
@@ -3852,112 +3819,6 @@ namespace ScheduleManager {
         return (MinValueOk && MaxValueOk);
     }
 
-    bool CheckScheduleValue(int const ScheduleIndex, // Which Schedule being tested
-                            Real64 const Value       // Actual desired value
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   November 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function checks the indicated schedule value for validity.  Uses the ScheduleIndex
-        // from (GetScheduleIndex).
-
-        // METHODOLOGY EMPLOYED:
-        // This routine is best used with "discrete" schedules.  The routine must traverse all values
-        // in the schedule and compares by equality.
-
-        // Return value
-        bool CheckScheduleValue;
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int Loop;  // Loop Control variable
-        int DayT;  // Day Type Loop control
-        int WkSch; // Pointer for WeekSchedule value
-
-        CheckScheduleValue = false;
-
-        if (ScheduleIndex == -1) {
-            CheckScheduleValue = (Value == 1.0);
-        } else if (ScheduleIndex == 0) {
-            CheckScheduleValue = (Value == 0.0);
-        } else if (ScheduleIndex < 1 || ScheduleIndex > NumSchedules) {
-            ShowFatalError("CheckScheduleValue called with ScheduleIndex out of range");
-        }
-
-        if (ScheduleIndex > 0) {
-            CheckScheduleValue = false;
-            for (Loop = 1; Loop <= 366; ++Loop) {
-                WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
-                    if (any_eq(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue, Value)) {
-                        CheckScheduleValue = true;
-                        goto DayLoop_exit;
-                    }
-                }
-            }
-        DayLoop_exit:;
-        }
-
-        return CheckScheduleValue;
-    }
-
-    bool CheckScheduleValue(int const ScheduleIndex, // Which Schedule being tested
-                            int const Value          // Actual desired value
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   November 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function checks the indicated schedule value for validity.  Uses the ScheduleIndex
-        // from (GetScheduleIndex).
-
-        // METHODOLOGY EMPLOYED:
-        // This routine is best used with "discrete" schedules.  The routine must traverse all values
-        // in the schedule and compares by equality.
-
-        // Return value
-        bool CheckScheduleValue;
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int Loop;  // Loop Control variable
-        int DayT;  // Day Type Loop control
-        int WkSch; // Pointer for WeekSchedule value
-
-        CheckScheduleValue = false;
-        if (ScheduleIndex == -1) {
-            CheckScheduleValue = (Value == 1);
-        } else if (ScheduleIndex == 0) {
-            CheckScheduleValue = (Value == 0);
-        } else if (ScheduleIndex < 1 || ScheduleIndex > NumSchedules) {
-            ShowFatalError("CheckScheduleValue called with ScheduleIndex out of range");
-        }
-
-        if (ScheduleIndex > 0) {
-            for (Loop = 1; Loop <= 366; ++Loop) {
-                WkSch = Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                for (DayT = 1; DayT <= MaxDayTypes; ++DayT) {
-                    if (any_eq(DaySchedule(WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue, double(Value))) {
-                        CheckScheduleValue = true;
-                        goto DayLoop_exit;
-                    }
-                }
-            }
-        DayLoop_exit:;
-        }
-
-        return CheckScheduleValue;
-    }
-
     bool CheckDayScheduleValueMinMax(int const ScheduleIndex,        // Which Day Schedule being tested
                                      Real64 const Minimum,           // Minimum desired value
                                      std::string const &MinString,   // Minimum indicator ('>', '>=')
@@ -4582,21 +4443,6 @@ namespace ScheduleManager {
         }
 
         return TotalHours;
-    }
-
-    int GetNumberOfSchedules()
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Greg Stark
-        //       DATE WRITTEN   September 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function returns the number of schedules.
-
-        return NumSchedules;
     }
 
 } // namespace ScheduleManager

@@ -402,7 +402,6 @@ namespace ZoneTempPredictorCorrector {
         using General::FindNumberInList;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
-        using ScheduleManager::CheckScheduleValue;
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
         using ScheduleManager::GetScheduleMaxValue;
@@ -890,7 +889,7 @@ namespace ZoneTempPredictorCorrector {
                                 ErrorsFound = true;
                             }
                         } else { // TempIndex = 0
-                            if (CheckScheduleValue(CTIndex, SingleHeatingSetPoint)) {
+                            if (GetCurrentScheduleValue(CTIndex) == SingleHeatingSetPoint) {
                                 ShowSevereError("Control Type Schedule=" + TempControlledZone(TempControlledZoneNum).ControlTypeSchedName);
                                 ShowContinueError("..specifies control type 1 (" + ValidControlTypes(SglHeatSetPoint) +
                                                   ") as the control type. Not valid for this zone.");
@@ -912,7 +911,7 @@ namespace ZoneTempPredictorCorrector {
                                 ErrorsFound = true;
                             }
                         } else { // TempIndex = 0
-                            if (CheckScheduleValue(CTIndex, SingleCoolingSetPoint)) {
+                            if (GetCurrentScheduleValue(CTIndex) == SingleCoolingSetPoint) {
                                 ShowSevereError("Control Type Schedule=" + TempControlledZone(TempControlledZoneNum).ControlTypeSchedName);
                                 ShowContinueError("..specifies control type 2 (" + ValidControlTypes(SglCoolSetPoint) +
                                                   ") as the control type. Not valid for this zone.");
@@ -934,7 +933,7 @@ namespace ZoneTempPredictorCorrector {
                                 ErrorsFound = true;
                             }
                         } else { // TempIndex = 0
-                            if (CheckScheduleValue(CTIndex, SingleHeatCoolSetPoint)) {
+                            if (GetCurrentScheduleValue(CTIndex) == SingleHeatCoolSetPoint) {
                                 ShowSevereError("Schedule=" + TempControlledZone(TempControlledZoneNum).ControlTypeSchedName);
                                 ShowContinueError("..specifies control type 3 (" + ValidControlTypes(SglHCSetPoint) +
                                                   ") as the control type. Not valid for this zone.");
@@ -956,7 +955,7 @@ namespace ZoneTempPredictorCorrector {
                                 ErrorsFound = true;
                             }
                         } else { // TempIndex = 0
-                            if (CheckScheduleValue(CTIndex, DualSetPointWithDeadBand)) {
+                            if (GetCurrentScheduleValue(CTIndex) == DualSetPointWithDeadBand) {
                                 ShowSevereError("Schedule=" + TempControlledZone(TempControlledZoneNum).ControlTypeSchedName);
                                 ShowContinueError("..specifies control type 4 (" + ValidControlTypes(DualSetPoint) +
                                                   ") as the control type. Not valid for this zone.");
@@ -1629,7 +1628,7 @@ namespace ZoneTempPredictorCorrector {
                                 ErrorsFound = true;
                             }
                         } else { // ComfortIndex = 0
-                            if (CheckScheduleValue(CTIndex, SglHeatSetPointFanger)) {
+                            if (GetCurrentScheduleValue(CTIndex) == SglHeatSetPointFanger) {
                                 ShowSevereError("Control Type Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
                                 ShowContinueError("..specifies thermal control type 1 (" + ValidComfortControlTypes(SglHeatSetPointFanger) +
                                                   ") as the control type. Not valid for this zone.");
@@ -1652,7 +1651,7 @@ namespace ZoneTempPredictorCorrector {
                                 ErrorsFound = true;
                             }
                         } else { // ComfortIndex = 0
-                            if (CheckScheduleValue(CTIndex, SglCoolSetPointFanger)) {
+                            if (GetCurrentScheduleValue(CTIndex) == SglCoolSetPointFanger) {
                                 ShowSevereError("Control Type Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
                                 ShowContinueError("..specifies thermal control type 2 (" + ValidComfortControlTypes(SglCoolSetPointFanger) +
                                                   ") as the control type. Not valid for this zone.");
@@ -1675,7 +1674,7 @@ namespace ZoneTempPredictorCorrector {
                                 ErrorsFound = true;
                             }
                         } else { // ComfortIndex = 0
-                            if (CheckScheduleValue(CTIndex, SglHCSetPointFanger)) {
+                            if (GetCurrentScheduleValue(CTIndex) == SglHCSetPointFanger) {
                                 ShowSevereError("Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
                                 ShowContinueError("..specifies thermal control type 3 (" + ValidComfortControlTypes(SglHCSetPointFanger) +
                                                   ") as the control type. Not valid for this zone.");
@@ -1698,7 +1697,7 @@ namespace ZoneTempPredictorCorrector {
                                 ErrorsFound = true;
                             }
                         } else { // ComfortIndex = 0
-                            if (CheckScheduleValue(CTIndex, DualSetPointFanger)) {
+                            if (GetCurrentScheduleValue(CTIndex) == DualSetPointFanger) {
                                 ShowSevereError("Schedule=" + ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchedName);
                                 ShowContinueError("..specifies thermal control type 4 (" + ValidComfortControlTypes(DualSetPointFanger) +
                                                   ") as the control type. Not valid for this zone.");
@@ -2673,11 +2672,8 @@ namespace ZoneTempPredictorCorrector {
                 if (GrossApproxAvgDryBulbDesignDay > 10 && GrossApproxAvgDryBulbDesignDay < 30) {
                     AdapComfortSetPointSummerDesDay(4) = 0.33 * GrossApproxAvgDryBulbDesignDay + 18.8;
                     AdapComfortSetPointSummerDesDay(5) = 0.33 * GrossApproxAvgDryBulbDesignDay + 20.8;
-                    ;
                     AdapComfortSetPointSummerDesDay(6) = 0.33 * GrossApproxAvgDryBulbDesignDay + 21.8;
-                    ;
                     AdapComfortSetPointSummerDesDay(7) = 0.33 * GrossApproxAvgDryBulbDesignDay + 22.8;
-                    ;
                 }
             }
         }

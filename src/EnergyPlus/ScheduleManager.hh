@@ -272,14 +272,6 @@ namespace ScheduleManager {
                                   Real32 Maximum          // Maximum desired value
     );
 
-    bool CheckScheduleValue(int ScheduleIndex, // Which Schedule being tested
-                            Real64 Value       // Actual desired value
-    );
-
-    bool CheckScheduleValue(int ScheduleIndex, // Which Schedule being tested
-                            int Value          // Actual desired value
-    );
-
     bool CheckDayScheduleValueMinMax(int ScheduleIndex,            // Which Day Schedule being tested
                                      Real64 Minimum,               // Minimum desired value
                                      std::string const &MinString,       // Minimum indicator ('>', '>=')
@@ -320,8 +312,6 @@ namespace ScheduleManager {
                                 int StartDayOfWeek, // Day of week for start of year
                                 bool isItLeapYear   // true if it is a leap year containing February 29
     );
-
-    int GetNumberOfSchedules();
 
 } // namespace ScheduleManager
 
