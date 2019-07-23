@@ -1,3 +1,8 @@
+######################################################################################################################################################
+#                                                        D E F A U L T    G E N E R A T O R S                                                        #
+######################################################################################################################################################
+
+
 # Default the Binary generators: problem is that none of the CPACK_BINARY_XXX wil show up in CMakeCache,
 # which makes it less clear what will happen in terms of package generation
 #if(WIN32)
@@ -54,6 +59,7 @@ elseif(WIN32)
   set(CPACK_BINARY_WIX   OFF CACHE BOOL "Recommended OFF")
 endif()
 
+
 # Turn off source generators
 # Need a list, which can't be empty, but not have sensible defined value. So a list of two empty element works as
 # a workaround
@@ -74,6 +80,11 @@ elseif(WIN32)
   set(CPACK_SOURCE_7Z  OFF CACHE BOOL "Recommended OFF")
   set(CPACK_SOURCE_ZIP OFF CACHE BOOL "Recommended OFF")
 endif()
+
+
+######################################################################################################################################################
+#                                              B A S E    I N S T A L L   &    P R O J E C T    I N F O                                              #
+######################################################################################################################################################
 
 # Base install
 set(CPACK_INSTALL_CMAKE_PROJECTS
@@ -140,6 +151,9 @@ set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE.txt")
 install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION ./ )
 install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON" DESTINATION ./ )
 
+
+#################################################################  A U T O D O C S  ##################################################################
+
 # Some docs are generated on the fly here, create a dir for the 'built' files
 set( DOCS_OUT "${CMAKE_BINARY_DIR}/autodocs" )
 # This is NOT an install command, we actually want it to be performed so we can generate the package, so do it at build system generation
@@ -169,6 +183,10 @@ if(NOT "$ENV{GITHUB_TOKEN}" STREQUAL "")
 else()
   message(WARNING "No GITHUB_TOKEN found in environment; package won't include the change log")
 endif()
+
+
+#################################################################  D A T A S E T S  ##################################################################
+
 
 # Install files that are in the current repo
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/AirCooledChiller.idf" DESTINATION "./DataSets" COMPONENT Datasets)
@@ -223,6 +241,9 @@ INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/Macro/SandiaPVdata.imf" DESTINATION 
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/Macro/SolarCollectors.imf" DESTINATION "./MacroDataSets" COMPONENT Datasets)
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/Macro/UtilityTariffObjects.imf" DESTINATION "./MacroDataSets" COMPONENT Datasets)
 
+
+#############################################################  W E A T H E R    D A T A  #############################################################
+
 # weather files
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/weather/USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy" DESTINATION "./WeatherData" COMPONENT WeatherData)
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/weather/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw" DESTINATION "./WeatherData" COMPONENT WeatherData)
@@ -240,6 +261,9 @@ INSTALL(FILES "${CMAKE_SOURCE_DIR}/weather/USA_VA_Sterling-Washington.Dulles.Int
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/weather/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.epw" DESTINATION "./WeatherData" COMPONENT WeatherData)
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/weather/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.stat" DESTINATION "./WeatherData" COMPONENT WeatherData)
 
+
+#############################################################   E X A M P L E    F I L E S   #########################################################
+
 INSTALL( DIRECTORY testfiles/ DESTINATION ExampleFiles/
   COMPONENT ExampleFiles
   PATTERN _* EXCLUDE
@@ -247,6 +271,9 @@ INSTALL( DIRECTORY testfiles/ DESTINATION ExampleFiles/
   PATTERN CMakeLists.txt EXCLUDE
   PATTERN performance EXCLUDE
 )
+
+
+#############################################################   M I S C E L L A N E O U S   ##########################################################
 
 # TODO Remove version from file name or generate
 # These files names are stored in variables because they also appear as start menu shortcuts later.
@@ -267,6 +294,11 @@ install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/coeff_check.py" DESTI
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/coeff_conv.py" DESTINATION "workflows/") # COMPONENT Workflows)
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/energyplus.py" DESTINATION "workflows/") # COMPONENT Workflows)
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/transition.py" DESTINATION "workflows/") # COMPONENT Workflows)
+
+
+######################################################################################################################################################
+#                                                         P L A T F O R M    S P E C I F I C                                                         #
+######################################################################################################################################################
 
 if( WIN32 )
   # calcsoilsurftemp is now built from source, just need to install the batch run script
@@ -433,9 +465,12 @@ if( UNIX AND NOT APPLE )
   install(PROGRAMS scripts/runreadvars DESTINATION "./")
 endif()
 
+# TODO: Unused now
 configure_file("${CMAKE_SOURCE_DIR}/cmake/CMakeCPackOptions.cmake.in"
   "${CMAKE_BINARY_DIR}/CMakeCPackOptions.cmake" @ONLY)
 set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_BINARY_DIR}/CMakeCPackOptions.cmake")
+
+##########################################################   D O C U M E N T A T I O N   #############################################################
 
 if ( BUILD_DOCS )
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/Acknowledgments.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
@@ -453,6 +488,11 @@ if ( BUILD_DOCS )
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/TipsAndTricksUsingEnergyPlus.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/UsingEnergyPlusForCompliance.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
 endif ()
+
+
+######################################################################################################################################################
+#                                                    P A C K A G I N G   &   C O M P O N E N T S                                                     #
+######################################################################################################################################################
 
 # Careful: the position (and what you include) matters a lot!
 include(CPack)
