@@ -2829,7 +2829,7 @@ This output variable is the additional heating demand rate of the supplemental h
 
 \subsection{AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass}\label{airloophvacunitaryheatcoolvavchangeoverbypass}
 
-The changeover-bypass variable air volume (CBVAV) unitary system is a compound object made up of other components. Each CBVAV system consists of an outdoor air mixer, direct expansion (DX) cooling coil, heating coil, and a supply air fan as shown in the figures below. Zone thermostats and terminal units are required in each zone served by this system. The terminal units are specific to this system type and are either \hyperref[airterminalsingleductvavheatandcoolreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat} or \hyperref[airterminalsingleductvavheatandcoolnoreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat}. A zone humidistat and single zone max humidity set point manager may also be specified to help control high humidity levels. These individual components are described elsewhere in this document. The CBVAV unitary system object coordinates the operation of these components and is modeled as a type of air loop equipment (Ref. \hyperref[airloophvac]{AirLoopHVAC}).
+The changeover-bypass variable air volume (CBVAV) unitary system is a compound object made up of other components. Each CBVAV system consists of an outdoor air mixer, direct expansion (DX) cooling coil, heating coil, and a supply air fan as shown in the figures below. Zone thermostats and terminal units are required in each zone served by this system. The terminal units are specific to this system type and are either \hyperref[airterminalsingleductvavheatandcoolreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat} or \hyperref[airterminalsingleductvavheatandcoolnoreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat}. A zone humidistat and single zone max humidity set point manager may also be specified to help control high humidity levels. These individual components are described elsewhere in this document. The system may also be connected to an inlet node of either the \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer} or \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} to more accurately model the \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem}. The CBVAV unitary system object coordinates the operation of these components and is modeled as a type of air loop equipment (Ref. \hyperref[airloophvac]{AirLoopHVAC}).
 
 \begin{figure}[hbtp] % fig 123
 \centering
@@ -2841,6 +2841,12 @@ The changeover-bypass variable air volume (CBVAV) unitary system is a compound o
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image309.png}
 \caption{Schematic of a CBVAV unitary system (blow through fan placement) \protect \label{fig:schematic-of-a-cbvav-unitary-system-blow}}
+\end{figure}
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/ChangeoverBypassVAV-ReturnPlenumOrMixer.png}
+\caption{Schematic of a CBVAV unitary system used with outdoor air system \protect \label{fig:schematic-of-a-cbvav-unitary-system-used-with-outdoor-air-system}}
 \end{figure}
 
 Links to the CBVAV system's supply air fan, coils, and outdoor air mixer specifications are provided in the object's input syntax. Additional inputs include system and outdoor air flow rates during heating and cooling operation, the priority control mode, and dehumidification control type. A description of each input field for the CBVAV unitary system compound object is provided below.
@@ -3021,6 +3027,10 @@ The default is \textbf{None}. For the other dehumidification control modes, the 
 
 objects. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate.
 
+\paragraph{Field: Plenum or Mixer Inlet Node Name}\label{field-bypass-duct-mixer-node-name}
+
+This alpha field defines the name of the HVAC system node where the bypass air enters the zone mixer or return plenum. This name should match the name of the inlet node in the \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer} or \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} associated with this system. This node name must be different from the system's air outlet node or bypass duct splitter node name.
+
 As shown in the example below, correct specification of the CBVAV unitary system requires specification of the following objects in addition to the AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass object:
 
 1)~~~outdoor air mixer (\hyperref[outdoorairmixer]{OutdoorAir:Mixer})
@@ -3033,7 +3043,9 @@ As shown in the example below, correct specification of the CBVAV unitary system
 
 5)~~~terminal unit for each zone being served by this system (\hyperref[airterminalsingleductvavheatandcoolreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat} or \hyperref[airterminalsingleductvavheatandcoolnoreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat})
 
-Note: The fan, heating coil, cooling coil, and outdoor air mixer must be connected in the air loop according to the configurations shown above (Figure~\ref{fig:schematic-of-a-cbvav-unitary-system-draw} and Figure~\ref{fig:schematic-of-a-cbvav-unitary-system-blow}).
+6)~~~When the Plenum or Mixer Inlet Node Name is specified, this node name must connect to either a \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer} or \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} and the \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem} may then be used to control the outdoor air flow rates and, therefore, the inlet condition to the unit.
+
+Note: The fan, heating coil, cooling coil, and outdoor air mixer must be connected in the air loop according to the configurations shown above (Figure~\ref{fig:schematic-of-a-cbvav-unitary-system-draw}, Figure~\ref{fig:schematic-of-a-cbvav-unitary-system-blow} or Figure~\ref{fig:schematic-of-a-cbvav-unitary-system-used-with-outdoor-air-system}).
 
 \begin{lstlisting}
 
