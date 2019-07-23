@@ -3,7 +3,7 @@
 ######################################################################################################################################################
 
 
-# Default the Binary generators: problem is that none of the CPACK_BINARY_XXX wil show up in CMakeCache,
+# Default the Binary generators: problem is that none of the CPACK_BINARY_<GenName> will show up in CMakeCache,
 # which makes it less clear what will happen in terms of package generation
 #if(WIN32)
   #set(CPACK_GENERATOR "IFW;ZIP")
@@ -26,14 +26,14 @@ if (UNIX)
   set(CPACK_BINARY_NSIS    OFF CACHE BOOL "Recommended OFF")
 
   if(APPLE)
-    set(CPACK_BINARY_IFW ON CACHE BOOL "Enable to build IFW package, which is the recommend method")
+    set(CPACK_BINARY_IFW ON CACHE BOOL "Enable to build IFW package, which is the recommended method")
     set(CPACK_BINARY_STGZ    OFF CACHE BOOL "Recommended OFF")
 
     # Mac Specific options to turn off
     set(CPACK_BINARY_BUNDLE        OFF CACHE BOOL "Recommended OFF")
     set(CPACK_BINARY_DRAGNDROP     OFF CACHE BOOL "Recommended OFF")
     set(CPACK_BINARY_OSXX11        OFF CACHE BOOL "Recommended OFF")
-    set(CPACK_BINARY_PACKAGEMAKER  OFF CACHE BOOL "This was the legacy method on Apple, superseeded by IFW.")
+    set(CPACK_BINARY_PACKAGEMAKER  OFF CACHE BOOL "This was the legacy method on Apple, superseded by IFW.")
     set(CPACK_BINRARY_PRODUCTBUILD OFF CACHE BOOL "Recommended OFF")
 
   else()
@@ -51,7 +51,7 @@ elseif(WIN32)
   set(CPACK_BINARY_IFW    ON CACHE BOOL "Enable to build IFW package, which is the recommend method")
   set(CPACK_BINARY_ZIP    ON CACHE BOOL "Enable to build a ZIP package, recommended for an official release")
 
-  set(CPACK_BINARY_NSIS  OFF CACHE BOOL "This was the legacy method on Windows, superseeded by IFW")
+  set(CPACK_BINARY_NSIS  OFF CACHE BOOL "This was the legacy method on Windows, superseded by IFW")
   set(CPACK_BINARY_7Z    OFF CACHE BOOL "Recommended OFF")
   set(CPACK_BINARY_NUGET OFF CACHE BOOL "Recommended OFF")
   set(CPACK_BINARY_WIX   OFF CACHE BOOL "Recommended OFF")
@@ -60,7 +60,7 @@ elseif(WIN32)
   # TODO: the "FORCE" is temporary to avoid people having an existing build directory build IFW, remove after next release
   # We want to force update the cache to avoid user suddenly getting build errors
   if(CPACK_BINARY_NSIS)
-    set(CPACK_BINARY_NSIS  OFF CACHE BOOL "This was the legacy method on Windows, superseeded by IFW" FORCE)
+    set(CPACK_BINARY_NSIS  OFF CACHE BOOL "This was the legacy method on Windows, superseded by IFW" FORCE)
     set(CPACK_BINARY_IFW    ON CACHE BOOL "Enable to build IFW package, which is the recommend method" FORCE)
     message("Switching from NSIS to IFW as the supported generator has changed on Windows")
   endif()
