@@ -1,3 +1,80 @@
+# Default the Binary generators: problem is that none of the CPACK_BINARY_XXX wil show up in CMakeCache,
+# which makes it less clear what will happen in terms of package generation
+#if(WIN32)
+  #set(CPACK_GENERATOR "IFW;ZIP")
+#elseif(APPLE)
+  #set(CPACK_GENERATOR "IFW;TGZ")
+#elseif(UNIX)
+  #set(CPACK_GENERATOR "STGZ;TGZ")
+#endif()
+
+
+
+# So instead, let's cache the default value we want for the individual options for CPACK_BINARY_<GenName>
+if (UNIX)
+
+  # Set everything to off for now
+  set(CPACK_BINARY_DEB     OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_BINARY_FREEBSD OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_BINARY_RPM     OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_BINARY_TBZ2    OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_BINARY_NSIS    OFF CACHE BOOL "Recommended OFF")
+
+  if(APPLE)
+    set(CPACK_BINARY_IFW ON CACHE BOOL "Enable to build IFW package, which is the recommend method")
+    set(CPACK_BINARY_STGZ    OFF CACHE BOOL "Recommended OFF")
+
+    # Mac Specific options to turn off
+    set(CPACK_BINARY_BUNDLE        OFF CACHE BOOL "Recommended OFF")
+    set(CPACK_BINARY_DRAGNDROP     OFF CACHE BOOL "Recommended OFF")
+    set(CPACK_BINARY_OSXX11        OFF CACHE BOOL "Recommended OFF")
+    set(CPACK_BINARY_PACKAGEMAKER  OFF CACHE BOOL "This was the legacy method on Apple, superseeded by IFW.")
+    set(CPACK_BINRARY_PRODUCTBUILD OFF CACHE BOOL "Recommended OFF")
+
+  else()
+    set(CPACK_BINARY_IFW     OFF CACHE BOOL "This should be off")
+    set(CPACK_BINARY_STGZ ON CACHE BOOL "Enable to build a Linux sh installer script, which is the recommended method") # Uses STGZ currently (install .sh script CACHE BOOL)
+
+    # Unix (non Apple CACHE BOOL) specific option to turn off
+    set(CPACK_BINARY_TZ  OFF CACHE BOOL "Recommended OFF")
+  endif()
+  # Tar.gz for inclusion in other programs for eg
+  set(CPACK_BINARY_TGZ    ON CACHE BOOL "Enable to build a tar.gz package, recommended for an official release")
+
+
+elseif(WIN32)
+  set(CPACK_BINARY_IFW    ON CACHE BOOL "Enable to build IFW package, which is the recommend method")
+  set(CPACK_BINARY_ZIP    ON CACHE BOOL "Enable to build a ZIP package, recommended for an official release")
+
+  # We want to force update the cache to avoid user suddenly getting build errors
+  set(CPACK_BINARY_NSIS    OFF CACHE BOOL "This was the legacy method on Windows, superseeded by IFW" FORCE)
+
+  set(CPACK_BINARY_7Z    OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_BINARY_NUGET OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_BINARY_WIX   OFF CACHE BOOL "Recommended OFF")
+endif()
+
+# Turn off source generators
+# Need a list, which can't be empty, but not have sensible defined value. So a list of two empty element works as
+# a workaround
+# list(CPACK_SOURCE_GENERATOR ";")
+
+# Instead use indiv CPACK_SOURCE_<GenName>: all to OFF
+if (UNIX)
+
+  set(CPACK_SOURCE_RPM  OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_SOURCE_TBZ2 OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_SOURCE_TGZ  OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_SOURCE_TXZ  OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_SOURCE_TZ   OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_SOURCE_ZIP  OFF CACHE BOOL "Recommended OFF")
+
+elseif(WIN32)
+
+  set(CPACK_SOURCE_7Z  OFF CACHE BOOL "Recommended OFF")
+  set(CPACK_SOURCE_ZIP OFF CACHE BOOL "Recommended OFF")
+endif()
+
 # Base install
 set(CPACK_INSTALL_CMAKE_PROJECTS
   "${CMAKE_BINARY_DIR};EnergyPlus;ALL;/"
