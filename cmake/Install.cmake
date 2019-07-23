@@ -489,6 +489,13 @@ if ( BUILD_DOCS )
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/UsingEnergyPlusForCompliance.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
 endif ()
 
+##########################################################   S Y S T E M    L I B R A R I E S   #############################################################
+
+# TODO: is this unecessary now? I had forgotten to actually create a Libraries via cpack_add_component but everything seemed fined
+# At worse, try not to uncomment this as is, but place it inside an if(PLATFORM) statement
+#SET(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+#INCLUDE(InstallRequiredSystemLibraries)
+#INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./" COMPONENT Libraries)
 
 ######################################################################################################################################################
 #                                                    P A C K A G I N G   &   C O M P O N E N T S                                                     #
@@ -554,6 +561,11 @@ cpack_add_component(CopyAndRegisterSystemDLLs
   REQUIRED
 )
 
+#cpack_add_component(Libraries
+#  DISPLAY_NAME "Install required system libraries"
+#  DESCRIPTION  "This is probably not required right now..."
+#)
+
 # Regular stuff, like chmod +x
 cpack_ifw_configure_component(Unspecified
     SCRIPT cmake/qtifw/install_operations.qs
@@ -579,7 +591,3 @@ cpack_ifw_configure_component(Licenses
   LICENSES
     "EnergyPlus" ${CPACK_RESOURCE_FILE_LICENSE}
 )
-
-SET(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
-INCLUDE(InstallRequiredSystemLibraries)
-INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./" COMPONENT Libraries)
