@@ -1010,19 +1010,18 @@ namespace HeatBalanceManager {
                                           cNumericFieldNames);
             {
                 auto const SELECT_CASE_var(AlphaName(1));
-                // The default is CTF = 0.  Then the moisture solution is EMPD =2
-                if ((SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") || (SELECT_CASE_var == "DEFAULT") || (SELECT_CASE_var == "CTF")) {
-                    OverallHeatTransferSolutionAlgo = UseCTF;
-                    AlphaName(1) = "CTF - Conduction Transfer Function";
+                // The default is CTF
+                if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
+                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+                    DataHeatBalance::AnyCTF = true;
 
-                } else if ((SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") || (SELECT_CASE_var == "EMPD")) {
-                    OverallHeatTransferSolutionAlgo = UseEMPD;
-                    AlphaName(1) = "EMPD - Effective Moisture Penetration Depth";
+                } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
+                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_EMPD;
+                    DataHeatBalance::AnyEMPD = true;
 
-                } else if ((SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") || (SELECT_CASE_var == "CONDFD") ||
-                           (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCEDETAILED")) {
-                    OverallHeatTransferSolutionAlgo = UseCondFD;
-                    AlphaName(1) = "CONDFD - Conduction Finite Difference";
+                } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
+                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CondFD;
+                    DataHeatBalance::AnyCondFD = true;
                     if (NumOfTimeStepInHour < 20) {
                         ShowSevereError("GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Conduction Finite Difference but Number of TimeSteps in Hour < 20, Value is " +
@@ -1031,9 +1030,9 @@ namespace HeatBalanceManager {
                                           "Errors or inaccurate calculations may occur.");
                     }
 
-                } else if ((SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") || (SELECT_CASE_var == "HAMT")) {
-                    OverallHeatTransferSolutionAlgo = UseHAMT;
-                    AlphaName(1) = "HAMT - Combined Heat and Moisture Transfer Finite Element";
+                } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
+                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_HAMT;
+                    DataHeatBalance::AnyHAMT = true;
                     if (NumOfTimeStepInHour < 20) {
                         ShowSevereError("GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Combined Heat and Moisture Finite Element but Number of TimeSteps in Hour < 20, Value is " +
@@ -1045,8 +1044,8 @@ namespace HeatBalanceManager {
                     }
 
                 } else {
-                    OverallHeatTransferSolutionAlgo = UseCTF;
-                    AlphaName(1) = "CTF - Conduction Transfer Function";
+                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+                    DataHeatBalance::AnyCTF = true;
                 }
             }
 
@@ -1068,14 +1067,11 @@ namespace HeatBalanceManager {
             }
 
         } else {
-            OverallHeatTransferSolutionAlgo = UseCTF;
-            AlphaName(1) = "ConductionTransferFunction";
+            OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+            DataHeatBalance::AnyCTF = true;
             MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
             MaxSurfaceTempLimitBeforeFatal = MaxSurfaceTempLimit * 2.5;
         }
-
-        HeatTransferAlgosUsed.allocate(1);
-        HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
 
         // algorithm input checks now deferred until surface properties are read in,
         //  moved to SurfaceGeometry.cc routine GetSurfaceHeatTransferAlgorithmOverrides
@@ -4502,6 +4498,18 @@ namespace HeatBalanceManager {
                                     ", missing material = " + ConstructAlphas(Layer));
                     ErrorsFound = true;
                 } else {
+                    MaterialLayerGroup = Material(Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer)).Group;
+                    if (!((MaterialLayerGroup == GlassEquivalentLayer) || (MaterialLayerGroup == ShadeEquivalentLayer) ||
+                          (MaterialLayerGroup == DrapeEquivalentLayer) || (MaterialLayerGroup == BlindEquivalentLayer) ||
+                          (MaterialLayerGroup == ScreenEquivalentLayer) || (MaterialLayerGroup == GapEquivalentLayer))) {
+                        ShowSevereError("Invalid material layer type in window " + CurrentModuleObject + " = " +
+                                        Construct(TotRegConstructs + ConstrNum).Name);
+                        ShowContinueError("...Window layer = " + ConstructAlphas(Layer) +
+                                          " is not allowed in Construction:WindowEquivalentLayer window object.");
+                        ShowContinueError("Only materials of type Material:*:EquivalentLayer are allowed");
+                        ErrorsFound = true;
+                    }
+
                     if (ConstructNumAlpha <= 2) {
 
                     } else {
@@ -5211,7 +5219,7 @@ namespace HeatBalanceManager {
 
         if (BeginSimFlag) {
             AllocateHeatBalArrays(); // Allocate the Module Arrays
-            if (any_eq(HeatTransferAlgosUsed, UseCTF) || any_eq(HeatTransferAlgosUsed, UseEMPD)) {
+            if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
                 DisplayString("Initializing Response Factors");
                 InitConductionTransferFunctions(); // Initialize the response factors
             }

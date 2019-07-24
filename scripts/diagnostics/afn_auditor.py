@@ -1,5 +1,4 @@
 import json
-import os
 import argparse
 import sys
 import auditor
@@ -51,7 +50,8 @@ multizone_component_names = ['AirflowNetwork:MultiZone:Surface:Crack',
                              'AirflowNetwork:MultiZone:Component:HorizontalOpening',
                              'AirflowNetwork:MultiZone:Component:ZoneExhaustFan']
 
-class AFN_Auditor(auditor.Auditor):
+
+class AFNAuditor(auditor.Auditor):
     def __init__(self, model):
         super().__init__(model)
         self.nodes = {}
@@ -72,22 +72,23 @@ class AFN_Auditor(auditor.Auditor):
                 self.vertex_ccw = False
         if self.__extract():
             self.__connect_multizone()
+
     def __extract(self):
-        lookup = {'AirflowNetwork:MultiZone:Zone':self.nodes,
-                  'AirflowNetwork:MultiZone:Surface':self.surfs,
-                  'AirflowNetwork:MultiZone:ReferenceCrackConditions':self.refconds,
-                  'AirflowNetwork:MultiZone:Surface:Crack':self.afes,
-                  'AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea':self.afes,
-                  'AirflowNetwork:MultiZone:Component:DetailedOpening':self.afes,
-                  'AirflowNetwork:MultiZone:Component:SimpleOpening':self.afes,
-                  'AirflowNetwork:MultiZone:Component:HorizontalOpening':self.afes,
-                  'AirflowNetwork:MultiZone:Component:ZoneExhaustFan':self.afes,
-                  'AirflowNetwork:MultiZone:ExternalNode':self.external_nodes,
-                  'AirflowNetwork:Distribution:Node':self.nodes,
-                  'AirflowNetwork:IntraZone:Node':self.nodes}
-        # Load the simcontrol object
+        lookup = {'AirflowNetwork:MultiZone:Zone': self.nodes,
+                  'AirflowNetwork:MultiZone:Surface': self.surfs,
+                  'AirflowNetwork:MultiZone:ReferenceCrackConditions': self.refconds,
+                  'AirflowNetwork:MultiZone:Surface:Crack': self.afes,
+                  'AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea': self.afes,
+                  'AirflowNetwork:MultiZone:Component:DetailedOpening': self.afes,
+                  'AirflowNetwork:MultiZone:Component:SimpleOpening': self.afes,
+                  'AirflowNetwork:MultiZone:Component:HorizontalOpening': self.afes,
+                  'AirflowNetwork:MultiZone:Component:ZoneExhaustFan': self.afes,
+                  'AirflowNetwork:MultiZone:ExternalNode': self.external_nodes,
+                  'AirflowNetwork:Distribution:Node': self.nodes,
+                  'AirflowNetwork:IntraZone:Node': self.nodes}
+        # Load the sim-control object
         try:
-            self.simcontrol = self.model['AirflowNetwork:SimulationControl']
+            self.sim_control = self.model['AirflowNetwork:SimulationControl']
         except KeyError:
             self.json['messages'] = ['Model does not contain a AirflowNetwork:SimulationControl object, aborting audit']
             return False
@@ -99,28 +100,28 @@ class AFN_Auditor(auditor.Auditor):
         for key in keys:
             directions.append(wpa[key])
 
-        for k,v in self.model['AirflowNetwork:MultiZone:WindPressureCoefficientValues'].items():
+        for k, v in self.model['AirflowNetwork:MultiZone:WindPressureCoefficientValues'].items():
             keys = [el for el in v.keys() if el.startswith('wind_pres')]
             keys.sort()
-            coeffs = []
+            coefficients = []
             for key in keys:
-                coeffs.append(v[key])
-            self.wpcs[k] = {'wind_directions' : directions,
-                            'wind_pressure_coefficient_values' : coeffs}
+                coefficients.append(v[key])
+            self.wpcs[k] = {'wind_directions': directions,
+                            'wind_pressure_coefficient_values': coefficients}
 
         # Pull out the airflow network objects
         for key in self.model.keys():
             if key in lookup:
-                thedict = lookup[key]
-                for k,v in self.model[key].items():
-                    thedict[k] = v
+                the_dict = lookup[key]
+                for k, v in self.model[key].items():
+                    the_dict[k] = v
         return True
         
     def write_dot(self, fp):
-        if self.nodes == []:
+        if not self.nodes:
             # Have to have internal nodes
             return
-        if self.surfs == []:
+        if not self.surfs:
             # Have to have connections
             return
         #
@@ -142,12 +143,11 @@ class AFN_Auditor(auditor.Auditor):
             fp.write('%s -- %s\n' % (surf['nodes'][0]['display_name'],
                                      surf['nodes'][1]['display_name']))
         fp.write('}\n')
-    def __compute_azimuths(self):
-        if self.relative_geometry:
-            for surf in self.surfs:
-                htsurf = self.model['BuildingSurface:Detailed'][surf['building_surface_name']]
+    #def __compute_azimuths(self):
+    #    if self.relative_geometry:
+    #        for surf in self.surfs:
+    #            htsurf = self.model['BuildingSurface:Detailed'][surf['building_surface_name']]
                 
-            
     def __connect_multizone(self):
         # Link surfaces to nodes, need to automate this better at some point
         for name, node in self.nodes.items():
@@ -162,38 +162,39 @@ class AFN_Auditor(auditor.Auditor):
         heat_transfer_surface_names = ['BuildingSurface:Detailed',
                                        'FenestrationSurface:Detailed']
 
-        htsurfs = {}
+        ht_surfs = {}
         for name in heat_transfer_surface_names:
-            htsurfs.update(self.model[name])
+            ht_surfs.update(self.model[name])
 
         outdoor_count = 0
 
         for name, surf in self.surfs.items():
-            window = None
             try:
-                htsurf = htsurfs[surf['surface_name']]
+                ht_surf = ht_surfs[surf['surface_name']]
             except KeyError:
                 raise auditor.BadModel('Failed to find heat transfer surface for AirflowNetwork surface "' + name + '"')
-            if 'building_surface_name' in htsurf:
-                window = htsurf
+            if 'building_surface_name' in ht_surf:
+                window = ht_surf
                 try:
-                    htsurf = htsurfs[window['building_surface_name']]
+                    ht_surf = ht_surfs[window['building_surface_name']]
                 except KeyError:
-                    raise auditor.BadModel('Failed to find window heat transfer surface for AirflowNetwork surface "' + name + '"')
+                    raise auditor.BadModel(
+                        'Failed to find window heat transfer surface for AirflowNetwork surface "' + name + '"'
+                    )
 
-            bc = htsurf['outside_boundary_condition']
+            bc = ht_surf['outside_boundary_condition']
 
             linked_nodes = []
             if bc == 'Outdoors':
                 outdoor_count += 1
                 external_node = self.external_nodes[surf['external_node_name']]
                 external_node['link_count'] += 1
-                zone_name = htsurf['zone_name']
+                zone_name = ht_surf['zone_name']
                 # Find the multizone zone that points at this zone
-                afnzone = None
-                for name,node in self.nodes.items():
+                afn_zone = None
+                for _, node in self.nodes.items():
                     if node['zone_name'] == zone_name:
-                        afnzone = node
+                        afn_zone = node
                         node['link_count'] += 1
                         node['external_connections'] += 1
                         if surf['external_node_name'] in node['neighbors']:
@@ -205,36 +206,38 @@ class AFN_Auditor(auditor.Auditor):
                         else:
                             external_node['neighbors'][zone_name] = 1
                         break
-                if afnzone == None:
+                if afn_zone is None:
                     raise auditor.BadModel('Failed to find AirflowNetwork zone for thermal zone "' + zone_name + '"')
-                linked_nodes = [afnzone, external_node]
+                linked_nodes = [afn_zone, external_node]
             elif bc == 'Surface':
-                zone_name = htsurf['zone_name']
+                zone_name = ht_surf['zone_name']
                 # Find the multizone zone that points at this zone
-                afnzone = None
-                for name,node in self.nodes.items():
+                afn_zone = None
+                for _, node in self.nodes.items():
                     if node['zone_name'] == zone_name:
-                        afnzone = node
+                        afn_zone = node
                         node['link_count'] += 1
                         break
-                if afnzone == None:
+                if afn_zone is None:
                     raise auditor.BadModel('Failed to find AirflowNetwork zone for thermal zone "' + zone_name + '"')
-                linked_nodes = [afnzone]
-                adjhtsurf = htsurfs[htsurf['outside_boundary_condition_object']]
+                linked_nodes = [afn_zone]
+                adjhtsurf = ht_surfs[ht_surf['outside_boundary_condition_object']]
                 adj_zone_name = adjhtsurf['zone_name']
                 adj_afnzone = None
-                for name,node in self.nodes.items():
+                for _, node in self.nodes.items():
                     if node['zone_name'] == adj_zone_name:
                         adj_afnzone = node
                         node['link_count'] += 1
                         break
-                if adj_afnzone == None:
-                    raise auditor.BadModel('Failed to find AirflowNetwork zone for adjacent thermal zone "' + adj_zone_name + '"')
+                if adj_afnzone is None:
+                    raise auditor.BadModel(
+                        'Failed to find AirflowNetwork zone for adjacent thermal zone "' + adj_zone_name + '"'
+                    )
                 linked_nodes.append(adj_afnzone)
-                if adj_zone_name in afnzone['neighbors']:
-                    afnzone['neighbors'][adj_zone_name] += 1
+                if adj_zone_name in afn_zone['neighbors']:
+                    afn_zone['neighbors'][adj_zone_name] += 1
                 else:
-                    afnzone['neighbors'][adj_zone_name] = 1
+                    afn_zone['neighbors'][adj_zone_name] = 1
                 if zone_name in adj_afnzone['neighbors']:
                     adj_afnzone['neighbors'][zone_name] += 1
                 else:
@@ -242,12 +245,13 @@ class AFN_Auditor(auditor.Auditor):
                 
             surf['nodes'] = linked_nodes
         return True
+
     def audit(self, **kwargs):
         if self.nodes == {} or self.external_nodes == {} or self.surfs == {}:
             self.extract()
             self.connect_multizone()
 
-        #for name, surf in netcomps.data['AirflowNetwork:MultiZone:Surface'].items():
+        # for name, surf in netcomps.data['AirflowNetwork:MultiZone:Surface'].items():
         #    if len(surf['nodes']) != 2:
         #        raise Exception('Failed to define all surface linkages')
 
@@ -260,7 +264,7 @@ class AFN_Auditor(auditor.Auditor):
         max_links = 0
         max_external_link_node_name = None
         max_external_links = 0
-        for name,node in self.nodes.items():
+        for name, node in self.nodes.items():
             if node['link_count'] > max_links:
                 max_link_node_name = name
                 max_links = node['link_count']
@@ -276,8 +280,8 @@ class AFN_Auditor(auditor.Auditor):
             else:
                 external_link_histogram[node['external_connections']] = 1
 
-        #print(max_link_node_name, max_external_link_node_name)
-        #print(len(self.nodes))
+        # print(max_link_node_name, max_external_link_node_name)
+        # print(len(self.nodes))
 
         #
         # For a simple brick zone, 6 multizone links would connect it to all neighbors.
@@ -287,40 +291,44 @@ class AFN_Auditor(auditor.Auditor):
         large_links = 0
         too_many_links = 0
         way_too_many_links = 0
-        for k,v in link_histogram.items():
+        for k, v in link_histogram.items():
             if k >= 25:
                 large_links += v
             if k >= 50:
                 too_many_links += v
             if k >= 100:
                 way_too_many_links += v
-        #print(large_links, too_many_links, way_too_many_links)
+        # print(large_links, too_many_links, way_too_many_links)
 
         # Do the same thing for external connections, but using 2 as the ideal, quadruple that
         # would be ~8
         large_external_links = 0
         too_many_external_links = 0
         way_too_many_external_links = 0
-        for k,v in external_link_histogram.items():
+        for k, v in external_link_histogram.items():
             if k >= 8:
                 large_external_links += v
             if k >= 16:
                 too_many_external_links += v
             if k >= 32:
                 way_too_many_external_links += v
-        #print(large_external_links, too_many_external_links, way_too_many_external_links)
+        # print(large_external_links, too_many_external_links, way_too_many_external_links)
 
         #
         # Machine-readable output
         #
         self.json['multizone_link_histogram'] = link_histogram
-        self.json['max_multizone_links'] = {'zone' : self.nodes[max_link_node_name]['zone_name'],
-                                            'afn_zone' : max_link_node_name,
-                                            'count' : max_links}
+        self.json['max_multizone_links'] = {
+            'zone': self.nodes[max_link_node_name]['zone_name'],
+            'afn_zone': max_link_node_name,
+            'count': max_links
+        }
         self.json['external_link_histogram'] = external_link_histogram
-        self.json['max_external_links'] = {'zone' : self.nodes[max_external_link_node_name]['zone_name'],
-                                           'afn_zone' : max_external_link_node_name,
-                                            'count' : max_external_links}
+        self.json['max_external_links'] = {
+            'zone': self.nodes[max_external_link_node_name]['zone_name'],
+            'afn_zone': max_external_link_node_name,
+            'count': max_external_links
+        }
         self.json['messages'] = []
         if large_links > 0:
             mesg = '%d zone(s) with greater than 25 links' % large_links
@@ -345,7 +353,7 @@ if __name__ == '__main__':
     # The main body of the script, do argument processing first
     #
     parser = argparse.ArgumentParser(description='AirflowNetwork model audit script')
-    #args.add_argument('-g', '--graph', help='Generate a graphviz graph',
+    # args.add_argument('-g', '--graph', help='Generate a graphviz graph',
     #                  default=False, action='store_true')
     parser.add_argument('-g', '--graph', help='generate a graphviz .dot output file',
                         dest='graph', metavar='dotfile', default=None,
@@ -357,10 +365,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     fp = open(args.json_file, 'r')
-    model = json.load(fp)
+    my_model = json.load(fp)
     fp.close()
 
-    auditor = AFN_Auditor(model)
+    auditor = AFNAuditor(my_model)
 
     auditor.audit()
 

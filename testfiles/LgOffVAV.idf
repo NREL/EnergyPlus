@@ -4662,8 +4662,8 @@
     P1T AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     P2TEquipment,            !- Name
@@ -4672,8 +4672,8 @@
     P2T AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     P3TEquipment,            !- Name
@@ -4682,8 +4682,8 @@
     P3T AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     P4TEquipment,            !- Name
@@ -4692,8 +4692,8 @@
     P4T AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     C1TEquipment,            !- Name
@@ -4702,8 +4702,8 @@
     C1T AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     P1FEquipment,            !- Name
@@ -4712,8 +4712,8 @@
     P1F AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     P2FEquipment,            !- Name
@@ -4722,8 +4722,8 @@
     P2F AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     P3FEquipment,            !- Name
@@ -4732,8 +4732,8 @@
     P3F AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     P4FEquipment,            !- Name
@@ -4742,8 +4742,8 @@
     P4F AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     C1FEquipment,            !- Name
@@ -4752,8 +4752,8 @@
     C1F AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     P1IEquipment,            !- Name
@@ -4762,8 +4762,8 @@
     P1I AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     P2IEquipment,            !- Name
@@ -4772,8 +4772,8 @@
     P2I AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     P3IEquipment,            !- Name
@@ -4782,8 +4782,8 @@
     P3I AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     P4IEquipment,            !- Name
@@ -4792,8 +4792,8 @@
     P4I AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     C1IEquipment,            !- Name
@@ -4802,8 +4802,8 @@
     C1I AHU,                 !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     P1T AHU,                 !- Name

@@ -57,6 +57,7 @@
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
+#include <DataHeatBalSurface.hh>
 #include <DataLoopNode.hh>
 #include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
@@ -1581,6 +1582,128 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     EXPECT_LT(transSol, 0.2);
     refPtIllum = DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt(1);
     EXPECT_LT(refPtIllum, 1000.0);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_Default)
+{
+    // Test various inputs for HeatBalanceAlgorithm
+    // Default is CTF if no HeatBalanceAlgorithm object is present
+
+    EXPECT_FALSE(DataHeatBalance::AnyCTF);
+    bool errorsfound = false;
+
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetProjectControlData(errorsfound);
+    EXPECT_FALSE(errorsfound);
+    EXPECT_TRUE(DataHeatBalance::AnyCTF);
+    EXPECT_FALSE(DataHeatBalance::AnyEMPD);
+    EXPECT_FALSE(DataHeatBalance::AnyCondFD);
+    EXPECT_FALSE(DataHeatBalance::AnyHAMT);
+    EXPECT_EQ(DataHeatBalance::OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CTF);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
+{
+    // Test various inputs for HeatBalanceAlgorithm
+
+    EXPECT_FALSE(DataHeatBalance::AnyCTF);
+    bool errorsfound = false;
+
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+        "  HeatBalanceAlgorithm,",
+        "  ConductionTransferFunction, !- Algorithm",
+        "  205.2,                      !- Surface Temperature Upper Limit",
+        "  0.004,                      !- Minimum Surface Convection Heat Transfer Coefficient Value",
+        "  200.6;                      !- Maximum Surface Convection Heat Transfer Coefficient Value",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetProjectControlData(errorsfound);
+    EXPECT_FALSE(errorsfound);
+    EXPECT_TRUE(DataHeatBalance::AnyCTF);
+    EXPECT_FALSE(DataHeatBalance::AnyEMPD);
+    EXPECT_FALSE(DataHeatBalance::AnyCondFD);
+    EXPECT_FALSE(DataHeatBalance::AnyHAMT);
+    EXPECT_EQ(DataHeatBalance::OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CTF);
+    EXPECT_EQ(DataHeatBalSurface::MaxSurfaceTempLimit, 205.2);
+    EXPECT_EQ(DataHeatBalance::LowHConvLimit, 0.004);
+    EXPECT_EQ(DataHeatBalance::HighHConvLimit, 200.6);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_EMPD)
+{
+    // Test various inputs for HeatBalanceAlgorithm
+
+    bool errorsfound = false;
+
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+        "  HeatBalanceAlgorithm,",
+        "  MoisturePenetrationDepthConductionTransferFunction; !- Algorithm",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetProjectControlData(errorsfound);
+    EXPECT_FALSE(errorsfound);
+    EXPECT_FALSE(DataHeatBalance::AnyCTF);
+    EXPECT_TRUE(DataHeatBalance::AnyEMPD);
+    EXPECT_FALSE(DataHeatBalance::AnyCondFD);
+    EXPECT_FALSE(DataHeatBalance::AnyHAMT);
+    EXPECT_EQ(DataHeatBalance::OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_EMPD);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
+{
+    // Test various inputs for HeatBalanceAlgorithm
+
+    bool errorsfound = false;
+
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+        "  HeatBalanceAlgorithm,",
+        "  ConductionFiniteDifference; !- Algorithm",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetProjectControlData(errorsfound);
+    EXPECT_FALSE(errorsfound);
+    EXPECT_FALSE(DataHeatBalance::AnyCTF);
+    EXPECT_FALSE(DataHeatBalance::AnyEMPD);
+    EXPECT_TRUE(DataHeatBalance::AnyCondFD);
+    EXPECT_FALSE(DataHeatBalance::AnyHAMT);
+    EXPECT_EQ(DataHeatBalance::OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CondFD);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
+{
+    // Test various inputs for HeatBalanceAlgorithm
+
+    bool errorsfound = false;
+
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+        "  HeatBalanceAlgorithm,",
+        "  CombinedHeatAndMoistureFiniteElement; !- Algorithm",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetProjectControlData(errorsfound);
+    EXPECT_FALSE(errorsfound);
+    EXPECT_FALSE(DataHeatBalance::AnyCTF);
+    EXPECT_FALSE(DataHeatBalance::AnyEMPD);
+    EXPECT_FALSE(DataHeatBalance::AnyCondFD);
+    EXPECT_TRUE(DataHeatBalance::AnyHAMT);
+    EXPECT_EQ(DataHeatBalance::OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_HAMT);
 }
 
 } // namespace EnergyPlus
