@@ -257,7 +257,59 @@ namespace UnitarySystems {
                               bool &CoolActive,
                               int const ZoneOAUnitNum,
                               Real64 const OAUCoilOutTemp,
+                              bool const ZoneEquipment,
+                              Real64 &sysOutputProvided,
+                              Real64 &latOutputProvided)
+    {
+        simulateSys(Name,
+                    FirstHVACIteration,
+                    AirLoopNum,
+                    CompIndex,
+                    HeatActive,
+                    CoolActive,
+                    ZoneOAUnitNum,
+                    OAUCoilOutTemp,
+                    ZoneEquipment,
+                    sysOutputProvided,
+                    latOutputProvided);
+    }
+
+    void UnitarySys::simulate(std::string const &Name,
+                              bool const FirstHVACIteration,
+                              int const &AirLoopNum,
+                              int &CompIndex,
+                              bool &HeatActive,
+                              bool &CoolActive,
+                              int const ZoneOAUnitNum,
+                              Real64 const OAUCoilOutTemp,
                               bool const ZoneEquipment)
+    {
+        Real64 sysOutputProvided = 0.0;
+        Real64 latOutputProvided = 0.0;
+        simulateSys(Name,
+                    FirstHVACIteration,
+                    AirLoopNum,
+                    CompIndex,
+                    HeatActive,
+                    CoolActive,
+                    ZoneOAUnitNum,
+                    OAUCoilOutTemp,
+                    ZoneEquipment,
+                    sysOutputProvided,
+                    latOutputProvided);
+    }
+
+    void UnitarySys::simulateSys(std::string const &Name,
+                                 bool const FirstHVACIteration,
+                                 int const &AirLoopNum,
+                                 int &CompIndex,
+                                 bool &HeatActive,
+                                 bool &CoolActive,
+                                 int const ZoneOAUnitNum,
+                                 Real64 const OAUCoilOutTemp,
+                                 bool const ZoneEquipment,
+                                 Real64 &sysOutputProvided,
+                                 Real64 &latOutputProvided)
     {
         int CompOn = 0;
 
@@ -286,15 +338,18 @@ namespace UnitarySystems {
                 auto const SELECT_CASE_var(this->m_ControlType);
                 if (SELECT_CASE_var == ControlType::Setpoint) {
                     if (ZoneEquipment) {
-                        this->controlUnitarySystemtoSP(0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn);
+                        this->controlUnitarySystemtoSP(0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
                     } else {
-                        this->controlUnitarySystemtoSP(AirLoopNum, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn);
+                        this->controlUnitarySystemtoSP(
+                            AirLoopNum, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
                     }
                 } else if (SELECT_CASE_var == ControlType::Load || SELECT_CASE_var == ControlType::CCMASHRAE) {
                     if (ZoneEquipment) {
-                        this->controlUnitarySystemtoLoad(0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn);
+                        this->controlUnitarySystemtoLoad(
+                            0, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
                     } else {
-                        this->controlUnitarySystemtoLoad(AirLoopNum, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn);
+                        this->controlUnitarySystemtoLoad(
+                            AirLoopNum, FirstHVACIteration, CompOn, OAUCoilOutTemp, HXUnitOn, sysOutputProvided, latOutputProvided);
                     }
                 }
             }
@@ -307,9 +362,9 @@ namespace UnitarySystems {
             this->reportUnitarySystem(AirLoopNum);
         }
 
-        CoolActive = false;
+        // CoolActive = false; // set in call from ZoneEquipmentManager
         if (this->m_CoolingPartLoadFrac * double(CompOn) > 0.0) CoolActive = true;
-        HeatActive = false;
+        // HeatActive = false; // set in call from ZoneEquipmentManager
         if (this->m_HeatingPartLoadFrac * double(CompOn) > 0.0 || this->m_SuppHeatPartLoadFrac * double(CompOn) > 0.0) HeatActive = true;
 
         // set econo lockout flag
@@ -2989,12 +3044,16 @@ namespace UnitarySystems {
                                         DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .EquipName(EquipNum) != thisObjectName)
                                         continue;
+                                    // When used as zone equipment these 2 variables will not be used to access SequencedOutput variables
+                                    // leave this here in case it could be used in the future. It would need to be changed to use equipIndex instead.
+                                    // (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
                                     thisSys.m_ZoneSequenceCoolingNum =
                                         DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                             .CoolingPriority(EquipNum);
                                     thisSys.m_ZoneSequenceHeatingNum =
                                         DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                             .HeatingPriority(EquipNum);
+                                    break;
                                 }
                             }
                             thisSys.ControlZoneNum = ControlledZoneNum;
@@ -3057,6 +3116,9 @@ namespace UnitarySystems {
                                             DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                     .EquipName(EquipNum) != thisObjectName)
                                             continue;
+                                        // When used as zone equipment these 2 variables will not be used to access SequencedOutput variables
+                                        // leave this here in case it could be used in the future. It would need to be changed to use equipIndex instead.
+                                        // (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
                                         thisSys.m_ZoneSequenceCoolingNum =
                                             DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .CoolingPriority(EquipNum);
@@ -3123,6 +3185,9 @@ namespace UnitarySystems {
                                             DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                     .EquipName(EquipNum) != thisObjectName)
                                             continue;
+                                        // When used as zone equipment these 2 variables will not be used to access SequencedOutput variables
+                                        // leave this here in case it could be used in the future. It would need to be changed to use equipIndex instead.
+                                        // (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
                                         thisSys.m_ZoneSequenceCoolingNum =
                                             DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .CoolingPriority(EquipNum);
@@ -3293,7 +3358,9 @@ namespace UnitarySystems {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
                             } else {                                                                  // mine data from fan object
-                                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(loc_m_FanName)); // call constructor
+                                if (HVACFan::getFanObjectVectorIndex(loc_m_FanName) < 0) {
+                                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(loc_m_FanName)); // call constructor
+                                }
                                 thisSys.m_FanIndex = HVACFan::getFanObjectVectorIndex(loc_m_FanName);
                                 if (thisSys.m_FanIndex > -1) {
                                     FanInletNode = HVACFan::fanObjs[thisSys.m_FanIndex]->inletNodeNum;
@@ -6876,7 +6943,9 @@ namespace UnitarySystems {
                                                 bool const FirstHVACIteration, // True when first HVAC iteration
                                                 int &CompOn,                   // Determines if compressor is on or off
                                                 Real64 const OAUCoilOutTemp,   // the coil inlet temperature of OutdoorAirUnit
-                                                bool HXUnitOn                  // Flag to control HX for HXAssisted Cooling Coil
+                                                bool HXUnitOn,                 // Flag to control HX for HXAssisted Cooling Coil
+                                                Real64 &sysOutputProvided,     // system sensible output at supply air node
+                                                Real64 &latOutputProvided      // sytsem latent output at supply air node
     )
     {
 
@@ -6925,8 +6994,6 @@ namespace UnitarySystems {
         Real64 CoolPLR = this->m_CoolingPartLoadFrac;
         Real64 HeatPLR = this->m_HeatingPartLoadFrac;
         Real64 HeatCoilLoad = HeatPLR * this->m_DesignHeatingCapacity;
-        Real64 SensOutput = 0.0;
-        Real64 LatOutput = 0.0;
 
         if (this->CoolCoilFluidInletNode > 0) {
             PlantUtilities::SetComponentFlowRate(DataLoopNode::Node(this->CoolCoilFluidInletNode).MassFlowRate,
@@ -6973,8 +7040,8 @@ namespace UnitarySystems {
                                       CoolPLR,
                                       HeatPLR,
                                       OnOffAirFlowRatio,
-                                      SensOutput,
-                                      LatOutput,
+                                      sysOutputProvided,
+                                      latOutputProvided,
                                       HXUnitOn,
                                       HeatCoilLoad,
                                       SupHeaterLoad,
@@ -6990,8 +7057,8 @@ namespace UnitarySystems {
                                               CoolPLR,
                                               HeatPLR,
                                               OnOffAirFlowRatio,
-                                              SensOutput,
-                                              LatOutput,
+                                              sysOutputProvided,
+                                              latOutputProvided,
                                               HXUnitOn,
                                               HeatCoilLoad,
                                               SupHeaterLoad,
@@ -7029,7 +7096,9 @@ namespace UnitarySystems {
                                               bool const FirstHVACIteration, // True when first HVAC iteration
                                               int &CompOn,                   // compressor on/off control
                                               Real64 const OAUCoilOutTemp,   // the coil inlet temperature of OutdoorAirUnit
-                                              bool HXUnitOn                  // Flag to control HX for HXAssisted Cooling Coil
+                                              bool HXUnitOn,                 // Flag to control HX for HXAssisted Cooling Coil
+                                              Real64 &sysOutputProvided,     // sensible output at supply air node
+                                              Real64 &latOutputProvided      // latent output at supply air node
     )
     {
 
@@ -7177,6 +7246,7 @@ namespace UnitarySystems {
             }
         }
 
+        calculateCapacity(sysOutputProvided, latOutputProvided);
         this->m_InitHeatPump = false;
     }
 
@@ -7218,7 +7288,8 @@ namespace UnitarySystems {
                 // here we need to deal with sequenced zone equip
                 HeatingLoad = false;
                 CoolingLoad = false;
-                if (this->m_ZoneSequenceCoolingNum > 0 && this->m_ZoneSequenceHeatingNum > 0) {
+                if (this->m_ZoneSequenceCoolingNum > 0 && this->m_ZoneSequenceHeatingNum > 0 and this->m_AirLoopEquipment) {
+                    // air loop equipment uses sequenced variables
                     QToCoolSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum)
                                        .SequencedOutputRequiredToCoolingSP(this->m_ZoneSequenceCoolingNum);
                     QToHeatSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum)
@@ -7243,10 +7314,11 @@ namespace UnitarySystems {
                     MoistureLoad = DataZoneEnergyDemands::ZoneSysMoistureDemand(this->ControlZoneNum)
                                        .SequencedOutputRequiredToDehumidSP(this->m_ZoneSequenceCoolingNum);
                 } else {
+                    // zone equipment uses Remaining* variables
                     ZoneLoad = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputRequired;
-                    QToCoolSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).OutputRequiredToCoolingSP;
-                    QToHeatSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).OutputRequiredToHeatingSP;
-                    MoistureLoad = DataZoneEnergyDemands::ZoneSysMoistureDemand(this->ControlZoneNum).OutputRequiredToDehumidifyingSP;
+                    QToCoolSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputReqToCoolSP;
+                    QToHeatSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(this->ControlZoneNum).RemainingOutputReqToHeatSP;
+                    MoistureLoad = DataZoneEnergyDemands::ZoneSysMoistureDemand(this->ControlZoneNum).RemainingOutputReqToDehumidSP;
                 }
 
                 if (this->m_DehumidControlType_Num != DehumCtrlType::None) {
@@ -8579,10 +8651,10 @@ namespace UnitarySystems {
                     this->m_ZoneSequenceHeatingNum = heatingPriority;
                 }
                 this->m_MyCheckFlag = false;
-                if (this->m_ZoneSequenceCoolingNum == 0) {
-                    ShowSevereError(this->UnitType + " \"" + this->Name +
-                                    "\": No matching air terminal found in the zone equipment list for zone = " +
-                                    DataHeatBalance::Zone(this->ControlZoneNum).Name + ".");
+                if (this->m_ZoneSequenceCoolingNum == 0 || this->m_ZoneSequenceHeatingNum == 0) {
+                    ShowSevereError(this->UnitType + " \"" + this->Name + "\": Airloop air terminal in the zone equipment list for zone = " +
+                                    DataHeatBalance::Zone(this->ControlZoneNum).Name +
+                                    " not found or is not allowed Zone Equipment Cooling or Heating Sequence = 0.");
                     ShowFatalError("Subroutine InitLoadBasedControl: Errors found in getting " + this->UnitType +
                                    " input.  Preceding condition(s) causes termination.");
                 }
@@ -9600,14 +9672,23 @@ namespace UnitarySystems {
     void UnitarySys::calculateCapacity(Real64 &SensOutput, Real64 &LatOutput)
     {
 
-        // Check delta T (outlet to space), IF positive use space HumRat ELSE outlet humrat to calculate
+        // Check delta T (outlet to reference temp), IF positive use reference HumRat ELSE outlet humrat to calculate
         // sensible capacity as MdotDeltaH at constant humidity ratio
-        Real64 MinHumRatio = DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat;
         int OutletNode = this->AirOutNode;
         Real64 AirMassFlow = DataLoopNode::Node(OutletNode).MassFlowRate;
-        Real64 ZoneTemp = DataLoopNode::Node(this->NodeNumOfControlledZone).Temp;
-        Real64 ZoneHumRat = DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat;
-        if (DataLoopNode::Node(OutletNode).Temp < ZoneTemp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat;
+        Real64 RefTemp = 0.0;
+        Real64 RefHumRat = 0.0;
+        Real64 MinHumRatio = 0.0;
+        if (this->m_ControlType == ControlType::Setpoint) {
+            RefTemp = DataLoopNode::Node(this->AirInNode).Temp;
+            RefHumRat = DataLoopNode::Node(this->AirInNode).HumRat;
+            MinHumRatio = DataLoopNode::Node(this->AirInNode).HumRat;
+        } else {
+            RefTemp = DataLoopNode::Node(this->NodeNumOfControlledZone).Temp;
+            RefHumRat = DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat;
+            MinHumRatio = DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat;
+        }
+        if (DataLoopNode::Node(OutletNode).Temp < RefTemp) MinHumRatio = DataLoopNode::Node(OutletNode).HumRat;
 
         // calculate sensible load met
         if (this->ATMixerExists) {
@@ -9616,12 +9697,12 @@ namespace UnitarySystems {
                 int ATMixOutNode = this->ATMixerOutNode;
                 SensOutput =
                     DataLoopNode::Node(ATMixOutNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(ATMixOutNode).Temp, MinHumRatio) -
-                                                                     Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
+                                                                     Psychrometrics::PsyHFnTdbW(RefTemp, MinHumRatio));
                 if (this->m_Humidistat) {
                     //   Calculate latent load met (at constant temperature)
                     LatOutput = DataLoopNode::Node(ATMixOutNode).MassFlowRate *
-                                    (Psychrometrics::PsyHFnTdbW(ZoneTemp, DataLoopNode::Node(ATMixOutNode).HumRat) -
-                                     Psychrometrics::PsyHFnTdbW(ZoneTemp, ZoneHumRat)) -
+                                    (Psychrometrics::PsyHFnTdbW(RefTemp, DataLoopNode::Node(ATMixOutNode).HumRat) -
+                                     Psychrometrics::PsyHFnTdbW(RefTemp, RefHumRat)) -
                                 this->m_LatLoadLoss;
                 } else {
                     LatOutput = 0.0;
@@ -9629,11 +9710,11 @@ namespace UnitarySystems {
             } else {
                 // Air terminal inlet side mixer
                 SensOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) -
-                                            Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio));
+                                            Psychrometrics::PsyHFnTdbW(RefTemp, MinHumRatio));
                 if (this->m_Humidistat) {
                     //   Calculate latent load met (at constant temperature)
-                    LatOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(ZoneTemp, DataLoopNode::Node(OutletNode).HumRat) -
-                                               Psychrometrics::PsyHFnTdbW(ZoneTemp, ZoneHumRat)) -
+                    LatOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(RefTemp, DataLoopNode::Node(OutletNode).HumRat) -
+                                               Psychrometrics::PsyHFnTdbW(RefTemp, RefHumRat)) -
                                 this->m_LatLoadLoss;
                 } else {
                     LatOutput = 0.0;
@@ -9642,14 +9723,14 @@ namespace UnitarySystems {
         } else {
             // Calculate sensible load met (at constant humidity ratio)
             SensOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) -
-                                        Psychrometrics::PsyHFnTdbW(ZoneTemp, MinHumRatio)) -
+                                        Psychrometrics::PsyHFnTdbW(RefTemp, MinHumRatio)) -
                          this->m_SenLoadLoss;
 
             if (this->m_Humidistat) {
 
                 //   Calculate latent load met (at constant temperature)
-                LatOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(ZoneTemp, DataLoopNode::Node(OutletNode).HumRat) -
-                                           Psychrometrics::PsyHFnTdbW(ZoneTemp, ZoneHumRat)) -
+                LatOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(RefTemp, DataLoopNode::Node(OutletNode).HumRat) -
+                                           Psychrometrics::PsyHFnTdbW(RefTemp, RefHumRat)) -
                             this->m_LatLoadLoss;
             } else {
                 LatOutput = 0.0;
