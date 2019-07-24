@@ -87,9 +87,6 @@ namespace DataGlobals {
     extern int const ksHVACSizeRunPeriodDesign; // a weather period design day run during HVAC Sizing Simulation
     extern int const ksReadAllWeatherData;      // a weather period for reading all weather data prior to the simulation
 
-    extern int const ZoneTSReporting; // value for Zone Time Step Reporting (UpdateDataAndReport)
-    extern int const HVACTSReporting; // value for HVAC Time Step Reporting (UpdateDataAndReport)
-
     extern Real64 const MaxEXPArg; // maximum exponent in EXP() function
     extern Real64 const Pi;        // Pi 3.1415926535897932384626435
     extern Real64 const PiOvr2;    // Pi/2

@@ -75,7 +75,7 @@ namespace OutputProcessor {
         int const NumVariables = 2;
         Array1D_int VarIndexes(NumVariables);                     // Variable Numbers
         Array1D_int VarTypes(NumVariables);                       // Variable Types (1=integer, 2=real, 3=meter)
-        Array1D_int IndexTypes(NumVariables);                     // Variable Index Types (1=Zone,2=HVAC)
+        Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables);                     // Variable Index Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar(NumVariables); // units from enum for each variable
         Array1D_int ResourceTypes(NumVariables);                  // ResourceTypes for each variable
         Array1D_string EndUses(NumVariables);                     // EndUses for each variable
@@ -1090,23 +1090,25 @@ namespace OutputProcessor {
         auto const calledFrom = "UnitTest";
 
         for (auto const &indexGroup : resource_map) {
-            EXPECT_EQ(indexGroup.second, ValidateIndexType(indexGroup.first, calledFrom)) << "where indexTypeKey is " << indexGroup.first;
+            EXPECT_EQ(indexGroup.second, ValidateTimeStepType(indexGroup.first, calledFrom)) << "where indexTypeKey is " << indexGroup.first;
         }
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_DeathTest_validateIndexType)
     {
         auto const calledFrom = "UnitTest";
-        EXPECT_ANY_THROW(ValidateIndexType("BAD INPUT", calledFrom));
+        EXPECT_ANY_THROW(ValidateTimeStepType("BAD INPUT", calledFrom));
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_standardIndexTypeKey)
     {
-        EXPECT_EQ("Zone", StandardIndexTypeKey(1));
-        EXPECT_EQ("HVAC", StandardIndexTypeKey(2));
-        EXPECT_EQ("UNKW", StandardIndexTypeKey(0));
-        EXPECT_EQ("UNKW", StandardIndexTypeKey(-1));
-        EXPECT_EQ("UNKW", StandardIndexTypeKey(3));
+        EXPECT_EQ("Zone", StandardTimeStepTypeKey(OutputProcessor::TimeStepType::TimeStepZone));
+        EXPECT_EQ("HVAC", StandardTimeStepTypeKey(OutputProcessor::TimeStepType::TimeStepSystem));
+
+        // It's no longer possible to pass something that isn't part of the enum, that's kind of the point of using an enum!
+        //EXPECT_EQ("UNKW", StandardTimeStepTypeKey(0));
+        //EXPECT_EQ("UNKW", StandardTimeStepTypeKey(-1));
+        //EXPECT_EQ("UNKW", StandardTimeStepTypeKey(3));
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_validateVariableType)
@@ -1418,172 +1420,179 @@ namespace OutputProcessor {
 
         EnergyPlus::sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
 
+
+        // For now I don't accept anything else than TimeStepZone or TimeStepSystem, but to make it easier if we need to change that later
+        // and to preserve the original test (passing int=3 before should have defaulted to Zone...)
+        OutputProcessor::TimeStepType aThirdTimeStepType = OutputProcessor::TimeStepType::TimeStepZone;
+
+
         WriteReportVariableDictionaryItem(ReportingFrequency::TimeStep, StoreType::Averaged, 1, -999, "indexGroup", "1", "keyedValue", "variableName",
-                                          1, OutputProcessor::Unit::m3_s, _, _);
+                                          OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1,keyedValue,variableName [m3/s] !TimeStep"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::TimeStep, StoreType::Summed, 2, -999, "indexGroup", "2", "keyedValue", "variableName",
-                                          1, OutputProcessor::Unit::m3_s, _, _);
+                                          OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"2,1,keyedValue,variableName [m3/s] !TimeStep"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::TimeStep, StoreType::Averaged, 3, -999, "indexGroup", "3", "keyedValue", "variableName",
-                                          1, OutputProcessor::Unit::m3_s, _, "scheduleName");
+                                          OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, "scheduleName");
         EXPECT_TRUE(compare_eso_stream(delimited_string({"3,1,keyedValue,variableName [m3/s] !TimeStep,scheduleName"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::TimeStep, StoreType::Averaged, 4, -999, "indexGroup", "4", "keyedValue", "variableName",
-                                          2, OutputProcessor::Unit::m3_s, _, _);
+                                          OutputProcessor::TimeStepType::TimeStepSystem, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"4,1,keyedValue,variableName [m3/s] !TimeStep"})));
 
+        // Hum, can no longer pass Something else than what's in the enum...
         WriteReportVariableDictionaryItem(ReportingFrequency::TimeStep, StoreType::Averaged, 5, -999, "indexGroup", "5", "keyedValue", "variableName",
-                                          3, OutputProcessor::Unit::m3_s, _, _);
+                                          aThirdTimeStepType, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"5,1,keyedValue,variableName [m3/s] !TimeStep"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::EachCall, StoreType::Averaged, 6, -999, "indexGroup", "6", "keyedValue", "variableName",
-                                          1, OutputProcessor::Unit::m3_s, _, _);
+                                          OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"6,1,keyedValue,variableName [m3/s] !Each Call"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::EachCall, StoreType::Summed, 7, -999, "indexGroup", "7", "keyedValue", "variableName",
-                                          1, OutputProcessor::Unit::m3_s, _, _);
+                                          OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"7,1,keyedValue,variableName [m3/s] !Each Call"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::EachCall, StoreType::Averaged, 8, -999, "indexGroup", "8", "keyedValue", "variableName",
-                                          1, OutputProcessor::Unit::m3_s, _, "scheduleName");
+                                          OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, "scheduleName");
         EXPECT_TRUE(compare_eso_stream(delimited_string({"8,1,keyedValue,variableName [m3/s] !Each Call,scheduleName"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::EachCall, StoreType::Averaged, 9, -999, "indexGroup", "9", "keyedValue", "variableName",
-                                          2, OutputProcessor::Unit::m3_s, _, _);
+                                          OutputProcessor::TimeStepType::TimeStepSystem, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"9,1,keyedValue,variableName [m3/s] !Each Call"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::EachCall, StoreType::Averaged, 10, -999, "indexGroup", "10", "keyedValue",
-                                          "variableName", 3, OutputProcessor::Unit::m3_s, _, _);
+                                          "variableName", aThirdTimeStepType, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"10,1,keyedValue,variableName [m3/s] !Each Call"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Hourly, StoreType::Averaged, 11, -999, "indexGroup", "11", "keyedValue", "variableName",
-                                          1, OutputProcessor::Unit::m3_s, _, _);
+                                          OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(TrackingHourlyVariables);
         TrackingHourlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"11,1,keyedValue,variableName [m3/s] !Hourly"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Hourly, StoreType::Summed, 12, -999, "indexGroup", "12", "keyedValue", "variableName",
-                                          1, OutputProcessor::Unit::m3_s, _, _);
+                                          OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(TrackingHourlyVariables);
         TrackingHourlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"12,1,keyedValue,variableName [m3/s] !Hourly"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Hourly, StoreType::Averaged, 13, -999, "indexGroup", "13", "keyedValue", "variableName",
-                                          1, OutputProcessor::Unit::m3_s, _, "scheduleName");
+                                          OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, "scheduleName");
         EXPECT_TRUE(TrackingHourlyVariables);
         TrackingHourlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"13,1,keyedValue,variableName [m3/s] !Hourly,scheduleName"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Hourly, StoreType::Averaged, 14, -999, "indexGroup", "14", "keyedValue", "variableName",
-                                          2, OutputProcessor::Unit::m3_s, _, _);
+                                          OutputProcessor::TimeStepType::TimeStepSystem, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(TrackingHourlyVariables);
         TrackingHourlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"14,1,keyedValue,variableName [m3/s] !Hourly"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Hourly, StoreType::Averaged, 15, -999, "indexGroup", "15", "keyedValue", "variableName",
-                                          3, OutputProcessor::Unit::m3_s, _, _);
+                                          aThirdTimeStepType, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(TrackingHourlyVariables);
         TrackingHourlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"15,1,keyedValue,variableName [m3/s] !Hourly"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Daily, StoreType::Averaged, 16, -999, "indexGroup", "16", "keyedValue", "variableName",
-                                          1, OutputProcessor::Unit::m3_s, _, _);
+                                          OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(TrackingDailyVariables);
         TrackingDailyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"16,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"})));
 
-        WriteReportVariableDictionaryItem(ReportingFrequency::Daily, StoreType::Summed, 17, -999, "indexGroup", "17", "keyedValue", "variableName", 1,
-                                          OutputProcessor::Unit::m3_s, _, _);
+        WriteReportVariableDictionaryItem(ReportingFrequency::Daily, StoreType::Summed, 17, -999, "indexGroup", "17", "keyedValue", "variableName",
+                                          OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(TrackingDailyVariables);
         TrackingDailyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"17,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Daily, StoreType::Averaged, 18, -999, "indexGroup", "18", "keyedValue", "variableName",
-                                          1, OutputProcessor::Unit::m3_s, _, "scheduleName");
+                                          OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, "scheduleName");
         EXPECT_TRUE(TrackingDailyVariables);
         TrackingDailyVariables = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"18,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute],scheduleName"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Daily, StoreType::Averaged, 19, -999, "indexGroup", "19", "keyedValue", "variableName",
-                                          2, OutputProcessor::Unit::m3_s, _, _);
+                                          OutputProcessor::TimeStepType::TimeStepSystem, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(TrackingDailyVariables);
         TrackingDailyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"19,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Daily, StoreType::Averaged, 20, -999, "indexGroup", "20", "keyedValue", "variableName",
-                                          3, OutputProcessor::Unit::m3_s, _, _);
+                                          aThirdTimeStepType, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(TrackingDailyVariables);
         TrackingDailyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"20,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Monthly, StoreType::Averaged, 21, -999, "indexGroup", "21", "keyedValue",
-                                          "variableName", 1, OutputProcessor::Unit::m3_s, _, _);
+                                          "variableName", OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(TrackingMonthlyVariables);
         TrackingMonthlyVariables = false;
         EXPECT_TRUE(
             compare_eso_stream(delimited_string({"21,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Monthly, StoreType::Summed, 22, -999, "indexGroup", "22", "keyedValue", "variableName",
-                                          1, OutputProcessor::Unit::m3_s, _, _);
+                                          OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(TrackingMonthlyVariables);
         TrackingMonthlyVariables = false;
         EXPECT_TRUE(
             compare_eso_stream(delimited_string({"22,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Monthly, StoreType::Averaged, 23, -999, "indexGroup", "23", "keyedValue",
-                                          "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName");
+                                          "variableName", OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, "scheduleName");
         EXPECT_TRUE(TrackingMonthlyVariables);
         TrackingMonthlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"23,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute],scheduleName"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Monthly, StoreType::Averaged, 24, -999, "indexGroup", "24", "keyedValue",
-                                          "variableName", 2, OutputProcessor::Unit::m3_s, _, _);
+                                          "variableName", OutputProcessor::TimeStepType::TimeStepSystem, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(TrackingMonthlyVariables);
         TrackingMonthlyVariables = false;
         EXPECT_TRUE(
             compare_eso_stream(delimited_string({"24,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Monthly, StoreType::Averaged, 25, -999, "indexGroup", "25", "keyedValue",
-                                          "variableName", 3, OutputProcessor::Unit::m3_s, _, _);
+                                          "variableName", aThirdTimeStepType, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(TrackingMonthlyVariables);
         TrackingMonthlyVariables = false;
         EXPECT_TRUE(
             compare_eso_stream(delimited_string({"25,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Simulation, StoreType::Averaged, 26, -999, "indexGroup", "26", "keyedValue",
-                                          "variableName", 1, OutputProcessor::Unit::m3_s, _, _);
+                                          "variableName", OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(TrackingRunPeriodVariables);
         TrackingRunPeriodVariables = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"26,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Simulation, StoreType::Summed, 27, -999, "indexGroup", "27", "keyedValue",
-                                          "variableName", 1, OutputProcessor::Unit::m3_s, _, _);
+                                          "variableName", OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(TrackingRunPeriodVariables);
         TrackingRunPeriodVariables = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"27,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Simulation, StoreType::Averaged, 28, -999, "indexGroup", "28", "keyedValue",
-                                          "variableName", 1, OutputProcessor::Unit::m3_s, _, "scheduleName");
+                                          "variableName", OutputProcessor::TimeStepType::TimeStepZone, OutputProcessor::Unit::m3_s, _, "scheduleName");
         EXPECT_TRUE(TrackingRunPeriodVariables);
         TrackingRunPeriodVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string(
             {"28,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute],scheduleName"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Simulation, StoreType::Averaged, 29, -999, "indexGroup", "29", "keyedValue",
-                                          "variableName", 2, OutputProcessor::Unit::m3_s, _, _);
+                                          "variableName", OutputProcessor::TimeStepType::TimeStepSystem, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(TrackingRunPeriodVariables);
         TrackingRunPeriodVariables = false;
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"29,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"})));
 
         WriteReportVariableDictionaryItem(ReportingFrequency::Simulation, StoreType::Averaged, 30, -999, "indexGroup", "30", "keyedValue",
-                                          "variableName", 3, OutputProcessor::Unit::m3_s, _, _);
+                                          "variableName", aThirdTimeStepType, OutputProcessor::Unit::m3_s, _, _);
         EXPECT_TRUE(TrackingRunPeriodVariables);
         TrackingRunPeriodVariables = false;
         EXPECT_TRUE(compare_eso_stream(
@@ -2243,21 +2252,21 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_setupTimePointers)
     {
-        TimeValue.allocate(2);
+        // OutputProcessor::TimeValue.allocate(2);
 
         auto timeStep = 1.0;
 
         SetupTimePointers("Zone", timeStep);
 
-        EXPECT_DOUBLE_EQ(timeStep, TimeValue(1).TimeStep);
-        EXPECT_DOUBLE_EQ(0.0, TimeValue(1).CurMinute);
+        EXPECT_DOUBLE_EQ(timeStep, TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep);
+        EXPECT_DOUBLE_EQ(0.0, TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute);
 
         timeStep = 2.0;
 
         SetupTimePointers("HVAC", timeStep);
 
-        EXPECT_DOUBLE_EQ(timeStep, TimeValue(2).TimeStep);
-        EXPECT_DOUBLE_EQ(0.0, TimeValue(2).CurMinute);
+        EXPECT_DOUBLE_EQ(timeStep, TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep);
+        EXPECT_DOUBLE_EQ(0.0, TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute);
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_getReportVariableInput)
@@ -3072,15 +3081,15 @@ namespace OutputProcessor {
             DataEnvironment::EndMonthFlag = true;
         }
 
-        TimeValue.allocate(2);
+        // OutputProcessor::TimeValue.allocate(2);
 
         auto timeStep = 1.0 / 6;
 
         SetupTimePointers("Zone", timeStep);
         SetupTimePointers("HVAC", timeStep);
 
-        TimeValue(1).CurMinute = 50;
-        TimeValue(2).CurMinute = 50;
+        TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
+        TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
         GetReportVariableInput();
         SetupOutputVariable("Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average",
@@ -3105,7 +3114,7 @@ namespace OutputProcessor {
 
         UpdateMeterReporting();
 
-        UpdateDataandReport(DataGlobals::ZoneTSReporting);
+        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
 
         auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -3256,15 +3265,15 @@ namespace OutputProcessor {
             DataEnvironment::EndMonthFlag = true;
         }
 
-        TimeValue.allocate(2);
+        // OutputProcessor::TimeValue.allocate(2);
 
         auto timeStep = 1.0 / 6;
 
         SetupTimePointers("Zone", timeStep);
         SetupTimePointers("HVAC", timeStep);
 
-        TimeValue(1).CurMinute = 50;
-        TimeValue(2).CurMinute = 50;
+        TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
+        TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
         GetReportVariableInput();
         SetupOutputVariable("Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average",
@@ -3293,7 +3302,7 @@ namespace OutputProcessor {
 
         UpdateMeterReporting();
 
-        UpdateDataandReport(DataGlobals::ZoneTSReporting);
+        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
 
         auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -3453,15 +3462,15 @@ namespace OutputProcessor {
             DataEnvironment::EndMonthFlag = true;
         }
 
-        TimeValue.allocate(2);
+        // OutputProcessor::TimeValue.allocate(2);
 
         auto timeStep = 1.0 / 6;
 
         SetupTimePointers("Zone", timeStep);
         SetupTimePointers("HVAC", timeStep);
 
-        TimeValue(1).CurMinute = 50;
-        TimeValue(2).CurMinute = 50;
+        TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
+        TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
         GetReportVariableInput();
         SetupOutputVariable("Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average",
@@ -3490,7 +3499,7 @@ namespace OutputProcessor {
 
         UpdateMeterReporting();
 
-        UpdateDataandReport(DataGlobals::HVACTSReporting);
+        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
 
         auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -3597,13 +3606,13 @@ namespace OutputProcessor {
         if (DataEnvironment::DayOfMonth == WeatherManager::EndDayOfMonth(DataEnvironment::Month)) {
             DataEnvironment::EndMonthFlag = true;
         }
-        TimeValue.allocate(2);
+        // OutputProcessor::TimeValue.allocate(2);
         auto timeStep = 1.0 / 6;
         SetupTimePointers("Zone", timeStep);
         SetupTimePointers("HVAC", timeStep);
 
-        TimeValue(1).CurMinute = 10;
-        TimeValue(2).CurMinute = 10;
+        TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 10;
+        TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 10;
 
         DataGlobals::WarmupFlag = true;
 
@@ -3617,33 +3626,33 @@ namespace OutputProcessor {
 
         PurchAir(1).TotHeatEnergy = 1.1;
         UpdateMeterReporting();
-        UpdateDataandReport(DataGlobals::HVACTSReporting);
+        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 1.3;
         UpdateMeterReporting();
-        UpdateDataandReport(DataGlobals::HVACTSReporting);
+        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 1.5;
         UpdateMeterReporting();
-        UpdateDataandReport(DataGlobals::HVACTSReporting);
+        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 1.7;
         UpdateMeterReporting();
-        UpdateDataandReport(DataGlobals::HVACTSReporting);
+        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 1.9;
         UpdateMeterReporting();
-        UpdateDataandReport(DataGlobals::HVACTSReporting);
+        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 2.2;
         UpdateMeterReporting();
-        UpdateDataandReport(DataGlobals::HVACTSReporting);
+        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
 
         DataGlobals::WarmupFlag = false;
 
         PurchAir(1).TotHeatEnergy = 2.4;
         UpdateMeterReporting();
-        UpdateDataandReport(DataGlobals::ZoneTSReporting); // zone timestep
+        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone); // zone timestep
 
         compare_eso_stream(delimited_string({
             "7,1,,Zone Ideal Loads Supply Air Total Heating Energy [J] !Each Call",
@@ -3668,15 +3677,15 @@ namespace OutputProcessor {
 
         PurchAir(1).TotHeatEnergy = 100.0;
         UpdateMeterReporting();
-        UpdateDataandReport(DataGlobals::HVACTSReporting);
+        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 200.0;
         UpdateMeterReporting();
-        UpdateDataandReport(DataGlobals::HVACTSReporting);
+        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 300.0;
         UpdateMeterReporting();
-        UpdateDataandReport(DataGlobals::ZoneTSReporting); // zone timestep
+        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone); // zone timestep
 
         compare_eso_stream(delimited_string({
             "2,365,12,31, 0,24, 0.00,10.00,Tuesday",
@@ -3723,15 +3732,15 @@ namespace OutputProcessor {
             DataEnvironment::EndMonthFlag = true;
         }
 
-        TimeValue.allocate(2);
+        // OutputProcessor::TimeValue.allocate(2);
 
         auto timeStep = 1.0 / 6;
 
         SetupTimePointers("Zone", timeStep);
         SetupTimePointers("HVAC", timeStep);
 
-        TimeValue(1).CurMinute = 50;
-        TimeValue(2).CurMinute = 50;
+        TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
+        TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
         GetReportVariableInput();
         SetupOutputVariable("Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average",
@@ -3740,7 +3749,7 @@ namespace OutputProcessor {
         SetupOutputVariable("Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _,
                             "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1);
         UpdateMeterReporting();
-        UpdateDataandReport(DataGlobals::ZoneTSReporting);
+        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
 
         GenOutputVariablesAuditReport();
 
@@ -3789,15 +3798,15 @@ namespace OutputProcessor {
             DataEnvironment::EndMonthFlag = true;
         }
 
-        TimeValue.allocate(2);
+        // OutputProcessor::TimeValue.allocate(2);
 
         auto timeStep = 1.0 / 6;
 
         SetupTimePointers("Zone", timeStep);
         SetupTimePointers("HVAC", timeStep);
 
-        TimeValue(1).CurMinute = 50;
-        TimeValue(2).CurMinute = 50;
+        TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
+        TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
         OutputReportTabular::GetInputTabularMonthly();
         OutputReportTabular::InitializeTabularMonthly();
@@ -3809,7 +3818,7 @@ namespace OutputProcessor {
         SetupOutputVariable("Lights Electric Energy", OutputProcessor::Unit::J, light_consumption, "Zone", "Sum", "SPACE1-1 LIGHTS 1", _,
                             "Electricity", "InteriorLights", "GeneralLights", "Building", "SPACE1-1", 1, 1);
         UpdateMeterReporting();
-        UpdateDataandReport(DataGlobals::ZoneTSReporting);
+        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
 
         NumExtraVars = 0;
         BuildKeyVarList("Air Loop 1|AirSupply InletNode", "SYSTEM NODE SETPOINT TEMPERATURE", 1, 2);

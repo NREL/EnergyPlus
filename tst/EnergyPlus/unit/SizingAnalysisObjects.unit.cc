@@ -116,7 +116,7 @@ public:
         Environment(4).DesignDayNum = 2;
         Environment(4).SeedEnvrnNum = 2;
 
-        TimeValue.allocate(2);
+        // OutputProcessor::TimeValue.allocate(2);
         TimeValue(1).TimeStep >>= TimeStepZone;
         TimeValue(2).TimeStep >>= DataHVACGlobals::TimeStepSys;
 

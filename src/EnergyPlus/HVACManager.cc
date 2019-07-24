@@ -150,7 +150,6 @@ namespace HVACManager {
     using DataGlobals::emsCallFromHVACIterationLoop;
     using DataGlobals::EndHourFlag;
     using DataGlobals::HourOfDay;
-    using DataGlobals::HVACTSReporting;
     using DataGlobals::isPulseZoneSizing;
     using DataGlobals::KickOffSimulation;
     using DataGlobals::MetersHaveBeenInitialized;
@@ -508,7 +507,7 @@ namespace HVACManager {
             }
 
             DetectOscillatingZoneTemp();
-            UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(HVACTSReporting)
+            UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem)
             UpdateIceFractions();          // Update fraction of ice stored in TES
             ManageWater();
             // update electricity data for net, purchased, sold etc.
@@ -534,11 +533,11 @@ namespace HVACManager {
                 }
                 if (DoOutputReporting) {
                     ReportMaxVentilationLoads();
-                    UpdateDataandReport(HVACTSReporting);
+                    UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
                     if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                         if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
                     }
-                    UpdateTabularReports(HVACTSReporting);
+                    UpdateTabularReports(OutputProcessor::TimeStepType::TimeStepSystem);
                 }
                 if (ZoneSizingCalc) {
                     UpdateZoneSizing(DuringDay);
@@ -569,7 +568,7 @@ namespace HVACManager {
                     PrintedWarmup = true;
                 }
                 CalcMoreNodeInfo();
-                UpdateDataandReport(HVACTSReporting);
+                UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
                 if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                     if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
                 }
@@ -596,7 +595,7 @@ namespace HVACManager {
                     }
                     PrintedWarmup = true;
                 }
-                UpdateDataandReport(HVACTSReporting);
+                UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
             }
             ManageEMS(emsCallFromEndSystemTimestepAfterHVACReporting, anyEMSRan); // EMS calling point
             // UPDATE SYSTEM CLOCKS

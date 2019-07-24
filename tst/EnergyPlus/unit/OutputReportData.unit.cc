@@ -96,7 +96,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
     int keyCount = 0;
     int typeVar = 0;
     OutputProcessor::StoreType avgSumVar;
-    int stepTypeVar = 0;
+    OutputProcessor::TimeStepType stepTypeVar;
     OutputProcessor::Unit unitsVar = OutputProcessor::Unit::None;
 
     fldStTest.m_variMeter = "EXTERIOR LIGHTS ELECTRIC ENERGY";

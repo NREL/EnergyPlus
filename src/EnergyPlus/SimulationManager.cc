@@ -2796,7 +2796,7 @@ namespace SimulationManager {
         int NumVariables;
         Array1D_int VarIndexes;
         Array1D_int VarIDs;
-        Array1D_int IndexTypes;
+        Array1D<OutputProcessor::TimeStepType> IndexTypes;
         Array1D_int VarTypes;
         Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
         Array1D_string VarNames;
@@ -2835,7 +2835,9 @@ namespace SimulationManager {
             for (Loop1 = 1; Loop1 <= NumVariables; ++Loop1) {
                 ObjexxFCL::gio::write(OutputFileDebug, "(1X,'RepVar,',I5,',',I5,',',A,',[',A,'],',A,',',A,',',A,',',I5)")
                     << VarIndexes(Loop1) << VarIDs(Loop1) << VarNames(Loop1) << unitEnumToString(unitsForVar(Loop1))
-                    << GetResourceTypeChar(ResourceTypes(Loop1)) << EndUses(Loop1) << Groups(Loop1) << IndexTypes(Loop1);
+                    << GetResourceTypeChar(ResourceTypes(Loop1)) << EndUses(Loop1) << Groups(Loop1)
+                    // TODO: Should call OutputProcessor::StandardTimeStepTypeKey(IndexTypes(Loop1)) to return "Zone" or "HVAC"
+                    << static_cast<int>(IndexTypes(Loop1));
             }
             VarIndexes.deallocate();
             IndexTypes.deallocate();
