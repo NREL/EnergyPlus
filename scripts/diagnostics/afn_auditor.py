@@ -377,20 +377,5 @@ if __name__ == '__main__':
         #
         # Generate a graph
         #
-        # Give nodes names for displaying
-        count = 0
-        for name, node in auditor.external_nodes.items():
-            node['display_name'] = 'E%d' % count
-            count += 1
-
-        count = 0
-        for name, node in auditor.nodes.items():
-            node['display_name'] = 'I%d' % count
-            count += 1
-
-        args.graph.write('graph linkages {\n')
-        for name, surf in auditor.surfs.items():
-            args.graph.write('%s -- %s\n' % (surf['nodes'][0]['display_name'],
-                                             surf['nodes'][1]['display_name']))
-        args.graph.write('}\n')
+        auditor.write_dot(args.graph)
         args.graph.close()
