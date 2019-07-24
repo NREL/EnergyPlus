@@ -526,7 +526,7 @@ namespace AirflowNetwork {
                 properties[n].temperature = OutDryBulbTemp;
                 properties[n].humidityRatio = OutHumRat;
             }
-            properties[n].sqrtDensity = std::sqrt(properties[n].density);
+            properties[n].sqrt_density = std::sqrt(properties[n].density);
             properties[n].viscosity = 1.71432e-5 + 4.828e-8 * properties[n].temperature;
             //if (LIST >= 2) ObjexxFCL::gio::write(Unit21, Format_903) << "D,V:" << n << properties[n].density << properties[n].viscosity;
         }
@@ -1378,9 +1378,9 @@ namespace AirflowNetwork {
             VisAve = (propN.viscosity + propM.viscosity) / 2.0;
             Tave = (propN.temperature + propM.temperature) / 2.0;
             if (PDROP >= 0.0) {
-                coef = DisSysCompReliefAirData(CompNum).FlowCoef / propN.sqrtDensity * Corr;
+                coef = DisSysCompReliefAirData(CompNum).FlowCoef / propN.sqrt_density * Corr;
             } else {
-                coef = DisSysCompReliefAirData(CompNum).FlowCoef / propM.sqrtDensity * Corr;
+                coef = DisSysCompReliefAirData(CompNum).FlowCoef / propM.sqrt_density * Corr;
             }
 
             if (LFLAG) {
@@ -1406,9 +1406,9 @@ namespace AirflowNetwork {
                     FL = CDM * PDROP;
                     // Turbulent flow.
                     if (expn == 0.5) {
-                        FT = coef * propN.sqrtDensity * std::sqrt(PDROP) * Ctl;
+                        FT = coef * propN.sqrt_density * std::sqrt(PDROP) * Ctl;
                     } else {
-                        FT = coef * propN.sqrtDensity * std::pow(PDROP, expn) * Ctl;
+                        FT = coef * propN.sqrt_density * std::pow(PDROP, expn) * Ctl;
                     }
                 } else {
                     // Flow in negative direction.
@@ -1419,9 +1419,9 @@ namespace AirflowNetwork {
                     FL = CDM * PDROP;
                     // Turbulent flow.
                     if (expn == 0.5) {
-                        FT = -coef * propM.sqrtDensity * std::sqrt(-PDROP) * Ctl;
+                        FT = -coef * propM.sqrt_density * std::sqrt(-PDROP) * Ctl;
                     } else {
-                        FT = -coef * propM.sqrtDensity * std::pow(-PDROP, expn) * Ctl;
+                        FT = -coef * propM.sqrt_density * std::pow(-PDROP, expn) * Ctl;
                     }
                 }
                 // Select laminar or turbulent flow.
@@ -1501,9 +1501,9 @@ namespace AirflowNetwork {
         VisAve = (propN.viscosity + propM.viscosity) / 2.0;
         Tave = (propN.temperature + propM.temperature) / 2.0;
         if (PDROP >= 0.0) {
-            coef /= propN.sqrtDensity;
+            coef /= propN.sqrt_density;
         } else {
-            coef /= propM.sqrtDensity;
+            coef /= propM.sqrt_density;
         }
 
         if (LFLAG) {
@@ -1529,9 +1529,9 @@ namespace AirflowNetwork {
                 FL = CDM * PDROP;
                 // Turbulent flow.
                 if (expn == 0.5) {
-                    FT = coef * propN.sqrtDensity * std::sqrt(PDROP) * Ctl;
+                    FT = coef * propN.sqrt_density * std::sqrt(PDROP) * Ctl;
                 } else {
-                    FT = coef * propN.sqrtDensity * std::pow(PDROP, expn) * Ctl;
+                    FT = coef * propN.sqrt_density * std::pow(PDROP, expn) * Ctl;
                 }
             } else {
                 // Flow in negative direction.
@@ -1542,9 +1542,9 @@ namespace AirflowNetwork {
                 FL = CDM * PDROP;
                 // Turbulent flow.
                 if (expn == 0.5) {
-                    FT = -coef * propM.sqrtDensity * std::sqrt(-PDROP) * Ctl;
+                    FT = -coef * propM.sqrt_density * std::sqrt(-PDROP) * Ctl;
                 } else {
-                    FT = -coef * propM.sqrtDensity * std::pow(-PDROP, expn) * Ctl;
+                    FT = -coef * propM.sqrt_density * std::pow(-PDROP, expn) * Ctl;
                 }
             }
             // Select laminar or turbulent flow.
