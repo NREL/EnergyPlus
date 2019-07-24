@@ -244,8 +244,9 @@ class AFN_Auditor(auditor.Auditor):
         return True
     def audit(self, **kwargs):
         if self.nodes == {} or self.external_nodes == {} or self.surfs == {}:
-            self.extract()
-            self.connect_multizone()
+            # This is not a super great way to get this done, should reconsider
+            self.__extract()
+            self.__connect_multizone()
 
         #for name, surf in netcomps.data['AirflowNetwork:MultiZone:Surface'].items():
         #    if len(surf['nodes']) != 2:
