@@ -134,17 +134,6 @@ foreach( i RANGE 1 ${end} )
 
 endforeach()
 
-# Temporary conversion of old Table:* to new Table:Lookup
-set(SRC
-  Transition.f90
-  CreateNewIDFUsingRulesTableLookup.f90
-  )
-
-set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Transition-TableLookup )
-add_executable( "Transition-TableLookup" ${SRC} )
-target_link_libraries( Transition-TableLookup TransitionLib )
-
-
 # then install all the support files
 
 install(FILES "${CMAKE_SOURCE_DIR}/src/Transition/InputRulesFiles/Rules8-4-0-to-8-5-0.xls" DESTINATION "PreProcess/IDFVersionUpdater")

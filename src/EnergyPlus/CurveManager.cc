@@ -400,7 +400,6 @@ namespace CurveManager {
         int NumExponent;                 // Number of exponent curve objects in the input file
         int NumWPCValTab;                // Number of wind pressure coefficient value table objects in the input file
         int NumChillerPartLoadWithLift;  // Number of ChillerPartLoadWithLift curve objects in the input data file
-        int NumMultVarLookup;            // Number of multivariable tables
         int NumFanPressRise;             // cpw22Aug2010 Number of fan pressure rise curve objects in the input file
         int NumExpSkewNorm;              // cpw22Aug2010 Number of exponential skew normal curve objects in the input file
         int NumSigmoid;                  // cpw22Aug2010 Number of sigmoid curve objects in the input file
@@ -1772,8 +1771,10 @@ namespace CurveManager {
                             axis.push_back(windDirs[TableDataIndex - 1]);
                             lookupValues.push_back(Numbers(TableDataIndex));
                         }
-                        axis.push_back(360.0);
-                        lookupValues.push_back(Numbers(1));
+                        if (axis[axis.size() - 1] < 360.0) {
+                            axis.push_back(360.0);
+                            lookupValues.push_back(Numbers(1));
+                        }
 
                         std::vector<Btwxt::GridAxis> gridAxes;
                         gridAxes.emplace_back(axis, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double> {0.0, 360.0});
