@@ -2703,7 +2703,7 @@ namespace AirflowNetwork {
     int genericCrack(Real64 coef,                // Flow coefficient
                      Real64 const expn,          // Flow exponent
                      bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
-                     Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                     Real64 const pdrop,         // Total pressure drop across a component (P1 - P2) [Pa]
                      const AirProperties &propN, // Node 1 properties
                      const AirProperties &propM, // Node 2 properties
                      std::array<Real64, 2> &F,   // Airflow through the component [kg/s]
@@ -2764,57 +2764,50 @@ namespace AirflowNetwork {
         VisAve = 0.5*(propN.viscosity + propM.viscosity);
         Tave = 0.5*(propN.temperature + propM.temperature);
 
+        double sign{1.0};
+        double upwind_temperature{propN.temperature};
+        double upwind_density{propN.density};
+        double upwind_viscosity{propN.viscosity};
+        double upwind_sqrt_density{propN.sqrt_density};
+        double abs_pdrop = pdrop;
+
+        if (pdrop < 0.0) {
+            sign = -1.0;
+            upwind_temperature = propM.temperature;
+            upwind_density = propM.density;
+            upwind_viscosity = propM.viscosity;
+            upwind_sqrt_density = propM.sqrt_density;
+            abs_pdrop = -pdrop;
+        }
+
         if (LFLAG) {
             // Initialization by linear relation.
-            if (PDROP >= 0.0) {
-                RhoCor = TOKELVIN(propN.temperature) / TOKELVIN(Tave);
-                Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                DF[0] = coef * propN.sqrt_density / propN.viscosity * Ctl;
-            } else {
-                RhoCor = TOKELVIN(propM.temperature) / TOKELVIN(Tave);
-                Ctl = std::pow(RhozNorm / propM.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                DF[0] = coef * propM.sqrt_density / propM.viscosity * Ctl;
-            }
-            F[0] = DF[0] * PDROP;
+            RhoCor = TOKELVIN(upwind_temperature) / TOKELVIN(Tave);
+            Ctl = std::pow(RhozNorm / upwind_density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
+            DF[0] = coef * upwind_sqrt_density / upwind_viscosity * Ctl;
+            F[0] = DF[0] * pdrop;
         } else {
             // Standard calculation.
-            if (PDROP >= 0.0) {
-                // Flow in positive direction.
-                // Laminar flow.
-                coef /= propN.sqrt_density;
-                RhoCor = TOKELVIN(propN.temperature) / TOKELVIN(Tave);
-                Ctl = std::pow(RhozNorm / propN.density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                CDM = coef * propN.density / propN.viscosity * Ctl;
-                FL = CDM * PDROP;
-                // Turbulent flow.
-                if (expn == 0.5) {
-                    FT = coef * propN.sqrt_density * std::sqrt(PDROP) * Ctl;
-                } else {
-                    FT = coef * propN.sqrt_density * std::pow(PDROP, expn) * Ctl;
-                }
+            // Laminar flow.
+            coef /= upwind_sqrt_density;
+            RhoCor = TOKELVIN(upwind_temperature) / TOKELVIN(Tave);
+            Ctl = std::pow(RhozNorm / upwind_density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
+            CDM = coef * upwind_density / upwind_viscosity * Ctl;
+            FL = CDM * pdrop;
+            // Turbulent flow.
+            if (expn == 0.5) {
+                FT = coef * upwind_sqrt_density * std::sqrt(abs_pdrop) * Ctl;
             } else {
-                // Flow in negative direction.
-                // Laminar flow.
-                coef /= propM.sqrt_density;
-                RhoCor = TOKELVIN(propM.temperature) / TOKELVIN(Tave);
-                Ctl = std::pow(RhozNorm / propM.density / RhoCor, 2.0 * expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-                CDM = coef * propM.density / propM.viscosity * Ctl;
-                FL = CDM * PDROP;
-                // Turbulent flow.
-                if (expn == 0.5) {
-                    FT = -coef * propM.sqrt_density * std::sqrt(-PDROP) * Ctl;
-                } else {
-                    FT = -coef * propM.sqrt_density * std::pow(-PDROP, expn) * Ctl;
-                }
+                FT = coef * upwind_sqrt_density * std::pow(abs_pdrop, expn) * Ctl;
             }
             // Select laminar or turbulent flow.
             //if (LIST >= 4) ObjexxFCL::gio::write(Unit21, Format_901) << " generic crack: " << PDROP << FL << FT;
-            if (std::abs(FL) <= std::abs(FT)) {
+            if (std::abs(FL) <= FT) {
                 F[0] = FL;
                 DF[0] = CDM;
             } else {
-                F[0] = FT;
-                DF[0] = FT * expn / PDROP;
+                F[0] = sign*FT;
+                DF[0] = F[0] * expn / pdrop;
             }
         }
         return 1;
