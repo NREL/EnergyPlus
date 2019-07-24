@@ -1856,7 +1856,7 @@ namespace CurveManager {
                             axis = btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
 
                             // remove NANs
-                            axis.erase(std::remove_if(axis.begin(), axis.end(), [](const double &x){return isnan(x);}), axis.end());
+                            axis.erase(std::remove_if(axis.begin(), axis.end(), [](const double &x){return std::isnan(x);}), axis.end());
 
                             // sort
                             std::sort(axis.begin(), axis.end());
@@ -2044,7 +2044,7 @@ namespace CurveManager {
                     lookupValues = btwxtManager.tableFiles[filePath].getArray({colNum, rowNum});
 
                     // remove NANs
-                    lookupValues.erase(std::remove_if(lookupValues.begin(), lookupValues.end(),  [](const double &x){return isnan(x);}), lookupValues.end());
+                    lookupValues.erase(std::remove_if(lookupValues.begin(), lookupValues.end(),  [](const double &x){return std::isnan(x);}), lookupValues.end());
 
                 } else if (fields.count("values")) {
                     for (auto value : fields.at("values")) {
@@ -2063,7 +2063,7 @@ namespace CurveManager {
                     bool pointsSpecified = false;
                     bool pointsUnspecified = false;
                     for (auto value : normalizeTarget) {
-                        if (isnan(value)) {
+                        if (std::isnan(value)) {
                             pointsUnspecified = true;
                         } else {
                             pointsSpecified = true;
