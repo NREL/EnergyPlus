@@ -139,8 +139,8 @@ class AFN_Auditor(auditor.Auditor):
 
         fp.write('graph linkages {\n')
         for name, surf in self.surfs.items():
-            fp.write('%s -- %s\n' % (surf.nodes[0]['display_name'],
-                                     surf.nodes[1]['display_name']))
+            fp.write('%s -- %s\n' % (surf['nodes'][0]['display_name'],
+                                     surf['nodes'][1]['display_name']))
         fp.write('}\n')
     def __compute_azimuths(self):
         if self.relative_geometry:
@@ -379,18 +379,18 @@ if __name__ == '__main__':
         #
         # Give nodes names for displaying
         count = 0
-        for name, node in external_nodes.items():
+        for name, node in auditor.external_nodes.items():
             node['display_name'] = 'E%d' % count
             count += 1
 
         count = 0
-        for name, node in nodes.items():
+        for name, node in auditor.nodes.items():
             node['display_name'] = 'I%d' % count
             count += 1
 
         args.graph.write('graph linkages {\n')
-        for name, surf in surfs.items():
-            args.graph.write('%s -- %s\n' % (surf.nodes[0]['display_name'],
-                                             surf.nodes[1]['display_name']))
+        for name, surf in auditor.surfs.items():
+            args.graph.write('%s -- %s\n' % (surf['nodes'][0]['display_name'],
+                                             surf['nodes'][1]['display_name']))
         args.graph.write('}\n')
         args.graph.close()
