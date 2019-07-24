@@ -691,12 +691,18 @@ namespace HVACInterfaceManager {
 
         } else { // tank has mass
             if (MassFlowRate > 0.0) {
-                TankFinalTemp = (LastTankOutletTemp - (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp)) *
-                                    std::exp(-(MassFlowRate * Cp) / (ThisTankMass * Cp) * TimeStepSeconds) +
+                // original code is: std::exp(-(MassFlowRate * Cp) / (ThisTankMass * Cp) * TimeStepSeconds)
+                Real64 stdexpMCp = (MassFlowRate * Cp) / (ThisTankMass * Cp) * TimeStepSeconds;
+                if (stdexpMCp < 700.0) {
+                    stdexpMCp = std::exp(-(stdexpMCp));
+                } else {
+                    stdexpMCp = 0.0;
+                }
+                TankFinalTemp = (LastTankOutletTemp - (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp)) * stdexpMCp +
                                 (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp);
                 TankAverageTemp = ((ThisTankMass * Cp) / (MassFlowRate * Cp) *
                                        (LastTankOutletTemp - (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp)) *
-                                       (1.0 - std::exp(-(MassFlowRate * Cp) / (ThisTankMass * Cp) * TimeStepSeconds)) / TimeStepSeconds +
+                                       (1.0 - stdexpMCp) / TimeStepSeconds +
                                    (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp));
             } else {
                 TankFinalTemp = PumpHeat / (ThisTankMass * Cp) * TimeStepSeconds + LastTankOutletTemp;
