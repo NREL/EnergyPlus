@@ -369,4 +369,20 @@ TEST(General, nthDayOfWeekOfMonth_test)
     EXPECT_EQ(62, nthDayOfWeekOfMonth(4, 1, 3)); // first wednesday of march
 }
 
+TEST_F(EnergyPlusFixture, General_EpexpTest)
+{
+    //Global exp function test
+    Real64 x;
+    Real64 y;
+
+    x = -69.0;
+    y = epexp(x);
+    EXPECT_NEAR(0.0, y, 1.0E-20);
+
+    x = -700.0;
+    y = epexp(x);
+    EXPECT_NEAR(0.0, y, 1.0E-20);
+
+}
+
 } // namespace EnergyPlus
