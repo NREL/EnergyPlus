@@ -1824,34 +1824,16 @@ namespace HeatBalanceManager {
 
             // Load the material derived type from the input data.
             Material(MaterNum).Name = MaterialNames(1);
-
-            if (MaterialNumProp >= 1) {
-                Material(MaterNum).Resistance = MaterialProps(1);
-                Material(MaterNum).ROnly = true;
-            } else {
-                Material(MaterNum).Resistance = 0.01;
-            }
-            if (MaterialNumProp >= 2) {
-                Material(MaterNum).AbsorpThermal = MaterialProps(2);
-                Material(MaterNum).AbsorpThermalInput = MaterialProps(2);
-            } else {
-                Material(MaterNum).AbsorpThermal = 0.9999;
-                Material(MaterNum).AbsorpThermalInput = 0.9999;
-            }
-            if (MaterialNumProp >= 3) {
-                Material(MaterNum).AbsorpSolar = MaterialProps(3);
-                Material(MaterNum).AbsorpSolarInput = MaterialProps(3);
-            } else {
-                Material(MaterNum).AbsorpSolar = 1.0;
-                Material(MaterNum).AbsorpSolarInput = 1.0;
-            }
-            if (MaterialNumProp >= 4) {
-                Material(MaterNum).AbsorpVisible = MaterialProps(4);
-                Material(MaterNum).AbsorpVisibleInput = MaterialProps(4);
-            } else {
-                Material(MaterNum).AbsorpVisible = 1.0;
-                Material(MaterNum).AbsorpVisibleInput = 1.0;
-            }
+            
+            // Load data for other properties that need defaults
+            Material(MaterNum).ROnly = true;
+            Material(MaterNum).Resistance = 0.01;
+            Material(MaterNum).AbsorpThermal = 0.9999;
+            Material(MaterNum).AbsorpThermalInput = 0.9999;
+            Material(MaterNum).AbsorpSolar = 1.0;
+            Material(MaterNum).AbsorpSolarInput = 1.0;
+            Material(MaterNum).AbsorpVisible = 1.0;
+            Material(MaterNum).AbsorpVisibleInput = 1.0;
 
             NominalR(MaterNum) = Material(MaterNum).Resistance;
         }
