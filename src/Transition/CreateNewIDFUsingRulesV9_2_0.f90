@@ -431,6 +431,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with E, insert the rules here
 
               ! If your original object starts with F, insert the rules here
+             CASE('FOUNDATION:KIVA')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff = .false.
+                 OutArgs(1) = InArgs(1)
+                 OutArgs(2) = Blank
+                 OutArgs(3:CurArgs+1) = InArgs(2:CurArgs)
+                 CurArgs = CurArgs + 1
+                 NoDiff = .false.
 
               ! If your original object starts with G, insert the rules here
 
@@ -492,7 +500,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ELSE
                   OutArgs(8) = InArgs(8)
                 ENDIF
-                
+
                  OutArgs(9:CurArgs)=InArgs(9:CurArgs)
                  NoDiff = .false.
 

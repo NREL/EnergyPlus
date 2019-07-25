@@ -233,7 +233,7 @@ namespace HeatBalanceKivaManager {
                                                    // about the building at this point)
 
         Real64 Tin;
-        if (zoneAssumedTemperature > -280) {
+        if (zoneAssumedTemperature > -999) { // default sets this below -999 at -9999 so uses value if entered
             Tin = zoneAssumedTemperature + DataGlobals::KelvinConv;
         } else {
             switch (zoneControlType) {

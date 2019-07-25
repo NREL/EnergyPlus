@@ -393,6 +393,7 @@
 
   Foundation:Kiva,
     Slab Foundation,         !- Name
+    ,                        !- Initial Indoor Air Temperature
     ,                        !- Interior Horizontal Insulation Material Name
     ,                        !- Interior Horizontal Insulation Depth {m}
     ,                        !- Interior Horizontal Insulation Width {m}
@@ -524,4 +525,3 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
-

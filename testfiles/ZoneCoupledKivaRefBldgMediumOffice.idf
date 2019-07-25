@@ -366,6 +366,7 @@
 
   Foundation:Kiva,
     Slab Foundation,         !- Name
+    ,                        !- Initial Indoor Air Temperature
     ,                        !- Interior Horizontal Insulation Material Name
     ,                        !- Interior Horizontal Insulation Depth {m}
     ,                        !- Interior Horizontal Insulation Width {m}
@@ -7977,4 +7978,3 @@
     0,                       !- Nuclear High Level Emission Factor {g/MJ}
     ,                        !- Nuclear High Level Emission Factor Schedule Name
     0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
-
