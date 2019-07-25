@@ -29,6 +29,7 @@ import json
 import os
 import argparse
 import sys
+import uuid
 import auditor
 
 #
@@ -195,7 +196,8 @@ class AFN_Auditor(auditor.Auditor):
 
         htsurfs = {}
         for name in heat_transfer_surface_names:
-            htsurfs.update(self.model[name])
+            if name in self.model:
+                htsurfs.update(self.model[name])
 
         outdoor_count = 0
 
@@ -217,7 +219,17 @@ class AFN_Auditor(auditor.Auditor):
             linked_nodes = []
             if bc == 'Outdoors':
                 outdoor_count += 1
-                external_node = self.external_nodes[surf['external_node_name']]
+                try:
+                    external_node_name = surf['external_node_name']
+                except KeyError:
+                    # This is probably a model using precomputed WPCs, should check that
+                    external_node_name = uuid.uuid4().hex[:6].upper()
+                    self.external_nodes[external_node_name] = {'link_count':0, 'zone_name':None, 'neighbors':{}}
+                    surf['external_node_name'] = external_node_name
+                try:
+                    external_node = self.external_nodes[external_node_name]
+                except KeyError:
+                    raise auditor.BadModel('Failed to find external node "' + external_node_name + '" for AirflowNetwork surface "' + name + '"')
                 external_node['link_count'] += 1
                 zone_name = htsurf['zone_name']
                 # Find the multizone zone that points at this zone
