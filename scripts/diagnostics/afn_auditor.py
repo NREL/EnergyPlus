@@ -110,8 +110,9 @@ class AFN_Auditor(auditor.Auditor):
                   'AirflowNetwork:MultiZone:Component:HorizontalOpening':self.afes,
                   'AirflowNetwork:MultiZone:Component:ZoneExhaustFan':self.afes,
                   'AirflowNetwork:MultiZone:ExternalNode':self.external_nodes,
-                  'AirflowNetwork:Distribution:Node':self.nodes,
-                  'AirflowNetwork:IntraZone:Node':self.nodes}
+                  #'AirflowNetwork:Distribution:Node':self.nodes,
+                  #'AirflowNetwork:IntraZone:Node':self.nodes
+                  }
         # Load the simcontrol object
         try:
             self.simcontrol = self.model['AirflowNetwork:SimulationControl']
@@ -119,21 +120,24 @@ class AFN_Auditor(auditor.Auditor):
             self.json['messages'] = ['Model does not contain a AirflowNetwork:SimulationControl object, aborting audit']
             return False
         # Handle the wind pressure coefficients, should maybe remove these from the model once we're done
-        wpa = next(iter(self.model['AirflowNetwork:MultiZone:WindPressureCoefficientArray'].values()))
-        keys = [el for el in wpa.keys() if el.startswith('wind_dir')]
-        keys.sort()
-        directions = []
-        for key in keys:
-            directions.append(wpa[key])
-
-        for k,v in self.model['AirflowNetwork:MultiZone:WindPressureCoefficientValues'].items():
-            keys = [el for el in v.keys() if el.startswith('wind_pres')]
+        try:
+            wpa = next(iter(self.model['AirflowNetwork:MultiZone:WindPressureCoefficientArray'].values()))
+            keys = [el for el in wpa.keys() if el.startswith('wind_dir')]
             keys.sort()
-            coeffs = []
+            directions = []
             for key in keys:
-                coeffs.append(v[key])
-            self.wpcs[k] = {'wind_directions' : directions,
-                            'wind_pressure_coefficient_values' : coeffs}
+                directions.append(wpa[key])
+
+            for k,v in self.model['AirflowNetwork:MultiZone:WindPressureCoefficientValues'].items():
+                keys = [el for el in v.keys() if el.startswith('wind_pres')]
+                keys.sort()
+                coeffs = []
+                for key in keys:
+                    coeffs.append(v[key])
+                self.wpcs[k] = {'wind_directions' : directions,
+                                'wind_pressure_coefficient_values' : coeffs}
+        except KeyError:
+            self.wpcs = {}
 
         # Pull out the airflow network objects
         for key in self.model.keys():
