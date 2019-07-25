@@ -167,7 +167,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_GenericCrack)
     std::array<double, 2> F{{0.0, 0.0}};
     std::array<double, 2> DF{{0.0, 0.0}};
 
-    double dp{10.0};
+    Real64 dp{10.0};
 
     // Linearized test
     // double C = powerlaw.linearize(1.0, state0, state1);
@@ -201,6 +201,75 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_GenericCrack)
     EXPECT_EQ(0.0, DF[1]);
 
     NF = genericCrack(0.001, 0.65, false, -dp, properties0, properties1, F, DF);
+    EXPECT_EQ(1, NF);
+    EXPECT_NEAR(-0.001 * std::pow(10.0, 0.65), F[0], 1.0e-5);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_NEAR(0.000065 * std::pow(10.0, 0.65), DF[0], 1.0e-5);
+    EXPECT_EQ(0.0, DF[1]);
+}
+
+TEST_F(EnergyPlusFixture, AirflowNetworkSolverTest_SurfaceCrack)
+{
+
+    int i = 1;
+    int n = 1;
+    int m = 2;
+    int NF;
+    std::array<Real64, 2> F{{0.0, 0.0}};
+    std::array<Real64, 2> DF{{0.0, 0.0}};
+
+    NetworkNumOfLinks = 0;
+    NumOfLinksIntraZone = 0;
+
+    //AirflowNetworkCompData.allocate(j);
+    //AirflowNetworkCompData(j).TypeNum = 1;
+    //MultizoneSurfaceData.allocate(i);
+    //MultizoneSurfaceData(i).Width = 10.0;
+    //MultizoneSurfaceData(i).Height = 5.0;
+    //MultizoneSurfaceData(i).OpenFactor = 1.0;
+
+    SurfaceCrack crack;
+    crack.FlowCoef = 0.001;
+    crack.FlowExpo = 0.65;
+    crack.StandardP = 101325.0;
+    crack.StandardT = 20.0;
+    crack.StandardW = 0.0;
+
+    AirProperties properties0, properties1;
+    properties0.density = properties1.density = 1.2041;
+    properties0.sqrt_density = properties1.sqrt_density = std::sqrt(1.2041);
+    properties0.viscosity = properties1.viscosity = 0.0000181625;
+
+    Real64 dp{10.0};
+
+    // Laminar tests
+    Real64 rhonorm = AIRDENSITY(101325.0, 20.0, 0.0);
+    Real64 viscnorm = 1.71432e-5 + 4.828e-8 * 20.0;
+    Real64 ctl = std::pow(rhonorm / 1.2041, -0.35) * std::pow(viscnorm / 0.0000181625, 0.3);
+
+    NF = crack.calculate(true, dp, 1, properties0, properties1, F, DF);
+    EXPECT_EQ(1, NF);
+    EXPECT_NEAR(ctl * 0.01 * std::sqrt(1.2041) / 0.0000181625, F[0], 1.0e-8);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_NEAR(ctl * 0.001 * std::sqrt(1.2041) / 0.0000181625, DF[0], 1.0e-8);
+    EXPECT_EQ(0.0, DF[1]);
+
+    NF = crack.calculate(true, -dp, 1, properties0, properties1, F, DF);
+    EXPECT_EQ(1, NF);
+    EXPECT_NEAR(-ctl * 0.01 * std::sqrt(1.2041) / 0.0000181625, F[0], 1.0e-8);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_NEAR(ctl * 0.001 * std::sqrt(1.2041) / 0.0000181625, DF[0], 1.0e-8);
+    EXPECT_EQ(0.0, DF[1]);
+
+    // Turbulent tests
+    NF = crack.calculate(false, dp, 1, properties0, properties1, F, DF);
+    EXPECT_EQ(1, NF);
+    EXPECT_NEAR(0.001 * std::pow(10.0, 0.65), F[0], 1.0e-5);
+    EXPECT_EQ(0.0, F[1]);
+    EXPECT_NEAR(0.000065 * std::pow(10.0, 0.65), DF[0], 1.0e-5);
+    EXPECT_EQ(0.0, DF[1]);
+
+    NF = crack.calculate(false, -dp, 1, properties0, properties1, F, DF);
     EXPECT_EQ(1, NF);
     EXPECT_NEAR(-0.001 * std::pow(10.0, 0.65), F[0], 1.0e-5);
     EXPECT_EQ(0.0, F[1]);
