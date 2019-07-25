@@ -2743,33 +2743,19 @@ namespace AirflowNetwork {
         // DERIVED TYPE DEFINITIONS
         // na
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 CDM;
-        Real64 FL;
-        Real64 FT;
-        Real64 RhozNorm;
-        Real64 VisczNorm;
-        Real64 Ctl;
-        Real64 VisAve;
-        Real64 Tave;
-        Real64 RhoCor;
-
-        // Formats
-        //static ObjexxFCL::gio::Fmt Format_901("(A5,6X,4E16.7)");
-
         // FLOW:
         // Calculate normal density and viscocity at Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
-        RhozNorm = AIRDENSITY(101325.0, 20.0, 0.0);
-        VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
-        VisAve = 0.5*(propN.viscosity + propM.viscosity);
-        Tave = 0.5*(propN.temperature + propM.temperature);
+        Real64 RhozNorm{AIRDENSITY(101325.0, 20.0, 0.0)};
+        Real64 VisczNorm{1.71432e-5 + 4.828e-8 * 20.0};
+        Real64 VisAve{0.5 * (propN.viscosity + propM.viscosity)};
+        Real64 Tave{0.5 * (propN.temperature + propM.temperature)};
 
-        double sign{1.0};
-        double upwind_temperature{propN.temperature};
-        double upwind_density{propN.density};
-        double upwind_viscosity{propN.viscosity};
-        double upwind_sqrt_density{propN.sqrt_density};
-        double abs_pdrop = pdrop;
+        Real64 sign{1.0};
+        Real64 upwind_temperature{propN.temperature};
+        Real64 upwind_density{propN.density};
+        Real64 upwind_viscosity{propN.viscosity};
+        Real64 upwind_sqrt_density{propN.sqrt_density};
+        Real64 abs_pdrop = pdrop;
 
         if (pdrop < 0.0) {
             sign = -1.0;
@@ -2780,28 +2766,26 @@ namespace AirflowNetwork {
             abs_pdrop = -pdrop;
         }
 
+        // Laminar flow.
+        Real64 RhoCor{TOKELVIN(upwind_temperature) / TOKELVIN(Tave)};
+        Real64 Ctl{std::pow(RhozNorm / upwind_density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0)};
+        Real64 CDM{coef * upwind_sqrt_density / upwind_viscosity * Ctl};
+        Real64 FL{CDM * pdrop};
+
         if (LFLAG) {
             // Initialization by linear relation.
-            RhoCor = TOKELVIN(upwind_temperature) / TOKELVIN(Tave);
-            Ctl = std::pow(RhozNorm / upwind_density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-            DF[0] = coef * upwind_sqrt_density / upwind_viscosity * Ctl;
-            F[0] = DF[0] * pdrop;
+            DF[0] = CDM;
+            F[0] = FL;
         } else {
             // Standard calculation.
-            // Laminar flow.
-            coef /= upwind_sqrt_density;
-            RhoCor = TOKELVIN(upwind_temperature) / TOKELVIN(Tave);
-            Ctl = std::pow(RhozNorm / upwind_density / RhoCor, expn - 1.0) * std::pow(VisczNorm / VisAve, 2.0 * expn - 1.0);
-            CDM = coef * upwind_density / upwind_viscosity * Ctl;
-            FL = CDM * pdrop;
             // Turbulent flow.
+            Real64 FT;
             if (expn == 0.5) {
-                FT = coef * upwind_sqrt_density * std::sqrt(abs_pdrop) * Ctl;
+                FT = coef * std::sqrt(abs_pdrop) * Ctl;
             } else {
-                FT = coef * upwind_sqrt_density * std::pow(abs_pdrop, expn) * Ctl;
+                FT = coef *  std::pow(abs_pdrop, expn) * Ctl;
             }
             // Select laminar or turbulent flow.
-            //if (LIST >= 4) ObjexxFCL::gio::write(Unit21, Format_901) << " generic crack: " << PDROP << FL << FT;
             if (std::abs(FL) <= FT) {
                 F[0] = FL;
                 DF[0] = CDM;
