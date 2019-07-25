@@ -109,7 +109,7 @@ for pr_num in pr_numbers:
             PRS[label_name].append([pr_num, title])
 
 # Now write the nice markdown output file
-with io.open(md_file, 'w') as f:
+with io.open(md_file, 'w', encoding='utf-8') as f:
     def out(s):
         print(s, file=f)
 
@@ -132,7 +132,7 @@ with io.open(md_file, 'w') as f:
     if debug:
         out_pr_class('Unknown', 'Other-DevelopersFixPlease')
 
-with io.open(html_file, 'w') as f2:
+with io.open(html_file, 'w', encoding='utf-8') as f2:
     def out(s):
         print(s, file=f2)
 
