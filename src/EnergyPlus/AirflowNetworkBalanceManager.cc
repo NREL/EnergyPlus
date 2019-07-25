@@ -6165,6 +6165,9 @@ namespace AirflowNetworkBalanceManager {
     static int makeTable(const std::string &name, const int gridIndex, const std::vector<Real64> &y)
     {
         // Add a new table and performance curve
+        std::string contextString = "CalcWindPressureCoeffs: Creating table \"" + name + "\"";
+        Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &contextString);
+
         int CurveNum = CurveManager::PerfCurve.size() + 1;
         CurveManager::PerfCurve.push_back(CurveManager::PerfomanceCurveData());
 

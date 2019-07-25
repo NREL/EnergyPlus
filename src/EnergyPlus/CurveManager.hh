@@ -289,6 +289,12 @@ namespace CurveManager {
     extern BtwxtManager btwxtManager;
     // Functions
 
+    void BtwxtMessageCallback(
+        const Btwxt::MsgLevel messageType,
+        const std::string message,
+        void *contextPtr
+    );
+
     // Clears the global data in CurveManager.
     // Needed for unit tests, should not be normally called.
     void clear_state();

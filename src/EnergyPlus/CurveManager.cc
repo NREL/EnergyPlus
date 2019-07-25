@@ -1745,6 +1745,9 @@ namespace CurveManager {
 
                     PerfCurve(CurveNum).InterpolationType = BtwxtMethod;
 
+                    std::string contextString = CurrentModuleObject + " \"" + Alphas(1) + "\"";
+                    Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &contextString);
+
                     PerfCurve(CurveNum).Var1Min = 0.0;
                     PerfCurve(CurveNum).Var1MinPresent = true;
                     PerfCurve(CurveNum).Var1Max = 360.0;
