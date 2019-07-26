@@ -279,12 +279,7 @@ namespace OutputProcessor {
     // Object Data
 
     // Pointers to the actual TimeStep variables
-    std::map<TimeStepType, TimeSteps> TimeValue =
-    {
-        { TimeStepType::TimeStepZone, TimeSteps() },
-        { TimeStepType::TimeStepSystem, TimeSteps() },
-    };
-
+    std::map<TimeStepType, TimeSteps> TimeValue;
     Array1D<RealVariableType> RVariableTypes;         // Variable Types structure (use NumOfRVariables to traverse)
     Array1D<IntegerVariableType> IVariableTypes;      // Variable Types structure (use NumOfIVariables to traverse)
     Array1D<VariableTypeForDDOutput> DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
@@ -518,10 +513,14 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string cValue;
         // ValidateTimeStepType will throw a Fatal if not valid
-        TimeStepType Index = ValidateTimeStepType(TimeStepTypeKey, "SetupTimePointers");
+        TimeStepType timeStepType = ValidateTimeStepType(TimeStepTypeKey, "SetupTimePointers");
 
-        TimeValue.at(Index).TimeStep >>= TimeStep;
-        TimeValue.at(Index).CurMinute = 0.0;
+        TimeSteps tPtr;
+        tPtr.TimeStep >>= TimeStep;
+        if ( !TimeValue.insert( std::make_pair( timeStepType, tPtr ) ).second ) {
+            // The element was already present... shouldn't happen
+            ShowFatalError("SetupTimePointers was already called for " + TimeStepTypeKey);
+        }
 
     }
 
@@ -4199,7 +4198,7 @@ namespace OutputProcessor {
                                            std::string const &reportIDChr,     // The reporting ID for the data
                                            std::string const &keyedValue,      // The key name for the data
                                            std::string const &variableName,    // The variable's actual name
-                                           int const timeStepType,
+                                           TimeStepType const timeStepType,
                                            OutputProcessor::Unit const &unitsForVar, // The variables units
                                            Optional_string_const customUnitName,
                                            Optional_string_const ScheduleName)
@@ -4297,7 +4296,7 @@ namespace OutputProcessor {
                                                        indexGroup,
                                                        keyedValue,
                                                        variableName,
-                                                       timeStepType,
+                                                       static_cast<int>(timeStepType),
                                                        UnitsString,
                                                        static_cast<int>(reportingInterval),
                                                        false,

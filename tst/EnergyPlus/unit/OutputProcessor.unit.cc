@@ -1082,10 +1082,18 @@ namespace OutputProcessor {
         }
     }
 
-    TEST_F(SQLiteFixture, OutputProcessor_validateIndexType)
+    TEST_F(SQLiteFixture, OutputProcessor_validateTimeStepType)
     {
-        std::map<std::string, int> const resource_map = {{"ZONE", 1}, {"HEATBALANCE", 1}, {"HEAT BALANCE", 1},
-                                                         {"HVAC", 2}, {"SYSTEM", 2},      {"PLANT", 2}};
+        std::map<std::string, OutputProcessor::TimeStepType> const resource_map = {
+            // Zone
+            {"ZONE", OutputProcessor::TimeStepType::TimeStepZone},
+            {"HEATBALANCE", OutputProcessor::TimeStepType::TimeStepZone},
+            {"HEAT BALANCE", OutputProcessor::TimeStepType::TimeStepZone},
+            // System
+            {"HVAC", OutputProcessor::TimeStepType::TimeStepSystem},
+            {"SYSTEM", OutputProcessor::TimeStepType::TimeStepSystem},
+            {"PLANT", OutputProcessor::TimeStepType::TimeStepSystem}
+        };
 
         auto const calledFrom = "UnitTest";
 
@@ -1094,7 +1102,7 @@ namespace OutputProcessor {
         }
     }
 
-    TEST_F(SQLiteFixture, OutputProcessor_DeathTest_validateIndexType)
+    TEST_F(SQLiteFixture, OutputProcessor_DeathTest_validateTimeStepType)
     {
         auto const calledFrom = "UnitTest";
         EXPECT_ANY_THROW(ValidateTimeStepType("BAD INPUT", calledFrom));
@@ -1380,37 +1388,41 @@ namespace OutputProcessor {
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
+        // TODO: so before it was internally calling createSQLiteReportDictionaryRecord with indexType = 1 which in SQLiteProcedures means HVAC
+        // but in OutputProcessor domain it means Zone...
+        std::string timeStepTypeString = "HVAC System";
+
         std::vector<std::vector<std::string>> reportDataDictionary(
-            {{"1", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "J"},
-             {"2", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "W"},
-             {"3", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Zone Timestep", "", "J"},
-             {"4", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Zone Timestep", "", "W"},
-             {"5", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Zone Timestep", "", "W"},
-             {"6", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "J"},
-             {"7", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "J"},
-             {"8", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "HVAC System Timestep", "", "J"},
-             {"9", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "HVAC System Timestep", "", "J"},
-             {"10", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "HVAC System Timestep", "", "J"},
-             {"11", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", "J"},
-             {"12", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", ""},
-             {"13", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Hourly", "", ""},
-             {"14", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Hourly", "", ""},
-             {"15", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Hourly", "", ""},
-             {"16", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Daily", "", ""},
-             {"17", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Daily", "", ""},
-             {"18", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Daily", "", "deltaC"},
-             {"19", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Daily", "", "deltaC"},
-             {"20", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Daily", "", "deltaC"},
-             {"21", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "deltaC"},
-             {"22", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "deltaC"},
-             {"23", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Monthly", "", "deltaC"},
-             {"24", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Monthly", "", "deltaC"},
-             {"25", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Monthly", "", "deltaC"},
-             {"26", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "deltaC"},
-             {"27", "1", "Sum", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "deltaC"},
-             {"28", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "deltaC"},
-             {"29", "1", "Avg", "indexGroup", "HVAC System", "", "meterName", "Run Period", "", "deltaC"},
-             {"30", "1", "Avg", "indexGroup", "HVAC System", "Cumulative ", "meterName", "Run Period", "", "deltaC"}});
+            {{"1", "1", "Avg", "indexGroup", timeStepTypeString, "", "meterName", "Zone Timestep", "", "J"},
+             {"2", "1", "Sum", "indexGroup", timeStepTypeString, "", "meterName", "Zone Timestep", "", "W"},
+             {"3", "1", "Avg", "indexGroup", timeStepTypeString, "Cumulative ", "meterName", "Zone Timestep", "", "J"},
+             {"4", "1", "Avg", "indexGroup", timeStepTypeString, "", "meterName", "Zone Timestep", "", "W"},
+             {"5", "1", "Avg", "indexGroup", timeStepTypeString, "Cumulative ", "meterName", "Zone Timestep", "", "W"},
+             {"6", "1", "Avg", "indexGroup", timeStepTypeString, "", "meterName", "HVAC System Timestep", "", "J"},
+             {"7", "1", "Sum", "indexGroup", timeStepTypeString, "", "meterName", "HVAC System Timestep", "", "J"},
+             {"8", "1", "Avg", "indexGroup", timeStepTypeString, "Cumulative ", "meterName", "HVAC System Timestep", "", "J"},
+             {"9", "1", "Avg", "indexGroup", timeStepTypeString, "", "meterName", "HVAC System Timestep", "", "J"},
+             {"10", "1", "Avg", "indexGroup", timeStepTypeString, "Cumulative ", "meterName", "HVAC System Timestep", "", "J"},
+             {"11", "1", "Avg", "indexGroup", timeStepTypeString, "", "meterName", "Hourly", "", "J"},
+             {"12", "1", "Sum", "indexGroup", timeStepTypeString, "", "meterName", "Hourly", "", ""},
+             {"13", "1", "Avg", "indexGroup", timeStepTypeString, "Cumulative ", "meterName", "Hourly", "", ""},
+             {"14", "1", "Avg", "indexGroup", timeStepTypeString, "", "meterName", "Hourly", "", ""},
+             {"15", "1", "Avg", "indexGroup", timeStepTypeString, "Cumulative ", "meterName", "Hourly", "", ""},
+             {"16", "1", "Avg", "indexGroup", timeStepTypeString, "", "meterName", "Daily", "", ""},
+             {"17", "1", "Sum", "indexGroup", timeStepTypeString, "", "meterName", "Daily", "", ""},
+             {"18", "1", "Avg", "indexGroup", timeStepTypeString, "Cumulative ", "meterName", "Daily", "", "deltaC"},
+             {"19", "1", "Avg", "indexGroup", timeStepTypeString, "", "meterName", "Daily", "", "deltaC"},
+             {"20", "1", "Avg", "indexGroup", timeStepTypeString, "Cumulative ", "meterName", "Daily", "", "deltaC"},
+             {"21", "1", "Avg", "indexGroup", timeStepTypeString, "", "meterName", "Monthly", "", "deltaC"},
+             {"22", "1", "Sum", "indexGroup", timeStepTypeString, "", "meterName", "Monthly", "", "deltaC"},
+             {"23", "1", "Avg", "indexGroup", timeStepTypeString, "Cumulative ", "meterName", "Monthly", "", "deltaC"},
+             {"24", "1", "Avg", "indexGroup", timeStepTypeString, "", "meterName", "Monthly", "", "deltaC"},
+             {"25", "1", "Avg", "indexGroup", timeStepTypeString, "Cumulative ", "meterName", "Monthly", "", "deltaC"},
+             {"26", "1", "Avg", "indexGroup", timeStepTypeString, "", "meterName", "Run Period", "", "deltaC"},
+             {"27", "1", "Sum", "indexGroup", timeStepTypeString, "", "meterName", "Run Period", "", "deltaC"},
+             {"28", "1", "Avg", "indexGroup", timeStepTypeString, "Cumulative ", "meterName", "Run Period", "", "deltaC"},
+             {"29", "1", "Avg", "indexGroup", timeStepTypeString, "", "meterName", "Run Period", "", "deltaC"},
+             {"30", "1", "Avg", "indexGroup", timeStepTypeString, "Cumulative ", "meterName", "Run Period", "", "deltaC"}});
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
     }
 
@@ -2593,12 +2605,16 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        AddToOutputVariableList("Site Outdoor Air Drybulb Temperature", 1, StoreType::Averaged, 2, OutputProcessor::Unit::C);
-        AddToOutputVariableList("Site Outdoor Air Wetbulb Temperature", 1, StoreType::Averaged, 2, OutputProcessor::Unit::C);
-        AddToOutputVariableList("Site Outdoor Air Humidity Ratio", 1, StoreType::Averaged, 2, OutputProcessor::Unit::kgWater_kgDryAir);
-        AddToOutputVariableList("Site Outdoor Air Relative Humidity", 1, StoreType::Averaged, 2, OutputProcessor::Unit::Perc);
+        AddToOutputVariableList("Site Outdoor Air Drybulb Temperature", OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged, 2, OutputProcessor::Unit::C);
+        AddToOutputVariableList("Site Outdoor Air Wetbulb Temperature", OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged, 2, OutputProcessor::Unit::C);
+        AddToOutputVariableList("Site Outdoor Air Humidity Ratio", OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged, 2, OutputProcessor::Unit::kgWater_kgDryAir);
+        AddToOutputVariableList("Site Outdoor Air Relative Humidity", OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged, 2, OutputProcessor::Unit::Perc);
 
-        EXPECT_EQ(1, DDVariableTypes(1).IndexType);
+        EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, DDVariableTypes(1).timeStepType);
         EXPECT_EQ(StoreType::Averaged, DDVariableTypes(1).storeType);
         EXPECT_EQ(2, DDVariableTypes(1).VariableType);
         EXPECT_EQ(0, DDVariableTypes(1).Next);
@@ -2606,7 +2622,7 @@ namespace OutputProcessor {
         EXPECT_EQ("Site Outdoor Air Drybulb Temperature", DDVariableTypes(1).VarNameOnly);
         EXPECT_EQ(OutputProcessor::Unit::C, DDVariableTypes(1).units);
 
-        EXPECT_EQ(1, DDVariableTypes(2).IndexType);
+        EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, DDVariableTypes(2).timeStepType);
         EXPECT_EQ(StoreType::Averaged, DDVariableTypes(2).storeType);
         EXPECT_EQ(2, DDVariableTypes(2).VariableType);
         EXPECT_EQ(0, DDVariableTypes(2).Next);
@@ -2614,7 +2630,7 @@ namespace OutputProcessor {
         EXPECT_EQ("Site Outdoor Air Wetbulb Temperature", DDVariableTypes(2).VarNameOnly);
         EXPECT_EQ(OutputProcessor::Unit::C, DDVariableTypes(2).units);
 
-        EXPECT_EQ(1, DDVariableTypes(3).IndexType);
+        EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, DDVariableTypes(3).timeStepType);
         EXPECT_EQ(StoreType::Averaged, DDVariableTypes(3).storeType);
         EXPECT_EQ(2, DDVariableTypes(3).VariableType);
         EXPECT_EQ(0, DDVariableTypes(3).Next);
@@ -2622,7 +2638,7 @@ namespace OutputProcessor {
         EXPECT_EQ("Site Outdoor Air Humidity Ratio", DDVariableTypes(3).VarNameOnly);
         EXPECT_EQ(OutputProcessor::Unit::kgWater_kgDryAir, DDVariableTypes(3).units);
 
-        EXPECT_EQ(1, DDVariableTypes(4).IndexType);
+        EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, DDVariableTypes(4).timeStepType);
         EXPECT_EQ(StoreType::Averaged, DDVariableTypes(4).storeType);
         EXPECT_EQ(2, DDVariableTypes(4).VariableType);
         EXPECT_EQ(0, DDVariableTypes(4).Next);
@@ -2658,7 +2674,7 @@ namespace OutputProcessor {
         EXPECT_EQ("", ReqRepVars(1).SchedName);
         EXPECT_EQ(true, ReqRepVars(1).Used);
 
-        EXPECT_EQ(1, DDVariableTypes(1).IndexType);
+        EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, DDVariableTypes(1).timeStepType);
         EXPECT_EQ(StoreType::Averaged, DDVariableTypes(1).storeType);
         EXPECT_EQ(2, DDVariableTypes(1).VariableType);
         EXPECT_EQ(0, DDVariableTypes(1).Next);
@@ -3897,18 +3913,27 @@ namespace OutputProcessor {
     TEST_F(EnergyPlusFixture, OutputProcessor_unitStringFromDDitem)
     {
 
-        AddToOutputVariableList("energy variable 1", 1, StoreType::Averaged, 1, OutputProcessor::Unit::J);
-        AddToOutputVariableList("energy variable 2", 1, StoreType::Averaged, 1, OutputProcessor::Unit::J);
-        AddToOutputVariableList("energy variable 3", 1, StoreType::Averaged, 1, OutputProcessor::Unit::J);
+        AddToOutputVariableList("energy variable 1", OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged, 1, OutputProcessor::Unit::J);
+        AddToOutputVariableList("energy variable 2", OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged, 1, OutputProcessor::Unit::J);
+        AddToOutputVariableList("energy variable 3", OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged, 1, OutputProcessor::Unit::J);
 
-        AddToOutputVariableList("humidity ratio variable 1", 1, StoreType::Averaged, 1, OutputProcessor::Unit::kgWater_kgDryAir);
-        AddToOutputVariableList("humidity ratio variable 2", 1, StoreType::Averaged, 1, OutputProcessor::Unit::kgWater_kgDryAir);
+        AddToOutputVariableList("humidity ratio variable 1", OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged, 1, OutputProcessor::Unit::kgWater_kgDryAir);
+        AddToOutputVariableList("humidity ratio variable 2", OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged, 1, OutputProcessor::Unit::kgWater_kgDryAir);
 
-        AddToOutputVariableList("flow variable 1", 1, StoreType::Averaged, 1, OutputProcessor::Unit::kgWater_s);
-        AddToOutputVariableList("flow variable 2", 1, StoreType::Averaged, 1, OutputProcessor::Unit::kgWater_s);
+        AddToOutputVariableList("flow variable 1", OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged, 1, OutputProcessor::Unit::kgWater_s);
+        AddToOutputVariableList("flow variable 2", OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged, 1, OutputProcessor::Unit::kgWater_s);
 
-        AddToOutputVariableList("user defined EMS variable 1", 1, StoreType::Averaged, 1, OutputProcessor::Unit::customEMS, "ergs/century");
-        AddToOutputVariableList("user defined EMS variable 2", 1, StoreType::Averaged, 1, OutputProcessor::Unit::customEMS, "swamps/county");
+        AddToOutputVariableList("user defined EMS variable 1", OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged, 1, OutputProcessor::Unit::customEMS, "ergs/century");
+        AddToOutputVariableList("user defined EMS variable 2", OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged, 1, OutputProcessor::Unit::customEMS, "swamps/county");
 
         EXPECT_EQ(" [J]", unitStringFromDDitem(3));
 

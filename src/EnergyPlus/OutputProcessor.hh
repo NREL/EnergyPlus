@@ -264,11 +264,12 @@ namespace OutputProcessor {
     struct TimeSteps
     {
         // Members
-        Reference<Real64> TimeStep; // Pointer to the Actual Time Step Variable (Zone or HVAC)
+        Reference<Real64> TimeStep; // fortran POINTER Pointer to the Actual Time Step Variable (Zone or HVAC)
         Real64 CurMinute;           // Current minute (decoded from real Time Step Value)
 
         // Default Constructor
         TimeSteps()
+            : CurMinute(0.0)
         {
         }
     };
@@ -565,7 +566,7 @@ namespace OutputProcessor {
     };
 
     // Object Data
-    extern std::map<TimeStepType, TimeSteps> TimeValue;                     // Pointers to the actual TimeStep variables
+    extern std::map<TimeStepType, TimeSteps> TimeValue;      // Pointers to the actual TimeStep variables
     extern Array1D<RealVariableType> RVariableTypes;         // Variable Types structure (use NumOfRVariables to traverse)
     extern Array1D<IntegerVariableType> IVariableTypes;      // Variable Types structure (use NumOfIVariables to traverse)
     extern Array1D<VariableTypeForDDOutput> DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
