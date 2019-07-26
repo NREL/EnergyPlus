@@ -2,15 +2,22 @@
 
 import json
 import os
+import sys
 
 
 def usage():
     print("""This script verifies that the idf list in CMakeLists.txt matches the idf files in the testfiles directory.
-Call with one argument: the directory which includes idfs and the CMakeLists.txt file""")
+One command line argument is optional: the path to the testfiles folder of a repo, containing an idf and cmake file.
+If given with no command line arguments, the script finds the testfiles folder in the current repository.""")
 
 
-current_script_dir = os.path.dirname(os.path.realpath(__file__))
-test_files_dir = os.path.join(current_script_dir, '..', '..', 'testfiles')
+if len(sys.argv) == 1:
+    print("IN 1")
+    current_script_dir = os.path.dirname(os.path.realpath(__file__))
+    test_files_dir = os.path.join(current_script_dir, '..', '..', 'testfiles')
+else:
+    print("IN 2")
+    test_files_dir = sys.argv[1]
 
 cmake_lists_file = os.path.join(test_files_dir, "CMakeLists.txt")
 cmake_list_idf_files = set()
@@ -51,10 +58,11 @@ for fil in found_idf_files_trimmed:
 need_to_add_to_cmake = found_idf_files_refined.difference(cmake_list_idf_files)
 if len(need_to_add_to_cmake) > 0:
     for this_file in sorted(need_to_add_to_cmake):
+        relative_path = os.path.join(test_files_dir, this_file)
         print(json.dumps({
             'tool': 'verify_idfs_in_cmake',
-            'filename': this_file,
-            'file': this_file,
+            'filename': relative_path,
+            'file': relative_path,
             'line': 0,
             'messagetype': 'error',
             'message': 'File missing from testfiles/CMakeLists.txt'
