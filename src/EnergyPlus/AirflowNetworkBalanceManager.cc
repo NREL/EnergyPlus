@@ -497,9 +497,9 @@ namespace AirflowNetworkBalanceManager {
         if (AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
             if (ValidateDistributionSystemFlag) {
                 ValidateDistributionSystem();
+                ValidateFanFlowRate();
                 ValidateDistributionSystemFlag = false;
             }
-            ValidateFanFlowRate();
         }
         CalcAirflowNetworkAirBalance();
 
@@ -10447,14 +10447,12 @@ namespace AirflowNetworkBalanceManager {
             {
                 auto const SELECT_CASE_var(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum);
                 if (SELECT_CASE_var == CompTypeNum_CVF) { // 'CVF'
-                    int nodeNum = AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusNodeNum;
                     int typeNum = AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum;
-                    // Will potentially be passed by ref to Fans::GetFanVolFlow so make a copy instead of using a ref
-                    Real64 FanFlow = Node(nodeNum).MassFlowRate;
                     if (DisSysCompCVFData(typeNum).FanTypeNum == FanType_SimpleVAV) {
                         if (DisSysCompCVFData(typeNum).FanModelFlag) {
                             DisSysCompCVFData(typeNum).MaxAirMassFlowRate = HVACFan::fanObjs[DisSysCompCVFData(typeNum).FanIndex]->designAirVolFlowRate * StdRhoAir;
                         } else {
+                            Real64 FanFlow; // Return type
                             GetFanVolFlow(DisSysCompCVFData(typeNum).FanIndex, FanFlow);
                             DisSysCompCVFData(typeNum).MaxAirMassFlowRate = FanFlow * StdRhoAir;
                         }
