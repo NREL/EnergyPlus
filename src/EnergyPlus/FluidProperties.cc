@@ -62,7 +62,7 @@
 #include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
-#undef EP_cache_GlycolSpecificHeat
+#define EP_cache_GlycolSpecificHeat
 
 namespace EnergyPlus {
 

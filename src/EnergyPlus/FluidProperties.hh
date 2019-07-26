@@ -62,7 +62,7 @@
 #include <EnergyPlus.hh>
 
 
-#undef EP_cache_GlycolSpecificHeat
+#define EP_cache_GlycolSpecificHeat
 
 
 namespace EnergyPlus {
