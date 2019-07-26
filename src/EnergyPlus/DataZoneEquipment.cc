@@ -544,11 +544,16 @@ namespace DataZoneEquipment {
                         GetZoneEquipmentDataErrorsFound = true;
                     }
                 }
+                const int nAlphasInExtensible = 4;
+                const int nNumsInExtensible = 2;
+                const int nAlphasBeforeExtensible = 2;
+                const int nNumsBeforeExtensible = 0;
                 maxEquipCount = 0;
-                numEquipCount = (NumAlphas - 2) / 2;
-                if (numEquipCount * 2 != (NumAlphas - 2)) ++numEquipCount;
+                numEquipCount = (NumAlphas - nAlphasBeforeExtensible) / nAlphasInExtensible;
+                if (numEquipCount * nAlphasInExtensible != (NumAlphas - nAlphasBeforeExtensible)) ++numEquipCount;
                 for (ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= numEquipCount; ++ZoneEquipTypeNum) {
-                    if (!lAlphaBlanks(2 * ZoneEquipTypeNum + 1) && !lAlphaBlanks(2 * ZoneEquipTypeNum + 2)) {
+                    if (!lAlphaBlanks(nAlphasInExtensible * (ZoneEquipTypeNum - 1) + nAlphasBeforeExtensible + 1) &&
+                        !lAlphaBlanks(nAlphasInExtensible * (ZoneEquipTypeNum - 1) + nAlphasBeforeExtensible + 2)) {
                         ++maxEquipCount;
                         continue;
                     }
@@ -569,8 +574,8 @@ namespace DataZoneEquipment {
                 thisZoneEquipList.HeatingPriority.allocate(thisZoneEquipList.NumOfEquipTypes);
                 thisZoneEquipList.CoolingCapacity.allocate(thisZoneEquipList.NumOfEquipTypes);
                 thisZoneEquipList.HeatingCapacity.allocate(thisZoneEquipList.NumOfEquipTypes);
-                thisZoneEquipList.SequentialCoolingFraction.allocate(thisZoneEquipList.NumOfEquipTypes);
-                thisZoneEquipList.SequentialHeatingFraction.allocate(thisZoneEquipList.NumOfEquipTypes);
+                thisZoneEquipList.SequentialCoolingFractionSchedPtr.allocate(thisZoneEquipList.NumOfEquipTypes);
+                thisZoneEquipList.SequentialHeatingFractionSchedPtr.allocate(thisZoneEquipList.NumOfEquipTypes);
                 thisZoneEquipList.EquipType = "";
                 thisZoneEquipList.EquipType_Num = 0;
                 thisZoneEquipList.EquipName = "";
@@ -579,12 +584,13 @@ namespace DataZoneEquipment {
                 thisZoneEquipList.HeatingPriority = 0;
                 thisZoneEquipList.CoolingCapacity = 0;
                 thisZoneEquipList.HeatingCapacity = 0;
-                thisZoneEquipList.SequentialCoolingFraction = 1.0;
-                thisZoneEquipList.SequentialHeatingFraction = 1.0;
+                thisZoneEquipList.SequentialCoolingFractionSchedPtr = 0;
+                thisZoneEquipList.SequentialHeatingFractionSchedPtr = 0;
 
                 for (ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= thisZoneEquipList.NumOfEquipTypes; ++ZoneEquipTypeNum) {
-                    thisZoneEquipList.EquipType(ZoneEquipTypeNum) = AlphArray(2 * ZoneEquipTypeNum + 1);
-                    thisZoneEquipList.EquipName(ZoneEquipTypeNum) = AlphArray(2 * ZoneEquipTypeNum + 2);
+                    const int ZoneEquipTypeIdx = ZoneEquipTypeNum - 1;
+                    thisZoneEquipList.EquipType(ZoneEquipTypeNum) = AlphArray(nAlphasInExtensible * ZoneEquipTypeIdx + nAlphasBeforeExtensible + 1);
+                    thisZoneEquipList.EquipName(ZoneEquipTypeNum) = AlphArray(nAlphasInExtensible * ZoneEquipTypeIdx + nAlphasBeforeExtensible + 2);
                     ValidateComponent(thisZoneEquipList.EquipType(ZoneEquipTypeNum),
                                       thisZoneEquipList.EquipName(ZoneEquipTypeNum),
                                       IsNotOK,
@@ -593,11 +599,11 @@ namespace DataZoneEquipment {
                         ShowContinueError("In " + CurrentModuleObject + '=' + thisZoneEquipList.Name);
                         GetZoneEquipmentDataErrorsFound = true;
                     }
-                    thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) = nint(NumArray(4 * ZoneEquipTypeNum - 3));
+                    thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) = nint(NumArray(nNumsInExtensible * ZoneEquipTypeIdx + nNumsBeforeExtensible + 1));
                     if ((thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) < 0) ||
                         (thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) > thisZoneEquipList.NumOfEquipTypes)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
-                        ShowContinueError("invalid " + cNumericFields(2 * ZoneEquipTypeNum - 1) + "=[" +
+                        ShowContinueError("invalid " + cNumericFields(nNumsInExtensible * ZoneEquipTypeIdx + nNumsBeforeExtensible + 1) + "=[" +
                                           RoundSigDigits(thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum)) + "].");
                         ShowContinueError("equipment sequence must be > 0 and <= number of equipments in the list.");
                         if (thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) > 0)
@@ -605,11 +611,11 @@ namespace DataZoneEquipment {
                         GetZoneEquipmentDataErrorsFound = true;
                     }
 
-                    thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) = nint(NumArray(4 * ZoneEquipTypeNum - 2));
+                    thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) = nint(NumArray(nNumsInExtensible * ZoneEquipTypeIdx + nNumsBeforeExtensible + 2));
                     if ((thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) < 0) ||
                         (thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) > thisZoneEquipList.NumOfEquipTypes)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
-                        ShowContinueError("invalid " + cNumericFields(2 * ZoneEquipTypeNum) + "=[" +
+                        ShowContinueError("invalid " + cNumericFields(nNumsInExtensible * ZoneEquipTypeIdx + nNumsBeforeExtensible + 2) + "=[" +
                                           RoundSigDigits(thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum)) + "].");
                         ShowContinueError("equipment sequence must be > 0 and <= number of equipments in the list.");
                         if (thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) > 0)
@@ -617,8 +623,31 @@ namespace DataZoneEquipment {
                         GetZoneEquipmentDataErrorsFound = true;
                     }
 
-                    thisZoneEquipList.SequentialCoolingFraction(ZoneEquipTypeNum) = 4 * ZoneEquipTypeNum - 1 > NumNums ? 1.0 : NumArray(4 * ZoneEquipTypeNum - 1);
-                    thisZoneEquipList.SequentialHeatingFraction(ZoneEquipTypeNum) = 4 * ZoneEquipTypeNum > NumNums ? 1.0 : NumArray(4 * ZoneEquipTypeNum);
+                    const int coolingFractionArrayIdx = nAlphasInExtensible * ZoneEquipTypeIdx + nAlphasBeforeExtensible + 3;
+                    if (lAlphaBlanks(coolingFractionArrayIdx)) {
+                        thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) = ScheduleAlwaysOn;
+                    } else {
+                        thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) = GetScheduleIndex(AlphArray(coolingFractionArrayIdx));
+                        if (thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) == 0) {
+                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                            ShowContinueError("invalid " + cAlphaFields(coolingFractionArrayIdx)  + "=[" + AlphArray(coolingFractionArrayIdx) + "].");
+                            ShowContinueError("Schedule does not exist.");
+                            GetZoneEquipmentDataErrorsFound = true;
+                        }
+                    }
+
+                    const int heatingFractionArrayIdx = nAlphasInExtensible * ZoneEquipTypeIdx + nAlphasBeforeExtensible + 4;
+                    if (lAlphaBlanks(heatingFractionArrayIdx)) {
+                        thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) = ScheduleAlwaysOn;
+                    } else {
+                        thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) = GetScheduleIndex(AlphArray(heatingFractionArrayIdx));
+                        if (thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) == 0) {
+                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
+                            ShowContinueError("invalid " + cAlphaFields(heatingFractionArrayIdx)  + "=[" + AlphArray(heatingFractionArrayIdx) + "].");
+                            ShowContinueError("Schedule does not exist.");
+                            GetZoneEquipmentDataErrorsFound = true;
+                        }
+                    }
 
                     // do this here for initial prototype, but later will call all the equipment in a separate function to see who is on - maybe
                     if (thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) > 0) ++thisZoneEquipList.NumAvailHeatEquip;
@@ -750,7 +779,7 @@ namespace DataZoneEquipment {
                         GetZoneEquipmentDataErrorsFound = true;
                     } else if (count_eq(thisZoneEquipList.CoolingPriority, ZoneEquipTypeNum) == 0) {
                         ShowWarningError(RoutineName + CurrentModuleObject + " = " + thisZoneEquipList.Name);
-                        ShowContinueError("...zero assignments for Zone Equipment Cooling Sequence=" + RoundSigDigits(ZoneEquipTypeNum) +
+                        ShowContinueError("...zero assigned to Zone Equipment Cooling Sequence=" + RoundSigDigits(ZoneEquipTypeNum) +
                                           ", apparent gap in sequence assignments in this equipment list.");
                     }
                     if (count_eq(thisZoneEquipList.HeatingPriority, ZoneEquipTypeNum) > 1) {
@@ -761,7 +790,7 @@ namespace DataZoneEquipment {
                         GetZoneEquipmentDataErrorsFound = true;
                     } else if (count_eq(thisZoneEquipList.HeatingPriority, ZoneEquipTypeNum) == 0) {
                         ShowWarningError(RoutineName + CurrentModuleObject + " = " + thisZoneEquipList.Name);
-                        ShowContinueError("...zero assignments for Zone Equipment Heating or No-Load Sequence=" + RoundSigDigits(ZoneEquipTypeNum) +
+                        ShowContinueError("...zero assigned to Zone Equipment Heating or No-Load Sequence=" + RoundSigDigits(ZoneEquipTypeNum) +
                                           ", apparent gap in sequence assignments in this equipment list.");
                     }
                 }
@@ -1847,6 +1876,17 @@ namespace DataZoneEquipment {
         }
         DataHVACGlobals::MinAirLoopIterationsAfterFirst = minIterations;
     }
+
+    Real64 EquipList::SequentialHeatingFraction(const int equipNum)
+    {
+        return ScheduleManager::GetCurrentScheduleValue(SequentialHeatingFractionSchedPtr(equipNum));
+    }
+
+    Real64 EquipList::SequentialCoolingFraction(const int equipNum)
+    {
+        return ScheduleManager::GetCurrentScheduleValue(SequentialCoolingFractionSchedPtr(equipNum));
+    }
+
 
 } // namespace DataZoneEquipment
 
