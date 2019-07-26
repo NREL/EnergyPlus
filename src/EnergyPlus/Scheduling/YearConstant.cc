@@ -45,10 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <DataGlobals.hh>
 #include <EMSManager.hh>
 #include <EnergyPlus.hh>
-#include <GlobalNames.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Scheduling/Base.hh>
@@ -89,7 +87,6 @@ void ScheduleConstant::processInput()
         if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
             EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
         }
-        // EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
         // then just add it to the vector via the constructor
         scheduleConstants.emplace_back(thisObjectName, fields);
     }
@@ -121,15 +118,12 @@ ScheduleConstant::ScheduleConstant(std::string const &objectName, nlohmann::json
         this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
     }
     this->value = fields.at("hourly_value");
-    if (EnergyPlus::DataGlobals::AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-        EnergyPlus::SetupEMSActuator("Schedule:Constant", this->name, "Schedule Value", "[ ]", this->emsActuatedOn, this->emsActuatedValue);
-    }
     if (this->typeLimits && !this->valuesInBounds()) {
         EnergyPlus::ShowFatalError("Schedule bounds error causes program termination");
     }
 }
 
-void ScheduleConstant::updateValue()
+void ScheduleConstant::updateValue(int EP_UNUSED(simTime))
 {
     if (this->emsActuatedOn) {
         this->value = this->emsActuatedValue;
@@ -145,6 +139,7 @@ void ScheduleConstant::setupOutputVariables()
         // Set Up Reporting
         EnergyPlus::SetupOutputVariable(
             "NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
+        EnergyPlus::SetupEMSActuator("Schedule:Constant", thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
     }
 }
 

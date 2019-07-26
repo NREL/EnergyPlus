@@ -208,8 +208,8 @@ namespace Scheduling {
         }
         auto & intervalsData = fields.at("data");
         for (auto const & intervalData : intervalsData) {
-            untilTimes.push_back(intervalData.at("time"));
-            valuesUntilTimes.push_back(intervalData.at("value_until_time"));
+            this->untilTimes.push_back(intervalData.at("time"));
+            this->valuesUntilTimes.push_back(intervalData.at("value_until_time"));
         }
     }
 

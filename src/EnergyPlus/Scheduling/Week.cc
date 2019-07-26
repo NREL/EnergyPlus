@@ -48,7 +48,6 @@
 #include <Scheduling/Base.hh>
 #include <Scheduling/Week.hh>
 #include <Scheduling/Day.hh>
-#include <EnergyPlus.hh>
 #include <UtilityRoutines.hh>
 #include <InputProcessing/InputProcessor.hh>
 
@@ -134,18 +133,18 @@ void ScheduleWeek::processInput()
 ScheduleWeekDaily::ScheduleWeekDaily(std::string const &objectName, nlohmann::json const &fields)
 {
     this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
-    sunday = ScheduleDay::factory(fields.at("sunday_schedule_day_name"));
-    monday = ScheduleDay::factory(fields.at("monday_schedule_day_name"));
-    tuesday = ScheduleDay::factory(fields.at("tuesday_schedule_day_name"));
-    wednesday = ScheduleDay::factory(fields.at("wednesday_schedule_day_name"));
-    thursday = ScheduleDay::factory(fields.at("thursday_schedule_day_name"));
-    friday = ScheduleDay::factory(fields.at("friday_schedule_day_name"));
-    saturday = ScheduleDay::factory(fields.at("saturday_schedule_day_name"));
-    holiday = ScheduleDay::factory(fields.at("holiday_schedule_day_name"));
-    summerdesignday = ScheduleDay::factory(fields.at("summerdesignday_schedule_day_name"));
-    winterdesignday = ScheduleDay::factory(fields.at("winterdesignday_schedule_day_name"));
-    customday1 = ScheduleDay::factory(fields.at("customday1_schedule_day_name"));
-    customday2 = ScheduleDay::factory(fields.at("customday2_schedule_day_name"));
+    this->sunday = ScheduleDay::factory(fields.at("sunday_schedule_day_name"));
+    this->monday = ScheduleDay::factory(fields.at("monday_schedule_day_name"));
+    this->tuesday = ScheduleDay::factory(fields.at("tuesday_schedule_day_name"));
+    this->wednesday = ScheduleDay::factory(fields.at("wednesday_schedule_day_name"));
+    this->thursday = ScheduleDay::factory(fields.at("thursday_schedule_day_name"));
+    this->friday = ScheduleDay::factory(fields.at("friday_schedule_day_name"));
+    this->saturday = ScheduleDay::factory(fields.at("saturday_schedule_day_name"));
+    this->holiday = ScheduleDay::factory(fields.at("holiday_schedule_day_name"));
+    this->summerDesignDay = ScheduleDay::factory(fields.at("summerdesignday_schedule_day_name"));
+    this->winterDesignDay = ScheduleDay::factory(fields.at("winterdesignday_schedule_day_name"));
+    this->customDay1 = ScheduleDay::factory(fields.at("customday1_schedule_day_name"));
+    this->customDay2 = ScheduleDay::factory(fields.at("customday2_schedule_day_name"));
 }
 
 ScheduleWeekCompact::ScheduleWeekCompact(std::string const &objectName, nlohmann::json const &fields)
@@ -153,8 +152,8 @@ ScheduleWeekCompact::ScheduleWeekCompact(std::string const &objectName, nlohmann
     this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
     auto & daysData = fields.at("data");
     for (auto const & dayData : daysData) {
-        dayTypeList.push_back(dayData.at("daytype_list"));
-        scheduleDayName.push_back(dayData.at("schedule_day_name"));
+        this->dayTypeList.push_back(dayData.at("daytype_list"));
+        this->scheduleDayName.push_back(dayData.at("schedule_day_name"));
         // auto scheduleInstance = ScheduleWeek::factory(scheduleName);
         //weekScheduleRanges.emplace_back(startMonth, startDay, endMonth, endDay, scheduleInstance);
     }

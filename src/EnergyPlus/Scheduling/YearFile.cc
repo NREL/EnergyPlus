@@ -45,9 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <DataGlobals.hh>
 #include <EnergyPlus.hh>
-#include <GlobalNames.hh>
+#include <EMSManager.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Scheduling/Base.hh>
@@ -79,7 +78,6 @@ void ScheduleFile::processInput()
         if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
             EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
         }
-        // EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
         // then just add it to the vector via the constructor
         scheduleFiles.emplace_back(thisObjectName, fields);
     }
@@ -92,21 +90,91 @@ void ScheduleFile::clear_state()
 
 ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &fields)
 {
-    this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
-    // get a schedule type limits reference directly and store that
+    // Schedule:File,
+    // \min-fields 5
+    //       \memo A Schedule:File points to a text computer file that has 8760-8784 hours of data.
+    //  A1 , \field Name
+    //       \required-field
+    //       \type alpha
+    //       \reference ScheduleNames
+    //  A2 , \field Schedule Type Limits Name
+    //       \type object-list
+    //       \object-list ScheduleTypeLimitsNames
+    //  A3 , \field File Name
+    //       \required-field
+    //       \retaincase
+    //  N1 , \field Column Number
+    //       \required-field
+    //       \type integer
+    //       \minimum 1
+    //  N2 , \field Rows to Skip at Top
+    //       \required-field
+    //       \type integer
+    //       \minimum 0
+    //  N3 , \field Number of Hours of Data
+    //       \note 8760 hours does not account for leap years, 8784 does.
+    //       \note should be either 8760 or 8784
+    //       \default 8760
+    //       \minimum 8760
+    //       \maximum 8784
+    //  A4 , \field Column Separator
+    //       \type choice
+    //       \key Comma
+    //       \key Tab
+    //       \key Space
+    //       \key Semicolon
+    //       \default Comma
+    //  A5 , \field Interpolate to Timestep
+    //       \note when the interval does not match the user specified timestep a "Yes" choice will average between the intervals request (to
+    //       \note timestep resolution.  a "No" choice will use the interval value at the simulation timestep without regard to if it matches
+    //       \note the boundary or not.
+    //       \type choice
+    //       \key Yes
+    //       \key No
+    //       \default No
+    //  N4 ; \field Minutes per Item
+    //       \note Must be evenly divisible into 60
+    //       \type integer
+    //       \minimum 1
+    //       \maximum 60
+    this->name = objectName;
+    // these are required
+    this->fileName = fields.at("file_name");
+    this->columnNumber = fields.at("column_number");
+    this->rowsToSkipAtTop = fields.at("rows_to_skip_at_top");
+    // then there are optionals
     if (fields.find("schedule_type_limits_name") != fields.end()) {
         this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
     }
-    this->value = fields.at("hourly_value");
-    if (EnergyPlus::DataGlobals::AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-        //            SetupEMSActuator("Schedule:Constant", this->name, "Schedule Value", "[ ]", this->emsActuatedOn, this->emsActuatedValue);
+    if(fields.find("minutes_per_item") != fields.end()) {
+        this->minutesPerItem = fields.at("minutes_per_item");
     }
-    if (!this->valuesInBounds()) {
-        // ShowFatalError("Schedule bounds error causes program termination")
+    if(fields.find("column_separator") != fields.end()) {
+        std::string separatorUpperCase = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("column_separator"));
+        if (separatorUpperCase == "COMMA") {
+            this->columnSeparator = SeparatorType::COMMA;
+        } else if (separatorUpperCase == "SEMICOLON") {
+            this->columnSeparator = SeparatorType::SEMICOLON;
+        } else if (separatorUpperCase == "SPACE") {
+            this->columnSeparator = SeparatorType::SPACE;
+        } else if (separatorUpperCase == "TAB") {
+            this->columnSeparator = SeparatorType::TAB;
+        } else {
+            EnergyPlus::ShowFatalError("Schedule:File named \"" + this->name + "\": Bad column separator value: \"" + separatorUpperCase + "\"");
+        }
+    }
+    if(fields.find("interpolate_to_timestep") != fields.end()) {
+        this->interpolateToTimeStep = fields.at("interpolate_to_timestep");
+    }
+    if(fields.find("number_of_hours_of_data") != fields.end()) {
+        this->numberOfHoursOfData = fields.at("number_of_hours_of_data");
+    }
+    if (this->typeLimits && !this->valuesInBounds()) {
+        EnergyPlus::ShowFatalError("Schedule bounds error causes program termination");
     }
 }
 
-void ScheduleFile::updateValue()
+void ScheduleFile::updateValue(int simTime)
 {
     if (this->emsActuatedOn) {
         this->value = this->emsActuatedValue;
@@ -121,20 +189,21 @@ void ScheduleFile::setupOutputVariables()
         // Set Up Reporting
         EnergyPlus::SetupOutputVariable(
             "NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
+        EnergyPlus::SetupEMSActuator("Schedule:Constant", thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
     }
 }
 
 bool ScheduleFile::valuesInBounds()
 {
-    if (this->typeLimits) {
-        if (this->value > this->typeLimits->maximum) {
-            // ShowSevereError("Value out of bounds")
-            return false;
-        } else if (this->value < this->typeLimits->minimum) {
-            // ShowSevereError("Value out of bounds")
-            return false;
-        }
-    }
+//    if (this->typeLimits) {
+//        if (this->value > this->typeLimits->maximum) {
+//            EnergyPlus::ShowSevereError("Value out of bounds");
+//            return false;
+//        } else if (this->value < this->typeLimits->minimum) {
+//            EnergyPlus::ShowSevereError("Value out of bounds");
+//            return false;
+//        }
+//    }
     return true;
 }
 

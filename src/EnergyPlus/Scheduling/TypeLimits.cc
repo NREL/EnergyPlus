@@ -52,15 +52,11 @@
 
 namespace Scheduling {
 std::vector<ScheduleTypeData> scheduleTypeLimits;
-// bool needToGetInput = true;
 
 ScheduleTypeData *ScheduleTypeData::factory(const std::string& name)
 {
     // call this in the right order and we don't have to check this everytime...
     // just make SURE that the schedule input manager calls the type limits input processor before anything else
-//    if (needToGetInput) {
-//        ScheduleTypeData::processInput();
-//    }
     for (auto & thisTypeLimit : scheduleTypeLimits) {
         if (thisTypeLimit.name == name) {
             return &thisTypeLimit;
@@ -93,13 +89,6 @@ void ScheduleTypeData::processInput() {
 
 void ScheduleTypeData::clear_state() {
     scheduleTypeLimits.clear();
-    //needToGetInput = true;
-}
-
-void toUpper(std::string &s) {
-    std::for_each(s.begin(), s.end(), [](char & c) {
-        c = ::toupper(c);
-    });
 }
 
 ScheduleTypeData::ScheduleTypeData(std::string const &objectName, nlohmann::json const &fields) {
@@ -112,7 +101,7 @@ ScheduleTypeData::ScheduleTypeData(std::string const &objectName, nlohmann::json
     }
     if (fields.find("numeric_type") != fields.end()) {
         std::string thisType = fields.at("numeric_type");
-        toUpper(thisType);
+        EnergyPlus::UtilityRoutines::MakeUPPERCase(thisType);
         if (thisType == "DISCRETE" || thisType == "INTEGER") {
             this->isContinuous = false;
         } else if (thisType == "CONTINUOUS" || thisType == "REAL") {

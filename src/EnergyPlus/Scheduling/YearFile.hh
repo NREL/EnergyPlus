@@ -56,6 +56,13 @@
 
 namespace Scheduling {
 
+enum class SeparatorType {
+    COMMA,
+    SEMICOLON,
+    SPACE,
+    TAB
+};
+
 struct ScheduleFile : ScheduleBase
 {
     // constructors/destructors
@@ -66,7 +73,7 @@ struct ScheduleFile : ScheduleBase
     // overridden base class methods
     Real64 getCurrentValue() override;
     bool valuesInBounds() override;
-    void updateValue() override;
+    void updateValue(int simTime) override;
 
     // static functions related to the state of all schedule:file objects
     static void processInput();
@@ -76,6 +83,13 @@ struct ScheduleFile : ScheduleBase
     // instance methods for this class
 
     // member variables
+    std::string fileName = "";
+    int columnNumber = 0;
+    int rowsToSkipAtTop = 0;
+    int minutesPerItem = 0;
+    SeparatorType columnSeparator = SeparatorType::COMMA;
+    bool interpolateToTimeStep = false;
+    int numberOfHoursOfData = 8760;
 
 };
 

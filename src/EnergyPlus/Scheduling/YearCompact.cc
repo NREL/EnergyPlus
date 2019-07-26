@@ -45,9 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <DataGlobals.hh>
 #include <EnergyPlus.hh>
-#include <GlobalNames.hh>
+#include <EMSManager.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Scheduling/Base.hh>
@@ -84,7 +83,6 @@ void ScheduleCompact::processInput()
         if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
             EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
         }
-        // EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
         // then just add it to the vector via the constructor
         scheduleCompacts.emplace_back(thisObjectName, fields);
     }
@@ -97,21 +95,44 @@ void ScheduleCompact::clear_state()
 
 ScheduleCompact::ScheduleCompact(std::string const &objectName, nlohmann::json const &fields)
 {
-    this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
+    // Schedule:Compact,
+    //   \extensible:1 - repeat last field, remembering to remove ; from "inner" fields.
+    //   \min-fields 5
+    //   \memo Irregular object.  Does not follow the usual definition for fields.  Fields A3... are:
+    //   \memo Through: Date
+    //   \memo For: Applicable days (ref: Schedule:Week:Compact)
+    //   \memo Interpolate: Average/Linear/No (ref: Schedule:Day:Interval) -- optional, if not used will be "No"
+    //   \memo Until: <Time> (ref: Schedule:Day:Interval)
+    //   \memo <numeric value>
+    //   \memo words "Through","For","Interpolate","Until" must be included.
+    //   \format compactSchedule
+    //  A1 , \field Name
+    //       \required-field
+    //       \type alpha
+    //       \reference ScheduleNames
+    //  A2 , \field Schedule Type Limits Name
+    //       \type object-list
+    //       \object-list ScheduleTypeLimitsNames
+    //  A3 , \field Field 1
+    //       \begin-extensible
+    //  A4 , \field Field 2
+    //  A5 , \field Field 3
+    //  A6 , \field Field 4
+    this->name = objectName;
     // get a schedule type limits reference directly and store that
     if (fields.find("schedule_type_limits_name") != fields.end()) {
         this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
     }
-    // this->value = fields.at("hourly_value");
-    if (EnergyPlus::DataGlobals::AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-        //            SetupEMSActuator("Schedule:Constant", this->name, "Schedule Value", "[ ]", this->emsActuatedOn, this->emsActuatedValue);
+    auto fieldWiseData = fields.at("data");
+    for (auto & field : fieldWiseData) {
+        this->fieldsOfData.push_back(field);
     }
-    if (!this->valuesInBounds()) {
-        // ShowFatalError("Schedule bounds error causes program termination")
+    if (this->typeLimits && !this->valuesInBounds()) {
+        EnergyPlus::ShowFatalError("Schedule bounds error causes program termination");
     }
 }
 
-void ScheduleCompact::updateValue()
+void ScheduleCompact::updateValue(int simTime)
 {
     if (this->emsActuatedOn) {
         this->value = this->emsActuatedValue;
@@ -126,20 +147,21 @@ void ScheduleCompact::setupOutputVariables()
         // Set Up Reporting
         EnergyPlus::SetupOutputVariable(
             "NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
+        EnergyPlus::SetupEMSActuator("Schedule:Compact", thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
     }
 }
 
 bool ScheduleCompact::valuesInBounds()
 {
-    if (this->typeLimits) {
-        if (this->value > this->typeLimits->maximum) {
-            // ShowSevereError("Value out of bounds")
-            return false;
-        } else if (this->value < this->typeLimits->minimum) {
-            // ShowSevereError("Value out of bounds")
-            return false;
-        }
-    }
+//    if (this->typeLimits) {
+//        if (this->value > this->typeLimits->maximum) {
+//            // ShowSevereError("Value out of bounds")
+//            return false;
+//        } else if (this->value < this->typeLimits->minimum) {
+//            // ShowSevereError("Value out of bounds")
+//            return false;
+//        }
+//    }
     return true;
 }
 

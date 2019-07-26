@@ -65,7 +65,7 @@ namespace Scheduling {
         // abstract functions that must be implemented by derived classes
         virtual Real64 getCurrentValue() = 0;
         virtual bool valuesInBounds() = 0;
-        virtual void updateValue() = 0;
+        virtual void updateValue(int simTime) = 0; // expecting simTime to be seconds since 1/1 00:00:00 of the first simulation year
     };
 
     static std::vector<std::string> allSchedNames;

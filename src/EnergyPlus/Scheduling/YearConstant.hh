@@ -66,7 +66,7 @@ struct ScheduleConstant : ScheduleBase
     // overridden base class methods
     Real64 getCurrentValue() override;
     bool valuesInBounds() override;
-    void updateValue() override;
+    void updateValue(int simTime) override;
 
     // static functions related to the state of all constant schedules
     static void setupOutputVariables();

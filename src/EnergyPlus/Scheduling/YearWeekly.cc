@@ -45,9 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <DataGlobals.hh>
 #include <EnergyPlus.hh>
-#include <GlobalNames.hh>
+#include <EMSManager.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Scheduling/Base.hh>
@@ -80,7 +79,6 @@ void ScheduleYear::processInput()
         if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
             EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
         }
-        // EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
         // then just add it to the vector via the constructor
         scheduleYears.emplace_back(thisObjectName, fields);
     }
@@ -93,7 +91,43 @@ void ScheduleYear::clear_state()
 
 ScheduleYear::ScheduleYear(std::string const &objectName, nlohmann::json const &fields)
 {
-    this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
+    // Schedule:Year,
+    //       \min-fields 7
+    //       \extensible:5
+    //       \memo A Schedule:Year contains from 1 to 52 week schedules
+    //  A1 , \field Name
+    //       \required-field
+    //       \type alpha
+    //       \reference ScheduleNames
+    //  A2 , \field Schedule Type Limits Name
+    //       \type object-list
+    //       \object-list ScheduleTypeLimitsNames
+    //  A3 , \field Schedule:Week Name 1
+    //       \begin-extensible
+    //       \required-field
+    //       \type object-list
+    //       \object-list WeekScheduleNames
+    //  N1 , \field Start Month 1
+    //       \required-field
+    //       \type integer
+    //       \minimum 1
+    //       \maximum 12
+    //  N2 , \field Start Day 1
+    //       \required-field
+    //       \type integer
+    //       \minimum 1
+    //       \maximum 31
+    //  N3 , \field End Month 1
+    //       \required-field
+    //       \type integer
+    //       \minimum 1
+    //       \maximum 12
+    //  N4 , \field End Day 1
+    //       \required-field
+    //       \type integer
+    //       \minimum 1
+    //       \maximum 31
+    this->name = objectName;
     // get a schedule type limits reference directly and store that
     if (fields.find("schedule_type_limits_name") != fields.end()) {
         this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
@@ -104,19 +138,15 @@ ScheduleYear::ScheduleYear(std::string const &objectName, nlohmann::json const &
         int const startDay = weekData.at("start_day");
         int const endMonth = weekData.at("end_month");
         int const endDay = weekData.at("end_day");
-        std::string const scheduleName = weekData.at("schedule_week_name");
-        auto scheduleInstance = ScheduleWeek::factory(scheduleName);
-        weekScheduleRanges.emplace_back(startMonth, startDay, endMonth, endDay, scheduleInstance);
+        auto scheduleInstance = ScheduleWeek::factory(weekData.at("schedule_week_name"););
+        this->weekScheduleRanges.emplace_back(startMonth, startDay, endMonth, endDay, scheduleInstance);
     }
-    if (EnergyPlus::DataGlobals::AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-        //            SetupEMSActuator("Schedule:Constant", this->name, "Schedule Value", "[ ]", this->emsActuatedOn, this->emsActuatedValue);
-    }
-    if (!this->valuesInBounds()) {
-        // ShowFatalError("Schedule bounds error causes program termination")
+    if (this->typeLimits && !this->valuesInBounds()) {
+        EnergyPlus::ShowFatalError("Schedule bounds error causes program termination");
     }
 }
 
-void ScheduleYear::updateValue()
+void ScheduleYear::updateValue(int simTime)
 {
     if (this->emsActuatedOn) {
         this->value = this->emsActuatedValue;
@@ -131,20 +161,21 @@ void ScheduleYear::setupOutputVariables()
         // Set Up Reporting
         EnergyPlus::SetupOutputVariable(
             "NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
+        EnergyPlus::SetupEMSActuator("Schedule:Year", thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
     }
 }
 
 bool ScheduleYear::valuesInBounds()
 {
-    if (this->typeLimits) {
-        if (this->value > this->typeLimits->maximum) {
-            // ShowSevereError("Value out of bounds")
-            return false;
-        } else if (this->value < this->typeLimits->minimum) {
-            // ShowSevereError("Value out of bounds")
-            return false;
-        }
-    }
+//    if (this->typeLimits) {
+//        if (this->value > this->typeLimits->maximum) {
+//            // ShowSevereError("Value out of bounds")
+//            return false;
+//        } else if (this->value < this->typeLimits->minimum) {
+//            // ShowSevereError("Value out of bounds")
+//            return false;
+//        }
+//    }
     return true;
 }
 

@@ -66,7 +66,7 @@ struct ScheduleCompact : ScheduleBase
     // overridden base class methods
     Real64 getCurrentValue() override;
     bool valuesInBounds() override;
-    void updateValue() override;
+    void updateValue(int simTime) override;
 
     // static functions related to the state of all compact schedules
     static void processInput();
@@ -76,7 +76,7 @@ struct ScheduleCompact : ScheduleBase
     // instance methods for this class
 
     // member variables
-
+    std::vector<std::string> fieldsOfData;
 };
 
 extern std::vector<ScheduleCompact> scheduleCompacts;
