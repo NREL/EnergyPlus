@@ -69,19 +69,27 @@ struct WeekScheduleRange {
 
 struct ScheduleYear : ScheduleBase
 {
-    bool emsActuatedOn = false;
-    Real64 emsActuatedValue = 0.0;
+    // constructors/destructors
     ScheduleYear() = default;
     ScheduleYear(std::string const &objectName, nlohmann::json const &fields);
+    ~ScheduleYear() = default;
+
+    // overridden base class methods
     Real64 getCurrentValue() override;
+    bool valuesInBounds() override;
+    void updateValue() override;
+
+    // static functions related to the state of all weekly schedules
     static void processInput();
     static void clear_state();
-    ~ScheduleYear() = default;
-    void updateValue();
     static void setupOutputVariables();
-    bool valuesInBounds() override;
+
+    // instance methods for this class
+
+    // member variables
     std::vector<WeekScheduleRange> weekScheduleRanges;
 };
+
 extern std::vector<ScheduleYear> scheduleYears;
 
 }

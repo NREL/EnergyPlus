@@ -46,10 +46,12 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <DataGlobals.hh>
+#include <EMSManager.hh>
 #include <EnergyPlus.hh>
 #include <GlobalNames.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
+#include <Scheduling/Base.hh>
 #include <Scheduling/YearConstant.hh>
 #include <UtilityRoutines.hh>
 
@@ -81,9 +83,12 @@ void ScheduleConstant::processInput()
     auto &instancesValue = instances.value();
     for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
         auto const &fields = instance.value();
-        auto const &thisObjectName = instance.key();
-        // do any pre-construction checks
+        auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
+        // do any pre-construction operations
         EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+        if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
+            EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
+        }
         // EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
         // then just add it to the vector via the constructor
         scheduleConstants.emplace_back(thisObjectName, fields);
@@ -97,17 +102,30 @@ void ScheduleConstant::clear_state()
 
 ScheduleConstant::ScheduleConstant(std::string const &objectName, nlohmann::json const &fields)
 {
-    this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
+    // Schedule:Constant,
+    //   \memo Constant hourly value for entire year.
+    //   \format singleLine
+    //  A1 , \field Name
+    //       \required-field
+    //       \type alpha
+    //       \reference ScheduleNames
+    //  A2 , \field Schedule Type Limits Name
+    //       \type object-list
+    //       \object-list ScheduleTypeLimitsNames
+    //  N1 ; \field Hourly Value
+    //       \type real
+    //       \default 0
+    this->name = objectName;
     // get a schedule type limits reference directly and store that
     if (fields.find("schedule_type_limits_name") != fields.end()) {
         this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
     }
     this->value = fields.at("hourly_value");
     if (EnergyPlus::DataGlobals::AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-        //            SetupEMSActuator("Schedule:Constant", this->name, "Schedule Value", "[ ]", this->emsActuatedOn, this->emsActuatedValue);
+        EnergyPlus::SetupEMSActuator("Schedule:Constant", this->name, "Schedule Value", "[ ]", this->emsActuatedOn, this->emsActuatedValue);
     }
-    if (!this->valuesInBounds()) {
-        // ShowFatalError("Schedule bounds error causes program termination")
+    if (this->typeLimits && !this->valuesInBounds()) {
+        EnergyPlus::ShowFatalError("Schedule bounds error causes program termination");
     }
 }
 
@@ -116,6 +134,7 @@ void ScheduleConstant::updateValue()
     if (this->emsActuatedOn) {
         this->value = this->emsActuatedValue;
     } else {
+        // nothing really to do, if EMS isn't overriding it, it's just the same old value
         // this->value = this->value;
     }
 }
@@ -131,12 +150,13 @@ void ScheduleConstant::setupOutputVariables()
 
 bool ScheduleConstant::valuesInBounds()
 {
+    // TODO: Consider where to protect against null typeLimits.  Inside here only?  Caller only?  Both?
     if (this->typeLimits) {
         if (this->value > this->typeLimits->maximum) {
-            // ShowSevereError("Value out of bounds")
+            EnergyPlus::ShowSevereError("Value out of bounds");
             return false;
         } else if (this->value < this->typeLimits->minimum) {
-            // ShowSevereError("Value out of bounds")
+            EnergyPlus::ShowSevereError("Value out of bounds");
             return false;
         }
     }

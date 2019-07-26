@@ -45,6 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <Scheduling/Base.hh>
 #include <Scheduling/Week.hh>
 #include <Scheduling/Day.hh>
 #include <EnergyPlus.hh>
@@ -99,9 +100,12 @@ void ScheduleWeek::processInput()
     auto &instancesValue = instances.value();
     for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
         auto const &fields = instance.value();
-        auto const &thisObjectName = instance.key();
-        // do any pre-construction checks
+        auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
+        // do any pre-construction operations
         EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+        if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
+            EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
+        }
         // then just add it to the vector via the constructor
         scheduleWeekDailies.emplace_back(thisObjectName, fields);
     }
@@ -114,9 +118,12 @@ void ScheduleWeek::processInput()
     instancesValue = instances.value();
     for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
         auto const &fields = instance.value();
-        auto const &thisObjectName = instance.key();
-        // do any pre-construction checks
+        auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
+        // do any pre-construction operations
         EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+        if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
+            EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
+        }
         // then just add it to the vector via the constructor
         scheduleWeekCompacts.emplace_back(thisObjectName, fields);
     }

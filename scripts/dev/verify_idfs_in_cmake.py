@@ -7,17 +7,11 @@ import sys
 
 def usage():
     print("""This script verifies that the idf list in CMakeLists.txt matches the idf files in the testfiles directory.
-One command line argument is optional: the path to the testfiles folder of a repo, containing an idf and cmake file.
-If given with no command line arguments, the script finds the testfiles folder in the current repository.""")
+Command line arguments are ignored.  The script finds the testfiles folder in the current repository.""")
 
 
-if len(sys.argv) == 1:
-    print("IN 1")
-    current_script_dir = os.path.dirname(os.path.realpath(__file__))
-    test_files_dir = os.path.join(current_script_dir, '..', '..', 'testfiles')
-else:
-    print("IN 2")
-    test_files_dir = sys.argv[1]
+current_script_dir = os.path.dirname(os.path.realpath(__file__))
+test_files_dir = os.path.join(current_script_dir, '..', '..', 'testfiles')
 
 cmake_lists_file = os.path.join(test_files_dir, "CMakeLists.txt")
 cmake_list_idf_files = set()

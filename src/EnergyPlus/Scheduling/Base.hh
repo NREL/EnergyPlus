@@ -59,12 +59,16 @@ namespace Scheduling {
         std::string name = "";
         Real64 value = 0.0;
         ScheduleTypeData *typeLimits = nullptr;
+        bool emsActuatedOn = false;
+        Real64 emsActuatedValue = 0.0;
 
         // abstract functions that must be implemented by derived classes
         virtual Real64 getCurrentValue() = 0;
-
         virtual bool valuesInBounds() = 0;
+        virtual void updateValue() = 0;
     };
+
+    static std::vector<std::string> allSchedNames;
 
     enum class ScheduleType {
         CONSTANT,

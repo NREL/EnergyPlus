@@ -50,6 +50,7 @@
 #include <GlobalNames.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
+#include <Scheduling/Base.hh>
 #include <Scheduling/YearFile.hh>
 #include <UtilityRoutines.hh>
 
@@ -72,9 +73,12 @@ void ScheduleFile::processInput()
     auto &instancesValue = instances.value();
     for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
         auto const &fields = instance.value();
-        auto const &thisObjectName = instance.key();
-        // do any pre-construction checks
+        auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
+        // do any pre-construction operations
         EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+        if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
+            EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
+        }
         // EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
         // then just add it to the vector via the constructor
         scheduleFiles.emplace_back(thisObjectName, fields);

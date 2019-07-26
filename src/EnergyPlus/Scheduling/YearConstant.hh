@@ -58,18 +58,27 @@ namespace Scheduling {
 
 struct ScheduleConstant : ScheduleBase
 {
-    bool emsActuatedOn = false;
-    Real64 emsActuatedValue = 0.0;
+    // constructors/destructors
     ScheduleConstant() = default;
     ScheduleConstant(std::string const &objectName, nlohmann::json const &fields);
+    ~ScheduleConstant() = default;
+
+    // overridden base class methods
     Real64 getCurrentValue() override;
+    bool valuesInBounds() override;
+    void updateValue() override;
+
+    // static functions related to the state of all constant schedules
+    static void setupOutputVariables();
     static void processInput();
     static void clear_state();
-    ~ScheduleConstant() = default;
-    void updateValue();
-    static void setupOutputVariables();
-    bool valuesInBounds() override;
+
+    // instance methods for this class
+
+    // member variables
+
 };
+
 extern std::vector<ScheduleConstant> scheduleConstants;
 
 }

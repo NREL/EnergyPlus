@@ -58,18 +58,27 @@ namespace Scheduling {
 
 struct ScheduleCompact : ScheduleBase
 {
-    bool emsActuatedOn = false;
-    Real64 emsActuatedValue = 0.0;
+    // constructors/destructors
     ScheduleCompact() = default;
     ScheduleCompact(std::string const &objectName, nlohmann::json const &fields);
+    ~ScheduleCompact() = default;
+
+    // overridden base class methods
     Real64 getCurrentValue() override;
+    bool valuesInBounds() override;
+    void updateValue() override;
+
+    // static functions related to the state of all compact schedules
     static void processInput();
     static void clear_state();
-    ~ScheduleCompact() = default;
-    void updateValue();
     static void setupOutputVariables();
-    bool valuesInBounds() override;
+
+    // instance methods for this class
+
+    // member variables
+
 };
+
 extern std::vector<ScheduleCompact> scheduleCompacts;
 
 }
