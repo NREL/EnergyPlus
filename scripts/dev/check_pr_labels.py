@@ -23,6 +23,11 @@ try:
 
     # every PR must have one of these labels or it is a warning
     required_labels = ['Defect', 'NewFeature', 'Performance', 'Refactoring', 'DoNotPublish']
+    message_str = "Pull Request %s was missing required labels, must have at least one of these: "
+    for i, label in enumerate(required_labels, 1):
+        message_str += label
+        if i < len(required_labels):
+            message_str += ', '
 
     # loop over each PR, try to match the HEAD SHA with the current SHA, and verify the labels are correct
     for p in pulls:
@@ -33,11 +38,11 @@ try:
             if not any([l in required_labels for l in labels]):
                 print(json.dumps({
                     'tool': 'check_required_labels.py',
-                    'filename': 'Pull Request # ' + str(p['number']),
-                    'file': 'Pull Request # ' + str(p['number']),
+                    'filename': 'scripts/dev/check_pr_labels.md',
+                    'file': 'scripts/dev/check_pr_labels.md',
                     'line': 0,
                     'messagetype': 'warning',
-                    'message': 'Pull Request was missing required labels, must have one of these: Defect, NewFeature, Performance, Refactoring, DoNotPublish'
+                    'message': message_str % p['number']
                 }))
 
 except:  # anything could happen - internet connectivity, etc
@@ -47,5 +52,5 @@ except:  # anything could happen - internet connectivity, etc
         'filename': 'unknown',
         'line': 0,
         'messagetype': 'warning',
-        'message': 'Pull Request Label Check Failed - May have been an internet or GitHub API problem - Verify labels anyway'
+        'message': 'Pull Request Label Check Failed - Maybe an internet or GitHub API problem - Verify labels anyway'
     }))
