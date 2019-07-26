@@ -10442,25 +10442,21 @@ namespace AirflowNetworkBalanceManager {
 
     void ValidateFanFlowRate() {
 
-        int i;
-        int j;
-        int k;
-        Real64 FanFlow;
-
         // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
-        for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
+        for (int i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
             {
                 auto const SELECT_CASE_var(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum);
                 if (SELECT_CASE_var == CompTypeNum_CVF) { // 'CVF'
-                    j = AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusNodeNum;
-                    k = AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum;
-                    FanFlow = Node(j).MassFlowRate;
-                    if (DisSysCompCVFData(k).FanTypeNum == FanType_SimpleVAV) {
-                        if (DisSysCompCVFData(k).FanModelFlag) {
-                            DisSysCompCVFData(k).MaxAirMassFlowRate = HVACFan::fanObjs[DisSysCompCVFData(k).FanIndex]->designAirVolFlowRate * StdRhoAir;
+                    int nodeNum = AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[1]).EPlusNodeNum;
+                    int typeNum = AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum;
+                    // Will potentially be passed by ref to Fans::GetFanVolFlow so make a copy instead of using a ref
+                    Real64 FanFlow = Node(nodeNum).MassFlowRate;
+                    if (DisSysCompCVFData(typeNum).FanTypeNum == FanType_SimpleVAV) {
+                        if (DisSysCompCVFData(typeNum).FanModelFlag) {
+                            DisSysCompCVFData(typeNum).MaxAirMassFlowRate = HVACFan::fanObjs[DisSysCompCVFData(typeNum).FanIndex]->designAirVolFlowRate * StdRhoAir;
                         } else {
-                            GetFanVolFlow(DisSysCompCVFData(k).FanIndex, FanFlow);
-                            DisSysCompCVFData(k).MaxAirMassFlowRate = FanFlow * StdRhoAir;
+                            GetFanVolFlow(DisSysCompCVFData(typeNum).FanIndex, FanFlow);
+                            DisSysCompCVFData(typeNum).MaxAirMassFlowRate = FanFlow * StdRhoAir;
                         }
                     }
                 } else if (SELECT_CASE_var == CompTypeNum_FAN) { //'FAN'
