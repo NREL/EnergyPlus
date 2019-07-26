@@ -1115,7 +1115,9 @@ namespace OutputProcessor {
         // Look it up in a list of valid index types.
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static std::vector<std::string> zoneIndexes({"ZONE"}); // , "HEATBALANCE", "HEAT BALANCE"})
+
+        // TODO: , "HEATBALANCE", "HEAT BALANCE" are used nowhere aside from tests. Should we remove them?
+        static std::vector<std::string> zoneIndexes({"ZONE", "HEATBALANCE", "HEAT BALANCE"});
         static std::vector<std::string> systemIndexes({"HVAC", "SYSTEM", "PLANT"});
         std::string uppercase(UtilityRoutines::MakeUPPERCase(TimeStepTypeKey));
 
@@ -6135,8 +6137,8 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
             ResultsFramework::OutputSchema->RIDetailedZoneTSData.newRow(Month, DayOfMonth, HourOfDay, TimeValue.at(TimeStepType::TimeStepZone).CurMinute);
         }
         if (t_TimeStepTypeKey == TimeStepType::TimeStepSystem) {
-            // TODO this is an error probably, was using TimeValue(1)
-            ResultsFramework::OutputSchema->RIDetailedHVACTSData.newRow(Month, DayOfMonth, HourOfDay, TimeValue.at(TimeStepType::TimeStepZone).CurMinute);
+            // TODO this was an error probably, was using TimeValue(1)
+            ResultsFramework::OutputSchema->RIDetailedHVACTSData.newRow(Month, DayOfMonth, HourOfDay, TimeValue.at(TimeStepType::TimeStepSystem).CurMinute);
         }
     }
 
