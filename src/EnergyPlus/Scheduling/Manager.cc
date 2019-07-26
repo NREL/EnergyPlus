@@ -108,7 +108,7 @@ ScheduleBase *getScheduleReference(const std::string &scheduleName)
 void updateAllSchedules()
 {
     for (auto &thisSchedule : scheduleConstants) {
-        thisSchedule.updateValue();
+        thisSchedule.updateValue(0.0);
     }
 }
 

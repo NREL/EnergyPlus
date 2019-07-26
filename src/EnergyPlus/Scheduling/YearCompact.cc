@@ -124,8 +124,8 @@ ScheduleCompact::ScheduleCompact(std::string const &objectName, nlohmann::json c
         this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
     }
     auto fieldWiseData = fields.at("data");
-    for (auto & field : fieldWiseData) {
-        this->fieldsOfData.push_back(field);
+    for (auto const & datum : fieldWiseData) {
+        this->fieldsOfData.push_back(datum.at("field").dump()); // TODO: Yes, this is silly, and temporary
     }
     if (this->typeLimits && !this->valuesInBounds()) {
         EnergyPlus::ShowFatalError("Schedule bounds error causes program termination");
