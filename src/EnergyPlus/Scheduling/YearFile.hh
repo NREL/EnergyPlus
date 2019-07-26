@@ -45,78 +45,33 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Scheduling/ScheduleTypeLimits.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <UtilityRoutines.hh>
+#ifndef SRC_ENERGYPLUS_SCHEDULING_YEARFILE_HH
+#define SRC_ENERGYPLUS_SCHEDULING_YEARFILE_HH
+
+#include <vector>
+
+#include <EnergyPlus.hh>
+#include <Scheduling/Base.hh>
+#include <nlohmann/json.hpp>
 
 namespace Scheduling {
-std::vector<ScheduleTypeData> scheduleTypeLimits;
-// bool needToGetInput = true;
 
-ScheduleTypeData *ScheduleTypeData::factory(const std::string& name)
+struct ScheduleFile : ScheduleBase
 {
-    // call this in the right order and we don't have to check this everytime...
-    // just make SURE that the schedule input manager calls the type limits input processor before anything else
-//    if (needToGetInput) {
-//        ScheduleTypeData::processInput();
-//    }
-    for (auto & thisTypeLimit : scheduleTypeLimits) {
-        if (thisTypeLimit.name == name) {
-            return &thisTypeLimit;
-        }
-    }
-    // ShowFatalError("Could not find type limits object with name: " + name);
-    return nullptr;
-}
-
-void ScheduleTypeData::processInput() {
-    std::string const thisObjectType = "ScheduleTypeLimits";
-    auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
-    if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
-        return; // no schedule type limits to process
-    }
-    auto &instancesValue = instances.value();
-    for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-        auto const &fields = instance.value();
-        auto const &thisObjectName = instance.key();
-        // do any pre-construction checks
-        EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
-        //EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
-        // then just add it to the vector via the constructor
-        scheduleTypeLimits.emplace_back(thisObjectName, fields);
-    }
-}
-
-void ScheduleTypeData::clear_state() {
-    scheduleTypeLimits.clear();
-    //needToGetInput = true;
-}
-
-void toUpper(std::string &s) {
-    std::for_each(s.begin(), s.end(), [](char & c) {
-        c = ::toupper(c);
-    });
-}
-
-ScheduleTypeData::ScheduleTypeData(std::string const &objectName, nlohmann::json const &fields) {
-    this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
-    if (fields.find("lower_limit_value") != fields.end()) {
-        this->minimum = fields.at("lower_limit_value");
-    }
-    if (fields.find("upper_limit_value") != fields.end()) {
-        this->maximum = fields.at("upper_limit_value");
-    }
-    if (fields.find("numeric_type") != fields.end()) {
-        std::string thisType = fields.at("numeric_type");
-        toUpper(thisType);
-        if (thisType == "DISCRETE" || thisType == "INTEGER") {
-            this->isContinuous = false;
-        } else if (thisType == "CONTINUOUS" || thisType == "REAL") {
-            this->isContinuous = true;
-        } else {
-            //ShowSevereError - bad inputs
-        }
-    }
-}
+    bool emsActuatedOn = false;
+    Real64 emsActuatedValue = 0.0;
+    ScheduleFile() = default;
+    ScheduleFile(std::string const &objectName, nlohmann::json const &fields);
+    Real64 getCurrentValue() override;
+    static void processInput();
+    static void clear_state();
+    ~ScheduleFile() = default;
+    void updateValue();
+    static void setupOutputVariables();
+    bool valuesInBounds() override;
+};
+extern std::vector<ScheduleFile> scheduleFiles;
 
 }
+
+#endif //SRC_ENERGYPLUS_SCHEDULING_YEARFILE_HH

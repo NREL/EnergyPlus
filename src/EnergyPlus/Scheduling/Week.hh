@@ -45,51 +45,56 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef EPLUS6_DATASCHEDULES_HH
-#define EPLUS6_DATASCHEDULES_HH
+#ifndef SRC_ENERGYPLUS_SCHEDULING_WEEK_HH
+#define SRC_ENERGYPLUS_SCHEDULING_WEEK_HH
 
 #include <string>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
+#include <Scheduling/Day.hh>
+
 namespace Scheduling {
 
-enum class ScheduleType
-{
-    CONSTANT,
-    COMPACT,
-    YEAR,
-    FILE,
-    UNKNOWN
-};
+    struct ScheduleWeek {
+        std::string name;
 
-std::vector<std::string> const allValidDayTypes({"Sunday",
-                                                 "Monday",
-                                                 "Tuesday",
-                                                 "Wednesday",
-                                                 "Thursday",
-                                                 "Friday",
-                                                 "Saturday",
-                                                 "Holiday",
-                                                 "SummerDesignDay",
-                                                 "WinterDesignDay",
-                                                 "CustomDay1",
-                                                 "CustomDay2"});
+        static ScheduleWeek *factory(const std::string &scheduleName);
 
-std::vector<std::string> const typeLimitUnitTypes({"Dimensionless",
-                                                   "Temperature",
-                                                   "DeltaTemperature",
-                                                   "PrecipitationRate",
-                                                   "Angle",
-                                                   "ConvectionCoefficient",
-                                                   "ActivityLevel",
-                                                   "Velocity",
-                                                   "Capacity",
-                                                   "Power",
-                                                   "Availability",
-                                                   "Percent",
-                                                   "Control",
-                                                   "Mode"});
+        static void processInput();
+
+        static void clear_state();
+    };
+
+    struct ScheduleWeekDaily : ScheduleWeek {
+        ScheduleDay *sunday;
+        ScheduleDay *monday;
+        ScheduleDay *tuesday;
+        ScheduleDay *wednesday;
+        ScheduleDay *thursday;
+        ScheduleDay *friday;
+        ScheduleDay *saturday;
+        ScheduleDay *holiday;
+        ScheduleDay *summerdesignday;
+        ScheduleDay *winterdesignday;
+        ScheduleDay *customday1;
+        ScheduleDay *customday2;
+
+        ScheduleWeekDaily(std::string const &objectName, nlohmann::json const &fields);
+    };
+
+    struct ScheduleWeekCompact : ScheduleWeek {
+        // TODO: These two eventually become a vector of a new structure for the extensible group
+        std::vector<std::string> dayTypeList;
+        std::vector<std::string> scheduleDayName;
+
+        ScheduleWeekCompact(std::string const &objectName, nlohmann::json const &fields);
+    };
+
+    extern std::vector<ScheduleWeek> scheduleWeeks;
+    extern std::vector<ScheduleWeekDaily> scheduleWeekDailies;
+    extern std::vector<ScheduleWeekCompact> scheduleWeekCompacts;
 
 } // namespace Scheduling
-
-#endif // EPLUS6_DATASCHEDULES_HH
+#endif // SRC_ENERGYPLUS_SCHEDULING_WEEK_HH

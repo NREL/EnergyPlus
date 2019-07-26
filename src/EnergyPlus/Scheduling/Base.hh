@@ -45,33 +45,62 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
-#define SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
+#ifndef SRC_ENERGYPLUS_SCHEDULING_BASE_HH
+#define SRC_ENERGYPLUS_SCHEDULING_BASE_HH
 
-#include <vector>
-
+#include <string>
 #include <EnergyPlus.hh>
-#include <Scheduling/ScheduleBase.hh>
-#include <nlohmann/json.hpp>
+#include <Scheduling/TypeLimits.hh>
 
 namespace Scheduling {
 
-struct ScheduleConstant : ScheduleBase
-{
-    bool emsActuatedOn = false;
-    Real64 emsActuatedValue = 0.0;
-    ScheduleConstant() = default;
-    ScheduleConstant(std::string const &objectName, nlohmann::json const &fields);
-    Real64 getCurrentValue() override;
-    static void processInput();
-    static void clear_state();
-    ~ScheduleConstant() = default;
-    void updateValue();
-    static void setupOutputVariables();
-    bool valuesInBounds() override;
-};
-extern std::vector<ScheduleConstant> scheduleConstants;
+    struct ScheduleBase {
+        // members common to all schedules
+        std::string name = "";
+        Real64 value = 0.0;
+        ScheduleTypeData *typeLimits = nullptr;
+
+        // abstract functions that must be implemented by derived classes
+        virtual Real64 getCurrentValue() = 0;
+
+        virtual bool valuesInBounds() = 0;
+    };
+
+    enum class ScheduleType {
+        CONSTANT,
+        COMPACT,
+        YEAR,
+        FILE,
+        UNKNOWN
+    };
+
+    std::vector<std::string> const allValidDayTypes({"Sunday",
+                                                     "Monday",
+                                                     "Tuesday",
+                                                     "Wednesday",
+                                                     "Thursday",
+                                                     "Friday",
+                                                     "Saturday",
+                                                     "Holiday",
+                                                     "SummerDesignDay",
+                                                     "WinterDesignDay",
+                                                     "CustomDay1",
+                                                     "CustomDay2"});
+
+    std::vector<std::string> const typeLimitUnitTypes({"Dimensionless",
+                                                       "Temperature",
+                                                       "DeltaTemperature",
+                                                       "PrecipitationRate",
+                                                       "Angle",
+                                                       "ConvectionCoefficient",
+                                                       "ActivityLevel",
+                                                       "Velocity",
+                                                       "Capacity",
+                                                       "Power",
+                                                       "Availability",
+                                                       "Percent",
+                                                       "Control",
+                                                       "Mode"});
 
 }
-
-#endif //SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
+#endif //SRC_ENERGYPLUS_SCHEDULING_BASE_HH

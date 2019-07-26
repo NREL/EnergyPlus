@@ -489,20 +489,21 @@ SET( SRC
   SQLiteProcedures.hh
   ScheduleManager.cc
   ScheduleManager.hh
-  Scheduling/DataSchedules.hh
-  Scheduling/ScheduleBase.hh
-  Scheduling/ScheduleCompact.cc
-  Scheduling/ScheduleCompact.hh
-  Scheduling/ScheduleConstant.cc
-  Scheduling/ScheduleConstant.hh
-  Scheduling/ScheduleFile.cc
-  Scheduling/ScheduleFile.hh
-  Scheduling/ScheduleYear.cc
-  Scheduling/ScheduleYear.hh
-  Scheduling/ScheduleTypeLimits.cc
-  Scheduling/ScheduleTypeLimits.cc
-  Scheduling/ScheduleWeek.cc
-  Scheduling/ScheduleWeek.hh
+  Scheduling/Base.hh
+  Scheduling/YearCompact.cc
+  Scheduling/YearCompact.hh
+  Scheduling/YearConstant.cc
+  Scheduling/YearConstant.hh
+  Scheduling/Day.cc
+  Scheduling/Day.hh
+  Scheduling/YearFile.cc
+  Scheduling/YearFile.hh
+  Scheduling/YearWeekly.cc
+  Scheduling/YearWeekly.hh
+  Scheduling/TypeLimits.cc
+  Scheduling/TypeLimits.cc
+  Scheduling/Week.cc
+  Scheduling/Week.hh
   Scheduling/Manager.cc
   Scheduling/Manager.hh
   SetPointManager.cc

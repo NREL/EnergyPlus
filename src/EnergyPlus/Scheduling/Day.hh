@@ -45,26 +45,51 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SRC_ENERGYPLUS_SCHEDULING_SCHEDULEBASE_HH
-#define SRC_ENERGYPLUS_SCHEDULING_SCHEDULEBASE_HH
+#ifndef SRC_ENERGYPLUS_SCHEDULING_DAY_HH
+#define SRC_ENERGYPLUS_SCHEDULING_DAY_HH
 
 #include <string>
+#include <vector>
+
+#include <nlohmann/json.hpp>
+
 #include <EnergyPlus.hh>
-#include <Scheduling/ScheduleTypeLimits.hh>
+#include <Scheduling/TypeLimits.hh>
 
 namespace Scheduling {
 
-struct ScheduleBase
-{
-    // members common to all schedules
-    std::string name = "";
-    Real64 value = 0.0;
-    ScheduleTypeData * typeLimits = nullptr;
+    struct ScheduleDay
+    {
+        std::string name;
+        ScheduleTypeData * typeLimits = nullptr;
+        static ScheduleDay *factory(const std::string& scheduleName);
+        static void processInput();
+        static void clear_state();
+    };
 
-    // abstract functions that must be implemented by derived classes
-    virtual Real64 getCurrentValue() = 0;
-    virtual bool valuesInBounds() = 0;
-};
+    struct ScheduleDayHourly : ScheduleDay
+    {
+        std::vector<Real64> hourlyValues;
+        ScheduleDayHourly(std::string const &objectName, nlohmann::json const &fields);
+    };
 
-}
-#endif //SRC_ENERGYPLUS_SCHEDULING_SCHEDULEBASE_HH
+    struct ScheduleDayInterval : ScheduleDay
+    {
+        enum class Interpolation {
+            NONE,
+            AVERAGE,
+            LINEAR
+        };
+        // TODO: These two eventually become a vector of a new structure for the extensible group
+        std::vector<Real64> untilTimes;
+        std::vector<Real64> valuesUntilTimes;
+        Interpolation interpolateToTimestep = Interpolation::NONE;
+        ScheduleDayInterval(std::string const &objectName, nlohmann::json const &fields);
+    };
+
+    extern std::vector<ScheduleDay> scheduleDays;
+    extern std::vector<ScheduleDayHourly> scheduleDayHourlys;
+    extern std::vector<ScheduleDayInterval> scheduleDayIntervals;
+
+} // namespace Scheduling
+#endif // SRC_ENERGYPLUS_SCHEDULING_DAY_HH

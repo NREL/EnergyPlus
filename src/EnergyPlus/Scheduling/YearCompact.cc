@@ -45,56 +45,98 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SRC_ENERGYPLUS_SCHEDULING_SCHEDULEWEEK_HH
-#define SRC_ENERGYPLUS_SCHEDULING_SCHEDULEWEEK_HH
-
-#include <string>
-#include <vector>
-
-#include <nlohmann/json.hpp>
+#include <DataGlobals.hh>
+#include <EnergyPlus.hh>
+#include <GlobalNames.hh>
+#include <InputProcessing/InputProcessor.hh>
+#include <OutputProcessor.hh>
+#include <Scheduling/YearCompact.hh>
+#include <UtilityRoutines.hh>
 
 namespace Scheduling {
 
-struct ScheduleWeek
+std::vector<ScheduleCompact> scheduleCompacts;
+
+Real64 ScheduleCompact::getCurrentValue()
 {
-    std::string name;
-    static ScheduleWeek *factory(const std::string& scheduleName);
-    static void processInput();
-    static void clear_state();
-};
+    return this->value;
+}
 
-struct ScheduleWeekDaily : ScheduleWeek
+void ScheduleCompact::processInput()
 {
-    // TODO: Make these references to Day schedules
-    std::string sundayName;
-    std::string mondayName;
-    std::string tuesdayName;
-    std::string wednesdayName;
-    std::string thursdayName;
-    std::string fridayName;
-    std::string saturdayName;
-    std::string holidayName;
-    std::string summerdesigndayName;
-    std::string winterdesigndayName;
-    std::string customday1Name;
-    std::string customday2Name;
-    ScheduleWeekDaily(std::string const &objectName, nlohmann::json const &fields);
-};
+    ScheduleCompact c;
+    c.value = 0;
+    c.name = "";
+    scheduleCompacts.push_back(c);
+    // Now we'll go through normal processing operations
+    std::string const thisObjectType = "Schedule:Compact";
+    auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
+    if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
+        return; // no constant schedules to process
+    }
+    auto &instancesValue = instances.value();
+    for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+        auto const &fields = instance.value();
+        auto const &thisObjectName = instance.key();
+        // do any pre-construction checks
+        EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+        // EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+        // then just add it to the vector via the constructor
+        scheduleCompacts.emplace_back(thisObjectName, fields);
+    }
+}
 
-
-
-struct ScheduleWeekCompact : ScheduleWeek
+void ScheduleCompact::clear_state()
 {
-    // TODO: These two eventually become a vector of a new structure for the extensible group
-    std::vector<std::string> dayTypeList;
-    std::vector<std::string> scheduleDayName;
+    scheduleCompacts.clear();
+}
 
-    ScheduleWeekCompact(std::string const &objectName, nlohmann::json const &fields);
-};
+ScheduleCompact::ScheduleCompact(std::string const &objectName, nlohmann::json const &fields)
+{
+    this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
+    // get a schedule type limits reference directly and store that
+    if (fields.find("schedule_type_limits_name") != fields.end()) {
+        this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
+    }
+    // this->value = fields.at("hourly_value");
+    if (EnergyPlus::DataGlobals::AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
+        //            SetupEMSActuator("Schedule:Constant", this->name, "Schedule Value", "[ ]", this->emsActuatedOn, this->emsActuatedValue);
+    }
+    if (!this->valuesInBounds()) {
+        // ShowFatalError("Schedule bounds error causes program termination")
+    }
+}
 
-extern std::vector<ScheduleWeek> scheduleWeeks;
-extern std::vector<ScheduleWeekDaily> scheduleWeekDailies;
-extern std::vector<ScheduleWeekCompact> scheduleWeekCompacts;
+void ScheduleCompact::updateValue()
+{
+    if (this->emsActuatedOn) {
+        this->value = this->emsActuatedValue;
+    } else {
+        // this->value = this->value;
+    }
+}
+
+void ScheduleCompact::setupOutputVariables()
+{
+    for (auto &thisSchedule : scheduleCompacts) {
+        // Set Up Reporting
+        EnergyPlus::SetupOutputVariable(
+            "NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
+    }
+}
+
+bool ScheduleCompact::valuesInBounds()
+{
+    if (this->typeLimits) {
+        if (this->value > this->typeLimits->maximum) {
+            // ShowSevereError("Value out of bounds")
+            return false;
+        } else if (this->value < this->typeLimits->minimum) {
+            // ShowSevereError("Value out of bounds")
+            return false;
+        }
+    }
+    return true;
+}
 
 } // namespace Scheduling
-#endif // SRC_ENERGYPLUS_SCHEDULING_SCHEDULEWEEK_HH

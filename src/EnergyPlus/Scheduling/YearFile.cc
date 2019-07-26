@@ -50,7 +50,7 @@
 #include <GlobalNames.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
-#include <Scheduling/ScheduleFile.hh>
+#include <Scheduling/YearFile.hh>
 #include <UtilityRoutines.hh>
 
 namespace Scheduling {

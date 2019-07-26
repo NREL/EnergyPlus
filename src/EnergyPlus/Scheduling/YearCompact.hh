@@ -45,31 +45,33 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus.hh>
+#ifndef SRC_ENERGYPLUS_SCHEDULING_YEARCOMPACT_HH
+#define SRC_ENERGYPLUS_SCHEDULING_YEARCOMPACT_HH
 
-#include <string>
 #include <vector>
+
+#include <EnergyPlus.hh>
+#include <Scheduling/Base.hh>
 #include <nlohmann/json.hpp>
 
 namespace Scheduling {
 
-struct ScheduleTypeData
+struct ScheduleCompact : ScheduleBase
 {
-    // Members
-    std::string name = ""; // Schedule Type Name
-    bool limited = false;     // True if this Schedule Type has limits
-    Real64 minimum = 0.0;   // Minimum for limited schedule
-    Real64 maximum = 0.0;   // Maximum for limited schedule
-    bool isContinuous = true;      // True if this is a "real" schedule, false if integer
-    int unitType = 0;     // reference ScheduleTypeLimit table
-
+    bool emsActuatedOn = false;
+    Real64 emsActuatedValue = 0.0;
+    ScheduleCompact() = default;
+    ScheduleCompact(std::string const &objectName, nlohmann::json const &fields);
+    Real64 getCurrentValue() override;
     static void processInput();
     static void clear_state();
-    // factory method and constructor
-    static ScheduleTypeData * factory(const std::string& name);
-    ScheduleTypeData(std::string const &objectName, nlohmann::json const &fields);
+    ~ScheduleCompact() = default;
+    void updateValue();
+    static void setupOutputVariables();
+    bool valuesInBounds() override;
 };
-
-extern std::vector<ScheduleTypeData> scheduleTypeLimits;
+extern std::vector<ScheduleCompact> scheduleCompacts;
 
 }
+
+#endif //SRC_ENERGYPLUS_SCHEDULING_YEARCOMPACT_HH

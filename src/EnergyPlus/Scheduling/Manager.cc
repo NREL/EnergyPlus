@@ -47,10 +47,10 @@
 
 #include <EnergyPlus.hh>
 #include <Scheduling/Manager.hh>
-#include <Scheduling/ScheduleConstant.hh>
-#include <Scheduling/ScheduleCompact.hh>
-#include <Scheduling/ScheduleYear.hh>
-#include <Scheduling/ScheduleFile.hh>
+#include <Scheduling/YearConstant.hh>
+#include <Scheduling/YearCompact.hh>
+#include <Scheduling/YearWeekly.hh>
+#include <Scheduling/YearFile.hh>
 
 namespace Scheduling {
 std::vector<IndexBasedScheduleData> indexToSubtypeMap;

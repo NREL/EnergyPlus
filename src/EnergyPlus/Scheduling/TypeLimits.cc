@@ -45,34 +45,35 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <GlobalNames.hh>
+#include <Scheduling/TypeLimits.hh>
 #include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <Scheduling/ScheduleCompact.hh>
 #include <UtilityRoutines.hh>
 
 namespace Scheduling {
+std::vector<ScheduleTypeData> scheduleTypeLimits;
+// bool needToGetInput = true;
 
-std::vector<ScheduleCompact> scheduleCompacts;
-
-Real64 ScheduleCompact::getCurrentValue()
+ScheduleTypeData *ScheduleTypeData::factory(const std::string& name)
 {
-    return this->value;
+    // call this in the right order and we don't have to check this everytime...
+    // just make SURE that the schedule input manager calls the type limits input processor before anything else
+//    if (needToGetInput) {
+//        ScheduleTypeData::processInput();
+//    }
+    for (auto & thisTypeLimit : scheduleTypeLimits) {
+        if (thisTypeLimit.name == name) {
+            return &thisTypeLimit;
+        }
+    }
+    // ShowFatalError("Could not find type limits object with name: " + name);
+    return nullptr;
 }
 
-void ScheduleCompact::processInput()
-{
-    ScheduleCompact c;
-    c.value = 0;
-    c.name = "";
-    scheduleCompacts.push_back(c);
-    // Now we'll go through normal processing operations
-    std::string const thisObjectType = "Schedule:Compact";
+void ScheduleTypeData::processInput() {
+    std::string const thisObjectType = "ScheduleTypeLimits";
     auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
     if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
-        return; // no constant schedules to process
+        return; // no schedule type limits to process
     }
     auto &instancesValue = instances.value();
     for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -80,63 +81,42 @@ void ScheduleCompact::processInput()
         auto const &thisObjectName = instance.key();
         // do any pre-construction checks
         EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
-        // EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+        //EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
         // then just add it to the vector via the constructor
-        scheduleCompacts.emplace_back(thisObjectName, fields);
+        scheduleTypeLimits.emplace_back(thisObjectName, fields);
     }
 }
 
-void ScheduleCompact::clear_state()
-{
-    scheduleCompacts.clear();
+void ScheduleTypeData::clear_state() {
+    scheduleTypeLimits.clear();
+    //needToGetInput = true;
 }
 
-ScheduleCompact::ScheduleCompact(std::string const &objectName, nlohmann::json const &fields)
-{
+void toUpper(std::string &s) {
+    std::for_each(s.begin(), s.end(), [](char & c) {
+        c = ::toupper(c);
+    });
+}
+
+ScheduleTypeData::ScheduleTypeData(std::string const &objectName, nlohmann::json const &fields) {
     this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
-    // get a schedule type limits reference directly and store that
-    if (fields.find("schedule_type_limits_name") != fields.end()) {
-        this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
+    if (fields.find("lower_limit_value") != fields.end()) {
+        this->minimum = fields.at("lower_limit_value");
     }
-    // this->value = fields.at("hourly_value");
-    if (EnergyPlus::DataGlobals::AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-        //            SetupEMSActuator("Schedule:Constant", this->name, "Schedule Value", "[ ]", this->emsActuatedOn, this->emsActuatedValue);
+    if (fields.find("upper_limit_value") != fields.end()) {
+        this->maximum = fields.at("upper_limit_value");
     }
-    if (!this->valuesInBounds()) {
-        // ShowFatalError("Schedule bounds error causes program termination")
-    }
-}
-
-void ScheduleCompact::updateValue()
-{
-    if (this->emsActuatedOn) {
-        this->value = this->emsActuatedValue;
-    } else {
-        // this->value = this->value;
-    }
-}
-
-void ScheduleCompact::setupOutputVariables()
-{
-    for (auto &thisSchedule : scheduleCompacts) {
-        // Set Up Reporting
-        EnergyPlus::SetupOutputVariable(
-            "NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
-    }
-}
-
-bool ScheduleCompact::valuesInBounds()
-{
-    if (this->typeLimits) {
-        if (this->value > this->typeLimits->maximum) {
-            // ShowSevereError("Value out of bounds")
-            return false;
-        } else if (this->value < this->typeLimits->minimum) {
-            // ShowSevereError("Value out of bounds")
-            return false;
+    if (fields.find("numeric_type") != fields.end()) {
+        std::string thisType = fields.at("numeric_type");
+        toUpper(thisType);
+        if (thisType == "DISCRETE" || thisType == "INTEGER") {
+            this->isContinuous = false;
+        } else if (thisType == "CONTINUOUS" || thisType == "REAL") {
+            this->isContinuous = true;
+        } else {
+            //ShowSevereError - bad inputs
         }
     }
-    return true;
 }
 
-} // namespace Scheduling
+}

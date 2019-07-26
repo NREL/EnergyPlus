@@ -45,33 +45,38 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SRC_ENERGYPLUS_SCHEDULING_SCHEDULEFILE_HH
-#define SRC_ENERGYPLUS_SCHEDULING_SCHEDULEFILE_HH
-
-#include <vector>
+#ifndef SRC_ENERGYPLUS_SCHEDULING_TYPELIMITS_HH
+#define SRC_ENERGYPLUS_SCHEDULING_TYPELIMITS_HH
 
 #include <EnergyPlus.hh>
-#include <Scheduling/ScheduleBase.hh>
+
+#include <string>
+#include <vector>
 #include <nlohmann/json.hpp>
 
 namespace Scheduling {
 
-struct ScheduleFile : ScheduleBase
-{
-    bool emsActuatedOn = false;
-    Real64 emsActuatedValue = 0.0;
-    ScheduleFile() = default;
-    ScheduleFile(std::string const &objectName, nlohmann::json const &fields);
-    Real64 getCurrentValue() override;
-    static void processInput();
-    static void clear_state();
-    ~ScheduleFile() = default;
-    void updateValue();
-    static void setupOutputVariables();
-    bool valuesInBounds() override;
-};
-extern std::vector<ScheduleFile> scheduleFiles;
+    struct ScheduleTypeData {
+        // Members
+        std::string name = ""; // Schedule Type Name
+        bool limited = false;     // True if this Schedule Type has limits
+        Real64 minimum = 0.0;   // Minimum for limited schedule
+        Real64 maximum = 0.0;   // Maximum for limited schedule
+        bool isContinuous = true;      // True if this is a "real" schedule, false if integer
+        int unitType = 0;     // reference ScheduleTypeLimit table
+
+        static void processInput();
+
+        static void clear_state();
+
+        // factory method and constructor
+        static ScheduleTypeData *factory(const std::string &name);
+
+        ScheduleTypeData(std::string const &objectName, nlohmann::json const &fields);
+    };
+
+    extern std::vector<ScheduleTypeData> scheduleTypeLimits;
 
 }
 
-#endif //SRC_ENERGYPLUS_SCHEDULING_SCHEDULEFILE_HH
+#endif // SRC_ENERGYPLUS_SCHEDULING_TYPELIMITS_HH

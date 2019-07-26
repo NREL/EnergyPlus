@@ -45,33 +45,33 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SRC_ENERGYPLUS_SCHEDULING_SCHEDULECOMPACT_HH
-#define SRC_ENERGYPLUS_SCHEDULING_SCHEDULECOMPACT_HH
+#ifndef SRC_ENERGYPLUS_SCHEDULING_YEARCONSTANT_HH
+#define SRC_ENERGYPLUS_SCHEDULING_YEARCONSTANT_HH
 
 #include <vector>
 
 #include <EnergyPlus.hh>
-#include <Scheduling/ScheduleBase.hh>
+#include <Scheduling/Base.hh>
 #include <nlohmann/json.hpp>
 
 namespace Scheduling {
 
-struct ScheduleCompact : ScheduleBase
+struct ScheduleConstant : ScheduleBase
 {
     bool emsActuatedOn = false;
     Real64 emsActuatedValue = 0.0;
-    ScheduleCompact() = default;
-    ScheduleCompact(std::string const &objectName, nlohmann::json const &fields);
+    ScheduleConstant() = default;
+    ScheduleConstant(std::string const &objectName, nlohmann::json const &fields);
     Real64 getCurrentValue() override;
     static void processInput();
     static void clear_state();
-    ~ScheduleCompact() = default;
+    ~ScheduleConstant() = default;
     void updateValue();
     static void setupOutputVariables();
     bool valuesInBounds() override;
 };
-extern std::vector<ScheduleCompact> scheduleCompacts;
+extern std::vector<ScheduleConstant> scheduleConstants;
 
 }
 
-#endif //SRC_ENERGYPLUS_SCHEDULING_SCHEDULECOMPACT_HH
+#endif //SRC_ENERGYPLUS_SCHEDULING_YEARCONSTANT_HH

@@ -52,8 +52,7 @@
 #include <vector>
 
 #include <EnergyPlus.hh>
-#include <Scheduling/DataSchedules.hh>
-#include <Scheduling/ScheduleBase.hh>
+#include <Scheduling/Base.hh>
 
 namespace Scheduling {
 

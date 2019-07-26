@@ -45,29 +45,17 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SRC_ENERGYPLUS_SCHEDULING_SCHEDULEYEAR_HH
-#define SRC_ENERGYPLUS_SCHEDULING_SCHEDULEYEAR_HH
+#ifndef SRC_ENERGYPLUS_SCHEDULING_YEARWEEKLY_HH
+#define SRC_ENERGYPLUS_SCHEDULING_YEARWEEKLY_HH
 
 #include <vector>
 
 #include <EnergyPlus.hh>
-#include <Scheduling/ScheduleBase.hh>
-#include <Scheduling/ScheduleWeek.hh>
+#include <Scheduling/Base.hh>
+#include <Scheduling/Week.hh>
 #include <nlohmann/json.hpp>
 
 namespace Scheduling {
-
-struct ScheduleDayHourly {
-
-};
-
-struct ScheduleDayInterval {
-
-};
-
-struct ScheduleDayList {
-
-};
 
 struct WeekScheduleRange {
     int beginMonth = 0;
@@ -98,4 +86,4 @@ extern std::vector<ScheduleYear> scheduleYears;
 
 }
 
-#endif //SRC_ENERGYPLUS_SCHEDULING_SCHEDULEYEAR_HH
+#endif //SRC_ENERGYPLUS_SCHEDULING_YEARWEEKLY_HH

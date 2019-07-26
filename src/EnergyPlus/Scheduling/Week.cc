@@ -45,38 +45,56 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <DataGlobals.hh>
+#include <Scheduling/Week.hh>
+#include <Scheduling/Day.hh>
 #include <EnergyPlus.hh>
-#include <GlobalNames.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <Scheduling/ScheduleConstant.hh>
 #include <UtilityRoutines.hh>
+#include <InputProcessing/InputProcessor.hh>
+
+#include <nlohmann/json.hpp>
 
 namespace Scheduling {
 
-std::vector<ScheduleConstant> scheduleConstants;
+bool getInputFlag = true;
+std::vector<ScheduleWeek> scheduleWeeks;
+std::vector<ScheduleWeekDaily> scheduleWeekDailies;
+std::vector<ScheduleWeekCompact> scheduleWeekCompacts;
 
-Real64 ScheduleConstant::getCurrentValue()
+void ScheduleWeek::clear_state()
 {
-    return this->value;
+    getInputFlag = true;
+    scheduleWeeks.clear();
+    scheduleWeekDailies.clear();
+    scheduleWeekCompacts.clear();
 }
 
-void ScheduleConstant::processInput()
+ScheduleWeek *ScheduleWeek::factory(const std::string& scheduleName)
 {
-    // We are going to play nice with the schedule manager assumptions, which include that a component model can call
-    // the schedule value functions with an index of zero and always get zero back.  Weird but ok.  To accommodate that,
-    // we agree that the constant schedules must be the first type read in first, and that we will include an unnamed
-    // constant schedule that always returns zero with no type limits or anything.
-    ScheduleConstant c;
-    c.value = 0;
-    c.name = "";
-    scheduleConstants.push_back(c);
-    // Now we'll go through normal processing operations
-    std::string const thisObjectType = "Schedule:Constant";
-    auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
+    // get input if needed
+    if (getInputFlag) {
+        ScheduleWeek::processInput();
+    }
+    // then loop over supported vectors to try to find it
+    for (auto & dailySchedule : scheduleWeekDailies) {
+        if (dailySchedule.name == scheduleName) {
+            return &dailySchedule;
+        }
+    }
+    for (auto & compactSchedule : scheduleWeekCompacts) {
+        if (compactSchedule.name == scheduleName) {
+            return &compactSchedule;
+        }
+    }
+    // error if not found
+//    EnergyPlus::ShowFatalError("Could not find week schedule named \"" + scheduleName + "\"");
+    return nullptr;
+}
+void ScheduleWeek::processInput()
+{
+    std::string thisObjectType = "Schedule:Week:Daily";
+    auto instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
     if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
-        return; // no constant schedules to process
+        return; // no daily week schedules to process
     }
     auto &instancesValue = instances.value();
     for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -84,63 +102,54 @@ void ScheduleConstant::processInput()
         auto const &thisObjectName = instance.key();
         // do any pre-construction checks
         EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
-        // EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
         // then just add it to the vector via the constructor
-        scheduleConstants.emplace_back(thisObjectName, fields);
+        scheduleWeekDailies.emplace_back(thisObjectName, fields);
     }
+
+    thisObjectType = "Schedule:Week:Compact";
+    instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
+    if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
+        return; // no constant schedules to process
+    }
+    instancesValue = instances.value();
+    for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+        auto const &fields = instance.value();
+        auto const &thisObjectName = instance.key();
+        // do any pre-construction checks
+        EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+        // then just add it to the vector via the constructor
+        scheduleWeekCompacts.emplace_back(thisObjectName, fields);
+    }
+    // get schedule:week:daily and schedule:week:compact, fill appropriate vectors
+    getInputFlag = false;
 }
 
-void ScheduleConstant::clear_state()
-{
-    scheduleConstants.clear();
-}
-
-ScheduleConstant::ScheduleConstant(std::string const &objectName, nlohmann::json const &fields)
+ScheduleWeekDaily::ScheduleWeekDaily(std::string const &objectName, nlohmann::json const &fields)
 {
     this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
-    // get a schedule type limits reference directly and store that
-    if (fields.find("schedule_type_limits_name") != fields.end()) {
-        this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
-    }
-    this->value = fields.at("hourly_value");
-    if (EnergyPlus::DataGlobals::AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-        //            SetupEMSActuator("Schedule:Constant", this->name, "Schedule Value", "[ ]", this->emsActuatedOn, this->emsActuatedValue);
-    }
-    if (!this->valuesInBounds()) {
-        // ShowFatalError("Schedule bounds error causes program termination")
-    }
+    sunday = ScheduleDay::factory(fields.at("sunday_schedule_day_name"));
+    monday = ScheduleDay::factory(fields.at("monday_schedule_day_name"));
+    tuesday = ScheduleDay::factory(fields.at("tuesday_schedule_day_name"));
+    wednesday = ScheduleDay::factory(fields.at("wednesday_schedule_day_name"));
+    thursday = ScheduleDay::factory(fields.at("thursday_schedule_day_name"));
+    friday = ScheduleDay::factory(fields.at("friday_schedule_day_name"));
+    saturday = ScheduleDay::factory(fields.at("saturday_schedule_day_name"));
+    holiday = ScheduleDay::factory(fields.at("holiday_schedule_day_name"));
+    summerdesignday = ScheduleDay::factory(fields.at("summerdesignday_schedule_day_name"));
+    winterdesignday = ScheduleDay::factory(fields.at("winterdesignday_schedule_day_name"));
+    customday1 = ScheduleDay::factory(fields.at("customday1_schedule_day_name"));
+    customday2 = ScheduleDay::factory(fields.at("customday2_schedule_day_name"));
 }
 
-void ScheduleConstant::updateValue()
+ScheduleWeekCompact::ScheduleWeekCompact(std::string const &objectName, nlohmann::json const &fields)
 {
-    if (this->emsActuatedOn) {
-        this->value = this->emsActuatedValue;
-    } else {
-        // this->value = this->value;
+    this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
+    auto & daysData = fields.at("data");
+    for (auto const & dayData : daysData) {
+        dayTypeList.push_back(dayData.at("daytype_list"));
+        scheduleDayName.push_back(dayData.at("schedule_day_name"));
+        // auto scheduleInstance = ScheduleWeek::factory(scheduleName);
+        //weekScheduleRanges.emplace_back(startMonth, startDay, endMonth, endDay, scheduleInstance);
     }
 }
-
-void ScheduleConstant::setupOutputVariables()
-{
-    for (auto &thisSchedule : scheduleConstants) {
-        // Set Up Reporting
-        EnergyPlus::SetupOutputVariable(
-            "NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
-    }
-}
-
-bool ScheduleConstant::valuesInBounds()
-{
-    if (this->typeLimits) {
-        if (this->value > this->typeLimits->maximum) {
-            // ShowSevereError("Value out of bounds")
-            return false;
-        } else if (this->value < this->typeLimits->minimum) {
-            // ShowSevereError("Value out of bounds")
-            return false;
-        }
-    }
-    return true;
-}
-
 } // namespace Scheduling
