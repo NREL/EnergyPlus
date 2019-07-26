@@ -3386,6 +3386,10 @@ This value is the front side long-wave hemispherical emissivity of the glazing. 
 
 This value is the back side long-wave hemispherical emissivity of the glazing. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.84.
 
+\paragraph{Field: Thermal Resistance}\label{field-thermal-resistance-equivglazing}
+
+This field is used to enter the thermal resistance (R-value) of the material layer. Units for this parameter are (m\(^{2}\)-K)/W. Thermal resistance must be greater than zero.  The default value is 0.158 which is roughly equivalent to a single layer of 1/4" glass.
+
 An IDF example for this object, is shown below:
 
 \begin{lstlisting}
@@ -3418,7 +3422,8 @@ WindowMaterial:Glazing:EquivalentLayer,
     0.0,                     !- Back Side Diffuse-Diffuse Visible Reflectance
     0.0,                     !- Infrared Transmittance
     0.84,                    !- Front Side Infrared Emissivity
-    0.84;                    !- Back Side Infrared Emissivity
+    0.84,                    !- Back Side Infrared Emissivity
+    0.158;                   !- Thermal Resistance
 \end{lstlisting}
 
 \subsection{WindowMaterial:Gap:EquivalentLayer}\label{windowmaterialgapequivalentlayer}
