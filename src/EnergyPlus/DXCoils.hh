@@ -967,6 +967,8 @@ namespace DXCoils {
     void SetDXCoilAirLoopNumber(std::string const &CoilName,
                                 int const AirLoopNum); // must match coil names for the coil type
 
+    void DisableLatentDegradation(int const DXCoilNum);
+
     // Clears the global data in DXCoils.
     // Needed for unit tests, should not be normally called.
     void clear_state();

@@ -17080,6 +17080,18 @@ namespace DXCoils {
         }
     } // must match coil names for the coil type
 
+    void DisableLatentDegradation(int const DXCoilNum)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         L. Gu
+        //       DATE WRITTEN   JUne, 2019
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Disable latent degradation when direct solution is used.
+
+        DXCoil(DXCoilNum).Twet_Rated(1) = 0.0;
+    }
+
     // Clears the global data in DXCoils.
     // Needed for unit tests, should not be normally called.
     void clear_state()
