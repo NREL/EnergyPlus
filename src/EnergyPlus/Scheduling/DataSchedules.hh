@@ -51,6 +51,17 @@
 #include <string>
 #include <vector>
 
+namespace Scheduling {
+
+enum class ScheduleType
+{
+    CONSTANT,
+    COMPACT,
+    YEAR,
+    FILE,
+    UNKNOWN
+};
+
 std::vector<std::string> const allValidDayTypes({"Sunday",
                                                  "Monday",
                                                  "Tuesday",
@@ -78,4 +89,7 @@ std::vector<std::string> const typeLimitUnitTypes({"Dimensionless",
                                                    "Percent",
                                                    "Control",
                                                    "Mode"});
+
+} // namespace Scheduling
+
 #endif // EPLUS6_DATASCHEDULES_HH

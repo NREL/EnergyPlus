@@ -45,33 +45,57 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
-#define SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
+#ifndef SRC_ENERGYPLUS_SCHEDULING_SCHEDULEYEAR_HH
+#define SRC_ENERGYPLUS_SCHEDULING_SCHEDULEYEAR_HH
 
 #include <vector>
 
 #include <EnergyPlus.hh>
 #include <Scheduling/ScheduleBase.hh>
+#include <Scheduling/ScheduleWeek.hh>
 #include <nlohmann/json.hpp>
 
 namespace Scheduling {
 
-struct ScheduleConstant : ScheduleBase
+struct ScheduleDayHourly {
+
+};
+
+struct ScheduleDayInterval {
+
+};
+
+struct ScheduleDayList {
+
+};
+
+struct WeekScheduleRange {
+    int beginMonth = 0;
+    int beginDay = 0;
+    int endMonth = 0;
+    int endDay = 0;
+    ScheduleWeek * scheduleInstance;
+    WeekScheduleRange(int _beginMonth, int _beginDay, int _endMonth, int _endDay, ScheduleWeek * _scheduleInstance) :
+        beginMonth(_beginMonth), beginDay(_beginDay), endMonth(_endMonth), endDay(_endDay), scheduleInstance(_scheduleInstance) {}
+};
+
+struct ScheduleYear : ScheduleBase
 {
     bool emsActuatedOn = false;
     Real64 emsActuatedValue = 0.0;
-    ScheduleConstant() = default;
-    ScheduleConstant(std::string const &objectName, nlohmann::json const &fields);
+    ScheduleYear() = default;
+    ScheduleYear(std::string const &objectName, nlohmann::json const &fields);
     Real64 getCurrentValue() override;
     static void processInput();
     static void clear_state();
-    ~ScheduleConstant() = default;
+    ~ScheduleYear() = default;
     void updateValue();
     static void setupOutputVariables();
     bool valuesInBounds() override;
+    std::vector<WeekScheduleRange> weekScheduleRanges;
 };
-extern std::vector<ScheduleConstant> scheduleConstants;
+extern std::vector<ScheduleYear> scheduleYears;
 
 }
 
-#endif //SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
+#endif //SRC_ENERGYPLUS_SCHEDULING_SCHEDULEYEAR_HH

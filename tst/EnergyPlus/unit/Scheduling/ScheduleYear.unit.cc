@@ -45,33 +45,43 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
-#define SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
+#include <gtest/gtest.h>
 
-#include <vector>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <Fixtures/EnergyPlusFixture.hh>
 
-#include <EnergyPlus.hh>
-#include <Scheduling/ScheduleBase.hh>
-#include <nlohmann/json.hpp>
+namespace EnergyPlus {
 
-namespace Scheduling {
-
-struct ScheduleConstant : ScheduleBase
+TEST_F(EnergyPlusFixture, ScheduleYear_GetInputs)
 {
-    bool emsActuatedOn = false;
-    Real64 emsActuatedValue = 0.0;
-    ScheduleConstant() = default;
-    ScheduleConstant(std::string const &objectName, nlohmann::json const &fields);
-    Real64 getCurrentValue() override;
-    static void processInput();
-    static void clear_state();
-    ~ScheduleConstant() = default;
-    void updateValue();
-    static void setupOutputVariables();
-    bool valuesInBounds() override;
-};
-extern std::vector<ScheduleConstant> scheduleConstants;
+    /*
+  Schedule:Year,
+    SouthZone-Control Sched, !- Name
+    Control Type,            !- Schedule Type Limits Name
+    SouthZoneWinterControl-WEEK,  !- Schedule:Week Name 1
+    1,                       !- Start Month 1
+    1,                       !- Start Day 1
+    12,                      !- End Month 1
+    31;                      !- End Day 1
+     */
 
+    std::string const idf_objects = delimited_string({"Schedule:Year, thisYear, , weekSched, 1, 1, 12, 31;"});
+    ASSERT_TRUE(process_idf(idf_objects));
+    std::string const thisObjectType = "Schedule:Year";
+    auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
+    auto &instancesValue = instances.value();
+    for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+        auto const &fields = instance.value();
+        // auto const &thisObjectName = instance.key();
+        auto &weeksData = fields.at("schedule_weeks");
+        for (auto const &weekData : weeksData) {
+            EXPECT_EQ(1, weekData.at("start_month"));
+            EXPECT_EQ(1, weekData.at("start_day"));
+            EXPECT_EQ(12, weekData.at("end_month"));
+            EXPECT_EQ(31, weekData.at("end_day"));
+            EXPECT_EQ("weekSched", weekData.at("schedule_week_name"));
+        }
+    }
 }
 
-#endif //SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
+} // namespace EnergyPlus

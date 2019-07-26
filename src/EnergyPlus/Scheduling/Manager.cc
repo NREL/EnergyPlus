@@ -48,6 +48,9 @@
 #include <EnergyPlus.hh>
 #include <Scheduling/Manager.hh>
 #include <Scheduling/ScheduleConstant.hh>
+#include <Scheduling/ScheduleCompact.hh>
+#include <Scheduling/ScheduleYear.hh>
+#include <Scheduling/ScheduleFile.hh>
 
 namespace Scheduling {
 std::vector<IndexBasedScheduleData> indexToSubtypeMap;
@@ -66,7 +69,7 @@ int GetScheduleIndex(const std::string &scheduleName)
         processAllSchedules();
     }
     // then just ignore zero and look through each of the types and return the index in the subtype map
-    for (unsigned int mappingIndex = 1; mappingIndex < indexToSubtypeMap.size(); mappingIndex++) {
+    for (size_t mappingIndex = 1; mappingIndex < indexToSubtypeMap.size(); mappingIndex++) {
         if (indexToSubtypeMap[mappingIndex].name == scheduleName) {
             return mappingIndex;
         }
@@ -86,6 +89,12 @@ ScheduleBase *getScheduleReference(const std::string &scheduleName)
             switch (mapping.thisType) {
             case ScheduleType::CONSTANT:
                 return &scheduleConstants[mapping.indexInTypeArray];
+            case ScheduleType::COMPACT:
+                return &scheduleCompacts[mapping.indexInTypeArray];
+            case ScheduleType::YEAR:
+                return &scheduleYears[mapping.indexInTypeArray];
+            case ScheduleType::FILE:
+                return &scheduleFiles[mapping.indexInTypeArray];
             case ScheduleType::UNKNOWN:
                 // Fatal Error
                 return nullptr;
@@ -119,10 +128,24 @@ void processAllSchedules()
     // then we'll go through and call each subtype factory and accumulate index values into our map
     ScheduleConstant::processInput();
     ScheduleConstant::setupOutputVariables();
-    for (unsigned int subTypeIndex = 0; subTypeIndex < scheduleConstants.size(); subTypeIndex++) {
+    for (size_t subTypeIndex = 0; subTypeIndex < scheduleConstants.size(); subTypeIndex++) {
         indexToSubtypeMap.emplace_back(scheduleConstants[subTypeIndex].name, ScheduleType::CONSTANT, subTypeIndex);
     }
-
+    ScheduleCompact::processInput();
+    ScheduleCompact::setupOutputVariables();
+    for (size_t subTypeIndex = 0; subTypeIndex < scheduleCompacts.size(); subTypeIndex++) {
+        indexToSubtypeMap.emplace_back(scheduleCompacts[subTypeIndex].name, ScheduleType::COMPACT, subTypeIndex);
+    }
+    ScheduleYear::processInput();
+    ScheduleYear::setupOutputVariables();
+    for (size_t subTypeIndex = 0; subTypeIndex < scheduleYears.size(); subTypeIndex++) {
+        indexToSubtypeMap.emplace_back(scheduleYears[subTypeIndex].name, ScheduleType::YEAR, subTypeIndex);
+    }
+    ScheduleFile::processInput();
+    ScheduleFile::setupOutputVariables();
+    for (size_t subTypeIndex = 0; subTypeIndex < scheduleFiles.size(); subTypeIndex++) {
+        indexToSubtypeMap.emplace_back(scheduleFiles[subTypeIndex].name, ScheduleType::FILE, subTypeIndex);
+    }
     scheduleInputProcessed = true;
 }
 
@@ -133,6 +156,12 @@ Real64 GetScheduleValue(int scheduleIndex)
     switch (mapping.thisType) {
     case ScheduleType::CONSTANT:
         return scheduleConstants[mapping.indexInTypeArray].getCurrentValue();
+    case ScheduleType::COMPACT:
+        return scheduleCompacts[mapping.indexInTypeArray].getCurrentValue();
+    case ScheduleType::YEAR:
+        return scheduleYears[mapping.indexInTypeArray].getCurrentValue();
+    case ScheduleType::FILE:
+        return scheduleFiles[mapping.indexInTypeArray].getCurrentValue();
     case ScheduleType::UNKNOWN:
         return -1;
     }
@@ -141,7 +170,7 @@ Real64 GetScheduleValue(int scheduleIndex)
 
 int numSchedules()
 {
-    return indexToSubtypeMap.size() - 1; // don't report the zeroeth item
+    return (int)indexToSubtypeMap.size() - 1; // don't report the zeroeth item
 }
 
 std::string scheduleName(int const scheduleIndex) {
@@ -149,6 +178,12 @@ std::string scheduleName(int const scheduleIndex) {
     switch (mapping.thisType) {
     case ScheduleType::CONSTANT:
         return scheduleConstants[mapping.indexInTypeArray].name;
+    case ScheduleType::COMPACT:
+        return scheduleCompacts[mapping.indexInTypeArray].name;
+    case ScheduleType::YEAR:
+        return scheduleYears[mapping.indexInTypeArray].name;
+    case ScheduleType::FILE:
+        return scheduleFiles[mapping.indexInTypeArray].name;
     case ScheduleType::UNKNOWN:
         return "";
     }
@@ -159,6 +194,12 @@ std::string scheduleType(int const scheduleIndex) {
     switch (mapping.thisType) {
     case ScheduleType::CONSTANT:
         return "Schedule:Constant";
+    case ScheduleType::COMPACT:
+        return "Schedule:Compact";
+    case ScheduleType::YEAR:
+        return "Schedule:Year";
+    case ScheduleType::FILE:
+        return "Schedule:File";
     case ScheduleType::UNKNOWN:
         return "";
     }
@@ -170,6 +211,32 @@ Real64 scheduleMinValue(int const scheduleIndex) {
 
 Real64 scheduleMaxValue(int const scheduleIndex) {
     return 999;
+}
+
+int getScheduleTime(int yearNum, int monthNum, int dayNum, int hourNum, int minuteNum, int secondNum) {
+    // TODO: Handle leap year (and daylight savings?)
+    static const std::vector<int> cumulativeSecondsInMonthsNonLeap {
+        0, // end of month 0
+        2678400, // end of jan
+        5097600, // end of feb
+        7776000, // end of mar
+        10368000, // end of apr
+        13046400, // end of may
+        15638400, // end of june
+        18316800, // end of july
+        20995200, // end of aug
+        23587200, // end of sep
+        26265600, // end of oct
+        28857600, // end of nov
+        31536000  // end of dec
+    };
+    int const fromYears = 31536000 * (yearNum - 1);
+    int const fromMonths = cumulativeSecondsInMonthsNonLeap[monthNum - 1];
+    int const fromDays = 86400 * (dayNum - 1);
+    int const fromHours = 3600 * hourNum;
+    int const fromMinutes = 60 * minuteNum;
+    int const fromSeconds = secondNum;
+    return fromYears + fromMonths + fromDays + fromHours + fromMinutes + fromSeconds;
 }
 
 }

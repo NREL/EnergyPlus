@@ -145,6 +145,7 @@ set( test_src
   Scheduling/SchedulingFixture.hh
   Scheduling/Manager.unit.cc
   Scheduling/ScheduleConstant.unit.cc
+  Scheduling/ScheduleYear.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
   SimAirServingZones.unit.cc

@@ -45,33 +45,98 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
-#define SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
-
-#include <vector>
-
+#include <DataGlobals.hh>
 #include <EnergyPlus.hh>
-#include <Scheduling/ScheduleBase.hh>
-#include <nlohmann/json.hpp>
+#include <GlobalNames.hh>
+#include <InputProcessing/InputProcessor.hh>
+#include <OutputProcessor.hh>
+#include <Scheduling/ScheduleCompact.hh>
+#include <UtilityRoutines.hh>
 
 namespace Scheduling {
 
-struct ScheduleConstant : ScheduleBase
-{
-    bool emsActuatedOn = false;
-    Real64 emsActuatedValue = 0.0;
-    ScheduleConstant() = default;
-    ScheduleConstant(std::string const &objectName, nlohmann::json const &fields);
-    Real64 getCurrentValue() override;
-    static void processInput();
-    static void clear_state();
-    ~ScheduleConstant() = default;
-    void updateValue();
-    static void setupOutputVariables();
-    bool valuesInBounds() override;
-};
-extern std::vector<ScheduleConstant> scheduleConstants;
+std::vector<ScheduleCompact> scheduleCompacts;
 
+Real64 ScheduleCompact::getCurrentValue()
+{
+    return this->value;
 }
 
-#endif //SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
+void ScheduleCompact::processInput()
+{
+    ScheduleCompact c;
+    c.value = 0;
+    c.name = "";
+    scheduleCompacts.push_back(c);
+    // Now we'll go through normal processing operations
+    std::string const thisObjectType = "Schedule:Compact";
+    auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
+    if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
+        return; // no constant schedules to process
+    }
+    auto &instancesValue = instances.value();
+    for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+        auto const &fields = instance.value();
+        auto const &thisObjectName = instance.key();
+        // do any pre-construction checks
+        EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+        // EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+        // then just add it to the vector via the constructor
+        scheduleCompacts.emplace_back(thisObjectName, fields);
+    }
+}
+
+void ScheduleCompact::clear_state()
+{
+    scheduleCompacts.clear();
+}
+
+ScheduleCompact::ScheduleCompact(std::string const &objectName, nlohmann::json const &fields)
+{
+    this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
+    // get a schedule type limits reference directly and store that
+    if (fields.find("schedule_type_limits_name") != fields.end()) {
+        this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
+    }
+    // this->value = fields.at("hourly_value");
+    if (EnergyPlus::DataGlobals::AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
+        //            SetupEMSActuator("Schedule:Constant", this->name, "Schedule Value", "[ ]", this->emsActuatedOn, this->emsActuatedValue);
+    }
+    if (!this->valuesInBounds()) {
+        // ShowFatalError("Schedule bounds error causes program termination")
+    }
+}
+
+void ScheduleCompact::updateValue()
+{
+    if (this->emsActuatedOn) {
+        this->value = this->emsActuatedValue;
+    } else {
+        // this->value = this->value;
+    }
+}
+
+void ScheduleCompact::setupOutputVariables()
+{
+    for (auto &thisSchedule : scheduleCompacts) {
+        // Set Up Reporting
+        EnergyPlus::SetupOutputVariable(
+            "NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
+    }
+}
+
+bool ScheduleCompact::valuesInBounds()
+{
+    if (this->typeLimits) {
+        if (this->value > this->typeLimits->maximum) {
+            // ShowSevereError("Value out of bounds")
+            return false;
+        } else if (this->value < this->typeLimits->minimum) {
+            // ShowSevereError("Value out of bounds")
+            return false;
+        }
+    }
+    return true;
+}
+
+} // namespace Scheduling

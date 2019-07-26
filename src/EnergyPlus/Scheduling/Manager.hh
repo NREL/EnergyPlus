@@ -52,15 +52,10 @@
 #include <vector>
 
 #include <EnergyPlus.hh>
+#include <Scheduling/DataSchedules.hh>
 #include <Scheduling/ScheduleBase.hh>
 
 namespace Scheduling {
-
-enum class ScheduleType
-{
-    CONSTANT,
-    UNKNOWN
-};
 
 // Each schedule type file will hold a vector of their own types, hopefully ultimately components will hold references to these instances directly
 // To enable gradual transition from index-based operations to references, we need to be able to still be able to call by index.
@@ -98,6 +93,7 @@ std::string scheduleName(int scheduleIndex);
 std::string scheduleType(int scheduleIndex);
 Real64 scheduleMinValue(int scheduleIndex);
 Real64 scheduleMaxValue(int scheduleIndex);
+int getScheduleTime(int yearNum, int monthNum, int dayNum, int hourNum, int minuteNum, int secondNum);
 
 } // namespace Scheduling
 #endif // SRC_ENERGYPLUS_SCHEDULING_MANAGER_HH

@@ -45,8 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
-#define SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
+#ifndef SRC_ENERGYPLUS_SCHEDULING_SCHEDULEFILE_HH
+#define SRC_ENERGYPLUS_SCHEDULING_SCHEDULEFILE_HH
 
 #include <vector>
 
@@ -56,22 +56,22 @@
 
 namespace Scheduling {
 
-struct ScheduleConstant : ScheduleBase
+struct ScheduleFile : ScheduleBase
 {
     bool emsActuatedOn = false;
     Real64 emsActuatedValue = 0.0;
-    ScheduleConstant() = default;
-    ScheduleConstant(std::string const &objectName, nlohmann::json const &fields);
+    ScheduleFile() = default;
+    ScheduleFile(std::string const &objectName, nlohmann::json const &fields);
     Real64 getCurrentValue() override;
     static void processInput();
     static void clear_state();
-    ~ScheduleConstant() = default;
+    ~ScheduleFile() = default;
     void updateValue();
     static void setupOutputVariables();
     bool valuesInBounds() override;
 };
-extern std::vector<ScheduleConstant> scheduleConstants;
+extern std::vector<ScheduleFile> scheduleFiles;
 
 }
 
-#endif //SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
+#endif //SRC_ENERGYPLUS_SCHEDULING_SCHEDULEFILE_HH

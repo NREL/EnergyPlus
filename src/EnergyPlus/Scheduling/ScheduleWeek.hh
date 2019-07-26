@@ -45,33 +45,56 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
-#define SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
+#ifndef SRC_ENERGYPLUS_SCHEDULING_SCHEDULEWEEK_HH
+#define SRC_ENERGYPLUS_SCHEDULING_SCHEDULEWEEK_HH
 
+#include <string>
 #include <vector>
 
-#include <EnergyPlus.hh>
-#include <Scheduling/ScheduleBase.hh>
 #include <nlohmann/json.hpp>
 
 namespace Scheduling {
 
-struct ScheduleConstant : ScheduleBase
+struct ScheduleWeek
 {
-    bool emsActuatedOn = false;
-    Real64 emsActuatedValue = 0.0;
-    ScheduleConstant() = default;
-    ScheduleConstant(std::string const &objectName, nlohmann::json const &fields);
-    Real64 getCurrentValue() override;
+    std::string name;
+    static ScheduleWeek *factory(const std::string& scheduleName);
     static void processInput();
     static void clear_state();
-    ~ScheduleConstant() = default;
-    void updateValue();
-    static void setupOutputVariables();
-    bool valuesInBounds() override;
 };
-extern std::vector<ScheduleConstant> scheduleConstants;
 
-}
+struct ScheduleWeekDaily : ScheduleWeek
+{
+    // TODO: Make these references to Day schedules
+    std::string sundayName;
+    std::string mondayName;
+    std::string tuesdayName;
+    std::string wednesdayName;
+    std::string thursdayName;
+    std::string fridayName;
+    std::string saturdayName;
+    std::string holidayName;
+    std::string summerdesigndayName;
+    std::string winterdesigndayName;
+    std::string customday1Name;
+    std::string customday2Name;
+    ScheduleWeekDaily(std::string const &objectName, nlohmann::json const &fields);
+};
 
-#endif //SRC_ENERGYPLUS_SCHEDULING_SCHEDULECONSTANT_HH
+
+
+struct ScheduleWeekCompact : ScheduleWeek
+{
+    // TODO: These two eventually become a vector of a new structure for the extensible group
+    std::vector<std::string> dayTypeList;
+    std::vector<std::string> scheduleDayName;
+
+    ScheduleWeekCompact(std::string const &objectName, nlohmann::json const &fields);
+};
+
+extern std::vector<ScheduleWeek> scheduleWeeks;
+extern std::vector<ScheduleWeekDaily> scheduleWeekDailies;
+extern std::vector<ScheduleWeekCompact> scheduleWeekCompacts;
+
+} // namespace Scheduling
+#endif // SRC_ENERGYPLUS_SCHEDULING_SCHEDULEWEEK_HH
