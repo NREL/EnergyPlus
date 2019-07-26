@@ -62,6 +62,8 @@
 #include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
+#undef EP_cache_GlycolSpecificHeat
+
 namespace EnergyPlus {
 
 namespace FluidProperties {
@@ -151,9 +153,11 @@ namespace FluidProperties {
     int FluidIndex_EthyleneGlycol(0);
     int FluidIndex_PropoleneGlycol(0);
 
+#ifdef EP_cache_GlycolSpecificHeat
     int const t_sh_cache_size(1024 * 1024);
     int const t_sh_precision_bits(24);
     Int64 const t_sh_cache_mask(t_sh_cache_size - 1);
+#endif
 
     // ACCESSIBLE SPECIFICATIONS OF MODULE SUBROUTINES OR FUNCTONS:
 
@@ -164,7 +168,9 @@ namespace FluidProperties {
     Array1D<FluidPropsGlycolData> GlycolData;
     Array1D<FluidPropsGlycolErrors> GlycolErrorTracking;
 
+#ifdef EP_cache_GlycolSpecificHeat
     Array1D<cached_tsh> cached_t_sh; // DIMENSION(t_sh_cache_size)
+#endif
 
     // Data Initializer Forward Declarations
     // See GetFluidPropertiesData "SUBROUTINE LOCAL DATA" for actual data.
@@ -188,7 +194,9 @@ namespace FluidProperties {
         GlyRawData.deallocate();
         GlycolData.deallocate();
         GlycolErrorTracking.deallocate();
-        if (DataGlobals::UseGlycCache) cached_t_sh.deallocate();
+#ifdef EP_cache_GlycolSpecificHeat
+        cached_t_sh.deallocate();
+#endif
     }
 
     void DefaultEthGlyCpData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
@@ -581,8 +589,9 @@ namespace FluidProperties {
         cNumericFieldNames = "";
         lNumericFieldBlanks = false;
 
-        if (DataGlobals::UseGlycCache) cached_t_sh.allocate({0, t_sh_cache_size});
-
+#ifdef EP_cache_GlycolSpecificHeat
+        cached_t_sh.allocate({0, t_sh_cache_size});
+#endif
         // Check to see if there is any FluidName input.  If not, this is okay as
         // long as the user only desires to simulate loops with water.  More than
         // one FluidName input is not allowed.
@@ -8042,12 +8051,19 @@ namespace FluidProperties {
     }
 
     //*****************************************************************************
-
+#ifdef EP_cache_GlycolSpecificHeat
     Real64 GetSpecificHeatGlycol_raw(std::string const &Glycol,    // carries in substance name
                                      Real64 const Temperature,     // actual temperature given as input
                                      int &GlycolIndex,             // Index to Glycol Properties
                                      std::string const &CalledFrom // routine this function was called from (error messages)
     )
+#else
+    Real64 GetSpecificHeatGlycol(std::string const &Glycol,    // carries in substance name
+                                 Real64 const Temperature,     // actual temperature given as input
+                                 int &GlycolIndex,             // Index to Glycol Properties
+                                 std::string const &CalledFrom // routine this function was called from (error messages)
+    )
+#endif
     {
 
         // FUNCTION INFORMATION:
