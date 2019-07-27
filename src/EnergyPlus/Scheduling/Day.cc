@@ -54,7 +54,6 @@
 namespace Scheduling {
 
     bool dayScheduleGetInputFlag = true;
-    std::vector<ScheduleDay> scheduleDays;
     std::vector<ScheduleDayHourly> scheduleDayHourlys;
     std::vector<ScheduleDayInterval> scheduleDayIntervals;
 
@@ -117,7 +116,6 @@ namespace Scheduling {
 
     void Scheduling::ScheduleDay::clear_state() {
         dayScheduleGetInputFlag = true;
-        scheduleDays.clear();
         scheduleDayHourlys.clear();
         scheduleDayIntervals.clear();
     }

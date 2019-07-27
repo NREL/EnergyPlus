@@ -87,7 +87,6 @@ namespace Scheduling {
         ScheduleDayInterval(std::string const &objectName, nlohmann::json const &fields);
     };
 
-    extern std::vector<ScheduleDay> scheduleDays;
     extern std::vector<ScheduleDayHourly> scheduleDayHourlys;
     extern std::vector<ScheduleDayInterval> scheduleDayIntervals;
 

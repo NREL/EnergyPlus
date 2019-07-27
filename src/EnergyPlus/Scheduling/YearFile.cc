@@ -64,7 +64,7 @@ Real64 ScheduleFile::getCurrentValue()
 
 void ScheduleFile::processInput()
 {
-    std::string const thisObjectType = "Schedule:Constant";
+    std::string const thisObjectType = "Schedule:File";
     auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
     if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
         return; // no constant schedules to process

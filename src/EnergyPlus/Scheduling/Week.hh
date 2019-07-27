@@ -93,7 +93,6 @@ struct ScheduleWeekCompact : ScheduleWeek
     ScheduleWeekCompact(std::string const &objectName, nlohmann::json const &fields);
 };
 
-extern std::vector<ScheduleWeek> scheduleWeeks;
 extern std::vector<ScheduleWeekDaily> scheduleWeekDailies;
 extern std::vector<ScheduleWeekCompact> scheduleWeekCompacts;
 

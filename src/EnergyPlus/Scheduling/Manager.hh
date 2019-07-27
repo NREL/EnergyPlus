@@ -75,9 +75,7 @@ struct IndexBasedScheduleData
 
 };
 
-struct ScheduleManagement {
-    static void clear_state();
-};
+void clear_state();
 
 int GetScheduleIndex(const std::string &scheduleName);
 

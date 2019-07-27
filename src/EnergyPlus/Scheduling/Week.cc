@@ -56,14 +56,12 @@
 namespace Scheduling {
 
 bool getInputFlag = true;
-std::vector<ScheduleWeek> scheduleWeeks;
 std::vector<ScheduleWeekDaily> scheduleWeekDailies;
 std::vector<ScheduleWeekCompact> scheduleWeekCompacts;
 
 void ScheduleWeek::clear_state()
 {
     getInputFlag = true;
-    scheduleWeeks.clear();
     scheduleWeekDailies.clear();
     scheduleWeekCompacts.clear();
 }

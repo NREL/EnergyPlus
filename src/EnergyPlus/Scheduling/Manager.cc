@@ -60,7 +60,7 @@ namespace Scheduling {
 std::vector<IndexBasedScheduleData> indexToSubtypeMap;
 bool scheduleInputProcessed = false;
 
-void ScheduleManagement::clear_state()
+void clear_state()
 {
     // clear out anything from this particular module
     scheduleInputProcessed = false;

@@ -441,7 +441,6 @@ void EnergyPlusFixture::clear_all_states()
     RuntimeLanguageProcessor::clear_state();
     ScheduleManager::clear_state();
     Scheduling::clear_state();
-    Scheduling::ScheduleConstant::clear_state();
     SetPointManager::clear_state();
     SimAirServingZones::clear_state();
     SimulationManager::clear_state();
