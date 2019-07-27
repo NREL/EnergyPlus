@@ -45,6 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <exception>
+
 #include <EnergyPlus.hh>
 #include <EMSManager.hh>
 #include <InputProcessing/InputProcessor.hh>
@@ -125,7 +127,19 @@ ScheduleCompact::ScheduleCompact(std::string const &objectName, nlohmann::json c
     }
     auto fieldWiseData = fields.at("data");
     for (auto const & datum : fieldWiseData) {
-        this->fieldsOfData.push_back(datum.at("field").dump()); // TODO: Yes, this is silly, and temporary
+        CompactField cf;
+        try {
+            std::string possibleString = datum.at("field");
+            // parse the string for type and value
+            cf.thisFieldType = CompactField::FieldType::THROUGH;
+            cf.stringData = possibleString;
+        } catch (nlohmann::detail::type_error & error) {
+            // if it wasn't a string, it should've been a schedule value (float)
+            Real64 possibleFloat = datum.at("field");
+            cf.thisFieldType = CompactField::FieldType::VALUE;
+            cf.floatData = possibleFloat;
+        }
+        this->fieldsOfData.push_back(cf);
     }
     if (this->typeLimits && !this->valuesInBounds()) {
         EnergyPlus::ShowFatalError("Schedule bounds error causes program termination");

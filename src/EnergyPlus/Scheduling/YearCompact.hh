@@ -56,6 +56,21 @@
 
 namespace Scheduling {
 
+struct CompactField {
+    enum class FieldType {
+        THROUGH,
+        FOR,
+        UNTIL,
+        INTERPOLATE,
+        VALUE,
+        UNKNOWN
+    };
+
+    FieldType thisFieldType = FieldType::UNKNOWN;
+    std::string stringData = "";
+    Real64 floatData = 0.0;
+};
+
 struct ScheduleCompact : ScheduleBase
 {
     // constructors/destructors
@@ -76,7 +91,7 @@ struct ScheduleCompact : ScheduleBase
     // instance methods for this class
 
     // member variables
-    std::vector<std::string> fieldsOfData;
+    std::vector<CompactField> fieldsOfData;
 };
 
 extern std::vector<ScheduleCompact> scheduleCompacts;
