@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef HeatBalanceSurfaceManager_hh_INCLUDED
 #define HeatBalanceSurfaceManager_hh_INCLUDED
@@ -68,157 +57,130 @@
 namespace EnergyPlus {
 
 namespace DataSurfaces {
-	struct SurfaceData;
+    struct SurfaceData;
 }
 namespace DataHeatBalance {
-	struct ZoneData;
+    struct ZoneData;
 }
 
 namespace HeatBalanceSurfaceManager {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+    // DERIVED TYPE DEFINITIONS:
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	// na
+    // MODULE VARIABLE DECLARATIONS:
 
-	// Subroutine Specifications for the Heat Balance Module
-	// Driver Routines
+    // Subroutine Specifications for the Heat Balance Module
+    // Driver Routines
 
-	// Initialization routines for module
+    // Initialization routines for module
 
-	// Algorithms for the module
-	// These old external subroutines have been moved into the namespace and are no longer externals
-	// CalcHeatBalanceOutsideSurf  ! The heat balance routines are now public because the
-	//  CalcHeatBalanceInsideSurf   ! radiant systems need access to them in order to simulate
+    // Algorithms for the module
+    // These old external subroutines have been moved into the namespace and are no longer externals
+    // CalcHeatBalanceOutsideSurf  ! The heat balance routines are now public because the
+    //  CalcHeatBalanceInsideSurf   ! radiant systems need access to them in order to simulate
 
-	// Record Keeping/Utility Routines for Module
+    // Record Keeping/Utility Routines for Module
 
-	// Reporting routines for module
+    // Reporting routines for module
 
-	// Functions
-	void
-	clear_state();
+    // Functions
+    void clear_state();
 
-	void
-	ManageSurfaceHeatBalance();
+    void ManageSurfaceHeatBalance();
 
-	// Beginning Initialization Section of the Module
-	//******************************************************************************
+    // Beginning Initialization Section of the Module
+    //******************************************************************************
 
-	void
-	InitSurfaceHeatBalance();
+    void InitSurfaceHeatBalance();
 
-	void
-	GatherForPredefinedReport();
+    void GatherForPredefinedReport();
 
-	void
-	AllocateSurfaceHeatBalArrays();
+    void AllocateSurfaceHeatBalArrays();
 
-	void
-	InitThermalAndFluxHistories();
+    void InitThermalAndFluxHistories();
 
-	void
-	InitSolarHeatGains();
+    void InitSolarHeatGains();
 
-	void
-	InitIntSolarDistribution();
+    void InitIntSolarDistribution();
 
-	void
-	ComputeIntThermalAbsorpFactors();
+    void ComputeIntThermalAbsorpFactors();
 
-	void
-	ComputeIntSWAbsorpFactors();
+    void ComputeIntSWAbsorpFactors();
 
-	void
-	ComputeDifSolExcZonesWIZWindows( int const NumberOfZones ); // Number of zones
+    void ComputeDifSolExcZonesWIZWindows(int const NumberOfZones); // Number of zones
 
-	void
-	InitEMSControlledSurfaceProperties();
+    void InitEMSControlledSurfaceProperties();
 
-	void
-	InitEMSControlledConstructions();
+    void InitEMSControlledConstructions();
 
-	// End Initialization Section of the Module
-	//******************************************************************************
+    // End Initialization Section of the Module
+    //******************************************************************************
 
-	// Begin Algorithm Section of the Module
-	//******************************************************************************
+    // Begin Algorithm Section of the Module
+    //******************************************************************************
 
-	// Beginning of Record Keeping subroutines for the HB Module
-	// *****************************************************************************
+    // Beginning of Record Keeping subroutines for the HB Module
+    // *****************************************************************************
 
-	void
-	UpdateFinalSurfaceHeatBalance();
+    void UpdateFinalSurfaceHeatBalance();
 
-	void
-	UpdateThermalHistories();
+    void UpdateThermalHistories();
 
-	void
-	CalculateZoneMRT( Optional_int_const ZoneToResimulate = _ ); // if passed in, then only calculate surfaces that have this zone
+    void CalculateZoneMRT(Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
-	// End of Record Keeping subroutines for the HB Module
-	// *****************************************************************************
+    // End of Record Keeping subroutines for the HB Module
+    // *****************************************************************************
 
-	// Beginning of Reporting subroutines for the HB Module
-	// *****************************************************************************
+    // Beginning of Reporting subroutines for the HB Module
+    // *****************************************************************************
 
-	void
-	ReportSurfaceHeatBalance();
+    void ReportSurfaceHeatBalance();
 
-	// End of Reporting subroutines for the HB Module
-	// *****************************************************************************
+    // End of Reporting subroutines for the HB Module
+    // *****************************************************************************
 
+    // *****************************************************************************
+    // *****************************************************************************
+    // *****************************************************************************
+    // *****************************************************************************
 
+    // Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) but now moved into namespace HeatBalanceSurfaceManager
 
+    void CalcHeatBalanceOutsideSurf(Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
+
+    void CalcHeatBalanceInsideSurf(Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
+
+    void CalcHeatBalanceInsideSurf2(const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
+                                    const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
+                                    const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate
+                                    const std::vector<int> &HTWindowSurfs,    // Window heat transfer surfaces to simulate
+                                    Optional_int_const ZoneToResimulate = _);
+
+    void TestSurfTempCalcHeatBalanceInsideSurf(Real64 TH12, DataSurfaces::SurfaceData &surface, DataHeatBalance::ZoneData &zone, int WarmupSurfTemp);
+
+    void CalcOutsideSurfTemp(int const SurfNum,      // Surface number DO loop counter
+                             int const ZoneNum,      // Zone number the current surface is attached to
+                             int const ConstrNum,    // Construction index for the current surface
+                             Real64 const HMovInsul, // "Convection" coefficient of movable insulation
+                             Real64 const TempExt,   // Exterior temperature boundary condition
+                             bool &ErrorFlag         // Error flag for movable insulation problem
+    );
+
+    void CalcExteriorVentedCavity(int const SurfNum); // index of surface
+
+    void GatherComponentLoadsSurfAbsFact();
+
+} // namespace HeatBalanceSurfaceManager
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
 
-// Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) but now moved into namespace HeatBalanceSurfaceManager
-
-void
-CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate = _ ); // if passed in, then only calculate surfaces that have this zone
-
-void
-CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate = _ ); // if passed in, then only calculate surfaces that have this zone
-
-void
-TestSurfTempCalcHeatBalanceInsideSurf(
-	Real64 TH12,
-	DataSurfaces::SurfaceData & surface,
-	DataHeatBalance::ZoneData & zone,
-	int WarmupSurfTemp
-);
-
-void
-CalcOutsideSurfTemp(
-	int const SurfNum, // Surface number DO loop counter
-	int const ZoneNum, // Zone number the current surface is attached to
-	int const ConstrNum, // Construction index for the current surface
-	Real64 const HMovInsul, // "Convection" coefficient of movable insulation
-	Real64 const TempExt, // Exterior temperature boundary condition
-	bool & ErrorFlag // Error flag for movable insulation problem
-);
-
-void
-CalcExteriorVentedCavity( int const SurfNum ); // index of surface
-
-void
-GatherComponentLoadsSurfAbsFact();
-
-} // HeatBalanceSurfaceManager
-// *****************************************************************************
-// *****************************************************************************
-// *****************************************************************************
-// *****************************************************************************
-
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

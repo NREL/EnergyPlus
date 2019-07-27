@@ -11,8 +11,8 @@
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
@@ -22,7 +22,7 @@
 !           There is a single window in West Zones south wall. The walls are 1 in stucco over 4 in common brick
 !           and gypboard. The roof is a built up roof with 1/2 in stone over 3/8 in felt over 1 in dense insulation
 !           supported by 2 in heavy weight concrete. The window is single pane 3mm clear.
-!           The window to wall ratio is approxomately 0.07.
+!           The window to wall ratio is approximately 0.07.
 !
 !           The building is oriented due north.
 !
@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.6;
+  Version,9.2;
 
   Timestep,6;
 
@@ -128,11 +128,13 @@
     Yes;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
+    ,                        !- Begin Year
     1,                       !- End Month
     14,                      !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -141,11 +143,13 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 2,            !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
+    ,                        !- Begin Year
     7,                       !- End Month
     7,                       !- End Day of Month
+    ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -162,7 +166,7 @@
 
 ##set1 descondyear[] "2009"
 ##ifdef descondyear[] == "2009"
- ! Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6캜
+ ! Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6째C
 
   SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Htg 99% Condns DB,  !- Name
@@ -192,7 +196,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6캜 MWB=23캜
+ ! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6째C MWB=23째C
 
   SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Clg 1% Condns DB=>MWB,  !- Name
@@ -223,7 +227,7 @@
     1.00;                    !- Sky Clearness
 
 ##elseif descondyear[] == "2005"
- ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3캜
+ ! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -253,7 +257,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
- ! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5캜 MCWB=  23.0캜
+ ! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5째C MCWB=  23.0째C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -284,7 +288,7 @@
     1.0;                     !- Sky Clearness
 
 ##elseif descondyear[] == "2001"
- ! CHICAGO_OHARE_INTL_IL_USA Heating 99%, MaxDB= -18.10캜
+ ! CHICAGO_OHARE_INTL_IL_USA Heating 99%, MaxDB= -18.10째C
 
   SizingPeriod:DesignDay,
     CHICAGO_OHARE_INTL_IL_USA Heating 99% Conditions,  !- Name
@@ -314,7 +318,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
- ! CHICAGO_OHARE_INTL_IL_USA Cooling (DB=>MWB) 1%, MaxDB=  31.30캜 MWB=  22.80캜
+ ! CHICAGO_OHARE_INTL_IL_USA Cooling (DB=>MWB) 1%, MaxDB=  31.30째C MWB=  22.80째C
 
   SizingPeriod:DesignDay,
     CHICAGO_OHARE_INTL_IL_USA Cooling 1% Conditions DB=>MWB,  !- Name
@@ -1446,7 +1450,7 @@
     Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 1 Node,             !- Zone Air Node Name
-    Zone 1 Outlet Node;      !- Zone Return Air Node Name
+    Zone 1 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     EAST ZONE,               !- Zone Name
@@ -1454,7 +1458,7 @@
     Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 2 Node,             !- Zone Air Node Name
-    Zone 2 Outlet Node;      !- Zone Return Air Node Name
+    Zone 2 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentConnections,
     NORTH ZONE,              !- Zone Name
@@ -1462,10 +1466,11 @@
     Zone3Inlets,             !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     Zone 3 Node,             !- Zone Air Node Name
-    Zone 3 Outlet Node;      !- Zone Return Air Node Name
+    Zone 3 Outlet Node;      !- Zone Return Air Node or NodeList Name
 
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone1TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1473,6 +1478,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone2TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
@@ -1480,6 +1486,7 @@
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
+    SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone3TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence

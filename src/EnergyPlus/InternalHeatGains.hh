@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,22 +44,13 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef InternalHeatGains_hh_INCLUDED
 #define InternalHeatGains_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -71,166 +60,130 @@ namespace EnergyPlus {
 
 namespace InternalHeatGains {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
 
-	extern bool GetInternalHeatGainsInputFlag; // Controls the GET routine calling (limited to first time)
+    extern bool GetInternalHeatGainsInputFlag; // Controls the GET routine calling (limited to first time)
+    extern bool ErrorsFound;                   // if errors were found in the input
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE InternalHeatGains
-	//PUBLIC  SumInternalConvectionGainsByIndices
-	//PUBLIC SumReturnAirConvectionGainsByIndices
-	//PUBLIC  SumInternalRadiationGainsByIndices
-	//PUBLIC  SumInternalLatentGainsByIndices
-	//PUBLIC
-	//PUBLIC  SumInternalCO2GainsByIndices
-	//PUBLIC  GetInternalGainDeviceIndex
+    // SUBROUTINE SPECIFICATIONS FOR MODULE InternalHeatGains
+    // PUBLIC  SumInternalConvectionGainsByIndices
+    // PUBLIC SumReturnAirConvectionGainsByIndices
+    // PUBLIC  SumInternalRadiationGainsByIndices
+    // PUBLIC  SumInternalLatentGainsByIndices
+    // PUBLIC
+    // PUBLIC  SumInternalCO2GainsByIndices
+    // PUBLIC  GetInternalGainDeviceIndex
 
-	// Functions
-	void
-	clear_state();
+    // Functions
+    void clear_state();
 
-	void
-	ManageInternalHeatGains( Optional_bool_const InitOnly = _ ); // when true, just calls the get input, if appropriate and returns.
+    void ManageInternalHeatGains(Optional_bool_const InitOnly = _); // when true, just calls the get input, if appropriate and returns.
 
-	void
-	GetInternalHeatGainsInput();
+    void GetInternalHeatGainsInput();
 
-	void
-	InitInternalHeatGains();
+    void InitInternalHeatGains();
 
-	void
-	CalcZoneITEq();
+    void CheckReturnAirHeatGain();
 
-	void
-	ReportInternalHeatGains();
+    void CalcZoneITEq();
 
-	Real64
-	GetDesignLightingLevelForZone( int const WhichZone ); // name of zone
+    void ReportInternalHeatGains();
 
-	void
-	CheckLightsReplaceableMinMaxForZone( int const WhichZone ); // Zone Number
+    Real64 GetDesignLightingLevelForZone(int const WhichZone); // name of zone
+    
+    bool CheckThermalComfortSchedules(bool const WorkEffSch,  // Blank work efficiency schedule = true
+                                      bool const CloInsSch,   // Blank clothing insulation schedule = true
+                                      bool const AirVeloSch); // Blank air velocity schedule = true
 
-	void
-	UpdateInternalGainValues(
-		Optional_bool_const SuppressRadiationUpdate = _,
-		Optional_bool_const SumLatentGains = _
-	);
+    void CheckLightsReplaceableMinMaxForZone(int const WhichZone); // Zone Number
 
-	void
-	SumAllInternalConvectionGains(
-		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Real64 & SumConvGainRate
-	);
+    void UpdateInternalGainValues(Optional_bool_const SuppressRadiationUpdate = _, Optional_bool_const SumLatentGains = _);
 
-	void
-	SumInternalConvectionGainsByTypes(
-		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
-		Real64 & SumConvGainRate
-	);
+    void SumAllInternalConvectionGains(int const ZoneNum,        // zone index pointer for which zone to sum gains for
+                                       Real64 &SumConvGainRate); // For HybridModel
 
-	void
-	GetInternalGainDeviceIndex(
-		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		int const IntGainTypeOfNum, // zone internal gain type number
-		std::string const & IntGainName, // Internal gain name
-		int & DeviceIndex, // Device index
-		bool & ErrorFound
-	);
+    void SumAllInternalConvectionGainsExceptPeople(int const ZoneNum,                    // zone index pointer for which zone to sum gains for
+                                                   Real64 &SumConvGainRateExceptPeople);
 
-	void
-	SumInternalConvectionGainsByIndices(
-		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Array1S_int const DeviceIndexARR, // variable length 1-d array of integer device index pointers to include in summation
-		Array1A< Real64 > const FractionARR, // array of fractional multipliers to apply to devices
-		Real64 & SumConvGainRate
-	);
+    void SumInternalConvectionGainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
+                                           Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+                                           Real64 &SumConvGainRate);
 
-	void
-	SumInternalLatentGainsByIndices(
-		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Array1S_int const DeviceIndexARR, // variable length 1-d array of integer device index pointers to include in summation
-		Array1A< Real64 > const FractionARR, // array of fractional multipliers to apply to devices
-		Real64 & SumLatentGainRate
-	);
+    void GetInternalGainDeviceIndex(int const ZoneNum,              // zone index pointer for which zone to sum gains for
+                                    int const IntGainTypeOfNum,     // zone internal gain type number
+                                    std::string const &IntGainName, // Internal gain name
+                                    int &DeviceIndex,               // Device index
+                                    bool &ErrorFound);
 
-	void
-	SumReturnAirConvectionGainsByIndices(
-		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Array1S_int const DeviceIndexARR, // variable length 1-d array of integer device index pointers to include in summation
-		Array1A< Real64 > const FractionARR, // array of fractional multipliers to apply to devices
-		Real64 & SumReturnAirGainRate
-	);
+    void SumInternalConvectionGainsByIndices(
+        int const ZoneNum,                 // zone index pointer for which zone to sum gains for
+        Array1S_int const DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
+        Array1A<Real64> const FractionARR, // array of fractional multipliers to apply to devices
+        Real64 &SumConvGainRate);
 
-	void
-	SumAllReturnAirConvectionGains(
-		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Real64 & SumReturnAirGainRate
-	);
+    void SumInternalLatentGainsByIndices(
+        int const ZoneNum,                 // zone index pointer for which zone to sum gains for
+        Array1S_int const DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
+        Array1A<Real64> const FractionARR, // array of fractional multipliers to apply to devices
+        Real64 &SumLatentGainRate);
 
-	void
-	SumReturnAirConvectionGainsByTypes(
-		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
-		Real64 & SumReturnAirGainRate
-	);
+    void SumReturnAirConvectionGainsByIndices(
+        int const ZoneNum,                 // zone index pointer for which zone to sum gains for
+        Array1S_int const DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
+        Array1A<Real64> const FractionARR, // array of fractional multipliers to apply to devices
+        Real64 &SumReturnAirGainRate);
 
-	void
-	SumAllInternalRadiationGains(
-		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Real64 & SumRadGainRate
-	);
+    void SumAllReturnAirConvectionGains(int const ZoneNum, // zone index pointer for which zone to sum gains for
+                                        Real64 &SumReturnAirGainRate,
+                                        int const ReturnNodeNum // return air node number
+    );
 
-	void
-	SumInternalRadiationGainsByTypes(
-		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
-		Real64 & SumRadiationGainRate
-	);
+    void SumReturnAirConvectionGainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
+                                            Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+                                            Real64 &SumReturnAirGainRate);
 
-	void
-	SumAllInternalLatentGains(
-		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Real64 & SumLatentGainRate
-	);
+    void SumAllInternalRadiationGains(int const ZoneNum, // zone index pointer for which zone to sum gains for
+                                      Real64 &SumRadGainRate);
 
-	void
-	SumInternalLatentGainsByTypes(
-		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
-		Real64 & SumLatentGainRate
-	);
+    void SumInternalRadiationGainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
+                                          Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+                                          Real64 &SumRadiationGainRate);
 
-	void
-	SumAllReturnAirLatentGains(
-		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Real64 & SumRetAirLatentGainRate
-	);
+    void SumAllInternalLatentGains(int const ZoneNum, // zone index pointer for which zone to sum gains for
+                                   Real64 &SumLatentGainRate);
+    
+    // Added for hybrid model -- calculate the latent gain from all sources except for people
+    void SumAllInternalLatentGainsExceptPeople(int const ZoneNum, // zone index pointer for which zone to sum gains for
+                                               Real64 &SumLatentGainRateExceptPeople);
 
-	void
-	SumAllInternalCO2Gains(
-		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Real64 & SumCO2GainRate
-	);
+    void SumInternalLatentGainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
+                                       Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+                                       Real64 &SumLatentGainRate);
 
-	void
-	SumInternalCO2GainsByTypes(
-		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
-		Real64 & SumCO2GainRate
-	);
+    void SumAllReturnAirLatentGains(int const ZoneNum, // zone index pointer for which zone to sum gains for
+                                    Real64 &SumRetAirLatentGainRate,
+                                    int const ReturnNodeNum // return air node number
+    );
 
-	void
-	SumAllInternalGenericContamGains(
-		int const ZoneNum, // zone index pointer for which zone to sum gains for
-		Real64 & SumGCGainRate
-	);
+    void SumAllInternalCO2Gains(int const ZoneNum, // zone index pointer for which zone to sum gains for
+                                Real64 &SumCO2GainRate);
 
-	void
-	GatherComponentLoadsIntGain();
+    // Added for hybrid model -- Overload function for calculating CO2 gains except people
+    void SumAllInternalCO2GainsExceptPeople(int const ZoneNum, // zone index pointer for which zone to sum gains for
+                                            Real64 &SumCO2GainRateExceptPeople);
 
-} // InternalHeatGains
+    void SumInternalCO2GainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
+                                    Array1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
+                                    Real64 &SumCO2GainRate);
 
-} // EnergyPlus
+    void SumAllInternalGenericContamGains(int const ZoneNum, // zone index pointer for which zone to sum gains for
+                                          Real64 &SumGCGainRate);
+
+    void GatherComponentLoadsIntGain();
+
+} // namespace InternalHeatGains
+
+} // namespace EnergyPlus
 
 #endif

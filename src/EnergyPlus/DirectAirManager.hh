@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DirectAirManager_hh_INCLUDED
 #define DirectAirManager_hh_INCLUDED
@@ -63,123 +52,106 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace DirectAirManager {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS:
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
 
-	//Type declarations in DirectAir module
+    // Type declarations in DirectAir module
 
-	//MODULE VARIABLE DECLARATIONS:
-	extern int NumDirectAir;
-	extern Array1D_bool CheckEquipName;
-	//SUBROUTINE SPECIFICATIONS FOR MODULE AirLoopSplitter
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumDirectAir;
+    extern Array1D_bool CheckEquipName;
+    // SUBROUTINE SPECIFICATIONS FOR MODULE AirLoopSplitter
 
-	// Types
+    // Types
 
-	struct DirectAirProps
-	{
-		// Members
-		// Input Data
-		std::string cObjectName;
-		std::string EquipID;
-		std::string Schedule;
-		int ZoneSupplyAirNode;
-		int SchedPtr;
-		Real64 MaxAirVolFlowRate; // Max Specified Volume Flow Rate of Sys [m3/sec]
-		Real64 AirMassFlowRateMax; // Max mass flow [kg/sec]
-		Real64 InitMaxAvailMassFlow; // The Initial max mass Flow to set the Control Flow Fraction
-		Real64 AirMassFlowFraction;
-		int ZoneEquipAirInletNode;
-		// Simulation Data
-		Real64 SensOutputProvided;
-		bool EMSOverrideAirFlow; // if true, EMS is calling to override flow rate
-		Real64 EMSMassFlowRateValue; // value EMS is directing to use for flow rate [kg/s]
-		//Reporting Variables
-		Real64 HeatRate;
-		Real64 CoolRate;
-		Real64 HeatEnergy;
-		Real64 CoolEnergy;
-		// pointers
-		int ZoneEqNum;
-		int ZoneNum;
+    struct DirectAirProps
+    {
+        // Members
+        // Input Data
+        std::string cObjectName;
+        std::string EquipID;
+        std::string Schedule;
+        int ZoneSupplyAirNode;
+        int SchedPtr;
+        Real64 MaxAirVolFlowRate;    // Max Specified Volume Flow Rate of Sys [m3/sec]
+        Real64 AirMassFlowRateMax;   // Max mass flow [kg/sec]
+        Real64 InitMaxAvailMassFlow; // The Initial max mass Flow to set the Control Flow Fraction
+        Real64 AirMassFlowFraction;
+        int ZoneEquipAirInletNode;
+        int AirTerminalSizingSpecIndex; // Pointer to DesignSpecification:AirTerminal:Sizing obect
+        int TermUnitSizingNum;          // index to TermUnitSizing and TermUnitFinalZoneSizing for this terminal unit
+        // Simulation Data
+        Real64 SensOutputProvided;
+        bool EMSOverrideAirFlow;     // if true, EMS is calling to override flow rate
+        Real64 EMSMassFlowRateValue; // value EMS is directing to use for flow rate [kg/s]
+        // Reporting Variables
+        Real64 HeatRate;
+        Real64 CoolRate;
+        Real64 HeatEnergy;
+        Real64 CoolEnergy;
+        // pointers
+        int ZoneEqNum;
+        int ZoneNum;
 
-		// Default Constructor
-		DirectAirProps() :
-			ZoneSupplyAirNode( 0 ),
-			SchedPtr( 0 ),
-			MaxAirVolFlowRate( 0.0 ),
-			AirMassFlowRateMax( 0.0 ),
-			InitMaxAvailMassFlow( 0.0 ),
-			AirMassFlowFraction( 0.0 ),
-			ZoneEquipAirInletNode( 0 ),
-			SensOutputProvided( 0.0 ),
-			EMSOverrideAirFlow( false ),
-			EMSMassFlowRateValue( 0.0 ),
-			HeatRate( 0.0 ),
-			CoolRate( 0.0 ),
-			HeatEnergy( 0.0 ),
-			CoolEnergy( 0.0 ),
-			ZoneEqNum( 0 ),
-			ZoneNum( 0 )
-		{}
+        bool NoOAFlowInputFromUser; // avoids OA calculation if no input specified by user
+        int OARequirementsPtr;      // - Index to DesignSpecification:OutdoorAir object
+        int CtrlZoneInNodeIndex;    // which controlled zone inlet node number corresponds with this unit
+        int AirLoopNum;             // air loop index
+        int OAPerPersonMode;        // mode for how per person rates are determined, DCV or design.
 
-	};
+        // Default Constructor
+        DirectAirProps()
+            : ZoneSupplyAirNode(0), SchedPtr(0), MaxAirVolFlowRate(0.0), AirMassFlowRateMax(0.0), InitMaxAvailMassFlow(0.0), AirMassFlowFraction(0.0),
+              ZoneEquipAirInletNode(0), AirTerminalSizingSpecIndex(0), SensOutputProvided(0.0), EMSOverrideAirFlow(false), EMSMassFlowRateValue(0.0),
+              HeatRate(0.0), CoolRate(0.0), HeatEnergy(0.0), CoolEnergy(0.0), ZoneEqNum(0), ZoneNum(0), NoOAFlowInputFromUser(true),
+              OARequirementsPtr(0), CtrlZoneInNodeIndex(0), AirLoopNum(0), OAPerPersonMode(0)
+        {
+        }
+    };
 
-	// Object Data
-	extern Array1D< DirectAirProps > DirectAir;
+    // Object Data
+    extern Array1D<DirectAirProps> DirectAir;
 
-	// Functions
+    // Functions
 
-	void
-	clear_state();
+    void clear_state();
 
-	void
-	SimDirectAir(
-		std::string const & EquipName,
-		int const ControlledZoneNum,
-		bool const FirstHVACIteration,
-		Real64 & SensOutputProvided,
-		Real64 & LatOutputProvided, // Latent output provided (kg/s), dehumidification = negative
-		int & CompIndex
-	);
+    void SimDirectAir(std::string const &EquipName,
+                      int const ControlledZoneNum,
+                      bool const FirstHVACIteration,
+                      Real64 &SensOutputProvided,
+                      Real64 &LatOutputProvided, // Latent output provided (kg/s), dehumidification = negative
+                      int &CompIndex);
 
-	void
-	GetDirectAirInput();
+    void GetDirectAirInput();
 
-	// Beginning Initialization Section of the Module
-	//******************************************************************************
+    // Beginning Initialization Section of the Module
+    //******************************************************************************
 
-	void
-	InitDirectAir(
-		int const DirectAirNum,
-		int const ControlledZoneNum,
-		bool const FirstHVACIteration
-	);
+    void InitDirectAir(int const DirectAirNum, int const ControlledZoneNum, bool const FirstHVACIteration);
 
-	void
-	SizeDirectAir( int const DirectAirNum );
+    void SizeDirectAir(int const DirectAirNum);
 
-	// End Initialization Section of the Module
-	//******************************************************************************
+    // End Initialization Section of the Module
+    //******************************************************************************
 
-	void
-	CalcDirectAir(
-		int const DirectAirNum,
-		int const ControlledZoneNum,
-		Real64 & SensOutputProvided,
-		Real64 & LatOutputProvided // Latent output provided, kg/s, dehumidification = negative
-	);
+    void CalcDirectAir(int const DirectAirNum,
+                       int const ControlledZoneNum,
+                       Real64 &SensOutputProvided,
+                       Real64 &LatOutputProvided // Latent output provided, kg/s, dehumidification = negative
+    );
 
-} // DirectAirManager
+} // namespace DirectAirManager
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

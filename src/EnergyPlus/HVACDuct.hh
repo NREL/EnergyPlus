@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef HVACDuct_hh_INCLUDED
 #define HVACDuct_hh_INCLUDED
@@ -63,75 +52,66 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace HVACDuct {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern int NumDucts;
-	extern Array1D_bool CheckEquipName;
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumDucts;
+    extern Array1D_bool CheckEquipName;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE HVACDuct:
+    // SUBROUTINE SPECIFICATIONS FOR MODULE HVACDuct:
 
-	// <name Public routines, optionally name Private routines within this module>
+    // <name Public routines, optionally name Private routines within this module>
 
-	// Types
+    // Types
 
-	struct DuctData
-	{
-		// Members
-		std::string Name; // duct unique name
-		int InletNodeNum; // inlet node number
-		int OutletNodeNum; // outlet node number
+    struct DuctData
+    {
+        // Members
+        std::string Name;  // duct unique name
+        int InletNodeNum;  // inlet node number
+        int OutletNodeNum; // outlet node number
 
-		// Default Constructor
-		DuctData() :
-			InletNodeNum( 0 ),
-			OutletNodeNum( 0 )
-		{}
+        // Default Constructor
+        DuctData() : InletNodeNum(0), OutletNodeNum(0)
+        {
+        }
+    };
 
-	};
+    // Object Data
+    extern Array1D<DuctData> Duct;
 
-	// Object Data
-	extern Array1D< DuctData > Duct;
+    // Functions
 
-	// Functions
+    void SimDuct(std::string const &CompName,   // name of the duct component
+                 bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
+                 int &CompIndex                 // index of duct component
+    );
 
-	void
-	SimDuct(
-		std::string const & CompName, // name of the duct component
-		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
-		int & CompIndex // index of duct component
-	);
+    void GetDuctInput();
 
-	void
-	GetDuctInput();
+    void InitDuct(int const DuctNum); // number of the current duct being simulated
 
-	void
-	InitDuct( int const DuctNum ); // number of the current duct being simulated
+    void CalcDuct(int const DuctNum); // number of the current duct being simulated !unused1208
 
-	void
-	CalcDuct( int const DuctNum ); // number of the current duct being simulated !unused1208
+    void UpdateDuct(int const DuctNum); // number of the current duct being simulated
 
-	void
-	UpdateDuct( int const DuctNum ); // number of the current duct being simulated
+    void ReportDuct(int const DuctNum); // number of the current duct being simulated !unused1208
 
-	void
-	ReportDuct( int const DuctNum ); // number of the current duct being simulated !unused1208
+} // namespace HVACDuct
 
-} // HVACDuct
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

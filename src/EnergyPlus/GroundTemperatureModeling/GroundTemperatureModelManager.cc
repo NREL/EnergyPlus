@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,19 +44,10 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
-#include<memory>
-#include<vector>
+#include <memory>
+#include <vector>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -71,111 +60,111 @@
 #include <GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh>
 #include <GroundTemperatureModeling/SiteShallowGroundTemperatures.hh>
 #include <GroundTemperatureModeling/XingGroundTemperatureModel.hh>
-#include <InputProcessor.hh>
+#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
 namespace GroundTemperatureManager {
 
-	int const objectType_KusudaGroundTemp( 1 );
-	int const objectType_FiniteDiffGroundTemp( 2 );
-	int const objectType_SiteBuildingSurfaceGroundTemp( 3 );
-	int const objectType_SiteShallowGroundTemp( 4 );
-	int const objectType_SiteDeepGroundTemp( 5 );
-	int const objectType_SiteFCFactorMethodGroundTemp( 6 );
-	int const objectType_XingGroundTemp( 7 );
+    int const objectType_KusudaGroundTemp(1);
+    int const objectType_FiniteDiffGroundTemp(2);
+    int const objectType_SiteBuildingSurfaceGroundTemp(3);
+    int const objectType_SiteShallowGroundTemp(4);
+    int const objectType_SiteDeepGroundTemp(5);
+    int const objectType_SiteFCFactorMethodGroundTemp(6);
+    int const objectType_XingGroundTemp(7);
 
-	Array1D_string const CurrentModuleObjects( 7, { "Site:Groundtemperature:Undisturbed:KusudaAchenbach", "Site:GroundTemperature:Undisturbed:FiniteDifference", "Site:GroundTemperature:BuildingSurface", "Site:GroundTemperature:Shallow", "Site:GroundTemperature:Deep", "Site:GroundTemperature:FCfactorMethod", "Site:GroundTemperature:Undisturbed:Xing"} );
+    Array1D_string const CurrentModuleObjects(7,
+                                              {"Site:GroundTemperature:Undisturbed:KusudaAchenbach",
+                                               "Site:GroundTemperature:Undisturbed:FiniteDifference",
+                                               "Site:GroundTemperature:BuildingSurface",
+                                               "Site:GroundTemperature:Shallow",
+                                               "Site:GroundTemperature:Deep",
+                                               "Site:GroundTemperature:FCfactorMethod",
+                                               "Site:GroundTemperature:Undisturbed:Xing"});
 
-	std::vector < std::shared_ptr < BaseGroundTempsModel > > groundTempModels;
+    std::vector<std::shared_ptr<BaseGroundTempsModel>> groundTempModels;
 
-	//******************************************************************************
+    //******************************************************************************
 
-	std::shared_ptr< BaseGroundTempsModel >
-	GetGroundTempModelAndInit(
-		std::string const & objectType_str,
-		std::string const & objectName
-	)
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Matt Mitchell
-		//       DATE WRITTEN   Summer 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(std::string const &objectType_str, std::string const &objectName)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Matt Mitchell
+        //       DATE WRITTEN   Summer 2015
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// Called by objects requireing ground temperature models. Determines type and calls appropriate factory method.
+        // PURPOSE OF THIS SUBROUTINE:
+        // Called by objects requiring ground temperature models. Determines type and calls appropriate factory method.
 
-		// USE STATEMENTS:
-		using InputProcessor::MakeUPPERCase;
+        // Locals
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int objectType(0);
 
-		// Locals
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int objectType( 0 );
+        std::string objectType_str_UPPERCase = UtilityRoutines::MakeUPPERCase(objectType_str);
 
-		std::string objectType_str_UPPERCase = MakeUPPERCase( objectType_str );
+        // Set object type
+        if (objectType_str_UPPERCase == UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(objectType_KusudaGroundTemp))) {
+            objectType = objectType_KusudaGroundTemp;
+        } else if (objectType_str_UPPERCase == UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(objectType_FiniteDiffGroundTemp))) {
+            objectType = objectType_FiniteDiffGroundTemp;
+        } else if (objectType_str_UPPERCase == UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(objectType_SiteBuildingSurfaceGroundTemp))) {
+            objectType = objectType_SiteBuildingSurfaceGroundTemp;
+        } else if (objectType_str_UPPERCase == UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(objectType_SiteShallowGroundTemp))) {
+            objectType = objectType_SiteShallowGroundTemp;
+        } else if (objectType_str_UPPERCase == UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(objectType_SiteDeepGroundTemp))) {
+            objectType = objectType_SiteDeepGroundTemp;
+        } else if (objectType_str_UPPERCase == UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(objectType_SiteFCFactorMethodGroundTemp))) {
+            objectType = objectType_SiteFCFactorMethodGroundTemp;
+        } else if (objectType_str_UPPERCase == UtilityRoutines::MakeUPPERCase(CurrentModuleObjects(objectType_XingGroundTemp))) {
+            objectType = objectType_XingGroundTemp;
+        } else {
+            // Error out if no ground temperature object types recognized
+            ShowFatalError("GetGroundTempsModelAndInit: Ground temperature object " + objectType_str + " not recognized.");
+        }
 
-		// Set object type
-		if ( objectType_str_UPPERCase == MakeUPPERCase( CurrentModuleObjects( objectType_KusudaGroundTemp ) ) ) {
-			objectType = objectType_KusudaGroundTemp;
-		} else if ( objectType_str_UPPERCase == MakeUPPERCase( CurrentModuleObjects( objectType_FiniteDiffGroundTemp ) ) ) {
-			objectType = objectType_FiniteDiffGroundTemp;
-		} else if ( objectType_str_UPPERCase == MakeUPPERCase( CurrentModuleObjects( objectType_SiteBuildingSurfaceGroundTemp ) ) ) {
-			objectType = objectType_SiteBuildingSurfaceGroundTemp;
-		} else if ( objectType_str_UPPERCase == MakeUPPERCase( CurrentModuleObjects( objectType_SiteShallowGroundTemp ) ) ){
-			objectType = objectType_SiteShallowGroundTemp;
-		} else if ( objectType_str_UPPERCase == MakeUPPERCase( CurrentModuleObjects( objectType_SiteDeepGroundTemp ) ) ) {
-			objectType = objectType_SiteDeepGroundTemp;
-		} else if ( objectType_str_UPPERCase == MakeUPPERCase( CurrentModuleObjects( objectType_SiteFCFactorMethodGroundTemp ) ) ) {
-			objectType = objectType_SiteFCFactorMethodGroundTemp;
-		} else if (objectType_str_UPPERCase == MakeUPPERCase( CurrentModuleObjects( objectType_XingGroundTemp ) ) ) {
-			objectType = objectType_XingGroundTemp;
-		} else {
-			// Error out if no ground temperature object types recognized
-			ShowFatalError( "GetGroundTempsModelAndInit: Ground temperature object " + objectType_str + " not recognized." );
-		}
+        int numGTMs = groundTempModels.size();
 
-		int numGTMs = groundTempModels.size();
+        // Check if this instance of this model has already been retrieved
+        for (int i = 0; i < numGTMs; ++i) {
+            auto currentModel(groundTempModels[i]);
+            // Check if the type and name match
+            if (objectType == currentModel->objectType && objectName == currentModel->objectName) {
+                return groundTempModels[i];
+            }
+        }
 
-		// Check if this instance of this model has already been retrieved
-		for ( int i = 0; i < numGTMs; ++i ) {
-			auto currentModel( groundTempModels[i] );
-			// Check if the type and name match
-			if ( objectType == currentModel->objectType && objectName == currentModel->objectName) {
-				return groundTempModels[i];
-			}
-		}
+        // If not found, create new instance of the model
+        if (objectType == objectType_KusudaGroundTemp) {
+            return KusudaGroundTempsModel::KusudaGTMFactory(objectType, objectName);
+        } else if (objectType == objectType_FiniteDiffGroundTemp) {
+            return FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(objectType, objectName);
+        } else if (objectType == objectType_SiteBuildingSurfaceGroundTemp) {
+            return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(objectType, objectName);
+        } else if (objectType == objectType_SiteShallowGroundTemp) {
+            return SiteShallowGroundTemps::ShallowGTMFactory(objectType, objectName);
+        } else if (objectType == objectType_SiteDeepGroundTemp) {
+            return SiteDeepGroundTemps::DeepGTMFactory(objectType, objectName);
+        } else if (objectType == objectType_SiteFCFactorMethodGroundTemp) {
+            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(objectType, objectName);
+        } else if (objectType == objectType_XingGroundTemp) {
+            return XingGroundTempsModel::XingGTMFactory(objectType, objectName);
+        } else {
+            // Error
+            return nullptr;
+        }
+    }
 
-		// If not found, create new instance of the model
-		if ( objectType == objectType_KusudaGroundTemp ) {
-			return KusudaGroundTempsModel::KusudaGTMFactory( objectType, objectName );
-		} else if ( objectType == objectType_FiniteDiffGroundTemp ) {
-			return FiniteDiffGroundTempsModel::FiniteDiffGTMFactory( objectType, objectName );
-		} else if ( objectType == objectType_SiteBuildingSurfaceGroundTemp ) {
-			return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory( objectType, objectName );
-		} else if ( objectType == objectType_SiteShallowGroundTemp ) {
-			return SiteShallowGroundTemps::ShallowGTMFactory( objectType, objectName );
-		} else if ( objectType == objectType_SiteDeepGroundTemp ) {
-			return SiteDeepGroundTemps::DeepGTMFactory( objectType, objectName );
-		} else if ( objectType == objectType_SiteFCFactorMethodGroundTemp ) {
-			return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory( objectType, objectName );
-		} else if ( objectType == objectType_XingGroundTemp ) {
-			return XingGroundTempsModel::XingGTMFactory( objectType, objectName );
-		} else {
-			// Error
-			return nullptr;
-		}
-	}
+    //******************************************************************************
 
-	//******************************************************************************
+    void clear_state()
+    {
+        groundTempModels.clear();
+    }
 
-	void
-	clear_state() {
-		groundTempModels.clear();
-	}
+    //******************************************************************************
 
-	//******************************************************************************
+} // namespace GroundTemperatureManager
 
-}	// GroundTemperatureManager
-
-}	// EnergyPlus
+} // namespace EnergyPlus

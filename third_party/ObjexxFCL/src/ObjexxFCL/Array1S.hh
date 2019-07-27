@@ -3,13 +3,13 @@
 
 // Array1S: 1D Slice Array Proxy
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -66,12 +66,15 @@ public: // Types
 	typedef  typename Super::Size  Size;
 	typedef  typename Super::Difference  Difference;
 
-	// Using
-	using Super::in_range;
 	using Super::isize;
 	using Super::overlap;
 	using Super::size;
+
+protected: // Types
+
+	using Super::in_range;
 	using Super::slice_k;
+
 	using Super::contiguous_;
 	using Super::data_;
 	using Super::data_beg_;
@@ -1108,7 +1111,8 @@ public: // Subscript
 	T const &
 	operator []( size_type const i ) const
 	{
-		assert( contains( i + 1 ) );
+		assert( i < std::numeric_limits< int >::max() );
+		assert( contains( static_cast< int >( i + 1 ) ) );
 		return data_[ k_ + ( m_ * ( i + 1 ) ) ];
 	}
 
@@ -1116,7 +1120,8 @@ public: // Subscript
 	T &
 	operator []( size_type const i )
 	{
-		assert( contains( i + 1 ) );
+		assert( i < std::numeric_limits< int >::max() );
+		assert( contains( static_cast< int >( i + 1 ) ) );
 		return data_[ k_ + ( m_ * ( i + 1 ) ) ];
 	}
 

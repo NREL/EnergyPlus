@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef SizingManager_hh_INCLUDED
 #define SizingManager_hh_INCLUDED
@@ -63,125 +52,122 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace SizingManager {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS: none
+    // Data
+    // MODULE PARAMETER DEFINITIONS: none
 
-	// DERIVED TYPE DEFINITIONS: none
+    // DERIVED TYPE DEFINITIONS: none
 
-	// INTERFACE BLOCK SPECIFICATIONS: none
+    // INTERFACE BLOCK SPECIFICATIONS: none
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern int NumAirLoops;
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumAirLoops;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
+    // SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
 
-	// Types
+    // Types
 
-	struct ZoneListData
-	{
-		// Members
-		std::string Name;
-		int NumOfZones;
-		Array1D_int Zones;
+    struct ZoneListData
+    {
+        // Members
+        std::string Name;
+        int NumOfZones;
+        Array1D_int Zones;
 
-		// Default Constructor
-		ZoneListData() :
-			NumOfZones( 0 )
-		{}
+        // Default Constructor
+        ZoneListData() : NumOfZones(0)
+        {
+        }
+    };
 
-	};
+    // Functions
+    void clear_state();
 
-	// Functions
-	void
-	clear_state();
+    void ManageSizing();
 
-	void
-	ManageSizing();
+    void ManageSystemSizingAdjustments();
 
-	void
-	GetOARequirements();
+    void ManageSystemVentilationAdjustments();
 
-	void
-	ProcessInputOARequirements(
-		std::string const & cCurrentModuleObject,
-		int const OAIndex,
-		Array1_string const & cAlphaArgs,
-		int & NumAlphas,
-		Array1< Real64 > const & rNumericArgs,
-		int & NumNumbers,
-		Array1_bool const & lNumericFieldBlanks, //Unused
-		Array1_bool const & lAlphaFieldBlanks,
-		Array1_string const & cAlphaFieldNames,
-		Array1_string const & cNumericFieldNames, //Unused
-		bool & ErrorsFound // If errors found in input
-	);
+    void DetermineSystemPopulationDiversity();
 
-	void
-	GetZoneAirDistribution();
+    void GetOARequirements();
 
-	void
-	GetZoneHVACSizing();
+    void ProcessInputOARequirements(std::string const &cCurrentModuleObject,
+                                    int const OAIndex,
+                                    Array1_string const &cAlphaArgs,
+                                    int &NumAlphas,
+                                    Array1<Real64> const &rNumericArgs,
+                                    int &NumNumbers,
+                                    Array1_bool const &lNumericFieldBlanks, // Unused
+                                    Array1_bool const &lAlphaFieldBlanks,
+                                    Array1_string const &cAlphaFieldNames,
+                                    Array1_string const &cNumericFieldNames, // Unused
+                                    bool &ErrorsFound                        // If errors found in input
+    );
 
-	void
-	GetSizingParams();
+    void GetZoneAirDistribution();
 
-	void
-	GetZoneSizingInput();
+    void GetZoneHVACSizing();
 
-	void
-	GetZoneAndZoneListNames(
-		bool & ErrorsFound,
-		int & NumZones,
-		Array1D_string & ZoneNames,
-		int & NumZoneLists,
-		Array1D< ZoneListData > & ZoneListNames
-	);
+    void GetAirTerminalSizing();
 
-	void
-	GetSystemSizingInput();
+    void GetSizingParams();
 
-	void
-	GetPlantSizingInput();
+    void GetZoneSizingInput();
 
-	void
-	SetupZoneSizing( bool & ErrorsFound );
+    void
+    GetZoneAndZoneListNames(bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames);
 
-	void
-	ReportZoneSizing(
-		std::string const & ZoneName, // the name of the zone
-		std::string const & LoadType, // the description of the input variable
-		Real64 const CalcDesLoad, // the value from the sizing calculation [W]
-		Real64 const UserDesLoad, // the value from the sizing calculation modified by user input [W]
-		Real64 const CalcDesFlow, // calculated design air flow rate [m3/s]
-		Real64 const UserDesFlow, // user input or modified design air flow rate [m3/s]
-		std::string const & DesDayName, // the name of the design day that produced the peak
-		std::string const & PeakHrMin, // time stamp of the peak
-		Real64 const PeakTemp, // temperature at peak [C]
-		Real64 const PeakHumRat, // humidity ratio at peak [kg water/kg dry air]
-		Real64 const FloorArea, // zone floor area [m2]
-		Real64 const TotOccs, // design number of occupants for the zone
-		Real64 const MinOAVolFlow, // zone design minimum outside air flow rate [m3/s]
-		Real64 const DOASHeatAddRate // zone design heat addition rate from the DOAS [W]
-	);
+    void GetSystemSizingInput();
 
-	void
-	ReportSysSizing(
-		std::string const & SysName, // the name of the zone
-		std::string const & VarDesc, // the description of the input variable
-		Real64 const VarValue // the value from the sizing calculation
-	);
+    void GetPlantSizingInput();
 
-} // SizingManager
+    void SetupZoneSizing(bool &ErrorsFound);
 
-} // EnergyPlus
+    void ReportZoneSizing(std::string const &ZoneName,   // the name of the zone
+                          std::string const &LoadType,   // the description of the input variable
+                          Real64 const CalcDesLoad,      // the value from the sizing calculation [W]
+                          Real64 const UserDesLoad,      // the value from the sizing calculation modified by user input [W]
+                          Real64 const CalcDesFlow,      // calculated design air flow rate [m3/s]
+                          Real64 const UserDesFlow,      // user input or modified design air flow rate [m3/s]
+                          std::string const &DesDayName, // the name of the design day that produced the peak
+                          std::string const &PeakHrMin,  // time stamp of the peak
+                          Real64 const PeakTemp,         // temperature at peak [C]
+                          Real64 const PeakHumRat,       // humidity ratio at peak [kg water/kg dry air]
+                          Real64 const FloorArea,        // zone floor area [m2]
+                          Real64 const TotOccs,          // design number of occupants for the zone
+                          Real64 const MinOAVolFlow,     // zone design minimum outside air flow rate [m3/s]
+                          Real64 const DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
+    );
+
+    void ReportSysSizing(std::string const &SysName,      // the name of the zone
+                         std::string const &LoadType,     // either "Cooling" or "Heating"
+                         std::string const &PeakLoadType, // either "Sensible" or "Total"
+                         Real64 const &UserDesCap,        // User  Design Capacity
+                         Real64 const &CalcDesVolFlow,    // Calculated  Design Air Flow Rate
+                         Real64 const &UserDesVolFlow,    // User Design Air Flow Rate
+                         std::string const &DesDayName,   // the name of the design day that produced the peak
+                         std::string const &DesDayDate,   // the date that produced the peak
+                         int const &TimeStepIndex         // time step of the peak
+    );
+
+    std::string TimeIndexToHrMinString(int timeIndex);
+
+    void UpdateFacilitySizing(int const CallIndicator);
+
+    void UpdateTermUnitFinalZoneSizing();
+
+} // namespace SizingManager
+
+} // namespace EnergyPlus
 
 #endif

@@ -3,13 +3,13 @@
 
 // Character Functions
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -19,54 +19,7 @@
 
 namespace ObjexxFCL {
 
-// Types
-typedef  char const *  c_cstring;
-
-// Inspector
-
-// Lowercased 8-bit ASCII char
-inline
-char
-to_lower( char const c )
-{
-	int const i( static_cast< int >( c ) );
-	return ( ( ( 65 <= i ) && ( i <= 90 ) ) || ( ( 192 <= i ) && ( i <= 223 ) ) ? i + 32 : i );
-}
-
-// Uppercased 8-bit ASCII char
-inline
-char
-to_upper( char const c )
-{
-	int const i( static_cast< int >( c ) );
-	return ( ( ( 97 <= i ) && ( i <= 122 ) ) || ( ( 224 <= i ) && ( i <= 255 ) ) ? i - 32 : i );
-}
-
-// Predicate
-
-// char == char Case-Insensitively
-inline
-bool
-equali( char const c, char const d )
-{
-	return ( to_lower( c ) == to_lower( d ) );
-}
-
-// char == char Case-Optionally?
-inline
-bool
-equal( char const c, char const d, bool const exact_case = true )
-{
-	return ( exact_case ? c == d : to_lower( c ) == to_lower( d ) );
-}
-
-// char < char Case-Insensitively?
-inline
-bool
-lessthani( char const c, char const d )
-{
-	return ( to_lower( c ) < to_lower( d ) );
-}
+// Predicate /////
 
 // char is Blank?
 inline
@@ -127,22 +80,6 @@ is_vowel( char const c )
 	return ( vowels.find( std::tolower( c ) ) != std::string::npos );
 }
 
-// char is Lowercase Alphabetic?
-inline
-bool
-is_lower( char const c )
-{
-	return ( std::islower( c ) != 0 );
-}
-
-// char is Uppercase Alphabetic?
-inline
-bool
-is_upper( char const c )
-{
-	return ( std::isupper( c ) != 0 );
-}
-
 // char is Alphanumeric?
 inline
 bool
@@ -159,6 +96,22 @@ is_digit( char const c )
 	return ( std::isdigit( c ) != 0 );
 }
 
+// char is Lowercase Alphabetic?
+inline
+bool
+is_lower( char const c )
+{
+	return ( std::islower( c ) != 0 );
+}
+
+// char is Uppercase Alphabetic?
+inline
+bool
+is_upper( char const c )
+{
+	return ( std::isupper( c ) != 0 );
+}
+
 // char is in a string?
 inline
 bool
@@ -169,7 +122,7 @@ is_any_of( char const c, std::string const & s )
 
 // char is in a cstring?
 bool
-is_any_of( char const c, c_cstring const s );
+is_any_of( char const c, char const * const s );
 
 // char is in a string?
 inline
@@ -182,7 +135,7 @@ has_any_of( char const c, std::string const & s )
 // char is in a cstring?
 inline
 bool
-has_any_of( char const c, c_cstring const s )
+has_any_of( char const c, char const * const s )
 {
 	return is_any_of( c, s );
 }
@@ -197,7 +150,97 @@ not_any_of( char const c, std::string const & s )
 
 // char is not in a cstring?
 bool
-not_any_of( char const c, c_cstring const s );
+not_any_of( char const c, char const * const s );
+
+// Comparison /////
+
+// Lowercased 8-bit ASCII char
+char
+to_lower( char const c ); // Defined below
+
+// Uppercased 8-bit ASCII char
+char
+to_upper( char const c ); // Defined below
+
+// char == char Case-Optionally?
+inline
+bool
+equal( char const c, char const d, bool const exact_case = true )
+{
+	return ( exact_case ? c == d : to_lower( c ) == to_lower( d ) );
+}
+
+// char == char Case-Insensitively
+inline
+bool
+equali( char const c, char const d )
+{
+	return ( to_lower( c ) == to_lower( d ) );
+}
+
+// char < char Case-Optionally?
+inline
+bool
+lessthan( char const c, char const d, bool const exact_case = true )
+{
+	return ( exact_case ? c < d : to_lower( c ) < to_lower( d ) );
+}
+
+// char < char Case-Insensitively?
+inline
+bool
+lessthani( char const c, char const d )
+{
+	return ( to_lower( c ) < to_lower( d ) );
+}
+
+// ASCII Lexical < Comparison
+inline
+bool
+LLT( char const c, char const d )
+{
+	return ( c < d );
+}
+
+// ASCII Lexical <= Comparison
+inline
+bool
+LLE( char const c, char const d )
+{
+	return ( c <= d );
+}
+
+// ASCII Lexical >= Comparison
+inline
+bool
+LGE( char const c, char const d )
+{
+	return ( c >= d );
+}
+
+// ASCII Lexical < Comparison
+inline
+bool
+LGT( char const c, char const d )
+{
+	return ( c > d );
+}
+
+// ASCII Lexical < Comparison
+inline
+bool
+llt( char const c, char const d )
+{
+	return ( c < d );
+}
+
+// ASCII Lexical <= Comparison
+inline
+bool
+lle( char const c, char const d )
+{
+	return ( c <= d );
+}
 
 // ASCII Lexical >= Comparison
 inline
@@ -215,23 +258,7 @@ lgt( char const c, char const d )
 	return ( c > d );
 }
 
-// ASCII Lexical <= Comparison
-inline
-bool
-lle( char const c, char const d )
-{
-	return ( c <= d );
-}
-
-// ASCII Lexical < Comparison
-inline
-bool
-llt( char const c, char const d )
-{
-	return ( c < d );
-}
-
-// Integer Conversion
+// Conversion /////
 
 // Integer Value of a char
 inline
@@ -249,7 +276,7 @@ IACHAR( char const c )
 	return static_cast< int >( c );
 }
 
-// Modifier
+// Modifier /////
 
 // Lowercase a char
 inline
@@ -269,7 +296,7 @@ uppercase( char & c )
 	return c;
 }
 
-// Generator
+// Generator /////
 
 // Lowercased Copy of a char
 inline
@@ -285,6 +312,24 @@ char
 uppercased( char const c )
 {
 	return to_upper( c );
+}
+
+// Lowercased 8-bit ASCII char
+inline
+char
+to_lower( char const c )
+{
+	int const i( static_cast< int >( c ) );
+	return ( ( ( 65 <= i ) && ( i <= 90 ) ) || ( ( 192 <= i ) && ( i <= 223 ) ) ? i + 32 : i );
+}
+
+// Uppercased 8-bit ASCII char
+inline
+char
+to_upper( char const c )
+{
+	int const i( static_cast< int >( c ) );
+	return ( ( ( 97 <= i ) && ( i <= 122 ) ) || ( ( 224 <= i ) && ( i <= 255 ) ) ? i - 32 : i );
 }
 
 } // ObjexxFCL

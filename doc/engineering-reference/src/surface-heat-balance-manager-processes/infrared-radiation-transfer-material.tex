@@ -48,6 +48,7 @@ Equating heat fluxes and eliminating T\(_{2}\) gives:
 
 \begin{equation}
 {q_{1 - 3}} = \frac{\sigma }{2}A\left( {T_1^4 - T_3^4} \right)
+\label{eq:RadExchangeBlackBodyInBetween}
 \end{equation}
 
 where:
@@ -60,7 +61,7 @@ A is the plate area in m\(^{2}\), and
 
 T is the temperature in K.
 
-Equation shows that the presence of a black body surface between a source and a sink reduces the heat flux by a factor of two. The same result occurs when the IRT surface is between two zones in EnergyPlus. In that case the adjacent zones behave as black body cavities at some equivalent temperature. In order to account for this reduction, the IRT area must be doubled. This can be done without any difficulty in the EnergyPlus radiant exchange routine because the radiation view factors are determined by an approximate procedure that is based on the areas of the surfaces. Thus, doubling the surface area of the IRT surface results in the correct transfer of radiation through the IRT surface. The doubling will occur automatically in the program as described in the Input Output Reference document.
+Equation~\ref{eq:RadExchangeBlackBodyInBetween} shows that the presence of a black body surface between a source and a sink reduces the heat flux by a factor of two. The same result occurs when the IRT surface is between two zones in EnergyPlus. In that case the adjacent zones behave as black body cavities at some equivalent temperature. In order to account for this reduction, the IRT area must be doubled. This can be done without any difficulty in the EnergyPlus radiant exchange routine because the radiation view factors are determined by an approximate procedure that is based on the areas of the surfaces. Thus, doubling the surface area of the IRT surface results in the correct transfer of radiation through the IRT surface. The doubling will occur automatically in the program as described in the Input Output Reference document.
 
 It should be noted that, because of the black body behavior of the IRT surface, any visible or solar short wavelength radiation incident on the surface will be absorbed and included with the long wavelength (IR) exchange with the adjacent zone. No energy will be lost, but zones with IRT surfaces should not be used in any lighting analyses.
 

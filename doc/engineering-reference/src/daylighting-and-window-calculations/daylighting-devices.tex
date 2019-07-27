@@ -55,7 +55,7 @@ For an opaque surface, the reflectivity is:
 \rho  = 1 - \alpha
 \end{equation}
 
-where a = surface absorptivity.~ Visible (i.e.~daylighting) and solar absorptivities give visible and solar reflectivities, respectively.~ Measured reflectivities for commercial TDDs range from 0.90 to 0.99.~ Although the actual surface reflectivity is slightly dependent on the incident angle, the model assumes a constant reflectivity for all angles.
+where \(\alpha\) = surface absorptivity.~ Visible (i.e.~daylighting) and solar absorptivities give visible and solar reflectivities, respectively.~ Measured reflectivities for commercial TDDs range from 0.90 to 0.99.~ Although the actual surface reflectivity is slightly dependent on the incident angle, the model assumes a constant reflectivity for all angles.
 
 The full analytical expression for the transmittance of a beam of light in a highly reflective pipe has been developed by Swift and Smith and verified by experiment (1994).~ By integrating over all rays incident on the pipe entrance, they find the transmittance of a beam of collimated radiation to be:
 
@@ -67,9 +67,9 @@ where
 
 a = L/D, the aspect ratio of the TDD
 
-r = surface reflectivity
+\(\rho\) = surface reflectivity
 
-q = incident angle
+\(\theta\) = incident angle
 
 s = entry point
 
@@ -97,9 +97,9 @@ The beam transmittance of the TDD takes into account the dome and diffuser trans
 
 where
 
-\(\tau_{dome}\)(q) = beam transmittance of the dome glazing at the incident angle
+\(\tau_{dome}\)(\(\theta\)) = beam transmittance of the dome glazing at the incident angle
 
-\(\tau_{pipe}\)(q) = beam transmittance of the pipe at the incident angle, as described above
+\(\tau_{pipe}\)(\(\theta\)) = beam transmittance of the pipe at the incident angle, as described above
 
 \(\tau_{diffuser}\) = diffuse transmittance of the diffuser glazing
 
@@ -113,7 +113,7 @@ The calculation of TDD diffuse transmittance is considerably more complex and is
 
 The daylighting simulation of the TDD treats the diffuser surface as a regular window illuminated from the outside by sun, sky, and ground.~ However, the TDD model replaces the window glazing transmittance with the appropriate TDD transmittance and converts all transmitted light to diffuse.
 
-The illuminance due to the direct beam of the sun is found using the TDD beam transmittance t\(_{TDD}\)(q) as described above.~ The incident angle q is relative to the dome surface.
+The illuminance due to the direct beam of the sun is found using the TDD beam transmittance t\(_{TDD}\)(\(\theta\)) as described above.~ The incident angle \(\theta\) is relative to the dome surface.
 
 The illuminance due to sky radiation and ground reflected radiation is calculated with the normal daylighting model integration over the sky and ground within the viewable hemisphere of the dome.~ The transmittance of each sky or ground~ element is also found using the TDD beam transmittance at the incident angle of the sky or ground element relative to the dome.
 
@@ -123,7 +123,7 @@ Light from the diffuser is converted to diffuse inside the zone in the same way 
 
 Solar radiation incident on a window is calculated separately as sun, sky, and ground radiation.~ A different transmittance must be applied for each type of radiation.
 
-For beam radiation the TDD beam transmittance t\(_{TDD}\)(q) for the solar spectrum is used as described above.~ For sky and ground radiation a diffuse transmittance for the TDD must be developed.
+For beam radiation the TDD beam transmittance t\(_{TDD}\)(\(\theta\)) for the solar spectrum is used as described above.~ For sky and ground radiation a diffuse transmittance for the TDD must be developed.
 
 The transmittance of diffuse radiation can be defined as the total transmitted flux divided by the total incident flux.
 
@@ -139,9 +139,9 @@ Swift and Smith (1994) suggest a weighted integral of the beam transmittance ove
 
 where
 
-P(q) = angular distribution function
+P(\(\theta\)) = angular distribution function
 
-For isotropic diffuse radiation P(q) is the cosine of the incident angle q.
+For isotropic diffuse radiation P(\(\theta\)) is the cosine of the incident angle \(\theta\).
 
 \begin{equation}
 {\tau_{diff,iso}} = \frac{{\int_{\theta  = 0}^{\pi /2} {\tau (\theta )\cos \theta } \sin \theta d\theta }}{{\int_{\theta  = 0}^{\pi /2} {\cos \theta } \sin \theta d\theta }}
@@ -165,7 +165,7 @@ where
 
 \(\tau_{diff,iso}\) = diffuse isotropic transmittance
 
-t(q) = beam transmittance at incident angle q of sun
+t(\(\theta\)) = beam transmittance at incident angle q of sun
 
 \(\tau_{diff,horiz}\) = diffuse transmittance of the horizon, derived below
 
@@ -207,7 +207,7 @@ I\(_{sun}\) = solar beam intensity of the sun
 
 I\(_{h,sky}\) = total horizontal diffuse solar radiation due to the sky
 
-q = incident angle of the beam on the dome
+\(\theta\) = incident angle of the beam on the dome
 
 f\(_{sunlit}\) = sunlit beam fraction of the dome area
 
@@ -215,7 +215,7 @@ f\(_{skymult}\) = anisotropic sky view multiplier (see AnisoSkyMult)
 
 F\(_{sg}\) = view from ground to dome
 
-\(\tau_{TDD}\)(q) = TDD beam transmittance
+\(\tau_{TDD}\)(\(\theta\)) = TDD beam transmittance
 
 \(\tau_{TDD,diff,aniso}\) = TDD anisotropic sky transmittance
 
@@ -247,11 +247,7 @@ The total absorbed solar radiation in the TDD is the sum of the following gains:
 \item
   Inward bound solar absorbed by multiple pipe reflections
 \item
-  Outward bound solar absorbed by multiple pipe reflections due to:
-\item
-  Reflection off of diffuser surface (inside of TDD)
-\item
-  Zone diffuse interior shortwave incident on the diffuser from lights, etc.
+  Outward bound solar absorbed by multiple pipe reflections due to: reflection off of diffuser surface (inside of TDD) and zone diffuse interior shortwave incident on the diffuser from lights, etc.
 \item
   Inward flowing absorbed solar in dome and diffuser glazing
 \end{itemize}
@@ -266,7 +262,7 @@ The inward bound solar absorbed by the pipe is the difference between the solar 
 {Q_{abs,in}} = {q''_{trans,dome}}{A_{dome}} - {q''_{inc,diffuser}}{A_{diffuser}}
 \end{equation}
 
-The solar transmitted by the dome q``\(_{trans,dome}\) is calculated as usual for a window.~ The solar incident on the diffuser q''\(_{inc,diffuser}\) is more complicated because each component must be treated separately.
+The solar transmitted by the dome q''\(_{trans,dome}\) is calculated as usual for a window.~ The solar incident on the diffuser q''\(_{inc,diffuser}\) is more complicated because each component must be treated separately.
 
 \begin{equation}
 {q''_{inc,diffuser}} = {q''_{beam}}\frac{{{\tau_{TDD,beam}}(\theta )}}{{{\tau_{diffuser}}}} + {q''_{sky}}\frac{{{\tau_{TDD,aniso}}(Hour)}}{{{\tau_{diffuser}}}} + {q''_{gnd}}\frac{{{\tau_{TDD,iso}}}}{{{\tau_{diffuser}}}}
@@ -278,7 +274,7 @@ The outward bound solar absorbed by the pipe is given by:
 {Q_{abs,out}} = \left( {{{q''}_{refl,diffuser}}\frac{{\left( {1 - {\tau_{TDD}}} \right)}}{{{\tau_{diffuser}}}} + {{q''}_{zoneSW}}\left( {1 - {\tau_{TDD}}} \right)} \right){A_{diffuser}}
 \end{equation}
 
-where q``\(_{zoneSW}\) is the zone interior diffuse shortwave flux from window, lights, and ambient surface reflections, and
+where q''\(_{zoneSW}\) is the zone interior diffuse shortwave flux from window, lights, and ambient surface reflections, and
 
 \begin{equation}
 {q''_{refl,diffuser}} = {q''_{inc,diffuser}} - {q''_{abs,diffuser}} - {q''_{trans,diffuser}}
@@ -332,11 +328,11 @@ In the daylighting simulation this is accomplished by forcing all the transmitte
 
 where
 
-F\(_{CW}\) = upgoing flux
+\(\Phi_{CW}\) = upgoing flux
 
-F\(_{FW}\) = downgoing flux
+\(\Phi_{FW}\) = downgoing flux
 
-F = total flux
+\(\Phi\) = total flux
 
 Since it is assumed that all light falls on the inside shelf, it is implied that the upper window~ cannot contribute any direct illuminance (i.e.~the upper window cannot be seen from anywhere in the zone).~ The remaining light is entirely interreflected sky-related and interreflected sun-related upgoing flux.
 
@@ -374,17 +370,17 @@ E\(_{sun}\) = exterior illuminance due to light from the sun
 
 E\(_{h,\,sky}\) = exterior horizontal illuminance due to light from the sky
 
-q = incident angle of the beam on the shelf
+\(\theta\) = incident angle of the beam on the shelf
 
 f\(_{sunlit}\) = sunlit beam fraction of the shelf surface area
 
 f\(_{skymult}\) = anisotropic sky view multiplier (see AnisoSkyMult)
 
-r\(_{vis}\) = shelf surface reflectivity in the visible spectrum
+\(\rho_{vis}\) = shelf surface reflectivity in the visible spectrum
 
 F\(_{ws}\) = view factor from window to shelf
 
-t\(_{diff,\, vis}\) = diffuse window transmittance in the visible spectrum
+\(\tau_{diff,\, vis}\) = diffuse window transmittance in the visible spectrum
 
 The sunlit beam fraction f\(_{sunlit}\) and the anisotropic sky view multiplier f\(_{skymult}\) are borrowed from the heat balance solar calculations.
 
@@ -442,13 +438,13 @@ I\(_{sun}\) = solar beam intensity of the sun
 
 I\(_{h,\, sky}\) = total horizontal diffuse solar radiation due to the sky
 
-q = incident angle of the beam on the shelf
+\(\theta\) = incident angle of the beam on the shelf
 
 f\(_{sunlit}\) = sunlit beam fraction of the surface area
 
 f\(_{skymult}\) = anisotropic sky view multiplier (see AnisoSkyMult)
 
-r\(_{sol}\) = shelf surface reflectivity in the solar spectrum
+\(\rho_{sol}\) = shelf surface reflectivity in the solar spectrum
 
 F\(_{ws}\) = view factor from window to shelf
 
@@ -485,15 +481,15 @@ The attenuation is characterized by the \textbf{well efficiency}, which is the r
 The well efficiency depends on the visible reflectance of well's side walls and on the well cavity ratio, \textbf{\emph{WCR}}, which is given by:
 
 \begin{equation}
-WCR = \frac{{{\rm{2}}{\rm{.5 x Well Height x Well Perimeter}}}}{{{\rm{Well Area}}}}
+WCR = \frac{{{\rm{2}}{\rm{.5 x Well~Height x Well~Perimeter}}}}{{{\rm{Well~Area}}}}
 \end{equation}
 
 Well Height, Well Perimeter and Well Area are inputs to the model and are discussed in the figure caption above.
 
-The model in EnergyPlus was implemented by fitting a curve to the data presented as Figure~\ref{fig:illustration-of-zone-air-mass-flow-balance}-21, ``Efficiency factors for various depths of light wells based on well-interreflectance values,'' found in the Lighting Handbook (IES 1993).~ The figure below reproduces that reference data and shows well efficiency vs.~WCR for different side wall reflectances. For use in the EnergyPlus calculation, a fit has been made to this graph that gives the following mathematical expression, where ``Reflectance'' is the user input value of the well-wall reflectance expressed as a fraction:
+The model in EnergyPlus was implemented by fitting a curve to the data presented as Figure~8-21, ``Efficiency factors for various depths of light wells based on well-interreflectance values,'' found in the Lighting Handbook (IES 1993).~ The figure below reproduces that reference data and shows well efficiency vs.~WCR for different side wall reflectances. For use in the EnergyPlus calculation, a fit has been made to this graph that gives the following mathematical expression, where ``Reflectance'' is the user input value of the well-wall reflectance expressed as a fraction:
 
 \begin{equation}
-{\rm{Well efficiency}} = {e^{ - WCR*(0.16368 - 0.144678*{\rm{Reflectance}})}}
+{\rm{Well~efficiency}} = {e^{ - WCR*(0.16368 - 0.144678*{\rm{Reflectance}})}}
 \end{equation}
 
 \begin{figure}[hbtp] % fig 73

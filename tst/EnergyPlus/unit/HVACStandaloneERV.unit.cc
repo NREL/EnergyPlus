@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::Standalone ERV Unit Tests
 
@@ -63,16 +52,14 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/HVACStandAloneERV.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
-
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::HVACStandAloneERV;
@@ -85,160 +72,195 @@ using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::ScheduleManager;
 
-TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test1 )
+TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
 {
-	ZoneEquipConfig.allocate( 1 );
-	ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
-	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
+    std::string const idf_objects = delimited_string({
+        "  Fan:OnOff,",
+        "    ERV Supply Fan,          !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    0.5,                     !- Fan Total Efficiency",
+        "    75.0,                    !- Pressure Rise {Pa}",
+        "    20000.0,                 !- Maximum Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    HR Supply Outlet Node,   !- Air Inlet Node Name",
+        "    Supply Fan Outlet Node;  !- Air Outlet Node Name",
 
-	Zone.allocate( 1 );
-	Zone( 1 ).Name = ZoneEquipConfig( 1 ).ZoneName;
-	ZoneEqSizing.allocate( 1 );
-	CurZoneEqNum = 1;
+        "  Fan:OnOff,",
+        "    ERV Exhaust Fan,         !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    0.5,                     !- Fan Total Efficiency",
+        "    75.0,                    !- Pressure Rise {Pa}",
+        "    20000.0,                 !- Maximum Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    HR Secondary Outlet Node,!- Air Inlet Node Name",
+        "    Exhaust Fan Outlet Node; !- Air Outlet Node Name",
 
-	TotPeople = 2; // Total number of people statements
-	People.allocate(TotPeople);
-	People( 1 ).ZonePtr = 1;
-	People( 1 ).NumberOfPeople = 100.0;
-	People( 1 ).NumberOfPeoplePtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
-	People( 2 ).ZonePtr = 1;
-	People( 2 ).NumberOfPeople = 200.0;
-	People( 2 ).NumberOfPeoplePtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+        "  Schedule:Compact,",
+        "    FanAndCoilAvailSched,    !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0;        !- Field 3",
+    });
 
-	StandAloneERV.allocate( 1 );
+    ASSERT_TRUE(process_idf(idf_objects));
 
-	// size on floor area
-	StandAloneERV( 1 ).SupplyAirVolFlow = AutoSize;
-	StandAloneERV( 1 ).AirVolFlowPerFloorArea = 1.0;
-	StandAloneERV( 1 ).AirVolFlowPerOccupant = 0.0;
-	Zone( 1 ).Multiplier = 1.0;
-	Zone( 1 ).FloorArea = 1000.0;
-	SizeStandAloneERV( 1 );
-	EXPECT_EQ( 1000.0, StandAloneERV( 1 ).SupplyAirVolFlow );
+    ZoneEquipConfig.allocate(1);
+    ZoneEquipConfig(1).ZoneName = "Zone 1";
+    ZoneEquipConfig(1).ActualZoneNum = 1;
 
-	// size on occupancy
-	StandAloneERV( 1 ).SupplyAirVolFlow = AutoSize; // Need to reset this for each pass
-	StandAloneERV( 1 ).AirVolFlowPerFloorArea = 0.0;
-	StandAloneERV( 1 ).AirVolFlowPerOccupant = 10.0;
-	Zone( 1 ).Multiplier = 1.0;
-	Zone( 1 ).FloorArea = 1000.0;
-	SizeStandAloneERV( 1 );
-	EXPECT_EQ( 3000.0, StandAloneERV( 1 ).SupplyAirVolFlow );
+    Zone.allocate(1);
+    Zone(1).Name = ZoneEquipConfig(1).ZoneName;
+    ZoneEqSizing.allocate(1);
+    CurZoneEqNum = 1;
+    DataSizing::ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
 
-	// size on floor area and occupancy
-	StandAloneERV( 1 ).SupplyAirVolFlow = AutoSize;
-	StandAloneERV( 1 ).AirVolFlowPerFloorArea = 1.0;
-	StandAloneERV( 1 ).AirVolFlowPerOccupant = 10.0;
-	Zone( 1 ).Multiplier = 1.0;
-	Zone( 1 ).FloorArea = 1000.0;
-	SizeStandAloneERV( 1 );
-	EXPECT_EQ( 4000.0, StandAloneERV( 1 ).SupplyAirVolFlow );
+    TotPeople = 2; // Total number of people statements
+    People.allocate(TotPeople);
+    People(1).ZonePtr = 1;
+    People(1).NumberOfPeople = 100.0;
+    People(1).NumberOfPeoplePtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    People(2).ZonePtr = 1;
+    People(2).NumberOfPeople = 200.0;
+    People(2).NumberOfPeoplePtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
 
-	// size on floor area and occupancy using zone multiplier
-	StandAloneERV( 1 ).SupplyAirVolFlow = AutoSize;
-	Zone( 1 ).Multiplier = 5.0;
-	SizeStandAloneERV( 1 );
-	EXPECT_EQ( 20000.0, StandAloneERV( 1 ).SupplyAirVolFlow );
+    StandAloneERV.allocate(1);
 
+    // size on floor area
+    StandAloneERV(1).SupplyAirVolFlow = AutoSize;
+    StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
+    StandAloneERV(1).AirVolFlowPerFloorArea = 1.0;
+    StandAloneERV(1).AirVolFlowPerOccupant = 0.0;
+    StandAloneERV(1).SupplyAirFanType_Num = DataHVACGlobals::FanType_SimpleOnOff;
+    StandAloneERV(1).SupplyAirFanName = "ERV SUPPLY FAN";
+    StandAloneERV(1).SupplyAirFanIndex = 1;
+    StandAloneERV(1).ExhaustAirFanType_Num = DataHVACGlobals::FanType_SimpleOnOff;
+    StandAloneERV(1).ExhaustAirFanName = "ERV EXHAUST FAN";
+    StandAloneERV(1).ExhaustAirFanIndex = 2;
+    Zone(1).Multiplier = 1.0;
+    Zone(1).FloorArea = 1000.0;
+    SizeStandAloneERV(1);
+    EXPECT_EQ(1000.0, StandAloneERV(1).SupplyAirVolFlow);
+
+    // size on occupancy
+    StandAloneERV(1).SupplyAirVolFlow = AutoSize; // Need to reset this for each pass
+    StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
+    StandAloneERV(1).AirVolFlowPerFloorArea = 0.0;
+    StandAloneERV(1).AirVolFlowPerOccupant = 10.0;
+    Zone(1).Multiplier = 1.0;
+    Zone(1).FloorArea = 1000.0;
+    SizeStandAloneERV(1);
+    EXPECT_EQ(3000.0, StandAloneERV(1).SupplyAirVolFlow);
+
+    // size on floor area and occupancy
+    StandAloneERV(1).SupplyAirVolFlow = AutoSize;
+    StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
+    StandAloneERV(1).AirVolFlowPerFloorArea = 1.0;
+    StandAloneERV(1).AirVolFlowPerOccupant = 10.0;
+    Zone(1).Multiplier = 1.0;
+    Zone(1).FloorArea = 1000.0;
+    SizeStandAloneERV(1);
+    EXPECT_EQ(4000.0, StandAloneERV(1).SupplyAirVolFlow);
+
+    // size on floor area and occupancy using zone multiplier
+    StandAloneERV(1).SupplyAirVolFlow = AutoSize;
+    StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
+    Zone(1).Multiplier = 5.0;
+    SizeStandAloneERV(1);
+    EXPECT_EQ(20000.0, StandAloneERV(1).SupplyAirVolFlow);
 }
 
-TEST_F( EnergyPlusFixture, HVACStandAloneERV_Test2 ) {
+TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
+{
 
-	int write_stat;
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
+    std::string const idf_objects = delimited_string({
+        "  Fan:OnOff,",
+        "    ERV Supply Fan,          !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    0.5,                     !- Fan Total Efficiency",
+        "    75.0,                    !- Pressure Rise {Pa}",
+        "    autosize,                !- Maximum Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    HR Supply Outlet Node,   !- Air Inlet Node Name",
+        "    Supply Fan Outlet Node;  !- Air Outlet Node Name",
 
-	std::string const idf_objects = delimited_string( {
-		" Version,8.5;",
+        "  Fan:OnOff,",
+        "    ERV Exhaust Fan,         !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    0.5,                     !- Fan Total Efficiency",
+        "    75.0,                    !- Pressure Rise {Pa}",
+        "    autosize,                !- Maximum Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    HR Secondary Outlet Node,!- Air Inlet Node Name",
+        "    Exhaust Fan Outlet Node; !- Air Outlet Node Name",
 
-		"  Fan:OnOff,",
-			"    ERV Supply Fan,          !- Name",
-			"    FanAndCoilAvailSched,    !- Availability Schedule Name",
-			"    0.5,                     !- Fan Total Efficiency",
-			"    75.0,                    !- Pressure Rise {Pa}",
-			"    autosize,                !- Maximum Flow Rate {m3/s}",
-			"    0.9,                     !- Motor Efficiency",
-			"    1.0,                     !- Motor In Airstream Fraction",
-			"    HR Supply Outlet Node,   !- Air Inlet Node Name",
-			"    Supply Fan Outlet Node;  !- Air Outlet Node Name",
+        "  Schedule:Compact,",
+        "    FanAndCoilAvailSched,    !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0;        !- Field 3",
+    });
 
-			"  Fan:OnOff,",
-			"    ERV Exhaust Fan,         !- Name",
-			"    FanAndCoilAvailSched,    !- Availability Schedule Name",
-			"    0.5,                     !- Fan Total Efficiency",
-			"    75.0,                    !- Pressure Rise {Pa}",
-			"    autosize,                !- Maximum Flow Rate {m3/s}",
-			"    0.9,                     !- Motor Efficiency",
-			"    1.0,                     !- Motor In Airstream Fraction",
-			"    HR Secondary Outlet Node,!- Air Inlet Node Name",
-			"    Exhaust Fan Outlet Node; !- Air Outlet Node Name",
+    ASSERT_TRUE(process_idf(idf_objects));
 
-			"  Schedule:Compact,",
-			"    FanAndCoilAvailSched,    !- Name",
-			"    Fraction,                !- Schedule Type Limits Name",
-			"    Through: 12/31,          !- Field 1",
-			"    For: AllDays,            !- Field 2",
-			"    Until: 24:00,1.0;        !- Field 3",
-	} );
+    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ProcessScheduleInput();  // read schedules
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+    GetFanInput();
 
-	NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-	MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-	ProcessScheduleInput(); // read schedules
+    EnergyPlus::DataSizing::CurZoneEqNum = 1;
 
-	GetFanInput();
+    ZoneEquipConfig.allocate(1);
+    ZoneEquipConfig(1).ZoneName = "Zone 1";
+    ZoneEquipConfig(1).ActualZoneNum = 1;
 
-	EnergyPlus::DataSizing::CurZoneEqNum = 1;
+    Zone.allocate(1);
+    Zone(1).Name = ZoneEquipConfig(1).ZoneName;
+    Zone(1).Multiplier = 1.0;
+    Zone(1).FloorArea = 100.0;
 
-	ZoneEquipConfig.allocate( 1 );
-	ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
-	ZoneEquipConfig( 1 ).ActualZoneNum = 1;
+    ZoneEqSizing.allocate(1);
+    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
+    ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
-	Zone.allocate( 1 );
-	Zone( 1 ).Name = ZoneEquipConfig( 1 ).ZoneName;
-	Zone( 1 ).Multiplier = 1.0;
-	Zone( 1 ).FloorArea = 100.0;
+    FinalZoneSizing.allocate(1);
+    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.0;
+    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.0;
 
-	ZoneEqSizing.allocate( 1 );
-	ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 25 );
-	ZoneEqSizing( CurZoneEqNum ).SizingMethod( DataHVACGlobals::SystemAirflowSizing ) = DataSizing::SupplyAirFlowRate;
+    TotPeople = 2; // Total number of people objects
+    People.allocate(TotPeople);
+    People(1).ZonePtr = 1;
+    People(1).NumberOfPeople = 10.0;
+    People(1).NumberOfPeoplePtr = ScheduleAlwaysOn; // always returns a 1 for schedule value
+    People(2).ZonePtr = 1;
+    People(2).NumberOfPeople = 20.0;
+    People(2).NumberOfPeoplePtr = ScheduleAlwaysOn; // always returns a 1 for schedule value
 
-	FinalZoneSizing.allocate( 1 );
-	FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 0.0;
-	FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 0.0;
+    StandAloneERV.allocate(1);
+    StandAloneERV(1).SupplyAirVolFlow = DataSizing::AutoSize;
+    StandAloneERV(1).ExhaustAirVolFlow = DataSizing::AutoSize;
+    StandAloneERV(1).DesignSAFanVolFlowRate = DataSizing::AutoSize;
+    StandAloneERV(1).DesignEAFanVolFlowRate = DataSizing::AutoSize;
+    StandAloneERV(1).DesignHXVolFlowRate = DataSizing::AutoSize;
+    StandAloneERV(1).SupplyAirFanName = Fan(1).FanName;
+    StandAloneERV(1).SupplyAirFanIndex = 1;
+    StandAloneERV(1).ExhaustAirFanName = Fan(2).FanName;
+    StandAloneERV(1).ExhaustAirFanIndex = 2;
+    StandAloneERV(1).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
+    StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
+    StandAloneERV(1).AirVolFlowPerFloorArea = 0.01;
+    StandAloneERV(1).AirVolFlowPerOccupant = 0.0;
+    StandAloneERV(1).HighRHOAFlowRatio = 1.2;
 
-	TotPeople = 2; // Total number of people objects
-	People.allocate( TotPeople );
-	People( 1 ).ZonePtr = 1;
-	People( 1 ).NumberOfPeople = 10.0;
-	People( 1 ).NumberOfPeoplePtr = ScheduleAlwaysOn; // always returns a 1 for schedule value
-	People( 2 ).ZonePtr = 1;
-	People( 2 ).NumberOfPeople = 20.0;
-	People( 2 ).NumberOfPeoplePtr = ScheduleAlwaysOn; // always returns a 1 for schedule value
+    SizeStandAloneERV(1);
 
-	StandAloneERV.allocate( 1 );
-	StandAloneERV( 1 ).SupplyAirVolFlow = DataSizing::AutoSize;
-	StandAloneERV( 1 ).ExhaustAirVolFlow = DataSizing::AutoSize;
-	StandAloneERV( 1 ).DesignSAFanVolFlowRate = DataSizing::AutoSize;
-	StandAloneERV( 1 ).DesignEAFanVolFlowRate = DataSizing::AutoSize;
-	StandAloneERV( 1 ).DesignHXVolFlowRate = DataSizing::AutoSize;
-	StandAloneERV( 1 ).SupplyAirFanName = Fan( 1 ).FanName;
-	StandAloneERV( 1 ).SupplyAirFanIndex = 1;
-	StandAloneERV( 1 ).ExhaustAirFanName = Fan( 2 ).FanName;
-	StandAloneERV( 1 ).ExhaustAirFanIndex = 2;
-	StandAloneERV( 1 ).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
-	StandAloneERV( 1 ).HeatExchangerName = "ERV Heat Exchanger";
-	StandAloneERV( 1 ).AirVolFlowPerFloorArea = 0.01;
-	StandAloneERV( 1 ).AirVolFlowPerOccupant = 0.0;
-	StandAloneERV( 1 ).HighRHOAFlowRatio = 1.2;
-
-	SizeStandAloneERV( 1 );
-
-	EXPECT_EQ( 1.0, StandAloneERV( 1 ).SupplyAirVolFlow );
-	EXPECT_EQ( 1.0, StandAloneERV( 1 ).DesignHXVolFlowRate );
-	EXPECT_EQ( 1.2, StandAloneERV( 1 ).DesignSAFanVolFlowRate );
-	EXPECT_EQ( 1.2, StandAloneERV( 1 ).DesignEAFanVolFlowRate );
-
-	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
+    EXPECT_EQ(1.0, StandAloneERV(1).SupplyAirVolFlow);
+    EXPECT_EQ(1.2, StandAloneERV(1).DesignSAFanVolFlowRate);
+    EXPECT_EQ(1.2, StandAloneERV(1).DesignEAFanVolFlowRate);
 }

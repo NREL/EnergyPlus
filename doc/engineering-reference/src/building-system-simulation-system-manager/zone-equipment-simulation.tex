@@ -32,7 +32,7 @@ RETURN
 \item
   Perform zone equipment initialization calculations.
 \item
-  If calculation of the design zone air flow rates and loads needs to be done, do it. The results of this calculation are stored in the zone sizing data structures and used by the component automatic sizing algorithms and the central system sizing calculations.
+  If calculation of the design zone air flow rates and loads needs to be done, do it. The results of this calculation are stored in the zone sizing and air terminal sizing data structures and used by the component automatic sizing algorithms and the central system sizing calculations.
 \item
   Otherwise simulate all of the zone equipment.
 \item
@@ -50,7 +50,7 @@ The input specifying a set of zone equipment consists of:
   \item
     the ZoneHVAC:EquipmentConnections object data;
     \begin{enumerate}
-      \item the zone connection to the air loop – air inlet nodes, exhaust nodes, outlet node, zone node;
+      \item the zone connection to the air loop – air inlet nodes, exhaust nodes, return nodes, and zone node;
       \item the components serving each zone – air terminal units, fan coils etc.;
     \end{enumerate}
   \item
@@ -61,7 +61,7 @@ The input specifying a set of zone equipment consists of:
   \item
     zone return air path data;
     \begin{enumerate}
-      \item zone mixer and return plenums;
+      \item zone mixers and return plenums;
     \end{enumerate}
 \end{enumerate}
 
@@ -111,9 +111,9 @@ The subroutine \emph{SimZoneEquipment} does the actual simulation of all the zon
 
 For zone equipment components that are part of the demand side of an air loop the simulation sequence is effectively performed in the direction of the air flow. First the supply air plenums and zone splitters are simulated in their input order. Then the air terminal units are simulated followed by the zone return plenums and zone mixer. Each air terminal unit sets its inlet node to the air mass flow rate required to satisfy its zone load. These mass flow rates are then passed back upstream to the air loop demand-side inlet nodes at the end of each zone equipment simulation sequence. These demand-side inlet mass flow rates are then used as mass flow rate setpoints in the air loop supply-side simulation.
 
-If multiple air-conditioning components are attached to a zone, the components are simulated in the order specified by the user assigned priority given in the ZoneHVAC:EquipmentList object.
+If multiple air-conditioning components are attached to a zone, the components are simulated in the order specified by the user assigned priority given in the ZoneHVAC:EquipmentList object, using one of four load distribution schemes. See Zone Equipment Load Distribution described in \ref{zone-equipment-load-distribution}
 
-For each full air loop there should be 1 supply air path for each primary air system outlet (i.e.~1 for single duct systems,~ 2 for dual duct systems). For each full air loop there should be one return air path. The supply air paths consist of any combination of zone splitters and zone supply air plenums as long as it forms a tree structure with the supply air path inlet node the root and the air terminal unit inlet nodes as the leaves. The return air path configuration is limited to a single mixer; there may be multiple return plenums.
+For each full air loop there should be 1 supply air path for each primary air system outlet (i.e.~1 for single duct systems,~ 2 for dual duct systems). For each full air loop there may be one return air path. The supply air paths consist of any combination of zone splitters and zone supply air plenums as long as it forms a tree structure with the supply air path inlet node the root and the air terminal unit inlet nodes as the leaves. The return air paths consist of any combination of zone mixers and zone return air plenums as long as it forms a tree structure with the demand-side outlet node the root and the zone return air nodes as the leaves.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -160,3 +160,62 @@ For each full air loop there should be 1 supply air path for each primary air sy
 \end{enumerate}
 
 This completes a single simulation sequence of all the zone equipment.
+
+\subsection{Zone Equipment Load Distribution}\label{zone-equipment-load-distribution}
+
+The function \emph{DistributeSystemOutputRequired} allocates the curent zone load among the available pieces of zone equipment for the current load type (cooling, heating, or no-load). Because some air loop components such as AirLoopHVAC:UnitarySystem may be controlled based on a control zone load, the sequenced loads must be known prior to the final iteration of the HVAC simulation so that the air loop equipment will adjust its output accordingly. When the zone equipment list is initially read, the maximum number of equipment across all zones is used to set the number of air loop iterations required after the initial iteration, \emph{MinAirLoopIterationsAfterFirst}. The control sequence is shown below.
+\begin{enumerate}
+\item
+  Initial iteration (\emph{FirstHVACIteration} is true)
+  \begin{enumerate}
+  \item
+    Set all sequenced loads to the full zone design load for the current load type (cooling or heating).
+  \item
+    Simulate air loops and zone equipment.
+  \item
+    Do not adjust any of the sequenced loads - all equipment is called with the design load.
+  \item
+    Store the sensible output (capacity) for each piece of equipment.
+  \end{enumerate}
+\item
+  Second iteration (\emph{FirstHVACIteration} is false)
+  \begin{enumerate}
+  \item
+    Set all sequenced loads according to the specified load distribution scheme:
+    \begin{itemize}
+    \item
+      SequentialLoad - Initially all sequenced loads are set to the full load required.
+    \item
+      UniformLoad - The sequenced loads for all active equipment are set to the full load divided by the number of active pieces of equipment. All inactive sequenced loads are set to zero.
+    \item
+      UniformPLR - Using the current equipment capacities (stored during the initial iteration), distribute the load among the availalbe pieces of equipment, such that each one is operating at the same part load ratio (PLR).
+    \item
+      SequentialUniformPLR - Using the current equipment capacities (stored during the initial iteration), determine how many of the available pieces of equipment are required to meet the current full load.  Then distribute the load among those pieces of equipment, such that each one is operating at the same part load ratio (PLR).
+    \end{itemize}
+  \item
+    Simulate air loops.
+  \item
+    Simulate zone equipment.
+    \begin{itemize}
+    \item
+      If the load distribution type is SequentialLoad, update each successive sequenced load to be the current remaining load. 
+    \item
+      Otherwise, leave the sequenced loads as-is from the initial distribution.
+    \end{itemize}
+  \end{enumerate}
+\item
+  Third iteration and beyond (\emph{FirstHVACIteration} is false)
+  \begin{enumerate}
+  \item
+    Simulate air loops.
+  \item
+    Simulate zone equipment.
+    \begin{itemize}
+    \item
+      If the load distribution type is SequentialLoad, update each successive sequenced load to be the current remaining load. 
+    \item
+      Otherwise, leave the sequenced loads as-is from the initial distribution.
+    \end{itemize}
+  \end{enumerate}
+\end{enumerate}
+

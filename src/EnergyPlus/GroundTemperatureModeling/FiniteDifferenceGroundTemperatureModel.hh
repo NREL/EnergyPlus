@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef FiniteDifferenceGroundTemperatureModel_hh_INCLUDED
 #define FiniteDifferenceGroundTemperatureModel_hh_INCLUDED
@@ -73,165 +62,127 @@
 
 namespace EnergyPlus {
 
-	// Derived class for Finite-Difference Model
-	class FiniteDiffGroundTempsModel : public BaseGroundTempsModel {
-		
-		public:
-			Real64 baseConductivity;
-			Real64 baseDensity;
-			Real64 baseSpecificHeat;
-			int totalNumCells;
-			Real64 timeStepInSeconds;
-			Real64 evapotransCoeff;
-			Real64 saturatedWaterContent; 
-			Real64 waterContent;
-			Real64 annualAveAirTemp;
-			Real64 minDailyAirTemp; // Set hi. Will be reset later
-			Real64 maxDailyAirTemp; // Set low. Will be reset later
-			Real64 dayOfMinDailyAirTemp;
-			Real64 depth;
-			Real64 simTimeInDays;
+// Derived class for Finite-Difference Model
+class FiniteDiffGroundTempsModel : public BaseGroundTempsModel
+{
 
-		// Default constructor
-		FiniteDiffGroundTempsModel() :
-			minDailyAirTemp( 100.0 ),
-			maxDailyAirTemp( -100.0 ),
-			dayOfMinDailyAirTemp( 1 )
+public:
+    Real64 baseConductivity;
+    Real64 baseDensity;
+    Real64 baseSpecificHeat;
+    int totalNumCells;
+    Real64 timeStepInSeconds;
+    Real64 evapotransCoeff;
+    Real64 saturatedWaterContent;
+    Real64 waterContent;
+    Real64 annualAveAirTemp;
+    Real64 minDailyAirTemp; // Set hi. Will be reset later
+    Real64 maxDailyAirTemp; // Set low. Will be reset later
+    Real64 dayOfMinDailyAirTemp;
+    Real64 depth;
+    Real64 simTimeInDays;
 
-		{}
+    // Default constructor
+    FiniteDiffGroundTempsModel() : minDailyAirTemp(100.0), maxDailyAirTemp(-100.0), dayOfMinDailyAirTemp(1)
 
-		struct instanceOfCellData {
+    {
+    }
 
-			struct properties
-			{
-				Real64 conductivity;
-				Real64 density;
-				Real64 specificHeat;
-				Real64 diffusivity;
-				Real64 rhoCp;
-			};
+    struct instanceOfCellData
+    {
 
-			properties props;
-		
-			int index;
-			Real64 thickness;
-			Real64 minZValue;
-			Real64 maxZValue;
-			Real64 temperature;
-			Real64 temperature_prevIteration;
-			Real64 temperature_prevTimeStep;
-			Real64 temperature_finalConvergence;
-			Real64 beta;
-			Real64 volume;
-			Real64 conductionArea = 1.0; // Assumes 1 m2 
-		
-			};
+        struct properties
+        {
+            Real64 conductivity;
+            Real64 density;
+            Real64 specificHeat;
+            Real64 diffusivity;
+            Real64 rhoCp;
+        };
 
-		Array1D< instanceOfCellData > cellArray;
+        properties props;
 
-		struct instanceOfWeatherData
-			{
-				Real64 dryBulbTemp;
-				Real64 relativeHumidity;
-				Real64 windSpeed;
-				Real64 horizontalRadiation;
-				Real64 airDensity;
-			};
+        int index;
+        Real64 thickness;
+        Real64 minZValue;
+        Real64 maxZValue;
+        Real64 temperature;
+        Real64 temperature_prevIteration;
+        Real64 temperature_prevTimeStep;
+        Real64 temperature_finalConvergence;
+        Real64 beta;
+        Real64 volume;
+        Real64 conductionArea = 1.0; // Assumes 1 m2
+    };
 
-		Array1D< instanceOfWeatherData > weatherDataArray;
+    Array1D<instanceOfCellData> cellArray;
 
-		static std::shared_ptr< FiniteDiffGroundTempsModel > 
-		FiniteDiffGTMFactory(
-			int objectType,
-			std::string objectName
-		);
+    struct instanceOfWeatherData
+    {
+        Real64 dryBulbTemp;
+        Real64 relativeHumidity;
+        Real64 windSpeed;
+        Real64 horizontalRadiation;
+        Real64 airDensity;
+    };
 
-		void
-		getWeatherData();
+    Array1D<instanceOfWeatherData> weatherDataArray;
 
-		void
-		initAndSim();
+    static std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGTMFactory(int objectType, std::string objectName);
 
-		void
-		developMesh();
+    void getWeatherData();
 
-		void
-		performSimulation();
+    void initAndSim();
 
-		void
-		updateSurfaceCellTemperature();
+    void developMesh();
 
-		void
-		updateGeneralDomainCellTemperature(
-			int const cell
-		);
+    void performSimulation();
 
-		void
-		updateBottomCellTemperature();
+    void updateSurfaceCellTemperature();
 
-		void
-		initDomain();
+    void updateGeneralDomainCellTemperature(int const cell);
 
-		bool
-		checkFinalTemperatureConvergence();
+    void updateBottomCellTemperature();
 
-		bool
-		checkIterationTemperatureConvergence();
+    void initDomain();
 
-		void
-		updateIterationTemperatures();
+    bool checkFinalTemperatureConvergence();
 
-		void
-		updateTimeStepTemperatures();
+    bool checkIterationTemperatureConvergence();
 
-		void
-		doStartOfTimeStepInits();
+    void updateIterationTemperatures();
 
-		Real64
-		getGroundTemp();
+    void updateTimeStepTemperatures();
 
-		Real64
-		getGroundTempAtTimeInSeconds(
-			Real64 const depth,
-			Real64 const timeInSecondsOfSim
-		);
+    void doStartOfTimeStepInits();
 
-		Real64
-		getGroundTempAtTimeInMonths(
-			Real64 const depth,
-			int const monthOfSim
-		);
+    Real64 getGroundTemp();
 
-		void
-		evaluateSoilRhoCp(
-			Optional< int const > cell = _,
-			Optional_bool_const InitOnly = _
-		);
+    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim);
 
-		Real64
-		interpolate(
-			Real64 const x,
-			Real64 const x_hi,
-			Real64 const x_low,
-			Real64 const y_hi,
-			Real64 const y_low
-		);
+    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim);
 
-		Array2D< Real64 > groundTemps;
+    void evaluateSoilRhoCp(Optional<int const> cell = _, Optional_bool_const InitOnly = _);
 
-		Array1D< Real64 > cellDepths;
+    Real64 interpolate(Real64 const x, Real64 const x_hi, Real64 const x_low, Real64 const y_hi, Real64 const y_low);
 
-		enum surfaceTypes {
-			surfaceCoverType_bareSoil = 1,
-			surfaceCoverType_shortGrass = 2,
-			surfaceCoverType_longGrass = 3
-		};
+    Array2D<Real64> groundTemps;
 
-		// Destructor
-		~FiniteDiffGroundTempsModel(){}
+    Array1D<Real64> cellDepths;
 
-	};
+    enum surfaceTypes
+    {
+        surfaceCoverType_bareSoil = 1,
+        surfaceCoverType_shortGrass = 2,
+        surfaceCoverType_longGrass = 3
+    };
 
-}
+    // Destructor
+    ~FiniteDiffGroundTempsModel()
+    {
+    }
+};
+
+} // namespace EnergyPlus
 
 #endif

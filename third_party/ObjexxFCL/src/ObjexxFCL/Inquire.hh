@@ -3,13 +3,13 @@
 
 // Inquire Support
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -35,16 +35,13 @@ class IFileStream;
 class OFileStream;
 class FileStream;
 
-// Types
-typedef  char const *  c_cstring;
-
 // Inquire by Name
 void
 Inquire( std::string const & name, IOFlags & flags );
 
 // Inquire by Name
 void
-Inquire( c_cstring const name, IOFlags & flags );
+Inquire( char const * const name, IOFlags & flags );
 
 // Inquire by Stream
 void

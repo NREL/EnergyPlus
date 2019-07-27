@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef UFADManager_hh_INCLUDED
 #define UFADManager_hh_INCLUDED
@@ -66,59 +55,47 @@ namespace EnergyPlus {
 
 namespace UFADManager {
 
-	// Data
-	// MODULE VARIABLE DECLARATIONS:
-	extern Real64 HAT_MX; // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone
-	extern Real64 HAT_MXWin; // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone (windows only)
-	extern Real64 HA_MX; // HA_MX Convection Coefficient times Area for the upper subzone
-	extern Real64 HA_MXWin; // HA_MX Convection Coefficient times Area for the upper subzone (windows only)
-	extern Real64 HAT_OC; // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone
-	extern Real64 HAT_OCWin; // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone (windows only)
-	extern Real64 HA_OC; // HA_OC Convection Coefficient times Area for the lower subzone
-	extern Real64 HA_OCWin; // HA_OC Convection Coefficient times Area for the lower subzone (windows only)
-	extern Real64 HAT_FLOOR; // HAT_FLOOR Convection Coefficient times Area times Temperature for the floor(?) subzone
-	extern Real64 HA_FLOOR; // HA_FLOOR Convection Coefficient times Area for the floor(?) subzone
-	extern Real64 HeightFloorSubzoneTop; // Assumed thickness of floor subzone
-	extern Real64 ThickOccupiedSubzoneMin; // Minimum thickness of occupied subzone
-	extern Real64 HeightIntMass; // Height of internal mass surfaces, assumed vertical, cannot exceed ceiling height
-	extern Real64 HeightIntMassDefault; // Default height of internal mass surfaces
+    // Data
+    // MODULE VARIABLE DECLARATIONS:
+    extern Real64 HAT_MX;                  // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone
+    extern Real64 HAT_MXWin;               // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone (windows only)
+    extern Real64 HA_MX;                   // HA_MX Convection Coefficient times Area for the upper subzone
+    extern Real64 HA_MXWin;                // HA_MX Convection Coefficient times Area for the upper subzone (windows only)
+    extern Real64 HAT_OC;                  // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone
+    extern Real64 HAT_OCWin;               // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone (windows only)
+    extern Real64 HA_OC;                   // HA_OC Convection Coefficient times Area for the lower subzone
+    extern Real64 HA_OCWin;                // HA_OC Convection Coefficient times Area for the lower subzone (windows only)
+    extern Real64 HAT_FLOOR;               // HAT_FLOOR Convection Coefficient times Area times Temperature for the floor(?) subzone
+    extern Real64 HA_FLOOR;                // HA_FLOOR Convection Coefficient times Area for the floor(?) subzone
+    extern Real64 HeightFloorSubzoneTop;   // Assumed thickness of floor subzone
+    extern Real64 ThickOccupiedSubzoneMin; // Minimum thickness of occupied subzone
+    extern Real64 HeightIntMass;           // Height of internal mass surfaces, assumed vertical, cannot exceed ceiling height
+    extern Real64 HeightIntMassDefault;    // Default height of internal mass surfaces
 
-	// SUBROUTINE SPECIFICATIONS:
+    // SUBROUTINE SPECIFICATIONS:
 
-	// Functions
+    // Functions
 
-	void
-	ManageUCSDUFModels(
-		int const ZoneNum, // index number for the specified zone
-		int const ZoneModelType // type of zone model; UCSDUFI = 6
-	);
+    void ManageUCSDUFModels(int const ZoneNum,      // index number for the specified zone
+                            int const ZoneModelType // type of zone model; UCSDUFI = 6
+    );
 
-	void
-	InitUCSDUF(
-		int const ZoneNum,
-		int const ZoneModelType // type of zone model; UCSDUFI = 6
-	);
+    void InitUCSDUF(int const ZoneNum,
+                    int const ZoneModelType // type of zone model; UCSDUFI = 6
+    );
 
-	void
-	SizeUCSDUF(
-		int const ZoneNum,
-		int const ZoneModelType // type of zone model; UCSDUFI = 6
-	);
+    void SizeUCSDUF(int const ZoneNum,
+                    int const ZoneModelType // type of zone model; UCSDUFI = 6
+    );
 
-	void
-	HcUCSDUF(
-		int const ZoneNum,
-		Real64 const FractionHeight
-	);
+    void HcUCSDUF(int const ZoneNum, Real64 const FractionHeight);
 
-	void
-	CalcUCSDUI( int const ZoneNum ); // index number for the specified zone
+    void CalcUCSDUI(int const ZoneNum); // index number for the specified zone
 
-	void
-	CalcUCSDUE( int const ZoneNum ); // index number for the specified zone
+    void CalcUCSDUE(int const ZoneNum); // index number for the specified zone
 
-} // UFADManager
+} // namespace UFADManager
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

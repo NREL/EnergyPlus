@@ -1,12 +1,12 @@
 // ObjexxFCL::floops Unit Tests
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -52,7 +52,7 @@ TEST( floopsTest, floops4 )
 
 TEST( floopsTest, floops5 )
 {
-	double i, b = 2.5, e = -2.5, s = -1.0;
+	double i, b = 2.5, e = -2.5, s = -1.0; // Floating point loop control variables
 	EXPECT_EQ( std::size_t( 6 ), floops( i, b, e, s ) );
 	EXPECT_EQ( b, i );
 }

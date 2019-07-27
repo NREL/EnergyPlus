@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataBranchNodeConnections_hh_INCLUDED
 #define DataBranchNodeConnections_hh_INCLUDED
@@ -63,120 +52,114 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace DataBranchNodeConnections {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern int NumCompSets; // Number of Component Sets found in branches
-	extern int NumNodeConnectionErrors; // Count of node connection errors
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumCompSets;             // Number of Component Sets found in branches
+    extern int NumNodeConnectionErrors; // Count of node connection errors
 
-	extern int NumOfNodeConnections;
-	extern int MaxNumOfNodeConnections;
-	extern int NodeConnectionAlloc;
-	extern int NumOfActualParents;
-	extern int NumOfAirTerminalNodes;
-	extern int MaxNumOfAirTerminalNodes;
-	extern int EqNodeConnectionAlloc;
+    extern int NumOfNodeConnections;
+    extern int MaxNumOfNodeConnections;
+    extern int NodeConnectionAlloc;
+    extern int NumOfActualParents;
+    extern int NumOfAirTerminalNodes;
+    extern int MaxNumOfAirTerminalNodes;
+    extern int EqNodeConnectionAlloc;
 
-	// Types
+    // Types
 
-	struct ComponentListData
-	{
-		// Members
-		std::string ParentCType; // Parent Object Type (Cannot be SPLITTER or MIXER)
-		std::string ParentCName; // Parent Object Name
-		std::string CType; // Component Type (Cannot be SPLITTER or MIXER)
-		std::string CName; // Component Name
-		std::string InletNodeName; // Inlet Node ID
-		std::string OutletNodeName; // Outlet Node ID
-		std::string Description; // Description of Component List Type
-		bool InfoFilled; // true when all information has been filled
+    struct ComponentListData
+    {
+        // Members
+        std::string ParentCType;    // Parent Object Type (Cannot be SPLITTER or MIXER)
+        std::string ParentCName;    // Parent Object Name
+        std::string CType;          // Component Type (Cannot be SPLITTER or MIXER)
+        std::string CName;          // Component Name
+        std::string InletNodeName;  // Inlet Node ID
+        std::string OutletNodeName; // Outlet Node ID
+        std::string Description;    // Description of Component List Type
+        bool InfoFilled;            // true when all information has been filled
 
-		// Default Constructor
-		ComponentListData() :
-			InfoFilled( false )
-		{}
+        // Default Constructor
+        ComponentListData() : InfoFilled(false)
+        {
+        }
+    };
 
-	};
+    struct NodeConnectionDef
+    {
+        // Members
+        int NodeNumber;             // Node number of this node connection
+        std::string NodeName;       // Node Name of this node connection
+        std::string ObjectType;     // Object/Component Type of this node connection
+        std::string ObjectName;     // Name of the Object/Component Type of this node connection
+        std::string ConnectionType; // Connection Type (must be valid) for this node connection
+        int FluidStream;            // Fluid Stream for this node connection
+        bool ObjectIsParent;        // Indicator whether the object is a parent or not
 
-	struct NodeConnectionDef
-	{
-		// Members
-		int NodeNumber; // Node number of this node connection
-		std::string NodeName; // Node Name of this node connection
-		std::string ObjectType; // Object/Component Type of this node connection
-		std::string ObjectName; // Name of the Object/Component Type of this node connection
-		std::string ConnectionType; // Connection Type (must be valid) for this node connection
-		int FluidStream; // Fluid Stream for this node connection
-		bool ObjectIsParent; // Indicator whether the object is a parent or not
+        // Default Constructor
+        NodeConnectionDef() : NodeNumber(0), FluidStream(0), ObjectIsParent(false)
+        {
+        }
+    };
 
-		// Default Constructor
-		NodeConnectionDef() :
-			NodeNumber( 0 ),
-			FluidStream( 0 ),
-			ObjectIsParent( false )
-		{}
+    struct ParentListData
+    {
+        // Members
+        std::string CType;          // Component Type (Cannot be SPLITTER or MIXER)
+        std::string CName;          // Component Name
+        std::string InletNodeName;  // Inlet Node ID
+        std::string OutletNodeName; // Outlet Node ID
+        std::string Description;    // Description of Component List Type
+        bool InfoFilled;            // true when all information has been filled
 
-	};
+        // Default Constructor
+        ParentListData() : InfoFilled(false)
+        {
+        }
+    };
 
-	struct ParentListData
-	{
-		// Members
-		std::string CType; // Component Type (Cannot be SPLITTER or MIXER)
-		std::string CName; // Component Name
-		std::string InletNodeName; // Inlet Node ID
-		std::string OutletNodeName; // Outlet Node ID
-		std::string Description; // Description of Component List Type
-		bool InfoFilled; // true when all information has been filled
+    struct EqNodeConnectionDef
+    {
+        // Members
+        std::string NodeName;       // Node Name of this node connection
+        std::string ObjectType;     // Object/Component Type of this node connection
+        std::string ObjectName;     // Name of the Object/Component Type of this node connection
+        std::string InputFieldName; // Input Field Name for this connection
+        std::string ConnectionType; // Connection Type (must be valid) for this node connection
 
-		// Default Constructor
-		ParentListData() :
-			InfoFilled( false )
-		{}
+        // Default Constructor
+        EqNodeConnectionDef()
+        {
+        }
+    };
 
-	};
+    // Object Data
+    extern Array1D<ComponentListData> CompSets;
+    extern Array1D<ParentListData> ParentNodeList;
+    extern Array1D<NodeConnectionDef> NodeConnections;
+    extern Array1D<EqNodeConnectionDef> AirTerminalNodeConnections;
+    extern Array1D_bool NonConnectedNodes;
 
-	struct EqNodeConnectionDef
-	{
-		// Members
-		std::string NodeName; // Node Name of this node connection
-		std::string ObjectType; // Object/Component Type of this node connection
-		std::string ObjectName; // Name of the Object/Component Type of this node connection
-		std::string InputFieldName; // Input Field Name for this connection
-		std::string ConnectionType; // Connection Type (must be valid) for this node connection
+    // Clears the global data in DataBranchNodeConnections.
+    // Needed for unit tests, should not be normally called.
+    void clear_state();
 
-		// Default Constructor
-		EqNodeConnectionDef()
-		{}
+} // namespace DataBranchNodeConnections
 
-	};
-
-	// Object Data
-	extern Array1D< ComponentListData > CompSets;
-	extern Array1D< ParentListData > ParentNodeList;
-	extern Array1D< NodeConnectionDef > NodeConnections;
-	extern Array1D< EqNodeConnectionDef > AirTerminalNodeConnections;
-	extern Array1D_bool NonConnectedNodes;
-
-	// Clears the global data in DataBranchNodeConnections.
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state();
-
-} // DataBranchNodeConnections
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef GeneratorDynamicsManager_hh_INCLUDED
 #define GeneratorDynamicsManager_hh_INCLUDED
@@ -69,60 +58,53 @@ namespace EnergyPlus {
 
 namespace GeneratorDynamicsManager {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // na
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+    // DERIVED TYPE DEFINITIONS:
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	// na
+    // MODULE VARIABLE DECLARATIONS:
+    // na
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
+    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
-	// Functions
+    // Functions
 
-	void
-	SetupGeneratorControlStateManager( int const GenNum ); // index of generator to setup
+    void SetupGeneratorControlStateManager(int const GenNum); // index of generator to setup
 
-	void
-	ManageGeneratorControlState(
-		int const GeneratorType, // type of Generator
-		std::string const & GeneratorName, // user specified name of Generator
-		int const GeneratorNum, // Generator number
-		bool const RunFlagElectCenter, // TRUE when Generator operating per electric load center request
-		bool const RunFlagPlant, // TRUE when generator operating per Plant request (always false)
-		Real64 const ElecLoadRequest, // Generator Electrical power demand
-		Real64 const ThermalLoadRequest, // cogenerator Thermal power demand
-		Real64 & ElecLoadProvided, // power allowed
-		int & OperatingMode, // operating mode
-		Real64 & PLRforSubtimestepStartUp, // part load ratio for switch to normal from start up
-		Real64 & PLRforSubtimestepShutDown, // part load ratio for switch from cool down to other
-		bool const FirstHVACIteration // True is this is first HVAC iteration
-	);
+    void ManageGeneratorControlState(int const GeneratorType,           // type of Generator
+                                     std::string const &GeneratorName,  // user specified name of Generator
+                                     int const GeneratorNum,            // Generator number
+                                     bool const RunFlagElectCenter,     // TRUE when Generator operating per electric load center request
+                                     bool const RunFlagPlant,           // TRUE when generator operating per Plant request (always false)
+                                     Real64 const ElecLoadRequest,      // Generator Electrical power demand
+                                     Real64 const ThermalLoadRequest,   // cogenerator Thermal power demand
+                                     Real64 &ElecLoadProvided,          // power allowed
+                                     int &OperatingMode,                // operating mode
+                                     Real64 &PLRforSubtimestepStartUp,  // part load ratio for switch to normal from start up
+                                     Real64 &PLRforSubtimestepShutDown, // part load ratio for switch from cool down to other
+                                     bool const FirstHVACIteration      // True is this is first HVAC iteration
+    );
 
-	void
-	ManageGeneratorFuelFlow(
-		int const GeneratorType, // type of Generator
-		std::string const & GeneratorName, // user specified name of Generator
-		int const GeneratorNum, // Generator number
-		bool const RunFlag, // TRUE when Generator operating
-		Real64 const FuelFlowRequest, // Generator demand mdot kg/ s
-		Real64 & FuelFlowProvided, // allowed after constraints kg/s
-		bool & ConstrainedIncreasingMdot, // true if request was altered because of fuel rate of change up
-		bool & ConstrainedDecreasingMdot // true if request was altered because of fuel rate of change down
-	);
+    void ManageGeneratorFuelFlow(int const GeneratorType,          // type of Generator
+                                 std::string const &GeneratorName, // user specified name of Generator
+                                 int const GeneratorNum,           // Generator number
+                                 bool const RunFlag,               // TRUE when Generator operating
+                                 Real64 const FuelFlowRequest,     // Generator demand mdot kg/ s
+                                 Real64 &FuelFlowProvided,         // allowed after constraints kg/s
+                                 bool &ConstrainedIncreasingMdot,  // true if request was altered because of fuel rate of change up
+                                 bool &ConstrainedDecreasingMdot   // true if request was altered because of fuel rate of change down
+    );
 
-	Real64
-	FuncDetermineCWMdotForInternalFlowControl(
-		int const GeneratorNum, // ID of generator
-		Real64 const Pnetss, // power net steady state
-		Real64 const TcwIn // temperature of cooling water at inlet
-	);
+    Real64 FuncDetermineCWMdotForInternalFlowControl(int const GeneratorNum, // ID of generator
+                                                     Real64 const Pnetss,    // power net steady state
+                                                     Real64 const TcwIn      // temperature of cooling water at inlet
+    );
 
-} // GeneratorDynamicsManager
+} // namespace GeneratorDynamicsManager
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

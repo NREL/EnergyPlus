@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,63 +44,52 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus Headers
-#include <DataZoneEnergyDemands.hh>
 #include <DataPrecisionGlobals.hh>
+#include <DataZoneEnergyDemands.hh>
 
 namespace EnergyPlus {
 
 namespace DataZoneEnergyDemands {
 
-	// MODULE INFORMATION
-	//             AUTHOR:  Russ Taylor
-	//       DATE WRITTEN:  Oct 1997
+    // MODULE INFORMATION
+    //             AUTHOR:  Russ Taylor
+    //       DATE WRITTEN:  Oct 1997
 
-	// PURPOSE OF THIS MODULE:
-	// This module  contains the essential coil information that is needed by water and air
-	//loop managers as well as the coil simulations
+    // PURPOSE OF THIS MODULE:
+    // This module  contains the essential coil information that is needed by water and air
+    // loop managers as well as the coil simulations
 
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
+    // Using/Aliasing
+    using namespace DataPrecisionGlobals;
 
-	// Data
-	// -only module should be available to other modules and routines.
-	// Thus, all variables in this module must be PUBLIC.
+    // Data
+    // -only module should be available to other modules and routines.
+    // Thus, all variables in this module must be PUBLIC.
 
-	// MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	Array1D_bool DeadBandOrSetback; // true if zone temperature is in the thermostat deadband
-	// before any heating / cooling done
-	Array1D_bool Setback; // true if zone temperature has increased
-	// from previous setting
-	Array1D_bool CurDeadBandOrSetback; // same as above except updated after each piece of zone equipment
-	// in a zone is simulated
+    Array1D_bool DeadBandOrSetback; // true if zone temperature is in the thermostat deadband
+    // before any heating / cooling done
+    Array1D_bool Setback; // true if zone temperature has increased
+    // from previous setting
+    Array1D_bool CurDeadBandOrSetback; // same as above except updated after each piece of zone equipment
+    // in a zone is simulated
 
-	// Object Data
-	Array1D< ZoneSystemDemandData > ZoneSysEnergyDemand;
-	Array1D< ZoneSystemMoistureDemand > ZoneSysMoistureDemand;
+    // Object Data
+    Array1D<ZoneSystemDemandData> ZoneSysEnergyDemand;
+    Array1D<ZoneSystemMoistureDemand> ZoneSysMoistureDemand;
 
-	void
-	clear_state()
-	{
-		DeadBandOrSetback.deallocate();
-		Setback.deallocate();
-		CurDeadBandOrSetback.deallocate();
-		ZoneSysEnergyDemand.deallocate();
-		ZoneSysMoistureDemand.deallocate();
-	
-	}
+    void clear_state()
+    {
+        DeadBandOrSetback.deallocate();
+        Setback.deallocate();
+        CurDeadBandOrSetback.deallocate();
+        ZoneSysEnergyDemand.deallocate();
+        ZoneSysMoistureDemand.deallocate();
+    }
 
-} // DataZoneEnergyDemands
+} // namespace DataZoneEnergyDemands
 
-} // EnergyPlus
+} // namespace EnergyPlus

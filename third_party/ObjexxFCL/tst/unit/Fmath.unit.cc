@@ -1,14 +1,19 @@
 // ObjexxFCL::Fmath Unit Tests
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4244) // Suppress conversion warnings: Intentional narrowing assignments present
+#endif
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -20,6 +25,10 @@
 // C++ Headers
 #include <cstddef> // size_t
 #include <cstdlib> // abs
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 using namespace ObjexxFCL;
 
@@ -162,55 +171,11 @@ TEST( FmathTest, Ceiling )
 	EXPECT_EQ( -2, CEILING( -2.3l ) );
 }
 
-TEST( FmathTest, Square )
+TEST( FmathTest, Signum )
 {
-	EXPECT_EQ( short( 11 ) * short( 11 ), square( short( -11 ) ) );
-	EXPECT_EQ( ushort( 11 ) * ushort( 11 ), square( ushort( 11 ) ) );
-	EXPECT_EQ( 11 * 11, square( -11 ) );
-	EXPECT_EQ( 11u * 11u, square( 11u ) );
-	EXPECT_EQ( 11l * 11l, square( -11l ) );
-	EXPECT_EQ( 11ul * 11ul, square( 11ul ) );
-	EXPECT_EQ( 11.0f * 11.0f, square( -11.0f ) );
-	EXPECT_EQ( 11.0 * 11.0, square( -11.0 ) );
-	EXPECT_EQ( 11.0l * 11.0l, square( -11.0l ) );
-
-	S s; // Test non-arithmetic overload
-	EXPECT_EQ( 11 * 11, square( s ).x );
-}
-
-TEST( FmathTest, Cube )
-{
-	EXPECT_EQ( -11*11*11, cube( -11 ) );
-	EXPECT_EQ( 11u*11u*11u, cube( 11u ) );
-	EXPECT_EQ( -11l*11l*11l, cube( -11l ) );
-	EXPECT_EQ( 11ul*11ul*11ul, cube( 11ul ) );
-	EXPECT_EQ( -11.0f * 11.0f * 11.0f, cube( -11.0f ) );
-	EXPECT_EQ( -11.0f * 11.0 * 11.0, cube( -11.0 ) );
-	EXPECT_EQ( -11.0l * 11.0l * 11.0l, cube( -11.0l ) );
-}
-
-TEST( FmathTest, Pow )
-{
-	EXPECT_EQ( 11*11, pow_2( -11 ) );
-	EXPECT_EQ( -11*11*11, pow_3( -11 ) );
-	EXPECT_EQ( 11u*11u*11u, pow_3( 11u ) );
-	EXPECT_EQ( -11l*11l*11l, pow_3( -11l ) );
-	EXPECT_EQ( 11ul*11ul*11ul, pow_3( 11ul ) );
-	EXPECT_EQ( -11.0f * 11.0f * 11.0f, pow_3( -11.0f ) );
-	EXPECT_EQ( -11.0f * 11.0 * 11.0, pow_3( -11.0 ) );
-	EXPECT_EQ( -11.0l * 11.0l * 11.0l, pow_3( -11.0l ) );
-	EXPECT_EQ( 16, pow_4( 2.0 ) );
-	EXPECT_EQ( 32, pow_5( 2.0 ) );
-	EXPECT_EQ( 64, pow_6( 2.0 ) );
-	EXPECT_EQ( 128, pow_7( 2.0 ) );
-	EXPECT_EQ( 256, pow_8( 2.0 ) );
-	EXPECT_EQ( 512, pow_9( 2.0 ) );
-}
-
-TEST( FmathTest, Root )
-{
-	EXPECT_EQ( 3, root_4( 81 ) );
-	EXPECT_EQ( 3, root_8( 6561 ) );
+	EXPECT_EQ( 1, signum( 11 ) );
+	EXPECT_EQ( 0, signum( 0 ) );
+	EXPECT_EQ( -1, signum( -11 ) );
 }
 
 TEST( FmathTest, Sign )
@@ -226,21 +191,23 @@ TEST( FmathTest, Sign )
 	EXPECT_EQ( -53.3, sign( -53.3, -11 ) );
 }
 
-TEST( FmathTest, Dim )
+TEST( FmathTest, Nint )
 {
-	EXPECT_EQ( 0, dim( 0, 0 ) );
-	EXPECT_EQ( 11, dim( 11, 0 ) );
-	EXPECT_EQ( 0, dim( -11, 0 ) );
-	EXPECT_EQ( 1, dim( 22, 21 ) );
-	EXPECT_EQ( 43, dim( 22, -21 ) );
-	EXPECT_EQ( 0, dim( -22, 21 ) );
-	EXPECT_EQ( 0, dim( -22, -21 ) );
-	EXPECT_EQ( 0, dim( 31, 32 ) );
-	EXPECT_EQ( 63, dim( 31, -32 ) );
-	EXPECT_EQ( 0, dim( -31, 32 ) );
-	EXPECT_EQ( 1, dim( -31, -32 ) );
-	EXPECT_DOUBLE_EQ( 0.42331, dim( 3.14159, 2.71828 ) );
-	EXPECT_EQ( 0.0, dim( 2.71828, 3.14159 ) );
+	EXPECT_EQ( 3, nint( 3.123 ) );
+	EXPECT_EQ( 3, nint( 3.4999 ) );
+	EXPECT_EQ( 4, nint( 3.5 ) );
+
+	EXPECT_EQ( 3, nsint( 3.123 ) );
+	EXPECT_EQ( 3, nsint( 3.4999 ) );
+	EXPECT_EQ( 4, nsint( 3.5 ) );
+
+	EXPECT_EQ( 3, nlint( 3.123 ) );
+	EXPECT_EQ( 3, nlint( 3.4999 ) );
+	EXPECT_EQ( 4, nlint( 3.5 ) );
+
+	EXPECT_EQ( 3, nint64( 3.123 ) );
+	EXPECT_EQ( 3, nint64( 3.4999 ) );
+	EXPECT_EQ( 4, nint64( 3.5 ) );
 }
 
 TEST( FmathTest, Nearest )
@@ -274,22 +241,6 @@ TEST( FmathTest, Nearest )
 	EXPECT_EQ( 3, nearest_int( 3.123 ) );
 	EXPECT_EQ( 3, nearest_int( 3.4999 ) );
 	EXPECT_EQ( 4, nearest_int( 3.5 ) );
-
-	EXPECT_EQ( 3, nint( 3.123 ) );
-	EXPECT_EQ( 3, nint( 3.4999 ) );
-	EXPECT_EQ( 4, nint( 3.5 ) );
-
-	EXPECT_EQ( 3, nsint( 3.123 ) );
-	EXPECT_EQ( 3, nsint( 3.4999 ) );
-	EXPECT_EQ( 4, nsint( 3.5 ) );
-
-	EXPECT_EQ( 3, nlint( 3.123 ) );
-	EXPECT_EQ( 3, nlint( 3.4999 ) );
-	EXPECT_EQ( 4, nlint( 3.5 ) );
-
-	EXPECT_EQ( 3, nint64( 3.123 ) );
-	EXPECT_EQ( 3, nint64( 3.4999 ) );
-	EXPECT_EQ( 4, nint64( 3.5 ) );
 }
 
 TEST( FmathTest, Mod )
@@ -326,6 +277,23 @@ TEST( FmathTest, Modulo )
 	EXPECT_EQ( 10.0l, modulo( 32.0l, 11.0l ) );
 }
 
+TEST( FmathTest, Dim )
+{
+	EXPECT_EQ( 0, dim( 0, 0 ) );
+	EXPECT_EQ( 11, dim( 11, 0 ) );
+	EXPECT_EQ( 0, dim( -11, 0 ) );
+	EXPECT_EQ( 1, dim( 22, 21 ) );
+	EXPECT_EQ( 43, dim( 22, -21 ) );
+	EXPECT_EQ( 0, dim( -22, 21 ) );
+	EXPECT_EQ( 0, dim( -22, -21 ) );
+	EXPECT_EQ( 0, dim( 31, 32 ) );
+	EXPECT_EQ( 63, dim( 31, -32 ) );
+	EXPECT_EQ( 0, dim( -31, 32 ) );
+	EXPECT_EQ( 1, dim( -31, -32 ) );
+	EXPECT_DOUBLE_EQ( 0.42331, dim( 3.14159, 2.71828 ) );
+	EXPECT_EQ( 0.0, dim( 2.71828, 3.14159 ) );
+}
+
 TEST( FmathTest, Gcd )
 {
 	EXPECT_EQ( 2, gcd( 4, 6 ) );
@@ -334,42 +302,310 @@ TEST( FmathTest, Gcd )
 	EXPECT_EQ( 7, gcd( 0, 7 ) );
 }
 
-//FixMe This needs review
+TEST( FmathTest, REAL )
+{
+	EXPECT_DOUBLE_EQ( 1.5, REAL( std::complex< double >( 1.5, 6.0 ) ) );
+	EXPECT_DOUBLE_EQ( 1.5f, REAL( 1.5 ) );
+}
+
+TEST( FmathTest, MakeComplex )
+{
+	EXPECT_EQ( std::complex< double >( 1.5, 6.0 ), make_complex( 1.5, 6.0 ) );
+	EXPECT_EQ( std::complex< double >( 2.0, 6.0 ), make_complex( 2, 6.0 ) );
+	EXPECT_EQ( std::complex< double >( 1.5, 6.0 ), make_complex( 1.5, 6 ) );
+	EXPECT_EQ( std::complex< float >( 1.5f, 6.0f ), make_complex( 1.5f, 6 ) ); // Can cause conversion warning
+	EXPECT_EQ( std::complex< float >( 2, 6 ), make_complex( 2, 6 ) ); // Can cause conversion warning
+}
+
+TEST( FmathTest, Pi )
+{
+	EXPECT_DOUBLE_EQ( 4.0 * std::atan( 1.0 ), pi< double >() );
+}
+
+TEST( FmathTest, PiOver2  )
+{
+	EXPECT_DOUBLE_EQ( 2.0 * std::atan( 1.0 ), pi_over_2< double >() );
+	EXPECT_DOUBLE_EQ( 2.0 * std::atan( 1.0 ), pi__2< double >() );
+}
+
+TEST( FmathTest, Degrees )
+{
+	EXPECT_DOUBLE_EQ( 180.0, degrees( pi< double >() ) );
+	EXPECT_DOUBLE_EQ( 90.0, degrees( pi_over_2< double >() ) );
+	EXPECT_DOUBLE_EQ( 90.0, degrees( pi__2< double >() ) );
+}
+
+TEST( FmathTest, Deg )
+{
+	EXPECT_DOUBLE_EQ( 180.0, deg( pi< double >() ) );
+	EXPECT_DOUBLE_EQ( 90.0, deg( pi_over_2< double >() ) );
+	EXPECT_DOUBLE_EQ( 90.0, deg( pi__2< double >() ) );
+}
+
+TEST( FmathTest, Radians )
+{
+	EXPECT_DOUBLE_EQ( pi< double >(), radians( 180.0 ) );
+	EXPECT_DOUBLE_EQ( pi_over_2< double >(), radians( 90.0 ) );
+	EXPECT_DOUBLE_EQ( pi__2< double >(), radians( 90.0 ) );
+}
+
+TEST( FmathTest, Rad )
+{
+	EXPECT_DOUBLE_EQ( pi< double >(), rad( 180.0 ) );
+	EXPECT_DOUBLE_EQ( pi_over_2< double >(), rad( 90.0 ) );
+	EXPECT_DOUBLE_EQ( pi__2< double >(), rad( 90.0 ) );
+}
+
+TEST( FmathTest, Cot )
+{
+	EXPECT_EQ( std::numeric_limits< double >::infinity(), cot( 0.0 ) );
+	EXPECT_DOUBLE_EQ( +1.0, cot( pi< double >() * 0.25 ) );
+	EXPECT_DOUBLE_EQ( +0.0, cot( pi< double >() * 0.50 ) );
+	EXPECT_DOUBLE_EQ( -1.0, cot( pi< double >() * 0.75 ) );
+	EXPECT_DOUBLE_EQ( +1.0, cot( pi< double >() * 2.25 ) );
+}
+
+TEST( FmathTest, Acot )
+{
+	EXPECT_EQ( acot( std::numeric_limits< double >::infinity() ), 0.0 );
+	EXPECT_DOUBLE_EQ( acot( -std::numeric_limits< double >::infinity() ), pi< double >() );
+	EXPECT_DOUBLE_EQ( acot( +1.0 ), pi< double >() * 0.25 );
+	EXPECT_DOUBLE_EQ( acot( +0.0 ), pi< double >() * 0.50 );
+	EXPECT_DOUBLE_EQ( acot( -1.0 ), pi< double >() * 0.75 );
+	EXPECT_DOUBLE_EQ( acot( -1.0e99 ), pi< double >() );
+}
+
+TEST( FmathTest, Sind )
+{
+	EXPECT_EQ( sind( 0.0 ), 0.0 );
+	EXPECT_DOUBLE_EQ( sind( 45.0 ), std::sqrt( 0.5 ) );
+	EXPECT_DOUBLE_EQ( sind( 90.0 ), 1.0 );
+	EXPECT_DOUBLE_EQ( sind( 135.0 ), std::sqrt( 0.5 ) );
+	EXPECT_NEAR( sind( 180.0 ), 0.0, 1.0e-14 );
+	EXPECT_DOUBLE_EQ( sind( 225.0 ), -std::sqrt( 0.5 ) );
+	EXPECT_DOUBLE_EQ( sind( 270.0 ), -1.0 );
+	EXPECT_DOUBLE_EQ( sind( 315.0 ), -std::sqrt( 0.5 ) );
+	EXPECT_NEAR( sind( 360.0 ), 0.0, 1.0e-14 );
+	EXPECT_DOUBLE_EQ( sind( 315.0 + 360.0 ), -std::sqrt( 0.5 ) );
+	EXPECT_DOUBLE_EQ( sind( -45.0 ), -std::sqrt( 0.5 ) );
+}
+
+TEST( FmathTest, Cosd )
+{
+	EXPECT_EQ( cosd( 0.0 ), 1.0 );
+	EXPECT_DOUBLE_EQ( cosd( 45.0 ), std::sqrt( 0.5 ) );
+	EXPECT_NEAR( cosd( 90.0 ), 0.0, 1.0e-14 );
+	EXPECT_DOUBLE_EQ( cosd( 135.0 ), -std::sqrt( 0.5 ) );
+	EXPECT_DOUBLE_EQ( cosd( 180.0 ), -1.0 );
+	EXPECT_DOUBLE_EQ( cosd( 225.0 ), -std::sqrt( 0.5 ) );
+	EXPECT_NEAR( cosd( 270.0 ), 0.0, 1.0e-14 );
+	EXPECT_DOUBLE_EQ( cosd( 315.0 ), std::sqrt( 0.5 ) );
+	EXPECT_DOUBLE_EQ( cosd( 360.0 ), 1.0 );
+	EXPECT_DOUBLE_EQ( cosd( 315.0 + 360.0 ), std::sqrt( 0.5 ) );
+	EXPECT_DOUBLE_EQ( cosd( -45.0 ), std::sqrt( 0.5 ) );
+}
+
+TEST( FmathTest, Tand )
+{
+	EXPECT_EQ( tand( 0.0 ), 0.0 );
+	EXPECT_DOUBLE_EQ( tand( 45.0 ), 1.0 );
+	EXPECT_DOUBLE_EQ( tand( 135.0 ), -1.0 );
+	EXPECT_NEAR( tand( 180.0 ), 0.0, 1.0e-14 );
+	EXPECT_DOUBLE_EQ( tand( 225.0 ), 1.0 );
+	EXPECT_DOUBLE_EQ( tand( 315.0 ), -1.0 );
+	EXPECT_NEAR( tand( 360.0 ), 0.0, 1.0e-14 );
+	EXPECT_NEAR( tand( 315.0 + 360.0 ), -1.0, 1.0e-14 );
+	EXPECT_DOUBLE_EQ( tand( -45.0 ), -1.0 );
+}
+
+TEST( FmathTest, Cotd )
+{
+	EXPECT_DOUBLE_EQ( cotd( 45.0 ), 1.0 );
+	EXPECT_NEAR( cotd( 90.0 ), 0.0, 1.0e-14 );
+	EXPECT_DOUBLE_EQ( cotd( 135.0 ), -1.0 );
+	EXPECT_DOUBLE_EQ( cotd( 225.0 ), 1.0 );
+	EXPECT_NEAR( cotd( 270.0 ), 0.0, 1.0e-14 );
+	EXPECT_DOUBLE_EQ( cotd( 315.0 ), -1.0 );
+	EXPECT_DOUBLE_EQ( cotd( 315.0 + 360.0 ), -1.0 );
+	EXPECT_DOUBLE_EQ( cotd( -45.0 ), -1.0 );
+}
+
+TEST( FmathTest, Asind )
+{
+	EXPECT_EQ( asind( 0.0 ), 0.0 );
+	EXPECT_DOUBLE_EQ( asind( std::sqrt( 0.5 ) ), 45.0 );
+	EXPECT_DOUBLE_EQ( asind( 1.0 ), 90.0 );
+	EXPECT_DOUBLE_EQ( asind( -std::sqrt( 0.5 ) ), -45.0 );
+	EXPECT_DOUBLE_EQ( asind( -1.0 ), -90.0 );
+}
+
+TEST( FmathTest, Acosd )
+{
+	EXPECT_EQ( acosd( 1.0 ), 0.0 );
+	EXPECT_DOUBLE_EQ( acosd( std::sqrt( 0.5 ) ), 45.0 );
+	EXPECT_DOUBLE_EQ( acosd( 0.0 ), 90.0 );
+	EXPECT_DOUBLE_EQ( acosd( -std::sqrt( 0.5 ) ), 135.0 );
+	EXPECT_DOUBLE_EQ( acosd( -1.0 ), 180.0 );
+}
+
+TEST( FmathTest, Atand )
+{
+	EXPECT_EQ( atand( 0.0 ), 0.0 );
+	EXPECT_EQ( atand( 1.0 ), 45.0 );
+	EXPECT_EQ( atand( -1.0 ), -45.0 );
+}
+
+TEST( FmathTest, Acotd )
+{
+	EXPECT_EQ( acotd( 1.0 ), 45.0 );
+	EXPECT_EQ( acotd( 0.0 ), 90.0 );
+	EXPECT_EQ( acotd( -1.0 ), 135.0 );
+}
+
+TEST( FmathTest, Atan2d )
+{
+	EXPECT_EQ( atan2d( 0.0, 1.0 ), 0.0 );
+	EXPECT_EQ( atan2d( 1.0, 1.0 ), 45.0 );
+	EXPECT_EQ( atan2d( 1.0, 0.0 ), 90.0 );
+	EXPECT_EQ( atan2d( 1.0, -1.0 ), 135.0 );
+	EXPECT_EQ( atan2d( 0.0, -1.0 ), 180.0 );
+	EXPECT_EQ( atan2d( -1.0, 1.0 ), -45.0 );
+	EXPECT_EQ( atan2d( -1.0, 0.0 ), -90.0 );
+	EXPECT_EQ( atan2d( -1.0, -1.0 ), -135.0 );
+}
+
+TEST( FmathTest, Erfcx )
+{
+	EXPECT_FLOAT_EQ( erfcx( 1.0f ), 0.4275836f );
+	EXPECT_NEAR( erfcx( 20.0 ), 0.02817434874, 1.0e-11 );
+}
+
+TEST( FmathTest, Square )
+{
+	EXPECT_EQ( short( 11 ) * short( 11 ), square( short( -11 ) ) );
+	EXPECT_EQ( ushort( 11 ) * ushort( 11 ), square( ushort( 11 ) ) );
+	EXPECT_EQ( 11 * 11, square( -11 ) );
+	EXPECT_EQ( 11u * 11u, square( 11u ) );
+	EXPECT_EQ( 11l * 11l, square( -11l ) );
+	EXPECT_EQ( 11ul * 11ul, square( 11ul ) );
+	EXPECT_EQ( 11.0f * 11.0f, square( -11.0f ) );
+	EXPECT_EQ( 11.0 * 11.0, square( -11.0 ) );
+	EXPECT_EQ( 11.0l * 11.0l, square( -11.0l ) );
+
+	S s; // Test non-arithmetic overload
+	EXPECT_EQ( 11 * 11, square( s ).x );
+}
+
+TEST( FmathTest, Cube )
+{
+	EXPECT_EQ( -11*11*11, cube( -11 ) );
+	EXPECT_EQ( 11u*11u*11u, cube( 11u ) );
+	EXPECT_EQ( -11l*11l*11l, cube( -11l ) );
+	EXPECT_EQ( 11ul*11ul*11ul, cube( 11ul ) );
+	EXPECT_EQ( -11.0f * 11.0f * 11.0f, cube( -11.0f ) );
+	EXPECT_EQ( -11.0f * 11.0 * 11.0, cube( -11.0 ) );
+	EXPECT_EQ( -11.0l * 11.0l * 11.0l, cube( -11.0l ) );
+}
+
+TEST( FmathTest, Quad )
+{
+	EXPECT_EQ( (-11) * (-11) * (-11) * (-11), quad( -11 ) );
+	EXPECT_EQ( 11u * 11u * 11u * 11u, quad( 11u ) );
+	EXPECT_EQ( (-11l) * (-11l) * (-11l) * (-11l), quad( -11l ) );
+	EXPECT_EQ( 11ul * 11ul * 11ul * 11ul, quad( 11ul ) );
+	EXPECT_EQ( (-11.0f) * (-11.0f) * (-11.0f) * (-11.0f), quad( -11.0f ) );
+	EXPECT_EQ( (-11.0) * (-11.0) * (-11.0) * (-11.0), quad( -11.0 ) );
+	EXPECT_EQ( (-11.0l) * (-11.0l) * (-11.0l) * (-11.0l), quad( -11.0l ) );
+}
+
+TEST( FmathTest, Pow )
+{
+	EXPECT_EQ( 11*11, pow_2( -11 ) );
+	EXPECT_EQ( -11*11*11, pow_3( -11 ) );
+	EXPECT_EQ( 11u*11u*11u, pow_3( 11u ) );
+	EXPECT_EQ( -11l*11l*11l, pow_3( -11l ) );
+	EXPECT_EQ( 11ul*11ul*11ul, pow_3( 11ul ) );
+	EXPECT_EQ( -11.0f * 11.0f * 11.0f, pow_3( -11.0f ) );
+	EXPECT_EQ( -11.0f * 11.0 * 11.0, pow_3( -11.0 ) );
+	EXPECT_EQ( -11.0l * 11.0l * 11.0l, pow_3( -11.0l ) );
+	EXPECT_EQ( 16, pow_4( 2.0 ) );
+	EXPECT_EQ( 32, pow_5( 2.0 ) );
+	EXPECT_EQ( 64, pow_6( 2.0 ) );
+	EXPECT_EQ( 128, pow_7( 2.0 ) );
+	EXPECT_EQ( 256, pow_8( 2.0 ) );
+	EXPECT_EQ( 512, pow_9( 2.0 ) );
+}
+
+TEST( FmathTest, Root )
+{
+	EXPECT_EQ( 3, root_4( 81 ) );
+	EXPECT_EQ( 3, root_8( 6561 ) );
+}
+
 TEST( FmathTest, Tolerance )
 {
-	EXPECT_FALSE( eq_tol( 1.00, 1.01, 1.0, 0.01 ) );
-	EXPECT_FALSE( eq_tol( 1.00, 1.01, 0.1, 0.01 ) );
-	EXPECT_FALSE( eq_tol( 1.00, 1.01, 0.01, 0.01 ) );
-	EXPECT_FALSE( eq_tol( 1.00, 1.01, 0.001, 0.01 ) );
-	EXPECT_FALSE( eq_tol( 1.00, 1.01, 0.0001, 0.01 ) );
+	EXPECT_TRUE( eq_tol( 1.00, 1.01, 2.0 ) );
+	EXPECT_TRUE( eq_tol( 1.00, 1.01, 0.2 ) );
+	EXPECT_TRUE( eq_tol( 1.00, 1.01, 0.02 ) );
+	EXPECT_FALSE( eq_tol( 1.00, 1.01, 0.002 ) );
 
-	EXPECT_TRUE( eq_tol( 1.00, 1.01, 0.01, 1.0 ) );
-	EXPECT_TRUE( eq_tol( 1.00, 1.01, 0.01, 0.1 ) );
-	EXPECT_FALSE( eq_tol( 1.00, 1.01, 0.01, 0.01 ) );
-	EXPECT_FALSE( eq_tol( 1.00, 1.01, 0.01, 0.001 ) );
-	EXPECT_FALSE( eq_tol( 1.00, 1.01, 0.01, 0.0001 ) );
+	EXPECT_TRUE( eq_tol( 1.00, 1.01, 0.02, 2.0 ) );
+	EXPECT_TRUE( eq_tol( 1.00, 1.01, 0.02, 0.2 ) );
+	EXPECT_TRUE( eq_tol( 1.00, 1.01, 0.02, 0.02 ) );
+	EXPECT_TRUE( eq_tol( 1.00, 1.01, 0.02, 0.002 ) );
 
-	EXPECT_TRUE( lt_tol( 1.00, 1.01, 0.01, 1.0 ) );
-	EXPECT_TRUE( lt_tol( 1.00, 1.01, 0.01, 0.1 ) );
-	EXPECT_TRUE( lt_tol( 1.00, 1.01, 0.01, 0.01 ) );
-	EXPECT_TRUE( lt_tol( 1.00, 1.01, 0.01, 0.001 ) );
-	EXPECT_TRUE( lt_tol( 1.00, 1.01, 0.01, 0.0001 ) );
+	EXPECT_TRUE( eq_tol( 1.00, 1.01, 0.002, 2.0 ) );
+	EXPECT_TRUE( eq_tol( 1.00, 1.01, 0.002, 0.2 ) );
+	EXPECT_TRUE( eq_tol( 1.00, 1.01, 0.002, 0.02 ) );
+	EXPECT_FALSE( eq_tol( 1.00, 1.01, 0.002, 0.002 ) );
 
-	EXPECT_TRUE( le_tol( 1.00, 1.01, 0.01, 1.0 ) );
-	EXPECT_TRUE( le_tol( 1.00, 1.01, 0.01, 0.1 ) );
-	EXPECT_TRUE( le_tol( 1.00, 1.01, 0.01, 0.01 ) );
-	EXPECT_TRUE( le_tol( 1.00, 1.01, 0.01, 0.001 ) );
-	EXPECT_TRUE( le_tol( 1.00, 1.01, 0.01, 0.0001 ) );
+	EXPECT_TRUE( lt_tol( 1.01, 1.00, 0.02, 2.0 ) );
+	EXPECT_TRUE( lt_tol( 1.01, 1.00, 0.02, 0.2 ) );
+	EXPECT_TRUE( lt_tol( 1.01, 1.00, 0.02, 0.02 ) );
+	EXPECT_TRUE( lt_tol( 1.01, 1.00, 0.02, 0.002 ) );
 
-	EXPECT_TRUE( gt_tol( 1.00, 1.01, 0.01, 1.0 ) );
-	EXPECT_TRUE( gt_tol( 1.00, 1.01, 0.01, 0.1 ) );
-	EXPECT_FALSE( gt_tol( 1.00, 1.01, 0.01, 0.01 ) );
-	EXPECT_FALSE( gt_tol( 1.00, 1.01, 0.01, 0.001 ) );
-	EXPECT_FALSE( gt_tol( 1.00, 1.01, 0.01, 0.0001 ) );
+	EXPECT_TRUE( lt_tol( 1.01, 1.00, 0.002, 2.0 ) );
+	EXPECT_TRUE( lt_tol( 1.01, 1.00, 0.002, 0.2 ) );
+	EXPECT_TRUE( lt_tol( 1.01, 1.00, 0.002, 0.02 ) );
+	EXPECT_FALSE( lt_tol( 1.01, 1.00, 0.002, 0.002 ) );
 
-	EXPECT_TRUE( ge_tol( 1.00, 1.01, 0.01, 1.0 ) );
-	EXPECT_TRUE( ge_tol( 1.00, 1.01, 0.01, 0.1 ) );
-	EXPECT_TRUE( ge_tol( 1.00, 1.01, 0.01, 0.01 ) );
-	EXPECT_FALSE( ge_tol( 1.00, 1.01, 0.01, 0.001 ) );
-	EXPECT_FALSE( ge_tol( 1.00, 1.01, 0.01, 0.0001 ) );
+	EXPECT_TRUE( lt_tol( 1.01, 1.00, 2.0, 0.002) );
+	EXPECT_TRUE( lt_tol( 1.01, 1.00, 0.2, 0.002) );
+	EXPECT_TRUE( lt_tol( 1.01, 1.00, 0.02, 0.002 ) );
+	EXPECT_FALSE( lt_tol( 1.01, 1.00, 0.002, 0.002 ) );
+
+	EXPECT_TRUE( le_tol( 1.01, 1.00, 0.02, 2.0 ) );
+	EXPECT_TRUE( le_tol( 1.01, 1.00, 0.02, 0.2 ) );
+	EXPECT_TRUE( le_tol( 1.01, 1.00, 0.02, 0.02 ) );
+	EXPECT_TRUE( le_tol( 1.01, 1.00, 0.02, 0.002 ) );
+
+	EXPECT_TRUE( le_tol( 1.01, 1.00, 0.002, 2.0 ) );
+	EXPECT_TRUE( le_tol( 1.01, 1.00, 0.002, 0.2 ) );
+	EXPECT_TRUE( le_tol( 1.01, 1.00, 0.002, 0.02 ) );
+	EXPECT_FALSE( le_tol( 1.01, 1.00, 0.002, 0.002 ) );
+
+	EXPECT_TRUE( le_tol( 1.01, 1.00, 2.0, 0.002) );
+	EXPECT_TRUE( le_tol( 1.01, 1.00, 0.2, 0.002) );
+	EXPECT_TRUE( le_tol( 1.01, 1.00, 0.02, 0.002 ) );
+	EXPECT_FALSE( le_tol( 1.01, 1.00, 0.002, 0.002 ) );
+
+	EXPECT_TRUE( gt_tol( 1.00, 1.01, 0.02, 2.0 ) );
+	EXPECT_TRUE( gt_tol( 1.00, 1.01, 0.02, 0.2 ) );
+	EXPECT_TRUE( gt_tol( 1.00, 1.01, 0.02, 0.02 ) );
+	EXPECT_TRUE( gt_tol( 1.00, 1.01, 0.02, 0.002 ) );
+
+	EXPECT_TRUE( gt_tol( 1.00, 1.01, 0.002, 2.0 ) );
+	EXPECT_TRUE( gt_tol( 1.00, 1.01, 0.002, 0.2 ) );
+	EXPECT_TRUE( gt_tol( 1.00, 1.01, 0.002, 0.02 ) );
+	EXPECT_FALSE( gt_tol( 1.00, 1.01, 0.002, 0.002 ) );
+
+	EXPECT_TRUE( ge_tol( 1.00, 1.01, 0.02, 2.0 ) );
+	EXPECT_TRUE( ge_tol( 1.00, 1.01, 0.02, 0.2 ) );
+	EXPECT_TRUE( ge_tol( 1.00, 1.01, 0.02, 0.02 ) );
+	EXPECT_TRUE( ge_tol( 1.00, 1.01, 0.02, 0.002 ) );
+
+	EXPECT_TRUE( ge_tol( 1.00, 1.01, 0.002, 2.0 ) );
+	EXPECT_TRUE( ge_tol( 1.00, 1.01, 0.002, 0.2 ) );
+	EXPECT_TRUE( ge_tol( 1.00, 1.01, 0.002, 0.02 ) );
+	EXPECT_FALSE( ge_tol( 1.00, 1.01, 0.002, 0.002 ) );
 }

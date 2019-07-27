@@ -20,7 +20,7 @@ The following general guidelines are to be followed when choosing names for new 
 \item
   Although they should be avoided where practical, acronyms (and symbols) are acceptable where their use is commonplace and contributes to conciseness in identifying a complex engineering concept. Examples of acceptable acronyms for output variable names are listed in the table below.
 \item
-  Abbreviations should not be used and the words spelled out completely (except for Units).
+  Abbreviations should not be used and the words spelled out completely.
 \item
   Where practical, reuse existing names for output variables across different models for similar components.~ For example, a new model for a zone baseboard heater should reuse the existing names for output variables already in use for other baseboard models rather than use new names that distinguish the kind of baseboard model that the output is associated with.~ The user-defined name of the component should allow the user to know the association without the basic name of the output variable reflecting that association.~ This has the advantage of reducing the total number of output variable names and making it simpler for users.
 \item
@@ -31,7 +31,7 @@ The following general guidelines are to be followed when choosing names for new 
   Output variable names shall always be less than 100 characters long.
 \end{itemize}
 
-An output variable name should be constructed from up to six separate name elements.~ The following diagram shows the elements and the order that they are to be used in the name.~ The first three are each somewhat optional and are used as needed to identify the type of engineering model, object, or device being reported on.~ The last three are nearly always needed. Units are always needed (as described below.
+An output variable name should be constructed from up to five separate name elements.~ The following diagram shows the elements and the order that they are to be used in the name.~ The first three are each somewhat optional and are used as needed to identify the type of engineering model, object, or device being reported on.~ The last two are nearly always needed. .
 
 \begin{figure}[hbtp] % fig 2
 \centering
@@ -49,11 +49,9 @@ An output variable name should be constructed from up to six separate name eleme
 
 \textbf{Dimensional Nature.} This name element is used to identify the nature of the physical dimensions of the quantity being reported in words.~ This name element is nearly always needed. This name element is the final part of the name so that names end with terms that reflect the nature of the value being reported. However, the name element should not be the actual units.~ For example, an output that has units of degrees Celsius, the final word in the name should be ``Temperature.''~ Or an output for air flow that has units of kg/s, the final words in the name should be ``Mass Flow Rate.''~ When reporting on electricity use in Watts, the term ``Power'' is used; however most other uses of Watts use the term ``Rate.''
 
-\textbf{Units}. This name element is used to identify the units of the value being reported.~ ~Units of output variables are strictly SI, as used in EnergyPlus.~ Units are concatenated on the end of the name with square brackets and separated by a space and.~ Dimensionless quantities shall use empty brackets ``{[} {]}.''~ The preferred set of units is listed at the top of the Energy+.idd file. Units are always abbreviated.
+In some situations, a model may lend itself to generating a series of related output variables that depend on input.~ For example a surface heat transfer model may have results for numerous individual nodes or cells across the thickness of the surfaces.~ The number of nodes in the model will vary at runtime depending on the Construction.~ When this is the case, the standard approach used in EnergyPlus is to produce a series of output variables by enumerating the output variable name (rather than the key value) to generate a specific name for each instance.~ The generated name element for each instance in the series is appended to the end of the name and should end in a number. For example, the third node in a stratified tank model is called ``Chilled Water Thermal Storage Temperature Node 3 {[}C{]}.''~ This is done to facilitate wildcarding when postprocessing output.
 
-In some situations, a model may lend itself to generating a series of related output variables that depend on input.~ For example a surface heat transfer model may have results for numerous individual nodes or cells across the thickness of the surfaces.~ The number of nodes in the model will vary at runtime depending on the Construction.~ When this is the case, the standard approach used in EnergyPlus is to produce a series of output variables by enumerating the output variable name (rather than the key value) to generate a specific name for each instance.~ The generated name element for each instance in the series is appended to the end of the name (but before the Units element) and should end in a number. For example, the third node in a stratified tank model is called ``Chilled Water Thermal Storage Temperature Node 3 {[}C{]}.''~ This is done to facilitate wildcarding when postprocessing output.
-
-For Version 8.0, a comprehensive effort was made to rename output variables to follow the guidelines and scheme described above.~ As of Version 8.0 the existing output variables demonstrate the pattern and should serve as good examples to follow for future output variables. The following table lists a few examples of terms, but these are not meant to be comprehensive or restrictive.~ It is expected that new models may have valid reasons to introduce new terms and units. Developers should examine RDD output files for comprehensive lists of example output variable names.
+For Version 8.0, a comprehensive effort was made to rename output variables to follow the guidelines and scheme described above.~ As of Version 8.0 the existing output variables demonstrate the pattern and should serve as good examples to follow for future output variables. The following table lists a few examples of terms, but these are not meant to be comprehensive or restrictive.~ It is expected that new models may have valid reasons to introduce new terms. Developers should examine RDD output files for comprehensive lists of example output variable names.
 
 % table 5
 \begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
@@ -84,171 +82,63 @@ Setpoint Manager & Node & Baseboard & Status \tabularnewline
 
 ~The following table lists acronyms and symbols used in output variable names.
 
-Table 6. Output Variable Example Abbreviations
 
-Acronym
+% table 6
+\begin{longtable}[c]{p{1.5in}p{4.5in}}
+\caption{Output Variable Example Abbreviations \label{table:output-variable-example-abbreviations}} \tabularnewline
+\toprule 
+Acronym & Definition \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Output Variable Example Abbreviations} \tabularnewline
+\toprule 
+Acronym & Definition \tabularnewline
+\midrule
+\endhead
+AC & Alternating Current\tabularnewline
+AFN & AirflowNetwork\tabularnewline
+Ar & Argon\tabularnewline
+ASHRAE & American Society of Heating, Refrigeration, and Air-Conditioning Engineers, Inc.\tabularnewline
+BSDF & Bidirectional Scattering Distribution Function\tabularnewline
+CEN & European Committee for Standardization (Comite Europeen de Normalisation)\tabularnewline
+CH4 & Methane\tabularnewline
+CO & Carbon Monoxide\tabularnewline
+CO2 & Carbon Dioxide\tabularnewline
+CondFD & Conduction Finite Difference\tabularnewline
+COP & Coefficient of Performance\tabularnewline
+DC & Direct Current\tabularnewline
+DX & Direct Expansion\tabularnewline
+EIR & Energy Input Ratio\tabularnewline
+EMPD & Effective Moisture Penetration Depth\tabularnewline
+H20 & Water\tabularnewline
+HAMT & Heat and Moisture Transfer\tabularnewline
+Hg & Mercury\tabularnewline
+HHV & Higher Heating Value\tabularnewline
+HVAC & Heating Ventilation and Air Conditioning\tabularnewline
+KSU & Kansas State University\tabularnewline
+LHV & Lower Heating Value\tabularnewline
+N2 & Nitrogen\tabularnewline
+N2O & Nitrous Oxide\tabularnewline
+NH3 & Ammonia\tabularnewline
+NMVOC & Non-Methane Volatile Organic Compounds\tabularnewline
+NOx & Nitrogen Oxides\tabularnewline
+O2 & Oxygen\tabularnewline
+Pb & Lead\tabularnewline
+PM & Particulate Matter\tabularnewline
+PM10 & Particulate Matter of 10 microns or less in size\tabularnewline
+PM2.5 & Particulate Matter of 2.5 microns or less in size\tabularnewline
+PMV & Predicted Mean Vote\tabularnewline
+PPD & Percent People Dissatisfied\tabularnewline
+PV & Photovoltaic\tabularnewline
+PVT & Photovoltaic-Thermal\tabularnewline
+SO2 & Sulfur Dioxide\tabularnewline
+VAV & Variable Air Volume\tabularnewline
+VRF & Variable Refrigerant Flow\tabularnewline
+WAHP & Water to Air Heat Pump\tabularnewline
+\bottomrule
+\end{longtable}
 
-Definition
-
-AC
-
-Alternating Current
-
-AFN
-
-AirflowNetwork
-
-Ar
-
-Argon
-
-ASHRAE
-
-American Society of Heating, Refrigeration, and Air-Conditioning Engineers, Inc.
-
-BSDF
-
-Bidirectional Scattering Distribution Function
-
-CEN
-
-European Committee for Standardization (Comite Europeen de Normalisation)
-
-CH4
-
-Methane
-
-CO
-
-Carbon Monoxide
-
-CO2
-
-Carbon Dioxide
-
-CondFD
-
-Conduction Finite Difference
-
-COP
-
-Coefficient of Performance
-
-DC
-
-Direct Current
-
-DX
-
-Direct Expansion
-
-EIR
-
-Energy Input Ratio
-
-EMPD
-
-Effective Moisture Penetration Depth
-
-H20
-
-Water
-
-HAMT
-
-Heat and Moisture Transfer
-
-Hg
-
-Mercury
-
-HHV
-
-Higher Heating Value
-
-HVAC
-
-Heating Ventilation and Air Conditioning
-
-KSU
-
-Kansas State University
-
-LHV
-
-Lower Heating Value
-
-N2
-
-Nitrogen
-
-N2O
-
-Nitrous Oxide
-
-NH3
-
-Ammonia
-
-NMVOC
-
-Non-Methane Volatile Organic Compounds
-
-NOx
-
-Nitrogen Oxides
-
-O2
-
-Oxygen
-
-Pb
-
-Lead
-
-PM
-
-Particulate Matter
-
-PM10
-
-Particulate Matter of 10 microns or less in size
-
-PM2.5
-
-Particulate Matter of 2.5 microns or less in size
-
-PMV
-
-Predicted Mean Vote
-
-PPD
-
-Percent People Dissatisfied
-
-PV
-
-Photovoltaic
-
-PVT
-
-Photovoltaic-Thermal
-
-SO2
-
-Sulfur Dioxide
-
-VAV
-
-Variable Air Volume
-
-VRF
-
-Variable Refrigerant Flow
-
-WAHP
-
-Water to Air Heat Pump
 
 \subsection{What are Meters?}\label{what-are-meters}
 
@@ -265,34 +155,37 @@ In EnergyPlus meters are an additional output reporting capability. A meter is a
 
 Meter output variables are created at the same time and in the same manner as ordinary output variables. SetupOutputVariable is called but the optional arguments ResourceTypeKey, EndUseKey, and GroupKey must be used in addition to the usual arguments. For example, in the electric steam humidifier module
 
-CALL SetupOutputVariable(`Humidifier Electric Energy {[}J{]}', \&
-
-~ Humidifier(HumNum)\%ElecUseEnergy, `System',`Sum', \&
-
-~ Humidifier(HumNum)\%Name)
+\begin{lstlisting}
+SetupOutputVariable( "Humidifier Electric Energy", OutputProcessor::Unit::J, 
+  Humidifier( HumNum ).ElecUseEnergy, "System", "Sum", Humidifier( HumNum ).Name);
+ 
+\end{lstlisting}
 
 creates an output variable labeled `Humidifier Electric Energy {[}J{]}' with the value of Humidifier(HumNum)\%ElecUseEnergy.
 
-CALL SetupOutputVariable(`Humidifier Electric Energy {[}J{]}', \&
+\begin{lstlisting}
+SetupOutputVariable( "Humidifier Electric Energy", OutputProcessor::Unit::J, 
+  Humidifier( HumNum ).ElecUseEnergy, "System", "Sum", Humidifier( HumNum ).Name, _, 
+  "ELECTRICITY", "HUMIDIFIER", _, "System" );
 
-~ Humidifier(HumNum)\%ElecUseEnergy, `System',`Sum', \&
+\end{lstlisting}
 
-~ Humidifier(HumNum)\%Name, \& ~ ResourceTypeKey = `ELECTRICITY',EndUseKey = `HUMIDIFIER', \&
 
-~ GroupKey = `System')
-
-Creates the same output variable but in addition creates a meter output variable Humidifier:Electricity {[}J{]}. This variable will contain the sum of all the electricity consumption of the humidifiers in the system. In addition, this electrical consumption will be added into the meter variables Electricity:HVAC {[}J{]} and Electricity:Facility {[}J{]}.
+Creates the same output variable but in addition creates a meter output variable Humidifier:Electricity . This variable will contain the sum of all the electricity consumption of the humidifiers in the system. In addition, this electrical consumption will be added into the meter variables Electricity:HVAC and Electricity:Facility.
 
 \subsection{Rules for Meter Variables}\label{rules-for-meter-variables}
 
 There are a number of rules developers must follow in order to account for all electricity and fuel consumption as well as to prevent consumables from being double counted.
 
-t~Electricity and fuel meters must always be defined at the simple component level. Some EnergyPlus components are compound components: they are built up from simple components. Examples are fan coils (composed of heating coils, cooling coils, and fans), terminal units etc. Some example simple components are heating and cooling coils, fans, humidifiers etc. Electricity and fuel consumption should always be metered at the simple component level and never at the compound component level. This prevents double counting of the fuel or energy consumption.
-
-t~A variable should be metered once only. This means a variable can be assigned to only one resource type and to only one end use category.
-
-t~Energy Transfer should be metered in the same way as fuel or electricity use. Energy Transfer meters should only be defined for simple components and should be assigned the same end use category as the fuel or electricity consumption.
-
-t~All fuel and electricity consumption must be put in some (one) meter.
-
-t~Use Energy Transfer judiciously; if in doubt, leave it out.
+\begin{itemize}
+\item
+Electricity and fuel meters must always be defined at the simple component level. Some EnergyPlus components are compound components: they are built up from simple components. Examples are fan coils (composed of heating coils, cooling coils, and fans), terminal units etc. Some example simple components are heating and cooling coils, fans, humidifiers etc. Electricity and fuel consumption should always be metered at the simple component level and never at the compound component level. This prevents double counting of the fuel or energy consumption.
+\item
+A variable should be metered once only. This means a variable can be assigned to only one resource type and to only one end use category.
+\item
+Energy Transfer should be metered in the same way as fuel or electricity use. Energy Transfer meters should only be defined for simple components and should be assigned the same end use category as the fuel or electricity consumption.
+\item
+All fuel and electricity consumption must be put in some (one) meter.
+\item
+Use Energy Transfer judiciously; if in doubt, leave it out.
+\end{itemize}

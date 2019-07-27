@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::AirflowNetworkSolver unit tests
 
@@ -71,29 +60,28 @@ using namespace EnergyPlus;
 using namespace DataHeatBalance;
 using namespace HeatBalanceManager;
 
-TEST_F( EnergyPlusFixture, ConstructionInternalSource )
+TEST_F(EnergyPlusFixture, ConstructionInternalSource)
 {
 
-	std::string const idf_objects = delimited_string({
-		"	Version,8.4;	",
-		"	Construction:InternalSource,	",
-			"	Slab Floor with Radiant, !- Name",
-			"	4,                       !- Source Present After Layer Number",
-			"	4,                       !- Temperature Calculation Requested After Layer Number",
-			"	2,                       !- Dimensions for the CTF Calculation",
-			"	0.3048,                  !- Tube Spacing {m}",
-			"	CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer",
-			"	INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2",
-			"	GYP1,                    !- Layer 3",
-			"	GYP2,                    !- Layer 4",
-			"	FINISH FLOORING - TILE 1 / 16 IN;  !- Layer 5",
-	});
+    std::string const idf_objects = delimited_string({
+        "	Construction:InternalSource,	",
+        "	Slab Floor with Radiant, !- Name",
+        "	4,                       !- Source Present After Layer Number",
+        "	4,                       !- Temperature Calculation Requested After Layer Number",
+        "	2,                       !- Dimensions for the CTF Calculation",
+        "	0.3048,                  !- Tube Spacing {m}",
+        "	CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer",
+        "	INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2",
+        "	GYP1,                    !- Layer 3",
+        "	GYP2,                    !- Layer 4",
+        "	FINISH FLOORING - TILE 1 / 16 IN;  !- Layer 5",
+    });
 
-	ASSERT_FALSE( process_idf( idf_objects ) );
+    ASSERT_TRUE(process_idf(idf_objects));
 
-	bool errorsFound( false );
+    bool errorsFound(false);
 
-	GetConstructData( errorsFound );
+    GetConstructData(errorsFound);
 
-	EXPECT_NEAR( 0.1524, Construct( 1 ).ThicknessPerpend, 0.0001 );
+    EXPECT_NEAR(0.1524, Construct(1).ThicknessPerpend, 0.0001);
 }

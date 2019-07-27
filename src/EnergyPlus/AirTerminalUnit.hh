@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef AirTerminalUnit_hh_INCLUDED
 #define AirTerminalUnit_hh_INCLUDED
@@ -68,103 +57,96 @@
 namespace EnergyPlus {
 
 // types of air terminal units, refactored from old DataDefineEquip
-enum AirTerminalUnitType {
-	notYetDetermined,
-	dualDuctConstVolume,
-	dualDuctVAV,
-	singleDuctVAVReheat,
-	singleDuctConstVolReheat,
-	singleDuctVAVNoReheat,
-	singleDuct_SeriesPIU_Reheat,
-	singleDuct_ParallelPIU_Reheat,
-	singleDuct_ConstVol_4PipeInduc,
-	singleDuctVAVReheatVSFan,
-	singleDuctCBVAVReheat,
-	singleDuctCBVAVNoReheat,
-	singleDuctConstVolCooledBeam,
-	dualDuctVAVOutdoorAir,
-	singleDuctUserDefined,
-	singleDuctInletATMixer,
-	singleDuctSupplyATMixer,
-	singleDuctConstVolFourPipeBeam
+enum AirTerminalUnitType
+{
+    notYetDetermined,
+    dualDuctConstVolume,
+    dualDuctVAV,
+    singleDuctVAVReheat,
+    singleDuctConstVolReheat,
+    singleDuctConstVolNoReheat,
+    singleDuctVAVNoReheat,
+    singleDuct_SeriesPIU_Reheat,
+    singleDuct_ParallelPIU_Reheat,
+    singleDuct_ConstVol_4PipeInduc,
+    singleDuctVAVReheatVSFan,
+    singleDuctCBVAVReheat,
+    singleDuctCBVAVNoReheat,
+    singleDuctConstVolCooledBeam,
+    dualDuctVAVOutdoorAir,
+    singleDuctUserDefined,
+    singleDuctATMixer,
+    singleDuctConstVolFourPipeBeam
 };
 
 // base class for all air distribution units.  zone air terminals for connecting to central air handlers
 class AirTerminalUnit
 {
 protected: // Creation
+    // Default Constructor
+    AirTerminalUnit()
+        : terminalType(notYetDetermined), aDUNum(0), airAvailSchedNum(0), airAvailable(false), vDotDesignPrimAir(0.0),
+          vDotDesignPrimAirWasAutosized(false), mDotDesignPrimAir(0.0), airInNodeNum(0), airOutNodeNum(0), zoneIndex(0), zoneNodeIndex(0),
+          ctrlZoneInNodeIndex(0), airLoopNum(0)
+    {
+    }
 
-	// Default Constructor
-	AirTerminalUnit() :
-		terminalType( notYetDetermined ),
-		aDUNum( 0 ),
-		airAvailSchedNum( 0 ),
-		airAvailable( false ),
-		vDotDesignPrimAir( 0.0 ),
-		vDotDesignPrimAirWasAutosized( false ),
-		mDotDesignPrimAir( 0.0 ),
-		airInNodeNum( 0 ),
-		airOutNodeNum( 0 ),
-		zoneIndex( 0 ),
-		zoneNodeIndex( 0 )
-	{}
+    // Copy Constructor
+    AirTerminalUnit(AirTerminalUnit const &) = default;
 
-	// Copy Constructor
-	AirTerminalUnit( AirTerminalUnit const & ) = default;
-
-	// Move Constructor
-#if !defined(_MSC_VER) || defined(__INTEL_COMPILER) || (_MSC_VER>=1900)
-	AirTerminalUnit( AirTerminalUnit && ) = default;
+    // Move Constructor
+#if !defined(_MSC_VER) || defined(__INTEL_COMPILER) || (_MSC_VER >= 1900)
+    AirTerminalUnit(AirTerminalUnit &&) = default;
 #endif
 
 public: // Creation
-
-	// Destructor
-	virtual
-	~AirTerminalUnit()
-	{}
+    // Destructor
+    virtual ~AirTerminalUnit()
+    {
+    }
 
 protected: // Assignment
+    // Copy Assignment
 
-	// Copy Assignment
+    AirTerminalUnit &operator=(AirTerminalUnit const &) = default;
 
-	AirTerminalUnit &
-	operator =( AirTerminalUnit const & ) = default;
-
-	// Move Assignment
-#if !defined(_MSC_VER) || defined(__INTEL_COMPILER) || (_MSC_VER>=1900)
-	AirTerminalUnit &
-	operator =( AirTerminalUnit && ) = default;
+    // Move Assignment
+#if !defined(_MSC_VER) || defined(__INTEL_COMPILER) || (_MSC_VER >= 1900)
+    AirTerminalUnit &operator=(AirTerminalUnit &&) = default;
 #endif
 
-public: // Methods
+public:                                                  // Methods
+    virtual void simulate(bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
+                          Real64 &NonAirSysOutput        // convective cooling by the beam system [W]
+                          ) = 0;
 
-	virtual
-	void
-	simulate(
-		bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
-		Real64 & NonAirSysOutput // convective cooling by the beam system [W]
-	) = 0;
+    virtual int getZoneIndex() = 0;
 
+    virtual int getAirLoopNum() = 0;
 
+    virtual Real64 getPrimAirDesignVolFlow() = 0;
 
-protected: // Data
+    virtual int getTermUnitSizingIndex() = 0;
 
-	AirTerminalUnitType terminalType; // Type of air distribution unit  //Legacy For use during transition to OO
-	std::string name; // name of unit
-	std::string unitType; // type of unit = e.g. AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam
-	int aDUNum; // index of this unit in the corresponding air distribution unit structure
-	int airAvailSchedNum; // index to schedule for pimary air availability
-	bool airAvailable; // true if primary air is available
-	Real64 vDotDesignPrimAir; // Design primary air volume flow rate m3/s (autosizable)
-	bool vDotDesignPrimAirWasAutosized; // true if user input for design air flow was autsized on input
-	Real64 mDotDesignPrimAir; // Design primary air mass flow rate kg/s
-	int airInNodeNum; // unit air inlet system node number, air enters into air terminal unit
-	int airOutNodeNum; // unit air outlet system node number, air enters into zone from air terminal
-	int zoneIndex; // zone index for this air terminal unit
-	int zoneNodeIndex; // index in node structure for the zone node for this air terminal
-}; // AirTerminalUnit
+protected:                              // Data
+    AirTerminalUnitType terminalType;   // Type of air distribution unit  //Legacy For use during transition to OO
+    std::string name;                   // name of unit
+    std::string unitType;               // type of unit = e.g. AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam
+    int aDUNum;                         // index of this unit in the corresponding air distribution unit structure
+    int airAvailSchedNum;               // index to schedule for pimary air availability
+    bool airAvailable;                  // true if primary air is available
+    Real64 vDotDesignPrimAir;           // Design primary air volume flow rate m3/s (autosizable)
+    bool vDotDesignPrimAirWasAutosized; // true if user input for design air flow was autsized on input
+    Real64 mDotDesignPrimAir;           // Design primary air mass flow rate kg/s
+    int airInNodeNum;                   // unit air inlet system node number, air enters into air terminal unit
+    int airOutNodeNum;                  // unit air outlet system node number, air enters into zone from air terminal
+    int zoneIndex;                      // zone index for this air terminal unit
+    int zoneNodeIndex;                  // index in node structure for the zone node for this air terminal
+    int ctrlZoneInNodeIndex;            // which controlled zone inlet node number corresponds with this unit
+    int airLoopNum;                     // index to airloop that this terminal unit is connected to
+    int termUnitSizingNum;              // index to TermUnitSizing, TermUnitFinalZoneSizing, and more for this air distribution unit
+};                                      // AirTerminalUnit
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif // AirTerminalUnit_hh_INCLUDED

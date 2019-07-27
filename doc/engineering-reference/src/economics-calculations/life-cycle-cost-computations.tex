@@ -19,33 +19,43 @@ The computation of life-cycle costs is broken into three main routines which are
 
 \subsection{ExpressAsCashFlows}\label{expressascashflows}
 
-Step 1. If the input file has ComponentCost:* items, then create an additional instance of a nonrecurring cost to hold the total.
+\begin{enumerate}
+\def\labelenumi{Step~\arabic{enumi}.}
+\item If the input file has ComponentCost:* items, then create an additional instance of a nonrecurring cost to hold the total.
+\item Get the costs for each resource that has non-zero utility costs.
+\item Compute the inflation on a monthly basis. For cases where the inflation approach is constant dollars, the inflation is set to 1.0 for all months. For current dollar analyses, compute the inflation rate on a monthly basis. Just using 1/12 of the annual inflation is almost correct but introduces a small error so instead the inverse of the formula 4-32 from Newnan (Engineering Economic Analysis Ninth Edition by Donald Newnan, Ted Eschenbach, and Jerome Lavelle):
+\end{enumerate}
 
-Step 2. Get the costs for each resource that has non-zero utility costs.
-
-Step 3. Compute the inflation on a monthly basis. For cases where the inflation approach is constant dollars, the inflation is set to 1.0 for all months. For current dollar analyses, compute the inflation rate on a monthly basis. Just using 1/12 of the annual inflation is almost correct but introduces a small error so instead the inverse of the formula 4-32 from Newnan (Engineering Economic Analysis Ninth Edition by Donald Newnan, Ted Eschenbach, and Jerome Lavelle):
-
-inflationPerMonth = ((inflation + 1.00) ** (1.0/12.0)) - 1
+\begin{equation}
+Inflation~Per~Month = ((inflation + 1.00) ^ (1.0/12.0)) - 1
+\end{equation}
 
 Then the inflation is applied for each month:
 
-monthlyInflationFactor(jMonth) = (1 + inflationPerMonth) ** (jMonth - 1)
+\begin{equation}
+Monthly~Inflation~Factor(jMonth) = (1 + inflationPerMonth) ^ (jMonth - 1)
+\end{equation}
 
-Step 4. Put the nonrecurring, nonrecurring, and utility costs into a monthly array for the entire length of the study period.
-
-Step 5. Multiply the monthly costs by the monthly inflation which was set to 1.0 for constant dollar analyses.
-
-Step 6. Multiply the monthly costs for resources with use adjustments.
-
-Step 7. Sum the monthly costs by category.
-
-Step 8. Based on the base date, accumulate the monthly costs into yearly costs.
+\begin{enumerate}
+\def\labelenumi{Step~\arabic{enumi}.}
+\setcounter{enumi}{3}
+\item Put the nonrecurring, recurring, and utility costs into a monthly array for the entire length of the study period.
+\item Multiply the monthly costs by the monthly inflation which was set to 1.0 for constant dollar analyses.
+\item Multiply the monthly costs for resources with use adjustments.
+\item Sum the monthly costs by category.
+\item Based on the base date, accumulate the monthly costs into yearly costs.
+\end{enumerate}
 
 \subsection{ComputePresentValue}\label{computepresentvalue}
 
-Step 1. For each year of the study compute the discount factor (SPV) using the following formula:
+\begin{enumerate}
+\def\labelenumi{Step~\arabic{enumi}.}
+\item For each year of the study compute the discount factor (SPV) using the following formula:
+\end{enumerate}
 
-SPV\(_{yr}\) = 1 / ((1 + curDiscountRate) ** effectiveYear)
+\begin{equation}
+SPV_{yr} = 1 / ((1 + curDiscountRate) ^ effectiveYear)
+\end{equation}
 
 This formula is based on formula D.2.1.1 from NIST Handbook 135 Life Cycle Costing Manual for the Federal Energy Management Program by Sieglinde K. Fuller and Stephen R. Petersen.
 
@@ -53,22 +63,26 @@ Where the effectiveYear depends on the discount convention. If end of year disco
 
 For energy costs, the use price escalations are multiplied by the discount factors.
 
-Step 2. Compute the present value for each month by multiply the monthly costs by the discount factor for each year.
-
-Step 3. Sum the costs by category.
+\begin{enumerate}
+\def\labelenumi{Step~\arabic{enumi}.}
+\setcounter{enumi}{1}
+\item Compute the present value for each month by multiply the monthly costs by the discount factor for each year.
+\item Sum the costs by category.
+\end{enumerate}
 
 \subsection{ComputeTaxAndDepreciation}\label{computetaxanddepreciation}
 
-Step 1. Depending on the depreciation method selected the depreciation factors are set to various constants. Depreciation factors are based on IRS Publication 946 for 2009 ``How to Depreciate Property.'' The MACRS values are based on Modified Accelerated Cost Recovery System GDS for 3, 5, 7, 10 year property are based on 200\% depreciation method shown in Appendix A of IRS Publication 946 using half year. 15 and 20 are based on 150\% (Chart 1 of IRS Publication 946). For Straight Line depreciation GDS is used for 27 years (actually 27.5) 31 years (actually 31.5 years) and 39 years using mid month. For 40 years ADS is used (chart 2) Table A-1 is used for 3, 4, 5, 10, 15 and 20 years. Table A-6 is for 27 years. Table A-7 for 31 years. Table A-7a for 39 years. Table A-13 for 40 years. These years are a classification of property and should not be confused with the length of the study. For 27 years, 31 years, 39 years and 40 years the June value was used. All references in this paragraph are to IRS Publication 946.
+\begin{enumerate}
+\def\labelenumi{Step~\arabic{enumi}.}
+\item Depending on the depreciation method selected the depreciation factors are set to various constants. Depreciation factors are based on IRS Publication 946 for 2009 ``How to Depreciate Property.'' The MACRS values are based on Modified Accelerated Cost Recovery System GDS for 3, 5, 7, 10 year property are based on 200\% depreciation method shown in Appendix A of IRS Publication 946 using half year. 15 and 20 are based on 150\% (Chart 1 of IRS Publication 946). For Straight Line depreciation GDS is used for 27 years (actually 27.5) 31 years (actually 31.5 years) and 39 years using mid month. For 40 years ADS is used (chart 2) Table A-1 is used for 3, 4, 5, 10, 15 and 20 years. Table A-6 is for 27 years. Table A-7 for 31 years. Table A-7a for 39 years. Table A-13 for 40 years. These years are a classification of property and should not be confused with the length of the study. For 27 years, 31 years, 39 years and 40 years the June value was used. All references in this paragraph are to IRS Publication 946.
+\item Apply the annual depreciation factors to the capital costs.
+\item For each year the taxable income is the grand total of all costs minus the depreciated capital costs.
+\item Taxes are the taxable income times the tax rate.
+\item The after tax present value is:
+\end{enumerate}
 
-Step 2. Apply the annual depreciation factors to the capital costs.
-
-Step 3. For each year the taxable income is the grand total of all costs minus the depreciated capital costs.
-
-Step 4. Taxes are the taxable income times the tax rate.
-
-Step 5. The after tax present value is
-
-AfterTaxPresentValue\(_{yr}\) = GrandTotal\(_{yr}\) - Taxes\(_{yr}\) * SPV\(_{yr}\)
+\begin{equation}
+AfterTaxPresentValue_{yr} = GrandTotal_{yr} - Taxes_{yr} * SPV_{yr}
+\end{equation}
 
 All major results are presented on the tabular report.

@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef OutsideEnergySources_hh_INCLUDED
 #define OutsideEnergySources_hh_INCLUDED
@@ -63,181 +52,78 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
 namespace OutsideEnergySources {
 
-	// Using/Aliasing
+    extern int NumDistrictUnits;
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS
-	extern int const EnergyType_DistrictHeating;
-	extern int const EnergyType_DistrictCooling;
+    struct OutsideEnergySourceSpecs : public PlantComponent
+    {
 
-	// DERIVED TYPE DEFINITIONS
+        // Members
+        std::string Name;          // user identifier
+        Real64 NomCap = 0.0;             // design nominal capacity of district service
+        bool NomCapWasAutoSized = false;   // ture if Nominal Capacity was autosize on input
+        int CapFractionSchedNum = 0;   // capacity modifier schedule number
+        int InletNodeNum = 0;          // Node number on the inlet side of the plant
+        int OutletNodeNum = 0;         // Node number on the inlet side of the plant
+        Real64 EnergyTransfer = 0.0;     // cooling energy provided in time step
+        Real64 EnergyRate = 0.0;         // cooling power
+        int EnergyType = 0;            // flag for district heating OR cooling
+        // loop topology variables
+        int LoopNum = 0;
+        int LoopSideNum = 0;
+        int BranchNum = 0;
+        int CompNum = 0;
+        // flags
+        bool OneTimeInitFlag = true;
+        bool BeginEnvrnInitFlag = true;
+        bool CheckEquipName = true;
+        Real64 MassFlowRate = 0.0;
+        Real64 InletTemp = 0.0;
+        Real64 OutletTemp = 0.0;
 
-	//MODULE VARIABLE DECLARATIONS:
-	extern int NumDistrictUnits;
+        OutsideEnergySourceSpecs() = default;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE OutsideEnergySources
+        virtual ~OutsideEnergySourceSpecs() = default;
 
-	// Types
+        static PlantComponent *factory(int objectType, std::string objectName);
 
-	struct OutsideEnergySourceSpecs
-	{
-		// Members
-		std::string PlantLoopID; // main plant loop ID
-		std::string SecndryLoopID; // secondary chiller loop (cond loop) ID
-		std::string ScheduleID; // equipment availability schedule
-		std::string Name; // user identifier
-		Real64 NomCap; // design nominal capacity of district service
-		bool NomCapWasAutoSized; // ture if Nominal Capacity was autosize on input
-		int CapFractionSchedNum; // capacity modifier schedule number
-		int InletNodeNum; // Node number on the inlet side of the plant
-		int OutletNodeNum; // Node number on the inlet side of the plant
-		Real64 EnergyTransfer; // cooling energy provided in time step
-		Real64 EnergyRate; // cooling power
-		int EnergyType; // flag for district heating OR cooling
-		int MassFlowReSimIndex;
-		//loop topology variables
-		int LoopNum;
-		int LoopSideNum;
-		int BranchNum;
-		int CompNum;
-		//flags
-		bool OneTimeInitFlag;
-		bool BeginEnvrnInitFlag;
-		bool CheckEquipName;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+                      bool RunFlag) override;
 
-		// Default Constructor
-		OutsideEnergySourceSpecs() :
-			NomCap( 0.0 ),
-			NomCapWasAutoSized( false ),
-			CapFractionSchedNum( 0 ),
-			InletNodeNum( 0 ),
-			OutletNodeNum( 0 ),
-			EnergyTransfer( 0.0 ),
-			EnergyRate( 0.0 ),
-			EnergyType( 0 ),
-			MassFlowReSimIndex( 0 ),
-			LoopNum( 0 ),
-			LoopSideNum( 0 ),
-			BranchNum( 0 ),
-			CompNum( 0 ),
-			OneTimeInitFlag( true ),
-			BeginEnvrnInitFlag( true ),
-			CheckEquipName( true )
-		{}
+        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
 
-	};
+        void getDesignCapacities(const PlantLocation &calledFromLocation,
+                                 Real64 &MaxLoad,
+                                 Real64 &MinLoad,
+                                 Real64 &OptLoad) override;
 
-	struct ReportVars
-	{
-		// Members
-		Real64 MassFlowRate;
-		Real64 InletTemp;
-		Real64 OutletTemp;
-		Real64 EnergyTransfer;
+        void initialize(Real64 curLoad);
 
-		// Default Constructor
-		ReportVars() :
-			MassFlowRate( 0.0 ),
-			InletTemp( 0.0 ),
-			OutletTemp( 0.0 ),
-			EnergyTransfer( 0.0 )
-		{}
-	};
+        void calculate(bool runFlag, Real64 curLoad);
 
-	// Object Data
-	extern Array1D< OutsideEnergySourceSpecs > EnergySource;
-	extern Array1D< ReportVars > EnergySourceReport;
+        void size();
 
-	// Functions
-	void
-	clear_state();
+    };
 
-	void
-	SimOutsideEnergy(
-		std::string const & EnergyType,
-		std::string const & EquipName,
-		int const EquipFlowCtrl, // Flow control mode for the equipment
-		int & CompIndex,
-		bool const RunFlag,
-		bool const InitLoopEquip,
-		Real64 & MyLoad,
-		Real64 & MaxCap,
-		Real64 & MinCap,
-		Real64 & OptCap,
-		bool const FirstHVACIteration
-	);
+    // Object Data
+    extern Array1D<OutsideEnergySourceSpecs> EnergySource;
 
-	// End OutsideEnergySources Module Driver Subroutines
-	//******************************************************************************
+    // Functions
+    void clear_state();
 
-	// Beginning of OutsideEnergySources Module Get Input subroutines
-	//******************************************************************************
+    void GetOutsideEnergySourcesInput();
 
-	void
-	GetOutsideEnergySourcesInput();
+    void InitSimVars(int EnergySourceNum, Real64 MyLoad);
 
-	// End of Get Input subroutines for the OutsideEnergySources Module
-	//******************************************************************************
+} // namespace OutsideEnergySources
 
-	// Beginning Initialization Section of the OutsideEnergySources Module
-	//******************************************************************************
-
-	void
-	InitSimVars(
-		int const EnergySourceNum, // Which item being initialized
-		Real64 & MassFlowRate,
-		Real64 & InletTemp,
-		Real64 & OutletTemp,
-		Real64 const MyLoad
-	);
-
-	// End Initialization Section of the OutsideEnergySources Module
-	//******************************************************************************
-
-	// Beginning of OutsideEnergySources Module Utility Subroutines
-	// *****************************************************************************
-
-	void
-	SizeDistrictEnergy(
-		int const EnergySourceNum
-	);
-
-	void
-	SimDistrictEnergy(
-		bool const RunFlag,
-		int const DistrictEqNum,
-		Real64 & MyLoad,
-		Real64 const MassFlowRate,
-		Real64 const InletTemp,
-		Real64 & OutletTemp
-	);
-
-	// End of OutsideEnergySources Module Utility Subroutines
-	// *****************************************************************************
-
-	// Beginning of Record Keeping subroutines for the OutsideEnergySources Module
-	// *****************************************************************************
-
-	void
-	UpdateRecords(
-		Real64 const MyLoad,
-		int const EqNum,
-		Real64 const MassFlowRate,
-		Real64 const OutletTemp
-	);
-
-	// End of Record Keeping subroutines for the OutsideEnergySources Module
-	// *****************************************************************************
-
-} // OutsideEnergySources
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

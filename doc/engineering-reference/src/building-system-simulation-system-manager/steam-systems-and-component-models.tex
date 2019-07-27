@@ -46,7 +46,7 @@ It should be noted that the figure is simply a schematic and not a scaled repres
 \item
   ~Process 1--2 on the Ts diagram, represents condensation of steam in the coil at constant pressure; this is where the steam gives up latent heat to the zone.
 \item
-  ~Process 2--3 represents the subcooling of condensed steam at higher pressure, this subcooling takes place inside the steam coil, just before the steam trap.~ The delta temperature represented by 2-3 is the degree of subcooling in the steam coil, and is a user input to the steam coil.~ This subcool generally accounts for 1 to 2 \% of the total heat transfer in the steam coil.
+  ~Process 2--3 represents the subcooling of condensed steam at higher pressure, this subcooling takes place inside the steam coil, just before the steam trap.~ The delta temperature represented by 2-3 is the degree of subcooling in the steam coil, and is a user input to the steam coil.~ This subcool generally accounts for 1 to 2\% of the total heat transfer in the steam coil.
 \item
   ~Process 3--4' represents the isenthalpic expansion of water from high-pressure steam side to atmospheric pressure across the steam trap.~ As steam gives up its latent heat at the steam coil the condensate that forms in the steam coil still exists at higher pressure.~ This condensate is discharged to a lower pressure across the steam trap, this condensate contains more heat than necessary to maintain the liquid phase at the lower pressure, this excess heat causes some of the condensate to vaporize or flash to steam at lower pressure at some quality.~ The amount of water that flashes to steam can be calculated by the following equation
 \end{itemize}
@@ -57,13 +57,13 @@ It should be noted that the figure is simply a schematic and not a scaled repres
 
 Where h4' is Enthalpy of liquid at steam pressure just before condensate is supposed to leave the coil.~ Enthalpy at Point 3 is equal to enthalpy at point 4', since it is an isenthalpic process, and~ hfg is the latent enthalpy of the fluid at atmospheric pressure.
 
-For example, water at 102LC and 120 Kpa flashes to steam at at100LC and atmospheric pressure, with quality equal to 0.003.~ This results in loss of some latent capacity of steam and is one of the terms contributing to loop loss in steam system.
+For example, water at 102\(^{\circ}\)C and 120 Kpa flashes to steam at 100\(^{\circ}\)C and atmospheric pressure, with quality equal to 0.003.~ This results in loss of some latent capacity of steam and is one of the terms contributing to loop loss in steam system.
 
 \begin{itemize}
 \item
   ~Process 4'- 4 represents the condensation of the flashed steam, which has exited from steam trap into the condensate drain.~ Condensation occurs at atmospheric pressure Patm, there is loss in latent capacity due to this unavoidable process, only condensate can be returned back to the boiler in a steam system.
 \item
-  ~Process 4-5 represents the loop sub cooling at atmospheric pressure; this is the sub cooling of the condensate that takes place during condensate return to the boiler because the return loop is not insulated, loop sub cooling is of the order of 20LC to 30LC.~ This is a user-defined input in every steam coil, because the variability in location of steam coils in a building will result in different condensate return temperatures for each of the coils.
+  ~Process 4-5 represents the loop sub cooling at atmospheric pressure; this is the sub cooling of the condensate that takes place during condensate return to the boiler because the return loop is not insulated, loop sub cooling is of the order of 20\(^{\circ}\)C to 30\(^{\circ}\)C.~ This is a user-defined input in every steam coil, because the variability in location of steam coils in a building will result in different condensate return temperatures for each of the coils.
 \item
   ~Process 5-6 represents the temperature and pressure rise in condensate due to pump heat addition.~ The pumping process generates heat, which is added to the condensate.~ The condensate is pumped back to the boiler at higher pressure.
 \item
@@ -88,31 +88,31 @@ Building steam heating systems avoid supplying superheated steam because superhe
 
 Case 1: Loop Operating at Saturation Conditions (no superheat), calculating enthalpy of saturated steam at boiler outlet temperature.
 
-Boiler Outlet Temperature = 105BC,
+Boiler Outlet Temperature = 105\(^{\circ}\)C,
 
 \begin{equation}
-{h_{Case1:NoSuperheat}} = [{h_f}_{{{105}^ \bullet }C}]
+{h_{Case1:NoSuperheat}} = [{h_f}_{{{105}^ \circ }C}]
 \end{equation}
 
 \begin{equation}
 {h_{Case1:NoSuperheat}} = \,\,\,\,2684000\,\,\,\,\,\,J
 \end{equation}
 
-Case 2: Loop operating with Superheated steam, calculating enthalpy of superheated steam for 5BC superheat.
+Case 2: Loop operating with Superheated steam, calculating enthalpy of superheated steam for 5\(^{\circ}\)C superheat.
 
-Degree of Superheat = 5BC
+Degree of Superheat = 5\(^{\circ}\)C
 
-Boiler Outlet Temperature = 110BC,
+Boiler Outlet Temperature = 110\(^{\circ}\)C,
 
 \begin{equation}
-{h_{Case2:Superheat}} = [{h_f}_{{{110}^ \bullet }C}]
+{h_{Case2:Superheat}} = [{h_f}_{{{110}^ \circ }C}]
 \end{equation}
 
 \begin{equation}
 {h_{Case2:Superheat}} = \,\,\,2691000\,\,\,\,\,\,\,\,J
 \end{equation}
 
-The energy difference between the superheated state and the saturated state as calculated in the following equation.~ A 5BC superheat provides only a 0.2608\% increase in heat transfer.~ The advantage of this additional increase in heat transfer is negligible, especially when considering the economic aspect of sizing a bigger heat exchanger to accommodate additional superheat transfer.~ The detrimental effects of superheated steam on the building HVAC system also come into effect once superheat is used.
+The energy difference between the superheated state and the saturated state as calculated in the following equation.~ A 5\(^{\circ}\)C superheat provides only a 0.2608\% increase in heat transfer.~ The advantage of this additional increase in heat transfer is negligible, especially when considering the economic aspect of sizing a bigger heat exchanger to accommodate additional superheat transfer.~ The detrimental effects of superheated steam on the building HVAC system also come into effect once superheat is used.
 
 \begin{equation}
 \Delta {Q_{2 - 1}}\,\,\, = \,\,\,\frac{{2691000\, - 2684000}}{{2684000}}\,\, \times 100\,\,\,\, = \,\,0.2608\,\,\,percent
@@ -132,7 +132,7 @@ With the above simplifying assumption enables the EnergyPlus steam loop to be so
 
 \subsubsection{Steam Traps}\label{steam-traps}
 
-Steam traps are essential part of the steam system; they are indirect flow controllers of the loop.~ Purpose of steam trap is to allow only condensate out of the coil from higher-pressure steam to lower atmospheric pressure condensate return line.~ Points 3-4C, in schematic~ Figure~\ref{fig:schematic-of-temperature-entropy-diagram-for}, represent this process across the steam trap on the Ts diagram.~ The expansion process across the steam trap is assumed to be isenthalpic.~ There is possibility of flashing of high-pressure condensate across the trap because of pressure drop, resulting in generation of steam at lower pressure, this steam generated at lower pressure subsequently condenses in the return piping, and heat is lost to the atmosphere.~ This heat lost is a part of the steam loop losses.
+Steam traps are essential part of the steam system; they are indirect flow controllers of the loop.~ Purpose of steam trap is to allow only condensate out of the coil from higher-pressure steam to lower atmospheric pressure condensate return line.~ Points 3-4', in schematic Figure~\ref{fig:schematic-of-temperature-entropy-diagram-for}, represent this process across the steam trap on the Ts diagram.~ The expansion process across the steam trap is assumed to be isenthalpic.~ There is possibility of flashing of high-pressure condensate across the trap because of pressure drop, resulting in generation of steam at lower pressure, this steam generated at lower pressure subsequently condenses in the return piping, and heat is lost to the atmosphere.~ This heat lost is a part of the steam loop losses.
 
 Steam traps are modeled in the EnergyPlus steam coil by assigning the condensate outlet from the coil a quality of 0.0 and sub cooling the condensate at lower pressure.
 
@@ -166,7 +166,7 @@ EnergyPlus heat balance methods determine the amount of heating required in the 
 {\dot m_{zc}}\,\,\,\, = \,\,\,\,\,\frac{{{Q_{zc}}}}{{{h_{fg}} + {c_{p,w}} \times \Delta {T_{sc}}}}
 \end{equation}
 
-In case of the air loop-heating coil, the load on the coil is calculated within the coil simulation routine.~ The air loop coil is setpoint controlled and heats the air to maintain the air stream at the desired setpoint, the setpoint is a user input, generally in the range of 12B C to 16BC. The following equation describes the air loop coil load.
+In case of the air loop-heating coil, the load on the coil is calculated within the coil simulation routine.~ The air loop coil is setpoint controlled and heats the air to maintain the air stream at the desired setpoint, the setpoint is a user input, generally in the range of 12\(^{\circ}\)C to 16\(^{\circ}\)C. The following equation describes the air loop coil load.
 
 \begin{equation}
 {Q_{al}}\,\, = \,\,{\dot m_a}\,\,\, \times \,\,\,\,\,{c_{p,a}}\,\,\, \times \,\,\,\,\,\left[ {{T_{sp}}\,\,\, - \,\,\,{T_a}} \right]
@@ -193,7 +193,7 @@ IF\,\,\,\,\,(Coil\, = LoadControlled)\,\,\,\,\,\,THEN\,
 Check for operational conditions only then continue simulation further.~ The operational conditions are the inlet mass flow rates of steam and air to the coil, the user schedule to the coil and heating load on the coil.~ The coil is simulated only if these conditions are met.
 
 \begin{equation}
-IF\,\,\,\left[ {\,({{\dot m}_s}\,\,\, > \,\,\,0)\,\,.\,\,\,and.\,\,\,({{\dot m}_a} > \,\,\,0)\,\,.and.\,\,(Schedule\,\, = \,\,\,ON)\,.and.\,\,\,({Q_{ZC}}\,\, > \,\,0.0)\,} \right]\,\,\,THEN
+IF\,\,\,\left[ {\,({{\dot m}_s}\,\,\, > \,\,\,0)\,\,.and.\,\,\,({{\dot m}_a} > \,\,\,0)\,\,.and.\,\,(Schedule\,\, = \,\,\,ON)\,.and.\,\,\,({Q_{ZC}}\,\, > \,\,0.0)\,} \right]\,\,\,THEN
 \end{equation}
 
 If the heating demand from the zone-heating coil is greater than coil capacity, then the heating coil is undersized, and the coil can only deliver its maximum heating capacity to the zone.~ In this case the heating demand on the coil is set equal to this lower value of maximum heating capacity.~ If the above is not true then the simulation ignores this statement and proceeds to the next one.
@@ -390,9 +390,9 @@ As depicted in the figure above the steam condenses on entering the coils, sub c
 
 The steam coils works on two basic assumptions, firstly, it's assumed that perfect latent heat transfer takes place over every time step, secondly, the user specified degree of subcooling occurs in the coil.~ Steam coils always use steam traps- purpose of which is to only let water out of the coil, hence the modeler knows with certainty the outlet dryness faction of steam coil is at quality equal to 0.0, because water leaves coil.~ Hence the heat transfer is equal to latent heat of steam, which is independent of UA value of coil when averaged over time step of EnergyPlus simulation.
 
-In practice there is 1\% to 2 \% sub cooling of the outlet water stream, the user with desired degree of subcool input accounts for this, subsequently UA calculation for the coil model become superfluous and is neglected in the EnergyPlus model.
+In practice there is 1\% to 2\% sub cooling of the outlet water stream, the user with desired degree of subcool input accounts for this, subsequently UA calculation for the coil model become superfluous and is neglected in the EnergyPlus model.
 
-Ideally for sub-cooling UA would play an important role, however sub cooling in steam coil constitutes negligible amount of heat transfer, hence this model avoids the UA calculation.~ This is a very reasonable assumption since sensible heat transfer is barely 1\% to 2 \% of the total heat transfer in steam coils, simply due to large latent heat capacity of coil. NOTE in his thesis he gives a little example here which is probably not necessary for the Docs.
+Ideally for sub-cooling UA would play an important role, however sub cooling in steam coil constitutes negligible amount of heat transfer, hence this model avoids the UA calculation.~ This is a very reasonable assumption since sensible heat transfer is barely 1\% to 2\% of the total heat transfer in steam coils, simply due to large latent heat capacity of coil. NOTE in his thesis he gives a little example here which is probably not necessary for the Docs.
 
 \subsection{Condensate Pump}\label{condensate-pump}
 

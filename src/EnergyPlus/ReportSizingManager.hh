@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef ReportSizingManager_hh_INCLUDED
 #define ReportSizingManager_hh_INCLUDED
@@ -69,40 +58,48 @@ namespace EnergyPlus {
 
 namespace ReportSizingManager {
 
-	// Functions
+    // Functions
 
-	void
-	ReportSizingOutput(
-		std::string const & CompType, // the type of the component
-		std::string const & CompName, // the name of the component
-		std::string const & VarDesc, // the description of the input variable
-		Real64 const VarValue, // the value from the sizing calculation
-		Optional_string_const UsrDesc = _, // the description of a user-specified variable
-		Optional< Real64 const > UsrValue = _ // the value from the user for the desc item
-	);
+    void ReportSizingOutput(std::string const &CompType,        // the type of the component
+                            std::string const &CompName,        // the name of the component
+                            std::string const &VarDesc,         // the description of the input variable
+                            Real64 const VarValue,              // the value from the sizing calculation
+                            Optional_string_const UsrDesc = _,  // the description of a user-specified variable
+                            Optional<Real64 const> UsrValue = _ // the value from the user for the desc item
+    );
 
+    void RequestSizing(std::string const &CompType,      // type of component
+                       std::string const &CompName,      // name of component
+                       int const SizingType,             // integerized type of sizing requested (see DataHVACGlobals, e.g. CoolingCapacitySizing)
+                       std::string const &SizingString,  // string containing info for eio report
+                       Real64 &SizingResult,             // result of the sizing procedure
+                       bool const PrintWarningFlag,      // TRUE when requesting output (eio) reporting
+                       std::string const &CallingRoutine // name of calling rotuine for warning messages
+    );
 
-	void
-	RequestSizing(
-		std::string const & CompType, // type of component
-		std::string const & CompName, // name of component
-		int const SizingType, // integerized type of sizing requested (see DataHVACGlobals, e.g. CoolingCapacitySizing)
-		std::string const & SizingString, // string containing info for eio report
-		Real64 & SizingResult, // result of the sizing procedure
-		bool const PrintWarningFlag, // TRUE when requesting output (eio) reporting
-		std::string const & CallingRoutine // name of calling rotuine for warning messages
-	);
+    void GetCoilDesFlowT(int SysNum,           // central air system index
+                         Real64 CpAir,         // specific heat to be used in calculations [J/kgC]
+                         Real64 &DesFlow,      // returned design mass flow [kg/s]
+                         Real64 &DesExitTemp,  // returned design coil exit temperature [kg/s]
+                         Real64 &DesExitHumRat // returned design coil exit humidity ratio [kg/kg]
+    );
 
-	void
-	GetCoilDesFlowT(
-		int SysNum, // central air system index
-		Real64 CpAir, // specific heat to be used in calculations [J/kgC]
-		Real64 & DesFlow, // returned design mass flow [kg/s]
-		Real64 & DesExitTemp // returned design coil exit temperature [kg/s]
-	);
+    Real64 setOAFracForZoneEqSizing(Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
+    Real64 setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+                                               DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                               DataSizing::ZoneSizingData const &finalZoneSizing);
+    Real64 setHeatCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+                                                 DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                 DataSizing::ZoneSizingData const &finalZoneSizing);
+    Real64 setCoolCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+                                               DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                               DataSizing::ZoneSizingData const &finalZoneSizing);
+    Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+                                                 DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                 DataSizing::ZoneSizingData const &finalZoneSizing);
 
-} // ReportSizingManager
+} // namespace ReportSizingManager
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

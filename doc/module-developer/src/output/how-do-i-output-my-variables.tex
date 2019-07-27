@@ -6,35 +6,34 @@ To do this is very simple.~ All you need to do is place a simple call to \emph{S
 
 For you the call is:
 
-Call SetupOutputVariable(VariableName,ActualVariable,~ \&
+\begin{lstlisting}
 
-~~~~~~~~~~~~~~~~~~~~~~~~ IndexTypeKey, VariableTypeKey,KeyedValue,ReportFreq \&
+SetupOutputVariable(VariableName, VariableUnit, ActualVariable, IndexTypeKey, VariableTypeKey, 
+  KeyedValue,ReportFreq, ResourceTypeKey,EndUseKey,GroupKey)
+  
+  
+\end{lstlisting}
 
-~~~~~~~~~~~~~~~~~~~~~~~~ ResourceTypeKey,EndUseKey,GroupKey)
 
 Interface statements allow for the same call to be used for either real or integer ``ActualVariable'' variables.~ A few examples from EnergyPlus and then we will define the arguments:
 
-CALL SetupOutputVariable(`Site Outdoor Drybulb Temperature {[}C{]}', \&
+\begin{lstlisting}
 
-~~~~~~~ OutDryBulbTemp,`Zone',`Average',`Environment')
+SetupOutputVariable( "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, OutDryBulbTemp, 
+  "Zone", "Average", "Environment" );
+  
+SetupOutputVariable( "Zone Mean Air Temperature", OutputProcessor::Unit::C, ZnAirRpt( Loop ).MeanAirTemp, 
+  "Zone", "Average", Zone( Loop ).Name );
+  
+SetupOutputVariable( "Fan Coil Heating Energy", OutputProcessor::Unit::J, 
+  FanCoil( FanCoilNum ).HeatEnergy, "System", "Sum", FanCoil( FanCoilNum ).Name );
+  
+SetupOutputVariable( "Zone Dehumidifier Electric Energy", OutputProcessor::Unit::J,
+  ZoneDehumid( ZoneDehumidIndex ).ElecConsumption, "System", "Sum", 
+  ZoneDehumid( ZoneDehumidIndex ).Name,_, "Electric", "COOLING", _, "System" );
+  
+\end{lstlisting}
 
-CALL SetupOutputVariable(`Zone Mean Air Temperature {[}C{]}', \&
-
-~~~~~~~ ZnRpt(Loop)\%MeanAirTemp,`Zone', `State',Zone(Loop)\%Name)
-
-CALL SetupOutputVariable(`Fan Coil Heating Energy {[}J{]}', \&
-
-~~~~~~~ FanCoil(FanCoilNum)\%HeatEnergy,`System',~~ \&
-
-~~~~~ ~`Sum',FanCoil(FanCoilNum)\%Name)
-
-CALL SetupOutputVariable(`Humidifier Electric Energy {[}J{]}',
-
-~~~~~~~ Humidifier(HumNum)\%ElecUseEnergy,`System',`Sum', \&
-
-~~~~~~~ Humidifier(HumNum)\%Name, ResourceTypeKey = `ELECTRICITY',\&
-
-~~~~~~~ EndUseKey = `HUMIDIFIER', GroupKey = `System')
 
 % table 4
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
@@ -50,7 +49,8 @@ SetupOutput Variable Arguments & Description \tabularnewline
 \midrule
 \endhead
 
-VariableName & String name of variable, units should be included in [].~ If no units, use [] \tabularnewline
+VariableName & String name of variable, no units should be included and no text should appear in brackets. \tabularnewline
+VariableUnit & Actual units corresponding the the actual variable. An enum should be used from the list which is defined in OutputProcessor::Unit. \tabularnewline
 ActualVariable & This should be the actual variable that will store the value.~ The OutputProcessor sets up a pointer to this variable, so it will need to be a SAVEd variable if in a local routine.~ As noted in examples, can be a simple variable or part of an array/derived type. \tabularnewline
 IndexTypeKey & When this variable has its proper value.~ ‘Zone’ is used for variables that will have value on the global timestep (alias “HeatBalance”).~ ‘HVAC’ is used for variables that will have values calculated on the variable system timesteps (alias “System”, “Plant”) \tabularnewline
 VariableTypeKey & Two kinds of variables are produced.~ ‘State’ or ‘Average’ are values that are instantaneous at the timestep (zone air temperature, outdoor weather conditions).~ ‘NonState’ or ‘Sum’ are values which need to be summed for a period (energy). \tabularnewline
@@ -66,3 +66,5 @@ GroupKey & Meter Super Group Key; an optional argument used when the variable is
 As described in the \emph{Input Output Reference}, not all variables may be available in any particular simulation.~ Only those variables that will have values generated will be available for reporting.~ In the IDF, you can include a ``Output:VariableDictionary,regular;'' command that will produce the eplusout.rdd file containing all the variables with their IndexTypeKeys.~ This list can be used to tailor the requests for values in the OutputFileStandard.
 
 This variable dictionary is separated into two pieces: regular reporting variables and meter variables.~ It can also be sorted by name (ascending).
+
+

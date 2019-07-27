@@ -6,11 +6,12 @@ A heat balance must exist at the outside surface-air interface. The incoming con
 
 \begin{equation}
 Conductive + Convective + Radiative = 0
+\label{eq:BasicSteadyStateHeatBalanceEquation}
 \end{equation}
 
 In contrast to the internal surface heat balance that treats all surfaces simultaneously, the external thermal balance for each surface is performed independent of all other surfaces. This implies that there is no direct interaction between the individual surfaces.
 
-TARP includes four possible representations for the basic outside surface heat balance. The first two depend on which of the optimal surface conductance algorithms the user selects. The simple outside surface conductance that includes both the convective and thermal interchange between the surface and the environment in a single coefficient, is represented by the thermal network in Figure~\ref{fig:thermal-network-for-simple-outside-surface}. Equation can also be expressed as:
+TARP includes four possible representations for the basic outside surface heat balance. The first two depend on which of the optimal surface conductance algorithms the user selects. The simple outside surface conductance that includes both the convective and thermal interchange between the surface and the environment in a single coefficient, is represented by the thermal network in Figure~\ref{fig:thermal-network-for-simple-outside-surface}. Equation~\ref{eq:BasicSteadyStateHeatBalanceEquation} can also be expressed as:
 
 \begin{equation}
 \left[ {{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {{\rm{Y}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{I}}_t} - {{\rm{X}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{O}}_{\rm{t}}}} \right]{\rm{ + }}\left[ {{\rm{HO}}\cdot \left( {{{\rm{T}}_{\rm{a}}} - {\rm{T}}{{\rm{O}}_t}} \right)} \right]{\rm{  + QSO  =  0}}
@@ -20,12 +21,14 @@ This can be solved for the outside surface temperature.
 
 \begin{equation}
 {\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{\rm{t}}}{\rm{ + HO}}\cdot {{\rm{T}}_{\rm{a}}}}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + HO}}}}} \right]{\rm{  }}
+\label{eq:OutsideSurfTempHeatBalEq}
 \end{equation}
 
-The detailed outside surface conductance model considers convection and radiant interchange with the sky and with the ground as separate factors. Its use in the outside thermal balance is shown in Figure~\ref{fig:thermal-network-for-detailed-outside-surface}.In this case, equation can be expanded to give
+The detailed outside surface conductance model considers convection and radiant interchange with the sky and with the ground as separate factors. Its use in the outside thermal balance is shown in Figure~\ref{fig:thermal-network-for-detailed-outside-surface}. In this case, Equation~\ref{eq:BasicSteadyStateHeatBalanceEquation} can be expanded to give:
 
 \begin{equation}
 \left[ {{\rm{KO}}{{\rm{P}}_{\rm{t}}}{\rm{ + }}{{\rm{Y}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{I}}_{\rm{t}}}{\rm{ - }}{{\rm{X}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{O}}_{\rm{t}}}} \right]{\rm{ + }}\left[ {{\rm{HA}}\cdot \left( {{{\rm{T}}_{\rm{a}}}{\rm{ - T}}{{\rm{O}}_{\rm{t}}}} \right){\rm{ + HS}}\cdot \left( {{{\rm{T}}_{\rm{s}}}{\rm{ - T}}{{\rm{O}}_{\rm{t}}}} \right){\rm{ + HG}}\cdot \left( {{{\rm{T}}_{\rm{g}}}{\rm{ - T}}{{\rm{O}}_{\rm{t}}}} \right)} \right]{\rm{  + QSO  =  0  }}
+\label{eq:MoreDetailedOutsideSurfHeatBalEq}
 \end{equation}
 
 This can be solved for the outside surface temperature:
@@ -36,28 +39,31 @@ This can be solved for the outside surface temperature:
 
 The third and fourth representations occur when the outside surface has been covered with movable insulation. The insulation has a conductance of UM. The thermal network in Figure~\ref{fig:thermal-network-for-outside-moveable} represents this case.The insulation must be mass-less because it is not generally possible to perform a correct thermal balance at the juncture of two surfaces each modeled by CTF.
 
-The equation for the thermal balance between the surface and the insulation is
+The equation for the thermal balance between the surface and the insulation is:
 
 \begin{equation}
 \left[ {{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {{\rm{Y}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{I}}_t} - {{\rm{X}}_{\rm{0}}}\cdot {\rm{T}}{{\rm{O}}_{\rm{t}}} + {\rm{UM}}\cdot \left( {{\rm{TM - T}}{{\rm{O}}_{\rm{t}}}} \right)} \right]{\rm{ + QSO  =  0}}
 \end{equation}
 
-Which can be rewritten to solve for TO :
+Which can be rewritten to solve for TO:
 
 \begin{equation}
 {\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{\rm{t}}}{\rm{ + UM}}\cdot {\rm{TM}}}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + UM}}}}} \right]{\rm{  }}
+\label{eq:HeatBalEqforTo}
 \end{equation}
 
 Depending on whether or not the detailed or simple algorithm for surface conductance is being used, there are two expressions for TM, the outside temperature of the insulation. For the simple conductance:
 
 \begin{equation}
 {\rm{TM}} = \left[ {\frac{{{\rm{QSM + UM}}\cdot {\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ + HO}}\cdot {{\rm{T}}_{\rm{a}}}}}{{{\rm{UM + HO}}}}} \right]
+\label{eq:OutTempMovableInsulation}
 \end{equation}
 
 For the detailed conductance:
 
 \begin{equation}
 {\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{QSM}} + {\rm{UM}}\cdot {\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ + HA}}\cdot {{\rm{T}}_{\rm{a}}}{\rm{ + HS}}\cdot {{\rm{T}}_{\rm{s}}}{\rm{ + HG}}\cdot {{\rm{T}}_{\rm{g}}}}}{{{\rm{UM + HA + HS + HG}}}}} \right]{\rm{  }}
+\label{eq:TOtEquationDetailedConductance}
 \end{equation}
 
 In this case the values of HA, HS and HG must be found by using an estimated value of TM in place of TO.
@@ -82,13 +88,14 @@ In this case the values of HA, HS and HG must be found by using an estimated val
 
 \subsection{Heat Balance Cases}\label{heat-balance-cases}
 
-TO\(_{t}\) and TI\(_{t}\) are related through the Y\(_{0}\)CTF. However TI\(_{t}\) is also unknown. While it is possible to combine the outside and the inside surface heat balances to compute TO\(_{t}\) and TI\(_{t}\) simultaneously, TARP uses a simpler procedure where TO\(_{t}\) is based on a previous value of TI. When Y\(_{0}\) is small, as occurs in well insulated or very massive surfaces, TI\(_{t}\) can be replaced by TI\(_{t-1}\) (which is known for the previous hour's heat balance) without significantly effecting the value of TO\(_{t}\) When Y\(_{0}\) is large, TO and TI can so strongly be coupled that separate outside and inside heat balances do not work because the environment and zone temperatures have negligible influence on the heat balances. The TARP uses the inside surface heat balance to couple TO\(_{t}\) with TZ and TR. These two temperatures are less strongly influenced by TO and allow a reasonable heat balance. On the first heat balance iteration, TZ and TR are the values at time t-1. The user may optionally require that TO\(_{t}\) be recomputed with every iteration of TI\(_{t}\). ~In this case TZ and TR have values from the previous iteration and a true simultaneous solution is achieved. In most conventional constructions, recomputing TO\(_{t}\) does not significantly change the computed zone loads and temperatures. The inside surface heat balance is given by
+TO\(_{t}\) and TI\(_{t}\) are related through the Y\(_{0}\)CTF. However TI\(_{t}\) is also unknown. While it is possible to combine the outside and the inside surface heat balances to compute TO\(_{t}\) and TI\(_{t}\) simultaneously, TARP uses a simpler procedure where TO\(_{t}\) is based on a previous value of TI. When Y\(_{0}\) is small, as occurs in well insulated or very massive surfaces, TI\(_{t}\) can be replaced by TI\(_{t-1}\) (which is known for the previous hour's heat balance) without significantly effecting the value of TO\(_{t}\) When Y\(_{0}\) is large, TO and TI can so strongly be coupled that separate outside and inside heat balances do not work because the environment and zone temperatures have negligible influence on the heat balances. The TARP uses the inside surface heat balance to couple TO\(_{t}\) with TZ and TR. These two temperatures are less strongly influenced by TO and allow a reasonable heat balance. On the first heat balance iteration, TZ and TR are the values at time t-1. The user may optionally require that TO\(_{t}\) be recomputed with every iteration of TI\(_{t}\). ~In this case TZ and TR have values from the previous iteration and a true simultaneous solution is achieved. In most conventional constructions, recomputing TO\(_{t}\) does not significantly change the computed zone loads and temperatures. The inside surface heat balance is given by:
 
 \begin{equation}
 {\rm{T}}{{\rm{I}}_{\rm{t}}} = \left[ {\frac{{KI{P_t} + QSI + HC\cdot TZ + HR\cdot TR + {Y_0}\cdot TO}}{{{Z_0} + HC + HR}}} \right]
+\label{eq:InsideSurfTempHeatBalEq}
 \end{equation}
 
-The surface heat balances can be combined in eight ways according to conditions for calculations of the outside surface temperature
+The surface heat balances can be combined in eight ways according to conditions for calculations of the outside surface temperature:
 
 \begin{equation}
 {F_1} = \left[ {\frac{{{Y_0}}}{{{Z_0} + HI + HR}}} \right]
@@ -104,7 +111,7 @@ The surface heat balances can be combined in eight ways according to conditions 
 
 \subsubsection{Case1: Y\(_{0}\)~ small, simple conductance, no movable insulation:}\label{case1-yux5f0-small-simple-conductance-no-movable-insulation}
 
-From Equation
+From Equation~\ref{eq:OutsideSurfTempHeatBalEq},
 
 \begin{equation}
 {\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{{\rm{t - 1}}}}{\rm{ + HO}}\cdot {{\rm{T}}_{\rm{a}}}}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + HO}}}}} \right]{\rm{  }}
@@ -112,7 +119,7 @@ From Equation
 
 \subsubsection{Case2: Y\(_{0}\) not small, simple conductance, no movable insulation:}\label{case2-yux5f0-not-small-simple-conductance-no-movable-insulation}
 
-From Equations and
+From Equations~\ref{eq:OutsideSurfTempHeatBalEq} and~\ref{eq:InsideSurfTempHeatBalEq}:
 
 \begin{equation}
 {\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {\rm{HO}}\cdot {{\rm{T}}_{\rm{a}}} + {{\rm{F}}_1}\cdot \left( {{\rm{KI}}{{\rm{P}}_{\rm{t}}}{\rm{ + QSI + HI}}\cdot {\rm{TZ + HR}}\cdot {\rm{TR}}} \right)}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + HO - }}{{\rm{F}}_{\rm{1}}}\cdot {{\rm{Y}}_0}}}} \right]{\rm{  }}
@@ -120,7 +127,7 @@ From Equations and
 
 \subsubsection{Case3: Y\(_{0}\)~ small, detailed conductance, no movable insulation:}\label{case3-yux5f0-small-detailed-conductance-no-movable-insulation}
 
-From Equation
+From Equation~\ref{eq:MoreDetailedOutsideSurfHeatBalEq}:
 
 \begin{equation}
 {\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{{\rm{t - 1}}}}{\rm{ + HA}}\cdot {{\rm{T}}_{\rm{a}}} + {\rm{HS}}\cdot {{\rm{T}}_{\rm{s}}} + {\rm{HG}}\cdot {{\rm{T}}_{\rm{g}}}}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + HA + HS + HG}}}}} \right]{\rm{  }}
@@ -128,7 +135,7 @@ From Equation
 
 \subsubsection{Case4: Y\(_{0}\) not small, detailed conductance, no movable insulation:}\label{case4-yux5f0-not-small-detailed-conductance-no-movable-insulation}
 
-From Equations and
+From Equations~\ref{eq:MoreDetailedOutsideSurfHeatBalEq} and~\ref{eq:InsideSurfTempHeatBalEq}:
 
 \begin{equation}
 {\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {\rm{HA}}\cdot {{\rm{T}}_{\rm{a}}} + {\rm{HS}}\cdot {{\rm{T}}_{\rm{s}}} + {\rm{HG}}\cdot {{\rm{T}}_{\rm{g}}} + {{\rm{F}}_{\rm{1}}}\cdot \left( {{\rm{KI}}{{\rm{P}}_{\rm{t}}}{\rm{ + QSI + HI}}\cdot {\rm{TZ + HR}}\cdot {\rm{TR}}} \right)}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + HA + HS + HG - }}{{\rm{F}}_1}\cdot {{\rm{Y}}_0}}}} \right]{\rm{  }}
@@ -136,27 +143,34 @@ From Equations and
 
 \subsubsection{Case5: Y\(_{0}\)~ small, simple conductance, with movable insulation:}\label{case5-yux5f0-small-simple-conductance-with-movable-insulation}
 
-From Equations and \(TO_t = \left[ \frac{ KOP_t + QSO + HA \cdot T_a + HS \cdot T_s + HG \cdot T_g + F_1 \cdot \left( KIP_t QS1 + HI \cdot TZ + HR \cdot TR \right) } { X_0 + HA + HS + HG - F_1 \cdot Y_0 } \right]\)
+From Equations~\ref{eq:HeatBalEqforTo} and~\ref{eq:OutTempMovableInsulation}:
+
+\begin{equation}
+TO_t = \left[ \frac{ KOP_t + QSO + Y_0 \cdot {TI_{t-1}} + F_2 \cdot \left( QSM + HO \cdot TM \right) } { X_0 + UM - F_2 \cdot UM } \right]
+\label{eq:HeatBalanceEquationCase5}
+\end{equation}
 
 \subsubsection{Case6: Y\(_{0}\) not small, simple conductance, with movable insulation:}\label{case6-yux5f0-not-small-simple-conductance-with-movable-insulation}
 
-From Equations , and
+From Equations~\ref{eq:HeatBalEqforTo}, ~\ref{eq:OutTempMovableInsulation} and~\ref{eq:InsideSurfTempHeatBalEq}:
 
 \begin{equation}
 {\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{F}}_2}\cdot \left( {{\rm{QSM + HO}}\cdot {{\rm{T}}_{\rm{a}}}} \right) + {{\rm{F}}_1}\cdot \left( {{\rm{KI}}{{\rm{P}}_{\rm{t}}}{\rm{ + QSI + HI}}\cdot {\rm{TZ + HR}}\cdot {\rm{TR}}} \right)}}{{{{\rm{X}}_{\rm{0}}} + {\rm{UM - }}{{\rm{F}}_{\rm{2}}}\cdot {\rm{UM - }}{{\rm{F}}_{\rm{1}}}\cdot {{\rm{Y}}_{\rm{0}}}}}} \right]{\rm{  }}
+\label{eq:HeatBalanceEquationCase6}
 \end{equation}
 
 \subsubsection{Case7: Y\(_{0}\)~ small, detailed conductance, with movable insulation:}\label{case7-yux5f0-small-detailed-conductance-with-movable-insulation}
 
-From Equations and
+From Equations~\ref{eq:HeatBalEqforTo} and~\ref{eq:TOtEquationDetailedConductance}:
 
 \begin{equation}
 {\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{Y}}_0}\cdot {\rm{T}}{{\rm{I}}_{{\rm{t - 1}}}}{\rm{ + }}{{\rm{F}}_{\rm{3}}}\left( {{\rm{QSM + HA}}\cdot {{\rm{T}}_{\rm{a}}}{\rm{ + HS}}\cdot {{\rm{T}}_{\rm{s}}}{\rm{ + HG}}\cdot {{\rm{T}}_{\rm{g}}}} \right)}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + UM - }}{{\rm{F}}_{\rm{3}}}\cdot {\rm{UM}}}}} \right]{\rm{  }}
+\label{eq:HeatBalanceEquationCase7}
 \end{equation}
 
 \subsubsection{Case8: Y\(_{0}\) not small, detailed conductance, with movable insulation:}\label{case8-yux5f0-not-small-detailed-conductance-with-movable-insulation}
 
-From Equations , and
+From Equations~\ref{eq:HeatBalEqforTo}, ~\ref{eq:TOtEquationDetailedConductance} and~\ref{eq:InsideSurfTempHeatBalEq}:
 
 \begin{equation}
 \medmuskip=0mu
@@ -165,111 +179,93 @@ From Equations , and
 \nulldelimiterspace=0pt
 \scriptspace=0pt
 {\rm{T}}{{\rm{O}}_{\rm{t}}}{\rm{ = }}\left[ {\frac{{{\rm{KO}}{{\rm{P}}_{\rm{t}}} + {\rm{QSO}} + {{\rm{F}}_1}\cdot \left( {{\rm{KI}}{{\rm{P}}_{\rm{t}}}{\rm{ + QSI + HI}}\cdot {\rm{TZ + HR}}\cdot {\rm{TR}}} \right){\rm{ + }}{{\rm{F}}_{\rm{3}}}\left( {{\rm{QSM + HA}}\cdot {{\rm{T}}_{\rm{a}}}{\rm{ + HS}}\cdot {{\rm{T}}_{\rm{s}}}{\rm{ + HG}}\cdot {{\rm{T}}_{\rm{g}}}} \right)}}{{{{\rm{X}}_{\rm{0}}}{\rm{ + UM - }}{{\rm{F}}_{\rm{3}}}\cdot {\rm{UM - }}{{\rm{F}}_{\rm{1}}}\cdot {{\rm{Y}}_{\rm{0}}}}}} \right]{\rm{  }}
+\label{eq:HeatBalanceEquationCase8}
 \end{equation}
 
-\subsection{Fortran Algorithm Examples}\label{fortran-algorithm-examples}
+\subsection{C++ Algorithm Examples}\label{c++-algorithm-examples}
+
+These C++ code snippets show the implementation of these different cases.
 
 \subsubsection{Case5: Y\(_{0}\)~ small, simple conductance, with movable insulation:}\label{case5-yux5f0-small-simple-conductance-with-movable-insulation-1}
 
-From Equation
+From Equation~\ref{eq:HeatBalanceEquationCase5}:
 
 \begin{lstlisting}
-! Outside heat balance case: Movable insulation, slow conduction, simple convection
- F2 = DBLE(HmovInsul) / ( DBLE(HmovInsul) + DBLE(HExtSurf(SurfNum)) )
- TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)                       &
-                    +DBLE(QRadSWOutAbs(SurfNum) )                   &
-           +Construct(ConstrNum)\%CTFCross(0)*TempSurfIn(SurfNum)   &
-           +F2* ( DBLE(QRadSWOutMvIns(SurfNum))                     &
-           + DBLE(HExtSurf(SurfNum))* DBLE(TempExt) ) )             &
-           /( Construct(ConstrNum)\%CTFOutside(0) + DBLE(HmovInsul) &
-          - F2* DBLE(HMovInsul))
+// Outside heat balance case: Movable insulation, slow conduction, simple convection
+   F2 = HMovInsul / (HMovInsul + HExtSurf(SurfNum) );
+   TH(1, 1, SurfNum) = (-CTFConstOutPart(SurfNum) + QRadSWOutAbs(SurfNum) + construct.CTFCross(0) * TempSurfIn(SurfNum) +
+                       F2 * (QRadSWOutMvIns(SurfNum) + (HExtSurf(SurfNum)) * TempExt) /
+                       (construct.CTFOutside(0) + HMovInsul - F2 * HMovInsul);
 \end{lstlisting}
 
 \subsubsection{Case6: Y\(_{0}\) not small, simple conductance, with movable insulation:}\label{case6-yux5f0-not-small-simple-conductance-with-movable-insulation-1}
 
-From Equation
+From Equation~\ref{eq:HeatBalanceEquationCase6}:
 
 \begin{lstlisting}
-! Outside heat balance case: Movable insulation, quick conduction, simple convection
-F2 = DBLE(HmovInsul) / ( DBLE(HmovInsul) + DBLE(HExtSurf(SurfNum)) )
-TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)              &
-DBLE(QRadSWOutAbs(SurfNum))                               &
-+F2*( DBLE(QRadSWOutMvIns(SurfNum))                       &
-+DBLE(HExtSurf(SurfNum))* DBLE(TempExt) )                 &
-+F1*( CTFConstInPart(SurfNum)                             &
-+ DBLE(QRadSWInAbs(SurfNum))                              &
-+ DBLE(QRadThermInAbs(SurfNum))                           &
-+ DBLE(HConvIn(SurfNum))*MAT(ZoneNum)                     &
-+ DBLE(NetLWRadToSurf(SurfNum)) ) )                       &
-/( Construct(ConstrNum)\%CTFOutside(0) + DBLE(HmovInsul)  &
--F2* DBLE(HMovInsul )- F1*Construct(ConstrNum)\%CTFCross(0) )
+// Outside heat balance case: Movable insulation, quick conduction, simple convection
+   F1 = construct.CTFCross(0) / (construct.CTFInside(0) + HConvIn(SurfNum));
+   F2 = HMovInsul / (HMovInsul + HExtSurf(SurfNum) );
+   TH(1, 1, SurfNum) = (-CTFConstOutPart(SurfNum) + QRadSWOutAbs(SurfNum) + QRadLWOutSrdSurfs(SurfNum) +
+                       F1 * (CTFConstInPart(SurfNum) + QRadSWInAbs(SurfNum) + QRadThermInAbs(SurfNum) + 
+                       HConvIn(SurfNum) * MAT(ZoneNum) + NetLWRadToSurf(SurfNum)) +
+                       F2 * (QRadSWOutMvIns(SurfNum) + (HExtSurf(SurfNum)) * TempExt) /
+                      (construct.CTFOutside(0) + HMovInsul - F2 * HMovInsul - F1 * construct.CTFCross(0));
 \end{lstlisting}
 
 \subsubsection{Case7: Y\(_{0}\)~ small, detailed conductance, with movable insulation:}\label{case7-yux5f0-small-detailed-conductance-with-movable-insulation-1}
 
-From Equation
+From Equation~\ref{eq:HeatBalanceEquationCase7}:
 
 \begin{lstlisting}
-! Outside heat balance case: Movable insulation, slow conduction, detailed convection
-F2 = DBLE(HMovInsul)/ ( DBLE(HMovInsul) + DBLE(HExtSurf(SurfNum))  &
-           +DBLE(HSky) + DBLE(HGround) )
-TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)                       &
-+DBLE(QRadSWOutAbs(SurfNum))                                       &
-+Construct(ConstrNum)\%CTFCross(0)*TempSurfIn(SurfNum)             &
-+F2*( DBLE(QRadSWOutMvIns(SurfNum))                                &
-+DBLE(HExtSurf(SurfNum))*DBLE(TempExt)                             &
-+DBLE(HSky)*DBLE(SkyTemp)                                          &
-+DBLE(HGround)*DBLE(OutDryBulbTemp) ) )                            &
-/( Construct(ConstrNum)\%CTFOutside(0)                             &
-+DBLE(HMovInsul) - F2*DBLE(HMovInsul) )
+// Outside heat balance case: Movable insulation, slow conduction, detailed convection
+   F2 = HMovInsul / (HMovInsul + HcExtSurf(SurfNum) + HAirExtSurf(SurfNum) + HSkyExtSurf(SurfNum) + HGrdExtSurf(SurfNum));
+   TH(1, 1, SurfNum) = (-CTFConstOutPart(SurfNum) + QRadSWOutAbs(SurfNum) + QRadLWOutSrdSurfs(SurfNum) + construct.CTFCross(0) * TempSurfIn(SurfNum) +
+                       F2 * (QRadSWOutMvIns(SurfNum) + (HcExtSurf(SurfNum) + HAirExtSurf(SurfNum)) * 
+                       TempExt + QAdditionalHeatSourceOutside(SurfNum) +
+                       HSkyExtSurf(SurfNum) * TSky + HGrdExtSurf(SurfNum) * TGround)) /
+                       (construct.CTFOutside(0) + HMovInsul - F2 * HMovInsul);
 \end{lstlisting}
 
 \subsubsection{Case8: Y\(_{0}\) not small, detailed conductance, with movable insulation:}\label{case8-yux5f0-not-small-detailed-conductance-with-movable-insulation-1}
 
-From Equation
+From Equation~\ref{eq:HeatBalanceEquationCase8}:
 
 \begin{lstlisting}
-! Outside heat balance case: Movable insulation, quick conduction, detailed convection
-F2 = DBLE(HMovInsul)/ ( DBLE(HMovInsul) + DBLE(HExtSurf(SurfNum)) &
-           +DBLE(HSky) + DBLE(HGround) )
-TH(SurfNum,1,1) = (-CTFConstOutPart(SurfNum)                      &
-+DBLE(QRadSWOutAbs(SurfNum))                                      &
-+F1*( CTFConstInPart(SurfNum)                                     &
-+DBLE(QRadSWInAbs(SurfNum))                                       &
-+DBLE(QRadThermInAbs(SurfNum))                                    &
-+DBLE(HConvIn(SurfNum))*MAT(ZoneNum)                              &
-+DBLE(NetLWRadToSurf(SurfNum)) )                                  &
-+F2*( DBLE(QRadSWOutMvIns(SurfNum))                               &
-+DBLE(HExtSurf(SurfNum))*DBLE(TempExt)                            &
-+DBLE(HSky)*DBLE(SkyTemp)                                         &
-+DBLE(HGround)*DBLE(OutDryBulbTemp) )                             &
-/( Construct(ConstrNum)\%CTFOutside(0)                            &
-+DBLE(HMovInsul) - F2*DBLE(HMovInsul)                             &
--F1*Construct(ConstrNum)\%CTFCross(0) )
+// Outside heat balance case: Movable insulation, quick conduction, detailed convection
+   F1 = construct.CTFCross(0) / (construct.CTFInside(0) + HConvIn(SurfNum));
+   F2 = HMovInsul / (HMovInsul + HcExtSurf(SurfNum) + HAirExtSurf(SurfNum) + HSkyExtSurf(SurfNum) + HGrdExtSurf(SurfNum));
+   TH(1, 1, SurfNum) = (-CTFConstOutPart(SurfNum) + QRadSWOutAbs(SurfNum) + QRadLWOutSrdSurfs(SurfNum) +
+                       F1 * (CTFConstInPart(SurfNum) + QRadSWInAbs(SurfNum) + QRadThermInAbs(SurfNum) + 
+                       HConvIn(SurfNum) * MAT(ZoneNum) + NetLWRadToSurf(SurfNum)) +
+                       F2 * (QRadSWOutMvIns(SurfNum) + (HcExtSurf(SurfNum) + HAirExtSurf(SurfNum)) * 
+                       TempExt + QAdditionalHeatSourceOutside(SurfNum) +
+                       HSkyExtSurf(SurfNum) * TSky + HGrdExtSurf(SurfNum) * TGround)) /
+                       (construct.CTFOutside(0) + HMovInsul - F2 * HMovInsul - F1 * construct.CTFCross(0));
 \end{lstlisting}
 
-\subsection{Fortran Variable Descriptions}\label{fortran-variable-descriptions}
+\subsection{C++ Variable Descriptions}\label{c++-variable-descriptions}
 
 % table 16
 {\scriptsize
 \begin{longtable}[c]{p{1.8in}p{1.2in}p{0.9in}p{0.9in}p{1.2in}}
 
-\caption{Fortran Variables and Descriptions \label{table:fortran-variables-and-descriptions}} \tabularnewline
+\caption{C++ Variables and Descriptions \label{table:c++-variables-and-descriptions}} \tabularnewline
 \toprule 
-FORTRAN Variable & Description & Tarp Variable & Units & Description \tabularnewline
+C++ Variable & Description & Tarp Variable & Units & Description \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Fortran Variables and Descriptions} \tabularnewline
+\caption[]{C++ Variables and Descriptions} \tabularnewline
 \toprule 
-FORTRAN Variable & Description & Tarp Variable & Units & Description \tabularnewline
+C++ Variable & Description & Tarp Variable & Units & Description \tabularnewline
 \midrule
 \endhead
 
-TH(SurfNum,1,1) & Temperature History(SurfNum,Hist Term,In/Out), where: Hist Term (1 = Current Time, 2-MaxCTFTerms = previous times), In/Out (1 = Outside, 2 = Inside) & TO & C & Temperature of outside of surface I at time t \tabularnewline
-Construct(ConstrNum) \% CTFCross(0) & Cross or Y term of the CTF equation & Y0 & W/m  K & Cross CTF term \tabularnewline
-Construct(ConstrNum) \% CTFInside(0) & Inside or Z terms of the CTF equation & Z0 & W/m  K & Inside CTF term \tabularnewline
-Construct(ConstrNum) \% CTFOutside(0) & Outside or X terms of the CTF equation & X0 & W/m  K & Outside CTF term \tabularnewline
+TH(1, 1, SurfNum) & Temperature History(SurfNum,Hist Term,In/Out), where: Hist Term (1 = Current Time, 2-MaxCTFTerms = previous times), In/Out (1 = Outside, 2 = Inside) & TO & C & Temperature of outside of surface I at time t \tabularnewline
+Construct(ConstrNum).CTFCross(0) & Cross or Y term of the CTF equation & Y0 & W/m  K & Cross CTF term \tabularnewline
+Construct(ConstrNum).CTFInside(0) & Inside or Z terms of the CTF equation & Z0 & W/m  K & Inside CTF term \tabularnewline
+Construct(ConstrNum).CTFOutside(0) & Outside or X terms of the CTF equation & X0 & W/m  K & Outside CTF term \tabularnewline
 CTFConstInPart(SurfNum) & Constant inside portion of the CTF calculation & KIP & W/m & Portion of inward conductive flux based on previous temperature and flux history terms \tabularnewline
 CTFConstOutPart(SurfNum) & Constant Outside portion of the CTF calculation & KOP & W/m & Portion of outward conductive flux based on previous temperature and flux history terms \tabularnewline
 F1, F2, F3 & Intermediate calculation variables & F1, F2, F3 & ~ & Radiation interchange factor between surfaces \tabularnewline

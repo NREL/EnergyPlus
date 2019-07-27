@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef BaseboardElectric_hh_INCLUDED
 #define BaseboardElectric_hh_INCLUDED
@@ -63,122 +52,93 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace BaseboardElectric {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS
-	extern std::string const cCMO_BBRadiator_Electric;
-	extern Real64 const SimpConvAirFlowSpeed; // m/s
+    // Data
+    // MODULE PARAMETER DEFINITIONS
+    extern std::string const cCMO_BBRadiator_Electric;
+    extern Real64 const SimpConvAirFlowSpeed; // m/s
 
-	// DERIVED TYPE DEFINITIONS
+    // DERIVED TYPE DEFINITIONS
 
-	//MODULE VARIABLE DECLARATIONS:
-	extern int NumBaseboards;
-	extern Array1D_bool MySizeFlag;
-	extern Array1D_bool CheckEquipName;
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumBaseboards;
+    extern Array1D_bool MySizeFlag;
+    extern Array1D_bool CheckEquipName;
 
-	//SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
+    // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
-	// Types
+    // Types
 
-	struct BaseboardParams
-	{
-		// Members
-		std::string EquipName;
-		std::string EquipType;
-		std::string Schedule;
-		int SchedPtr;
-		Real64 NominalCapacity;
-		Real64 BaseboardEfficiency;
-		Real64 AirInletTemp;
-		Real64 AirInletHumRat;
-		Real64 AirOutletTemp;
-		Real64 Power;
-		Real64 Energy;
-		Real64 ElecUseLoad;
-		Real64 ElecUseRate;
-		int ZonePtr; // point to teh zone where the basebaord is located
-		int HeatingCapMethod; // - Method for heating capacity scaledsizing calculation- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
-		Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+    struct BaseboardParams
+    {
+        // Members
+        std::string EquipName;
+        std::string EquipType;
+        std::string Schedule;
+        int SchedPtr;
+        Real64 NominalCapacity;
+        Real64 BaseboardEfficiency;
+        Real64 AirInletTemp;
+        Real64 AirInletHumRat;
+        Real64 AirOutletTemp;
+        Real64 Power;
+        Real64 Energy;
+        Real64 ElecUseLoad;
+        Real64 ElecUseRate;
+        int ZonePtr;                  // point to teh zone where the basebaord is located
+        int HeatingCapMethod;         // - Method for heating capacity scaledsizing calculation- (HeatingDesignCapacity, CapacityPerFloorArea,
+                                      // FracOfAutosizedHeatingCapacity)
+        Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
 
-		// Default Constructor
-		BaseboardParams() :
-			SchedPtr( 0 ),
-			NominalCapacity( 0.0 ),
-			BaseboardEfficiency( 0.0 ),
-			AirInletTemp( 0.0 ),
-			AirInletHumRat( 0.0 ),
-			AirOutletTemp( 0.0 ),
-			Power( 0.0 ),
-			Energy( 0.0 ),
-			ElecUseLoad( 0.0 ),
-			ElecUseRate( 0.0 ),
-			ZonePtr( 0 ),
-			HeatingCapMethod( 0.0 ),
-			ScaledHeatingCapacity( 0.0 )
-		{}
+        // Default Constructor
+        BaseboardParams()
+            : SchedPtr(0), NominalCapacity(0.0), BaseboardEfficiency(0.0), AirInletTemp(0.0), AirInletHumRat(0.0), AirOutletTemp(0.0), Power(0.0),
+              Energy(0.0), ElecUseLoad(0.0), ElecUseRate(0.0), ZonePtr(0), HeatingCapMethod(0.0), ScaledHeatingCapacity(0.0)
+        {
+        }
+    };
 
-	};
+    struct BaseboardNumericFieldData
+    {
+        // Members
+        Array1D_string FieldNames;
 
-	struct BaseboardNumericFieldData
-	{
-		// Members
-		Array1D_string FieldNames;
+        // Default Constructor
+        BaseboardNumericFieldData()
+        {
+        }
+    };
 
-		// Default Constructor
-		BaseboardNumericFieldData()
-		{}
+    // Object Data
+    extern Array1D<BaseboardParams> Baseboard;
+    extern Array1D<BaseboardNumericFieldData> BaseboardNumericFields;
 
-	};
+    // Functions
 
-	// Object Data
-	extern Array1D< BaseboardParams > Baseboard;
-	extern Array1D< BaseboardNumericFieldData > BaseboardNumericFields;
+    void clear_state();
 
-	// Functions
+    void SimElectricBaseboard(std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
 
-	void
-	clear_state();
+    void GetBaseboardInput();
 
-	void
-	SimElectricBaseboard(
-		std::string const & EquipName,
-		int const ActualZoneNum,
-		int const ControlledZoneNum,
-		Real64 & PowerMet,
-		int & CompIndex
-	);
+    void InitBaseboard(int const BaseboardNum, int const ControlledZoneNum);
 
-	void
-	GetBaseboardInput();
+    void SizeElectricBaseboard(int const BaseboardNum);
 
-	void
-	InitBaseboard(
-		int const BaseboardNum,
-		int const ControlledZoneNum
-	);
+    void SimElectricConvective(int const BaseboardNum, Real64 const LoadMet);
 
-	void
-	SizeElectricBaseboard( int const BaseboardNum );
+    void ReportBaseboard(int const BaseboardNum);
 
-	void
-	SimElectricConvective(
-		int const BaseboardNum,
-		Real64 const LoadMet
-	);
+} // namespace BaseboardElectric
 
-	void
-	ReportBaseboard( int const BaseboardNum );
-
-} // BaseboardElectric
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

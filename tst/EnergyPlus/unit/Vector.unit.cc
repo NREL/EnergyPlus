@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::DataVectorTypes::Vector Unit Tests
 
@@ -69,96 +58,96 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::DataVectorTypes;
 using namespace ObjexxFCL;
 
-TEST( VectorTest, Basic )
+TEST(VectorTest, Basic)
 {
-	ShowMessage( "Begin Test: VectorTest, Basic" );
-	{
-		Vector v( 0.0, 0.0, 0.0 );
-		EXPECT_EQ( 0.0, v.x );
-		EXPECT_EQ( 0.0, v.y );
-		EXPECT_EQ( 0.0, v.z );
-		EXPECT_EQ( 0.0, v.length() );
-		EXPECT_EQ( 0.0, v.length_squared() );
-		EXPECT_EQ( 0.0, magnitude( v ) );
-		EXPECT_EQ( 0.0, magnitude_squared( v ) );
-		v *= 22.0;
-		EXPECT_EQ( 0.0, v.x );
-		EXPECT_EQ( 0.0, v.y );
-		EXPECT_EQ( 0.0, v.z );
-		EXPECT_EQ( 0.0, v.length() );
-		EXPECT_EQ( 0.0, v.length_squared() );
-		EXPECT_EQ( 0.0, magnitude( v ) );
-		EXPECT_EQ( 0.0, magnitude_squared( v ) );
-		v += 2.0;
-		EXPECT_EQ( 2.0, v.x );
-		EXPECT_EQ( 2.0, v.y );
-		EXPECT_EQ( 2.0, v.z );
-		EXPECT_EQ( 12.0, v.length_squared() );
-		EXPECT_EQ( 12.0, magnitude_squared( v ) );
-		v /= 2.0;
-		EXPECT_EQ( 1.0, v.x );
-		EXPECT_EQ( 1.0, v.y );
-		EXPECT_EQ( 1.0, v.z );
-		EXPECT_EQ( 3.0, v.length_squared() );
-		EXPECT_EQ( 3.0, magnitude_squared( v ) );
-		v -= 1.0;
-		EXPECT_EQ( 0.0, v.x );
-		EXPECT_EQ( 0.0, v.y );
-		EXPECT_EQ( 0.0, v.z );
-		EXPECT_EQ( 0.0, v.length() );
-		EXPECT_EQ( 0.0, v.length_squared() );
-		EXPECT_EQ( 0.0, magnitude( v ) );
-		EXPECT_EQ( 0.0, magnitude_squared( v ) );
-		Vector u( v );
-		EXPECT_EQ( u.x, v.x );
-		EXPECT_EQ( u.y, v.y );
-		EXPECT_EQ( u.z, v.z );
-	}
-	{
-		Vector v( 3.0 );
-		EXPECT_EQ( 3.0, v.x );
-		EXPECT_EQ( 3.0, v.y );
-		EXPECT_EQ( 3.0, v.z );
-		EXPECT_EQ( 27.0, v.length_squared() );
-		EXPECT_EQ( 27.0, magnitude_squared( v ) );
-		Vector u( v * 2.0 );
-		EXPECT_EQ( 6.0, u.x );
-		EXPECT_EQ( 6.0, u.y );
-		EXPECT_EQ( 6.0, u.z );
-		Vector w( -u );
-		EXPECT_EQ( -6.0, w.x );
-		EXPECT_EQ( -6.0, w.y );
-		EXPECT_EQ( -6.0, w.z );
-	}
-	{
-		Vector v( 1.0, 2.0, 3.0 );
-		EXPECT_EQ( 1.0, v.x );
-		EXPECT_EQ( 2.0, v.y );
-		EXPECT_EQ( 3.0, v.z );
-		EXPECT_EQ( 14.0, v.length_squared() );
-		EXPECT_EQ( 14.0, magnitude_squared( v ) );
-		Vector u( 1.0, 2.0, 3.0 );
-		EXPECT_EQ( 0.0, distance( u, v ) );
-		EXPECT_EQ( 0.0, distance_squared( u, v ) );
-		EXPECT_EQ( 14.0, dot( u, v ) );
-		Vector x( cross( u, v ) );
-		EXPECT_EQ( 0.0, x.x );
-		EXPECT_EQ( 0.0, x.y );
-		EXPECT_EQ( 0.0, x.z );
-	}
-	{
-		Vector v( 1.0, 2.0, 3.0 );
-		EXPECT_EQ( 1.0, v.x );
-		EXPECT_EQ( 2.0, v.y );
-		EXPECT_EQ( 3.0, v.z );
-		EXPECT_EQ( 14.0, v.length_squared() );
-		EXPECT_EQ( 14.0, magnitude_squared( v ) );
-		Vector u( 2.0 );
-		EXPECT_EQ( 2.0, distance_squared( u, v ) );
-		EXPECT_EQ( 12.0, dot( u, v ) );
-		Vector x( cross( u, v ) );
-		EXPECT_EQ( 2.0, x.x );
-		EXPECT_EQ( -4.0, x.y );
-		EXPECT_EQ( 2.0, x.z );
-	}
+    ShowMessage("Begin Test: VectorTest, Basic");
+    {
+        Vector v(0.0, 0.0, 0.0);
+        EXPECT_EQ(0.0, v.x);
+        EXPECT_EQ(0.0, v.y);
+        EXPECT_EQ(0.0, v.z);
+        EXPECT_EQ(0.0, v.length());
+        EXPECT_EQ(0.0, v.length_squared());
+        EXPECT_EQ(0.0, magnitude(v));
+        EXPECT_EQ(0.0, magnitude_squared(v));
+        v *= 22.0;
+        EXPECT_EQ(0.0, v.x);
+        EXPECT_EQ(0.0, v.y);
+        EXPECT_EQ(0.0, v.z);
+        EXPECT_EQ(0.0, v.length());
+        EXPECT_EQ(0.0, v.length_squared());
+        EXPECT_EQ(0.0, magnitude(v));
+        EXPECT_EQ(0.0, magnitude_squared(v));
+        v += 2.0;
+        EXPECT_EQ(2.0, v.x);
+        EXPECT_EQ(2.0, v.y);
+        EXPECT_EQ(2.0, v.z);
+        EXPECT_EQ(12.0, v.length_squared());
+        EXPECT_EQ(12.0, magnitude_squared(v));
+        v /= 2.0;
+        EXPECT_EQ(1.0, v.x);
+        EXPECT_EQ(1.0, v.y);
+        EXPECT_EQ(1.0, v.z);
+        EXPECT_EQ(3.0, v.length_squared());
+        EXPECT_EQ(3.0, magnitude_squared(v));
+        v -= 1.0;
+        EXPECT_EQ(0.0, v.x);
+        EXPECT_EQ(0.0, v.y);
+        EXPECT_EQ(0.0, v.z);
+        EXPECT_EQ(0.0, v.length());
+        EXPECT_EQ(0.0, v.length_squared());
+        EXPECT_EQ(0.0, magnitude(v));
+        EXPECT_EQ(0.0, magnitude_squared(v));
+        Vector u(v);
+        EXPECT_EQ(u.x, v.x);
+        EXPECT_EQ(u.y, v.y);
+        EXPECT_EQ(u.z, v.z);
+    }
+    {
+        Vector v(3.0);
+        EXPECT_EQ(3.0, v.x);
+        EXPECT_EQ(3.0, v.y);
+        EXPECT_EQ(3.0, v.z);
+        EXPECT_EQ(27.0, v.length_squared());
+        EXPECT_EQ(27.0, magnitude_squared(v));
+        Vector u(v * 2.0);
+        EXPECT_EQ(6.0, u.x);
+        EXPECT_EQ(6.0, u.y);
+        EXPECT_EQ(6.0, u.z);
+        Vector w(-u);
+        EXPECT_EQ(-6.0, w.x);
+        EXPECT_EQ(-6.0, w.y);
+        EXPECT_EQ(-6.0, w.z);
+    }
+    {
+        Vector v(1.0, 2.0, 3.0);
+        EXPECT_EQ(1.0, v.x);
+        EXPECT_EQ(2.0, v.y);
+        EXPECT_EQ(3.0, v.z);
+        EXPECT_EQ(14.0, v.length_squared());
+        EXPECT_EQ(14.0, magnitude_squared(v));
+        Vector u(1.0, 2.0, 3.0);
+        EXPECT_EQ(0.0, distance(u, v));
+        EXPECT_EQ(0.0, distance_squared(u, v));
+        EXPECT_EQ(14.0, dot(u, v));
+        Vector x(cross(u, v));
+        EXPECT_EQ(0.0, x.x);
+        EXPECT_EQ(0.0, x.y);
+        EXPECT_EQ(0.0, x.z);
+    }
+    {
+        Vector v(1.0, 2.0, 3.0);
+        EXPECT_EQ(1.0, v.x);
+        EXPECT_EQ(2.0, v.y);
+        EXPECT_EQ(3.0, v.z);
+        EXPECT_EQ(14.0, v.length_squared());
+        EXPECT_EQ(14.0, magnitude_squared(v));
+        Vector u(2.0);
+        EXPECT_EQ(2.0, distance_squared(u, v));
+        EXPECT_EQ(12.0, dot(u, v));
+        Vector x(cross(u, v));
+        EXPECT_EQ(2.0, x.x);
+        EXPECT_EQ(-4.0, x.y);
+        EXPECT_EQ(2.0, x.z);
+    }
 }

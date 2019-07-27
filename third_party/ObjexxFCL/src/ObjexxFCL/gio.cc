@@ -1,12 +1,12 @@
 // Global I/O Support
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -29,7 +29,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #ifdef _WIN32
+#ifdef _WIN64
+#define stat _stat64
+#else
 #define stat _stat
+#endif
 #endif
 
 namespace ObjexxFCL {
@@ -643,7 +647,7 @@ inquire( Name const & name, IOFlags & flags )
 
 // Inquire by Name
 void
-inquire( c_cstring const name, IOFlags & flags )
+inquire( char const * const name, IOFlags & flags )
 {
 	inquire( std::string( name ), flags );
 }
@@ -658,7 +662,7 @@ file_exists( std::string const & file_name )
 
 // File Exists?
 bool
-file_exists( c_cstring const file_name )
+file_exists( char const * const file_name )
 {
 	struct stat file_stat;
 	return ( stat( file_name, &file_stat ) == 0 );
@@ -673,7 +677,7 @@ file_openable( std::string const & file_name )
 
 // File Openable?
 bool
-file_openable( c_cstring const file_name )
+file_openable( char const * const file_name )
 {
 	return std::ifstream( file_name ).good();
 }

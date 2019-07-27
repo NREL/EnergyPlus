@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataSurfaceColors_hh_INCLUDED
 #define DataSurfaceColors_hh_INCLUDED
@@ -70,56 +59,52 @@ namespace EnergyPlus {
 
 namespace DataSurfaceColors {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	extern int const NumColors;
-	extern int const ColorNo_Text;
-	extern int const ColorNo_Wall;
-	extern int const ColorNo_Window;
-	extern int const ColorNo_GlassDoor;
-	extern int const ColorNo_Door;
-	extern int const ColorNo_Floor;
-	extern int const ColorNo_Roof;
-	extern int const ColorNo_ShdDetBldg;
-	extern int const ColorNo_ShdDetFix;
-	extern int const ColorNo_ShdAtt;
-	extern int const ColorNo_PV;
-	extern int const ColorNo_TDDDome;
-	extern int const ColorNo_TDDDiffuser;
-	extern int const ColorNo_DaylSensor1;
-	extern int const ColorNo_DaylSensor2;
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    extern int const NumColors;
+    extern int const ColorNo_Text;
+    extern int const ColorNo_Wall;
+    extern int const ColorNo_Window;
+    extern int const ColorNo_GlassDoor;
+    extern int const ColorNo_Door;
+    extern int const ColorNo_Floor;
+    extern int const ColorNo_Roof;
+    extern int const ColorNo_ShdDetBldg;
+    extern int const ColorNo_ShdDetFix;
+    extern int const ColorNo_ShdAtt;
+    extern int const ColorNo_PV;
+    extern int const ColorNo_TDDDome;
+    extern int const ColorNo_TDDDiffuser;
+    extern int const ColorNo_DaylSensor1;
+    extern int const ColorNo_DaylSensor2;
 
-	extern Array1D_int const defaultcolorno; // text | wall | window | glassdoor | door | floor | roof | detached building shade (moves with building) | detached building fixed | attached building shading | PV | TDD:Dome | TDD:Diffuser | Daylight Sensor 1 | Daylight Sensor 2
+    extern Array1D_int const defaultcolorno; // text | wall | window | glassdoor | door | floor | roof | detached building shade (moves with building)
+                                             // | detached building fixed | attached building shading | PV | TDD:Dome | TDD:Diffuser | Daylight Sensor
+                                             // 1 | Daylight Sensor 2
 
-	extern Array1D_string const colorkeys;
+    extern Array1D_string const colorkeys;
 
-	extern Array1D_int const colorkeyptr;
+    extern Array1D_int const colorkeyptr;
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+    // DERIVED TYPE DEFINITIONS:
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern Array1D_int DXFcolorno;
+    // MODULE VARIABLE DECLARATIONS:
+    extern Array1D_int DXFcolorno;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE:
+    // SUBROUTINE SPECIFICATIONS FOR MODULE:
 
-	// Functions
+    // Functions
 
-	bool
-	MatchAndSetColorTextString(
-		std::string const & String, // string to be matched
-		int const SetValue, // value to be used for the color
-		Optional_string_const ColorType = _ // for now, must be DXF
-	);
+    bool MatchAndSetColorTextString(std::string const &String,          // string to be matched
+                                    int const SetValue,                 // value to be used for the color
+                                    Optional_string_const ColorType = _ // for now, must be DXF
+    );
 
-	void
-	SetUpSchemeColors(
-		std::string const & SchemeName,
-		Optional_string_const ColorType = _
-	);
+    void SetUpSchemeColors(std::string const &SchemeName, Optional_string_const ColorType = _);
 
-} // DataSurfaceColors
+} // namespace DataSurfaceColors
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

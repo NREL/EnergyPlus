@@ -3,31 +3,25 @@
 <head>
 	<meta charset="UTF-8">
 	<title>ObjexxFCL Developers Guide</title>
-	<meta name="description" content="Objexx Fortran Compatibility Library">
+	<meta name="description" content="Objexx Fortran-C++ Library">
 	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
-	<meta name="copyright" content="Copyright 2000-2016 Objexx Engineering, Inc. All rights reserved.">
-	<link rel="icon" href="favicon.ico" type="image/x-icon">
-	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-	<link rel="stylesheet" href="styles/Objexx.css" type="text/css">
-	<style type="text/css">
-	<!--
-	.style1 {color: #16694A}
-	-->
-	</style>
+	<meta name="copyright" content="Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.">
+	<link rel="icon" type="image/png" href="img/favicon.png">
+	<link rel="stylesheet" href="css/Objexx.css" type="text/css">
 </head>
 <body bgcolor="#FFFFFF" text="#000000" link="#CC3366" vlink="#990033" alink="#FF3366">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 	<tr>
 		<td></td>
-		<td height="70"><a href="ObjexxFCL.html"><img src="images/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
+		<td height="70"><a href="ObjexxFCL.html"><img src="img/Objexx.logo.svg" alt="Home" border="0" align="left" height="50"></a></td>
 		<td></td>
-		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.1</div></td>
+		<td colspan="3" valign="middle"><div id="Title">ObjexxFCL 4.2</div></td>
 		<td></td>
 	</tr>
 	<tr>
 		<td></td>
-		<td colspan="5" height="16" valign="top" bgcolor="#CFD8B4"></td>
+		<td colspan="5" height="16" valign="top" bgcolor="#EB7A87"></td>
 		<td></td>
 	</tr>
 	<tr>
@@ -73,12 +67,68 @@
 					<td>ObjexxFCL Project-specific declarations</td>
 				</tr>
 				<tr class="table_text">
-					<td><font color="#16694A"><b>byte</b></font></td>
-					<td>Single-byte integer</td>
+					<td>Array</td>
+					<td>Array abstract base class template</td>
 				</tr>
 				<tr class="table_text">
-					<td><font color="#16694A"><b>ubyte</b></font></td>
-					<td>Single-byte unsigned integer</td>
+					<td><font color="#16694A"><b>Array.all</b></font></td>
+					<td>All-dimension Array master wrapper</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Array<em>N</em></b></font></td>
+					<td><em>N</em>D Array abstract base class template</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Array<em>N</em>D</b></font></td>
+					<td><em>N</em>D Real Array class template</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Array<em>N</em>A</b></font></td>
+					<td><em>N</em>D Argument (contiguous proxy) Array class template</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Array<em>N</em>.all</b></font></td>
+					<td><em>N</em>D Array master wrapper</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Array<em>N</em>S</b></font></td>
+					<td><em>N</em>D Slice Array class template</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>MArray<em>N</em></b></font></td>
+					<td><em>N</em>D Member array class template</td>
+				</tr>
+				<tr class="table_text">
+					<td>ArrayInitializer</td>
+					<td>Array initializer class template</td>
+				</tr>
+				<tr class="table_text">
+					<td>ArrayTail</td>
+					<td>Array contiguous tail proxy class template</td>
+				</tr>
+				<tr class="table_text">
+					<td>IndexRange</td>
+					<td>Index range class</td>
+				</tr>
+				<tr class="table_text">
+					<td>InitializerSentinel</td>
+					<td>Array initializer sentinel class</td>
+				</tr>
+				<tr class="table_text">
+					<td>ProxySentinel</td>
+					<td>Proxy array sentinel class</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Vector2</b></font></td>
+					<td>Fast 2-element vector</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Vector3</b></font></td>
+					<td>Fast 3-element vector</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Vector4</b></font></td>
+					<td>Fast 4-element vector</td>
 				</tr>
 				<tr class="table_text">
 					<td><font color="#16694A"><b>CArray</b></font></td>
@@ -105,58 +155,6 @@
 					<td>ChunkVector exponent wrapper class</td>
 				</tr>
 				<tr class="table_text">
-					<td>Array</td>
-					<td>Array abstract base class template</td>
-				</tr>
-				<tr class="table_text">
-					<td><span class="style1"><b>Array.all</b></span></td>
-					<td>All-dimension Array master wrapper</td>
-				</tr>
-				<tr class="table_text">
-					<td><span class="style1"><b>Array<em>N</em></b></span></td>
-					<td><em>N</em>D Array abstract base class template</td>
-				</tr>
-				<tr class="table_text">
-					<td><font color="#16694A"><b>Array<em>N</em>D</b></font></td>
-					<td><em>N</em>D Real Array class template</td>
-				</tr>
-				<tr class="table_text">
-					<td><span class="style1"><b>Array<em>N</em>A</b></span></td>
-					<td><em>N</em>D Argument (contiguous proxy) Array class template</td>
-				</tr>
-				<tr class="table_text">
-					<td><span class="style1"><b>Array<em>N</em>.all</b></span></td>
-					<td><em>N</em>D Array master wrapper</td>
-				</tr>
-				<tr class="table_text">
-					<td><span class="style1"><b>Array<em>N</em>S</b></span></td>
-					<td><em>N</em>D Slice Array class template</td>
-				</tr>
-				<tr class="table_text">
-					<td><span class="style1"><b>MArray<em>N</em></b></span></td>
-					<td><em>N</em>D Member array class template</td>
-				</tr>
-				<tr class="table_text">
-					<td>ArrayInitializer</td>
-					<td>Array initializer class template</td>
-				</tr>
-				<tr class="table_text">
-					<td>ArrayTail</td>
-					<td>Array contiguous tail proxy class template</td>
-				</tr>
-				<tr class="table_text">
-					<td>IndexRange</td>
-					<td>Index range class</td>
-				</tr>
-				<tr class="table_text">
-					<td>InitializerSentinel</td>
-					<td>Array initializer sentinel class</td>
-				</tr>
-				<tr class="table_text">
-					<td>ProxySentinel</td>
-					<td>Proxy array sentinel class</td>
-				</tr>
-				<tr class="table_text">
 					<td>Omit</td>
 					<td>Omitted argument sentinel class</td>
 				</tr>
@@ -169,7 +167,7 @@
 					<td>C-style string (char*) memory managed wrapper class</td>
 				</tr>
 				<tr class="table_text">
-					<td><b><font color="#16694A">string.constants.hh</font></b></td>
+					<td><b><font color="#16694A">string.constants</font></b></td>
 					<td>Useful std::string constants</td>
 				</tr>
 				<tr class="table_text">
@@ -191,6 +189,18 @@
 				<tr class="table_text">
 					<td><font color="#16694A"><b>numeric</b></font></td>
 					<td>Numeric intrinsics: kind-related, digits, huge, ...</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>bit</b></font></td>
+					<td>Bit functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>byte</b></font></td>
+					<td>Single-byte integer</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>ubyte</b></font></td>
+					<td>Single-byte unsigned integer</td>
 				</tr>
 				<tr class="table_text">
 					<td><font color="#16694A"><b>gio</b></font></td>
@@ -245,19 +255,31 @@
 					<td>Stream manipulators used by fmt</td>
 				</tr>
 				<tr class="table_text">
-					<td><font color="#16694A"><b>Time_Date</b></font></td>
+					<td><font color="#16694A"><b>time</b></font></td>
 					<td>Time and date functions</td>
 				</tr>
 				<tr class="table_text">
-					<td><font color="#16694A"><b>Optional.hh</b></font></td>
+					<td><font color="#16694A"><b>random</b></font></td>
+					<td>Random number functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>command</b></font></td>
+					<td>Command line functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>environment</b></font></td>
+					<td>Environment variable functions</td>
+				</tr>
+				<tr class="table_text">
+					<td><font color="#16694A"><b>Optional</b></font></td>
 					<td>Optional argument wrapper class template</td>
 				</tr>
 				<tr class="table_text">
-					<td><font color="#16694A"><b>Required.hh</b></font></td>
+					<td><font color="#16694A"><b>Required</b></font></td>
 					<td>Required argument wrapper class template</td>
 				</tr>
 				<tr class="table_text">
-					<td><font color="#16694A"><b>Reference.hh</b></font></td>
+					<td><font color="#16694A"><b>Reference</b></font></td>
 					<td>Reference (POINTER) wrapper class template</td>
 				</tr>
 				<tr class="table_text">
@@ -388,17 +410,17 @@
 		<td height="21"></td>
 		<td></td>
 		<td></td>
-		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2016 Objexx Engineering, Inc. All Rights Reserved.</td>
+		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2017 Objexx Engineering, Inc. All Rights Reserved.</td>
 		<td></td>
 	</tr>
 	<tr>
-		<td><img src="images/spacer.gif" alt="" style="width:25px; height:9px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:100px; height:1px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:40px; height:1px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:500px; height:1px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:40px; height:1px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:100%; height:1px"></td>
-		<td><img src="images/spacer.gif" alt="" style="width:25px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:9px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:500px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:40px; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:100%; height:1px"></td>
+		<td><img src="img/spacer.gif" alt="" style="width:25px; height:1px"></td>
 	</tr>
 </tbody>
 </table>

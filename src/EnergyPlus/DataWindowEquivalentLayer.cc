@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,77 +44,71 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus Headers
-#include <DataWindowEquivalentLayer.hh>
 #include <DataPrecisionGlobals.hh>
+#include <DataWindowEquivalentLayer.hh>
 
 namespace EnergyPlus {
 
 namespace DataWindowEquivalentLayer {
-	// MODULE INFORMATION:
-	//       AUTHOR         Bereket Nigusse, FSEC/UCF
-	//       DATE WRITTEN   May 2013
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
+    // MODULE INFORMATION:
+    //       AUTHOR         Bereket Nigusse, FSEC/UCF
+    //       DATE WRITTEN   May 2013
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS MODULE:
-	// This data-only module for equivalent layer window model.
+    // PURPOSE OF THIS MODULE:
+    // This data-only module for equivalent layer window model.
 
-	// METHODOLOGY EMPLOYED:
-	// na
+    // METHODOLOGY EMPLOYED:
+    // na
 
-	// REFERENCES:
-	// na
+    // REFERENCES:
+    // na
 
-	// OTHER NOTES:
-	// na
+    // OTHER NOTES:
+    // na
 
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
+    // Using/Aliasing
+    using namespace DataPrecisionGlobals;
 
-	// Data
-	// CFSTY: Complex Fenestration System
-	int const CFSMAXNL( 6 ); // max # of glaze or shade layers
-	// Long-wave (aka LW or thermal) layer properties
-	// Short wave (aka SW or solar) layer properties
-	// "black" room (no reflection)
-	// Layer information
+    // Data
+    // CFSTY: Complex Fenestration System
+    int const CFSMAXNL(6); // max # of glaze or shade layers
+    // Long-wave (aka LW or thermal) layer properties
+    // Short wave (aka SW or solar) layer properties
+    // "black" room (no reflection)
+    // Layer information
 
-	// Gap Gas Properties
-	// Gap information
-	// Equivalent Layer Window Constructon
-	// CFSLAYER: layer types
-	int const ltyNONE( 0 ); // unused / empty layer
-	int const ltyGLAZE( 1 ); // glazing layer i.e, purely specular
-	int const ltyDRAPE( 2 ); // pleated drapes/curtains
-	int const ltyROLLB( 3 ); // roller blind
-	int const ltyVBHOR( 4 ); // venetian blinds - horizontal
-	int const ltyVBVER( 5 ); // venetian blinds - vertical
-	int const ltyINSCRN( 6 ); // insect screen
-	int const ltyROOM( 7 ); // indoor space and/or make no adjustment
-	int const ltyGZS( 8 ); // glazing with spectral data (read from aux file)
-	// index for solar arrays
-	int const isDIFF( 1 );
-	int const isBEAM( 2 );
-	// Defined CFSLayers and CFSs
-	int TotWinEquivLayerConstructs( 0 ); // Number of constructions with Window equivalent Layer
+    // Gap Gas Properties
+    // Gap information
+    // Equivalent Layer Window Constructon
+    // CFSLAYER: layer types
+    int const ltyNONE(0);   // unused / empty layer
+    int const ltyGLAZE(1);  // glazing layer i.e, purely specular
+    int const ltyDRAPE(2);  // pleated drapes/curtains
+    int const ltyROLLB(3);  // roller blind
+    int const ltyVBHOR(4);  // venetian blinds - horizontal
+    int const ltyVBVER(5);  // venetian blinds - vertical
+    int const ltyINSCRN(6); // insect screen
+    int const ltyROOM(7);   // indoor space and/or make no adjustment
+    int const ltyGZS(8);    // glazing with spectral data (read from aux file)
+    // index for solar arrays
+    int const isDIFF(1);
+    int const isBEAM(2);
+    // Defined CFSLayers and CFSs
+    int TotWinEquivLayerConstructs(0); // Number of constructions with Window equivalent Layer
 
-	// Object Data
-	CFSSWP SWP_ROOMBLK; // Solar reflectance, BEAM-BEAM, front | Solar reflectance, BEAM-BEAM, back | Solar transmittance, BEAM-BEAM, front | Solar transmittance, BEAM-BEAM, back | Solar reflectance, BEAM-DIFFUSE, front | Solar reflectance, BEAM-DIFFUSE, back | Solar transmittance, BEAM-DIFFUSE, front | Solar transmittance, BEAM-DIFFUSE, back | Solar reflectance, DIFFUSE-DIFFUSE, front | Solar reflectance, DIFFUSE-DIFFUSE, back | Solar transmittance, DIFFUSE-DIFFUSE
-	Array1D< CFSLAYER > CFSLayers;
-	Array1D< CFSTY > CFS;
-	Array1D< CFSGAP > CFSGaps;
+    // Object Data
+    CFSSWP SWP_ROOMBLK; // Solar reflectance, BEAM-BEAM, front | Solar reflectance, BEAM-BEAM, back | Solar transmittance, BEAM-BEAM, front | Solar
+                        // transmittance, BEAM-BEAM, back | Solar reflectance, BEAM-DIFFUSE, front | Solar reflectance, BEAM-DIFFUSE, back | Solar
+                        // transmittance, BEAM-DIFFUSE, front | Solar transmittance, BEAM-DIFFUSE, back | Solar reflectance, DIFFUSE-DIFFUSE, front |
+                        // Solar reflectance, DIFFUSE-DIFFUSE, back | Solar transmittance, DIFFUSE-DIFFUSE
+    Array1D<CFSLAYER> CFSLayers;
+    Array1D<CFSTY> CFS;
+    Array1D<CFSGAP> CFSGaps;
 
-} // DataWindowEquivalentLayer
+} // namespace DataWindowEquivalentLayer
 
-} // EnergyPlus
+} // namespace EnergyPlus

@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef OutAirNodeManager_hh_INCLUDED
 #define OutAirNodeManager_hh_INCLUDED
@@ -69,46 +58,41 @@ namespace EnergyPlus {
 
 namespace OutAirNodeManager {
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS:
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
 
-	//Type declarations in OutAirNodeManager module
+    // Type declarations in OutAirNodeManager module
 
-	//MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	extern Array1D_int OutsideAirNodeList; // List of all outside air inlet nodes
-	extern int NumOutsideAirNodes; // Number of single outside air nodes
-	extern bool GetOutAirNodesInputFlag; // Flag set to make sure you get input once
+    extern Array1D_int OutsideAirNodeList; // List of all outside air inlet nodes
+    extern int NumOutsideAirNodes;         // Number of single outside air nodes
+    extern bool GetOutAirNodesInputFlag;   // Flag set to make sure you get input once
 
-	//SUBROUTINE SPECIFICATIONS FOR MODULE OutAirNodeManager
+    // SUBROUTINE SPECIFICATIONS FOR MODULE OutAirNodeManager
 
-	// Functions
+    // Functions
 
-	// Clears the global data in OutAirNodeManager.
-	// Needed for unit tests, should not be normally called.
-	void
-	clear_state();
+    // Clears the global data in OutAirNodeManager.
+    // Needed for unit tests, should not be normally called.
+    void clear_state();
 
-	void
-	SetOutAirNodes();
+    void SetOutAirNodes();
 
-	void
-	GetOutAirNodesInput();
+    void GetOutAirNodesInput();
 
-	void
-	InitOutAirNodes();
+    void InitOutAirNodes();
 
-	bool
-	CheckOutAirNodeNumber( int const NodeNumber ); // Number of node to check to see if in Outside Air list
+    bool CheckOutAirNodeNumber(int const NodeNumber); // Number of node to check to see if in Outside Air list
 
-	void
-	CheckAndAddAirNodeNumber(
-		int const NodeNumber, // Number of node to check to see if in Outside Air list
-		bool & Okay // True if found, false if not
-	);
+    void CheckAndAddAirNodeNumber(int const NodeNumber, // Number of node to check to see if in Outside Air list
+                                  bool &Okay            // True if found, false if not
+    );
+    void SetOANodeValues(int const NodeNum, // Number of node to check to see if in Outside Air list
+                         bool InitCall            // True if Init calls, false if CheckAndAddAirNodeNumber calls
+    );
+} // namespace OutAirNodeManager
 
-} // OutAirNodeManager
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <memory>
@@ -64,200 +53,191 @@
 #include <DataIPShortCuts.hh>
 #include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <GroundTemperatureModeling/XingGroundTemperatureModel.hh>
-#include <InputProcessor.hh>
+#include <InputProcessing/InputProcessor.hh>
+#include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
 
 namespace EnergyPlus {
 
-	//******************************************************************************
+//******************************************************************************
 
-	// Xing model factory
-	std::shared_ptr< XingGroundTempsModel > 
-	XingGroundTempsModel::XingGTMFactory( 
-		int objectType, 
-		std::string objectName
-	)
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Matt Mitchell
-		//       DATE WRITTEN   Summer 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+// Xing model factory
+std::shared_ptr<XingGroundTempsModel> XingGroundTempsModel::XingGTMFactory(int objectType, std::string objectName)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Matt Mitchell
+    //       DATE WRITTEN   Summer 2015
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// Reads input and creates instance of Xing ground temps model
+    // PURPOSE OF THIS SUBROUTINE:
+    // Reads input and creates instance of Xing ground temps model
 
-		// USE STATEMENTS:
-		using namespace DataIPShortCuts;
-		using namespace GroundTemperatureManager;
+    // USE STATEMENTS:
+    using namespace DataIPShortCuts;
+    using namespace GroundTemperatureManager;
 
-		// Locals
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		bool found = false;
-		int NumNums;
-		int NumAlphas;
-		int IOStat;
-		bool ErrorsFound = false;
+    // Locals
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    bool found = false;
+    int NumNums;
+    int NumAlphas;
+    int IOStat;
+    bool ErrorsFound = false;
 
-		// New shared pointer for this model object
-		std::shared_ptr< XingGroundTempsModel > thisModel( new XingGroundTempsModel() );
+    // New shared pointer for this model object
+    std::shared_ptr<XingGroundTempsModel> thisModel(new XingGroundTempsModel());
 
-		std::string const cCurrentModuleObject = CurrentModuleObjects( objectType_XingGroundTemp );
-		int numCurrModels = InputProcessor::GetNumObjectsFound( cCurrentModuleObject );
+    std::string const cCurrentModuleObject = CurrentModuleObjects(objectType_XingGroundTemp);
+    int numCurrModels = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
-		for ( int modelNum = 1; modelNum <= numCurrModels; ++modelNum ) {
+    for (int modelNum = 1; modelNum <= numCurrModels; ++modelNum) {
 
-			InputProcessor::GetObjectItem( cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
+        inputProcessor->getObjectItem(cCurrentModuleObject, modelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
 
-			if ( objectName == cAlphaArgs( 1 ) ) {
-				// Read input into object here
+        if (objectName == cAlphaArgs(1)) {
+            // Read input into object here
 
-				thisModel->objectName = cAlphaArgs( 1 );
-				thisModel->objectType = objectType;
-				thisModel->groundThermalDiffisivity = rNumericArgs( 1 ) / ( rNumericArgs( 2 ) * rNumericArgs( 3 ) );
-				thisModel->aveGroundTemp = rNumericArgs( 4 );
-				thisModel->surfTempAmplitude_1 = rNumericArgs( 5 );
-				thisModel->surfTempAmplitude_2 = rNumericArgs( 6 );
-				thisModel->phaseShift_1 = rNumericArgs( 7 );
-				thisModel->phaseShift_2 = rNumericArgs( 8 );
-				
-				found = true;
-				break;
-			}
-		}
+            thisModel->objectName = cAlphaArgs(1);
+            thisModel->objectType = objectType;
+            thisModel->groundThermalDiffisivity = rNumericArgs(1) / (rNumericArgs(2) * rNumericArgs(3));
+            thisModel->aveGroundTemp = rNumericArgs(4);
+            thisModel->surfTempAmplitude_1 = rNumericArgs(5);
+            thisModel->surfTempAmplitude_2 = rNumericArgs(6);
+            thisModel->phaseShift_1 = rNumericArgs(7);
+            thisModel->phaseShift_2 = rNumericArgs(8);
 
-		if ( found && !ErrorsFound ) {
-			groundTempModels.push_back( thisModel );
-			return thisModel;
-		} else {
-			ShowFatalError( "Site:GroundTemperature:Undisturbed:Xing--Errors getting input for ground temperature model");
-			return nullptr;
-		}
-	}
+            found = true;
+            break;
+        }
+    }
 
-	//******************************************************************************
+    if (found && !ErrorsFound) {
+        groundTempModels.push_back(thisModel);
+        return thisModel;
+    } else {
+        ShowFatalError("Site:GroundTemperature:Undisturbed:Xing--Errors getting input for ground temperature model");
+        return nullptr;
+    }
+}
 
-	Real64 XingGroundTempsModel::getGroundTemp()
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Matt Mitchell
-		//       DATE WRITTEN   Summer 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+//******************************************************************************
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// Returns the ground temperature for the Site:GroundTemperature:Undisturbed:Xing
+Real64 XingGroundTempsModel::getGroundTemp()
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Matt Mitchell
+    //       DATE WRITTEN   Summer 2015
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-		// USE STATEMENTS:
-		using DataGlobals::Pi;
-		using WeatherManager::NumDaysInYear;
+    // PURPOSE OF THIS SUBROUTINE:
+    // Returns the ground temperature for the Site:GroundTemperature:Undisturbed:Xing
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int n;
-		Real64 static tp( NumDaysInYear ); // Period of soil temperature cycle
-		Real64 Ts_1; // Amplitude of surface temperature
-		Real64 Ts_2; // Amplitude of surface temperature
-		Real64 PL_1; // Phase shift of surface temperature
-		Real64 PL_2; // Phase shift of surface temperature
+    // USE STATEMENTS:
+    using DataGlobals::Pi;
+    using WeatherManager::NumDaysInYear;
 
-		Real64 term1;
-		Real64 term2;
-		Real64 term3;
-		Real64 term4;
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int n;
+    Real64 static tp(NumDaysInYear); // Period of soil temperature cycle
+    Real64 Ts_1;                     // Amplitude of surface temperature
+    Real64 Ts_2;                     // Amplitude of surface temperature
+    Real64 PL_1;                     // Phase shift of surface temperature
+    Real64 PL_2;                     // Phase shift of surface temperature
 
-		Real64 retVal;
-		Real64 summation;
+    Real64 term1;
+    Real64 term2;
+    Real64 term3;
+    Real64 term4;
 
-		// Inits
-		Ts_1 = surfTempAmplitude_1;
-		PL_1 = phaseShift_1;
-		Ts_2 = surfTempAmplitude_2;
-		PL_2 = phaseShift_2;
+    Real64 retVal;
+    Real64 summation;
 
-		n = 1;
-		term1 = -depth * std::sqrt( ( n * Pi ) / ( groundThermalDiffisivity * tp ) );
-		term2 = ( 2 * Pi * n ) / tp * ( simTimeInDays - PL_1 ) - depth * std::sqrt( ( n * Pi ) / ( groundThermalDiffisivity * tp ) );
+    // Inits
+    Ts_1 = surfTempAmplitude_1;
+    PL_1 = phaseShift_1;
+    Ts_2 = surfTempAmplitude_2;
+    PL_2 = phaseShift_2;
 
-		n = 2;
-		term3 = -depth * std::sqrt( ( n * Pi ) / ( groundThermalDiffisivity * tp ) );
-		term4 = ( 2 * Pi * n ) / tp * ( simTimeInDays - PL_2 ) - depth * std::sqrt( ( n * Pi ) / ( groundThermalDiffisivity * tp ) );
+    n = 1;
+    term1 = -depth * std::sqrt((n * Pi) / (groundThermalDiffisivity * tp));
+    term2 = (2 * Pi * n) / tp * (simTimeInDays - PL_1) - depth * std::sqrt((n * Pi) / (groundThermalDiffisivity * tp));
 
-		summation = std::exp( term1 ) * Ts_1 * std::cos( term2 ) + std::exp( term3 ) * Ts_2 * std::cos( term4 );
+    n = 2;
+    term3 = -depth * std::sqrt((n * Pi) / (groundThermalDiffisivity * tp));
+    term4 = (2 * Pi * n) / tp * (simTimeInDays - PL_2) - depth * std::sqrt((n * Pi) / (groundThermalDiffisivity * tp));
 
-		retVal = aveGroundTemp - summation;
+    summation = std::exp(term1) * Ts_1 * std::cos(term2) + std::exp(term3) * Ts_2 * std::cos(term4);
 
-		return retVal;
-	}
+    retVal = aveGroundTemp - summation;
 
-	//******************************************************************************
+    return retVal;
+}
 
-	Real64 XingGroundTempsModel::getGroundTempAtTimeInMonths(
-		Real64 _depth,
-		int _month
-	)
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Matt Mitchell
-		//       DATE WRITTEN   Summer 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+//******************************************************************************
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// Returns ground temperature when input time is in months
+Real64 XingGroundTempsModel::getGroundTempAtTimeInMonths(Real64 _depth, int _month)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Matt Mitchell
+    //       DATE WRITTEN   Summer 2015
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-		// USE STATEMENTS:
-		using WeatherManager::NumDaysInYear;
+    // PURPOSE OF THIS SUBROUTINE:
+    // Returns ground temperature when input time is in months
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 const aveDaysInMonth = NumDaysInYear / 12;
+    // USE STATEMENTS:
+    using WeatherManager::NumDaysInYear;
 
-		depth = _depth;
-	
-		// Set month
-		if ( _month >= 1 && _month <= 12 ) {
-			simTimeInDays = aveDaysInMonth * ( ( _month - 1 ) + 0.5 );
-		} else {
-			int monthIndex = remainder( _month, 12 );
-			simTimeInDays = aveDaysInMonth * ( ( monthIndex - 1 ) + 0.5 );
-		}
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    Real64 const aveDaysInMonth = NumDaysInYear / 12;
 
-		// Get and return ground temp
-		return getGroundTemp();
-	}
+    depth = _depth;
 
-	//******************************************************************************
+    // Set month
+    if (_month >= 1 && _month <= 12) {
+        simTimeInDays = aveDaysInMonth * ((_month - 1) + 0.5);
+    } else {
+        int monthIndex = remainder(_month, 12);
+        simTimeInDays = aveDaysInMonth * ((monthIndex - 1) + 0.5);
+    }
 
-	Real64 XingGroundTempsModel::getGroundTempAtTimeInSeconds(
-		Real64 _depth,
-		Real64 seconds
-	)
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Matt Mitchell
-		//       DATE WRITTEN   Summer 2015
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+    // Get and return ground temp
+    return getGroundTemp();
+}
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// Returns ground temperature when time is in seconds
+//******************************************************************************
 
-		// USE STATEMENTS:
-		using DataGlobals::SecsInDay;
-		using WeatherManager::NumDaysInYear;
+Real64 XingGroundTempsModel::getGroundTempAtTimeInSeconds(Real64 _depth, Real64 seconds)
+{
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Matt Mitchell
+    //       DATE WRITTEN   Summer 2015
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    // PURPOSE OF THIS SUBROUTINE:
+    // Returns ground temperature when time is in seconds
 
-		depth = _depth;
+    // USE STATEMENTS:
+    using DataGlobals::SecsInDay;
+    using WeatherManager::NumDaysInYear;
 
-		simTimeInDays = seconds / SecsInDay;
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		if ( simTimeInDays >  NumDaysInYear ) {
-			simTimeInDays = remainder( simTimeInDays, NumDaysInYear );
-		}
+    depth = _depth;
 
-		return getGroundTemp();
-	}
+    simTimeInDays = seconds / SecsInDay;
 
-	//******************************************************************************
+    if (simTimeInDays > NumDaysInYear) {
+        simTimeInDays = remainder(simTimeInDays, NumDaysInYear);
+    }
 
-}	// EnergyPlus namespace
+    return getGroundTemp();
+}
+
+//******************************************************************************
+
+} // namespace EnergyPlus

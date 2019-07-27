@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef ZonePlenum_hh_INCLUDED
 #define ZonePlenum_hh_INCLUDED
@@ -64,234 +53,196 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace ZonePlenum {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// DERIVED TYPE DEFINITIONS
+    // Data
+    // DERIVED TYPE DEFINITIONS
 
-	extern int NumZonePlenums; // The Number of ZonePlenums found in the Input
-	extern int NumZoneReturnPlenums; // The Number of ZoneReturnPlenums found in the Input
-	extern int NumZoneSupplyPlenums; // The Number of ZoneSupplyPlenums found in the Input
-	extern Array1D_bool CheckRetEquipName;
-	extern Array1D_bool CheckSupEquipName;
+    extern int NumZonePlenums;       // The Number of ZonePlenums found in the Input
+    extern int NumZoneReturnPlenums; // The Number of ZoneReturnPlenums found in the Input
+    extern int NumZoneSupplyPlenums; // The Number of ZoneSupplyPlenums found in the Input
+    extern Array1D_bool CheckRetEquipName;
+    extern Array1D_bool CheckSupEquipName;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE ZONEPLENUM
+    // SUBROUTINE SPECIFICATIONS FOR MODULE ZONEPLENUM
 
-	// Types
+    // Types
 
-	struct ZoneReturnPlenumConditions
-	{
-		// Members
-		std::string ZonePlenumName;
-		std::string ZoneName;
-		std::string ZoneNodeName;
-		Real64 ZoneTemp;
-		Real64 ZoneHumRat;
-		Real64 ZoneEnthalpy;
-		Real64 OutletTemp;
-		Real64 OutletHumRat;
-		Real64 OutletEnthalpy;
-		Real64 OutletPressure;
-		int ZoneNodeNum;
-		int ActualZoneNum;
-		int OutletNode;
-		Real64 OutletMassFlowRate; // MassFlow through the ZonePlenum being Simulated [kg/Sec]
-		Real64 OutletMassFlowRateMaxAvail; // [kg/Sec]
-		Real64 OutletMassFlowRateMinAvail; // [kg/Sec]
-		int NumInducedNodes;
-		Array1D_int InducedNode;
-		Array1D< Real64 > InducedMassFlowRate;
-		Array1D< Real64 > InducedMassFlowRateMaxAvail;
-		Array1D< Real64 > InducedMassFlowRateMinAvail;
-		Array1D< Real64 > InducedTemp;
-		Array1D< Real64 > InducedHumRat;
-		Array1D< Real64 > InducedEnthalpy;
-		Array1D< Real64 > InducedPressure;
-		Array1D< Real64 > InducedCO2;
-		Array1D< Real64 > InducedGenContam;
-		bool InitFlag;
-		int NumInletNodes;
-		Array1D_int InletNode;
-		Array1D< Real64 > InletMassFlowRate;
-		Array1D< Real64 > InletMassFlowRateMaxAvail;
-		Array1D< Real64 > InletMassFlowRateMinAvail;
-		Array1D< Real64 > InletTemp;
-		Array1D< Real64 > InletHumRat;
-		Array1D< Real64 > InletEnthalpy;
-		Array1D< Real64 > InletPressure;
-		Array1D_int ADUIndex; // index to AirDistUnit leaking to this plenum
-		int NumADUs; // number of ADU's that can leak to this plenum
-		Array1D_int ZoneEqNum; // list of zone equip config indices for this plenum
+    struct ZoneReturnPlenumConditions
+    {
+        // Members
+        std::string ZonePlenumName;
+        std::string ZoneName;
+        std::string ZoneNodeName;
+        Real64 ZoneTemp;
+        Real64 ZoneHumRat;
+        Real64 ZoneEnthalpy;
+        Real64 OutletTemp;
+        Real64 OutletHumRat;
+        Real64 OutletEnthalpy;
+        Real64 OutletPressure;
+        int ZoneNodeNum;
+        int ActualZoneNum;
+        int OutletNode;
+        Real64 OutletMassFlowRate;         // MassFlow through the ZonePlenum being Simulated [kg/Sec]
+        Real64 OutletMassFlowRateMaxAvail; // [kg/Sec]
+        Real64 OutletMassFlowRateMinAvail; // [kg/Sec]
+        int NumInducedNodes;
+        Array1D_int InducedNode;
+        Array1D<Real64> InducedMassFlowRate;
+        Array1D<Real64> InducedMassFlowRateMaxAvail;
+        Array1D<Real64> InducedMassFlowRateMinAvail;
+        Array1D<Real64> InducedTemp;
+        Array1D<Real64> InducedHumRat;
+        Array1D<Real64> InducedEnthalpy;
+        Array1D<Real64> InducedPressure;
+        Array1D<Real64> InducedCO2;
+        Array1D<Real64> InducedGenContam;
+        bool InitFlag;
+        int NumInletNodes;
+        Array1D_int InletNode;
+        Array1D<Real64> InletMassFlowRate;
+        Array1D<Real64> InletMassFlowRateMaxAvail;
+        Array1D<Real64> InletMassFlowRateMinAvail;
+        Array1D<Real64> InletTemp;
+        Array1D<Real64> InletHumRat;
+        Array1D<Real64> InletEnthalpy;
+        Array1D<Real64> InletPressure;
+        Array1D_int ADUIndex;  // index to AirDistUnit leaking to this plenum
+        int NumADUs;           // number of ADU's that can leak to this plenum
+        Array1D_int ZoneEqNum; // list of zone equip config indices for this plenum
 
-		// Default Constructor
-		ZoneReturnPlenumConditions() :
-			ZoneTemp( 0.0 ),
-			ZoneHumRat( 0.0 ),
-			ZoneEnthalpy( 0.0 ),
-			OutletTemp( 0.0 ),
-			OutletHumRat( 0.0 ),
-			OutletEnthalpy( 0.0 ),
-			OutletPressure( 0.0 ),
-			ZoneNodeNum( 0 ),
-			ActualZoneNum( 0 ),
-			OutletNode( 0 ),
-			OutletMassFlowRate( 0.0 ),
-			OutletMassFlowRateMaxAvail( 0.0 ),
-			OutletMassFlowRateMinAvail( 0.0 ),
-			NumInducedNodes( 0 ),
-			InitFlag( false ),
-			NumInletNodes( 0 )
-		{}
+        // Default Constructor
+        ZoneReturnPlenumConditions()
+            : ZoneTemp(0.0), ZoneHumRat(0.0), ZoneEnthalpy(0.0), OutletTemp(0.0), OutletHumRat(0.0), OutletEnthalpy(0.0), OutletPressure(0.0),
+              ZoneNodeNum(0), ActualZoneNum(0), OutletNode(0), OutletMassFlowRate(0.0), OutletMassFlowRateMaxAvail(0.0),
+              OutletMassFlowRateMinAvail(0.0), NumInducedNodes(0), InitFlag(false), NumInletNodes(0)
+        {
+        }
+    };
 
-	};
+    struct ZoneSupplyPlenumConditions
+    {
+        // Members
+        std::string ZonePlenumName;
+        std::string ZoneName;
+        std::string ZoneNodeName;
+        Real64 ZoneTemp;
+        Real64 ZoneHumRat;
+        Real64 ZoneEnthalpy;
+        Real64 InletTemp;
+        Real64 InletHumRat;
+        Real64 InletEnthalpy;
+        Real64 InletPressure;
+        int ZoneNodeNum;
+        int ActualZoneNum;
+        int InletNode;
+        Real64 InletMassFlowRate;         // MassFlow through the ZonePlenum being Simulated [kg/Sec]
+        Real64 InletMassFlowRateMaxAvail; // [kg/Sec]
+        Real64 InletMassFlowRateMinAvail; // [kg/Sec]
+        bool InitFlag;
+        int NumOutletNodes;
+        Array1D_int OutletNode;
+        Array1D<Real64> OutletMassFlowRate;
+        Array1D<Real64> OutletMassFlowRateMaxAvail;
+        Array1D<Real64> OutletMassFlowRateMinAvail;
+        Array1D<Real64> OutletTemp;
+        Array1D<Real64> OutletHumRat;
+        Array1D<Real64> OutletEnthalpy;
+        Array1D<Real64> OutletPressure;
 
-	struct ZoneSupplyPlenumConditions
-	{
-		// Members
-		std::string ZonePlenumName;
-		std::string ZoneName;
-		std::string ZoneNodeName;
-		Real64 ZoneTemp;
-		Real64 ZoneHumRat;
-		Real64 ZoneEnthalpy;
-		Real64 InletTemp;
-		Real64 InletHumRat;
-		Real64 InletEnthalpy;
-		Real64 InletPressure;
-		int ZoneNodeNum;
-		int ActualZoneNum;
-		int InletNode;
-		Real64 InletMassFlowRate; // MassFlow through the ZonePlenum being Simulated [kg/Sec]
-		Real64 InletMassFlowRateMaxAvail; // [kg/Sec]
-		Real64 InletMassFlowRateMinAvail; // [kg/Sec]
-		bool InitFlag;
-		int NumOutletNodes;
-		Array1D_int OutletNode;
-		Array1D< Real64 > OutletMassFlowRate;
-		Array1D< Real64 > OutletMassFlowRateMaxAvail;
-		Array1D< Real64 > OutletMassFlowRateMinAvail;
-		Array1D< Real64 > OutletTemp;
-		Array1D< Real64 > OutletHumRat;
-		Array1D< Real64 > OutletEnthalpy;
-		Array1D< Real64 > OutletPressure;
+        // Default Constructor
+        ZoneSupplyPlenumConditions()
+            : ZoneTemp(0.0), ZoneHumRat(0.0), ZoneEnthalpy(0.0), InletTemp(0.0), InletHumRat(0.0), InletEnthalpy(0.0), InletPressure(0.0),
+              ZoneNodeNum(0), ActualZoneNum(0), InletNode(0), InletMassFlowRate(0.0), InletMassFlowRateMaxAvail(0.0), InletMassFlowRateMinAvail(0.0),
+              InitFlag(false), NumOutletNodes(0)
+        {
+        }
+    };
 
-		// Default Constructor
-		ZoneSupplyPlenumConditions() :
-			ZoneTemp( 0.0 ),
-			ZoneHumRat( 0.0 ),
-			ZoneEnthalpy( 0.0 ),
-			InletTemp( 0.0 ),
-			InletHumRat( 0.0 ),
-			InletEnthalpy( 0.0 ),
-			InletPressure( 0.0 ),
-			ZoneNodeNum( 0 ),
-			ActualZoneNum( 0 ),
-			InletNode( 0 ),
-			InletMassFlowRate( 0.0 ),
-			InletMassFlowRateMaxAvail( 0.0 ),
-			InletMassFlowRateMinAvail( 0.0 ),
-			InitFlag( false ),
-			NumOutletNodes( 0 )
-		{}
+    // Object Data
+    extern Array1D<ZoneReturnPlenumConditions> ZoneRetPlenCond;
+    extern Array1D<ZoneSupplyPlenumConditions> ZoneSupPlenCond;
 
-	};
+    // Functions
 
-	// Object Data
-	extern Array1D< ZoneReturnPlenumConditions > ZoneRetPlenCond;
-	extern Array1D< ZoneSupplyPlenumConditions > ZoneSupPlenCond;
+    void clear_state();
 
-	// Functions
+    void SimAirZonePlenum(std::string const &CompName,
+                          int const iCompType,
+                          int &CompIndex,
+                          Optional_bool_const FirstHVACIteration = _, // Autodesk:OPTIONAL Used without PRESENT check
+                          Optional_bool_const FirstCall = _,          // Autodesk:OPTIONAL Used without PRESENT check
+                          Optional_bool PlenumInletChanged = _        // Autodesk:OPTIONAL Used without PRESENT check
+    );
 
-	void
-	clear_state();
+    // Get Input Section of the Module
+    //******************************************************************************
 
-	void
-	SimAirZonePlenum(
-		std::string const & CompName,
-		int const iCompType,
-		int & CompIndex,
-		Optional_bool_const FirstHVACIteration = _, //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_bool_const FirstCall = _, //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_bool PlenumInletChanged = _ //Autodesk:OPTIONAL Used without PRESENT check
-	);
+    void GetZonePlenumInput();
 
-	// Get Input Section of the Module
-	//******************************************************************************
+    // End of Get Input subroutines for the HB Module
+    //******************************************************************************
 
-	void
-	GetZonePlenumInput();
+    // Beginning Initialization Section of the Module
+    //******************************************************************************
 
-	// End of Get Input subroutines for the HB Module
-	//******************************************************************************
+    void InitAirZoneReturnPlenum(int const ZonePlenumNum);
 
-	// Beginning Initialization Section of the Module
-	//******************************************************************************
+    void InitAirZoneSupplyPlenum(int const ZonePlenumNum, bool const FirstHVACIteration, bool const FirstCall);
 
-	void
-	InitAirZoneReturnPlenum( int const ZonePlenumNum );
+    // End Initialization Section of the Module
+    //******************************************************************************
 
-	void
-	InitAirZoneSupplyPlenum(
-		int const ZonePlenumNum,
-		bool const FirstHVACIteration,
-		bool const FirstCall
-	);
+    // Begin Algorithm Section of the Module
+    //******************************************************************************
 
-	// End Initialization Section of the Module
-	//******************************************************************************
+    void CalcAirZoneReturnPlenum(int const ZonePlenumNum);
 
-	// Begin Algorithm Section of the Module
-	//******************************************************************************
+    void CalcAirZoneSupplyPlenum(int const ZonePlenumNum, bool const FirstCall);
 
-	void
-	CalcAirZoneReturnPlenum( int const ZonePlenumNum );
+    // End Algorithm Section of the Module
+    // *****************************************************************************
 
-	void
-	CalcAirZoneSupplyPlenum(
-		int const ZonePlenumNum,
-		bool const FirstCall
-	);
+    // Beginning of Update subroutines for the ZonePlenum Module
+    // *****************************************************************************
 
-	// End Algorithm Section of the Module
-	// *****************************************************************************
+    void UpdateAirZoneReturnPlenum(int const ZonePlenumNum);
 
-	// Beginning of Update subroutines for the ZonePlenum Module
-	// *****************************************************************************
+    void UpdateAirZoneSupplyPlenum(int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall);
 
-	void
-	UpdateAirZoneReturnPlenum( int const ZonePlenumNum );
+    //        End of Update subroutines for the ZonePlenum Module
+    // *****************************************************************************
 
-	void
-	UpdateAirZoneSupplyPlenum(
-		int const ZonePlenumNum,
-		bool & PlenumInletChanged,
-		bool const FirstCall
-	);
+    // Beginning of Reporting subroutines for the ZonePlenum Module
+    // *****************************************************************************
 
-	//        End of Update subroutines for the ZonePlenum Module
-	// *****************************************************************************
+    void ReportZoneReturnPlenum(int const ZonePlenumNum); // unused1208
 
-	// Beginning of Reporting subroutines for the ZonePlenum Module
-	// *****************************************************************************
+    void ReportZoneSupplyPlenum(int const ZonePlenumNum); // unused1208
 
-	void
-	ReportZoneReturnPlenum( int const ZonePlenumNum ); // unused1208
+    //        End of Reporting subroutines for the ZonePlenum Module
+    // *****************************************************************************
 
-	void
-	ReportZoneSupplyPlenum( int const ZonePlenumNum ); // unused1208
+    // Beginning of mining functions for the ZonePlenum Module
+    // *****************************************************************************
 
-	//        End of Reporting subroutines for the ZonePlenum Module
-	// *****************************************************************************
+    int GetReturnPlenumIndex(int const &ExNodeNum);
 
-} // ZonePlenum
+    void GetReturnPlenumName(int const &ReturnPlenumIndex, std::string &ReturnPlenumName);
 
-} // EnergyPlus
+    //        End of mining functions for the ZonePlenum Module
+    // *****************************************************************************
+
+} // namespace ZonePlenum
+
+} // namespace EnergyPlus
 
 #endif

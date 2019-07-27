@@ -1,0 +1,12 @@
+# EditorConfig is awesome: http://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Default newlines with a newline ending every file
+[*]
+insert_final_newline = true
+indent_size = 4
+indent_style = space
+
+

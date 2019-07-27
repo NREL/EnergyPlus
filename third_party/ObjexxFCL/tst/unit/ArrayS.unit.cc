@@ -1,12 +1,12 @@
 // ObjexxFCL::ArrayS Unit Tests
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -293,7 +293,7 @@ TEST( ArraySTest, Array2SSlice3D )
 //END PROGRAM
 
 	Array3D_int M( 9, 9, 9 );
-	for ( Array3D_int::size_type i = 0; i < 9*9*9; ++i ) M[ i ] = static_cast< int >( i ); // Memory offset values
+	for ( BArray::size_type i = 0; i < 9*9*9; ++i ) M[ i ] = static_cast< int >( i ); // Memory offset values
 
 	Array2S_int S( M( 7, {8,2,-2}, {8,2,-2} ) );
 	EXPECT_EQ( 1, S.l1() );

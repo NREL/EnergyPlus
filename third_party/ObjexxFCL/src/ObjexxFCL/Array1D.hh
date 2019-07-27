@@ -3,13 +3,13 @@
 
 // Array1D: 1D Array
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -73,26 +73,30 @@ public: // Types
 
 	typedef  std::function< void( Array1D< T > & ) >  InitializerFunction;
 
-	using Super::assign;
-	using Super::clear_move;
 	using Super::conformable;
 	using Super::contains;
 	using Super::index;
-	using Super::initialize;
 	using Super::isize1;
 	using Super::l;
+	using Super::operator ();
+	using Super::operator [];
+	using Super::size1;
+	using Super::u;
+
+protected: // Types
+
+	using Super::assign;
+	using Super::clear_move;
+	using Super::initialize;
 	using Super::move_if;
 	using Super::move_or_copy;
 	using Super::move_or_copy_backward;
-	using Super::operator ();
-	using Super::operator [];
 	using Super::resize;
 	using Super::shift_set;
 	using Super::shift_only_set;
-	using Super::size1;
 	using Super::size_of;
 	using Super::swap1;
-	using Super::u;
+
 	using Super::capacity_;
 	using Super::data_;
 	using Super::I_;
@@ -1719,7 +1723,7 @@ public: // std::vector-like API
 	iterator
 	insert( const_iterator pos, Iterator first, Iterator last )
 	{
-		I_.grow( std::distance( first, last ) );
+		I_.grow( static_cast< int >( std::distance( first, last ) ) );
 		return Base::do_insert_iterator( pos, first, last );
 	}
 
@@ -1762,7 +1766,7 @@ public: // std::vector-like API
 	iterator
 	erase( const_iterator first, const_iterator last )
 	{
-		I_.shrink( std::distance( first, last ) );
+		I_.shrink( static_cast< int >( std::distance( first, last ) ) );
 		return Base::do_erase_iterator( first, last );
 	}
 
@@ -2188,7 +2192,7 @@ operator ==( Array1S< T > const & a, Array1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	Array1D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) == b[ l ] );
 	}
@@ -2203,7 +2207,7 @@ operator !=( Array1S< T > const & a, Array1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	Array1D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) != b[ l ] );
 	}
@@ -2218,7 +2222,7 @@ operator <( Array1S< T > const & a, Array1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	Array1D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) < b[ l ] );
 	}
@@ -2233,7 +2237,7 @@ operator <=( Array1S< T > const & a, Array1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	Array1D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) <= b[ l ] );
 	}
@@ -2248,7 +2252,7 @@ operator >( Array1S< T > const & a, Array1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	Array1D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) > b[ l ] );
 	}
@@ -2263,7 +2267,7 @@ operator >=( Array1S< T > const & a, Array1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	Array1D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) >= b[ l ] );
 	}
@@ -2550,7 +2554,7 @@ operator ==( MArray1< A, T > const & a, Array1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	Array1D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) == b[ l ] );
 	}
@@ -2565,7 +2569,7 @@ operator !=( MArray1< A, T > const & a, Array1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	Array1D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) != b[ l ] );
 	}
@@ -2580,7 +2584,7 @@ operator <( MArray1< A, T > const & a, Array1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	Array1D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) < b[ l ] );
 	}
@@ -2595,7 +2599,7 @@ operator <=( MArray1< A, T > const & a, Array1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	Array1D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) <= b[ l ] );
 	}
@@ -2610,7 +2614,7 @@ operator >( MArray1< A, T > const & a, Array1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	Array1D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) > b[ l ] );
 	}
@@ -2625,7 +2629,7 @@ operator >=( MArray1< A, T > const & a, Array1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	Array1D< bool > r( Array1D< bool >::shape( a ) );
-	Array1D< bool >::size_type l( 0u );
+	BArray::size_type l( 0u );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) >= b[ l ] );
 	}

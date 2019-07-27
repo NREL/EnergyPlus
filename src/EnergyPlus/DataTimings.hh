@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataTimings_hh_INCLUDED
 #define DataTimings_hh_INCLUDED
@@ -74,105 +63,94 @@ namespace EnergyPlus {
 
 namespace DataTimings {
 
-	// Data
-	// -only module should be available to other modules and routines.
-	// Thus, all variables in this module must be PUBLIC.
+    // Data
+    // -only module should be available to other modules and routines.
+    // Thus, all variables in this module must be PUBLIC.
 
-	// MODULE PARAMETER DEFINITIONS:
-	extern int const MaxTimingStringLength; // string length for timing string array
+    // MODULE PARAMETER DEFINITIONS:
+    extern int const MaxTimingStringLength; // string length for timing string array
 
-	// DERIVED TYPE DEFINITIONS
+    // DERIVED TYPE DEFINITIONS
 
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern int NumTimingElements;
-	extern int MaxTimingElements;
-	extern Real64 dailyWeatherTime;
-	extern Real64 dailyExteriorEnergyUseTime;
-	extern Real64 dailyHeatBalanceTime;
-	extern Real64 hbdailyInit;
-	extern Real64 hbdailyOutSurf;
-	extern Real64 hbdailyInSurf;
-	extern Real64 hbdailyHVAC;
-	extern Real64 hbdailyRep;
-	extern Real64 clockrate;
-	extern bool lprocessingInputTiming;
-	extern bool lmanageSimulationTiming;
-	extern bool lcloseoutReportingTiming;
+    // MODULE VARIABLE DECLARATIONS:
+    extern int NumTimingElements;
+    extern int MaxTimingElements;
+    extern Real64 dailyWeatherTime;
+    extern Real64 dailyExteriorEnergyUseTime;
+    extern Real64 dailyHeatBalanceTime;
+    extern Real64 hbdailyInit;
+    extern Real64 hbdailyOutSurf;
+    extern Real64 hbdailyInSurf;
+    extern Real64 hbdailyHVAC;
+    extern Real64 hbdailyRep;
+    extern Real64 clockrate;
+    extern bool lprocessingInputTiming;
+    extern bool lmanageSimulationTiming;
+    extern bool lcloseoutReportingTiming;
 
-	// Following for calls to routines
+    // Following for calls to routines
 #ifdef EP_Count_Calls
-	extern int NumShadow_Calls;
-	extern int NumShadowAtTS_Calls;
-	extern int NumClipPoly_Calls;
-	extern int NumInitSolar_Calls;
-	extern int NumAnisoSky_Calls;
-	extern int NumDetPolyOverlap_Calls;
-	extern int NumCalcPerSolBeam_Calls;
-	extern int NumDetShadowCombs_Calls;
-	extern int NumIntSolarDist_Calls;
-	extern int NumIntRadExchange_Calls;
-	extern int NumIntRadExchangeZ_Calls;
-	extern int NumIntRadExchangeMain_Calls;
-	extern int NumIntRadExchangeOSurf_Calls;
-	extern int NumIntRadExchangeISurf_Calls;
-	extern int NumMaxInsideSurfIterations;
-	extern int NumCalcScriptF_Calls;
+    extern int NumShadow_Calls;
+    extern int NumShadowAtTS_Calls;
+    extern int NumClipPoly_Calls;
+    extern int NumInitSolar_Calls;
+    extern int NumAnisoSky_Calls;
+    extern int NumDetPolyOverlap_Calls;
+    extern int NumCalcPerSolBeam_Calls;
+    extern int NumDetShadowCombs_Calls;
+    extern int NumIntSolarDist_Calls;
+    extern int NumIntRadExchange_Calls;
+    extern int NumIntRadExchangeZ_Calls;
+    extern int NumIntRadExchangeMain_Calls;
+    extern int NumIntRadExchangeOSurf_Calls;
+    extern int NumIntRadExchangeISurf_Calls;
+    extern int NumMaxInsideSurfIterations;
+    extern int NumCalcScriptF_Calls;
 #endif
 
-	// Types
+    // Types
 
-	struct timings
-	{
-		// Members
-		std::string Element;
-		Real64 rstartTime;
-		Real64 currentTimeSum;
-		int calls;
+    struct timings
+    {
+        // Members
+        std::string Element;
+        Real64 rstartTime;
+        Real64 currentTimeSum;
+        int calls;
 
-		// Default Constructor
-		timings() :
-			rstartTime( 0.0 ),
-			currentTimeSum( 0.0 ),
-			calls( 0 )
-		{}
+        // Default Constructor
+        timings() : rstartTime(0.0), currentTimeSum(0.0), calls(0)
+        {
+        }
+    };
 
-	};
+    // Object Data
+    extern Array1D<timings> Timing;
 
-	// Object Data
-	extern Array1D< timings > Timing;
+    // Functions
 
-	// Functions
+    void epStartTime(std::string const &ctimingElementstring);
 
-	void
-	epStartTime( std::string const & ctimingElementstring );
+    void epStopTime(std::string const &ctimingElementstring,
+                    Optional_bool_const printit = _, // true if it should be printed here.
+                    Optional_string_const wprint = _ // only needed (and assumed, if printit is true)
+    );
 
-	void
-	epStopTime(
-		std::string const & ctimingElementstring,
-		Optional_bool_const printit = _, // true if it should be printed here.
-		Optional_string_const wprint = _ // only needed (and assumed, if printit is true)
-	);
+    void epSummaryTimes(Real64 &TimeUsed_CPUTime);
 
-	void
-	epSummaryTimes( Real64 & TimeUsed_CPUTime );
+    Real64 epGetTimeUsed(std::string const &ctimingElementstring);
 
-	Real64
-	epGetTimeUsed( std::string const & ctimingElementstring );
+    Real64 epGetTimeUsedperCall(std::string const &ctimingElementstring);
 
-	Real64
-	epGetTimeUsedperCall( std::string const & ctimingElementstring );
+    Real64 eptime();
 
-	Real64
-	eptime();
+    Real64 epElapsedTime();
 
-	Real64
-	epElapsedTime();
+} // namespace DataTimings
 
-} // DataTimings
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

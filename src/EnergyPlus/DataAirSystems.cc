@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,88 +44,102 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus Headers
 #include <DataAirSystems.hh>
-#include <DataPrecisionGlobals.hh>
+#include <Fans.hh>
+#include <HVACFan.hh>
 
 namespace EnergyPlus {
 
 namespace DataAirSystems {
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Plant code authors?
-	//       DATE WRITTEN
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
+    // MODULE INFORMATION:
+    //       AUTHOR         Plant code authors?
+    //       DATE WRITTEN
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS MODULE:
-	// This data-only module contains the structures for various parts of the Plant and
-	// Condenser Loops.
+    // PURPOSE OF THIS MODULE:
+    // This data-only module contains the structures for various parts of the Plant and
+    // Condenser Loops.
 
-	// METHODOLOGY EMPLOYED:
-	// na
+    // METHODOLOGY EMPLOYED:
+    // na
 
-	// REFERENCES: none
+    // REFERENCES: none
 
-	// OTHER NOTES: none
+    // OTHER NOTES: none
 
-	// USE STATEMENTS:
-	// Use statements for data only modules (only modules that should be used here and sparingly)
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
-	using namespace DataPlant;
+    // USE STATEMENTS:
+    // Use statements for data only modules (only modules that should be used here and sparingly)
+    // Using/Aliasing
+    using namespace DataPlant;
 
-	// Data
-	//MODULE PARAMETER DEFINITIONS:
-	// DERIVED TYPE DEFINITIONS
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS
 
-	// DefinePrimaryAirSystem contains the data for a primary air HVAC system
+    // DefinePrimaryAirSystem contains the data for a primary air HVAC system
 
-	// The ConnectionPoint derived type is used to link quickly between loops at connection points
-	// and avoids the need for repetitive searches.
+    // The ConnectionPoint derived type is used to link quickly between loops at connection points
+    // and avoids the need for repetitive searches.
 
-	// INTERFACE BLOCK SPECIFICATIONS
-	// None
+    // INTERFACE BLOCK SPECIFICATIONS
+    // None
 
-	// MODULE VARIABLE DECLARATIONS
-	// For each type of air path, define an array of DefineAirPaths
+    // MODULE VARIABLE DECLARATIONS
+    // For each type of air path, define an array of DefineAirPaths
 
-	// Temporary arrays
+    // Temporary arrays
 
-	// Object Data
-	Array1D< DefinePrimaryAirSystem > PrimaryAirSystem;
-	Array1D< ConnectionPoint > DemandSideConnect; // Connections between loops
-	Array1D< ConnectZoneComp > ZoneCompToPlant; // Connections between loops
-	Array1D< ConnectZoneSubComp > ZoneSubCompToPlant; // Connections between loops
-	Array1D< ConnectZoneSubSubComp > ZoneSubSubCompToPlant; // Connections between loops
-	Array1D< ConnectAirSysComp > AirSysCompToPlant; // Connections between loops
-	Array1D< ConnectAirSysSubComp > AirSysSubCompToPlant; // Connections between loops
-	Array1D< ConnectAirSysSubSubComp > AirSysSubSubCompToPlant; // Connections between loops
+    // Object Data
+    Array1D<DefinePrimaryAirSystem> PrimaryAirSystem;
+    Array1D<ConnectionPoint> DemandSideConnect;               // Connections between loops
+    Array1D<ConnectZoneComp> ZoneCompToPlant;                 // Connections between loops
+    Array1D<ConnectZoneSubComp> ZoneSubCompToPlant;           // Connections between loops
+    Array1D<ConnectZoneSubSubComp> ZoneSubSubCompToPlant;     // Connections between loops
+    Array1D<ConnectAirSysComp> AirSysCompToPlant;             // Connections between loops
+    Array1D<ConnectAirSysSubComp> AirSysSubCompToPlant;       // Connections between loops
+    Array1D<ConnectAirSysSubSubComp> AirSysSubSubCompToPlant; // Connections between loops
 
-	// Functions
-	void
-	clear_state(){
-	
-		PrimaryAirSystem.deallocate();
-		DemandSideConnect.deallocate(); // Connections between loops
-		ZoneCompToPlant.deallocate(); // Connections between loops
-		ZoneSubCompToPlant.deallocate(); // Connections between loops
-		ZoneSubSubCompToPlant.deallocate(); // Connections between loops
-		AirSysCompToPlant.deallocate(); // Connections between loops
-		AirSysSubCompToPlant.deallocate(); // Connections between loops
-		AirSysSubSubCompToPlant.deallocate(); // Connections 
-	}
+    // Functions
+    void clear_state()
+    {
 
-} // DataAirSystems
+        PrimaryAirSystem.deallocate();
+        DemandSideConnect.deallocate();       // Connections between loops
+        ZoneCompToPlant.deallocate();         // Connections between loops
+        ZoneSubCompToPlant.deallocate();      // Connections between loops
+        ZoneSubSubCompToPlant.deallocate();   // Connections between loops
+        AirSysCompToPlant.deallocate();       // Connections between loops
+        AirSysSubCompToPlant.deallocate();    // Connections between loops
+        AirSysSubSubCompToPlant.deallocate(); // Connections
+    }
 
-} // EnergyPlus
+    Real64 calcFanDesignHeatGain(int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow)
+    {
+        Real64 fanDesHeatLoad = 0.0; // design fan heat load (W)
+
+        if (dataFanEnumType < 0 || dataFanIndex < 0 || desVolFlow == 0.0) return fanDesHeatLoad;
+
+        switch (dataFanEnumType) {
+        case DataAirSystems::structArrayLegacyFanModels: {
+            fanDesHeatLoad = Fans::FanDesHeatGain(dataFanIndex, desVolFlow);
+            break;
+        }
+        case DataAirSystems::objectVectorOOFanSystemModel: {
+            fanDesHeatLoad = HVACFan::fanObjs[dataFanIndex]->getFanDesignHeatGain(desVolFlow);
+            break;
+        }
+        case DataAirSystems::fanModelTypeNotYetSet: {
+            // do nothing
+            break;
+        }
+        } // end switch
+        return fanDesHeatLoad;
+    }
+
+} // namespace DataAirSystems
+
+} // namespace EnergyPlus

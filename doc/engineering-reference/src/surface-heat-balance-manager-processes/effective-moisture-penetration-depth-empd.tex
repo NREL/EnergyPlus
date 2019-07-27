@@ -97,7 +97,7 @@ R_{MT,2} = \frac {d_{EMPD,1} + d_{EMPD,2}} {2 \bar R_{water} T \delta_{perm} }
 These moisture fluxes are used to update the moisture content (or equivalent RH, \(\phi\) of each layer:
 
 \begin{equation}
-\phi_{1}(t) = \phi_{1}(t-\delta t) - \frac { (j_{zone} + j_{2}) \cdot TimeStep} {\rho_{matl} d_{EMPD,2} \frac {du}{d\phi}}
+\phi_{1}(t) = \phi_{1}(t-\delta t) - \frac { (j_{zone} + j_{2}) \cdot TimeStep} {\rho_{matl} d_{EMPD,1} \frac {du}{d\phi}}
 \end{equation}
 
 \begin{equation}
@@ -115,11 +115,11 @@ $\frac {du}{d\phi}$ = slope of moisture curve (change in moisture content / chan
 The equivalent RH and equivalent vapor density are related with:
 
 \begin{equation}
-\rho_{v,1} = \frac {\phi_{1} P_{sat}(T)} {\bar R_{water}}
+\rho_{v,1} = \frac {\phi_{1} P_{sat}(T)} {\bar R_{water} T}
 \end{equation}
 
 \begin{equation}
-\rho_{v,2} = \frac {\phi_{2} P_{sat}(T)} {\bar R_{water}}
+\rho_{v,2} = \frac {\phi_{2} P_{sat}(T)} {\bar R_{water} T}
 \end{equation}
 
 The zone flux is used, along with the area of the particular surface, to update the zone humidity ratio, as discussed in \ref{moisture-predictor-corrector}.
@@ -139,7 +139,7 @@ For further information on the EMPD model, see References below.
   A  &= \text{surface area} \RB{m^{2}} \\
   d &= \text{penetration depth} \RB{m} \\
   j &= \text{water mass flux} \RB{\frac{kg}{m^{2} \cdot s}} \\
-  \bar R_{water} &= \text{universal gas constant for water,} \; 452.61 \RB{\frac{J}{kg \cdot K}}   \\
+  \bar R_{water} &= \text{universal gas constant for water,} \; 461.52 \RB{\frac{J}{kg \cdot K}}   \\
   R_{MT} &= \text{Mass transfer resistance} \RB{s/m} \\
   T &= \text{temperature} \RB{K} \\
   u &= \text{moisture content} \RB{\frac{kg}{kg}}

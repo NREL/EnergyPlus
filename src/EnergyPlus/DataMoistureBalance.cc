@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus Headers
 #include <DataMoistureBalance.hh>
@@ -64,90 +53,89 @@ namespace EnergyPlus {
 
 namespace DataMoistureBalance {
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Richard J. Liesen
-	//       DATE WRITTEN   May 2000
-	//       MODIFIED       April 2008; CondFD still uses some of this data.
-	//       RE-ENGINEERED  na
+    // MODULE INFORMATION:
+    //       AUTHOR         Richard J. Liesen
+    //       DATE WRITTEN   May 2000
+    //       MODIFIED       April 2008; CondFD still uses some of this data.
+    //       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS MODULE:
-	// This module should contain the information that is needed to between the
-	// MTF moisture modules and the calculation of the transfer functions
-	// Data is still used in the CondFD solution.
+    // PURPOSE OF THIS MODULE:
+    // This module should contain the information that is needed to between the
+    // MTF moisture modules and the calculation of the transfer functions
+    // Data is still used in the CondFD solution.
 
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
+    // Using/Aliasing
+    using namespace DataPrecisionGlobals;
 
-	// Data
-	// module should be available to other modules and routines.  Thus,
-	// all variables in this module must be PUBLIC.
+    // Data
+    // module should be available to other modules and routines.  Thus,
+    // all variables in this module must be PUBLIC.
 
-	// MODULE PARAMETER DEFINITIONS
+    // MODULE PARAMETER DEFINITIONS
 
-	// Parameters for the definition and limitation of arrays:
+    // Parameters for the definition and limitation of arrays:
 
-	// This is more or less the traditional value from BLAST.
-	Real64 const Lam( 2500000.0 ); // heat of adsorption for building materials
+    // This is more or less the traditional value from BLAST.
+    Real64 const Lam(2500000.0); // heat of adsorption for building materials
 
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	// Public Variables that will also be used in the Moisture Surface Balance
-	Array3D< Real64 > FluxH; // transfer function coeff for calculating the CPF Flux history term
-	Array5D< Real64 > IcoefH; // transfer function coeff for calculating the CPF history term
-	Array4D< Real64 > Icoef; // transfer function coeff for calculating the CPF history term
-	Array2D< Real64 > DiffC; // Thermal Diffusivity in combined potential formulation (CPF)
-	// for each equation
-	Array2D< Real64 > mtinc; // # of Moisture transfer function time increment for each equation
-	Array1D< Real64 > S1; // Thermal Diffusivity in combined potential formulation (CPF)
-	// for each equation
-	Array1D< Real64 > R2; // Thermal Diffusivity in combined potential formulation (CPF)
-	// for each equation
-	Array1D< Real64 > TempOutsideAirFD; // Temperature outside air for the FD surface
+    // MODULE VARIABLE DECLARATIONS:
+    // Public Variables that will also be used in the Moisture Surface Balance
+    Array3D<Real64> FluxH;  // transfer function coeff for calculating the CPF Flux history term
+    Array5D<Real64> IcoefH; // transfer function coeff for calculating the CPF history term
+    Array4D<Real64> Icoef;  // transfer function coeff for calculating the CPF history term
+    Array2D<Real64> DiffC;  // Thermal Diffusivity in combined potential formulation (CPF)
+    // for each equation
+    Array2D<Real64> mtinc; // # of Moisture transfer function time increment for each equation
+    Array1D<Real64> S1;    // Thermal Diffusivity in combined potential formulation (CPF)
+    // for each equation
+    Array1D<Real64> R2; // Thermal Diffusivity in combined potential formulation (CPF)
+    // for each equation
+    Array1D<Real64> TempOutsideAirFD; // Temperature outside air for the FD surface
 
-	Array2D_int mhstry; // # of FD History terms for each equation
-	Array1D_int CMTF; // Type of material layer
-	Array2D_int Nmrf; // # of Moisture Response Factors for CPF Solution
+    Array2D_int mhstry; // # of FD History terms for each equation
+    Array1D_int CMTF;   // Type of material layer
+    Array2D_int Nmrf;   // # of Moisture Response Factors for CPF Solution
 
-	//variables used for MTF moisture implementation
-	Array1D< Real64 > RhoVaporAirOut; // Vapor Density outside surface
-	Array1D< Real64 > RhoVaporAirIn; // Vapor Density inside surface
-	Array1D< Real64 > HConvExtFD; // thermal convection coefficient outside surface
-	Array1D< Real64 > HMassConvExtFD; // mass convection coefficient outside surface
-	Array1D< Real64 > HConvInFD; // thermal convection coefficient inside surface
-	Array1D< Real64 > HMassConvInFD; // mass convection coefficient inside surface
-	Array1D< Real64 > RhoVaporSurfIn; // Vapor Density inside surface
-	Array1D< Real64 > HSkyFD; // Sky Convection Coefficient
-	Array1D< Real64 > HGrndFD; // Ground Convection Coefficient
-	Array1D< Real64 > HAirFD; // Air Convection Coefficient
+    // variables used for MTF moisture implementation
+    Array1D<Real64> RhoVaporAirOut; // Vapor Density outside surface
+    Array1D<Real64> RhoVaporAirIn;  // Vapor Density inside surface
+    Array1D<Real64> HConvExtFD;     // thermal convection coefficient outside surface
+    Array1D<Real64> HMassConvExtFD; // mass convection coefficient outside surface
+    Array1D<Real64> HConvInFD;      // thermal convection coefficient inside surface
+    Array1D<Real64> HMassConvInFD;  // mass convection coefficient inside surface
+    Array1D<Real64> RhoVaporSurfIn; // Vapor Density inside surface
+    Array1D<Real64> HSkyFD;         // Sky Convection Coefficient
+    Array1D<Real64> HGrndFD;        // Ground Convection Coefficient
+    Array1D<Real64> HAirFD;         // Air Convection Coefficient
 
-	void
-	clear_state()
-	{
-		FluxH.deallocate();
-		IcoefH.deallocate();
-		Icoef.deallocate();
-		DiffC.deallocate();
-		mtinc.deallocate();
-		S1.deallocate();
-		R2.deallocate();
-		TempOutsideAirFD.deallocate();
-		mhstry.deallocate();
-		CMTF.deallocate();
-		Nmrf.deallocate();
-		RhoVaporAirOut.deallocate();
-		RhoVaporAirIn.deallocate();
-		HConvExtFD.deallocate();
-		HMassConvExtFD.deallocate();
-		HConvInFD.deallocate();
-		HMassConvInFD.deallocate();
-		RhoVaporSurfIn.deallocate();
-		HSkyFD.deallocate();
-		HGrndFD.deallocate();
-		HAirFD.deallocate();
-	}
+    void clear_state()
+    {
+        FluxH.deallocate();
+        IcoefH.deallocate();
+        Icoef.deallocate();
+        DiffC.deallocate();
+        mtinc.deallocate();
+        S1.deallocate();
+        R2.deallocate();
+        TempOutsideAirFD.deallocate();
+        mhstry.deallocate();
+        CMTF.deallocate();
+        Nmrf.deallocate();
+        RhoVaporAirOut.deallocate();
+        RhoVaporAirIn.deallocate();
+        HConvExtFD.deallocate();
+        HMassConvExtFD.deallocate();
+        HConvInFD.deallocate();
+        HMassConvInFD.deallocate();
+        RhoVaporSurfIn.deallocate();
+        HSkyFD.deallocate();
+        HGrndFD.deallocate();
+        HAirFD.deallocate();
+    }
 
-} // DataMoistureBalance
+} // namespace DataMoistureBalance
 
-} // EnergyPlus
+} // namespace EnergyPlus

@@ -25,9 +25,10 @@ The following discussion on variables and hierarchies is based on the text that 
 
 \subsection{Conceptual Framework -- Variables and Hierarchy}\label{conceptual-framework-variables-and-hierarchy}
 
-To understand how to use the utility bill calculation portion of EnergyPlus you first need to understand some important concepts of variables and hierarchy.~ A variable, for the purposes of this section, is simply a named holder of a series of numbers. In most cases, the variable will be a named holder of 12 numbers, one number for each monthly utility bill. Here is a visualization of a variable called Electric Energy Use:
+To understand how to use the utility bill calculation portion of EnergyPlus you first need to understand some important concepts of variables and hierarchy.~ A variable, for the purposes of this section, is simply a named holder of a series of numbers. In most cases, the variable will be a named holder of 12 numbers, one number for each monthly utility bill. A simple visualization of a variable called Electric Energy Use is shown in Table~\ref{table:example-monthly-electric-energy-use}.
 
-\begin{longtable}[c]{@{}ll@{}}
+\begin{longtable}[c]{@{}lc@{}}
+\caption{Example of Monthly Electric Energy Use \label{table:example-monthly-electric-energy-use}} \tabularnewline
 \toprule 
 Month & Electric Energy Use \tabularnewline
 \midrule
@@ -57,13 +58,13 @@ If you have ever done any computer programming, you can think of a variable as a
 
 In many of today's utility rates, the charges for energy or demand are broken into distribution and supply charges.~ To allow for this, more than one charge may to be defined for a particular category.~ The variables assigned to the same category are added together.
 
-The categories are combined in following hierarchy:
+The categories are combined in the hierarchy shown in Figure~\ref{fig:category-hierarchy}.
 
 
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image7909.png}
-\caption{Category Hierarchy \label{fig:category-hierarchy}}
+\caption{Category Hierarchy for Utility Bills \label{fig:category-hierarchy}}
 \end{figure}
 
 Any charges included in the EnergyCharges category are added together. The EnergyCharges, DemandCharges and ServiceCharges are added together to form the Basis. The Basis, Adjustments and Surcharges are added together to form the Subtotal. The Subtotal and Taxes are added together to be the Total.~ The total represents the total monthly charges on that tariff for the energy source used.~ The combining of categories together is performed automatically unless the user specifies the UtilityCost:Computation.~ In addition, each category, which is also a variable, may be used as a source. For example, a tax that is 5\% of the subtotal would be shown as:
@@ -104,29 +105,27 @@ The order in which the computation should be made is complicated by the fact tha
 
 Luckily there are known algorithms for sorting though these types of interdependencies.~ In fact, the method that spreadsheets use for sorting through the dependencies of cell formulas referencing other cells with formula is very similar.~ In addition, linkers (used as part of the computer language compiling process) face similar issues of sorting through dependences. Figuring out the optimal path in a complex project represented by a PERT Chart also uses a similar algorithm.
 
-Generically, dependency problems are usually characterized as Directed Acycle Graphs (DAGs). A DAG shows the individual formulas as circles and uses arrows between the circles to show which formula is dependent on which other formulas.~ One of the simplest explanations can be seen at the following website:
+Generically, dependency problems are usually characterized as Directed Acycle Graphs (DAGs). A DAG shows the individual formulas as circles and uses arrows between the circles to show which formula is dependent on which other formulas.~ One example algorithm that was used in EnergyPlus is described below:
 
-(Click on lecture 14 ``Critical Path'').
-
-The lecture and site was created by Alison Cawsey, Department of Computing and Electrical Engineering, Heriot-Watt University Edinburgh EH14 4AS, UK.~ The specific algorithm that was used in EnergyPlus is described at this site and is quoted below:
-
-Calculate, for each node, the in-degree of that node (ie, now many edges end up there). Store these in array D.
-
-Repeat:
-
--- Remove (output) node such that D{[}n{]} = 0.
-
--- Decrement D{[}x{]} for all nodes x that are neighbors of n (edge from n to x).
+\begin{itemize}
+\item Calculate, for each node, the in-degree of that node (ie, now many edges end up there). Store these in array D.
+\item Repeat:
+\begin{itemize}
+\item Remove (output) node such that D{[}n{]} = 0.
+\item Decrement D{[}x{]} for all nodes x that are neighbors of n (edge from n to x).
+\end{itemize}
+\end{itemize}
 
 Of course in this case ``node'' has nothing to do with EnergyPlus nodes but is just describing one of the formulas in a DAG.~ This is just one of several different methods to solve a DAG.~ The general method for solving a DAG is called a topological sort. The algorithm used in EnergyPlus is one of the simplest methods available and is appropriate given the number of dependencies.~ More efficient algorithms are known but are probably only appropriate for much larger number of dependencies.
 
 One important note, if after the algorithm is exercised, and some of the formulas still have a count on the number of dependencies, it must be the result of a circular dependency and an error condition is flagged in the ERR file.
 
-The objects have specific variables that are used as inputs and outputs, and thus the outputs are dependent on the inputs, are shown in the following table:
+The objects have specific variables that are used as inputs and outputs, and thus the outputs are dependent on the inputs, are shown in Table~\ref{table:object-variables-input-output}.
 
-\textbf{\emph{Object Variables Inputs and Outputs}}
+\textbf{\emph{}}
 
 \begin{longtable}[c]{@{}lll@{}}
+\caption{Object Variables: Inputs and Outputs \label{table:object-variables-input-output}} \tabularnewline
 \toprule 
 Object & Outputs & Inputs \tabularnewline
 \midrule

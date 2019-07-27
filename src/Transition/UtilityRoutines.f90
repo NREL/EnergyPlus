@@ -382,7 +382,7 @@ FUNCTION FindUnitNumber (FileName) RESULT (UnitNumber)
       Pos=INDEX(TestFileName,FileName)
       IF (Pos .ne. 0) THEN
         !  Must be the last part of the file
-        IF (Pos+FileNameLength-1 .eq. TestFileLength) EXIT
+        IF (Pos+FileNameLength-1 == TestFileLength) EXIT
       ENDIF
     END DO
   ENDIF
@@ -864,7 +864,7 @@ SUBROUTINE ShowErrorMessage(ErrorMessage,OutUnit1,OutUnit2)
   SAVE     StandardErrorOutput
 
   done=INDEX(ErrorMessage,'Completed Successfully')
-  IF (TotalErrors .eq. 0 .and. done .eq. 0) THEN
+  IF (TotalErrors == 0 .and. done == 0) THEN
     StandardErrorOutput=GetNewUnitNumber()
     IF (FileOK) THEN
       OPEN(StandardErrorOutput,File=TRIM(FileNamePath)//'.VCpErr')
@@ -962,9 +962,122 @@ REAL FUNCTION CalculateMuEMPD(a, b, c, d, d_empd, density_matl) RESULT(mu_EMPD)
 
 END FUNCTION
 
+INTEGER FUNCTION GetYearFromStartDayString(sDay) RESULT(Year)
+    CHARACTER(len=*), INTENT(IN) :: sDay
+    IF (sDay(1:2)=="SU".OR.sDay(1:2)=="Su".OR.sDay(1:2)=="sU".OR.sDay(1:2)=="su") THEN
+      Year = 2017
+    ELSE IF (sDay(1:1)=="M".OR.sDay(1:1)=="m") THEN
+      Year = 2007
+    ELSE IF (sDay(1:2)=="TU".OR.sDay(1:2)=="Tu".OR.sDay(1:2)=="tU".OR.sDay(1:2)=="tu") THEN
+      Year = 2013
+    ELSE IF (sDay(1:1)=="W".OR.sDay(1:1)=="w") THEN
+      Year = 2014
+    ELSE IF (sDay(1:2)=="TH".OR.sDay(1:2)=="Th".OR.sDay(1:2)=="tH".OR.sDay(1:2)=="th") THEN
+      Year = 2015
+    ELSE IF (sDay(1:1)=="F".OR.sDay(1:1)=="f") THEN
+      Year = 2010
+    ELSE IF (sDay(1:2)=="SA".OR.sDay(1:2)=="Sa".OR.sDay(1:2)=="sA".OR.sDay(1:2)=="sa") THEN
+      Year = 2011
+    ELSE
+      Year = 2018
+    END IF
+END FUNCTION
+
+INTEGER FUNCTION GetLeapYearFromStartDayString(sDay) RESULT(Year)
+    CHARACTER(len=*), INTENT(IN) :: sDay
+    IF (sDay(1:2)=="SU".OR.sDay(1:2)=="Su".OR.sDay(1:2)=="sU".OR.sDay(1:2)=="su") THEN
+      Year = 2012
+    ELSE IF (sDay(1:1)=="M".OR.sDay(1:1)=="m") THEN
+      Year = 1996
+    ELSE IF (sDay(1:2)=="TU".OR.sDay(1:2)=="Tu".OR.sDay(1:2)=="tU".OR.sDay(1:2)=="tu") THEN
+      Year = 2008
+    ELSE IF (sDay(1:1)=="W".OR.sDay(1:1)=="w") THEN
+      Year = 1992
+    ELSE IF (sDay(1:2)=="TH".OR.sDay(1:2)=="Th".OR.sDay(1:2)=="tH".OR.sDay(1:2)=="th") THEN
+      Year = 2004
+    ELSE IF (sDay(1:1)=="F".OR.sDay(1:1)=="f") THEN
+      Year = 2016
+    ELSE IF (sDay(1:2)=="SA".OR.sDay(1:2)=="Sa".OR.sDay(1:2)=="sA".OR.sDay(1:2)=="sa") THEN
+      Year = 2000
+    ELSE
+      Year = 2016
+    END IF
+END FUNCTION
+
+INTEGER FUNCTION GetWeekdayNumFromString(sDay) RESULT(weekdayNum)
+    CHARACTER(len=*), INTENT(IN) :: sDay
+    IF (sDay(1:2)=="SU".OR.sDay(1:2)=="Su".OR.sDay(1:2)=="sU".OR.sDay(1:2)=="su") THEN
+        weekdayNum = 1
+    ELSE IF (sDay(1:1)=="M".OR.sDay(1:1)=="m") THEN
+        weekdayNum = 2
+    ELSE IF (sDay(1:2)=="TU".OR.sDay(1:2)=="Tu".OR.sDay(1:2)=="tU".OR.sDay(1:2)=="tu") THEN
+        weekdayNum = 3
+    ELSE IF (sDay(1:1)=="W".OR.sDay(1:1)=="w") THEN
+        weekdayNum = 4
+    ELSE IF (sDay(1:2)=="TH".OR.sDay(1:2)=="Th".OR.sDay(1:2)=="tH".OR.sDay(1:2)=="th") THEN
+        weekdayNum = 5
+    ELSE IF (sDay(1:1)=="F".OR.sDay(1:1)=="f") THEN
+        weekdayNum = 6
+    ELSE IF (sDay(1:2)=="SA".OR.sDay(1:2)=="Sa".OR.sDay(1:2)=="sA".OR.sDay(1:2)=="sa") THEN
+        weekdayNum = 7
+    END IF
+END FUNCTION
+
+INTEGER FUNCTION CalculateDayOfYear(iMonth, iDay, LeapYear) RESULT(Day)
+    ! This function takes an integer month (1-12), integer date (1-31), and boolean flag
+    ! for leap year, then accesses a 1-based array of "days before" this month, plus the current
+    ! date, to return the day of the year
+    INTEGER, INTENT(IN) :: iMonth, iDay
+    LOGICAL, INTENT(IN) :: LeapYear
+    INTEGER :: DaysBefore(12) = (/ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 /)
+    INTEGER :: DaysBeforeLeap(12) = (/ 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335 /);
+    IF (LeapYear) THEN
+        Day = DaysBeforeLeap(iMonth) + iDay;
+    ELSE
+        Day = DaysBefore(iMonth) + iDay;
+    END IF
+END FUNCTION CalculateDayOfYear
+
+INTEGER FUNCTION FindYearForWeekDay(iMonth, iDay, cWeekday) RESULT(Year)
+    ! Should take in an integer month (1-12), integer date (1-31), and integer weekday (1-7)
+    ! and return back a year that matches this condition, whether leap year or not
+    INTEGER, INTENT(IN) :: iMonth, iDay
+    CHARACTER(len=*), INTENT(IN) :: cWeekday
+    INTEGER :: DefaultYear(13) = (/ 2013, 2014, 2015, 2010, 2011, 2017, 2007, 2013, 2014, 2015, 2010, 2011, 2017 /)
+    INTEGER :: DefaultLeapYear(13) = (/ 2008, 1992, 2004, 2016, 2000, 2012, 1996, 2008, 1992, 2004, 2016, 2000, 2012 /)
+    LOGICAL :: LeapYear = .FALSE.
+    INTEGER :: Ordinal = 0, Rem = 0, Index = 0
+    INTEGER :: iWeekday = 0
+    INTEGER, EXTERNAL :: CalculateDayOfYear, GetWeekdayNumFromString
+    IF (iMonth==2.AND.iDay==29) THEN
+        LeapYear = .TRUE.
+    END IF
+    iWeekday = GetWeekdayNumFromString(cWeekday)
+    Ordinal = CalculateDayOfYear(iMonth, iDay, LeapYear)
+    Rem = MOD(Ordinal, 7)
+    Index = iWeekday - Rem + 5
+    IF (LeapYear) THEN
+        Year = DefaultLeapYear(iWeekday - Rem + 6)
+    ELSE
+        Year = DefaultYear(iWeekday - Rem + 6)
+    END IF
+END FUNCTION
+
+LOGICAL FUNCTION IsYearNumberALeapYear(YearNumber) RESULT(LeapYear)
+    INTEGER, INTENT(IN) :: YearNumber
+    IF ((YearNumber/4.0) == INT(YearNumber/4.0)) THEN
+      IF ((YearNumber/1000.0) == INT(YearNumber/1000.0)) THEN
+        LeapYear = .TRUE.
+        RETURN
+      END IF
+    END IF
+    LeapYear = .FALSE.
+    RETURN
+END FUNCTION
+
 !     NOTICE
 !
-!     Copyright © 1996-2008 The Board of Trustees of the University of Illinois
+!     Copyright ï¿½ 1996-2008 The Board of Trustees of the University of Illinois
 !     and The Regents of the University of California through Ernest Orlando Lawrence
 !     Berkeley National Laboratory, pending any required approval by the
 !     US Department of Energy.  All rights reserved.

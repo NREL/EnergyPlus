@@ -20,7 +20,9 @@ The zone design data arrays are:
 
 \emph{FinalZoneSizing(i)} corresponds to \emph{CalcFinalZoneSizing} but includes the effect of the user specified sizing factor or user specified zone design flow rate.
 
-The data stored in \emph{CalcZoneSizing}, \emph{CalcFinalZoneSizing}, \emph{ZoneSizing} and \emph{FinalZoneSizing} includes the following data items.
+\emph{TermUnitFinalZoneSizing(k)} corresponds to \emph{FinalZoneSizing} but includes the effect of any air system terminal unit sizing factors input with DesignSpecification:AirTerminal:Sizing objects. The index k is for each air terminal unit. There may be more or less terminal units than there are controlled zones.
+
+The data stored in \emph{CalcZoneSizing}, \emph{CalcFinalZoneSizing}, \emph{ZoneSizing}, \emph{FinalZoneSizing} and \emph{TermUnitFinalZoneSizing} includes the following data items.
 
 % table 40
 \begin{longtable}[c]{p{1.85in}p{4.13in}}
@@ -36,15 +38,15 @@ Name & Description \tabularnewline
 \midrule
 \endhead
 
-All the data from ZoneSizingInput &  \tabularnewline
+Select data from ZoneSizingInput &  \tabularnewline
 DesHeatMassFlow & the zone design heating air mass flow rate in [kg/s] \tabularnewline
 DesCoolMassFlow & the zone design cooling air mass flow rate in [kg/s] \tabularnewline
 DesHeatLoad & the zone design heating load in [W] \tabularnewline
 DesCoolLoad & the zone design cooling load in [W] \tabularnewline
 DesHeatDens & the zone design heating air density [kg/m  ] \tabularnewline
 DesCoolDens & the zone design cooling air density [kg/m  ] \tabularnewline
-DesHeatVolFlow & the zone design heating air volume flow rate [m  /s] \tabularnewline
-DesCoolVolFlow & the zone design cooling air volume flow rate [m  /s] \tabularnewline
+DesHeatVolFlow & the zone design heating air volume flow rate [m\(^{3}\)/s] \tabularnewline
+DesCoolVolFlow & the zone design cooling air volume flow rate [m\(^{3}\)/s] \tabularnewline
 DesHeatCoilInTemp & zone heating coil design air inlet temperature [C] \tabularnewline
 DesCoolCoilInTemp & zone cooling coil design air inlet temperature [C] \tabularnewline
 DesHeatCoilInHumRat & the zone heating coil design air inlet humidity ratio [kg/kg] \tabularnewline
@@ -69,7 +71,7 @@ TimeStepNumAtHeatMax & zone time step number (in the day) at the heating peak \t
 TimeStepNumAtCoolMax & zone time step number (in the day) at the cooling peak \tabularnewline
 HeatDDNum & design day index of design day causing heating peak \tabularnewline
 CoolDDNum & design day index of design day causing cooling peak \tabularnewline
-MinOA & design minimum outside air [m3/s] \tabularnewline
+MinOA & design minimum outside air [m\(^{3}\)/s] \tabularnewline
 HeatFlowSeq(i) & daily sequence of zone heating air mass flow rates (zone time step) [kg/s] \tabularnewline
 CoolFlowSeq(i) & daily sequence of zone cooling air mass flow rates (zone time step) [kg/s] \tabularnewline
 HeatLoadSeq(i) & daily sequence of zone heating loads (zone time step) [W] \tabularnewline
@@ -108,7 +110,7 @@ With the DOAS supply temperature set and the air mass flow rate set to the minim
 {\dot Q_{doa}} = {c_{p,air}}{\dot m_{vent,min}}({T_{sup}} - {T_z})
 \end{equation}
 
-\emph{UpdateSSystemOutputRequired} is then invoked to adjust the load to be met by the ideal zone system.
+\emph{UpdateSystemOutputRequired} is then invoked to adjust the load to be met by the ideal zone system.
 
 The ideal loads calculation steps are as follows.
 
@@ -157,18 +159,12 @@ The calculated and stored sequences are summed or averaged over the zone time-st
 
 \begin{enumerate}
 \def\labelenumi{(\alph{enumi})}
-\item
-  \emph{CoolFlowSeq}
-\item
-  \emph{CoolLoadSeq}
-\item
-  \emph{HeatFlowSeq}
-\item
-  \emph{HeatLoadSeq}
-\item
-  \emph{CoolZoneRetTempSeq}
-\item
-  \emph{HeatZoneRetTempSeq} 
+{\setlength\itemindent{25pt} \item \emph{CoolFlowSeq} }
+{\setlength\itemindent{25pt} \item \emph{CoolLoadSeq} }
+{\setlength\itemindent{25pt} \item \emph{HeatFlowSeq} }
+{\setlength\itemindent{25pt} \item \emph{HeatLoadSeq} }
+{\setlength\itemindent{25pt} \item \emph{CoolZoneRetTempSeq} }
+{\setlength\itemindent{25pt} \item \emph{HeatZoneRetTempSeq} }
 \end{enumerate}
 
 \begin{enumerate}
@@ -206,9 +202,61 @@ If \emph{heating design air flow method} is \emph{flow/zone}, then \emph{heating
 
 \textbf{This concludes the calculation of the zone design flow rates and loads.}
 
+\subsection{Air Terminal Unit Sizing}\label{air-terminal-unit-sizing}
+
+Each controlled zone may have one or more air terminal units (AirTerminal:*) served by one or more central air handlers (AirLoopHVAC). Each air terminal unit may reference a DesignSpecification:AirTerminal:Sizing object which is used to adjust the \emph{FinalZoneSizing} data for each terminal unit with these user inputs:
+
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+		$DesSensCoolingFrac$ &= Fraction of Design Sensible Cooling Load\\
+		$DesCoolSATRatio$ &= Cooling Design Supply Air Temperature Difference Ratio\\
+		$DesSensHeatingFrac$ &= Fraction of Design Sensible Heating Load\\
+		$DesHeatSATRatio$ &= Heating Design Supply Air Temperature Difference Ratio\\
+	  $MinOAFrac$ &= Fraction of Minimum Outdoor Air Flow\\
+\\
+\end{tabular}
+
+All of these factors default to 1.0. Function \emph{UpdateTermUnitFinalZoneSizing} first fills each instance of \emph{TermUnitFinalZoneSizing} with a copy of \emph{FinaZoneSizing} for the controlled zone served by the terminal unit. Then, if there is an applicable DesignSpecification:AirTerminal:Sizing input, the following adjustments are made:
+
+\begin{equation}
+    {CoolLoad_{TU}} = {CoolLoad_{FZ}} \cdot {DesSensCoolingFrac}
+\end{equation}
+
+\begin{equation}
+    {minOAFlow_{TU}} = {minOAFlow_{FZ}} \cdot {MinOAFrac}
+\end{equation}
+
+\begin{equation}
+    {CoolFlowRatio} = {DesSensCoolingFrac} / {DesCoolSATRatio}
+\end{equation}
+
+{\scriptsize
+\begin{equation}
+    {CoolFlow_{TU}} = {CoolFlowNoOA_{FZ}} \cdot CoolFlowRatio + {MinOAFrac} \cdot ( {CoolFlowWithOA_{FZ}} - {CoolFlowNoOA_{FZ}} ) 
+\end{equation}}
+
+\begin{equation}
+    {CoolFlow_{TU}} = max({CoolFlow_{TU}},{minOAFlow_{TU}}) 
+\end{equation}
+
+Where:
+
+\begin{tabular}{lp{0.7\linewidth}}
+\\
+    $CoolLoad$ &= Cooling load variables: $DesCoolLoad, CoolLoadSeq, NonAirSysDesCoolLoad$\\
+    $CoolFlow$ &= Cooling flow variables: $DesCoolVolFlow, CoolFlowSeq$\\
+    $CoolFlowNoOA$ &= Cooling flow variables not adjusted for minimum outdoor air: $DesCoolVolFlowNoOA, CoolFlowSeqNoOA$\\
+    $minOAFlow$ &= minimum outdoor air flow rate\\
+    Subscript $FZ$ &= Value from $FinalZoneSizing$\\
+    Subscript $TU$ &= Value for $TermUnitFinalZoneSizing$\\
+\\
+\end{tabular}
+
+Likewise for heating.
+
 \subsection{Zone HVAC Scalable Sizing}\label{zone-hvac-scalable-sizing}
 
-For zone HVAC equipments scalable sizing applies to supply air flow rate and capacity for both cooling and heating. The scalable sizing method allowed for supply air flow rates include: \emph{FractionOfAutosizedCoolingAirflow}, \emph{FractionOfAutosizedHeatingAirflow}, \emph{FlowPerFloorArea, FlowPerCoolingCapacity}, and \emph{FlowPerHeatingCapacity}. The supply air flow rate scalable sizing methods are defined as follows:
+For zone HVAC equipment, scalable sizing applies to supply air flow rate and capacity for both cooling and heating. The scalable sizing method allowed for supply air flow rates include: \emph{FractionOfAutosizedCoolingAirflow}, sizing method allowed for supply air flow rates include: \emph{FractionOfAutosizedCoolingAirflow}, \emph{FractionOfAutosizedHeatingAirflow}, \emph{FlowPerFloorArea, FlowPerCoolingCapacity}, and \emph{FlowPerHeatingCapacity}. The supply air flow rate scalable sizing methods are defined as follows:
 
 \textbf{\emph{FlowPerFloorArea}}: the simulation engine determine the supply air flow rates from the user specified \emph{supply air flow rates per unit floor area} and the zone floor area of the zone served by the zone HVAC equipment.
 

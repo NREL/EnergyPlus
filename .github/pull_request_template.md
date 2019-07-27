@@ -14,11 +14,10 @@ Add to this list or remove from it as applicable.  This is a simple templated se
 
 ### Review Checklist
 This will not be exhaustively relevant to every PR.
- - [ ] Code style (parentheses padding, variable names)
  - [ ] Functional code review (it has to work!)
  - [ ] If defect, results of running current develop vs this branch should exhibit the fix
  - [ ] CI status: all green or justified
- - [ ] Performance: CI Linux results include performance check -- verify this
+ - [ ] Performance: CI Linux results include performance check
  - [ ] Unit Test(s)
  - C++ checks:
    - [ ] Argument types
@@ -26,11 +25,10 @@ This will not be exhaustively relevant to every PR.
  - IDD changes:
    - [ ] Verify naming conventions and styles, memos and notes and defaults
    - [ ] Open windows IDF Editor with modified IDD to check for errors
-   - [ ] If transition, add rules to spreadsheet
+   - [ ] If transition, add to input rules file for interfaces
    - [ ] If transition, add transition source
    - [ ] If transition, update idfs
  - [ ] If new idf included, locally check the err file and other outputs
- - [ ] Documentation changes in place
- - [ ] Changed docs build successfully
+ - [ ] Required documentation updates?
  - [ ] ExpandObjects changes?
  - [ ] If output changes, including tabular output structure, add to output rules file for interfaces

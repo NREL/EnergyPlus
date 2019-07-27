@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus Headers
 #include <DataDaylightingDevices.hh>
@@ -64,50 +53,50 @@ namespace EnergyPlus {
 
 namespace DataDaylightingDevices {
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Peter Graham Ellis
-	//       DATE WRITTEN   May 2003
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
+    // MODULE INFORMATION:
+    //       AUTHOR         Peter Graham Ellis
+    //       DATE WRITTEN   May 2003
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS MODULE:
-	// This data-only module is a repository for variables used in daylighting devices which
-	// are shared by several modules.
+    // PURPOSE OF THIS MODULE:
+    // This data-only module is a repository for variables used in daylighting devices which
+    // are shared by several modules.
 
-	// METHODOLOGY EMPLOYED: na
-	// REFERENCES: na
-	// OTHER NOTES: na
+    // METHODOLOGY EMPLOYED: na
+    // REFERENCES: na
+    // OTHER NOTES: na
 
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
+    // Using/Aliasing
+    using namespace DataPrecisionGlobals;
 
-	// Data
-	// -only module should be available to other modules and routines.
-	// Thus, all variables in this module must be PUBLIC.
+    // Data
+    // -only module should be available to other modules and routines.
+    // Thus, all variables in this module must be PUBLIC.
 
-	// MODULE PARAMETER DEFINITIONS:
-	int const MaxTZones( 10 ); // Maximum number of transition zones
-	int const NumOfAngles( 19 ); // Number of data points on transmittance vs. angle curve
+    // MODULE PARAMETER DEFINITIONS:
+    int const MaxTZones(10);   // Maximum number of transition zones
+    int const NumOfAngles(19); // Number of data points on transmittance vs. angle curve
 
-	int const VisibleBeam( 1 ); // Constant for radiation type
-	int const SolarBeam( 2 ); // Constant for radiation type
-	int const SolarAniso( 3 ); // Constant for radiation type
-	int const SolarIso( 4 ); // Constant for radiation type
+    int const VisibleBeam(1); // Constant for radiation type
+    int const SolarBeam(2);   // Constant for radiation type
+    int const SolarAniso(3);  // Constant for radiation type
+    int const SolarIso(4);    // Constant for radiation type
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// MODULE VARIABLE TYPE DECLARATIONS:
+    // MODULE VARIABLE TYPE DECLARATIONS:
 
-	// INTERFACE BLOCK SPECIFICATIONS: na
+    // INTERFACE BLOCK SPECIFICATIONS: na
 
-	// MODULE VARIABLE DECLARATIONS:
-	int NumOfTDDPipes( 0 ); // Number of TDD pipes in the input file
-	int NumOfShelf( 0 ); // Number of daylighting shelves in the input file
+    // MODULE VARIABLE DECLARATIONS:
+    int NumOfTDDPipes(0); // Number of TDD pipes in the input file
+    int NumOfShelf(0);    // Number of daylighting shelves in the input file
 
-	// Object Data
-	Array1D< TDDPipeData > TDDPipe;
-	Array1D< ShelfData > Shelf;
+    // Object Data
+    Array1D<TDDPipeData> TDDPipe;
+    Array1D<ShelfData> Shelf;
 
-} // DataDaylightingDevices
+} // namespace DataDaylightingDevices
 
-} // EnergyPlus
+} // namespace EnergyPlus

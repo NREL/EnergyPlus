@@ -1,14 +1,19 @@
 // ObjexxFCL::Array4 Unit Tests
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4244) // Suppress conversion warnings: Intentional narrowing assignments present
+#endif
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -17,6 +22,10 @@
 #include <ObjexxFCL/Array4.all.hh>
 #include <ObjexxFCL/Array.functions.hh>
 #include "ObjexxFCL.unit.hh"
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 using namespace ObjexxFCL;
 
@@ -82,7 +91,7 @@ TEST( Array4Test, ConstructOtherData )
 			}
 		}
 	}
-	Array4D_int B( A );
+	Array4D_int B( A ); // May cause conversion warnings
 	EXPECT_EQ( A.I1(), B.I1() );
 	EXPECT_EQ( A.I2(), B.I2() );
 	EXPECT_EQ( A.I3(), B.I3() );
@@ -320,4 +329,63 @@ TEST( Array4Test, PredicateComparisonsValues )
 	EXPECT_TRUE( gt( A3, 10 ) && gt( 2444, A3 ) );
 	EXPECT_FALSE( gt( A3, 1111 ) || gt( 2222, A3 ) );
 	EXPECT_TRUE( ge( A3, 1111 ) && ge( 2333, A3 ) );
+}
+
+TEST( Array4Test, FunctionUnpack )
+{
+	Array1D_int const a( { 1, 2, 3, 4, 5, 6, 7, 8 } );
+	Array4D_bool const mask( 2, 2, 2, 2, { true, false, false, true, true, false, false, true, true, false, false, true, true, false, false, true } );
+	EXPECT_TRUE( eq( Array4D_int( 2, 2, 2, 2, { 1, 42, 42, 2, 3, 42, 42, 4, 5, 42, 42, 6, 7, 42, 42, 8 } ), unpack( a, mask, 42 ) ) );
+	Array4D_int const f( 2, 2, 2, 2, { 11, 12, 13, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25, 26, 27, 28 } );
+	EXPECT_TRUE( eq( Array4D_int( 2, 2, 2, 2, { 1, 12, 13, 2, 3, 16, 17, 4, 5, 22, 23, 6, 7, 26, 27, 8 } ), unpack( a, mask, f ) ) );
+}
+
+TEST( Array4Test, FunctionMerge )
+{
+	{
+		Array4D_int const a( 2, 2, 2, 2, 1 );
+		Array4D_int const b( 2, 2, 2, 2, 2 );
+		EXPECT_TRUE( eq( a, merge( a, b, true ) ) );
+		EXPECT_TRUE( eq( b, merge( a, b, false ) ) );
+	}
+
+	{
+		Array4D_int const a( 2, 2, 2, 2, 1 );
+		int const b( 2 );
+		Array4D_int const B( 2, 2, 2, 2, 2 );
+		EXPECT_TRUE( eq( a, merge( a, b, true ) ) );
+		EXPECT_TRUE( eq( B, merge( a, b, false ) ) );
+	}
+
+	{
+		int const a( 1 );
+		Array4D_int const b( 2, 2, 2, 2, 2 );
+		Array4D_int const A( 2, 2, 2, 2, 1 );
+		EXPECT_TRUE( eq( A, merge( a, b, true ) ) );
+		EXPECT_TRUE( eq( b, merge( a, b, false ) ) );
+	}
+
+	{
+		Array4D_int const a( 2, 2, 2, 2, 1 );
+		Array4D_int const b( 2, 2, 2, 2, 2 );
+		Array4D_bool const mask( 2, 2, 2, 2, { true, false, false, true, true, false, false, true, true, false, false, true, true, false, false, true } );
+		Array4D_int const m( 2, 2, 2, 2, { 1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1 } );
+		EXPECT_TRUE( eq( m, merge( a, b, mask ) ) );
+	}
+
+	{
+		Array4D_int const a( 2, 2, 2, 2, 1 );
+		int const b( 2 );
+		Array4D_bool const mask( 2, 2, 2, 2, { true, false, false, true, true, false, false, true, true, false, false, true, true, false, false, true } );
+		Array4D_int const m( 2, 2, 2, 2, { 1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1 } );
+		EXPECT_TRUE( eq( m, merge( a, b, mask ) ) );
+	}
+
+	{
+		int const a( 1 );
+		Array4D_int const b( 2, 2, 2, 2, 2 );
+		Array4D_bool const mask( 2, 2, 2, 2, { true, false, false, true, true, false, false, true, true, false, false, true, true, false, false, true } );
+		Array4D_int const m( 2, 2, 2, 2, { 1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1 } );
+		EXPECT_TRUE( eq( m, merge( a, b, mask ) ) );
+	}
 }

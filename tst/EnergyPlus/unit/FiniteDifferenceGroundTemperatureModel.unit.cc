@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::GroundTemperatureModels Unit Tests
 
@@ -62,91 +51,278 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "EnergyPlus/DataGlobals.hh"
-#include "EnergyPlus/DataIPShortCuts.hh"
+#include <DataGlobals.hh>
+#include <DataIPShortCuts.hh>
+#include <GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
+#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <WeatherManager.hh>
+#include <DataEnvironment.hh>
+#include <SimulationManager.hh>
+#include <ElectricPowerServiceManager.hh>
+#include <ConfiguredFunctions.hh>
+
 #include "Fixtures/EnergyPlusFixture.hh"
-#include "EnergyPlus/GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh"
-#include "EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh"
-#include "EnergyPlus/WeatherManager.hh"
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::GroundTemperatureManager;
- 
-TEST_F( EnergyPlusFixture, FiniteDiffGroundTempModelTest )
+
+TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModelTest)
 {
 
-	using DataGlobals::Pi;
-	using WeatherManager::NumDaysInYear;
-	using namespace DataIPShortCuts;
+    using DataGlobals::Pi;
+    using WeatherManager::NumDaysInYear;
+    using namespace DataIPShortCuts;
 
-	std::shared_ptr< FiniteDiffGroundTempsModel > thisModel( new FiniteDiffGroundTempsModel() );
+    std::shared_ptr<FiniteDiffGroundTempsModel> thisModel(new FiniteDiffGroundTempsModel());
 
-	thisModel->objectType = objectType_FiniteDiffGroundTemp;
-	thisModel->objectName = "Test";
-	thisModel->baseConductivity = 1.08;
-	thisModel->baseDensity = 962.0;
-	thisModel->baseSpecificHeat = 2576.0;
-	thisModel->waterContent = 30.0 / 100.0;
-	thisModel->saturatedWaterContent = 50.0 / 100.0;
-	thisModel->evapotransCoeff = 0.408;
+    thisModel->objectType = GroundTemperatureManager::objectType_FiniteDiffGroundTemp;
+    thisModel->objectName = "Test";
+    thisModel->baseConductivity = 1.08;
+    thisModel->baseDensity = 962.0;
+    thisModel->baseSpecificHeat = 2576.0;
+    thisModel->waterContent = 30.0 / 100.0;
+    thisModel->saturatedWaterContent = 50.0 / 100.0;
+    thisModel->evapotransCoeff = 0.408;
 
-	EXPECT_NEAR( 2.0, thisModel->interpolate( 2.0, 3.0, 1.0, 3.0, 1.0 ), 0.0000001 );
+    EXPECT_NEAR(2.0, thisModel->interpolate(2.0, 3.0, 1.0, 3.0, 1.0), 0.0000001);
 
-	thisModel->developMesh();
+    thisModel->developMesh();
 
-	// Setting weather data manually here
-	thisModel->weatherDataArray.dimension( NumDaysInYear );
+    // Setting weather data manually here
+    thisModel->weatherDataArray.dimension(NumDaysInYear);
 
-	Real64 drybulb_minTemp = 5;
-	Real64 drybulb_amp = 10;
-	Real64 relHum_const = 0.5;
-	Real64 windSpeed_const = 3.0;
-	Real64 solar_min = 100;
-	Real64 solar_amp = 100;
+    Real64 drybulb_minTemp = 5;
+    Real64 drybulb_amp = 10;
+    Real64 relHum_const = 0.5;
+    Real64 windSpeed_const = 3.0;
+    Real64 solar_min = 100;
+    Real64 solar_amp = 100;
 
-	for ( int day = 1; day <= NumDaysInYear; ++day ) {
-		auto & tdwd = thisModel->weatherDataArray( day ); // "This day weather data"
+    for (int day = 1; day <= NumDaysInYear; ++day) {
+        auto &tdwd = thisModel->weatherDataArray(day); // "This day weather data"
 
-		Real64 theta = 2 * Pi * day / NumDaysInYear;
-		Real64 omega = 2 * Pi * 130 / NumDaysInYear; // Shifts min to around the end of Jan
+        Real64 theta = 2 * Pi * day / NumDaysInYear;
+        Real64 omega = 2 * Pi * 130 / NumDaysInYear; // Shifts min to around the end of Jan
 
-		tdwd.dryBulbTemp = drybulb_amp * std::sin( theta - omega ) + ( drybulb_minTemp + drybulb_amp );
-		tdwd.relativeHumidity = relHum_const;
-		tdwd.windSpeed = windSpeed_const;
-		tdwd.horizontalRadiation = solar_amp * std::sin( theta - omega ) + ( solar_min + solar_amp );;
-		tdwd.airDensity = 1.2;
-	}
+        tdwd.dryBulbTemp = drybulb_amp * std::sin(theta - omega) + (drybulb_minTemp + drybulb_amp);
+        tdwd.relativeHumidity = relHum_const;
+        tdwd.windSpeed = windSpeed_const;
+        tdwd.horizontalRadiation = solar_amp * std::sin(theta - omega) + (solar_min + solar_amp);
+        ;
+        tdwd.airDensity = 1.2;
+    }
 
-	thisModel->annualAveAirTemp = 15.0;
-	thisModel->maxDailyAirTemp = 25.0;
-	thisModel->minDailyAirTemp = 5.0;
-	thisModel->dayOfMinDailyAirTemp = 30;
+    thisModel->annualAveAirTemp = 15.0;
+    thisModel->maxDailyAirTemp = 25.0;
+    thisModel->minDailyAirTemp = 5.0;
+    thisModel->dayOfMinDailyAirTemp = 30;
 
-	thisModel->performSimulation();
+    thisModel->performSimulation();
 
-	EXPECT_NEAR( 4.51, thisModel->getGroundTempAtTimeInMonths( 0.0, 1 ), 0.01 );
-	EXPECT_NEAR( 19.14, thisModel->getGroundTempAtTimeInMonths( 0.0, 6 ), 0.01 );
-	EXPECT_NEAR( 7.96, thisModel->getGroundTempAtTimeInMonths( 0.0, 12 ), 0.01 );
-	EXPECT_NEAR( 3.46, thisModel->getGroundTempAtTimeInMonths( 0.0, 14 ), 0.01 );
+    EXPECT_NEAR(4.51, thisModel->getGroundTempAtTimeInMonths(0.0, 1), 0.01);
+    EXPECT_NEAR(19.14, thisModel->getGroundTempAtTimeInMonths(0.0, 6), 0.01);
+    EXPECT_NEAR(7.96, thisModel->getGroundTempAtTimeInMonths(0.0, 12), 0.01);
+    EXPECT_NEAR(3.46, thisModel->getGroundTempAtTimeInMonths(0.0, 14), 0.01);
 
-	EXPECT_NEAR( 14.36, thisModel->getGroundTempAtTimeInMonths( 3.0, 1 ), 0.01 );
-	EXPECT_NEAR( 11.78, thisModel->getGroundTempAtTimeInMonths( 3.0, 6 ), 0.01 );
-	EXPECT_NEAR( 15.57, thisModel->getGroundTempAtTimeInMonths( 3.0, 12 ), 0.01 );
+    EXPECT_NEAR(14.36, thisModel->getGroundTempAtTimeInMonths(3.0, 1), 0.01);
+    EXPECT_NEAR(11.78, thisModel->getGroundTempAtTimeInMonths(3.0, 6), 0.01);
+    EXPECT_NEAR(15.57, thisModel->getGroundTempAtTimeInMonths(3.0, 12), 0.01);
 
-	EXPECT_NEAR( 14.58, thisModel->getGroundTempAtTimeInMonths( 25.0, 1 ), 0.01 );
-	EXPECT_NEAR( 14.55, thisModel->getGroundTempAtTimeInMonths( 25.0, 6 ), 0.01 );
-	EXPECT_NEAR( 14.53, thisModel->getGroundTempAtTimeInMonths( 25.0, 12 ), 0.01 );
+    EXPECT_NEAR(14.58, thisModel->getGroundTempAtTimeInMonths(25.0, 1), 0.01);
+    EXPECT_NEAR(14.55, thisModel->getGroundTempAtTimeInMonths(25.0, 6), 0.01);
+    EXPECT_NEAR(14.53, thisModel->getGroundTempAtTimeInMonths(25.0, 12), 0.01);
 
-	EXPECT_NEAR( 5.04, thisModel->getGroundTempAtTimeInSeconds( 0.0, 0.0 ), 0.01 ); 
-	EXPECT_NEAR( 19.28, thisModel->getGroundTempAtTimeInSeconds( 0.0, 14342400 ), 0.01 );
-	EXPECT_NEAR( 7.32, thisModel->getGroundTempAtTimeInSeconds( 0.0, 30153600), 0.01 );
-	EXPECT_NEAR( 3.53, thisModel->getGroundTempAtTimeInSeconds( 0.0, 35510400 ), 0.01 );
+    EXPECT_NEAR(5.04, thisModel->getGroundTempAtTimeInSeconds(0.0, 0.0), 0.01);
+    EXPECT_NEAR(19.28, thisModel->getGroundTempAtTimeInSeconds(0.0, 14342400), 0.01);
+    EXPECT_NEAR(7.32, thisModel->getGroundTempAtTimeInSeconds(0.0, 30153600), 0.01);
+    EXPECT_NEAR(3.53, thisModel->getGroundTempAtTimeInSeconds(0.0, 35510400), 0.01);
 
-	EXPECT_NEAR( 14.36, thisModel->getGroundTempAtTimeInSeconds( 3.0, 1296000 ), 0.01 );
-	EXPECT_NEAR( 11.80, thisModel->getGroundTempAtTimeInSeconds( 3.0, 14342400 ), 0.01 );
-	EXPECT_NEAR( 15.46, thisModel->getGroundTempAtTimeInSeconds( 3.0, 30153600 ), 0.01 );
+    EXPECT_NEAR(14.36, thisModel->getGroundTempAtTimeInSeconds(3.0, 1296000), 0.01);
+    EXPECT_NEAR(11.80, thisModel->getGroundTempAtTimeInSeconds(3.0, 14342400), 0.01);
+    EXPECT_NEAR(15.46, thisModel->getGroundTempAtTimeInSeconds(3.0, 30153600), 0.01);
 
-	EXPECT_NEAR( 14.52, thisModel->getGroundTempAtTimeInSeconds( 25.0, 0.0 ), 0.01 );
-	EXPECT_NEAR( 14.55, thisModel->getGroundTempAtTimeInSeconds( 25.0, 14342400 ), 0.01 );
-	EXPECT_NEAR( 14.52, thisModel->getGroundTempAtTimeInSeconds( 25.0, 30153600 ), 0.01 );
+    EXPECT_NEAR(14.52, thisModel->getGroundTempAtTimeInSeconds(25.0, 0.0), 0.01);
+    EXPECT_NEAR(14.55, thisModel->getGroundTempAtTimeInSeconds(25.0, 14342400), 0.01);
+    EXPECT_NEAR(14.52, thisModel->getGroundTempAtTimeInSeconds(25.0, 30153600), 0.01);
+}
+
+TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_NoWeather) {
+
+    std::shared_ptr<EnergyPlus::FiniteDiffGroundTempsModel> thisModel(new EnergyPlus::FiniteDiffGroundTempsModel());
+
+    thisModel->objectType = EnergyPlus::GroundTemperatureManager::objectType_FiniteDiffGroundTemp;
+    thisModel->objectName = "Test";
+    thisModel->baseConductivity = 1.08;
+    thisModel->baseDensity = 962.0;
+    thisModel->baseSpecificHeat = 2576.0;
+    thisModel->waterContent = 30.0 / 100.0;
+    thisModel->saturatedWaterContent = 50.0 / 100.0;
+    thisModel->evapotransCoeff = 0.408;
+
+    // No Weather file specified, so we expect it to fail
+    ASSERT_THROW(thisModel->getWeatherData(), std::runtime_error);
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.",
+        "   **   ~~~   ** Either place in.epw in the working directory or specify a weather file on the command line using -w /path/to/weather.epw",
+        "   **  Fatal  ** Simulation halted due to input error in ground temperature model.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file."
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+}
+
+TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
+
+    // I have to actually specify the RunPerod and SizingPeriods because in getWeatherData calls WeatherManager::GetNextEnvironment
+    // I cannot hard set WeatherManager's GetBranchInputOneTimeFlag (in anonymous namespace) to false,
+    // so it'll end up calling >WeatherManager::ReadUserWeatherInput which calls the inputProcessor to set the NumOfEnvrn in particular.
+    std::string const idf_objects = delimited_string({
+
+  "Version,9.1;",
+
+  "Timestep,4;"
+
+  "SimulationControl,",
+  "  Yes,                     !- Do Zone Sizing Calculation",
+  "  Yes,                     !- Do System Sizing Calculation",
+  "  No,                      !- Do Plant Sizing Calculation",
+  "  Yes,                     !- Run Simulation for Sizing Periods",
+  "  No;                      !- Run Simulation for Weather File Run Periods",
+
+  "RunPeriod,",
+  "  January,                 !- Name",
+  "  1,                       !- Begin Month",
+  "  1,                       !- Begin Day of Month",
+  "  ,                        !- Begin Year",
+  "  1,                       !- End Month",
+  "  31,                      !- End Day of Month",
+  "  ,                        !- End Year",
+  "  Tuesday,                 !- Day of Week for Start Day",
+  "  Yes,                     !- Use Weather File Holidays and Special Days",
+  "  Yes,                     !- Use Weather File Daylight Saving Period",
+  "  No,                      !- Apply Weekend Holiday Rule",
+  "  Yes,                     !- Use Weather File Rain Indicators",
+  "  Yes;                     !- Use Weather File Snow Indicators",
+
+  "Site:Location,",
+  "  CHICAGO_IL_USA TMY2-94846,  !- Name",
+  "  41.78,                   !- Latitude {deg}",
+  "  -87.75,                  !- Longitude {deg}",
+  "  -6.00,                   !- Time Zone {hr}",
+  "  190.00;                  !- Elevation {m}",
+
+  "SizingPeriod:DesignDay,",
+  "  CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name",
+  "  7,                       !- Month",
+  "  21,                      !- Day of Month",
+  "  SummerDesignDay,         !- Day Type",
+  "  31.5,                    !- Maximum Dry-Bulb Temperature {C}",
+  "  10.7,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+  "  ,                        !- Dry-Bulb Temperature Range Modifier Type",
+  "  ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+  "  Wetbulb,                 !- Humidity Condition Type",
+  "  23.0,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+  "  ,                        !- Humidity Condition Day Schedule Name",
+  "  ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+  "  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+  "  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+  "  99063.,                  !- Barometric Pressure {Pa}",
+  "  5.3,                     !- Wind Speed {m/s}",
+  "  230,                     !- Wind Direction {deg}",
+  "  No,                      !- Rain Indicator",
+  "  No,                      !- Snow Indicator",
+  "  No,                      !- Daylight Saving Time Indicator",
+  "  ASHRAEClearSky,          !- Solar Model Indicator",
+  "  ,                        !- Beam Solar Day Schedule Name",
+  "  ,                        !- Diffuse Solar Day Schedule Name",
+  "  ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+  "  ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+  "  1.0;                     !- Sky Clearness",
+
+  "SizingPeriod:DesignDay,",
+  "  CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name",
+  "  1,                       !- Month",
+  "  21,                      !- Day of Month",
+  "  WinterDesignDay,         !- Day Type",
+  "  -17.3,                   !- Maximum Dry-Bulb Temperature {C}",
+  "  0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}",
+  "  ,                        !- Dry-Bulb Temperature Range Modifier Type",
+  "  ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+  "  Wetbulb,                 !- Humidity Condition Type",
+  "  -17.3,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+  "  ,                        !- Humidity Condition Day Schedule Name",
+  "  ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+  "  ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+  "  ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+  "  99063.,                  !- Barometric Pressure {Pa}",
+  "  4.9,                     !- Wind Speed {m/s}",
+  "  270,                     !- Wind Direction {deg}",
+  "  No,                      !- Rain Indicator",
+  "  No,                      !- Snow Indicator",
+  "  No,                      !- Daylight Saving Time Indicator",
+  "  ASHRAEClearSky,          !- Solar Model Indicator",
+  "  ,                        !- Beam Solar Day Schedule Name",
+  "  ,                        !- Diffuse Solar Day Schedule Name",
+  "  ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+  "  ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+  "  0.0;                     !- Sky Clearness",
+
+    });
+
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // Set an actual weather file to Chicago EPW
+    WeatherManager::WeatherFileExists = true;
+    DataStringGlobals::inputWeatherFileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
+
+    // Read the project data, such as Timestep
+    DataGlobals::BeginSimFlag = true;
+    SimulationManager::GetProjectData();
+    EXPECT_EQ(DataGlobals::NumOfTimeStepInHour, 4);
+
+    // Needed to avoid crash in SetupSimulation (from ElectricPowerServiceManager.hh)
+    createFacilityElectricPowerServiceObject();
+
+    bool ErrorsFound(false);
+    SimulationManager::SetupSimulation(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    EXPECT_EQ(WeatherManager::NumOfEnvrn, 3);
+    EXPECT_EQ(DataEnvironment::TotDesDays, 2);
+    EXPECT_EQ(WeatherManager::TotRunPers, 1);
+
+    std::shared_ptr<EnergyPlus::FiniteDiffGroundTempsModel> thisModel(new EnergyPlus::FiniteDiffGroundTempsModel());
+
+    thisModel->objectType = EnergyPlus::GroundTemperatureManager::objectType_FiniteDiffGroundTemp;
+    thisModel->objectName = "Test";
+    thisModel->baseConductivity = 1.08;
+    thisModel->baseDensity = 962.0;
+    thisModel->baseSpecificHeat = 2576.0;
+    thisModel->waterContent = 30.0 / 100.0;
+    thisModel->saturatedWaterContent = 50.0 / 100.0;
+    thisModel->evapotransCoeff = 0.408;
+
+    // Shouldn't throw
+    thisModel->getWeatherData();
+
+    // It should have reverted the added period
+    EXPECT_EQ(WeatherManager::NumOfEnvrn, 3);
+    EXPECT_EQ(DataEnvironment::TotDesDays, 2);
+    EXPECT_EQ(WeatherManager::TotRunPers, 1);
+
+    // And should have populated a 365-day array of averages
+    EXPECT_EQ(365u, thisModel->weatherDataArray.size());
+
+    // Checking the first day against manually calculated value from EPW (24-hour averages for Jan 1)
+    auto &firstDay = thisModel->weatherDataArray(1);
+    EXPECT_DOUBLE_EQ(firstDay.dryBulbTemp, -5.4);
+    EXPECT_NEAR(firstDay.relativeHumidity, 0.7083, 0.005);
+    EXPECT_NEAR(firstDay.windSpeed, 2.8083, 0.001);
+    // Sum of (BeamSolarRad + DifSolarRad)/24
+    EXPECT_NEAR(firstDay.horizontalRadiation, 140, 2);
+
 }

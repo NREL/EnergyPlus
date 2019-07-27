@@ -2,7 +2,7 @@
 
 A ray-tracing method is used to calculate beam solar and sky solar radiation that is diffusely reflected onto each of a building's exterior surfaces (walls, roofs, windows and doors), called here ``receiving surfaces.'' The calculation begins by generating a set of rays proceeding into the outward hemisphere at each receiving point on a receiving surface. Then it determinines whether each ray hits the sky, ground or an obstruction. The radiance at the hit point from reflection of incident beam or sky solar is determined and the contribution of this radiance to the receiving surface is calculated, added to the contribution from other hit points, and averaged over the receiving points. Separate calculations are done for beam-to-diffuse and sky solar reflection from all obstructions and beam-to-diffuse and sky solar reflection from the ground. (For beam-to-beam reflection see ``Beam Solar Radiation Specularly Reflected from Obstructions,'' below.)
 
-\subsection{\emph{Receiving points}}\label{receiving-points}
+\subsection{Receiving points}\label{receiving-points}
 
 An \emph{N}-sided surface is assigned \emph{N} receiving points with the following coordinates, expressed in terms of the surface vertex coordinates:
 
@@ -12,13 +12,13 @@ An \emph{N}-sided surface is assigned \emph{N} receiving points with the followi
 
 where
 
-\emph{P\(_{ij}\) = j\(^{th}\)} coordinate of the* i\(^{th}\)* receiving point
+\emph{P\(_{ij}\) = j\(^{th}\)} coordinate of the i\(^{th}\) receiving point
 
-\emph{v\(_{kj}\)} = * j\(^{th}\)* coordinate of the \emph{k\(^{th}\)} surface vertex
+\emph{v\(_{kj}\)} = j\(^{th}\) coordinate of the \emph{k\(^{th}\)} surface vertex
 
-If \emph{N} = 3:~ \emph{a\(_{kj}\)} = 3/5 if \emph{k} = \emph{i};~ = 1/5 otherwise
+If \emph{N} = 3:~ \emph{a\(_{kj}\)} = 3/5 if \emph{k} = \emph{i};~\emph{a\(_{kj}\)} = 1/5 otherwise
 
-If \emph{N} \textgreater{} 3:~ \emph{a\(_{kj}\)} = \(\frac{{N + 1}}{{2N}}\) ~if \emph{k} = \emph{i};~ = \(\frac{1}{{2N}}\) ~otherwise
+If \emph{N} \textgreater{} 3:~ \emph{a\(_{kj}\)} = \(\frac{{N + 1}}{{2N}}\) ~if \emph{k} = \emph{i};~\emph{a\(_{kj}\)} = \(\frac{1}{{2N}}\) ~otherwise
 
 For example, for a vertical 3m by 5m rectangle with vertices (0,0,3), (0,0,0), (5,0,0) and (5,0,3), this expression gives receiving points at (1.25,0,2.25), (1.25,0,0.75), (3.75,0,0.75) and (3.75,0,2.25), as shown in Figure~\ref{fig:vertical-rectangular-exterior-heat-transfer}.
 
@@ -28,7 +28,7 @@ For example, for a vertical 3m by 5m rectangle with vertices (0,0,3), (0,0,0), (
 \caption{Vertical rectangular exterior heat transfer surface showing location of receiving points for calculating incident solar radiation reflected from obstructions. \protect \label{fig:vertical-rectangular-exterior-heat-transfer}}
 \end{figure}
 
-\subsection{\emph{Rays}}\label{rays}
+\subsection{Rays}\label{rays}
 
 A total of 90 rays are sent out into the exterior hemisphere surrounding each receiving point. An upgoing ray may hit an obstruction or the sky. A downgoing ray may hit an obstruction or the ground. See Figure~\ref{fig:two-dimensional-schematic-showing-rays-going}.
 
@@ -78,15 +78,12 @@ RecSurfNum is the receiving surface number,
 
 \emph{DifShdgRatioIsoSky\(_{obs,i}\)} = (obstructed sky irradiance on obstruction)/(unobstructed sky irradiance on obstruction)
 
-In this equation the product \emph{ViewFacSky*DifShdgRatioIsoSky} is the sky irradiance at the hit point divided by the horizontal sky irradiance taking into account shadowing of sky diffuse radiation on the obstruction by other obstructions, and assuming that the radiance of the sky is uniform. Note that we ignore secondary reflections here and in the following sections. In the present case this means that the irradiance at the hit point due to reflection of sky radiation from the ground or from other obstructions is not considered.
+In this equation, the product \emph{ViewFacSky*DifShdgRatioIsoSky} is the sky irradiance at the hit point divided by the horizontal sky irradiance taking into account shadowing of sky diffuse radiation on the obstruction by other obstructions, and assuming that the radiance of the sky is uniform. Note that we ignore secondary reflections here and in the following sections. In the present case this means that the irradiance at the hit point due to reflection of sky radiation from the ground or from other obstructions is not considered.
 
 The above reflection factor is used in the timestep calculation to find the irradiance on a receiving surface due to sky radiation reflected from obstructions:
 
 \begin{equation}
-\begin{split}
-QRadSWOutIncSkyDiffReflObs(RecSurfNum) = DifSolarRad \\
-* ReflFacSkySolObs(RecSurfNum) (W/m^{2})
-\end{split}
+QRadSWOutIncSkyDiffReflObs(RecSurfNum) = DifSolarRad * ReflFacSkySolObs(RecSurfNum) (W/m^{2})
 \end{equation}
 
 where \emph{DifSolarRad} is the horizontal sky irradiance on an unobstructed horizontal plane (W/m\(^{2}\)).
@@ -121,7 +118,9 @@ where
 
 This factor is used in the timestep calculation to find the irradiance on a receiving surface due to sky radiation reflected from the ground:
 
-QRadSWOutIncSkyDiffReflGnd(RecSurfNum) = DifSolarRad * \({\rho_{gnd}}\) * ReflFacSkySolGnd(RecSurfNum)~ (W/m\(^{2}\))
+\begin{equation}
+QRadSWOutIncSkyDiffReflGnd(RecSurfNum) = DifSolarRad * {\rho_{gnd}} * ReflFacSkySolGnd(RecSurfNum)~ (W/m^{2})
+\end{equation}
 
 where \({\rho_{gnd}}\) is the solar reflectance of the ground, which is assumed to be uniform over the ground plane but may vary monthly (because of snow cover, for example).
 
@@ -150,9 +149,15 @@ where
 
 This factor is used in the timestep calculation to find the diffuse irradiance on a receiving surface due to beam solar diffusely reflected from obstructions:
 
-QRadSWOutIncBmToDiffReflObs(RecSurfNum) = BeamSolarRad * (WeightNow * ReflFacBmToDiffSolObs(RecSurfNum,HourOfDay) + WeightPreviousHour * ReflFacBmToDiffSolObs(RecSurfNum,PreviousHour))
+\begin{equation}
+\begin{split}
+QRadSWOutIncBmToDiffReflObs(RecSurfNum) = BeamSolarRad \\
+* (WeightNow * ReflFacBmToDiffSolObs(RecSurfNum,HourOfDay) \\
++ WeightPreviousHour * ReflFacBmToDiffSolObs(RecSurfNum,PreviousHour))
+\end{split}
+\end{equation}
 
-where \emph{BeamSolarRad} is the timestep value of beam normal solar intensity (W/m2), and \emph{WeightNow} and \emph{WeightPreviousHour} are time-averaging factors.
+where \emph{BeamSolarRad} is the timestep value of beam normal solar intensity \(W/{m^2}\), and \emph{WeightNow} and \emph{WeightPreviousHour} are time-averaging factors.
 
 \subsection{Beam Solar Radiation Diffusely Reflected from the Ground}\label{beam-solar-radiation-diffusely-reflected-from-the-ground}
 
@@ -173,7 +178,9 @@ where
 
 This factor is used in the timestep calculation to find the diffuse irradiance on a receiving surface due to beam solar diffusely reflected from the ground:
 
-QRadSWOutIncBmToDiffReflGnd(RecSurfNum) = BeamSolarRad * \({\rho_{gnd}}\) * (WeightNow * ReflFacBmToDiffSolGnd(RecSurfNum,HourOfDay) + WeightPreviousHour * ReflFacBmToDiffSolGnd(RecSurfNum,PreviousHour))
+\begin{equation}
+QRadSWOutIncBmToDiffReflGnd(RecSurfNum) = BeamSolarRad * {\rho_{gnd}} * (WeightNow * ReflFacBmToDiffSolGnd(RecSurfNum,HourOfDay) + WeightPreviousHour * ReflFacBmToDiffSolGnd(RecSurfNum,PreviousHour))
+\end{equation}
 
 \subsection{Beam Solar Radiation Specularly Reflected from Obstructions}\label{beam-solar-radiation-specularly-reflected-from-obstructions}
 
@@ -235,4 +242,6 @@ In this case \({f_{C,glazed}}\) is ``Fraction of shading surface that is glazed'
 
 The above specular reflection factor is used in the timestep calculation to find the beam irradiance on a receiving surface due to beam-beam reflection from obstructions:
 
+\begin{equation}
 QRadSWOutIncBmToBmReflObsRecSurfNum) = BeamSolarRad * (WeightNow * ReflFacBmToBmSolObs(RecSurfNum,HourOfDay) + WeightPreviousHour * ReflFacBmToBmSolObs(RecSurfNum,PreviousHour))
+\end{equation}

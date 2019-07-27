@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus Headers
 #include <DataMoistureBalanceEMPD.hh>
@@ -64,57 +53,56 @@ namespace EnergyPlus {
 
 namespace DataMoistureBalanceEMPD {
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Muthusamy V. Swami and Lixing Gu
-	//       DATE WRITTEN   Aug. 2000
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
+    // MODULE INFORMATION:
+    //       AUTHOR         Muthusamy V. Swami and Lixing Gu
+    //       DATE WRITTEN   Aug. 2000
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS MODULE:
-	// This module should contain the information that is needed to calculate
-	// moisture level at interior surfaces
+    // PURPOSE OF THIS MODULE:
+    // This module should contain the information that is needed to calculate
+    // moisture level at interior surfaces
 
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
+    // Using/Aliasing
+    using namespace DataPrecisionGlobals;
 
-	// Data
-	// module should be available to other modules and routines.  Thus,
-	// all variables in this module must be PUBLIC.
+    // Data
+    // module should be available to other modules and routines.  Thus,
+    // all variables in this module must be PUBLIC.
 
-	// MODULE PARAMETER DEFINITIONS
+    // MODULE PARAMETER DEFINITIONS
 
-	// Parameters for the definition and limitation of arrays:
+    // Parameters for the definition and limitation of arrays:
 
-	Real64 const Lam( 2500000.0 ); // heat of adsorption for building materials
+    Real64 const Lam(2500000.0); // heat of adsorption for building materials
 
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	// Variables that are used in both the Surface Heat Balance and the Moisture Balance
-	Array1D< Real64 > RVSurfaceOld; // Moisture level at interior surfaces at previous time step
-	Array1D< Real64 > RVSurface; // Moisture level at interior surfaces at current interation
-	// and current time step
-	Array1D< Real64 > HeatFluxLatent; // Moisture flux at interior surfaces [W]
-	Array1D< Real64 > RVSurfLayerOld;
-	Array1D< Real64 > RVdeepOld;
-	Array1D< Real64 > RVSurfLayer;
-	Array1D< Real64 > RVDeepLayer;
-	Array1D< Real64 > RVwall;
+    // MODULE VARIABLE DECLARATIONS:
+    // Variables that are used in both the Surface Heat Balance and the Moisture Balance
+    Array1D<Real64> RVSurfaceOld; // Moisture level at interior surfaces at previous time step
+    Array1D<Real64> RVSurface;    // Moisture level at interior surfaces at current interation
+    // and current time step
+    Array1D<Real64> HeatFluxLatent; // Moisture flux at interior surfaces [W]
+    Array1D<Real64> RVSurfLayerOld;
+    Array1D<Real64> RVdeepOld;
+    Array1D<Real64> RVSurfLayer;
+    Array1D<Real64> RVDeepLayer;
+    Array1D<Real64> RVwall;
 
-	void
-	clear_state()
-	{
-		RVSurfaceOld.deallocate();
-		RVSurface.deallocate();
-		HeatFluxLatent.deallocate();
-		RVSurfLayerOld.deallocate();
-		RVdeepOld.deallocate();
-		RVSurfLayer.deallocate();
-		RVDeepLayer.deallocate();
-		RVwall.deallocate();
-	}
+    void clear_state()
+    {
+        RVSurfaceOld.deallocate();
+        RVSurface.deallocate();
+        HeatFluxLatent.deallocate();
+        RVSurfLayerOld.deallocate();
+        RVdeepOld.deallocate();
+        RVSurfLayer.deallocate();
+        RVDeepLayer.deallocate();
+        RVwall.deallocate();
+    }
 
-} // DataMoistureBalanceEMPD
+} // namespace DataMoistureBalanceEMPD
 
-} // EnergyPlus
+} // namespace EnergyPlus

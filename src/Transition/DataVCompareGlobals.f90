@@ -57,7 +57,7 @@ character(len=255) CurWorkDir
 character(len=270) IDDFileNameWithPath
 character(len=270) NewIDDFileNameWithPath
 CHARACTER(len=255) :: RepVarFileNameWithPath
-    
+
 logical withUnits  ! True if units should be displayed on output lines (by field names)
 logical LeaveBlank  ! True if blank fields on input should be left blank (no default fill)
 integer auditf  ! auditfile
@@ -97,6 +97,7 @@ INTEGER NumNumbers
 CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: OutArgs
 INTEGER, ALLOCATABLE, DIMENSION(:) :: MatchArg
 CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: InArgs
+CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: TempArgs
 
 CHARACTER(len=MaxNameLength), DIMENSION(:), ALLOCATABLE :: OldRepVarName
 CHARACTER(len=MaxNameLength), DIMENSION(:), ALLOCATABLE :: NewRepVarName

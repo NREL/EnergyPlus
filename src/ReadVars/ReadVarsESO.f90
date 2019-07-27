@@ -150,6 +150,7 @@
   character(len=30) cdayofsim
   integer :: commacount
   integer :: commalimit
+  logical :: FixHeader
 
   write(*,*) 'ReadVarsESO program starting.'
   maxrptnum=-1
@@ -166,6 +167,7 @@
   Freqs=0
   gotinputfilename=.false.
   gotoutputfilename=.false.
+  FixHeader=.false.
 
   commalimit=LEN(outline)-10
 
@@ -199,6 +201,8 @@
       if (LineArg(1:1) == 'u' .or. LineArg(1:1) == 'U') Limited=.false.
       ! nolimit
       if (LineArg(1:1) == 'n' .or. LineArg(1:1) == 'N') Limited=.false.
+      ! fixheader
+      if (LineArg(1:1) == 'f' .or. LineArg(1:1) == 'F') FixHeader=.true.
     enddo
   endif
 
@@ -412,7 +416,11 @@
             ignorethisone=.true.
             pos=index(line,'[')
             if (pos /= 0) then
-              line=line(2:pos-1)
+              ! Without the indexes on the LHS, the compiler is complaining that we are squeezing a character position out
+              ! We add these and it works, but it could potentially leave a trailing character from the prior string
+              ! So we'll add a space to that trailing point
+              line(1:pos-2)=line(2:pos-1)
+              line(pos-1:len(line)) = ' '
             else
               line=line(2:)
             endif
@@ -505,9 +513,9 @@
     write(auditunit,*) 'getting all vars from:',trim(inputfilename)
   endif
 
-  numtoskip=6
+  numtoskip=7
   read(esounit,inoutformat,end=901) line
-  if (index(line,'Program Version') == 0) numtoskip=5
+  if (index(line,'Program Version') == 0) numtoskip=6
   do i=1,numtoskip
     read(esounit,inoutformat,end=901) line
   enddo
@@ -655,7 +663,10 @@
               line=line(i:)
               i=index(line,'!')
               if (i /= 0) then
-                stovar(nstore)=line(1:i-1)
+                ! Without the array bounds on the LHS, the compiler warns about mismatched sizes
+                ! Adding them forces both LHS and RHS to be the same size
+                ! stovar should be blank coming into this section, so trailing blanks should persist
+                stovar(nstore)(1:i-1)=line(1:i-1)
                 stovar(nstore)=trim(stovar(nstore))//'('
                 i=i+1
                 line=line(i:)
@@ -700,7 +711,10 @@
             line=line(i:)
             i=index(line,'!')
             if (i /= 0) then
-              trackvar(ij)=line(1:i-1)
+              ! The compiler warns if you try to take part of the line and apply it to the entire trackvar
+              ! Adding explicit indeces seems unnecessary, but it hushes up the compiler
+              ! The trackvar should be blank at this point, so this should be fine
+              trackvar(ij)(1:i-1)=line(1:i-1)
               trackvar(ij)=trim(trackvar(ij))//'('
               i=i+1
               line=line(i:)
@@ -786,7 +800,10 @@
             ! Check frequency part -- after !
             i=index(line,'!')
             if (i /= 0) then
-              trackvar(ij)=line(1:i-1)
+              ! The compiler warns if you try to take part of the line and apply it to the entire trackvar
+              ! Adding explicit indeces seems unnecessary, but it hushes up the compiler
+              ! The trackvar should be blank at this point, so this should be fine
+              trackvar(ij)(1:i-1)=line(1:i-1)
               trackvar(ij)=trim(trackvar(ij))//'('
               i=i+1
               line=line(i:)
@@ -978,7 +995,11 @@
       write(auditunit,*) 'line 904 variable =',tracknum(ij),' not found'
     endif
   enddo
-  write(csvunit,inoutformat) ' ' !  final..trim(outline)
+  if (FixHeader) then
+    write(csvunit,inoutformat)     !  final..trim(outline)
+  else
+    write(csvunit,inoutformat) ' '
+  endif
   read(esounit,inoutformat) line ! first environment line
   curdate=blank
   curmonday=blank
@@ -1368,24 +1389,24 @@
     stop
 
 906 write(*,*) 'Output file='//trim(outputfilename)
-    write(*,*) 'error occured during processing.'
+    write(*,*) 'error occurred during processing.'
     write(*,*) 'Apparent line in error (1st 50 characters):'
     write(*,*) trim(line(1:50))
     write(*,*) 'ReadVarsESO program terminated.'
     write(auditunit,*) 'Output file='//trim(outputfilename)
-    write(auditunit,*) 'error occured during processing.'
+    write(auditunit,*) 'error occurred during processing.'
     write(auditunit,*) 'Apparent line in error (1st 50 characters):'
     write(auditunit,*) trim(line(1:50))
     write(auditunit,*) 'ReadVarsESO program terminated.'
     stop
 
 907 write(*,*) 'Output file='//trim(outputfilename)
-    write(*,*) 'error occured during processing.'
+    write(*,*) 'error occurred during processing.'
     write(*,*) 'Blank line in middle of processing.'
     write(*,*) 'Likely fatal error during EnergyPlus execution.'
     write(*,*) 'ReadVarsESO program terminated.'
     write(auditunit,*) 'Output file='//trim(outputfilename)
-    write(auditunit,*) 'error occured during processing.'
+    write(auditunit,*) 'error occurred during processing.'
     write(auditunit,*) 'Blank line in middle of processing.'
     write(auditunit,*) 'Likely fatal error during EnergyPlus execution.'
     write(auditunit,*) 'ReadVarsESO program terminated.'

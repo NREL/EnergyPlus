@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // EnergyPlus::ZoneEquipmentManager Unit Tests
 
@@ -73,37 +62,27 @@ using namespace EnergyPlus;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::FluidProperties;
 
-TEST_F( EnergyPlusFixture, FluidProperties_GetDensityGlycol)
+TEST_F(EnergyPlusFixture, FluidProperties_GetDensityGlycol)
 {
 
-	std::string const idf_objects = delimited_string({
-		" Version,8.4;",
-		" ",
-	    "FluidProperties:GlycolConcentration,",
-		"  GLHXFluid,       !- Name",
-		"  PropyleneGlycol, !- Glycol Type",
-		"  ,                !- User Defined Glycol Name",
-		"  0.3;             !- Glycol Concentration",
-		" "
-	} );
+    std::string const idf_objects = delimited_string({"FluidProperties:GlycolConcentration,", "  GLHXFluid,       !- Name",
+                                                      "  PropyleneGlycol, !- Glycol Type", "  ,                !- User Defined Glycol Name",
+                                                      "  0.3;             !- Glycol Concentration", " "});
 
-	ASSERT_FALSE(process_idf(idf_objects));
-	EXPECT_FALSE(has_err_output());
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_FALSE(has_err_output());
 
-	int FluidIndex = 0;
+    int FluidIndex = 0;
 
-	EXPECT_NEAR( 1037.89, GetDensityGlycol( "GLHXFLUID", -35.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1037.89, GetDensityGlycol( "GLHXFLUID", -15.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1034.46, GetDensityGlycol( "GLHXFLUID", 5.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1030.51, GetDensityGlycol( "GLHXFLUID", 15.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1026.06, GetDensityGlycol( "GLHXFLUID", 25.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1021.09, GetDensityGlycol( "GLHXFLUID", 35.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1015.62, GetDensityGlycol( "GLHXFLUID", 45.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR( 1003.13, GetDensityGlycol( "GLHXFLUID", 65.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR(  988.60, GetDensityGlycol( "GLHXFLUID", 85.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR(  972.03, GetDensityGlycol( "GLHXFLUID", 105.0, FluidIndex, "UnitTest" ), 0.01 );
-	EXPECT_NEAR(  953.41, GetDensityGlycol( "GLHXFLUID", 125.0, FluidIndex, "UnitTest" ), 0.01 );
-
+    EXPECT_NEAR(1037.89, GetDensityGlycol("GLHXFLUID", -35.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(1037.89, GetDensityGlycol("GLHXFLUID", -15.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(1034.46, GetDensityGlycol("GLHXFLUID", 5.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(1030.51, GetDensityGlycol("GLHXFLUID", 15.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(1026.06, GetDensityGlycol("GLHXFLUID", 25.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(1021.09, GetDensityGlycol("GLHXFLUID", 35.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(1015.62, GetDensityGlycol("GLHXFLUID", 45.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(1003.13, GetDensityGlycol("GLHXFLUID", 65.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(988.60, GetDensityGlycol("GLHXFLUID", 85.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(972.03, GetDensityGlycol("GLHXFLUID", 105.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(953.41, GetDensityGlycol("GLHXFLUID", 125.0, FluidIndex, "UnitTest"), 0.01);
 }
-
-

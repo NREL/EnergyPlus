@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef ConductionTransferFunctionCalc_hh_INCLUDED
 #define ConductionTransferFunctionCalc_hh_INCLUDED
@@ -71,75 +60,67 @@ namespace EnergyPlus {
 
 namespace ConductionTransferFunctionCalc {
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	//INTEGER, PRIVATE, PARAMETER :: MaxTotNodes = 75   ! Maximum total number of
-	// nodes per construction.  This limit is a compromise between faster,
-	// less accurate solutions and slower, possibly more accurate answers.
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // INTEGER, PRIVATE, PARAMETER :: MaxTotNodes = 75   ! Maximum total number of
+    // nodes per construction.  This limit is a compromise between faster,
+    // less accurate solutions and slower, possibly more accurate answers.
 
-	extern int const NumOfPerpendNodes; // Number of nodes in the direction
-	// perpendicular to the main direction of heat transfer.  This is only used
-	// when a two-dimensional solution has been requested for a construction
-	// with a heat source/sink.
+    extern int const NumOfPerpendNodes; // Number of nodes in the direction
+    // perpendicular to the main direction of heat transfer.  This is only used
+    // when a two-dimensional solution has been requested for a construction
+    // with a heat source/sink.
 
-	// DERIVED TYPE DEFINITIONS
-	// na
+    // DERIVED TYPE DEFINITIONS
+    // na
 
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	extern Array2D< Real64 > AExp; // Exponential of AMat
-	extern Array2D< Real64 > AInv; // Inverse of AMat
-	extern Array2D< Real64 > AMat; // "A" matrix from Seem's dissertation
-	// (constant coefficients of linear system)
-	extern Array1D< Real64 > BMat; // "B" matrix of state space method (non-zero elements)
-	extern Array1D< Real64 > CMat; // "C" matrix of state space method (non-zero elements)
-	extern Array1D< Real64 > DMat; // "D" matrix of state space method (non-zero elements)
-	extern Array1D< Real64 > e; // Coefficients for the surface flux history term
-	extern Array2D< Real64 > Gamma1; // Intermediate calculation array corresponding to a term
-	// in Seem's dissertation
-	extern Array2D< Real64 > Gamma2; // Intermediate calculation array corresponding to a term
-	// in Seem's dissertation
-	extern int NodeSource; // Node at which a source or sink is present
-	extern int NodeUserTemp; // Node where user wishes to calculate a temperature
-	// (for constructions with sources/sinks only)
-	extern int rcmax; // Total number of nodes in the construct (<= MaxTotNodes)
-	extern Array3D< Real64 > s; // Coefficients for the surface temperature history terms
-	extern Array2D< Real64 > s0; // Coefficients for the current surface temperature terms
-	extern Real64 TinyLimit;
-	extern Array2D< Real64 > IdenMatrix; // Identity Matrix
+    // MODULE VARIABLE DECLARATIONS:
+    extern Array2D<Real64> AExp; // Exponential of AMat
+    extern Array2D<Real64> AInv; // Inverse of AMat
+    extern Array2D<Real64> AMat; // "A" matrix from Seem's dissertation
+    // (constant coefficients of linear system)
+    extern Array1D<Real64> BMat;   // "B" matrix of state space method (non-zero elements)
+    extern Array1D<Real64> CMat;   // "C" matrix of state space method (non-zero elements)
+    extern Array1D<Real64> DMat;   // "D" matrix of state space method (non-zero elements)
+    extern Array1D<Real64> e;      // Coefficients for the surface flux history term
+    extern Array2D<Real64> Gamma1; // Intermediate calculation array corresponding to a term
+    // in Seem's dissertation
+    extern Array2D<Real64> Gamma2; // Intermediate calculation array corresponding to a term
+    // in Seem's dissertation
+    extern int NodeSource;   // Node at which a source or sink is present
+    extern int NodeUserTemp; // Node where user wishes to calculate a temperature
+    // (for constructions with sources/sinks only)
+    extern int rcmax;          // Total number of nodes in the construct (<= MaxTotNodes)
+    extern Array3D<Real64> s;  // Coefficients for the surface temperature history terms
+    extern Array2D<Real64> s0; // Coefficients for the current surface temperature terms
+    extern Real64 TinyLimit;
+    extern Array2D<Real64> IdenMatrix; // Identity Matrix
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
+    // SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
 
-	// Functions
+    // Functions
 
-	void
-	InitConductionTransferFunctions();
+    void InitConductionTransferFunctions();
 
-	void
-	CalculateExponentialMatrix( Real64 & delt ); // Time step of the resulting CTFs
+    void CalculateExponentialMatrix(Real64 &delt); // Time step of the resulting CTFs
 
-	void
-	CalculateInverseMatrix();
+    void CalculateInverseMatrix();
 
-	void
-	CalculateGammas(
-		Real64 const delt, // Time increment in fraction of an hour
-		int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
-	);
+    void CalculateGammas(Real64 const delt,           // Time increment in fraction of an hour
+                         int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
+    );
 
-	void
-	CalculateCTFs(
-		int & nrf, // Number of response factor terms
-		int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
-	);
+    void CalculateCTFs(int &nrf,                    // Number of response factor terms
+                       int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
+    );
 
-	void
-	ReportCTFs( bool const DoReportBecauseError );
+    void ReportCTFs(bool const DoReportBecauseError);
 
-} // ConductionTransferFunctionCalc
+} // namespace ConductionTransferFunctionCalc
 
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

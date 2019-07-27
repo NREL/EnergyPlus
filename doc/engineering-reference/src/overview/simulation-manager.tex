@@ -20,7 +20,7 @@ BeginTimeStepFlag & EndTimeStepFlag \tabularnewline
 \bottomrule
 \end{longtable}
 
-There is also a \textbf{WarmupFlag} to signal that the program is in warmup state. The operation of these flags can be seen in the following subroutine. The advantage of using the flag system is that any subroutine throughout the code can determine the exact state of the simulation by checking the status of the flags.
+There is also a \textbf{WarmupFlag} to signal that the program is in warmup state. The operation of these flags can be seen in the following subroutine. This code is actually simplified, old EnergyPlus FORTRAN code but it concisely demonstrates the use of these flags in the code. The advantage of using the flag system is that any subroutine throughout the code can determine the exact state of the simulation by checking the status of the flags.
 
 \begin{lstlisting}
 SUBROUTINE ManageSimulation     ! Main driver routine for this module

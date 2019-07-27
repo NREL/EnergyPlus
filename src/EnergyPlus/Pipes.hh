@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef Pipes_hh_INCLUDED
 #define Pipes_hh_INCLUDED
@@ -63,87 +52,77 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 #include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
-	// Forward Declarations
-	struct PlantLocation;
+// Forward Declarations
+struct PlantLocation;
 
 namespace Pipes {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS
-	// na
+    // Data
+    // MODULE PARAMETER DEFINITIONS
+    // na
 
-	// DERIVED TYPE DEFINITIONS
+    // DERIVED TYPE DEFINITIONS
 
-	// MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	extern int NumLocalPipes;
-	extern bool GetPipeInputFlag;
+    extern int NumLocalPipes;
+    extern bool GetPipeInputFlag;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
+    // SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
 
-	// Types
+    // Types
 
-	struct LocalPipeData : public PlantComponent
-	{
-		virtual
-		~LocalPipeData()
-		{}
+    struct LocalPipeData : public PlantComponent
+    {
+        virtual ~LocalPipeData()
+        {
+        }
 
-		// Members
-		std::string Name;
-		int TypeOf; // type of pipe
-		int InletNodeNum; // Node number on the inlet side of the plant
-		int OutletNodeNum; // Node number on the inlet side of the plant
-		int LoopNum; // Index of plant loop where this pipe resides
-		int LoopSide; // Index of plant loop side where this pipe resides
-		int BranchIndex; // Index of plant Branch index where this pipe resides
-		int CompIndex; // Index of plant Comp index where this pipe resides
-		bool OneTimeInit;
-		bool CheckEquipName;
-		bool EnvrnFlag;
+        // Members
+        std::string Name;
+        int TypeOf;        // type of pipe
+        int InletNodeNum;  // Node number on the inlet side of the plant
+        int OutletNodeNum; // Node number on the inlet side of the plant
+        int LoopNum;       // Index of plant loop where this pipe resides
+        int LoopSide;      // Index of plant loop side where this pipe resides
+        int BranchIndex;   // Index of plant Branch index where this pipe resides
+        int CompIndex;     // Index of plant Comp index where this pipe resides
+        bool OneTimeInit;
+        bool CheckEquipName;
+        bool EnvrnFlag;
 
-		// Default Constructor
-		LocalPipeData() :
-			TypeOf( 0 ),
-			InletNodeNum( 0 ),
-			OutletNodeNum( 0 ),
-			LoopNum( 0 ),
-			LoopSide( 0 ),
-			BranchIndex( 0 ),
-			CompIndex( 0 ),
-			OneTimeInit( true ),
-			CheckEquipName( true ),
-			EnvrnFlag( true )
-		{}
+        // Default Constructor
+        LocalPipeData()
+            : TypeOf(0), InletNodeNum(0), OutletNodeNum(0), LoopNum(0), LoopSide(0), BranchIndex(0), CompIndex(0), OneTimeInit(true),
+              CheckEquipName(true), EnvrnFlag(true)
+        {
+        }
 
-		public:
-			static PlantComponent * factory( int objectType, std::string objectName );
+    public:
+        static PlantComponent *factory(int objectType, std::string objectName);
 
-		public:
-			void simulate( const PlantLocation & calledFromLocation, bool const FirstHVACIteration, Real64 & CurLoad, bool const RunFlag ) override;
+    public:
+        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+    };
 
-	};
+    // Object Data
+    extern Array1D<LocalPipeData> LocalPipe; // dimension to number of pipes
 
-	// Object Data
-	extern Array1D< LocalPipeData > LocalPipe; // dimension to number of pipes
+    // Functions
+    void clear_state();
 
-	// Functions
-	void
-	clear_state();
+    void GetPipeInput();
 
-	void
-	GetPipeInput();
+} // namespace Pipes
 
-} // Pipes
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

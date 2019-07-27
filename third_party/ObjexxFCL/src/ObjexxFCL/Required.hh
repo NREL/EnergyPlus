@@ -3,13 +3,13 @@
 
 // Required Argument Wrapper
 //
-// Project: Objexx Fortran Compatibility Library (ObjexxFCL)
+// Project: Objexx Fortran-C++ Library (ObjexxFCL)
 //
-// Version: 4.1.0
+// Version: 4.2.0
 //
 // Language: C++
 //
-// Copyright (c) 2000-2016 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2017 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -25,7 +25,11 @@ namespace ObjexxFCL {
 
 // Required Argument Wrapper
 template< typename T, typename Enable >
-class Required
+class Required;
+
+// Required Argument Wrapper: Concrete Type Specialization
+template< typename T >
+class Required< T, typename std::enable_if< ! std::is_abstract< T >::value >::type >
 {
 
 private: // Friend
@@ -35,6 +39,7 @@ private: // Friend
 public: // Types
 
 	typedef  T  Value;
+	typedef  typename std::enable_if< ! std::is_abstract< T >::value >::type  EnableType;
 	typedef  typename std::conditional< std::is_scalar< T >::value, T const, T const & >::type  Tc;
 	typedef  typename std::conditional< std::is_scalar< T >::value, typename std::remove_const< T >::type, T const & >::type  Tr;
 
@@ -56,9 +61,9 @@ public: // Creation
 		assert( ptr_ != nullptr ); // Required object must be present
 	}
 
-	// Required Constructor Template
+	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type >
-	Required( Required< U, Enable > const & o ) :
+	Required( Required< U, EnableType > const & o ) :
 	 ptr_( o.own_ ? new T( o() ) : o.ptr_ ),
 	 own_( o.own_ )
 	{
@@ -128,7 +133,7 @@ public: // Assignment
 	operator =( U const & val )
 	{
 		assert( ptr_ != nullptr );
-		*ptr_ = val;
+		*ptr_ = T( val );
 		return *this;
 	}
 
@@ -189,6 +194,17 @@ public: // Properties
 	own() const
 	{
 		return own_;
+	}
+
+public: // Modifiers
+
+	// Clear
+	void
+	clear()
+	{
+		if ( own_ ) delete ptr_;
+		ptr_ = nullptr;
+		own_ = false;
 	}
 
 public: // Comparison
@@ -280,7 +296,7 @@ public: // Creation
 		assert( ptr_ != nullptr ); // Required object must be present
 	}
 
-	// Required Constructor Template
+	// Copy Constructor Template
 	template< typename U, class = typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type >
 	Required( Required< U, EnableType > const & o ) :
 	 ptr_( o.ptr_ )
@@ -386,6 +402,15 @@ public: // Properties
 		return ( ptr_ != nullptr );
 	}
 
+public: // Modifiers
+
+	// Clear
+	void
+	clear()
+	{
+		ptr_ = nullptr;
+	}
+
 public: // Comparison
 
 	// Required == Required
@@ -458,6 +483,15 @@ bool
 PRESENT( Required< T > const & r )
 {
 	return r.present();
+}
+
+// Required Maker
+template< typename T >
+inline
+Required< T >
+make_Required( T const & val )
+{
+	return Required< T >( val );
 }
 
 } // ObjexxFCL

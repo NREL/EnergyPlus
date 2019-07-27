@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 #ifndef DataSurfaceLists_hh_INCLUDED
 #define DataSurfaceLists_hh_INCLUDED
@@ -63,95 +52,89 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace DataSurfaceLists {
 
-	// Using/Aliasing
+    // Using/Aliasing
 
-	// Data
-	// -only module should be available to other modules and routines.
-	// Thus, all variables in this module must be PUBLIC.
+    // Data
+    // -only module should be available to other modules and routines.
+    // Thus, all variables in this module must be PUBLIC.
 
-	// MODULE PARAMETER DEFINITIONS:
+    // MODULE PARAMETER DEFINITIONS:
 
-	// DERIVED TYPE DEFINITIONS:
+    // DERIVED TYPE DEFINITIONS:
 
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
+    // INTERFACE BLOCK SPECIFICATIONS
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
+    // MODULE VARIABLE DECLARATIONS:
 
-	extern int NumOfSurfaceLists; // Number of surface lists in the user input file
-	extern int NumOfSurfListVentSlab; // Number of surface lists in the user input file
-	extern bool SurfaceListInputsFilled; // Set to TRUE after first pass through air loop
+    extern int NumOfSurfaceLists;        // Number of surface lists in the user input file
+    extern int NumOfSurfListVentSlab;    // Number of surface lists in the user input file
+    extern bool SurfaceListInputsFilled; // Set to TRUE after first pass through air loop
 
-	//  CHARACTER(len=*), PARAMETER :: CurrentModuleObject = ' '
-	// SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaceLists
+    //  CHARACTER(len=*), PARAMETER :: CurrentModuleObject = ' '
+    // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaceLists
 
-	// Types
+    // Types
 
-	struct SurfaceListData
-	{
-		// Members
-		std::string Name; // Name of the surface list
-		int NumOfSurfaces; // Number of surfaces in the list
-		Array1D_string SurfName; // Surfaces named in the list
-		Array1D_int SurfPtr; // Location of surfaces in Surface derived type
-		Array1D< Real64 > SurfFlowFrac; // Fraction of mass flow/length for a surface
+    struct SurfaceListData
+    {
+        // Members
+        std::string Name;             // Name of the surface list
+        int NumOfSurfaces;            // Number of surfaces in the list
+        Array1D_string SurfName;      // Surfaces named in the list
+        Array1D_int SurfPtr;          // Location of surfaces in Surface derived type
+        Array1D<Real64> SurfFlowFrac; // Fraction of mass flow/length for a surface
 
-		// Default Constructor
-		SurfaceListData() :
-			NumOfSurfaces( 0 )
-		{}
+        // Default Constructor
+        SurfaceListData() : NumOfSurfaces(0)
+        {
+        }
+    };
 
-	};
+    struct SlabListData
+    {
+        // Members
+        std::string Name;               // Name of the surface list
+        int NumOfSurfaces;              // Number of surfaces in the list
+        Array1D_string SurfName;        // Surfaces named in the list
+        Array1D_int SurfPtr;            // Location of surfaces in Surface derived type
+        Array1D_string ZoneName;        // Zone named in the list
+        Array1D_int ZonePtr;            // Location of Zone in Surface derived type
+        Array1D<Real64> CoreDiameter;   // Fraction of mass flow/length for a surface
+        Array1D<Real64> CoreLength;     // Fraction of mass flow/length for a surface
+        Array1D<Real64> CoreNumbers;    // Fraction of mass flow/length for a surface
+        Array1D_string SlabInNodeName;  // Zone named in the list
+        Array1D_string SlabOutNodeName; // Zone named in the list
 
-	struct SlabListData
-	{
-		// Members
-		std::string Name; // Name of the surface list
-		int NumOfSurfaces; // Number of surfaces in the list
-		Array1D_string SurfName; // Surfaces named in the list
-		Array1D_int SurfPtr; // Location of surfaces in Surface derived type
-		Array1D_string ZoneName; // Zone named in the list
-		Array1D_int ZonePtr; // Location of Zone in Surface derived type
-		Array1D< Real64 > CoreDiameter; // Fraction of mass flow/length for a surface
-		Array1D< Real64 > CoreLength; // Fraction of mass flow/length for a surface
-		Array1D< Real64 > CoreNumbers; // Fraction of mass flow/length for a surface
-		Array1D_string SlabInNodeName; // Zone named in the list
-		Array1D_string SlabOutNodeName; // Zone named in the list
+        // Default Constructor
+        SlabListData() : NumOfSurfaces(0)
+        {
+        }
+    };
 
-		// Default Constructor
-		SlabListData() :
-			NumOfSurfaces( 0 )
-		{}
+    // Object Data
+    extern Array1D<SurfaceListData> SurfList;
+    extern Array1D<SlabListData> SlabList;
 
-	};
+    // Functions
 
-	// Object Data
-	extern Array1D< SurfaceListData > SurfList;
-	extern Array1D< SlabListData > SlabList;
+    void clear_state();
 
-	// Functions
+    void GetSurfaceListsInputs();
 
-	void
-	clear_state();
+    int GetNumberOfSurfaceLists();
 
-	void
-	GetSurfaceListsInputs();
+    int GetNumberOfSurfListVentSlab();
 
-	int
-	GetNumberOfSurfaceLists();
+} // namespace DataSurfaceLists
 
-	int
-	GetNumberOfSurfListVentSlab();
-
-} // DataSurfaceLists
-
-} // EnergyPlus
+} // namespace EnergyPlus
 
 #endif

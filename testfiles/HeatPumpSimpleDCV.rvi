@@ -12,13 +12,11 @@ Cooling Coil Total Cooling Energy
 Cooling Coil Sensible Cooling Rate
 Cooling Coil Sensible Cooling Energy
 Cooling Coil Electric Power
-Heating Coil Total Heating Rate
-Heating Coil Total Heating Energy
+Heating Coil Heating Rate
+Heating Coil Heating Energy
 Heating Coil Electric Power
 Heating Coil Defrost Electric Power
 Heating Coil Defrost Electric Energy
-Heating Coil Air Heating Rate
-Heating Coil Air Heating Energy
 Heating Coil Gas Rate
 Heating Coil Gas Energy
 System Node Mass Flow Rate

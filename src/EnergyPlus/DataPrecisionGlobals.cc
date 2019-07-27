@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,15 +44,6 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/numeric.hh>
@@ -66,56 +55,56 @@ namespace EnergyPlus {
 
 namespace DataPrecisionGlobals {
 
-	// Module containing the routines dealing with the precision of data in EnergyPlus
+    // Module containing the routines dealing with the precision of data in EnergyPlus
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Linda Lawrie
-	//       DATE WRITTEN   January 2008
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
+    // MODULE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   January 2008
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS MODULE:
-	// This module allows for setting the default precision to "double precision" using
-	// F95 KIND and parameters.  Should it ever be necessary to try a higher precision, it
-	// will be easy to switch for testing.
+    // PURPOSE OF THIS MODULE:
+    // This module allows for setting the default precision to "double precision" using
+    // F95 KIND and parameters.  Should it ever be necessary to try a higher precision, it
+    // will be easy to switch for testing.
 
-	// METHODOLOGY EMPLOYED:
-	// na
+    // METHODOLOGY EMPLOYED:
+    // na
 
-	// REFERENCES:
-	// na
+    // REFERENCES:
+    // na
 
-	// OTHER NOTES:
-	// na
+    // OTHER NOTES:
+    // na
 
-	// USE STATEMENTS:
-	// na
+    // USE STATEMENTS:
+    // na
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS:
-	int const i32( selected_int_kind( 6 ) ); // 6 digits
-	int const i64( selected_int_kind( 12 ) ); // 12 digits
-	int const r32( kind( 1.0 ) );
-	int const r64( kind( 1.0 ) );
-	int const default_prec( r64 );
-	Real64 const constant_zero( 0.0 );
-	Real64 const constant_one( 1.0 );
-	Real64 const constant_minusone( -1.0 );
-	Real64 const constant_twenty( 20.0 );
-	Real64 const constant_pointfive( 0.5 );
-	Real64 const EXP_LowerLimit( -20.0 ); // In IVF=2.061153622438558d-009 - used 20
-	// because it's already used in other parts of the code
-	Real64 const EXP_UpperLimit( 40.0 ); // In IVF=2.353852668370200d+017
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    int const i32(SELECTED_INT_KIND(6));  // 6 digits
+    int const i64(SELECTED_INT_KIND(12)); // 12 digits
+    int const r32(KIND(1.0));
+    int const r64(KIND(1.0));
+    int const default_prec(r64);
+    Real64 const constant_zero(0.0);
+    Real64 const constant_one(1.0);
+    Real64 const constant_minusone(-1.0);
+    Real64 const constant_twenty(20.0);
+    Real64 const constant_pointfive(0.5);
+    Real64 const EXP_LowerLimit(-20.0); // In IVF=2.061153622438558d-009 - used 20
+    // because it's already used in other parts of the code
+    Real64 const EXP_UpperLimit(40.0); // In IVF=2.353852668370200d+017
 
-	// DERIVED TYPE DEFINITIONS:
-	// na
+    // DERIVED TYPE DEFINITIONS:
+    // na
 
-	// MODULE VARIABLE DECLARATIONS:
-	// na
+    // MODULE VARIABLE DECLARATIONS:
+    // na
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE:
-	// na
+    // SUBROUTINE SPECIFICATIONS FOR MODULE:
+    // na
 
-} // DataPrecisionGlobals
+} // namespace DataPrecisionGlobals
 
-} // EnergyPlus
+} // namespace EnergyPlus

@@ -1,10 +1,8 @@
-// EnergyPlus, Copyright (c) 1996-2016, The Board of Trustees of the University of Illinois and
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
-// (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights
-// reserved.
-//
-// If you have questions about your rights to use or distribute this software, please contact
-// Berkeley Lab's Innovation & Partnerships Office at IPO@lbl.gov.
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
 // U.S. Government consequently retains certain rights. As such, the U.S. Government has been
@@ -35,7 +33,7 @@
 //     specifically required in this Section (4), Licensee shall not use in a company name, a
 //     product name, in advertising, publicity, or other promotional activities any name, trade
 //     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
-//     similar designation, without Lawrence Berkeley National Laboratory's prior written consent.
+//     similar designation, without the U.S. Department of Energy's prior written consent.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -46,18 +44,10 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-//
-// You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the
-// features, functionality or performance of the source code ("Enhancements") to anyone; however,
-// if you choose to make your Enhancements available either publicly, or directly to Lawrence
-// Berkeley National Laboratory, without imposing a separate written license agreement for such
-// Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free
-// perpetual license to install, use, modify, prepare derivative works, incorporate into other
-// computer software, distribute, and sublicense such enhancements or derivative works thereof,
-// in binary and source code form.
 
 // C++ Headers
 #include <cmath>
+#include <iostream>
 #include <string>
 
 // ObjexxFCL Headers
@@ -65,757 +55,476 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <OutsideEnergySources.hh>
 #include <BranchNodeConnections.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
 #include <DataPlant.hh>
-#include <DataSizing.hh>
 #include <DataPrecisionGlobals.hh>
+#include <DataSizing.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
-#include <InputProcessor.hh>
+#include <GlobalNames.hh>
+#include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
-#include <ReportSizingManager.hh>
+#include <OutsideEnergySources.hh>
 #include <PlantUtilities.hh>
+#include <ReportSizingManager.hh>
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
+#include "OutsideEnergySources.hh"
+
 
 namespace EnergyPlus {
 
 namespace OutsideEnergySources {
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Dan Fisher
-	//       DATE WRITTEN   Unknown
-	//       MODIFIED       na
-	//       RE-ENGINEERED  Brent Griffith, Sept 2010, revised plant interactions.
-
-	// PURPOSE OF THIS MODULE:
-	// Module containing the routines dealing with the OutsideEnergySources
-
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
-	using DataGlobals::SecInHour;
-	using DataGlobals::MaxNameLength;
-	using DataGlobals::DisplayExtraWarnings;
-	using namespace DataEnvironment;
-	using namespace DataHVACGlobals;
-	using namespace DataLoopNode;
-	using General::TrimSigDigits;
-	using General::RoundSigDigits;
-	using DataPlant::PlantLoop;
-	using DataPlant::TypeOf_PurchHotWater;
-	using DataPlant::TypeOf_PurchChilledWater;
-	using DataPlant::ScanPlantLoopsForObject;
-
-	//MODULE PARAMETER DEFINITIONS
-	int const EnergyType_DistrictHeating( 1 );
-	int const EnergyType_DistrictCooling( 2 );
-
-	//MODULE VARIABLE DECLARATIONS:
-	int NumDistrictUnits( 0 );
-
-	// SUBROUTINE SPECIFICATIONS FOR MODULE OutsideEnergySources
-	namespace {
-	// These were static variables within different functions. They were pulled out into the namespace
-	// to facilitate easier unit testing of those functions.
-	// These are purposefully not in the header file as an extern variable. No one outside of this should
-	// use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
-	// This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-		bool SimOutsideEnergyGetInputFlag( true );
-	}
-	// Object Data
-	Array1D< OutsideEnergySourceSpecs > EnergySource;
-	Array1D< ReportVars > EnergySourceReport;
-
-	// Functions
-	void
-	clear_state()
-	{
-		NumDistrictUnits = 0;
-		SimOutsideEnergyGetInputFlag = true;
-		EnergySource.deallocate();
-		EnergySourceReport.deallocate();
-	}
-
-
-	void
-	SimOutsideEnergy(
-		std::string const & EP_UNUSED( EnergyType ),
-		std::string const & EquipName,
-		int const EP_UNUSED( EquipFlowCtrl ), // Flow control mode for the equipment
-		int & CompIndex,
-		bool const RunFlag,
-		bool const InitLoopEquip,
-		Real64 & MyLoad,
-		Real64 & MaxCap,
-		Real64 & MinCap,
-		Real64 & OptCap,
-		bool const EP_UNUSED( FirstHVACIteration )
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Dan Fisher
-		//       DATE WRITTEN   Sept. 1998
-		//       MODIFIED       May 2010; Edwin Lee; Linda Lawrie (consolidation)
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Manage the simulation of district (aka purchased) energy.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::FindItemInList;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		/////////// hoisted into namespace SimOutsideEnergyGetInputFlag ////////////
-		// static bool GetInputFlag( true ); // Get input once and once only
-		/////////////////////////////////////////////////
-		int EqNum;
-		Real64 InletTemp;
-		Real64 OutletTemp;
-		Real64 MassFlowRate;
-		//FLOW
-
-		//GET INPUT
-		if ( SimOutsideEnergyGetInputFlag ) {
-			GetOutsideEnergySourcesInput();
-			SimOutsideEnergyGetInputFlag = false;
-		}
-
-		// Find the correct Equipment
-		if ( CompIndex == 0 ) {
-			EqNum = FindItemInList( EquipName, EnergySource );
-			if ( EqNum == 0 ) {
-				ShowFatalError( "SimOutsideEnergy: Unit not found=" + EquipName );
-			}
-			CompIndex = EqNum;
-		} else {
-			EqNum = CompIndex;
-			if ( EnergySource( EqNum ).CheckEquipName ) {
-				if ( EqNum > NumDistrictUnits || EqNum < 1 ) {
-					ShowFatalError( "SimOutsideEnergy:  Invalid CompIndex passed=" + TrimSigDigits( EqNum ) + ", Number of Units=" + TrimSigDigits( NumDistrictUnits ) + ", Entered Unit name=" + EquipName );
-				}
-				if ( EquipName != EnergySource( EqNum ).Name ) {
-					ShowFatalError( "SimOutsideEnergy: Invalid CompIndex passed=" + TrimSigDigits( EqNum ) + ", Unit name=" + EquipName + ", stored Unit Name for that index=" + EnergySource( EqNum ).Name );
-				}
-				EnergySource( EqNum ).CheckEquipName = false;
-			}
-		}
-
-		//CALCULATE
-		if ( InitLoopEquip ) {
-			InitSimVars( EqNum, MassFlowRate, InletTemp, OutletTemp, MyLoad );
-			SizeDistrictEnergy( EqNum );
-
-			MinCap = 0.0;
-			MaxCap = EnergySource( EqNum ).NomCap;
-			OptCap = EnergySource( EqNum ).NomCap;
-			return;
-		}
-
-		InitSimVars( EqNum, MassFlowRate, InletTemp, OutletTemp, MyLoad );
-		SimDistrictEnergy( RunFlag, EqNum, MyLoad, MassFlowRate, InletTemp, OutletTemp );
-		UpdateRecords( MyLoad, EqNum, MassFlowRate, OutletTemp );
-
-	}
-
-	// End OutsideEnergySources Module Driver Subroutines
-	//******************************************************************************
-
-	// Beginning of OutsideEnergySources Module Get Input subroutines
-	//******************************************************************************
-
-	void
-	GetOutsideEnergySourcesInput()
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Dan Fisher
-		//       DATE WRITTEN   April 1998
-		//       MODIFIED       May 2010; Edwin Lee; Linda Lawrie (consolidation)
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This routine obtains the input data puts it into the
-		// component arrays. Data items in the component arrays
-		// are initialized. Output variables are set up.
-
-		// METHODOLOGY EMPLOYED: to be determined...
-
-		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-		using InputProcessor::GetObjectItem;
-		using InputProcessor::VerifyName;
-		using namespace DataIPShortCuts;
-		using NodeInputManager::GetOnlySingleNode;
-		using BranchNodeConnections::TestCompSet;
-		using ScheduleManager::GetScheduleIndex;
-		using ScheduleManager::CheckScheduleValueMinMax;
-		using DataGlobals::ScheduleAlwaysOn;
-		using DataSizing::AutoSize;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int EnergySourceNum;
-		int NumAlphas; // Number of elements in the alpha array
-		int NumNums; // Number of elements in the numeric array
-		int IOStat; // IO Status when calling get input subroutine
-		int NumDistrictUnitsHeat;
-		int NumDistrictUnitsCool;
-		int IndexCounter;
-		static bool ErrorsFound( false ); // If errors detected in input
-		bool IsNotOK; // Flag to verify name
-		bool IsBlank; // Flag for blank name
-
-		//GET NUMBER OF ALL EQUIPMENT TYPES
-		cCurrentModuleObject = "DistrictHeating";
-		NumDistrictUnitsHeat = GetNumObjectsFound( cCurrentModuleObject );
-		cCurrentModuleObject = "DistrictCooling";
-		NumDistrictUnitsCool = GetNumObjectsFound( cCurrentModuleObject );
-		NumDistrictUnits = NumDistrictUnitsHeat + NumDistrictUnitsCool;
-
-		if ( allocated( EnergySource ) ) return;
-
-		EnergySource.allocate( NumDistrictUnits );
-		EnergySourceReport.allocate( NumDistrictUnits );
-
-		cCurrentModuleObject = "DistrictHeating";
-
-		EnergySourceNum = 0;
-		for ( IndexCounter = 1; IndexCounter <= NumDistrictUnitsHeat; ++IndexCounter ) {
-			++EnergySourceNum;
-			GetObjectItem( cCurrentModuleObject, EnergySourceNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames );
-
-			if ( EnergySourceNum > 1 ) {
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), EnergySource, EnergySourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
-			}
-			EnergySource( EnergySourceNum ).Name = cAlphaArgs( 1 );
-			EnergySource( EnergySourceNum ).PlantLoopID = "";
-			EnergySource( EnergySourceNum ).SecndryLoopID = "";
-			EnergySource( EnergySourceNum ).ScheduleID = "";
-			EnergySource( EnergySourceNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			EnergySource( EnergySourceNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Hot Water Nodes" );
-			EnergySource( EnergySourceNum ).NomCap = rNumericArgs( 1 );
-			if ( EnergySource( EnergySourceNum ).NomCap == AutoSize ) {
-				EnergySource( EnergySourceNum ).NomCapWasAutoSized = true;
-			}
-			EnergySource( EnergySourceNum ).EnergyTransfer = 0.0;
-			EnergySource( EnergySourceNum ).EnergyRate = 0.0;
-			EnergySource( EnergySourceNum ).EnergyType = EnergyType_DistrictHeating;
-			if ( ! lAlphaFieldBlanks( 4 ) ) {
-				EnergySource( EnergySourceNum ).CapFractionSchedNum = GetScheduleIndex( cAlphaArgs( 4 ) );
-				if ( EnergySource( EnergySourceNum ).CapFractionSchedNum == 0 ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + EnergySource( EnergySourceNum ).Name + "\", is not valid" );
-					ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" was not found." );
-					ErrorsFound = true;
-				}
-				if ( ! CheckScheduleValueMinMax( EnergySource( EnergySourceNum ).CapFractionSchedNum, ">=", 0.0 ) ) {
-					ShowWarningError( cCurrentModuleObject + "=\"" + EnergySource( EnergySourceNum ).Name + "\", is not valid" );
-					ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" should not have negative values." );
-					ShowContinueError( "Negative values will be treated as zero, and the simulation continues." );
-				}
-			} else {
-				EnergySource( EnergySourceNum ).CapFractionSchedNum = ScheduleAlwaysOn;
-			}
-		}
-
-		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject + ", Preceding condition caused termination." );
-		}
-
-		EnergySourceNum = 0;
-		for ( IndexCounter = 1; IndexCounter <= NumDistrictUnitsHeat; ++IndexCounter ) {
-			++EnergySourceNum;
-			SetupOutputVariable( "District Heating Hot Water Energy [J]", EnergySource( EnergySourceNum ).EnergyTransfer, "System", "Sum", EnergySource( EnergySourceNum ).Name, _, "DistrictHeating", "Heating", _, "Plant" );
-			SetupOutputVariable( "District Heating Hot Water Rate [W]", EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
-
-			SetupOutputVariable( "District Heating Rate [W]", EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Heating Inlet Temperature [C]", EnergySourceReport( EnergySourceNum ).InletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Heating Outlet Temperature [C]", EnergySourceReport( EnergySourceNum ).OutletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Heating Mass Flow Rate [kg/s]", EnergySourceReport( EnergySourceNum ).MassFlowRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
-		}
-
-		cCurrentModuleObject = "DistrictCooling";
-
-		EnergySourceNum = NumDistrictUnitsHeat; //To initialize counter
-		for ( IndexCounter = 1; IndexCounter <= NumDistrictUnitsCool; ++IndexCounter ) {
-			++EnergySourceNum;
-			GetObjectItem( cCurrentModuleObject, IndexCounter, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames );
-
-			if ( EnergySourceNum > 1 ) {
-				IsNotOK = false;
-				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), EnergySource, EnergySourceNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
-					if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-				}
-			}
-			EnergySource( EnergySourceNum ).Name = cAlphaArgs( 1 );
-			EnergySource( EnergySourceNum ).PlantLoopID = "";
-			EnergySource( EnergySourceNum ).SecndryLoopID = "";
-			EnergySource( EnergySourceNum ).ScheduleID = "";
-			EnergySource( EnergySourceNum ).InletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-			EnergySource( EnergySourceNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Chilled Water Nodes" );
-			EnergySource( EnergySourceNum ).NomCap = rNumericArgs( 1 );
-			if ( EnergySource( EnergySourceNum ).NomCap == AutoSize ) {
-				EnergySource( EnergySourceNum ).NomCapWasAutoSized = true;
-			}
-			EnergySource( EnergySourceNum ).EnergyTransfer = 0.0;
-			EnergySource( EnergySourceNum ).EnergyRate = 0.0;
-			EnergySource( EnergySourceNum ).EnergyType = EnergyType_DistrictCooling;
-			if ( ! lAlphaFieldBlanks( 4 ) ) {
-				EnergySource( EnergySourceNum ).CapFractionSchedNum = GetScheduleIndex( cAlphaArgs( 4 ) );
-				if ( EnergySource( EnergySourceNum ).CapFractionSchedNum == 0 ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + EnergySource( EnergySourceNum ).Name + "\", is not valid" );
-					ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" was not found." );
-					ErrorsFound = true;
-				}
-				if ( ! CheckScheduleValueMinMax( EnergySource( EnergySourceNum ).CapFractionSchedNum, ">=", 0.0 ) ) {
-					ShowWarningError( cCurrentModuleObject + "=\"" + EnergySource( EnergySourceNum ).Name + "\", is not valid" );
-					ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" should not have negative values." );
-					ShowContinueError( "Negative values will be treated as zero, and the simulation continues." );
-				}
-			} else {
-				EnergySource( EnergySourceNum ).CapFractionSchedNum = ScheduleAlwaysOn;
-			}
-
-		}
-
-		if ( ErrorsFound ) {
-			ShowFatalError( "Errors found in processing input for " + cCurrentModuleObject + ", Preceding condition caused termination." );
-		}
-
-		EnergySourceNum = NumDistrictUnitsHeat; //To initialize counter
-		for ( IndexCounter = 1; IndexCounter <= NumDistrictUnitsCool; ++IndexCounter ) {
-			++EnergySourceNum;
-			SetupOutputVariable( "District Cooling Chilled Water Energy [J]", EnergySource( EnergySourceNum ).EnergyTransfer, "System", "Sum", EnergySource( EnergySourceNum ).Name, _, "DistrictCooling", "Cooling", _, "Plant" );
-			SetupOutputVariable( "District Cooling Chilled Water Rate [W]", EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
-
-			SetupOutputVariable( "District Cooling Rate [W]", EnergySource( EnergySourceNum ).EnergyRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Cooling Inlet Temperature [C]", EnergySourceReport( EnergySourceNum ).InletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Cooling Outlet Temperature [C]", EnergySourceReport( EnergySourceNum ).OutletTemp, "System", "Average", EnergySource( EnergySourceNum ).Name );
-			SetupOutputVariable( "District Cooling Mass Flow Rate [kg/s]", EnergySourceReport( EnergySourceNum ).MassFlowRate, "System", "Average", EnergySource( EnergySourceNum ).Name );
-		}
-
-	}
-
-	// End of Get Input subroutines for the OutsideEnergySources Module
-	//******************************************************************************
-
-	// Beginning Initialization Section of the OutsideEnergySources Module
-	//******************************************************************************
-
-	void
-	InitSimVars(
-		int const EnergySourceNum, // Which item being initialized
-		Real64 & MassFlowRate,
-		Real64 & InletTemp,
-		Real64 & OutletTemp,
-		Real64 const MyLoad
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR:          Dan Fisher
-		//       DATE WRITTEN:    October 1998
-		//       MODIFIED       May 2010; Edwin Lee; Linda Lawrie (consolidation)
-		//       RE-ENGINEERED  Sept 2010, Brent Griffith, plant rewrite
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine does one-time inits and sets the operating mass flow rate of this machine
-
-		// METHODOLOGY EMPLOYED:
-		// One time inits include validating source type (should happen in getinput?) and locating this
-		//  component on the PlantLoop topology.
-		// The mass flow rate is determined based on component load, and making use of
-		//  the SetComponentFlowRate routine.
-		// The mass flow rate could be an inter-connected-loop side trigger. This is not really the type of
-		//  interconnect that that routine was written for, but it is the clearest example of using it.
-
-		// Using/Aliasing
-		using PlantUtilities::SetComponentFlowRate;
-		using PlantUtilities::InitComponentNodes;
-		using PlantUtilities::RegisterPlantCompDesignFlow;
-		using DataGlobals::BeginEnvrnFlag;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int TempTypeFlag( 0 );
-		static Real64 TempPlantMdot( 0.0 ); // local copy of plant flow
-		int LoopNum;
-		int LoopSideNum;
-		int BranchIndex;
-		int CompIndex;
-		int InletNode;
-		int OutletNode;
-		bool errFlag;
-		// Init more variables
-
-		if ( EnergySource( EnergySourceNum ).OneTimeInitFlag ) {
-			if ( EnergySource( EnergySourceNum ).EnergyType == EnergyType_DistrictHeating ) {
-				TempTypeFlag = TypeOf_PurchHotWater;
-			} else if ( EnergySource( EnergySourceNum ).EnergyType == EnergyType_DistrictCooling ) {
-				TempTypeFlag = TypeOf_PurchChilledWater;
-			} else {
-				ShowFatalError( "InitSimVars: Invalid EnergyType for District Heating/Cooling=" + EnergySource( EnergySourceNum ).Name );
-			}
-			// Locate the unit on the plant loops for later usage
-			errFlag = false;
-			ScanPlantLoopsForObject( EnergySource( EnergySourceNum ).Name, TempTypeFlag, EnergySource( EnergySourceNum ).LoopNum, EnergySource( EnergySourceNum ).LoopSideNum, EnergySource( EnergySourceNum ).BranchNum, EnergySource( EnergySourceNum ).CompNum, _, _, _, _, _, errFlag );
-			if ( errFlag ) {
-				ShowFatalError( "InitSimVars: Program terminated due to previous condition(s)." );
-			}
-			// set limits on outlet node temps to plant loop limits
-			PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).LoopSide( EnergySource( EnergySourceNum ).LoopSideNum ).Branch( EnergySource( EnergySourceNum ).BranchNum ).Comp( EnergySource( EnergySourceNum ).CompNum ).MinOutletTemp = PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).MinTemp;
-			PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).LoopSide( EnergySource( EnergySourceNum ).LoopSideNum ).Branch( EnergySource( EnergySourceNum ).BranchNum ).Comp( EnergySource( EnergySourceNum ).CompNum ).MaxOutletTemp = PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).MaxTemp;
-			// Register design flow rate for inlet node (helps to autosize comp setpoint op scheme flows
-			RegisterPlantCompDesignFlow( EnergySource( EnergySourceNum ).InletNodeNum, PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).MaxVolFlowRate );
-
-			EnergySource( EnergySourceNum ).OneTimeInitFlag = false;
-		}
-
-		//begin environment inits
-		if ( BeginEnvrnFlag && EnergySource( EnergySourceNum ).BeginEnvrnInitFlag ) {
-			// component model has not design flow rates, using data for overall plant loop
-			InitComponentNodes( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).MinMassFlowRate, PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).MaxMassFlowRate, EnergySource( EnergySourceNum ).InletNodeNum, EnergySource( EnergySourceNum ).OutletNodeNum, EnergySource( EnergySourceNum ).LoopNum, EnergySource( EnergySourceNum ).LoopSideNum, EnergySource( EnergySourceNum ).BranchNum, EnergySource( EnergySourceNum ).CompNum );
-			EnergySource( EnergySourceNum ).BeginEnvrnInitFlag = false;
-		}
-		if ( ! BeginEnvrnFlag ) EnergySource( EnergySourceNum ).BeginEnvrnInitFlag = true;
-
-		// now do everytime inits
-		InletNode = EnergySource( EnergySourceNum ).InletNodeNum;
-		OutletNode = EnergySource( EnergySourceNum ).OutletNodeNum;
-		InletTemp = Node( InletNode ).Temp;
-		OutletTemp = InletTemp;
-		LoopNum = EnergySource( EnergySourceNum ).LoopNum;
-		LoopSideNum = EnergySource( EnergySourceNum ).LoopSideNum;
-		BranchIndex = EnergySource( EnergySourceNum ).BranchNum;
-		CompIndex = EnergySource( EnergySourceNum ).CompNum;
-
-		if ( std::abs( MyLoad ) > 0.0 ) {
-			TempPlantMdot = PlantLoop( LoopNum ).MaxMassFlowRate;
-		} else {
-			TempPlantMdot = 0.0; // expect no flow needed
-		}
-
-		// get actual mass flow to use, hold in MassFlowRate variable
-		SetComponentFlowRate( TempPlantMdot, InletNode, OutletNode, LoopNum, LoopSideNum, BranchIndex, CompIndex );
-		MassFlowRate = TempPlantMdot;
-
-	}
-
-	// End Initialization Section of the OutsideEnergySources Module
-	//******************************************************************************
-
-	// Beginning of OutsideEnergySources Module Utility Subroutines
-	// *****************************************************************************
-
-	void
-	SizeDistrictEnergy(
-		int const EnergySourceNum
-	)
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Daeho Kang
-		//       DATE WRITTEN   April 2014
-		//       MODIFIED
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		//  This subroutine is for sizing capacities of district cooling and heating objects.
-
-		// USE STATEMENTS:
-		using DataSizing::AutoSize;
-		using DataSizing::PlantSizData;
-		using DataSizing::AutoVsHardSizingThreshold;
-		using ReportSizingManager::ReportSizingOutput;
-		using FluidProperties::GetDensityGlycol;
-		using FluidProperties::GetSpecificHeatGlycol;
-		using DataPlant::PlantFirstSizesOkayToFinalize;
-		using DataPlant::PlantFirstSizesOkayToReport;
-		using DataPlant::PlantFinalSizesOkayToReport;
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizNum( 0 );	// Plant sizing index for hot water loop
-		bool ErrorsFound( false );	// If errors detected in input
-		Real64 NomCapDes( 0.0 );	// Autosized nominal capacity for reporting
-		Real64 NomCapUser( 0.0 );	// Hardsized nominal capacity for reporting
-		Real64 rho( 0.0 );	// Density (kg/m3)
-		Real64 Cp( 0.0 );	// Specific Heat (J/kg-K)
-
-		// Type name string variable to collapse the sizing for cooling and heating into one block
-		std::string typeName;
-		if ( EnergySource( EnergySourceNum ).EnergyType == EnergyType_DistrictCooling ) {
-			typeName = "Cooling";
-		} else { // Heating
-			typeName = "Heating";
-		}
-
-		// Do the sizing here
-
-		PltSizNum = PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).PlantSizNum;
-		if ( PltSizNum > 0 ) {
-			rho = GetDensityGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidIndex, "SizeDistrict" + typeName );
-			Cp = GetSpecificHeatGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, DataGlobals::InitConvTemp, PlantLoop(EnergySource( EnergySourceNum).LoopNum ).FluidIndex, "SizeDistrict" + typeName );
-			NomCapDes = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate;
-			if ( PlantFirstSizesOkayToFinalize ) {
-				if ( EnergySource( EnergySourceNum ).NomCapWasAutoSized ) {
-					EnergySource( EnergySourceNum ).NomCap = NomCapDes;
-					if ( PlantFinalSizesOkayToReport ) {
-						ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name,
-							"Design Size Nominal Capacity [W]", NomCapDes );
-					}
-					if ( PlantFirstSizesOkayToReport ) {
-						ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name,
-							"Initial Design Size Nominal Capacity [W]", NomCapDes );
-					}
-				} else {  // Hard-size with sizing data
-					if ( EnergySource( EnergySourceNum ).NomCap > 0.0 && NomCapDes > 0.0 ) {
-						NomCapUser = EnergySource( EnergySourceNum ).NomCap;
-						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name,
-								"Design Size Nominal Capacity [W]", NomCapDes, "User-Specified Nominal Capacity [W]", NomCapUser );
-							if ( DisplayExtraWarnings ) {
-								if ( ( std::abs( NomCapDes - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeDistrict" + typeName + ": Potential issue with equipment sizing for " + EnergySource( EnergySourceNum ).Name );
-									ShowContinueError ( "User-Specified Nominal Capacity of " + RoundSigDigits( NomCapUser, 2 ) + " [W]" );
-									ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( NomCapDes, 2 ) + " [W]" );
-									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-								}
-							}
-						}
-					}
-				}
-			}
-		} else {
-			if ( EnergySource( EnergySourceNum ).NomCapWasAutoSized && PlantFirstSizesOkayToFinalize ) {
-				ShowSevereError( "Autosizing of District " + typeName + " nominal capacity requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in District" + typeName + " object=" + EnergySource( EnergySourceNum ).Name );
-				ErrorsFound = true;
-			}
-			if ( ! EnergySource( EnergySourceNum ).NomCapWasAutoSized && EnergySource( EnergySourceNum ).NomCap > 0.0 && PlantFinalSizesOkayToReport ) {
-				ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name,
-				 "User-Specified Nominal Capacity [W]", EnergySource( EnergySourceNum ).NomCap );
-			}
-		}
-		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
-		}
-	}
-
-	void
-	SimDistrictEnergy(
-		bool const RunFlag,
-		int const DistrictEqNum,
-		Real64 & MyLoad,
-		Real64 const MassFlowRate,
-		Real64 const InletTemp,
-		Real64 & OutletTemp
-	)
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Dan Fisher
-		//       DATE WRITTEN   July 1998
-		//       MODIFIED       May 2010; Edwin Lee; Linda Lawrie (consolidation)
-		//       RE-ENGINEERED  Sept 2010, Brent Griffith, plant rewrite
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine needs a description.
-
-		// METHODOLOGY EMPLOYED:
-		// Needs description, as appropriate.
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using FluidProperties::GetSpecificHeatGlycol;
-		using ScheduleManager::GetCurrentScheduleValue;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "SimDistrictEnergy" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int LoopNum;
-		int LoopSideNum;
-		int BranchIndex;
-		int CompIndex;
-		int InletNode;
-		int OutletNode;
-		Real64 LoopMinTemp;
-		Real64 LoopMaxTemp;
-		Real64 Cp; // local cp at current temp
-		Real64 CurrentCap;
-		Real64 CapFraction;
-
-		//FLOW
-
-		//set inlet and outlet nodes
-		InletNode = EnergySource( DistrictEqNum ).InletNodeNum;
-		OutletNode = EnergySource( DistrictEqNum ).OutletNodeNum;
-		LoopNum = EnergySource( DistrictEqNum ).LoopNum;
-		LoopSideNum = EnergySource( DistrictEqNum ).LoopSideNum;
-		BranchIndex = EnergySource( DistrictEqNum ).BranchNum;
-		CompIndex = EnergySource( DistrictEqNum ).CompNum;
-		LoopMinTemp = PlantLoop( LoopNum ).MinTemp;
-		LoopMaxTemp = PlantLoop( LoopNum ).MaxTemp;
-
-		Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, InletTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
-
-		//  apply power limit from input
-		CapFraction = GetCurrentScheduleValue( EnergySource( DistrictEqNum ).CapFractionSchedNum );
-		CapFraction = max( 0.0, CapFraction ); // ensure non negative
-		CurrentCap = EnergySource( DistrictEqNum ).NomCap * CapFraction;
-		if ( std::abs( MyLoad ) > CurrentCap ) {
-			MyLoad = sign( CurrentCap, MyLoad );
-		}
-
-		if ( EnergySource( DistrictEqNum ).EnergyType == EnergyType_DistrictCooling ) {
-			if ( MyLoad > 0.0 ) MyLoad = 0.0;
-		} else if ( EnergySource( DistrictEqNum ).EnergyType == EnergyType_DistrictHeating ) {
-			if ( MyLoad < 0.0 ) MyLoad = 0.0;
-		}
-
-		// determine outlet temp based on inlet temp, cp, and MyLoad
-		if ( ( MassFlowRate > 0.0 ) && RunFlag ) {
-			OutletTemp = ( MyLoad + MassFlowRate * Cp * InletTemp ) / ( MassFlowRate * Cp );
-			//apply loop limits on temperature result to keep in check
-			if ( OutletTemp < LoopMinTemp ) {
-				OutletTemp = max( OutletTemp, LoopMinTemp );
-				MyLoad = MassFlowRate * Cp * ( OutletTemp - InletTemp );
-			}
-			if ( OutletTemp > LoopMaxTemp ) {
-				OutletTemp = min( OutletTemp, LoopMaxTemp );
-				MyLoad = MassFlowRate * Cp * ( OutletTemp - InletTemp );
-			}
-		} else {
-			OutletTemp = InletTemp;
-			MyLoad = 0.0;
-		}
-
-	}
-
-	// End of OutsideEnergySources Module Utility Subroutines
-	// *****************************************************************************
-
-	// Beginning of Record Keeping subroutines for the OutsideEnergySources Module
-	// *****************************************************************************
-
-	void
-	UpdateRecords(
-		Real64 const MyLoad,
-		int const EqNum,
-		Real64 const MassFlowRate,
-		Real64 const OutletTemp
-	)
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR:          Dan Fisher
-		//       DATE WRITTEN:    October 1998
-		//       MODIFIED       May 2010; Edwin Lee; Linda Lawrie (consolidation)
-		//       RE-ENGINEERED  Sept 2010, Brent Griffith, plant rewrite
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine needs a description.
-
-		// METHODOLOGY EMPLOYED:
-		// Needs description, as appropriate.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int InletNode;
-		int OutletNode;
-
-		//set inlet and outlet nodes
-		InletNode = EnergySource( EqNum ).InletNodeNum;
-		OutletNode = EnergySource( EqNum ).OutletNodeNum;
-		Node( OutletNode ).Temp = OutletTemp;
-		EnergySourceReport( EqNum ).MassFlowRate = MassFlowRate;
-		EnergySourceReport( EqNum ).InletTemp = Node( InletNode ).Temp;
-		EnergySourceReport( EqNum ).OutletTemp = OutletTemp;
-		EnergySource( EqNum ).EnergyRate = std::abs( MyLoad );
-		EnergySource( EqNum ).EnergyTransfer = EnergySource( EqNum ).EnergyRate * TimeStepSys * SecInHour;
-		EnergySourceReport( EqNum ).EnergyTransfer = EnergySource( EqNum ).EnergyTransfer;
-	}
-
-	// End of Record Keeping subroutines for the OutsideEnergySources Module
-	// *****************************************************************************
-
-} // OutsideEnergySources
-
-} // EnergyPlus
+    // MODULE INFORMATION:
+    //       AUTHOR         Dan Fisher
+    //       DATE WRITTEN   Unknown
+    //       MODIFIED       na
+    //       RE-ENGINEERED  Brent Griffith, Sept 2010, revised plant interactions.
+
+    // PURPOSE OF THIS MODULE:
+    // Module containing the routines dealing with the OutsideEnergySources
+
+    // MODULE VARIABLE DECLARATIONS:
+    int NumDistrictUnits(0);
+
+    // SUBROUTINE SPECIFICATIONS FOR MODULE OutsideEnergySources
+    namespace {
+        // These were static variables within different functions. They were pulled out into the namespace
+        // to facilitate easier unit testing of those functions.
+        // These are purposefully not in the header file as an extern variable. No one outside of this should
+        // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+        // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+        bool SimOutsideEnergyGetInputFlag(true);
+    } // namespace
+    // Object Data
+    Array1D<OutsideEnergySourceSpecs> EnergySource;
+    std::unordered_map<std::string, std::string> EnergySourceUniqueNames;
+
+    // Functions
+    void clear_state()
+    {
+        NumDistrictUnits = 0;
+        SimOutsideEnergyGetInputFlag = true;
+        EnergySource.deallocate();
+        EnergySourceUniqueNames.clear();
+    }
+
+    PlantComponent *OutsideEnergySourceSpecs::factory(int objectType, std::string objectName) {
+        // Process the input data for outside energy sources if it hasn't been done already
+        if (SimOutsideEnergyGetInputFlag) {
+            GetOutsideEnergySourcesInput();
+            SimOutsideEnergyGetInputFlag = false;
+        }
+        // Now look for this particular pipe in the list
+        for (auto &source : EnergySource) {
+            if (source.EnergyType == objectType && source.Name == objectName) {
+                return &source;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError(
+                "OutsideEnergySourceSpecsFactory: Error getting inputs for source named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    void OutsideEnergySourceSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration),
+                                            Real64 &CurLoad, bool RunFlag) {
+        this->initialize(CurLoad);
+        this->calculate(RunFlag, CurLoad);
+    }
+
+    void OutsideEnergySourceSpecs::onInitLoopEquip(const PlantLocation &) {
+        this->initialize(0.0);
+        this->size();
+    }
+
+    void OutsideEnergySourceSpecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad,
+                                                       Real64 &MinLoad, Real64 &OptLoad) {
+        MinLoad = 0.0;
+        MaxLoad = this->NomCap;
+        OptLoad = this->NomCap;
+    }
+
+    void GetOutsideEnergySourcesInput()
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Dan Fisher
+        //       DATE WRITTEN   April 1998
+        //       MODIFIED       May 2010; Edwin Lee; Linda Lawrie (consolidation)
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This routine obtains the input data puts it into the
+        // component arrays. Data items in the component arrays
+        // are initialized. Output variables are set up.
+
+        // GET NUMBER OF ALL EQUIPMENT TYPES
+        int const NumDistrictUnitsHeat = inputProcessor->getNumObjectsFound("DistrictHeating");
+        int const NumDistrictUnitsCool = inputProcessor->getNumObjectsFound("DistrictCooling");
+        NumDistrictUnits = NumDistrictUnitsHeat + NumDistrictUnitsCool;
+
+        if (allocated(EnergySource)) return;
+
+        EnergySource.allocate(NumDistrictUnits);
+        EnergySourceUniqueNames.reserve(static_cast<unsigned>(NumDistrictUnits));
+
+        bool ErrorsFound(false); // If errors detected in input
+        int heatIndex = 0;
+        int coolIndex = 0;
+
+        for (int EnergySourceNum = 1; EnergySourceNum <= NumDistrictUnits; ++EnergySourceNum) {
+
+            std::string reportVarPrefix;
+            std::string nodeNames;
+            int typeOf;
+            int thisIndex;
+            if (EnergySourceNum <= NumDistrictUnitsHeat) {
+                DataIPShortCuts::cCurrentModuleObject = "DistrictHeating";
+                reportVarPrefix = "District Heating ";
+                nodeNames = "Hot Water Nodes";
+                typeOf = DataPlant::TypeOf_PurchHotWater;
+                heatIndex++;
+                thisIndex = heatIndex;
+            } else {
+                DataIPShortCuts::cCurrentModuleObject = "DistrictCooling";
+                reportVarPrefix = "District Cooling ";
+                nodeNames = "Chilled Water Nodes";
+                typeOf = DataPlant::TypeOf_PurchChilledWater;
+                coolIndex++;
+                thisIndex = coolIndex;
+            }
+
+            int NumAlphas = 0, NumNums = 0, IOStat = 0;
+            inputProcessor->getObjectItem(
+                    DataIPShortCuts::cCurrentModuleObject, thisIndex, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, _, DataIPShortCuts::lAlphaFieldBlanks, DataIPShortCuts::cAlphaFieldNames);
+
+            if (EnergySourceNum > 1) {
+                GlobalNames::VerifyUniqueInterObjectName(
+                    EnergySourceUniqueNames, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaFieldNames(1), ErrorsFound);
+            }
+            EnergySource(EnergySourceNum).Name = DataIPShortCuts::cAlphaArgs(1);
+            EnergySource(EnergySourceNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(
+                    DataIPShortCuts::cAlphaArgs(2), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
+            EnergySource(EnergySourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(
+                    DataIPShortCuts::cAlphaArgs(3), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
+            BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaArgs(2), DataIPShortCuts::cAlphaArgs(3), nodeNames);
+            EnergySource(EnergySourceNum).NomCap = DataIPShortCuts::rNumericArgs(1);
+            if (EnergySource(EnergySourceNum).NomCap == DataSizing::AutoSize) {
+                EnergySource(EnergySourceNum).NomCapWasAutoSized = true;
+            }
+            EnergySource(EnergySourceNum).EnergyTransfer = 0.0;
+            EnergySource(EnergySourceNum).EnergyRate = 0.0;
+            EnergySource(EnergySourceNum).EnergyType = typeOf;
+            if (!DataIPShortCuts::lAlphaFieldBlanks(4)) {
+                EnergySource(EnergySourceNum).CapFractionSchedNum = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(4));
+                if (EnergySource(EnergySourceNum).CapFractionSchedNum == 0) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + EnergySource(EnergySourceNum).Name + "\", is not valid");
+                    ShowContinueError(DataIPShortCuts::cAlphaFieldNames(4) + "=\"" + DataIPShortCuts::cAlphaArgs(4) + "\" was not found.");
+                    ErrorsFound = true;
+                }
+                if (!ScheduleManager::CheckScheduleValueMinMax(EnergySource(EnergySourceNum).CapFractionSchedNum, ">=", 0.0)) {
+                    ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + EnergySource(EnergySourceNum).Name + "\", is not valid");
+                    ShowContinueError(DataIPShortCuts::cAlphaFieldNames(4) + "=\"" + DataIPShortCuts::cAlphaArgs(4) + "\" should not have negative values.");
+                    ShowContinueError("Negative values will be treated as zero, and the simulation continues.");
+                }
+            } else {
+                EnergySource(EnergySourceNum).CapFractionSchedNum = DataGlobals::ScheduleAlwaysOn;
+            }
+        }
+
+        if (ErrorsFound) {
+            ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject + ", Preceding condition caused termination.");
+        }
+
+    }
+
+    void OutsideEnergySourceSpecs::initialize(Real64 MyLoad)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR:          Dan Fisher
+        //       DATE WRITTEN:    October 1998
+        //       MODIFIED       May 2010; Edwin Lee; Linda Lawrie (consolidation)
+        //       RE-ENGINEERED  Sept 2010, Brent Griffith, plant rewrite
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine does one-time inits and sets the operating mass flow rate of this machine
+
+        // METHODOLOGY EMPLOYED:
+        // One time inits include validating source type (should happen in getinput?) and locating this
+        //  component on the PlantLoop topology.
+        // The mass flow rate is determined based on component load, and making use of
+        //  the SetComponentFlowRate routine.
+        // The mass flow rate could be an inter-connected-loop side trigger. This is not really the type of
+        //  interconnect that that routine was written for, but it is the clearest example of using it.
+
+        if (this->OneTimeInitFlag) {
+            // Locate the unit on the plant loops for later usage
+            bool errFlag = false;
+            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                                                    this->EnergyType,
+                                    this->LoopNum,
+                                    this->LoopSideNum,
+                                    this->BranchNum,
+                                    this->CompNum,
+                                    errFlag,
+                                    _,
+                                    _,
+                                    _,
+                                    _,
+                                    _);
+            if (errFlag) {
+                ShowFatalError("InitSimVars: Program terminated due to previous condition(s).");
+            }
+            // set limits on outlet node temps to plant loop limits
+            DataPlant::PlantLoop(this->LoopNum)
+                .LoopSide(this->LoopSideNum)
+                .Branch(this->BranchNum)
+                .Comp(this->CompNum)
+                .MinOutletTemp = DataPlant::PlantLoop(this->LoopNum).MinTemp;
+            DataPlant::PlantLoop(this->LoopNum)
+                .LoopSide(this->LoopSideNum)
+                .Branch(this->BranchNum)
+                .Comp(this->CompNum)
+                .MaxOutletTemp = DataPlant::PlantLoop(this->LoopNum).MaxTemp;
+            // Register design flow rate for inlet node (helps to autosize comp setpoint op scheme flows
+            PlantUtilities::RegisterPlantCompDesignFlow(this->InletNodeNum, DataPlant::PlantLoop(this->LoopNum).MaxVolFlowRate);
+
+            this->OneTimeInitFlag = false;
+
+            // this may need some help, if the objects change location later, due to a push_back,
+            //  then the pointers to these output variables will be bad
+            //for (int EnergySourceNum = 1; EnergySourceNum <= NumDistrictUnits; ++EnergySourceNum) {
+            std::string hotOrChilled = "Hot ";
+            std::string reportVarPrefix = "District Heating ";
+            std::string heatingOrCooling = "Heating";
+            std::string typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchHotWater);
+            if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater) {
+                hotOrChilled = "Chilled ";
+                reportVarPrefix = "District Cooling ";
+                heatingOrCooling = "Cooling";
+                typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchChilledWater);
+            }
+
+            SetupOutputVariable(reportVarPrefix + hotOrChilled + "Water Energy",
+                                OutputProcessor::Unit::J,
+                                this->EnergyTransfer,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                typeName,
+                                heatingOrCooling,
+                                _,
+                                "Plant");
+            SetupOutputVariable(reportVarPrefix + hotOrChilled + "Water Rate",
+                                OutputProcessor::Unit::W,
+                                this->EnergyRate,
+                                "System",
+                                "Average",
+                                this->Name);
+
+            SetupOutputVariable(reportVarPrefix + "Rate",
+                                OutputProcessor::Unit::W,
+                                this->EnergyRate,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable(reportVarPrefix + "Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->InletTemp,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable(reportVarPrefix + "Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->OutletTemp,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable(reportVarPrefix + "Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->MassFlowRate,
+                                "System",
+                                "Average",
+                                this->Name);
+        }
+
+        //}
+
+        // begin environment inits
+        if (DataGlobals::BeginEnvrnFlag && this->BeginEnvrnInitFlag) {
+            // component model has not design flow rates, using data for overall plant loop
+            PlantUtilities::InitComponentNodes(DataPlant::PlantLoop(this->LoopNum).MinMassFlowRate,
+                                               DataPlant::PlantLoop(this->LoopNum).MaxMassFlowRate,
+                               this->InletNodeNum,
+                               this->OutletNodeNum,
+                               this->LoopNum,
+                               this->LoopSideNum,
+                               this->BranchNum,
+                               this->CompNum);
+            this->BeginEnvrnInitFlag = false;
+        }
+        if (!DataGlobals::BeginEnvrnFlag) this->BeginEnvrnInitFlag = true;
+
+        Real64 TempPlantMassFlow(0.0);
+        if (std::abs(MyLoad) > 0.0) {
+            TempPlantMassFlow = DataPlant::PlantLoop(this->LoopNum).MaxMassFlowRate;
+        }
+
+        // get actual mass flow to use, hold in MassFlowRate variable
+        PlantUtilities::SetComponentFlowRate(TempPlantMassFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+
+        this->InletTemp = DataLoopNode::Node(this->InletNodeNum).Temp;
+        this->MassFlowRate = TempPlantMassFlow;
+    }
+
+    void OutsideEnergySourceSpecs::size()
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Daeho Kang
+        //       DATE WRITTEN   April 2014
+        //       MODIFIED
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        //  This subroutine is for sizing capacities of district cooling and heating objects.
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        bool ErrorsFound(false); // If errors detected in input
+
+        // Type name string variable to collapse the sizing for cooling and heating into one block
+        std::string typeName;
+        if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater) {
+            typeName = "Cooling";
+        } else { // Heating
+            typeName = "Heating";
+        }
+
+        int const PltSizNum = DataPlant::PlantLoop(this->LoopNum).PlantSizNum;
+        if (PltSizNum > 0) {
+            Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
+                                   DataGlobals::InitConvTemp,
+                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                   "SizeDistrict" + typeName);
+            Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
+                                       DataGlobals::InitConvTemp,
+                                                                     DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                       "SizeDistrict" + typeName);
+            Real64 const NomCapDes = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate;
+            if (DataPlant::PlantFirstSizesOkayToFinalize) {
+                if (this->NomCapWasAutoSized) {
+                    this->NomCap = NomCapDes;
+                    if (DataPlant::PlantFinalSizesOkayToReport) {
+                        ReportSizingManager::ReportSizingOutput("District" + typeName, this->Name, "Design Size Nominal Capacity [W]", NomCapDes);
+                    }
+                    if (DataPlant::PlantFirstSizesOkayToReport) {
+                        ReportSizingManager::ReportSizingOutput(
+                            "District" + typeName, this->Name, "Initial Design Size Nominal Capacity [W]", NomCapDes);
+                    }
+                } else { // Hard-size with sizing data
+                    if (this->NomCap > 0.0 && NomCapDes > 0.0) {
+                        Real64 const NomCapUser = this->NomCap;
+                        if (DataPlant::PlantFinalSizesOkayToReport) {
+                            ReportSizingManager::ReportSizingOutput("District" + typeName,
+                                               this->Name,
+                                               "Design Size Nominal Capacity [W]",
+                                               NomCapDes,
+                                               "User-Specified Nominal Capacity [W]",
+                                               NomCapUser);
+                            if (DataGlobals::DisplayExtraWarnings) {
+                                if ((std::abs(NomCapDes - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
+                                    ShowMessage("SizeDistrict" + typeName + ": Potential issue with equipment sizing for " +
+                                                this->Name);
+                                    ShowContinueError("User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
+                                    ShowContinueError("differs from Design Size Nominal Capacity of " + General::RoundSigDigits(NomCapDes, 2) + " [W]");
+                                    ShowContinueError("This may, or may not, indicate mismatched component sizes.");
+                                    ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            if (this->NomCapWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
+                ShowSevereError("Autosizing of District " + typeName + " nominal capacity requires a loop Sizing:Plant object");
+                ShowContinueError("Occurs in District" + typeName + " object=" + this->Name);
+                ErrorsFound = true;
+            }
+            if (!this->NomCapWasAutoSized && this->NomCap > 0.0 && DataPlant::PlantFinalSizesOkayToReport) {
+                ReportSizingManager::ReportSizingOutput("District" + typeName,
+                                   this->Name,
+                                   "User-Specified Nominal Capacity [W]",
+                                   this->NomCap);
+            }
+        }
+        if (ErrorsFound) {
+            ShowFatalError("Preceding sizing errors cause program termination");
+        }
+    }
+
+    void OutsideEnergySourceSpecs::calculate(bool runFlag, Real64 MyLoad)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Dan Fisher
+        //       DATE WRITTEN   July 1998
+        //       MODIFIED       May 2010; Edwin Lee; Linda Lawrie (consolidation)
+        //       RE-ENGINEERED  Sept 2010, Brent Griffith, plant rewrite
+
+         // SUBROUTINE PARAMETER DEFINITIONS:
+        static std::string const RoutineName("SimDistrictEnergy");
+
+        // set inlet and outlet nodes
+        int const LoopNum = this->LoopNum;
+        Real64 const LoopMinTemp = DataPlant::PlantLoop(LoopNum).MinTemp;
+        Real64 const LoopMaxTemp = DataPlant::PlantLoop(LoopNum).MaxTemp;
+
+        Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(LoopNum).FluidName, this->InletTemp, DataPlant::PlantLoop(LoopNum).FluidIndex, RoutineName);
+
+        //  apply power limit from input
+        Real64 CapFraction = ScheduleManager::GetCurrentScheduleValue(this->CapFractionSchedNum);
+        CapFraction = max(0.0, CapFraction); // ensure non negative
+        Real64 const CurrentCap = this->NomCap * CapFraction;
+        if (std::abs(MyLoad) > CurrentCap) {
+            MyLoad = sign(CurrentCap, MyLoad);
+        }
+
+        if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater) {
+            if (MyLoad > 0.0) MyLoad = 0.0;
+        } else if (this->EnergyType == DataPlant::TypeOf_PurchHotWater) {
+            if (MyLoad < 0.0) MyLoad = 0.0;
+        }
+
+        // determine outlet temp based on inlet temp, cp, and MyLoad
+        if ((this->MassFlowRate > 0.0) && runFlag) {
+            this->OutletTemp = (MyLoad + this->MassFlowRate * Cp * this->InletTemp) / (this->MassFlowRate * Cp);
+            // apply loop limits on temperature result to keep in check
+            if (this->OutletTemp < LoopMinTemp) {
+                this->OutletTemp = max(this->OutletTemp, LoopMinTemp);
+                MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
+            }
+            if (this->OutletTemp > LoopMaxTemp) {
+                this->OutletTemp = min(this->OutletTemp, LoopMaxTemp);
+                MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
+            }
+        } else {
+            this->OutletTemp = this->InletTemp;
+            MyLoad = 0.0;
+        }
+        int const OutletNode = this->OutletNodeNum;
+        DataLoopNode::Node(OutletNode).Temp = this->OutletTemp;
+        this->EnergyRate = std::abs(MyLoad);
+        this->EnergyTransfer = this->EnergyRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    }
+
+} // namespace OutsideEnergySources
+
+} // namespace EnergyPlus

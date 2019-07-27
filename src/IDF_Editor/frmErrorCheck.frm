@@ -13,6 +13,15 @@ Begin VB.Form frmErrorCheck
    ScaleWidth      =   11175
    ShowInTaskbar   =   0   'False
    StartUpPosition =   3  'Windows Default
+   Begin VB.CheckBox chkIgnoreMacro 
+      Caption         =   "Ignore Macros"
+      Height          =   375
+      Left            =   4800
+      TabIndex        =   8
+      ToolTipText     =   "Does not check fields that contains any of the following:  # [ @ $ = "
+      Top             =   3840
+      Width           =   2055
+   End
    Begin VB.CommandButton cmdClose 
       Cancel          =   -1  'True
       Caption         =   "Close"
@@ -103,6 +112,7 @@ If returnMsg(1) <> "" Then
       lstMsgs.ItemData(lstMsgs.NewIndex) = i
     End If
   Next i
+  cmdGoto.Enabled = True
 Else
   lstMsgs.AddItem "No invalid entries found."
   cmdGoto.Enabled = False
@@ -112,7 +122,13 @@ If checkRangeOnSave = checkRangeYes Then
 Else
   chkValidCheckOnSave.Value = vbUnchecked
 End If
+If ignoreValidatingMacros Then
+  chkIgnoreMacro.Value = vbChecked
+Else
+  chkIgnoreMacro.Value = vbUnchecked
+End If
 End Sub
+
 
 
 Private Sub Form_Load()
@@ -134,6 +150,18 @@ Else
   checkRangeOnSave = checkRangeNo
 End If
 End Sub
+
+Private Sub chkIgnoreMacro_Click()
+If chkIgnoreMacro.Value = vbChecked Then
+  ignoreValidatingMacros = True
+Else
+  ignoreValidatingMacros = False
+End If
+' repopulate the list with new setting
+lstMsgs.Clear
+Call performCheck
+End Sub
+
 
 Private Sub cmdGoto_Click()
 Dim cur As Long
