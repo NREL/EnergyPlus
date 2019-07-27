@@ -89,40 +89,43 @@ ScheduleWeek *ScheduleWeek::factory(const std::string& scheduleName)
 }
 void ScheduleWeek::processInput()
 {
-    std::string thisObjectType = "Schedule:Week:Daily";
-    auto instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
-    if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
-        return; // no daily week schedules to process
-    }
-    auto &instancesValue = instances.value();
-    for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-        auto const &fields = instance.value();
-        auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
-        // do any pre-construction operations
-        EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
-        if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
-            EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
+    {
+        std::string thisObjectType = "Schedule:Week:Daily";
+        auto instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
+        if (instances != EnergyPlus::inputProcessor->epJSON.end()) {
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
+                // do any pre-construction operations
+                EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+                if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) !=
+                    Scheduling::allSchedNames.end()) {
+                    EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
+                }
+                // then just add it to the vector via the constructor
+                scheduleWeekDailies.emplace_back(thisObjectName, fields);
+            }
         }
-        // then just add it to the vector via the constructor
-        scheduleWeekDailies.emplace_back(thisObjectName, fields);
     }
-
-    thisObjectType = "Schedule:Week:Compact";
-    instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
-    if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
-        return; // no constant schedules to process
-    }
-    instancesValue = instances.value();
-    for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-        auto const &fields = instance.value();
-        auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
-        // do any pre-construction operations
-        EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
-        if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
-            EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
+    {
+        std::string thisObjectType = "Schedule:Week:Compact";
+        auto instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
+        if (instances != EnergyPlus::inputProcessor->epJSON.end()) {
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
+                // do any pre-construction operations
+                EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+                if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) !=
+                    Scheduling::allSchedNames.end()) {
+                    EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
+                }
+                // then just add it to the vector via the constructor
+                scheduleWeekCompacts.emplace_back(thisObjectName, fields);
+            }
         }
-        // then just add it to the vector via the constructor
-        scheduleWeekCompacts.emplace_back(thisObjectName, fields);
     }
     // get schedule:week:daily and schedule:week:compact, fill appropriate vectors
     getInputFlag = false;

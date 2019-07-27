@@ -8343,7 +8343,7 @@ void GetVariableKeyCountandType(std::string const &varName,            // Standa
     // Use the GetScheduleIndex function
     // Schedules do not have keys, so only one will be found
     if (!Found) {
-        keyVarIndexes(1) = GetScheduleIndex(varName);
+        keyVarIndexes(1) = Scheduling::GetScheduleIndex(varName);
         if (keyVarIndexes(1) > 0) {
             Found = true;
             numKeys = 1;

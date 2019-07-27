@@ -174,7 +174,7 @@ ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &
     }
 }
 
-void ScheduleFile::updateValue(int simTime)
+void ScheduleFile::updateValue(int EP_UNUSED(simTime))
 {
     if (this->emsActuatedOn) {
         this->value = this->emsActuatedValue;

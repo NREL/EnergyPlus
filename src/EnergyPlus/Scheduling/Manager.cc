@@ -200,6 +200,7 @@ std::string scheduleName(int const scheduleIndex) {
     case ScheduleType::UNKNOWN:
         return "";
     }
+    return ""; // hush up compiler warning
 }
 
 std::string scheduleType(int const scheduleIndex) {
@@ -216,13 +217,14 @@ std::string scheduleType(int const scheduleIndex) {
     case ScheduleType::UNKNOWN:
         return "";
     }
+    return ""; // hush up compiler warning
 }
 
-Real64 scheduleMinValue(int const scheduleIndex) {
+Real64 scheduleMinValue(int const EP_UNUSED(scheduleIndex)) {
     return -999;
 }
 
-Real64 scheduleMaxValue(int const scheduleIndex) {
+Real64 scheduleMaxValue(int const EP_UNUSED(scheduleIndex)) {
     return 999;
 }
 

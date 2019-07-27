@@ -190,7 +190,7 @@ ScheduleCompact::ScheduleCompact(std::string const &objectName, nlohmann::json c
     }
 }
 
-void ScheduleCompact::updateValue(int simTime)
+void ScheduleCompact::updateValue(int EP_UNUSED(simTime))
 {
     if (this->emsActuatedOn) {
         this->value = this->emsActuatedValue;

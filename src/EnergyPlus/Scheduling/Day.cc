@@ -79,36 +79,35 @@ namespace Scheduling {
         {
             std::string thisObjectType = "Schedule:Day:Hourly";
             auto instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
-            if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
-                return; // no hourly day schedules to process
-            }
-            auto &instancesValue = instances.value();
-            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-                auto const &fields = instance.value();
-                auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
-                // do any pre-construction operations
-                EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
-                if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
-                    EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
+            if (instances != EnergyPlus::inputProcessor->epJSON.end()) {
+                auto &instancesValue = instances.value();
+                for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                    auto const &fields = instance.value();
+                    auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
+                    // do any pre-construction operations
+                    EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+                    if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) !=
+                        Scheduling::allSchedNames.end()) {
+                        EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
+                    }
+                    // then just add it to the vector via the constructor
+                    scheduleDayHourlys.emplace_back(thisObjectName, fields);
                 }
-                // then just add it to the vector via the constructor
-                scheduleDayHourlys.emplace_back(thisObjectName, fields);
             }
         }
         {
             std::string thisObjectType = "Schedule:Day:Interval";
             auto instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
-            if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
-                return; // no interval day schedules to process
-            }
-            auto &instancesValue = instances.value();
-            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-                auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
-                // do any pre-construction checks
-                EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
-                // then just add it to the vector via the constructor
-                scheduleDayIntervals.emplace_back(thisObjectName, fields);
+            if (instances != EnergyPlus::inputProcessor->epJSON.end()) {
+                auto &instancesValue = instances.value();
+                for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                    auto const &fields = instance.value();
+                    auto const &thisObjectName = instance.key();
+                    // do any pre-construction checks
+                    EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+                    // then just add it to the vector via the constructor
+                    scheduleDayIntervals.emplace_back(thisObjectName, fields);
+                }
             }
         }
         dayScheduleGetInputFlag = false;

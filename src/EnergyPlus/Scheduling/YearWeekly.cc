@@ -146,7 +146,7 @@ ScheduleYear::ScheduleYear(std::string const &objectName, nlohmann::json const &
     }
 }
 
-void ScheduleYear::updateValue(int simTime)
+void ScheduleYear::updateValue(int EP_UNUSED(simTime))
 {
     if (this->emsActuatedOn) {
         this->value = this->emsActuatedValue;
