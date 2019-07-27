@@ -47,6 +47,10 @@
 
 #include <EnergyPlus.hh>
 #include <Scheduling/Manager.hh>
+#include <Scheduling/Base.hh>
+#include <Scheduling/Day.hh>
+#include <Scheduling/TypeLimits.hh>
+#include <Scheduling/Week.hh>
 #include <Scheduling/YearConstant.hh>
 #include <Scheduling/YearCompact.hh>
 #include <Scheduling/YearWeekly.hh>
@@ -56,10 +60,19 @@ namespace Scheduling {
 std::vector<IndexBasedScheduleData> indexToSubtypeMap;
 bool scheduleInputProcessed = false;
 
-void clear_state()
+void ScheduleManagement::clear_state()
 {
+    // clear out anything from this particular module
     scheduleInputProcessed = false;
     indexToSubtypeMap.clear();
+    // but this clear state also needs to manage the child clear states
+    ScheduleDay::clear_state();
+    ScheduleTypeData::clear_state();
+    ScheduleWeek::clear_state();
+    ScheduleYear::clear_state();
+    ScheduleConstant::clear_state();
+    ScheduleCompact::clear_state();
+    ScheduleFile::clear_state();
 }
 
 int GetScheduleIndex(const std::string &scheduleName)

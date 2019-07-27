@@ -56,6 +56,23 @@
 
 namespace Scheduling {
 
+struct Until {
+    std::string sTime;
+    Real64 value;
+};
+
+struct For {
+    std::string sInterpolate = "";
+    bool interpolate = false;
+    std::vector<std::string> days;
+    std::vector<Until> untils;
+};
+
+struct Through {
+    std::string date;
+    std::vector<For> fors;
+};
+
 struct CompactField {
     enum class FieldType {
         THROUGH,
@@ -92,6 +109,7 @@ struct ScheduleCompact : ScheduleBase
 
     // member variables
     std::vector<CompactField> fieldsOfData;
+    std::vector<Through> throughs;
 };
 
 extern std::vector<ScheduleCompact> scheduleCompacts;
