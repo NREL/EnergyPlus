@@ -95,9 +95,13 @@ ScheduleTypeData::ScheduleTypeData(std::string const &objectName, nlohmann::json
     this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
     if (fields.find("lower_limit_value") != fields.end()) {
         this->minimum = fields.at("lower_limit_value");
+    } else {
+        this->minimum = -std::numeric_limits<float>::max();
     }
     if (fields.find("upper_limit_value") != fields.end()) {
         this->maximum = fields.at("upper_limit_value");
+    } else {
+        this->maximum = std::numeric_limits<float>::max();
     }
     if (fields.find("numeric_type") != fields.end()) {
         std::string thisType = fields.at("numeric_type");
