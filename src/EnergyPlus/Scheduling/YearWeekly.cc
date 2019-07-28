@@ -130,7 +130,7 @@ ScheduleYear::ScheduleYear(std::string const &objectName, nlohmann::json const &
     this->name = objectName;
     // get a schedule type limits reference directly and store that
     if (fields.find("schedule_type_limits_name") != fields.end()) {
-        this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
+        this->typeLimits = ScheduleTypeData::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("schedule_type_limits_name")));
     }
     auto & weeksData = fields.at("schedule_weeks");
     for (auto const & weekData : weeksData) {
@@ -138,7 +138,7 @@ ScheduleYear::ScheduleYear(std::string const &objectName, nlohmann::json const &
         int const startDay = weekData.at("start_day");
         int const endMonth = weekData.at("end_month");
         int const endDay = weekData.at("end_day");
-        auto scheduleInstance = ScheduleWeek::factory(weekData.at("schedule_week_name"));
+        auto scheduleInstance = ScheduleWeek::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(weekData.at("schedule_week_name")));
         this->weekScheduleRanges.emplace_back(startMonth, startDay, endMonth, endDay, scheduleInstance);
     }
     if (this->typeLimits && !this->valuesInBounds()) {

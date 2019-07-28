@@ -145,7 +145,7 @@ namespace Scheduling {
         //       \default 0
         this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
         if (fields.find("schedule_type_limits_name") != fields.end()) {
-            this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
+            this->typeLimits = ScheduleTypeData::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("schedule_type_limits_name")));
         }
         for (int i = 1; i <= 24; i++) {
             this->hourlyValues.push_back(fields.at("hour_" + std::to_string(i)));
@@ -191,9 +191,8 @@ namespace Scheduling {
         //       \note "until" includes the time entered.
         //       \units hh:mm
         this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
-        this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
         if (fields.find("schedule_type_limits_name") != fields.end()) {
-            this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
+            this->typeLimits = ScheduleTypeData::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("schedule_type_limits_name")));
         }
         if (fields.find("interpolate_to_timestep") != fields.end()) {
             auto fieldValue = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("interpolate_to_timestep"));
@@ -205,7 +204,7 @@ namespace Scheduling {
         }
         auto & intervalsData = fields.at("data");
         for (auto const & intervalData : intervalsData) {
-            this->untilTimes.push_back(intervalData.at("time"));
+            // this->untilTimes.push_back(intervalData.at("time")); // TODO: Fix this non-string conversion stuff
             this->valuesUntilTimes.push_back(intervalData.at("value_until_time"));
         }
     }

@@ -115,7 +115,7 @@ ScheduleConstant::ScheduleConstant(std::string const &objectName, nlohmann::json
     this->name = objectName;
     // get a schedule type limits reference directly and store that
     if (fields.find("schedule_type_limits_name") != fields.end()) {
-        this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
+        this->typeLimits = ScheduleTypeData::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("schedule_type_limits_name")));
     }
     this->value = fields.at("hourly_value");
     if (this->typeLimits && !this->valuesInBounds()) {

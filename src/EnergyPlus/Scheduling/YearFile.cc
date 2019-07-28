@@ -144,7 +144,7 @@ ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &
     this->rowsToSkipAtTop = fields.at("rows_to_skip_at_top");
     // then there are optionals
     if (fields.find("schedule_type_limits_name") != fields.end()) {
-        this->typeLimits = ScheduleTypeData::factory(fields.at("schedule_type_limits_name"));
+        this->typeLimits = ScheduleTypeData::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("schedule_type_limits_name")));
     }
     if(fields.find("minutes_per_item") != fields.end()) {
         this->minutesPerItem = fields.at("minutes_per_item");
@@ -164,7 +164,15 @@ ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &
         }
     }
     if(fields.find("interpolate_to_timestep") != fields.end()) {
-        this->interpolateToTimeStep = fields.at("interpolate_to_timestep");
+        try {
+            // try direct casting, if not we'll revert to string parsing
+            this->interpolateToTimeStep = fields.at("interpolate_to_timestep");
+        } catch (nlohmann::json::type_error &) {
+            if (EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("interpolate_to_timestep")) == "YES") {
+                this->interpolateToTimeStep = true;
+            }
+        }
+
     }
     if(fields.find("number_of_hours_of_data") != fields.end()) {
         this->numberOfHoursOfData = fields.at("number_of_hours_of_data");
