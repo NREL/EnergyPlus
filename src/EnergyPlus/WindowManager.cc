@@ -272,7 +272,6 @@ namespace WindowManager {
     Array2D<Real64> top(5, 5, 0.0);                                // Transmittance matrix for subr. op
     Array2D<Real64> rfop(5, 5, 0.0);                               // Front reflectance matrix for subr. op
     Array2D<Real64> rbop(5, 5, 0.0);                               // Back transmittance matrix for subr. op
-    Array1D<Real64> IndepVarCurveFit(MaxNumOfIncidentAngles, 0.0); // Values of independent variable (cos of inc. angle) for curve fit
     Array1D<Real64> DepVarCurveFit(MaxNumOfIncidentAngles, 0.0);   // Values of dependent variable corresponding to IndepVarCurveFit values
     Array1D<Real64> CoeffsCurveFit(6, 0.0);                        // Polynomial coefficients from curve fit
     Array1D<Real64> tsolPhi(MaxNumOfIncidentAngles, 0.0);          // Glazing system solar transmittance for each angle of incidence
@@ -287,7 +286,6 @@ namespace WindowManager {
     Array1D<Real64> CosPhiIndepVar(MaxNumOfIncidentAngles, 0.0);   // Cos of incidence angles at 10-deg increments for curve fits
 
     Array1D<int> LayerNum(5, 0); // Glass layer number
-    Array1D<int> AngleNum(5, 0); // Glass layer number for spectral and angular data only
 
     std::unique_ptr<CWindowModel> inExtWindowModel;       // Information about windows model (interior or exterior)
     std::unique_ptr<CWindowOpticalModel> winOpticalModel; // Information about windows optical model (Simplified or BSDF)
@@ -403,7 +401,6 @@ namespace WindowManager {
         top = Array2D<Real64>(5, 5, 0.0);
         rfop = Array2D<Real64>(5, 5, 0.0);
         rbop = Array2D<Real64>(5, 5, 0.0);
-        IndepVarCurveFit = Array1D<Real64>(10, 0.0);
         DepVarCurveFit = Array1D<Real64>(10, 0.0);
         CoeffsCurveFit = Array1D<Real64>(6, 0.0);
         tsolPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
@@ -788,7 +785,6 @@ namespace WindowManager {
             AllGlassIsSpectralAverage = true;
             int TotalIPhi = 10;
             LayerNum = 0;
-            AngleNum = 0;
 
             // Loop over glass layers in the construction
             for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
@@ -917,23 +913,12 @@ namespace WindowManager {
                 }
             } // End of loop over glass layers in the construction for front calculation
 
-            // Perform do loop to find common incident angles if multiple SpectralAngular layers are specified
-            for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                LayPtr = Construct(ConstrNum).LayerPoint(LayerNum(IGlass));
-                if (Material(LayPtr).GlassSpectralAndAngle) {
-                    AngleNum(IGlass) = LayerNum(IGlass);
-                }
-            }
             if (TotalIPhi > MaxNumOfIncidentAngles) {
                 ShowSevereError("WindowManage::InitGlassOpticalCalculations = " + Construct(ConstrNum).Name +
                                 ", Invalid maximum value of common incidet angles = " + TrimSigDigits(TotalIPhi) + ".");
                 ShowContinueError("The maximum number of incident angles for each construct is " + TrimSigDigits(MaxNumOfIncidentAngles) +
                                   ". Please rearrange the dataset.");
                 ShowFatalError("Errors found getting inputs. Previous error(s) cause program termination.");
-            }
-
-            for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                LayPtr = Construct(ConstrNum).LayerPoint(LayerNum(IGlass));
             }
 
             // Loop over incidence angle from 0 to 90 deg in 10 deg increments.
@@ -943,10 +928,6 @@ namespace WindowManager {
             for (IPhi = 1; IPhi <= TotalIPhi; ++IPhi) {
                 // 10 degree increment for incident angle is only value for a construction without a layer = SpectralAndAngle
                 Phi = double(IPhi - 1) * 10.0;
-                for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                    // Override 10 degree increment for incident angle for a construction with a layer = SpectralAndAngle
-                    LayPtr = Construct(ConstrNum).LayerPoint(LayerNum(IGlass));
-                }
                 CosPhi = std::cos(Phi * DegToRadians);
                 if (std::abs(CosPhi) < 0.0001) CosPhi = 0.0;
 
@@ -1139,9 +1120,6 @@ namespace WindowManager {
             // When a construction has a layer = SpectralAndAngle, the 10 degree increment will be overridden.
             for (IPhi = 1; IPhi <= TotalIPhi; ++IPhi) {
                 Phi = double(IPhi - 1) * 10.0;
-                for (IGlass = 1; IGlass <= NGlass; ++IGlass) {
-                    LayPtr = Construct(ConstrNum).LayerPoint(LayerNum(IGlass));
-                }
                 CosPhi = std::cos(Phi * DegToRadians);
                 if (std::abs(CosPhi) < 0.0001) CosPhi = 0.0;
 
