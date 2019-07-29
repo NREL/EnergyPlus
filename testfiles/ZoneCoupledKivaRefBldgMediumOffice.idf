@@ -7978,3 +7978,4 @@
     0,                       !- Nuclear High Level Emission Factor {g/MJ}
     ,                        !- Nuclear High Level Emission Factor Schedule Name
     0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
+

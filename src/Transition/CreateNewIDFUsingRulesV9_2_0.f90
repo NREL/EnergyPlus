@@ -500,7 +500,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ELSE
                   OutArgs(8) = InArgs(8)
                 ENDIF
-
+                
                  OutArgs(9:CurArgs)=InArgs(9:CurArgs)
                  NoDiff = .false.
 
