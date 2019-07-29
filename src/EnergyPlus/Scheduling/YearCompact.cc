@@ -45,10 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <exception>
-
-#include <EnergyPlus.hh>
 #include <EMSManager.hh>
+#include <EnergyPlus.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Scheduling/Base.hh>
@@ -125,69 +123,80 @@ ScheduleCompact::ScheduleCompact(std::string const &objectName, nlohmann::json c
     if (fields.find("schedule_type_limits_name") != fields.end()) {
         this->typeLimits = ScheduleTypeData::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("schedule_type_limits_name")));
     }
-    std::map<CompactField::FieldType, std::vector<CompactField::FieldType>> validNextFieldTypes =
-        {
-            {CompactField::FieldType::THROUGH, {CompactField::FieldType::FOR}},
-            {CompactField::FieldType::FOR, {CompactField::FieldType::UNTIL, CompactField::FieldType::INTERPOLATE}},
-            {CompactField::FieldType::INTERPOLATE, {CompactField::FieldType::UNTIL}},
-            {CompactField::FieldType::UNTIL, {CompactField::FieldType::VALUE}},
-            {CompactField::FieldType::VALUE, {CompactField::FieldType::UNTIL, CompactField::FieldType::FOR, CompactField::FieldType::THROUGH}},
-        };
-    std::vector<CompactField::FieldType> validFieldTypes{CompactField::FieldType::THROUGH}; // start with through, that should always be first
     auto fieldWiseData = fields.at("data");
-    for (auto const & datum : fieldWiseData) {
+    this->processFields(fieldWiseData);
+    if (this->typeLimits && !this->valuesInBounds()) {
+        EnergyPlus::ShowFatalError("Schedule bounds error causes program termination");
+    }
+}
+
+void ScheduleCompact::processFields(nlohmann::json const &fieldWiseData) {
+    std::map<CompactField::FieldType, std::vector<CompactField::FieldType>> validNextFieldTypes = {
+        {CompactField::FieldType::THROUGH, {CompactField::FieldType::FOR}},
+        {CompactField::FieldType::FOR, {CompactField::FieldType::UNTIL, CompactField::FieldType::INTERPOLATE}},
+        {CompactField::FieldType::INTERPOLATE, {CompactField::FieldType::UNTIL}},
+        {CompactField::FieldType::UNTIL, {CompactField::FieldType::VALUE}},
+        {CompactField::FieldType::VALUE, {CompactField::FieldType::UNTIL, CompactField::FieldType::FOR, CompactField::FieldType::THROUGH}},
+    };
+    std::vector<CompactField::FieldType> validFieldTypes{CompactField::FieldType::THROUGH}; // start with through, that should always be first
+    for (auto const &datum : fieldWiseData) {
         CompactField::FieldType lastFieldType = CompactField::FieldType::UNKNOWN;
-        try {
-            std::string possibleString = datum.at("field");
-            // parse the string for type and value
-            possibleString = EnergyPlus::UtilityRoutines::MakeUPPERCase(possibleString);
-            if (possibleString.compare(0, 7, "THROUGH") == 0) {
-                lastFieldType = CompactField::FieldType::THROUGH;
-                if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
-                    EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE, ENCOUNTERED THROUGH WHEN IT WAS NOT VALID, ALLOWED TYPES = whatever");
-                }
-                this->throughs.emplace_back();
-                this->throughs.back().date = possibleString.substr(8);
-            } else if (possibleString.compare(0, 3, "FOR") == 0) {
-                lastFieldType = CompactField::FieldType::FOR;
-                if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
-                    EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE, ENCOUNTERED FOR WHEN IT WAS NOT VALID, ALLOWED TYPES = whatever");
-                }
-                this->throughs.back().fors.emplace_back();
-                std::istringstream iss(possibleString.substr(4));
-                std::vector<std::string> results(std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>());
-                this->throughs.back().fors.back().days = results;
-            } else if (possibleString.compare(0, 11, "INTERPOLATE") == 0) {
-                lastFieldType = CompactField::FieldType::INTERPOLATE;
-                if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
-                    EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE, ENCOUNTERED INTERPOLATE WHEN IT WAS NOT VALID, ALLOWED TYPES = whatever");
-                }
-                this->throughs.back().fors.back().sInterpolate = possibleString.substr(12);
-            } else if (possibleString.compare(0, 5, "UNTIL") == 0) {
-                lastFieldType = CompactField::FieldType::UNTIL;
-                if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
-                    EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE, ENCOUNTERED UNTIL WHEN IT WAS NOT VALID, ALLOWED TYPES = whatever");
-                }
-                this->throughs.back().fors.back().untils.emplace_back();
-                this->throughs.back().fors.back().untils.back().sTime = possibleString.substr(6);
-            }
-        } catch (nlohmann::detail::type_error & error) {
-            lastFieldType = CompactField::FieldType::VALUE;
-            // if it wasn't a string, it should've been a schedule value (float)
-            if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
-                EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE, ENCOUNTERED VALUE WHEN IT WAS NOT VALID, ALLOWED TYPES = whatever");
-            }
-            Real64 possibleFloat = datum.at("field");
-            this->throughs.back().fors.back().untils.back().value = possibleFloat;
-        }
+        lastFieldType = this->processSingleField(lastFieldType, datum, validFieldTypes);
         if (lastFieldType == CompactField::FieldType::UNKNOWN) {
             EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE; COULD NOT PROCESS FIELD");
         }
         validFieldTypes = validNextFieldTypes[lastFieldType];
     }
-    if (this->typeLimits && !this->valuesInBounds()) {
-        EnergyPlus::ShowFatalError("Schedule bounds error causes program termination");
+}
+
+CompactField::FieldType ScheduleCompact::processSingleField(CompactField::FieldType lastFieldType,
+                                                      nlohmann::json datum,
+                                                      std::vector<CompactField::FieldType> const &validFieldTypes)
+{
+    try {
+        std::string possibleString = datum.at("field");
+        // parse the string for type and value
+        possibleString = EnergyPlus::UtilityRoutines::MakeUPPERCase(possibleString);
+        if (possibleString.compare(0, 7, "THROUGH") == 0) {
+            lastFieldType = CompactField::FieldType::THROUGH;
+            if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
+                EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE, ENCOUNTERED THROUGH WHEN IT WAS NOT VALID, ALLOWED TYPES = whatever");
+            }
+            this->throughs.emplace_back();
+            this->throughs.back().date = possibleString.substr(8);
+        } else if (possibleString.compare(0, 3, "FOR") == 0) {
+            lastFieldType = CompactField::FieldType::FOR;
+            if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
+                EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE, ENCOUNTERED FOR WHEN IT WAS NOT VALID, ALLOWED TYPES = whatever");
+            }
+            this->throughs.back().fors.emplace_back();
+            std::istringstream iss(possibleString.substr(4));
+            std::vector<std::string> results(std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>());
+            this->throughs.back().fors.back().days = results;
+        } else if (possibleString.compare(0, 11, "INTERPOLATE") == 0) {
+            lastFieldType = CompactField::FieldType::INTERPOLATE;
+            if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
+                EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE, ENCOUNTERED INTERPOLATE WHEN IT WAS NOT VALID, ALLOWED TYPES = whatever");
+            }
+            this->throughs.back().fors.back().sInterpolate = possibleString.substr(12);
+        } else if (possibleString.compare(0, 5, "UNTIL") == 0) {
+            lastFieldType = CompactField::FieldType::UNTIL;
+            if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
+                EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE, ENCOUNTERED UNTIL WHEN IT WAS NOT VALID, ALLOWED TYPES = whatever");
+            }
+            this->throughs.back().fors.back().untils.emplace_back();
+            this->throughs.back().fors.back().untils.back().sTime = possibleString.substr(6);
+        }
+    } catch (nlohmann::detail::type_error &error) {
+        lastFieldType = CompactField::FieldType::VALUE;
+        // if it wasn't a string, it should've been a schedule value (float)
+        if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
+            EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE, ENCOUNTERED VALUE WHEN IT WAS NOT VALID, ALLOWED TYPES = whatever");
+        }
+        Real64 possibleFloat = datum.at("field");
+        this->throughs.back().fors.back().untils.back().value = possibleFloat;
     }
+    return lastFieldType;
 }
 
 void ScheduleCompact::updateValue(int EP_UNUSED(simTime))
@@ -205,21 +214,22 @@ void ScheduleCompact::setupOutputVariables()
         // Set Up Reporting
         EnergyPlus::SetupOutputVariable(
             "NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
-        EnergyPlus::SetupEMSActuator("Schedule:Compact", thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
+        EnergyPlus::SetupEMSActuator(
+            "Schedule:Compact", thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
     }
 }
 
 bool ScheduleCompact::valuesInBounds()
 {
-//    if (this->typeLimits) {
-//        if (this->value > this->typeLimits->maximum) {
-//            // ShowSevereError("Value out of bounds")
-//            return false;
-//        } else if (this->value < this->typeLimits->minimum) {
-//            // ShowSevereError("Value out of bounds")
-//            return false;
-//        }
-//    }
+    //    if (this->typeLimits) {
+    //        if (this->value > this->typeLimits->maximum) {
+    //            // ShowSevereError("Value out of bounds")
+    //            return false;
+    //        } else if (this->value < this->typeLimits->minimum) {
+    //            // ShowSevereError("Value out of bounds")
+    //            return false;
+    //        }
+    //    }
     return true;
 }
 

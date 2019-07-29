@@ -45,78 +45,17 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SRC_ENERGYPLUS_SCHEDULING_YEARCOMPACT_HH
-#define SRC_ENERGYPLUS_SCHEDULING_YEARCOMPACT_HH
+#include <gtest/gtest.h>
 
-#include <vector>
+#include <Scheduling/SchedulingFixture.hh>
+#include <Scheduling/YearFile.hh>
 
-#include <EnergyPlus.hh>
-#include <Scheduling/Base.hh>
-#include <nlohmann/json.hpp>
+namespace EnergyPlus {
 
-namespace Scheduling {
-
-struct Until {
-    std::string sTime;
-    Real64 value;
-};
-
-struct For {
-    std::string sInterpolate = "";
-    bool interpolate = false; // TODO: Change to enum for Average, Linear, No; default to NO
-    std::vector<std::string> days;
-    std::vector<Until> untils;
-};
-
-struct Through {
-    std::string date;
-    std::vector<For> fors;
-};
-
-struct CompactField {
-    enum class FieldType {
-        THROUGH,
-        FOR,
-        UNTIL,
-        INTERPOLATE,
-        VALUE,
-        UNKNOWN
-    };
-
-    FieldType thisFieldType = FieldType::UNKNOWN;
-    std::string stringData = "";
-    Real64 floatData = 0.0;
-};
-
-struct ScheduleCompact : ScheduleBase
+TEST_F(SchedulingTestFixture, TestYearFile1)
 {
-    // constructors/destructors
-    ScheduleCompact() = default;
-    ScheduleCompact(std::string const &objectName, nlohmann::json const &fields);
-    ~ScheduleCompact() = default;
-
-    // overridden base class methods
-    Real64 getCurrentValue() override;
-    bool valuesInBounds() override;
-    void updateValue(int simTime) override;
-
-    // static functions related to the state of all compact schedules
-    static void processInput();
-    static void clear_state();
-    static void setupOutputVariables();
-
-    // instance methods for this class
-    CompactField::FieldType
-    processSingleField(CompactField::FieldType lastFieldType, nlohmann::json datum, std::vector<CompactField::FieldType> const &validFieldTypes);
-    void processFields(nlohmann::json const &fieldWiseData);
-
-    // member variables
-    std::vector<CompactField> fieldsOfData;
-    std::vector<Through> throughs;
-};
-
-extern std::vector<ScheduleCompact> scheduleCompacts;
-
+    // as of right now there's really not much to test here, but I can at least confirm that it does have a clear_state method
+    EXPECT_TRUE(true);
 }
 
-#endif //SRC_ENERGYPLUS_SCHEDULING_YEARCOMPACT_HH
+}

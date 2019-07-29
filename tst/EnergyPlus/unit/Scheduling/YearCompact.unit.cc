@@ -45,78 +45,30 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SRC_ENERGYPLUS_SCHEDULING_YEARCOMPACT_HH
-#define SRC_ENERGYPLUS_SCHEDULING_YEARCOMPACT_HH
+#include <gtest/gtest.h>
 
-#include <vector>
-
-#include <EnergyPlus.hh>
-#include <Scheduling/Base.hh>
 #include <nlohmann/json.hpp>
 
-namespace Scheduling {
+#include <Scheduling/SchedulingFixture.hh>
+#include <Scheduling/YearCompact.hh>
 
-struct Until {
-    std::string sTime;
-    Real64 value;
-};
+namespace EnergyPlus {
 
-struct For {
-    std::string sInterpolate = "";
-    bool interpolate = false; // TODO: Change to enum for Average, Linear, No; default to NO
-    std::vector<std::string> days;
-    std::vector<Until> untils;
-};
-
-struct Through {
-    std::string date;
-    std::vector<For> fors;
-};
-
-struct CompactField {
-    enum class FieldType {
-        THROUGH,
-        FOR,
-        UNTIL,
-        INTERPOLATE,
-        VALUE,
-        UNKNOWN
-    };
-
-    FieldType thisFieldType = FieldType::UNKNOWN;
-    std::string stringData = "";
-    Real64 floatData = 0.0;
-};
-
-struct ScheduleCompact : ScheduleBase
+TEST_F(SchedulingTestFixture, TestCompactFieldProcessing)
 {
-    // constructors/destructors
-    ScheduleCompact() = default;
-    ScheduleCompact(std::string const &objectName, nlohmann::json const &fields);
-    ~ScheduleCompact() = default;
-
-    // overridden base class methods
-    Real64 getCurrentValue() override;
-    bool valuesInBounds() override;
-    void updateValue(int simTime) override;
-
-    // static functions related to the state of all compact schedules
-    static void processInput();
-    static void clear_state();
-    static void setupOutputVariables();
-
-    // instance methods for this class
-    CompactField::FieldType
-    processSingleField(CompactField::FieldType lastFieldType, nlohmann::json datum, std::vector<CompactField::FieldType> const &validFieldTypes);
-    void processFields(nlohmann::json const &fieldWiseData);
-
-    // member variables
-    std::vector<CompactField> fieldsOfData;
-    std::vector<Through> throughs;
-};
-
-extern std::vector<ScheduleCompact> scheduleCompacts;
-
+    nlohmann::json minimalFields = nlohmann::json::array({
+                                                             {{"field", "Through: 12/31"}},
+                                                             {{"field", "For: AllDays"}},
+                                                             {{"field", "Until: 24:00"}},
+                                                             {{"field", 24}}
+    });
+    Scheduling::ScheduleCompact compact;
+    compact.processFields(minimalFields);
+    EXPECT_EQ(1u, compact.throughs.size());
+    EXPECT_EQ(1u, compact.throughs.front().fors.size());
+    EXPECT_EQ(1u, compact.throughs.front().fors.front().untils.size());
+    EXPECT_EQ(24, compact.throughs.front().fors.front().untils.front().value);
+    EXPECT_EQ(false, compact.throughs.front().fors.front().interpolate); // default is to not interpolate
 }
 
-#endif //SRC_ENERGYPLUS_SCHEDULING_YEARCOMPACT_HH
+}

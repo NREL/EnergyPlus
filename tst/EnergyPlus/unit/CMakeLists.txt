@@ -142,10 +142,15 @@ set( test_src
   RunPeriod.unit.cc
   RuntimeLanguageProcessor.unit.cc
   ScheduleManager.unit.cc
-  Scheduling/SchedulingFixture.hh
+  Scheduling/Day.unit.cc
   Scheduling/Manager.unit.cc
-  Scheduling/ScheduleConstant.unit.cc
-  Scheduling/ScheduleYear.unit.cc
+  Scheduling/SchedulingFixture.hh
+  Scheduling/TypeLimits.unit.cc
+  Scheduling/Week.unit.cc
+  Scheduling/YearCompact.unit.cc
+  Scheduling/YearConstant.unit.cc
+  Scheduling/YearFile.unit.cc
+  Scheduling/YearWeekly.unit.cc
   SecondaryDXCoils.unit.cc
   SetPointManager.unit.cc
   SimAirServingZones.unit.cc
