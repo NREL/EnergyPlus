@@ -691,23 +691,22 @@ namespace HVACInterfaceManager {
 
         } else { // tank has mass
             if (MassFlowRate > 0.0) {
-                Real64 ExponentTerm = (MassFlowRate * Cp) / (ThisTankMass * Cp) * TimeStepSeconds;
+                Real64 const mdotCp = MassFlowRate * Cp;
+                Real64 const mdotCpTempIn = mdotCp * TankInletTemp;
+                Real64 const tankMassCp = ThisTankMass * Cp;
+                Real64 const ExponentTerm = mdotCp / tankMassCp * TimeStepSeconds;
                 if (ExponentTerm >= 700.0) {
-                    TankFinalTemp = (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp);
+                    TankFinalTemp = (mdotCp * TankInletTemp + PumpHeat) / mdotCp;
 
-                    TankAverageTemp =
-                        ((ThisTankMass * Cp) / (MassFlowRate * Cp) *
-                             (LastTankOutletTemp - (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp)) / TimeStepSeconds +
-                         (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp));
+                    TankAverageTemp = (tankMassCp / mdotCp * (LastTankOutletTemp - (mdotCpTempIn + PumpHeat) / mdotCp) / TimeStepSeconds +
+                                       (mdotCpTempIn + PumpHeat) / mdotCp);
                 } else {
-                    TankFinalTemp = (LastTankOutletTemp - (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp)) *
-                                        std::exp(-(MassFlowRate * Cp) / (ThisTankMass * Cp) * TimeStepSeconds) +
-                                    (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp);
+                    TankFinalTemp = (LastTankOutletTemp - (mdotCpTempIn + PumpHeat) / mdotCp) * std::exp(-ExponentTerm) +
+                                    (mdotCpTempIn + PumpHeat) / (MassFlowRate * Cp);
 
-                    TankAverageTemp = ((ThisTankMass * Cp) / (MassFlowRate * Cp) *
-                                           (LastTankOutletTemp - (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp)) *
-                                           (1.0 - std::exp(-(MassFlowRate * Cp) / (ThisTankMass * Cp) * TimeStepSeconds)) / TimeStepSeconds +
-                                       (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp));
+                    TankAverageTemp = (tankMassCp / mdotCp * (LastTankOutletTemp - (mdotCpTempIn + PumpHeat) / mdotCp) *
+                                           (1.0 - std::exp(-ExponentTerm)) / TimeStepSeconds +
+                                       (mdotCpTempIn + PumpHeat) / mdotCp);
                 }
             } else {
                 TankFinalTemp = PumpHeat / (ThisTankMass * Cp) * TimeStepSeconds + LastTankOutletTemp;
