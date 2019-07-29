@@ -18,6 +18,6 @@ link_libraries(btwxt gtest gmock)
 
 add_executable(btwxt_tests ${library_sources})
 
-#include(GoogleTest)
+include(GoogleTest)
 
-#gtest_discover_tests(btwxt_tests TEST_PREFIX btwxt:)
+gtest_discover_tests(btwxt_tests TEST_PREFIX btwxt:)
