@@ -1320,13 +1320,6 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     EXPECT_DOUBLE_EQ(0.0, MSHeatPump(2).TotHeatEnergyRate);
     EXPECT_DOUBLE_EQ(0.0, MSHeatPump(2).TotCoolEnergyRate);
 
-    int CompOp = 1;
-    int OpMode = 1;
-    int ZoneNum = 1;
-    int SpeedNum;
-    Real64 SpeedRatio;
-    Real64 PartLoadFrac;
-    Real64 SupHeaterLoad = 0.0;
     DataLoopNode::Node(9).Temp = 24.0;
     DataLoopNode::Node(9).HumRat = 0.008;
     DataLoopNode::Node(6).Temp = 24.0;
