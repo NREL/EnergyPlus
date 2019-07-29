@@ -54,6 +54,7 @@
 #include <nlohmann/json.hpp>
 
 #include <EnergyPlus.hh>
+#include <Scheduling/Base.hh>
 #include <Scheduling/TypeLimits.hh>
 
 namespace Scheduling {
@@ -75,15 +76,10 @@ namespace Scheduling {
 
     struct ScheduleDayInterval : ScheduleDay
     {
-        enum class Interpolation {
-            NONE,
-            AVERAGE,
-            LINEAR
-        };
         // TODO: These two eventually become a vector of a new structure for the extensible group
         std::vector<Real64> untilTimes;
         std::vector<Real64> valuesUntilTimes;
-        Interpolation interpolateToTimestep = Interpolation::NONE;
+        Scheduling::Interpolation interpolateToTimestep = Interpolation::NONE;
         ScheduleDayInterval(std::string const &objectName, nlohmann::json const &fields);
     };
 

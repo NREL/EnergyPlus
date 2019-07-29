@@ -78,6 +78,12 @@ namespace Scheduling {
         UNKNOWN
     };
 
+    enum class Interpolation {
+        NONE,
+        AVERAGE,
+        LINEAR
+    };
+
     std::vector<std::string> const allValidDayTypes({"Sunday",
                                                      "Monday",
                                                      "Tuesday",

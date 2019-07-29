@@ -68,7 +68,7 @@ TEST_F(SchedulingTestFixture, TestCompactFieldProcessing)
     EXPECT_EQ(1u, compact.throughs.front().fors.size());
     EXPECT_EQ(1u, compact.throughs.front().fors.front().untils.size());
     EXPECT_EQ(24, compact.throughs.front().fors.front().untils.front().value);
-    EXPECT_EQ(false, compact.throughs.front().fors.front().interpolate); // default is to not interpolate
+    EXPECT_EQ(Scheduling::Interpolation::NONE, compact.throughs.front().fors.front().interpolate); // default is to not interpolate
 }
 
 }

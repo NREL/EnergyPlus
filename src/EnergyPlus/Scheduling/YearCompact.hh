@@ -62,8 +62,7 @@ struct Until {
 };
 
 struct For {
-    std::string sInterpolate = "";
-    bool interpolate = false; // TODO: Change to enum for Average, Linear, No; default to NO
+    Scheduling::Interpolation interpolate = Scheduling::Interpolation::NONE;
     std::vector<std::string> days;
     std::vector<Until> untils;
 };

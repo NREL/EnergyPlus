@@ -178,7 +178,12 @@ CompactField::FieldType ScheduleCompact::processSingleField(CompactField::FieldT
             if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
                 EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE, ENCOUNTERED INTERPOLATE WHEN IT WAS NOT VALID, ALLOWED TYPES = whatever");
             }
-            this->throughs.back().fors.back().sInterpolate = possibleString.substr(12);
+            std::string sInterpolate = possibleString.substr(12);
+            if (sInterpolate == "LINEAR") {
+                this->throughs.back().fors.back().interpolate = Interpolation::LINEAR;
+            } else if (sInterpolate == "AVERAGE") {
+                this->throughs.back().fors.back().interpolate = Interpolation::AVERAGE;
+            }
         } else if (possibleString.compare(0, 5, "UNTIL") == 0) {
             lastFieldType = CompactField::FieldType::UNTIL;
             if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
