@@ -1508,7 +1508,7 @@ namespace UnitVentilator {
         UnitVent(UnitVentNum).FanPartLoadRatio = 0.0;
 
         if (UnitVent(UnitVentNum).FanSchedPtr > 0) {
-            if (GetCurrentScheduleValue(UnitVent(UnitVentNum).FanSchedPtr) == 0.0 && UnitVent(UnitVentNum).FanType_Num == FanType_SimpleOnOff) {
+            if (GetCurrentScheduleValue(UnitVent(UnitVentNum).FanSchedPtr) == 0.0) {
                 UnitVent(UnitVentNum).OpMode = CycFanCycCoil;
             } else {
                 UnitVent(UnitVentNum).OpMode = ContFanCycCoil;
