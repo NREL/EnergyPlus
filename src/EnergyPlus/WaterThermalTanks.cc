@@ -7940,6 +7940,7 @@ namespace WaterThermalTanks {
         const Real64 TemperatureConvergenceCriteria = 0.0001;
         const Real64 SubTimestepMax = 60.0 * 10.0; // seconds
         const Real64 SubTimestepMin = 10.0; // seconds
+        Real64 dt;
 
         // Using/Aliasing
         using DataGlobals::HourOfDay;
@@ -8209,7 +8210,7 @@ namespace WaterThermalTanks {
                     if (Denominator != 0.0)
                         dt = min(dt, dT_max / Denominator);
                 }
-                dt = max(SubTimestepMin, dt);
+                dt = max(min(SubTimestepMin, TimeRemaining), dt);
                 dt = min(SubTimestepMax, dt);
             }
 
