@@ -152,6 +152,7 @@
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/IceThermalStorage.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
@@ -397,6 +398,7 @@ void EnergyPlusFixture::clear_all_states()
     HybridModel::clear_state();
     HysteresisPhaseChange::clear_state();
     EnergyPlus::inputProcessor->clear_state();
+    IceThermalStorage::clear_state();
     IntegratedHeatPump::clear_state();
     InternalHeatGains::clear_state();
     LowTempRadiantSystem::clear_state();

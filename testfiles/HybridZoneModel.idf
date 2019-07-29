@@ -1277,8 +1277,8 @@
     ZONE 1 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 1 Ideal Loads,      !- Name
@@ -1340,8 +1340,8 @@
     ZONE 2 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 2 Ideal Loads,      !- Name
@@ -1403,8 +1403,8 @@
     ZONE 3 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 3 Ideal Loads,      !- Name
@@ -1466,8 +1466,8 @@
     ZONE 4 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 4 Ideal Loads,      !- Name

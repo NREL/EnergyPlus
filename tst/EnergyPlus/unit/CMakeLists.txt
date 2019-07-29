@@ -96,6 +96,7 @@ set( test_src
   HVACVariableRefrigerantFlow.unit.cc
   HWBaseboardRadiator.unit.cc
   HybridModel.unit.cc
+  IceThermalStorage.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
@@ -168,6 +169,7 @@ set( test_src
   UnitaryHybridAirConditioner.unit.cc
   UnitarySystem.unit.cc
   UnitHeater.unit.cc
+  UnitVentilator.unit.cc
   UtilityRoutines.unit.cc
   VariableSpeedCoils.unit.cc
   VAVDefMinMaxFlow.unit.cc
