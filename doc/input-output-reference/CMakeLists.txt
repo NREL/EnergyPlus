@@ -199,7 +199,6 @@ SET( INCLUDED_IMAGES
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image112.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image133.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image134.png
-  ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image184.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image185.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image186.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image187.png

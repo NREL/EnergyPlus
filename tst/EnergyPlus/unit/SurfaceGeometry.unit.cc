@@ -57,6 +57,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -681,8 +682,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
     GetMaterialData(FoundError);
     GetConstructData(FoundError);
     GetZoneData(FoundError); // Read Zone data from input file
-    HeatTransferAlgosUsed.allocate(1);
-    HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
+    DataHeatBalance::AnyCTF = true;
     SetupZoneGeometry(FoundError); // this calls GetSurfaceData()
 
     EXPECT_FALSE(FoundError);
@@ -3387,9 +3387,12 @@ TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
 {
+    // Test surface heat transfer algorithms and heat balance surface lists
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
+        "  HeatBalanceAlgorithm,",
+        "  MoisturePenetrationDepthConductionTransferFunction; !- Algorithm",
         "Material,",
         "    Gypsum Board,            !- Name",
         "    MediumSmooth,            !- Roughness",
@@ -3480,10 +3483,66 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
         "    10.0470868899,           !- Vertex 4 Y-coordinate {m}",
         "    3.499104;                !- Vertex 4 Z-coordinate {m}",
 
+        "BuildingSurface:Detailed,",
+        "    Zone1_Floor_4_0_20000,  !- Name",
+        "    Floor,                   !- Surface Type",
+        "    Project semi-exposed ceiling_Rev,  !- Construction Name",
+        "    ZONE1,             !- Zone Name",
+        "    Outdoors,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    23.20708687,             !- Vertex 1 X-coordinate {m}",
+        "    8.1545602599,            !- Vertex 1 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 1 Z-coordinate {m}",
+        "    19.64595244,              !- Vertex 2 X-coordinate {m}",
+        "    8.1545602599,            !- Vertex 2 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 2 Z-coordinate {m}",
+        "    19.64595244,              !- Vertex 3 X-coordinate {m}",
+        "    10.0470868899,           !- Vertex 3 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 3 Z-coordinate {m}",
+        "    23.20708687,             !- Vertex 4 X-coordinate {m}",
+        "    10.0470868899,           !- Vertex 4 Y-coordinate {m}",
+        "    3.499104;                !- Vertex 4 Z-coordinate {m}",
+
+        "BuildingSurface:Detailed,",
+        "    Zone1_Floor_4_0_30000,  !- Name",
+        "    Floor,                   !- Surface Type",
+        "    Project semi-exposed ceiling_Rev,  !- Construction Name",
+        "    ZONE1,             !- Zone Name",
+        "    Outdoors,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    23.20708687,             !- Vertex 1 X-coordinate {m}",
+        "    8.1545602599,            !- Vertex 1 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 1 Z-coordinate {m}",
+        "    19.64595244,              !- Vertex 2 X-coordinate {m}",
+        "    8.1545602599,            !- Vertex 2 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 2 Z-coordinate {m}",
+        "    19.64595244,              !- Vertex 3 X-coordinate {m}",
+        "    10.0470868899,           !- Vertex 3 Y-coordinate {m}",
+        "    3.499104,                !- Vertex 3 Z-coordinate {m}",
+        "    23.20708687,             !- Vertex 4 X-coordinate {m}",
+        "    10.0470868899,           !- Vertex 4 Y-coordinate {m}",
+        "    3.499104;                !- Vertex 4 Z-coordinate {m}",
+
         "SurfaceProperty:HeatTransferAlgorithm:Construction,",
-        "    Ceilings,                !- Name",
-        "    ConductionFiniteDifference,  !- Algorithm",
+        "    Ceilings CondFD,               !- Name",
+        "    ConductionFiniteDifference,    !- Algorithm",
         "    Project semi-exposed ceiling;  !- Construction Name",
+
+        "SurfaceProperty:HeatTransferAlgorithm,",
+        "    Zone1_Floor_4_0_20000,       !- Surface Name",
+        "    CombinedHeatAndMoistureFiniteElement;  !- Algorithm",
+
+        "SurfaceProperty:HeatTransferAlgorithm,",
+        "    Zone1_Floor_4_0_30000,       !- Surface Name",
+        "    ConductionTransferFunction;  !- Algorithm",
 
         "Zone,",
         "    DATATELCOM,       !- Name",
@@ -3539,19 +3598,52 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     GetSurfaceData(ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
-    EXPECT_EQ(5, Surface(1).HeatTransferAlgorithm);
-    EXPECT_EQ(5, Surface(2).HeatTransferAlgorithm);
+    int surfNum = UtilityRoutines::FindItemInList("DATATELCOM_CEILING_1_0_0", DataSurfaces::Surface);
+    EXPECT_EQ(DataSurfaces::HeatTransferModel_CondFD, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_TRUE(DataHeatBalance::AnyCondFD);
+
+    surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_10000", DataSurfaces::Surface);
+    EXPECT_EQ(DataSurfaces::HeatTransferModel_CondFD, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_TRUE(DataHeatBalance::AnyEMPD); // input as EMPD but then later overriden to CondFD - see error message below
+
+    surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_20000", DataSurfaces::Surface);
+    EXPECT_EQ(DataSurfaces::HeatTransferModel_HAMT, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_TRUE(DataHeatBalance::AnyHAMT);
+
+    surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_30000", DataSurfaces::Surface);
+    EXPECT_EQ(DataSurfaces::HeatTransferModel_CTF, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_TRUE(DataHeatBalance::AnyCTF);
+
     std::string const error_string = delimited_string({
         "   ** Warning ** GetSurfaceData: Entered Zone Floor Areas differ from calculated Zone Floor Area(s).",
         "   **   ~~~   ** ...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.",
+        "   ** Warning ** The moisture penetration depth conduction transfer function algorithm is used but the input file includes no "
+        "MaterialProperty:MoisturePenetrationDepth:Settings objects.",
+        "   ** Warning ** The combined heat and moisture finite element algorithm is used but the input file includes no "
+        "MaterialProperty:HeatAndMoistureTransfer:* objects.",
+        "   **   ~~~   ** Certain materials objects are necessary to achieve proper results with the heat transfer algorithm(s) selected.",
         "   ** Warning ** An interior surface is defined as two surfaces with reverse constructions. The HeatTransferAlgorithm in both constructions "
         "should be same.",
         "   **   ~~~   ** The HeatTransferAlgorithm of Surface: DATATELCOM_CEILING_1_0_0, is CondFD - ConductionFiniteDifference",
-        "   **   ~~~   ** The HeatTransferAlgorithm of Surface: ZONE1_FLOOR_4_0_10000, is CTF - ConductionTransferFunction",
+        "   **   ~~~   ** The HeatTransferAlgorithm of Surface: ZONE1_FLOOR_4_0_10000, is EMPD - MoisturePenetrationDepthConductionTransferFunction",
         "   **   ~~~   ** The HeatTransferAlgorithm of Surface: ZONE1_FLOOR_4_0_10000, is assigned to CondFD - ConductionFiniteDifference. "
         "Simulation continues.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    // Check heat balance surface lists
+    // Remember that ZoneHTSurfaceList includes all HT surfaces in the zone PLUS any adjacent interzone surfaces - same for ZoneIZSurfaceList
+    EXPECT_EQ(DataSurfaces::AllHTSurfaceList.size(), 4u);
+    EXPECT_EQ(DataSurfaces::AllIZSurfaceList.size(), 2u);
+
+    int zoneNum = UtilityRoutines::FindItemInList("DATATELCOM", DataHeatBalance::Zone);
+    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneHTSurfaceList.size(), 2u);
+    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
+
+    zoneNum = UtilityRoutines::FindItemInList("ZONE1", DataHeatBalance::Zone);
+    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneHTSurfaceList.size(), 4u);
+    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
+
 }
 
 // Test for #7071: if a Surface references an outside boundary surface that cannot be found, we handle it gracefully with an error message

@@ -5192,10 +5192,10 @@ namespace Furnaces {
                 Furnace(FurnaceNum).ZoneSequenceHeatingNum = heatingPriority;
             }
             MyCheckFlag(FurnaceNum) = false;
-            if (Furnace(FurnaceNum).ZoneSequenceCoolingNum == 0) {
+            if (Furnace(FurnaceNum).ZoneSequenceCoolingNum == 0 || Furnace(FurnaceNum).ZoneSequenceHeatingNum == 0) {
                 ShowSevereError(cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
-                                "\": No matching air terminal found in the zone equipment list for zone = " +
-                                Zone(Furnace(FurnaceNum).ControlZoneNum).Name + ".");
+                                "\": Airloop air terminal in the zone equipment list for zone = " + Zone(Furnace(FurnaceNum).ControlZoneNum).Name +
+                                " not found or is not allowed Zone Equipment Cooling or Heating Sequence = 0.");
                 ShowFatalError("Subroutine InitFurnace: Errors found in getting " + cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) +
                                " input.  Preceding condition(s) causes termination.");
             }

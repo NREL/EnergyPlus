@@ -85,7 +85,7 @@ TEST_F(EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test1)
 
     SimpleFluidCooler(FluidCoolerNum).Name = "Test";
     SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 2.5;
-    SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PIM_NominalCapacity;
+    SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::NOMINAL_CAPACITY;
     SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum = 1;
     SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = 1;
     SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity = 50000;
@@ -108,22 +108,22 @@ TEST_F(EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test1)
     SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = 0;
     SimpleFluidCooler(FluidCoolerNum).LowSpeedFluidCoolerUA = 0;
     SimpleFluidCooler(1).DesignEnteringWaterTemp = 50;
-    bool testResult = TestFluidCoolerTwoSpeedInputForDesign(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum);
+    bool testResult = SimpleFluidCooler(1).validateTwoSpeedInputs(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
     SimpleFluidCooler(1).DesignEnteringWaterTemp = -10;
-    testResult = TestFluidCoolerTwoSpeedInputForDesign(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum);
+    testResult = SimpleFluidCooler(1).validateTwoSpeedInputs(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_TRUE(testResult); // error message triggered
 
     SimpleFluidCooler(1).DesignEnteringWaterTemp = 50;
     SimpleFluidCooler(1).FluidCoolerLowSpeedNomCap = AutoSize;
     SimpleFluidCooler(1).FluidCoolerLowSpeedNomCapWasAutoSized = true;
-    testResult = TestFluidCoolerTwoSpeedInputForDesign(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum);
+    testResult = SimpleFluidCooler(1).validateTwoSpeedInputs(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
     SimpleFluidCooler(1).FluidCoolerLowSpeedNomCap = 0; // this should trigger the original error condition
     SimpleFluidCooler(1).FluidCoolerLowSpeedNomCapWasAutoSized = false;
-    testResult = TestFluidCoolerTwoSpeedInputForDesign(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum);
+    testResult = SimpleFluidCooler(1).validateTwoSpeedInputs(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_TRUE(testResult); // error message triggered
 
     SimpleFluidCooler.deallocate();
@@ -152,7 +152,7 @@ TEST_F(EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test2)
 
     SimpleFluidCooler(FluidCoolerNum).Name = "Test";
     SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 1.0;
-    SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PIM_UFactor;
+    SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::U_FACTOR;
     SimpleFluidCooler(FluidCoolerNum).DesignEnteringWaterTemp = 52;
     SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirTemp = 35;
     SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirWetBulbTemp = 25;
@@ -173,13 +173,13 @@ TEST_F(EnergyPlusFixture, TwoSpeedFluidCoolerInput_Test2)
     AlphArray(4) = "UFactorTimesAreaAndDesignWaterFlowRate";
     SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = AutoSize;
     SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized = false;
-    bool testResult = TestFluidCoolerTwoSpeedInputForDesign(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum);
+    bool testResult = SimpleFluidCooler(1).validateTwoSpeedInputs(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_TRUE(testResult); // error message triggered
 
     ErrrorsFound = false;
     SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = AutoSize;
     SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized = true;
-    testResult = TestFluidCoolerTwoSpeedInputForDesign(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum);
+    testResult = SimpleFluidCooler(1).validateTwoSpeedInputs(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
     SimpleFluidCooler.deallocate();
@@ -209,7 +209,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test3)
 
     SimpleFluidCooler(FluidCoolerNum).Name = "Test";
     SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 2.5;
-    SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PIM_UFactor;
+    SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::U_FACTOR;
     SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum = 1;
     SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = 1;
     SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity = 50000;
@@ -226,21 +226,21 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test3)
     AlphArray(4) = "UFactorTimesAreaAndDesignWaterFlowRate";
     SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = true;
     SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = 1;
-    bool testResult = TestFluidCoolerSingleSpeedInputForDesign(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum);
+    bool testResult = SimpleFluidCooler(1).validateSingleSpeedInputs(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
     SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = true;
     SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = 0;
-    testResult = TestFluidCoolerSingleSpeedInputForDesign(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum);
+    testResult = SimpleFluidCooler(1).validateSingleSpeedInputs(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
     SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = false;
     SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = 1;
-    testResult = TestFluidCoolerSingleSpeedInputForDesign(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum);
+    testResult = SimpleFluidCooler(1).validateSingleSpeedInputs(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
 
     SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = false;
     SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = 0;
-    testResult = TestFluidCoolerSingleSpeedInputForDesign(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum);
+    testResult = SimpleFluidCooler(1).validateSingleSpeedInputs(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_TRUE(testResult); // error message triggered
 }
