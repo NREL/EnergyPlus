@@ -68,7 +68,7 @@ struct For {
 };
 
 struct Through {
-    std::string date;
+    int timeStamp;
     std::vector<For> fors;
 };
 
@@ -108,6 +108,9 @@ struct ScheduleCompact : ScheduleBase
     CompactField::FieldType
     processSingleField(CompactField::FieldType lastFieldType, nlohmann::json datum, std::vector<CompactField::FieldType> const &validFieldTypes);
     void processFields(nlohmann::json const &fieldWiseData);
+    static std::string trimCompactFieldValue(std::string const &);
+    int processThroughFieldValue(std::string const &);
+    bool validateContinuity();
 
     // member variables
     std::vector<CompactField> fieldsOfData;

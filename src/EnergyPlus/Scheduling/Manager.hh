@@ -93,7 +93,6 @@ std::string scheduleName(int scheduleIndex);
 std::string scheduleType(int scheduleIndex);
 Real64 scheduleMinValue(int scheduleIndex);
 Real64 scheduleMaxValue(int scheduleIndex);
-int getScheduleTime(int yearNum, int monthNum, int dayNum, int hourNum, int minuteNum, int secondNum);
 
 } // namespace Scheduling
 #endif // SRC_ENERGYPLUS_SCHEDULING_MANAGER_HH

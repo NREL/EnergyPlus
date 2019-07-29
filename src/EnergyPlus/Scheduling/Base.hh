@@ -48,69 +48,99 @@
 #ifndef SRC_ENERGYPLUS_SCHEDULING_BASE_HH
 #define SRC_ENERGYPLUS_SCHEDULING_BASE_HH
 
-#include <string>
 #include <EnergyPlus.hh>
 #include <Scheduling/TypeLimits.hh>
+#include <string>
 
 namespace Scheduling {
 
-    struct ScheduleBase {
-        // members common to all schedules
-        std::string name = "";
-        Real64 value = 0.0;
-        ScheduleTypeData *typeLimits = nullptr;
-        bool emsActuatedOn = false;
-        Real64 emsActuatedValue = 0.0;
+struct ScheduleBase
+{
+    // members common to all schedules
+    std::string name = "";
+    Real64 value = 0.0;
+    ScheduleTypeData *typeLimits = nullptr;
+    bool emsActuatedOn = false;
+    Real64 emsActuatedValue = 0.0;
 
-        // abstract functions that must be implemented by derived classes
-        virtual Real64 getCurrentValue() = 0;
-        virtual bool valuesInBounds() = 0;
-        virtual void updateValue(int simTime) = 0; // expecting simTime to be seconds since 1/1 00:00:00 of the first simulation year
+    // abstract functions that must be implemented by derived classes
+    virtual Real64 getCurrentValue() = 0;
+    virtual bool valuesInBounds() = 0;
+    virtual void updateValue(int simTime) = 0; // expecting simTime to be seconds since 1/1 00:00:00 of the first simulation year
+};
+
+static std::vector<std::string> allSchedNames;
+
+enum class ScheduleType
+{
+    CONSTANT,
+    COMPACT,
+    YEAR,
+    FILE,
+    UNKNOWN
+};
+
+enum class Interpolation
+{
+    NONE,
+    AVERAGE,
+    LINEAR
+};
+
+std::vector<std::string> const allValidDayTypes({"Sunday",
+                                                 "Monday",
+                                                 "Tuesday",
+                                                 "Wednesday",
+                                                 "Thursday",
+                                                 "Friday",
+                                                 "Saturday",
+                                                 "Holiday",
+                                                 "SummerDesignDay",
+                                                 "WinterDesignDay",
+                                                 "CustomDay1",
+                                                 "CustomDay2"});
+
+std::vector<std::string> const typeLimitUnitTypes({"Dimensionless",
+                                                   "Temperature",
+                                                   "DeltaTemperature",
+                                                   "PrecipitationRate",
+                                                   "Angle",
+                                                   "ConvectionCoefficient",
+                                                   "ActivityLevel",
+                                                   "Velocity",
+                                                   "Capacity",
+                                                   "Power",
+                                                   "Availability",
+                                                   "Percent",
+                                                   "Control",
+                                                   "Mode"});
+
+inline int getScheduleTime(int yearNum, int monthNum, int dayNum, int hourNum, int minuteNum, int secondNum)
+{
+    // TODO: Handle leap year (and daylight savings?)
+    static const std::vector<int> cumulativeSecondsInMonthsNonLeap{
+        0,        // end of month 0
+        2678400,  // end of jan
+        5097600,  // end of feb
+        7776000,  // end of mar
+        10368000, // end of apr
+        13046400, // end of may
+        15638400, // end of june
+        18316800, // end of july
+        20995200, // end of aug
+        23587200, // end of sep
+        26265600, // end of oct
+        28857600, // end of nov
+        31536000  // end of dec
     };
-
-    static std::vector<std::string> allSchedNames;
-
-    enum class ScheduleType {
-        CONSTANT,
-        COMPACT,
-        YEAR,
-        FILE,
-        UNKNOWN
-    };
-
-    enum class Interpolation {
-        NONE,
-        AVERAGE,
-        LINEAR
-    };
-
-    std::vector<std::string> const allValidDayTypes({"Sunday",
-                                                     "Monday",
-                                                     "Tuesday",
-                                                     "Wednesday",
-                                                     "Thursday",
-                                                     "Friday",
-                                                     "Saturday",
-                                                     "Holiday",
-                                                     "SummerDesignDay",
-                                                     "WinterDesignDay",
-                                                     "CustomDay1",
-                                                     "CustomDay2"});
-
-    std::vector<std::string> const typeLimitUnitTypes({"Dimensionless",
-                                                       "Temperature",
-                                                       "DeltaTemperature",
-                                                       "PrecipitationRate",
-                                                       "Angle",
-                                                       "ConvectionCoefficient",
-                                                       "ActivityLevel",
-                                                       "Velocity",
-                                                       "Capacity",
-                                                       "Power",
-                                                       "Availability",
-                                                       "Percent",
-                                                       "Control",
-                                                       "Mode"});
-
+    int const fromYears = 31536000 * (yearNum - 1);
+    int const fromMonths = cumulativeSecondsInMonthsNonLeap[monthNum - 1];
+    int const fromDays = 86400 * (dayNum - 1);
+    int const fromHours = 3600 * hourNum;
+    int const fromMinutes = 60 * minuteNum;
+    int const fromSeconds = secondNum;
+    return fromYears + fromMonths + fromDays + fromHours + fromMinutes + fromSeconds;
 }
-#endif //SRC_ENERGYPLUS_SCHEDULING_BASE_HH
+
+} // namespace Scheduling
+#endif // SRC_ENERGYPLUS_SCHEDULING_BASE_HH

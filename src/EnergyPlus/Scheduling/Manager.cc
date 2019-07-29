@@ -228,30 +228,4 @@ Real64 scheduleMaxValue(int const EP_UNUSED(scheduleIndex)) {
     return 999;
 }
 
-int getScheduleTime(int yearNum, int monthNum, int dayNum, int hourNum, int minuteNum, int secondNum) {
-    // TODO: Handle leap year (and daylight savings?)
-    static const std::vector<int> cumulativeSecondsInMonthsNonLeap {
-        0, // end of month 0
-        2678400, // end of jan
-        5097600, // end of feb
-        7776000, // end of mar
-        10368000, // end of apr
-        13046400, // end of may
-        15638400, // end of june
-        18316800, // end of july
-        20995200, // end of aug
-        23587200, // end of sep
-        26265600, // end of oct
-        28857600, // end of nov
-        31536000  // end of dec
-    };
-    int const fromYears = 31536000 * (yearNum - 1);
-    int const fromMonths = cumulativeSecondsInMonthsNonLeap[monthNum - 1];
-    int const fromDays = 86400 * (dayNum - 1);
-    int const fromHours = 3600 * hourNum;
-    int const fromMinutes = 60 * minuteNum;
-    int const fromSeconds = secondNum;
-    return fromYears + fromMonths + fromDays + fromHours + fromMinutes + fromSeconds;
-}
-
 }
