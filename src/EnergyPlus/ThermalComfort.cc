@@ -1077,7 +1077,7 @@ namespace ThermalComfort {
 
             CloCond = 1.0 / (CloUnit * 0.155);
 
-            // INITIALIZE THE POLLOWING VARIABLES
+            // INITIALIZE THE FOLLOWING VARIABLES
             if (AirVel < 0.137) AirVel = 0.137;
 
             Hc = 8.6 * std::pow(AirVel, 0.53);

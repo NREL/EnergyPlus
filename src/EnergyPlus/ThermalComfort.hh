@@ -202,11 +202,10 @@ namespace ThermalComfort {
         // Default Constructor
         ThermalComfortDataType()
             : FangerPMV(0.0), FangerPPD(0.0), CloSurfTemp(0.0), PiercePMVET(0.0), PiercePMVSET(0.0), PierceDISC(0.0), PierceTSENS(0.0),
-              PierceSET(0.0),KsuTSV(0.0),
-              ThermalComfortMRT(0.0), ThermalComfortOpTemp(0.0), ClothingValue(0.0), ThermalComfortAdaptiveASH5590(0),
-              ThermalComfortAdaptiveASH5580(0), ThermalComfortAdaptiveCEN15251CatI(0), ThermalComfortAdaptiveCEN15251CatII(0),
-              ThermalComfortAdaptiveCEN15251CatIII(0), TComfASH55(0.0), TComfCEN15251(0.0), ASHRAE55RunningMeanOutdoorTemp(0.0),
-              CEN15251RunningMeanOutdoorTemp(0.0)
+              PierceSET(0.0), KsuTSV(0.0), ThermalComfortMRT(0.0), ThermalComfortOpTemp(0.0), ClothingValue(0.0),
+              ThermalComfortAdaptiveASH5590(0), ThermalComfortAdaptiveASH5580(0), ThermalComfortAdaptiveCEN15251CatI(0),
+              ThermalComfortAdaptiveCEN15251CatII(0), ThermalComfortAdaptiveCEN15251CatIII(0), TComfASH55(0.0), TComfCEN15251(0.0),
+              ASHRAE55RunningMeanOutdoorTemp(0.0), CEN15251RunningMeanOutdoorTemp(0.0)
         {
         }
     };
