@@ -54,21 +54,79 @@
 
 namespace EnergyPlus {
 
-TEST_F(SchedulingTestFixture, TestCompactFieldProcessing)
+TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingMinimal)
 {
-    nlohmann::json minimalFields = nlohmann::json::array({
-                                                             {{"field", "Through: 12/31"}},
-                                                             {{"field", "For: AllDays"}},
-                                                             {{"field", "Until: 24:00"}},
-                                                             {{"field", 24}}
-    });
-    Scheduling::ScheduleCompact compact;
-    compact.processFields(minimalFields);
-    EXPECT_EQ(1u, compact.throughs.size());
-    EXPECT_EQ(1u, compact.throughs.front().fors.size());
-    EXPECT_EQ(1u, compact.throughs.front().fors.front().untils.size());
-    EXPECT_EQ(24, compact.throughs.front().fors.front().untils.front().value);
-    EXPECT_EQ(Scheduling::Interpolation::NONE, compact.throughs.front().fors.front().interpolate); // default is to not interpolate
+    {
+        // Minimal input structure
+        nlohmann::json fields =
+            nlohmann::json::array({
+                {{"field", "Through: 12/31"}},
+                {{"field", "For: AllDays"}},
+                {{"field", "Until: 24:00"}},
+                {{"field", 24}}});
+        Scheduling::ScheduleCompact compact;
+        compact.processFields(fields);
+        EXPECT_EQ(1u, compact.throughs.size());
+        EXPECT_EQ(1u, compact.throughs.front().fors.size());
+        EXPECT_EQ(1u, compact.throughs.front().fors.front().untils.size());
+        EXPECT_EQ(24, compact.throughs.front().fors.front().untils.front().value);
+        EXPECT_EQ(Scheduling::Interpolation::NONE, compact.throughs.front().fors.front().interpolate); // default is to not interpolate
+    }
+}
+
+TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingInterpolationVariations)
+{
+    {
+        // With average interpolation entry
+        nlohmann::json fields =
+            nlohmann::json::array({
+                                      {{"field", "Through: 12/31"}},
+                                      {{"field", "For: AllDays"}},
+                                      {{"field", "Interpolate: Average"}},
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 24}}});
+        Scheduling::ScheduleCompact compact;
+        compact.processFields(fields);
+        EXPECT_EQ(1u, compact.throughs.size());
+        EXPECT_EQ(1u, compact.throughs.front().fors.size());
+        EXPECT_EQ(1u, compact.throughs.front().fors.front().untils.size());
+        EXPECT_EQ(24, compact.throughs.front().fors.front().untils.front().value);
+        EXPECT_EQ(Scheduling::Interpolation::AVERAGE, compact.throughs.front().fors.front().interpolate);
+    }
+    {
+        // With linear interpolation entry
+        nlohmann::json fields =
+            nlohmann::json::array({
+                                      {{"field", "Through: 12/31"}},
+                                      {{"field", "For: AllDays"}},
+                                      {{"field", "Interpolate: LINEar"}},
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 24}}});
+        Scheduling::ScheduleCompact compact;
+        compact.processFields(fields);
+        EXPECT_EQ(1u, compact.throughs.size());
+        EXPECT_EQ(1u, compact.throughs.front().fors.size());
+        EXPECT_EQ(1u, compact.throughs.front().fors.front().untils.size());
+        EXPECT_EQ(24, compact.throughs.front().fors.front().untils.front().value);
+        EXPECT_EQ(Scheduling::Interpolation::LINEAR, compact.throughs.front().fors.front().interpolate);
+    }
+    {
+        // With intentional NO interpolation entry
+        nlohmann::json fields =
+            nlohmann::json::array({
+                                      {{"field", "Through: 12/31"}},
+                                      {{"field", "For: AllDays"}},
+                                      {{"field", "Interpolate: nO"}},
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 24}}});
+        Scheduling::ScheduleCompact compact;
+        compact.processFields(fields);
+        EXPECT_EQ(1u, compact.throughs.size());
+        EXPECT_EQ(1u, compact.throughs.front().fors.size());
+        EXPECT_EQ(1u, compact.throughs.front().fors.front().untils.size());
+        EXPECT_EQ(24, compact.throughs.front().fors.front().untils.front().value);
+        EXPECT_EQ(Scheduling::Interpolation::NONE, compact.throughs.front().fors.front().interpolate);
+    }
 }
 
 }

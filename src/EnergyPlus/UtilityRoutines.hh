@@ -403,6 +403,8 @@ namespace UtilityRoutines {
 
     std::string MakeUPPERCase(std::string const &InputString); // Input String
 
+    std::string epTrim(std::string& s);
+
     inline bool SameString(std::string const &s, std::string const &t)
     {
         // case insensitive comparison

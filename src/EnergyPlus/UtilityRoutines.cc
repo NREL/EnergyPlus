@@ -317,6 +317,14 @@ namespace UtilityRoutines {
         return ResultString;
     }
 
+    std::string epTrim(std::string& s)
+    {
+        std::string sNew;
+        sNew = s.erase(s.find_last_not_of(' ') + 1);
+        sNew = sNew.erase(0, sNew.find_first_not_of(' '));
+        return sNew;
+    }
+
     void VerifyName(std::string const &NameToVerify,
                     Array1D_string const &NamesList,
                     int const NumOfNames,
