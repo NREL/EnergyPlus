@@ -335,6 +335,95 @@ TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingThroughFields)
     }
 }
 
+
+TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingUntilFields)
+{
+    {
+        nlohmann::json fields =
+            nlohmann::json::array({
+                                      {{"field", "Through: 12/31"}},
+                                      {{"field", "For: AllDays"}},
+                                      {{"field", "Until:22:00"}}, // no space between Until: and time
+                                      {{"field", 20}},
+                                      {{"field", "Until:  24:00"}}, // extra space between Until: and time
+                                      {{"field", 24}}
+                                  });
+        Scheduling::ScheduleCompact compact;
+        compact.processFields(fields);
+        EXPECT_EQ(2u, compact.throughs.front().fors.front().untils.size());
+    }
+    {
+        nlohmann::json fields =
+            nlohmann::json::array({
+                                      {{"field", "Through: 12/31"}},
+                                      {{"field", "For: AllDays"}},
+                                      {{"field", "Until:  "}}, // missing value on Until block
+                                      {{"field", 24}}
+                                  });
+        Scheduling::ScheduleCompact compact;
+        ASSERT_THROW(compact.processFields(fields), std::runtime_error);
+    }
+    {
+        nlohmann::json fields =
+            nlohmann::json::array({
+                                      {{"field", "Through: 12/31"}},
+                                      {{"field", "For: AllDays"}},
+                                      {{"field", "Until"}}, // no space at all after Until
+                                      {{"field", 24}}
+                                  });
+        Scheduling::ScheduleCompact compact;
+        ASSERT_THROW(compact.processFields(fields), std::runtime_error);
+    }
+    {
+        nlohmann::json fields =
+            nlohmann::json::array({
+                                      {{"field", "Through: 12/31"}},
+                                      {{"field", "For: AllDays"}},
+                                      {{"field", "Until: Qc:00"}}, // malformed value on Until block
+                                      {{"field", 24}}});
+        Scheduling::ScheduleCompact compact;
+        ASSERT_THROW(compact.processFields(fields), std::runtime_error);
+    }
+    {
+        nlohmann::json fields =
+            nlohmann::json::array({
+                                      {{"field", "Through:12/31"}},
+                                      {{"field", "For: AllDays"}},
+                                      {{"field", "Until: 22:00"}}, // insufficient Until coverage
+                                      {{"field", 24}}});
+        Scheduling::ScheduleCompact compact;
+        ASSERT_THROW(compact.processFields(fields), std::runtime_error);
+    }
+    {
+        nlohmann::json fields =
+            nlohmann::json::array({
+                                      {{"field", "Through:06/30"}},
+                                      {{"field", "For: AllDays"}},
+                                      {{"field", "Until: 21:00"}},
+                                      {{"field", 24}},
+                                      {{"field", "Until: 21:00"}}, // duplicate Until block
+                                      {{"field", 24}},
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 24}}});
+        Scheduling::ScheduleCompact compact;
+        ASSERT_THROW(compact.processFields(fields), std::runtime_error);
+    }
+    {
+        nlohmann::json fields =
+            nlohmann::json::array({
+                                      {{"field", "Through:06/30"}},
+                                      {{"field", "For: AllDays"}},
+                                      {{"field", "Until: 21:00"}},
+                                      {{"field", 24}},
+                                      {{"field", "Until: 19:00"}}, // bad order of Until blocks
+                                      {{"field", 24}},
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 24}}});
+        Scheduling::ScheduleCompact compact;
+        ASSERT_THROW(compact.processFields(fields), std::runtime_error);
+    }
+}
+
 //TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingForFields)
 //{
 //    {

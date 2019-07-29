@@ -132,7 +132,7 @@ ScheduleCompact::ScheduleCompact(std::string const &objectName, nlohmann::json c
     }
 }
 
-bool ScheduleCompact::validateContinuity()
+bool ScheduleCompact::validateContinuity() //  TODO: This function should be renamed and also adapt the input structure into the final TS,Val vectors
 {
     int lastThroughTime = -1;
     for (auto const & thisThrough : this->throughs) {
@@ -140,27 +140,42 @@ bool ScheduleCompact::validateContinuity()
             EnergyPlus::ShowFatalError("Invalid sequence of Through timestamps for Schedule:Compact = " + this->name);
         }
         lastThroughTime = thisThrough.timeStamp;
-
+        // std::vector<DayTypes> or something like this
+        for (auto const & thisFor : thisThrough.fors) {
+            // collect all the day types in all the Fors
+            int lastUntilTime = -1;
+            for (auto const & thisUntil : thisFor.untils) {
+                if (thisUntil.time <= lastUntilTime) {
+                    EnergyPlus::ShowFatalError("Invalid sequence of Until timestamps for Schedule:Compact = " + this->name);
+                }
+                lastUntilTime = thisUntil.time;
+            }
+            if (thisFor.untils.back().time != 86400) {
+                EnergyPlus::ShowFatalError("Invalid Until timestamps, they do not reach the end of the day for Schedule:Compact = " + this->name);
+            }
+        }
+        // check to make sure all possible day types are covered in this Through
     }
-    if (this->throughs.back().timeStamp != 31449600) {
+    // check final through to make sure we hit the end of the year
+    if (this->throughs.back().timeStamp != 31449600) { // magic number is midnight morning on 12/31 TODO: Handle leap year
         EnergyPlus::ShowFatalError("Invalid Through timestamps, they do not reach the end of the year for Schedule:Compact = " + this->name);
     }
     return true;
 }
 
 void ScheduleCompact::processFields(nlohmann::json const &fieldWiseData) {
-    std::map<CompactField::FieldType, std::vector<CompactField::FieldType>> validNextFieldTypes = {
-        {CompactField::FieldType::THROUGH, {CompactField::FieldType::FOR}},
-        {CompactField::FieldType::FOR, {CompactField::FieldType::UNTIL, CompactField::FieldType::INTERPOLATE}},
-        {CompactField::FieldType::INTERPOLATE, {CompactField::FieldType::UNTIL}},
-        {CompactField::FieldType::UNTIL, {CompactField::FieldType::VALUE}},
-        {CompactField::FieldType::VALUE, {CompactField::FieldType::UNTIL, CompactField::FieldType::FOR, CompactField::FieldType::THROUGH}},
+    std::map<FieldType, std::vector<FieldType>> validNextFieldTypes = {
+        {FieldType::THROUGH, {FieldType::FOR}},
+        {FieldType::FOR, {FieldType::UNTIL, FieldType::INTERPOLATE}},
+        {FieldType::INTERPOLATE, {FieldType::UNTIL}},
+        {FieldType::UNTIL, {FieldType::VALUE}},
+        {FieldType::VALUE, {FieldType::UNTIL, FieldType::FOR, FieldType::THROUGH}},
     };
-    std::vector<CompactField::FieldType> validFieldTypes{CompactField::FieldType::THROUGH}; // start with through, that should always be first
+    std::vector<FieldType> validFieldTypes{FieldType::THROUGH}; // start with through, that should always be first
     for (auto const &datum : fieldWiseData) {
-        CompactField::FieldType lastFieldType = CompactField::FieldType::UNKNOWN;
+        FieldType lastFieldType = FieldType::UNKNOWN;
         lastFieldType = this->processSingleField(lastFieldType, datum, validFieldTypes);
-        if (lastFieldType == CompactField::FieldType::UNKNOWN) {
+        if (lastFieldType == FieldType::UNKNOWN) {
             EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE; COULD NOT PROCESS FIELD");
         }
         validFieldTypes = validNextFieldTypes[lastFieldType];
@@ -170,16 +185,16 @@ void ScheduleCompact::processFields(nlohmann::json const &fieldWiseData) {
     }
 }
 
-CompactField::FieldType ScheduleCompact::processSingleField(CompactField::FieldType lastFieldType,
+FieldType ScheduleCompact::processSingleField(FieldType lastFieldType,
                                                       nlohmann::json datum,
-                                                      std::vector<CompactField::FieldType> const &validFieldTypes)
+                                                      std::vector<FieldType> const &validFieldTypes)
 {
     try {
         std::string possibleString = datum.at("field");
         // parse the string for type and value
         possibleString = EnergyPlus::UtilityRoutines::MakeUPPERCase(possibleString);
         if (possibleString.compare(0, 7, "THROUGH") == 0) {
-            lastFieldType = CompactField::FieldType::THROUGH;
+            lastFieldType = FieldType::THROUGH;
             if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
                 EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE, ENCOUNTERED THROUGH WHEN IT WAS NOT VALID, ALLOWED TYPES = whatever");
             }
@@ -188,7 +203,7 @@ CompactField::FieldType ScheduleCompact::processSingleField(CompactField::FieldT
             auto newTimeStamp = this->processThroughFieldValue(date);
             this->throughs.back().timeStamp = newTimeStamp;
         } else if (possibleString.compare(0, 3, "FOR") == 0) {
-            lastFieldType = CompactField::FieldType::FOR;
+            lastFieldType = FieldType::FOR;
             if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
                 EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE, ENCOUNTERED FOR WHEN IT WAS NOT VALID, ALLOWED TYPES = whatever");
             }
@@ -198,7 +213,7 @@ CompactField::FieldType ScheduleCompact::processSingleField(CompactField::FieldT
             std::vector<std::string> results(std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>());
             this->throughs.back().fors.back().days = results;
         } else if (possibleString.compare(0, 11, "INTERPOLATE") == 0) {
-            lastFieldType = CompactField::FieldType::INTERPOLATE;
+            lastFieldType = FieldType::INTERPOLATE;
             if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
                 EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE, ENCOUNTERED INTERPOLATE WHEN IT WAS NOT VALID, ALLOWED TYPES = whatever");
             }
@@ -209,15 +224,16 @@ CompactField::FieldType ScheduleCompact::processSingleField(CompactField::FieldT
                 this->throughs.back().fors.back().interpolate = Interpolation::AVERAGE;
             }
         } else if (possibleString.compare(0, 5, "UNTIL") == 0) {
-            lastFieldType = CompactField::FieldType::UNTIL;
+            lastFieldType = FieldType::UNTIL;
             if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
                 EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE, ENCOUNTERED UNTIL WHEN IT WAS NOT VALID, ALLOWED TYPES = whatever");
             }
             this->throughs.back().fors.back().untils.emplace_back();
-            this->throughs.back().fors.back().untils.back().sTime = ScheduleCompact::trimCompactFieldValue(possibleString.substr(5));
+            auto sTime = ScheduleCompact::trimCompactFieldValue(possibleString.substr(5));
+            this->throughs.back().fors.back().untils.back().time = this->processUntilFieldValue(sTime);
         }
     } catch (nlohmann::detail::type_error &error) {
-        lastFieldType = CompactField::FieldType::VALUE;
+        lastFieldType = FieldType::VALUE;
         // if it wasn't a string, it should've been a schedule value (float)
         if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
             EnergyPlus::ShowFatalError("BAD INPUT ON COMPACT SCHEDULE, ENCOUNTERED VALUE WHEN IT WAS NOT VALID, ALLOWED TYPES = whatever");
@@ -330,6 +346,40 @@ int ScheduleCompact::processThroughFieldValue(std::string const &s)
         break;
     }
     return Scheduling::getScheduleTime(1, month, day, 0, 0, 0);  // TODO: Handle multiple years
+}
+
+
+int ScheduleCompact::processUntilFieldValue(std::string const &s)
+{
+    // check for missing value
+    if (s.empty()) {
+        EnergyPlus::ShowFatalError("Blank value on Until: field for Schedule:Compact named " + this->name);
+    }
+    // check that it matches the right pattern
+    std::regex re("[0-9]?[0-9]:[0-9][0-9]");
+    std::smatch m;
+    if (!std::regex_match(s, m, re)) { // I expect one single match, and needs to apply to whole string, so just regex_match, not regex_search
+        EnergyPlus::ShowFatalError("Invalid value on Until: field for Schedule:Compact named " + this->name + "; invalid input value: " + s);
+    }
+    // then process out the month and day, two possibilities: M/DD and MM/DD, I'm just checking the position of the slash
+    std::string sHour, sMinute;
+    if (s[1] == '/') {
+        sHour = s.substr(0, 1);
+        sMinute = s.substr(2, 2);
+    } else { // must be MM/DD if it passed the regex above
+        sHour = s.substr(0, 2);
+        sMinute = s.substr(3, 2);
+    }
+    int hour = std::stoi(sHour);
+    int minute = std::stoi(sMinute);
+    // validate the hours and minutes
+    if (hour < 0 || hour > 24) { // TODO: Do we handle subhourly right now, like 00:15?
+        EnergyPlus::ShowFatalError("Out of range hour (" + sHour + ") for Schedule:Compact " + this->name);
+    }
+    if (minute < 0 || minute > 59) {
+        EnergyPlus::ShowFatalError("Out of range minute (" + sMinute + ") for Schedule:Compact " + this->name);
+    }
+    return Scheduling::getScheduleTime(1, 1, 1, hour, minute, 0);  // TODO: Handle multiple years ALSO Make a more efficient routine for time-only
 }
 
 } // namespace Scheduling

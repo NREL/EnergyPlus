@@ -57,13 +57,13 @@
 namespace Scheduling {
 
 struct Until {
-    std::string sTime;
+    int time;
     Real64 value;
 };
 
 struct For {
     Scheduling::Interpolation interpolate = Scheduling::Interpolation::NONE;
-    std::vector<std::string> days;
+    std::vector<std::string> days; // TODO: Handle day types and such
     std::vector<Until> untils;
 };
 
@@ -72,19 +72,13 @@ struct Through {
     std::vector<For> fors;
 };
 
-struct CompactField {
-    enum class FieldType {
-        THROUGH,
-        FOR,
-        UNTIL,
-        INTERPOLATE,
-        VALUE,
-        UNKNOWN
-    };
-
-    FieldType thisFieldType = FieldType::UNKNOWN;
-    std::string stringData = "";
-    Real64 floatData = 0.0;
+enum class FieldType {
+    THROUGH,
+    FOR,
+    UNTIL,
+    INTERPOLATE,
+    VALUE,
+    UNKNOWN
 };
 
 struct ScheduleCompact : ScheduleBase
@@ -105,15 +99,14 @@ struct ScheduleCompact : ScheduleBase
     static void setupOutputVariables();
 
     // instance methods for this class
-    CompactField::FieldType
-    processSingleField(CompactField::FieldType lastFieldType, nlohmann::json datum, std::vector<CompactField::FieldType> const &validFieldTypes);
+    FieldType processSingleField(FieldType lastFieldType, nlohmann::json datum, std::vector<FieldType> const &validFieldTypes);
     void processFields(nlohmann::json const &fieldWiseData);
     static std::string trimCompactFieldValue(std::string const &);
     int processThroughFieldValue(std::string const &);
+    int processUntilFieldValue(std::string const &);
     bool validateContinuity();
 
     // member variables
-    std::vector<CompactField> fieldsOfData;
     std::vector<Through> throughs;
 };
 
