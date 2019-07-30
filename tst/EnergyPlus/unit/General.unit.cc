@@ -375,6 +375,7 @@ TEST_F(EnergyPlusFixture, General_EpexpTest)
     Real64 x;
     Real64 y;
 
+    // Negative value
     x = -69.0;
     y = epexp(x);
     EXPECT_NEAR(0.0, y, 1.0E-20);
@@ -383,6 +384,14 @@ TEST_F(EnergyPlusFixture, General_EpexpTest)
     y = epexp(x);
     EXPECT_NEAR(0.0, y, 1.0E-20);
 
+    // Positive values
+    x = 10.0;
+    y = epexp(x, 700.0);
+    EXPECT_NEAR(22026.46579480, y, 0.00001);
+
+    x = 800.0;
+    y = epexp(x, 700.0);
+    EXPECT_NEAR(1.0142320547350045e+304, y, 1.0E2);
 }
 
 } // namespace EnergyPlus

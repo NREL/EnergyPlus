@@ -3932,7 +3932,7 @@ namespace General {
 
     Real64 epexp(Real64 x, Real64 defaultHigh)
     {
-        if (x < -708.4) {
+        if (x < -70.0) {
             return 0.0;
         } else if (x > defaultHigh) {
             return std::exp(defaultHigh);
