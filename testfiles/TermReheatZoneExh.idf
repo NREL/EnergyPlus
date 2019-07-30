@@ -445,7 +445,7 @@
     Office Lighting,         !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekdaysy,          !- Field 2
+    For: Weekdays,          !- Field 2
     Until: 6:00,5.00E-002,   !- Field 3
     Until: 7:00,0.20,        !- Field 5
     Until: 17:00,1.00,       !- Field 7

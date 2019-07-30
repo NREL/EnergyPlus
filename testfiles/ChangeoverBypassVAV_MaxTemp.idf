@@ -311,8 +311,7 @@
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: WeekDays SummerDesignDay, !- Field 2
-    Until: 8:00,0.0,         !- Field 3
-    Until: 8:00,0.50,        !- Field 5
+    Until: 8:00,0.50,        !- Field 5  ! If diffs, this is why
     Until: 12:00,1.00,       !- Field 7
     Until: 13:00,0.50,       !- Field 9
     Until: 16:00,1.00,       !- Field 11

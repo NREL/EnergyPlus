@@ -288,6 +288,10 @@ TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingThroughFields)
                                       {{"field", "For: AllDays"}},
                                       {{"field", "Until: 24:00"}},
                                       {{"field", 24}},
+                                      {{"field", "Through: 9/1"}}, // single digit month and day
+                                      {{"field", "For: AllDays"}},
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 22}},
                                       {{"field", "Through: 12/1"}}, // single digit day
                                       {{"field", "For: AllDays"}},
                                       {{"field", "Until: 24:00"}},
@@ -299,7 +303,7 @@ TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingThroughFields)
                                   });
         Scheduling::ScheduleCompact compact;
         compact.processFields(fields);
-        EXPECT_EQ(3u, compact.throughs.size());
+        EXPECT_EQ(4u, compact.throughs.size());
     }
     {
         nlohmann::json fields =
@@ -377,6 +381,8 @@ TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingUntilFields)
             nlohmann::json::array({
                                       {{"field", "Through: 12/31"}},
                                       {{"field", "For: AllDays"}},
+                                      {{"field", "Until:7:00"}}, // single digit hour
+                                      {{"field", 20}},
                                       {{"field", "Until:22:00"}}, // no space between Until: and time
                                       {{"field", 20}},
                                       {{"field", "Until:  24:00"}}, // extra space between Until: and time
@@ -384,7 +390,7 @@ TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingUntilFields)
                                   });
         Scheduling::ScheduleCompact compact;
         compact.processFields(fields);
-        EXPECT_EQ(2u, compact.throughs.front().fors.front().untils.size());
+        EXPECT_EQ(3u, compact.throughs.front().fors.front().untils.size());
     }
     {
         nlohmann::json fields =

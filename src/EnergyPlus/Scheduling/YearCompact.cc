@@ -322,10 +322,22 @@ int ScheduleCompact::processThroughFieldValue(std::string const &s)
     }
     // then process out the month and day, two possibilities: M/DD and MM/DD, I'm just checking the position of the slash
     std::string sMonth, sDay;
-    if (s[1] == '/') {
+    if (s.size() == 3u) {
+        // 9/1
         sMonth = s.substr(0, 1);
-        sDay = s.substr(2, s.size() - 2);
+        sDay = s.substr(2, 1);
+    } else if (s.size() == 4u) {
+        if (s[1] == '/') {
+            // 9/01
+            sMonth = s.substr(0, 1);
+            sDay = s.substr(2, 2);
+        } else {
+            // 09/1
+            sMonth = s.substr(0, 2);
+            sDay = s.substr(3, 1);
+        }
     } else { // must be MM/DD if it passed the regex above
+        // 09/01
         sMonth = s.substr(0, 2);
         sDay = s.substr(3, s.size() - 3);
     }
@@ -380,10 +392,10 @@ int ScheduleCompact::processUntilFieldValue(std::string const &s)
     }
     // then process out the month and day, two possibilities: M/DD and MM/DD, I'm just checking the position of the slash
     std::string sHour, sMinute;
-    if (s[1] == '/') {
+    if (s[1] == ':') {
         sHour = s.substr(0, 1);
         sMinute = s.substr(2, 2);
-    } else { // must be MM/DD if it passed the regex above
+    } else { // must be HH:MM if it passed the regex above
         sHour = s.substr(0, 2);
         sMinute = s.substr(3, 2);
     }
