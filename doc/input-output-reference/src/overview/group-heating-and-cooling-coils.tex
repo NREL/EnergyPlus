@@ -78,7 +78,7 @@ The coil has two modes of operation, termed as \textbf{SimpleAnalysis} and \text
 
 \paragraph{Field: Heat Exchanger Configuration}\label{field-heat-exchanger-configuration-000}
 
-The coil is operable in two configurations: \textit{CounterFlow} or \textit{CrossFlow}. Chilled water coils are generally built as counter-flow. The default is CounterFlow..
+The coil is operable in two configurations: \textit{CounterFlow} or \textit{CrossFlow}. Chilled water coils are generally built as counter-flow. The default is CounterFlow. The detailed NTU-Effectiveness relationships for each flow setting are described in the Engineering Reference, Section `Effectiveness Equations' in `Simulation Models - Encyclopedic Reference: Coil' chapter.
 
 \paragraph{Field: Condensate Collection Water Storage Tank Name}\label{field-condensate-collection-water-storage-tank-name}
 
@@ -212,11 +212,11 @@ The maximum possible water flow rate (m\(^{3}\)/sec) through the coil. This fiel
 
 \paragraph{Field: Water Inlet Node Name}\label{field-water-inlet-node-name-1-000}
 
-The name of the coil s water inlet node from the hot water loop.
+The name of the coil's water inlet node from the hot water loop.
 
 \paragraph{Field: Water Outlet Node Name}\label{field-water-outlet-node-name-1-000}
 
-The name of the coil s water outlet node from the hot water loop.
+The name of the coil's water outlet node from the hot water loop.
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-1-003}
 
@@ -331,7 +331,7 @@ A unique identifying name for each steam coil.
 
 \paragraph{Field:Availability Schedule Name}\label{fieldavailability-schedule-name-2-000}
 
-Schedule that defines when the coil is available. If the schedule s value is less than or equal to 0.0, then the coil is not available and flow will not be requested. If the schedule s value is \textgreater{} 0.0 (usually 1 is used), the coil is available. If this field is blank, the schedule has values of 1 for all time periods.
+Schedule that defines when the coil is available. If the schedule's value is less than or equal to 0.0, then the coil is not available and flow will not be requested. If the schedule's value is \textgreater{} 0.0 (usually 1 is used), the coil is available. If this field is blank, the schedule has values of 1 for all time periods.
 
 \paragraph{Field: Maximum Steam Flow Rate}\label{field-maximum-steam-flow-rate}
 
@@ -449,7 +449,7 @@ A unique identifying name for each coil.
 
 \paragraph{Field:Availability Schedule Name}\label{fieldavailability-schedule-name-3}
 
-Schedule that defines when the coil is available. If the schedule s value is 0.0, then the coil is not available and flow will not be requested. If the schedule s value is \textgreater{} 0.0 (usually 1 is used), the coil is available. If this field is blank, the schedule has values of 1 for all time periods. Schedule values must be \textgreater{} = 0 and \textless{} = 1.
+Schedule that defines when the coil is available. If the schedule's value is 0.0, then the coil is not available and flow will not be requested. If the schedule's value is \textgreater{} 0.0 (usually 1 is used), the coil is available. If this field is blank, the schedule has values of 1 for all time periods. Schedule values must be \textgreater{} = 0 and \textless{} = 1.
 
 \paragraph{Field: Efficiency}\label{field-efficiency}
 
@@ -526,7 +526,7 @@ A unique identifying name for each coil.
 
 \paragraph{Field:Availability Schedule Name}\label{fieldavailability-schedule-name-4}
 
-Schedule that defines when the coil is available. If the schedule s value is 0.0, then the coil is not available and flow will not be requested. If the schedule s value is \textgreater{} 0.0 (usually 1 is used), the coil is available. If this field is blank, the schedule has values of 1 for all time periods. Schedule values must be \textgreater{} = 0 and \textless{} = 1.
+Schedule that defines when the coil is available. If the schedule's value is 0.0, then the coil is not available and flow will not be requested. If the schedule's value is \textgreater{} 0.0 (usually 1 is used), the coil is available. If this field is blank, the schedule has values of 1 for all time periods. Schedule values must be \textgreater{} = 0 and \textless{} = 1.
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-4-001}
 
@@ -687,7 +687,7 @@ NOTE: When the heating source is a Refrigeration Compressor rack, the heat rejec
 
 \paragraph{Field: Temperature Setpoint Node Name}\label{field-temperature-setpoint-node-name-3}
 
-This optional alpha field defines the name of the HVAC system node used for temperature-based control (e.g., controlling the heating coil s outlet air dry-bulb temperature to a setpoint). If the desuperheater heating coil is temperature controlled through the use of a Set Point Manager, then the control node specified in the Set Point Manager will be entered here. If the desuperheater heating coil is controlled based on a certain heating load to be met (e.g., using this heating coil as part of \hyperref[airloophvacunitaryfurnaceheatcool]{AirLoopHVAC:Unitary:Furnace:HeatCool} for high humidity control), this field should be left blank.
+This optional alpha field defines the name of the HVAC system node used for temperature-based control (e.g., controlling the heating coil's outlet air dry-bulb temperature to a setpoint). If the desuperheater heating coil is temperature controlled through the use of a Set Point Manager, then the control node specified in the Set Point Manager will be entered here. If the desuperheater heating coil is controlled based on a certain heating load to be met (e.g., using this heating coil as part of \hyperref[airloophvacunitaryfurnaceheatcool]{AirLoopHVAC:Unitary:Furnace:HeatCool} for high humidity control), this field should be left blank.
 
 \paragraph{Field: Parasitic Electric Load}\label{field-parasitic-electric-load}
 
@@ -1236,7 +1236,7 @@ A unique identifying name for each coil.
 
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-4-003}
 
-Schedule that defines when the coil is available. If the schedule s value is 0.0, then the coil is not available and flow will not be requested. If the schedule s value is \textgreater{} 0.0 (usually 1 is used), the coil is available. If this field is blank, the schedule has values of 1 for all time periods. Schedule values must be \textgreater{} = 0 and \textless{} = 1.
+Schedule that defines when the coil is available. If the schedule's value is 0.0, then the coil is not available and flow will not be requested. If the schedule's value is \textgreater{} 0.0 (usually 1 is used), the coil is available. If this field is blank, the schedule has values of 1 for all time periods. Schedule values must be \textgreater{} = 0 and \textless{} = 1.
 
 \paragraph{Field: Fuel Type}\label{field-gas-burner-efficiency}
 
@@ -1357,7 +1357,7 @@ A unique identifying name for each coil.
 
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-5-001}
 
-Schedule that defines when the coil is available. If the schedule s value is 0.0, then the coil is not available and flow will not be requested. If the schedule s value is \textgreater{} 0.0 (usually 1 is used), the coil is available. If this field is blank, the schedule has values of 1 for all time periods. Schedule values must be \textgreater{} = 0 and \textless{} = 1.
+Schedule that defines when the coil is available. If the schedule's value is 0.0, then the coil is not available and flow will not be requested. If the schedule's value is \textgreater{} 0.0 (usually 1 is used), the coil is available. If this field is blank, the schedule has values of 1 for all time periods. Schedule values must be \textgreater{} = 0 and \textless{} = 1.
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-7}
 
@@ -1389,7 +1389,7 @@ A typical part load fraction correlation for a conventional gas heating coil (e.
 
 \paragraph{Field: Parasitic Gas Load}\label{field-parasitic-gas-load-1}
 
-This numeric field is the parasitic gas load associated with the gas coil s operation (Watts), such as a standing pilot light. The model assumes that this parasitic load is consumed only for the portion of the simulation timestep where the gas heating coil is not operating.
+This numeric field is the parasitic gas load associated with the gas coil's operation (Watts), such as a standing pilot light. The model assumes that this parasitic load is consumed only for the portion of the simulation timestep where the gas heating coil is not operating.
 
 \paragraph{Field: Stage 1 Gas Burner Efficiency}\label{field-stage-1-gas-burner-efficiency}
 
@@ -1546,7 +1546,7 @@ A unique identifying name for each coil.
 
 \paragraph{Field:Availability Schedule Name}\label{fieldavailability-schedule-name-5}
 
-Schedule that defines when the coil is available. If the schedule s value is 0.0, then the coil is not available and flow will not be requested. If the schedule s value is \textgreater{} 0.0 (usually 1 is used), the coil is available. If this field is blank, the schedule has values of 1 for all time periods.
+Schedule that defines when the coil is available. If the schedule's value is 0.0, then the coil is not available and flow will not be requested. If the schedule's value is \textgreater{} 0.0 (usually 1 is used), the coil is available. If this field is blank, the schedule has values of 1 for all time periods.
 
 \paragraph{Field: Maximum Water Flow Rate}\label{field-maximum-water-flow-rate-1}
 
@@ -1741,7 +1741,7 @@ This model requires 5 curves as follows:
 
 The curves are simply specified by name. Curve inputs are described in the curve manager section of this document (see Performance Curves in this document).
 
-The next four input fields are optional and relate to the degradation of latent cooling capacity when the supply air fan operates continuously while the cooling coil/compressor cycle on and off to meet the cooling load. The fan operating mode is determined in the partent object and is considered to either be constant (e.g.~\hyperref[coilsystemcoolingdx]{CoilSystem:Cooling:DX}) or can be scheduled (e.g.~\hyperref[airloophvacunitaryheatcool]{AirLoopHVAC:UnitaryHeatCool}). When scheduled, the schedule value must be greater than 0 to calculate degradation of latent cooling capacity. At times when the parent object s supply air fan operating mode schedule is 0, latent degradation will be ignored. When modeling latent capacity degradation, these next four input fields must all have positive values.
+The next four input fields are optional and relate to the degradation of latent cooling capacity when the supply air fan operates continuously while the cooling coil/compressor cycle on and off to meet the cooling load. The fan operating mode is determined in the partent object and is considered to either be constant (e.g.~\hyperref[coilsystemcoolingdx]{CoilSystem:Cooling:DX}) or can be scheduled (e.g.~\hyperref[airloophvacunitaryheatcool]{AirLoopHVAC:UnitaryHeatCool}). When scheduled, the schedule value must be greater than 0 to calculate degradation of latent cooling capacity. At times when the parent object's supply air fan operating mode schedule is 0, latent degradation will be ignored. When modeling latent capacity degradation, these next four input fields must all have positive values.
 
 The next input specifies the outdoor air node used to define the conditions of the air entering the outdoor condenser. If this field is left blank, the outdoor temperature entering the condenser is taken directly from the weather data. If this field is not blank, the node name specified must be listed in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor temperature from the weather data. Alternately, the node name must be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor temperature entering the condenser is taken directly from the weather data.
 
@@ -1891,7 +1891,7 @@ This numeric field defines the crankcase heater capacity in Watts. When the outd
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-crankcase-heater-operation}
 
-This numeric field defines the outdoor air dry-bulb temperature above which the compressor s crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C, and the default value is 10 °C.
+This numeric field defines the outdoor air dry-bulb temperature above which the compressor's crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C, and the default value is 10 °C.
 
 \paragraph{Field: Supply Water Storage Tank Name}\label{field-supply-water-storage-tank-name-000}
 
@@ -1903,7 +1903,7 @@ This field is optional. It is used to describe where condensate from the coil is
 
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity-000}
 
-This numeric field contains the capacity of the DX coil s electric evaporative cooler basin heater in watts per degree Kelvin. This field only applies for Condenser Type = EvaporativelyCooled. This field is used in conjunction with the Basin Heater Setpoint Temperature described in the following field. The basin heater electric power is equal to this field multiplied by the difference between the basin heater set point temperature and the outdoor dry-bulb temperature. The basin heater only operates when the DX coil is off, regardless of the basin heater schedule described below. The basin heater capacity must be greater than or equal to zero, with a default value of zero if this field is left blank.
+This numeric field contains the capacity of the DX coil's electric evaporative cooler basin heater in watts per degree Kelvin. This field only applies for Condenser Type = EvaporativelyCooled. This field is used in conjunction with the Basin Heater Setpoint Temperature described in the following field. The basin heater electric power is equal to this field multiplied by the difference between the basin heater set point temperature and the outdoor dry-bulb temperature. The basin heater only operates when the DX coil is off, regardless of the basin heater schedule described below. The basin heater capacity must be greater than or equal to zero, with a default value of zero if this field is left blank.
 
 \paragraph{Field: Basin Heater Setpoint Temperature}\label{field-basin-heater-setpoint-temperature-000}
 
@@ -2147,7 +2147,7 @@ This field is optional. It is used to describe where condensate from the coil is
 
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity-1-000}
 
-This numeric field contains the capacity of the DX coil s electric evaporative cooler basin heater in watts per degree Kelvin. This field only applies for Condenser Type = EvaporativelyCooled. This field is used in conjunction with the Basin Heater Setpoint Temperature described in the following field. The basin heater electric power is equal to this field multiplied by the difference between the basin heater set point temperature and the outdoor dry-bulb temperature. The basin heater only operates when the DX coil is off, regardless of the basin heater schedule described below. The basin heater capacity must be greater than or equal to zero, with a default value of zero if this field is left blank.
+This numeric field contains the capacity of the DX coil's electric evaporative cooler basin heater in watts per degree Kelvin. This field only applies for Condenser Type = EvaporativelyCooled. This field is used in conjunction with the Basin Heater Setpoint Temperature described in the following field. The basin heater electric power is equal to this field multiplied by the difference between the basin heater set point temperature and the outdoor dry-bulb temperature. The basin heater only operates when the DX coil is off, regardless of the basin heater schedule described below. The basin heater capacity must be greater than or equal to zero, with a default value of zero if this field is left blank.
 
 \paragraph{Field: Basin Heater Setpoint Temperature}\label{field-basin-heater-setpoint-temperature-1-000}
 
@@ -2303,7 +2303,7 @@ This numeric field defines the crankcase heater capacity in Watts. When the outd
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-crankcase-heater-operation-1}
 
-This numeric field defines the outdoor air dry-bulb temperature above which the compressor s crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C, and the default value is 10 °C.
+This numeric field defines the outdoor air dry-bulb temperature above which the compressor's crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C, and the default value is 10 °C.
 
 \paragraph{Field: Number of Capacity Stages}\label{field-number-of-capacity-stages}
 
@@ -2351,7 +2351,7 @@ This numeric field defines the minimum outdoor air dry-bulb temperature where th
 
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity-2-000}
 
-This numeric field contains the capacity of the DX coil s electric evaporative cooler basin heater in watts per degree Kelvin. This field only applies for Condenser Type = EvaporativelyCooled. This field is used in conjunction with the Basin Heater Setpoint Temperature described in the following field. The basin heater electric power is equal to this field multiplied by the difference between the basin heater set point temperature and the outdoor dry-bulb temperature. The basin heater only operates when the DX coil is off, regardless of the basin heater schedule described below. The basin heater capacity must be greater than or equal to zero, with a default value of zero if this field is left blank.
+This numeric field contains the capacity of the DX coil's electric evaporative cooler basin heater in watts per degree Kelvin. This field only applies for Condenser Type = EvaporativelyCooled. This field is used in conjunction with the Basin Heater Setpoint Temperature described in the following field. The basin heater electric power is equal to this field multiplied by the difference between the basin heater set point temperature and the outdoor dry-bulb temperature. The basin heater only operates when the DX coil is off, regardless of the basin heater schedule described below. The basin heater capacity must be greater than or equal to zero, with a default value of zero if this field is left blank.
 
 \paragraph{Field: Basin Heater Setpoint Temperature}\label{field-basin-heater-setpoint-temperature-2-000}
 
@@ -2444,7 +2444,7 @@ This numeric field defines the crankcase heater capacity in Watts. When the outd
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-crankcase-heater-operation-2}
 
-This numeric field defines the outdoor air dry-bulb temperature above which the compressor s crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C. If this input field is left blank, the default value is 10 °C.
+This numeric field defines the outdoor air dry-bulb temperature above which the compressor's crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C. If this input field is left blank, the default value is 10 °C.
 
 \paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
 
@@ -2452,7 +2452,7 @@ This numeric field defines the minimum outdoor air dry-bulb temperature where th
 
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity-3-000}
 
-This numeric field contains the capacity of the DX coil s electric evaporative cooler basin heater in watts per degree Kelvin. This field only applies for Condenser Type = EvaporativelyCooled. This field is used in conjunction with the Basin Heater Setpoint Temperature described in the following field. The basin heater electric power is equal to this field multiplied by the difference between the basin heater set point temperature and the outdoor dry-bulb temperature. The basin heater only operates when the DX coil is off, regardless of the basin heater schedule described below. The basin heater capacity must be greater than or equal to zero, with a default value of zero if this field is left blank.
+This numeric field contains the capacity of the DX coil's electric evaporative cooler basin heater in watts per degree Kelvin. This field only applies for Condenser Type = EvaporativelyCooled. This field is used in conjunction with the Basin Heater Setpoint Temperature described in the following field. The basin heater electric power is equal to this field multiplied by the difference between the basin heater set point temperature and the outdoor dry-bulb temperature. The basin heater only operates when the DX coil is off, regardless of the basin heater schedule described below. The basin heater capacity must be greater than or equal to zero, with a default value of zero if this field is left blank.
 
 \paragraph{Field: Basin Heater Setpoint Temperature}\label{field-basin-heater-setpoint-temperature-3-000}
 
@@ -2814,11 +2814,11 @@ This is the runtime fraction of the DX coil compressor and condenser fan(s) for 
 
 \paragraph{Cooling Coil Crankcase Heater Electric Power{[}W{]}}\label{cooling-coil-crankcase-heater-electric-powerw}
 
-This is the average electricity consumption rate of the DX coil compressor s crankcase heater in Watts for the timestep being reported. If the DX Cooling Coil is used in a heat pump, the crankcase heater is reported only for the heating coil.
+This is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. If the DX Cooling Coil is used in a heat pump, the crankcase heater is reported only for the heating coil.
 
 \paragraph{Cooling Coil Crankcase Heater Electric Energy {[}J{]}}\label{cooling-coil-crankcase-heater-electric-energy-j}
 
-This is the electricity consumption of the DX coil compressor s crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (ref. Output:Meter objects). This output variable appears only when the DX Cooling Coil is not used as part of a heat pump, otherwise the crankcase heater is reported only for the heating coil.
+This is the electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (ref. Output:Meter objects). This output variable appears only when the DX Cooling Coil is not used as part of a heat pump, otherwise the crankcase heater is reported only for the heating coil.
 
 \paragraph{Cooling Coil Condenser Inlet Temperature {[}C{]}}\label{cooling-coil-condenser-inlet-temperature-c}
 
@@ -2969,7 +2969,7 @@ This numeric field defines the crankcase heater capacity in Watts. When the outd
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-crankcase-heater-operation-3}
 
-This numeric field defines the outdoor air dry-bulb temperature above which the compressor s crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C, and the default value is 10 °C.
+This numeric field defines the outdoor air dry-bulb temperature above which the compressor's crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C, and the default value is 10 °C.
 
 \paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation}
 
@@ -2985,7 +2985,7 @@ This field is optional. It is used to describe where condensate from the coil is
 
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity-4}
 
-This numeric field contains the capacity of the DX coil s electric evaporative cooler basin
+This numeric field contains the capacity of the DX coil's electric evaporative cooler basin
 
 heater in watts per degree Kelvin. This field only applies for Condenser Type = EvaporativelyCooled. This field is used in conjunction with the Basin Heater Setpoint temperature described in the following field. The basin heater electric power is equal to this field multiplied by the difference between the basin heater set point temperature and the outdoor dry-bulb temperature. The basin heater only operates when the DX coil is off, regardless of the basin heater schedule described below. The basin heater capacity must be greater than or equal to zero, with a default value of zero if this field is left blank.
 
@@ -3379,7 +3379,7 @@ This model requires 5 curves as follows:
 
 The curves are simply specified by name. Curve inputs are described in the curve manager section of this document (see Performance Curves in this document).
 
-The next four input fields are optional and relate to the degradation of latent cooling capacity when the supply air fan operates continuously while the cooling coil/compressor cycle on and off to meet the cooling load. The fan operating mode is either considered to be constant (e.g.~\hyperref[coilsystemcoolingdx]{CoilSystem:Cooling:DX}) or can be scheduled in the parent object (e.g.~\hyperref[airloophvacunitaryheatcool]{AirLoopHVAC:UnitaryHeatCool}). When scheduled, the schedule value must be greater than 0 to calculate degradation of latent cooling capacity. At times when the parent object s supply air fan operating mode schedule is 0, latent degradation will be ignored. When used, these next four input fields must all have positive values in order to model latent capacity degradation.
+The next four input fields are optional and relate to the degradation of latent cooling capacity when the supply air fan operates continuously while the cooling coil/compressor cycle on and off to meet the cooling load. The fan operating mode is either considered to be constant (e.g.~\hyperref[coilsystemcoolingdx]{CoilSystem:Cooling:DX}) or can be scheduled in the parent object (e.g.~\hyperref[airloophvacunitaryheatcool]{AirLoopHVAC:UnitaryHeatCool}). When scheduled, the schedule value must be greater than 0 to calculate degradation of latent cooling capacity. At times when the parent object's supply air fan operating mode schedule is 0, latent degradation will be ignored. When used, these next four input fields must all have positive values in order to model latent capacity degradation.
 
 The next input specifies the outdoor air node used to define the conditions of the air entering the outdoor condenser. If this field is not blank, the node name specified must be listed in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor temperature from the weather data. Alternately, the node name must be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor temperature entering the condenser is taken directly from the weather data. This field may also be left blank, if this is the case then the outdoor temperature entering the condenser is taken directly from the weather data.
 
@@ -3761,7 +3761,7 @@ This numeric field defines the crankcase heater capacity in Watts. When the outd
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-crankcase-heater-operation-4}
 
-This numeric field defines the outdoor air dry-bulb temperature above which the compressor s crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 C. If this input field is left blank, the default value is 10 C.
+This numeric field defines the outdoor air dry-bulb temperature above which the compressor's crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 C. If this input field is left blank, the default value is 10 C.
 
 \paragraph{Field: Defrost Strategy}\label{field-defrost-strategy}
 
@@ -3890,11 +3890,11 @@ This is the electricity consumption of the DX coil unit in Joules for the timest
 
 \paragraph{Heating Coil Crankcase Heater Electric Power {[}W{]}}\label{heating-coil-crankcase-heater-electric-power-w}
 
-This is the average electricity consumption rate of the DX coil compressor s crankcase heater in Watts for the timestep being reported.
+This is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported.
 
 \paragraph{Heating Coil Crankcase Heater Electric Energy {[}J{]}}\label{heating-coil-crankcase-heater-electric-energy-j}
 
-This is the electricity consumption of the DX coil compressor s crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Miscellaneous, Group Key = System (ref. Output:Meter objects).
+This is the electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Miscellaneous, Group Key = System (ref. Output:Meter objects).
 
 \paragraph{Heating Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-4}
 
@@ -3962,7 +3962,7 @@ This numeric field defines the crankcase heater capacity in Watts. When the outd
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-crankcase-heater-operation-5}
 
-This numeric field defines the outdoor air dry-bulb temperature above which the compressor s crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C. If this input field is left blank, the default value is 10 °C.
+This numeric field defines the outdoor air dry-bulb temperature above which the compressor's crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C. If this input field is left blank, the default value is 10 °C.
 
 \paragraph{Field: Defrost Energy Input Ratio Function of Temperature Curve Name}\label{field-defrost-energy-input-ratio-function-of-temperature-curve-name-1}
 
@@ -4221,11 +4221,11 @@ This is the fuel consumption of the DX coil unit in Joules for the timestep bein
 
 \paragraph{Heating Coil Crankcase Heater Electric Power {[}W{]}}\label{heating-coil-crankcase-heater-electric-power-w-1}
 
-This is the average electricity consumption rate of the DX coil compressor s crankcase heater in Watts for the timestep being reported. When a companion cooling coil exits, the crankcase heater power of the companion cool coil is alos reported in this variable.
+This is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. When a companion cooling coil exits, the crankcase heater power of the companion cool coil is alos reported in this variable.
 
 \paragraph{Heating Coil Crankcase Heater Electric Energy {[}J{]}}\label{heating-coil-crankcase-heater-electric-energy-j-1}
 
-This is the electricity consumption of the DX coil compressor s crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (ref. Output:Meter objects). When a companion cooling coil exits, the crankcase heater power of the companion cool coil is alos reported in this variable.
+This is the electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (ref. Output:Meter objects). When a companion cooling coil exits, the crankcase heater power of the companion cool coil is alos reported in this variable.
 
 \paragraph{Heating Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-5}
 
@@ -4330,7 +4330,7 @@ This numeric field defines the crankcase heater capacity in Watts. When the outd
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-crankcase-heater-operation-6}
 
-This numeric field defines the outdoor air dry-bulb temperature above which the compressor s crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C. If this input field is left blank, the default value is 10 °C.
+This numeric field defines the outdoor air dry-bulb temperature above which the compressor's crankcase heater is disabled. The value for this input field must be greater than or equal to 0.0 °C. If this input field is left blank, the default value is 10 °C.
 
 \paragraph{Field: Defrost Strategy}\label{field-defrost-strategy-2}
 
@@ -4629,7 +4629,7 @@ This alpha field contains a unique user-assigned name for an instance of a desup
 
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-12-000}
 
-This alpha field contains the name of the schedule (ref: Schedule) that denotes whether the desuperheater coil is available to operate during a given time period. A schedule value equal to 0 denotes that the desuperheater coil is off for that time period. A value other than 0 denotes that the desuperheater coil is available to operate during that time period. During times when the desuperheater coil is scheduled off, the heater (element or burner) in the water tank object operates based on its tank set point temperature schedule and the desuperheater coil s parasitic electric power is also off for that time period. If this field is blank, the schedule has values of 1 for all time periods.
+This alpha field contains the name of the schedule (ref: Schedule) that denotes whether the desuperheater coil is available to operate during a given time period. A schedule value equal to 0 denotes that the desuperheater coil is off for that time period. A value other than 0 denotes that the desuperheater coil is available to operate during that time period. During times when the desuperheater coil is scheduled off, the heater (element or burner) in the water tank object operates based on its tank set point temperature schedule and the desuperheater coil's parasitic electric power is also off for that time period. If this field is blank, the schedule has values of 1 for all time periods.
 
 \paragraph{Field: Setpoint Temperature Schedule Name}\label{field-setpoint-temperature-schedule-name}
 
@@ -4639,7 +4639,7 @@ This alpha field contains the name of the schedule (ref: Schedule) that specifie
 
 This numeric field contains the dead band temperature difference in degrees Celsius. The desuperheater coil cut-in temperature is defined as the desuperheater coil set point temperature defined above minus this dead band temperature difference. The desuperheater coil turns on when the water temperature in the tank falls below the cut-in temperature. The desuperheater coil remains on until the water temperature in the tank rises above the desuperheater coil set point ( cut-out ) temperature defined above. The dead band temperature difference must be greater than 0 °C and less than or equal to 20 °C. If this field is left blank, the default value is 5 °C.
 
-Desuperheater water heating coils are typically used to offset energy consumption by the water tank s heater (element or burner). Therefore, the cut-in temperature for the desuperheater coil (set point minus dead band temperature difference) is usually higher than the set point temperature for the heater (element or burner) in the associated water heater tank object. At times when the water heater tank set point temperature is greater than the cut-in temperature of the desuperheater coil, the model disables the desuperheater coil and the tank s heater is used to heat the water.
+Desuperheater water heating coils are typically used to offset energy consumption by the water tank's heater (element or burner). Therefore, the cut-in temperature for the desuperheater coil (set point minus dead band temperature difference) is usually higher than the set point temperature for the heater (element or burner) in the associated water heater tank object. At times when the water heater tank set point temperature is greater than the cut-in temperature of the desuperheater coil, the model disables the desuperheater coil and the tank's heater is used to heat the water.
 
 \paragraph{Field: Rated Heat Reclaim Recovery Efficiency}\label{field-rated-heat-reclaim-recovery-efficiency}
 
@@ -4702,15 +4702,15 @@ This alpha (choice) field defines the source of superheated refrigerant gas from
 
 \paragraph{Field: Heating Source Name}\label{field-heating-source-name-1}
 
-This alpha field defines the name of the desuperheater coil s heat source (e.g., the name of a specific coil of the type mentioned in the previous field which provides waste heat to this desuperheater water heating coil).
+This alpha field defines the name of the desuperheater coil's heat source (e.g., the name of a specific coil of the type mentioned in the previous field which provides waste heat to this desuperheater water heating coil).
 
 \paragraph{Field: Water Flow Rate}\label{field-water-flow-rate}
 
-This numeric field defines the desuperheater coil s water flow rate in cubic meters per second. The model assumes that this flow rate is constant (throughout the simulation period) when the desuperheater coil operates, and that it corresponds to the heat reclaim recovery efficiency performance specified by the user. This water flow rate must be greater than zero.
+This numeric field defines the desuperheater coil's water flow rate in cubic meters per second. The model assumes that this flow rate is constant (throughout the simulation period) when the desuperheater coil operates, and that it corresponds to the heat reclaim recovery efficiency performance specified by the user. This water flow rate must be greater than zero.
 
 \paragraph{Field: Water Pump Power}\label{field-water-pump-power}
 
-This numeric field defines the coil s water circulation pump power in Watts. This is the operating pump power as installed. Values must be greater than or equal to 0. If this field is left blank, the default value is 0. A warning message will be issued if the ratio of water pump power to desuperheater water volumetric flow rate exceeds 7.9264E6 W/m\(^{3}\)/s, but the simulation will continue using the user-defined values. The model assumes that this integral pump (i.e., no need to define a separate pump object) cycles on and off with the desuperheater heating coil.
+This numeric field defines the coil's water circulation pump power in Watts. This is the operating pump power as installed. Values must be greater than or equal to 0. If this field is left blank, the default value is 0. A warning message will be issued if the ratio of water pump power to desuperheater water volumetric flow rate exceeds 7.9264E6 W/m\(^{3}\)/s, but the simulation will continue using the user-defined values. The model assumes that this integral pump (i.e., no need to define a separate pump object) cycles on and off with the desuperheater heating coil.
 
 \paragraph{Field: Fraction of Pump Heat to Water}\label{field-fraction-of-pump-heat-to-water}
 
@@ -5069,7 +5069,7 @@ The DX system can operate with a cycling compressor or a varying speed compresso
 
 The heat exchanger-assisted DX cooling coil is a virtual component consisting of a direct expansion (DX) cooling coil and an air-to-air heat exchanger as shown in Figure~\ref{fig:schematic-of-the-coilsystem-cooling-dx} below. The air-to-air heat exchanger pre-conditions the air entering the cooling coil, and reuses this energy to post-condition the supply air leaving the cooling coil. This heat exchange process improves the latent removal performance of the cooling coil by allowing it to dedicate more of its cooling capacity toward dehumidification (lower sensible heat ratio).
 
-This compound object models the basic operation of an air-to-air heat exchanger in conjunction with a cooling coil. The heat exchanger-assisted DX cooling coil does not have an operating schedule of its own; its operating schedule is governed by the availability schedules for the DX cooling coil and the air-to-air heat exchanger. This compound object is used in place of where a DX cooling coil object would normally be used by itself.
+This compound object models the basic operation of an air-to-air heat exchanger in conjunction with a cooling coil. The heat exchanger-assisted DX cooling coil does not have an operating schedule of its own; its operating schedule is governed by the availability schedules for the DX cooling coil and the air-to-air heat exchanger. This compound object is used in the same way as a DX cooling coil object. It cannot be used directly on a branch. It must be contained within a parent object such as CoilSystem:Cooling:DX or AirloopHVAC:UnitarySystem and others which list CoilSystem:Cooling:DX:HeatExchangerAssisted as a valid cooling coil option.
 
 To model a heat exchanger-assisted DX cooling coil, the input data file should include the following objects:
 
@@ -5077,12 +5077,20 @@ To model a heat exchanger-assisted DX cooling coil, the input data file should i
 \item
   CoilSystem:Cooling:DX:HeatExchangerAssisted object
 \item
-  Air-to-air heat exchanger object (\hyperref[heatexchangerairtoairflatplate]{HeatExchanger:AirToAir:FlatPlate}, \hyperref[heatexchangerairtoairsensibleandlatent]{HeatExchanger:AirToAir:SensibleAndLatent}, or \hyperref[heatexchangerdesiccantbalancedflow]{HeatExchanger:Desiccant:BalancedFlow})
+  Air-to-air heat exchanger object such as:
+\begin{itemize}
+\item
+\hyperref[heatexchangerairtoairflatplate]{HeatExchanger:AirToAir:FlatPlate}
+\item
+\hyperref[heatexchangerairtoairsensibleandlatent]{HeatExchanger:AirToAir:SensibleAndLatent}
+\item
+\hyperref[heatexchangerdesiccantbalancedflow]{HeatExchanger:Desiccant:BalancedFlow}
+\end{itemize}
 \item
   DX cooling coil object (\hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} or \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed})
 \end{itemize}
 
-In terms of controlling the operation of the heat exchanger, the heat exchanger is assumed to always provide its heat transfer when the associated DX cooling coil is operating and no high humidity control mechanism is specified. However, the heat exchanger s energy transfer may be controlled (i.e., turned on and off) based on a zone air humidity level using either a humidistat (ref. \hyperref[airloophvacunitaryfurnaceheatcool]{AirLoopHVAC:Unitary:Furnace:HeatCool} or \hyperref[airloophvacunitaryheatcool]{AirLoopHVAC:UnitaryHeatCool}) or a humidistat and a maximum humidity set point manager to place a humidity ratio set point on the appropriate control node (ref. \hyperref[coilsystemcoolingdx]{CoilSystem:Cooling:DX}). This model may also be used with the unitary changeover bypass system and the unitary air-to-air heat pump system (ref. \hyperref[airloophvacunitaryheatcoolvavchangeoverbypass]{AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass} and \hyperref[airloophvacunitaryheatpumpairtoair]{AirLoopHVAC:UnitaryHeatPump:AirToAir}); however, the heat exchanger is assumed to always provide its heat transfer when the cooling coil operates and cannot be turned on and off based on a zone air humidity set point. Two zone air conditioners may also use this model for improved dehumidification. The first type is the packaged terminal heat pump (ref. \hyperref[zonehvacpackagedterminalheatpump]{ZoneHVAC:PackagedTerminalHeatPump}) where the heat exchanger s heat transfer is always active whenever the cooling coil operates. The second type is the window air conditioner (ref. \hyperref[zonehvacwindowairconditioner]{ZoneHVAC:WindowAirConditioner}) where the heat exchanger s heat transfer is always active when the cooling coil operates and no high humidity control mechanism is specified, OR the heat exchanger s heat transfer may be controlled based on zone air humidity level if a humidistat and high humidity set point manager are specified (maximum humidity ratio set point placed on the heat exchanger s exhaust air outlet node, ref. Figure~\ref{fig:schematic-of-the-coilsystem-cooling-dx}).
+In terms of controlling the operation of the heat exchanger, the heat exchanger is assumed to always provide its heat transfer when the associated DX cooling coil is operating and no high humidity control mechanism is specified. However, the heat exchanger's energy transfer may be controlled (i.e., turned on and off) based on a zone air humidity level using either a humidistat (ref. \hyperref[airloophvacunitaryfurnaceheatcool]{AirLoopHVAC:Unitary:Furnace:HeatCool} or \hyperref[airloophvacunitaryheatcool]{AirLoopHVAC:UnitaryHeatCool}) or a humidistat and a maximum humidity set point manager to place a humidity ratio set point on the appropriate control node (ref. \hyperref[coilsystemcoolingdx]{CoilSystem:Cooling:DX}). This model may also be used with the unitary changeover bypass system and the unitary air-to-air heat pump system (ref. \hyperref[airloophvacunitaryheatcoolvavchangeoverbypass]{AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass} and \hyperref[airloophvacunitaryheatpumpairtoair]{AirLoopHVAC:UnitaryHeatPump:AirToAir}); however, the heat exchanger is assumed to always provide its heat transfer when the cooling coil operates and cannot be turned on and off based on a zone air humidity set point. Two zone air conditioners may also use this model for improved dehumidification. The first type is the packaged terminal heat pump (ref. \hyperref[zonehvacpackagedterminalheatpump]{ZoneHVAC:PackagedTerminalHeatPump}) where the heat exchanger's heat transfer is always active whenever the cooling coil operates. The second type is the window air conditioner (ref. \hyperref[zonehvacwindowairconditioner]{ZoneHVAC:WindowAirConditioner}) where the heat exchanger's heat transfer is always active when the cooling coil operates and no high humidity control mechanism is specified, OR the heat exchanger's heat transfer may be controlled based on zone air humidity level if a humidistat and high humidity set point manager are specified (maximum humidity ratio set point placed on the heat exchanger's exhaust air outlet node, ref. Figure~\ref{fig:schematic-of-the-coilsystem-cooling-dx}).
 
 Links to the cooling coil and air-to-air heat exchanger specifications are provided in the input data syntax for this compound object. A description of each input field for this compound object is provided below.
 
@@ -6631,11 +6639,11 @@ This numeric field defines ratio of the initial moisture evaporation rate from t
 
 \paragraph{Field: High Pressure Cutoff}\label{field-high-pressure-cutoff}
 
-This numeric field defines the compressor s maximum allowable pressure in Pascal (N/m2)
+This numeric field defines the compressor's maximum allowable pressure in Pascal (N/m2)
 
 \paragraph{Field: Low Pressure Cutoff}\label{field-low-pressure-cutoff}
 
-This numeric field defines the compressor s minimum allowable pressure in Pascal (N/m2)
+This numeric field defines the compressor's minimum allowable pressure in Pascal (N/m2)
 
 \paragraph{Field: Water Inlet Node Name}\label{field-water-inlet-node-name-5-000}
 
@@ -6675,7 +6683,7 @@ This numeric field defines the estimated parameter \textbf{compressor power loss
 
 \paragraph{Field: Compressor Efficiency}\label{field-compressor-efficiency}
 
-This numeric field defines the estimated parameter of the \textbf{compressor s efficiency}. The compressor efficiency is formulated as the equation below:
+This numeric field defines the estimated parameter of the \textbf{compressor's efficiency}. The compressor efficiency is formulated as the equation below:
 
 \begin{equation}
 \eta  = \frac{{{{\dot W}_{Theoritical}}}}{{{{\dot W}_{CompInput}} - {{\dot W}_{Loss}}}}
@@ -7504,7 +7512,7 @@ The output variable is the total source side heat transfer of the coil in Joules
 
 \subsection{Coil:Heating:WaterToAirHeatPump:ParameterEstimation}\label{coilheatingwatertoairheatpumpparameterestimation}
 
-The Water to Air heat pump heating coil is a deterministic model that requires parameters to describe the operating conditions of the heat pump s components. The parameters are generated from the manufacturer catalog data using multi-variable optimization method. However, the parameters required for WatertoAirHP heating coil is similar to WatertoAirHP cooling except (source side outside heat transfer coefficient) parameter is not required for heating. In addition, the heating coil model can be used for 3 type of compressors which are \textbf{reciprocating}, \textbf{rotary} and \textbf{scroll}.
+The Water to Air heat pump heating coil is a deterministic model that requires parameters to describe the operating conditions of the heat pump's components. The parameters are generated from the manufacturer catalog data using multi-variable optimization method. However, the parameters required for WatertoAirHP heating coil is similar to WatertoAirHP cooling except (source side outside heat transfer coefficient) parameter is not required for heating. In addition, the heating coil model can be used for 3 type of compressors which are \textbf{reciprocating}, \textbf{rotary} and \textbf{scroll}.
 
 \subsubsection{Inputs}\label{inputs-32}
 
@@ -7530,11 +7538,11 @@ This numeric field defines the gross heating capacity for the WatertoAirHP heati
 
 \paragraph{Field: High Pressure Cutoff}\label{field-high-pressure-cutoff-1}
 
-This numeric field defines the compressor s maximum allowable pressure in Pascal (N/m2)
+This numeric field defines the compressor's maximum allowable pressure in Pascal (N/m2)
 
 \paragraph{Field: Low Pressure Cutoff}\label{field-low-pressure-cutoff-1}
 
-This numeric field defines the compressor s minimum allowable pressure in Pascal (N/m2)
+This numeric field defines the compressor's minimum allowable pressure in Pascal (N/m2)
 
 \paragraph{Field: Water Inlet Node Name}\label{field-water-inlet-node-name-8}
 
@@ -7570,7 +7578,7 @@ This numeric field defines the estimated parameter \textbf{compressor power loss
 
 \paragraph{Field: Compressor Efficiency}\label{field-compressor-efficiency-1}
 
-This numeric field defines the estimated parameter of the \textbf{compressor s efficiency}. The compressor efficiency is formulated as the equation below:
+This numeric field defines the estimated parameter of the \textbf{compressor's efficiency}. The compressor efficiency is formulated as the equation below:
 
 \begin{equation}
 \eta  = \frac{{{{\dot W}_{Theoritical}}}}{{{{\dot W}_{CompInput}} - {{\dot W}_{Loss}}}}
@@ -8288,7 +8296,7 @@ The model offers various modes of operation that can be controlled over time usi
   Discharge Only Mode. This mode is where the coil cools process air by discharging the TES tank.
 \end{itemize}
 
-This cooling coil can be autosized. The cooling capacity for the cooling only mode is sized to meet the air system s final design cooling capacity. The cooling capacity for the other modes, and the storage capacity, can all be scaled relative to that one capacity using sizing factors that can be input by the user.
+This cooling coil can be autosized. The cooling capacity for the cooling only mode is sized to meet the air system's final design cooling capacity. The cooling capacity for the other modes, and the storage capacity, can all be scaled relative to that one capacity using sizing factors that can be input by the user.
 
 \subsubsection{Inputs}\label{inputs-35}
 
@@ -8343,7 +8351,7 @@ This field is used to describe the size of ice-based TES tank, in GJ. The storag
 
 \paragraph{Field: Storage Capacity Sizing Factor {[}hr{]}}\label{field-storage-capacity-sizing-factor-hr}
 
-This field is used if one of the previous two fields is set to autocalculate. The value entered here is a time duration, in hours. This time period is used for calculating a storage capacity. The basic idea is that storage be sized such that the TES can provide cooling at rated capacity for this amount of time. The rated capacity used in the sizing calculation is the Discharge Only Mode Rated Storage Discharging Capacity unless the Discharge Only mode is not available in which case it is the Cooling Only Mode Rated Total Evaporator Cooling Capacity. This sizing factor approach allows scaling the storage size relative to the TES coil s capacity. The sizing factor is applied for an ice-based TES by simply multiplying the rated capacity by the time duration (converted to seconds). For fluid-based TES, a change in fluid temperature of 10 °C is assumed to calculate the tank volume.
+This field is used if one of the previous two fields is set to autocalculate. The value entered here is a time duration, in hours. This time period is used for calculating a storage capacity. The basic idea is that storage be sized such that the TES can provide cooling at rated capacity for this amount of time. The rated capacity used in the sizing calculation is the Discharge Only Mode Rated Storage Discharging Capacity unless the Discharge Only mode is not available in which case it is the Cooling Only Mode Rated Total Evaporator Cooling Capacity. This sizing factor approach allows scaling the storage size relative to the TES coil's capacity. The sizing factor is applied for an ice-based TES by simply multiplying the rated capacity by the time duration (converted to seconds). For fluid-based TES, a change in fluid temperature of 10 °C is assumed to calculate the tank volume.
 
 \paragraph{Field: Storage Tank Ambient Temperature Node Name}\label{field-storage-tank-ambient-temperature-node-name}
 
@@ -8363,11 +8371,11 @@ This field is the air volume flow rate through the coil, in m\(^{3}\)/s, at rati
 
 \paragraph{Field: Evaporator Air Inlet Node Name}\label{field-evaporator-air-inlet-node-name-3}
 
-This field is the name of an HVAC system node that the coil draws in as its inlet air. This for the evaporator s connection to air system but it may include other air cooling devices that are in series with the evaporator and contained within the packaged TES coil. This node must be unique across the model. This field is required.
+This field is the name of an HVAC system node that the coil draws in as its inlet air. This for the evaporator's connection to air system but it may include other air cooling devices that are in series with the evaporator and contained within the packaged TES coil. This node must be unique across the model. This field is required.
 
 \paragraph{Field: Evaporator Air Outlet Node Name}\label{field-evaporator-air-outlet-node-name-2}
 
-This field is the name of an HVAC system node that the coils sends its outlet air. This for the evaporator s connection to air system but it may include other air cooling devices that are in series with the evaporator and contained within the packaged TES coil. This node must be unique across the model. This field is required.
+This field is the name of an HVAC system node that the coils sends its outlet air. This for the evaporator's connection to air system but it may include other air cooling devices that are in series with the evaporator and contained within the packaged TES coil. This node must be unique across the model. This field is required.
 
 \paragraph{Field: Cooling Only Mode Available}\label{field-cooling-only-mode-available}
 
@@ -8375,7 +8383,7 @@ This field is used to indicate if the packaged TES coil includes a mode with onl
 
 \paragraph{Field: Cooling Only Mode Rated Total Evaporator Cooling Capacity {[}W{]}}\label{field-cooling-only-mode-rated-total-evaporator-cooling-capacity-w}
 
-This field is used to specify the total, full load cooling capacity (sensible plus latent), in Watts, of the TES coil at rated conditions, while operating in Cooling Only Mode. The rating conditions are air entering the cooling coil at 26.7 °C drybulb, 19.4 °C wetbulb and air entering the outdoor condenser section at 35 °C drybulb and 23.9 °C wetbulb, and the air flow rate specified in Rated Evaporator Air Flow Rate. Capacity should be gross (i.e.~supply air fan heat is NOT included). This total cooling capacity is a central value for TES coil in the sense that it is the basis for various autocalculated sizes for the rest of the model which can be scaled off of this one value. This field is required if Cooling Only Mode is available or if another operating mode s capacity, or storage capacity, will be autocalculated from this value. This field is autosizable.
+This field is used to specify the total, full load cooling capacity (sensible plus latent), in Watts, of the TES coil at rated conditions, while operating in Cooling Only Mode. The rating conditions are air entering the cooling coil at 26.7 °C drybulb, 19.4 °C wetbulb and air entering the outdoor condenser section at 35 °C drybulb and 23.9 °C wetbulb, and the air flow rate specified in Rated Evaporator Air Flow Rate. Capacity should be gross (i.e.~supply air fan heat is NOT included). This total cooling capacity is a central value for TES coil in the sense that it is the basis for various autocalculated sizes for the rest of the model which can be scaled off of this one value. This field is required if Cooling Only Mode is available or if another operating mode's capacity, or storage capacity, will be autocalculated from this value. This field is autosizable.
 
 \paragraph{Field: Cooling Only Mode Rated Sensible Heat Ratio}\label{field-cooling-only-mode-rated-sensible-heat-ratio}
 
@@ -8451,7 +8459,7 @@ This field is used to specify the coefficient of performance (COP) at rating con
 
 \paragraph{Field: Cooling And Charge Mode Total Evaporator Cooling Capacity Function of Temperature Curve Name}\label{field-cooling-and-charge-mode-total-evaporator-cooling-capacity-function-of-temperature-curve-name}
 
-This field is the name of a separate performance curve object that parameterizes the variation of the total cooling capacity as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the condenser section, and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The z values are the state of the TES tank which are the tank s temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 35.0 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of the curve is multiplied by Cooling And Charge Mode Rated Total Evaporator Cooling Capacity to model capacity at temperatures away from the rating point. This field is required if Cooling And Charge Mode is available.
+This field is the name of a separate performance curve object that parameterizes the variation of the total cooling capacity as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the condenser section, and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The z values are the state of the TES tank which are the tank's temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 35.0 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of the curve is multiplied by Cooling And Charge Mode Rated Total Evaporator Cooling Capacity to model capacity at temperatures away from the rating point. This field is required if Cooling And Charge Mode is available.
 
 \paragraph{Field: Cooling And Charge Mode Total Evaporator Cooling Capacity Function of Flow Fraction Curve Name}\label{field-cooling-and-charge-mode-total-evaporator-cooling-capacity-function-of-flow-fraction-curve-name}
 
@@ -8459,7 +8467,7 @@ This field is the name of a separate performance curve object that parameterizes
 
 \paragraph{Field: Cooling And Charge Mode Evaporator Energy Input Ratio Function of Temperature Curve Name}\label{field-cooling-and-charge-mode-evaporator-energy-input-ratio-function-of-temperature-curve-name}
 
-This field is the name of a separate performance curve object that parameterizes the variation of the energy input ratio (EIR) for evaporator cooling as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the condenser section, and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The z values are the state of the TES tank which are the tank s temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 35.0 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The performance curve is normalized to have the value of 1.0 at the rating point. The result of this curve is multiplied by the inverse of the Cooling And Charge Mode Cooling Rated COP to model electric energy consumption at temperatures away from the rating point. This field is required if Cooling And Charge Mode is available.
+This field is the name of a separate performance curve object that parameterizes the variation of the energy input ratio (EIR) for evaporator cooling as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the condenser section, and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The z values are the state of the TES tank which are the tank's temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 35.0 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The performance curve is normalized to have the value of 1.0 at the rating point. The result of this curve is multiplied by the inverse of the Cooling And Charge Mode Cooling Rated COP to model electric energy consumption at temperatures away from the rating point. This field is required if Cooling And Charge Mode is available.
 
 \paragraph{Field: Cooling And Charge Mode Evaporator Energy Input Ratio Function of Flow Fraction Curve Name}\label{field-cooling-and-charge-mode-evaporator-energy-input-ratio-function-of-flow-fraction-curve-name}
 
@@ -8471,7 +8479,7 @@ This field is the name of a separate performance curve object that parameterizes
 
 \paragraph{Field: Cooling And Charge Mode Storage Charge Capacity Function of Temperature Curve Name}\label{field-cooling-and-charge-mode-storage-charge-capacity-function-of-temperature-curve-name}
 
-This field is the name of a separate performance curve object that parameterizes the variation of the storage charging capacity as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the condenser section, and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The z values are the state of the TES tank which are the tank s temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 35.0 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of the curve is multiplied by Cooling And Charge Mode Rated Storage Charging Capacity to model capacity at temperatures away from the rating point. This field is required if Cooling And Charge Mode is available.
+This field is the name of a separate performance curve object that parameterizes the variation of the storage charging capacity as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the condenser section, and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The z values are the state of the TES tank which are the tank's temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 35.0 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of the curve is multiplied by Cooling And Charge Mode Rated Storage Charging Capacity to model capacity at temperatures away from the rating point. This field is required if Cooling And Charge Mode is available.
 
 \paragraph{Field: Cooling And Charge Mode Storage Charge Capacity Function of Total Evaporator PLR Curve Name}\label{field-cooling-and-charge-mode-storage-charge-capacity-function-of-total-evaporator-plr-curve-name}
 
@@ -8479,7 +8487,7 @@ This field is the name of a separate performance curve object that parameterizes
 
 \paragraph{Field: Cooling And Charge Mode Storage Energy Input Ratio Function of Temperature Curve Name}\label{field-cooling-and-charge-mode-storage-energy-input-ratio-function-of-temperature-curve-name}
 
-This field is the name of a separate performance curve object that parameterizes the variation of the energy input ratio (EIR) for charging as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the condenser section, and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The z values are the state of the TES tank which are the tank s temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 35.0 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of this curve is multiplied by the inverse of the Cooling And Charge Mode Charging Rated COP to model electric energy consumption at temperatures away from the rating point. This field is required if Cooling And Charge Mode is available.
+This field is the name of a separate performance curve object that parameterizes the variation of the energy input ratio (EIR) for charging as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the condenser section, and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The z values are the state of the TES tank which are the tank's temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 35.0 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of this curve is multiplied by the inverse of the Cooling And Charge Mode Charging Rated COP to model electric energy consumption at temperatures away from the rating point. This field is required if Cooling And Charge Mode is available.
 
 \paragraph{Field: Cooling And Charge Mode Storage Energy Input Ratio Function of Flow Fraction Curve Name}\label{field-cooling-and-charge-mode-storage-energy-input-ratio-function-of-flow-fraction-curve-name}
 
@@ -8495,7 +8503,7 @@ This field is the name of a separate performance curve object that parameterizes
 
 For a curve or table with two independent variables the SHR is a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil and (2) the drybulb temperature of the air entering the evaporator section. The performance curve can be any curve or table based on two independent variables, x and y, including: \hyperref[curvebiquadratic]{Curve:Biquadratic}, \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables}, \hyperref[curvebicubic]{Curve:Bicubic}, and \hyperref[curvequadraticlinear]{Curve:QuadraticLinear}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the evaporator section.
 
-For a curve or table with three independent variables the SHR is a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the evaporator section and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x and y values for the curve are the same as for two independent variables while the z values are the state of the TES tank which are the tank s temperature for water or fluid storage type or the storage fraction for ice storage types.
+For a curve or table with three independent variables the SHR is a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the evaporator section and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x and y values for the curve are the same as for two independent variables while the z values are the state of the TES tank which are the tank's temperature for water or fluid storage type or the storage fraction for ice storage types.
 
 The performance curve is normalized to have a value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 26.7 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of the curve is multiplied by the Cooling And Charge Mode Rated Sensible Heat Ratio to model the SHR at coil entering temperatures that differ from the rating point. This field is required if Cooling And Charge Mode is available.
 
@@ -8541,7 +8549,7 @@ This field is used to specify the coefficient of performance (COP) at rating con
 
 \paragraph{Field: Cooling And Discharge Mode Total Evaporator Cooling Capacity Function of Temperature Curve Name}\label{field-cooling-and-discharge-mode-total-evaporator-cooling-capacity-function-of-temperature-curve-name}
 
-This field is the name of a separate performance curve object that parameterizes the variation of the total cooling capacity as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the condenser section, and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The z values are the state of the TES tank which are the tank s temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 35.0 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of the curve is multiplied by Cooling And Discharge Mode Rated Total Evaporator Cooling Capacity to model capacity at temperatures away from the rating point. This field is required if Cooling And Discharge Mode is available.
+This field is the name of a separate performance curve object that parameterizes the variation of the total cooling capacity as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the condenser section, and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The z values are the state of the TES tank which are the tank's temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 35.0 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of the curve is multiplied by Cooling And Discharge Mode Rated Total Evaporator Cooling Capacity to model capacity at temperatures away from the rating point. This field is required if Cooling And Discharge Mode is available.
 
 \paragraph{Field: Cooling And Discharge Mode Total Evaporator Cooling Capacity Function of Flow Fraction Curve Name}\label{field-cooling-and-discharge-mode-total-evaporator-cooling-capacity-function-of-flow-fraction-curve-name}
 
@@ -8549,7 +8557,7 @@ This field is the name of a separate performance curve object that parameterizes
 
 \paragraph{Field: Cooling And Discharge Mode Evaporator Energy Input Ratio Function of Temperature Curve Name}\label{field-cooling-and-discharge-mode-evaporator-energy-input-ratio-function-of-temperature-curve-name}
 
-This field is the name of a separate performance curve object that parameterizes the variation of the energy input ratio (EIR) for evaporator cooling as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the condenser section, and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The z values are the state of the TES tank which are the tank s temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 35.0 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of this curve is multiplied by the inverse of the Cooling And Discharge Mode Cooling Rated COP to model electric energy consumption at temperatures away from the rating point. This field is required if Cooling And Discharge Mode is available.
+This field is the name of a separate performance curve object that parameterizes the variation of the energy input ratio (EIR) for evaporator cooling as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the condenser section, and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The z values are the state of the TES tank which are the tank's temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 35.0 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of this curve is multiplied by the inverse of the Cooling And Discharge Mode Cooling Rated COP to model electric energy consumption at temperatures away from the rating point. This field is required if Cooling And Discharge Mode is available.
 
 \paragraph{Field: Cooling And Discharge Mode Evaporator Energy Input Ratio Function of Flow Fraction Curve Name}\label{field-cooling-and-discharge-mode-evaporator-energy-input-ratio-function-of-flow-fraction-curve-name}
 
@@ -8561,7 +8569,7 @@ This field is the name of a separate performance curve object that parameterizes
 
 \paragraph{Field: Cooling And Discharge Mode Storage Discharge Capacity Function of Temperature Curve Name}\label{field-cooling-and-discharge-mode-storage-discharge-capacity-function-of-temperature-curve-name}
 
-This field is the name of a separate performance curve object that parameterizes the variation of the storage discharging capacity as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the condenser section, and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The z values are the state of the TES tank which are the tank s temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 35.0 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of the curve is multiplied by Cooling And Discharge Mode Rated Storage Discharging Capacity to model capacity at temperatures away from the rating point. This field is required if Cooling And Discharge Mode is available.
+This field is the name of a separate performance curve object that parameterizes the variation of the storage discharging capacity as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the condenser section, and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The z values are the state of the TES tank which are the tank's temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 35.0 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of the curve is multiplied by Cooling And Discharge Mode Rated Storage Discharging Capacity to model capacity at temperatures away from the rating point. This field is required if Cooling And Discharge Mode is available.
 
 \paragraph{Field: Cooling And Discharge Mode Storage Discharge Capacity Function of Flow Fraction Curve Name}\label{field-cooling-and-discharge-mode-storage-discharge-capacity-function-of-flow-fraction-curve-name}
 
@@ -8573,7 +8581,7 @@ This field is the name of a separate performance curve object that parameterizes
 
 \paragraph{Field: Cooling And Discharge Mode Storage Energy Input Ratio Function of Temperature Curve Name}\label{field-cooling-and-discharge-mode-storage-energy-input-ratio-function-of-temperature-curve-name}
 
-This field is the name of a separate performance curve object that parameterizes the variation of the energy input ratio (EIR) for discharging as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the condenser section, and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The z values are the state of the TES tank which are the tank s temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 35.0 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of this curve is multiplied by the inverse of the Cooling And Discharge Mode Discharging Rated COP to model electric energy consumption at temperatures away from the rating point. This field is required if Cooling And Discharge Mode is available.
+This field is the name of a separate performance curve object that parameterizes the variation of the energy input ratio (EIR) for discharging as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the condenser section, and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The z values are the state of the TES tank which are the tank's temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 35.0 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of this curve is multiplied by the inverse of the Cooling And Discharge Mode Discharging Rated COP to model electric energy consumption at temperatures away from the rating point. This field is required if Cooling And Discharge Mode is available.
 
 \paragraph{Field: Cooling And Discharge Mode Storage Energy Input Ratio Function of Flow Fraction Curve Name}\label{field-cooling-and-discharge-mode-storage-energy-input-ratio-function-of-flow-fraction-curve-name}
 
@@ -8589,7 +8597,7 @@ This field is the name of a separate performance curve object that parameterizes
 
 For a curve or table with two independent variables the SHR is a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil and (2) the drybulb temperature of the air entering the evaporator section. The performance curve can be any curve or table based on two independent variables, x and y, including: \hyperref[curvebiquadratic]{Curve:Biquadratic}, \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables}, \hyperref[curvebicubic]{Curve:Bicubic}, and \hyperref[curvequadraticlinear]{Curve:QuadraticLinear}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the evaporator section.
 
-For a curve or table with three independent variables the SHR is a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the evaporator section and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x and y values for the curve are the same as for two independent variables while the z values are the state of the TES tank which are the tank s temperature for water or fluid storage type or the storage fraction for ice storage types.
+For a curve or table with three independent variables the SHR is a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the evaporator section and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x and y values for the curve are the same as for two independent variables while the z values are the state of the TES tank which are the tank's temperature for water or fluid storage type or the storage fraction for ice storage types.
 
 The performance curve is normalized to have a value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 26.7 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of the curve is multiplied by the Cooling And Discharge Mode Rated Sensible Heat Ratio to model the SHR at coil entering temperatures that differ from the rating point. This field is required if Cooling And Discharge Mode is available.
 
@@ -8617,11 +8625,11 @@ This field is used to specify the coefficient of performance (COP) at rating con
 
 \paragraph{Field: Charge Only Mode Storage Charge Capacity Function of Temperature Curve Name}\label{field-charge-only-mode-storage-charge-capacity-function-of-temperature-curve-name}
 
-This field is the name of a separate performance curve object that parameterizes the variation of the storage charging capacity as a function of (1) the drybulb temperature of the air entering the condenser section, and (2) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on two independent variables, x and y, including: \hyperref[curvebiquadratic]{Curve:Biquadratic}, \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables}, \hyperref[curvebicubic]{Curve:Bicubic}, and \hyperref[curvequadraticlinear]{Curve:QuadraticLinear}. The x values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The y values are the state of the TES tank which are the tank s temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 35.0 °C, and y = 0.5 for Ice storage type or y = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of the curve is multiplied by Charge Only Mode Rated Storage Charging Capacity to model capacity at temperatures away from the rating point. This field is required if Charge Only Mode is available.
+This field is the name of a separate performance curve object that parameterizes the variation of the storage charging capacity as a function of (1) the drybulb temperature of the air entering the condenser section, and (2) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on two independent variables, x and y, including: \hyperref[curvebiquadratic]{Curve:Biquadratic}, \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables}, \hyperref[curvebicubic]{Curve:Bicubic}, and \hyperref[curvequadraticlinear]{Curve:QuadraticLinear}. The x values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The y values are the state of the TES tank which are the tank's temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 35.0 °C, and y = 0.5 for Ice storage type or y = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of the curve is multiplied by Charge Only Mode Rated Storage Charging Capacity to model capacity at temperatures away from the rating point. This field is required if Charge Only Mode is available.
 
 \paragraph{Field: Charge Only Mode Storage Energy Input Ratio Function of Temperature Curve Name}\label{field-charge-only-mode-storage-energy-input-ratio-function-of-temperature-curve-name}
 
-This field is the name of a separate performance curve object that parameterizes the variation of the energy input ratio (EIR) for charging as a function of (1) the drybulb temperature of the air entering the condenser section, and (2) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on two independent variables, x and y, including: \hyperref[curvebiquadratic]{Curve:Biquadratic}, \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables}, \hyperref[curvebicubic]{Curve:Bicubic}, and \hyperref[curvequadraticlinear]{Curve:QuadraticLinear}. The x values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The y values are the state of the TES tank which are the tank s temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 35.0 °C, and y = 0.5 for Ice storage type or y = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of this curve is multiplied by the inverse of the Charge Only Mode Charging Rated COP to model electric energy consumption at temperatures away from the rating point. This field is required if Charge Only Mode is available.
+This field is the name of a separate performance curve object that parameterizes the variation of the energy input ratio (EIR) for charging as a function of (1) the drybulb temperature of the air entering the condenser section, and (2) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on two independent variables, x and y, including: \hyperref[curvebiquadratic]{Curve:Biquadratic}, \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables}, \hyperref[curvebicubic]{Curve:Bicubic}, and \hyperref[curvequadraticlinear]{Curve:QuadraticLinear}. The x values for the performance curve are the drybulb temperature of air entering the condenser section (which if using evaporatively-cooled condenser the temperature will be adjusted to approach the wetbulb temperature depending on effectiveness). The y values are the state of the TES tank which are the tank's temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 35.0 °C, and y = 0.5 for Ice storage type or y = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of this curve is multiplied by the inverse of the Charge Only Mode Charging Rated COP to model electric energy consumption at temperatures away from the rating point. This field is required if Charge Only Mode is available.
 
 \paragraph{Field: Discharge Only Mode Available}\label{field-discharge-only-mode-available}
 
@@ -8647,7 +8655,7 @@ This field is used to specify the coefficient of performance (COP) at rating con
 
 \paragraph{Field: Discharge Only Mode Storage Discharge Capacity Function of Temperature Curve Name}\label{field-discharge-only-mode-storage-discharge-capacity-function-of-temperature-curve-name}
 
-This field is the name of a separate performance curve object that parameterizes the variation of the storage discharging capacity as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, and (2) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on two independent variables, x and y, including: \hyperref[curvebiquadratic]{Curve:Biquadratic}, \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables}, \hyperref[curvebicubic]{Curve:Bicubic}, and \hyperref[curvequadraticlinear]{Curve:QuadraticLinear}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values are the state of the TES tank which are the tank s temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C and y = 0.5 for Ice storage type or y = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of the curve is multiplied by Discharge Only Mode Rated Storage Discharging Capacity to model capacity at temperatures away from the rating point. This field is required if Discharge Only Mode is available.
+This field is the name of a separate performance curve object that parameterizes the variation of the storage discharging capacity as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, and (2) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on two independent variables, x and y, including: \hyperref[curvebiquadratic]{Curve:Biquadratic}, \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables}, \hyperref[curvebicubic]{Curve:Bicubic}, and \hyperref[curvequadraticlinear]{Curve:QuadraticLinear}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values are the state of the TES tank which are the tank's temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C and y = 0.5 for Ice storage type or y = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of the curve is multiplied by Discharge Only Mode Rated Storage Discharging Capacity to model capacity at temperatures away from the rating point. This field is required if Discharge Only Mode is available.
 
 \paragraph{Field: Discharge Only Mode Storage Discharge Capacity Function of Flow Fraction Curve Name}\label{field-discharge-only-mode-storage-discharge-capacity-function-of-flow-fraction-curve-name}
 
@@ -8655,7 +8663,7 @@ This field is the name of a separate performance curve object that parameterizes
 
 \paragraph{Field: Discharge Only Mode Energy Input Ratio Function of Temperature Curve Name}\label{field-discharge-only-mode-energy-input-ratio-function-of-temperature-curve-name}
 
-This field is the name of a separate performance curve object that parameterizes the variation of the energy input ratio (EIR) for discharging as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, and (2) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on two independent variables, x and y, including: \hyperref[curvebiquadratic]{Curve:Biquadratic}, \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables}, \hyperref[curvebicubic]{Curve:Bicubic}, and \hyperref[curvequadraticlinear]{Curve:QuadraticLinear}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values are the state of the TES tank which are the tank s temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C and y = 0.5 for Ice storage type or y = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of this curve is multiplied by the inverse of the Discharge Only Mode Rated COP to model electric energy consumption at temperatures away from the rating point. This field is required if Discharge Only Mode is available.
+This field is the name of a separate performance curve object that parameterizes the variation of the energy input ratio (EIR) for discharging as a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, and (2) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on two independent variables, x and y, including: \hyperref[curvebiquadratic]{Curve:Biquadratic}, \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables}, \hyperref[curvebicubic]{Curve:Bicubic}, and \hyperref[curvequadraticlinear]{Curve:QuadraticLinear}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values are the state of the TES tank which are the tank's temperature for water or fluid storage type or the storage fraction for ice storage types. The performance curve is normalized to have the value of 1.0 at the rating point which is defined to be x = 19.4 °C and y = 0.5 for Ice storage type or y = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of this curve is multiplied by the inverse of the Discharge Only Mode Rated COP to model electric energy consumption at temperatures away from the rating point. This field is required if Discharge Only Mode is available.
 
 \paragraph{Field: Discharge Only Mode Energy Input Ratio Function of Flow Fraction Curve Name}\label{field-discharge-only-mode-energy-input-ratio-function-of-flow-fraction-curve-name}
 
@@ -8671,7 +8679,7 @@ This field is the name of a separate performance curve object that parameterizes
 
 For a curve or table with two independent variables the SHR is a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil and (2) the drybulb temperature of the air entering the evaporator section. The performance curve can be any curve or table based on two independent variables, x and y, including: \hyperref[curvebiquadratic]{Curve:Biquadratic}, \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables}, \hyperref[curvebicubic]{Curve:Bicubic}, and \hyperref[curvequadraticlinear]{Curve:QuadraticLinear}. The x values for the performance curve are the wetbulb temperature of air entering the evaporator section. The y values for the performance curve are the drybulb temperature of air entering the evaporator section.
 
-For a curve or table with three independent variables the SHR is a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the evaporator section and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x and y values for the curve are the same as for two independent variables while the z values are the state of the TES tank which are the tank s temperature for water or fluid storage type or the storage fraction for ice storage types.
+For a curve or table with three independent variables the SHR is a function of (1) the wetbulb temperature of air entering the evaporator section of the TES coil, (2) the drybulb temperature of the air entering the evaporator section and (3) the state of TES tank (in C or fraction). The performance curve can be any curve or table based on three independent variables, x, y, and z, including: \hyperref[curvetriquadratic]{Curve:Triquadratic} and \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup}. The x and y values for the curve are the same as for two independent variables while the z values are the state of the TES tank which are the tank's temperature for water or fluid storage type or the storage fraction for ice storage types.
 
 The performance curve is normalized to have a value of 1.0 at the rating point which is defined to be x = 19.4 °C, y = 26.7 °C, and z = 0.5 for Ice storage type or z = Fluid Storage Tank Rating Temperature when storage type is Water or UserDefinedFluidType. The result of the curve is multiplied by the Discharge Only Mode Rated Sensible Heat Ratio to model the SHR at coil entering temperatures that differ from the rating point. This field is required if Discharge Only Mode is available.
 
@@ -8914,13 +8922,13 @@ These are the power and energy outputs associated with Cold Weather Operation An
 
 \paragraph{Cooling Coil Thermal Storage Mechanical Heat Transfer Energy {[}J{]}}\label{cooling-coil-thermal-storage-mechanical-heat-transfer-energy-j}
 
-These are the power and energy outputs for the coil s heat exchange with the TES tank, in Watts and Joules respectively. The sign convection is that negative values are cooling the TES tank, or charging it, and positive values are heating the TES tank, or discharging. This heat transfer is driven by the mechanical systems used inside the package to charge or discharge the TES tank.
+These are the power and energy outputs for the coil's heat exchange with the TES tank, in Watts and Joules respectively. The sign convection is that negative values are cooling the TES tank, or charging it, and positive values are heating the TES tank, or discharging. This heat transfer is driven by the mechanical systems used inside the package to charge or discharge the TES tank.
 
 \paragraph{Cooling Coil Thermal Storage Ambient Heat Transfer Rate {[}W{]}}\label{cooling-coil-thermal-storage-ambient-heat-transfer-rate-w}
 
 \paragraph{Cooling Coil Thermal Storage Ambient Heat Transfer Energy {[}J{]}}\label{cooling-coil-thermal-storage-ambient-heat-transfer-energy-j}
 
-These are the power and energy outputs for the TES tank s heat exchange with the surrounding ambient conditions, in Watts and Joules respectively. The sign convection is that negative values are cooling the TES tank, or charging it, and positive values are heating the TES tank, or discharging. This heat transfer is driven by the temperature difference between the media in the tank and the surrounding ambient and is governed by the UA factor.
+These are the power and energy outputs for the TES tank's heat exchange with the surrounding ambient conditions, in Watts and Joules respectively. The sign convection is that negative values are cooling the TES tank, or charging it, and positive values are heating the TES tank, or discharging. This heat transfer is driven by the temperature difference between the media in the tank and the surrounding ambient and is governed by the UA factor.
 
 \paragraph{Cooling Coil Ice Thermal Storage End Fraction {[]}}\label{cooling-coil-ice-thermal-storage-end-fraction}
 
@@ -8962,7 +8970,7 @@ This output is the electricity consumption of the basin heater, in Joules. This 
 
 \paragraph{Cooling Coil Thermal Storage Plant Heat Transfer Energy {[}J{]}}\label{cooling-coil-thermal-storage-plant-heat-transfer-energy-j}
 
-These are the power and energy outputs for the TES tank s heat exchange with the plant loop, in Watts and Joules respectively. This output is only available if the plant connection to the tank is used. The sign convection is that negative values are cooling the TES tank, or charging it, and positive values are heating the TES tank, or discharging. This heat transfer is driven by the temperature difference between the media in the tank and the plant loop fluid and is governed by the effectiveness and plant fluid mass flow rate.
+These are the power and energy outputs for the TES tank's heat exchange with the plant loop, in Watts and Joules respectively. This output is only available if the plant connection to the tank is used. The sign convection is that negative values are cooling the TES tank, or charging it, and positive values are heating the TES tank, or discharging. This heat transfer is driven by the temperature difference between the media in the tank and the plant loop fluid and is governed by the effectiveness and plant fluid mass flow rate.
 
 \subsection{Secondary Coils of DX System and Heat Pump}\label{secondary-coils-of-dx-system-and-heat-pump}
 
