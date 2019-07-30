@@ -288,6 +288,10 @@ TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingThroughFields)
                                       {{"field", "For: AllDays"}},
                                       {{"field", "Until: 24:00"}},
                                       {{"field", 24}},
+                                      {{"field", "Through: 12/1"}}, // single digit day
+                                      {{"field", "For: AllDays"}},
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 22}},
                                       {{"field", "Through:   12/31"}}, // extra space between Through: and date
                                       {{"field", "For: AllDays"}},
                                       {{"field", "Until: 24:00"}},
@@ -295,7 +299,7 @@ TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingThroughFields)
                                   });
         Scheduling::ScheduleCompact compact;
         compact.processFields(fields);
-        EXPECT_EQ(2u, compact.throughs.size());
+        EXPECT_EQ(3u, compact.throughs.size());
     }
     {
         nlohmann::json fields =
@@ -470,6 +474,41 @@ TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingForFields)
         Scheduling::ScheduleCompact compact;
         compact.processFields(fields);
         EXPECT_EQ(2u, compact.throughs.front().fors.size());
+    }
+    {
+        // diverse key mix
+        nlohmann::json fields =
+            nlohmann::json::array({
+                                      {{"field", "Through: 12/31"}},
+                                      {{"field", "For: WeekDays SummerDesignDay CustomDay1 CustomDay2"}},
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 24}},
+                                      {{"field", "For: Weekends WinterDesignDay Holiday"}},
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 24}}
+                                  });
+        Scheduling::ScheduleCompact compact;
+        compact.processFields(fields);
+        EXPECT_EQ(2u, compact.throughs.front().fors.size());
+    }
+    {
+        // allotherdays with other keys
+        nlohmann::json fields =
+            nlohmann::json::array({
+                                      {{"field", "Through: 12/31"}},
+                                      {{"field", "For: SummerDesignDay"}},
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 24}},
+                                      {{"field", "For: WinterDesignDay"}},
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 22}},
+                                      {{"field", "For: Weekday Saturday Sunday Holidays AllOtherDays"}},
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 20}}
+                                  });
+        Scheduling::ScheduleCompact compact;
+        compact.processFields(fields);
+        EXPECT_EQ(3u, compact.throughs.front().fors.size());
     }
     {
         nlohmann::json fields =

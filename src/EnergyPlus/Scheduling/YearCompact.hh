@@ -63,28 +63,28 @@ struct Until {
 };
 
 enum class DayType {
-    // These first 14 are plain single day IDs and make up the bitset length
+    // These first 12 are plain single day IDs and make up the bitset length
     SUMMERDESIGNDAY = 0,
     WINTERDESIGNDAY = 1,
     HOLIDAYS = 2,
-    WEEKDAYS = 3,
-    WEEKENDS = 4,
-    SUNDAY = 5,
-    MONDAY = 6,
-    TUESDAY = 7,
-    WEDNESDAY = 8,
-    THURSDAY = 9,
-    FRIDAY = 10,
-    SATURDAY = 11,
-    CUSTOMDAY1 = 12,
-    CUSTOMDAY2 = 13,
+    SUNDAY = 3,
+    MONDAY = 4,
+    TUESDAY = 5,
+    WEDNESDAY = 6,
+    THURSDAY = 7,
+    FRIDAY = 8,
+    SATURDAY = 9,
+    CUSTOMDAY1 = 10,
+    CUSTOMDAY2 = 11,
     // These two don't count for the bitset length
+    WEEKDAYS = 12,
+    WEEKENDS = 13,
     ALLDAYS = 14,
     ALLOTHERDAYS = 15,
     // And this is just a dummy value
     UNKNOWN = 16
 };
-int const NumDayTypeBits = 14;
+int const NumDayTypeBits = 12;
 
 struct For {
     Scheduling::Interpolation interpolate = Scheduling::Interpolation::NONE;

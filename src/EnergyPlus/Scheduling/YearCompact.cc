@@ -315,7 +315,7 @@ int ScheduleCompact::processThroughFieldValue(std::string const &s)
         EnergyPlus::ShowFatalError("Blank value on Through: field for Schedule:Compact named " + this->name);
     }
     // check that it matches the right pattern
-    std::regex re("[0-9]?[0-9]\\/[0-9][0-9]");
+    std::regex re("[0-9]?[0-9]\\/[0-9][0-9]?");
     std::smatch m;
     if (!std::regex_match(s, m, re)) { // I expect one single match, and needs to apply to whole string, so just regex_match, not regex_search
         EnergyPlus::ShowFatalError("Invalid value on Through: field for Schedule:Compact named " + this->name + "; invalid input value: " + s);
@@ -324,10 +324,10 @@ int ScheduleCompact::processThroughFieldValue(std::string const &s)
     std::string sMonth, sDay;
     if (s[1] == '/') {
         sMonth = s.substr(0, 1);
-        sDay = s.substr(2, 2);
+        sDay = s.substr(2, s.size() - 2);
     } else { // must be MM/DD if it passed the regex above
         sMonth = s.substr(0, 2);
-        sDay = s.substr(3, 2);
+        sDay = s.substr(3, s.size() - 3);
     }
     int month = std::stoi(sMonth);
     int day = std::stoi(sDay);
@@ -401,37 +401,37 @@ int ScheduleCompact::processUntilFieldValue(std::string const &s)
 
 DayType ScheduleCompact::getDayTypeFromString(const std::string &s)
 {
-    if (s == "WEEKDAYS") {
+    if (s == "WEEKDAY" || s == "WEEKDAYS") {
         return DayType::WEEKDAYS;
-    } else if (s == "WEEKENDS") {
+    } else if (s == "WEEKEND" || s == "WEEKENDS") {
         return DayType::WEEKENDS;
-    } else if (s == "HOLIDAYS") {
+    } else if (s == "HOLIDAY" || s == "HOLIDAYS") {
         return DayType::HOLIDAYS;
-    } else if (s == "ALLDAYS") {
+    } else if (s == "ALLDAY" || s == "ALLDAYS") {
         return DayType::ALLDAYS;
-    } else if (s == "SUMMERDESIGNDAY") {
+    } else if (s == "SUMMERDESIGNDAY" || s == "SUMMERDESIGNDAYS") {
         return DayType::SUMMERDESIGNDAY;
-    } else if (s == "WINTERDESIGNDAY") {
+    } else if (s == "WINTERDESIGNDAY" || s == "WINTERDESIGNDAYS") {
         return DayType::WINTERDESIGNDAY;
-    } else if (s == "SUNDAY") {
+    } else if (s == "SUNDAY" || s == "SUNDAYS") {
         return DayType::SUNDAY;
-    } else if (s == "MONDAY") {
+    } else if (s == "MONDAY" || s == "MONDAYS") {
         return DayType::MONDAY;
-    } else if (s == "TUESDAY") {
+    } else if (s == "TUESDAY" || s == "TUESDAYS") {
         return DayType::TUESDAY;
-    } else if (s == "WEDNESDAY") {
+    } else if (s == "WEDNESDAY" || s == "WEDNESDAYS") {
         return DayType::WEDNESDAY;
-    } else if (s == "THURSDAY") {
+    } else if (s == "THURSDAY" || s == "THURSDAYS") {
         return DayType::THURSDAY;
-    } else if (s == "FRIDAY") {
+    } else if (s == "FRIDAY" || s == "FRIDAYS") {
         return DayType::FRIDAY;
-    } else if (s == "SATURDAY") {
+    } else if (s == "SATURDAY" || s == "SATURDAYS") {
         return DayType::SATURDAY;
     } else if (s == "CUSTOMDAY1") {
         return DayType::CUSTOMDAY1;
     } else if (s == "CUSTOMDAY2") {
         return DayType::CUSTOMDAY2;
-    } else if (s == "ALLOTHERDAYS") {
+    } else if (s == "ALLOTHERDAY" || s == "ALLOTHERDAYS") {
         return DayType::ALLOTHERDAYS;
     } else {
         return DayType::UNKNOWN;
@@ -472,7 +472,7 @@ void ScheduleCompact::processForFieldValue(const std::vector<std::string> &keys,
         case DayType::ALLDAYS:
             bits.set();
             break;
-        case DayType::ALLOTHERDAYS: // can't be on the first For:, also can it be with other day types?
+        case DayType::ALLOTHERDAYS:
             thisFor.hasAllOtherDays = true;
             break;
         case DayType::UNKNOWN:
