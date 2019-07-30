@@ -380,9 +380,10 @@ namespace StandardRatings {
 
                     ChillerEIRFT = CurveValue(EIRFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
 
-                    if (ReducedPLR(RedCapNum) >= MinUnloadRat) {
-                        ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, ReducedPLR(RedCapNum));
-                        PartLoadRatio = ReducedPLR(RedCapNum);
+                    PartLoadRatio = ReducedPLR(RedCapNum) / ChillerCapFT;
+
+                    if (PartLoadRatio >= MinUnloadRat) {
+                        ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, PartLoadRatio);
                     } else {
                         ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, MinUnloadRat);
                         PartLoadRatio = MinUnloadRat;
@@ -428,9 +429,10 @@ namespace StandardRatings {
 
                     ChillerEIRFT = CurveValue(EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
 
-                    if (ReducedPLR(RedCapNum) >= MinUnloadRat) {
-                        ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, CondenserOutletTemp, ReducedPLR(RedCapNum));
-                        PartLoadRatio = ReducedPLR(RedCapNum);
+                    PartLoadRatio = ReducedPLR(RedCapNum) / ChillerCapFT;
+
+                    if (PartLoadRatio >= MinUnloadRat) {
+                        ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio);
                     } else {
                         ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, CondenserOutletTemp, MinUnloadRat);
                         PartLoadRatio = MinUnloadRat;
