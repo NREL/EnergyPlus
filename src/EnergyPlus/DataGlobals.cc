@@ -261,7 +261,6 @@ namespace DataGlobals {
     bool AnyBasementsInModel(false);     // true if there are any basements in the input file
     // Performance tradeoff globals
     bool DoCoilDirectSolutions(false);       //true if use coil direction solutions
-    bool UseCachedUtilityFunctions(false);   //true if use the cached version for utility functions including psychrometrics and glycol specific calculations
 
     int Progress(0); // current progress (0-100)
     void (*fProgressPtr)(int const);
@@ -360,7 +359,6 @@ namespace DataGlobals {
         AnySlabsInModel = false;
         AnyBasementsInModel = false;
         DoCoilDirectSolutions = false;
-        UseCachedUtilityFunctions = false;
         Progress = 0;
         eso_stream = nullptr;
         mtr_stream = nullptr;

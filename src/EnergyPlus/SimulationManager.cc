@@ -1150,14 +1150,9 @@ namespace SimulationManager {
             DoWeathSim = true;
         }
 
-        if (ErrorsFound) {
-            ShowFatalError("Errors found getting Project Input");
-        }
-
         CurrentModuleObject = "PerformancePrecisionTradeoffs";
-        NumRunControl = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (NumRunControl > 0) {
-            RunControlInInput = true;
+        int PerfPrecTradeoffs = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        if (PerfPrecTradeoffs > 0) {
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           1,
                                           Alphas,
@@ -1170,9 +1165,6 @@ namespace SimulationManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             if (Alphas(1) == "YES") DoCoilDirectSolutions = true;
-            if (NumAlpha > 1) {
-                if (Alphas(2) == "YES") UseCachedUtilityFunctions = true;
-            }
         }
 
         if (ErrorsFound) {
