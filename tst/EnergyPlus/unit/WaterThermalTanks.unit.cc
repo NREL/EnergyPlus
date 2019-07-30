@@ -2025,7 +2025,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     }
     Real64 Cp = FluidProperties::GetSpecificHeatGlycol("WATER", 60.0, DummyIndex, "StratifiedTankCalcNoDraw");
     TankNodeEnergy *= Cp;
-    EXPECT_NEAR(Tank.NetHeatTransferRate * SecInTimeStep, TankNodeEnergy, fabs(TankNodeEnergy * 0.0003));
+    EXPECT_NEAR(Tank.NetHeatTransferRate * SecInTimeStep, TankNodeEnergy, fabs(TankNodeEnergy * 0.0001));
 
     EXPECT_TRUE(Tank.HeaterOn1);
     EXPECT_FALSE(Tank.HeaterOn2);
