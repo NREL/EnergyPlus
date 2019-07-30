@@ -249,6 +249,36 @@ TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingBadFieldTypes)
     }
 }
 
+TEST_F(SchedulingTestFixture, TestLeapYearInThroughs)
+{
+    nlohmann::json fields =
+        nlohmann::json::array({
+                                  {{"field", "Through: 1/31"}}, // includes leap year data
+                                  {{"field", "For: AllDays"}},
+                                  {{"field", "Until: 24:00"}},
+                                  {{"field", 24}},
+                                  {{"field", "Through: 02/29"}}, // includes leap year data
+                                  {{"field", "For: AllDays"}},
+                                  {{"field", "Until: 24:00"}},
+                                  {{"field", 24}},
+                                  {{"field", "Through: 03/31"}}, // includes leap year data
+                                  {{"field", "For: AllDays"}},
+                                  {{"field", "Until: 24:00"}},
+                                  {{"field", 24}},
+                                  {{"field", "Through: 06/21"}}, // includes leap year data
+                                  {{"field", "For: AllDays"}},
+                                  {{"field", "Until: 24:00"}},
+                                  {{"field", 24}},
+                                  {{"field", "Through: 12/31"}},
+                                  {{"field", "For: AllDays"}},
+                                  {{"field", "Until: 24:00"}},
+                                  {{"field", 24}}
+                              });
+    Scheduling::ScheduleCompact compact;
+    compact.processFields(fields);
+    EXPECT_EQ(5u, compact.throughs.size());
+}
+
 TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingThroughFields)
 {
     {
@@ -424,30 +454,63 @@ TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingUntilFields)
     }
 }
 
-//TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingForFields)
-//{
-//    {
-//        // With linear interpolation entry
-//        nlohmann::json fields =
-//            nlohmann::json::array({
-//                                      {{"field", "Through: 12/31"}},
-//                                      {{"field", "For: "}},
-//                                      {{"field", "Until: 24:00"}},
-//                                      {{"field", 24}}});
-//        Scheduling::ScheduleCompact compact;
-//        ASSERT_THROW(compact.processFields(fields), std::runtime_error);
-//    }
-//    {
-//        // With intentional NO interpolation entry
-//        nlohmann::json fields =
-//            nlohmann::json::array({
-//                                      {{"field", "Through: 17/AB"}}, // TODO: This should cause a failure
-//                                      {{"field", "For: AllDays"}},
-//                                      {{"field", 24}}, // encounter Value outside of an Until
-//                                      {{"field", "Until: 24:00"}}});
-//        Scheduling::ScheduleCompact compact;
-//        ASSERT_THROW(compact.processFields(fields), std::runtime_error);
-//    }
-//}
+TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingForFields)
+{
+    {
+        nlohmann::json fields =
+            nlohmann::json::array({
+                                      {{"field", "Through: 12/31"}},
+                                      {{"field", "For: Sunday"}},
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 24}},
+                                      {{"field", "For: AllOtherDays"}},
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 24}}
+            });
+        Scheduling::ScheduleCompact compact;
+        compact.processFields(fields);
+        EXPECT_EQ(2u, compact.throughs.front().fors.size());
+    }
+    {
+        nlohmann::json fields =
+            nlohmann::json::array({
+                                      {{"field", "Through: 12/31"}},
+                                      {{"field", "For: "}}, // missing For name
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 24}}});
+        Scheduling::ScheduleCompact compact;
+        ASSERT_THROW(compact.processFields(fields), std::runtime_error);
+    }
+    {
+        nlohmann::json fields =
+            nlohmann::json::array({
+                                      {{"field", "Through: 12/31"}},
+                                      {{"field", "For: BADKEY"}}, // bad key
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 24}}});
+        Scheduling::ScheduleCompact compact;
+        ASSERT_THROW(compact.processFields(fields), std::runtime_error);
+    }
+    {
+        nlohmann::json fields =
+            nlohmann::json::array({
+                                      {{"field", "Through: 12/31"}},
+                                      {{"field", "For: AllOtherDays"}}, // found AllOtherDays on first entry
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 24}}});
+        Scheduling::ScheduleCompact compact;
+        ASSERT_THROW(compact.processFields(fields), std::runtime_error);
+    }
+    {
+        nlohmann::json fields =
+            nlohmann::json::array({
+                                      {{"field", "Through: 12/31"}},
+                                      {{"field", "For: Sundays"}}, // insufficient coverage
+                                      {{"field", "Until: 24:00"}},
+                                      {{"field", 24}}});
+        Scheduling::ScheduleCompact compact;
+        ASSERT_THROW(compact.processFields(fields), std::runtime_error);
+    }
+}
 
 }

@@ -48,6 +48,7 @@
 #ifndef SRC_ENERGYPLUS_SCHEDULING_YEARCOMPACT_HH
 #define SRC_ENERGYPLUS_SCHEDULING_YEARCOMPACT_HH
 
+#include <bitset>
 #include <vector>
 
 #include <EnergyPlus.hh>
@@ -61,9 +62,34 @@ struct Until {
     Real64 value;
 };
 
+enum class DayType {
+    // These first 14 are plain single day IDs and make up the bitset length
+    SUMMERDESIGNDAY = 0,
+    WINTERDESIGNDAY = 1,
+    HOLIDAYS = 2,
+    WEEKDAYS = 3,
+    WEEKENDS = 4,
+    SUNDAY = 5,
+    MONDAY = 6,
+    TUESDAY = 7,
+    WEDNESDAY = 8,
+    THURSDAY = 9,
+    FRIDAY = 10,
+    SATURDAY = 11,
+    CUSTOMDAY1 = 12,
+    CUSTOMDAY2 = 13,
+    // These two don't count for the bitset length
+    ALLDAYS = 14,
+    ALLOTHERDAYS = 15,
+    // And this is just a dummy value
+    UNKNOWN = 16
+};
+int const NumDayTypeBits = 14;
+
 struct For {
     Scheduling::Interpolation interpolate = Scheduling::Interpolation::NONE;
-    std::vector<std::string> days; // TODO: Handle day types and such
+    std::bitset<NumDayTypeBits> days;
+    bool hasAllOtherDays = false;
     std::vector<Until> untils;
 };
 
@@ -103,11 +129,14 @@ struct ScheduleCompact : ScheduleBase
     void processFields(nlohmann::json const &fieldWiseData);
     static std::string trimCompactFieldValue(std::string const &);
     int processThroughFieldValue(std::string const &);
+    void processForFieldValue(const std::vector<std::string>& keys, Scheduling::For &);
     int processUntilFieldValue(std::string const &);
     bool validateContinuity();
+    static DayType getDayTypeFromString(const std::string& s);
 
     // member variables
     std::vector<Through> throughs;
+    bool includesLeapYearData = false;
 };
 
 extern std::vector<ScheduleCompact> scheduleCompacts;

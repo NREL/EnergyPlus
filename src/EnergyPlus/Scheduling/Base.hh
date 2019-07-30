@@ -115,10 +115,12 @@ std::vector<std::string> const typeLimitUnitTypes({"Dimensionless",
                                                    "Control",
                                                    "Mode"});
 
-inline int getScheduleTime(int yearNum, int monthNum, int dayNum, int hourNum, int minuteNum, int secondNum)
+inline int getScheduleTime(int yearNum, int monthNum, int dayNum, int hourNum, int minuteNum, int secondNum, bool const leapYearDataFound)
 {
-    // TODO: Handle leap year (and daylight savings?)
-    static const std::vector<int> cumulativeSecondsInMonthsNonLeap{
+    // This function is a bit naive with leap years - if you end a non-leap-year but give it the date 2/29, it will still calculate the
+    // end of january plus 29 days worth of time.  This is for efficiency, trying to eliminate as much logic as possible
+    // TODO: Handle daylight savings?
+    std::vector<int> cumulativeSecondsInMonthsNonLeap{
         0,        // end of month 0
         2678400,  // end of jan
         5097600,  // end of feb
@@ -133,6 +135,11 @@ inline int getScheduleTime(int yearNum, int monthNum, int dayNum, int hourNum, i
         28857600, // end of nov
         31536000  // end of dec
     };
+    if (leapYearDataFound) {
+        for (int m = 2; m <= monthNum; m++) { // no need to overwrite all the months, just how far along we are in the year
+            cumulativeSecondsInMonthsNonLeap[m] += 86400;
+        }
+    }
     int const fromYears = 31536000 * (yearNum - 1);
     int const fromMonths = cumulativeSecondsInMonthsNonLeap[monthNum - 1];
     int const fromDays = 86400 * (dayNum - 1);

@@ -135,16 +135,27 @@ ScheduleCompact::ScheduleCompact(std::string const &objectName, nlohmann::json c
 bool ScheduleCompact::validateContinuity() //  TODO: This function should be renamed and also adapt the input structure into the final TS,Val vectors
 {
     int lastThroughTime = -1;
-    for (auto const & thisThrough : this->throughs) {
+    for (auto const &thisThrough : this->throughs) {
         if (thisThrough.timeStamp <= lastThroughTime) {
             EnergyPlus::ShowFatalError("Invalid sequence of Through timestamps for Schedule:Compact = " + this->name);
         }
         lastThroughTime = thisThrough.timeStamp;
         // std::vector<DayTypes> or something like this
-        for (auto const & thisFor : thisThrough.fors) {
-            // collect all the day types in all the Fors
+        if (thisThrough.fors.front().hasAllOtherDays) {
+            EnergyPlus::ShowFatalError("AllOtherDays used in first For: field for Schedule:Compact = " + this->name);
+        }
+        std::bitset<Scheduling::NumDayTypeBits> runningTally;
+        for (auto const &thisFor : thisThrough.fors) {
+            if ((runningTally & thisFor.days).any()) {
+                EnergyPlus::ShowFatalError("Duplicate days found in For: field for Schedule:Compact = " + this->name);
+            }
+            if (thisFor.hasAllOtherDays) {
+                runningTally.set();
+            } else {
+                runningTally |= thisFor.days;
+            }
             int lastUntilTime = -1;
-            for (auto const & thisUntil : thisFor.untils) {
+            for (auto const &thisUntil : thisFor.untils) {
                 if (thisUntil.time <= lastUntilTime) {
                     EnergyPlus::ShowFatalError("Invalid sequence of Until timestamps for Schedule:Compact = " + this->name);
                 }
@@ -154,16 +165,23 @@ bool ScheduleCompact::validateContinuity() //  TODO: This function should be ren
                 EnergyPlus::ShowFatalError("Invalid Until timestamps, they do not reach the end of the day for Schedule:Compact = " + this->name);
             }
         }
-        // check to make sure all possible day types are covered in this Through
+        if (!runningTally.all()) {
+            EnergyPlus::ShowFatalError("Insufficient day coverage in For: fields for Schedule:Compact = " + this->name);
+        }
     }
     // check final through to make sure we hit the end of the year
-    if (this->throughs.back().timeStamp != 31449600) { // magic number is midnight morning on 12/31 TODO: Handle leap year
+    int midnightMorningLastDayOfYear = 31449600;
+    if (this->includesLeapYearData) {
+        midnightMorningLastDayOfYear += 86400;
+    }
+    if (this->throughs.back().timeStamp != midnightMorningLastDayOfYear) {
         EnergyPlus::ShowFatalError("Invalid Through timestamps, they do not reach the end of the year for Schedule:Compact = " + this->name);
     }
     return true;
 }
 
-void ScheduleCompact::processFields(nlohmann::json const &fieldWiseData) {
+void ScheduleCompact::processFields(nlohmann::json const &fieldWiseData)
+{
     std::map<FieldType, std::vector<FieldType>> validNextFieldTypes = {
         {FieldType::THROUGH, {FieldType::FOR}},
         {FieldType::FOR, {FieldType::UNTIL, FieldType::INTERPOLATE}},
@@ -185,9 +203,7 @@ void ScheduleCompact::processFields(nlohmann::json const &fieldWiseData) {
     }
 }
 
-FieldType ScheduleCompact::processSingleField(FieldType lastFieldType,
-                                                      nlohmann::json datum,
-                                                      std::vector<FieldType> const &validFieldTypes)
+FieldType ScheduleCompact::processSingleField(FieldType lastFieldType, nlohmann::json datum, std::vector<FieldType> const &validFieldTypes)
 {
     try {
         std::string possibleString = datum.at("field");
@@ -211,7 +227,7 @@ FieldType ScheduleCompact::processSingleField(FieldType lastFieldType,
             auto theseDayTypes = ScheduleCompact::trimCompactFieldValue(possibleString.substr(3));
             std::istringstream iss(theseDayTypes);
             std::vector<std::string> results(std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>());
-            this->throughs.back().fors.back().days = results;
+            this->processForFieldValue(results, this->throughs.back().fors.back());
         } else if (possibleString.compare(0, 11, "INTERPOLATE") == 0) {
             lastFieldType = FieldType::INTERPOLATE;
             if (std::find(validFieldTypes.begin(), validFieldTypes.end(), lastFieldType) == validFieldTypes.end()) {
@@ -339,15 +355,16 @@ int ScheduleCompact::processThroughFieldValue(std::string const &s)
             EnergyPlus::ShowFatalError("Out of range day (" + sDay + ") for month " + sMonth + " for Schedule:Compact " + this->name);
         }
         break;
-    default:  // will be month 2
-        if (day < 1 || day > 28) { // TODO: Handle leap year
+    default:                       // will be month 2
+        if (day == 29) {
+            this->includesLeapYearData = true;
+        } else if (day < 1 || day > 29) {
             EnergyPlus::ShowFatalError("Out of range day (" + sDay + ") for month " + sMonth + " for Schedule:Compact " + this->name);
         }
         break;
     }
-    return Scheduling::getScheduleTime(1, month, day, 0, 0, 0);  // TODO: Handle multiple years
+    return Scheduling::getScheduleTime(1, month, day, 0, 0, 0, this->includesLeapYearData); // TODO: Handle multiple years
 }
-
 
 int ScheduleCompact::processUntilFieldValue(std::string const &s)
 {
@@ -379,7 +396,89 @@ int ScheduleCompact::processUntilFieldValue(std::string const &s)
     if (minute < 0 || minute > 59) {
         EnergyPlus::ShowFatalError("Out of range minute (" + sMinute + ") for Schedule:Compact " + this->name);
     }
-    return Scheduling::getScheduleTime(1, 1, 1, hour, minute, 0);  // TODO: Handle multiple years ALSO Make a more efficient routine for time-only
+    return Scheduling::getScheduleTime(1, 1, 1, hour, minute, 0, this->includesLeapYearData); // TODO: Make a more efficient routine for time-only
+}
+
+DayType ScheduleCompact::getDayTypeFromString(const std::string &s)
+{
+    if (s == "WEEKDAYS") {
+        return DayType::WEEKDAYS;
+    } else if (s == "WEEKENDS") {
+        return DayType::WEEKENDS;
+    } else if (s == "HOLIDAYS") {
+        return DayType::HOLIDAYS;
+    } else if (s == "ALLDAYS") {
+        return DayType::ALLDAYS;
+    } else if (s == "SUMMERDESIGNDAY") {
+        return DayType::SUMMERDESIGNDAY;
+    } else if (s == "WINTERDESIGNDAY") {
+        return DayType::WINTERDESIGNDAY;
+    } else if (s == "SUNDAY") {
+        return DayType::SUNDAY;
+    } else if (s == "MONDAY") {
+        return DayType::MONDAY;
+    } else if (s == "TUESDAY") {
+        return DayType::TUESDAY;
+    } else if (s == "WEDNESDAY") {
+        return DayType::WEDNESDAY;
+    } else if (s == "THURSDAY") {
+        return DayType::THURSDAY;
+    } else if (s == "FRIDAY") {
+        return DayType::FRIDAY;
+    } else if (s == "SATURDAY") {
+        return DayType::SATURDAY;
+    } else if (s == "CUSTOMDAY1") {
+        return DayType::CUSTOMDAY1;
+    } else if (s == "CUSTOMDAY2") {
+        return DayType::CUSTOMDAY2;
+    } else if (s == "ALLOTHERDAYS") {
+        return DayType::ALLOTHERDAYS;
+    } else {
+        return DayType::UNKNOWN;
+    }
+}
+
+void ScheduleCompact::processForFieldValue(const std::vector<std::string> &keys, Scheduling::For &thisFor)
+{
+    auto &bits = thisFor.days;
+    for (auto const &key : keys) {
+        auto dayType = ScheduleCompact::getDayTypeFromString(key);
+        switch (dayType) {
+        case DayType::WEEKDAYS:
+            bits.set((int)DayType::MONDAY);
+            bits.set((int)DayType::TUESDAY);
+            bits.set((int)DayType::WEDNESDAY);
+            bits.set((int)DayType::THURSDAY);
+            bits.set((int)DayType::FRIDAY);
+            break;
+        case DayType::WEEKENDS:
+            bits.set((int)DayType::SUNDAY);
+            bits.set((int)DayType::SATURDAY);
+            break;
+        case DayType::SUMMERDESIGNDAY:
+        case DayType::WINTERDESIGNDAY:
+        case DayType::HOLIDAYS:
+        case DayType::SUNDAY:
+        case DayType::MONDAY:
+        case DayType::TUESDAY:
+        case DayType::WEDNESDAY:
+        case DayType::THURSDAY:
+        case DayType::FRIDAY:
+        case DayType::SATURDAY:
+        case DayType::CUSTOMDAY1:
+        case DayType::CUSTOMDAY2:
+            bits.set((int)dayType);
+            break;
+        case DayType::ALLDAYS:
+            bits.set();
+            break;
+        case DayType::ALLOTHERDAYS: // can't be on the first For:, also can it be with other day types?
+            thisFor.hasAllOtherDays = true;
+            break;
+        case DayType::UNKNOWN:
+            EnergyPlus::ShowFatalError("Bad key type in For field of Schedule:Compact = " + this->name);
+        }
+    }
 }
 
 } // namespace Scheduling

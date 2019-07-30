@@ -94,16 +94,35 @@ TEST_F(SchedulingTestFixture, SchedulingManager_TestGetScheduleReference) {
 
 TEST_F(SchedulingTestFixture, SchedulingManager_TestGetScheduleTime) {
     auto & seconds = Scheduling::getScheduleTime;
-    EXPECT_EQ(0, seconds(1, 1, 1, 0, 0, 0)); // very beginning of the sim, time 0
-    EXPECT_EQ(10, seconds(1, 1, 1, 0, 0, 10)); // ten seconds into the year
-    EXPECT_EQ(63, seconds(1, 1, 1, 0, 1, 3)); // an hour and 3 seconds into the year
-    EXPECT_EQ(43200, seconds(1, 1, 1, 12, 0, 0)); // noon, 1/1
-    EXPECT_EQ(86400, seconds(1, 1, 2, 0, 0, 0)); // midnight, 1/2 morning
-    EXPECT_EQ(1756800, seconds(1, 1, 21, 8, 0, 0)); // 8am 1/21 (typical winter design day morning)
-    EXPECT_EQ(2678400, seconds(1, 2, 1, 0, 0, 0)); // midnight, 2/1 morning -- instantaneous end of January
-    EXPECT_EQ(17424000, seconds(1, 7, 21, 16, 0, 0)); // 4pm 7/21 (typical summer design day afternoon)
-    EXPECT_EQ(31535999, seconds(1, 12, 31, 23, 59, 59)); // 1 second to midnight, 12/31
-    EXPECT_EQ(31579200, seconds(2, 1, 1, 12, 0, 0)); // noon, 1/1, YEAR 2
+    bool noLeapYear = false;
+    EXPECT_EQ(0, seconds(1, 1, 1, 0, 0, 0, noLeapYear)); // very beginning of the sim, time 0
+    EXPECT_EQ(10, seconds(1, 1, 1, 0, 0, 10, noLeapYear)); // ten seconds into the year
+    EXPECT_EQ(63, seconds(1, 1, 1, 0, 1, 3, noLeapYear)); // an hour and 3 seconds into the year
+    EXPECT_EQ(43200, seconds(1, 1, 1, 12, 0, 0, noLeapYear)); // noon, 1/1
+    EXPECT_EQ(86400, seconds(1, 1, 2, 0, 0, 0, noLeapYear)); // midnight, 1/2 morning
+    EXPECT_EQ(1756800, seconds(1, 1, 21, 8, 0, 0, noLeapYear)); // 8am 1/21 (typical winter design day morning)
+    EXPECT_EQ(2678400, seconds(1, 2, 1, 0, 0, 0, noLeapYear)); // midnight, 2/1 morning -- instantaneous end of January
+    EXPECT_EQ(17424000, seconds(1, 7, 21, 16, 0, 0, noLeapYear)); // 4pm 7/21 (typical summer design day afternoon)
+    EXPECT_EQ(31535999, seconds(1, 12, 31, 23, 59, 59, noLeapYear)); // 1 second to midnight, 12/31
+    EXPECT_EQ(31579200, seconds(2, 1, 1, 12, 0, 0, noLeapYear)); // noon, 1/1, YEAR 2
+}
+
+TEST_F(SchedulingTestFixture, SchedulingManager_TestGetScheduleTimeLeapYear) {
+    auto & seconds = Scheduling::getScheduleTime;
+    bool leapYear = true;
+    EXPECT_EQ(0, seconds(1, 1, 1, 0, 0, 0, leapYear)); // very beginning of the sim, time 0
+    EXPECT_EQ(10, seconds(1, 1, 1, 0, 0, 10, leapYear)); // ten seconds into the year
+    EXPECT_EQ(63, seconds(1, 1, 1, 0, 1, 3, leapYear)); // an hour and 3 seconds into the year
+    EXPECT_EQ(43200, seconds(1, 1, 1, 12, 0, 0, leapYear)); // noon, 1/1
+    EXPECT_EQ(86400, seconds(1, 1, 2, 0, 0, 0, leapYear)); // midnight, 1/2 morning
+    EXPECT_EQ(1756800, seconds(1, 1, 21, 8, 0, 0, leapYear)); // 8am 1/21 (typical winter design day morning)
+    EXPECT_EQ(2678400, seconds(1, 2, 1, 0, 0, 0, leapYear)); // midnight, 2/1 morning -- instantaneous end of January
+    EXPECT_EQ(0, seconds(1, 2, 28, 0, 0, 0, leapYear)); // midnight, 2/28 morning
+    EXPECT_EQ(0, seconds(1, 2, 28, 12, 0, 0, leapYear)); // noon, 2/28
+    EXPECT_EQ(0, seconds(1, 2, 29, 0, 0, 0, leapYear)); // midnight, 2/29 morning
+    EXPECT_EQ(17424000, seconds(1, 7, 21, 16, 0, 0, leapYear)); // 4pm 7/21 (typical summer design day afternoon)
+    EXPECT_EQ(31535999, seconds(1, 12, 31, 23, 59, 59, leapYear)); // 1 second to midnight, 12/31
+    EXPECT_EQ(31579200, seconds(2, 1, 1, 12, 0, 0, leapYear)); // noon, 1/1, YEAR 2
 }
 
 }
