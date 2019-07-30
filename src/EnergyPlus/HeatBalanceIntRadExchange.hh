@@ -90,12 +90,16 @@ namespace HeatBalanceIntRadExchange {
 
     void InitInteriorRadExchange();
 
-    void GetInputViewFactors(std::string const &ZoneName, // Needed to check for user input view factors.
-                             int const N,                 // NUMBER OF SURFACES
-                             Array2A<Real64> F,           // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-                             Array1A_int const SPtr,      // pointer to actual surface number
-                             bool &NoUserInputF,          // Flag signifying no input F's for this
-                             bool &ErrorsFound            // True when errors are found in number of fields vs max args
+    void AlignInputViewFactors(std::string const &cCurrentModuleObject, // Object type
+                               bool &ErrorsFound                        // True when errors are found
+    );
+
+    void GetInputViewFactors(std::string const &EnclosureName, // Needed to check for user input view factors.
+                             int const N,                      // NUMBER OF SURFACES
+                             Array2A<Real64> F,                // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
+                             Array1A_int const SPtr,           // pointer to actual surface number
+                             bool &NoUserInputF,               // Flag signifying no input F's for this
+                             bool &ErrorsFound                 // True when errors are found in number of fields vs max args
     );
 
     void GetInputViewFactorsbyName(std::string const &ZoneName, // Needed to check for user input view factors.

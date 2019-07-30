@@ -378,7 +378,7 @@ namespace SurfaceGeometry {
 
     void SetupShadeSurfacesForSolarCalcs();
 
-    void SetupAirBoundaries(bool &ErrorsFound);   // Set to true if errors found
+    void SetupEnclosuresAndAirBoundaries(bool &ErrorsFound);   // Set to true if errors found
 
     void CheckConvexity(int const SurfNum, // Current surface number
                         int const NSides   // Number of sides to figure

@@ -2056,8 +2056,8 @@ namespace SurfaceGeometry {
 
         GetSurfaceHeatTransferAlgorithmOverrides(ErrorsFound);
 
-        // Process Air Boundaries if any
-        SetupAirBoundaries(ErrorsFound);
+        // Set up enclosures, process Air Boundaries if any
+        SetupEnclosuresAndAirBoundaries(ErrorsFound);
 
         GetSurfaceSrdSurfsData(ErrorsFound);
 
@@ -12613,12 +12613,12 @@ namespace SurfaceGeometry {
         }
     }
 
-    void SetupAirBoundaries(bool &ErrorsFound)
+    void SetupEnclosuresAndAirBoundaries(bool &ErrorsFound)
     {
         bool anyRadiantGroupedZones = false;
         int enclosureNum = 0;
         if (std::any_of(Construct.begin(), Construct.end(), [](DataHeatBalance::ConstructionData const &e) { return e.TypeIsAirBoundary; })) {
-            std::string RoutineName = "SetupAirBoundaries";
+            std::string RoutineName = "SetupEnclosuresAndAirBoundaries";
             int errorCount = 0;
             for (int surfNum = 1; surfNum <= DataSurfaces::TotSurfaces; ++surfNum) {
                 auto &surf(Surface(surfNum));
@@ -12657,19 +12657,23 @@ namespace SurfaceGeometry {
                             thisSideEnclosureNum = enclosureNum;
                             DataViewFactorInformation::ZoneInfo(enclosureNum).ZoneNames.push_back(surf.ZoneName);
                             DataViewFactorInformation::ZoneInfo(enclosureNum).ZoneNums.push_back(surf.Zone);
+                            DataViewFactorInformation::ZoneInfo(enclosureNum).FloorArea+=Zone(surf.Zone).FloorArea;
                             otherSideEnclosureNum = enclosureNum;
                             DataViewFactorInformation::ZoneInfo(enclosureNum).ZoneNames.push_back(Surface(surf.ExtBoundCond).ZoneName);
                             DataViewFactorInformation::ZoneInfo(enclosureNum).ZoneNums.push_back(Surface(surf.ExtBoundCond).Zone);
+                            DataViewFactorInformation::ZoneInfo(enclosureNum).FloorArea += Zone(surf.ExtBoundCond).FloorArea;
                         } else if (thisSideEnclosureNum == 0){
                             // Other side is assigned, so use that one for both
                             thisSideEnclosureNum = otherSideEnclosureNum;
                             DataViewFactorInformation::ZoneInfo(otherSideEnclosureNum).ZoneNames.push_back(surf.ZoneName);
                             DataViewFactorInformation::ZoneInfo(otherSideEnclosureNum).ZoneNums.push_back(surf.Zone);
+                            DataViewFactorInformation::ZoneInfo(otherSideEnclosureNum).FloorArea += Zone(surf.Zone).FloorArea;
                         } else if (otherSideEnclosureNum == 0) {
                             // This side is assigned, so use that one for both
                             otherSideEnclosureNum = thisSideEnclosureNum;
                             DataViewFactorInformation::ZoneInfo(thisSideEnclosureNum).ZoneNames.push_back(Surface(surf.ExtBoundCond).ZoneName);
                             DataViewFactorInformation::ZoneInfo(thisSideEnclosureNum).ZoneNums.push_back(Surface(surf.ExtBoundCond).Zone);
+                            DataViewFactorInformation::ZoneInfo(thisSideEnclosureNum).FloorArea += Zone(surf.ExtBoundCond).FloorArea;
                         } else if (thisSideEnclosureNum != otherSideEnclosureNum) {
                             // This should never happen
                             ShowSevereError(RoutineName + ": Radiant enclosure grouping error for Surface=\"" + surf.Name + "\"." +
@@ -12690,7 +12694,7 @@ namespace SurfaceGeometry {
             for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
                 if(Zone(zoneNum).RadiantEnclosureNum == 0) {
                     ++enclosureNum;
-                    DataViewFactorInformation::ZoneInfo(enclosureNum).Name = "Enclosure "+General::RoundSigDigits(enclosureNum);
+                    DataViewFactorInformation::ZoneInfo(enclosureNum).Name = Zone(zoneNum).Name;
                     Zone(zoneNum).RadiantEnclosureNum = enclosureNum;
                     DataViewFactorInformation::ZoneInfo(enclosureNum).ZoneNames.push_back(Zone(zoneNum).Name);
                     DataViewFactorInformation::ZoneInfo(enclosureNum).ZoneNums.push_back(zoneNum);
@@ -12704,6 +12708,7 @@ namespace SurfaceGeometry {
                 DataViewFactorInformation::ZoneInfo(zoneNum).Name = Zone(zoneNum).Name;
                 DataViewFactorInformation::ZoneInfo(zoneNum).ZoneNames.push_back(Zone(zoneNum).Name);
                 DataViewFactorInformation::ZoneInfo(zoneNum).ZoneNums.push_back(zoneNum);
+                DataViewFactorInformation::ZoneInfo(zoneNum).FloorArea = Zone(zoneNum).FloorArea;
             }
             DataViewFactorInformation::NumOfRadiantEnclosures = DataGlobals::NumOfZones;
         }

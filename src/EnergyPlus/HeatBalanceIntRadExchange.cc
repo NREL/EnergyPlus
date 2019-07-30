@@ -537,7 +537,7 @@ namespace HeatBalanceIntRadExchange {
 
         if (ViewFactorReport) { // Print heading
             ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Surface View Factor and Grey Interchange Information>";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <View Factor - Zone Information>,Zone Name,Number of Surfaces";
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <View Factor - Zone/Enclosure Information>,Zone/Enclosure Name,Number of Surfaces";
             ObjexxFCL::gio::write(OutputFileInits, fmtA)
                 << "! <View Factor - Surface Information>,Surface Name,Surface Class,Area {m2},Azimuth,Tilt,Thermal Emissivity,#Sides,Vertices";
             ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <View Factor / Grey Interchange Type>,Surface Name(s)";
@@ -546,13 +546,14 @@ namespace HeatBalanceIntRadExchange {
 
         cCurrentModuleObject = "ZoneProperty:UserViewFactors:bySurfaceName";
         NumZonesWithUserFbyS = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        if (NumZonesWithUserFbyS > 0) AlignInputViewFactors(cCurrentModuleObject, ErrorsFound);
 
         MaxNumOfZoneSurfaces = 0;
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
             auto & thisEnclosure(DataViewFactorInformation::ZoneInfo(enclosureNum));
             if (enclosureNum == 1) {
                 if (DisplayAdvancedReportVariables)
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Surface View Factor Check Values>,Zone Name,Original Check Value,Calculated Fixed Check "
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Surface View Factor Check Values>,Zone/Enclosure Name,Original Check Value,Calculated Fixed Check "
                                                          "Value,Final Check Value,Number of Iterations,Fixed RowSum Convergence,Used RowSum "
                                                          "Convergence";
             }
@@ -660,7 +661,7 @@ namespace HeatBalanceIntRadExchange {
 
             if (ViewFactorReport) { // Write to SurfInfo File
                 // Zone Surface Information Output
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Surface View Factor - Zone Information," + thisEnclosure.Name + ',' +
+                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Surface View Factor - Zone/Enclosure Information," + thisEnclosure.Name + ',' +
                                                          RoundSigDigits(thisEnclosure.NumOfSurfaces);
 
                 for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
@@ -863,12 +864,102 @@ namespace HeatBalanceIntRadExchange {
         }
     }
 
-    void GetInputViewFactorsbyName(std::string const &ZoneName, // Needed to check for user input view factors.
-                                   int const N,                 // NUMBER OF SURFACES
-                                   Array2A<Real64> F,           // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-                                   Array1A_int const SPtr,      // pointer to actual surface number
-                                   bool &NoUserInputF,          // Flag signifying no input F's for this
-                                   bool &ErrorsFound            // True when errors are found in number of fields vs max args
+    void AlignInputViewFactors(std::string const &cCurrentModuleObject, // Object type
+                               bool &ErrorsFound                        // True when errors are found
+    )
+    {
+        auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
+        auto &instancesValue = instances.value();
+        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            auto const &fields = instance.value();
+            // auto thisZoneOrZoneListName = instance.key();
+            std::string const thisZoneOrZoneListName = fields.at("zone_or_zonelist_name");
+            bool enclMatchFound = false;
+            // do not mark object as used here - let GetInputViewFactorsbyName do that
+
+            // Look for matching enclosure name
+            for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
+                auto &thisEnclosure(DataViewFactorInformation::ZoneInfo(enclosureNum));
+                if (thisZoneOrZoneListName == thisEnclosure.Name) {
+                    // View factor zone name matches enclosure name
+                    enclMatchFound = true;
+                    break;
+                } else {
+                    // Find matching ZoneList name
+                    int zListNum = UtilityRoutines::FindItemInList(
+                        UtilityRoutines::MakeUPPERCase(thisZoneOrZoneListName), DataHeatBalance::ZoneList, DataHeatBalance::NumOfZoneLists);
+                    if (zListNum > 0) {
+                        bool anyZoneNotFound = false;
+                        for (int zListZoneNum : ZoneList(zListNum).Zone) {
+                            bool thisZoneFound = false;
+                            for (int enclZoneNum : thisEnclosure.ZoneNums) {
+                                if (enclZoneNum == zListZoneNum) {
+                                    enclMatchFound = true;
+                                    thisZoneFound = true;
+                                    break;
+                                }
+                            }
+                            if (!thisZoneFound) {
+                                // If no matching zone was found
+                                if (!anyZoneNotFound) {
+                                    // Main error message first time here
+                                    ShowSevereError("AlignInputViewFactors: " + cCurrentModuleObject + "=\"" + thisZoneOrZoneListName +
+                                                    "\" ZoneList zones are not the same as enclosure zones.");
+                                    ShowContinueError("ZoneList zones not found in this enclosure as defined by Construction:AirBoundary surfaces:");
+                                }
+                                ShowContinueError(DataHeatBalance::Zone(zListZoneNum).Name);
+                                anyZoneNotFound = true;
+                                ErrorsFound = true;
+                            }
+                        }
+                        if (enclMatchFound) {
+                            // If matching ZoneList name found, set the enclosure name to match
+                            thisEnclosure.Name = thisZoneOrZoneListName;
+
+                            // Now check that all zones in the enclosure are found in the ZoneList
+                            bool anyZoneNotFound = false;
+                            for (int enclZoneNum : thisEnclosure.ZoneNums) {
+                                bool thisZoneFound = false;
+                                for (int zListZoneNum : ZoneList(zListNum).Zone) {
+                                    if (enclZoneNum == zListZoneNum) {
+                                        thisZoneFound = true;
+                                        break;
+                                    }
+                                }
+                                if (!thisZoneFound) {
+                                    // If no matching zone was found
+                                    if (!anyZoneNotFound) {
+                                        // Main error message first time here
+                                        ShowSevereError("AlignInputViewFactors: " + cCurrentModuleObject + "=\"" + thisZoneOrZoneListName +
+                                                        "\" ZoneList zones are not the same as enclosure zones.");
+                                        ShowContinueError(
+                                            "Enclosure zones (as defined by Construction:AirBoundary surfaces) not found in this ZoneList:");
+                                    }
+                                    ShowContinueError(DataHeatBalance::Zone(enclZoneNum).Name);
+                                    anyZoneNotFound = true;
+                                    ErrorsFound = true;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!enclMatchFound) {
+                // Matching zone or zonelist name not found
+                ShowSevereError("AlignInputViewFactors: " + cCurrentModuleObject + "=\"" + thisZoneOrZoneListName +
+                                "\" did not find a matching Zone or ZoneList name.");
+                ErrorsFound = true;
+            }
+        }
+    }
+
+    void GetInputViewFactorsbyName(std::string const &EnclosureName, // Needed to check for user input view factors.
+                                   int const N,                      // NUMBER OF SURFACES
+                                   Array2A<Real64> F,                // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
+                                   Array1A_int const SPtr,           // pointer to actual surface number
+                                   bool &NoUserInputF,               // Flag signifying no input F's for this
+                                   bool &ErrorsFound                 // True when errors are found in number of fields vs max args
     )
     {
 
@@ -876,10 +967,9 @@ namespace HeatBalanceIntRadExchange {
         //       AUTHOR         Curt Pedersen
         //       DATE WRITTEN   September 2005
         //       MODIFIED       Linda Lawrie;September 2010
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This routine gets the user view factor info.
+        // This routine gets the user view factor info for an enclosure which could be a zone or a group of zones
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
@@ -898,15 +988,15 @@ namespace HeatBalanceIntRadExchange {
         int numinx1;
         int inx1;
         int inx2;
-        Array1D_string ZoneSurfaceNames;
+        Array1D_string enclosureSurfaceNames;
 
         NoUserInputF = true;
-        UserFZoneIndex = inputProcessor->getObjectItemNum("ZoneProperty:UserViewFactors:bySurfaceName", "zone_name", ZoneName);
+        UserFZoneIndex = inputProcessor->getObjectItemNum("ZoneProperty:UserViewFactors:bySurfaceName", "zone_name", EnclosureName);
 
         if (UserFZoneIndex > 0) {
-            ZoneSurfaceNames.allocate(N);
+            enclosureSurfaceNames.allocate(N);
             for (index = 1; index <= N; ++index) {
-                ZoneSurfaceNames(index) = Surface(SPtr(index)).Name;
+                enclosureSurfaceNames(index) = Surface(SPtr(index)).Name;
             }
             NoUserInputF = false;
 
@@ -923,32 +1013,30 @@ namespace HeatBalanceIntRadExchange {
                                           cNumericFieldNames);
 
             if (NumNums < pow_2(N)) {
-                ShowSevereError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values.");
+                ShowWarningError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", not enough values.");
                 ShowContinueError("...Number of input values [" + TrimSigDigits(NumNums) + "] is less than the required number=[" +
-                                  TrimSigDigits(pow_2(N)) + "].");
-                ErrorsFound = true;
-                NumNums = 0; // cancel getting any coordinates
+                                  TrimSigDigits(pow_2(N)) + "] Missing surface pairs will have a zero view factor.");
             }
             F = 0.0;
             numinx1 = 0;
 
             for (index = 2; index <= NumAlphas; index += 2) {
-                inx1 = UtilityRoutines::FindItemInList(cAlphaArgs(index), ZoneSurfaceNames, N);
-                inx2 = UtilityRoutines::FindItemInList(cAlphaArgs(index + 1), ZoneSurfaceNames, N);
+                inx1 = UtilityRoutines::FindItemInList(cAlphaArgs(index), enclosureSurfaceNames, N);
+                inx2 = UtilityRoutines::FindItemInList(cAlphaArgs(index + 1), enclosureSurfaceNames, N);
                 if (inx1 == 0) {
-                    ShowSevereError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", invalid surface name.");
-                    ShowContinueError("...Surface name=\"" + cAlphaArgs(index) + "\", not in this zone.");
+                    ShowSevereError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
+                    ShowContinueError("...Surface name=\"" + cAlphaArgs(index) + "\", not in this zone or enclosure.");
                     ErrorsFound = true;
                 }
                 if (inx2 == 0) {
-                    ShowSevereError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", invalid surface name.");
-                    ShowContinueError("...Surface name=\"" + cAlphaArgs(index + 2) + "\", not in this zone.");
+                    ShowSevereError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
+                    ShowContinueError("...Surface name=\"" + cAlphaArgs(index + 2) + "\", not in this zone or enclosure.");
                     ErrorsFound = true;
                 }
                 ++numinx1;
                 if (inx1 > 0 && inx2 > 0) F(inx2, inx1) = rNumericArgs(numinx1);
             }
-            ZoneSurfaceNames.deallocate();
+            enclosureSurfaceNames.deallocate();
         }
     }
 
