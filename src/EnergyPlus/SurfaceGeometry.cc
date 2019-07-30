@@ -12661,7 +12661,7 @@ namespace SurfaceGeometry {
                             otherSideEnclosureNum = enclosureNum;
                             DataViewFactorInformation::ZoneInfo(enclosureNum).ZoneNames.push_back(Surface(surf.ExtBoundCond).ZoneName);
                             DataViewFactorInformation::ZoneInfo(enclosureNum).ZoneNums.push_back(Surface(surf.ExtBoundCond).Zone);
-                            DataViewFactorInformation::ZoneInfo(enclosureNum).FloorArea += Zone(surf.ExtBoundCond).FloorArea;
+                            DataViewFactorInformation::ZoneInfo(enclosureNum).FloorArea += Zone(Surface(surf.ExtBoundCond).Zone).FloorArea;
                         } else if (thisSideEnclosureNum == 0){
                             // Other side is assigned, so use that one for both
                             thisSideEnclosureNum = otherSideEnclosureNum;
@@ -12673,7 +12673,7 @@ namespace SurfaceGeometry {
                             otherSideEnclosureNum = thisSideEnclosureNum;
                             DataViewFactorInformation::ZoneInfo(thisSideEnclosureNum).ZoneNames.push_back(Surface(surf.ExtBoundCond).ZoneName);
                             DataViewFactorInformation::ZoneInfo(thisSideEnclosureNum).ZoneNums.push_back(Surface(surf.ExtBoundCond).Zone);
-                            DataViewFactorInformation::ZoneInfo(thisSideEnclosureNum).FloorArea += Zone(surf.ExtBoundCond).FloorArea;
+                            DataViewFactorInformation::ZoneInfo(thisSideEnclosureNum).FloorArea += Zone(Surface(surf.ExtBoundCond).Zone).FloorArea;
                         } else if (thisSideEnclosureNum != otherSideEnclosureNum) {
                             // This should never happen
                             ShowSevereError(RoutineName + ": Radiant enclosure grouping error for Surface=\"" + surf.Name + "\"." +
@@ -12698,6 +12698,7 @@ namespace SurfaceGeometry {
                     Zone(zoneNum).RadiantEnclosureNum = enclosureNum;
                     DataViewFactorInformation::ZoneInfo(enclosureNum).ZoneNames.push_back(Zone(zoneNum).Name);
                     DataViewFactorInformation::ZoneInfo(enclosureNum).ZoneNums.push_back(zoneNum);
+                    DataViewFactorInformation::ZoneInfo(enclosureNum).FloorArea = Zone(zoneNum).FloorArea;
                 }
             }
             DataViewFactorInformation::NumOfRadiantEnclosures = enclosureNum;
