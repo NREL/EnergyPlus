@@ -169,6 +169,7 @@ set( test_src
   UnitaryHybridAirConditioner.unit.cc
   UnitarySystem.unit.cc
   UnitHeater.unit.cc
+  UnitVentilator.unit.cc
   UtilityRoutines.unit.cc
   VariableSpeedCoils.unit.cc
   VAVDefMinMaxFlow.unit.cc
