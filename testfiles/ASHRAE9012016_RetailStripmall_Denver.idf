@@ -3168,7 +3168,6 @@
     Until: 24:00,23.89,      !- Field 23
     For: Sunday Holidays AllOtherDays, !- Field 25
     Until:  8:00,29.44,      !- Field 26
-    Until:  8:00,26.67,      !- Field 28
     Until: 23:00,23.89,      !- Field 30
     Until: 24:00,23.89;      !- Field 32
 
@@ -3196,7 +3195,6 @@
     Until: 24:00,23.89,      !- Field 32
     For: Sunday Holidays AllOtherDays, !- Field 34
     Until:  8:00,29.44,      !- Field 35
-    Until:  8:00,26.67,      !- Field 37
     Until: 23:00,23.89,      !- Field 39
     Until: 24:00,23.89;      !- Field 41
 
@@ -3223,7 +3221,6 @@
     Until: 23:00,23.89,      !- Field 30
     Until: 24:00,23.89,      !- Field 32
     For: Sunday Holidays AllOtherDays, !- Field 34
-    Until:  8:00,23.89,      !- Field 35
     Until:  8:00,23.89,      !- Field 37
     Until: 23:00,23.89,      !- Field 39
     Until: 24:00,23.89;      !- Field 41
