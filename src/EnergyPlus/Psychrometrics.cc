@@ -1301,22 +1301,20 @@ namespace Psychrometrics {
                            std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
-        if (W <= -0.0001) {
-            if (!WarmupFlag) {
-                if (iPsyErrIndex(iPsyWFnTdpPb) == 0) {
-                    String = " Dew-Point= " + TrimSigDigits(TDP, 2) + " Pressure= " + TrimSigDigits(PB, 2);
-                    ShowWarningMessage("Calculated Humidity Ratio invalid (PsyWFnTdpPb)");
-                    if (!CalledFrom.empty()) {
-                        ShowContinueErrorTimeStamp(" Routine=" + CalledFrom + ',');
-                    } else {
-                        ShowContinueErrorTimeStamp(" Routine=Unknown,");
-                    }
-                    ShowContinueError(String);
-                    String = "Calculated Humidity Ratio= " + TrimSigDigits(W, 4);
-                    ShowContinueError(String + " ... Humidity Ratio set to .00001");
+        if (!WarmupFlag) {
+            if (iPsyErrIndex(iPsyWFnTdpPb) == 0) {
+                String = " Dew-Point= " + TrimSigDigits(TDP, 2) + " Barometric Pressure= " + TrimSigDigits(PB, 2);
+                ShowWarningMessage("Calculated partial vapor pressure is greater than the barometric pressure, so that calculated humidity ratio is invalid (PsyWFnTdpPb).");
+                if (!CalledFrom.empty()) {
+                    ShowContinueErrorTimeStamp(" Routine=" + CalledFrom + ',');
+                } else {
+                    ShowContinueErrorTimeStamp(" Routine=Unknown,");
                 }
-                ShowRecurringWarningErrorAtEnd("Entered Humidity Ratio invalid (PsyWFnTdpPb)", iPsyErrIndex(iPsyWFnTdpPb), W, W, _, "[]", "[]");
+                ShowContinueError(String);
+                String = "Instead, calculated Humidity Ratio at " + TrimSigDigits(TDP - 1, 1) +  " (1 degree less) = " + TrimSigDigits(W, 4);
+                ShowContinueError(String + " will be used. Simulation continues.");
             }
+            ShowRecurringWarningErrorAtEnd("Entered Humidity Ratio invalid (PsyWFnTdpPb)", iPsyErrIndex(iPsyWFnTdpPb), W, W, _, "[]", "[]");
         }
     }
 #endif

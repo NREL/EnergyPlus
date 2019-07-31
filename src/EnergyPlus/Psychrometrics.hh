@@ -886,10 +886,15 @@ namespace Psychrometrics {
 
         // Validity test
         if (W < 0.0) {
+            Real64 const PDEW(
+                PsyPsatFnTemp(TDP - 1.0, (CalledFrom.empty() ? RoutineName : CalledFrom))); // saturation pressure at dew-point temperature {Pascals}
+            Real64 W1 = PDEW * 0.62198 / (PB - PDEW);
 #ifdef EP_psych_errors
-            if (W <= -0.0001) PsyWFnTdpPb_error(TDP, PB, W, CalledFrom);
+            if (W <= -0.0001) {
+                PsyWFnTdpPb_error(TDP, PB, W1, CalledFrom);
+            }
 #endif
-            return 1.0e-5;
+            return W1;
         } else {
             return W;
         }
