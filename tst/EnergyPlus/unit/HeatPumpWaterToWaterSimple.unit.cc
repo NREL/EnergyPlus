@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <HeatBalanceManager.hh>
 #include <HeatPumpWaterToWaterSimple.hh>
+#include <Globals.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <Plant/PlantManager.hh>
@@ -746,7 +747,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
         DataEnvironment::EndMonthFlag = false;
         DataGlobals::WarmupFlag = true;
         DataGlobals::DayOfSim = 0;
-        DataGlobals::DayOfSimChr = "0";
+        ep_globals.DayOfSimChr = "0";
 
         while ((DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
 

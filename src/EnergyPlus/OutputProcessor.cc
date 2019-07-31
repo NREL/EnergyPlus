@@ -75,6 +75,7 @@
 #include <DataSystemVariables.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
+#include <Globals.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -119,7 +120,7 @@ namespace OutputProcessor {
     using DataEnvironment::Month;
     using DataEnvironment::Year;
     using DataGlobals::DayOfSim;
-    using DataGlobals::DayOfSimChr;
+    //!$using DataGlobals::DayOfSimChr;
     using DataGlobals::HourOfDay;
     using DataGlobals::HVACTSReporting;
     using DataGlobals::MaxNameLength;
@@ -3075,7 +3076,7 @@ namespace OutputProcessor {
                                          TimeStepStampReportNbr,
                                          TimeStepStampReportChr,
                                          DayOfSim,
-                                         DayOfSimChr,
+                                         ep_globals.DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month,
                                          DayOfMonth,
@@ -3098,7 +3099,7 @@ namespace OutputProcessor {
                                          TimeStepStampReportNbr,
                                          TimeStepStampReportChr,
                                          DayOfSim,
-                                         DayOfSimChr,
+                                         ep_globals.DayOfSimChr,
                                          PrintTimeStamp && PrintESOTimeStamp && PrintTimeStampToSQL,
                                          Month,
                                          DayOfMonth,
@@ -3201,7 +3202,7 @@ namespace OutputProcessor {
                                          TimeStepStampReportNbr,
                                          TimeStepStampReportChr,
                                          DayOfSim,
-                                         DayOfSimChr,
+                                         ep_globals.DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month,
                                          DayOfMonth,
@@ -3302,7 +3303,7 @@ namespace OutputProcessor {
                                          DailyStampReportNbr,
                                          DailyStampReportChr,
                                          DayOfSim,
-                                         DayOfSimChr,
+                                         ep_globals.DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month,
                                          DayOfMonth,
@@ -3397,7 +3398,7 @@ namespace OutputProcessor {
                                          MonthlyStampReportNbr,
                                          MonthlyStampReportChr,
                                          DayOfSim,
-                                         DayOfSimChr,
+                                         ep_globals.DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL,
                                          Month);
                 PrintTimeStamp = false;
@@ -3547,7 +3548,7 @@ namespace OutputProcessor {
             ResultsFramework::OutputSchema->initializeMeters(EnergyMeters, ReportingFrequency::Simulation);
         }
         if (ResultsFramework::OutputSchema->SMMeters.rDataFrameEnabled()) {
-            ResultsFramework::OutputSchema->SMMeters.newRow(DayOfSimChr);
+            ResultsFramework::OutputSchema->SMMeters.newRow(ep_globals.DayOfSimChr);
         }
 
         PrintTimeStamp = true;
@@ -3564,7 +3565,7 @@ namespace OutputProcessor {
                                          RunPeriodStampReportNbr,
                                          RunPeriodStampReportChr,
                                          DayOfSim,
-                                         DayOfSimChr,
+                                         ep_globals.DayOfSimChr,
                                          PrintTimeStamp && PrintTimeStampToSQL);
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
@@ -6075,7 +6076,7 @@ void UpdateDataandReport(int const IndexTypeKey) // What kind of data to update 
     using namespace OutputProcessor;
     using DataEnvironment::EndMonthFlag;
     using DataEnvironment::EndYearFlag;
-    using DataGlobals::DayOfSimChr;
+    //!$using DataGlobals::DayOfSimChr;
     using DataGlobals::EndDayFlag;
     using DataGlobals::EndEnvrnFlag;
     using DataGlobals::EndHourFlag;
@@ -6225,7 +6226,7 @@ void UpdateDataandReport(int const IndexTypeKey) // What kind of data to update 
                                                  TimeStepStampReportNbr,
                                                  TimeStepStampReportChr,
                                                  DayOfSim,
-                                                 DayOfSimChr,
+                                                 ep_globals.DayOfSimChr,
                                                  true,
                                                  Month,
                                                  DayOfMonth,
@@ -6309,7 +6310,7 @@ void UpdateDataandReport(int const IndexTypeKey) // What kind of data to update 
                                                  TimeStepStampReportNbr,
                                                  TimeStepStampReportChr,
                                                  DayOfSim,
-                                                 DayOfSimChr,
+                                                 ep_globals.DayOfSimChr,
                                                  true,
                                                  Month,
                                                  DayOfMonth,
@@ -6402,7 +6403,7 @@ void UpdateDataandReport(int const IndexTypeKey) // What kind of data to update 
                                                      TimeStepStampReportNbr,
                                                      TimeStepStampReportChr,
                                                      DayOfSim,
-                                                     DayOfSimChr,
+                                                     ep_globals.DayOfSimChr,
                                                      true,
                                                      Month,
                                                      DayOfMonth,
@@ -6458,7 +6459,7 @@ void UpdateDataandReport(int const IndexTypeKey) // What kind of data to update 
                                                      TimeStepStampReportNbr,
                                                      TimeStepStampReportChr,
                                                      DayOfSim,
-                                                     DayOfSimChr,
+                                                     ep_globals.DayOfSimChr,
                                                      true,
                                                      Month,
                                                      DayOfMonth,
@@ -6504,7 +6505,7 @@ void UpdateDataandReport(int const IndexTypeKey) // What kind of data to update 
                                      TimeStepStampReportNbr,
                                      TimeStepStampReportChr,
                                      DayOfSim,
-                                     DayOfSimChr,
+                                     ep_globals.DayOfSimChr,
                                      true,
                                      Month,
                                      DayOfMonth,
@@ -6605,7 +6606,7 @@ void UpdateDataandReport(int const IndexTypeKey) // What kind of data to update 
                                      DailyStampReportNbr,
                                      DailyStampReportChr,
                                      DayOfSim,
-                                     DayOfSimChr,
+                                     ep_globals.DayOfSimChr,
                                      true,
                                      Month,
                                      DayOfMonth,
@@ -6652,7 +6653,7 @@ void UpdateDataandReport(int const IndexTypeKey) // What kind of data to update 
     if (EndMonthFlag || EndEnvrnFlag) {
         if (TrackingMonthlyVariables) {
             WriteTimeStampFormatData(
-                eso_stream, ReportingFrequency::Monthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, true, Month);
+                eso_stream, ReportingFrequency::Monthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, ep_globals.DayOfSimChr, true, Month);
             TimePrint = false;
         }
 
@@ -6691,7 +6692,7 @@ void UpdateDataandReport(int const IndexTypeKey) // What kind of data to update 
     if (EndEnvrnFlag) {
         if (TrackingRunPeriodVariables) {
             WriteTimeStampFormatData(
-                eso_stream, ReportingFrequency::Simulation, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, true);
+                eso_stream, ReportingFrequency::Simulation, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, ep_globals.DayOfSimChr, true);
             TimePrint = false;
         }
 

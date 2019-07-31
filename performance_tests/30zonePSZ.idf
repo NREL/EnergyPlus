@@ -1998,8 +1998,8 @@
     ZN_1_FLR_1_SEC_1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_1 Direct Air,  !- Name
@@ -2377,8 +2377,8 @@
     ZN_1_FLR_2_SEC_1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_2_SEC_1 Direct Air,  !- Name
@@ -2756,8 +2756,8 @@
     ZN_1_FLR_1_SEC_2 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_2 Direct Air,  !- Name
@@ -3135,8 +3135,8 @@
     ZN_1_FLR_2_SEC_2 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_2_SEC_2 Direct Air,  !- Name
@@ -3514,8 +3514,8 @@
     ZN_1_FLR_1_SEC_3 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_3 Direct Air,  !- Name
@@ -3893,8 +3893,8 @@
     ZN_1_FLR_2_SEC_3 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_2_SEC_3 Direct Air,  !- Name
@@ -4272,8 +4272,8 @@
     ZN_1_FLR_1_SEC_4 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_4 Direct Air,  !- Name
@@ -4651,8 +4651,8 @@
     ZN_1_FLR_2_SEC_4 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_2_SEC_4 Direct Air,  !- Name
@@ -5030,8 +5030,8 @@
     ZN_1_FLR_1_SEC_5 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_5 Direct Air,  !- Name
@@ -5409,8 +5409,8 @@
     ZN_1_FLR_2_SEC_5 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_2_SEC_5 Direct Air,  !- Name
@@ -5788,8 +5788,8 @@
     ZN_1_FLR_1_SEC_6 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_6 Direct Air,  !- Name
@@ -6167,8 +6167,8 @@
     ZN_1_FLR_2_SEC_6 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_2_SEC_6 Direct Air,  !- Name
@@ -6546,8 +6546,8 @@
     ZN_1_FLR_1_SEC_7 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_7 Direct Air,  !- Name
@@ -6925,8 +6925,8 @@
     ZN_1_FLR_2_SEC_7 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_2_SEC_7 Direct Air,  !- Name
@@ -7304,8 +7304,8 @@
     ZN_1_FLR_1_SEC_8 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_8 Direct Air,  !- Name
@@ -7683,8 +7683,8 @@
     ZN_1_FLR_2_SEC_8 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_2_SEC_8 Direct Air,  !- Name
@@ -8062,8 +8062,8 @@
     ZN_1_FLR_1_SEC_9 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_9 Direct Air,  !- Name
@@ -8441,8 +8441,8 @@
     ZN_1_FLR_2_SEC_9 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_2_SEC_9 Direct Air,  !- Name
@@ -8820,8 +8820,8 @@
     ZN_1_FLR_1_SEC_10 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_10 Direct Air,  !- Name
@@ -9199,8 +9199,8 @@
     ZN_1_FLR_2_SEC_10 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_2_SEC_10 Direct Air,  !- Name
@@ -9578,8 +9578,8 @@
     ZN_1_FLR_1_SEC_11 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_11 Direct Air,  !- Name
@@ -9957,8 +9957,8 @@
     ZN_1_FLR_2_SEC_11 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_2_SEC_11 Direct Air,  !- Name
@@ -10336,8 +10336,8 @@
     ZN_1_FLR_1_SEC_12 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_12 Direct Air,  !- Name
@@ -10715,8 +10715,8 @@
     ZN_1_FLR_2_SEC_12 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_2_SEC_12 Direct Air,  !- Name
@@ -11071,8 +11071,8 @@
     ZN_1_FLR_1_SEC_13 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_13 Direct Air,  !- Name
@@ -11427,8 +11427,8 @@
     ZN_1_FLR_2_SEC_13 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_2_SEC_13 Direct Air,  !- Name
@@ -11751,8 +11751,8 @@
     ZN_1_FLR_1_SEC_14 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_14 Direct Air,  !- Name
@@ -12075,8 +12075,8 @@
     ZN_1_FLR_2_SEC_14 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_2_SEC_14 Direct Air,  !- Name
@@ -12431,8 +12431,8 @@
     ZN_1_FLR_1_SEC_15 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_1_SEC_15 Direct Air,  !- Name
@@ -12787,8 +12787,8 @@
     ZN_1_FLR_2_SEC_15 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     ZN_1_FLR_2_SEC_15 Direct Air,  !- Name

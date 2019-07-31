@@ -64,6 +64,7 @@
 #include <ExteriorEnergyUse.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <Globals.hh>
 #include <HVACSizingSimulationManager.hh>
 #include <HeatBalanceManager.hh>
 #include <Plant/PlantManager.hh>
@@ -293,11 +294,11 @@ void ManageHVACSizingSimulation(bool &ErrorsFound)
             // EndMonthFlag = false;
             WarmupFlag = true;
             DayOfSim = 0;
-            DayOfSimChr = "0";
+            ep_globals.DayOfSimChr = "0";
             NumOfWarmupDays = 0;
 
             bool anyEMSRan;
-            ManageEMS(emsCallFromBeginNewEvironment, anyEMSRan); // calling point
+            ManageEMS(ep_globals.emsCallFromBeginNewEvironment, anyEMSRan); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
@@ -305,13 +306,13 @@ void ManageHVACSizingSimulation(bool &ErrorsFound)
                     if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
                 }
                 ++DayOfSim;
-                ObjexxFCL::gio::write(DayOfSimChr, fmtLD) << DayOfSim;
-                strip(DayOfSimChr);
+                ObjexxFCL::gio::write(ep_globals.DayOfSimChr, fmtLD) << DayOfSim;
+                strip(ep_globals.DayOfSimChr);
                 if (!WarmupFlag) {
                     ++CurrentOverallSimDay;
                     DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);
                 } else {
-                    DayOfSimChr = "0";
+                    ep_globals.DayOfSimChr = "0";
                 }
                 BeginDayFlag = true;
                 EndDayFlag = false;

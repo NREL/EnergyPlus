@@ -6516,7 +6516,7 @@ namespace OutputReportTabular {
         using DataOutputs::iTotalAutoSizableFields;
         using DataOutputs::iTotalFieldsWithDefaults;
         using ExteriorEnergyUse::ExteriorLights;
-		//using ExteriorEnergyUse::NumExteriorLights;
+		//!$using ExteriorEnergyUse::NumExteriorLights;
         using General::RoundSigDigits;
         using ScheduleManager::GetScheduleName;
         using ScheduleManager::ScheduleAverageHoursPerWeek;

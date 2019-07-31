@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/Globals.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
@@ -70,10 +71,10 @@ TEST_F(EnergyPlusFixture, Fans_FanSizing)
     CurZoneEqNum = 0;
     CurSysNum = 0;
     CurOASysNum = 0;
-    NumFans = 1;
-    Fan.allocate(NumFans);
-    FanNumericFields.allocate(NumFans);
-    FanNumericFields(NumFans).FieldNames.allocate(3);
+    ep_globals.NumFans = 1;
+    Fan.allocate(ep_globals.NumFans);
+    FanNumericFields.allocate(ep_globals.NumFans);
+    FanNumericFields(ep_globals.NumFans).FieldNames.allocate(3);
 
     int FanNum = 1;
     Fan(FanNum).FanName = "Test Fan";

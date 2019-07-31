@@ -84,6 +84,7 @@
 #include <EMSManager.hh>
 #include <Fans.hh>
 #include <General.hh>
+#include <Globals.hh>
 #include <HVACStandAloneERV.hh>
 #include <IceThermalStorage.hh>
 #include <InternalHeatGains.hh>
@@ -2374,7 +2375,7 @@ namespace HVACManager {
 
         using DataHVACGlobals::FanType_ZoneExhaust;
         using Fans::Fan;
-        using Fans::NumFans;
+        //!$using Fans::NumFans;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2432,7 +2433,7 @@ namespace HVACManager {
             ZnAirRpt(ZoneLoop).ExhTotalLoss = 0;
             ZnAirRpt(ZoneLoop).ExhSensiLoss = 0;
 
-            for (FanNum = 1; FanNum <= NumFans; ++FanNum) {
+            for (FanNum = 1; FanNum <= ep_globals.NumFans; ++FanNum) {
                 //  Add reportable vars
                 if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
                     for (int ExhNum = 1; ExhNum <= ZoneEquipConfig(ZoneLoop).NumExhaustNodes; ExhNum++) {

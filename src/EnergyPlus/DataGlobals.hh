@@ -65,7 +65,7 @@ namespace DataGlobals {
 
     extern bool runReadVars;
     extern bool DDOnlySimulation;
-    extern bool AnnualSimulation;
+    //!$extern bool AnnualSimulation;
     extern bool outputEpJSONConversion;
     extern bool isEpJSON;
     extern bool isCBOR;
@@ -76,7 +76,7 @@ namespace DataGlobals {
     extern int const BeginDay;
     extern int const DuringDay;
     extern int const EndDay;
-    extern int const EndZoneSizingCalc;
+    //!$extern int const EndZoneSizingCalc;
     extern int const EndSysSizingCalc;
 
     // Parameters for KindOfSim
@@ -120,7 +120,7 @@ namespace DataGlobals {
     // Parameters for EMS Calling Points
     extern int const emsCallFromZoneSizing;                           // Identity where EMS called from
     extern int const emsCallFromSystemSizing;                         // Identity where EMS called from
-    extern int const emsCallFromBeginNewEvironment;                   // Identity where EMS called from
+    //!$extern int const emsCallFromBeginNewEvironment;                   // Identity where EMS called from
     extern int const emsCallFromBeginNewEvironmentAfterWarmUp;        // Identity where EMS called from
     extern int const emsCallFromBeginTimestepBeforePredictor;         // Identity where EMS called from
     extern int const emsCallFromBeforeHVACManagers;                   // Identity where EMS called from
@@ -215,7 +215,7 @@ namespace DataGlobals {
     extern bool BeginFullSimFlag;       // True until full simulation has begun, False after first time step
     extern bool BeginTimeStepFlag;      // True at the start of each time step, False after first subtime step of time step
     extern int DayOfSim;                // Counter for days (during the simulation)
-    extern std::string DayOfSimChr;     // Counter for days (during the simulation) (character -- for reporting)
+    //!$extern std::string DayOfSimChr;     // Counter for days (during the simulation) (character -- for reporting)
     extern int CalendarYear;            // Calendar year of the current day of simulation
     extern std::string CalendarYearChr; // Calendar year of the current day of simulation (character -- for reporting)
     extern bool EndEnvrnFlag;           // True at the end of each environment (last time step of last hour of last day of environ)

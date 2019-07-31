@@ -87,6 +87,7 @@
 #include <FanCoilUnits.hh>
 #include <Fans.hh>
 #include <General.hh>
+#include <Globals.hh>
 #include <HVACInterfaceManager.hh>
 #include <HVACStandAloneERV.hh>
 #include <HVACVariableRefrigerantFlow.hh>
@@ -2200,7 +2201,7 @@ namespace ZoneEquipmentManager {
         using DataGlobals::DuringDay;
         using DataGlobals::emsCallFromZoneSizing;
         using DataGlobals::EndDay;
-        using DataGlobals::EndZoneSizingCalc;
+        //!$using DataGlobals::EndZoneSizingCalc;
         using DataGlobals::HourOfDay;
         using DataGlobals::isPulseZoneSizing;
         using DataGlobals::MinutesPerTimeStep;
@@ -2524,7 +2525,7 @@ namespace ZoneEquipmentManager {
                     }
                 }
 
-            } else if (SELECT_CASE_var == EndZoneSizingCalc) {
+            } else if (SELECT_CASE_var == ep_globals.EndZoneSizingCalc) {
 
                 // candidate EMS calling point to customize CalcFinalZoneSizing
                 bool anyEMSRan;
@@ -4144,8 +4145,8 @@ namespace ZoneEquipmentManager {
                 const int &equipNum = PrioritySimOrder(priorityNum).EquipPtr;
 
                 // Determine whether we're heating or cooling and choose the appropriate fraction
-                const Real64 &heatLoadRatio = thisZEqList.SequentialHeatingFraction(equipNum);
-                const Real64 &coolLoadRatio = thisZEqList.SequentialCoolingFraction(equipNum);
+                const Real64 heatLoadRatio = thisZEqList.SequentialHeatingFraction(equipNum);
+                const Real64 coolLoadRatio = thisZEqList.SequentialCoolingFraction(equipNum);
                 const Real64 loadRatio = (energy.TotalOutputRequired >= 0.0) ? heatLoadRatio : coolLoadRatio;
 
                 // Energy loads

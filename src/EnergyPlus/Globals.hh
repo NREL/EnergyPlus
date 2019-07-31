@@ -51,11 +51,27 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 
+#include <string>
+
 struct Globals
 {
-	// MODULE VARIABLE DECLARATIONS:
-	int NumExteriorLights; // Number of Exterior Light Inputs
-	int NumExteriorEqs;    // Number of Exterior Equipment Inputs
+    // Data
+    bool AnnualSimulation = false;
+
+    // MODULE PARAMETER DEFINITIONS
+    int const EndZoneSizingCalc = 4;
+
+    // MODULE VARIABLE DECLARATIONS: ExteriorEnergyUse
+    int NumExteriorLights = 0; // Number of Exterior Light Inputs
+    int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
+
+    //MODULE VARIABLE DECLARATION: Fans
+    int NumFans = 0;
+
+    // Parameters for EMS Calling Points
+    int const emsCallFromBeginNewEvironment = 3;  // Identity where EMS called from
+
+    std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
 };
 
 extern Globals ep_globals;
