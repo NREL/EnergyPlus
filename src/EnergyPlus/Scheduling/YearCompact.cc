@@ -192,7 +192,7 @@ void ScheduleCompact::createTimeSeries() {
             std::bitset<Scheduling::NumDayTypeBits> bs;
             bs.set((int)dt);
             for (auto const & thisFor : thisThrough.fors) {
-                if ((thisFor.days & bs).any()) {
+                if (thisFor.hasAllOtherDays || (thisFor.days & bs).any()) {
                     for (auto const & thisUntil : thisFor.untils) {
                         auto currentTimeStamp = priorThroughTime + (dayNum * 86400) + thisUntil.time;
                         this->timeStamp.push_back(currentTimeStamp);
