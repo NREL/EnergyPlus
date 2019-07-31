@@ -210,7 +210,6 @@ namespace HeatBalanceIntRadExchange {
         epStartTime("CalcInteriorRadExchange=");
 #endif
         if (CalcInteriorRadExchangefirstTime) {
-            InitInteriorRadExchange();
 #ifdef EP_HBIRE_SEQ
             SendSurfaceTempInKto4thPrecalc.allocate(MaxNumOfZoneSurfaces);
 #else
@@ -880,7 +879,7 @@ namespace HeatBalanceIntRadExchange {
             // Look for matching enclosure name
             for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
                 auto &thisEnclosure(DataViewFactorInformation::ZoneInfo(enclosureNum));
-                if (thisZoneOrZoneListName == thisEnclosure.Name) {
+                if (UtilityRoutines::SameString(thisZoneOrZoneListName, thisEnclosure.Name)) {
                     // View factor zone name matches enclosure name
                     enclMatchFound = true;
                     break;

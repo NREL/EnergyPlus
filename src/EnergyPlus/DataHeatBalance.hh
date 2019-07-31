@@ -585,7 +585,7 @@ namespace DataHeatBalance {
     extern Array1D<Real64> QSDifSol;                // Like QS, but diffuse solar short-wave only.
     extern Array1D<Real64> ITABSF;                  // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
     extern Array1D<Real64> TMULT;                   // TMULT  - MULTIPLIER TO COMPUTE 'ITABSF'
-    extern Array1D<Real64> QL;                      // TOTAL THERMAL RADIATION ADDED TO ZONE
+    extern Array1D<Real64> QL;                      // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
     extern Array2D<Real64> SunlitFracHR;            // Hourly fraction of heat transfer surface that is sunlit
     extern Array2D<Real64> CosIncAngHR;             // Hourly cosine of beam radiation incidence angle on surface
     extern Array3D<Real64> SunlitFrac;              // TimeStep fraction of heat transfer surface that is sunlit

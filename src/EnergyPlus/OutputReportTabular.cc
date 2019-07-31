@@ -418,7 +418,6 @@ namespace OutputReportTabular {
     int DesignDayCount(0);
 
     // arrays related to pulse and load component reporting
-    Array2D<Real64> radiantPulseUsed;
     Array2D_int radiantPulseTimestep;
     Array2D<Real64> radiantPulseReceived;
     Array3D<Real64> loadConvectedNormal;
@@ -676,7 +675,6 @@ namespace OutputReportTabular {
         sourceFactorOtherFuel2 = 0.0;
         DesignDayName.deallocate();
         DesignDayCount = 0;
-        radiantPulseUsed.deallocate();
         radiantPulseTimestep.deallocate();
         radiantPulseReceived.deallocate();
         loadConvectedNormal.deallocate();
@@ -12077,8 +12075,6 @@ namespace OutputReportTabular {
 
         if (AllocateLoadComponentArraysDoAllocate) {
             // For many of the following arrays the last dimension is the number of environments and is same as sizing arrays
-            radiantPulseUsed.allocate({0, TotDesDays + TotRunDesPersDays}, NumOfZones);
-            radiantPulseUsed = 0.0;
             radiantPulseTimestep.allocate({0, TotDesDays + TotRunDesPersDays}, NumOfZones);
             radiantPulseTimestep = 0;
             radiantPulseReceived.allocate({0, TotDesDays + TotRunDesPersDays}, TotSurfaces);
@@ -12197,7 +12193,6 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        radiantPulseUsed.deallocate();
         radiantPulseTimestep.deallocate();
         radiantPulseReceived.deallocate();
         // need for reporting  DEALLOCATE(loadConvectedNormal)
@@ -12540,7 +12535,7 @@ namespace OutputReportTabular {
         // The overall methodology is explained below:
         //
         // Determine decay curve - Pulse of radiant heat which is about 5% of lighting and
-        //   equipment input [radiantPulseUsed(iZone)] for a single timestep a few hours after
+        //   equipment input for a single timestep a few hours after
         //   cooling or heat is scheduled on for each zone [radiantPulseTimestep(iZone)].
         //   The radiant heat received on each wall is stored [radiantPulseReceived(jSurface)].
         //   The load convected in the normal case [loadConvectedNormal(jSurface, kTime, mode)]
@@ -13183,6 +13178,7 @@ namespace OutputReportTabular {
         powerGenRadIntoSurf = 0.;
         lightLWRadIntoSurf.allocate(NumOfTimeStepInHour * 24);
         lightLWRadIntoSurf = 0.;
+        int radEnclosureNum = Zone(zoneIndex).RadiantEnclosureNum;
 
         if (desDaySelected != 0) {
 
@@ -13209,7 +13205,7 @@ namespace OutputReportTabular {
 
                     // determine for each timestep the amount of radiant heat for each end use absorbed in each surface
                     Real64 QRadThermInAbsMult =
-                        TMULTseq(desDaySelected, kTimeStep, zoneIndex) * ITABSFseq(desDaySelected, kTimeStep, jSurf) * Surface(jSurf).Area;
+                        TMULTseq(desDaySelected, kTimeStep, radEnclosureNum) * ITABSFseq(desDaySelected, kTimeStep, jSurf) * Surface(jSurf).Area;
                     peopleRadIntoSurf(kTimeStep) = peopleRadSeq(desDaySelected, kTimeStep, zoneIndex) * QRadThermInAbsMult;
                     equipRadIntoSurf(kTimeStep) = equipRadSeq(desDaySelected, kTimeStep, zoneIndex) * QRadThermInAbsMult;
                     hvacLossRadIntoSurf(kTimeStep) = hvacLossRadSeq(desDaySelected, kTimeStep, zoneIndex) * QRadThermInAbsMult;
