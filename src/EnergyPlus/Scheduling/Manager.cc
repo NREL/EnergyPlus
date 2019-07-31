@@ -118,10 +118,19 @@ ScheduleBase *getScheduleReference(const std::string &scheduleName)
     return nullptr;
 }
 
-void updateAllSchedules()
+void updateAllSchedules(int const simTime)
 {
     for (auto &thisSchedule : scheduleConstants) {
-        thisSchedule.updateValue(0.0);
+        thisSchedule.updateValue(simTime);
+    }
+    for (auto &thisSchedule : scheduleCompacts) {
+        thisSchedule.updateValue(simTime);
+    }
+    for (auto &thisSchedule : scheduleYears) {
+        thisSchedule.updateValue(simTime);
+    }
+    for (auto &thisSchedule : scheduleFiles) {
+        thisSchedule.updateValue(simTime);
     }
 }
 

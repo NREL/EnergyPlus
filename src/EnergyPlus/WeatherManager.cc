@@ -2496,7 +2496,11 @@ namespace WeatherManager {
         }
 
         UpdateScheduleValues();
-        Scheduling::updateAllSchedules();
+
+        // calculate an effective simulation time for scheduling
+        // TODO: Update this for all the things and define it carefully
+        int const simTime = 0;
+        Scheduling::updateAllSchedules(simTime);
 
         std::sprintf(time_stamp, "%02d/%02d %02hu", Month, DayOfMonth, (unsigned short)(HourOfDay - 1));
 

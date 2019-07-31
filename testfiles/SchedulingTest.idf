@@ -9,6 +9,14 @@
     Limits 0-10 Discrete,
     5.6;
 
+  Schedule:Compact,
+    Compact Sched 1,
+    ,
+    Through: 12/31,
+    For: AllDays,
+    Until: 24:00,
+    0.2;
+
 ! Enabling this should cause a severe out of bounds error
 !  Schedule:Constant,
 !    Constant Schedule With Limits Bounded,

@@ -85,7 +85,7 @@ void processAllSchedules();
 
 Real64 GetScheduleValue(int scheduleIndex);
 
-void updateAllSchedules();
+void updateAllSchedules(int simTime);
 
 // some simple data mining functions
 int numSchedules();

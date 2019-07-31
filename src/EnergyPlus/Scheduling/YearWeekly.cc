@@ -141,8 +141,8 @@ ScheduleYear::ScheduleYear(std::string const &objectName, nlohmann::json const &
         auto scheduleInstance = ScheduleWeek::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(weekData.at("schedule_week_name")));
         this->weekScheduleRanges.emplace_back(startMonth, startDay, endMonth, endDay, scheduleInstance);
     }
-    if (this->typeLimits && !this->valuesInBounds()) {
-        EnergyPlus::ShowFatalError("Schedule bounds error causes program termination");
+    if (this->typeLimits) {
+        this->validateTypeLimits();
     }
 }
 
@@ -165,7 +165,7 @@ void ScheduleYear::setupOutputVariables()
     }
 }
 
-bool ScheduleYear::valuesInBounds()
+bool ScheduleYear::validateTypeLimits()
 {
 //    if (this->typeLimits) {
 //        if (this->value > this->typeLimits->maximum) {

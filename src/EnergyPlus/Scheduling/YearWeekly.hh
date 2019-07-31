@@ -76,7 +76,7 @@ struct ScheduleYear : ScheduleBase
 
     // overridden base class methods
     Real64 getCurrentValue() override;
-    bool valuesInBounds() override;
+    bool validateTypeLimits() override;
     void updateValue(int simTime) override;
 
     // static functions related to the state of all weekly schedules

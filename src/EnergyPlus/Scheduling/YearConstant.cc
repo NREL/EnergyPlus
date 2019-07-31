@@ -118,8 +118,8 @@ ScheduleConstant::ScheduleConstant(std::string const &objectName, nlohmann::json
         this->typeLimits = ScheduleTypeData::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("schedule_type_limits_name")));
     }
     this->value = fields.at("hourly_value");
-    if (this->typeLimits && !this->valuesInBounds()) {
-        EnergyPlus::ShowFatalError("Schedule bounds error causes program termination");
+    if (this->typeLimits) {
+        this->validateTypeLimits();
     }
 }
 
@@ -127,9 +127,6 @@ void ScheduleConstant::updateValue(int EP_UNUSED(simTime))
 {
     if (this->emsActuatedOn) {
         this->value = this->emsActuatedValue;
-    } else {
-        // nothing really to do, if EMS isn't overriding it, it's just the same old value
-        // this->value = this->value;
     }
 }
 
@@ -143,17 +140,14 @@ void ScheduleConstant::setupOutputVariables()
     }
 }
 
-bool ScheduleConstant::valuesInBounds()
+bool ScheduleConstant::validateTypeLimits()
 {
-    // TODO: Consider where to protect against null typeLimits.  Inside here only?  Caller only?  Both?
-    if (this->typeLimits) {
-        if (this->value > this->typeLimits->maximum) {
-            EnergyPlus::ShowSevereError("Value out of bounds");
-            return false;
-        } else if (this->value < this->typeLimits->minimum) {
-            EnergyPlus::ShowSevereError("Value out of bounds");
-            return false;
-        }
+    if (this->value > this->typeLimits->maximum) {
+        EnergyPlus::ShowSevereError("Value out of bounds");
+        return false;
+    } else if (this->value < this->typeLimits->minimum) {
+        EnergyPlus::ShowSevereError("Value out of bounds");
+        return false;
     }
     return true;
 }

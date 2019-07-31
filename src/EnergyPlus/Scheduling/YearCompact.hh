@@ -116,7 +116,7 @@ struct ScheduleCompact : ScheduleBase
 
     // overridden base class methods
     Real64 getCurrentValue() override;
-    bool valuesInBounds() override;
+    bool validateTypeLimits() override;
     void updateValue(int simTime) override;
 
     // static functions related to the state of all compact schedules
@@ -133,10 +133,14 @@ struct ScheduleCompact : ScheduleBase
     int processUntilFieldValue(std::string const &);
     bool validateContinuity();
     static DayType getDayTypeFromString(const std::string& s);
+    void createTimeSeries();
 
     // member variables
     std::vector<Through> throughs;
     bool includesLeapYearData = false;
+    std::vector<Real64> timeStamp;
+    std::vector<Real64> values;
+    int lastIndexUsed = 0;
 };
 
 extern std::vector<ScheduleCompact> scheduleCompacts;

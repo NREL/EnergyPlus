@@ -45,7 +45,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <algorithm>
 #include <regex>
+#include <bitset>
 
 #include <EMSManager.hh>
 #include <EnergyPlus.hh>
@@ -66,10 +68,6 @@ Real64 ScheduleCompact::getCurrentValue()
 
 void ScheduleCompact::processInput()
 {
-    ScheduleCompact c;
-    c.value = 0;
-    c.name = "";
-    scheduleCompacts.push_back(c);
     // Now we'll go through normal processing operations
     std::string const thisObjectType = "Schedule:Compact";
     auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
@@ -127,12 +125,13 @@ ScheduleCompact::ScheduleCompact(std::string const &objectName, nlohmann::json c
     }
     auto fieldWiseData = fields.at("data");
     this->processFields(fieldWiseData);
-    if (this->typeLimits && !this->valuesInBounds()) {
-        EnergyPlus::ShowFatalError("Schedule bounds error causes program termination");
+    this->createTimeSeries();
+    if (this->typeLimits) {
+        this->validateTypeLimits();
     }
 }
 
-bool ScheduleCompact::validateContinuity() //  TODO: This function should be renamed and also adapt the input structure into the final TS,Val vectors
+bool ScheduleCompact::validateContinuity()
 {
     int lastThroughTime = -1;
     for (auto const &thisThrough : this->throughs) {
@@ -140,7 +139,6 @@ bool ScheduleCompact::validateContinuity() //  TODO: This function should be ren
             EnergyPlus::ShowFatalError("Invalid sequence of Through timestamps for Schedule:Compact = " + this->name);
         }
         lastThroughTime = thisThrough.timeStamp;
-        // std::vector<DayTypes> or something like this
         if (thisThrough.fors.front().hasAllOtherDays) {
             EnergyPlus::ShowFatalError("AllOtherDays used in first For: field for Schedule:Compact = " + this->name);
         }
@@ -178,6 +176,34 @@ bool ScheduleCompact::validateContinuity() //  TODO: This function should be ren
         EnergyPlus::ShowFatalError("Invalid Through timestamps, they do not reach the end of the year for Schedule:Compact = " + this->name);
     }
     return true;
+}
+
+void ScheduleCompact::createTimeSeries() {
+    // TODO: Handle multiyear
+    // TODO: Handle leap year
+    // TODO: Handle daylight savings time
+    int priorThroughTime = 0;
+    int currentDay = 0;
+    for (auto const & thisThrough : this->throughs) {
+        int numDaysInThrough = (thisThrough.timeStamp / 86400) + 1;
+        for (int dayNum = 1; dayNum <= numDaysInThrough; dayNum++) {
+            currentDay++;
+            Scheduling::DayType dt = Scheduling::DayType::MONDAY; // TODO: Get current day type for overall day number
+            std::bitset<Scheduling::NumDayTypeBits> bs;
+            bs.set((int)dt);
+            for (auto const & thisFor : thisThrough.fors) {
+                if ((thisFor.days & bs).any()) {
+                    for (auto const & thisUntil : thisFor.untils) {
+                        auto currentTimeStamp = priorThroughTime + (dayNum * 86400) + thisUntil.time;
+                        this->timeStamp.push_back(currentTimeStamp);
+                        this->values.push_back(thisUntil.value);
+                    }
+                }
+            }
+        }
+        priorThroughTime = thisThrough.timeStamp;
+    }
+
 }
 
 void ScheduleCompact::processFields(nlohmann::json const &fieldWiseData)
@@ -260,12 +286,15 @@ FieldType ScheduleCompact::processSingleField(FieldType lastFieldType, nlohmann:
     return lastFieldType;
 }
 
-void ScheduleCompact::updateValue(int EP_UNUSED(simTime))
+void ScheduleCompact::updateValue(int simTime)
 {
     if (this->emsActuatedOn) {
         this->value = this->emsActuatedValue;
     } else {
-        // this->value = this->value;
+        // TODO: Change search to start with "this->timeStamp.begin() + this->lastIndexUsed - 1" once we can reset it
+        auto item = std::lower_bound(this->timeStamp.begin(), this->timeStamp.end(), simTime);
+        this->lastIndexUsed = item - this->timeStamp.begin();
+        this->value = this->values[this->lastIndexUsed];
     }
 }
 
@@ -280,17 +309,18 @@ void ScheduleCompact::setupOutputVariables()
     }
 }
 
-bool ScheduleCompact::valuesInBounds()
+bool ScheduleCompact::validateTypeLimits()
 {
-    //    if (this->typeLimits) {
-    //        if (this->value > this->typeLimits->maximum) {
-    //            // ShowSevereError("Value out of bounds")
-    //            return false;
-    //        } else if (this->value < this->typeLimits->minimum) {
-    //            // ShowSevereError("Value out of bounds")
-    //            return false;
-    //        }
-    //    }
+    // TODO: Add unit test for out of bounds, discrete, etc.
+    Real64 const maxValue = *std::max_element(this->values.begin(), this->values.end());
+    Real64 const minValue = *std::min_element(this->values.begin(), this->values.end());
+    if (maxValue > this->typeLimits->maximum) {
+        EnergyPlus::ShowSevereError("Value out of bounds");
+        return false;
+    } else if (minValue < this->typeLimits->minimum) {
+        EnergyPlus::ShowSevereError("Value out of bounds");
+        return false;
+    }
     return true;
 }
 

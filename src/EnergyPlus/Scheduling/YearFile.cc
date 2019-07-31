@@ -177,8 +177,8 @@ ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &
     if(fields.find("number_of_hours_of_data") != fields.end()) {
         this->numberOfHoursOfData = fields.at("number_of_hours_of_data");
     }
-    if (this->typeLimits && !this->valuesInBounds()) {
-        EnergyPlus::ShowFatalError("Schedule bounds error causes program termination");
+    if (this->typeLimits) {
+        this->validateTypeLimits();
     }
 }
 
@@ -201,7 +201,7 @@ void ScheduleFile::setupOutputVariables()
     }
 }
 
-bool ScheduleFile::valuesInBounds()
+bool ScheduleFile::validateTypeLimits()
 {
 //    if (this->typeLimits) {
 //        if (this->value > this->typeLimits->maximum) {
