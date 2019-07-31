@@ -213,6 +213,10 @@ std::string scheduleName(int const scheduleIndex) {
 }
 
 std::string scheduleType(int const scheduleIndex) {
+    // TODO: This is a very temporary band-aid
+    if (scheduleIndex >= (int)indexToSubtypeMap.size()) {
+        return "Schedule:File:Shading";
+    }
     auto const &mapping(indexToSubtypeMap[scheduleIndex]);
     switch (mapping.thisType) {
     case ScheduleType::CONSTANT:

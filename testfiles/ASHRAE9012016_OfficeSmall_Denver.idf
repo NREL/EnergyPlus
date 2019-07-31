@@ -583,7 +583,7 @@
     Until: 06:00,0.0,        !- Field 3
     Until: 19:00,1.0,        !- Field 5
     Until: 24:00,0.0,        !- Field 7
-    For: Weedends WinterDesignDay, !- Field 9
+    For: Weekends WinterDesignDay, !- Field 9
     Until: 24:00,0.0,        !- Field 10
     For: Holidays AllOtherDays, !- Field 12
     Until: 24:00,0.0;        !- Field 13

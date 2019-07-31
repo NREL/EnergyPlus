@@ -394,21 +394,21 @@
     Htg-SetP-Sch,            !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: WeekDays CustomDay1 CustomDay2 Sunday Saturday Holiday SummerDesignDay WinterDesignDay", !- Field 2
+    For: WeekDays CustomDay1 CustomDay2 Sunday Saturday Holiday SummerDesignDay WinterDesignDay, !- Field 2
     Until: 24:00,20;         !- Field 3
 
   Schedule:Compact,
     Clg-SetP-Sch,            !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: WeekDays CustomDay1 CustomDay2 Sunday Saturday Holiday SummerDesignDay WinterDesignDay", !- Field 2
+    For: WeekDays CustomDay1 CustomDay2 Sunday Saturday Holiday SummerDesignDay WinterDesignDay, !- Field 2
     Until: 24:00,20;         !- Field 3
 
   Schedule:Compact,
     FanAvailSched,           !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: WeekDays CustomDay1 CustomDay2 Sunday Saturday Holiday SummerDesignDay WinterDesignDay", !- Field 2
+    For: WeekDays CustomDay1 CustomDay2 Sunday Saturday Holiday SummerDesignDay WinterDesignDay, !- Field 2
     Until: 24:00,1;          !- Field 3
 
 !-   ===========  ALL OBJECTS IN CLASS: MATERIAL ===========
