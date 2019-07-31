@@ -709,7 +709,7 @@ namespace FanCoilUnits {
                 } else if (UtilityRoutines::SameString(FanCoil(FanCoilNum).FanType, "Fan:SystemModel")) {
                     FanCoil(FanCoilNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(FanCoil(FanCoilNum).FanName));           // call constructor
-                    FanCoil(FanCoilNum).FanIndex = HVACFan::getFanObjectVectorIndex(FanCoil(FanCoilNum).FanName); // zero-based
+                    FanCoil(FanCoilNum).FanIndex = HVACFan::getFanObjectVectorIndex(FanCoil(FanCoilNum).FanName, true); // zero-based
                     FanCoil(FanCoilNum).FanAirVolFlow = HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->designAirVolFlowRate;
                     // Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
                     if (FanCoil(FanCoilNum).MaxAirVolFlow > FanCoil(FanCoilNum).FanAirVolFlow && FanCoil(FanCoilNum).FanAirVolFlow != AutoSize) {

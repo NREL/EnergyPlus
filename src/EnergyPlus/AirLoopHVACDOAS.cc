@@ -475,7 +475,7 @@ namespace AirLoopHVACDOAS {
                     } else if (SELECT_CASE_var == "FAN:SYSTEMMODEL") {
                         thisDOAS.FanName = CompName;
                         thisDOAS.m_FanTypeNum = SimAirServingZones::Fan_System_Object;
-                        thisDOAS.m_FanIndex = HVACFan::getFanObjectVectorIndex(CompName);
+                        thisDOAS.m_FanIndex = HVACFan::getFanObjectVectorIndex(CompName, true);
                         OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = HVACFan::fanObjs[thisDOAS.m_FanIndex]->inletNodeNum;
                         if (OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) == 0) {
                             InletNodeErrFlag = true;

@@ -14142,7 +14142,7 @@ namespace DXCoils {
                         } else if (PrimaryAirSystem(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).CompType_Num ==
                                    SimAirServingZones::Fan_System_Object) {
                             SupplyFanName = PrimaryAirSystem(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).Name;
-                            SupplyFanIndex = HVACFan::getFanObjectVectorIndex(SupplyFanName);
+                            SupplyFanIndex = HVACFan::getFanObjectVectorIndex(SupplyFanName, true);
                             SupplyFan_TypeNum = DataHVACGlobals::FanType_SystemModelObject;
 
                         } else if (PrimaryAirSystem(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).CompType_Num == UnitarySystem) {

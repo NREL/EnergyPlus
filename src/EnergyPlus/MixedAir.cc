@@ -644,7 +644,7 @@ namespace MixedAir {
 
             } else if (SELECT_CASE_var == Fan_System_Object) { // 'Fan:SystemModel'
                 if (CompIndex == 0) {                          // 0 means has not been filled because of 1-based arrays in old fortran
-                    CompIndex = HVACFan::getFanObjectVectorIndex(CompName) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
+                    CompIndex = HVACFan::getFanObjectVectorIndex(CompName, true) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
                 }
                 if (Sim) {
                     HVACFan::fanObjs[CompIndex - 1]->simulate(_, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift

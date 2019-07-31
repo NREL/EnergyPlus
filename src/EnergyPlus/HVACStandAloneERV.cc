@@ -412,7 +412,7 @@ namespace HVACStandAloneERV {
                 StandAloneERV(StandAloneERVNum).SupplyAirFanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(StandAloneERV(StandAloneERVNum).SupplyAirFanName)); // call constructor
                 StandAloneERV(StandAloneERVNum).SupplyAirFanIndex =
-                    HVACFan::getFanObjectVectorIndex(StandAloneERV(StandAloneERVNum).SupplyAirFanName);
+                    HVACFan::getFanObjectVectorIndex(StandAloneERV(StandAloneERVNum).SupplyAirFanName, true);
                 StandAloneERV(StandAloneERVNum).SupplyAirFanSchPtr =
                     HVACFan::fanObjs[StandAloneERV(StandAloneERVNum).SupplyAirFanIndex]->availSchedIndex;
                 StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate =
@@ -466,7 +466,7 @@ namespace HVACStandAloneERV {
                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(StandAloneERV(StandAloneERVNum).ExhaustAirFanName)); // call constructor
 
                 StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex =
-                    HVACFan::getFanObjectVectorIndex(StandAloneERV(StandAloneERVNum).ExhaustAirFanName);
+                    HVACFan::getFanObjectVectorIndex(StandAloneERV(StandAloneERVNum).ExhaustAirFanName, true);
                 StandAloneERV(StandAloneERVNum).ExhaustAirFanSchPtr =
                     HVACFan::fanObjs[StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex]->availSchedIndex;
                 StandAloneERV(StandAloneERVNum).DesignEAFanVolFlowRate =

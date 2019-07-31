@@ -1347,7 +1347,7 @@ namespace AirflowNetworkBalanceManager {
 
                 if (UtilityRoutines::SameString(UtilityRoutines::MakeUPPERCase(fan_type), "FAN:SYSTEMMODEL")) {
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fan_name));
-                    fanIndex = HVACFan::getFanObjectVectorIndex(fan_name);
+                    fanIndex = HVACFan::getFanObjectVectorIndex(fan_name, true);
                     if (fanIndex < 0) {
                         ShowSevereError("...occurs in " + CurrentModuleObject + " = " + DisSysCompCVFData(i).Name);
                         success = false;
@@ -10249,7 +10249,7 @@ namespace AirflowNetworkBalanceManager {
                         break;
                     }
                     if (DisSysCompCVFData(i).FanModelFlag && DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff) {
-                        int fanIndex = HVACFan::getFanObjectVectorIndex(DisSysCompCVFData(i).Name);
+                        int fanIndex = HVACFan::getFanObjectVectorIndex(DisSysCompCVFData(i).Name, true);
                         if ( HVACFan::fanObjs[fanIndex]->AirPathFlag) {
                             DisSysCompCVFData(i).FanTypeNum = FanType_SimpleConstVolume;
                         } else {
@@ -10316,7 +10316,7 @@ namespace AirflowNetworkBalanceManager {
             bool FanModelConstFlag = false;
             for (i = 1; i <= DisSysNumOfCVFs; i++) {
                 if (DisSysCompCVFData(i).FanModelFlag) {
-                    int fanIndex = HVACFan::getFanObjectVectorIndex(DisSysCompCVFData(i).Name);
+                    int fanIndex = HVACFan::getFanObjectVectorIndex(DisSysCompCVFData(i).Name, true);
                     if (DisSysCompCVFData(i).FanTypeNum == FanType_SimpleOnOff && HVACFan::fanObjs[fanIndex]->AirPathFlag) {
                         DisSysCompCVFData(i).FanTypeNum = FanType_SimpleConstVolume;
                         SupplyFanType = FanType_SimpleConstVolume;

@@ -472,7 +472,7 @@ namespace WindowAC {
                 if (UtilityRoutines::SameString(WindAC(WindACNum).FanType, "Fan:SystemModel")) {
                     WindAC(WindACNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(WindAC(WindACNum).FanName)); // call constructor
-                    WindAC(WindACNum).FanIndex = HVACFan::getFanObjectVectorIndex(WindAC(WindACNum).FanName);
+                    WindAC(WindACNum).FanIndex = HVACFan::getFanObjectVectorIndex(WindAC(WindACNum).FanName, true);
                     FanVolFlow = HVACFan::fanObjs[WindAC(WindACNum).FanIndex]->designAirVolFlowRate;
                     if (FanVolFlow != AutoSize) {
                         if (FanVolFlow < WindAC(WindACNum).MaxAirVolFlow) {

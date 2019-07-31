@@ -3358,10 +3358,10 @@ namespace UnitarySystems {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
                             } else {                                                                  // mine data from fan object
-                                if (HVACFan::getFanObjectVectorIndex(loc_m_FanName, true) < 0) {
+                                if (HVACFan::getFanObjectVectorIndex(loc_m_FanName, false) < 0) {
                                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(loc_m_FanName)); // call constructor
                                 }
-                                thisSys.m_FanIndex = HVACFan::getFanObjectVectorIndex(loc_m_FanName);
+                                thisSys.m_FanIndex = HVACFan::getFanObjectVectorIndex(loc_m_FanName, true);
                                 if (thisSys.m_FanIndex > -1) {
                                     FanInletNode = HVACFan::fanObjs[thisSys.m_FanIndex]->inletNodeNum;
                                     FanOutletNode = HVACFan::fanObjs[thisSys.m_FanIndex]->outletNodeNum;

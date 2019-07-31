@@ -480,7 +480,7 @@ namespace OutdoorAirUnit {
             if (HVACFan::checkIfFanNameIsAFanSystem(OutAirUnit(OAUnitNum).SFanName)) { // no object type in input, so check if Fan:SystemModel
                 OutAirUnit(OAUnitNum).SFanType = DataHVACGlobals::FanType_SystemModelObject;
                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(OutAirUnit(OAUnitNum).SFanName)); // call constructor
-                OutAirUnit(OAUnitNum).SFan_Index = HVACFan::getFanObjectVectorIndex(OutAirUnit(OAUnitNum).SFanName);
+                OutAirUnit(OAUnitNum).SFan_Index = HVACFan::getFanObjectVectorIndex(OutAirUnit(OAUnitNum).SFanName, true);
                 OutAirUnit(OAUnitNum).SFanMaxAirVolFlow = HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->designAirVolFlowRate;
                 OutAirUnit(OAUnitNum).SFanAvailSchedPtr = HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->availSchedIndex;
             } else {
@@ -521,7 +521,7 @@ namespace OutdoorAirUnit {
                 if (HVACFan::checkIfFanNameIsAFanSystem(OutAirUnit(OAUnitNum).ExtFanName)) { // no object type in input, so check if Fan:SystemModel
                     OutAirUnit(OAUnitNum).ExtFanType = DataHVACGlobals::FanType_SystemModelObject;
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(OutAirUnit(OAUnitNum).ExtFanName)); // call constructor
-                    OutAirUnit(OAUnitNum).ExtFan_Index = HVACFan::getFanObjectVectorIndex(OutAirUnit(OAUnitNum).ExtFanName);
+                    OutAirUnit(OAUnitNum).ExtFan_Index = HVACFan::getFanObjectVectorIndex(OutAirUnit(OAUnitNum).ExtFanName, true);
                     OutAirUnit(OAUnitNum).EFanMaxAirVolFlow = HVACFan::fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->designAirVolFlowRate;
                     OutAirUnit(OAUnitNum).ExtFanAvailSchedPtr = HVACFan::fanObjs[OutAirUnit(OAUnitNum).ExtFan_Index]->availSchedIndex;
                 } else {

@@ -783,7 +783,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData()
         case DataAirSystems::objectVectorOOFanSystemModel: {
             c->fanTypeName = "Fan:SystemModel";
             if (c->supFanVecIndex < 0) {
-                c->supFanVecIndex = HVACFan::getFanObjectVectorIndex(c->fanAssociatedWithCoilName);
+                c->supFanVecIndex = HVACFan::getFanObjectVectorIndex(c->fanAssociatedWithCoilName, true);
             }
             c->fanSizeMaxAirVolumeFlow = HVACFan::fanObjs[c->supFanVecIndex]->designAirVolFlowRate;
             c->fanSizeMaxAirMassFlow = HVACFan::fanObjs[c->supFanVecIndex]->maxAirMassFlowRate();
@@ -1762,7 +1762,7 @@ void ReportCoilSelection::setCoilSupplyFanInfo(std::string const &coilName, // u
         c->supFanNum = locFanIndex;
     } else if (fanEnumType == DataAirSystems::objectVectorOOFanSystemModel) {
         if (fanIndex < 0) {
-            locFanIndex = HVACFan::getFanObjectVectorIndex(fanName);
+            locFanIndex = HVACFan::getFanObjectVectorIndex(fanName, true);
         } else {
             locFanIndex = fanIndex;
         }
