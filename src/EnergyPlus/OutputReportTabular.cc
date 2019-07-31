@@ -5918,9 +5918,9 @@ namespace OutputReportTabular {
                         coolingDesignlinepassed = true;
                         lineType = coolingConditionsLine;
                     }
-                } else if (has(lineIn, "(standard) heating degree-days (18.3°C baseline)")) {
+                } else if (has(lineIn, "(standard) heating degree-days (18.3")) {
                     lineType = stdHDDLine;
-                } else if (has(lineIn, "(standard) cooling degree-days (10°C baseline)")) {
+                } else if (has(lineIn, "(standard) cooling degree-days (10")) {
                     lineType = stdCDDLine;
 
                 } else if (has(lineIn, "Maximum Dry Bulb")) {
@@ -5931,15 +5931,15 @@ namespace OutputReportTabular {
                     lineType = maxDewPointLine;
                 } else if (has(lineIn, "Minimum Dew Point")) {
                     lineType = minDewPointLine;
-                } else if (has(lineIn, "(wthr file) heating degree-days (18°C baseline)") || has(lineIn, "heating degree-days (18°C baseline)")) {
+                } else if (has(lineIn, "(wthr file) heating degree-days (18") || has(lineIn, "heating degree-days (18")) {
                     lineType = wthHDDLine;
-                } else if (has(lineIn, "(wthr file) cooling degree-days (10°C baseline)") || has(lineIn, "cooling degree-days (10°C baseline)")) {
+                } else if (has(lineIn, "(wthr file) cooling degree-days (10") || has(lineIn, "cooling degree-days (10")) {
                     lineType = wthCDDLine;
                 }
                 // these not part of big if/else because sequential
                 if (lineType == KoppenDes1Line && isKoppen) lineType = KoppenDes2Line;
                 if (lineType == KoppenLine && isKoppen) lineType = KoppenDes1Line;
-                if (has(lineIn, "(Köppen classification)")) lineType = KoppenLine;
+                if (has(lineIn, "ppen classification)")) lineType = KoppenLine;
                 if (lineType == AshStdDes2Line) lineType = AshStdDes3Line;
                 if (lineType == AshStdDes1Line) lineType = AshStdDes2Line;
                 if (lineType == AshStdLine) lineType = AshStdDes1Line;
