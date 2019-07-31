@@ -106,7 +106,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
 
     DXCoilNumericFields.allocate(NumDXCoils);
     DXCoilNumericFields(2).PerfMode.allocate(1);
-    DXCoilNumericFields(2).PerfMode(1).FieldNames.allocate(15);
+    DXCoilNumericFields(2).PerfMode(1).FieldNames.allocate(17);
     DXCoil(2).DefrostStrategy = Resistive;
     DXCoil(2).DefrostCapacity = 5000.0;
     DXCoil(2).Name = "DX Heating coil";
