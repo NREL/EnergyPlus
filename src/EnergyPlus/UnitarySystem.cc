@@ -7362,20 +7362,17 @@ namespace UnitarySystems {
 
                 } else { // Not Outdoor Air Unit. Either airloop or zone equipment
                     if (AirLoopNum > 0) economizerFlag = DataAirLoop::AirLoopControlInfo(AirLoopNum).EconoActive;
+                    Real64 humRatMaxSP = 1.0;
+                    this->m_DesiredOutletHumRat = humRatMaxSP;
                     if (ControlNode == 0) {
                         this->m_DesiredOutletTemp = 0.0;
                         if (OutNode > 0) {
                             if (DataLoopNode::Node(OutNode).HumRatMax > 0.0) {
                                 this->m_DesiredOutletHumRat = DataLoopNode::Node(OutNode).HumRatMax;
-                            } else {
-                                this->m_DesiredOutletHumRat = 1.0;
                             }
-                        } else {
-                            this->m_DesiredOutletHumRat = 1.0;
                         }
                     } else if (ControlNode == OutNode) {
                         if (this->m_ISHundredPercentDOASDXCoil && this->m_RunOnSensibleLoad) {
-                            Real64 humRatMaxSP = 1.0;
                             if (DataLoopNode::Node(ControlNode).HumRatMax > 0.0) humRatMaxSP = DataLoopNode::Node(ControlNode).HumRatMax;
                             this->frostControlSetPointLimit(DataLoopNode::Node(ControlNode).TempSetPoint,
                                                             humRatMaxSP,
@@ -7387,7 +7384,7 @@ namespace UnitarySystems {
                         //  IF HumRatMax is zero, then there is no request from SetpointManager:SingleZone:Humidity:Maximum
                         // user might place temp SP at system outlet and HumRat set point at coil outlet
                         if (this->m_DehumidControlType_Num != DehumCtrlType::None) {
-                            Real64 humRatMaxSP = 1.0;
+                            if (DataLoopNode::Node(this->AirOutNode).HumRatMax > 0.0) humRatMaxSP = DataLoopNode::Node(this->AirOutNode).HumRatMax;
                             if (DataLoopNode::Node(ControlNode).HumRatMax > 0.0) humRatMaxSP = DataLoopNode::Node(ControlNode).HumRatMax;
                             if (this->m_ISHundredPercentDOASDXCoil && this->m_RunOnLatentLoad) {
                                 this->frostControlSetPointLimit(DataLoopNode::Node(ControlNode).TempSetPoint,
@@ -7397,11 +7394,8 @@ namespace UnitarySystems {
                                                                 2);
                             }
                             this->m_DesiredOutletHumRat = humRatMaxSP;
-                        } else {
-                            this->m_DesiredOutletHumRat = 1.0;
                         }
                     } else {
-                        Real64 humRatMaxSP = 1.0;
                         if (DataLoopNode::Node(ControlNode).HumRatMax > 0.0) humRatMaxSP = DataLoopNode::Node(ControlNode).HumRatMax;
                         if (DataLoopNode::Node(OutNode).HumRatMax > 0.0) humRatMaxSP = DataLoopNode::Node(OutNode).HumRatMax;
                         if (this->m_ISHundredPercentDOASDXCoil && this->m_RunOnSensibleLoad) {
@@ -7422,8 +7416,6 @@ namespace UnitarySystems {
                                                                 2);
                             }
                             this->m_DesiredOutletHumRat = humRatMaxSP;
-                        } else {
-                            this->m_DesiredOutletHumRat = 1.0;
                         }
                     }
                 }
