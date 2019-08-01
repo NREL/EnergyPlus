@@ -589,16 +589,7 @@ namespace HeatBalanceIntRadExchange {
             // Initialize the area and emissivity arrays
             for (ZoneSurfNum = 1; ZoneSurfNum <= NumOfZoneSurfaces; ++ZoneSurfNum) {
                 int const SurfNum = ZoneInfo(ZoneNum).SurfacePtr(ZoneSurfNum);
-
-                //************************************************
-                if (!Construct(Surface(SurfNum).Construction).TypeIsIRT) {
-                    ZoneInfo(ZoneNum).Area(ZoneSurfNum) = Surface(SurfNum).Area;
-                } else {
-                    // Double area for infrared transparent (IRT) surfaces
-                    ZoneInfo(ZoneNum).Area(ZoneSurfNum) = 2.0 * Surface(SurfNum).Area;
-                }
-                //***********************************************
-
+                ZoneInfo(ZoneNum).Area(ZoneSurfNum) = Surface(SurfNum).Area;
                 ZoneInfo(ZoneNum).Emissivity(ZoneSurfNum) = Construct(Surface(SurfNum).Construction).InsideAbsorpThermal;
                 ZoneInfo(ZoneNum).Azimuth(ZoneSurfNum) = Surface(SurfNum).Azimuth;
                 ZoneInfo(ZoneNum).Tilt(ZoneSurfNum) = Surface(SurfNum).Tilt;
