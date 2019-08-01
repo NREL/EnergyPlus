@@ -47,15 +47,20 @@
 
 #include <gtest/gtest.h>
 
+#include <Scheduling/Manager.hh>
 #include <Scheduling/SchedulingFixture.hh>
 #include <Scheduling/TypeLimits.hh>
 
 namespace EnergyPlus {
 
-TEST_F(SchedulingTestFixture, TestTypeLimits1)
+TEST_F(SchedulingTestFixture, TestDuplicateNameFails)
 {
-    // as of right now there's really not much to test here, but I can at least confirm that it does have a clear_state method
-    EXPECT_TRUE(true);
+    std::string const idf_objects = delimited_string({
+                                                         "ScheduleTypeLimits,ThisTypeLimit,0.1,0.6,Discrete;",
+                                                         "ScheduleTypeLimits,ThisTypeLimit,0.2,0.5,Continuous;"
+                                                     });
+    ASSERT_FALSE(process_idf(idf_objects, false));
+    compare_err_stream("   ** Severe  ** Duplicate name found. name: \"ThisTypeLimit\". Overwriting existing object.\n");
 }
 
 }

@@ -79,6 +79,7 @@ void ScheduleConstant::processInput()
         return; // no constant schedules to process
     }
     auto &instancesValue = instances.value();
+    bool inputErrorsOccurred = false;
     for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
         auto const &fields = instance.value();
         auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
@@ -89,6 +90,10 @@ void ScheduleConstant::processInput()
         }
         // then just add it to the vector via the constructor
         scheduleConstants.emplace_back(thisObjectName, fields);
+        inputErrorsOccurred |= scheduleConstants.back().inputErrorOccurred;
+    }
+    if (inputErrorsOccurred) {
+        EnergyPlus::ShowFatalError("Input processing errors on Schedule:Constant objects cause program termination");
     }
 }
 
@@ -119,7 +124,9 @@ ScheduleConstant::ScheduleConstant(std::string const &objectName, nlohmann::json
     }
     this->value = fields.at("hourly_value");
     if (this->typeLimits) {
-        this->validateTypeLimits();
+        if (!this->validateTypeLimits()) {
+            this->inputErrorOccurred = true;
+        }
     }
 }
 

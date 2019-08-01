@@ -78,10 +78,6 @@ void ScheduleTypeData::processInput() {
         auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
         // do any pre-construction operations
         EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
-        if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
-            EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
-        }
-        //EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
         // then just add it to the vector via the constructor
         scheduleTypeLimits.emplace_back(thisObjectName, fields);
     }
@@ -92,6 +88,26 @@ void ScheduleTypeData::clear_state() {
 }
 
 ScheduleTypeData::ScheduleTypeData(std::string const &objectName, nlohmann::json const &fields) {
+    // ScheduleTypeLimits,
+    //       \memo ScheduleTypeLimits specifies the data types and limits for the values contained in schedules
+    //  A1,  \field Name
+    //       \required-field
+    //       \reference ScheduleTypeLimitsNames
+    //       \note used to validate schedule types in various schedule objects
+    //  N1,  \field Lower Limit Value
+    //       \note lower limit (real or integer) for the Schedule Type.  e.g. if fraction, this is 0.0
+    //       \unitsBasedOnField A3
+    //  N2,  \field Upper Limit Value
+    //       \note upper limit (real or integer) for the Schedule Type.  e.g. if fraction, this is 1.0
+    //       \unitsBasedOnField A3
+    //  A2,  \field Numeric Type
+    //       \note Numeric type is either Continuous (all numbers within the min and
+    //       \note max are valid or Discrete (only integer numbers between min and
+    //       \note max are valid.
+    //       \type choice
+    //       \key Continuous
+    //       \key Discrete
+    //  A3;  \field Unit Type
     this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
     if (fields.find("lower_limit_value") != fields.end()) {
         this->minimum = fields.at("lower_limit_value");

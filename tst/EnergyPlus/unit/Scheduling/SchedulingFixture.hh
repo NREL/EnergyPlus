@@ -61,9 +61,6 @@ protected:
     void SetUp() override
     {
         EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
-        std::string const idf_objects =
-            delimited_string({"Schedule:Constant,Always On,,1.0;", "Schedule:Constant,Always Off,,0.0;", "Schedule:Constant,Always Pi,,3.14;"});
-        ASSERT_TRUE(process_idf(idf_objects));
     }
     void TearDown() override
     {

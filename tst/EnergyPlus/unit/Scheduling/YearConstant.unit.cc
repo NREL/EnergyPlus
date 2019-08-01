@@ -49,17 +49,22 @@
 
 #include <EnergyPlus/Scheduling/YearConstant.hh>
 #include <Scheduling/SchedulingFixture.hh>
+#include <Scheduling/Manager.hh>
 
 namespace EnergyPlus {
 
 TEST_F(SchedulingTestFixture, ScheduleConstant_TestProcessInput)
 {
+    std::string const idf_objects = delimited_string({"Schedule:Constant,Always On,,1.0;"});
+    ASSERT_TRUE(process_idf(idf_objects));
     Scheduling::ScheduleConstant::processInput();
-    EXPECT_EQ(4u, Scheduling::scheduleConstants.size()); // there's an extra hidden constant schedule to account for here.
+    EXPECT_EQ(2u, Scheduling::scheduleConstants.size()); // there's an extra hidden constant schedule to account for here.
 }
 
 TEST_F(SchedulingTestFixture, ScheduleConstant_TestGetScheduleIndex)
 {
+    std::string const idf_objects = delimited_string({"Schedule:Constant,Always On,,1.0;", "Schedule:Constant,Always Off,,0.0;"});
+    ASSERT_TRUE(process_idf(idf_objects));
     Scheduling::ScheduleConstant::processInput();
     EXPECT_EQ("ALWAYS OFF", Scheduling::scheduleConstants[1].name); // will be upper case, and lexicographically ordered
     EXPECT_NEAR(0.0, Scheduling::scheduleConstants[1].getCurrentValue(), 0.0001);
@@ -67,15 +72,50 @@ TEST_F(SchedulingTestFixture, ScheduleConstant_TestGetScheduleIndex)
 
 TEST_F(SchedulingTestFixture, ScheduleConstant_TestZeroethSchedule)
 {
+    std::string const idf_objects = delimited_string({"Schedule:Constant,Always Off,,0.0;"});
+    ASSERT_TRUE(process_idf(idf_objects));
     Scheduling::ScheduleConstant::processInput();
     EXPECT_EQ(0.0, Scheduling::scheduleConstants[1].getCurrentValue());
 }
 
 TEST_F(SchedulingTestFixture, ScheduleConstant_TestClearState)
 {
+    std::string const idf_objects = delimited_string({"Schedule:Constant,Always On,,1.0;"});
+    ASSERT_TRUE(process_idf(idf_objects));
     Scheduling::ScheduleConstant::processInput();
     Scheduling::ScheduleConstant::clear_state();
     EXPECT_EQ(0u, Scheduling::scheduleConstants.size());
+}
+
+TEST_F(SchedulingTestFixture, ScheduleConstant_TestDuplicateNames)
+{
+    std::string const idf_objects = delimited_string({"Schedule:Constant,Always On,,1.0;", "Schedule:Compact,Always On,,1.0;"});
+    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_THROW(Scheduling::processAllSchedules(), std::runtime_error);
+}
+
+TEST_F(SchedulingTestFixture, ScheduleConstant_UpdateValueAndEMS)
+{
+    std::string const idf_objects = delimited_string({"Schedule:Constant,Always On,,1.0;"});
+    ASSERT_TRUE(process_idf(idf_objects));
+    auto thisSched = Scheduling::getScheduleReference("ALWAYS ON");
+    EXPECT_EQ(1.0, thisSched->getCurrentValue());
+    // now override with EMS
+    thisSched->emsActuatedOn = true;
+    thisSched->emsActuatedValue = 14.0;
+    Scheduling::updateAllSchedules(0.0);
+    EXPECT_EQ(14.0, thisSched->getCurrentValue());
+}
+
+TEST_F(SchedulingTestFixture, ScheduleConstant_TestValidation)
+{
+    std::string const idf_objects = delimited_string({
+        "Schedule:Constant,Always Low,ThisTypeLimit,1.0;",
+        "Schedule:Constant,Always Hi,ThisTypeLimit,0.1;",
+        "ScheduleTypeLimits,ThisTypeLimit,0.2,0.5,Continuous;"
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+    ASSERT_THROW(Scheduling::processAllSchedules(), std::runtime_error);
 }
 
 } // namespace EnergyPlus

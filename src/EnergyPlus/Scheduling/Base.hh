@@ -62,6 +62,7 @@ struct ScheduleBase
     ScheduleTypeData *typeLimits = nullptr;
     bool emsActuatedOn = false;
     Real64 emsActuatedValue = 0.0;
+    bool inputErrorOccurred = false;
 
     // abstract functions that must be implemented by derived classes
     virtual Real64 getCurrentValue() = 0;
