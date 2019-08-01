@@ -913,7 +913,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected) {
     cbvav.HeatOutAirVolFlow = 0.0;
     cbvav.NoCoolHeatOutAirVolFlow = 0.0;
     cbvav.mixerIndex = 1; // denotes CBVAV is connected to mixer inlet node
-    cbvav.PlenumMixerInletAirNode = 10; // mixer inlet node same different than splitter outlet air node
+    cbvav.PlenumMixerInletAirNode = 10; // mixer inlet node different than splitter outlet air node
     cbvav.AirLoopNumber = 1;
 
     //  initialize node data

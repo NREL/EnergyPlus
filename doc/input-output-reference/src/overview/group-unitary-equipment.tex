@@ -3031,7 +3031,12 @@ objects. When extra dehumidification is required, the system may not be able to 
 
 \paragraph{Field: Plenum or Mixer Inlet Node Name}\label{field-bypass-duct-mixer-node-name}
 
-This alpha field defines the name of the HVAC system node where the bypass air enters the zone mixer or return plenum. This name should match the name of the inlet node in the \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer} or \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} associated with this system. This node name must be different from the system's air outlet node or bypass duct splitter node name.
+This alpha field defines the name of the HVAC system node where the bypass air enters the zone mixer or return plenum. This node name must be different from the system's \textbf{\hyperref[field-air-outlet-node-name-3-002]{Air Outlet Node Name}} and \textbf{\hyperref[field-bypass-duct-splitter-node-name]{Bypass Duct Splitter Node Name}}. This name should match the name of the inlet node in the \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer} or \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} associated with this system.
+
+\paragraph{Field: Minimum Runtime Before Operating Mode Change}\label{minimum-runtime-before-operating-mode-change}
+
+This numeric field defines the amount of time, in hours, the HVAC system operates before a mode change is allowed. The value entered must be greater than or equal to 0. The default value is 0.25 hours if this input is present and blank. If this field is not present the minimum runtime is 0 hours (i.e., immediate change over as needed).
+\medskip
 
 As shown in the example below, correct specification of the CBVAV unitary system requires specification of the following objects in addition to the AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass object:
 
@@ -3045,7 +3050,7 @@ As shown in the example below, correct specification of the CBVAV unitary system
 
 5)~~~terminal unit for each zone being served by this system (\hyperref[airterminalsingleductvavheatandcoolreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat} or \hyperref[airterminalsingleductvavheatandcoolnoreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat})
 
-6)~~~When the Plenum or Mixer Inlet Node Name is specified, this node name must connect to either a \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer} or \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} and the \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem} may then be used to control the outdoor air flow rates and, therefore, the inlet condition to the unit.
+6)~~~When the Plenum or Mixer Inlet Node Name is specified, this node name must connect to either the \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer} or \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} and the \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem} may then be used to control the outdoor air flow rates. When using the AirloopHVAC:OutdoorAirSystem it is recommended that the Cooling, Heating and No Load Outdoor Air Flow Rate inputs are set to 0, otherwise the amount of outdoor air is increased and the coils may not autosize properly.
 
 Note: The fan, heating coil, cooling coil, and outdoor air mixer must be connected in the air loop according to the configurations shown above (Figure~\ref{fig:schematic-of-a-cbvav-unitary-system-draw}, Figure~\ref{fig:schematic-of-a-cbvav-unitary-system-blow} or Figure~\ref{fig:schematic-of-a-cbvav-unitary-system-used-with-outdoor-air-system}).
 
@@ -3199,6 +3204,8 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
   HVAC,Average,Unitary System Bypass Air Mass Flow Rate {[}kg/s{]}
 \item
   HVAC,Average,Unitary System Air Outlet Setpoint Temperature {[}C{]}
+\item
+  HVAC,Average,Unitary System Operating Mode Index {[]}
 \end{itemize}
 
 \paragraph{Unitary System Total Heating Rate {[}W{]}}\label{unitary-system-total-heating-rate-w-2}
@@ -3272,3 +3279,7 @@ This output field is the mass flow rate of air, in kg/s, being bypassed from the
 \paragraph{Unitary System Air Outlet Setpoint Temperature {[}C{]}}\label{unitary-system-air-outlet-setpoint-temperature-c}
 
 This output field is the dry-bulb set point temperature in degrees Celsius. This set point temperature is calculated by the model based on the zone cooling/heating loads calculated by EnergyPlus, and the priority control mode and the dehumidification control type specified for this unitary system. The CBVAV system attempts to achieve the outlet air set point temperature to the extent possible.
+
+\paragraph{Unitary System Operating Mode Index {[]}}\label{unitary-system-operating-mode-index}
+
+This output field is the current operating mode, either cooling, heating or no cooling or heating.  A value of 0 represents no cooling or heating is required, a value of 1 represents cooling and a value of 2 represents heating. These specific values can be seen using the detailed time step reporting frequency. If longer reporting frequencies are used (e.g., timestep, hourly, etc.) then this output is averaged over the reporting interval and the result is dependent on the value selected for \hyperref[minimum-runtime-before-operating-mode-change]{Minimum Runtime Before Operating Mode Change}.
