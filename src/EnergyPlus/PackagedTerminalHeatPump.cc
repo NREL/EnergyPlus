@@ -830,7 +830,7 @@ namespace PackagedTerminalHeatPump {
             if (UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:SystemModel")) {
                 PTUnit(PTUnitNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(PTUnit(PTUnitNum).FanName)); // call constructor
-                PTUnit(PTUnitNum).FanIndex = HVACFan::getFanObjectVectorIndex(PTUnit(PTUnitNum).FanName, true);
+                PTUnit(PTUnitNum).FanIndex = HVACFan::getFanObjectVectorIndex(PTUnit(PTUnitNum).FanName);
                 FanInletNodeNum = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->inletNodeNum;
                 FanOutletNodeNum = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->outletNodeNum;
                 FanVolFlow = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
@@ -1714,7 +1714,7 @@ namespace PackagedTerminalHeatPump {
             if (UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:SystemModel")) {
                 PTUnit(PTUnitNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(PTUnit(PTUnitNum).FanName)); // call constructor
-                PTUnit(PTUnitNum).FanIndex = HVACFan::getFanObjectVectorIndex(PTUnit(PTUnitNum).FanName, true);
+                PTUnit(PTUnitNum).FanIndex = HVACFan::getFanObjectVectorIndex(PTUnit(PTUnitNum).FanName);
                 FanInletNodeNum = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->inletNodeNum;
                 FanOutletNodeNum = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->outletNodeNum;
                 FanVolFlow = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;
@@ -2451,7 +2451,7 @@ namespace PackagedTerminalHeatPump {
                 if (UtilityRoutines::SameString(PTUnit(PTUnitNum).FanType, "Fan:SystemModel")) {
                     PTUnit(PTUnitNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(PTUnit(PTUnitNum).FanName)); // call constructor
-                    PTUnit(PTUnitNum).FanIndex = HVACFan::getFanObjectVectorIndex(PTUnit(PTUnitNum).FanName, true);
+                    PTUnit(PTUnitNum).FanIndex = HVACFan::getFanObjectVectorIndex(PTUnit(PTUnitNum).FanName);
                     FanInletNodeNum = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->inletNodeNum;
                     FanOutletNodeNum = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->outletNodeNum;
                     FanVolFlow = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->designAirVolFlowRate;

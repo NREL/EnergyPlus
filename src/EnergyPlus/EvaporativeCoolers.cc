@@ -3766,7 +3766,7 @@ namespace EvaporativeCoolers {
 
                     ZoneEvapUnit(UnitLoop).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(ZoneEvapUnit(UnitLoop).FanName)); // call constructor
-                    ZoneEvapUnit(UnitLoop).FanIndex = HVACFan::getFanObjectVectorIndex(ZoneEvapUnit(UnitLoop).FanName, true);
+                    ZoneEvapUnit(UnitLoop).FanIndex = HVACFan::getFanObjectVectorIndex(ZoneEvapUnit(UnitLoop).FanName);
                     ZoneEvapUnit(UnitLoop).FanInletNodeNum = HVACFan::fanObjs[ZoneEvapUnit(UnitLoop).FanIndex]->inletNodeNum;
                     ZoneEvapUnit(UnitLoop).FanOutletNodeNum = HVACFan::fanObjs[ZoneEvapUnit(UnitLoop).FanIndex]->outletNodeNum;
                     ZoneEvapUnit(UnitLoop).ActualFanVolFlowRate = HVACFan::fanObjs[ZoneEvapUnit(UnitLoop).FanIndex]->designAirVolFlowRate;

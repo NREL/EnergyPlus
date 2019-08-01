@@ -1973,7 +1973,7 @@ namespace WaterThermalTanks {
                         if (UtilityRoutines::SameString(HPWH.FanType, "Fan:SystemModel")) {
                             HPWH.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                             HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(HPWH.FanName)); // call constructor
-                            HPWH.FanNum = HVACFan::getFanObjectVectorIndex(HPWH.FanName, true);
+                            HPWH.FanNum = HVACFan::getFanObjectVectorIndex(HPWH.FanName);
                             FanVolFlow = HVACFan::fanObjs[HPWH.FanNum]->designAirVolFlowRate;
 
                         } else {

@@ -1263,11 +1263,11 @@ namespace SimAirServingZones {
                                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name));
                             }
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompIndex =
-                                HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, true) +
+                                HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name) +
                                 1; // + 1 for shift from zero-based vector to 1-based compIndex
                                    // cpw22Aug2010 Add Fan_ComponentModel type (new num=24)
                             HVACFan::fanObjs[HVACFan::getFanObjectVectorIndex(
-                                                 PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, true)]
+                                                 PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name)]
                                 ->AirPathFlag = true;
                         } else if (componentType == "FAN:COMPONENTMODEL") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Fan_ComponentModel;
@@ -2084,18 +2084,18 @@ namespace SimAirServingZones {
                                 if (FoundOASys) {
                                     if (PrimaryAirSystem(AirLoopNum).Branch(BranchNum).DuctType != 3) {
                                         SupFanIndex =
-                                            HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, true);
+                                            HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
                                         supFanModelType = objectVectorOOFanSystemModel;
                                         goto EndOfAirLoop;
                                     }
                                 } else {
                                     RetFanIndex =
-                                        HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, true);
+                                        HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
                                     retFanModelType = objectVectorOOFanSystemModel;
                                 }
                             } else {
                                 SupFanIndex =
-                                    HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, true);
+                                    HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name);
                                 supFanModelType = objectVectorOOFanSystemModel;
                                 goto EndOfAirLoop;
                             }
@@ -3563,7 +3563,7 @@ namespace SimAirServingZones {
 
             } else if (SELECT_CASE_var == Fan_System_Object) { // "Fan:SystemModel" new for V8.6
                 if (CompIndex == 0) {                          // 0 means has not been filled because of 1-based arrays in old fortran
-                    CompIndex = HVACFan::getFanObjectVectorIndex(CompName, true) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
+                    CompIndex = HVACFan::getFanObjectVectorIndex(CompName) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
                 }
                 // if the fan is here, it can't (yet) really be cycling fan operation, set this ugly global in the event that there are dx coils
                 // involved but the fan should really run like constant volume and not cycle with compressor

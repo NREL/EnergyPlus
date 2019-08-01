@@ -103,8 +103,7 @@ namespace HVACFan {
                 }
             }
         }
-        if (!found && ErrorCheck)
-            {
+        if (!found && ErrorCheck) {
             ShowSevereError("getFanObjectVectorIndex: did not find Fan:SystemModel name =" + objectName + ". Check inputs");
         }
         return index;

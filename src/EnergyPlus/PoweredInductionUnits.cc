@@ -437,7 +437,7 @@ namespace PoweredInductionUnits {
             if (HVACFan::checkIfFanNameIsAFanSystem(PIU(PIUNum).FanName)) {
                 PIU(PIUNum).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(PIU(PIUNum).FanName)); // call constructor
-                PIU(PIUNum).Fan_Index = HVACFan::getFanObjectVectorIndex(PIU(PIUNum).FanName, true);
+                PIU(PIUNum).Fan_Index = HVACFan::getFanObjectVectorIndex(PIU(PIUNum).FanName);
                 PIU(PIUNum).FanAvailSchedPtr = HVACFan::fanObjs[PIU(PIUNum).Fan_Index]->availSchedIndex;
             } else {
                 bool isNotOkay(false);
@@ -644,7 +644,7 @@ namespace PoweredInductionUnits {
             if (HVACFan::checkIfFanNameIsAFanSystem(PIU(PIUNum).FanName)) {
                 PIU(PIUNum).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
                 HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(PIU(PIUNum).FanName)); // call constructor
-                PIU(PIUNum).Fan_Index = HVACFan::getFanObjectVectorIndex(PIU(PIUNum).FanName, true);
+                PIU(PIUNum).Fan_Index = HVACFan::getFanObjectVectorIndex(PIU(PIUNum).FanName);
                 PIU(PIUNum).FanAvailSchedPtr = HVACFan::fanObjs[PIU(PIUNum).Fan_Index]->availSchedIndex;
             } else {
                 bool isNotOkay(false);

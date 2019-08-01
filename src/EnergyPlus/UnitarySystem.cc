@@ -3361,7 +3361,7 @@ namespace UnitarySystems {
                                 if (HVACFan::getFanObjectVectorIndex(loc_m_FanName, false) < 0) {
                                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(loc_m_FanName)); // call constructor
                                 }
-                                thisSys.m_FanIndex = HVACFan::getFanObjectVectorIndex(loc_m_FanName, true);
+                                thisSys.m_FanIndex = HVACFan::getFanObjectVectorIndex(loc_m_FanName);
                                 if (thisSys.m_FanIndex > -1) {
                                     FanInletNode = HVACFan::fanObjs[thisSys.m_FanIndex]->inletNodeNum;
                                     FanOutletNode = HVACFan::fanObjs[thisSys.m_FanIndex]->outletNodeNum;

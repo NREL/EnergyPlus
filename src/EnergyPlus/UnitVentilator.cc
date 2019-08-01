@@ -562,7 +562,7 @@ namespace UnitVentilator {
                 } else if (UtilityRoutines::SameString(UnitVent(UnitVentNum).FanType, "Fan:SystemModel")) {
                     UnitVent(UnitVentNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(UnitVent(UnitVentNum).FanName));              // call constructor
-                    UnitVent(UnitVentNum).Fan_Index = HVACFan::getFanObjectVectorIndex(UnitVent(UnitVentNum).FanName, true); // zero-based
+                    UnitVent(UnitVentNum).Fan_Index = HVACFan::getFanObjectVectorIndex(UnitVent(UnitVentNum).FanName); // zero-based
                     UnitVent(UnitVentNum).FanOutletNode = HVACFan::fanObjs[UnitVent(UnitVentNum).Fan_Index]->outletNodeNum;
                     FanVolFlow = HVACFan::fanObjs[UnitVent(UnitVentNum).Fan_Index]->designAirVolFlowRate;
                     if (FanVolFlow != AutoSize && UnitVent(UnitVentNum).MaxAirVolFlow != AutoSize &&

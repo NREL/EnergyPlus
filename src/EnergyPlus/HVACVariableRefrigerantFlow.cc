@@ -3411,7 +3411,7 @@ namespace HVACVariableRefrigerantFlow {
 
                 } else {                                                            // mine data from fan object
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(FanName)); // call constructor
-                    VRFTU(VRFTUNum).FanIndex = HVACFan::getFanObjectVectorIndex(FanName, true);
+                    VRFTU(VRFTUNum).FanIndex = HVACFan::getFanObjectVectorIndex(FanName);
                     VRFTU(VRFTUNum).ActualFanVolFlowRate = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->designAirVolFlowRate;
                     FanInletNodeNum = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->inletNodeNum;
                     FanOutletNodeNum = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->outletNodeNum;

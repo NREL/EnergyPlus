@@ -744,7 +744,7 @@ namespace HVACUnitaryBypassVAV {
                 if (UtilityRoutines::SameString(CBVAV(CBVAVNum).FanType, "Fan:SystemModel")) {
                     CBVAV(CBVAVNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(CBVAV(CBVAVNum).FanName)); // call constructor
-                    CBVAV(CBVAVNum).FanIndex = HVACFan::getFanObjectVectorIndex(CBVAV(CBVAVNum).FanName, true);
+                    CBVAV(CBVAVNum).FanIndex = HVACFan::getFanObjectVectorIndex(CBVAV(CBVAVNum).FanName);
                     CBVAV(CBVAVNum).FanInletNodeNum = HVACFan::fanObjs[CBVAV(CBVAVNum).FanIndex]->inletNodeNum;
                     fanOutletNode = HVACFan::fanObjs[CBVAV(CBVAVNum).FanIndex]->outletNodeNum;
                     CBVAV(CBVAVNum).FanVolFlow = HVACFan::fanObjs[CBVAV(CBVAVNum).FanIndex]->designAirVolFlowRate;
