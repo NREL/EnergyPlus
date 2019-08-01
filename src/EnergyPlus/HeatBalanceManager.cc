@@ -1876,7 +1876,7 @@ namespace HeatBalanceManager {
             Material(MaterNum).AbsorpSolarInput = 0.0;
             Material(MaterNum).AbsorpVisible = 0.0;
             Material(MaterNum).AbsorpVisibleInput = 0.0;
-            HeatBalanceManager::NominalR(MaterNum) = Material(MaterNum).Resistance;
+            NominalR(MaterNum) = Material(MaterNum).Resistance;
             if (GlobalNames::VerifyUniqueInterObjectName(
                 UniqueMaterialNames, Material(MaterNum).Name, CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                 ShowContinueError("...All Material names must be unique regardless of subtype.");
@@ -7585,8 +7585,16 @@ namespace HeatBalanceManager {
                     thisConstruct.TypeIsAirBoundaryLumpedAirMass = true;
                 } else if (UtilityRoutines::SameString(airMethod, "SimpleMixing")) {
                     thisConstruct.TypeIsAirBoundaryMixing = true;
-                    thisConstruct.AirBoundaryACH = fields.at("simple_mixing_air_changes_per_hour");
-                    thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(fields.at("simple_mixing_schedule_name"));
+                    if (fields.find("simple_mixing_air_changes_per_hour") != fields.end()) {
+                        thisConstruct.AirBoundaryACH = fields.at("simple_mixing_air_changes_per_hour");
+                    } else {
+                        if (!inputProcessor->getDefaultValue(
+                                cCurrentModuleObject, "simple_mixing_air_changes_per_hour", thisConstruct.AirBoundaryACH))
+                            errorsFound = true;
+                    }
+                    if (fields.find("simple_mixing_schedule_name") != fields.end()) {
+                        thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(fields.at("simple_mixing_schedule_name"));
+                    }
                 }
             }
         }
