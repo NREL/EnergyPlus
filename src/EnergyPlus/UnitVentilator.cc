@@ -3433,7 +3433,7 @@ namespace UnitVentilator {
 
             if (UnitVent(UnitVentNum).CCoilPresent) {
 
-                mdot = UnitVent(UnitVentNum).MaxColdWaterFlow * PartLoadRatio;
+                mdot = CalcMdotCCoilCycFan(QZnReq,UnitVentNum,PartLoadRatio);
                 SetComponentFlowRate(mdot,
                                      UnitVent(UnitVentNum).ColdControlNode,
                                      UnitVent(UnitVentNum).ColdCoilOutNodeNum,
@@ -4026,7 +4026,22 @@ namespace UnitVentilator {
         return ActualOAMassFlowRate;
     }
 
+    Real64 CalcMdotCCoilCycFan(Real64 const QZnReq,         // Zone load to setpoint
+                               Real64 const UnitVentNum,    // Unit Ventilator index
+                               Real64 const PartLoadRatio   // Part load ratio for unit ventilator
+    )
+    {
+        Real64 mdot(0.0);   // Result or return value
 
+        if (QZnReq >= 0.0) {
+            mdot = 0.0;
+        } else {
+            mdot = UnitVent(UnitVentNum).MaxColdWaterFlow * PartLoadRatio;
+        }
+        
+        return mdot;
+    }
+    
 } // namespace UnitVentilator
 
 } // namespace EnergyPlus

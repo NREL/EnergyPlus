@@ -316,6 +316,11 @@ namespace UnitVentilator {
                                                       Real64 const Tinlet,          // Inlet Temperature to Unit or Zone Temperature
                                                       Real64 const Toutdoor         // Outdoor Air Temperature
     );
+    
+    Real64 CalcMdotCCoilCycFan(Real64 const QZnReq,         // Zone load to setpoint
+                               Real64 const UnitVentNum,    // Unit Ventilator index
+                               Real64 const PartLoadRatio   // Part load ratio for unit ventilator
+    );
 
 } // namespace UnitVentilator
 
