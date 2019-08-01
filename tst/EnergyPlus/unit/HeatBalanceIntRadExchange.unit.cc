@@ -58,6 +58,8 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
 using namespace EnergyPlus::HeatBalanceIntRadExchange;
 
@@ -217,6 +219,93 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     DataHeatBalance::Material(1).AbsorpThermal = DataHeatBalance::Construct(1).InsideAbsorpThermal;
     HeatBalanceIntRadExchange::UpdateMovableInsulationFlag(DidMIChange, SurfNum);
     EXPECT_TRUE(!DidMIChange);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "Zone 1;             !- Name",
+
+        "Zone,",
+        "Zone 2;             !- Name",
+
+        "Zone,",
+        "Zone 3;             !- Name",
+
+        "Zone,",
+        "Zone 4;             !- Name",
+
+        "Zone,",
+        "Zone 5;             !- Name",
+
+        "ZoneProperty:UserViewFactors:bySurfaceName,",
+        "Zone 3,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+
+        "ZoneProperty:UserViewFactors:bySurfaceName,",
+        "Perimeter Zones,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+
+        "ZoneList,",
+        "Perimeter Zones, !- Name",
+        "Zone 5, !- Zone 1 Name",
+        "Zone 2; !- Zone 2 Name",
+
+        "ZoneProperty:UserViewFactors:bySurfaceName,",
+        "Zone 6,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+        });
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    //auto numZones = inputProcessor->getNumObjectsFound("Zone");
+    //DataHeatBalFanSys::ZoneReOrder.allocate(numZones);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    DataViewFactorInformation::NumOfRadiantEnclosures = 3;
+    DataViewFactorInformation::ZoneInfo.allocate(3);
+    DataViewFactorInformation::ZoneInfo(1).Name = "Enclosure 1";
+    DataViewFactorInformation::ZoneInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 2"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 1"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneInfo(2).Name = "Enclosure 2";
+    DataViewFactorInformation::ZoneInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 4"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneInfo(3).Name = "Zone 3";
+
+    ErrorsFound = false;
+    HeatBalanceIntRadExchange::AlignInputViewFactors("ZoneProperty:UserViewFactors:bySurfaceName", ErrorsFound);
+    EXPECT_TRUE(ErrorsFound);
+    std::string const error_string = delimited_string({
+    "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:bySurfaceName=\"Perimeter Zones\" ZoneList zones are not the same as enclosure zones.",
+    "   **   ~~~   ** ZoneList zones not found in this enclosure as defined by Construction:AirBoundary surfaces:",
+    "   **   ~~~   ** ZONE 5",
+    "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:bySurfaceName=\"Perimeter Zones\" ZoneList zones are not the same as enclosure zones.",
+    "   **   ~~~   ** Enclosure zones (as defined by Construction:AirBoundary surfaces) not found in this ZoneList:",
+    "   **   ~~~   ** ZONE 1",
+    "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:bySurfaceName=\"Zone 6\" did not find a matching Zone or ZoneList name."
+        });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    EXPECT_EQ(DataViewFactorInformation::ZoneInfo(1).Name, "Perimeter Zones");
+    EXPECT_EQ(DataViewFactorInformation::ZoneInfo(2).Name, "Enclosure 2");
+    EXPECT_EQ(DataViewFactorInformation::ZoneInfo(3).Name, "Zone 3");
+
+
 }
 
 } // namespace EnergyPlus
