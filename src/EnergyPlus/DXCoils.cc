@@ -7626,6 +7626,8 @@ namespace DXCoils {
                                                    DXCoil(DXCoilNum).Name,
                                                    "Speed " + TrimSigDigits(Mode) + " User-Specified Rated Sensible Heat Ratio",
                                                    DXCoil(DXCoilNum).MSRatedSHR(Mode));
+                                // added for rated sensible cooling capacity estimate for html reporting, issue #7381
+                                DXCoil(DXCoilNum).RatedSHR(1) = DXCoil(DXCoilNum).MSRatedSHR(Mode);
                             }
                         } else { // autosize or hard-sized with system sizing data
                             CheckSysSizing(DXCoil(DXCoilNum).DXCoilType, DXCoil(DXCoilNum).Name);
@@ -7639,6 +7641,8 @@ namespace DXCoils {
                                                    DXCoil(DXCoilNum).Name,
                                                    "Speed " + TrimSigDigits(Mode) + " User-Specified Rated Sensible Heat Ratio",
                                                    DXCoil(DXCoilNum).MSRatedSHR(Mode));
+                                // added for rated sensible cooling capacity estimate for html reporting, issue #7381
+                                DXCoil(DXCoilNum).RatedSHR(1) = DXCoil(DXCoilNum).MSRatedSHR(Mode);
                             }
                         } else { // autosize or hard-sized with system sizing data
                             CheckZoneSizing(DXCoil(DXCoilNum).DXCoilType, DXCoil(DXCoilNum).Name);
@@ -7673,6 +7677,8 @@ namespace DXCoils {
                                            DXCoil(DXCoilNum).Name,
                                            "Speed " + TrimSigDigits(Mode) + " Design Size Rated Sensible Heat Ratio",
                                            MSRatedSHRDes);
+                        // added for rated sensible cooling capacity estimate for html reporting, issue #7381
+                        DXCoil(DXCoilNum).RatedSHR(1) = MSRatedSHRDes;
                     } else {
                         if (DXCoil(DXCoilNum).MSRatedSHR(Mode) > 0.0 && MSRatedSHRDes > 0.0 && !HardSizeNoDesRun) {
                             MSRatedSHRUser = DXCoil(DXCoilNum).MSRatedSHR(Mode);
@@ -7934,14 +7940,16 @@ namespace DXCoils {
                     PrintFlag = true;
                     CompName = DXCoil(DXCoilNum).Name;
                     CompType = DXCoil(DXCoilNum).DXCoilType;
-                    SizingMethod = HeatingCapacitySizing;
+                    SizingMethod = AutoCalculateSizing;
                     FieldNum = 10 + (Mode - 1) * 5;
-                    SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
+                    SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [W]";
                     if (IsAutoSize || !HardSizeNoDesRun) {
                         // Auto size low speed capacity to fraction of high speed capacity
-                        SizingMethod = AutoCalculateSizing;
                         DataConstantUsedForSizing = DXCoil(DXCoilNum).MSRatedTotCap(DXCoil(DXCoilNum).NumOfSpeeds);
                         DataFractionUsedForSizing = (float)Mode / DXCoil(DXCoilNum).NumOfSpeeds;
+                    } else {
+                        DataConstantUsedForSizing = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
+                        DataFractionUsedForSizing = 1.0;
                     }
                     TempSize = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
