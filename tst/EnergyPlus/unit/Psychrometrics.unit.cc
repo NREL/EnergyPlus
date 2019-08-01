@@ -59,6 +59,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
 {
 
     Real64 TDP;
+    // Sea level pressure
     Real64 PB = 101325.0;
     Real64 W;
 
@@ -78,5 +79,20 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
     W = Psychrometrics::PsyWFnTdpPb(TDP, PB);
     EXPECT_NEAR(17.5250143, W, 0.0001);
     EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    // Denver barometric pressure 
+    PB = 81000.0;
+    std::string const error_string1 = delimited_string({
+        "   ** Warning ** Calculated partial vapor pressure is greater than the barometric pressure, so that calculated humidity ratio is invalid "
+        "(PsyWFnTdpPb).",
+        "   **   ~~~   **  Routine=Unknown, Environment=, at Simulation time= 00:00 - 00:00",
+        "   **   ~~~   **  Dew-Point= 100.00 Barometric Pressure= 81000.00",
+        "   **   ~~~   ** Instead, calculated Humidity Ratio at 93.0 (7 degree less) = 20.0794 will be used. Simulation continues.",
+    });
+    Psychrometrics::iPsyErrIndex(5) = 0;
+    W = Psychrometrics::PsyWFnTdpPb(TDP, PB);
+    EXPECT_NEAR(20.07942181, W, 0.0001);
+    EXPECT_TRUE(compare_err_stream(error_string1, true));
+
 }
 } // namespace EnergyPlus

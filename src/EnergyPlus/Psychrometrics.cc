@@ -1298,6 +1298,7 @@ namespace Psychrometrics {
     void PsyWFnTdpPb_error(Real64 const TDP,             // dew-point temperature {C}
                            Real64 const PB,              // barometric pressure {Pascals}
                            Real64 const W,               // humidity ratio
+                           Real64 const DeltaT,          // Reduced temperature difference of dew point
                            std::string const &CalledFrom // routine this function was called from (error messages)
     )
     {
@@ -1311,7 +1312,8 @@ namespace Psychrometrics {
                     ShowContinueErrorTimeStamp(" Routine=Unknown,");
                 }
                 ShowContinueError(String);
-                String = "Instead, calculated Humidity Ratio at " + TrimSigDigits(TDP - 1, 1) +  " (1 degree less) = " + TrimSigDigits(W, 4);
+                String = "Instead, calculated Humidity Ratio at " + TrimSigDigits(TDP - DeltaT, 1) + " (" + TrimSigDigits(DeltaT) +
+                         " degree less) = " + TrimSigDigits(W, 4);
                 ShowContinueError(String + " will be used. Simulation continues.");
             }
             ShowRecurringWarningErrorAtEnd("Entered Humidity Ratio invalid (PsyWFnTdpPb)", iPsyErrIndex(iPsyWFnTdpPb), W, W, _, "[]", "[]");
