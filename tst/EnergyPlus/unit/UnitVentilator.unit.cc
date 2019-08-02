@@ -202,5 +202,61 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     EXPECT_NEAR(ExpectedOAMassFlowRate,OAMassFlowRate, 0.0001);
 
 }
+    
+TEST_F(EnergyPlusFixture, UnitVentilatorCalcMdotCCoilCycFanTest)
+{
+ 
+    Real64 QZnReq;
+    int UnitVentNum;
+    Real64 PartLoadRatio;
+    Real64 mdot;
+    Real64 ExpectedResult;
 
+    UnitVentilator::clear_state();
+
+    UnitVentNum = 1;
+    UnitVentilator::UnitVent.allocate(UnitVentNum);
+
+    // Test 1: QZnReq is greater than zero (heating) so mdot should be zero after the call
+    UnitVentilator::UnitVent(1).MaxColdWaterFlow = 0.1234;
+    mdot = -0.9999;
+    QZnReq = 5678.9;
+    PartLoadRatio = 1.0;
+    ExpectedResult = 0.0;
+    mdot = UnitVentilator::CalcMdotCCoilCycFan(QZnReq,UnitVentNum, PartLoadRatio);
+    
+    EXPECT_NEAR(ExpectedResult,mdot,0.0001);
+    
+    // Test 2: QZnReq is zero (no conditioning) so mdot should be zero after the call
+    UnitVentilator::UnitVent(1).MaxColdWaterFlow = 0.1234;
+    mdot = -0.9999;
+    QZnReq = 0.0;
+    PartLoadRatio = 1.0;
+    ExpectedResult = 0.0;
+    mdot = UnitVentilator::CalcMdotCCoilCycFan(QZnReq,UnitVentNum, PartLoadRatio);
+    
+    EXPECT_NEAR(ExpectedResult,mdot,0.0001);
+
+    // Test 3a: QZnReq is less than zero (cooling) so mdot should be non-zero, calculated based on the other variables
+    UnitVentilator::UnitVent(1).MaxColdWaterFlow = 0.1234;
+    mdot = -0.9999;
+    QZnReq = -5678.9;
+    PartLoadRatio = 1.0;
+    ExpectedResult = 0.1234;
+    mdot = UnitVentilator::CalcMdotCCoilCycFan(QZnReq,UnitVentNum, PartLoadRatio);
+    
+    EXPECT_NEAR(ExpectedResult,mdot,0.0001);
+
+    // Test 3b: QZnReq is less than zero (cooling) so mdot should be non-zero, calculated based on the other variables
+    UnitVentilator::UnitVent(1).MaxColdWaterFlow = 1.6;
+    mdot = -0.9999;
+    QZnReq = -5678.9;
+    PartLoadRatio = 0.5;
+    ExpectedResult = 0.8;
+    mdot = UnitVentilator::CalcMdotCCoilCycFan(QZnReq,UnitVentNum, PartLoadRatio);
+    
+    EXPECT_NEAR(ExpectedResult,mdot,0.0001);
+
+}
+    
 } // namespace EnergyPlus

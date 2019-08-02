@@ -318,7 +318,7 @@ namespace UnitVentilator {
     );
     
     Real64 CalcMdotCCoilCycFan(Real64 const QZnReq,         // Zone load to setpoint
-                               Real64 const UnitVentNum,    // Unit Ventilator index
+                               int const UnitVentNum,       // Unit Ventilator index
                                Real64 const PartLoadRatio   // Part load ratio for unit ventilator
     );
 
