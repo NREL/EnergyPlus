@@ -15277,7 +15277,7 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
 
 
 // Missing an AirflowNetwork:Distribution:Node for the Zone Air Node
-TEST_F(EnergyPlusFixture, DISABLED_AFN_CheckMultiZoneNodes_NoZoneNode)
+TEST_F(EnergyPlusFixture, AFN_CheckMultiZoneNodes_NoZoneNode)
 {
     DataGlobals::NumOfZones = 1;
     DataHeatBalance::Zone.allocate(1);
