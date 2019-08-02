@@ -65,12 +65,12 @@ using json = nlohmann::json;
 //#include <DataHVACGlobals.hh>
 //#include <DataIPShortCuts.hh>
 //#include <DataLoopNode.hh>
-//#include <DataPlant.hh>
+#include <DataPlant.hh>
 //#include <DataPrecisionGlobals.hh>
 //#include <DataStringGlobals.hh>
 //#include <DataSystemVariables.hh>
 //#include <DisplayRoutines.hh>
-//#include <FluidProperties.hh>
+#include <FluidProperties.hh>
 //#include <General.hh>
 #include <GroundHeatExchangers.hh>
 //#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
@@ -109,6 +109,7 @@ namespace GroundHeatExchangers {
     //   Ground Heat Exchanger.' Applied Energy. Vol 114, 57-69.
 
     //    // Using/Aliasing
+    using DataPlant::PlantLoop;
     //    using namespace DataPrecisionGlobals;
     //    using DataGlobals::BeginEnvrnFlag;
     //    using DataGlobals::BeginHourFlag;
@@ -187,22 +188,82 @@ namespace GroundHeatExchangers {
         // singleBoreholesVector.clear();
     }
 
-    void Pipe::init(const json& _j)
+    Real64 Pipe::calcTransitTime(Real64 flowRate, Real64 temperature)
     {
-        // init pipe
-        for (auto data : _j) {
-            // init properties
-            auto k = data["conductivity"];
-            auto rho = data["density"];
-            auto cp = static_cast<Real64>(data["specific-heat"]);
-            rhoCp = rho * cp;
-            diffusivity = k / rhoCp;
+        // PURPOSE OF THIS SUBROUTINE:
+        // Compute the fluid transit time
 
-            // init geometry
-            auto outDia = static_cast<Real64>(data["outer-diameter"]);
-            auto innerDia = static_cast<Real64>(data["inner-diameter"]);
-            auto length = static_cast<Real64>(data["length"]);
-        }
+        // USE STATEMENTS:
+        using FluidProperties::GetDensityGlycol;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        static std::string const routineName("calcTransitTime");
+
+        Real64 cp =
+            FluidProperties::GetDensityGlycol(PlantLoop(this->loopNum).FluidName, temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
+        Real64 vdot = flowRate / cp;
+        return this->volFluid / vdot;
+    }
+
+    Real64 Pipe::simulate(Real64 time, Real64 timeStep, Real64 flowRate, Real64 temperature)
+    {
+        return 0;
+    }
+
+    void Pipe::plugFlowOutletTemp(Real64 time)
+    {
+    }
+
+    void Pipe::inletTempHistory(Real64 inletTemp, Real64 time)
+    {
+    }
+
+    Real64 Pipe::mdotToRe(Real64 flowRate, Real64 temperature)
+    {
+        return 0;
+    }
+
+    Real64 Pipe::calcFrictionFactor(Real64 re)
+    {
+        return 0;
+    }
+
+    Real64 Pipe::calcCondResist()
+    {
+        return 0;
+    }
+
+    Real64 Pipe::calcConvResist(Real64 flowRate, Real64 temperature)
+    {
+        return 0;
+    }
+
+    Real64 Pipe::calcResist(Real64 flowRate, Real64 temperature)
+    {
+        return 0;
+    }
+
+    Real64 Pipe::laminarNu()
+    {
+        return 0;
+    }
+
+    Real64 Pipe::turbulentNu(Real64 re, Real64 temperature)
+    {
+        return 0;
+    }
+
+    Real64 Pipe::laminarFrictFact(Real64 re)
+    {
+        return 0;
+    }
+
+    Real64 Pipe::turbulentFrictFact(Real64 re)
+    {
+        return 0;
     }
 
     //

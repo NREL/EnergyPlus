@@ -52,7 +52,7 @@
 
 //// EnergyPlus Headers
 //#include <EnergyPlus/DataEnvironment.hh>
-//#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPlant.hh>
 //#include <EnergyPlus/DataSurfaces.hh>
 //#include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
@@ -68,7 +68,7 @@
 using namespace EnergyPlus;
 // using namespace EnergyPlus::DataGlobals;
 // using namespace EnergyPlus::DataLoopNode;
-// using namespace EnergyPlus::DataPlant;
+using namespace EnergyPlus::DataPlant;
 // using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::GroundHeatExchangers;
 // using namespace EnergyPlus::HeatBalanceManager;
@@ -76,20 +76,71 @@ using namespace EnergyPlus::GroundHeatExchangers;
 // using namespace EnergyPlus::ScheduleManager;
 // using namespace EnergyPlus::PlantManager;
 
-TEST_F(EnergyPlusFixture, GHE_Pipe_Init)
+TEST_F(EnergyPlusFixture, GHE_BaseProps_init)
 {
-    json j;
-    j["conductivity"] = 0.4;
-    j["density"] = 950;
-    j["specific-heat"] = 1900;
-    j["outer-diameter"] = 0.4;
-    j["inner-diameter"] = 0.35;
-    j["length"] = 100;
+    json j = {{"conductivity", 0.4}, {"density", 950}, {"specific-heat", 1900}};
 
-    Pipe pipe;
-    pipe.init(j);
+    BaseProps props(j);
+    EXPECT_EQ(props.k, 0.4);
+    EXPECT_EQ(props.rho, 950);
+    EXPECT_EQ(props.cp, 1900);
+    EXPECT_EQ(props.rhoCp, 950 * 1900);
+    EXPECT_EQ(props.diffusivity, 0.4 / (950 * 1900));
+}
 
+TEST_F(EnergyPlusFixture, GHE_Pipe_init)
+{
+
+    DataPlant::PlantLoop.allocate(2);
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(1).FluidIndex = 1;
+    DataPlant::PlantLoop(1).FluidName = "WATER";
+
+    json j = {{"conductivity", 0.4},
+              {"density", 950},
+              {"specific-heat", 1900},
+              {"outer-diameter", 0.0334},
+              {"inner-diameter", 0.0269},
+              {"length", 100},
+              {"initial-temperature", 10},
+              {"loop-num", 1}};
+
+    Pipe pipe(j);
+
+    Real64 tol = 0.0001;
+
+    // properties
     EXPECT_EQ(pipe.k, 0.4);
+    EXPECT_EQ(pipe.rho, 950);
+    EXPECT_EQ(pipe.cp, 1900);
+    EXPECT_EQ(pipe.rhoCp, 950 * 1900);
+    EXPECT_EQ(pipe.diffusivity, 0.4 / (950 * 1900));
+
+    // geometry
+    EXPECT_EQ(pipe.outDia, 0.0334);
+    EXPECT_EQ(pipe.innerDia, 0.0269);
+    EXPECT_EQ(pipe.length, 100);
+    EXPECT_NEAR(pipe.outRadius, 0.0334 / 2, tol);
+    EXPECT_NEAR(pipe.innerRadius, 0.0269 / 2, tol);
+    EXPECT_NEAR(pipe.wallThickness, 0.00325, tol);
+
+    // areas
+    EXPECT_NEAR(pipe.areaCrOuter, 8.761E-4, tol);
+    EXPECT_NEAR(pipe.areaCrInner, 5.628E-4, tol);
+    EXPECT_NEAR(pipe.areaCrPipe, 3.078E-4, tol);
+    EXPECT_NEAR(pipe.areaSurfOuter, 10.4929, tol);
+    EXPECT_NEAR(pipe.areaSurfInner, 8.4508, tol);
+
+    // volumes
+    EXPECT_NEAR(pipe.volTotal, 0.0876, tol);
+    EXPECT_NEAR(pipe.volFluid, 0.0568, tol);
+    EXPECT_NEAR(pipe.volPipeWall, 0.0307, tol);
+
+    DataPlant::PlantLoop.deallocate();
+}
+
+TEST_F(EnergyPlusFixture, Pipe_calcTransitTime)
+{
 }
 
 // TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Interpolate)

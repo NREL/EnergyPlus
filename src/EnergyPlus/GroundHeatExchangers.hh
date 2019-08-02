@@ -48,6 +48,9 @@
 #ifndef GroundHeatExchangers_hh_INCLUDED
 #define GroundHeatExchangers_hh_INCLUDED
 
+// C++ headers
+#include <deque>
+
 // ObjexxFCL Headers
 //#include <ObjexxFCL/Array1D.hh>
 
@@ -56,7 +59,7 @@
 using json = nlohmann::json;
 
 // EnergyPlus Headers
-//#include <DataGlobals.hh>
+#include <DataGlobals.hh>
 #include <EnergyPlus.hh>
 //#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 //#include <PlantComponent.hh>
@@ -66,6 +69,7 @@ namespace EnergyPlus {
 namespace GroundHeatExchangers {
 
     // Using/Aliasing
+    using DataGlobals::Pi;
     // using namespace GroundTemperatureManager;
 
     // Data
@@ -90,6 +94,16 @@ namespace GroundHeatExchangers {
         Real64 rhoCp = 0.0;       // Heat capacity [J/m3-K]
         Real64 diffusivity = 0.0; // Thermal diffusivity [m2/s]
 
+        // constructor
+        BaseProps(const json &j)
+        {
+            this->k = j["conductivity"];
+            this->rho = j["density"];
+            this->cp = j["specific-heat"];
+            this->rhoCp = rho * cp;
+            this->diffusivity = k / this->rhoCp;
+        }
+
         // default constructor
         BaseProps() = default;
 
@@ -100,10 +114,74 @@ namespace GroundHeatExchangers {
     struct Pipe : public BaseProps
     {
 
-        // member variables
-        Real64 outDia = 0.0;   // Outer diameter [m]
-        Real64 innerDia = 0.0; // Inner diameter [m]
-        Real64 length = 0.0;   // Length [m]
+        // E+ member variables
+        int loopNum = 0;
+
+        // model member variables
+        Real64 outDia = 0.0;        // Outer diameter [m]
+        Real64 innerDia = 0.0;      // Inner diameter [m]
+        Real64 length = 0.0;        // Length [m]
+        Real64 outRadius = 0.0;     // Outer radius [m]
+        Real64 innerRadius = 0.0;   // Inner radius [m]
+        Real64 wallThickness = 0.0; // Pipe wall thickness [m]
+        Real64 areaCrOuter = 0.0;   // Outer cross-sectional area [m2]
+        Real64 areaCrInner = 0.0;   // Inner cross-sectional area [m2]
+        Real64 areaCrPipe = 0.0;    // Pipe wall cross-sectional area [m2]
+        Real64 areaSurfOuter = 0.0; // Pipe outer surface area [m2]
+        Real64 areaSurfInner = 0.0; // Pipe inner surface area [m2]
+        Real64 volTotal = 0.0;      // Total pipe volume [m3]
+        Real64 volFluid = 0.0;      // Fluid volume [m3]
+        Real64 volPipeWall = 0.0;   // Pipe wall volume [m3]
+        Real64 f = 0.0;             // Friction factor [-]
+        Real64 resistPipe = 0.0;    // Total pipe resistance [K/(W/m)]
+        Real64 resistConv = 0.0;    // Pipe convection resistance [K/(W/m)]
+        int const numCells = 16;    // Number of pipe elements
+        Real64 re = 0.0;            // Reynolds number
+        std::vector<Real64> cellTemps = {
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // Pipe temperature for each node
+        std::deque<Real64> inletTemps = {0.0};                                               // Inlet temperature history [C]
+        std::deque<Real64> inletTempTimes = {0.0};                                           // Times for respective inlet temperatures [s]
+        Real64 outletTemp = 0.0;                                                             // Pipe outlet temperature [C]
+
+        // constructor
+        Pipe(const json &j)
+        {
+            // E+
+            this->loopNum = j["loop-num"];
+
+            // properties
+            BaseProps tmpProps(j);
+            this->k = tmpProps.k;
+            this->rho = tmpProps.rho;
+            this->cp = tmpProps.cp;
+            this->rhoCp = tmpProps.rhoCp;
+            this->diffusivity = tmpProps.diffusivity;
+
+            // geometry
+            this->outDia = j["outer-diameter"];
+            this->innerDia = j["inner-diameter"];
+            this->length = j["length"];
+            this->outRadius = this->outDia / 2;
+            this->innerRadius = this->innerDia / 2;
+            this->wallThickness = this->outRadius - this->innerRadius;
+
+            // areas
+            this->areaCrOuter = (Pi / 4) * pow(this->outDia, 2);
+            this->areaCrInner = (Pi / 4) * pow(this->innerDia, 2);
+            this->areaCrPipe = this->areaCrOuter - this->areaCrInner;
+            this->areaSurfOuter = Pi * this->outDia * this->length;
+            this->areaSurfInner = Pi * this->innerDia * this->length;
+
+            // volumes
+            this->volTotal = this->areaCrOuter * this->length;
+            this->volFluid = this->areaCrInner * this->length;
+            this->volPipeWall = this->volTotal - this->volFluid;
+
+            Real64 initTemp = j["initial-temperature"];
+            std::replace(this->cellTemps.begin(), this->cellTemps.end(), 0.0, initTemp);
+
+            //
+        }
 
         // default constructor
         Pipe() = default;
@@ -112,7 +190,19 @@ namespace GroundHeatExchangers {
         ~Pipe() = default;
 
         // members functions
-        void init(const json& _j);
+        Real64 calcTransitTime(Real64 flowRate, Real64 temperature);
+        Real64 simulate(Real64 time, Real64 timeStep, Real64 flowRate, Real64 temperature);
+        void plugFlowOutletTemp(Real64 time);
+        void inletTempHistory(Real64 inletTemp, Real64 time);
+        Real64 mdotToRe(Real64 flowRate, Real64 temperature);
+        Real64 calcFrictionFactor(Real64 re);
+        Real64 calcCondResist();
+        Real64 calcConvResist(Real64 flowRate, Real64 temperature);
+        Real64 calcResist(Real64 flowRate, Real64 temperature);
+        Real64 laminarNu();
+        Real64 turbulentNu(Real64 re, Real64 temperature);
+        Real64 laminarFrictFact(Real64 re);
+        Real64 turbulentFrictFact(Real64 re);
     };
 
     // struct GLHEVertPropsStruct
