@@ -1541,7 +1541,7 @@ namespace HVACUnitaryBypassVAV {
             DataLoopNode::Node(CBVAV(CBVAVNum).MixerReliefAirNode) = DataLoopNode::Node(MixerOutsideAirNode);
             MyEnvrnFlag(CBVAVNum) = false;
             CBVAV(CBVAVNum).LastMode = HeatingMode;
-            CBVAV(CBVAVNum).changeOverTimer = 0.0;
+            CBVAV(CBVAVNum).changeOverTimer = -1.0;
             //   set fluid-side hardware limits
             if (CBVAV(CBVAVNum).CoilControlNode > 0) {
                 //    If water coil max water flow rate is autosized, simulate once in order to mine max water flow rate
@@ -2152,8 +2152,6 @@ namespace HVACUnitaryBypassVAV {
 
         int OutletNode = CBVAV(CBVAVNum).AirOutNode;
         int InletNode = CBVAV(CBVAVNum).AirInNode;
-        int MixerOutsideAirNode = CBVAV(CBVAVNum).MixerOutsideAirNode;
-        int MixerReliefAirNode = CBVAV(CBVAVNum).MixerReliefAirNode;
         if (CBVAV(CBVAVNum).CondenserNodeNum > 0) {
             OutdoorDryBulbTemp = DataLoopNode::Node(CBVAV(CBVAVNum).CondenserNodeNum).Temp;
             OutdoorBaroPress = DataLoopNode::Node(CBVAV(CBVAVNum).CondenserNodeNum).Press;
@@ -3535,7 +3533,6 @@ namespace HVACUnitaryBypassVAV {
         Real64 TSupplyToHeatSetPtMax = -99999.0; // Maximum of the supply air temperatures required to reach the heating setpoint [C]
         Real64 TSupplyToCoolSetPtMin = 99999.0;  // Minimum of the supply air temperatures required to reach the cooling setpoint [C]
 
-        int OutletNode = CBVAV(CBVAVNumber).AirOutNode;
         for (int ZoneNum = 1; ZoneNum <= CBVAV(CBVAVNumber).NumControlledZones; ++ZoneNum) {
             int ZoneNodeNum = CBVAV(CBVAVNumber).ActualZoneNodeNum(ZoneNum);
             int BoxOutletNodeNum = CBVAV(CBVAVNumber).CBVAVBoxOutletNode(ZoneNum);
@@ -3677,7 +3674,7 @@ namespace HVACUnitaryBypassVAV {
         // Par(2) = desired air outlet temperature [C]
 
         int CoilIndex = int(Par(1));
-        Real64 OnOffAirFlowFrac = Par(3);
+        // Real64 OnOffAirFlowFrac = Par(3); // not used
         int CBVAVNumTemp = int(Par(4));
         bool FirstHVACIter = (Par(5) == 1.0);
         bool HXUnitOn = (Par(6) == 1.0); // flag to enable heat exchanger

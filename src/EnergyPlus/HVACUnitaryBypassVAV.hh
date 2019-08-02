@@ -290,7 +290,7 @@ namespace HVACUnitaryBypassVAV {
             MMDXIterationExceededIndex(0), MMDXIterationFailed(0), MMDXIterationFailedIndex(0), DMDXIterationExceeded(0),
             DMDXIterationExceededIndex(0), DMDXIterationFailed(0), DMDXIterationFailedIndex(0), CRDXIterationExceeded(0),
             CRDXIterationExceededIndex(0), CRDXIterationFailed(0), CRDXIterationFailedIndex(0), FirstPass(true), plenumIndex(0), mixerIndex(0),
-            changeOverTimer(0.0), minModeChangeTime(0.0)
+            changeOverTimer(-1.0), minModeChangeTime(0.0)
         {
         }
     };
