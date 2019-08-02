@@ -60,6 +60,8 @@ TEST_F(SchedulingTestFixture, SchedulingManager_TestClearState)
 
 TEST_F(SchedulingTestFixture, SchedulingManager_TestGetScheduleIndex)
 {
+    std::string const idf_objects = delimited_string({"Schedule:Constant,Always On,,1.0;", "Schedule:Constant,Always Off,,0.0;"});
+    ASSERT_TRUE(process_idf(idf_objects));
     Scheduling::processAllSchedules();
     EXPECT_EQ(-1, Scheduling::GetScheduleIndex("my_missing_schedule"));
     EXPECT_EQ(-1, Scheduling::GetScheduleIndex("always on")); // must be capitalized
@@ -74,12 +76,16 @@ TEST_F(SchedulingTestFixture, SchedulingManager_TestZeroIndexScheduleValue)
 
 TEST_F(SchedulingTestFixture, SchedulingManager_TestGetScheduleValue)
 {
+    std::string const idf_objects = delimited_string({"Schedule:Constant,Always On,,1.0;", "Schedule:Constant,Always Off,,0.0;"});
+    ASSERT_TRUE(process_idf(idf_objects));
     Scheduling::processAllSchedules();
     EXPECT_EQ(2, Scheduling::GetScheduleIndex("ALWAYS ON"));
     EXPECT_EQ(1.0, Scheduling::GetScheduleValue(2));
 }
 
 TEST_F(SchedulingTestFixture, SchedulingManager_TestGetScheduleReference) {
+    std::string const idf_objects = delimited_string({"Schedule:Constant,Always On,,1.0;", "Schedule:Constant,Always Off,,0.0;"});
+    ASSERT_TRUE(process_idf(idf_objects));
     std::string schedName;
     Scheduling::ScheduleBase *thisReference;
     Scheduling::processAllSchedules();

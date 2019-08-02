@@ -81,6 +81,9 @@ struct ScheduleFile : ScheduleBase
     static void setupOutputVariables();
 
     // instance methods for this class
+    static std::vector<std::vector<std::string>> processCSVLines(std::vector<std::string> const & lines);
+    std::vector<std::vector<std::string>> processCSVFile(std::string fileToOpen);
+    static std::vector<Real64> getNumericSubset(std::vector<std::vector<std::string>> dataset, int numRowsToSkip, int columnNumber);
 
     // member variables
     std::string fileName = "";

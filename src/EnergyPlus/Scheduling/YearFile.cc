@@ -45,6 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <fstream>
+
 #include <EnergyPlus.hh>
 #include <EMSManager.hh>
 #include <InputProcessing/InputProcessor.hh>
@@ -86,6 +88,66 @@ void ScheduleFile::processInput()
 void ScheduleFile::clear_state()
 {
     scheduleFiles.clear();
+}
+
+std::vector<Real64> ScheduleFile::getNumericSubset(std::vector<std::vector<std::string>>, int EP_UNUSED(numRowsToSkip), int EP_UNUSED(columnNumber))
+{
+    return std::vector<Real64>();
+}
+
+std::vector<std::vector<std::string>> ScheduleFile::processCSVLines(std::vector<std::string> const & lines) {
+    // first we should find the number of columns in this file
+    // we are going to base it on the number of tokens in line 1
+    auto & line0 = lines[0];
+    int maxExpectedColumnIndex = -1;
+    std::stringstream ss(line0);
+    while( ss.good() ) {
+        maxExpectedColumnIndex++;
+        std::string substr;
+        getline(ss, substr, ',');
+    }
+    // then we'll actually get the data from the file, filling out to the number of expected columns based on the header (first) line
+    std::vector<std::vector<std::string>> overallDataset;
+    int lineCounter = -1;
+    for (auto const & line : lines) {
+        lineCounter++;
+        std::stringstream ss(line);
+        int columnIndex = -1;
+        while( ss.good() ) {
+            columnIndex++;
+            std::string substr;
+            getline(ss, substr, ',');
+            if (lineCounter == 0) {
+                overallDataset.emplace_back();
+            }
+            overallDataset[columnIndex].push_back(substr);
+        }
+        if (columnIndex < maxExpectedColumnIndex) {
+            for (int i = columnIndex + 1; i <= maxExpectedColumnIndex; i++) {
+                overallDataset[i].push_back("");
+            }
+        }
+    }
+    return overallDataset;
+}
+
+std::vector<std::vector<std::string>> ScheduleFile::processCSVFile(std::string fileToOpen)
+{
+    // returns a vector of columnar data, where columnar data is a vector of values in a single column of the csv file
+
+
+    // check if file exists
+
+    // open file
+    std::string line;
+    std::ifstream myfile(fileToOpen);
+    std::vector<std::string> lines;
+    while (getline(myfile, line)) {
+        lines.push_back(line);
+    }
+    auto dataset = this->processCSVLines(lines);
+
+    return {{}};
 }
 
 ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &fields)
@@ -172,11 +234,12 @@ ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &
                 this->interpolateToTimeStep = true;
             }
         }
-
     }
     if(fields.find("number_of_hours_of_data") != fields.end()) {
         this->numberOfHoursOfData = fields.at("number_of_hours_of_data");
     }
+    // now actually read the file's data
+
     if (this->typeLimits) {
         this->validateTypeLimits();
     }
