@@ -1842,10 +1842,15 @@ namespace EnergyPlus {
                     //            !sum the branch flow requests to a total parallel branch flow request
                     if (this_splitter_outlet_branch.ControlType == ControlType_Active ||
                         this_splitter_outlet_branch.ControlType == ControlType_SeriesActive) {
-                        // revised to only consider an active branch to be active if there is also a non-zero flow request
-                        if (BranchFlowReq > 0.0) {
+                        if (this_splitter_outlet_branch.ControlType == ControlType_SeriesActive) {
+                            // only consider a series active control type to be active if there is also a non-zero flow request
+                            if (BranchFlowReq > 0.0) {
+                                TotParallelBranchFlowReq += BranchFlowReq;
+                                ++NumActiveBranches;
+                            } 
+                        } else { 
                             TotParallelBranchFlowReq += BranchFlowReq;
-                            ++NumActiveBranches;  // only increment for non-zero branch flow request. helps keep off branches from turning on below
+                            ++NumActiveBranches;
                         }
                     }
                     Node(FirstNodeOnBranch).MassFlowRate = BranchFlowReq;
@@ -2010,9 +2015,10 @@ namespace EnergyPlus {
                         for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
                             SplitterBranchOut = this_loopside.Splitter.BranchNumOut(OutletNum);
                             FirstNodeOnBranch = this_loopside.Branch(SplitterBranchOut).NodeNumIn;
-                            if ((this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_Active ||
-                                this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_SeriesActive) &&
-                                (this_loopside.Branch(SplitterBranchOut).RequestedMassFlow > 0.0)) { // revised, only branches that want to be "on"
+                            if (this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_Active ||
+                                ((this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_SeriesActive) &&
+                                 (this_loopside.Branch(SplitterBranchOut).RequestedMassFlow >
+                                  0.0))) { // only series active branches that want to be "on"
                                 // check Remaining flow (should be correct!)
                                 ActiveFlowRate = min(ActiveFlowRate, FlowRemaining);
                                 // set the flow rate to the MIN((MassFlowRate+AvtiveFlowRate), MaxAvail)
