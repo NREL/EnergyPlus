@@ -88,6 +88,7 @@ void ScheduleFile::processInput()
 void ScheduleFile::clear_state()
 {
     scheduleFiles.clear();
+    fileData.clear();
 }
 
 std::vector<Real64> ScheduleFile::getNumericSubset(std::vector<std::vector<std::string>>, int EP_UNUSED(numRowsToSkip), int EP_UNUSED(columnNumber))
@@ -100,11 +101,11 @@ std::vector<std::vector<std::string>> ScheduleFile::processCSVLines(std::vector<
     // we are going to base it on the number of tokens in line 1
     auto & line0 = lines[0];
     int maxExpectedColumnIndex = -1;
-    std::stringstream ss(line0);
-    while( ss.good() ) {
+    std::stringstream ss2(line0);
+    while( ss2.good() ) {
         maxExpectedColumnIndex++;
         std::string substr;
-        getline(ss, substr, ',');
+        getline(ss2, substr, ',');
     }
     // then we'll actually get the data from the file, filling out to the number of expected columns based on the header (first) line
     std::vector<std::vector<std::string>> overallDataset;
@@ -133,6 +134,14 @@ std::vector<std::vector<std::string>> ScheduleFile::processCSVLines(std::vector<
 
 std::vector<std::vector<std::string>> ScheduleFile::processCSVFile(std::string fileToOpen)
 {
+    // this should be called early and for all CSV files that will ultimately be processed
+    // it will populate a global variable called fileData that is usable by all CSV-based instances, not just one
+    // it populates that variable with simple string table data for all rows and columns of each csv file
+    // then later in the constructor of each schedule:file object, we just call that fileData map with a file name and
+    // a column of data, and that returns a list of strings representing the entire column.  We can then call the
+    // numericSubset function with a "num rows to skip" variable and that will convert that column to floats and
+    // truncate any skip rows and boom, we have our time series values for this scheduleg
+
     // returns a vector of columnar data, where columnar data is a vector of values in a single column of the csv file
 
 

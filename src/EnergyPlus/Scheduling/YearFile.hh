@@ -48,6 +48,7 @@
 #ifndef SRC_ENERGYPLUS_SCHEDULING_YEARFILE_HH
 #define SRC_ENERGYPLUS_SCHEDULING_YEARFILE_HH
 
+#include <map>
 #include <vector>
 
 #include <EnergyPlus.hh>
@@ -97,6 +98,7 @@ struct ScheduleFile : ScheduleBase
 };
 
 extern std::vector<ScheduleFile> scheduleFiles;
+extern std::map<std::string, std::map<int, std::vector<Real64>>> fileData;
 
 }
 
