@@ -1621,6 +1621,55 @@ namespace HeatBalanceIntRadExchange {
         }
     }
 
+    int GetRadiantSystemSurface(std::string const &cCurrentModuleObject, // Calling Object type
+                                std::string const &RadSysName,           // Calling Object name
+                                int const RadSysZoneNum,                 // Radiant system zone number
+                                std::string const &SurfaceName,          // Referenced surface name
+                                bool &ErrorsFound                        // True when errors are found
+    )
+    {
+        static std::string const routineName("GetRadiantSystemSurface: "); // include trailing blank space
+
+        // For radiant zone equipment, find the referenced surface and check if it is in the same zone or radiant enclosure
+        int const surfNum = UtilityRoutines::FindItemInList(SurfaceName, DataSurfaces::Surface);
+
+        // Trap for surfaces that do not exist
+        if (surfNum == 0) {
+            ShowSevereError(routineName + "Invalid Surface name = " + SurfaceName);
+            ShowContinueError("Occurs for " + cCurrentModuleObject + " = " + RadSysName);
+            ErrorsFound = true;
+            return surfNum;
+        }
+
+        if (RadSysZoneNum == 0) {
+            ShowSevereError(routineName + "Invalid Zone number passed by " + cCurrentModuleObject + " = " + RadSysName);
+            ErrorsFound = true;
+            return surfNum;
+        }
+
+        // Check if the surface and equipment are in the same zone or radiant enclosure
+        int const surfRadEnclNum = DataHeatBalance::Zone(DataSurfaces::Surface(surfNum).Zone).RadiantEnclosureNum;
+        int const radSysEnclNum = DataHeatBalance::Zone(RadSysZoneNum).RadiantEnclosureNum;
+        if (radSysEnclNum == 0) {
+            // This should never happen
+            ShowSevereError(routineName + "Somehow the radiant system enclosure number is zero for" + cCurrentModuleObject + " = " +
+                            RadSysName); // LCOV_EXCL_LINE
+            ErrorsFound = true;          // LCOV_EXCL_LINE
+        } else if (surfRadEnclNum == 0) {
+            // This should never happen
+            ShowSevereError(routineName + "Somehow  the surface enclosure number is zero for" + cCurrentModuleObject + " = " + RadSysName +
+                            " and Surface = " + SurfaceName); // LCOV_EXCL_LINE
+            ErrorsFound = true;                              // LCOV_EXCL_LINE
+        } else if (surfRadEnclNum != radSysEnclNum) {
+            ShowSevereError(routineName + "Surface = " + SurfaceName + " is not in the same zone or enclosure as the radiant equipment.");
+            ShowContinueError("Surface zone or enclosure = " + DataViewFactorInformation::ZoneInfo(surfRadEnclNum).Name);
+            ShowContinueError("Radiant equipment zone or enclosure = " + DataViewFactorInformation::ZoneInfo(radSysEnclNum).Name);
+            ShowContinueError("Occurs for " + cCurrentModuleObject + " = " + RadSysName);
+            ErrorsFound = true;
+        }
+        return surfNum;
+    }
+
 } // namespace HeatBalanceIntRadExchange
 
 } // namespace EnergyPlus

@@ -140,6 +140,13 @@ namespace HeatBalanceIntRadExchange {
                            Array2<Real64> &I  // Returned as inverse matrix
     );
 
+    int GetRadiantSystemSurface(std::string const &cCurrentModuleObject, // Calling Object type
+                                std::string const &RadSysName,           // Calling Object name
+                                int const RadSysZoneNum,                 // Radiant system zone number
+                                std::string const &SurfaceName,          // Referenced surface name
+                                bool &ErrorsFound                        // True when errors are found
+    );
+
 } // namespace HeatBalanceIntRadExchange
 
 } // namespace EnergyPlus
