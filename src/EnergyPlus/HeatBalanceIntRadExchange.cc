@@ -1651,10 +1651,10 @@ namespace HeatBalanceIntRadExchange {
         int const surfRadEnclNum = DataHeatBalance::Zone(DataSurfaces::Surface(surfNum).Zone).RadiantEnclosureNum;
         int const radSysEnclNum = DataHeatBalance::Zone(RadSysZoneNum).RadiantEnclosureNum;
         if (radSysEnclNum == 0) {
-            // This should never happen
+            // This should never happen - but it does in some simple unit tests that are designed to throw errors
             ShowSevereError(routineName + "Somehow the radiant system enclosure number is zero for" + cCurrentModuleObject + " = " +
-                            RadSysName); // LCOV_EXCL_LINE
-            ErrorsFound = true;          // LCOV_EXCL_LINE
+                            RadSysName);
+            ErrorsFound = true;
         } else if (surfRadEnclNum == 0) {
             // This should never happen
             ShowSevereError(routineName + "Somehow  the surface enclosure number is zero for" + cCurrentModuleObject + " = " + RadSysName +
