@@ -17,6 +17,26 @@
     Until: 24:00,
     0.2;
 
+  Schedule:Compact,
+    Quarterly Compact Sched 1,
+    ,
+    Through: 3/31,
+    For: AllDays,
+    Until: 24:00,
+    0.1,
+    Through: 6/30,
+    For: AllDays,
+    Until: 24:00,
+    0.2,
+    Through: 09/30,
+    For: AllDays,
+    Until: 24:00,
+    0.3,
+    Through: 12/31,
+    For: AllDays,
+    Until: 24:00,
+    0.4;
+
 ! Enabling this should cause a severe out of bounds error
 !  Schedule:Constant,
 !    Constant Schedule With Limits Bounded,
@@ -28,6 +48,17 @@
     0,
     10,
     Discrete;
+
+  Schedule:File,
+    File-based Schedule,     !- Name
+    Any Number,              !- Schedule Type Limits Name
+    /tmp/testfile.csv,             !- File Name
+    3,                       !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
+    60;                      !- Minutes per Item
 
   Version,9.2;
 

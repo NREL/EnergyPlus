@@ -103,4 +103,9 @@ TEST_F(SchedulingTestFixture, TestLineProcessingWithDataGaps) {
     EXPECT_EQ("-6", dataSet[4][6]); // final corner value
 }
 
+//TEST_F(SchedulingTestFixture, TestCSVProcessing_TOBEREMOVED) {
+//    Scheduling::ScheduleFile::processCSVFile("/tmp/my.csv");
+//    EXPECT_NE(Scheduling::fileData.end(), Scheduling::fileData.find("/tmp/my.csv"));
+//}
+
 }

@@ -373,7 +373,6 @@ TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingThroughFields)
     }
 }
 
-
 TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingUntilFields)
 {
     {
@@ -558,4 +557,38 @@ TEST_F(SchedulingTestFixture, TestYearCompactFieldProcessingForFields)
     }
 }
 
+TEST_F(SchedulingTestFixture, TestTimeSeriesCreation) {
+    // Minimal input structure
+    nlohmann::json fields =
+        nlohmann::json::array({
+                                  {{"field", "Through: 12/31"}},
+                                  {{"field", "For: AllDays"}},
+                                  {{"field", "Until: 24:00"}},
+                                  {{"field", 24}}});
+    Scheduling::ScheduleCompact compact;
+    compact.processFields(fields);
+    compact.validateContinuity();
+    compact.createTimeSeries();
+    EXPECT_EQ(365u, compact.timeStamp.size());
+    EXPECT_EQ(365u, compact.values.size());
+    for (int i = 0; i < 365; i++) {
+        EXPECT_EQ((i + 1) * 86400, compact.timeStamp[i]);
+    }
+    EXPECT_EQ(31536000, compact.timeStamp.back());
 }
+
+TEST_F(SchedulingTestFixture, TestValidateContinuity) {
+    // Minimal input structure
+    nlohmann::json fields =
+        nlohmann::json::array({
+                                  {{"field", "Through: 12/30"}},
+                                  {{"field", "For: AllDays"}},
+                                  {{"field", "Until: 24:00"}},
+                                  {{"field", 24}}});
+    Scheduling::ScheduleCompact compact;
+    compact.processFields(fields);
+    EXPECT_ANY_THROW(compact.validateContinuity());
+}
+
+}
+

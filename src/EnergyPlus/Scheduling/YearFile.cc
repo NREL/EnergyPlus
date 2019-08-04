@@ -47,8 +47,9 @@
 
 #include <fstream>
 
-#include <EnergyPlus.hh>
 #include <EMSManager.hh>
+#include <EnergyPlus.hh>
+#include <Expat/lib/expat.h>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Scheduling/Base.hh>
@@ -58,6 +59,7 @@
 namespace Scheduling {
 
 std::vector<ScheduleFile> scheduleFiles;
+std::map<std::string, std::vector<std::vector<std::string>>> fileData;
 
 Real64 ScheduleFile::getCurrentValue()
 {
@@ -74,6 +76,10 @@ void ScheduleFile::processInput()
     auto &instancesValue = instances.value();
     for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
         auto const &fields = instance.value();
+        // first populate the fileData with this input file, only if needed
+        if (fileData.find(fields.at("file_name")) == fileData.end()) {
+            ScheduleFile::processCSVFile(fields.at("file_name"));
+        }
         auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
         // do any pre-construction operations
         EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
@@ -91,9 +97,23 @@ void ScheduleFile::clear_state()
     fileData.clear();
 }
 
-std::vector<Real64> ScheduleFile::getNumericSubset(std::vector<std::vector<std::string>>, int EP_UNUSED(numRowsToSkip), int EP_UNUSED(columnNumber))
+bool ScheduleFile::establishNumericSubset(std::vector<std::vector<std::string>> dataSet)
 {
-    return std::vector<Real64>();
+    auto & thisColumnOfData = dataSet[this->columnNumber - 1];
+    int rowNum = 0;
+    for (auto const & datum : thisColumnOfData) {
+        rowNum++;
+        if (rowNum > this->rowsToSkipAtTop) {
+            this->timeStamp.push_back(rowNum * this->minutesPerItem * 60);
+            try {
+                this->values.push_back(std::stod(datum));
+            } catch (...) {
+                EnergyPlus::ShowSevereError("Failed to convert " + datum + " to numeric value");
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 std::vector<std::vector<std::string>> ScheduleFile::processCSVLines(std::vector<std::string> const & lines) {
@@ -132,7 +152,7 @@ std::vector<std::vector<std::string>> ScheduleFile::processCSVLines(std::vector<
     return overallDataset;
 }
 
-std::vector<std::vector<std::string>> ScheduleFile::processCSVFile(std::string fileToOpen)
+void ScheduleFile::processCSVFile(const std::string& fileToOpen)
 {
     // this should be called early and for all CSV files that will ultimately be processed
     // it will populate a global variable called fileData that is usable by all CSV-based instances, not just one
@@ -140,7 +160,7 @@ std::vector<std::vector<std::string>> ScheduleFile::processCSVFile(std::string f
     // then later in the constructor of each schedule:file object, we just call that fileData map with a file name and
     // a column of data, and that returns a list of strings representing the entire column.  We can then call the
     // numericSubset function with a "num rows to skip" variable and that will convert that column to floats and
-    // truncate any skip rows and boom, we have our time series values for this scheduleg
+    // truncate any skip rows and boom, we have our time series values for this schedule
 
     // returns a vector of columnar data, where columnar data is a vector of values in a single column of the csv file
 
@@ -154,9 +174,7 @@ std::vector<std::vector<std::string>> ScheduleFile::processCSVFile(std::string f
     while (getline(myfile, line)) {
         lines.push_back(line);
     }
-    auto dataset = this->processCSVLines(lines);
-
-    return {{}};
+    Scheduling::fileData[fileToOpen] = processCSVLines(lines);
 }
 
 ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &fields)
@@ -247,19 +265,25 @@ ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &
     if(fields.find("number_of_hours_of_data") != fields.end()) {
         this->numberOfHoursOfData = fields.at("number_of_hours_of_data");
     }
-    // now actually read the file's data
-
+    // now get the file contents from the master fileData variable
+    auto & fullDataSetThisFile = Scheduling::fileData[this->fileName];
+    if (!this->establishNumericSubset(fullDataSetThisFile)) {
+        EnergyPlus::ShowFatalError("CSV file processing errors cause program termination");
+    }
     if (this->typeLimits) {
         this->validateTypeLimits();
     }
 }
 
-void ScheduleFile::updateValue(int EP_UNUSED(simTime))
+void ScheduleFile::updateValue(int simTime)
 {
     if (this->emsActuatedOn) {
         this->value = this->emsActuatedValue;
     } else {
-        // this->value = this->value;
+        // TODO: Change search to start with "this->timeStamp.begin() + this->lastIndexUsed - 1" once we can reset it
+        auto item = std::lower_bound(this->timeStamp.begin(), this->timeStamp.end(), simTime);
+        this->lastIndexUsed = item - this->timeStamp.begin();
+        this->value = this->values[this->lastIndexUsed];
     }
 }
 

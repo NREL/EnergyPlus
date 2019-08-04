@@ -184,8 +184,9 @@ void ScheduleCompact::createTimeSeries() {
     // TODO: Handle daylight savings time
     int priorThroughTime = 0;
     int currentDay = 0;
+    int priorTimeStamp = -10000;
     for (auto const & thisThrough : this->throughs) {
-        int numDaysInThrough = (thisThrough.timeStamp / 86400) + 1;
+        int numDaysInThrough = ((thisThrough.timeStamp - priorThroughTime) / 86400) + 1; // TODO: double check this + 1 on the end
         for (int dayNum = 1; dayNum <= numDaysInThrough; dayNum++) {
             currentDay++;
             Scheduling::DayType dt = Scheduling::DayType::MONDAY; // TODO: Get current day type for overall day number
@@ -194,14 +195,18 @@ void ScheduleCompact::createTimeSeries() {
             for (auto const & thisFor : thisThrough.fors) {
                 if (thisFor.hasAllOtherDays || (thisFor.days & bs).any()) {
                     for (auto const & thisUntil : thisFor.untils) {
-                        auto currentTimeStamp = priorThroughTime + (dayNum * 86400) + thisUntil.time;
+                        auto currentTimeStamp = priorThroughTime + ((dayNum - 1) * 86400) + thisUntil.time;
+                        if (currentTimeStamp < priorTimeStamp) {
+                            int i = 1;
+                        }
                         this->timeStamp.push_back(currentTimeStamp);
                         this->values.push_back(thisUntil.value);
+                        priorTimeStamp = currentTimeStamp;
                     }
                 }
             }
         }
-        priorThroughTime = thisThrough.timeStamp;
+        priorThroughTime = thisThrough.timeStamp + 86400; // TODO: Make sure this should include the last day's 86400
     }
 
 }

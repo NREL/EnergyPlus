@@ -138,6 +138,8 @@ struct ScheduleCompact : ScheduleBase
     // member variables
     std::vector<Through> throughs;
     bool includesLeapYearData = false;
+
+    // member variables related to final data storage and lookup
     std::vector<Real64> timeStamp;
     std::vector<Real64> values;
     int lastIndexUsed = 0;

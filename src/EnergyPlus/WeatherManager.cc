@@ -2499,7 +2499,7 @@ namespace WeatherManager {
 
         // calculate an effective simulation time for scheduling
         // TODO: Update this for all the things and define it carefully
-        int const simTime = 0;
+        int const simTime = 86400 * (WeatherManager::DayOfYear - 1) + 3600 * (DataGlobals::HourOfDay - 1) + DataGlobals::TimeStepZone * DataGlobals::TimeStep;
         Scheduling::updateAllSchedules(simTime);
 
         std::sprintf(time_stamp, "%02d/%02d %02hu", Month, DayOfMonth, (unsigned short)(HourOfDay - 1));

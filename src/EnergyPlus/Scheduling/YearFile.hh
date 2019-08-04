@@ -82,9 +82,11 @@ struct ScheduleFile : ScheduleBase
     static void setupOutputVariables();
 
     // instance methods for this class
+    bool establishNumericSubset(std::vector<std::vector<std::string>> dataset);
+
+    // static methods for processing csv data to be available across all Schedule:File objects
     static std::vector<std::vector<std::string>> processCSVLines(std::vector<std::string> const & lines);
-    std::vector<std::vector<std::string>> processCSVFile(std::string fileToOpen);
-    static std::vector<Real64> getNumericSubset(std::vector<std::vector<std::string>> dataset, int numRowsToSkip, int columnNumber);
+    static void processCSVFile(const std::string& fileToOpen);
 
     // member variables
     std::string fileName = "";
@@ -95,10 +97,14 @@ struct ScheduleFile : ScheduleBase
     bool interpolateToTimeStep = false;
     int numberOfHoursOfData = 8760;
 
+    // member variables related to final data storage and lookup
+    std::vector<Real64> timeStamp;
+    std::vector<Real64> values;
+    int lastIndexUsed = 0;
 };
 
 extern std::vector<ScheduleFile> scheduleFiles;
-extern std::map<std::string, std::map<int, std::vector<Real64>>> fileData;
+extern std::map<std::string, std::vector<std::vector<std::string>>> fileData;
 
 }
 

@@ -140,6 +140,7 @@ void ScheduleConstant::updateValue(int EP_UNUSED(simTime))
 void ScheduleConstant::setupOutputVariables()
 {
     for (auto &thisSchedule : scheduleConstants) {
+        if (thisSchedule.name.empty()) continue; // name is a required input, so it must be the first one, with blank name, that always returns zero
         // Set Up Reporting
         EnergyPlus::SetupOutputVariable(
             "NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
