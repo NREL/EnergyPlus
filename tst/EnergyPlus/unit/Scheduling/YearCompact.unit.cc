@@ -586,8 +586,7 @@ TEST_F(SchedulingTestFixture, TestValidateContinuity) {
                                   {{"field", "Until: 24:00"}},
                                   {{"field", 24}}});
     Scheduling::ScheduleCompact compact;
-    compact.processFields(fields);
-    EXPECT_ANY_THROW(compact.validateContinuity());
+    EXPECT_ANY_THROW(compact.processFields(fields));
 }
 
 }
