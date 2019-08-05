@@ -4499,6 +4499,18 @@ namespace HeatBalanceManager {
                                     ", missing material = " + ConstructAlphas(Layer));
                     ErrorsFound = true;
                 } else {
+                    MaterialLayerGroup = Material(Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer)).Group;
+                    if (!((MaterialLayerGroup == GlassEquivalentLayer) || (MaterialLayerGroup == ShadeEquivalentLayer) ||
+                          (MaterialLayerGroup == DrapeEquivalentLayer) || (MaterialLayerGroup == BlindEquivalentLayer) ||
+                          (MaterialLayerGroup == ScreenEquivalentLayer) || (MaterialLayerGroup == GapEquivalentLayer))) {
+                        ShowSevereError("Invalid material layer type in window " + CurrentModuleObject + " = " +
+                                        Construct(TotRegConstructs + ConstrNum).Name);
+                        ShowContinueError("...Window layer = " + ConstructAlphas(Layer) +
+                                          " is not allowed in Construction:WindowEquivalentLayer window object.");
+                        ShowContinueError("Only materials of type Material:*:EquivalentLayer are allowed");
+                        ErrorsFound = true;
+                    }
+
                     if (ConstructNumAlpha <= 2) {
 
                     } else {

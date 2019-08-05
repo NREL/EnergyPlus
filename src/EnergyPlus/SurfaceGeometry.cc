@@ -9670,6 +9670,16 @@ namespace SurfaceGeometry {
                     ShowContinueError(" invalid (not found) " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\"");
                     ErrorsFound = true;
                 } else {
+                    int const MaterialLayerGroup = Material(MaterNum).Group;
+                    if ((MaterialLayerGroup == WindowSimpleGlazing) || (MaterialLayerGroup == GlassEquivalentLayer) ||
+                        (MaterialLayerGroup == ShadeEquivalentLayer) || (MaterialLayerGroup == DrapeEquivalentLayer) ||
+                        (MaterialLayerGroup == BlindEquivalentLayer) || (MaterialLayerGroup == ScreenEquivalentLayer) ||
+                        (MaterialLayerGroup == GapEquivalentLayer)) {
+                        ShowSevereError("Invalid movable insulation material for " + cCurrentModuleObject + ":");
+                        ShowSevereError("...Movable insulation material type specified = " + DataHeatBalance::cMaterialGroupType(MaterialLayerGroup));
+                        ShowSevereError("...Movable insulation material name specified = " + cAlphaArgs(3));
+                        ErrorsFound = true;
+                    }
                     if (SchNum == 0) {
                         ShowSevereError(cCurrentModuleObject + ", " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\", invalid data.");
                         ShowContinueError(" invalid (not found) " + cAlphaFieldNames(4) + "=\"" + cAlphaArgs(4) + "\"");

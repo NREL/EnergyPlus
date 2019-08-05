@@ -2138,38 +2138,7 @@ namespace DataHeatBalance {
         }
     };
 
-    struct HeatReclaimRefrigeratedRackData
-    {
-        // Members
-        std::string Name;       // Name of refrigerated rack
-        std::string SourceType; // object type for refrigerated rack
-        Real64 AvailCapacity;   // Total available heat reclaim capacity
-        Real64 UsedWaterHeater; // amount of avail used at plant water heater
-        Real64 UsedHVACCoil;    // amount of avail used at hvac coil
-
-        // Default Constructor
-        HeatReclaimRefrigeratedRackData() : AvailCapacity(0.0), UsedWaterHeater(0.0), UsedHVACCoil(0.0)
-        {
-        }
-    };
-
-    struct HeatReclaimRefrigCondenserData
-    {
-        // Members
-        std::string Name;        // Name of refrigeration system
-        int SourceType;          // object type for refrigeration system
-        Real64 AvailCapacity;    // Total available heat reclaim capacity
-        Real64 AvailTemperature; // Temperature of heat reclaim source
-        Real64 UsedWaterHeater;  // amount of avail used at plant water heater
-        Real64 UsedHVACCoil;     // amount of avail used at hvac coil
-
-        // Default Constructor
-        HeatReclaimRefrigCondenserData() : SourceType(0), AvailCapacity(0.0), AvailTemperature(0.0), UsedWaterHeater(0.0), UsedHVACCoil(0.0)
-        {
-        }
-    };
-
-    struct HeatReclaimDXCoilData
+    struct HeatReclaimDataBase
     {
         // Members
         std::string Name;       // Name of DX Coil
@@ -2177,7 +2146,48 @@ namespace DataHeatBalance {
         Real64 AvailCapacity;   // Total available heat reclaim capacity
 
         // Default Constructor
-        HeatReclaimDXCoilData() : AvailCapacity(0.0)
+        HeatReclaimDataBase() : AvailCapacity(0.0)
+        {
+        }
+    };
+
+    struct HeatReclaimRefrigeratedRackData : HeatReclaimDataBase // inherited from base struct
+    {
+        // Customized Members
+        Real64 UsedWaterHeater; // amount of avail used at plant water heater
+        Real64 UsedHVACCoil;    // amount of avail used at hvac coil
+
+        // Default Constructor
+        HeatReclaimRefrigeratedRackData() : UsedWaterHeater(0.0), UsedHVACCoil(0.0)
+        {
+        }
+    };
+
+    struct HeatReclaimRefrigCondenserData : HeatReclaimDataBase // inherited from base struct
+    {
+        // Customized Members
+        Real64 AvailTemperature; // Temperature of heat reclaim source
+        Real64 UsedWaterHeater;  // amount of avail used at plant water heater
+        Real64 UsedHVACCoil;     // amount of avail used at hvac coil
+
+        // Default Constructor
+        HeatReclaimRefrigCondenserData() : AvailTemperature(0.0), UsedWaterHeater(0.0), UsedHVACCoil(0.0)
+        {
+        }
+    };
+
+    struct HeatReclaimDXCoilData : HeatReclaimDataBase // inherited from base struct
+    {
+    };
+
+    struct HeatReclaimHPCoilData : HeatReclaimDataBase // inherited from base struct
+    {
+        // Customized Members
+        Real64 WaterHeatingDesuperheaterReclaimedHeatTotal;    // total reclaimed heat by water heating desuperheater coils
+        Array1D<Real64> WaterHeatingDesuperheaterReclaimedHeat; // heat reclaimed by water heating desuperheater coils
+
+        // Default Constructor
+        HeatReclaimHPCoilData() : WaterHeatingDesuperheaterReclaimedHeatTotal(0.0)
         {
         }
     };
@@ -2619,6 +2629,7 @@ namespace DataHeatBalance {
     extern Array1D<HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
     extern Array1D<HeatReclaimDXCoilData> HeatReclaimDXCoil;
     extern Array1D<HeatReclaimDXCoilData> HeatReclaimVS_DXCoil;
+    extern Array1D<HeatReclaimHPCoilData> HeatReclaimSimple_WAHPCoil;
     extern Array1D<AirReportVars> ZnAirRpt;
     extern Array1D<TCGlazingsType> TCGlazings;
     extern Array1D<ZoneEquipData> ZoneCO2Gen;
