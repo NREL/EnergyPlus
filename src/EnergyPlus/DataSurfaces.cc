@@ -498,6 +498,14 @@ namespace DataSurfaces {
     Array1D<Real64> WinGapConvHtFlowRepEnergy;     // Energy of WinGapConvHtFlowRep [J]
     Array1D<Real64> WinHeatTransferRepEnergy;      // Energy of WinHeatTransfer [J]
 
+    std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
+    std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
+    std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
+    std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
+
+    bool AnyHeatBalanceInsideSourceTerm(false);  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
+    bool AnyHeatBalanceOutsideSourceTerm(false); // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
     // Object Data
@@ -1148,6 +1156,12 @@ namespace DataSurfaces {
         WinShadingAbsorbedSolarEnergy.deallocate();
         WinGapConvHtFlowRepEnergy.deallocate();
         WinHeatTransferRepEnergy.deallocate();
+        AllHTSurfaceList.clear();
+        AllIZSurfaceList.clear();
+        AllHTNonWindowSurfaceList.clear();
+        AllHTWindowSurfaceList.clear();
+        AnyHeatBalanceInsideSourceTerm = false;
+        AnyHeatBalanceOutsideSourceTerm = false;
         Surface.deallocate();
         SurfaceWindow.deallocate();
         FrameDivider.deallocate();

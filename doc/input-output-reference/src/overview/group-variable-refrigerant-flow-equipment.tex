@@ -18,7 +18,7 @@ There are two alternative VRF models in EnergyPlus:
 
 In the VRF system model, direct-expansion cooling and/or heating coils with an optional supplemental heating coil are configured in a zone terminal unit, which is connected to a zone via the zone inlet and exhaust nodes. The zone terminal units are identified in a \emph{\hyperref[zoneterminalunitlist]{ZoneTerminalUnitList}} object, the name of which is entered as an input to the \emph{\hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow}} or \emph{\hyperref[airconditionervariablerefrigerantflowfluidtemperaturecontrol]{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}} object.
 
-The Energyplus connection methodology is shown as dashed and greyed arrows in Figure~\ref{fig:variable-refrigerant-flow-schematic} according to the following rules:
+The EnergyPlus connection methodology is shown as dashed and greyed arrows in Figure~\ref{fig:variable-refrigerant-flow-schematic} according to the following rules:
 
 \begin{itemize}
 \item
@@ -30,7 +30,7 @@ The Energyplus connection methodology is shown as dashed and greyed arrows in Fi
 \item
   The name of the \emph{\hyperref[zoneterminalunitlist]{ZoneTerminalUnitList}} object is an input to the \emph{\hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow}} or \emph{\hyperref[airconditionervariablerefrigerantflowfluidtemperaturecontrol]{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}} object.
 \item
-  The \emph{\hyperref[airconditionervariablerefrigerantflowfluidtemperaturecontrol]{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}} or \emph{\hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow}} object is not listed in an AirloopHVAC object, and therefore, can only be simulated if the terminal units are connected to the \emph{\hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow}} or \emph{\hyperref[airconditionervariablerefrigerantflowfluidtemperaturecontrol]{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}} object using the \hyperref[zoneterminalunitlist]{ZoneTerminalUnitList}.
+  The \emph{\hyperref[airconditionervariablerefrigerantflowfluidtemperaturecontrol]{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}} or \emph{\hyperref[airconditionervariablerefrigerantflow]{AirConditioner:Variable-RefrigerantFlow}} object is not listed in an AirloopHVAC object, and therefore, can only be simulated if the terminal units are connected to the \emph{\hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow}} or \emph{\hyperref[airconditionervariablerefrigerantflowfluidtemperaturecontrol]{AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl}} object using the \hyperref[zoneterminalunitlist]{ZoneTerminalUnitList}.
 \item
   Secondary ZoneHVAC equipment objects may be used in the same zones as the terminal units for other purposes (e.g., code compliance)
 \end{itemize}
@@ -43,7 +43,7 @@ The following schematic demonstrates these connection rules.
 \caption{Variable Refrigerant Flow Schematic \protect \label{fig:variable-refrigerant-flow-schematic}}
 \end{figure}
 
-Energyplus object type and object name, and node name relationships are also shown in the following figure to aid in the assembly of this HVAC system type.
+EnergyPlus object type and object name, and node name relationships are also shown in the following figure to aid in the assembly of this HVAC system type.
 
 \begin{figure}[hbtp]
 \centering

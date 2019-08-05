@@ -647,3 +647,21 @@ TEST_F(EnergyPlusFixture, ScheduleYearMaxItems)
     EXPECT_TRUE(compare_err_stream(delimited_string({"   ** Severe  ** <root>[Schedule:Year][SchYr_A][schedule_weeks] - Array should contain no more than 53 elements."})));
 
 }
+
+TEST_F(EnergyPlusFixture, ScheduleFileColumnSeparator)
+{
+    std::string const idf_objects = delimited_string({
+        "Schedule:File,",
+        "  Test1,                   !- Name",
+        "  ,                        !- Schedule Type Limits Name",
+        "  nofile.txt,              !- File Name",
+        "  1,                       !- Column Number",
+        "  0,                       !- Rows to Skip at Top",
+        "  8760,                    !- Number of Hours of Data",
+        "  Space,                   !- Column Separator",
+        "  No;                      !- Interpolate to Timestep"
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+}
