@@ -228,12 +228,13 @@ namespace HeatBalanceKivaManager {
         bcs->deepGroundTemperature = kivaWeather.annualAverageDrybulbTemp + DataGlobals::KelvinConv;
 
         // Estimate indoor temperature
+        static const Real64 defaultFlagTemp = -999; // default sets this below -999 at -9999 so uses value if entered
         const Real64 standardTemp = 22;            // degC
         Real64 assumedFloatingTemp = standardTemp; // degC (somewhat arbitrary assumption--not knowing anything else
                                                    // about the building at this point)
 
         Real64 Tin;
-        if (zoneAssumedTemperature > -999) { // default sets this below -999 at -9999 so uses value if entered
+        if (zoneAssumedTemperature > defaultFlagTemp) {
             Tin = zoneAssumedTemperature + DataGlobals::KelvinConv;
         } else {
             switch (zoneControlType) {
