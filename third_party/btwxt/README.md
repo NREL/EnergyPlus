@@ -1,3 +1,8 @@
+[![Build Status](https://travis-ci.org/bigladder/btwxt.svg?branch=master)](https://travis-ci.org/bigladder/btwxt)
+[![codecov](https://codecov.io/gh/bigladder/btwxt/branch/master/graph/badge.svg)](https://codecov.io/gh/bigladder/btwxt)
+
+# Btwxt
+
 ## General-purpose, N-dimensional interpolation library...
 
 Btwxt is a free and open source c++ library to perform numerical interpolation on a gridded data set. The general architecture is that it creates a RegularGridInterpolator object from a) a collection of grid axes and b) a collection of values that fit that axis system. That RegularGridInterpolator object can then be queried repeatedly for values that fall inside its grid.
@@ -12,8 +17,6 @@ Btwxt accepts:
 *   a collection of N vectors representing the input variables,
 *   attributes of each of the input vectors describing preferred interpolation and extrapolation methods, and
 *   an array of (or collection of arrays of) values that map onto the grid defined by the input vectors.
-
-While this interpolation library is designed to work for equipment performance curves in EnergyPlus, it should work efficiently in any situation requiring fast linear or cubic interpolation on a regular grid.
 
 ## How to Use
 
@@ -86,4 +89,3 @@ std::vector<double> result = my_interpolator(new_target);
 ## Dependencies
 Btwxt uses
 *  [Googletest](https://github.com/google/googletest), both gtest and gmock for unittests.
-The library uses CMake DownloadProject to incorporate Googletest into the build.
