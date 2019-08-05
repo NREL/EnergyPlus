@@ -59,32 +59,46 @@
 
 namespace Scheduling {
 
+    struct UntilTime {
+        int timeInDay;
+        Real64 value;
+        UntilTime(int _timeInDay, Real64 _value) : timeInDay(_timeInDay), value(_value) {}
+    };
+
     struct ScheduleDay
     {
+        // members common to all schedules
         std::string name;
         ScheduleTypeData * typeLimits = nullptr;
+        std::vector<UntilTime> untils;
+        Scheduling::Interpolation interpolateToTimestep = Interpolation::NONE;
         static ScheduleDay *factory(const std::string& scheduleName);
         static void processInput();
         static void clear_state();
     };
 
+    // TODO: Eliminate the derived classes and just use the base class
     struct ScheduleDayHourly : ScheduleDay
     {
-        std::vector<Real64> hourlyValues;
+        // constructors/destructors
         ScheduleDayHourly(std::string const &objectName, nlohmann::json const &fields);
     };
 
     struct ScheduleDayInterval : ScheduleDay
     {
-        // TODO: These two eventually become a vector of a new structure for the extensible group
-        std::vector<Real64> untilTimes;
-        std::vector<Real64> valuesUntilTimes;
-        Scheduling::Interpolation interpolateToTimestep = Interpolation::NONE;
+        // constructors/destructors
         ScheduleDayInterval(std::string const &objectName, nlohmann::json const &fields);
+    };
+
+    struct ScheduleDayList : ScheduleDay
+    {
+        // constructors/destructors
+        ScheduleDayList(std::string const &objectName, nlohmann::json const &fields);
     };
 
     extern std::vector<ScheduleDayHourly> scheduleDayHourlys;
     extern std::vector<ScheduleDayInterval> scheduleDayIntervals;
+    extern std::vector<ScheduleDayList> scheduleDayLists;
 
 } // namespace Scheduling
 #endif // SRC_ENERGYPLUS_SCHEDULING_DAY_HH

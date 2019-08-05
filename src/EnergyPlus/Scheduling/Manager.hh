@@ -83,6 +83,8 @@ ScheduleBase *getScheduleReference(const std::string &scheduleName);
 
 void processAllSchedules();
 
+void recreateAllTimeSeries(); // should be called for each new environment
+
 Real64 GetScheduleValue(int scheduleIndex);
 
 void updateAllSchedules(int simTime);

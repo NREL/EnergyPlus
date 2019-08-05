@@ -133,31 +133,158 @@ void ScheduleWeek::processInput()
 
 ScheduleWeekDaily::ScheduleWeekDaily(std::string const &objectName, nlohmann::json const &fields)
 {
+    // Schedule:Week:Daily,
+    //  A1 , \field Name
+    //  A2 , \field Sunday Schedule:Day Name
+    //  A3 , \field Monday Schedule:Day Name
+    //  A4 , \field Tuesday Schedule:Day Name
+    //  A5 , \field Wednesday Schedule:Day Name
+    //  A6 , \field Thursday Schedule:Day Name
+    //  A7 , \field Friday Schedule:Day Name
+    //  A8 , \field Saturday Schedule:Day Name
+    //  A9 , \field Holiday Schedule:Day Name
+    //  A10, \field SummerDesignDay Schedule:Day Name
+    //  A11, \field WinterDesignDay Schedule:Day Name
+    //  A12, \field CustomDay1 Schedule:Day Name
+    //  A13; \field CustomDay2 Schedule:Day Name
     auto & uc = EnergyPlus::UtilityRoutines::MakeUPPERCase;
     this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
-    this->sunday = ScheduleDay::factory(uc(fields.at("sunday_schedule_day_name")));
-    this->monday = ScheduleDay::factory(uc(fields.at("monday_schedule_day_name")));
-    this->tuesday = ScheduleDay::factory(uc(fields.at("tuesday_schedule_day_name")));
-    this->wednesday = ScheduleDay::factory(uc(fields.at("wednesday_schedule_day_name")));
-    this->thursday = ScheduleDay::factory(uc(fields.at("thursday_schedule_day_name")));
-    this->friday = ScheduleDay::factory(uc(fields.at("friday_schedule_day_name")));
-    this->saturday = ScheduleDay::factory(uc(fields.at("saturday_schedule_day_name")));
-    this->holiday = ScheduleDay::factory(uc(fields.at("holiday_schedule_day_name")));
-    this->summerDesignDay = ScheduleDay::factory(uc(fields.at("summerdesignday_schedule_day_name")));
-    this->winterDesignDay = ScheduleDay::factory(uc(fields.at("winterdesignday_schedule_day_name")));
-    this->customDay1 = ScheduleDay::factory(uc(fields.at("customday1_schedule_day_name")));
-    this->customDay2 = ScheduleDay::factory(uc(fields.at("customday2_schedule_day_name")));
+    this->days[Scheduling::DayType::SUNDAY] = ScheduleDay::factory(uc(fields.at("sunday_schedule_day_name")));
+    this->days[Scheduling::DayType::MONDAY] = ScheduleDay::factory(uc(fields.at("monday_schedule_day_name")));
+    this->days[Scheduling::DayType::TUESDAY] = ScheduleDay::factory(uc(fields.at("tuesday_schedule_day_name")));
+    this->days[Scheduling::DayType::WEDNESDAY] = ScheduleDay::factory(uc(fields.at("wednesday_schedule_day_name")));
+    this->days[Scheduling::DayType::THURSDAY] = ScheduleDay::factory(uc(fields.at("thursday_schedule_day_name")));
+    this->days[Scheduling::DayType::FRIDAY] = ScheduleDay::factory(uc(fields.at("friday_schedule_day_name")));
+    this->days[Scheduling::DayType::SATURDAY] = ScheduleDay::factory(uc(fields.at("saturday_schedule_day_name")));
+    this->days[Scheduling::DayType::HOLIDAYS] = ScheduleDay::factory(uc(fields.at("holiday_schedule_day_name")));
+    this->days[Scheduling::DayType::SUMMERDESIGNDAY] = ScheduleDay::factory(uc(fields.at("summerdesignday_schedule_day_name")));
+    this->days[Scheduling::DayType::WINTERDESIGNDAY] = ScheduleDay::factory(uc(fields.at("winterdesignday_schedule_day_name")));
+    this->days[Scheduling::DayType::CUSTOMDAY1] = ScheduleDay::factory(uc(fields.at("customday1_schedule_day_name")));
+    this->days[Scheduling::DayType::CUSTOMDAY2] = ScheduleDay::factory(uc(fields.at("customday2_schedule_day_name")));
+}
+
+ScheduleDay *ScheduleWeekDaily::getScheduleDay(Scheduling::DayType dt)
+{
+    return this->days[dt];
 }
 
 ScheduleWeekCompact::ScheduleWeekCompact(std::string const &objectName, nlohmann::json const &fields)
 {
+    // Schedule:Week:Compact,
+    //  \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
+    //  \memo Compact definition for Schedule:Day:List
+    //  \min-fields 3
+    //  A1 , \field Name
+    //  A2 , \field DayType List 1
+    //       \begin-extensible
+    //       \note Choices can be combined on single line
+    //       \note if separated by spaces. i.e. "Holiday Weekends"
+    //       \required-field
+    //       \type choice
+    //       \key AllDays
+    //       \key AllOtherDays
+    //       \key Weekdays
+    //       \key Weekends
+    //       \key Sunday
+    //       \key Monday
+    //       \key Tuesday
+    //       \key Wednesday
+    //       \key Thursday
+    //       \key Friday
+    //       \key Saturday
+    //       \key Holiday
+    //       \key SummerDesignDay
+    //       \key WinterDesignDay
+    //       \key CustomDay1
+    //       \key CustomDay2
+    //  A3 , \field Schedule:Day Name 1
+    //       \required-field
+    //       \type object-list
+    //       \object-list DayScheduleNames
+    //  A4 , \field DayType List 2
     this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
     auto & daysData = fields.at("data");
     for (auto const & dayData : daysData) {
-        this->dayTypeList.push_back(dayData.at("daytype_list"));
-        this->scheduleDayName.push_back(dayData.at("schedule_day_name"));
-        // auto scheduleInstance = ScheduleWeek::factory(scheduleName);
-        //weekScheduleRanges.emplace_back(startMonth, startDay, endMonth, endDay, scheduleInstance);
+        std::string dayType = EnergyPlus::UtilityRoutines::MakeUPPERCase(dayData.at("daytype_list"));
+        // OK, processing this kinda stinks,
+        // the string will be trimmed of surrounding whitespace initially, so first check for an optional "For" at the beginning, and remove
+        if (dayType.substr(0, 3) == "FOR") {
+            dayType.erase(0, 3);
+        }
+        // then we need to trim off any whitespace in case of "For : SUNDAY" types
+        dayType = EnergyPlus::UtilityRoutines::epTrim(dayType); // TODO: maybe epTrim should just operate on the string passed in
+        // now we could have ": SUNDAY" left, so trim off an optional colon
+        if (dayType.substr(0, 1) == ":") {
+            dayType.erase(0, 1);
+        }
+        // then we could still have " SUNDAY" left, so trim off whitespace again
+        dayType = EnergyPlus::UtilityRoutines::epTrim(dayType);
+        // now we can process it into a proper type
+        ScheduleDay *schedule = ScheduleDay::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(dayData.at("schedule_day_name")));
+        if (dayType == "SUNDAY") {
+            this->days[Scheduling::DayType::SUNDAY] = schedule;
+        } else if (dayType == "MONDAY") {
+            this->days[Scheduling::DayType::MONDAY] = schedule;
+        } else if (dayType == "TUESDAY") {
+            this->days[Scheduling::DayType::TUESDAY] = schedule;
+        } else if (dayType == "WEDNESDAY") {
+            this->days[Scheduling::DayType::WEDNESDAY] = schedule;
+        } else if (dayType == "THURSDAY") {
+            this->days[Scheduling::DayType::THURSDAY] = schedule;
+        } else if (dayType == "FRIDAY") {
+            this->days[Scheduling::DayType::FRIDAY] = schedule;
+        } else if (dayType == "SATURDAY") {
+            this->days[Scheduling::DayType::SATURDAY] = schedule;
+        } else if (dayType == "HOLIDAY") {
+            this->days[Scheduling::DayType::HOLIDAYS] = schedule;
+        } else if (dayType == "SUMMERDESIGNDAY") {
+            this->days[Scheduling::DayType::SUMMERDESIGNDAY] = schedule;
+        } else if (dayType == "WINTERDESIGNDAY") {
+            this->days[Scheduling::DayType::WINTERDESIGNDAY] = schedule;
+        } else if (dayType == "CUSTOMDAY1") {
+            this->days[Scheduling::DayType::CUSTOMDAY1] = schedule;
+        } else if (dayType == "CUSTOMDAY2") {
+            this->days[Scheduling::DayType::CUSTOMDAY2] = schedule;
+        } else if (dayType == "WEEKDAYS") {
+            this->days[Scheduling::DayType::MONDAY] = schedule;
+            this->days[Scheduling::DayType::TUESDAY] = schedule;
+            this->days[Scheduling::DayType::WEDNESDAY] = schedule;
+            this->days[Scheduling::DayType::THURSDAY] = schedule;
+            this->days[Scheduling::DayType::FRIDAY] = schedule;
+        } else if (dayType == "WEEKENDS") {
+            this->days[Scheduling::DayType::SATURDAY] = schedule;
+            this->days[Scheduling::DayType::SUNDAY] = schedule;
+        } else if (dayType == "ALLDAYS") {
+            this->days[Scheduling::DayType::MONDAY] = schedule;
+            this->days[Scheduling::DayType::TUESDAY] = schedule;
+            this->days[Scheduling::DayType::WEDNESDAY] = schedule;
+            this->days[Scheduling::DayType::THURSDAY] = schedule;
+            this->days[Scheduling::DayType::FRIDAY] = schedule;
+            this->days[Scheduling::DayType::SATURDAY] = schedule;
+            this->days[Scheduling::DayType::SUNDAY] = schedule;
+            this->days[Scheduling::DayType::HOLIDAYS] = schedule;
+            this->days[Scheduling::DayType::SUMMERDESIGNDAY] = schedule;
+            this->days[Scheduling::DayType::WINTERDESIGNDAY] = schedule;
+            this->days[Scheduling::DayType::CUSTOMDAY1] = schedule;
+            this->days[Scheduling::DayType::CUSTOMDAY2] = schedule;
+        } else if (dayType == "ALLOTHERDAYS") {
+            this->days[Scheduling::DayType::ALLOTHERDAYS] = schedule;
+            this->hasAllOtherDays = true;
+        }
     }
 }
+
+ScheduleDay *ScheduleWeekCompact::getScheduleDay(Scheduling::DayType dt)
+{
+    if (this->days.find(dt) == this->days.end()) {
+        if (this->hasAllOtherDays) {
+            return this->days[Scheduling::DayType::ALLOTHERDAYS];
+        }
+        // TODO: Get proper day type name here
+        // TODO: Do we just return a nullptr to allow the schedule to default to zero?
+        EnergyPlus::ShowFatalError("Could not find day schedule for day type SSSSS for Schedule:Week:Daily");
+    }
+    return this->days[dt];
+}
+
 } // namespace Scheduling

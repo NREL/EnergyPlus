@@ -270,9 +270,6 @@ ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &
     if (!this->establishNumericSubset(fullDataSetThisFile)) {
         EnergyPlus::ShowFatalError("CSV file processing errors cause program termination");
     }
-    if (this->typeLimits) {
-        this->validateTypeLimits();
-    }
 }
 
 void ScheduleFile::updateValue(int simTime)
@@ -309,6 +306,14 @@ bool ScheduleFile::validateTypeLimits()
 //        }
 //    }
     return true;
+}
+
+void ScheduleFile::createTimeSeries()
+{
+    // TODO: Need to use this in place of the numericSubset function and this should be done every environment - I think
+    if (this->typeLimits) {
+        this->validateTypeLimits();
+    }
 }
 
 } // namespace Scheduling

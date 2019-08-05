@@ -85,9 +85,16 @@ struct ScheduleYear : ScheduleBase
     static void setupOutputVariables();
 
     // instance methods for this class
+    bool createTimeSeries();
 
     // member variables
     std::vector<WeekScheduleRange> weekScheduleRanges;
+    bool includesLeapYearData = false;
+
+    // member variables related to final data storage and lookup
+    std::vector<Real64> timeStamp;
+    std::vector<Real64> values;
+    int lastIndexUsed = 0;
 };
 
 extern std::vector<ScheduleYear> scheduleYears;

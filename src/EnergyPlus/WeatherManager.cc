@@ -981,10 +981,10 @@ namespace WeatherManager {
                 ShowSevereError(RoutineName + "Requested Reverse Design Days (ReverseDD) but only 1 Design Day specified, program will terminate.");
             }
 
-            // Throw a Fatal now that we have said it'll terminalte
+            // Throw a Fatal now that we have said it'll terminate
             if (ErrorsFound) {
                 CloseWeatherFile(); // will only close if opened.
-                ShowFatalError(RoutineName + "Errors found in Weater Data Input. Program terminates.");
+                ShowFatalError(RoutineName + "Errors found in Weather Data Input. Program terminates.");
             }
 
             CurrentOverallSimDay = 0;
@@ -2499,7 +2499,7 @@ namespace WeatherManager {
 
         // calculate an effective simulation time for scheduling
         // TODO: Update this for all the things and define it carefully
-        int const simTime = 86400 * (WeatherManager::DayOfYear - 1) + 3600 * (DataGlobals::HourOfDay - 1) + DataGlobals::TimeStepZone * DataGlobals::TimeStep;
+        int const simTime = 86400 * (WeatherManager::DayOfYear - 1) + 3600 * ((DataGlobals::HourOfDay - 1) + DataGlobals::TimeStepZone * DataGlobals::TimeStep);
         Scheduling::updateAllSchedules(simTime);
 
         std::sprintf(time_stamp, "%02d/%02d %02hu", Month, DayOfMonth, (unsigned short)(HourOfDay - 1));

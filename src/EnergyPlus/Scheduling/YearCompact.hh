@@ -57,34 +57,12 @@
 
 namespace Scheduling {
 
+int const NumDayTypeBits = 12;
+
 struct Until {
     int time;
     Real64 value;
 };
-
-enum class DayType {
-    // These first 12 are plain single day IDs and make up the bitset length
-    SUMMERDESIGNDAY = 0,
-    WINTERDESIGNDAY = 1,
-    HOLIDAYS = 2,
-    SUNDAY = 3,
-    MONDAY = 4,
-    TUESDAY = 5,
-    WEDNESDAY = 6,
-    THURSDAY = 7,
-    FRIDAY = 8,
-    SATURDAY = 9,
-    CUSTOMDAY1 = 10,
-    CUSTOMDAY2 = 11,
-    // These two don't count for the bitset length
-    WEEKDAYS = 12,
-    WEEKENDS = 13,
-    ALLDAYS = 14,
-    ALLOTHERDAYS = 15,
-    // And this is just a dummy value
-    UNKNOWN = 16
-};
-int const NumDayTypeBits = 12;
 
 struct For {
     Scheduling::Interpolation interpolate = Scheduling::Interpolation::NONE;

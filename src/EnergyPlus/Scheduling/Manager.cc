@@ -134,6 +134,22 @@ void updateAllSchedules(int const simTime)
     }
 }
 
+void recreateAllTimeSeries()
+{
+    for (auto &thisSchedule : scheduleConstants) {
+        thisSchedule.createTimeSeries();
+    }
+    for (auto &thisSchedule : scheduleCompacts) {
+        thisSchedule.createTimeSeries();
+    }
+    for (auto &thisSchedule : scheduleYears) {
+        thisSchedule.createTimeSeries();
+    }
+    for (auto &thisSchedule : scheduleFiles) {
+        thisSchedule.createTimeSeries();
+    }
+}
+
 void processAllSchedules()
 {
     // This function will process all schedule related inputs.  Start with type limits, then call each derived type.

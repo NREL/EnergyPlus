@@ -48,11 +48,14 @@
 #ifndef SRC_ENERGYPLUS_SCHEDULING_WEEK_HH
 #define SRC_ENERGYPLUS_SCHEDULING_WEEK_HH
 
+#include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <nlohmann/json.hpp>
 
+#include <UtilityRoutines.hh>
 #include <Scheduling/Day.hh>
 
 namespace Scheduling {
@@ -60,37 +63,26 @@ namespace Scheduling {
 struct ScheduleWeek
 {
     std::string name;
+    std::map<Scheduling::DayType, ScheduleDay*> days;
 
     static ScheduleWeek *factory(const std::string &scheduleName);
     static void processInput();
     static void clear_state();
+
+    virtual ScheduleDay* getScheduleDay(Scheduling::DayType) = 0;
 };
 
 struct ScheduleWeekDaily : ScheduleWeek
 {
-    ScheduleDay *sunday;
-    ScheduleDay *monday;
-    ScheduleDay *tuesday;
-    ScheduleDay *wednesday;
-    ScheduleDay *thursday;
-    ScheduleDay *friday;
-    ScheduleDay *saturday;
-    ScheduleDay *holiday;
-    ScheduleDay *summerDesignDay;
-    ScheduleDay *winterDesignDay;
-    ScheduleDay *customDay1;
-    ScheduleDay *customDay2;
-
     ScheduleWeekDaily(std::string const &objectName, nlohmann::json const &fields);
+    ScheduleDay* getScheduleDay(Scheduling::DayType) override;
 };
 
 struct ScheduleWeekCompact : ScheduleWeek
 {
-    // TODO: These two eventually become a vector of a new structure for the extensible group
-    std::vector<std::string> dayTypeList;
-    std::vector<std::string> scheduleDayName;
-
     ScheduleWeekCompact(std::string const &objectName, nlohmann::json const &fields);
+    ScheduleDay* getScheduleDay(Scheduling::DayType) override;
+    bool hasAllOtherDays = false;
 };
 
 extern std::vector<ScheduleWeekDaily> scheduleWeekDailies;

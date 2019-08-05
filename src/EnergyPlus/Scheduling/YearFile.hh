@@ -83,6 +83,7 @@ struct ScheduleFile : ScheduleBase
 
     // instance methods for this class
     bool establishNumericSubset(std::vector<std::vector<std::string>> dataset);
+    void createTimeSeries();
 
     // static methods for processing csv data to be available across all Schedule:File objects
     static std::vector<std::vector<std::string>> processCSVLines(std::vector<std::string> const & lines);

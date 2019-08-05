@@ -69,6 +69,7 @@
 #include <Plant/PlantManager.hh>
 #include <PlantPipingSystemsManager.hh>
 #include <SQLiteProcedures.hh>
+#include <Scheduling/Manager.hh>
 #include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
@@ -295,6 +296,8 @@ void ManageHVACSizingSimulation(bool &ErrorsFound)
             DayOfSim = 0;
             DayOfSimChr = "0";
             NumOfWarmupDays = 0;
+
+            Scheduling::recreateAllTimeSeries();
 
             bool anyEMSRan;
             ManageEMS(emsCallFromBeginNewEvironment, anyEMSRan); // calling point

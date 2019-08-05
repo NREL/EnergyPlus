@@ -49,6 +49,7 @@
 #include <regex>
 #include <bitset>
 
+#include <DataEnvironment.hh>
 #include <EMSManager.hh>
 #include <EnergyPlus.hh>
 #include <InputProcessing/InputProcessor.hh>
@@ -56,6 +57,7 @@
 #include <Scheduling/Base.hh>
 #include <Scheduling/YearCompact.hh>
 #include <UtilityRoutines.hh>
+#include <WeatherManager.hh>
 
 namespace Scheduling {
 
@@ -125,10 +127,6 @@ ScheduleCompact::ScheduleCompact(std::string const &objectName, nlohmann::json c
     }
     auto fieldWiseData = fields.at("data");
     this->processFields(fieldWiseData);
-    this->createTimeSeries();
-    if (this->typeLimits) {
-        this->validateTypeLimits();
-    }
 }
 
 bool ScheduleCompact::validateContinuity()
@@ -182,13 +180,27 @@ void ScheduleCompact::createTimeSeries() {
     // TODO: Handle multiyear
     // TODO: Handle leap year
     // TODO: Handle daylight savings time
+    this->timeStamp.clear();
+    this->values.clear();
     int priorThroughTime = 0;
     int currentDay = 0;
+    int thisDayOfWeek = EnergyPlus::DataEnvironment::RunPeriodStartDayOfWeek - 1; // RunPeriodStartDayOfWeek should be 1-7, so this should be fine
     for (auto const & thisThrough : this->throughs) {
         int numDaysInThrough = ((thisThrough.timeStamp - priorThroughTime) / 86400) + 1; // TODO: double check this + 1 on the end
         for (int dayNum = 1; dayNum <= numDaysInThrough; dayNum++) {
             currentDay++;
-            Scheduling::DayType dt = Scheduling::DayType::MONDAY; // TODO: Get current day type for overall day number
+            thisDayOfWeek++;
+            if (thisDayOfWeek == 8) {
+                thisDayOfWeek = 1;
+            }
+            Scheduling::DayType dt;
+            auto const & thisEnvrnIndex = EnergyPlus::WeatherManager::Envrn;
+            if (EnergyPlus::WeatherManager::Environment(thisEnvrnIndex).KindOfEnvrn == EnergyPlus::DataGlobals::ksDesignDay) {
+                dt = ScheduleBase::mapWeatherManagerDayTypeToScheduleDayType(
+                    EnergyPlus::WeatherManager::DesDayInput(EnergyPlus::WeatherManager::Environment(thisEnvrnIndex).DesignDayNum).DayType);
+            } else {
+                dt = ScheduleBase::getDayTypeForDayOfWeek(thisDayOfWeek); // TODO: Need to check for DD status, custom day, holiday
+            }
             std::bitset<Scheduling::NumDayTypeBits> bs;
             bs.set((int)dt);
             for (auto const & thisFor : thisThrough.fors) {
@@ -203,7 +215,9 @@ void ScheduleCompact::createTimeSeries() {
         }
         priorThroughTime = thisThrough.timeStamp + 86400; // TODO: Make sure this should include the last day's 86400
     }
-
+    if (this->typeLimits) {
+        this->validateTypeLimits();
+    }
 }
 
 void ScheduleCompact::processFields(nlohmann::json const &fieldWiseData)

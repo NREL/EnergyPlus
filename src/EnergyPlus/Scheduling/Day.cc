@@ -56,6 +56,7 @@ namespace Scheduling {
     bool dayScheduleGetInputFlag = true;
     std::vector<ScheduleDayHourly> scheduleDayHourlys;
     std::vector<ScheduleDayInterval> scheduleDayIntervals;
+    std::vector<ScheduleDayList> scheduleDayLists;
 
     ScheduleDay *Scheduling::ScheduleDay::factory(const std::string &scheduleName) {
         if (dayScheduleGetInputFlag) {
@@ -69,6 +70,11 @@ namespace Scheduling {
         for (auto &intervalDay : scheduleDayIntervals) {
             if (intervalDay.name == scheduleName) {
                 return &intervalDay;
+            }
+        }
+        for (auto &listDay : scheduleDayLists) {
+            if (listDay.name == scheduleName) {
+                return &listDay;
             }
         }
         EnergyPlus::ShowFatalError("Could not find day schedule with name = \"" + scheduleName + "\"");
@@ -110,6 +116,21 @@ namespace Scheduling {
                 }
             }
         }
+        {
+            std::string thisObjectType = "Schedule:Day:List";
+            auto instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
+            if (instances != EnergyPlus::inputProcessor->epJSON.end()) {
+                auto &instancesValue = instances.value();
+                for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                    auto const &fields = instance.value();
+                    auto const &thisObjectName = instance.key();
+                    // do any pre-construction checks
+                    EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+                    // then just add it to the vector via the constructor
+                    scheduleDayLists.emplace_back(thisObjectName, fields);
+                }
+            }
+        }
         dayScheduleGetInputFlag = false;
     }
 
@@ -117,6 +138,7 @@ namespace Scheduling {
         dayScheduleGetInputFlag = true;
         scheduleDayHourlys.clear();
         scheduleDayIntervals.clear();
+        scheduleDayLists.clear();
     }
 
     Scheduling::ScheduleDayHourly::ScheduleDayHourly(std::string const &objectName, nlohmann::json const &fields) {
@@ -148,7 +170,13 @@ namespace Scheduling {
             this->typeLimits = ScheduleTypeData::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("schedule_type_limits_name")));
         }
         for (int i = 1; i <= 24; i++) {
-            this->hourlyValues.push_back(fields.at("hour_" + std::to_string(i)));
+            Real64 value = 0.0;
+            try {
+                value = fields.at("hour_" + std::to_string(i));
+            } catch (...) {
+                EnergyPlus::ShowFatalError("Could not process Schedule:Day:Hourly value for hour " + std::to_string(i));
+            }
+            this->untils.emplace_back(i * 3600, value);
         }
     }
 
@@ -186,10 +214,6 @@ namespace Scheduling {
         // A6  , \field Time 3
         //       \note "until" includes the time entered.
         //       \units hh:mm
-        // N3  , \field Value Until Time 3
-        // A7  , \field Time 4
-        //       \note "until" includes the time entered.
-        //       \units hh:mm
         this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
         if (fields.find("schedule_type_limits_name") != fields.end()) {
             this->typeLimits = ScheduleTypeData::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("schedule_type_limits_name")));
@@ -204,9 +228,50 @@ namespace Scheduling {
         }
         auto & intervalsData = fields.at("data");
         for (auto const & intervalData : intervalsData) {
-            // this->untilTimes.push_back(intervalData.at("time")); // TODO: Fix this non-string conversion stuff
-            this->valuesUntilTimes.push_back(intervalData.at("value_until_time"));
+            int untilTime = 0; // intervalData.at("time"); // TODO: Convert to numeric
+            Real64 value = intervalData.at("value_until_time");
+            this->untils.emplace_back(untilTime, value);
         }
     }
 
-}
+    ScheduleDayList::ScheduleDayList(std::string const &objectName, nlohmann::json const &fields)
+    {
+        // Schedule:Day:List,
+        //  A1 , \field Name
+        //  A2 , \field Schedule Type Limits Name
+        //  A3 , \field Interpolate to Timestep
+        //       \type choice
+        //       \key Average
+        //       \key Linear
+        //       \key No
+        //       \default No
+        //  N1 , \field Minutes per Item
+        //       \note Must be evenly divisible into 60
+        //       \type integer
+        //       \minimum 1
+        //       \maximum 60
+        //  N2,  \field Value 1
+        //        N3,N4,N5,N6,N7,N8,
+        this->name = EnergyPlus::UtilityRoutines::MakeUPPERCase(objectName);
+        if (fields.find("schedule_type_limits_name") != fields.end()) {
+            this->typeLimits = ScheduleTypeData::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("schedule_type_limits_name")));
+        }
+        if (fields.find("interpolate_to_timestep") != fields.end()) {
+            auto fieldValue = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("interpolate_to_timestep"));
+            if (fieldValue == "LINEAR") {
+                this->interpolateToTimestep = Interpolation::LINEAR;
+            } else if (fieldValue == "AVERAGE") {
+                this->interpolateToTimestep = Interpolation::AVERAGE;
+            }
+        }
+        int const minutesPerItem = fields.at("minutes_per_item"); // required and no default
+        int currentUntilTime = 0;
+        auto & intervalsData = fields.at("items");
+        for (auto const & intervalData : intervalsData) {
+            currentUntilTime += minutesPerItem * 60;
+            Real64 value = intervalData.at("value");
+            this->untils.emplace_back(currentUntilTime, value);
+        }
+    }
+
+    }

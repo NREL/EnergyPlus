@@ -123,11 +123,6 @@ ScheduleConstant::ScheduleConstant(std::string const &objectName, nlohmann::json
         this->typeLimits = ScheduleTypeData::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("schedule_type_limits_name")));
     }
     this->value = fields.at("hourly_value");
-    if (this->typeLimits) {
-        if (!this->validateTypeLimits()) {
-            this->inputErrorOccurred = true;
-        }
-    }
 }
 
 void ScheduleConstant::updateValue(int EP_UNUSED(simTime))
@@ -158,6 +153,15 @@ bool ScheduleConstant::validateTypeLimits()
         return false;
     }
     return true;
+}
+void ScheduleConstant::createTimeSeries()
+{
+    // TODO: If Schedule:Constant ends up being stored as a time series then we need to recreate it for each new environment here
+    if (this->typeLimits) {
+        if (!this->validateTypeLimits()) {
+            this->inputErrorOccurred = true;
+        }
+    }
 }
 
 } // namespace Scheduling

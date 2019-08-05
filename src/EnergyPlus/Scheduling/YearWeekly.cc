@@ -45,7 +45,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <DataEnvironment.hh>
 #include <EnergyPlus.hh>
+#include <General.hh>
 #include <EMSManager.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
@@ -53,6 +55,7 @@
 #include <Scheduling/Week.hh>
 #include <Scheduling/YearWeekly.hh>
 #include <UtilityRoutines.hh>
+#include <WeatherManager.hh>
 
 namespace Scheduling {
 
@@ -140,10 +143,56 @@ ScheduleYear::ScheduleYear(std::string const &objectName, nlohmann::json const &
         int const endDay = weekData.at("end_day");
         auto scheduleInstance = ScheduleWeek::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(weekData.at("schedule_week_name")));
         this->weekScheduleRanges.emplace_back(startMonth, startDay, endMonth, endDay, scheduleInstance);
+        if ((startMonth == 2 && startDay == 29) || (endMonth == 2 && endDay == 29)) {
+            this->includesLeapYearData = true;
+        }
+    }
+    if (!this->createTimeSeries()) {
+        this->inputErrorOccurred = true;
+    }
+}
+
+bool ScheduleYear::createTimeSeries()
+{
+    this->timeStamp.clear();
+    this->values.clear();
+    int endDayNum = 0;
+    int currentDay = 0;
+    int timeCompletedSoFar = 0;
+    // TODO: Need to recreate the time series for each environment since start day of week will change for each
+    int thisDayOfWeek = EnergyPlus::DataEnvironment::RunPeriodStartDayOfWeek;
+    for (auto const & week : this->weekScheduleRanges) {
+        int startDayNum = EnergyPlus::General::OrdinalDay(week.beginMonth, week.beginDay, 1);
+        if (startDayNum != endDayNum + 1) {
+            // non continuous, start day should be one more than the last end day
+            EnergyPlus::ShowSevereError("Could not get full year continuity for Schedule:Year = " + this->name);
+            return false;
+        }
+        endDayNum = EnergyPlus::General::OrdinalDay(week.endMonth, week.endDay, 1);
+        int numDaysInThrough = endDayNum - startDayNum;
+        for (int dayNum = 1; dayNum <= numDaysInThrough; dayNum++) {
+            currentDay++;
+            thisDayOfWeek++;
+            if (thisDayOfWeek == 8) {
+                thisDayOfWeek = 1;
+            }
+            Scheduling::DayType dt = ScheduleBase::getDayTypeForDayOfWeek(thisDayOfWeek); // TODO: Need to check for DD status, custom day, holiday
+            // call the current week schedule and ask for the day schedule for that day type
+            // use the day schedule to build out the time series for that day
+            auto const & thisDaySchedule = week.scheduleInstance->getScheduleDay(dt);
+            for (auto const & thisUntil : thisDaySchedule->untils) {
+                auto currentTimeStamp = timeCompletedSoFar + thisUntil.timeInDay;
+                this->timeStamp.push_back(currentTimeStamp);
+                this->values.push_back(thisUntil.value);
+            }
+        }
     }
     if (this->typeLimits) {
-        this->validateTypeLimits();
+        if (!this->validateTypeLimits()) {
+            this->inputErrorOccurred = true;
+        }
     }
+    return true;
 }
 
 void ScheduleYear::updateValue(int EP_UNUSED(simTime))

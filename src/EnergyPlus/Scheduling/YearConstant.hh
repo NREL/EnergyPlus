@@ -74,6 +74,7 @@ struct ScheduleConstant : ScheduleBase
     static void clear_state();
 
     // instance methods for this class
+    void createTimeSeries();
 
     // member variables
 
