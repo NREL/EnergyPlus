@@ -154,12 +154,14 @@ bool ScheduleConstant::validateTypeLimits()
     }
     return true;
 }
+
 void ScheduleConstant::createTimeSeries()
 {
     // TODO: If Schedule:Constant ends up being stored as a time series then we need to recreate it for each new environment here
     if (this->typeLimits) {
         if (!this->validateTypeLimits()) {
-            this->inputErrorOccurred = true;
+            EnergyPlus::ShowFatalError("Schedule constant processing errors cause program termination");
+            // TODO: Decide on a pattern for where to call ShowFatal
         }
     }
 }

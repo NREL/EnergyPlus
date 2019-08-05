@@ -49,8 +49,10 @@
 
 #include <nlohmann/json.hpp>
 
+#include <DataEnvironment.hh>
 #include <Scheduling/SchedulingFixture.hh>
 #include <Scheduling/YearCompact.hh>
+#include <WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -568,6 +570,10 @@ TEST_F(SchedulingTestFixture, TestTimeSeriesCreation) {
     Scheduling::ScheduleCompact compact;
     compact.processFields(fields);
     compact.validateContinuity();
+    EnergyPlus::DataEnvironment::RunPeriodStartDayOfWeek = 1;
+    EnergyPlus::WeatherManager::Envrn = 1;
+    EnergyPlus::WeatherManager::Environment.allocate(1);
+    EnergyPlus::WeatherManager::Environment(1).KindOfEnvrn = EnergyPlus::DataGlobals::ksRunPeriodWeather;
     compact.createTimeSeries();
     EXPECT_EQ(365u, compact.timeStamp.size());
     EXPECT_EQ(365u, compact.values.size());

@@ -47,6 +47,8 @@
 
 #include <gtest/gtest.h>
 
+#include <DataEnvironment.hh>
+#include <WeatherManager.hh>
 #include <EnergyPlus/Scheduling/YearConstant.hh>
 #include <Scheduling/SchedulingFixture.hh>
 #include <Scheduling/Manager.hh>
@@ -115,7 +117,12 @@ TEST_F(SchedulingTestFixture, ScheduleConstant_TestValidation)
         "ScheduleTypeLimits,ThisTypeLimit,0.2,0.5,Continuous;"
     });
     ASSERT_TRUE(process_idf(idf_objects));
-    ASSERT_THROW(Scheduling::processAllSchedules(), std::runtime_error);
+    Scheduling::processAllSchedules();
+    EnergyPlus::DataEnvironment::RunPeriodStartDayOfWeek = 1;
+    EnergyPlus::WeatherManager::Envrn = 1;
+    EnergyPlus::WeatherManager::Environment.allocate(1);
+    EnergyPlus::WeatherManager::Environment(1).KindOfEnvrn = EnergyPlus::DataGlobals::ksRunPeriodWeather;
+    ASSERT_THROW(Scheduling::recreateAllTimeSeries(), std::runtime_error);
 }
 
 } // namespace EnergyPlus
