@@ -80,17 +80,17 @@ The overall collector efficiency. This is the ratio of collected energy and the 
 
 \paragraph{Solar Collector Heat Transfer Energy {[}J{]}}\label{solar-collector-heat-transfer-energy-j}
 
-These are the overall rate (in W) and amount of energy ( in J) transferred to the collector s circulating fluid. Positive values indicate heating of the fluid while negative values indicate cooling of the fluid.
+These are the overall rate (in W) and amount of energy ( in J) transferred to the collector's circulating fluid. Positive values indicate heating of the fluid while negative values indicate cooling of the fluid.
 
 \paragraph{Solar Collector Heat Gain Rate {[}W{]}}\label{solar-collector-heat-gain-rate-w}
 
-This is the overall rate of heat addition to the collector s circulating fluid in Watts. Values are always positive or zero. If the fluid is actually cooled then the value is zero.
+This is the overall rate of heat addition to the collector's circulating fluid in Watts. Values are always positive or zero. If the fluid is actually cooled then the value is zero.
 
 \paragraph{Solar Collector Heat Loss Rate {[}W{]}}\label{solar-collector-heat-loss-rate-w}
 
-This is the overall rate of heat loss from the collector s circulating fluid in Watts. Values are always positive or zero. If the fluid is actually heated then the value is zero.
+This is the overall rate of heat loss from the collector's circulating fluid in Watts. Values are always positive or zero. If the fluid is actually heated then the value is zero.
 
-In addition, several surface variables are also relevant for the collector s surface object (BuildingSurface:Detailed or Shading:Zone:Detailed):
+In addition, several surface variables are also relevant for the collector's surface object (BuildingSurface:Detailed or Shading:Zone:Detailed):
 
 \begin{itemize}
 \item
@@ -433,7 +433,7 @@ This field should contain a unique name chosen by the user to identify a specifi
 
 \paragraph{Field: Surface Name}\label{field-surface-name-2-001}
 
-This field is the user-defined name of a surface object (defined elsewhere) to which the PVT module is attached. These can be any type of building surface that is exposed to the exterior environment. The model uses the named surface s geometry for the PVT solar collector.
+This field is the user-defined name of a surface object (defined elsewhere) to which the PVT module is attached. These can be any type of building surface that is exposed to the exterior environment. The model uses the named surface's geometry for the PVT solar collector.
 
 \paragraph{Field: Photovoltaic-Thermal Model Performance Name}\label{field-photovoltaic-thermal-model-performance-name}
 
@@ -445,7 +445,7 @@ This field is the user-defined name of a \hyperref[generatorphotovoltaic-000]{Ge
 
 \paragraph{Field: Thermal Working Fluid Type}\label{field-thermal-working-fluid-type}
 
-This field is the user s choice for the type of fluid used to collect thermal energy. PVT solar collectors can capture thermal energy in either air or water streams. The choices available for this field are Water or Air. If the choice is Air then the PVT collector needs to be connected to an HVAC air system loop. The PVT collector should be situated as the first component on an outdoor air inlet stream. If the choice is Water then the PVT collector needs to be connected to a Plant water system loop. The connections are made via node names which are defined in the following fields, depending on the working fluid type.
+This field is the user's choice for the type of fluid used to collect thermal energy. PVT solar collectors can capture thermal energy in either air or water streams. The choices available for this field are Water or Air. If the choice is Air then the PVT collector needs to be connected to an HVAC air system loop. The PVT collector should be situated as the first component on an outdoor air inlet stream. If the choice is Water then the PVT collector needs to be connected to a Plant water system loop. The connections are made via node names which are defined in the following fields, depending on the working fluid type.
 
 \paragraph{Field: Water Inlet Node Name}\label{field-water-inlet-node-name-003}
 
@@ -553,7 +553,7 @@ This field is used for the name of a schedule that provides values for the effic
 
 \paragraph{Field: Front Surface Emittance}\label{field-front-surface-emittance}
 
-This field is used to describe an average value for the total hemispherical emittance of the collector s front face exposed to the sky. This is used to model cooling applications where the PVT collectors are operated at night to cool the working fluid.
+This field is used to describe an average value for the total hemispherical emittance of the collector's front face exposed to the sky. This is used to model cooling applications where the PVT collectors are operated at night to cool the working fluid.
 
 An example input object follows.
 
@@ -666,7 +666,7 @@ The \hyperref[availabilitymanagerdifferentialthermostat]{AvailabilityManager:Dif
 
 This object is used to model unglazed transpired solar collectors (UTSC) used to condition outdoor air. These collectors are generally used to heat air drawn through perforated absorbers that are heated by the sun and also recover heat conducted out through the underlying wall. The SolarCollector:UnglazedTranspired object represents a single collector attached to one or more \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects and to one or more outdoor air systems. Therefore the transpired collector is part of both the thermal envelope and the HVAC system. An example file is provided called TranspiredCollectors.idf.
 
-The area and orientation of the collector is obtained from \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects, which are referenced by name. Although the collector surface itself is slightly detached from the underlying building wall (or roof), no additional surface object is needed to represent the collector itself. When modeling transpired collectors, it is important to consider the size of the collector when developing the building model s \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects because the underlying surfaces must match the collector. For example, if the collector covers only part of the wall, then that wall should be split into separate surfaces where one matches the size of the collector. A single collector can be associated with as many \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects as desired (although if you need to use more than 10 surfaces, then the IDD will need to be extended). The collector can be arranged at any tilt angle by describing the surfaces appropriately. The surfaces need not be contiguous nor have the same orientation, but the program will issue warnings if surfaces have widely ranging tilts and azimuths.
+The area and orientation of the collector is obtained from \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects, which are referenced by name. Although the collector surface itself is slightly detached from the underlying building wall (or roof), no additional surface object is needed to represent the collector itself. When modeling transpired collectors, it is important to consider the size of the collector when developing the building model's \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects because the underlying surfaces must match the collector. For example, if the collector covers only part of the wall, then that wall should be split into separate surfaces where one matches the size of the collector. A single collector can be associated with as many \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} objects as desired (although if you need to use more than 10 surfaces, then the IDD will need to be extended). The collector can be arranged at any tilt angle by describing the surfaces appropriately. The surfaces need not be contiguous nor have the same orientation, but the program will issue warnings if surfaces have widely ranging tilts and azimuths.
 
 The collector conditions outdoor air and is connected to the outdoor air system using the usual method of specifying node names. Using the UTSC model requires specifying a relatively complete HVAC air system that includes an outdoor air path. This will typically require using a set of objects that, at a minimum, will include: \hyperref[airloophvaccontrollerlist]{AirLoopHVAC:ControllerList}, \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList}, \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem}, \hyperref[outdoorairnodelist]{OutdoorAir:NodeList}, \hyperref[outdoorairmixer]{OutdoorAir:Mixer}, \hyperref[setpointmanagermixedair]{SetpointManager:MixedAir}, and \hyperref[controlleroutdoorair]{Controller:OutdoorAir}. A single UTSC can serve more than one outdoor air system but requires also using a separate object, called \hyperref[solarcollectorunglazedtranspiredmultisystem]{SolarCollector:UnglazedTranspired:Multisystem} to specify node connections.
 
