@@ -1750,8 +1750,8 @@
     Zone1FanCoil,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   NodeList,
     Zone1Inlets,             !- Name
@@ -1876,8 +1876,8 @@
     Zone2FanCoil,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   NodeList,
     Zone2Inlets,             !- Name
@@ -2002,8 +2002,8 @@
     Zone3FanCoil,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   NodeList,
     Zone3Inlets,             !- Name

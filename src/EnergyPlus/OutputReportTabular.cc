@@ -12820,10 +12820,10 @@ namespace OutputReportTabular {
                     ComputePeakDifference(ZoneCoolCompLoadTables(iZone));
                     ComputePeakDifference(ZoneHeatCompLoadTables(iZone));
 
-                    LoadSummaryUnitConversion(ZoneCoolCompLoadTables(iZone));
-                    LoadSummaryUnitConversion(ZoneHeatCompLoadTables(iZone));
+                    // We delay the potential application of SI to IP conversion and actual output until after both the AirLoopComponentLoadSummary
+                    // and FacilityComponentLoadSummary have been processed because below we try to retrieve the info directly when the timestamp
+                    // would match (cf #7356), and if we converted right now, we would apply the conversion twice
 
-                    OutputCompLoadSummary(zoneOuput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone);
                 }
             }
         }
@@ -12893,6 +12893,7 @@ namespace OutputReportTabular {
                 // them for specific design day and time of max
                 for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
                     if (!ZoneEquipConfig(iZone).IsControlled) continue;
+                    // The ZoneCoolCompLoadTables already hasn't gotten a potential IP conversion yet, so we won't convert it twice.
                     if (displayZoneComponentLoadSummary &&
                         (AirLoopZonesCoolCompLoadTables(iZone).desDayNum == ZoneCoolCompLoadTables(iZone).desDayNum) &&
                         (AirLoopZonesCoolCompLoadTables(iZone).timeStepMax == ZoneCoolCompLoadTables(iZone).timeStepMax)) {
@@ -13011,7 +13012,8 @@ namespace OutputReportTabular {
                 if (!ZoneEquipConfig(iZone).IsControlled) continue;
                 mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
                 if (mult == 0.0) mult = 1.0;
-                if (displayZoneComponentLoadSummary && (timeCoolMax == ZoneCoolCompLoadTables(iZone).desDayNum) &&
+                // The ZoneCoolCompLoadTables already hasn't gotten a potential IP conversion yet, so we won't convert it twice.
+                if (displayZoneComponentLoadSummary && (coolDesSelected == ZoneCoolCompLoadTables(iZone).desDayNum) &&
                     (timeCoolMax == ZoneCoolCompLoadTables(iZone).timeStepMax)) {
                     FacilityZonesCoolCompLoadTables(iZone) = ZoneCoolCompLoadTables(iZone);
                 } else {
@@ -13046,7 +13048,7 @@ namespace OutputReportTabular {
                 FacilityZonesCoolCompLoadTables(iZone).desDayNum = coolDesSelected;
                 CombineLoadCompResults(FacilityCoolCompLoadTables, FacilityZonesCoolCompLoadTables(iZone), mult);
 
-                if (displayZoneComponentLoadSummary && (timeHeatMax == ZoneHeatCompLoadTables(iZone).desDayNum) &&
+                if (displayZoneComponentLoadSummary && (heatDesSelected == ZoneHeatCompLoadTables(iZone).desDayNum) &&
                     (timeHeatMax == ZoneHeatCompLoadTables(iZone).timeStepMax)) {
                     FacilityZonesHeatCompLoadTables(iZone) = ZoneHeatCompLoadTables(iZone);
                 } else {
@@ -13095,6 +13097,20 @@ namespace OutputReportTabular {
             LoadSummaryUnitConversion(FacilityHeatCompLoadTables);
 
             OutputCompLoadSummary(facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0);
+        }
+
+
+        // ZoneComponentLoadSummary: Now we convert and Display
+        if (displayZoneComponentLoadSummary) {
+            for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
+                if (!ZoneEquipConfig(iZone).IsControlled) continue;
+                if (allocated(CalcFinalZoneSizing)) {
+                    LoadSummaryUnitConversion(ZoneCoolCompLoadTables(iZone));
+                    LoadSummaryUnitConversion(ZoneHeatCompLoadTables(iZone));
+
+                    OutputCompLoadSummary(zoneOuput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone);
+                }
+            }
         }
 
         ZoneHeatCompLoadTables.deallocate();
@@ -13512,14 +13528,14 @@ namespace OutputReportTabular {
                     compLoad.peakDateHrMin = CoolPeakDateHrMin(zoneIndex);
                 }
 
-                // Outside  Dry Bulb Temperature
+                // Outside Dry Bulb Temperature
                 compLoad.outsideDryBulb = CalcFinalZoneSizing(zoneIndex).CoolOutTempSeq(timeOfMax);
 
-                // Outside  Wet Bulb Temperature
+                // Outside Wet Bulb Temperature
                 // use standard sea level air pressure because air pressure is not tracked with sizing data
                 if (CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax) < 1.0 &&
                     CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax) > 0.0) {
-                    compLoad.outsideWebBulb = PsyTwbFnTdbWPb(CalcFinalZoneSizing(zoneIndex).CoolOutTempSeq(timeOfMax),
+                    compLoad.outsideWetBulb = PsyTwbFnTdbWPb(CalcFinalZoneSizing(zoneIndex).CoolOutTempSeq(timeOfMax),
                                                              CalcFinalZoneSizing(zoneIndex).CoolOutHumRatSeq(timeOfMax),
                                                              101325.0);
                 }
@@ -13565,14 +13581,14 @@ namespace OutputReportTabular {
                     compLoad.peakDateHrMin = HeatPeakDateHrMin(zoneIndex);
                 }
 
-                // Outside  Dry Bulb Temperature
+                // Outside Dry Bulb Temperature
                 compLoad.outsideDryBulb = CalcFinalZoneSizing(zoneIndex).HeatOutTempSeq(timeOfMax);
 
-                // Outside  Wet Bulb Temperature
+                // Outside Wet Bulb Temperature
                 // use standard sea level air pressure because air pressure is not tracked with sizing data
                 if (CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax) < 1.0 &&
                     CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax) > 0.0) {
-                    compLoad.outsideWebBulb = PsyTwbFnTdbWPb(CalcFinalZoneSizing(zoneIndex).HeatOutTempSeq(timeOfMax),
+                    compLoad.outsideWetBulb = PsyTwbFnTdbWPb(CalcFinalZoneSizing(zoneIndex).HeatOutTempSeq(timeOfMax),
                                                              CalcFinalZoneSizing(zoneIndex).HeatOutHumRatSeq(timeOfMax),
                                                              101325.0);
                 }
@@ -13794,7 +13810,7 @@ namespace OutputReportTabular {
         compLoadTotal.timeStepMax = compLoadPartial.timeStepMax;
         compLoadTotal.peakDateHrMin = compLoadPartial.peakDateHrMin;
         compLoadTotal.outsideDryBulb = compLoadPartial.outsideDryBulb;
-        compLoadTotal.outsideWebBulb = compLoadPartial.outsideWebBulb;
+        compLoadTotal.outsideWetBulb = compLoadPartial.outsideWetBulb;
         compLoadTotal.outsideHumRatio = compLoadPartial.outsideHumRatio;
         compLoadTotal.zoneDryBulb = compLoadPartial.zoneDryBulb;
         compLoadTotal.zoneRelHum = compLoadPartial.zoneRelHum;
@@ -13901,7 +13917,7 @@ namespace OutputReportTabular {
             }
             int tempConvIndx = getSpecificUnitIndex("C", "F");
             compLoadTotal.outsideDryBulb = ConvertIP(tempConvIndx, compLoadTotal.outsideDryBulb);
-            compLoadTotal.outsideWebBulb = ConvertIP(tempConvIndx, compLoadTotal.outsideWebBulb);
+            compLoadTotal.outsideWetBulb = ConvertIP(tempConvIndx, compLoadTotal.outsideWetBulb);
             compLoadTotal.zoneDryBulb = ConvertIP(tempConvIndx, compLoadTotal.zoneDryBulb);
             compLoadTotal.peakDesSensLoad *= powerConversion;
 
@@ -14080,8 +14096,8 @@ namespace OutputReportTabular {
                 columnHead(1) = "Value";
                 if (unitsStyle != unitsStyleInchPound) {
                     rowHead(1) = "Time of Peak Load";
-                    rowHead(2) = "Outside  Dry Bulb Temperature [C]";
-                    rowHead(3) = "Outside  Wet Bulb Temperature [C]";
+                    rowHead(2) = "Outside Dry Bulb Temperature [C]";
+                    rowHead(3) = "Outside Wet Bulb Temperature [C]";
                     rowHead(4) = "Outside Humidity Ratio at Peak [kgWater/kgAir]";
                     rowHead(5) = "Zone Dry Bulb Temperature [C]";
                     rowHead(6) = "Zone Relative Humidity [%]";
@@ -14099,8 +14115,8 @@ namespace OutputReportTabular {
                     rowHead(16) = "Difference Between Peak and Estimated Sensible Load [W]";
                 } else {
                     rowHead(1) = "Time of Peak Load";
-                    rowHead(2) = "Outside  Dry Bulb Temperature [F]";
-                    rowHead(3) = "Outside  Wet Bulb Temperature [F]";
+                    rowHead(2) = "Outside Dry Bulb Temperature [F]";
+                    rowHead(3) = "Outside Wet Bulb Temperature [F]";
                     rowHead(4) = "Outside Humidity Ratio at Peak [lbWater/lbAir]";
                     rowHead(5) = "Zone Dry Bulb Temperature [F]";
                     rowHead(6) = "Zone Relative Humidity [%]";
@@ -14120,8 +14136,8 @@ namespace OutputReportTabular {
 
                 if (curCompLoad.timeStepMax != 0) {
                     tableBody(1, 1) = curCompLoad.peakDateHrMin;                  // Time of Peak Load
-                    tableBody(1, 2) = RealToStr(curCompLoad.outsideDryBulb, 2);   // Outside  Dry Bulb Temperature
-                    tableBody(1, 3) = RealToStr(curCompLoad.outsideWebBulb, 2);   // Outside  Wet Bulb Temperature
+                    tableBody(1, 2) = RealToStr(curCompLoad.outsideDryBulb, 2);   // Outside Dry Bulb Temperature
+                    tableBody(1, 3) = RealToStr(curCompLoad.outsideWetBulb, 2);   // Outside Wet Bulb Temperature
                     tableBody(1, 4) = RealToStr(curCompLoad.outsideHumRatio, 5);  // Outside Humidity Ratio at Peak
                     tableBody(1, 5) = RealToStr(curCompLoad.zoneDryBulb, 2);      // Zone Dry Bulb Temperature
                     tableBody(1, 6) = RealToStr(100 * curCompLoad.zoneRelHum, 2); // Zone Relative Humdity

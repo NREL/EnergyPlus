@@ -16,9 +16,9 @@ If there are design conditions, then the format is as follows:
 
 Number of Design Conditions,Title of Design Condition,Design Stat,HDB 99.6\%,HDB 99\%,X WS 1\%,X WS 2.5\%,X WS 5\%,CM WS .4\%,CM MDB .4\%,CM WS 1\%,CM MDB 1\%,MWS 99.6\%,PWD 99.6\%,MWS .4\%,PWD .4\%,X MnDB Max,X MnDB Min,X StdDB Max,X StdDB Min,Design Stat,CDB .4\%,C MWB .4\%,CDB 1\%,C MWB 1\%,CDB 2\%,C MWB 2\%,E WB .4\%,E MDB .4\%,E WB 1\%,E MDB 1\%,E WB 2\%,E MDB 2\%,DP .4\%,HR .4\%,MDB .4\%,DP 1\%,HR 1\%,MDB 1\%,DP 2\%,HR 2\%,MDB 2\%,DB Range
 
-,,Units,\{°C\},\{°C\},\{m/s\},\{m/s\},\{m/s\},\{m/s\},\{°C\},\{m/s\},\{°C\},\{m/s\},\{Degree\},\{m/s\},\{Degree\},\{°C\},\{°C\},\{°C\},\{°C\},Units,\{°C\},\{°C\},\{°C\},\{°C\},\{°C\},\{°C\},\{°C\},\{°C\},\{°C\},\{°C\},\{°C\},\{°C\},\{°C\},\{g/kg\},\{°C\},\{°C\},\{g/kg\},\{°C\},\{°C\},\{g/kg\},\{°C\},\{°C\}
+,, Units, \{°C\}, \{°C\}, \{m/s\}, \{m/s\}, \{m/s\}, \{m/s\}, \{°C\}, \{m/s\}, \{°C\}, \{m/s\}, \{Degree\}, \{m/s\}, \{Degree\}, \{°C\}, \{°C\}, \{°C\}, \{°C\}, Units, \{°C\}, \{°C\}, \{°C\}, \{°C\}, \{°C\}, \{°C\}, \{°C\}, \{°C\}, \{°C\}, \{°C\}, \{°C\}, \{°C\}, \{°C\}, \{g/kg\}, \{°C\}, \{°C\}, \{g/kg\}, \{°C\}, \{°C\}, \{g/kg\}, \{°C\}, \{°C\}
 
-1,World Climate Design Data 2001 ASHRAE Handbook,HEATING,5.8,6.8,11.3,9.9,8.8,11.1,14.2,9.1,13.4,1.1,320,5.3,300,39.3,3.1,2.9,1.9,COOLING,32.2,20,29.5,19.7,27.9,20.1,23,28,22.3,26.2,21.7,25.3,21.7,16.4,24.8,21.1,15.8,24.3,20.6,15.3,23.9,6.7
+1, World Climate Design Data 2001 ASHRAE Handbook, HEATING, 5.8, 6.8, 11.3, 9.9, 8.8, 11.1, 14.2, 9.1, 13.4, 1.1, 320, 5.3, 300, 39.3, 3.1, 2.9, 1.9, COOLING, 32.2, 20, 29.5, 19.7, 27.9, 20.1, 23, 28, 22.3, 26.2, 21.7, 25.3, 21.7, 16.4, 24.8, 21.1, 15.8, 24.3, 20.6, 15.3, 23.9, 6.7 
 
 However, if there are no design conditions, then the format looks like:
 
@@ -44,7 +44,7 @@ The program uses a heuristic, time lagged calculation based on dry bulb temperat
 
 Number of Ground Temperature Depths,Ground Temperature Depth \{m\},Soil Conductivity \{W/m-K\},Soil Density \{kg/m3\},Soil Specific Heat \{J/kg-K\},Jan \{C\},Feb\{C\},Mar \{C\},Apr \{C\},May \{C\},Jun \{C\},Jul \{C\},Aug \{C\},Sep \{C\},Oct \{C\},Nov \{C\},Dec \{C\},\textless{}repeat to Number of temperature depths\textgreater{}
 
-3,.5,,,,20.69,22.30,22.69,22.26,19.95,17.43,15.09,13.43,12.99,13.86,15.84,18.29,2,,,,19.18,20.71,21.41,21.40,20.16,18.43,16.58,15.03,14.25,14.45,15.59,17.28,4,,,,18.18,19.38,20.10,20.30,19.82,18.80,17.56,16.35,15.56,15.39,15.89,16.89
+3,.5,,,,20.69,22.30,22.69,22.26,19.95,17.43,15.09,13.43,12.99,13.86,15.84,18.29,2,,,,19.18,20.71, 21.41,21.40,20.16,18.43,16.58,15.03,14.25,14.45,15.59,17.28,4,,,,18.18,19.38,20.10,20.30,19.82, 18.80,17.56,16.35,15.56,15.39,15.89,16.89
 
 \subsection{Holiday/Daylight Saving Header/Data (CSV)}\label{holidaydaylight-saving-headerdata-csv}
 
@@ -78,7 +78,7 @@ Number of Data Periods {[}DP{]},Number of Intervals per Hour,DP Name/Description
 
 The field ``names'' for each item are shown. First, the ``short'' names:
 
-Date,HH:MM,Datasource,DryBulb \{C\},DewPoint \{C\},RelHum \{\%\},Atmos Pressure \{Pa\},ExtHorzRad \{Wh/m2\},ExtDirRad \{Wh/m2\},HorzIRSky \{Wh/m2\},GloHorzRad \{Wh/m2\},DirNormRad \{Wh/m2\},DifHorzRad \{Wh/m2\},GloHorzIllum \{lux\},DirNormIllum \{lux\},DifHorzIllum \{lux\},ZenLum \{Cd/m2\},WindDir \{deg\},WindSpd \{m/s\},TotSkyCvr \{.1\},OpaqSkyCvr \{.1\},Visibility \{km\},Ceiling Hgt \{m\},PresWeathObs,PresWeathCodes,Precip Wtr \{mm\},Aerosol Opt Depth \{.001\},SnowDepth \{cm\},Days Last Snow,Albedo \{.01\},Rain \{mm\},Rain Quantity \{hr\}
+Date,HH:MM,Datasource,DryBulb \{C\},DewPoint \{C\},RelHum \{\%\},Atmos Pressure \{Pa\}, ExtHorzRad \{Wh/m2\},ExtDirRad \{Wh/m2\},HorzIRSky \{Wh/m2\},GloHorzRad \{Wh/m2\}, DirNormRad \{Wh/m2\},DifHorzRad \{Wh/m2\},GloHorzIllum \{lux\}, DirNormIllum \{lux\},DifHorzIllum \{lux\},ZenLum \{Cd/m2\},WindDir \{deg\},WindSpd \{m/s\}, TotSkyCvr \{.1\},OpaqSkyCvr \{.1\},Visibility \{km\},Ceiling Hgt \{m\},PresWeathObs, PresWeathCodes,Precip Wtr \{mm\},Aerosol Opt Depth \{.001\},SnowDepth \{cm\},Days Last Snow,Albedo \{.01\}, Rain \{mm\},Rain Quantity \{hr\}
 
 Then, the longer names:
 
@@ -86,7 +86,7 @@ Date,HH:MM,Datasource,Dry Bulb Temperature \{C\},Dew Point Temperature \{C\},Rel
 
 As noted previously, these headers and data are in the identical order to the items in the EPW records. Then the data is shown:
 
-1983/1/1,01:00,C9C9C9C9*0?9?9?9?9?9?9?9*0C8C8C8C8*0*0E8*0*0,26.2,19.2,65,101100,0,1415,412,0,0,0,0,0,0,0,180,6.5,9,7,23.3,77777,9,'999999999,0,0.2300,0,88
+1983/1/1,01:00,C9C9C9C9*0?9?9?9?9?9?9?9*0C8C8C8C8*0*0E8*0*0,26.2,19.2,65,101100,0, 1415,412,0,0,0,0,0,0,0,180,6.5,9,7,23.3,77777,9,'999999999,0,0.2300,0,88
 
 The Date and Time fields need a bit of description. The Date field (e.g.~1983/1/1) uses your standard system date for formatting. In the EPW file, these are three separate fields (year, month, and day in this example). The time field combines the hours and minutes into one field (hh:mm). This makes it easier for graphing with spreadsheet programs but a bit harder if you use the CSV format as input.
 

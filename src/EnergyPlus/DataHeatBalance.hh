@@ -174,12 +174,6 @@ namespace DataHeatBalance {
     extern int const Isotropic;
     extern int const Anisotropic;
 
-    // Parameters for HeatTransferAlgosUsed
-    extern int const UseCTF;
-    extern int const UseEMPD;
-    extern int const UseCondFD;
-    extern int const UseHAMT;
-
     // Parameters for ZoneAirSolutionAlgo
     extern int const Use3rdOrder;
     extern int const UseAnalyticalSolution;
@@ -348,13 +342,18 @@ namespace DataHeatBalance {
     extern int SolarDistribution;               // Solar Distribution Algorithm
     extern int InsideSurfIterations;            // Counts inside surface iterations
     extern int OverallHeatTransferSolutionAlgo; // UseCTF Solution, UseEMPD moisture solution, UseCondFD solution
-    extern int NumberOfHeatTransferAlgosUsed;
-    extern Array1D_int HeatTransferAlgosUsed;
+ 
+   // Flags for HeatTransfer Algorithms Used
+    extern bool AnyCTF;    // CTF used
+    extern bool AnyEMPD;   // EMPD used
+    extern bool AnyCondFD; // CondFD used
+    extern bool AnyHAMT;   // HAMT used
+    extern bool AnyKiva;   // Kiva used
+
     extern int MaxNumberOfWarmupDays;     // Maximum number of warmup days allowed
     extern int MinNumberOfWarmupDays;     // Minimum number of warmup days allowed
     extern Real64 CondFDRelaxFactor;      // Relaxation factor, for looping across all the surfaces.
     extern Real64 CondFDRelaxFactorInput; // Relaxation factor, for looping across all the surfaces, user input value
-    // LOGICAL ::  CondFDVariableProperties = .FALSE. ! if true, then variable conductivity or enthalpy in Cond FD.
 
     extern int ZoneAirSolutionAlgo;              // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
     extern Real64 BuildingRotationAppendixG;     // Building Rotation for Appendix G
@@ -1133,6 +1132,10 @@ namespace DataHeatBalance {
         Real64 MaximumY;           // Maximum Y value for entire zone
         Real64 MinimumZ;           // Minimum Z value for entire zone
         Real64 MaximumZ;           // Maximum Z value for entire zone
+        std::vector<int> ZoneHTSurfaceList;          // List of HT surfaces related to this zone (includes adjacent interzone surfaces)
+        std::vector<int> ZoneIZSurfaceList;          // List of interzone surfaces in this zone
+        std::vector<int> ZoneHTNonWindowSurfaceList; // List of non-window HT surfaces related to this zone (includes adjacent interzone surfaces)
+        std::vector<int> ZoneHTWindowSurfaceList;    // List of window surfaces related to this zone (includes adjacent interzone surfaces)
 
         Real64 OutDryBulbTemp;                 // Zone outside dry bulb air temperature (C)
         bool OutDryBulbTempEMSOverrideOn;      // if true, EMS is calling to override the surface's outdoor air temp
@@ -2135,38 +2138,7 @@ namespace DataHeatBalance {
         }
     };
 
-    struct HeatReclaimRefrigeratedRackData
-    {
-        // Members
-        std::string Name;       // Name of refrigerated rack
-        std::string SourceType; // object type for refrigerated rack
-        Real64 AvailCapacity;   // Total available heat reclaim capacity
-        Real64 UsedWaterHeater; // amount of avail used at plant water heater
-        Real64 UsedHVACCoil;    // amount of avail used at hvac coil
-
-        // Default Constructor
-        HeatReclaimRefrigeratedRackData() : AvailCapacity(0.0), UsedWaterHeater(0.0), UsedHVACCoil(0.0)
-        {
-        }
-    };
-
-    struct HeatReclaimRefrigCondenserData
-    {
-        // Members
-        std::string Name;        // Name of refrigeration system
-        int SourceType;          // object type for refrigeration system
-        Real64 AvailCapacity;    // Total available heat reclaim capacity
-        Real64 AvailTemperature; // Temperature of heat reclaim source
-        Real64 UsedWaterHeater;  // amount of avail used at plant water heater
-        Real64 UsedHVACCoil;     // amount of avail used at hvac coil
-
-        // Default Constructor
-        HeatReclaimRefrigCondenserData() : SourceType(0), AvailCapacity(0.0), AvailTemperature(0.0), UsedWaterHeater(0.0), UsedHVACCoil(0.0)
-        {
-        }
-    };
-
-    struct HeatReclaimDXCoilData
+    struct HeatReclaimDataBase
     {
         // Members
         std::string Name;       // Name of DX Coil
@@ -2174,7 +2146,48 @@ namespace DataHeatBalance {
         Real64 AvailCapacity;   // Total available heat reclaim capacity
 
         // Default Constructor
-        HeatReclaimDXCoilData() : AvailCapacity(0.0)
+        HeatReclaimDataBase() : AvailCapacity(0.0)
+        {
+        }
+    };
+
+    struct HeatReclaimRefrigeratedRackData : HeatReclaimDataBase // inherited from base struct
+    {
+        // Customized Members
+        Real64 UsedWaterHeater; // amount of avail used at plant water heater
+        Real64 UsedHVACCoil;    // amount of avail used at hvac coil
+
+        // Default Constructor
+        HeatReclaimRefrigeratedRackData() : UsedWaterHeater(0.0), UsedHVACCoil(0.0)
+        {
+        }
+    };
+
+    struct HeatReclaimRefrigCondenserData : HeatReclaimDataBase // inherited from base struct
+    {
+        // Customized Members
+        Real64 AvailTemperature; // Temperature of heat reclaim source
+        Real64 UsedWaterHeater;  // amount of avail used at plant water heater
+        Real64 UsedHVACCoil;     // amount of avail used at hvac coil
+
+        // Default Constructor
+        HeatReclaimRefrigCondenserData() : AvailTemperature(0.0), UsedWaterHeater(0.0), UsedHVACCoil(0.0)
+        {
+        }
+    };
+
+    struct HeatReclaimDXCoilData : HeatReclaimDataBase // inherited from base struct
+    {
+    };
+
+    struct HeatReclaimHPCoilData : HeatReclaimDataBase // inherited from base struct
+    {
+        // Customized Members
+        Real64 WaterHeatingDesuperheaterReclaimedHeatTotal;    // total reclaimed heat by water heating desuperheater coils
+        Array1D<Real64> WaterHeatingDesuperheaterReclaimedHeat; // heat reclaimed by water heating desuperheater coils
+
+        // Default Constructor
+        HeatReclaimHPCoilData() : WaterHeatingDesuperheaterReclaimedHeatTotal(0.0)
         {
         }
     };
@@ -2616,6 +2629,7 @@ namespace DataHeatBalance {
     extern Array1D<HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
     extern Array1D<HeatReclaimDXCoilData> HeatReclaimDXCoil;
     extern Array1D<HeatReclaimDXCoilData> HeatReclaimVS_DXCoil;
+    extern Array1D<HeatReclaimHPCoilData> HeatReclaimSimple_WAHPCoil;
     extern Array1D<AirReportVars> ZnAirRpt;
     extern Array1D<TCGlazingsType> TCGlazings;
     extern Array1D<ZoneEquipData> ZoneCO2Gen;
