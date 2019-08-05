@@ -589,7 +589,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   CALL ShowWarningError('Table:TwoIndependentVariables="'//trim(InArgs(1))//  &
                           '" references an external file="'//  &
                           trim(InArgs(14))//'". External files must be converted to the new format using'//&
-                          'table_convert.py.',Auditf)
+                          'table_convert.py or by appending the contents of the external file to the original IDF object.',Auditf)
                 END IF
 
                 DO iPt=1,NumOutputVals
@@ -772,7 +772,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   CALL ShowWarningError('Table:MultivariableLookup="'//trim(InArgs(1))//  &
                           '" references an external file="'//  &
                           trim(InArgs(6))//'". External files must be converted to the new format using'//&
-                          'table_convert.py.',Auditf)
+                          'table_convert.py or by appending the contents of the external file to the original IDF object.',Auditf)
                 END IF
 
                 ! Create arrays from data
