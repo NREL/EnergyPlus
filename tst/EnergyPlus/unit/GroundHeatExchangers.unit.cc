@@ -139,8 +139,27 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_init)
     DataPlant::PlantLoop.deallocate();
 }
 
-TEST_F(EnergyPlusFixture, Pipe_calcTransitTime)
+TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 {
+    DataPlant::PlantLoop.allocate(2);
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(1).FluidIndex = 1;
+    DataPlant::PlantLoop(1).FluidName = "WATER";
+
+    json j = {{"conductivity", 0.4},
+              {"density", 950},
+              {"specific-heat", 1900},
+              {"outer-diameter", 0.0334},
+              {"inner-diameter", 0.0269},
+              {"length", 100},
+              {"initial-temperature", 10},
+              {"loop-num", 1}};
+
+    Pipe pipe(j);
+
+    Real64 tol = 0.1;
+
+    EXPECT_NEAR(pipe.calcTransitTime(0.1, 20), 567.3, tol);
 }
 
 // TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Interpolate)

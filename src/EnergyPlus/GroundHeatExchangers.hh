@@ -192,8 +192,8 @@ namespace GroundHeatExchangers {
         // members functions
         Real64 calcTransitTime(Real64 flowRate, Real64 temperature);
         Real64 simulate(Real64 time, Real64 timeStep, Real64 flowRate, Real64 temperature);
-        void plugFlowOutletTemp(Real64 time);
-        void inletTempHistory(Real64 inletTemp, Real64 time);
+        Real64 plugFlowOutletTemp(Real64 time);
+        void logInletTemps(Real64 inletTemp, Real64 time);
         Real64 mdotToRe(Real64 flowRate, Real64 temperature);
         Real64 calcFrictionFactor(Real64 re);
         Real64 calcCondResist();

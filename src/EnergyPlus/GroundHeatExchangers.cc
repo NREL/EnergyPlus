@@ -213,11 +213,31 @@ namespace GroundHeatExchangers {
         return 0;
     }
 
-    void Pipe::plugFlowOutletTemp(Real64 time)
+    Real64 Pipe::plugFlowOutletTemp(Real64 time)
     {
+        if (time < 0) {
+            return this->inletTemps[0];
+        }
+
+        int idx = 0;
+        for (std::deque<Real64>::iterator it = this->inletTempTimes.begin(); it != this->inletTempTimes.end(); ++it) {
+            Real64 t_l = *it;
+            if (t_l > time) {
+                int idx_h = idx;
+                int idx_l = idx - 1;
+                t_l = this->inletTempTimes[idx_l];
+                Real64 t_h = this->inletTempTimes[idx_h];
+                Real64 temp_l = this->inletTemps[idx_l];
+                Real64 temp_h = this->inletTemps[idx_h];
+
+
+                //
+            }
+            ++idx;
+        }
     }
 
-    void Pipe::inletTempHistory(Real64 inletTemp, Real64 time)
+    void Pipe::logInletTemps(Real64 inletTemp, Real64 time)
     {
     }
 
