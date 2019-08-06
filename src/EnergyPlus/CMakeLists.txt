@@ -181,8 +181,6 @@ SET( SRC
   DemandManager.hh
   DesiccantDehumidifiers.cc
   DesiccantDehumidifiers.hh
-  DirectAirManager.cc
-  DirectAirManager.hh
   DisplacementVentMgr.cc
   DisplacementVentMgr.hh
   DisplayRoutines.cc

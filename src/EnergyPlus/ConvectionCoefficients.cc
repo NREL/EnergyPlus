@@ -6701,8 +6701,7 @@ namespace ConvectionCoefficients {
                     {
                         auto const SELECT_CASE_var(ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipType_Num(EquipNum));
 
-                        if ((SELECT_CASE_var == AirDistUnit_Num) || (SELECT_CASE_var == DirectAir_Num) ||
-                            (SELECT_CASE_var == PurchasedAir_Num)) { // central air equipment
+                        if ((SELECT_CASE_var == AirDistUnit_Num) || (SELECT_CASE_var == PurchasedAir_Num)) { // central air equipment
                             if (!(allocated(ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums))) continue;
                             // get inlet node, not zone node if possible
                             thisZoneInletNode = ZoneEquipList(ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);

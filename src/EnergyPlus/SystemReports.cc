@@ -3949,7 +3949,6 @@ namespace SystemReports {
             {"AIRTERMINAL:SINGLEDUCT:MIXER", AIRTERMINAL_SINGLEDUCT_MIXER},
             {"AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT", AIRTERMINAL_SINGLEDUCT_PARALLELPIU_REHEAT},
             {"AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT", AIRTERMINAL_SINGLEDUCT_SERIESPIU_REHEAT},
-            {"AIRTERMINAL:SINGLEDUCT:UNCONTROLLED", AIRTERMINAL_SINGLEDUCT_UNCONTROLLED},
             {"AIRTERMINAL:SINGLEDUCT:USERDEFINED", AIRTERMINAL_SINGLEDUCT_USERDEFINED},
             {"AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:NOREHEAT", AIRTERMINAL_SINGLEDUCT_VAV_HEATANDCOOL_NOREHEAT},
             {"AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:REHEAT", AIRTERMINAL_SINGLEDUCT_VAV_HEATANDCOOL_REHEAT},
@@ -4658,7 +4657,7 @@ namespace SystemReports {
                     } else if (SELECT_CASE_var == UnitHeater_Num || SELECT_CASE_var == VentilatedSlab_Num ||
                                //	ZoneHVAC:EvaporativeCoolerUnit ?????
                                SELECT_CASE_var == ZoneHybridEvaporativeCooler_Num || ZoneEvaporativeCoolerUnit_Num ||
-                               SELECT_CASE_var == AirDistUnit_Num || SELECT_CASE_var == DirectAir_Num || SELECT_CASE_var == BBWaterConvective_Num ||
+                               SELECT_CASE_var == AirDistUnit_Num || SELECT_CASE_var == BBWaterConvective_Num ||
                                SELECT_CASE_var == BBElectricConvective_Num || SELECT_CASE_var == HiTempRadiant_Num ||
                                //	not sure how HeatExchanger:* could be used as zone equipment ?????
                                SELECT_CASE_var == LoTempRadiant_Num || SELECT_CASE_var == ZoneExhaustFan_Num || SELECT_CASE_var == HeatXchngr_Num ||

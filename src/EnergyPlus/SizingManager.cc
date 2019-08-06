@@ -69,7 +69,6 @@
 #include <DataSizing.hh>
 #include <DataStringGlobals.hh>
 #include <DataZoneEquipment.hh>
-#include <DirectAirManager.hh>
 #include <DisplayRoutines.hh>
 #include <DualDuct.hh>
 #include <EMSManager.hh>
@@ -946,34 +945,6 @@ namespace SizingManager {
                                     }
                                 }
                             }
-                            // single-path air terminal so Vdz = Vpz
-                            DataSizing::VdzClgByZone(termUnitSizingIndex) = DataSizing::VpzClgByZone(termUnitSizingIndex); // store std 62.1 values
-                            DataSizing::VdzMinClgByZone(termUnitSizingIndex) =
-                                DataSizing::VpzMinClgByZone(termUnitSizingIndex);                                          // store std 62.1 values
-                            DataSizing::VdzHtgByZone(termUnitSizingIndex) = DataSizing::VpzHtgByZone(termUnitSizingIndex); // store std 62.1 values
-                            DataSizing::VdzMinHtgByZone(termUnitSizingIndex) =
-                                DataSizing::VpzMinHtgByZone(termUnitSizingIndex); // store std 62.1 values
-                        }
-                    }
-                }
-
-                // sum up flows for any direct air terminals, store 62.1 values by zone
-                if (allocated(DirectAirManager::DirectAir) && DirectAirManager::NumDirectAir > 0) {
-                    for (int directAirATUNum = 1; directAirATUNum <= DirectAirManager::NumDirectAir; ++directAirATUNum) {
-                        if (AirLoopNum == DirectAirManager::DirectAir(directAirATUNum).AirLoopNum) {
-                            int termUnitSizingIndex = DirectAirManager::DirectAir(directAirATUNum).TermUnitSizingNum;
-                            airLoopHeatingMaximumFlowRateSum += DirectAirManager::DirectAir(directAirATUNum).MaxAirVolFlowRate;
-                            airLoopMaxFlowRateSum += DirectAirManager::DirectAir(directAirATUNum).MaxAirVolFlowRate;
-                            airLoopHeatingMinimumFlowRateSum += DirectAirManager::DirectAir(directAirATUNum).MaxAirVolFlowRate;
-
-                            DataSizing::VpzClgByZone(termUnitSizingIndex) =
-                                DirectAirManager::DirectAir(directAirATUNum).MaxAirVolFlowRate; // store std 62.1 values
-                            DataSizing::VpzHtgByZone(termUnitSizingIndex) =
-                                DirectAirManager::DirectAir(directAirATUNum).MaxAirVolFlowRate; // store std 62.1 values
-                            DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
-                                DirectAirManager::DirectAir(directAirATUNum).MaxAirVolFlowRate; // store std 62.1 values
-                            DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
-                                DirectAirManager::DirectAir(directAirATUNum).MaxAirVolFlowRate; // store std 62.1 values
                             // single-path air terminal so Vdz = Vpz
                             DataSizing::VdzClgByZone(termUnitSizingIndex) = DataSizing::VpzClgByZone(termUnitSizingIndex); // store std 62.1 values
                             DataSizing::VdzMinClgByZone(termUnitSizingIndex) =
