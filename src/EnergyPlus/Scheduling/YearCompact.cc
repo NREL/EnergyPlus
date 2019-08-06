@@ -50,7 +50,6 @@
 #include <bitset>
 
 #include <DataEnvironment.hh>
-#include <EMSManager.hh>
 #include <EnergyPlus.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
@@ -176,8 +175,6 @@ void ScheduleCompact::createTimeSeries() {
     // TODO: Handle multiyear
     // TODO: Handle leap year
     // TODO: Handle daylight savings time
-    this->timeStamp.clear();
-    this->values.clear();
     int priorThroughTime = 0;
     int currentDay = 0;
     int thisDayOfWeek = EnergyPlus::DataEnvironment::RunPeriodStartDayOfWeek - 1; // RunPeriodStartDayOfWeek should be 1-7, so this should be fine
@@ -210,9 +207,6 @@ void ScheduleCompact::createTimeSeries() {
             }
         }
         priorThroughTime = thisThrough.timeStamp + 86400; // TODO: Make sure this should include the last day's 86400
-    }
-    if (this->typeLimits) {
-        this->validateTypeLimits();
     }
 }
 
@@ -294,14 +288,6 @@ FieldType ScheduleCompact::processSingleField(FieldType lastFieldType, nlohmann:
         this->throughs.back().fors.back().untils.back().value = possibleFloat;
     }
     return lastFieldType;
-}
-
-void ScheduleCompact::setupOutputVariables()
-{
-    for (auto &thisSchedule : scheduleCompacts) {
-        EnergyPlus::SetupOutputVariable("NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
-        EnergyPlus::SetupEMSActuator(thisSchedule.typeName, thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
-    }
 }
 
 std::string ScheduleCompact::trimCompactFieldValue(std::string const &s)
@@ -501,6 +487,19 @@ void ScheduleCompact::processForFieldValue(const std::vector<std::string> &keys,
             EnergyPlus::ShowFatalError("Bad key type in For field of Schedule:Compact = " + this->name);
         }
     }
+}
+
+void ScheduleCompact::prepareForNewEnvironment()
+{
+    this->timeStamp.clear();
+    this->values.clear();
+    this->lastIndexUsed = 0;
+    this->createTimeSeries();
+    // TODO: do we need to validate continuity?
+    if (this->typeLimits) {
+        this->validateTypeLimits();
+    }
+    // TODO: Check for error flag?
 }
 
 } // namespace Scheduling

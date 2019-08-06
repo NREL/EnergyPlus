@@ -74,7 +74,9 @@ struct ScheduleFile : ScheduleBase
     // static functions related to the state of all schedule:file objects
     static void processInput();
     static void clear_state();
-    static void setupOutputVariables();
+
+    // base-class overridden functions
+    void prepareForNewEnvironment() override;
 
     // instance methods for this class
     bool establishNumericSubset(std::vector<std::vector<std::string>> dataset);

@@ -510,7 +510,7 @@ namespace SimulationManager {
                 isFinalYear = true;
             }
 
-            Scheduling::recreateAllTimeSeries();
+            Scheduling::prepareSchedulesForNewEnvironment();
 
             HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
@@ -1908,7 +1908,7 @@ namespace SimulationManager {
             WarmupFlag = true;
             DayOfSim = 0;
 
-            Scheduling::recreateAllTimeSeries();
+            Scheduling::prepareSchedulesForNewEnvironment();
 
             ++DayOfSim;
             BeginDayFlag = true;

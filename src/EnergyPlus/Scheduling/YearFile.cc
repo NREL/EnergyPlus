@@ -47,10 +47,8 @@
 
 #include <fstream>
 
-#include <EMSManager.hh>
 #include <EnergyPlus.hh>
 #include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
 #include <Scheduling/Base.hh>
 #include <Scheduling/YearFile.hh>
 #include <UtilityRoutines.hh>
@@ -91,8 +89,9 @@ void ScheduleFile::clear_state()
     fileData.clear();
 }
 
-bool ScheduleFile::establishNumericSubset(std::vector<std::vector<std::string>> dataSet)
+void ScheduleFile::createTimeSeries()
 {
+    auto & dataSet = Scheduling::fileData[this->fileName];
     auto & thisColumnOfData = dataSet[this->columnNumber - 1];
     int rowNum = 0;
     int dataRowCount = 0;
@@ -104,12 +103,10 @@ bool ScheduleFile::establishNumericSubset(std::vector<std::vector<std::string>> 
             try {
                 this->values.push_back(std::stod(datum));
             } catch (...) {
-                EnergyPlus::ShowSevereError("Failed to convert " + datum + " to numeric value");
-                return false;
+                EnergyPlus::ShowFatalError("Failed to convert " + datum + " to numeric value");
             }
         }
     }
-    return true;
 }
 
 std::vector<std::vector<std::string>> ScheduleFile::processCSVLines(std::vector<std::string> const & lines) {
@@ -262,27 +259,18 @@ ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &
     if(fields.find("number_of_hours_of_data") != fields.end()) {
         this->numberOfHoursOfData = fields.at("number_of_hours_of_data");
     }
-    // now get the file contents from the master fileData variable
-    auto & fullDataSetThisFile = Scheduling::fileData[this->fileName];
-    if (!this->establishNumericSubset(fullDataSetThisFile)) {
-        EnergyPlus::ShowFatalError("CSV file processing errors cause program termination");
-    }
 }
 
-void ScheduleFile::setupOutputVariables()
+void ScheduleFile::prepareForNewEnvironment()
 {
-    for (auto &thisSchedule : scheduleFiles) {
-        EnergyPlus::SetupOutputVariable("NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
-        EnergyPlus::SetupEMSActuator(thisSchedule.typeName, thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
-    }
-}
-
-void ScheduleFile::createTimeSeries()
-{
-    // TODO: Need to use this in place of the numericSubset function and this should be done every environment - I think
+    this->timeStamp.clear();
+    this->values.clear();
+    this->lastIndexUsed = 0;
+    this->createTimeSeries();
     if (this->typeLimits) {
         this->validateTypeLimits();
     }
+    // TODO: Check for error flag?
 }
 
 } // namespace Scheduling

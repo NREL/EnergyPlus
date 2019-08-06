@@ -66,9 +66,9 @@ struct ScheduleConstant : ScheduleBase
     // overridden base class methods
     bool validateTypeLimits() override;
     void updateValue(int simTime) override;
+    void prepareForNewEnvironment() override;
 
     // static functions related to the state of all constant schedules
-    static void setupOutputVariables();
     static void processInput();
     static void clear_state();
 };

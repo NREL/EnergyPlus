@@ -297,7 +297,7 @@ void ManageHVACSizingSimulation(bool &ErrorsFound)
             DayOfSimChr = "0";
             NumOfWarmupDays = 0;
 
-            Scheduling::recreateAllTimeSeries();
+            Scheduling::prepareSchedulesForNewEnvironment();
 
             bool anyEMSRan;
             ManageEMS(emsCallFromBeginNewEvironment, anyEMSRan); // calling point

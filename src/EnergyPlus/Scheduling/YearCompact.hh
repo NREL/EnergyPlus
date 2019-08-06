@@ -95,7 +95,9 @@ struct ScheduleCompact : ScheduleBase
     // static functions related to the state of all compact schedules
     static void processInput();
     static void clear_state();
-    static void setupOutputVariables();
+
+    // base-class overridden functions
+    void prepareForNewEnvironment() override;
 
     // instance methods for this class
     FieldType processSingleField(FieldType lastFieldType, nlohmann::json datum, std::vector<FieldType> const &validFieldTypes);

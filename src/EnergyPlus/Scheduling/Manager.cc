@@ -134,20 +134,20 @@ void updateAllSchedules(int const simTime)
     }
 }
 
-void recreateAllTimeSeries()
+void prepareSchedulesForNewEnvironment()
 {
     // right now Schedule:Constant objects are not stored as time-series for efficiency
 //    for (auto &thisSchedule : scheduleConstants) {
 //        thisSchedule.createTimeSeries();
 //    }
     for (auto &thisSchedule : scheduleCompacts) {
-        thisSchedule.createTimeSeries();
+        thisSchedule.prepareForNewEnvironment();
     }
     for (auto &thisSchedule : scheduleYears) {
-        thisSchedule.createTimeSeries();
+        thisSchedule.prepareForNewEnvironment();
     }
     for (auto &thisSchedule : scheduleFiles) {
-        thisSchedule.createTimeSeries();
+        thisSchedule.prepareForNewEnvironment();
     }
 }
 
@@ -166,23 +166,23 @@ void processAllSchedules()
 
     // then we'll go through and call each subtype factory and accumulate index values into our map
     ScheduleConstant::processInput();
-    ScheduleConstant::setupOutputVariables();
     for (size_t subTypeIndex = 0; subTypeIndex < scheduleConstants.size(); subTypeIndex++) {
+        if (subTypeIndex > 0) scheduleConstants[subTypeIndex].setupOutputVariables();  // skip the zeroeth, built-in, schedule:constant object
         indexToSubtypeMap.emplace_back(scheduleConstants[subTypeIndex].name, ScheduleType::CONSTANT, subTypeIndex);
     }
     ScheduleCompact::processInput();
-    ScheduleCompact::setupOutputVariables();
     for (size_t subTypeIndex = 0; subTypeIndex < scheduleCompacts.size(); subTypeIndex++) {
+        scheduleCompacts[subTypeIndex].setupOutputVariables();
         indexToSubtypeMap.emplace_back(scheduleCompacts[subTypeIndex].name, ScheduleType::COMPACT, subTypeIndex);
     }
     ScheduleYear::processInput();
-    ScheduleYear::setupOutputVariables();
     for (size_t subTypeIndex = 0; subTypeIndex < scheduleYears.size(); subTypeIndex++) {
+        scheduleYears[subTypeIndex].setupOutputVariables();
         indexToSubtypeMap.emplace_back(scheduleYears[subTypeIndex].name, ScheduleType::YEAR, subTypeIndex);
     }
     ScheduleFile::processInput();
-    ScheduleFile::setupOutputVariables();
     for (size_t subTypeIndex = 0; subTypeIndex < scheduleFiles.size(); subTypeIndex++) {
+        scheduleFiles[subTypeIndex].setupOutputVariables();
         indexToSubtypeMap.emplace_back(scheduleFiles[subTypeIndex].name, ScheduleType::FILE, subTypeIndex);
     }
     scheduleInputProcessed = true;

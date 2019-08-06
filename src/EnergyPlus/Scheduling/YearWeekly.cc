@@ -48,7 +48,6 @@
 #include <DataEnvironment.hh>
 #include <EnergyPlus.hh>
 #include <General.hh>
-#include <EMSManager.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Scheduling/Base.hh>
@@ -145,10 +144,8 @@ ScheduleYear::ScheduleYear(std::string const &objectName, nlohmann::json const &
     }
 }
 
-bool ScheduleYear::createTimeSeries()
+void ScheduleYear::createTimeSeries()
 {
-    this->timeStamp.clear();
-    this->values.clear();
     int endDayNum = 0;
     int currentDay = 0;
     int priorThroughTime = 0;
@@ -158,7 +155,6 @@ bool ScheduleYear::createTimeSeries()
         if (startDayNum != endDayNum + 1) {
             // non continuous, start day should be one more than the last end day
             EnergyPlus::ShowSevereError("Could not get full year continuity for Schedule:Year = " + this->name);
-            return false;
         }
         endDayNum = EnergyPlus::General::OrdinalDay(week.endMonth, week.endDay, 1);
         int numDaysInThrough = endDayNum - startDayNum;
@@ -187,20 +183,19 @@ bool ScheduleYear::createTimeSeries()
             priorThroughTime += 86400;
         }
     }
-    if (this->typeLimits) {
-        if (!this->validateTypeLimits()) {
-            this->inputErrorOccurred = true;
-        }
-    }
-    return true;
 }
 
-void ScheduleYear::setupOutputVariables()
+void ScheduleYear::prepareForNewEnvironment()
 {
-    for (auto &thisSchedule : scheduleYears) {
-        EnergyPlus::SetupOutputVariable("NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
-        EnergyPlus::SetupEMSActuator(thisSchedule.typeName, thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
+    this->timeStamp.clear();
+    this->values.clear();
+    this->lastIndexUsed = 0;
+    this->createTimeSeries();
+    // TODO: do we need to validate continuity?
+    if (this->typeLimits) {
+        this->validateTypeLimits();
     }
+    // TODO: Check for error flag?
 }
 
 } // namespace Scheduling

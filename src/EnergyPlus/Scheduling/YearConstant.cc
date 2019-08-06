@@ -45,10 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EMSManager.hh>
 #include <EnergyPlus.hh>
 #include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
 #include <Scheduling/Base.hh>
 #include <Scheduling/YearConstant.hh>
 #include <UtilityRoutines.hh>
@@ -119,26 +117,12 @@ ScheduleConstant::ScheduleConstant(std::string const &objectName, nlohmann::json
         this->typeLimits = ScheduleTypeData::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("schedule_type_limits_name")));
     }
     this->value = fields.at("hourly_value");
-    if (this->typeLimits) {
-        if (!this->validateTypeLimits()) {
-            EnergyPlus::ShowFatalError("Schedule constant processing errors cause program termination");
-            // TODO: Decide on a pattern for where to call ShowFatal
-        }
-    }
 }
 
 void ScheduleConstant::updateValue(int EP_UNUSED(simTime))
 {
     if (this->emsActuatedOn) {
         this->value = this->emsActuatedValue;
-    }
-}
-
-void ScheduleConstant::setupOutputVariables()
-{
-    for (auto &thisSchedule : scheduleConstants) {
-        EnergyPlus::SetupOutputVariable("NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
-        EnergyPlus::SetupEMSActuator(thisSchedule.typeName, thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
     }
 }
 
@@ -153,6 +137,16 @@ bool ScheduleConstant::validateTypeLimits()
         return false;
     }
     return true;
+}
+
+void ScheduleConstant::prepareForNewEnvironment()
+{
+    if (this->typeLimits) {
+        if (!this->validateTypeLimits()) {
+            EnergyPlus::ShowFatalError("Schedule constant processing errors cause program termination");
+            // TODO: Decide on a pattern for where to call ShowFatal
+        }
+    }
 }
 
 } // namespace Scheduling

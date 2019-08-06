@@ -77,10 +77,12 @@ struct ScheduleYear : ScheduleBase
     // static functions related to the state of all weekly schedules
     static void processInput();
     static void clear_state();
-    static void setupOutputVariables();
+
+    // base-class overridden functions
+    void prepareForNewEnvironment() override;
 
     // instance methods for this class
-    bool createTimeSeries();
+    void createTimeSeries();
 
     // member variables
     std::vector<WeekScheduleRange> weekScheduleRanges;

@@ -45,6 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <EMSManager.hh>
+#include <OutputProcessor.hh>
 #include <Scheduling/Base.hh>
 
 namespace Scheduling {
@@ -142,6 +144,12 @@ DayType ScheduleBase::mapWeatherManagerDayTypeToScheduleDayType(int const wmDayT
         EnergyPlus::ShowFatalError("Bad WeatherManager DayType passed into mapWeatherManagerDayTypeToScheduleDayType");
         return DayType::UNKNOWN; // hush up compiler
     }
+}
+
+void ScheduleBase::setupOutputVariables()
+{
+    EnergyPlus::SetupOutputVariable("NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, this->value, "Zone", "Average", this->name);
+    EnergyPlus::SetupEMSActuator(this->typeName, this->name, "Schedule Value", "[ ]", this->emsActuatedOn, this->emsActuatedValue);
 }
 
 }

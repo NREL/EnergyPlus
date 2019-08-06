@@ -284,6 +284,7 @@ ScheduleDay *ScheduleWeekCompact::getScheduleDay(Scheduling::DayType dt)
     }
     // TODO: Do we just return a nullptr to allow the schedule to default to zero?
     EnergyPlus::ShowFatalError("Could not find day schedule for day type SSSSS for Schedule:Week:Daily");
+    return nullptr; // hush up the compiler
 }
 
 } // namespace Scheduling

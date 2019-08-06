@@ -92,10 +92,14 @@ struct ScheduleBase
     bool inputErrorOccurred = false;
     std::string typeName = "";
 
-    // abstract functions that must be implemented by derived classes
+    // virtual functions that can be overridden as needed by derived classes
     virtual bool validateTypeLimits();
     virtual void updateValue(int simTime); // expecting simTime to be seconds since 1/1 00:00:00 of the first simulation year
 
+    // abstract functions that must be overridden by derived classes
+    virtual void prepareForNewEnvironment() = 0;
+
+    void setupOutputVariables();
     static DayType getDayTypeForDayOfWeek(int dayOfWeek);
     static DayType mapWeatherManagerDayTypeToScheduleDayType(int wmDayType);
 
@@ -106,7 +110,6 @@ struct ScheduleBase
     int lastIndexUsed = 0;
 
     // TODO: Add a factory method to return a *ScheduleBase for components to use?
-    // TODO: Pull UpdateScheduleValue into this base class, require pulling timeStamp and value vectors up as well
 };
 
 static std::vector<std::string> allSchedNames;
