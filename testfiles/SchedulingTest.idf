@@ -1,3 +1,4 @@
+!*** Schedule:Constant
 
   Schedule:Constant,
     Constant Schedule 1 No Limits,
@@ -8,6 +9,8 @@
     Constant Schedule With Limits Not Bounded,
     Limits 0-10 Discrete,
     5.6;
+
+!*** Schedule:Compact
 
   Schedule:Compact,
     Compact Sched 1,
@@ -65,16 +68,47 @@
     10,
     Discrete;
 
-!  Schedule:File,
-!    File-based Schedule,     !- Name
-!    Any Number,              !- Schedule Type Limits Name
-!    /tmp/testfile.csv,             !- File Name
-!    3,                       !- Column Number
-!    1,                       !- Rows to Skip at Top
-!    ,                        !- Number of Hours of Data
-!    ,                        !- Column Separator
-!    ,                        !- Interpolate to Timestep
-!    60;                      !- Minutes per Item
+!*** Schedule:File
+
+  Schedule:File,
+    File-based Schedule,     !- Name
+    Any Number,              !- Schedule Type Limits Name
+    /tmp/datafile.csv,             !- File Name
+    3,                       !- Column Number
+    1,                       !- Rows to Skip at Top
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
+    60;                      !- Minutes per Item
+
+!*** Schedule:Year
+
+  ScheduleTypeLimits,
+    ControlType,             !- Name
+    0,                       !- Lower Limit Value
+    4,                       !- Upper Limit Value
+    DISCRETE;                !- Numeric Type
+
+  Schedule:Day:Interval,
+    CT Day Schedule,         !- Name
+    ControlType,             !- Schedule Type Limits Name
+    No,                      !- Interpolate to Timestep
+    Until: 24:00,            !- Time 1
+    4;                       !- Value Until Time 1
+
+  Schedule:Week:Compact,
+    CT WeekSchedule,         !- Name
+    For: Alldays,            !- DayType List 1
+    CT Day Schedule;         !- Schedule:Day Name 1
+
+  Schedule:Year,
+    Zone Control Type Schedule,  !- Name
+    ControlType,             !- Schedule Type Limits Name
+    CT WeekSchedule,         !- Schedule:Week Name 1
+    1,                       !- Start Month 1
+    1,                       !- Start Day 1
+    12,                      !- End Month 1
+    31;                      !- End Day 1
 
   Version,9.2;
 

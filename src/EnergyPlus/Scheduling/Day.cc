@@ -45,6 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <regex>
+
 #include <InputProcessing/InputProcessor.hh>
 #include <Scheduling/Base.hh>
 #include <Scheduling/Day.hh>
@@ -228,7 +230,44 @@ namespace Scheduling {
         }
         auto & intervalsData = fields.at("data");
         for (auto const & intervalData : intervalsData) {
-            int untilTime = 0; // intervalData.at("time"); // TODO: Convert to numeric
+            std::string sUntilTime = EnergyPlus::UtilityRoutines::MakeUPPERCase(intervalData.at("time"));
+            if (sUntilTime.substr(0, 5) == "UNTIL") {
+                sUntilTime = sUntilTime.erase(0, 5);
+            }
+            sUntilTime = EnergyPlus::UtilityRoutines::epTrim(sUntilTime);
+            if (sUntilTime.substr(0, 1) == ":") {
+                sUntilTime = sUntilTime.erase(0, 1);
+            }
+            sUntilTime = EnergyPlus::UtilityRoutines::epTrim(sUntilTime);
+            // check for missing value
+            if (sUntilTime.empty()) {
+                EnergyPlus::ShowFatalError("Blank value on Until: field for Schedule:Day:Interval named " + this->name);
+            }
+            // check that it matches the right pattern
+            std::regex re("[0-9]?[0-9]:[0-9][0-9]");
+            std::smatch m;
+            if (!std::regex_match(sUntilTime, m, re)) { // I expect one single match, and needs to apply to whole string, so just regex_match, not regex_search
+                EnergyPlus::ShowFatalError("Invalid value on Until: field for Schedule:Day:Interval named " + this->name + "; invalid input value: " + sUntilTime);
+            }
+            // then process out the month and day, two possibilities: M/DD and MM/DD, I'm just checking the position of the slash
+            std::string sHour, sMinute;
+            if (sUntilTime[1] == ':') {
+                sHour = sUntilTime.substr(0, 1);
+                sMinute = sUntilTime.substr(2, 2);
+            } else { // must be HH:MM if it passed the regex above
+                sHour = sUntilTime.substr(0, 2);
+                sMinute = sUntilTime.substr(3, 2);
+            }
+            int hour = std::stoi(sHour);
+            int minute = std::stoi(sMinute);
+            // validate the hours and minutes
+            if (hour < 0 || hour > 24) { // TODO: Do we handle subhourly right now, like 00:15?
+                EnergyPlus::ShowFatalError("Out of range hour (" + sHour + ") for Schedule:Day:Interval " + this->name);
+            }
+            if (minute < 0 || minute > 59) {
+                EnergyPlus::ShowFatalError("Out of range minute (" + sMinute + ") for Schedule:Day:Interval " + this->name);
+            }
+            int untilTime = Scheduling::getScheduleTime(1, 1, 1, hour, minute, 0, false); // TODO: Make a more efficient routine for time-only
             Real64 value = intervalData.at("value_until_time");
             this->untils.emplace_back(untilTime, value);
         }

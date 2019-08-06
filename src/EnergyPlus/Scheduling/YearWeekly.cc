@@ -147,9 +147,6 @@ ScheduleYear::ScheduleYear(std::string const &objectName, nlohmann::json const &
             this->includesLeapYearData = true;
         }
     }
-    if (!this->createTimeSeries()) {
-        this->inputErrorOccurred = true;
-    }
 }
 
 bool ScheduleYear::createTimeSeries()
@@ -158,9 +155,8 @@ bool ScheduleYear::createTimeSeries()
     this->values.clear();
     int endDayNum = 0;
     int currentDay = 0;
-    int timeCompletedSoFar = 0;
-    // TODO: Need to recreate the time series for each environment since start day of week will change for each
-    int thisDayOfWeek = EnergyPlus::DataEnvironment::RunPeriodStartDayOfWeek;
+    int priorThroughTime = 0;
+    int thisDayOfWeek = EnergyPlus::DataEnvironment::RunPeriodStartDayOfWeek - 1; // RunPeriodStartDayOfWeek should be 1-7, so this should be fine
     for (auto const & week : this->weekScheduleRanges) {
         int startDayNum = EnergyPlus::General::OrdinalDay(week.beginMonth, week.beginDay, 1);
         if (startDayNum != endDayNum + 1) {
@@ -176,15 +172,23 @@ bool ScheduleYear::createTimeSeries()
             if (thisDayOfWeek == 8) {
                 thisDayOfWeek = 1;
             }
-            Scheduling::DayType dt = ScheduleBase::getDayTypeForDayOfWeek(thisDayOfWeek); // TODO: Need to check for DD status, custom day, holiday
+            Scheduling::DayType dt;
+            auto const & thisEnvrnIndex = EnergyPlus::WeatherManager::Envrn;
+            if (EnergyPlus::WeatherManager::Environment(thisEnvrnIndex).KindOfEnvrn == EnergyPlus::DataGlobals::ksDesignDay) {
+                dt = ScheduleBase::mapWeatherManagerDayTypeToScheduleDayType(
+                    EnergyPlus::WeatherManager::DesDayInput(EnergyPlus::WeatherManager::Environment(thisEnvrnIndex).DesignDayNum).DayType);
+            } else {
+                dt = ScheduleBase::getDayTypeForDayOfWeek(thisDayOfWeek); // TODO: Need to check for DD status, custom day, holiday
+            }
             // call the current week schedule and ask for the day schedule for that day type
             // use the day schedule to build out the time series for that day
             auto const & thisDaySchedule = week.scheduleInstance->getScheduleDay(dt);
             for (auto const & thisUntil : thisDaySchedule->untils) {
-                auto currentTimeStamp = timeCompletedSoFar + thisUntil.timeInDay;
+                auto currentTimeStamp = priorThroughTime + thisUntil.timeInDay;
                 this->timeStamp.push_back(currentTimeStamp);
                 this->values.push_back(thisUntil.value);
             }
+            priorThroughTime += 86400;
         }
     }
     if (this->typeLimits) {
@@ -195,12 +199,15 @@ bool ScheduleYear::createTimeSeries()
     return true;
 }
 
-void ScheduleYear::updateValue(int EP_UNUSED(simTime))
+void ScheduleYear::updateValue(int simTime)
 {
     if (this->emsActuatedOn) {
         this->value = this->emsActuatedValue;
     } else {
-        // this->value = this->value;
+        // TODO: Change search to start with "this->timeStamp.begin() + this->lastIndexUsed - 1" once we can reset it
+        auto item = std::lower_bound(this->timeStamp.begin(), this->timeStamp.end(), simTime);
+        this->lastIndexUsed = item - this->timeStamp.begin();
+        this->value = this->values[this->lastIndexUsed];
     }
 }
 

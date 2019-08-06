@@ -101,10 +101,12 @@ bool ScheduleFile::establishNumericSubset(std::vector<std::vector<std::string>> 
 {
     auto & thisColumnOfData = dataSet[this->columnNumber - 1];
     int rowNum = 0;
+    int dataRowCount = 0;
     for (auto const & datum : thisColumnOfData) {
         rowNum++;
         if (rowNum > this->rowsToSkipAtTop) {
-            this->timeStamp.push_back(rowNum * this->minutesPerItem * 60);
+            dataRowCount++;
+            this->timeStamp.push_back(dataRowCount * this->minutesPerItem * 60);
             try {
                 this->values.push_back(std::stod(datum));
             } catch (...) {

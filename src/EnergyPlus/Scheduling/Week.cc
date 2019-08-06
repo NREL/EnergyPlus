@@ -276,15 +276,14 @@ ScheduleWeekCompact::ScheduleWeekCompact(std::string const &objectName, nlohmann
 
 ScheduleDay *ScheduleWeekCompact::getScheduleDay(Scheduling::DayType dt)
 {
-    if (this->days.find(dt) == this->days.end()) {
-        if (this->hasAllOtherDays) {
-            return this->days[Scheduling::DayType::ALLOTHERDAYS];
-        }
-        // TODO: Get proper day type name here
-        // TODO: Do we just return a nullptr to allow the schedule to default to zero?
-        EnergyPlus::ShowFatalError("Could not find day schedule for day type SSSSS for Schedule:Week:Daily");
+    if (this->days.find(dt) != this->days.end()) {
+        return this->days[dt];
     }
-    return this->days[dt];
+    if (this->hasAllOtherDays) {
+        return this->days[Scheduling::DayType::ALLOTHERDAYS];
+    }
+    // TODO: Do we just return a nullptr to allow the schedule to default to zero?
+    EnergyPlus::ShowFatalError("Could not find day schedule for day type SSSSS for Schedule:Week:Daily");
 }
 
 } // namespace Scheduling
