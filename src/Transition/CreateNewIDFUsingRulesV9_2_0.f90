@@ -148,6 +148,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER TotATSDUObjs
   INTEGER atCount
   INTEGER nodeCount
+  LOGICAL :: nodeFound = .false.
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -473,31 +474,53 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(1:2) = InArgs(1:2)
                  ! Loop through outlet node names looking for a match to an AirTerminal:SingleDuc:Ucontrolled node name
                  DO nodeCount=3, CurArgs
+                   nodeFound = .false.
                    DO atCount=1, TotATSDUObjs
                      IF (SameString(TRIM(InArgs(nodeCount)), TRIM(ATSDUNodeNames(atCount)))) THEN
-                       OutArgs(nodeCount) = TRIM(InArgs(nodeCount)) // ' ATInlet'
+                       nodeFound = .true.
                        EXIT
-                     ELSE
-                       OutArgs(nodeCount) = InArgs(nodeCount)
                      END IF
                    ENDDO
+                   IF (nodeFound) THEN
+                     OutArgs(nodeCount) = TRIM(InArgs(nodeCount)) // ' ATInlet'
+                   ELSE
+                     OutArgs(nodeCount) = InArgs(nodeCount)
+                   END IF
                  ENDDO
                 NoDiff = .false.
                 
-              ! This is part of the transition for AirTerminal:SingleDuc:Ucontrolled
+              ! This is part of the transition for AirTerminal:SingleDuct:Ucontrolled
             CASE('AIRLOOPHVAC:SUPPLYPLENUM')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  OutArgs(1:4) = InArgs(1:4)
                  ! Loop through outlet node names looking for a match to an AirTerminal:SingleDuc:Ucontrolled node name
                  DO nodeCount=5, CurArgs
+                   nodeFound = .false.
                    DO atCount=1, TotATSDUObjs
                      IF (SameString(TRIM(InArgs(nodeCount)), TRIM(ATSDUNodeNames(atCount)))) THEN
-                       OutArgs(nodeCount) = TRIM(InArgs(nodeCount)) // ' ATInlet'
+                       nodeFound = .true.
                        EXIT
-                     ELSE
-                       OutArgs(nodeCount) = InArgs(nodeCount)
                      END IF
                    ENDDO
+                   IF (nodeFound) THEN
+                     OutArgs(nodeCount) = TRIM(InArgs(nodeCount)) // ' ATInlet'
+                   ELSE
+                     OutArgs(nodeCount) = InArgs(nodeCount)
+                   END IF
+                 ENDDO
+                NoDiff = .false.
+                
+              ! This is part of the transition for AirTerminal:SingleDuct:Ucontrolled
+            CASE('ROOMAIR:NODE:AIRFLOWNETWORK:HVACEQUIPMENT')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1) = InArgs(1)
+                 ! Loop through fields looking for  AirTerminal:SingleDuct:Ucontrolled node name
+                 DO nodeCount=2, CurArgs
+                   IF (SameString(TRIM(InArgs(nodeCount)), TRIM(ATSDUNodeNames(atCount)))) THEN
+                     OutArgs(nodeCount) = TRIM(InArgs(nodeCount)) // ' ATInlet'
+                   ELSE
+                     OutArgs(nodeCount) = InArgs(nodeCount)
+                   END IF
                  ENDDO
                 NoDiff = .false.
                 
