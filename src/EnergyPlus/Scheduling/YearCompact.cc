@@ -296,39 +296,12 @@ FieldType ScheduleCompact::processSingleField(FieldType lastFieldType, nlohmann:
     return lastFieldType;
 }
 
-void ScheduleCompact::updateValue(int simTime)
-{
-    if (this->emsActuatedOn) {
-        this->value = this->emsActuatedValue;
-    } else {
-        // TODO: Change search to start with "this->timeStamp.begin() + this->lastIndexUsed - 1" once we can reset it
-        auto item = std::lower_bound(this->timeStamp.begin(), this->timeStamp.end(), simTime);
-        this->lastIndexUsed = item - this->timeStamp.begin();
-        this->value = this->values[this->lastIndexUsed];
-    }
-}
-
 void ScheduleCompact::setupOutputVariables()
 {
     for (auto &thisSchedule : scheduleCompacts) {
         EnergyPlus::SetupOutputVariable("NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
         EnergyPlus::SetupEMSActuator(thisSchedule.typeName, thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
     }
-}
-
-bool ScheduleCompact::validateTypeLimits()
-{
-    // TODO: Add unit test for out of bounds, discrete, etc.
-    Real64 const maxValue = *std::max_element(this->values.begin(), this->values.end());
-    Real64 const minValue = *std::min_element(this->values.begin(), this->values.end());
-    if (maxValue > this->typeLimits->maximum) {
-        EnergyPlus::ShowSevereError("Value out of bounds");
-        return false;
-    } else if (minValue < this->typeLimits->minimum) {
-        EnergyPlus::ShowSevereError("Value out of bounds");
-        return false;
-    }
-    return true;
 }
 
 std::string ScheduleCompact::trimCompactFieldValue(std::string const &s)

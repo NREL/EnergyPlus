@@ -195,38 +195,12 @@ bool ScheduleYear::createTimeSeries()
     return true;
 }
 
-void ScheduleYear::updateValue(int simTime)
-{
-    if (this->emsActuatedOn) {
-        this->value = this->emsActuatedValue;
-    } else {
-        // TODO: Change search to start with "this->timeStamp.begin() + this->lastIndexUsed - 1" once we can reset it
-        auto item = std::lower_bound(this->timeStamp.begin(), this->timeStamp.end(), simTime);
-        this->lastIndexUsed = item - this->timeStamp.begin();
-        this->value = this->values[this->lastIndexUsed];
-    }
-}
-
 void ScheduleYear::setupOutputVariables()
 {
     for (auto &thisSchedule : scheduleYears) {
         EnergyPlus::SetupOutputVariable("NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
         EnergyPlus::SetupEMSActuator(thisSchedule.typeName, thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
     }
-}
-
-bool ScheduleYear::validateTypeLimits()
-{
-//    if (this->typeLimits) {
-//        if (this->value > this->typeLimits->maximum) {
-//            // ShowSevereError("Value out of bounds")
-//            return false;
-//        } else if (this->value < this->typeLimits->minimum) {
-//            // ShowSevereError("Value out of bounds")
-//            return false;
-//        }
-//    }
-    return true;
 }
 
 } // namespace Scheduling

@@ -93,78 +93,17 @@ struct ScheduleBase
     std::string typeName = "";
 
     // abstract functions that must be implemented by derived classes
-    virtual bool validateTypeLimits() = 0;
-    virtual void updateValue(int simTime) = 0; // expecting simTime to be seconds since 1/1 00:00:00 of the first simulation year
+    virtual bool validateTypeLimits();
+    virtual void updateValue(int simTime); // expecting simTime to be seconds since 1/1 00:00:00 of the first simulation year
 
-    static DayType getDayTypeForDayOfWeek(int const dayOfWeek)
-    {
-        switch (dayOfWeek) {
-        case 1:
-            return DayType::SUNDAY;
-        case 2:
-            return DayType::MONDAY;
-        case 3:
-            return DayType::TUESDAY;
-        case 4:
-            return DayType::WEDNESDAY;
-        case 5:
-            return DayType::THURSDAY;
-        case 6:
-            return DayType::FRIDAY;
-        case 7:
-            return DayType::SATURDAY;
-        default:
-            EnergyPlus::ShowFatalError("Invalid dayOfWeek passed to getDayTypeForDayOfWeek");
-            return DayType::UNKNOWN; // hush up the compiler
-        }
-    }
+    static DayType getDayTypeForDayOfWeek(int dayOfWeek);
+    static DayType mapWeatherManagerDayTypeToScheduleDayType(int wmDayType);
 
-    static DayType mapWeatherManagerDayTypeToScheduleDayType(int wmDayType)
-    {
-        // Source indices, as defined in WeatherManager
-        //        static Array1D_string const ValidNames(12, // don't forget Array1D was 1 based here
-        //               {"SUNDAY",
-        //                "MONDAY",
-        //                "TUESDAY",
-        //                "WEDNESDAY",
-        //                "THURSDAY",
-        //                "FRIDAY",
-        //                "SATURDAY",
-        //                "HOLIDAY",
-        //                "SUMMERDESIGNDAY",
-        //                "WINTERDESIGNDAY",
-        //                "CUSTOMDAY1",
-        //                "CUSTOMDAY2"});
-        switch (wmDayType) {
-        case 1:
-            return DayType::SUNDAY;
-        case 2:
-            return DayType::MONDAY;
-        case 3:
-            return DayType::TUESDAY;
-        case 4:
-            return DayType::WEDNESDAY;
-        case 5:
-            return DayType::THURSDAY;
-        case 6:
-            return DayType::FRIDAY;
-        case 7:
-            return DayType::SATURDAY;
-        case 8:
-            return DayType::HOLIDAYS;
-        case 9:
-            return DayType::SUMMERDESIGNDAY;
-        case 10:
-            return DayType::WINTERDESIGNDAY;
-        case 11:
-            return DayType::CUSTOMDAY1;
-        case 12:
-            return DayType::CUSTOMDAY2;
-        default:
-            EnergyPlus::ShowFatalError("Bad WeatherManager DayType passed into mapWeatherManagerDayTypeToScheduleDayType");
-            return DayType::UNKNOWN; // hush up compiler
-        }
-    }
+    // time-series related data, used for all schedules except constant
+    bool includesLeapYearData = false;
+    std::vector<Real64> timeStamp;
+    std::vector<Real64> values;
+    int lastIndexUsed = 0;
 
     // TODO: Add a factory method to return a *ScheduleBase for components to use?
     // TODO: Pull UpdateScheduleValue into this base class, require pulling timeStamp and value vectors up as well
@@ -188,19 +127,6 @@ enum class Interpolation
     LINEAR
 };
 
-// std::vector<std::string> const allValidDayTypes({"Sunday",
-//                                                 "Monday",
-//                                                 "Tuesday",
-//                                                 "Wednesday",
-//                                                 "Thursday",
-//                                                 "Friday",
-//                                                 "Saturday",
-//                                                 "Holiday",
-//                                                 "SummerDesignDay",
-//                                                 "WinterDesignDay",
-//                                                 "CustomDay1",
-//                                                 "CustomDay2"});
-//
 // std::vector<std::string> const typeLimitUnitTypes({"Dimensionless",
 //                                                   "Temperature",
 //                                                   "DeltaTemperature",
@@ -216,7 +142,13 @@ enum class Interpolation
 //                                                   "Control",
 //                                                   "Mode"});
 
-inline int getScheduleTime(int yearNum, int monthNum, int dayNum, int hourNum, int minuteNum, int secondNum, bool const leapYearDataFound)
+inline int getScheduleTime(int const yearNum,
+                           int const monthNum,
+                           int const dayNum,
+                           int const hourNum,
+                           int const minuteNum,
+                           int const secondNum,
+                           bool const leapYearDataFound)
 {
     // This function is a bit naive with leap years - if you end a non-leap-year but give it the date 2/29, it will still calculate the
     // end of january plus 29 days worth of time.  This is for efficiency, trying to eliminate as much logic as possible

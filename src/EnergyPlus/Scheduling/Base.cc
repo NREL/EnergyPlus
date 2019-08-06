@@ -45,58 +45,103 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SRC_ENERGYPLUS_SCHEDULING_YEARFILE_HH
-#define SRC_ENERGYPLUS_SCHEDULING_YEARFILE_HH
-
-#include <map>
-#include <vector>
-
-#include <EnergyPlus.hh>
 #include <Scheduling/Base.hh>
-#include <nlohmann/json.hpp>
 
 namespace Scheduling {
 
-enum class SeparatorType {
-    COMMA,
-    SEMICOLON,
-    SPACE,
-    TAB
-};
-
-struct ScheduleFile : ScheduleBase
-{
-    // constructors/destructors
-    ScheduleFile() = default;
-    ScheduleFile(std::string const &objectName, nlohmann::json const &fields);
-    ~ScheduleFile() = default;
-
-    // static functions related to the state of all schedule:file objects
-    static void processInput();
-    static void clear_state();
-    static void setupOutputVariables();
-
-    // instance methods for this class
-    bool establishNumericSubset(std::vector<std::vector<std::string>> dataset);
-    void createTimeSeries();
-
-    // static methods for processing csv data to be available across all Schedule:File objects
-    static std::vector<std::vector<std::string>> processCSVLines(std::vector<std::string> const & lines);
-    static void processCSVFile(const std::string& fileToOpen);
-
-    // member variables
-    std::string fileName = "";
-    int columnNumber = 0;
-    int rowsToSkipAtTop = 0;
-    int minutesPerItem = 0;
-    SeparatorType columnSeparator = SeparatorType::COMMA;
-    bool interpolateToTimeStep = false;
-    int numberOfHoursOfData = 8760;
-};
-
-extern std::vector<ScheduleFile> scheduleFiles;
-extern std::map<std::string, std::vector<std::vector<std::string>>> fileData;
-
+bool ScheduleBase::validateTypeLimits() {
+    // TODO: Add unit test for out of bounds, discrete, etc.
+    Real64 const maxValue = *std::max_element(this->values.begin(), this->values.end());
+    Real64 const minValue = *std::min_element(this->values.begin(), this->values.end());
+    if (maxValue > this->typeLimits->maximum) {
+        EnergyPlus::ShowSevereError("Value out of bounds");
+        return false;
+    } else if (minValue < this->typeLimits->minimum) {
+        EnergyPlus::ShowSevereError("Value out of bounds");
+        return false;
+    }
+    return true;
 }
 
-#endif //SRC_ENERGYPLUS_SCHEDULING_YEARFILE_HH
+void ScheduleBase::updateValue(int const simTime) {
+    if (this->emsActuatedOn) {
+        this->value = this->emsActuatedValue;
+    } else {
+        // TODO: Change search to start with "this->timeStamp.begin() + this->lastIndexUsed - 1" once we can reset it
+        auto item = std::lower_bound(this->timeStamp.begin(), this->timeStamp.end(), simTime);
+        this->lastIndexUsed = item - this->timeStamp.begin();
+        this->value = this->values[this->lastIndexUsed];
+    }
+}
+
+DayType ScheduleBase::getDayTypeForDayOfWeek(int const dayOfWeek)
+{
+    switch (dayOfWeek) {
+    case 1:
+        return DayType::SUNDAY;
+    case 2:
+        return DayType::MONDAY;
+    case 3:
+        return DayType::TUESDAY;
+    case 4:
+        return DayType::WEDNESDAY;
+    case 5:
+        return DayType::THURSDAY;
+    case 6:
+        return DayType::FRIDAY;
+    case 7:
+        return DayType::SATURDAY;
+    default:
+        EnergyPlus::ShowFatalError("Invalid dayOfWeek passed to getDayTypeForDayOfWeek");
+        return DayType::UNKNOWN; // hush up the compiler
+    }
+}
+
+DayType ScheduleBase::mapWeatherManagerDayTypeToScheduleDayType(int const wmDayType)
+{
+    // Source indices, as defined in WeatherManager
+    //        static Array1D_string const ValidNames(12, // don't forget Array1D was 1 based here
+    //               {"SUNDAY",
+    //                "MONDAY",
+    //                "TUESDAY",
+    //                "WEDNESDAY",
+    //                "THURSDAY",
+    //                "FRIDAY",
+    //                "SATURDAY",
+    //                "HOLIDAY",
+    //                "SUMMERDESIGNDAY",
+    //                "WINTERDESIGNDAY",
+    //                "CUSTOMDAY1",
+    //                "CUSTOMDAY2"});
+    switch (wmDayType) {
+    case 1:
+        return DayType::SUNDAY;
+    case 2:
+        return DayType::MONDAY;
+    case 3:
+        return DayType::TUESDAY;
+    case 4:
+        return DayType::WEDNESDAY;
+    case 5:
+        return DayType::THURSDAY;
+    case 6:
+        return DayType::FRIDAY;
+    case 7:
+        return DayType::SATURDAY;
+    case 8:
+        return DayType::HOLIDAYS;
+    case 9:
+        return DayType::SUMMERDESIGNDAY;
+    case 10:
+        return DayType::WINTERDESIGNDAY;
+    case 11:
+        return DayType::CUSTOMDAY1;
+    case 12:
+        return DayType::CUSTOMDAY2;
+    default:
+        EnergyPlus::ShowFatalError("Bad WeatherManager DayType passed into mapWeatherManagerDayTypeToScheduleDayType");
+        return DayType::UNKNOWN; // hush up compiler
+    }
+}
+
+}

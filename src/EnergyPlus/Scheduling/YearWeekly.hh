@@ -74,10 +74,6 @@ struct ScheduleYear : ScheduleBase
     ScheduleYear(std::string const &objectName, nlohmann::json const &fields);
     ~ScheduleYear() = default;
 
-    // overridden base class methods
-    bool validateTypeLimits() override;
-    void updateValue(int simTime) override;
-
     // static functions related to the state of all weekly schedules
     static void processInput();
     static void clear_state();
@@ -88,12 +84,6 @@ struct ScheduleYear : ScheduleBase
 
     // member variables
     std::vector<WeekScheduleRange> weekScheduleRanges;
-    bool includesLeapYearData = false;
-
-    // member variables related to final data storage and lookup
-    std::vector<Real64> timeStamp;
-    std::vector<Real64> values;
-    int lastIndexUsed = 0;
 };
 
 extern std::vector<ScheduleYear> scheduleYears;

@@ -92,10 +92,6 @@ struct ScheduleCompact : ScheduleBase
     ScheduleCompact(std::string const &objectName, nlohmann::json const &fields);
     ~ScheduleCompact() = default;
 
-    // overridden base class methods
-    bool validateTypeLimits() override;
-    void updateValue(int simTime) override;
-
     // static functions related to the state of all compact schedules
     static void processInput();
     static void clear_state();
@@ -114,12 +110,6 @@ struct ScheduleCompact : ScheduleBase
 
     // member variables
     std::vector<Through> throughs;
-    bool includesLeapYearData = false;
-
-    // member variables related to final data storage and lookup
-    std::vector<Real64> timeStamp;
-    std::vector<Real64> values;
-    int lastIndexUsed = 0;
 };
 
 extern std::vector<ScheduleCompact> scheduleCompacts;
