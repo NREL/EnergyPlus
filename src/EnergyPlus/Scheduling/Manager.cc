@@ -107,6 +107,7 @@ ScheduleBase *getScheduleReference(const std::string &scheduleName)
             case ScheduleType::YEAR:
                 return &scheduleYears[mapping.indexInTypeArray];
             case ScheduleType::FILE:
+            case ScheduleType::SHADING_FILE:
                 return &scheduleFiles[mapping.indexInTypeArray];
             case ScheduleType::UNKNOWN:
                 // Fatal Error
@@ -217,6 +218,7 @@ Real64 GetScheduleValue(int scheduleIndex)
     case ScheduleType::YEAR:
         return scheduleYears[mapping.indexInTypeArray].value;
     case ScheduleType::FILE:
+    case ScheduleType::SHADING_FILE:
         return scheduleFiles[mapping.indexInTypeArray].value;
     case ScheduleType::UNKNOWN:
         return -1;
@@ -239,6 +241,7 @@ std::string scheduleName(int const scheduleIndex) {
     case ScheduleType::YEAR:
         return scheduleYears[mapping.indexInTypeArray].name;
     case ScheduleType::FILE:
+    case ScheduleType::SHADING_FILE:
         return scheduleFiles[mapping.indexInTypeArray].name;
     case ScheduleType::UNKNOWN:
         return "";
@@ -247,10 +250,6 @@ std::string scheduleName(int const scheduleIndex) {
 }
 
 std::string scheduleType(int const scheduleIndex) {
-    // TODO: This is a very temporary band-aid
-    if (scheduleIndex >= (int)indexToSubtypeMap.size()) {
-        return "Schedule:File:Shading";
-    }
     auto const &mapping(indexToSubtypeMap[scheduleIndex]);
     switch (mapping.thisType) {
     case ScheduleType::CONSTANT:
@@ -261,18 +260,58 @@ std::string scheduleType(int const scheduleIndex) {
         return "Schedule:Year";
     case ScheduleType::FILE:
         return "Schedule:File";
+    case ScheduleType::SHADING_FILE:
+        return "Schedule:File:Shading";
     case ScheduleType::UNKNOWN:
         return "";
     }
     return ""; // hush up compiler warning
 }
 
-Real64 scheduleMinValue(int const EP_UNUSED(scheduleIndex)) {
-    return -999;
+Real64 scheduleMinValue(int const scheduleIndex) {
+    ScheduleBase *scheduleReference; // no ownership, just reference
+    auto const &mapping(indexToSubtypeMap[scheduleIndex]);
+    switch (mapping.thisType) {
+    case ScheduleType::CONSTANT:
+        return scheduleConstants[mapping.indexInTypeArray].value;
+    case ScheduleType::COMPACT:
+        scheduleReference = &scheduleCompacts[mapping.indexInTypeArray];
+        break;
+    case ScheduleType::YEAR:
+        scheduleReference = &scheduleYears[mapping.indexInTypeArray];
+        break;
+    case ScheduleType::FILE:
+    case ScheduleType::SHADING_FILE:
+        scheduleReference = &scheduleFiles[mapping.indexInTypeArray];
+        break;
+    default:
+        EnergyPlus::ShowFatalError("Schedule Min Value called with unknown index type");
+        return -999;
+    }
+    return *std::min_element(scheduleReference->values.begin(), scheduleReference->values.end());
 }
 
-Real64 scheduleMaxValue(int const EP_UNUSED(scheduleIndex)) {
-    return 999;
+Real64 scheduleMaxValue(int const scheduleIndex) {
+    ScheduleBase *scheduleReference; // no ownership, just reference
+    auto const &mapping(indexToSubtypeMap[scheduleIndex]);
+    switch (mapping.thisType) {
+    case ScheduleType::CONSTANT:
+        return scheduleConstants[mapping.indexInTypeArray].value;
+    case ScheduleType::COMPACT:
+        scheduleReference = &scheduleCompacts[mapping.indexInTypeArray];
+        break;
+    case ScheduleType::YEAR:
+        scheduleReference = &scheduleYears[mapping.indexInTypeArray];
+        break;
+    case ScheduleType::FILE:
+    case ScheduleType::SHADING_FILE:
+        scheduleReference = &scheduleFiles[mapping.indexInTypeArray];
+        break;
+    default:
+        EnergyPlus::ShowFatalError("Schedule Min Value called with unknown index type");
+        return 999;
+    }
+    return *std::max_element(scheduleReference->values.begin(), scheduleReference->values.end());
 }
 
 }

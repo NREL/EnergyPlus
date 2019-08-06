@@ -75,16 +75,17 @@ struct ScheduleFile : ScheduleBase
     void createTimeSeries();
 
     // static methods for processing csv data to be available across all Schedule:File objects
-    static std::vector<std::vector<std::string>> processCSVLines(std::vector<std::string> const & lines, char delimiter);
-    static void processCSVFile(const std::string& fileToOpen, char delimiter);
+    std::vector<std::vector<std::string>> processCSVLines(std::vector<std::string> const & lines);
+    void processCSVFile(const std::string& fileToOpen);
 
     // member variables
     std::string fileName = "";
     int columnNumber = 0;
     int rowsToSkipAtTop = 0;
-    int minutesPerItem = 0;
+    char columnDelimiter = ',';
+    int minutesPerItem = 60;
     bool interpolateToTimeStep = false;
-    int numberOfHoursOfData = 8760;
+    int expectedRowCount = 0;
 };
 
 extern std::vector<ScheduleFile> scheduleFiles;

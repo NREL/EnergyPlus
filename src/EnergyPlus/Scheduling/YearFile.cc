@@ -97,7 +97,7 @@ void ScheduleFile::createTimeSeries()
         rowNum++;
         if (rowNum > this->rowsToSkipAtTop) {
             dataRowCount++;
-            this->timeStamp.push_back(dataRowCount * this->minutesPerItem * 60);
+            this->timeStamp.push_back(dataRowCount * this->minutesPerItem * 60); // TODO: Test a non-hourly interval
             if (datum.empty()) {
                 this->values.push_back(0);
             } else {
@@ -109,9 +109,12 @@ void ScheduleFile::createTimeSeries()
             }
         }
     }
+    if (dataRowCount != this->expectedRowCount) {
+        EnergyPlus::ShowFatalError("Malformed schedule file, invalid row count, expected to find this row count: " + std::to_string(this->expectedRowCount));
+    }
 }
 
-std::vector<std::vector<std::string>> ScheduleFile::processCSVLines(std::vector<std::string> const & lines, char const delimiter) {
+std::vector<std::vector<std::string>> ScheduleFile::processCSVLines(std::vector<std::string> const & lines) {
     // This function takes a list of CSV lines and splits them into string tokens - note it does not parse numeric values yet
     // This essentially just creates a 2D table of data in a vector of vectors of strings, where the first index is the column
     // First we should find the number of columns in this file; we are going to base it on the number of tokens in line 1
@@ -121,7 +124,7 @@ std::vector<std::vector<std::string>> ScheduleFile::processCSVLines(std::vector<
     while( ss2.good() ) {
         maxExpectedColumnIndex++;
         std::string substr;
-        getline(ss2, substr, delimiter);
+        getline(ss2, substr, this->columnDelimiter);  // TODO: Test all 4 delimiters
     }
     // then we'll actually get the data from the file, filling out to the number of expected columns based on the header (first) line
     std::vector<std::vector<std::string>> overallDataset;
@@ -133,7 +136,7 @@ std::vector<std::vector<std::string>> ScheduleFile::processCSVLines(std::vector<
         while( ss.good() ) {
             columnIndex++;
             std::string substr;
-            getline(ss, substr, delimiter);
+            getline(ss, substr, this->columnDelimiter);
             if (lineCounter == 0) {
                 overallDataset.emplace_back();
             }
@@ -148,7 +151,7 @@ std::vector<std::vector<std::string>> ScheduleFile::processCSVLines(std::vector<
     return overallDataset;
 }
 
-void ScheduleFile::processCSVFile(const std::string& fileToOpen, char const delimiter)
+void ScheduleFile::processCSVFile(const std::string& fileToOpen)
 {
     // This function adds the entire file contents of the given file path to a "master" map called Scheduling::fileData
     // This file does not populate individual schedules, it simply adds it to the list for later processing
@@ -162,7 +165,7 @@ void ScheduleFile::processCSVFile(const std::string& fileToOpen, char const deli
     while (getline(fileInstance, line)) {
         lines.push_back(line);
     }
-    Scheduling::fileData[fileToOpen] = processCSVLines(lines, delimiter);
+    Scheduling::fileData[fileToOpen] = processCSVLines(lines);
 }
 
 ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &fields)
@@ -226,18 +229,33 @@ ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &
     }
     if(fields.find("minutes_per_item") != fields.end()) {
         this->minutesPerItem = fields.at("minutes_per_item");
+        switch (this->minutesPerItem) {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 10:
+        case 12:
+        case 15:
+        case 30:
+        case 60:
+            break;
+        default:
+            EnergyPlus::ShowFatalError("Invalid minutes per item, must be evenly divisible into an hour for Schedule:File " + this->name);
+        }
     }
-    char columnDelimiter = ',';
     if(fields.find("column_separator") != fields.end()) {
         std::string separatorUpperCase = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("column_separator"));
         if (separatorUpperCase == "COMMA") {
-            columnDelimiter = ',';
+            this->columnDelimiter = ',';
         } else if (separatorUpperCase == "SEMICOLON") {
-            columnDelimiter = ';';
+            this->columnDelimiter = ';';
         } else if (separatorUpperCase == "SPACE") {
-            columnDelimiter = ' ';
+            this->columnDelimiter = ' ';
         } else if (separatorUpperCase == "TAB") {
-            columnDelimiter = '\t';
+            this->columnDelimiter = '\t';
         } else {
             EnergyPlus::ShowFatalError("Schedule:File named \"" + this->name + "\": Bad column separator value: \"" + separatorUpperCase + "\"");
         }
@@ -252,12 +270,14 @@ ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &
             }
         }
     }
+    int numberOfHoursOfData = 8760;
     if(fields.find("number_of_hours_of_data") != fields.end()) {
-        this->numberOfHoursOfData = fields.at("number_of_hours_of_data");
+        numberOfHoursOfData = fields.at("number_of_hours_of_data");
     }
+    this->expectedRowCount = numberOfHoursOfData * 60 / this->minutesPerItem;
     // only process the file if it isn't already in the master list
     if (fileData.find(fields.at("file_name")) == fileData.end()) {
-        ScheduleFile::processCSVFile(fields.at("file_name"), columnDelimiter);
+        this->processCSVFile(fields.at("file_name"));
     }
 }
 
