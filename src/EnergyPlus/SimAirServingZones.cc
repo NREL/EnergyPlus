@@ -59,10 +59,10 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <AirflowNetwork/Elements.hpp>
 #include <BranchInputManager.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <AirflowNetwork/Elements.hpp>
 #include <DataContaminantBalance.hh>
 #include <DataConvergParams.hh>
 #include <DataDefineEquip.hh>
@@ -1257,13 +1257,15 @@ namespace SimAirServingZones {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Fan_System_Object;
                             // Construct fan object
                             if (HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name) < 0) {
-                                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name));
+                                HVACFan::fanObjs.emplace_back(
+                                    new HVACFan::FanSystem(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name));
                             }
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompIndex =
                                 HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name) +
                                 1; // + 1 for shift from zero-based vector to 1-based compIndex
                                    // cpw22Aug2010 Add Fan_ComponentModel type (new num=24)
-                            HVACFan::fanObjs[HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name)]->AirPathFlag = true;
+                            HVACFan::fanObjs[HVACFan::getFanObjectVectorIndex(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name)]
+                                ->AirPathFlag = true;
                         } else if (componentType == "FAN:COMPONENTMODEL") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Fan_ComponentModel;
 
@@ -3548,7 +3550,7 @@ namespace SimAirServingZones {
                 // Evap Cooler Types for the air system simulation
             } else if (SELECT_CASE_var == EvapCooler) { // 'EvaporativeCooler:Direct:CelDekPad', 'EvaporativeCooler:Indirect:CelDekPad'
                 // 'EvaporativeCooler:Indirect:WetCoil', 'EvaporativeCooler:Indirect:ResearchSpecial'
-                SimEvapCooler(CompName, CompIndex);
+                SimEvapCooler(CompName, CompIndex, _);
 
                 // Desiccant Dehumidifier Types for the air system simulation
             } else if (SELECT_CASE_var == Desiccant) { // 'Dehumidifier:Desiccant:NoFans', 'Dehumidifier:Desiccant:System'

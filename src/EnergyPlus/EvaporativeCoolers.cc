@@ -193,7 +193,7 @@ namespace EvaporativeCoolers {
 
     // Functions
 
-    void SimEvapCooler(std::string const &CompName, int &CompIndex)
+    void SimEvapCooler(std::string const &CompName, int &CompIndex, Optional<Real64 const> PartLoadRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -243,6 +243,15 @@ namespace EvaporativeCoolers {
             }
         }
 
+        Real64 ZoneEvapCoolerPLR = 1.0;
+        // If PLR is not present, then set to 1.  Used only by ZoneHVAC:*:CelDekPad
+        if (present(PartLoadRatio)) {
+            // serrogate for pump part load ratio
+            ZoneEvapCoolerPLR = PartLoadRatio;
+        } else {
+            ZoneEvapCoolerPLR = 1.0;
+        }
+
         // With the correct EvapCoolNum Initialize
         InitEvapCooler(EvapCoolNum); // Initialize all related parameters
 
@@ -250,9 +259,9 @@ namespace EvaporativeCoolers {
             auto const SELECT_CASE_var(EvapCond(EvapCoolNum).EvapCoolerType);
 
             if (SELECT_CASE_var == iEvapCoolerDirectCELDEKPAD) {
-                CalcDirectEvapCooler(EvapCoolNum);
+                CalcDirectEvapCooler(EvapCoolNum, ZoneEvapCoolerPLR);
             } else if (SELECT_CASE_var == iEvapCoolerInDirectCELDEKPAD) {
-                CalcDryIndirectEvapCooler(EvapCoolNum);
+                CalcDryIndirectEvapCooler(EvapCoolNum, ZoneEvapCoolerPLR);
             } else if (SELECT_CASE_var == iEvapCoolerInDirectWETCOIL) {
                 CalcWetIndirectEvapCooler(EvapCoolNum);
             } else if (SELECT_CASE_var == iEvapCoolerInDirectRDDSpecial) {
@@ -1647,7 +1656,7 @@ namespace EvaporativeCoolers {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void CalcDirectEvapCooler(int &EvapCoolNum)
+    void CalcDirectEvapCooler(int &EvapCoolNum, Real64 const PartLoadRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1736,12 +1745,7 @@ namespace EvaporativeCoolers {
             //***************************************************************************
             //                  ENERGY CONSUMED BY THE RECIRCULATING PUMP
             // Add the pump energy to the total Evap Cooler energy comsumption
-            Real64 FlowFraction = 1.0;
-            Real64 MassFlowRateMax = Node(EvapCond(EvapCoolNum).InletNode).MassFlowRateMax;
-            if (MassFlowRateMax > 0) {
-                FlowFraction = EvapCond(EvapCoolNum).InletMassFlowRate / MassFlowRateMax;
-            }
-            EvapCond(EvapCoolNum).EvapCoolerPower += FlowFraction * EvapCond(EvapCoolNum).RecircPumpPower;
+            EvapCond(EvapCoolNum).EvapCoolerPower += PartLoadRatio * EvapCond(EvapCoolNum).RecircPumpPower;
             //******************
             //             WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
             //             H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
@@ -1776,7 +1780,7 @@ namespace EvaporativeCoolers {
         EvapCond(EvapCoolNum).OutletPressure = EvapCond(EvapCoolNum).InletPressure;
     }
 
-    void CalcDryIndirectEvapCooler(int &EvapCoolNum)
+    void CalcDryIndirectEvapCooler(int &EvapCoolNum, Real64 const PartLoadRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1890,21 +1894,16 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).OutletEnthalpy = PsyHFnTdbW(EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).OutletHumRat);
 
             //***************************************************************************
-            Real64 FlowFraction = 1.0;
-            Real64 MassFlowRateMax = Node(EvapCond(EvapCoolNum).InletNode).MassFlowRateMax;
-            if (MassFlowRateMax > 0) {
-                FlowFraction = EvapCond(EvapCoolNum).InletMassFlowRate / MassFlowRateMax;
-            }
             //                  POWER OF THE SECONDARY AIR FAN
             if (EvapCond(EvapCoolNum).IndirectFanEff > 0.0) {
-                EvapCond(EvapCoolNum).EvapCoolerPower += FlowFraction * EvapCond(EvapCoolNum).IndirectFanDeltaPress *
+                EvapCond(EvapCoolNum).EvapCoolerPower += PartLoadRatio * EvapCond(EvapCoolNum).IndirectFanDeltaPress *
                                                          EvapCond(EvapCoolNum).IndirectVolFlowRate / EvapCond(EvapCoolNum).IndirectFanEff;
             }
 
             //                  ENERGY CONSUMED BY THE RECIRCULATING PUMP
             //                  ENERGY CONSUMED BY THE RECIRCULATING PUMP
             // Add the pump energy to the total Evap Cooler energy comsumption
-            EvapCond(EvapCoolNum).EvapCoolerPower += FlowFraction * EvapCond(EvapCoolNum).IndirectRecircPumpPower;
+            EvapCond(EvapCoolNum).EvapCoolerPower += PartLoadRatio * EvapCond(EvapCoolNum).IndirectRecircPumpPower;
 
             //******************
             //             WATER CONSUMPTION IN LITERS OF WATER FOR DIRECT
@@ -1917,7 +1916,7 @@ namespace EvaporativeCoolers {
                  PsyRhoAirFnPbTdbW(EvapCond(EvapCoolNum).SecInletPressure, TDBSec, HumRatSec)) /
                 2.0;
             EvapCond(EvapCoolNum).EvapWaterConsumpRate =
-                FlowFraction * (HumRatSec - EvapCond(EvapCoolNum).SecInletHumRat) * EvapCond(EvapCoolNum).IndirectVolFlowRate * RhoAir / RhoWater;
+                PartLoadRatio * (HumRatSec - EvapCond(EvapCoolNum).SecInletHumRat) * EvapCond(EvapCoolNum).IndirectVolFlowRate * RhoAir / RhoWater;
             // A numerical check to keep from having very tiny negative water consumption values being reported
             if (EvapCond(EvapCoolNum).EvapWaterConsumpRate < 0.0) EvapCond(EvapCoolNum).EvapWaterConsumpRate = 0.0;
 
@@ -4604,11 +4603,11 @@ namespace EvaporativeCoolers {
         }
 
         if (ZoneEvapUnit(UnitNum).EvapCooler_1_AvailStatus) {
-            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_1_Name, ZoneEvapUnit(UnitNum).EvapCooler_1_Index);
+            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_1_Name, ZoneEvapUnit(UnitNum).EvapCooler_1_Index, PartLoadRatio);
         }
 
         if ((ZoneEvapUnit(UnitNum).EvapCooler_2_Index > 0) && ZoneEvapUnit(UnitNum).EvapCooler_2_AvailStatus) {
-            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index);
+            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index, PartLoadRatio);
         }
         if (ZoneEvapUnit(UnitNum).FanLocation == DrawThruFan) {
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
@@ -4785,11 +4784,11 @@ namespace EvaporativeCoolers {
         }
 
         if (ZoneEvapUnit(UnitNum).EvapCooler_1_AvailStatus) {
-            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_1_Name, ZoneEvapUnit(UnitNum).EvapCooler_1_Index);
+            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_1_Name, ZoneEvapUnit(UnitNum).EvapCooler_1_Index, _);
         }
 
         if ((ZoneEvapUnit(UnitNum).EvapCooler_2_Index > 0) && ZoneEvapUnit(UnitNum).EvapCooler_2_AvailStatus) {
-            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index);
+            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index, _);
         }
         if (ZoneEvapUnit(UnitNum).FanLocation == DrawThruFan) {
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
@@ -4918,11 +4917,11 @@ namespace EvaporativeCoolers {
         }
 
         if (ZoneEvapUnit(UnitNum).EvapCooler_1_AvailStatus) {
-            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_1_Name, ZoneEvapUnit(UnitNum).EvapCooler_1_Index);
+            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_1_Name, ZoneEvapUnit(UnitNum).EvapCooler_1_Index, _);
         }
 
         if ((ZoneEvapUnit(UnitNum).EvapCooler_2_Index > 0) && ZoneEvapUnit(UnitNum).EvapCooler_2_AvailStatus) {
-            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index);
+            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index, _);
         }
         if (ZoneEvapUnit(UnitNum).FanLocation == DrawThruFan) {
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
