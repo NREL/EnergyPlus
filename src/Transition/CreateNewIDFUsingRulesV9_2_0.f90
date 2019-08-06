@@ -142,7 +142,12 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=20) :: zeqNumStr
   CHARACTER(len=7) :: zeqHeatingOrCooling
   LOGICAL :: writeScheduleTypeObj = .true.
-
+  
+  ! For AirTerminal:SingleDuct:Uncontrolled transition
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: ATSDUNodeNames
+  INTEGER TotATSDUObjs
+  INTEGER atCount
+  INTEGER nodeCount
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -307,7 +312,19 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           CALL DisplayString('Processing IDF -- RunPeriod preprocessing complete.')
      ! End Pre-process RunPeriod
 
+     ! Begin Pre-process AirTerminal:SingleDuct:Uncontrolled
+          ! Clean up from any previous passes, then re-allocate
+          IF(ALLOCATED(ATSDUNodeNames)) DEALLOCATE(ATSDUNodeNames)
+          TotATSDUObjs = GetNumObjectsFound('AIRTERMINAL:SINGLEDUCT:UNCONTROLLED')
+          ALLOCATE(ATSDUNodeNames(TotATSDUObjs))
 
+          DO atCount=1, TotATSDUObjs
+            CALL GetObjectItem('AIRTERMINAL:SINGLEDUCT:UNCONTROLLED',atCount,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            ! Store Zone Supply Air Node Name to search and replace later in AirLoopHVAC:ZoneSplitter and AirLoopHVAC:SupplyPlenum objects
+            ATSDUNodeNames(atCount) = Alphas(3)
+          ENDDO
+
+ 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                                       P R O C E S S I N G                                                        !
@@ -427,7 +444,63 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !                 NoDiff = .false.
 
               ! If your original object starts with A, insert the rules here
+             CASE('AIRTERMINAL:SINGLEDUCT:UNCONTROLLED')
+                 ! ZoneHVAC:EquipmentList already has a transition rule of its own, so add this object type change there
+                 CALL GetNewObjectDefInIDD('AirTerminal:SingleDuct:ConstantVolume:NoReheat',NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:2)=InArgs(1:2)
+                 OutArgs(3) = TRIM(InArgs(3)) // ' ATInlet'
+                 OutArgs(4) =  InArgs(3)
+                 OutArgs(5:7)=InArgs(4:6)
 
+                CALL WriteOutIDFLines(DifLfn,'AirTerminal:SingleDuct:ConstantVolume:NoReheat',7,OutArgs,NwFldNames,NwFldUnits)
+                NoDiff=.false.
+                Written=.true.
+
+                CALL GetNewObjectDefInIDD('ZoneHVAC:AirDistributionUnit',PNumArgs,PAOrN,PReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                POutArgs(1) = TRIM(InArgs(1)) // ' ADU'
+                POutArgs(2) = InArgs(3)
+                POutArgs(3) = 'AirTerminal:SingleDuct:ConstantVolume:NoReheat'
+                POutArgs(4) = InArgs(1)
+                POutArgs(5) = Blank
+                POutArgs(6) = Blank
+                POutArgs(7) = InArgs(7)
+                CALL WriteOutIDFLines(DifLfn,'ZoneHVAC:AirDistributionUnit',PNumArgs,POutArgs,PFldNames,PFldUnits)
+
+              ! This is part of the transition for AirTerminal:SingleDuc:Ucontrolled
+            CASE('AIRLOOPHVAC:ZONESPLITTER')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1:2) = InArgs(1:2)
+                 ! Loop through outlet node names looking for a match to an AirTerminal:SingleDuc:Ucontrolled node name
+                 DO nodeCount=3, CurArgs
+                   DO atCount=1, TotATSDUObjs
+                     IF (SameString(TRIM(InArgs(nodeCount)), TRIM(ATSDUNodeNames(atCount)))) THEN
+                       OutArgs(nodeCount) = TRIM(InArgs(nodeCount)) // ' ATInlet'
+                       EXIT
+                     ELSE
+                       OutArgs(nodeCount) = InArgs(nodeCount)
+                     END IF
+                   ENDDO
+                 ENDDO
+                NoDiff = .false.
+                
+              ! This is part of the transition for AirTerminal:SingleDuc:Ucontrolled
+            CASE('AIRLOOPHVAC:SUPPLYPLENUM')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1:4) = InArgs(1:4)
+                 ! Loop through outlet node names looking for a match to an AirTerminal:SingleDuc:Ucontrolled node name
+                 DO nodeCount=5, CurArgs
+                   DO atCount=1, TotATSDUObjs
+                     IF (SameString(TRIM(InArgs(nodeCount)), TRIM(ATSDUNodeNames(atCount)))) THEN
+                       OutArgs(nodeCount) = TRIM(InArgs(nodeCount)) // ' ATInlet'
+                       EXIT
+                     ELSE
+                       OutArgs(nodeCount) = InArgs(nodeCount)
+                     END IF
+                   ENDDO
+                 ENDDO
+                NoDiff = .false.
+                
               ! If your original object starts with B, insert the rules here
 
               ! If your original object starts with C, insert the rules here
@@ -550,7 +623,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                     POutArgs(3) = InArgs(CurField)
                     CALL WriteOutIDFLines(DifLfn,'Schedule:Constant',PNumArgs,POutArgs,PFldNames,PFldUnits)
                   ELSE
-                    OutArgs(CurField) = InArgs(CurField)
+                    ! Add air terminal unit object type and name change here (see AirTerminal:SingleDuct:Uncontrolled above)
+                    IF (CurField > 2) THEN
+                      IF (SameString(TRIM(InArgs(CurField)),'AirTerminal:SingleDuct:Uncontrolled')) THEN
+                        OutArgs(CurField) = 'ZoneHVAC:AirDistributionUnit'
+                      ELSE IF (SameString(TRIM(InArgs(CurField-1)),'AirTerminal:SingleDuct:Uncontrolled')) THEN
+                        OutArgs(CurField) = TRIM(InArgs(CurField)) // ' ADU'
+                      ELSE
+                        OutArgs(CurField) = InArgs(CurField)
+                      END IF
+                    ELSE
+                      OutArgs(CurField) = InArgs(CurField)
+                    END IF
                   END IF
                 END DO
 
