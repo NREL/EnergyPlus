@@ -68,10 +68,6 @@ void ScheduleFile::processInput()
     auto &instancesValue = instances.value();
     for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
         auto const &fields = instance.value();
-        // first populate the fileData with this input file, only if needed
-        if (fileData.find(fields.at("file_name")) == fileData.end()) {
-            ScheduleFile::processCSVFile(fields.at("file_name"));
-        }
         auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
         // do any pre-construction operations
         EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
@@ -91,6 +87,8 @@ void ScheduleFile::clear_state()
 
 void ScheduleFile::createTimeSeries()
 {
+    // This function creates the time/value time-series for a specific subset of the master file-based schedule set
+    // This function skips rows at the top, grabs the right column of data, and converts the values into numerics
     auto & dataSet = Scheduling::fileData[this->fileName];
     auto & thisColumnOfData = dataSet[this->columnNumber - 1];
     int rowNum = 0;
@@ -100,25 +98,30 @@ void ScheduleFile::createTimeSeries()
         if (rowNum > this->rowsToSkipAtTop) {
             dataRowCount++;
             this->timeStamp.push_back(dataRowCount * this->minutesPerItem * 60);
-            try {
-                this->values.push_back(std::stod(datum));
-            } catch (...) {
-                EnergyPlus::ShowFatalError("Failed to convert " + datum + " to numeric value");
+            if (datum.empty()) {
+                this->values.push_back(0);
+            } else {
+                try {
+                    this->values.push_back(std::stod(datum));
+                } catch (...) {
+                    EnergyPlus::ShowFatalError("Failed to convert " + datum + " to numeric value");
+                }
             }
         }
     }
 }
 
-std::vector<std::vector<std::string>> ScheduleFile::processCSVLines(std::vector<std::string> const & lines) {
-    // first we should find the number of columns in this file
-    // we are going to base it on the number of tokens in line 1
+std::vector<std::vector<std::string>> ScheduleFile::processCSVLines(std::vector<std::string> const & lines, char const delimiter) {
+    // This function takes a list of CSV lines and splits them into string tokens - note it does not parse numeric values yet
+    // This essentially just creates a 2D table of data in a vector of vectors of strings, where the first index is the column
+    // First we should find the number of columns in this file; we are going to base it on the number of tokens in line 1
     auto & line0 = lines[0];
     int maxExpectedColumnIndex = -1;
     std::stringstream ss2(line0);
     while( ss2.good() ) {
         maxExpectedColumnIndex++;
         std::string substr;
-        getline(ss2, substr, ',');
+        getline(ss2, substr, delimiter);
     }
     // then we'll actually get the data from the file, filling out to the number of expected columns based on the header (first) line
     std::vector<std::vector<std::string>> overallDataset;
@@ -130,7 +133,7 @@ std::vector<std::vector<std::string>> ScheduleFile::processCSVLines(std::vector<
         while( ss.good() ) {
             columnIndex++;
             std::string substr;
-            getline(ss, substr, ',');
+            getline(ss, substr, delimiter);
             if (lineCounter == 0) {
                 overallDataset.emplace_back();
             }
@@ -145,29 +148,21 @@ std::vector<std::vector<std::string>> ScheduleFile::processCSVLines(std::vector<
     return overallDataset;
 }
 
-void ScheduleFile::processCSVFile(const std::string& fileToOpen)
+void ScheduleFile::processCSVFile(const std::string& fileToOpen, char const delimiter)
 {
-    // this should be called early and for all CSV files that will ultimately be processed
-    // it will populate a global variable called fileData that is usable by all CSV-based instances, not just one
-    // it populates that variable with simple string table data for all rows and columns of each csv file
-    // then later in the constructor of each schedule:file object, we just call that fileData map with a file name and
-    // a column of data, and that returns a list of strings representing the entire column.  We can then call the
-    // numericSubset function with a "num rows to skip" variable and that will convert that column to floats and
-    // truncate any skip rows and boom, we have our time series values for this schedule
-
-    // returns a vector of columnar data, where columnar data is a vector of values in a single column of the csv file
-
-
-    // check if file exists
-
-    // open file
-    std::string line;
-    std::ifstream myfile(fileToOpen);
+    // This function adds the entire file contents of the given file path to a "master" map called Scheduling::fileData
+    // This file does not populate individual schedules, it simply adds it to the list for later processing
+    // Multiple schedules could access different subsets of the same file, so we only want to process each file once
+    std::ifstream fileInstance(fileToOpen);
+    if (!fileInstance.is_open()) {
+        EnergyPlus::ShowFatalError("Could not open schedule file for processing, check path: " + fileToOpen);
+    }
     std::vector<std::string> lines;
-    while (getline(myfile, line)) {
+    std::string line;
+    while (getline(fileInstance, line)) {
         lines.push_back(line);
     }
-    Scheduling::fileData[fileToOpen] = processCSVLines(lines);
+    Scheduling::fileData[fileToOpen] = processCSVLines(lines, delimiter);
 }
 
 ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &fields)
@@ -232,16 +227,17 @@ ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &
     if(fields.find("minutes_per_item") != fields.end()) {
         this->minutesPerItem = fields.at("minutes_per_item");
     }
+    char columnDelimiter = ',';
     if(fields.find("column_separator") != fields.end()) {
         std::string separatorUpperCase = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("column_separator"));
         if (separatorUpperCase == "COMMA") {
-            this->columnSeparator = SeparatorType::COMMA;
+            columnDelimiter = ',';
         } else if (separatorUpperCase == "SEMICOLON") {
-            this->columnSeparator = SeparatorType::SEMICOLON;
+            columnDelimiter = ';';
         } else if (separatorUpperCase == "SPACE") {
-            this->columnSeparator = SeparatorType::SPACE;
+            columnDelimiter = ' ';
         } else if (separatorUpperCase == "TAB") {
-            this->columnSeparator = SeparatorType::TAB;
+            columnDelimiter = '\t';
         } else {
             EnergyPlus::ShowFatalError("Schedule:File named \"" + this->name + "\": Bad column separator value: \"" + separatorUpperCase + "\"");
         }
@@ -258,6 +254,10 @@ ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &
     }
     if(fields.find("number_of_hours_of_data") != fields.end()) {
         this->numberOfHoursOfData = fields.at("number_of_hours_of_data");
+    }
+    // only process the file if it isn't already in the master list
+    if (fileData.find(fields.at("file_name")) == fileData.end()) {
+        ScheduleFile::processCSVFile(fields.at("file_name"), columnDelimiter);
     }
 }
 

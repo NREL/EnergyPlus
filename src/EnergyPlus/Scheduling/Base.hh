@@ -99,6 +99,7 @@ struct ScheduleBase
     // abstract functions that must be overridden by derived classes
     virtual void prepareForNewEnvironment() = 0;
 
+    void resetTimeStartIndex(); // should be called every time time goes backward - new warm-up day, etc.
     void setupOutputVariables();
     static DayType getDayTypeForDayOfWeek(int dayOfWeek);
     static DayType mapWeatherManagerDayTypeToScheduleDayType(int wmDayType);
@@ -120,6 +121,7 @@ enum class ScheduleType
     COMPACT,
     YEAR,
     FILE,
+    SHADING_FILE,
     UNKNOWN
 };
 

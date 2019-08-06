@@ -69,8 +69,9 @@ void ScheduleBase::updateValue(int const simTime) {
     if (this->emsActuatedOn) {
         this->value = this->emsActuatedValue;
     } else {
-        // TODO: Change search to start with "this->timeStamp.begin() + this->lastIndexUsed - 1" once we can reset it
-        auto item = std::lower_bound(this->timeStamp.begin(), this->timeStamp.end(), simTime);
+        // change search start to this->timeStamp.begin() + this->lastIndexUsed at some point, BUT, it needs to not only be reset on every
+        // new environment, but also every warm-up day, etc.  Anytime that time goes backward.
+        auto item = std::lower_bound(this->timeStamp.begin() + this->lastIndexUsed, this->timeStamp.end(), simTime);
         this->lastIndexUsed = item - this->timeStamp.begin();
         this->value = this->values[this->lastIndexUsed];
     }
@@ -150,6 +151,11 @@ void ScheduleBase::setupOutputVariables()
 {
     EnergyPlus::SetupOutputVariable("NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, this->value, "Zone", "Average", this->name);
     EnergyPlus::SetupEMSActuator(this->typeName, this->name, "Schedule Value", "[ ]", this->emsActuatedOn, this->emsActuatedValue);
+}
+
+void ScheduleBase::resetTimeStartIndex()
+{
+    this->lastIndexUsed = 0;
 }
 
 }

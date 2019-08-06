@@ -151,6 +151,23 @@ void prepareSchedulesForNewEnvironment()
     }
 }
 
+void resetAllTimeStartIndex()
+{
+    // right now Schedule:Constant objects are not stored as time-series for efficiency
+//    for (auto &thisSchedule : scheduleConstants) {
+//        thisSchedule.createTimeSeries();
+//    }
+    for (auto &thisSchedule : scheduleCompacts) {
+        thisSchedule.resetTimeStartIndex();
+    }
+    for (auto &thisSchedule : scheduleYears) {
+        thisSchedule.resetTimeStartIndex();
+    }
+    for (auto &thisSchedule : scheduleFiles) {
+        thisSchedule.resetTimeStartIndex();
+    }
+}
+
 void processAllSchedules()
 {
     // This function will process all schedule related inputs.  Start with type limits, then call each derived type.

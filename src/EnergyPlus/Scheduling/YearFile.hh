@@ -57,13 +57,6 @@
 
 namespace Scheduling {
 
-enum class SeparatorType {
-    COMMA,
-    SEMICOLON,
-    SPACE,
-    TAB
-};
-
 struct ScheduleFile : ScheduleBase
 {
     // constructors/destructors
@@ -79,19 +72,17 @@ struct ScheduleFile : ScheduleBase
     void prepareForNewEnvironment() override;
 
     // instance methods for this class
-    bool establishNumericSubset(std::vector<std::vector<std::string>> dataset);
     void createTimeSeries();
 
     // static methods for processing csv data to be available across all Schedule:File objects
-    static std::vector<std::vector<std::string>> processCSVLines(std::vector<std::string> const & lines);
-    static void processCSVFile(const std::string& fileToOpen);
+    static std::vector<std::vector<std::string>> processCSVLines(std::vector<std::string> const & lines, char delimiter);
+    static void processCSVFile(const std::string& fileToOpen, char delimiter);
 
     // member variables
     std::string fileName = "";
     int columnNumber = 0;
     int rowsToSkipAtTop = 0;
     int minutesPerItem = 0;
-    SeparatorType columnSeparator = SeparatorType::COMMA;
     bool interpolateToTimeStep = false;
     int numberOfHoursOfData = 8760;
 };

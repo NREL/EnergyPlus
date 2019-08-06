@@ -537,6 +537,7 @@ namespace SimulationManager {
                     ++NumOfWarmupDays;
                     cWarmupDay = TrimSigDigits(NumOfWarmupDays);
                     DisplayString("Warming up {" + cWarmupDay + '}');
+                    Scheduling::resetAllTimeStartIndex();
                 } else if (DayOfSim == 1) {
                     if (KindOfSim == ksRunPeriodWeather) {
                         DisplayString("Starting Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
@@ -545,6 +546,7 @@ namespace SimulationManager {
                     }
                     ObjexxFCL::gio::write(OutputFileInits, Format_700) << NumOfWarmupDays;
                     ResetAccumulationWhenWarmupComplete();
+                    Scheduling::resetAllTimeStartIndex();
                 } else if (DisplayPerfSimulationFlag) {
                     if (KindOfSim == ksRunPeriodWeather) {
                         DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
@@ -553,9 +555,9 @@ namespace SimulationManager {
                     }
                     DisplayPerfSimulationFlag = false;
                 }
-                // for simulations that last longer than a week, identify when the last year of the simulation is started
+                // for simulations that last longer than a year, identify when the last year of the simulation is started
                 if ((DayOfSim > 365) && ((NumOfDayInEnvrn - DayOfSim) == 364) && !WarmupFlag) {
-                    DisplayString("Starting last  year of environment at:  " + DayOfSimChr);
+                    DisplayString("Starting last year of environment at:  " + DayOfSimChr);
                     ResetTabularReports();
                 }
 

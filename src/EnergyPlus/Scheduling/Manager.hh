@@ -85,6 +85,8 @@ void processAllSchedules();
 
 void prepareSchedulesForNewEnvironment(); // should be called for each new environment
 
+void resetAllTimeStartIndex(); // should be called for each time time goes backward (start a new warmup-day, etc.)
+
 Real64 GetScheduleValue(int scheduleIndex);
 
 void updateAllSchedules(int simTime);
