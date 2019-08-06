@@ -122,7 +122,7 @@ TEST_F(SchedulingTestFixture, ScheduleConstant_TestValidation)
     EnergyPlus::WeatherManager::Envrn = 1;
     EnergyPlus::WeatherManager::Environment.allocate(1);
     EnergyPlus::WeatherManager::Environment(1).KindOfEnvrn = EnergyPlus::DataGlobals::ksRunPeriodWeather;
-    ASSERT_THROW(Scheduling::recreateAllTimeSeries(), std::runtime_error);
+    ASSERT_THROW(Scheduling::prepareSchedulesForNewEnvironment(), std::runtime_error);
 }
 
 } // namespace EnergyPlus

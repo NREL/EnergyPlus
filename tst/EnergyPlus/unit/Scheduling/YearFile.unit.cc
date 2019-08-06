@@ -57,51 +57,51 @@ TEST_F(SchedulingTestFixture, TestYearFile1)
     // as of right now there's really not much to test here, but I can at least confirm that it does have a clear_state method
     EXPECT_TRUE(true);
 }
-
-TEST_F(SchedulingTestFixture, TestLineProcessing) {
-    std::vector<std::string> lines = {
-        "Time,Flow,Heat",
-        "1,3.14,2.718",
-        "2,6.28,12"
-    };
-    auto dataSet = Scheduling::ScheduleFile::processCSVLines(lines);
-    EXPECT_EQ(3u, dataSet.size());
-}
-
-TEST_F(SchedulingTestFixture, TestLineProcessingWithTrailingCommas) {
-    std::vector<std::string> lines = {
-        "Time,Flow,Heat,",
-        "1,3.14,2.718,",
-        "2,6.28,12,"
-    };
-    auto dataSet = Scheduling::ScheduleFile::processCSVLines(lines);
-    EXPECT_EQ(4u, dataSet.size()); // expect 3 columns of actual data plus trailing due to the trailing commas
-}
-
-TEST_F(SchedulingTestFixture, TestLineProcessingWithDataGaps) {
-    std::vector<std::string> lines = {
-        "Time,Flow,Heat,State1,State2",
-        "1,3.14,2.718,12,-1",
-        "2,,5.436,24,-2",  // blank flow
-        "3,9.42,8.154,36,-3",
-        "4,12.56,10.872", // completely missing last two
-        "5,15.7,13.59,", // missing last one entirely, but trailing token acts as placeholder for next-to-last one
-        "6,18.84,16.308,72,-6"
-    };
-    auto dataSet = Scheduling::ScheduleFile::processCSVLines(lines);
-    EXPECT_EQ(5u, dataSet.size()); // number of columns is based on header (first) row
-    for (size_t i = 0; i < 5; i++) {
-        EXPECT_EQ(7u, dataSet[i].size()); // each row should have the same length, even with missing data points
-    }
-    EXPECT_EQ("", dataSet[1][2]); // blank flow
-    EXPECT_EQ("5.436", dataSet[2][2]); // data just to the right of the blank flow
-    EXPECT_EQ("9.42", dataSet[1][3]); // data just below the blank flow
-    EXPECT_EQ("", dataSet[3][4]); // completely missing #1
-    EXPECT_EQ("", dataSet[4][4]); // completely missing #2
-    EXPECT_EQ("", dataSet[3][5]); // missing but with trailing token placeholder
-    EXPECT_EQ("", dataSet[4][5]); // completely missing #3
-    EXPECT_EQ("-6", dataSet[4][6]); // final corner value
-}
+//
+//TEST_F(SchedulingTestFixture, TestLineProcessing) {
+//    std::vector<std::string> lines = {
+//        "Time,Flow,Heat",
+//        "1,3.14,2.718",
+//        "2,6.28,12"
+//    };
+//    auto dataSet = Scheduling::ScheduleFile::processCSVLines(lines);
+//    EXPECT_EQ(3u, dataSet.size());
+//}
+//
+//TEST_F(SchedulingTestFixture, TestLineProcessingWithTrailingCommas) {
+//    std::vector<std::string> lines = {
+//        "Time,Flow,Heat,",
+//        "1,3.14,2.718,",
+//        "2,6.28,12,"
+//    };
+//    auto dataSet = Scheduling::ScheduleFile::processCSVLines(lines);
+//    EXPECT_EQ(4u, dataSet.size()); // expect 3 columns of actual data plus trailing due to the trailing commas
+//}
+//
+//TEST_F(SchedulingTestFixture, TestLineProcessingWithDataGaps) {
+//    std::vector<std::string> lines = {
+//        "Time,Flow,Heat,State1,State2",
+//        "1,3.14,2.718,12,-1",
+//        "2,,5.436,24,-2",  // blank flow
+//        "3,9.42,8.154,36,-3",
+//        "4,12.56,10.872", // completely missing last two
+//        "5,15.7,13.59,", // missing last one entirely, but trailing token acts as placeholder for next-to-last one
+//        "6,18.84,16.308,72,-6"
+//    };
+//    auto dataSet = Scheduling::ScheduleFile::processCSVLines(lines);
+//    EXPECT_EQ(5u, dataSet.size()); // number of columns is based on header (first) row
+//    for (size_t i = 0; i < 5; i++) {
+//        EXPECT_EQ(7u, dataSet[i].size()); // each row should have the same length, even with missing data points
+//    }
+//    EXPECT_EQ("", dataSet[1][2]); // blank flow
+//    EXPECT_EQ("5.436", dataSet[2][2]); // data just to the right of the blank flow
+//    EXPECT_EQ("9.42", dataSet[1][3]); // data just below the blank flow
+//    EXPECT_EQ("", dataSet[3][4]); // completely missing #1
+//    EXPECT_EQ("", dataSet[4][4]); // completely missing #2
+//    EXPECT_EQ("", dataSet[3][5]); // missing but with trailing token placeholder
+//    EXPECT_EQ("", dataSet[4][5]); // completely missing #3
+//    EXPECT_EQ("-6", dataSet[4][6]); // final corner value
+//}
 
 //TEST_F(SchedulingTestFixture, TestCSVProcessing_TOBEREMOVED) {
 //    Scheduling::ScheduleFile::processCSVFile("/tmp/my.csv");

@@ -60,22 +60,43 @@ std::map<std::string, std::vector<std::vector<std::string>>> fileData;
 
 void ScheduleFile::processInput()
 {
-    std::string const thisObjectType = "Schedule:File";
-    auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
-    if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
-        return; // no constant schedules to process
-    }
-    auto &instancesValue = instances.value();
-    for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-        auto const &fields = instance.value();
-        auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
-        // do any pre-construction operations
-        EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
-        if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
-            EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
+    {
+        std::string const thisObjectType = "Schedule:File";
+        auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
+        if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
+            return; // no constant schedules to process
         }
-        // then just add it to the vector via the constructor
-        scheduleFiles.emplace_back(thisObjectName, fields);
+        auto &instancesValue = instances.value();
+        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            auto const &fields = instance.value();
+            auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
+            // do any pre-construction operations
+            EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+            if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
+                EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
+            }
+            // then just add it to the vector via the constructor
+            scheduleFiles.emplace_back(thisObjectName, fields);
+        }
+    }
+    {
+        std::string const thisObjectType = "Schedule:File:Shading";
+        auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
+        if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
+            return; // no constant schedules to process
+        }
+        auto &instancesValue = instances.value();
+        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            auto const &fields = instance.value();
+            auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
+            // do any pre-construction operations
+            EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+            if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
+                EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
+            }
+            // then just add it to the vector via the constructor
+            scheduleFiles.emplace_back(thisObjectName, fields);
+        }
     }
 }
 
@@ -88,7 +109,7 @@ void ScheduleFile::clear_state()
 void ScheduleFile::createTimeSeries()
 {
     // This function creates the time/value time-series for a specific subset of the master file-based schedule set
-    // This function skips rows at the top, grabs the right column of data, and converts the values into numerics
+    // This function skips rows at the top, grabs the right column of data, and converts the values into numeric values
     auto & dataSet = Scheduling::fileData[this->fileName];
     auto & thisColumnOfData = dataSet[this->columnNumber - 1];
     int rowNum = 0;
