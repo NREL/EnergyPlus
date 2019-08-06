@@ -49,7 +49,6 @@
 
 #include <EMSManager.hh>
 #include <EnergyPlus.hh>
-#include <Expat/lib/expat.h>
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Scheduling/Base.hh>
@@ -60,11 +59,6 @@ namespace Scheduling {
 
 std::vector<ScheduleFile> scheduleFiles;
 std::map<std::string, std::vector<std::vector<std::string>>> fileData;
-
-Real64 ScheduleFile::getCurrentValue()
-{
-    return this->value;
-}
 
 void ScheduleFile::processInput()
 {
@@ -229,6 +223,7 @@ ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &
     //       \minimum 1
     //       \maximum 60
     this->name = objectName;
+    this->typeName = "Schedule:File";
     // these are required
     this->fileName = fields.at("file_name");
     this->columnNumber = fields.at("column_number");
@@ -289,10 +284,8 @@ void ScheduleFile::updateValue(int simTime)
 void ScheduleFile::setupOutputVariables()
 {
     for (auto &thisSchedule : scheduleFiles) {
-        // Set Up Reporting
-        EnergyPlus::SetupOutputVariable(
-            "NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
-        EnergyPlus::SetupEMSActuator("Schedule:Constant", thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
+        EnergyPlus::SetupOutputVariable("NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
+        EnergyPlus::SetupEMSActuator(thisSchedule.typeName, thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
     }
 }
 

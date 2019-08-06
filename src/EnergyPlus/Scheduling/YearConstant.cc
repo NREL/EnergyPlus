@@ -57,11 +57,6 @@ namespace Scheduling {
 
 std::vector<ScheduleConstant> scheduleConstants;
 
-Real64 ScheduleConstant::getCurrentValue()
-{
-    return this->value;
-}
-
 void ScheduleConstant::processInput()
 {
     // We are going to play nice with the schedule manager assumptions, which include that a component model can call
@@ -118,11 +113,18 @@ ScheduleConstant::ScheduleConstant(std::string const &objectName, nlohmann::json
     //       \type real
     //       \default 0
     this->name = objectName;
+    this->typeName = "Schedule:Constant";
     // get a schedule type limits reference directly and store that
     if (fields.find("schedule_type_limits_name") != fields.end()) {
         this->typeLimits = ScheduleTypeData::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("schedule_type_limits_name")));
     }
     this->value = fields.at("hourly_value");
+    if (this->typeLimits) {
+        if (!this->validateTypeLimits()) {
+            EnergyPlus::ShowFatalError("Schedule constant processing errors cause program termination");
+            // TODO: Decide on a pattern for where to call ShowFatal
+        }
+    }
 }
 
 void ScheduleConstant::updateValue(int EP_UNUSED(simTime))
@@ -135,16 +137,14 @@ void ScheduleConstant::updateValue(int EP_UNUSED(simTime))
 void ScheduleConstant::setupOutputVariables()
 {
     for (auto &thisSchedule : scheduleConstants) {
-        if (thisSchedule.name.empty()) continue; // name is a required input, so it must be the first one, with blank name, that always returns zero
-        // Set Up Reporting
-        EnergyPlus::SetupOutputVariable(
-            "NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
-        EnergyPlus::SetupEMSActuator("Schedule:Constant", thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
+        EnergyPlus::SetupOutputVariable("NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
+        EnergyPlus::SetupEMSActuator(thisSchedule.typeName, thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
     }
 }
 
 bool ScheduleConstant::validateTypeLimits()
 {
+    // TODO: Check for discrete/continuous?
     if (this->value > this->typeLimits->maximum) {
         EnergyPlus::ShowSevereError("Value out of bounds");
         return false;
@@ -153,17 +153,6 @@ bool ScheduleConstant::validateTypeLimits()
         return false;
     }
     return true;
-}
-
-void ScheduleConstant::createTimeSeries()
-{
-    // TODO: If Schedule:Constant ends up being stored as a time series then we need to recreate it for each new environment here
-    if (this->typeLimits) {
-        if (!this->validateTypeLimits()) {
-            EnergyPlus::ShowFatalError("Schedule constant processing errors cause program termination");
-            // TODO: Decide on a pattern for where to call ShowFatal
-        }
-    }
 }
 
 } // namespace Scheduling

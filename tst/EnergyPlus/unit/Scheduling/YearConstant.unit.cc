@@ -69,7 +69,7 @@ TEST_F(SchedulingTestFixture, ScheduleConstant_TestGetScheduleIndex)
     ASSERT_TRUE(process_idf(idf_objects));
     Scheduling::ScheduleConstant::processInput();
     EXPECT_EQ("ALWAYS OFF", Scheduling::scheduleConstants[1].name); // will be upper case, and lexicographically ordered
-    EXPECT_NEAR(0.0, Scheduling::scheduleConstants[1].getCurrentValue(), 0.0001);
+    EXPECT_NEAR(0.0, Scheduling::scheduleConstants[1].value, 0.0001);
 }
 
 TEST_F(SchedulingTestFixture, ScheduleConstant_TestZeroethSchedule)
@@ -77,7 +77,7 @@ TEST_F(SchedulingTestFixture, ScheduleConstant_TestZeroethSchedule)
     std::string const idf_objects = delimited_string({"Schedule:Constant,Always Off,,0.0;"});
     ASSERT_TRUE(process_idf(idf_objects));
     Scheduling::ScheduleConstant::processInput();
-    EXPECT_EQ(0.0, Scheduling::scheduleConstants[1].getCurrentValue());
+    EXPECT_EQ(0.0, Scheduling::scheduleConstants[1].value);
 }
 
 TEST_F(SchedulingTestFixture, ScheduleConstant_TestClearState)
@@ -101,12 +101,12 @@ TEST_F(SchedulingTestFixture, ScheduleConstant_UpdateValueAndEMS)
     std::string const idf_objects = delimited_string({"Schedule:Constant,Always On,,1.0;"});
     ASSERT_TRUE(process_idf(idf_objects));
     auto thisSched = Scheduling::getScheduleReference("ALWAYS ON");
-    EXPECT_EQ(1.0, thisSched->getCurrentValue());
+    EXPECT_EQ(1.0, thisSched->value);
     // now override with EMS
     thisSched->emsActuatedOn = true;
     thisSched->emsActuatedValue = 14.0;
     Scheduling::updateAllSchedules(0.0);
-    EXPECT_EQ(14.0, thisSched->getCurrentValue());
+    EXPECT_EQ(14.0, thisSched->value);
 }
 
 TEST_F(SchedulingTestFixture, ScheduleConstant_TestValidation)

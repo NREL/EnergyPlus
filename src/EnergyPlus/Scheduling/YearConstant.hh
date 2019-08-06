@@ -64,7 +64,6 @@ struct ScheduleConstant : ScheduleBase
     ~ScheduleConstant() = default;
 
     // overridden base class methods
-    Real64 getCurrentValue() override;
     bool validateTypeLimits() override;
     void updateValue(int simTime) override;
 
@@ -72,12 +71,6 @@ struct ScheduleConstant : ScheduleBase
     static void setupOutputVariables();
     static void processInput();
     static void clear_state();
-
-    // instance methods for this class
-    void createTimeSeries();
-
-    // member variables
-
 };
 
 extern std::vector<ScheduleConstant> scheduleConstants;

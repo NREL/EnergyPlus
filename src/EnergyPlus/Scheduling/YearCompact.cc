@@ -63,11 +63,6 @@ namespace Scheduling {
 
 std::vector<ScheduleCompact> scheduleCompacts;
 
-Real64 ScheduleCompact::getCurrentValue()
-{
-    return this->value;
-}
-
 void ScheduleCompact::processInput()
 {
     // Now we'll go through normal processing operations
@@ -121,6 +116,7 @@ ScheduleCompact::ScheduleCompact(std::string const &objectName, nlohmann::json c
     //  A5 , \field Field 3
     //  A6 , \field Field 4
     this->name = objectName;
+    this->typeName = "Schedule:Compact";
     // get a schedule type limits reference directly and store that
     if (fields.find("schedule_type_limits_name") != fields.end()) {
         this->typeLimits = ScheduleTypeData::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("schedule_type_limits_name")));
@@ -315,11 +311,8 @@ void ScheduleCompact::updateValue(int simTime)
 void ScheduleCompact::setupOutputVariables()
 {
     for (auto &thisSchedule : scheduleCompacts) {
-        // Set Up Reporting
-        EnergyPlus::SetupOutputVariable(
-            "NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
-        EnergyPlus::SetupEMSActuator(
-            "Schedule:Compact", thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
+        EnergyPlus::SetupOutputVariable("NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
+        EnergyPlus::SetupEMSActuator(thisSchedule.typeName, thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
     }
 }
 

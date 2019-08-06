@@ -90,9 +90,9 @@ struct ScheduleBase
     bool emsActuatedOn = false;
     Real64 emsActuatedValue = 0.0;
     bool inputErrorOccurred = false;
+    std::string typeName = "";
 
     // abstract functions that must be implemented by derived classes
-    virtual Real64 getCurrentValue() = 0;
     virtual bool validateTypeLimits() = 0;
     virtual void updateValue(int simTime) = 0; // expecting simTime to be seconds since 1/1 00:00:00 of the first simulation year
 

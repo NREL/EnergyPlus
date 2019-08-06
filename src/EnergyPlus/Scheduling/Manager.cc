@@ -136,9 +136,10 @@ void updateAllSchedules(int const simTime)
 
 void recreateAllTimeSeries()
 {
-    for (auto &thisSchedule : scheduleConstants) {
-        thisSchedule.createTimeSeries();
-    }
+    // right now Schedule:Constant objects are not stored as time-series for efficiency
+//    for (auto &thisSchedule : scheduleConstants) {
+//        thisSchedule.createTimeSeries();
+//    }
     for (auto &thisSchedule : scheduleCompacts) {
         thisSchedule.createTimeSeries();
     }
@@ -193,13 +194,13 @@ Real64 GetScheduleValue(int scheduleIndex)
     auto const &mapping(indexToSubtypeMap[scheduleIndex]);
     switch (mapping.thisType) {
     case ScheduleType::CONSTANT:
-        return scheduleConstants[mapping.indexInTypeArray].getCurrentValue();
+        return scheduleConstants[mapping.indexInTypeArray].value;
     case ScheduleType::COMPACT:
-        return scheduleCompacts[mapping.indexInTypeArray].getCurrentValue();
+        return scheduleCompacts[mapping.indexInTypeArray].value;
     case ScheduleType::YEAR:
-        return scheduleYears[mapping.indexInTypeArray].getCurrentValue();
+        return scheduleYears[mapping.indexInTypeArray].value;
     case ScheduleType::FILE:
-        return scheduleFiles[mapping.indexInTypeArray].getCurrentValue();
+        return scheduleFiles[mapping.indexInTypeArray].value;
     case ScheduleType::UNKNOWN:
         return -1;
     }

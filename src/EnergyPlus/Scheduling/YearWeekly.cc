@@ -61,11 +61,6 @@ namespace Scheduling {
 
 std::vector<ScheduleYear> scheduleYears;
 
-Real64 ScheduleYear::getCurrentValue()
-{
-    return this->value;
-}
-
 void ScheduleYear::processInput()
 {
     std::string const thisObjectType = "Schedule:Year";
@@ -131,6 +126,7 @@ ScheduleYear::ScheduleYear(std::string const &objectName, nlohmann::json const &
     //       \minimum 1
     //       \maximum 31
     this->name = objectName;
+    this->typeName = "Schedule:Year";
     // get a schedule type limits reference directly and store that
     if (fields.find("schedule_type_limits_name") != fields.end()) {
         this->typeLimits = ScheduleTypeData::factory(EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("schedule_type_limits_name")));
@@ -214,10 +210,8 @@ void ScheduleYear::updateValue(int simTime)
 void ScheduleYear::setupOutputVariables()
 {
     for (auto &thisSchedule : scheduleYears) {
-        // Set Up Reporting
-        EnergyPlus::SetupOutputVariable(
-            "NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
-        EnergyPlus::SetupEMSActuator("Schedule:Year", thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
+        EnergyPlus::SetupOutputVariable("NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, thisSchedule.value, "Zone", "Average", thisSchedule.name);
+        EnergyPlus::SetupEMSActuator(thisSchedule.typeName, thisSchedule.name, "Schedule Value", "[ ]", thisSchedule.emsActuatedOn, thisSchedule.emsActuatedValue);
     }
 }
 

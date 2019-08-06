@@ -72,7 +72,6 @@ struct ScheduleFile : ScheduleBase
     ~ScheduleFile() = default;
 
     // overridden base class methods
-    Real64 getCurrentValue() override;
     bool validateTypeLimits() override;
     void updateValue(int simTime) override;
 
