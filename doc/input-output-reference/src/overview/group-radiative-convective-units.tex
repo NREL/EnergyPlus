@@ -169,15 +169,15 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
 
 \paragraph{Baseboard Total Heating Rate {[}W{]}}\label{baseboard-total-heating-rate-w-000}
 
-This is the actual convective heat addition rate of the baseboard to the zone in Watts.~ This value includes the heat convected to the zone air from the baseboard unit, the heat radiated to people in the zone from the baseboard unit, and the additional convection from surfaces within the zone that have been heated by radiation from the baseboard unit.~ This value will be different from (and almost always less than) the next field.
+This is the actual convective heat addition rate of the baseboard to the zone in Watts.~ This value includes the heat convected to the zone air from the baseboard unit, the heat radiated to people in the zone from the baseboard unit, and the additional convection from surfaces within the zone that have been heated by radiation from the baseboard unit.~ This value will be different from (and almost always more than) the next field (convective heating rate).
 
 \paragraph{Baseboard Convective Heating Rate {[}W{]}}\label{baseboard-convective-heating-rate-w-000}
 
-This field reports the rate at which convective heat addition is transferred from the baseboard to the zone in Watts.
+This field reports the rate at which convective heat addition is transferred from the baseboard to the zone in Watts.  This field in combination with the baseboard radiant heating rate (the next field) equals the total heat addition to the space by the baseboard unit.
 
 \paragraph{Baseboard Radiant Heating Rate {[}W{]}}\label{baseboard-radiant-heating-rate-w-000}
 
-This field reports the rate at which radiant heat addition is transferred from the baseboard to the people and the surfaces within the zone in Watts.
+This field reports the rate at which radiant heat addition is transferred from the baseboard to the people and the surfaces within the zone in Watts.  This field in combination with the baseboard convective heating rate (the previous field) equals the total heat addition to the space by the baseboard unit.
 
 \paragraph{Baseboard Total Heating Energy ~{[}J{]}}\label{baseboard-total-heating-energy-j-000}
 
@@ -354,15 +354,15 @@ ZoneHVAC:Baseboard:RadiantConvective:Steam,
 
 \paragraph{Baseboard Total Heating Rate {[}W{]}}\label{baseboard-total-heating-rate-w-1}
 
-This is the actual convective heat addition rate of the baseboard to the zone in Watts.~ This value includes the heat convected to the zone air from the baseboard unit, the heat radiated to people in the zone from the baseboard unit, and the additional convection from surfaces within the zone that have been heated by radiation from the baseboard unit. This value will be different from (and almost always less than) the next field.
+This is the actual convective heat addition rate of the baseboard to the zone in Watts.~ This value includes the heat convected to the zone air from the baseboard unit, the heat radiated to people in the zone from the baseboard unit, and the additional convection from surfaces within the zone that have been heated by radiation from the baseboard unit. This value will be different from (and almost always more than) the next field.
 
 \paragraph{Baseboard Convective Heating Rate {[}W{]}}\label{baseboard-convective-heating-rate-w-1}
 
-This field reports the rate at which convective heat addition is transferred from the baseboard to the zone in Watts.
+This field reports the rate at which convective heat addition is transferred from the baseboard to the zone in Watts.  This field in combination with the baseboard radiant heating rate (the next field) equals the total heat addition to the space by the baseboard unit.
 
 \paragraph{Baseboard Radiant Heating Rate {[}W{]}}\label{baseboard-radiant-heating-rate-w-1}
 
-This field reports the rate at which radiant heat addition is transferred from the baseboard to the people and the surfaces within the zone in Watts.
+This field reports the rate at which radiant heat addition is transferred from the baseboard to the people and the surfaces within the zone in Watts.  This field in combination with the baseboard convective heating rate (the previous field) equals the total heat addition to the space by the baseboard unit.
 
 \paragraph{Baseboard Total Heating Energy {[}J{]}}\label{baseboard-total-heating-energy-j-1}
 
@@ -488,9 +488,9 @@ ZoneHVAC:Baseboard:RadiantConvective:Electric,
 \item
   HVAC,Average,Baseboard Total Heating Rate {[}W{]}
 \item
-  HVAC,Average,Baseboard Radiant Heating Rate {[}W{]}
-\item
   HVAC,Average,Baseboard Convective Heating Rate {[}W{]}
+\item
+  HVAC,Average,Baseboard Radiant Heating Rate {[}W{]}
 \item
   HVAC,Average,Baseboard Electric Power{[}W{]}
 \item
@@ -509,15 +509,15 @@ ZoneHVAC:Baseboard:RadiantConvective:Electric,
 
 \paragraph{Baseboard Total Heating Rate {[}W{]}}\label{baseboard-total-heating-rate-w-2}
 
-This is the actual convective heat addition rate of the baseboard to the zone in Watts. This value includes the heat convected to the zone air from the baseboard unit, the heat radiated to people in the zone from the baseboard unit, and the additional convection from surfaces within the zone that have been heated by radiation from the baseboard unit. This value will be different from (and almost always less than) the next field.
-
-\paragraph{Baseboard Radiant Heating Rate {[}W{]}}\label{baseboard-radiant-heating-rate-w-2}
-
-This field reports the rate at which radiant heat addition is transferred from the baseboard to the people and the surfaces within the zone in Watts.
+This is the actual convective heat addition rate of the baseboard to the zone in Watts. This value includes the heat convected to the zone air from the baseboard unit, the heat radiated to people in the zone from the baseboard unit, and the additional convection from surfaces within the zone that have been heated by radiation from the baseboard unit. This value will be different from (and almost always more than) the next field.
 
 \paragraph{Baseboard Convective Heating Rate {[}W{]}}\label{baseboard-convective-heating-rate-w-2}
 
-This field reports the rate at which convective heat addition is transferred from the baseboard to the zone in Watts.
+This field reports the rate at which convective heat addition is transferred from the baseboard to the zone in Watts.  This field in combination with the baseboard radiant heating rate (the next field) equals the total heat addition to the space by the baseboard unit.
+
+\paragraph{Baseboard Radiant Heating Rate {[}W{]}}\label{baseboard-radiant-heating-rate-w-2}
+
+This field reports the rate at which radiant heat addition is transferred from the baseboard to the people and the surfaces within the zone in Watts.  This field in combination with the baseboard convective heating rate (the previous field) equals the total heat addition to the space by the baseboard unit.
 
 \paragraph{Baseboard Electric Energy {[}J{]}}\label{baseboard-electric-energy-j-000}
 
