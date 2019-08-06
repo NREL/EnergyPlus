@@ -1150,21 +1150,20 @@ namespace SimulationManager {
             DoWeathSim = true;
         }
 
-        CurrentModuleObject = "PerformancePrecisionTradeoffs";
-        int PerfPrecTradeoffs = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (PerfPrecTradeoffs > 0) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
-                                          1,
-                                          Alphas,
-                                          NumAlpha,
-                                          Number,
-                                          NumNumber,
-                                          IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            if (Alphas(1) == "YES") DoCoilDirectSolutions = true;
+
+        auto const instances = inputProcessor->epJSON.find("PerformancePrecisionTradeoffs");
+        if (instances != inputProcessor->epJSON.end()) {
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed("PerformancePrecisionTradeoffs", thisObjectName);
+                if (fields.find("use_coil_direct_solutions") != fields.end()) {
+                    if (UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES") {
+                        DoCoilDirectSolutions = true;
+                    }
+                }
+            }
         }
 
         if (ErrorsFound) {
