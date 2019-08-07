@@ -940,7 +940,7 @@ namespace EnergyPlus {
 
         void ReadBasementInputs(int StartingDomainNumForBasement, int NumBasements, bool &ErrorsFound);
         
-        bool SiteGroundDomainNoMassMatCheck(Real64 const MaterialThickness,
+        bool SiteGroundDomainUsingNoMassMat(Real64 const MaterialThickness,
                                             int const MaterialNum);
         
         void SiteGroundDomainNoMassMatError(std::string const &FieldName,
