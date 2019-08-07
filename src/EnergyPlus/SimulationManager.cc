@@ -236,6 +236,7 @@ namespace SimulationManager {
         // Using/Aliasing
         using DataEnvironment::CurMnDy;
         using DataEnvironment::CurrentOverallSimDay;
+        using DataEnvironment::CurrentYearIsLeapYear;
         using DataEnvironment::EndMonthFlag;
         using DataEnvironment::EnvironmentName;
         using DataEnvironment::TotalOverallSimDays;
@@ -502,10 +503,16 @@ namespace SimulationManager {
             DayOfSim = 0;
             DayOfSimChr = "0";
             NumOfWarmupDays = 0;
-            if (NumOfDayInEnvrn <= 365) {
-                isFinalYear = true;
+            if (CurrentYearIsLeapYear = true) {
+                if (NumOfDayInEnvrn <= 366) {
+                    isFinalYear = true;
+                }
+            } else {
+                if (NumOfDayInEnvrn <= 365) {
+                    isFinalYear = true;
+                }
             }
-
+            
             HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
             bool anyEMSRan;
