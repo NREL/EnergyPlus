@@ -142,6 +142,9 @@ void updateAllSchedules(int const simTime)
 
 void prepareSchedulesForNewEnvironment()
 {
+    if (!scheduleInputProcessed) {
+        processAllSchedules();
+    }
     // right now Schedule:Constant objects are not stored as time-series for efficiency
     for (auto &thisSchedule : scheduleConstants) {
         thisSchedule.prepareForNewEnvironment();

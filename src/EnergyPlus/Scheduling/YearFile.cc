@@ -359,7 +359,7 @@ void ScheduleFileShading::createTimeSeries()
         rowNum++;
         if (rowNum > 1) {
             dataRowCount++;
-            this->timeStamp.push_back(dataRowCount * this->minutesPerItem * 60); // TODO: Shading interval?
+            this->timeStamp.push_back(dataRowCount * EnergyPlus::DataGlobals::TimeStepZoneSec);
             if (datum.empty()) {
                 this->values.push_back(0);
             } else {

@@ -160,13 +160,15 @@ void ScheduleBase::setupOutputVariables()
 void ScheduleBase::resetTimeStartIndex()
 {
     this->lastIndexUsed = 0;
+    // this->lastLookupIndexUsed = 0;
 }
 
 Real64 ScheduleBase::lookupScheduleValue(int const hour, int const timeStep)
 {
     // TODO: Keep a start index for this lookup, separate from the other start index
     int const simTime = 86400 * (EnergyPlus::DataEnvironment::DayOfYear - 1) + 3600 * ((hour - 1) + EnergyPlus::DataGlobals::TimeStepZone * timeStep);
-    auto item = std::lower_bound(this->timeStamp.begin(), this->timeStamp.end(), simTime);
+    auto item = std::lower_bound(this->timeStamp.begin(), this->timeStamp.end(), simTime); // + this->lastLookupIndexUsed
+    // this->lastLookupIndexUsed = item - this->timeStamp.begin();
     return this->values[this->lastIndexUsed];
 }
 

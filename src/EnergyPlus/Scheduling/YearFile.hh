@@ -107,7 +107,6 @@ struct ScheduleFileShading : ScheduleBase
     // member variables
     std::string fileName = "";
     int columnNumber = 0;
-    int minutesPerItem = 60;
 };
 
 extern std::vector<ScheduleFile> scheduleFiles;

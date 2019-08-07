@@ -387,8 +387,6 @@ namespace SimulationManager {
         DisplayString("Initializing Simulation");
         KickOffSimulation = true;
 
-        Scheduling::processAllSchedules();
-
         ResetEnvironmentCounter();
         SetupSimulation(ErrorsFound);
 

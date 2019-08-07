@@ -2937,23 +2937,8 @@
     ZONE 9 @ 200 600 1 T INLETS,  !- Name
     ZONE 9 @ 200 600 1 T INLET;  !- Node 1 Name
 
-  Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
-
-  Output:Variable,*,Zone Mean Air Temperature,hourly;
-
-  Output:Variable,*,Zone Total Internal Latent Gain Energy,hourly;
-
-  Output:Variable,*,Zone Mean Radiant Temperature,hourly;
-
-  Output:Variable,*,Zone Mean Radiant Temperature,hourly;
-
-  Output:Variable,*,Surface Inside Face Temperature,daily;
-
-  Output:Variable,*,Surface Outside Face Temperature,daily;
-
-  Output:Variable,*,Surface Inside Face Convection Heat Transfer Coefficient,daily;
-
-  Output:Variable,*,Surface Outside Face Convection Heat Transfer Coefficient,daily;
+  Output:Variable,*,New Schedule Value,hourly;
+Output:Variable,*,Surface Outside Face Sunlit Fraction,hourly;
 
   Output:VariableDictionary,Regular;
 

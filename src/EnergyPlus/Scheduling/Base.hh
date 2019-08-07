@@ -110,6 +110,7 @@ struct ScheduleBase
     std::vector<Real64> timeStamp;
     std::vector<Real64> values;
     int lastIndexUsed = 0;
+    int lastLookupIndexUsed = 0;
 
     // TODO: Add a factory method to return a *ScheduleBase for components to use?
 };
