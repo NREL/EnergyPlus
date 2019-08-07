@@ -73,6 +73,7 @@ void clear_state()
     ScheduleConstant::clear_state();
     ScheduleCompact::clear_state();
     ScheduleFile::clear_state();
+    ScheduleFileShading::clear_state();
 }
 
 int GetScheduleIndex(const std::string &scheduleName)
@@ -107,8 +108,9 @@ ScheduleBase *getScheduleReference(const std::string &scheduleName)
             case ScheduleType::YEAR:
                 return &scheduleYears[mapping.indexInTypeArray];
             case ScheduleType::FILE:
-            case ScheduleType::SHADING_FILE:
                 return &scheduleFiles[mapping.indexInTypeArray];
+            case ScheduleType::SHADING_FILE:
+                return &scheduleFileShadings[mapping.indexInTypeArray];
             case ScheduleType::UNKNOWN:
                 // Fatal Error
                 return nullptr;
@@ -133,6 +135,9 @@ void updateAllSchedules(int const simTime)
     for (auto &thisSchedule : scheduleFiles) {
         thisSchedule.updateValue(simTime);
     }
+    for (auto &thisSchedule : scheduleFileShadings) {
+        thisSchedule.updateValue(simTime);
+    }
 }
 
 void prepareSchedulesForNewEnvironment()
@@ -150,6 +155,9 @@ void prepareSchedulesForNewEnvironment()
     for (auto &thisSchedule : scheduleFiles) {
         thisSchedule.prepareForNewEnvironment();
     }
+    for (auto &thisSchedule : scheduleFileShadings) {
+        thisSchedule.prepareForNewEnvironment();
+    }
 }
 
 void resetAllTimeStartIndex()
@@ -165,6 +173,9 @@ void resetAllTimeStartIndex()
         thisSchedule.resetTimeStartIndex();
     }
     for (auto &thisSchedule : scheduleFiles) {
+        thisSchedule.resetTimeStartIndex();
+    }
+    for (auto &thisSchedule : scheduleFileShadings) {
         thisSchedule.resetTimeStartIndex();
     }
 }
@@ -203,6 +214,11 @@ void processAllSchedules()
         scheduleFiles[subTypeIndex].setupOutputVariables();
         indexToSubtypeMap.emplace_back(scheduleFiles[subTypeIndex].name, ScheduleType::FILE, subTypeIndex);
     }
+    ScheduleFileShading::processInput();
+    for (size_t subTypeIndex = 0; subTypeIndex < scheduleFileShadings.size(); subTypeIndex++) {
+        scheduleFileShadings[subTypeIndex].setupOutputVariables();
+        indexToSubtypeMap.emplace_back(scheduleFileShadings[subTypeIndex].name, ScheduleType::SHADING_FILE, subTypeIndex);
+    }
     scheduleInputProcessed = true;
 }
 
@@ -218,8 +234,9 @@ Real64 GetScheduleValue(int scheduleIndex)
     case ScheduleType::YEAR:
         return scheduleYears[mapping.indexInTypeArray].value;
     case ScheduleType::FILE:
-    case ScheduleType::SHADING_FILE:
         return scheduleFiles[mapping.indexInTypeArray].value;
+    case ScheduleType::SHADING_FILE:
+        return scheduleFileShadings[mapping.indexInTypeArray].value;
     case ScheduleType::UNKNOWN:
         return -1;
     }
@@ -241,8 +258,9 @@ std::string scheduleName(int const scheduleIndex) {
     case ScheduleType::YEAR:
         return scheduleYears[mapping.indexInTypeArray].name;
     case ScheduleType::FILE:
-    case ScheduleType::SHADING_FILE:
         return scheduleFiles[mapping.indexInTypeArray].name;
+    case ScheduleType::SHADING_FILE:
+        return scheduleFileShadings[mapping.indexInTypeArray].name;
     case ScheduleType::UNKNOWN:
         return "";
     }
@@ -281,8 +299,10 @@ Real64 scheduleMinValue(int const scheduleIndex) {
         scheduleReference = &scheduleYears[mapping.indexInTypeArray];
         break;
     case ScheduleType::FILE:
-    case ScheduleType::SHADING_FILE:
         scheduleReference = &scheduleFiles[mapping.indexInTypeArray];
+        break;
+    case ScheduleType::SHADING_FILE:
+        scheduleReference = &scheduleFileShadings[mapping.indexInTypeArray];
         break;
     default:
         EnergyPlus::ShowFatalError("Schedule Min Value called with unknown index type");
@@ -304,8 +324,10 @@ Real64 scheduleMaxValue(int const scheduleIndex) {
         scheduleReference = &scheduleYears[mapping.indexInTypeArray];
         break;
     case ScheduleType::FILE:
-    case ScheduleType::SHADING_FILE:
         scheduleReference = &scheduleFiles[mapping.indexInTypeArray];
+        break;
+    case ScheduleType::SHADING_FILE:
+        scheduleReference = &scheduleFileShadings[mapping.indexInTypeArray];
         break;
     default:
         EnergyPlus::ShowFatalError("Schedule Min Value called with unknown index type");

@@ -673,7 +673,7 @@ namespace ScheduleManager {
             }
         }
 
-        // add week and day schedules for each ExternalInterface:FunctionalMockupUnitExport:Schedule
+        // add week and day schedules for each ExternalInterface:FunctionalMockupUnitExport:Schedule // TODO: Schedule Refactor
         AddWeekSch += NumCSVAllColumnsSchedules * 366; // number of days/year
         // because need a week for each day
         AddDaySch += NumCSVAllColumnsSchedules * 366;

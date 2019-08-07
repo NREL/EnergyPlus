@@ -56,47 +56,85 @@
 namespace Scheduling {
 
 std::vector<ScheduleFile> scheduleFiles;
+std::vector<ScheduleFileShading> scheduleFileShadings;
 std::map<std::string, std::vector<std::vector<std::string>>> fileData;
+
+// UTILITY METHODS
+
+std::vector<std::vector<std::string>> processCSVLines(std::vector<std::string> const & lines, char const columnDelimiter) {
+    // This function takes a list of CSV lines and splits them into string tokens - note it does not parse numeric values yet
+    // This essentially just creates a 2D table of data in a vector of vectors of strings, where the first index is the column
+    // First we should find the number of columns in this file; we are going to base it on the number of tokens in line 1
+    auto & line0 = lines[0];
+    int maxExpectedColumnIndex = -1;
+    std::stringstream ss2(line0);
+    while( ss2.good() ) {
+        maxExpectedColumnIndex++;
+        std::string substr;
+        getline(ss2, substr, columnDelimiter);  // TODO: Test all 4 delimiters
+    }
+    // then we'll actually get the data from the file, filling out to the number of expected columns based on the header (first) line
+    std::vector<std::vector<std::string>> overallDataset;
+    int lineCounter = -1;
+    for (auto const & line : lines) {
+        lineCounter++;
+        std::stringstream ss(line);
+        int columnIndex = -1;
+        while( ss.good() ) {
+            columnIndex++;
+            std::string substr;
+            getline(ss, substr, columnDelimiter);
+            if (lineCounter == 0) {
+                overallDataset.emplace_back();
+            }
+            overallDataset[columnIndex].push_back(substr);
+        }
+        if (columnIndex < maxExpectedColumnIndex) {
+            for (int i = columnIndex + 1; i <= maxExpectedColumnIndex; i++) {
+                overallDataset[i].push_back("");
+            }
+        }
+    }
+    return overallDataset;
+}
+
+void processCSVFile(const std::string& fileToOpen, char const columnDelimiter)
+{
+    // This function adds the entire file contents of the given file path to a "master" map called Scheduling::fileData
+    // This file does not populate individual schedules, it simply adds it to the list for later processing
+    // Multiple schedules could access different subsets of the same file, so we only want to process each file once
+    std::ifstream fileInstance(fileToOpen);
+    if (!fileInstance.is_open()) {
+        EnergyPlus::ShowFatalError("Could not open schedule file for processing, check path: " + fileToOpen);
+    }
+    std::vector<std::string> lines;
+    std::string line;
+    while (getline(fileInstance, line)) {
+        lines.push_back(line);
+    }
+    Scheduling::fileData[fileToOpen] = processCSVLines(lines, columnDelimiter); // TODO: Why isn't this getting populated?
+}
+
+// SCHEDULE:FILE METHODS
 
 void ScheduleFile::processInput()
 {
-    {
-        std::string const thisObjectType = "Schedule:File";
-        auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
-        if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
-            return; // no constant schedules to process
-        }
-        auto &instancesValue = instances.value();
-        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-            auto const &fields = instance.value();
-            auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
-            // do any pre-construction operations
-            EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
-            if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
-                EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
-            }
-            // then just add it to the vector via the constructor
-            scheduleFiles.emplace_back(thisObjectName, fields);
-        }
+    std::string const thisObjectType = "Schedule:File";
+    auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
+    if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
+        return; // no constant schedules to process
     }
-    {
-        std::string const thisObjectType = "Schedule:File:Shading";
-        auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
-        if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
-            return; // no constant schedules to process
+    auto &instancesValue = instances.value();
+    for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+        auto const &fields = instance.value();
+        auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
+        // do any pre-construction operations
+        EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+        if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
+            EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
         }
-        auto &instancesValue = instances.value();
-        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-            auto const &fields = instance.value();
-            auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
-            // do any pre-construction operations
-            EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
-            if (std::find(Scheduling::allSchedNames.begin(), Scheduling::allSchedNames.end(), thisObjectName) != Scheduling::allSchedNames.end()) {
-                EnergyPlus::ShowFatalError("Duplicate schedule name, all schedules, across all schedule types, must be uniquely named");
-            }
-            // then just add it to the vector via the constructor
-            scheduleFiles.emplace_back(thisObjectName, fields);
-        }
+        // then just add it to the vector via the constructor
+        scheduleFiles.emplace_back(thisObjectName, fields);
     }
 }
 
@@ -133,60 +171,6 @@ void ScheduleFile::createTimeSeries()
     if (dataRowCount != this->expectedRowCount) {
         EnergyPlus::ShowFatalError("Malformed schedule file, invalid row count, expected to find this row count: " + std::to_string(this->expectedRowCount));
     }
-}
-
-std::vector<std::vector<std::string>> ScheduleFile::processCSVLines(std::vector<std::string> const & lines) {
-    // This function takes a list of CSV lines and splits them into string tokens - note it does not parse numeric values yet
-    // This essentially just creates a 2D table of data in a vector of vectors of strings, where the first index is the column
-    // First we should find the number of columns in this file; we are going to base it on the number of tokens in line 1
-    auto & line0 = lines[0];
-    int maxExpectedColumnIndex = -1;
-    std::stringstream ss2(line0);
-    while( ss2.good() ) {
-        maxExpectedColumnIndex++;
-        std::string substr;
-        getline(ss2, substr, this->columnDelimiter);  // TODO: Test all 4 delimiters
-    }
-    // then we'll actually get the data from the file, filling out to the number of expected columns based on the header (first) line
-    std::vector<std::vector<std::string>> overallDataset;
-    int lineCounter = -1;
-    for (auto const & line : lines) {
-        lineCounter++;
-        std::stringstream ss(line);
-        int columnIndex = -1;
-        while( ss.good() ) {
-            columnIndex++;
-            std::string substr;
-            getline(ss, substr, this->columnDelimiter);
-            if (lineCounter == 0) {
-                overallDataset.emplace_back();
-            }
-            overallDataset[columnIndex].push_back(substr);
-        }
-        if (columnIndex < maxExpectedColumnIndex) {
-            for (int i = columnIndex + 1; i <= maxExpectedColumnIndex; i++) {
-                overallDataset[i].push_back("");
-            }
-        }
-    }
-    return overallDataset;
-}
-
-void ScheduleFile::processCSVFile(const std::string& fileToOpen)
-{
-    // This function adds the entire file contents of the given file path to a "master" map called Scheduling::fileData
-    // This file does not populate individual schedules, it simply adds it to the list for later processing
-    // Multiple schedules could access different subsets of the same file, so we only want to process each file once
-    std::ifstream fileInstance(fileToOpen);
-    if (!fileInstance.is_open()) {
-        EnergyPlus::ShowFatalError("Could not open schedule file for processing, check path: " + fileToOpen);
-    }
-    std::vector<std::string> lines;
-    std::string line;
-    while (getline(fileInstance, line)) {
-        lines.push_back(line);
-    }
-    Scheduling::fileData[fileToOpen] = processCSVLines(lines);
 }
 
 ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &fields)
@@ -298,7 +282,7 @@ ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &
     this->expectedRowCount = numberOfHoursOfData * 60 / this->minutesPerItem;
     // only process the file if it isn't already in the master list
     if (fileData.find(fields.at("file_name")) == fileData.end()) {
-        this->processCSVFile(fields.at("file_name"));
+        processCSVFile(fields.at("file_name"), this->columnDelimiter);
     }
 }
 
@@ -313,5 +297,99 @@ void ScheduleFile::prepareForNewEnvironment()
     }
     // TODO: Check for error flag?
 }
+
+// SCHEDULE:FILE:SHADING METHODS
+
+void ScheduleFileShading::processInput()
+{
+    std::string const thisObjectType = "Schedule:File:Shading";
+    auto const instances = EnergyPlus::inputProcessor->epJSON.find(thisObjectType);
+    if (instances == EnergyPlus::inputProcessor->epJSON.end()) {
+        return; // no constant schedules to process
+    }
+    auto &instancesValue = instances.value();
+    for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+        // there is only 1 Schedule:File:Shading object, but it will spawn any number of actual schedule instances
+        auto const &fields = instance.value();
+        auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
+        // do any pre-construction operations
+        EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
+        std::string fileName = fields.at("file_name");
+//        if (fileData.find(fileName) != fileData.end()) {
+//            EnergyPlus::ShowFatalError("Shading file data already found - I dont think this will work"); // TODO: Evaluate
+//        }
+        processCSVFile(fileName, ',');
+        std::ifstream fileInstance(fileName);
+        if (!fileInstance.is_open()) {
+            EnergyPlus::ShowFatalError("Could not open shading schedule file for processing, check path: " + fileName);
+        }
+        std::string firstLine;
+        getline(fileInstance, firstLine);
+        int columnIndex = 0;
+        std::stringstream ss2(firstLine);
+        while( ss2.good() ) {
+            columnIndex++;
+            std::string substr;
+            getline(ss2, substr, ',');
+            if (columnIndex > 1) { // skip timestamp column
+                scheduleFileShadings.emplace_back(substr, columnIndex);
+            }
+        }
+    }
+}
+
+void ScheduleFileShading::clear_state()
+{
+    scheduleFileShadings.clear();
+    scheduleFiles.clear();
+    fileData.clear();
+}
+
+void ScheduleFileShading::createTimeSeries()
+{
+    // This function creates the time/value time-series for a specific subset of the master file-based schedule set
+    // This function skips rows at the top, grabs the right column of data, and converts the values into numeric values
+    auto & dataSet = Scheduling::fileData[this->fileName];
+    auto & thisColumnOfData = dataSet[this->columnNumber - 1];
+    int rowNum = 0;
+    int dataRowCount = 0;
+    for (auto const & datum : thisColumnOfData) {
+        rowNum++;
+        if (rowNum > 1) {
+            dataRowCount++;
+            this->timeStamp.push_back(dataRowCount * this->minutesPerItem * 60); // TODO: Shading interval?
+            if (datum.empty()) {
+                this->values.push_back(0);
+            } else {
+                try {
+                    this->values.push_back(std::stod(datum));
+                } catch (...) {
+                    EnergyPlus::ShowFatalError("Failed to convert " + datum + " to numeric value");
+                }
+            }
+        }
+    }
+//    if (dataRowCount != this->expectedRowCount) {
+//        EnergyPlus::ShowFatalError("Malformed schedule file, invalid row count, expected to find this row count: " + std::to_string(this->expectedRowCount));
+//    }
+}
+
+void ScheduleFileShading::prepareForNewEnvironment()
+{
+    this->timeStamp.clear();
+    this->values.clear();
+    this->lastIndexUsed = 0;
+    this->createTimeSeries();
+    if (this->typeLimits) {
+        this->validateTypeLimits();
+    }
+    // TODO: Check for error flag?
+}
+
+ScheduleFileShading::ScheduleFileShading(const std::string & columnHeader, int const columnIndex) {
+    this->name = columnHeader + "_shading";
+    this->columnNumber = columnIndex;
+}
+
 
 } // namespace Scheduling

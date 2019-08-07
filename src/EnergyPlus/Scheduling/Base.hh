@@ -87,7 +87,7 @@ struct ScheduleBase
     std::string name = "";
     Real64 value = 0.0;
     ScheduleTypeData *typeLimits = nullptr;
-    bool emsActuatedOn = false;
+    bool emsActuatedOn = false; // TODO: Add ExternalInterfaceOverrideOn?
     Real64 emsActuatedValue = 0.0;
     bool inputErrorOccurred = false;
     std::string typeName = "";

@@ -57,6 +57,9 @@
 
 namespace Scheduling {
 
+std::vector<std::vector<std::string>> processCSVLines(std::vector<std::string> const & lines, char columnDelimiter);
+void processCSVFile(const std::string& fileToOpen, char columnDelimiter);
+
 struct ScheduleFile : ScheduleBase
 {
     // constructors/destructors
@@ -74,10 +77,6 @@ struct ScheduleFile : ScheduleBase
     // instance methods for this class
     void createTimeSeries();
 
-    // static methods for processing csv data to be available across all Schedule:File objects
-    std::vector<std::vector<std::string>> processCSVLines(std::vector<std::string> const & lines);
-    void processCSVFile(const std::string& fileToOpen);
-
     // member variables
     std::string fileName = "";
     int columnNumber = 0;
@@ -88,7 +87,31 @@ struct ScheduleFile : ScheduleBase
     int expectedRowCount = 0;
 };
 
+struct ScheduleFileShading : ScheduleBase
+{
+    // constructors/destructors
+    ScheduleFileShading() = default;
+    ScheduleFileShading(std::string const & columnHeader, int columnIndex);
+    ~ScheduleFileShading() = default;
+
+    // static functions related to the state of all schedule:file:shading objects
+    static void processInput();
+    static void clear_state();
+
+    // base-class overridden functions
+    void prepareForNewEnvironment() override;
+
+    // instance methods for this class
+    void createTimeSeries();
+
+    // member variables
+    std::string fileName = "";
+    int columnNumber = 0;
+    int minutesPerItem = 60;
+};
+
 extern std::vector<ScheduleFile> scheduleFiles;
+extern std::vector<ScheduleFileShading> scheduleFileShadings;
 extern std::map<std::string, std::vector<std::vector<std::string>>> fileData;
 
 }
