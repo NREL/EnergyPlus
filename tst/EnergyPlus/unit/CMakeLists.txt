@@ -199,6 +199,7 @@ set( test_src
   XingGroundTemperatureModel.unit.cc
   ZoneContaminantPredictorCorrector.unit.cc
   ZoneEquipmentManager.unit.cc
+  ZoneHVACEvaporativeCooler.unit
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc
