@@ -1841,17 +1841,9 @@ namespace EnergyPlus {
                     BranchMaxAvail = Node(LastNodeOnBranch).MassFlowRateMaxAvail;
                     //            !sum the branch flow requests to a total parallel branch flow request
                     if (this_splitter_outlet_branch.ControlType == ControlType_Active ||
-                        this_splitter_outlet_branch.ControlType == ControlType_SeriesActive) {
-                        if (this_splitter_outlet_branch.ControlType == ControlType_SeriesActive) {
-                            // only consider a series active control type to be active if there is also a non-zero flow request
-                            if (BranchFlowReq > 0.0) {
-                                TotParallelBranchFlowReq += BranchFlowReq;
-                                ++NumActiveBranches;
-                            } 
-                        } else { 
-                            TotParallelBranchFlowReq += BranchFlowReq;
-                            ++NumActiveBranches;
-                        }
+                        ((this_splitter_outlet_branch.ControlType == ControlType_SeriesActive) && (BranchFlowReq > 0.0))) { // revised logic for series active
+                        TotParallelBranchFlowReq += BranchFlowReq;
+                        ++NumActiveBranches;
                     }
                     Node(FirstNodeOnBranch).MassFlowRate = BranchFlowReq;
                     Node(FirstNodeOnBranch).MassFlowRateMinAvail = BranchMinAvail;
