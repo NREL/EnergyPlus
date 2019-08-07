@@ -8028,7 +8028,7 @@ namespace ConvectionCoefficients {
         
         Hforced = 3.873 + 0.082 * std::pow(ACH, 0.98);
         
-        if (ACH > 3.0) {
+        if (ACH > 1.0) {
             return Hforced;
         }
         else { // Revert to purely natural convection
@@ -8054,7 +8054,7 @@ namespace ConvectionCoefficients {
         
         Hforced = 2.234 + 4.099 * std::pow(ACH, 0.503);
         
-        if (ACH > 3.0) {
+        if (ACH > 1.0) {
             return Hforced;
         }
         else { // Revert to purely natural convection
@@ -8080,7 +8080,7 @@ namespace ConvectionCoefficients {
         
         Hforced = 1.208 + 1.012 * std::pow(ACH, 0.604);
         
-        if (ACH > 3.0) {
+        if (ACH > 1.0) {
             return Hforced;
         }
         else { // Revert to purely natural convection
@@ -8107,10 +8107,10 @@ namespace ConvectionCoefficients {
         } else {
             Hnatural = CalcASHRAETARPNatural(Tsurf, Tair, -cosTilt);  // negative cosTilt because interior of surface
         }
-        if (ACH <= 2.5) {
+        if (ACH <= 0.5) {
             return Hnatural;
         } else {
-            return Hnatural + ((Hforced-Hnatural)*((ACH-2.5)/0.5));
+            return Hnatural + ((Hforced-Hnatural)*((ACH-0.5)/0.5));
         }
 
     }

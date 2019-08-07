@@ -596,7 +596,7 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_EvaluateIntHcModelsFisherPe
 
 
     // Case 1 - Low ACH (should default to CalcASHRAETARPNatural)
-    Real64 ACH = 1.;
+    Real64 ACH = 0.25;
     DataHeatBalance::Zone( 1 ).Volume = 125.0;
     DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0 * DataHeatBalance::Zone( 1 ).Volume * ACH;
 
@@ -779,7 +779,7 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestCalcFisherPedersenCeilD
 
     // Test 1: Non-window, all natural
     Hforced = 10.0;
-    ACH = 2.0;
+    ACH = 0.25;
     Tsurf = 23.0;
     Tair = 18.0;
     cosTilt = 1.0;
@@ -792,7 +792,7 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestCalcFisherPedersenCeilD
     
     // Test 2: Window, all natural
     Hforced = 10.0;
-    ACH = 2.0;
+    ACH = 0.25;
     Tsurf = 23.0;
     Tair = 18.0;
     cosTilt = 1.0;
@@ -805,7 +805,7 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestCalcFisherPedersenCeilD
 
     // Test 3: Non-window, all natural
     Hforced = 10.0;
-    ACH = 2.5;
+    ACH = 0.5;
     Tsurf = 23.0;
     Tair = 18.0;
     cosTilt = 1.0;
@@ -818,7 +818,7 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestCalcFisherPedersenCeilD
 
     // Test 4: Non-window, transition
     Hforced = 10.0;
-    ACH = 2.75;
+    ACH = 0.75;
     Tsurf = 23.0;
     Tair = 18.0;
     cosTilt = 1.0;
@@ -831,7 +831,7 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestCalcFisherPedersenCeilD
 
     // Test 5: Non-window, all ceiling diffuser correlation
     Hforced = 10.0;
-    ACH = 3.0;
+    ACH = 1.0;
     Tsurf = 23.0;
     Tair = 18.0;
     cosTilt = 1.0;
