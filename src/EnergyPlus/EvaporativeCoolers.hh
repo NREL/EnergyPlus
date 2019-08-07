@@ -333,7 +333,7 @@ namespace EvaporativeCoolers {
 
     // Functions
 
-    void SimEvapCooler(std::string const &CompName, int &CompIndex, Optional<Real64 const> PartLoadRatio);
+    void SimEvapCooler(std::string const &CompName, int &CompIndex, Real64 const PartLoadRatio = 1.0);
 
     // Get Input Section of the Module
     //******************************************************************************
@@ -360,7 +360,7 @@ namespace EvaporativeCoolers {
 
     void CalcDryIndirectEvapCooler(int &EvapCoolNum, Real64 const PartLoadRatio);
 
-    void CalcWetIndirectEvapCooler(int &EvapCoolNum);
+    void CalcWetIndirectEvapCooler(int &EvapCoolNum, Real64 const PartLoadRatio);
 
     void CalcResearchSpecialPartLoad(int &EvapCoolNum);
 

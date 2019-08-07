@@ -825,7 +825,7 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == EvapCooler) { // 'EvaporativeCooler:Direct:CelDekPad','EvaporativeCooler:Indirect:CelDekPad'
                 // 'EvaporativeCooler:Indirect:WetCoil','EvaporativeCooler:Indirect:ResearchSpecial'
                 if (Sim) {
-                    SimEvapCooler(CompName, CompIndex, _);
+                    SimEvapCooler(CompName, CompIndex);
                 }
 
             } else {
