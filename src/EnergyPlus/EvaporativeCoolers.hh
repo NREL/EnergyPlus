@@ -333,7 +333,7 @@ namespace EvaporativeCoolers {
 
     // Functions
 
-    void SimEvapCooler(std::string const &CompName, int &CompIndex, Optional<Real64 const> PartLoadRatio);
+    void SimEvapCooler(std::string const &CompName, int &CompIndex, Real64 const PartLoadRatio = 1.0);
 
     // Get Input Section of the Module
     //******************************************************************************
