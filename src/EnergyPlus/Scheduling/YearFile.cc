@@ -112,7 +112,8 @@ void processCSVFile(const std::string& fileToOpen, char const columnDelimiter)
     while (getline(fileInstance, line)) {
         lines.push_back(line);
     }
-    Scheduling::fileData[fileToOpen] = processCSVLines(lines, columnDelimiter); // TODO: Why isn't this getting populated?
+    auto a = processCSVLines(lines, columnDelimiter);
+    Scheduling::fileData[fileToOpen] = a; // TODO: Why isn't this getting populated?
 }
 
 // SCHEDULE:FILE METHODS
@@ -310,6 +311,7 @@ void ScheduleFileShading::processInput()
     auto &instancesValue = instances.value();
     for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
         // there is only 1 Schedule:File:Shading object, but it will spawn any number of actual schedule instances
+        EnergyPlus::DataGlobals::ScheduleFileShadingProcessed = true;
         auto const &fields = instance.value();
         auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
         // do any pre-construction operations
@@ -332,7 +334,7 @@ void ScheduleFileShading::processInput()
             std::string substr;
             getline(ss2, substr, ',');
             if (columnIndex > 1) { // skip timestamp column
-                scheduleFileShadings.emplace_back(substr, columnIndex);
+                scheduleFileShadings.emplace_back(fileName, substr, columnIndex);
             }
         }
     }
@@ -386,7 +388,8 @@ void ScheduleFileShading::prepareForNewEnvironment()
     // TODO: Check for error flag?
 }
 
-ScheduleFileShading::ScheduleFileShading(const std::string & columnHeader, int const columnIndex) {
+ScheduleFileShading::ScheduleFileShading(const std::string & fileName, const std::string & columnHeader, int const columnIndex) {
+    this->fileName = fileName;
     this->name = columnHeader + "_shading";
     this->columnNumber = columnIndex;
 }

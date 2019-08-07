@@ -103,6 +103,7 @@ struct ScheduleBase
     void setupOutputVariables();
     static DayType getDayTypeForDayOfWeek(int dayOfWeek);
     static DayType mapWeatherManagerDayTypeToScheduleDayType(int wmDayType);
+    Real64 lookupScheduleValue(int hour, int timeStep);
 
     // time-series related data, used for all schedules except constant
     bool includesLeapYearData = false;

@@ -45,9 +45,13 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <DataEnvironment.hh>
+#include <DataGlobals.hh>
 #include <EMSManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <OutputProcessor.hh>
 #include <Scheduling/Base.hh>
+#include <WeatherManager.hh>
 
 namespace Scheduling {
 
@@ -156,6 +160,14 @@ void ScheduleBase::setupOutputVariables()
 void ScheduleBase::resetTimeStartIndex()
 {
     this->lastIndexUsed = 0;
+}
+
+Real64 ScheduleBase::lookupScheduleValue(int const hour, int const timeStep)
+{
+    // TODO: Keep a start index for this lookup, separate from the other start index
+    int const simTime = 86400 * (EnergyPlus::DataEnvironment::DayOfYear - 1) + 3600 * ((hour - 1) + EnergyPlus::DataGlobals::TimeStepZone * timeStep);
+    auto item = std::lower_bound(this->timeStamp.begin(), this->timeStamp.end(), simTime);
+    return this->values[this->lastIndexUsed];
 }
 
 }

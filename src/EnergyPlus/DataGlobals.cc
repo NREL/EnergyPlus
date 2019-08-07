@@ -94,6 +94,8 @@ namespace DataGlobals {
     bool isMsgPack(false);
     bool preserveIDFOrder(true);
 
+    bool ScheduleFileShadingProcessed(false);
+
     // MODULE PARAMETER DEFINITIONS:
     int const BeginDay(1);
     int const DuringDay(2);
@@ -268,6 +270,7 @@ namespace DataGlobals {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
+        ScheduleFileShadingProcessed = false;
         runReadVars = false;
         DDOnlySimulation = false;
         AnnualSimulation = false;

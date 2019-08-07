@@ -72,6 +72,8 @@ namespace DataGlobals {
     extern bool isMsgPack;
     extern bool preserveIDFOrder;
 
+    extern bool ScheduleFileShadingProcessed;
+
     // MODULE PARAMETER DEFINITIONS:
     extern int const BeginDay;
     extern int const DuringDay;

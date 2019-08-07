@@ -112,7 +112,7 @@ ScheduleBase *getScheduleReference(const std::string &scheduleName)
             case ScheduleType::SHADING_FILE:
                 return &scheduleFileShadings[mapping.indexInTypeArray];
             case ScheduleType::UNKNOWN:
-                // Fatal Error
+                // Fatal Error - or just let it go...?
                 return nullptr;
             }
         }

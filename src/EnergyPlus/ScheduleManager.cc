@@ -157,7 +157,6 @@ namespace ScheduleManager {
     // Logical Variables for Module
     bool ScheduleInputProcessed(false); // This is false until the Schedule Input has been processed.
     bool ScheduleDSTSFileWarningIssued(false); // TODO: SCHEDULE REFACTOR
-    bool ScheduleFileShadingProcessed(false); // TODO: SCHEDULE REFACTOR
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -515,7 +514,7 @@ namespace ScheduleManager {
         // to update during run time
 
         CurrentModuleObject = "Schedule:File:Shading";
-        NumCommaFileShading = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        NumCommaFileShading = 0; //inputProcessor->getNumObjectsFound(CurrentModuleObject);
         NumAlphas = 0;
         NumNumbers = 0;
         if (NumCommaFileShading > 1) {
@@ -665,7 +664,7 @@ namespace ScheduleManager {
             }
 
             // schedule values have been filled into the CSVAllColumnNameAndValues map.
-            ScheduleFileShadingProcessed = true;
+            // Scheduling::ScheduleFileShadingProcessed = true;
 
             if (numerrors > 0) {
                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" " + RoundSigDigits(numerrors) +

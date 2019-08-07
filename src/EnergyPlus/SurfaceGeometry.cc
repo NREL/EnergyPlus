@@ -82,6 +82,7 @@
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <ScheduleManager.hh>
+#include <Scheduling/Manager.hh>
 #include <SurfaceGeometry.hh>
 #include <UtilityRoutines.hh>
 #include <Vectors.hh>
@@ -6409,15 +6410,13 @@ namespace SurfaceGeometry {
 
                 // Assign External Shading Schedule number
                 if (!lAlphaFieldBlanks(3)) {
-                    ExtShadingSchedNum = GetScheduleIndex(cAlphaArgs(3));
-                    if (ExtShadingSchedNum == 0) {
+                    SurfLocalEnvironment(Loop).externalShadingSchedule = Scheduling::getScheduleReference(cAlphaArgs(3));
+                    if (!SurfLocalEnvironment(Loop).externalShadingSchedule) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                         cAlphaFieldNames(3) + " has been found.");
                         ShowContinueError(cAlphaFieldNames(3) + " entered value = \"" + cAlphaArgs(3) +
                                           "\" no corresponding schedule has been found in the input file.");
                         ErrorsFound = true;
-                    } else {
-                        SurfLocalEnvironment(Loop).ExtShadingSchedPtr = ExtShadingSchedNum;
                     }
                 }
 
@@ -6459,9 +6458,9 @@ namespace SurfaceGeometry {
                         Surface(SurfLoop).HasLinkedOutAirNode = true;
                         Surface(SurfLoop).LinkedOutAirNode = SurfLocalEnvironment(Loop).OutdoorAirNodePtr;
                     }
-                    if (SurfLocalEnvironment(Loop).ExtShadingSchedPtr != 0) {
+                    if (SurfLocalEnvironment(Loop).externalShadingSchedule) {
                         Surface(SurfLoop).SchedExternalShadingFrac = true;
-                        Surface(SurfLoop).ExternalShadingSchInd = SurfLocalEnvironment(Loop).ExtShadingSchedPtr;
+                        Surface(SurfLoop).externalShadingSchedule = SurfLocalEnvironment(Loop).externalShadingSchedule;
                     }
                     if (SurfLocalEnvironment(Loop).SurroundingSurfsPtr != 0) {
                         Surface(SurfLoop).HasSurroundingSurfProperties = true;

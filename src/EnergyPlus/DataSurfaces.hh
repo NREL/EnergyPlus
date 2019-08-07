@@ -54,6 +54,7 @@
 #include <DataVectorTypes.hh>
 #include <EnergyPlus.hh>
 #include <Shape.hh>
+#include <Scheduling/Base.hh>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -731,7 +732,7 @@ namespace DataSurfaces {
         // XL added 7/25/2017
 
         bool SchedExternalShadingFrac;     // true if the external shading is scheduled or calculated externally to be imported
-        int ExternalShadingSchInd;         // Schedule for a the external shading
+        Scheduling::ScheduleBase * externalShadingSchedule;         // Schedule for a the external shading
         bool HasSurroundingSurfProperties; // true if surrounding surfaces properties are listed for an external surface
         int SurroundingSurfacesNum;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
         bool HasLinkedOutAirNode;          // true if an OutdoorAir::Node is linked to the surface
@@ -796,7 +797,7 @@ namespace DataSurfaces {
 
               WindDir(0.0), WindDirEMSOverrideOn(false), WindDirEMSOverrideValue(0.0),
 
-              SchedExternalShadingFrac(false), ExternalShadingSchInd(0), HasSurroundingSurfProperties(false), SurroundingSurfacesNum(0),
+              SchedExternalShadingFrac(false), externalShadingSchedule(nullptr), HasSurroundingSurfProperties(false), SurroundingSurfacesNum(0),
               HasLinkedOutAirNode(false), LinkedOutAirNode(0),
 
               UNomWOFilm("-              "), UNomFilm("-              "), ExtEcoRoof(false), ExtCavityPresent(false), ExtCavNum(0), IsPV(false),
@@ -1548,12 +1549,12 @@ namespace DataSurfaces {
         // Members
         std::string Name;
         int SurfPtr;             // surface pointer
-        int ExtShadingSchedPtr;  // schedule pointer
+        Scheduling::ScheduleBase * externalShadingSchedule;  // schedule pointer
         int SurroundingSurfsPtr; // schedule pointer
         int OutdoorAirNodePtr;   // schedule pointer
 
         // Default Constructor
-        SurfaceLocalEnvironment() : SurfPtr(0), ExtShadingSchedPtr(0), SurroundingSurfsPtr(0), OutdoorAirNodePtr(0)
+        SurfaceLocalEnvironment() : SurfPtr(0), externalShadingSchedule(nullptr), SurroundingSurfsPtr(0), OutdoorAirNodePtr(0)
         {
         }
     };

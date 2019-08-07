@@ -91,7 +91,7 @@ struct ScheduleFileShading : ScheduleBase
 {
     // constructors/destructors
     ScheduleFileShading() = default;
-    ScheduleFileShading(std::string const & columnHeader, int columnIndex);
+    ScheduleFileShading(std::string const & fileName, std::string const & columnHeader, int columnIndex);
     ~ScheduleFileShading() = default;
 
     // static functions related to the state of all schedule:file:shading objects

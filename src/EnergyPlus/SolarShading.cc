@@ -86,6 +86,7 @@
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <ScheduleManager.hh>
+#include <Scheduling/Manager.hh>
 #include <SolarReflectionManager.hh>
 #include <SolarShading.hh>
 #include <UtilityRoutines.hh>
@@ -580,7 +581,6 @@ namespace SolarShading {
         using DataSystemVariables::SutherlandHodgman;
         using DataSystemVariables::UseImportedSunlitFrac;
         using DataSystemVariables::UseScheduledSunlitFrac;
-        using ScheduleManager::ScheduleFileShadingProcessed;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtA("(A)");
@@ -704,7 +704,7 @@ namespace SolarShading {
                 UseScheduledSunlitFrac = true;
                 cAlphaArgs(4) = "ScheduledShading";
             } else if (UtilityRoutines::SameString(cAlphaArgs(4), "ImportedShading")) {
-                if (ScheduleFileShadingProcessed) {
+                if (DataGlobals::ScheduleFileShadingProcessed) {
                     UseImportedSunlitFrac = true;
                     cAlphaArgs(4) = "ImportedShading";
                 } else {
@@ -741,13 +741,11 @@ namespace SolarShading {
             cAlphaArgs(5) = "No";
             ReportExtShadingSunlitFrac = false;
         }
-        int ExtShadingSchedNum;
         if (UseImportedSunlitFrac) {
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(Surface(SurfNum).Name + "_shading");
-                if (ExtShadingSchedNum) {
+                Surface(SurfNum).externalShadingSchedule = Scheduling::getScheduleReference(Surface(SurfNum).Name + "_shading");
+                if (Surface(SurfNum).externalShadingSchedule) {
                     Surface(SurfNum).SchedExternalShadingFrac = true;
-                    Surface(SurfNum).ExternalShadingSchInd = ExtShadingSchedNum;
                 } else {
                     ShowWarningError(cCurrentModuleObject + ": sunlit fraction schedule not found for " + Surface(SurfNum).Name + " when using ImportedShading.");
                     ShowContinueError("These values are set to 1.0.");
@@ -4686,7 +4684,7 @@ namespace SolarShading {
         if ((UseScheduledSunlitFrac || UseImportedSunlitFrac) && !DoingSizing && KindOfSim == ksRunPeriodWeather){
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).SchedExternalShadingFrac) {
-                    SunlitFrac(iTimeStep, iHour, SurfNum) = LookUpScheduleValue(Surface(SurfNum).ExternalShadingSchInd, iHour, iTimeStep);
+                    SunlitFrac(iTimeStep, iHour, SurfNum) = Surface(SurfNum).externalShadingSchedule->lookupScheduleValue(iHour, iTimeStep);
                 } else {
                     SunlitFrac(iTimeStep, iHour, SurfNum) = 1.0;
                 }
