@@ -16060,23 +16060,26 @@ namespace DXCoils {
 
             //  Get total capacity modifying factor (function of temperature) for off-rated conditions
             //  InletAirHumRat may be modified in this ADP/BF loop, use temporary varible for calculations
-            InletAirHumRatTemp = InletAirHumRat;
 
-            // Calculate apparatus dew point conditions using TotCap and CBF
-            hDelta = TotCap / AirMassFlow;
-            // there is an issue here with using CBF to calculate the ADP enthalpy.
-            // at low loads the bypass factor increases significantly.
-            hADP = InletAirEnthalpy - hDelta / (1.0 - CBF);
-            tADP = PsyTsatFnHPb(hADP, OutdoorPressure, RoutineName);
-            //  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
-            //  tADP = PsyTsatFnHPb(hADP,InletAirPressure)
-            wADP = min(InletAirHumRat, PsyWFnTdbH(tADP, hADP, RoutineName));
-            hTinwADP = PsyHFnTdbW(InletAirDryBulbTemp, wADP);
-            if ((InletAirEnthalpy - hADP) > 1.e-10) {
-                SHR = min((hTinwADP - hADP) / (InletAirEnthalpy - hADP), 1.0);
-            } else {
-                SHR = 1.0;
-            }
+            // commented, not used issue #6950
+            //InletAirHumRatTemp = InletAirHumRat;
+
+            //// Calculate apparatus dew point conditions using TotCap and CBF
+            //hDelta = TotCap / AirMassFlow;
+            //// there is an issue here with using CBF to calculate the ADP enthalpy.
+            //// at low loads the bypass factor increases significantly.
+            //hADP = InletAirEnthalpy - hDelta / (1.0 - CBF);
+            //tADP = PsyTsatFnHPb(hADP, OutdoorPressure, RoutineName);
+            ////  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
+            ////  tADP = PsyTsatFnHPb(hADP,InletAirPressure)
+            //wADP = min(InletAirHumRat, PsyWFnTdbH(tADP, hADP, RoutineName));
+            //hTinwADP = PsyHFnTdbW(InletAirDryBulbTemp, wADP);
+            //if ((InletAirEnthalpy - hADP) > 1.e-10) {
+            //    SHR = min((hTinwADP - hADP) / (InletAirEnthalpy - hADP), 1.0);
+            //} else {
+            //    SHR = 1.0;
+            //}
+            // commented, not used issue #6950 ends here
 
             if (DXCoil(DXCoilNum).PLFFPLR(Mode) > 0 && CompCycRatio < 1.0) {
                 PLF = CurveValue(DXCoil(DXCoilNum).PLFFPLR(Mode), CompCycRatio); // Calculate part-load factor
@@ -16147,10 +16150,10 @@ namespace DXCoils {
             }
 
             // Coil total cooling
-            DXCoil(DXCoilNum).TotalCoolingEnergyRate = AirMassFlow * (InletAirEnthalpy - OutletAirEnthalpy);
+            Real64 AirMassFlowRate = DXCoil(DXCoilNum).InletAirMassFlowRate;
+            DXCoil(DXCoilNum).TotalCoolingEnergyRate = AirMassFlowRate * (InletAirEnthalpy - OutletAirEnthalpy);
 
             // Coil sensible cooling
-            MinAirHumRat = min(InletAirHumRat, OutletAirHumRat);
             DXCoil(DXCoilNum).SensCoolingEnergyRate = AirMassFlow * 1005.0 * (InletAirDryBulbTemp - OutletAirTemp);
             //  Don't let sensible capacity be greater than total capacity
             if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
