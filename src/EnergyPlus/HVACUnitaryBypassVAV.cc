@@ -3386,9 +3386,17 @@ namespace HVACUnitaryBypassVAV {
         // mode of operation, either cooling, heating, or none.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int lastDayOfSim(0);   // used during warmup to reset changeOverTimer since need to do same thing next warmup day
         Real64 ZoneLoad = 0.0; // Total load in controlled zone [W]
 
-        Real64 thisTime = (DataGlobals::DayOfSim - 1) * 24 + DataGlobals::HourOfDay - 1 + (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone +
+        int dayOfSim = DataGlobals::DayOfSim; // DayOfSim increments during Warmup when it actually simulates the same day
+        if (DataGlobals::WarmupFlag) {
+            // when warmupday increments then reset timer
+            if (lastDayOfSim != dayOfSim) CBVAV(CBVAVNum).changeOverTimer = -1.0; // reset to default (thisTime always > -1)
+            lastDayOfSim = dayOfSim;
+            dayOfSim = 1; // reset so that thisTime is <= 24 during warmup
+        }
+        Real64 thisTime = (dayOfSim - 1) * 24 + DataGlobals::HourOfDay - 1 + (DataGlobals::TimeStep - 1) * DataGlobals::TimeStepZone +
                           DataHVACGlobals::SysTimeElapsed;
 
         if (thisTime <= CBVAV(CBVAVNum).changeOverTimer) return;
@@ -3495,6 +3503,7 @@ namespace HVACUnitaryBypassVAV {
 
         if (CBVAV(CBVAVNum).LastMode != CBVAV(CBVAVNum).HeatCoolMode) {
             CBVAV(CBVAVNum).changeOverTimer = thisTime + CBVAV(CBVAVNum).minModeChangeTime;
+            CBVAV(CBVAVNum).LastMode = CBVAV(CBVAVNum).HeatCoolMode;
         }
     }
 
