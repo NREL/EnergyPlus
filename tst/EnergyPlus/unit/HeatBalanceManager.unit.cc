@@ -1278,6 +1278,24 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     EXPECT_EQ(20.0, Zone(1).OutWetBulbTemp);
     EXPECT_EQ(1.5, Zone(1).WindSpeed);
     EXPECT_EQ(90.0, Zone(1).WindDir);
+
+    // Add a test for #7308 without inputs of schedule names
+    DataLoopNode::Node(1).OutAirDryBulbSchedNum = 0;
+    DataLoopNode::Node(1).OutAirWetBulbSchedNum = 0;
+    DataLoopNode::Node(1).OutAirWindSpeedSchedNum = 0;
+    DataLoopNode::Node(1).OutAirWindDirSchedNum = 0;
+    DataEnvironment::OutDryBulbTemp = 25.0;
+    DataEnvironment::OutWetBulbTemp = 20.0;
+    DataEnvironment::WindSpeed = 1.5;
+    DataEnvironment::WindDir = 90.0;
+
+    InitHeatBalance();
+
+    // Test if local value correctly overwritten
+    EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);
+    EXPECT_EQ(20.0, Zone(1).OutWetBulbTemp);
+    EXPECT_EQ(1.5, Zone(1).WindSpeed);
+    EXPECT_EQ(90.0, Zone(1).WindDir);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInputTest)

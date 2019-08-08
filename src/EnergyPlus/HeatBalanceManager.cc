@@ -5345,10 +5345,26 @@ namespace HeatBalanceManager {
             SetOutAirNodes();
             for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 if (Zone(ZoneNum).HasLinkedOutAirNode) {
-                    Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
-                    Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum);
-                    Zone(ZoneNum).WindSpeed = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum);
-                    Zone(ZoneNum).WindDir = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum);
+                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum > 0) {
+                        Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
+                    } else {
+                        Zone(ZoneNum).OutDryBulbTemp = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulb;
+                    }
+                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum > 0) {
+                        Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum);
+                    } else {
+                        Zone(ZoneNum).OutWetBulbTemp = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulb;
+                    }
+                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum > 0) {
+                        Zone(ZoneNum).WindSpeed = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum);
+                    } else {
+                        Zone(ZoneNum).WindSpeed = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeed;
+                    }
+                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum > 0) {
+                        Zone(ZoneNum).WindDir = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum);
+                    } else {
+                        Zone(ZoneNum).WindDir = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDir;
+                    }
                 }
             }
         }
