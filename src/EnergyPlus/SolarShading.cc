@@ -4684,7 +4684,8 @@ namespace SolarShading {
         if ((UseScheduledSunlitFrac || UseImportedSunlitFrac) && !DoingSizing && KindOfSim == ksRunPeriodWeather){
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).SchedExternalShadingFrac) {
-                    SunlitFrac(iTimeStep, iHour, SurfNum) = Surface(SurfNum).externalShadingSchedule->lookupScheduleValue(iHour, iTimeStep);
+                    auto val = Surface(SurfNum).externalShadingSchedule->lookupScheduleValue(iHour, iTimeStep);
+                    SunlitFrac(iTimeStep, iHour, SurfNum) = val;
                 } else {
                     SunlitFrac(iTimeStep, iHour, SurfNum) = 1.0;
                 }
