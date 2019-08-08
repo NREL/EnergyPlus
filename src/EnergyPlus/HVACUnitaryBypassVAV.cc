@@ -1720,12 +1720,10 @@ namespace HVACUnitaryBypassVAV {
                 CompOnMassFlow = CBVAV(CBVAVNum).MaxHeatAirMassFlow;
                 CompOnFlowRatio = CBVAV(CBVAVNum).HeatingSpeedRatio;
                 OACompOnMassFlow = CBVAV(CBVAVNum).HeatOutAirMassFlow * OutsideAirMultiplier;
-                CBVAV(CBVAVNum).LastMode = HeatingMode;
             } else if (CBVAV(CBVAVNum).HeatCoolMode == CoolingMode) {
                 CompOnMassFlow = CBVAV(CBVAVNum).MaxCoolAirMassFlow;
                 CompOnFlowRatio = CBVAV(CBVAVNum).CoolingSpeedRatio;
                 OACompOnMassFlow = CBVAV(CBVAVNum).CoolOutAirMassFlow * OutsideAirMultiplier;
-                CBVAV(CBVAVNum).LastMode = CoolingMode;
             } else {
                 CompOnMassFlow = CBVAV(CBVAVNum).MaxNoCoolHeatAirMassFlow;
                 CompOnFlowRatio = CBVAV(CBVAVNum).NoHeatCoolSpeedRatio;
@@ -3608,10 +3606,8 @@ namespace HVACUnitaryBypassVAV {
         if (CBVAV(CBVAVNumber).HeatCoolMode == 0 && CBVAV(CBVAVNumber).OpMode == DataHVACGlobals::ContFanCycCoil) {
             if (OutAirTemp > TSupplyToCoolSetPtMin) {
                 CalcSetPointTempTarget = TSupplyToCoolSetPtMin;
-                CBVAV(CBVAVNumber).HeatCoolMode = CoolingMode;
             } else if (OutAirTemp < TSupplyToHeatSetPtMax) {
                 CalcSetPointTempTarget = TSupplyToHeatSetPtMax;
-                CBVAV(CBVAVNumber).HeatCoolMode = HeatingMode;
             } else {
                 CalcSetPointTempTarget = OutAirTemp;
             }
@@ -3622,10 +3618,8 @@ namespace HVACUnitaryBypassVAV {
             //   HeatCoolMode = 0 for OFF, 1 for cooling, 2 for heating
         } else if (CBVAV(CBVAVNumber).HeatCoolMode == CoolingMode && DXCoolCoilInletTemp < CalcSetPointTempTarget) {
             CalcSetPointTempTarget = DXCoolCoilInletTemp;
-            CBVAV(CBVAVNumber).HeatCoolMode = 0;
         } else if (CBVAV(CBVAVNumber).HeatCoolMode == HeatingMode && DXCoolCoilInletTemp > CalcSetPointTempTarget) {
             CalcSetPointTempTarget = DXCoolCoilInletTemp;
-            CBVAV(CBVAVNumber).HeatCoolMode = 0;
         }
 
         //   Limit outlet node temperature to MAX/MIN specified in input
