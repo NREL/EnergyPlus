@@ -1172,35 +1172,53 @@
   ZoneHVAC:EquipmentList,
     LIVING ZONE Equipment,   !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    LIVING ZONE Air Terminal 1,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    LIVING ZONE Air Terminal 1 ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
-    LIVING ZONE Air Terminal 2,  !- Zone Equipment 2 Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
+    LIVING ZONE Air Terminal 2 ADU,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     LIVING ZONE Air Terminal 1,  !- Name
     ,                        !- Availability Schedule Name
-    LIVING ZONE Zone Equip Inlet 1,  !- Zone Supply Air Node Name
+    LIVING ZONE Zone Equip Inlet 1 ATInlet,  !- Air Inlet Node Name
+    LIVING ZONE Zone Equip Inlet 1,  !- Air Outlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     ,                        !- Design Specification Outdoor Air Object Name
-    ,                        !- Per Person Ventilation Rate Mode
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    LIVING ZONE Air Terminal 1 ADU,  !- Name
+    LIVING ZONE Zone Equip Inlet 1,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    LIVING ZONE Air Terminal 1,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
     FurnaceAC1 75 Percent;   !- Design Specification Air Terminal Sizing Object Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     LIVING ZONE Air Terminal 2,  !- Name
     ,                        !- Availability Schedule Name
-    LIVING ZONE Zone Equip Inlet 2,  !- Zone Supply Air Node Name
+    LIVING ZONE Zone Equip Inlet 2 ATInlet,  !- Air Inlet Node Name
+    LIVING ZONE Zone Equip Inlet 2,  !- Air Outlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
     ,                        !- Design Specification Outdoor Air Object Name
-    ,                        !- Per Person Ventilation Rate Mode
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    LIVING ZONE Air Terminal 2 ADU,  !- Name
+    LIVING ZONE Zone Equip Inlet 2,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    LIVING ZONE Air Terminal 2,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
     FurnaceAC2 25 Percent;   !- Design Specification Air Terminal Sizing Object Name
 
   Sizing:System,
@@ -1275,7 +1293,7 @@
   AirLoopHVAC:ZoneSplitter,
     FurnaceAC1 Zone Splitter,!- Name
     FurnaceAC1 Supply Path Inlet,  !- Inlet Node Name
-    LIVING ZONE Zone Equip Inlet 1;  !- Outlet 1 Node Name
+    LIVING ZONE Zone Equip Inlet 1 ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     FurnaceAC1 Return Path,  !- Name
@@ -1501,7 +1519,7 @@
   AirLoopHVAC:ZoneSplitter,
     FurnaceAC2 Zone Splitter,!- Name
     FurnaceAC2 Supply Path Inlet,  !- Inlet Node Name
-    LIVING ZONE Zone Equip Inlet 2;  !- Outlet 1 Node Name
+    LIVING ZONE Zone Equip Inlet 2 ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     FurnaceAC2 Return Path,  !- Name

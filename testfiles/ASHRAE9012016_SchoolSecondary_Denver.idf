@@ -13482,277 +13482,277 @@
   InternalMass,
     Corner_Class_1_Pod_1_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    Corner_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone or ZoneList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_1_Pod_1_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    Corner_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone or ZoneList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_1_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    Mult_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone or ZoneList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_1_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    Mult_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone or ZoneList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_1_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    Corridor_Pod_1_ZN_1_FLR_1,  !- Zone or ZoneList Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_1_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    Corridor_Pod_1_ZN_1_FLR_2,  !- Zone or ZoneList Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_1_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    Corner_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone or ZoneList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_1_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    Corner_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone or ZoneList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_1_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
+    Mult_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone or ZoneList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_1_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
+    Mult_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone or ZoneList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_1_Pod_2_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    Corner_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone or ZoneList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_1_Pod_2_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    Corner_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone or ZoneList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_2_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    Mult_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone or ZoneList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_2_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    Mult_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone or ZoneList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_2_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    Corridor_Pod_2_ZN_1_FLR_1,  !- Zone or ZoneList Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_2_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    Corridor_Pod_2_ZN_1_FLR_2,  !- Zone or ZoneList Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_2_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    Corner_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone or ZoneList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_2_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    Corner_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone or ZoneList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_2_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
+    Mult_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone or ZoneList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_2_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
+    Mult_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone or ZoneList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_1_Pod_3_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    Corner_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone or ZoneList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_1_Pod_3_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    Corner_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone or ZoneList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_3_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    Mult_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone or ZoneList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_3_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    Mult_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone or ZoneList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_3_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    Corridor_Pod_3_ZN_1_FLR_1,  !- Zone or ZoneList Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_3_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    Corridor_Pod_3_ZN_1_FLR_2,  !- Zone or ZoneList Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_3_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    Corner_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone or ZoneList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_3_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    Corner_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone or ZoneList Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_3_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
+    Mult_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone or ZoneList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_3_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
+    Mult_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone or ZoneList Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Main_Corridor_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Main_Corridor_ZN_1_FLR_1,!- Zone Name
+    Main_Corridor_ZN_1_FLR_1,!- Zone or ZoneList Name
     2280.0000;               !- Surface Area {m2}
 
   InternalMass,
     Main_Corridor_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Main_Corridor_ZN_1_FLR_2,!- Zone Name
+    Main_Corridor_ZN_1_FLR_2,!- Zone or ZoneList Name
     2280.0000;               !- Surface Area {m2}
 
   InternalMass,
     Lobby_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Lobby_ZN_1_FLR_1,        !- Zone Name
+    Lobby_ZN_1_FLR_1,        !- Zone or ZoneList Name
     420.0000;                !- Surface Area {m2}
 
   InternalMass,
     Lobby_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Lobby_ZN_1_FLR_2,        !- Zone Name
+    Lobby_ZN_1_FLR_2,        !- Zone or ZoneList Name
     420.0000;                !- Surface Area {m2}
 
   InternalMass,
     Bathrooms_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Bathrooms_ZN_1_FLR_1,    !- Zone Name
+    Bathrooms_ZN_1_FLR_1,    !- Zone or ZoneList Name
     420.0000;                !- Surface Area {m2}
 
   InternalMass,
     Bathrooms_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Bathrooms_ZN_1_FLR_2,    !- Zone Name
+    Bathrooms_ZN_1_FLR_2,    !- Zone or ZoneList Name
     420.0000;                !- Surface Area {m2}
 
   InternalMass,
     Offices_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Offices_ZN_1_FLR_1,      !- Zone Name
+    Offices_ZN_1_FLR_1,      !- Zone or ZoneList Name
     1064.0000;               !- Surface Area {m2}
 
   InternalMass,
     Offices_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Offices_ZN_1_FLR_2,      !- Zone Name
+    Offices_ZN_1_FLR_2,      !- Zone or ZoneList Name
     1064.0000;               !- Surface Area {m2}
 
   InternalMass,
     Gym_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Gym_ZN_1_FLR_1,          !- Zone Name
+    Gym_ZN_1_FLR_1,          !- Zone or ZoneList Name
     3952.0000;               !- Surface Area {m2}
 
   InternalMass,
     Aux_Gym_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Aux_Gym_ZN_1_FLR_1,      !- Zone Name
+    Aux_Gym_ZN_1_FLR_1,      !- Zone or ZoneList Name
     2496.0000;               !- Surface Area {m2}
 
   InternalMass,
     Auditorium_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Auditorium_ZN_1_FLR_1,   !- Zone Name
+    Auditorium_ZN_1_FLR_1,   !- Zone or ZoneList Name
     1976.0000;               !- Surface Area {m2}
 
   InternalMass,
     Kitchen_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Kitchen_ZN_1_FLR_1,      !- Zone Name
+    Kitchen_ZN_1_FLR_1,      !- Zone or ZoneList Name
     432.0000;                !- Surface Area {m2}
 
   InternalMass,
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    LIBRARY_MEDIA_CENTER_ZN_1_FLR_2,  !- Zone Name
+    LIBRARY_MEDIA_CENTER_ZN_1_FLR_2,  !- Zone or ZoneList Name
     1680.0000;               !- Surface Area {m2}
 
   InternalMass,
     Cafeteria_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Cafeteria_ZN_1_FLR_1,    !- Zone Name
+    Cafeteria_ZN_1_FLR_1,    !- Zone or ZoneList Name
     1248.0000;               !- Surface Area {m2}
 
   InternalMass,
     Mech_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mech_ZN_1_FLR_1,         !- Zone Name
+    Mech_ZN_1_FLR_1,         !- Zone or ZoneList Name
     684.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mech_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mech_ZN_1_FLR_2,         !- Zone Name
+    Mech_ZN_1_FLR_2,         !- Zone or ZoneList Name
     684.0000;                !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========
@@ -20385,35 +20385,95 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:UNCONTROLLED ===========
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Gym_ZN_1_FLR_1 Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Gym_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Gym_ZN_1_FLR_1 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Gym_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Gym_ZN_1_FLR_1 Direct Air ADU,  !- Name
+    Gym_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Gym_ZN_1_FLR_1 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Aux_Gym_ZN_1_FLR_1 Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Aux_Gym_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Aux_Gym_ZN_1_FLR_1 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Aux_Gym_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Aux_Gym_ZN_1_FLR_1 Direct Air ADU,  !- Name
+    Aux_Gym_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Aux_Gym_ZN_1_FLR_1 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Auditorium_ZN_1_FLR_1 Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Auditorium_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Auditorium_ZN_1_FLR_1 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Auditorium_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Auditorium_ZN_1_FLR_1 Direct Air ADU,  !- Name
+    Auditorium_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Auditorium_ZN_1_FLR_1 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Kitchen_ZN_1_FLR_1 Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Kitchen_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Kitchen_ZN_1_FLR_1 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Kitchen_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Kitchen_ZN_1_FLR_1 Direct Air ADU,  !- Name
+    Kitchen_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Kitchen_ZN_1_FLR_1 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Cafeteria_ZN_1_FLR_1 Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Cafeteria_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Cafeteria_ZN_1_FLR_1 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Cafeteria_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Cafeteria_ZN_1_FLR_1 Direct Air ADU,  !- Name
+    Cafeteria_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Cafeteria_ZN_1_FLR_1 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:VAV:REHEAT ===========
 ! This V6 comment applies to the following 41 "AirTerminal:SingleDuct:VAV:Reheat" objects
@@ -21538,8 +21598,8 @@
     Corner_Class_1_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_1_ZN_1_FLR_2 Equipment,  !- Name
@@ -21548,8 +21608,8 @@
     Corner_Class_1_Pod_1_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
@@ -21558,8 +21618,8 @@
     Mult_Class_1_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_1_ZN_1_FLR_2 Equipment,  !- Name
@@ -21568,8 +21628,8 @@
     Mult_Class_1_Pod_1_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
@@ -21578,8 +21638,8 @@
     Corridor_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_1_ZN_1_FLR_2 Equipment,  !- Name
@@ -21588,8 +21648,8 @@
     Corridor_Pod_1_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
@@ -21598,8 +21658,8 @@
     Corner_Class_2_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_1_ZN_1_FLR_2 Equipment,  !- Name
@@ -21608,8 +21668,8 @@
     Corner_Class_2_Pod_1_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
@@ -21618,8 +21678,8 @@
     Mult_Class_2_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_1_ZN_1_FLR_2 Equipment,  !- Name
@@ -21628,8 +21688,8 @@
     Mult_Class_2_Pod_1_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
@@ -21638,8 +21698,8 @@
     Corner_Class_1_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_2_ZN_1_FLR_2 Equipment,  !- Name
@@ -21648,8 +21708,8 @@
     Corner_Class_1_Pod_2_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
@@ -21658,8 +21718,8 @@
     Mult_Class_1_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_2_ZN_1_FLR_2 Equipment,  !- Name
@@ -21668,8 +21728,8 @@
     Mult_Class_1_Pod_2_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
@@ -21678,8 +21738,8 @@
     Corridor_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_2_ZN_1_FLR_2 Equipment,  !- Name
@@ -21688,8 +21748,8 @@
     Corridor_Pod_2_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
@@ -21698,8 +21758,8 @@
     Corner_Class_2_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_2_ZN_1_FLR_2 Equipment,  !- Name
@@ -21708,8 +21768,8 @@
     Corner_Class_2_Pod_2_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
@@ -21718,8 +21778,8 @@
     Mult_Class_2_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_2_ZN_1_FLR_2 Equipment,  !- Name
@@ -21728,8 +21788,8 @@
     Mult_Class_2_Pod_2_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
@@ -21738,8 +21798,8 @@
     Corner_Class_1_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_3_ZN_1_FLR_2 Equipment,  !- Name
@@ -21748,8 +21808,8 @@
     Corner_Class_1_Pod_3_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
@@ -21758,8 +21818,8 @@
     Mult_Class_1_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_3_ZN_1_FLR_2 Equipment,  !- Name
@@ -21768,8 +21828,8 @@
     Mult_Class_1_Pod_3_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
@@ -21778,8 +21838,8 @@
     Corridor_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_3_ZN_1_FLR_2 Equipment,  !- Name
@@ -21788,8 +21848,8 @@
     Corridor_Pod_3_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
@@ -21798,8 +21858,8 @@
     Corner_Class_2_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_3_ZN_1_FLR_2 Equipment,  !- Name
@@ -21808,8 +21868,8 @@
     Corner_Class_2_Pod_3_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
@@ -21818,8 +21878,8 @@
     Mult_Class_2_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_3_ZN_1_FLR_2 Equipment,  !- Name
@@ -21828,8 +21888,8 @@
     Mult_Class_2_Pod_3_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Main_Corridor_ZN_1_FLR_1 Equipment,  !- Name
@@ -21838,14 +21898,14 @@
     Main_Corridor_ZN_1_FLR_1 dummy Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     Main_Corridor_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Main_Corridor_ZN_1_FLR_2 Equipment,  !- Name
@@ -21854,14 +21914,14 @@
     Main_Corridor_ZN_1_FLR_2 dummy Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     Main_Corridor_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Lobby_ZN_1_FLR_1 Equipment,  !- Name
@@ -21870,8 +21930,8 @@
     Lobby_ZN_1_FLR_1 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Lobby_ZN_1_FLR_2 Equipment,  !- Name
@@ -21880,8 +21940,8 @@
     Lobby_ZN_1_FLR_2 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Bathrooms_ZN_1_FLR_1 Equipment,  !- Name
@@ -21890,14 +21950,14 @@
     Bathrooms_ZN_1_FLR_1 Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     Bathrooms_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Bathrooms_ZN_1_FLR_2 Equipment,  !- Name
@@ -21906,14 +21966,14 @@
     Bathrooms_ZN_1_FLR_2 Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     Bathrooms_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Offices_ZN_1_FLR_1 Equipment,  !- Name
@@ -21922,8 +21982,8 @@
     Offices_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Offices_ZN_1_FLR_2 Equipment,  !- Name
@@ -21932,8 +21992,8 @@
     Offices_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Gym_ZN_1_FLR_1 Equipment,!- Name
@@ -21942,34 +22002,34 @@
     GYM_ZN_1_FLR_1 dummy Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
-    Gym_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 2 Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
+    Gym_ZN_1_FLR_1 Direct Air ADU,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Aux_Gym_ZN_1_FLR_1 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Aux_Gym_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Aux_Gym_ZN_1_FLR_1 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Auditorium_ZN_1_FLR_1 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Auditorium_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Auditorium_ZN_1_FLR_1 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Kitchen_ZN_1_FLR_1 Equipment,  !- Name
@@ -21978,24 +22038,24 @@
     Kitchen_ZN_1_FLR_1 Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
-    Kitchen_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 2 Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
+    Kitchen_ZN_1_FLR_1 Direct Air ADU,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Cafeteria_ZN_1_FLR_1 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Cafeteria_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Cafeteria_ZN_1_FLR_1 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2 Equipment,  !- Name
@@ -22004,8 +22064,8 @@
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mech_ZN_1_FLR_1 Equipment,  !- Name
@@ -22014,8 +22074,8 @@
     Mech_ZN_1_FLR_1 VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mech_ZN_1_FLR_2 Equipment,  !- Name
@@ -22024,8 +22084,8 @@
     Mech_ZN_1_FLR_2 VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTCONNECTIONS ===========
 
@@ -24507,27 +24567,27 @@
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC_1:5 Supply Air Splitter,  !- Name
     PSZ-AC_1:5 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Gym_ZN_1_FLR_1 Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Gym_ZN_1_FLR_1 Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC_2:6 Supply Air Splitter,  !- Name
     PSZ-AC_2:6 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Aux_Gym_ZN_1_FLR_1 Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Aux_Gym_ZN_1_FLR_1 Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC_3:7 Supply Air Splitter,  !- Name
     PSZ-AC_3:7 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Auditorium_ZN_1_FLR_1 Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Auditorium_ZN_1_FLR_1 Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC_4:8 Supply Air Splitter,  !- Name
     PSZ-AC_4:8 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Kitchen_ZN_1_FLR_1 Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Kitchen_ZN_1_FLR_1 Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC_5:9 Supply Air Splitter,  !- Name
     PSZ-AC_5:9 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Cafeteria_ZN_1_FLR_1 Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Cafeteria_ZN_1_FLR_1 Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:SUPPLYPATH ===========
 

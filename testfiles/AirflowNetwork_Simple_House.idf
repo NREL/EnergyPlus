@@ -1436,6 +1436,12 @@
     3.0;                     !- Node Height {m}
 
   AirflowNetwork:Distribution:Node,
+    ZoneSupplyRegisterNode ATInlet,  !- Name
+    Zone Inlet Node ATInlet, !- Component Name or Node Name
+    Other,                   !- Component Object Type or Node Type
+    3.0;                     !- Node Height {m}
+
+  AirflowNetwork:Distribution:Node,
     ZoneSupplyRegisterNode,  !- Name
     Zone Inlet Node,         !- Component Name or Node Name
     Other,                   !- Component Object Type or Node Type
@@ -1624,9 +1630,16 @@
     Attic Zone;              !- Thermal Zone Name
 
   AirflowNetwork:Distribution:Linkage,
+    ZoneSupply1Link2 ATInlet,!- Name
+    ZoneSupplyRegisterNode ATInlet,  !- Node 1 Name
+    ZoneSupplyRegisterNode,  !- Node 2 Name
+    ZoneSupply,              !- Component Name
+    Attic Zone;              !- Thermal Zone Name
+
+  AirflowNetwork:Distribution:Linkage,
     ZoneSupply1Link2,        !- Name
     ZoneSupplyNode,          !- Node 1 Name
-    ZoneSupplyRegisterNode,  !- Node 2 Name
+    ZoneSupplyRegisterNode ATInlet,  !- Node 2 Name
     ZoneSupply,              !- Component Name
     Attic Zone;              !- Thermal Zone Name
 
@@ -1742,12 +1755,12 @@
   ZoneHVAC:EquipmentList,
     ZoneEquipment,           !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    ZoneDirectAir,           !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ZoneDirectAir ADU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   CoilSystem:Cooling:DX,
     DX Cooling Coil System 1,!- Name
@@ -1758,11 +1771,23 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil 1;              !- Cooling Coil Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     ZoneDirectAir,           !- Name
     HVACAvailSched,          !- Availability Schedule Name
-    Zone Inlet Node,         !- Zone Supply Air Node Name
-    1.18;                    !- Maximum Air Flow Rate {m3/s}
+    Zone Inlet Node ATInlet, !- Air Inlet Node Name
+    Zone Inlet Node,         !- Air Outlet Node Name
+    1.18,                    !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    ZoneDirectAir ADU,       !- Name
+    Zone Inlet Node,         !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    ZoneDirectAir,           !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   ZoneControl:Thermostat,
     Zone Thermostat,         !- Name
@@ -1791,7 +1816,7 @@
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter,!- Name
     Zone Equipment Inlet Node,  !- Inlet Node Name
-    Zone Inlet Node;         !- Outlet 1 Node Name
+    Zone Inlet Node ATInlet; !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneMixer,
     Zone Return Air Mixer,   !- Name

@@ -1,12 +1,12 @@
-  Version,9.2;               !- Version Identifier
+  Version,9.2;
 
   SimulationControl,
-    Yes,
-    Yes,
-    No,
-    Yes,
-    No,
-    No;
+    Yes,                     !- Do Zone Sizing Calculation
+    Yes,                     !- Do System Sizing Calculation
+    No,                      !- Do Plant Sizing Calculation
+    Yes,                     !- Run Simulation for Sizing Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No;                      !- Do HVAC Sizing Simulation for Sizing Periods
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -4084,13 +4084,13 @@
   InternalMass,
     Dining_InternalMass_1,   !- Name
     InteriorFurnishings,     !- Construction Name
-    Dining,                  !- Zone Name
+    Dining,                  !- Zone or ZoneList Name
     743.4961;                !- Surface Area {m2}
 
   InternalMass,
     Kitchen_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Kitchen,                 !- Zone Name
+    Kitchen,                 !- Zone or ZoneList Name
     278.8105;                !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========
@@ -4597,17 +4597,41 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:UNCONTROLLED ===========
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Dining Direct Air,       !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Dining Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Dining Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Dining Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Dining Direct Air ADU,   !- Name
+    Dining Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Dining Direct Air,       !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Kitchen Direct Air,      !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Kitchen Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Kitchen Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Kitchen Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Kitchen Direct Air ADU,  !- Name
+    Kitchen Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Kitchen Direct Air,      !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTLIST ===========
 
@@ -4618,14 +4642,14 @@
     Dining Exhaust Fan,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
-    Dining Direct Air,       !- Zone Equipment 2 Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
+    Dining Direct Air ADU,   !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Kitchen Equipment,       !- Name
@@ -4634,14 +4658,14 @@
     Kitchen Exhaust Fan,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
-    Kitchen Direct Air,      !- Zone Equipment 2 Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
+    Kitchen Direct Air ADU,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTCONNECTIONS ===========
 
@@ -4952,12 +4976,12 @@
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC_1:1 Supply Air Splitter,  !- Name
     PSZ-AC_1:1 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Dining Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Dining Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC_2:2 Supply Air Splitter,  !- Name
     PSZ-AC_2:2 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Kitchen Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Kitchen Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:SUPPLYPATH ===========
 

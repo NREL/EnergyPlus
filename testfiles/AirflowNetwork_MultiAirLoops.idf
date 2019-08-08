@@ -2257,6 +2257,12 @@
     3.0;                     !- Node Height {m}
 
   AirflowNetwork:Distribution:Node,
+    Zone1SupplyRegisterNode ATInlet,  !- Name
+    Zone 1 Inlet Node ATInlet,  !- Component Name or Node Name
+    Other,                   !- Component Object Type or Node Type
+    3.0;                     !- Node Height {m}
+
+  AirflowNetwork:Distribution:Node,
     Zone1SupplyRegisterNode, !- Name
     Zone 1 Inlet Node,       !- Component Name or Node Name
     Other,                   !- Component Object Type or Node Type
@@ -2569,9 +2575,16 @@
     Attic Zone;              !- Thermal Zone Name
 
   AirflowNetwork:Distribution:Linkage,
+    Zone1Supply2Link ATInlet,!- Name
+    Zone1SupplyRegisterNode ATInlet,  !- Node 1 Name
+    Zone1SupplyRegisterNode, !- Node 2 Name
+    Zone1Supply,             !- Component Name
+    Attic Zone;              !- Thermal Zone Name
+
+  AirflowNetwork:Distribution:Linkage,
     Zone1Supply2Link,        !- Name
     Zone1SupplyNode,         !- Node 1 Name
-    Zone1SupplyRegisterNode, !- Node 2 Name
+    Zone1SupplyRegisterNode ATInlet,  !- Node 2 Name
     Zone1Supply,             !- Component Name
     Attic Zone;              !- Thermal Zone Name
 
@@ -2783,6 +2796,12 @@
     3.0;                     !- Node Height {m}
 
   AirflowNetwork:Distribution:Node,
+    Heat Pump 1 Zone1SupplyRegisterNode ATInlet,  !- Name
+    NORTH ZONE Zone Equip Inlet ATInlet,  !- Component Name or Node Name
+    Other,                   !- Component Object Type or Node Type
+    3.0;                     !- Node Height {m}
+
+  AirflowNetwork:Distribution:Node,
     Heat Pump 1 Zone1SupplyRegisterNode,  !- Name
     NORTH ZONE Zone Equip Inlet,  !- Component Name or Node Name
     Other,                   !- Component Object Type or Node Type
@@ -2980,9 +2999,16 @@
     Attic NORTH Zone;        !- Thermal Zone Name
 
   AirflowNetwork:Distribution:Linkage,
+    Heat Pump 1 Zone1InletlLink ATInlet,  !- Name
+    Heat Pump 1 Zone1SupplyRegisterNode ATInlet,  !- Node 1 Name
+    Heat Pump 1 Zone1SupplyRegisterNode,  !- Node 2 Name
+    Heat Pump 1 Zone1Supply, !- Component Name
+    Attic NORTH Zone;        !- Thermal Zone Name
+
+  AirflowNetwork:Distribution:Linkage,
     Heat Pump 1 Zone1InletlLink,  !- Name
     Heat Pump 1 Zone1SupplyNode,  !- Node 1 Name
-    Heat Pump 1 Zone1SupplyRegisterNode,  !- Node 2 Name
+    Heat Pump 1 Zone1SupplyRegisterNode ATInlet,  !- Node 2 Name
     Heat Pump 1 Zone1Supply, !- Component Name
     Attic NORTH Zone;        !- Thermal Zone Name
 
@@ -3137,12 +3163,12 @@
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone1DirectAir,          !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone1DirectAir ADU,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -3151,14 +3177,26 @@
     Zone2TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone1DirectAir,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    Zone 1 Inlet Node,       !- Zone Supply Air Node Name
-    0.64;                    !- Maximum Air Flow Rate {m3/s}
+    Zone 1 Inlet Node ATInlet,  !- Air Inlet Node Name
+    Zone 1 Inlet Node,       !- Air Outlet Node Name
+    0.64,                    !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone1DirectAir ADU,      !- Name
+    Zone 1 Inlet Node,       !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone1DirectAir,          !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   ZoneHVAC:AirDistributionUnit,
     Zone2TermReheat,         !- Name
@@ -3216,7 +3254,7 @@
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter,!- Name
     Zone Equipment Inlet Node,  !- Inlet Node Name
-    Zone 1 Inlet Node,       !- Outlet 1 Node Name
+    Zone 1 Inlet Node ATInlet,  !- Outlet 1 Node Name
     Zone 2 Reheat Air Inlet Node;  !- Outlet 2 Node Name
 
   AirLoopHVAC:ZoneMixer,
@@ -3486,18 +3524,30 @@
   ZoneHVAC:EquipmentList,
     NORTH ZONE Equipment,    !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    NORTH ZONE Air Terminal, !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    NORTH ZONE Air Terminal ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     NORTH ZONE Air Terminal, !- Name
     ,                        !- Availability Schedule Name
-    NORTH ZONE Zone Equip Inlet,  !- Zone Supply Air Node Name
-    0.5;                     !- Maximum Air Flow Rate {m3/s}
+    NORTH ZONE Zone Equip Inlet ATInlet,  !- Air Inlet Node Name
+    NORTH ZONE Zone Equip Inlet,  !- Air Outlet Node Name
+    0.5,                     !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    NORTH ZONE Air Terminal ADU,  !- Name
+    NORTH ZONE Zone Equip Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    NORTH ZONE Air Terminal, !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   AirLoopHVAC,
     Heat Pump 1,             !- Name
@@ -3536,7 +3586,7 @@
   AirLoopHVAC:ZoneSplitter,
     Heat Pump 1 Zone Splitter,  !- Name
     Heat Pump 1 Supply Path Inlet,  !- Inlet Node Name
-    NORTH ZONE Zone Equip Inlet;  !- Outlet 1 Node Name
+    NORTH ZONE Zone Equip Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     Heat Pump 1 Return Path, !- Name
