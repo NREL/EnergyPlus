@@ -3267,7 +3267,7 @@ namespace RefrigeratedCase {
 
                     // set CondenserType and rated temperature difference (51.7 - 35)C per ARI 460
                     Condenser(CondNum).CondenserType = RefrigCondenserTypeAir;
-                    HeatReclaimRefrigCondenser(CondNum).SourceType = RefrigCondenserTypeAir;
+                    HeatReclaimRefrigCondenser(CondNum).SourceType = CurrentModuleObject;
                     Condenser(CondNum).RatedDelT = CondARI460DelT; //= 16.7d0 ,Rated sat cond temp - dry bulb air T for air-cooled Condensers, ARI460
                     Condenser(CondNum).RatedTCondense = CondARI460Tcond;
                     if (Condenser(CondNum).CapCurvePtr > 0) {
@@ -3387,7 +3387,7 @@ namespace RefrigeratedCase {
 
                     // set CondenserType and rated Heat Rejection per ARI 490 rating
                     Condenser(CondNum).CondenserType = RefrigCondenserTypeEvap;
-                    HeatReclaimRefrigCondenser(CondNum).SourceType = RefrigCondenserTypeEvap;
+                    HeatReclaimRefrigCondenser(CondNum).SourceType = CurrentModuleObject;
                     Condenser(CondNum).RatedTCondense = CondARI490Tcond;
                     Condenser(CondNum).RatedDelT = CondARI490DelT;
 
@@ -3614,7 +3614,7 @@ namespace RefrigeratedCase {
 
                     // set CondenserType and rated Heat Rejection per ARI 450 rating
                     Condenser(CondNum).CondenserType = RefrigCondenserTypeWater;
-                    HeatReclaimRefrigCondenser(CondNum).SourceType = RefrigCondenserTypeWater;
+                    HeatReclaimRefrigCondenser(CondNum).SourceType = CurrentModuleObject;
                     if ((!lNumericBlanks(1)) && (Numbers(1) > 0.0)) {
                         Condenser(CondNum).RatedCapacity = Numbers(1);
                     } else {

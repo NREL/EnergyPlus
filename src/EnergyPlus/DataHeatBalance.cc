@@ -816,6 +816,7 @@ namespace DataHeatBalance {
     Array1D<HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
     Array1D<HeatReclaimDXCoilData> HeatReclaimDXCoil;
     Array1D<HeatReclaimDXCoilData> HeatReclaimVS_DXCoil;
+    Array1D<HeatReclaimHPCoilData> HeatReclaimSimple_WAHPCoil;
     Array1D<AirReportVars> ZnAirRpt;
     Array1D<TCGlazingsType> TCGlazings;
     Array1D<ZoneEquipData> ZoneCO2Gen;
@@ -1083,6 +1084,7 @@ namespace DataHeatBalance {
         HeatReclaimRefrigCondenser.deallocate();
         HeatReclaimDXCoil.deallocate();
         HeatReclaimVS_DXCoil.deallocate();
+        HeatReclaimSimple_WAHPCoil.deallocate();
         ZnAirRpt.deallocate();
         TCGlazings.deallocate();
         ZoneCO2Gen.deallocate();
