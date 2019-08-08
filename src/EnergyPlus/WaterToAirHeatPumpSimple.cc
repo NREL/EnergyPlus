@@ -77,6 +77,8 @@
 #include <ReportSizingManager.hh>
 #include <UtilityRoutines.hh>
 #include <WaterToAirHeatPumpSimple.hh>
+#include<DataHeatBalance.hh>
+#include<WaterThermalTanks.hh>
 
 namespace EnergyPlus {
 
@@ -128,6 +130,7 @@ namespace WaterToAirHeatPumpSimple {
     using DataHVACGlobals::WaterCycling;
     using DataPlant::TypeOf_CoilWAHPCoolingEquationFit;
     using DataPlant::TypeOf_CoilWAHPHeatingEquationFit;
+    using DataHeatBalance::HeatReclaimSimple_WAHPCoil;
 
     // Data
     // MODULE PARAMETER DEFINITIONS
@@ -372,6 +375,7 @@ namespace WaterToAirHeatPumpSimple {
         if (NumWatertoAirHPs > 0) {
             SimpleWatertoAirHP.allocate(NumWatertoAirHPs);
             SimpleHPTimeStepFlag.dimension(NumWatertoAirHPs, true);
+            DataHeatBalance::HeatReclaimSimple_WAHPCoil.allocate(NumWatertoAirHPs);
         }
 
         inputProcessor->getObjectDefMaxArgs("Coil:Cooling:WaterToAirHeatPump:EquationFit", NumParams, NumAlphas, NumNums);
@@ -407,7 +411,6 @@ namespace WaterToAirHeatPumpSimple {
                                           cNumericFields);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
-
             SimpleWatertoAirHP(HPNum).Name = AlphArray(1);
             SimpleWatertoAirHP(HPNum).WatertoAirHPType = "COOLING";
             SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum = TypeOf_CoilWAHPCoolingEquationFit;
@@ -434,6 +437,8 @@ namespace WaterToAirHeatPumpSimple {
             SimpleWatertoAirHP(HPNum).CoolPower5 = NumArray(21);
             SimpleWatertoAirHP(HPNum).Twet_Rated = NumArray(22);
             SimpleWatertoAirHP(HPNum).Gamma_Rated = NumArray(23);
+            DataHeatBalance::HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).Name = SimpleWatertoAirHP(HPNum).Name;
+            DataHeatBalance::HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).SourceType = CurrentModuleObject;
 
             SimpleWatertoAirHP(HPNum).WaterInletNodeNum = GetOnlySingleNode(
                 AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
@@ -1117,6 +1122,7 @@ namespace WaterToAirHeatPumpSimple {
         SimpleWatertoAirHP(HPNum).EnergyLatent = 0.0;
         SimpleWatertoAirHP(HPNum).EnergySource = 0.0;
         SimpleWatertoAirHP(HPNum).COP = 0.0;
+        DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = 0.0;
     }
 
     void SizeHVACWaterToAir(int const HPNum)
@@ -2369,11 +2375,19 @@ namespace WaterToAirHeatPumpSimple {
         QSensible *= PartLoadRatio;
         Winput *= RuntimeFrac;
         QSource = QSource_fullload * PartLoadRatio;
-
+        DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = QSource;
+        
         //  Add power to global variable so power can be summed by parent object
         DXElecCoolingPower = Winput;
 
         ReportingConstant = TimeStepSys * SecInHour;
+        DataHeatBalance::HeatReclaimHPCoilData &HeatReclaim = HeatReclaimSimple_WAHPCoil(HPNum);
+        HeatReclaim.WaterHeatingDesuperheaterReclaimedHeatTotal = 0.0;
+        if (allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)) {
+            for (auto& num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat) HeatReclaim.WaterHeatingDesuperheaterReclaimedHeatTotal += num;
+        }
+        QSource -= HeatReclaim.WaterHeatingDesuperheaterReclaimedHeatTotal;
+
         // Update heat pump data structure
         SimpleWatertoAirHP(HPNum).Power = Winput;
         SimpleWatertoAirHP(HPNum).QLoadTotal = QLoadTotal;
