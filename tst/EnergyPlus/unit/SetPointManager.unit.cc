@@ -69,7 +69,6 @@
 #include <DataZoneEquipment.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
