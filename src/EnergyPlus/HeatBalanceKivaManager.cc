@@ -1270,6 +1270,7 @@ namespace HeatBalanceKivaManager {
 
         defaultFoundation.foundation = defFnd;
         defaultFoundation.name = "<Default Foundation>";
+        defaultFoundation.assumedIndoorTemperature = -9999;
     }
 
     void KivaManager::addDefaultFoundation()
