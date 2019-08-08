@@ -178,17 +178,25 @@ void ScheduleCompact::createTimeSeries() {
     int priorThroughTime = 0;
     int currentDay = 0;
     int thisDayOfWeek = EnergyPlus::DataEnvironment::RunPeriodStartDayOfWeek - 1; // RunPeriodStartDayOfWeek should be 1-7, so this should be fine
+    int priorTimeStamp = -1;
     for (auto const & thisThrough : this->throughs) {
         int numDaysInThrough = ((thisThrough.timeStamp - priorThroughTime) / 86400) + 1; // TODO: double check this + 1 on the end
         for (int dayNum = 1; dayNum <= numDaysInThrough; dayNum++) {
             currentDay++;
             thisDayOfWeek++;
-            if (thisDayOfWeek == 8) {
+            if (thisDayOfWeek == 0) {
+                // weird situation with a weather environment that is run period but weather file simulation is turned off
+                // presumably because we've overridden the run with the -w flag?
+                // what about the doingsizing portion?
+                thisDayOfWeek = 1;
+            } else if (thisDayOfWeek == 8) {
                 thisDayOfWeek = 1;
             }
             Scheduling::DayType dt;
             auto const & thisEnvrnIndex = EnergyPlus::WeatherManager::Envrn;
-            if (EnergyPlus::WeatherManager::Environment(thisEnvrnIndex).KindOfEnvrn == EnergyPlus::DataGlobals::ksDesignDay) {
+            if (thisEnvrnIndex == 0) {
+                dt = DayType::MONDAY;
+            } else if (EnergyPlus::WeatherManager::Environment(thisEnvrnIndex).KindOfEnvrn == EnergyPlus::DataGlobals::ksDesignDay) {
                 dt = ScheduleBase::mapWeatherManagerDayTypeToScheduleDayType(
                     EnergyPlus::WeatherManager::DesDayInput(EnergyPlus::WeatherManager::Environment(thisEnvrnIndex).DesignDayNum).DayType);
             } else {
@@ -200,9 +208,15 @@ void ScheduleCompact::createTimeSeries() {
                 if (thisFor.hasAllOtherDays || (thisFor.days & bs).any()) {
                     for (auto const & thisUntil : thisFor.untils) {
                         auto currentTimeStamp = priorThroughTime + ((dayNum - 1) * 86400) + thisUntil.time;
+                        if (currentTimeStamp <= priorTimeStamp) {
+                            EnergyPlus::ShowFatalError("Bad timestamp calculation");
+                        }
                         this->timeStamp.push_back(currentTimeStamp);
                         this->values.push_back(thisUntil.value);
+                        priorTimeStamp = currentTimeStamp;
                     }
+                    // break if we've found a match
+                    break;
                 }
             }
         }

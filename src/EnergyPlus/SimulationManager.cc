@@ -359,6 +359,7 @@ namespace SimulationManager {
         ManageBranchInput(); // just gets input and returns.
 
         DoingSizing = true;
+        Scheduling::prepareSchedulesForNewEnvironment();
         ManageSizing();
 
         BeginFullSimFlag = true;
