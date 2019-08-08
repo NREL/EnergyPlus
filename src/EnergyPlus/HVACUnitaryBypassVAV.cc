@@ -1598,10 +1598,10 @@ namespace HVACUnitaryBypassVAV {
         }
 
         // IF CBVAV system was not autosized and the fan is autosized, check that fan volumetric flow rate is greater than CBVAV flow rates
-        if (!DataGlobals::DoingSizing && CBVAV(CBVAVNum).CheckFanFlow) {
+        if (CBVAV(CBVAVNum).CheckFanFlow) {
             std::string CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass";
 
-            if (CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
+            if (!DataGlobals::DoingSizing && CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
                 //     Check fan versus system supply air flow rates
                 if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).MaxCoolAirVolFlow) {
                     ShowWarningError(CurrentModuleObject + " - air flow rate = " + General::TrimSigDigits(CBVAV(CBVAVNum).FanVolFlow, 7) +
@@ -2164,7 +2164,9 @@ namespace HVACUnitaryBypassVAV {
 
         // Bypass excess system air through bypass duct and calculate new mixed air conditions at OA mixer inlet node
         if (CBVAV(CBVAVNum).plenumIndex > 0 || CBVAV(CBVAVNum).mixerIndex > 0) {
+            Real64 saveMixerInletAirNodeFlow = DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate;
             DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode) = DataLoopNode::Node(InletNode);
+            DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate = saveMixerInletAirNodeFlow;
         } else {
             DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).Temp =
                 (1.0 - BypassDuctFlowFraction) * DataLoopNode::Node(InletNode).Temp + BypassDuctFlowFraction * DataLoopNode::Node(OutletNode).Temp;
