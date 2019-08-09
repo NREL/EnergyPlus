@@ -7614,7 +7614,6 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     int EquipPtr(1);               // index to equipment list
     int CurZoneNum(1);             // index to zone
     int ZoneInletAirNode(0);       // zone inlet node number
-    Real64 DefrostWatts(0.0);      // calculation of VRF defrost power [W]
     Real64 SysOutputProvided(0.0); // function returns sensible capacity [W]
     Real64 LatOutputProvided(0.0); // function returns latent capacity [W]
 
@@ -8219,8 +8218,8 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     ASSERT_EQ(1, NumVRFTU);
     ASSERT_EQ(1, NumFans);
     ASSERT_EQ(2, NumDXCoils);
-    ASSERT_EQ("TU1 VRF DX COOLING COIL", DXCoil( 1 ).Name);
-    ASSERT_EQ("TU1 VRF DX HEATING COIL", DXCoil( 2 ).Name);
+    ASSERT_EQ("TU1 VRF DX COOLING COIL", thisDXCoolingCoil.Name);
+    ASSERT_EQ("TU1 VRF DX HEATING COIL", thisDXHeatingCoil.Name);
     // check if total cooling rate provided by the cooling coil matches
     // sum of the cooling delivered by VRF ATU and fan power when no OA
     EXPECT_EQ(0.0, thisVRFTU.CoolOutAirMassFlow);
@@ -8237,16 +8236,12 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     //   Test a group of methods related with the outdoor unit compressor calculations in the VRF_FluidTCtrl model.
 
     // Inputs_general
-    int const FlagCondMode(0); // Flag for running as condenser [-]
-    int const FlagEvapMode(1); // Flag for running as evaporator [-]
     bool ErrorsFound(false);       // function returns true on error
     bool FirstHVACIteration(true); // simulate the first pass through HVAC simulation, use false for next iteration
     int VRFCond(1);                // index to VRF condenser
     int VRFTUNum(1);               // index to VRF terminal unit
     int EquipPtr(1);               // index to equipment list
     int CurZoneNum(1);             // index to zone
-    int ZoneInletAirNode(0);       // zone inlet node number
-    Real64 DefrostWatts(0.0);      // calculation of VRF defrost power [W]
     Real64 SysOutputProvided(0.0); // function returns sensible capacity [W]
     Real64 LatOutputProvided(0.0); // function returns latent capacity [W]
 
@@ -9933,8 +9928,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     ASSERT_EQ(1, NumVRFTU);
     ASSERT_EQ(1, NumFans);
     ASSERT_EQ(2, NumDXCoils);
-    ASSERT_EQ("TU1 VRF DX COOLING COIL", DXCoil( 1 ).Name);
-    ASSERT_EQ("TU1 VRF DX HEATING COIL", DXCoil( 2 ).Name);
+    ASSERT_EQ("TU1 VRF DX COOLING COIL", thisDXCoolingCoil.Name);
+    ASSERT_EQ("TU1 VRF DX HEATING COIL", thisDXHeatingCoil.Name);
     // check if total cooling rate provided by the DX cooling coil matches
     // sum of the cooling delivered by VRF ATU and fan power when no OA
     EXPECT_EQ(0.0, thisVRFTU.CoolOutAirMassFlow);

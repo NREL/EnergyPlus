@@ -15797,15 +15797,10 @@ namespace DXCoils {
         Real64 InletAirDryBulbTemp;   // inlet air dry bulb temperature [C]
         Real64 InletAirEnthalpy;      // inlet air enthalpy [J/kg]
         Real64 InletAirHumRat;        // inlet air humidity ratio [kg/kg]
-        Real64 InletAirHumRatTemp;    // inlet air humidity ratio used in ADP/BF loop [kg/kg]
         //  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
         Real64 RatedCBF;      // coil bypass factor at rated conditions
-        Real64 SHR;           // Sensible Heat Ratio (sensible/total) of the cooling coil
         Real64 CBF;           // coil bypass factor at off rated conditions
         Real64 A0;            // NTU * air mass flow rate, used in CBF calculation
-        Real64 hDelta;        // Change in air enthalpy across the cooling coil [J/kg]
-        Real64 hADP;          // Apparatus dew point enthalpy [J/kg]
-        Real64 hTinwADP;      // Enthalpy at inlet dry-bulb and wADP [J/kg]
         Real64 PLF;           // Part load factor, accounts for thermal lag at compressor startup, used in power calculation
         Real64 CondInletTemp; // Condenser inlet temperature (C). Outdoor dry-bulb temp for air-cooled condenser.
         // Outdoor Wetbulb +(1 - effectiveness)*(outdoor drybulb - outdoor wetbulb) for evap condenser.
@@ -15822,11 +15817,8 @@ namespace DXCoils {
         Real64 OutdoorWetBulb;  // Outdoor wet-bulb temperature at condenser (C)
         Real64 OutdoorHumRat;   // Outdoor humidity ratio at condenser (kg/kg)
         Real64 OutdoorPressure; // Outdoor barometric pressure at condenser (Pa)
-        Real64 tADP;            // Apparatus dew point temperature [C]
-        Real64 wADP;            // Apparatus dew point humidity ratio [kg/kg]
 
         static Real64 CurrentEndTime(0.0); // end time of time step for current simulation time step
-        static Real64 MinAirHumRat(0.0);   // minimum of the inlet air humidity ratio and the outlet air humidity ratio
         int Mode;                          // Performance mode for Multimode DX coil; Always 1 for other coil types
         Real64 OutletAirTemp;              // Supply air temperature (average value if constant fan, full output if cycling fan)
         Real64 OutletAirHumRat;            // Supply air humidity ratio (average value if constant fan, full output if cycling fan)

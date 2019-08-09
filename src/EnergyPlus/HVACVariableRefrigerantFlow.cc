@@ -7925,7 +7925,6 @@ namespace HVACVariableRefrigerantFlow {
         int VRFTUOutletNodeNum;     // TU air outlet node
         int VRFTUInletNodeNum;      // TU air inlet node
         Real64 AirMassFlow;         // total supply air mass flow [m3/s]
-        Real64 MinHumRat;           // minimum humidity ratio for sensible capacity calculation (kg/kg)
         int OpMode;                 // fan operating mode, CycFanCycCoil or ContFanCycCoil
         int VRFCond;                // index to VRF condenser
         Real64 SpecHumOut;          // specific humidity ratio at outlet node
@@ -10928,7 +10927,6 @@ namespace HVACVariableRefrigerantFlow {
         int VRFTUOutletNodeNum;     // TU air outlet node
         int VRFTUInletNodeNum;      // TU air inlet node
         Real64 AirMassFlow;         // total supply air mass flow [m3/s]
-        Real64 MinHumRat;           // minimum humidity ratio for sensible capacity calculation (kg/kg)
         int OpMode;                 // fan operating mode, CycFanCycCoil or ContFanCycCoil
         int VRFCond;                // index to VRF condenser
         Real64 SpecHumOut;          // specific humidity ratio at outlet node
