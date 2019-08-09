@@ -10939,7 +10939,6 @@ namespace HVACVariableRefrigerantFlow {
         Real64 CondTemp;            // condensing temperature
         static int ATMixOutNode(0); // outlet node of ATM Mixer
         int ZoneNode;               // Zone node of VRFTU is serving
-
         // FLOW
 
         VRFCond = this->VRFSysNum;
@@ -11163,7 +11162,7 @@ namespace HVACVariableRefrigerantFlow {
             (VRF(VRFCond).HeatRecoveryUsed && TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList))) {
             // VRF terminal unit is on cooling mode
             DXCoilNum = this->CoolCoilIndex;
-            QCoilReq = ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum).RemainingOutputRequired;
+            QCoilReq = -PartLoadRatio * DXCoil(DXCoilNum).RatedTotCap(Mode);
             TeTc = VRF(VRFCond).IUEvaporatingTemp;
 
             // For HR operations, Te is lower than the outdoor air temperature because of outdoor evaporator operations
@@ -11174,7 +11173,7 @@ namespace HVACVariableRefrigerantFlow {
                    (VRF(VRFCond).HeatRecoveryUsed && TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList))) {
             // VRF terminal unit is on heating mode
             DXCoilNum = this->HeatCoilIndex;
-            QCoilReq = ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum).RemainingOutputRequired;
+            QCoilReq = PartLoadRatio * DXCoil(DXCoilNum).RatedTotCap(Mode);
             TeTc = VRF(VRFCond).IUCondensingTemp;
 
         } else {
