@@ -153,7 +153,11 @@ DayType ScheduleBase::mapWeatherManagerDayTypeToScheduleDayType(int const wmDayT
 
 void ScheduleBase::setupOutputVariables()
 {
-    EnergyPlus::SetupOutputVariable("NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, this->value, "Zone", "Average", this->name);
+    if (this->typeName == "Schedule:File:Shading") { // TODO: Convert over to regular Schedule Value once they aren't supported by the legacy ScheduleManager
+        EnergyPlus::SetupOutputVariable("Schedule Value", EnergyPlus::OutputProcessor::Unit::None, this->value, "Zone", "Average", this->name);
+    } else {
+        EnergyPlus::SetupOutputVariable("NEW Schedule Value", EnergyPlus::OutputProcessor::Unit::None, this->value, "Zone", "Average", this->name);
+    }
     EnergyPlus::SetupEMSActuator(this->typeName, this->name, "Schedule Value", "[ ]", this->emsActuatedOn, this->emsActuatedValue);
 }
 

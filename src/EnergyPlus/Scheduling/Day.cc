@@ -305,7 +305,7 @@ namespace Scheduling {
         }
         int const minutesPerItem = fields.at("minutes_per_item"); // required and no default
         int currentUntilTime = 0;
-        auto & intervalsData = fields.at("items");
+        auto & intervalsData = fields.at("extensions");
         for (auto const & intervalData : intervalsData) {
             currentUntilTime += minutesPerItem * 60;
             Real64 value = intervalData.at("value");

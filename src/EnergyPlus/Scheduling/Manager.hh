@@ -90,6 +90,7 @@ void resetAllTimeStartIndex(); // should be called for each time time goes backw
 Real64 GetScheduleValue(int scheduleIndex);
 
 void updateAllSchedules(int simTime);
+void setupScheduleOutputVariables();
 
 // some simple data mining functions
 int numSchedules();

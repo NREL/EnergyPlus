@@ -470,6 +470,7 @@ namespace SimulationManager {
 
         ResetEnvironmentCounter();
 
+        Scheduling::setupScheduleOutputVariables();
         EnvCount = 0;
         WarmupFlag = true;
 

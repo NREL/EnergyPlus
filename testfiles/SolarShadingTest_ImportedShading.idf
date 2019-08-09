@@ -93,8 +93,8 @@
     3.9999999E-02,           !- Loads Convergence Tolerance Value
     0.4000000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
-    1,                      !- Maximum Number of Warmup Days
-    1;                       !- Minimum Number of Warmup Days
+    25,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
 
   SurfaceConvectionAlgorithm:Inside,TARP;
 

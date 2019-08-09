@@ -199,30 +199,43 @@ void processAllSchedules()
     // then we'll go through and call each subtype factory and accumulate index values into our map
     ScheduleConstant::processInput();
     for (size_t subTypeIndex = 0; subTypeIndex < scheduleConstants.size(); subTypeIndex++) {
-        if (subTypeIndex > 0) scheduleConstants[subTypeIndex].setupOutputVariables();  // skip the zeroeth, built-in, schedule:constant object
         indexToSubtypeMap.emplace_back(scheduleConstants[subTypeIndex].name, ScheduleType::CONSTANT, subTypeIndex);
     }
     ScheduleCompact::processInput();
     for (size_t subTypeIndex = 0; subTypeIndex < scheduleCompacts.size(); subTypeIndex++) {
-        scheduleCompacts[subTypeIndex].setupOutputVariables();
         indexToSubtypeMap.emplace_back(scheduleCompacts[subTypeIndex].name, ScheduleType::COMPACT, subTypeIndex);
     }
     ScheduleYear::processInput();
     for (size_t subTypeIndex = 0; subTypeIndex < scheduleYears.size(); subTypeIndex++) {
-        scheduleYears[subTypeIndex].setupOutputVariables();
         indexToSubtypeMap.emplace_back(scheduleYears[subTypeIndex].name, ScheduleType::YEAR, subTypeIndex);
     }
     ScheduleFile::processInput();
     for (size_t subTypeIndex = 0; subTypeIndex < scheduleFiles.size(); subTypeIndex++) {
-        scheduleFiles[subTypeIndex].setupOutputVariables();
         indexToSubtypeMap.emplace_back(scheduleFiles[subTypeIndex].name, ScheduleType::FILE, subTypeIndex);
     }
     ScheduleFileShading::processInput();
     for (size_t subTypeIndex = 0; subTypeIndex < scheduleFileShadings.size(); subTypeIndex++) {
-        scheduleFileShadings[subTypeIndex].setupOutputVariables();
         indexToSubtypeMap.emplace_back(scheduleFileShadings[subTypeIndex].name, ScheduleType::SHADING_FILE, subTypeIndex);
     }
     scheduleInputProcessed = true;
+}
+
+void setupScheduleOutputVariables() {
+    for (size_t subTypeIndex = 0; subTypeIndex < scheduleConstants.size(); subTypeIndex++) {
+        if (subTypeIndex > 0) scheduleConstants[subTypeIndex].setupOutputVariables();  // skip the zeroeth, built-in, schedule:constant object
+    }
+    for (auto & scheduleCompact : scheduleCompacts) {
+        scheduleCompact.setupOutputVariables();
+    }
+    for (auto & scheduleYear : scheduleYears) {
+        scheduleYear.setupOutputVariables();
+    }
+    for (auto & scheduleFile : scheduleFiles) {
+        scheduleFile.setupOutputVariables();
+    }
+    for (auto & scheduleFileShading : scheduleFileShadings) {
+        scheduleFileShading.setupOutputVariables();
+    }
 }
 
 Real64 GetScheduleValue(int scheduleIndex)

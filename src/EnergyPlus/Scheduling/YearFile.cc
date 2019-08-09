@@ -69,9 +69,9 @@ std::vector<std::vector<std::string>> processCSVLines(std::vector<std::string> c
     int maxExpectedColumnIndex = -1;
     std::stringstream ss2(line0);
     while( ss2.good() ) {
-        maxExpectedColumnIndex++;
         std::string substr;
         getline(ss2, substr, columnDelimiter);  // TODO: Test all 4 delimiters
+        maxExpectedColumnIndex++;
     }
     // then we'll actually get the data from the file, filling out to the number of expected columns based on the header (first) line
     std::vector<std::vector<std::string>> overallDataset;
@@ -333,7 +333,7 @@ void ScheduleFileShading::processInput()
             columnIndex++;
             std::string substr;
             getline(ss2, substr, ',');
-            if (columnIndex > 1) { // skip timestamp column
+            if (columnIndex > 1 && !substr.empty()) { // skip first timestamp column and column implied by trailing comma
                 scheduleFileShadings.emplace_back(fileName, substr, columnIndex);
             }
         }

@@ -6362,7 +6362,6 @@ namespace SurfaceGeometry {
         int IOStat;
         int SurfNum;
         int NodeNum;
-        int ExtShadingSchedNum;
         int SurroundingSurfsNum;
 
         //-----------------------------------------------------------------------
