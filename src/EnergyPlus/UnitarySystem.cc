@@ -3117,8 +3117,8 @@ namespace UnitarySystems {
                                                     .EquipName(EquipNum) != thisObjectName)
                                             continue;
                                         // When used as zone equipment these 2 variables will not be used to access SequencedOutput variables
-                                        // leave this here in case it could be used in the future. It would need to be changed to use equipIndex instead.
-                                        // (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
+                                        // leave this here in case it could be used in the future. It would need to be changed to use equipIndex
+                                        // instead. (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
                                         thisSys.m_ZoneSequenceCoolingNum =
                                             DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .CoolingPriority(EquipNum);
@@ -3186,8 +3186,8 @@ namespace UnitarySystems {
                                                     .EquipName(EquipNum) != thisObjectName)
                                             continue;
                                         // When used as zone equipment these 2 variables will not be used to access SequencedOutput variables
-                                        // leave this here in case it could be used in the future. It would need to be changed to use equipIndex instead.
-                                        // (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
+                                        // leave this here in case it could be used in the future. It would need to be changed to use equipIndex
+                                        // instead. (i.e., for (ZoneEqInList = 1 to n, find equipment and return loop index)
                                         thisSys.m_ZoneSequenceCoolingNum =
                                             DataZoneEquipment::ZoneEquipList(DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).EquipListIndex)
                                                 .CoolingPriority(EquipNum);
@@ -3357,7 +3357,7 @@ namespace UnitarySystems {
                             if (isNotOK) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
-                            } else {                                                                  // mine data from fan object
+                            } else { // mine data from fan object
                                 if (HVACFan::getFanObjectVectorIndex(loc_m_FanName) < 0) {
                                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(loc_m_FanName)); // call constructor
                                 }
@@ -6372,6 +6372,9 @@ namespace UnitarySystems {
                             thisSys.m_HeatMassFlowRate.resize(thisSys.m_NumOfSpeedHeating + 1);
                             thisSys.m_HeatVolumeFlowRate.resize(thisSys.m_NumOfSpeedHeating + 1);
                             thisSys.m_MSHeatingSpeedRatio.resize(thisSys.m_NumOfSpeedHeating + 1);
+                            if (DataGlobals::DoCoilDirectSolutions) {
+                                thisSys.FullOutput.resize(thisSys.m_NumOfSpeedHeating + 1);
+                            }
                             for (int i = 1; i <= thisSys.m_NumOfSpeedHeating; ++i) {
                                 thisSys.m_HeatMassFlowRate[i] = 0.0;
                                 thisSys.m_HeatVolumeFlowRate[i] = 0.0;
@@ -6384,6 +6387,10 @@ namespace UnitarySystems {
                             thisSys.m_CoolMassFlowRate.resize(thisSys.m_NumOfSpeedCooling + 1);
                             thisSys.m_CoolVolumeFlowRate.resize(thisSys.m_NumOfSpeedCooling + 1);
                             thisSys.m_MSCoolingSpeedRatio.resize(thisSys.m_NumOfSpeedCooling + 1);
+                            if (DataGlobals::DoCoilDirectSolutions && thisSys.m_NumOfSpeedCooling > thisSys.m_NumOfSpeedHeating) {
+                                thisSys.FullOutput.resize(thisSys.m_NumOfSpeedCooling + 1);
+                                DXCoils::DisableLatentDegradation(thisSys.m_CoolingCoilIndex);
+                            }
                             for (int i = 1; i <= thisSys.m_NumOfSpeedCooling; ++i) {
                                 thisSys.m_CoolMassFlowRate[i] = 0.0;
                                 thisSys.m_CoolVolumeFlowRate[i] = 0.0;
@@ -7751,6 +7758,9 @@ namespace UnitarySystems {
                                                   HeatCoilLoad,
                                                   SupHeaterLoad,
                                                   CompressorONFlag);
+                    if (DataGlobals::DoCoilDirectSolutions && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
+                        this->FullOutput[SpeedNum] = SensOutputOn;
+                    }
                     if (this->m_HeatingCoilType_Num != DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit &&
                         (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater && !this->m_MultiSpeedHeatingCoil)) {
                         this->m_HeatingSpeedRatio = 0.0;
@@ -7801,7 +7811,9 @@ namespace UnitarySystems {
                                                   HeatCoilLoad,
                                                   SupHeaterLoad,
                                                   CompressorONFlag);
-
+                    if (DataGlobals::DoCoilDirectSolutions && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
+                        this->FullOutput[SpeedNum] = SensOutputOn;
+                    }
                     if ((this->m_CoolingCoilType_Num != DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) &&
                         ((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
                           this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) &&
@@ -7972,10 +7984,10 @@ namespace UnitarySystems {
             // must test to see if load is bounded by capacity before calling RegulaFalsi
             if ((HeatingLoad && ZoneLoad < SensOutputOn) || (CoolingLoad && ZoneLoad > SensOutputOn)) {
                 if ((HeatingLoad && ZoneLoad > SensOutputOff) || (CoolingLoad && ZoneLoad < SensOutputOff)) {
+                    Real64 SensOutput;
+                    Real64 LatOutput;
                     if (DataGlobals::DoCoilDirectSolutions && CoolingLoad &&
                         this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
-                        Real64 SensOutput;
-                        Real64 LatOutput;
                         CoolPLR = (ZoneLoad - SensOutputOff) / (SensOutputOn - SensOutputOff);
                         HeatPLR = 0.0;
                         this->calcUnitarySystemToLoad(AirLoopNum,
@@ -7993,10 +8005,32 @@ namespace UnitarySystems {
                                (this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
                                 this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric ||
                                 this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel)) {
-                        Real64 SensOutput;
-                        Real64 LatOutput;
                         CoolPLR = 0.0;
                         HeatPLR = (ZoneLoad - SensOutputOff) / (SensOutputOn - SensOutputOff);
+                        this->calcUnitarySystemToLoad(AirLoopNum,
+                                                      FirstHVACIteration,
+                                                      CoolPLR,
+                                                      HeatPLR,
+                                                      OnOffAirFlowRatio,
+                                                      SensOutput,
+                                                      LatOutput,
+                                                      HXUnitOn,
+                                                      HeatCoilLoad,
+                                                      SupHeaterLoad,
+                                                      CompressorONFlag);
+                    } else if (DataGlobals::DoCoilDirectSolutions && HeatingLoad &&
+                               this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
+                        CoolPLR = 0.0;
+                        if (this->m_HeatingSpeedNum == 1) {
+                            this->m_HeatingCycRatio = (ZoneLoad - SensOutputOff) / (this->FullOutput[this->m_HeatingSpeedNum] - SensOutputOff);
+                            HeatPLR = this->m_HeatingCycRatio;
+                            this->m_HeatingSpeedRatio = 0.0;
+                        } else {
+                            this->m_HeatingCycRatio = 1.0;
+                            this->m_HeatingSpeedRatio = (ZoneLoad - this->FullOutput[this->m_HeatingSpeedNum - 1]) /
+                                                        (this->FullOutput[this->m_HeatingSpeedNum] - this->FullOutput[this->m_HeatingSpeedNum - 1]);
+                            HeatPLR = this->m_HeatingSpeedRatio;
+                        }
                         this->calcUnitarySystemToLoad(AirLoopNum,
                                                       FirstHVACIteration,
                                                       CoolPLR,
@@ -9499,7 +9533,11 @@ namespace UnitarySystems {
                         AverageUnitMassFlow; // #5531 zone equipment needs MaxAvail set or fan will not turn ON
                 }
                 if (AverageUnitMassFlow > 0.0) {
-                    OnOffAirFlowRatio = CompOnMassFlow / AverageUnitMassFlow;
+                    if (SpeedNum > 1) {
+                        OnOffAirFlowRatio = 1.0;
+                    } else {
+                        OnOffAirFlowRatio = CompOnMassFlow / AverageUnitMassFlow;
+                    }
                 } else {
                     OnOffAirFlowRatio = 0.0;
                 }

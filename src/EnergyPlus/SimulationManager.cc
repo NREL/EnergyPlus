@@ -1154,24 +1154,18 @@ namespace SimulationManager {
             ShowFatalError("Errors found getting Project Input");
         }
 
-        CurrentModuleObject = "PerformancePrecisionTradeoffs";
-        NumRunControl = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        if (NumRunControl > 0) {
-            RunControlInInput = true;
-            inputProcessor->getObjectItem(CurrentModuleObject,
-                                          1,
-                                          Alphas,
-                                          NumAlpha,
-                                          Number,
-                                          NumNumber,
-                                          IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            if (Alphas(1) == "YES") DataGlobals::DoCoilDirectSolutions = true;
-            if (NumAlpha > 1) {
-                if (Alphas(2) == "YES") UseCachedUtilityFunctions = true;
+        auto const instances = inputProcessor->epJSON.find("PerformancePrecisionTradeoffs");
+        if (instances != inputProcessor->epJSON.end()) {
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed("PerformancePrecisionTradeoffs", thisObjectName);
+                if (fields.find("use_coil_direct_solutions") != fields.end()) {
+                    if (UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES") {
+                        DoCoilDirectSolutions = true;
+                    }
+                }
             }
         }
 
