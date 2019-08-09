@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/Scheduling/Manager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SolarShading.hh>
@@ -1009,7 +1010,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    Scheduling::processAllSchedules(); // read schedules
 
     HeatBalanceManager::GetMaterialData(FoundError);
     EXPECT_FALSE(FoundError);
@@ -1059,14 +1060,16 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     SolarShading::SkyDifSolarShading();
     CalcSkyDifShading = false;
 
-    ScheduleManager::UpdateScheduleValues();
+    Scheduling::prepareSchedulesForNewEnvironment();
+    Scheduling::updateAllSchedules(0);
     DataBSDFWindow::SUNCOSTS(4, 9, 1) = 0.1;
     DataBSDFWindow::SUNCOSTS(4, 9, 2) = 0.1;
     DataBSDFWindow::SUNCOSTS(4, 9, 3) = 0.1;
     FigureSolarBeamAtTimestep(DataGlobals::HourOfDay, DataGlobals::TimeStep);
+    auto scheduleReference = Scheduling::getScheduleReference("EXTSHADINGSCH:ZN001:ROOF");
 
     EXPECT_TRUE(UseScheduledSunlitFrac);
-    EXPECT_DOUBLE_EQ(0.5432, ScheduleManager::LookUpScheduleValue(2, 9, 4));
+    EXPECT_DOUBLE_EQ(0.5432, scheduleReference->lookupScheduleValue(9, 4));
     EXPECT_FALSE(SolarShading::SUNCOS(3) < 0.00001);
     EXPECT_DOUBLE_EQ(0.00001, DataEnvironment::SunIsUpValue);
     ;
