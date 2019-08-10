@@ -47,6 +47,7 @@
 
 #include <fstream>
 
+#include <DataSystemVariables.hh>
 #include <EnergyPlus.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <Scheduling/Base.hh>
@@ -103,6 +104,15 @@ void processCSVFile(const std::string& fileToOpen, char const columnDelimiter)
     // This function adds the entire file contents of the given file path to a "master" map called Scheduling::fileData
     // This file does not populate individual schedules, it simply adds it to the list for later processing
     // Multiple schedules could access different subsets of the same file, so we only want to process each file once
+    std::string fileNameToUse;
+    bool fileExists;
+    EnergyPlus::DataSystemVariables::CheckForActualFileName(fileToOpen, fileExists, fileNameToUse);
+    if (!fileExists) {
+        EnergyPlus::ShowSevereError("Issue processing Schedule:File:*; \"" + fileToOpen + "\" not found.");
+        EnergyPlus::ShowContinueError("Certain run environments require a full path to be included with the file name in the input field.");
+        EnergyPlus::ShowContinueError("Try again with putting full path and file name in the field.");
+        EnergyPlus::ShowFatalError("Schedule file issue causes program termination");
+    }
     std::ifstream fileInstance(fileToOpen);
     if (!fileInstance.is_open()) {
         EnergyPlus::ShowFatalError("Could not open schedule file for processing, check path: " + fileToOpen);
