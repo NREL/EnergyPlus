@@ -123,7 +123,7 @@ void processCSVFile(const std::string& fileToOpen, char const columnDelimiter)
         lines.push_back(line);
     }
     auto a = processCSVLines(lines, columnDelimiter);
-    Scheduling::fileData[fileToOpen] = a; // TODO: Why isn't this getting populated?
+    Scheduling::fileData[fileToOpen] = a;
 }
 
 // SCHEDULE:FILE METHODS
