@@ -401,9 +401,9 @@ namespace EvaporativeCoolers {
                               Real64 const FlowRatio   // secondary air flow fraction
     );
 
-    void CalcIndirectResearchSpecialEvapCooler(int const EvapCoolNum);
+    void CalcIndirectResearchSpecialEvapCooler(int const EvapCoolNum, Real64 const FanPLR);
 
-    void CalcDirectResearchSpecialEvapCooler(int const EvapCoolNum);
+    void CalcDirectResearchSpecialEvapCooler(int const EvapCoolNum, Real64 const FanPLR);
 
     // End Algorithm Section of the Module
     // *****************************************************************************
