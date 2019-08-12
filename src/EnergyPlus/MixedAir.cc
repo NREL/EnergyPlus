@@ -1367,9 +1367,10 @@ namespace MixedAir {
         int i;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_700("('!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
-                                   "{Yes/No},','System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
-                                   "Name,DSZAD Name')");
+        static ObjexxFCL::gio::Fmt Format_700(
+            "('!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
+            "{Yes/No},','System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
+            "Name,DSZAD Name')");
         static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // First, call other get input routines in this module to make sure data is filled during this routine.
@@ -1972,8 +1973,9 @@ namespace MixedAir {
                 {
                     IOFlags flags;
                     flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << " Controller:MechanicalVentilation," + VentilationMechanical(VentMechNum).Name + ',' +
-                                                                    VentilationMechanical(VentMechNum).SchName + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << " Controller:MechanicalVentilation," +
+                                                                               VentilationMechanical(VentMechNum).Name + ',' +
+                                                                               VentilationMechanical(VentMechNum).SchName + ',';
                 }
                 if (VentilationMechanical(VentMechNum).DCVFlag) {
                     {
@@ -2046,26 +2048,29 @@ namespace MixedAir {
                 {
                     IOFlags flags;
                     flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(VentilationMechanical(VentMechNum).ZoneMaxOAFraction, 2) + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
+                        << RoundSigDigits(VentilationMechanical(VentMechNum).ZoneMaxOAFraction, 2) + ',';
                 }
                 {
                     IOFlags flags;
                     flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << RoundSigDigits(VentilationMechanical(VentMechNum).NumofVentMechZones) + ',';
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
+                        << RoundSigDigits(VentilationMechanical(VentMechNum).NumofVentMechZones) + ',';
                 }
                 for (jZone = 1; jZone <= VentilationMechanical(VentMechNum).NumofVentMechZones; ++jZone) {
                     if (jZone < VentilationMechanical(VentMechNum).NumofVentMechZones) {
                         {
                             IOFlags flags;
                             flags.ADVANCE("NO");
-                            ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name + ',' +
-                                                                            VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
-                                                                            VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone) + ',';
+                            ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
+                                << Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name + ',' +
+                                       VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
+                                       VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone) + ',';
                         }
                     } else {
                         ObjexxFCL::gio::write(OutputFileInits, fmtA) << VentilationMechanical(VentMechNum).VentMechZoneName(jZone) + ',' +
-                                                                 VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
-                                                                 VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone);
+                                                                            VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
+                                                                            VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone);
                     }
                 }
             }
