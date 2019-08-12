@@ -104,15 +104,6 @@ void processCSVFile(const std::string& fileToOpen, char const columnDelimiter)
     // This function adds the entire file contents of the given file path to a "master" map called Scheduling::fileData
     // This file does not populate individual schedules, it simply adds it to the list for later processing
     // Multiple schedules could access different subsets of the same file, so we only want to process each file once
-    std::string fileNameToUse;
-    bool fileExists;
-    EnergyPlus::DataSystemVariables::CheckForActualFileName(fileToOpen, fileExists, fileNameToUse);
-    if (!fileExists) {
-        EnergyPlus::ShowSevereError("Issue processing Schedule:File:*; \"" + fileToOpen + "\" not found.");
-        EnergyPlus::ShowContinueError("Certain run environments require a full path to be included with the file name in the input field.");
-        EnergyPlus::ShowContinueError("Try again with putting full path and file name in the field.");
-        EnergyPlus::ShowFatalError("Schedule file issue causes program termination");
-    }
     std::ifstream fileInstance(fileToOpen);
     if (!fileInstance.is_open()) {
         EnergyPlus::ShowFatalError("Could not open schedule file for processing, check path: " + fileToOpen);
@@ -236,7 +227,17 @@ ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &
     this->name = objectName;
     this->typeName = "Schedule:File";
     // these are required
-    this->fileName = fields.at("file_name");
+    std::string _fileName = fields.at("file_name");
+    std::string fileNameToUse;
+    bool fileExists;
+    EnergyPlus::DataSystemVariables::CheckForActualFileName(_fileName, fileExists, fileNameToUse);
+    if (!fileExists) {
+        EnergyPlus::ShowSevereError("Issue processing Schedule:File:*; \"" + _fileName + "\" not found.");
+        EnergyPlus::ShowContinueError("Certain run environments require a full path to be included with the file name in the input field.");
+        EnergyPlus::ShowContinueError("Try again with putting full path and file name in the field.");
+        EnergyPlus::ShowFatalError("Schedule file issue causes program termination");
+    }
+    this->fileName = fileNameToUse;
     this->columnNumber = fields.at("column_number");
     this->rowsToSkipAtTop = fields.at("rows_to_skip_at_top");
     // then there are optionals
@@ -327,11 +328,17 @@ void ScheduleFileShading::processInput()
         // do any pre-construction operations
         EnergyPlus::inputProcessor->markObjectAsUsed(thisObjectType, thisObjectName);
         std::string fileName = fields.at("file_name");
-//        if (fileData.find(fileName) != fileData.end()) {
-//            EnergyPlus::ShowFatalError("Shading file data already found - I dont think this will work"); // TODO: Evaluate
-//        }
-        processCSVFile(fileName, ',');
-        std::ifstream fileInstance(fileName);
+        std::string fileNameToUse;
+        bool fileExists;
+        EnergyPlus::DataSystemVariables::CheckForActualFileName(fileName, fileExists, fileNameToUse);
+        if (!fileExists) {
+            EnergyPlus::ShowSevereError("Issue processing Schedule:File:*; \"" + fileName + "\" not found.");
+            EnergyPlus::ShowContinueError("Certain run environments require a full path to be included with the file name in the input field.");
+            EnergyPlus::ShowContinueError("Try again with putting full path and file name in the field.");
+            EnergyPlus::ShowFatalError("Schedule file issue causes program termination");
+        }
+        processCSVFile(fileNameToUse, ',');
+        std::ifstream fileInstance(fileNameToUse);
         if (!fileInstance.is_open()) {
             EnergyPlus::ShowFatalError("Could not open shading schedule file for processing, check path: " + fileName);
         }
@@ -344,7 +351,7 @@ void ScheduleFileShading::processInput()
             std::string substr;
             getline(ss2, substr, ',');
             if (columnIndex > 1 && !substr.empty()) { // skip first timestamp column and column implied by trailing comma
-                scheduleFileShadings.emplace_back(fileName, substr, columnIndex);
+                scheduleFileShadings.emplace_back(fileNameToUse, substr, columnIndex);
             }
         }
     }
