@@ -2398,6 +2398,8 @@ namespace HeatBalanceManager {
             Material(MaterNum).TausThermal = MaterialProps(23);
             Material(MaterNum).EmissThermalFront = MaterialProps(24);
             Material(MaterNum).EmissThermalBack = MaterialProps(25);
+            Material(MaterNum).Resistance = MaterialProps(26);
+            if (Material(MaterNum).Resistance <= 0.0) Material(MaterNum).Resistance = 0.158; // equivalent to single pane of 1/4" inch standard glass
             // Assumes thermal emissivity is the same as thermal absorptance
             Material(MaterNum).AbsorpThermalFront = Material(MaterNum).EmissThermalFront;
             Material(MaterNum).AbsorpThermalBack = Material(MaterNum).EmissThermalBack;
