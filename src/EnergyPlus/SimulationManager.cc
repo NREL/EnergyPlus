@@ -503,7 +503,7 @@ namespace SimulationManager {
             DayOfSim = 0;
             DayOfSimChr = "0";
             NumOfWarmupDays = 0;
-            if (CurrentYearIsLeapYear = true) {
+            if (CurrentYearIsLeapYear) {
                 if (NumOfDayInEnvrn <= 366) {
                     isFinalYear = true;
                 }
