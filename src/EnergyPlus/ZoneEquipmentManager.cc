@@ -2657,7 +2657,7 @@ namespace ZoneEquipmentManager {
                                 ShowContinueError("...check zone thermostat set point and design supply air temperatures");
                                 ShowContinueError("...zone name = " + CalcFinalZoneSizing(I).ZoneName);
                                 ShowContinueError("...design heating load         = " + RoundSigDigits(CalcFinalZoneSizing(I).DesCoolLoad, 2) + " W");
-                                ShowContinueError("...thermostat set piont temp   = " + RoundSigDigits(CalcFinalZoneSizing(I).HeatTstatTemp, 3) +
+                                ShowContinueError("...thermostat set point temp   = " + RoundSigDigits(CalcFinalZoneSizing(I).HeatTstatTemp, 3) +
                                                   " C");
                                 ShowContinueError("...zone temperature            = " + RoundSigDigits(CalcFinalZoneSizing(I).ZoneTempAtHeatPeak, 3) +
                                                   " C");
@@ -4144,8 +4144,8 @@ namespace ZoneEquipmentManager {
                 const int &equipNum = PrioritySimOrder(priorityNum).EquipPtr;
 
                 // Determine whether we're heating or cooling and choose the appropriate fraction
-                const Real64 &heatLoadRatio = thisZEqList.SequentialHeatingFraction(equipNum);
-                const Real64 &coolLoadRatio = thisZEqList.SequentialCoolingFraction(equipNum);
+                const Real64 heatLoadRatio = thisZEqList.SequentialHeatingFraction(equipNum);
+                const Real64 coolLoadRatio = thisZEqList.SequentialCoolingFraction(equipNum);
                 const Real64 loadRatio = (energy.TotalOutputRequired >= 0.0) ? heatLoadRatio : coolLoadRatio;
 
                 // Energy loads
