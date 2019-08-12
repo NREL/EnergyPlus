@@ -60,7 +60,12 @@ TEST_F(SchedulingTestFixture, TestDuplicateNameFails)
                                                          "ScheduleTypeLimits,ThisTypeLimit,0.2,0.5,Continuous;"
                                                      });
     ASSERT_FALSE(process_idf(idf_objects, false));
+#ifdef _WIN32
+    // I honestly haven't a clue why the CI system is showing this as a failure; on Windows it should be platform specific \n, right?
+    compare_err_stream("   ** Severe  ** Duplicate name found. name: \"ThisTypeLimit\". Overwriting existing object.\r\n");
+#else
     compare_err_stream("   ** Severe  ** Duplicate name found. name: \"ThisTypeLimit\". Overwriting existing object.\n");
+#endif
 }
 
 }
