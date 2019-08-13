@@ -1706,4 +1706,51 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
     EXPECT_EQ(DataHeatBalance::OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_HAMT);
 }
 
+TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
+{
+
+    bool errorsfound = false;
+    
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+        "WindowMaterial:Glazing:EquivalentLayer,",
+        "GLZCLR,                  !- Name",
+        "SpectralAverage,         !- Optical Data Type",
+        ",                        !- Window Glass Spectral Data Set Name",
+        "0.77,                    !- Front Side Beam-Beam Solar Transmittance {dimensionless}",
+        "0.77,                    !- Back Side Beam-Beam Solar Transmittance {dimensionless}",
+        "0.07,                    !- Front Side Beam-Beam Solar Reflectance {dimensionless}",
+        "0.07,                    !- Back Side Beam-Beam Solar Reflectance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Beam Visible Solar Transmittance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Beam Visible Solar Transmittance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Beam Visible Solar Reflectance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Beam Visible Solar Reflectance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Diffuse Solar Transmittance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Diffuse Solar Transmittance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Diffuse Solar Reflectance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Diffuse Solar Reflectance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Diffuse Visible Solar Transmittance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Diffuse Visible Solar Transmittance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Diffuse Visible Solar Reflectance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Diffuse Visible Solar Reflectance {dimensionless}",
+        "0.695,                   !- Diffuse-Diffuse Solar Transmittance {dimensionless}",
+        "0.16,                    !- Front Side Diffuse-Diffuse Solar Reflectance {dimensionless}",
+        "0.16,                    !- Back Side Diffuse-Diffuse Solar Reflectance {dimensionless}",
+        "0.0,                     !- Diffuse-Diffuse Visible Solar Transmittance {dimensionless}",
+        "0.0,                     !- Front Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}",
+        "0.0,                     !- Back Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}",
+        "0.0,                     !- Infrared Transmittance (applies to front and back) {dimensionless}",
+        "0.84,                    !- Front Side Infrared Emissivity {dimensionless}",
+        "0.84;                    !- Back Side Infrared Emissivity {dimensionless}",
+    });
+    
+    EXPECT_TRUE(process_idf(idf_objects));
+    
+    HeatBalanceManager::GetMaterialData(errorsfound);
+
+    EXPECT_FALSE(errorsfound);
+    EXPECT_NEAR(DataHeatBalance::Material(1).Resistance,0.158,0.0001);
+    
+}
+    
 } // namespace EnergyPlus
