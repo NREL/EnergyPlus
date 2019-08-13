@@ -7357,7 +7357,7 @@ namespace UnitarySystems {
                     } else if (ControlNode == OutNode) {
                         this->m_DesiredOutletTemp = OAUCoilOutletTemp;
                     }
-                    // If the unitary system is an equipment of Outdoor Air Unit, the desired coil outlet humidity level is set to 1.0 (no dehum)
+                    // If the unitary system is an Outdoor Air Unit, the desired coil outlet humidity level is set to 1.0 (no dehum)
                     this->m_DesiredOutletHumRat = 1.0;
 
                 } else { // Not Outdoor Air Unit. Either airloop or zone equipment
@@ -7393,7 +7393,7 @@ namespace UnitarySystems {
                                                                 this->DesignMinOutletTemp,
                                                                 2);
                             }
-                            this->m_DesiredOutletHumRat = humRatMaxSP;
+                            this->m_DesiredOutletHumRat = humRatMaxSP; // should this be outside so as to capture humrat for 100%DOASDXCoil ?
                         }
                     } else {
                         if (DataLoopNode::Node(ControlNode).HumRatMax > 0.0) humRatMaxSP = DataLoopNode::Node(ControlNode).HumRatMax;
@@ -7415,7 +7415,7 @@ namespace UnitarySystems {
                                                                 this->DesignMinOutletTemp,
                                                                 2);
                             }
-                            this->m_DesiredOutletHumRat = humRatMaxSP;
+                            this->m_DesiredOutletHumRat = humRatMaxSP; // should this be outside so as to capture humrat for 100%DOASDXCoil ?
                         }
                     }
                 }
