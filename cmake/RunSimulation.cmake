@@ -29,6 +29,9 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PRODUCT_PATH}/E
 execute_process(COMMAND "${CMAKE_COMMAND}" -E remove_directory "${OUTPUT_DIR_PATH}" )
 execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${OUTPUT_DIR_PATH}" )
 
+# We may need to copy some assets over so they can be read during integration testing
+execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${BINARY_DIR}/${TEST_FILE_FOLDER}/datasets/" )
+
 # Read the file contents to check for special cases
 file(READ "${IDF_PATH}" IDF_CONTENT)
 

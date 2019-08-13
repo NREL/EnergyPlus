@@ -178,7 +178,7 @@ void ScheduleCompact::createTimeSeries() {
     int priorThroughTime = 0;
     int currentDay = 0;
     int thisDayOfWeek = EnergyPlus::DataEnvironment::RunPeriodStartDayOfWeek - 1; // RunPeriodStartDayOfWeek should be 1-7, so this should be fine
-//    int priorTimeStamp = -1;
+    std::cout << "Creating timeSeries for " << this->name << std::endl;
     for (auto const & thisThrough : this->throughs) {
         int numDaysInThrough = ((thisThrough.timeStamp - priorThroughTime) / Scheduling::Constants::secondsInDay) + 1; // TODO: double check this + 1 on the end
         for (int dayNum = 1; dayNum <= numDaysInThrough; dayNum++) {
@@ -191,6 +191,8 @@ void ScheduleCompact::createTimeSeries() {
                 thisDayOfWeek = 1;
             } else if (thisDayOfWeek == 8) {
                 thisDayOfWeek = 1;
+            } else if (thisDayOfWeek == 9) {
+                std::cout << "Day of week somehow equals 9" << std::endl;
             }
             Scheduling::DayType dt;
             auto const & thisEnvrnIndex = EnergyPlus::WeatherManager::Envrn;
@@ -199,7 +201,14 @@ void ScheduleCompact::createTimeSeries() {
             } else if (EnergyPlus::WeatherManager::Environment(thisEnvrnIndex).KindOfEnvrn == EnergyPlus::DataGlobals::ksDesignDay) {
                 dt = ScheduleBase::mapWeatherManagerDayTypeToScheduleDayType(
                     EnergyPlus::WeatherManager::DesDayInput(EnergyPlus::WeatherManager::Environment(thisEnvrnIndex).DesignDayNum).DayType);
+            } else if (EnergyPlus::WeatherManager::Environment(thisEnvrnIndex).KindOfEnvrn == EnergyPlus::DataGlobals::ksRunPeriodDesign) {
+                dt = ScheduleBase::mapWeatherManagerDayTypeToScheduleDayType(static_cast<int>(
+                    EnergyPlus::WeatherManager::RunPeriodDesignInput(EnergyPlus::WeatherManager::Environment(thisEnvrnIndex).RunPeriodDesignNum)
+                        .startWeekDay));
             } else {
+                if (this->name == "ACTIVITY SCH") {
+                    std::cout << "Getting day type for day of week " << thisDayOfWeek << std::endl;
+                }
                 dt = ScheduleBase::getDayTypeForDayOfWeek(thisDayOfWeek); // TODO: Need to check for DD status, custom day, holiday
             }
             std::bitset<Scheduling::NumDayTypeBits> bs;
