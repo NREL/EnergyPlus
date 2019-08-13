@@ -477,6 +477,9 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataSurfaces::Surface(1).TAirRef = DataSurfaces::ZoneMeanAirTemp;
     DataSurfaces::Surface(2).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
     DataSurfaces::Surface(3).TAirRef = DataSurfaces::AdjacentAirTemp;
+    DataSurfaces::Surface(1).SolarEnclIndex = 1;
+    DataSurfaces::Surface(2).SolarEnclIndex = 1;
+    DataSurfaces::Surface(3).SolarEnclIndex = 1;
     DataHeatBalSurface::TempSurfInTmp(1) = 15.0;
     DataHeatBalSurface::TempSurfInTmp(2) = 20.0;
     DataHeatBalSurface::TempSurfInTmp(3) = 25.0;
@@ -2587,6 +2590,9 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataSurfaces::Surface(1).TAirRef = DataSurfaces::ZoneMeanAirTemp;
     DataSurfaces::Surface(2).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
     DataSurfaces::Surface(3).TAirRef = DataSurfaces::AdjacentAirTemp;
+    DataSurfaces::Surface(1).SolarEnclIndex = 1;
+    DataSurfaces::Surface(2).SolarEnclIndex = 1;
+    DataSurfaces::Surface(3).SolarEnclIndex = 1;
     DataHeatBalSurface::TempSurfInTmp(1) = 15.0;
     DataHeatBalSurface::TempSurfInTmp(2) = 20.0;
     DataHeatBalSurface::TempSurfInTmp(3) = 25.0;
