@@ -8045,20 +8045,13 @@ namespace HVACVariableRefrigerantFlow {
             }
         }
 
-        // If there is a supply side air terminal mixer, calculate its output
-        if (this->ATMixerExists) {
-            if (this->ATMixerType == ATMixer_SupplySide) {
-                SimATMixer(this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
-            }
-        }
         Real64 LatentLoadMet = 0.0; // latent load deleivered [kgH2O/s]
-        Real64 TempOut = Node(VRFTUOutletNodeNum).Temp;
-        Real64 TempIn = Node(VRFTUInletNodeNum).Temp;
-        SpecHumOut = Node(VRFTUOutletNodeNum).HumRat;
-        SpecHumIn = Node(VRFTUInletNodeNum).HumRat;
+        Real64 TempOut = 0.0;
+        Real64 TempIn = 0.0;
         if (this->ATMixerExists) {
             if (this->ATMixerType == ATMixer_SupplySide) {
-                // Air terminal supply side mixer
+                // Air terminal supply side mixer, calculate supply side mixer output
+                SimATMixer(this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
                 TempOut = Node(ATMixOutNode).Temp;
                 TempIn = Node(ZoneNode).Temp;
                 SpecHumOut = Node(ATMixOutNode).HumRat;
@@ -8070,6 +8063,11 @@ namespace HVACVariableRefrigerantFlow {
                 SpecHumOut = Node(VRFTUOutletNodeNum).HumRat;
                 SpecHumIn = Node(ZoneNode).HumRat;
             }
+        } else {
+            TempOut = Node(VRFTUOutletNodeNum).Temp;
+            TempIn = Node(VRFTUInletNodeNum).Temp;
+            SpecHumOut = Node(VRFTUOutletNodeNum).HumRat;
+            SpecHumIn = Node(VRFTUInletNodeNum).HumRat;
         }
         // calculate sensible load met using delta enthalpy
         LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
@@ -8197,8 +8195,8 @@ namespace HVACVariableRefrigerantFlow {
 
         SensibleConditioning = VRFTU(VRFTUNum).TerminalUnitSensibleRate;
         LatentConditioning = VRFTU(VRFTUNum).TerminalUnitLatentRate;
-        Real64 TempOut = Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
-        Real64 TempIn = Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp;
+        Real64 TempOut = 0.0;
+        Real64 TempIn = 0.0;
         if (VRFTU(VRFTUNum).ATMixerExists) {
             if (VRFTU(VRFTUNum).ATMixerType == ATMixer_SupplySide) {
                 // Air terminal supply side mixer
@@ -8209,6 +8207,9 @@ namespace HVACVariableRefrigerantFlow {
                 TempOut = Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
                 TempIn = Node(VRFTU(VRFTUNum).ZoneAirNode).Temp;
             }
+        } else {
+            TempOut = Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
+            TempIn = Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp;
         }
         // latent heat vaporization/condensation used in moist air psychometrics
         Real64 const H2OHtOfVap = PsyHfgAvgFnTdb2Tdb1(TempOut, TempIn);
@@ -11072,20 +11073,13 @@ namespace HVACVariableRefrigerantFlow {
             }
         }
 
-        // calculate supply side terminal unit OA mixer
-        if (this->ATMixerExists) {
-            if (this->ATMixerType == ATMixer_SupplySide) {
-                SimATMixer(this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
-            }
-        }
         Real64 LatentLoadMet = 0.0;
-        Real64 TempOut = Node(VRFTUOutletNodeNum).Temp;
-        Real64 TempIn = Node(VRFTUInletNodeNum).Temp;
-        SpecHumOut = Node(VRFTUOutletNodeNum).HumRat;
-        SpecHumIn = Node(VRFTUInletNodeNum).HumRat;
+        Real64 TempOut = 0.0;
+        Real64 TempIn = 0.0;
         if (this->ATMixerExists) {
             if (this->ATMixerType == ATMixer_SupplySide) {
-                // Air terminal supply side mixer
+                // Air terminal supply side mixer, calculate supply side mixer output
+                SimATMixer(this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
                 TempOut = Node(ATMixOutNode).Temp;
                 TempIn = Node(ZoneNode).Temp;
                 SpecHumOut = Node(ATMixOutNode).HumRat;
@@ -11097,6 +11091,11 @@ namespace HVACVariableRefrigerantFlow {
                 SpecHumOut = Node(VRFTUOutletNodeNum).HumRat;
                 SpecHumIn = Node(ZoneNode).HumRat;
             }
+        } else {
+            TempOut = Node(VRFTUOutletNodeNum).Temp;
+            TempIn = Node(VRFTUInletNodeNum).Temp;
+            SpecHumOut = Node(VRFTUOutletNodeNum).HumRat;
+            SpecHumIn = Node(VRFTUInletNodeNum).HumRat;
         }
         // calculate sensible load met using delta enthalpy
         LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
