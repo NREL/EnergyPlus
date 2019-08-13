@@ -70,16 +70,16 @@
 
 !*** Schedule:File
 
-  Schedule:File,
-    File-based Schedule,     !- Name
-    Any Number,              !- Schedule Type Limits Name
-    /tmp/datafile.csv,             !- File Name
-    3,                       !- Column Number
-    1,                       !- Rows to Skip at Top
-    ,                        !- Number of Hours of Data
-    ,                        !- Column Separator
-    ,                        !- Interpolate to Timestep
-    60;                      !- Minutes per Item
+!  Schedule:File,
+!    File-based Schedule,     !- Name
+!    Any Number,              !- Schedule Type Limits Name
+!    /tmp/datafile.csv,             !- File Name
+!    3,                       !- Column Number
+!    1,                       !- Rows to Skip at Top
+!    ,                        !- Number of Hours of Data
+!    ,                        !- Column Separator
+!    ,                        !- Interpolate to Timestep
+!    60;                      !- Minutes per Item
 
 !*** Schedule:Year
 
