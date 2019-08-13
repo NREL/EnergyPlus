@@ -169,6 +169,7 @@ set( test_src
   UnitaryHybridAirConditioner.unit.cc
   UnitarySystem.unit.cc
   UnitHeater.unit.cc
+  UnitVentilator.unit.cc
   UtilityRoutines.unit.cc
   VariableSpeedCoils.unit.cc
   VAVDefMinMaxFlow.unit.cc
@@ -189,6 +190,7 @@ set( test_src
   XingGroundTemperatureModel.unit.cc
   ZoneContaminantPredictorCorrector.unit.cc
   ZoneEquipmentManager.unit.cc
+  ZoneHVACEvaporativeCooler.unit
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc
