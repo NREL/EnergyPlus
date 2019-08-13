@@ -1168,6 +1168,24 @@ namespace Psychrometrics {
         return 1000.1207 + 8.3215874e-04 * TB - 4.929976e-03 * pow_2(TB) + 8.4791863e-06 * pow_3(TB);
     }
 
+    inline Real64 PsyDeltaHSenFnTdb2W2Tdb1W1(Real64 const TDB2, // dry-bulb temperature at outlet {C}
+        Real64 const dW2,   // humidity ratio at outlet
+        Real64 const TDB1, // dry-bulb temperature at inlet {C}
+        Real64 const dW1   // humidity ratio at inlet
+    )
+    {
+        // calculate sensible enthalpy difference
+        Real64 dWavg = 0.5 * (max(dW2, 1.0e-5) + max(dW1, 1.0e-5));
+        return (1.00484e3 + dWavg * 1.85895e3) * (TDB2 - TDB1);
+    }
+
+    inline Real64 PsyHfgAvgFnTdb2Tdb1(Real64 const TDB2, // dry-bulb temperature at outlet {C}
+        Real64 const TDB1 // dry-bulb temperature at inlet {C}
+    )
+    {
+        // calculate average latent heat of vaporization of water
+        return (2.50094e6 + 0.5 * (TDB2 + TDB1) * 1.85895e3);
+    }
 } // namespace Psychrometrics
 
 } // namespace EnergyPlus

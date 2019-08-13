@@ -8225,9 +8225,9 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     EXPECT_EQ(0.0, thisVRFTU.CoolOutAirMassFlow);
     EXPECT_EQ(0.0, thisVRFTU.HeatOutAirMassFlow);
     EXPECT_EQ(0.0, thisVRFTU.NoCoolHeatOutAirMassFlow);
-    EXPECT_NEAR(5367.4716, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
-    EXPECT_NEAR(4999.3220, thisVRFTU.TotalCoolingRate, 0.0001);
-    EXPECT_NEAR(368.1495, thisFan.FanPower, 0.0001);
+    EXPECT_NEAR(5367.5132, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
+    EXPECT_NEAR(4999.3622, thisVRFTU.TotalCoolingRate, 0.0001);
+    EXPECT_NEAR(368.1510, thisFan.FanPower, 0.0001);
     EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
 }
 TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
