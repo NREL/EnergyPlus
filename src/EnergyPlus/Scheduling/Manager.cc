@@ -146,7 +146,6 @@ void prepareSchedulesForNewEnvironment()
     if (!scheduleInputProcessed) {
         processAllSchedules();
     }
-    EnergyPlus::DisplayString("Preparing schedules for new environment");
     // right now Schedule:Constant objects are not stored as time-series for efficiency
     for (auto &thisSchedule : scheduleConstants) {
         thisSchedule.prepareForNewEnvironment();
@@ -163,7 +162,6 @@ void prepareSchedulesForNewEnvironment()
     for (auto &thisSchedule : scheduleFileShadings) {
         thisSchedule.prepareForNewEnvironment();
     }
-    EnergyPlus::DisplayString("Finished preparing schedules for new environment");
 }
 
 void resetAllTimeStartIndex()
@@ -197,40 +195,28 @@ void processAllSchedules()
     //  gets the zeroeth index in the mapping vector
 
     // call type limits first so we don't have to check each time we call the type limits factory from each schedule input
-    EnergyPlus::DisplayString("About to process type limit inputs");
     ScheduleTypeData::processInput();
-    EnergyPlus::DisplayString("Finished processing type limit inputs");
     // then we'll go through and call each subtype factory and accumulate index values into our map
-    EnergyPlus::DisplayString("About to process constant schedule inputs");
     ScheduleConstant::processInput();
     for (size_t subTypeIndex = 0; subTypeIndex < scheduleConstants.size(); subTypeIndex++) {
         indexToSubtypeMap.emplace_back(scheduleConstants[subTypeIndex].name, ScheduleType::CONSTANT, subTypeIndex);
     }
-    EnergyPlus::DisplayString("Finished processing constant schedule inputs");
-    EnergyPlus::DisplayString("About to process compact schedule inputs");
     ScheduleCompact::processInput();
     for (size_t subTypeIndex = 0; subTypeIndex < scheduleCompacts.size(); subTypeIndex++) {
         indexToSubtypeMap.emplace_back(scheduleCompacts[subTypeIndex].name, ScheduleType::COMPACT, subTypeIndex);
     }
-    EnergyPlus::DisplayString("Finished processing compact schedule inputs");
-    EnergyPlus::DisplayString("About to process weekly schedule inputs");
     ScheduleYear::processInput();
     for (size_t subTypeIndex = 0; subTypeIndex < scheduleYears.size(); subTypeIndex++) {
         indexToSubtypeMap.emplace_back(scheduleYears[subTypeIndex].name, ScheduleType::YEAR, subTypeIndex);
     }
-    EnergyPlus::DisplayString("Finished processing weekly schedule inputs");
-    EnergyPlus::DisplayString("About to process file schedule inputs");
     ScheduleFile::processInput();
     for (size_t subTypeIndex = 0; subTypeIndex < scheduleFiles.size(); subTypeIndex++) {
         indexToSubtypeMap.emplace_back(scheduleFiles[subTypeIndex].name, ScheduleType::FILE, subTypeIndex);
     }
-    EnergyPlus::DisplayString("Finished processing file schedule inputs");
-    EnergyPlus::DisplayString("About to process shading schedule inputs");
     ScheduleFileShading::processInput();
     for (size_t subTypeIndex = 0; subTypeIndex < scheduleFileShadings.size(); subTypeIndex++) {
         indexToSubtypeMap.emplace_back(scheduleFileShadings[subTypeIndex].name, ScheduleType::SHADING_FILE, subTypeIndex);
     }
-    EnergyPlus::DisplayString("Finished processing shading schedule inputs");
     scheduleInputProcessed = true;
 }
 

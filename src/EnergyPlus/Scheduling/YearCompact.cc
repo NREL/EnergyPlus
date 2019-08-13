@@ -178,7 +178,6 @@ void ScheduleCompact::createTimeSeries() {
     int priorThroughTime = 0;
     int currentDay = 0;
     int thisDayOfWeek = EnergyPlus::DataEnvironment::RunPeriodStartDayOfWeek - 1; // RunPeriodStartDayOfWeek should be 1-7, so this should be fine
-    std::cout << "Creating timeSeries for " << this->name << std::endl;
     for (auto const & thisThrough : this->throughs) {
         int numDaysInThrough = ((thisThrough.timeStamp - priorThroughTime) / Scheduling::Constants::secondsInDay) + 1; // TODO: double check this + 1 on the end
         for (int dayNum = 1; dayNum <= numDaysInThrough; dayNum++) {
@@ -191,8 +190,6 @@ void ScheduleCompact::createTimeSeries() {
                 thisDayOfWeek = 1;
             } else if (thisDayOfWeek == 8) {
                 thisDayOfWeek = 1;
-            } else if (thisDayOfWeek == 9) {
-                std::cout << "Day of week somehow equals 9" << std::endl;
             }
             Scheduling::DayType dt;
             auto const & thisEnvrnIndex = EnergyPlus::WeatherManager::Envrn;
@@ -206,9 +203,6 @@ void ScheduleCompact::createTimeSeries() {
                     EnergyPlus::WeatherManager::RunPeriodDesignInput(EnergyPlus::WeatherManager::Environment(thisEnvrnIndex).RunPeriodDesignNum)
                         .startWeekDay));
             } else {
-                if (this->name == "ACTIVITY SCH") {
-                    std::cout << "Getting day type for day of week " << thisDayOfWeek << std::endl;
-                }
                 dt = ScheduleBase::getDayTypeForDayOfWeek(thisDayOfWeek); // TODO: Need to check for DD status, custom day, holiday
             }
             std::bitset<Scheduling::NumDayTypeBits> bs;
@@ -219,12 +213,8 @@ void ScheduleCompact::createTimeSeries() {
                     found = true;
                     for (auto const & thisUntil : thisFor.untils) {
                         auto currentTimeStamp = priorThroughTime + ((dayNum - 1) * Scheduling::Constants::secondsInDay) + thisUntil.time;
-//                        if (currentTimeStamp <= priorTimeStamp) {
-//                            EnergyPlus::ShowFatalError("Bad timestamp calculation");
-//                        }
                         this->timeStamp.push_back(currentTimeStamp);
                         this->values.push_back(thisUntil.value);
-//                        priorTimeStamp = currentTimeStamp;
                     }
                     break;
                 }
