@@ -1116,7 +1116,7 @@ namespace HeatBalanceIntRadExchange {
 
             // Look for matching solar enclosure name
             bool enclMatchFound = false;
-            for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
+            for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
                 auto &thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
                 if (UtilityRoutines::SameString(thisZoneOrZoneListName, thisEnclosure.Name)) {
                     // View factor zone name matches enclosure name
