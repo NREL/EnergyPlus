@@ -187,7 +187,7 @@ void ScheduleYear::createTimeSeries()
                 this->timeStamp.push_back(currentTimeStamp);
                 this->values.push_back(thisUntil.value);
             }
-            priorThroughTime += 86400;
+            priorThroughTime += Scheduling::Constants::secondsInDay;
         }
     }
 }

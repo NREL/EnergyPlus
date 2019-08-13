@@ -48,10 +48,8 @@
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <EMSManager.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <OutputProcessor.hh>
 #include <Scheduling/Base.hh>
-#include <WeatherManager.hh>
 
 namespace Scheduling {
 
@@ -170,7 +168,7 @@ void ScheduleBase::resetTimeStartIndex()
 Real64 ScheduleBase::lookupScheduleValue(int const hour, int const timeStep)
 {
     // TODO: Keep a start index for this lookup, separate from the other start index
-    int const simTime = 86400 * (EnergyPlus::DataEnvironment::DayOfYear - 1) + 3600 * ((hour - 1) + EnergyPlus::DataGlobals::TimeStepZone * timeStep);
+    int const simTime = Scheduling::Constants::secondsInDay * (EnergyPlus::DataEnvironment::DayOfYear - 1) + 3600 * ((hour - 1) + EnergyPlus::DataGlobals::TimeStepZone * timeStep);
     auto item = std::lower_bound(this->timeStamp.begin(), this->timeStamp.end(), simTime); // + this->lastLookupIndexUsed
     auto thisIndex = item - this->timeStamp.begin();
     return this->values[thisIndex];

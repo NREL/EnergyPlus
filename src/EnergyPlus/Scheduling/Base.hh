@@ -112,7 +112,10 @@ struct ScheduleBase
     int lastIndexUsed = 0;
     int lastLookupIndexUsed = 0;
 
-    // TODO: Add a factory method to return a *ScheduleBase for components to use?
+};
+
+struct Constants {
+    static int const secondsInDay = 86400;
 };
 
 static std::vector<std::string> allSchedNames;
@@ -177,12 +180,12 @@ inline int getScheduleTime(int const yearNum,
     };
     if (leapYearDataFound) {
         for (int m = 2; m <= monthNum; m++) { // no need to overwrite all the months, just how far along we are in the year
-            cumulativeSecondsInMonthsNonLeap[m] += 86400;
+            cumulativeSecondsInMonthsNonLeap[m] += Scheduling::Constants::secondsInDay;
         }
     }
     int const fromYears = 31536000 * (yearNum - 1);
     int const fromMonths = cumulativeSecondsInMonthsNonLeap[monthNum - 1];
-    int const fromDays = 86400 * (dayNum - 1);
+    int const fromDays = Scheduling::Constants::secondsInDay * (dayNum - 1);
     int const fromHours = 3600 * hourNum;
     int const fromMinutes = 60 * minuteNum;
     int const fromSeconds = secondNum;

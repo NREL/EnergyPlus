@@ -152,7 +152,7 @@ bool ScheduleCompact::validateContinuity()
                 }
                 lastUntilTime = thisUntil.time;
             }
-            if (thisFor.untils.back().time != 86400) {
+            if (thisFor.untils.back().time != Scheduling::Constants::secondsInDay) {
                 EnergyPlus::ShowFatalError("Invalid Until timestamps, they do not reach the end of the day for Schedule:Compact = " + this->name);
             }
         }
@@ -163,7 +163,7 @@ bool ScheduleCompact::validateContinuity()
     // check final through to make sure we hit the end of the year
     int midnightMorningLastDayOfYear = 31449600;
     if (this->includesLeapYearData) {
-        midnightMorningLastDayOfYear += 86400;
+        midnightMorningLastDayOfYear += Scheduling::Constants::secondsInDay;
     }
     if (this->throughs.back().timeStamp != midnightMorningLastDayOfYear) {
         EnergyPlus::ShowFatalError("Invalid Through timestamps, they do not reach the end of the year for Schedule:Compact = " + this->name);
@@ -180,7 +180,7 @@ void ScheduleCompact::createTimeSeries() {
     int thisDayOfWeek = EnergyPlus::DataEnvironment::RunPeriodStartDayOfWeek - 1; // RunPeriodStartDayOfWeek should be 1-7, so this should be fine
 //    int priorTimeStamp = -1;
     for (auto const & thisThrough : this->throughs) {
-        int numDaysInThrough = ((thisThrough.timeStamp - priorThroughTime) / 86400) + 1; // TODO: double check this + 1 on the end
+        int numDaysInThrough = ((thisThrough.timeStamp - priorThroughTime) / Scheduling::Constants::secondsInDay) + 1; // TODO: double check this + 1 on the end
         for (int dayNum = 1; dayNum <= numDaysInThrough; dayNum++) {
             currentDay++;
             thisDayOfWeek++;
@@ -209,7 +209,7 @@ void ScheduleCompact::createTimeSeries() {
                 if (thisFor.hasAllOtherDays || (thisFor.days & bs).any()) {
                     found = true;
                     for (auto const & thisUntil : thisFor.untils) {
-                        auto currentTimeStamp = priorThroughTime + ((dayNum - 1) * 86400) + thisUntil.time;
+                        auto currentTimeStamp = priorThroughTime + ((dayNum - 1) * Scheduling::Constants::secondsInDay) + thisUntil.time;
 //                        if (currentTimeStamp <= priorTimeStamp) {
 //                            EnergyPlus::ShowFatalError("Bad timestamp calculation");
 //                        }
@@ -224,7 +224,7 @@ void ScheduleCompact::createTimeSeries() {
                 EnergyPlus::ShowFatalError("Could not achieve continuity, something went wrong, schedule = " + this->name);
             }
         }
-        priorThroughTime = thisThrough.timeStamp + 86400; // TODO: Make sure this should include the last day's 86400
+        priorThroughTime = thisThrough.timeStamp + Scheduling::Constants::secondsInDay; // TODO: Make sure this should include the last day's 86400
     }
 }
 
