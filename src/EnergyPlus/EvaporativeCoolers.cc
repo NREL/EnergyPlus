@@ -2196,7 +2196,7 @@ namespace EvaporativeCoolers {
         EvapCond(EvapCoolNum).PartLoadFract = PartLoadFrac;
     }
 
-    void CalcIndirectResearchSpecialEvapCooler(int const EvapCoolNum)
+    void CalcIndirectResearchSpecialEvapCooler(int const EvapCoolNum, Real64 const FanPLR)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2379,12 +2379,12 @@ namespace EvaporativeCoolers {
                 //***************************************************************************
                 //                  POWER OF THE SECONDARY AIR FAN with part load factor applied (assumes const efficiency)
                 EvapCond(EvapCoolNum).EvapCoolerPower +=
-                    EvapCond(EvapCoolNum).IndirectVolFlowRate * EvapCond(EvapCoolNum).FanSizingSpecificPower * PartLoad;
+                    EvapCond(EvapCoolNum).IndirectVolFlowRate * EvapCond(EvapCoolNum).FanSizingSpecificPower * PartLoad * FanPLR;
 
                 //                  ENERGY CONSUMED BY THE RECIRCULATING PUMP
                 //                  ENERGY CONSUMED BY THE RECIRCULATING PUMP
                 // Add the pump energy to the total Evap Cooler energy comsumption
-                EvapCond(EvapCoolNum).EvapCoolerPower += EvapCond(EvapCoolNum).IndirectRecircPumpPower * PartLoad;
+                EvapCond(EvapCoolNum).EvapCoolerPower += EvapCond(EvapCoolNum).IndirectRecircPumpPower * PartLoad * FanPLR;
 
                 //***************************************************************************
                 //                  CALCULATE THE WET BULB TEMP in the primary system air using PSYCH ROUTINES
@@ -3222,7 +3222,7 @@ namespace EvaporativeCoolers {
             if (EvapCond(EvapCoolIndex).FanPowerModifierCurveIndex > 0) {
                 FanPowerModCurveValue = CurveValue(EvapCond(EvapCoolIndex).FanPowerModifierCurveIndex, FlowRatio);
             } else {
-                FanPowerModCurveValue = EvapCond(EvapCoolIndex).PartLoadFract;
+                FanPowerModCurveValue = EvapCond(EvapCoolIndex).PartLoadFract * FlowRatio;
             }
             EvapCoolertotalPower += EvapCond(EvapCoolIndex).IndirectFanPower * FanPowerModCurveValue;
             if (DryWetMode == WetModulated || DryWetMode == WetFull) {
@@ -3231,7 +3231,7 @@ namespace EvaporativeCoolers {
                     PumpPowerModCurveValue = CurveValue(EvapCond(EvapCoolIndex).PumpPowerModifierCurveIndex, FlowRatio);
                 } else {
                     // linearly scale pump power using part-load-fraction when pump power modifier curve is not specified
-                    PumpPowerModCurveValue = EvapCond(EvapCoolIndex).PartLoadFract;
+                    PumpPowerModCurveValue = EvapCond(EvapCoolIndex).PartLoadFract * FlowRatio;
                 }
                 EvapCoolertotalPower += EvapCond(EvapCoolIndex).IndirectRecircPumpPower * PumpPowerModCurveValue;
             }
