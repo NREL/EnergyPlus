@@ -87,6 +87,7 @@
 #include <General.hh>
 #include <GlobalNames.hh>
 #include <HVACSizingSimulationManager.hh>
+#include <HeatBalanceIntRadExchange.hh>
 #include <HeatBalanceManager.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <HybridModel.hh>
@@ -332,6 +333,7 @@ namespace HeatBalanceManager {
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
             GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
+            HeatBalanceIntRadExchange::InitSolarViewFactors();
 
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
@@ -4739,7 +4741,8 @@ namespace HeatBalanceManager {
         NumOfZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
         Zone.allocate(NumOfZones);
-        DataViewFactorInformation::ZoneInfo.allocate(NumOfZones);
+        DataViewFactorInformation::ZoneRadiantInfo.allocate(NumOfZones);
+        DataViewFactorInformation::ZoneSolarInfo.allocate(NumOfZones);
         ZoneDaylight.allocate(NumOfZones);
 
         ZoneLoop = 0;

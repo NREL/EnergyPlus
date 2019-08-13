@@ -71,7 +71,7 @@ namespace HeatBalanceIntRadExchange {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int MaxNumOfZoneSurfaces; // Max saved to get large enough space for user input view factors
+    extern int MaxNumOfRadEnclosureSurfs; // Max saved to get large enough space for SendSurfaceTempInKto4thPrecalc
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceIntRadExchange
 
@@ -89,6 +89,8 @@ namespace HeatBalanceIntRadExchange {
     );
 
     void InitInteriorRadExchange();
+
+    void InitSolarViewFactors();
 
     void AlignInputViewFactors(std::string const &cCurrentModuleObject, // Object type
                                bool &ErrorsFound                        // True when errors are found
@@ -118,15 +120,16 @@ namespace HeatBalanceIntRadExchange {
                                     Array1A_int const SPtr         // pointer to REAL(r64) surface number (for error message)
     );
 
-    void FixViewFactors(int const N,                // NUMBER OF SURFACES
-                        Array1A<Real64> const A,    // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-                        Array2A<Real64> F,          // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
-                        int const ZoneNum,          // Zone number being fixe
-                        Real64 &OriginalCheckValue, // check of SUM(F) - N
-                        Real64 &FixedCheckValue,    // check after fixed of SUM(F) - N
-                        Real64 &FinalCheckValue,    // the one to go with
-                        int &NumIterations,         // number of iterations to fixed
-                        Real64 &RowSum              // RowSum of Fixed
+    void FixViewFactors(int const N,                     // NUMBER OF SURFACES
+                        Array1A<Real64> const A,         // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                        Array2A<Real64> F,               // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
+                        std::string &enclName,           // Name of Enclosure being fixed
+                        std::vector<int> const zoneNums, // Zones which are part of this enclosure
+                        Real64 &OriginalCheckValue,      // check of SUM(F) - N
+                        Real64 &FixedCheckValue,         // check after fixed of SUM(F) - N
+                        Real64 &FinalCheckValue,         // the one to go with
+                        int &NumIterations,              // number of iterations to fixed
+                        Real64 &RowSum                   // RowSum of Fixed
     );
 
     void CalcScriptF(int const N,             // Number of surfaces

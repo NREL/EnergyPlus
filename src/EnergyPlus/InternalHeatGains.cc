@@ -6035,7 +6035,7 @@ namespace InternalHeatGains {
 
         // QL is per radiant enclosure (one or more zones if grouped by air boundaries)
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
-            auto & thisEnclosure(DataViewFactorInformation::ZoneInfo(enclosureNum));
+            auto & thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
             QL(enclosureNum) = 0.0;
             for (int zoneNum : thisEnclosure.ZoneNums) {
                 Real64 zoneQL;
@@ -6060,7 +6060,7 @@ namespace InternalHeatGains {
                 curQL = QL(radEnclosureNum);
                 // for the loads component report during the special sizing run increase the radiant portion
                 // a small amount to create a "pulse" of heat that is used for the
-                adjQL = curQL + DataViewFactorInformation::ZoneInfo(radEnclosureNum).FloorArea * pulseMultipler;
+                adjQL = curQL + DataViewFactorInformation::ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
                 // ITABSF is the Inside Thermal Absorptance
                 // TMULT is a mulipliter for each zone
                 // QRadThermInAbs is the thermal radiation absorbed on inside surfaces

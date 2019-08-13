@@ -61,6 +61,7 @@ namespace EnergyPlus {
 namespace DataViewFactorInformation {
 
     extern int NumOfRadiantEnclosures; // Number of radiant enclosures
+    extern int NumOfSolarEnclosures;   // Number of solar enclosures
 
     struct ZoneViewFactorInformation
     {
@@ -76,16 +77,19 @@ namespace DataViewFactorInformation {
         Array1D<Real64> Azimuth;            // Azimuth angle of the surface (in degrees)
         Array1D<Real64> Tilt;               // Tilt angle of the surface (in degrees)
         Array1D_int SurfacePtr;             // Surface ALLOCATABLE (to Surface derived type)
-        Array1D_string Class;               // Class of surface (Wall, Roof, etc.)
         Real64 FloorArea;                   // Floor area of zone(s) in radiant enclosure
+        Real64 ExtWindowArea;               // Exterior window area
+        Real64 TotalSurfArea;               // Total surface area
+        Array1D<Real64> SolAbsorptance;     // Surface solar absorptance
 
         // Default Constructor
-        ZoneViewFactorInformation() : NumOfSurfaces(0), FloorArea(0.0)
+        ZoneViewFactorInformation() : NumOfSurfaces(0), FloorArea(0.0), ExtWindowArea(0.0), TotalSurfArea(0.0)
         {
         }
     };
 
-    extern Array1D<ZoneViewFactorInformation> ZoneInfo;
+    extern Array1D<ZoneViewFactorInformation> ZoneRadiantInfo;
+    extern Array1D<ZoneViewFactorInformation> ZoneSolarInfo;
 
     void clear_state();
 
