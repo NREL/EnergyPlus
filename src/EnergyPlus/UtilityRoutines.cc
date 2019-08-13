@@ -683,9 +683,9 @@ void CloseMiscOpenFiles()
         ObjexxFCL::gio::inquire(OutputFileDebug, flags);
         DebugPosition = flags.POSITION();
     }
-    //if (DebugPosition != "ASIS") {
+    if (DebugPosition != "ASIS") {
         DebugOutput = true;
-    //}
+    }
     if (DebugOutput) {
         ObjexxFCL::gio::close(OutputFileDebug);
     } else {
