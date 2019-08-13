@@ -9669,10 +9669,9 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 } else {
                     int const MaterialLayerGroup = Material(MaterNum).Group;
-                    if ((MaterialLayerGroup == WindowSimpleGlazing) || (MaterialLayerGroup == GlassEquivalentLayer) ||
-                        (MaterialLayerGroup == ShadeEquivalentLayer) || (MaterialLayerGroup == DrapeEquivalentLayer) ||
-                        (MaterialLayerGroup == BlindEquivalentLayer) || (MaterialLayerGroup == ScreenEquivalentLayer) ||
-                        (MaterialLayerGroup == GapEquivalentLayer)) {
+                    if ((MaterialLayerGroup == WindowSimpleGlazing) || (MaterialLayerGroup == ShadeEquivalentLayer) ||
+                        (MaterialLayerGroup == DrapeEquivalentLayer) || (MaterialLayerGroup == BlindEquivalentLayer) ||
+                        (MaterialLayerGroup == ScreenEquivalentLayer) || (MaterialLayerGroup == GapEquivalentLayer)) {
                         ShowSevereError("Invalid movable insulation material for " + cCurrentModuleObject + ":");
                         ShowSevereError("...Movable insulation material type specified = " + DataHeatBalance::cMaterialGroupType(MaterialLayerGroup));
                         ShowSevereError("...Movable insulation material name specified = " + cAlphaArgs(3));
