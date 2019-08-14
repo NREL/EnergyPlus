@@ -3786,6 +3786,8 @@ namespace MixedAir {
                 } else {
                     curAirLoopControlInfo.ResimAirLoopFlag = false;
                 }
+            } else if (curAirLoopControlInfo.HeatingActiveFlag) {
+                this->HRHeatingCoilActive = 1;
             } else {
                 this->HRHeatingCoilActive = 0;
             }
