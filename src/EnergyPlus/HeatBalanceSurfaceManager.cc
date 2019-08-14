@@ -1376,6 +1376,7 @@ namespace HeatBalanceSurfaceManager {
         TH.dimension(2, MaxCTFTerms, TotSurfaces, 0.0);
         TempSurfOut.dimension(TotSurfaces, 0.0);
         TempSurfInRep.dimension(TotSurfaces, 0.0);
+        TempSurfInMovInsRep.dimension(TotSurfaces, 0.0);
         QConvInReport.dimension(TotSurfaces, 0.0);
         QdotConvInRepPerArea.dimension(TotSurfaces, 0.0);
         QdotConvInRep.dimension(TotSurfaces, 0.0);
@@ -1498,6 +1499,8 @@ namespace HeatBalanceSurfaceManager {
             if (!Surface(loop).HeatTransSurf) continue;
             SetupOutputVariable(
                 "Surface Inside Face Temperature", OutputProcessor::Unit::C, TempSurfInRep(loop), "Zone", "State", Surface(loop).Name);
+            SetupOutputVariable(
+                "Surface Inside Face Interior Movable Insulation Temperature", OutputProcessor::Unit::C, TempSurfInMovInsRep(loop), "Zone", "State", Surface(loop).Name);
 
             if (Surface(loop).ExtBoundCond != KivaFoundation) {
                 SetupOutputVariable(
@@ -2063,6 +2066,7 @@ namespace HeatBalanceSurfaceManager {
         HGrdExtSurf = 0.0;
         TempSurfOut = 0.0;
         TempSurfInRep = 0.0;
+        TempSurfInMovInsRep = 0.0;
         QConvInReport = 0.0;
         QdotConvInRep = 0.0;
         QdotConvInRepPerArea = 0.0;
@@ -5105,6 +5109,18 @@ namespace HeatBalanceSurfaceManager {
         } // loop over zones
     }
 
+    void ReportIntMovInsInsideSurfTemp()
+    {
+        int SurfNum;
+        TempSurfInMovInsRep = TempSurfIn;
+        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            if (Surface(SurfNum).MaterialMovInsulInt > 0) {
+                if (GetCurrentScheduleValue(Surface(SurfNum).SchedMovInsulInt) > 0.0) {
+                    TempSurfInMovInsRep(SurfNum) = TempSurfInTmp(SurfNum);
+                }
+            }
+        }
+    }
     // End of Reporting subroutines for the HB Module
     // *****************************************************************************
 
@@ -6726,6 +6742,8 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
+        ReportIntMovInsInsideSurfTemp();
+        
         CalculateZoneMRT(ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
     }
 
