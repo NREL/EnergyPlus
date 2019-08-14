@@ -617,3 +617,64 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
     EXPECT_EQ(expectedIDifH, DiffRad);
     EXPECT_EQ(expectedIGlbH, GloHorzRad);
 }
+
+TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
+
+    // GetNextEnvironment Will call ReadUserWeatherInput which calls inputProcessor, so let's use process_idf to create one Environment (Design Day)
+    std::string const idf_objects = delimited_string({
+        "  Version,9.2;",
+
+        "  SizingPeriod:DesignDay,",
+        "    Atlanta Jan 21 cooling,  !- Name",
+        "    1,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    SummerDesignDay,         !- Day Type",
+        "    16.9,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    11.6,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    WetBulbProfileDefaultMultipliers,  !- Humidity Condition Type",
+        "    13.2,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    8,                       !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    97620,                   !- Barometric Pressure {Pa}",
+        "    0.0,                     !- Wind Speed {m/s}",
+        "    0.0,                     !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAETau2017,           !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    0.325,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    2.461;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}"
+
+});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataGlobals::BeginSimFlag = false;
+    DataGlobals::NumOfTimeStepInHour = 4;
+    WeatherManager::LocationGathered = false;
+
+    bool Available{false};
+    bool ErrorsFound{false};
+    ASSERT_THROW(WeatherManager::GetNextEnvironment(Available, ErrorsFound), std::runtime_error);
+    ASSERT_TRUE(ErrorsFound);
+
+    std::string const error_string = delimited_string({
+       "   ** Severe  ** No Location given. Must have location information for simulation.",
+       "   ** Warning ** Did you realize that you have Latitude=0.0, Longitude=0.0 and TimeZone=0.0?  Your building site is in the middle of the Atlantic Ocean.",
+       "   ** Severe  ** GetNextEnvironment: No location specified, program will terminate.",
+       "   **  Fatal  ** GetNextEnvironment: Errors found in Weater Data Input. Program terminates.",
+       "   ...Summary of Errors that led to program termination:",
+       "   ..... Reference severe error count=2",
+       "   ..... Last severe error=GetNextEnvironment: No location specified, program will terminate.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+    EXPECT_EQ(1, WeatherManager::NumOfEnvrn);
+    EXPECT_EQ(WeatherManager::Environment(1).KindOfEnvrn, DataGlobals::ksDesignDay);
+}

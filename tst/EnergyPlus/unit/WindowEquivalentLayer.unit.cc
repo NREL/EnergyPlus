@@ -915,3 +915,36 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     Real64 SlateAngleBlockBeamSolar = VB_CriticalSlatAngle(DataGlobals::RadToDeg * ProfAngVer);
     EXPECT_NEAR(SlateAngleBlockBeamSolar, DataSurfaces::SurfaceWindow(SurfNum).SlatAngThisTSDeg, 0.0001);
 }
+TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
+{
+
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+
+        "  Version,9.2;",
+
+        "   WindowMaterial:SimpleGlazingSystem,",
+        "     Simple Glazing System Layer,   !- Name",
+        "     2.8,                           !- U-Factor {W/m2-K}",
+        "     0.7;                           !- Solar Heat Gain Coefficient",
+
+        "   Construction:WindowEquivalentLayer,",
+        "     Simple Equivalent Layer Window,!- Name",
+        "     Simple Glazing System Layer;   !- Outside Layer",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_EQ(1, DataHeatBalance::TotMaterials);
+    EXPECT_EQ(DataHeatBalance::Material(1).Group, DataHeatBalance::WindowSimpleGlazing);
+    // get construction returns error forund true due to invalid layer
+    GetConstructData(ErrorsFound);
+    EXPECT_EQ(1, DataHeatBalance::TotConstructs);
+    EXPECT_EQ(1, DataWindowEquivalentLayer::TotWinEquivLayerConstructs);
+    EXPECT_TRUE(DataHeatBalance::Construct(1).TypeIsWindow);
+    EXPECT_TRUE(DataHeatBalance::Construct(1).WindowTypeEQL);
+    EXPECT_TRUE(ErrorsFound); // error found due to invalid layer
+}

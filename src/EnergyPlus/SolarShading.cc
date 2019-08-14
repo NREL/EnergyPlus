@@ -5908,7 +5908,6 @@ namespace SolarShading {
         using General::POLYF;
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace DataDaylightingDevices;
-        using DaylightingDevices::FindTDDPipe;
         using DaylightingDevices::TransTDD;
         using WindowEquivalentLayer::CalcEQLOpticalProperty;
         using WindowEquivalentLayer::CFSDiffAbsTrans;
@@ -6313,7 +6312,7 @@ namespace SolarShading {
                 VarSlats = SurfaceWindow(SurfNum).MovableSlats;
 
                 if (SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) {
-                    PipeNum = FindTDDPipe(SurfNum);
+                    PipeNum = SurfaceWindow(SurfNum).TDDPipeNum;
                     SurfNum2 = TDDPipe(PipeNum).Dome;
                 } else {
                     SurfNum2 = SurfNum;
@@ -8153,7 +8152,7 @@ namespace SolarShading {
 
                         // This lookup may be avoid if this 2nd surf loop can be combined with the 1st
                         if (SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) {
-                            PipeNum = FindTDDPipe(SurfNum);
+                            PipeNum = SurfaceWindow(SurfNum).TDDPipeNum;
                             SurfNum2 = TDDPipe(PipeNum).Dome;
 
                             DifSolarInc = DifSolarRad * AnisoSkyMult(SurfNum2) + GndSolarRad * Surface(SurfNum2).ViewFactorGround;
@@ -8271,7 +8270,6 @@ namespace SolarShading {
         // REFERENCES:
         // na
 
-        using DaylightingDevices::FindTDDPipe;
         using namespace DataDaylightingDevices;
 
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
@@ -8291,7 +8289,7 @@ namespace SolarShading {
 
                 int SurfNum2 = 0;
                 if (SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) {
-                    int PipeNum = FindTDDPipe(SurfNum);
+                    int PipeNum = SurfaceWindow(SurfNum).TDDPipeNum;
                     SurfNum2 = TDDPipe(PipeNum).Dome;
                 } else {
                     SurfNum2 = SurfNum;
@@ -8359,7 +8357,6 @@ namespace SolarShading {
         // REFERENCES:
         // na
 
-        using DaylightingDevices::FindTDDPipe;
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace DataDaylightingDevices;
         using namespace MultiLayerOptics;
@@ -8390,7 +8387,7 @@ namespace SolarShading {
                 if (Surface(SurfNum).Class != SurfaceClass_Window) continue;
                 int SurfNum2 = 0;
                 if (SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_TDD_Diffuser) {
-                    int PipeNum = FindTDDPipe(SurfNum);
+                    int PipeNum = SurfaceWindow(SurfNum).TDDPipeNum;
                     SurfNum2 = TDDPipe(PipeNum).Dome;
                 } else {
                     SurfNum2 = SurfNum;
