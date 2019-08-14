@@ -257,7 +257,7 @@ namespace EvaporativeCoolers {
                 CalcWetIndirectEvapCooler(EvapCoolNum, ZoneEvapCoolerPLR);
             } else if (SELECT_CASE_var == iEvapCoolerInDirectRDDSpecial) {
                 CalcResearchSpecialPartLoad(EvapCoolNum);
-                CalcIndirectResearchSpecialEvapCooler(EvapCoolNum);
+                CalcIndirectResearchSpecialEvapCooler(EvapCoolNum, ZoneEvapCoolerPLR);
             } else if (SELECT_CASE_var == iEvapCoolerDirectResearchSpecial) {
                 CalcResearchSpecialPartLoad(EvapCoolNum);
                 CalcDirectResearchSpecialEvapCooler(EvapCoolNum, ZoneEvapCoolerPLR);
@@ -2162,7 +2162,7 @@ namespace EvaporativeCoolers {
                     InitEvapCooler(EvapCoolNum);
 
                 } else if (SELECT_CASE_var == iEvapCoolerDirectResearchSpecial) {
-                    CalcDirectResearchSpecialEvapCooler(EvapCoolNum, 1.0);
+                    CalcDirectResearchSpecialEvapCooler(EvapCoolNum);
                     UpdateEvapCooler(EvapCoolNum);
                     FullOutput = Node(OutletNode).Temp - Node(InletNode).Temp;
                     ReqOutput = EvapCond(EvapCoolNum).DesiredOutletTemp - Node(InletNode).Temp;
