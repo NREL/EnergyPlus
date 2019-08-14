@@ -833,7 +833,7 @@ namespace ConvectionCoefficients {
         if (std::abs(CosTilt) < 0.98) { // Surface is not horizontal
             Diff = std::abs(WindDirection - Azimuth);
             if ((Diff - 180.0) > 0.001) Diff -= 360.0;
-            if ((std::abs(Diff) - 100.0) > 0.001) AgainstWind = false; // Surface is leeward
+            if ((std::abs(Diff) - 90.0) > 0.001) AgainstWind = false; // Surface is leeward
         }
 
         return AgainstWind;
