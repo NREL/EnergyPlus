@@ -293,8 +293,8 @@ ScheduleFile::ScheduleFile(std::string const &objectName, nlohmann::json const &
     }
     this->expectedRowCount = numberOfHoursOfData * 60 / this->minutesPerItem;
     // only process the file if it isn't already in the master list
-    if (fileData.find(fields.at("file_name")) == fileData.end()) {
-        processCSVFile(fields.at("file_name"), this->columnDelimiter);
+    if (fileData.find(this->fileName) == fileData.end()) {
+        processCSVFile(this->fileName, this->columnDelimiter);
     }
 }
 
@@ -337,6 +337,7 @@ void ScheduleFileShading::processInput()
             EnergyPlus::ShowContinueError("Try again with putting full path and file name in the field.");
             EnergyPlus::ShowFatalError("Schedule file issue causes program termination");
         }
+        // TODO: Probably want to warn if this filename has already been processed, could cause confusion
         processCSVFile(fileNameToUse, ',');
         std::ifstream fileInstance(fileNameToUse);
         if (!fileInstance.is_open()) {
