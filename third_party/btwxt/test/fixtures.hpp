@@ -39,6 +39,52 @@ protected:
   }
 };
 
+class OneDL0Fixture : public testing::Test {
+protected:
+    std::vector<std::vector<double>> grid;
+    std::vector<std::vector<double>> values;
+
+    OneDL0Fixture() {
+        grid = {{}};
+        values = {{}};
+    }
+};
+
+
+class OneDL1Fixture : public testing::Test {
+protected:
+    RegularGridInterpolator test_rgi;
+    GriddedData test_gridded_data;
+    std::vector<double> target;
+
+    OneDL1Fixture() {
+        std::vector<std::vector<double>> grid = {{2}};
+        std::vector<std::vector<double>> values = {{5}};
+
+        target = {2.5};
+        test_gridded_data = GriddedData(grid, values);
+        test_gridded_data.set_axis_extrap_method(0, Method::LINEAR);
+        test_rgi = RegularGridInterpolator(test_gridded_data);
+    }
+};
+
+class OneDL2Fixture : public testing::Test {
+protected:
+    RegularGridInterpolator test_rgi;
+    GriddedData test_gridded_data;
+    std::vector<double> target;
+
+    OneDL2Fixture() {
+        std::vector<std::vector<double>> grid = {{0, 10}};
+        std::vector<std::vector<double>> values = {{6, 3}};
+
+        target = {2.5};
+        test_gridded_data = GriddedData(grid, values);
+        test_gridded_data.set_axis_extrap_method(0, Method::LINEAR);
+        test_rgi = RegularGridInterpolator(test_gridded_data);
+    }
+};
+
 class TwoDFixture : public testing::Test {
 protected:
   RegularGridInterpolator test_rgi;

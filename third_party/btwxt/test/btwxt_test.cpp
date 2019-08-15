@@ -149,6 +149,30 @@ TEST_F(OneDFixture, cubic_interpolate) {
   EXPECT_NEAR(result, 4.804398, 0.0001);
 }
 
+TEST_F(OneDL0Fixture, throw_test) {
+    Btwxt::LOG_LEVEL = 0;
+    EXPECT_THROW(GriddedData(grid, values),std::invalid_argument);
+}
+
+TEST_F(OneDL1Fixture, cubic_interpolate) {
+    Btwxt::LOG_LEVEL = 0;
+    test_gridded_data.set_axis_interp_method(0, Method::CUBIC);
+    test_rgi = RegularGridInterpolator(test_gridded_data);
+    double result = test_rgi.get_values_at_target(target)[0];
+    Btwxt::LOG_LEVEL = 1;
+    EXPECT_NEAR(result, 5., 0.0001);
+}
+
+TEST_F(OneDL2Fixture, cubic_interpolate) {
+    Btwxt::LOG_LEVEL = 0;
+    test_gridded_data.set_axis_interp_method(0, Method::CUBIC);
+    test_rgi = RegularGridInterpolator(test_gridded_data);
+    double result = test_rgi.get_values_at_target(target)[0];
+    Btwxt::LOG_LEVEL = 1;
+    EXPECT_NEAR(result, 5.25, 0.0001);
+}
+
+
 TEST_F(TwoDFixture, cubic_interpolate) {
   Btwxt::LOG_LEVEL = 0;
   test_gridded_data.set_axis_interp_method(0, Method::CUBIC);

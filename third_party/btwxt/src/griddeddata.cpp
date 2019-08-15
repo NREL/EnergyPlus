@@ -17,10 +17,13 @@ GridAxis::GridAxis() = default;
 GridAxis::GridAxis(std::vector<double> grid_vector, Method extrapolation_method,
                    Method interpolation_method, std::pair<double, double> extrapolation_limits)
     : grid(std::move(grid_vector)),
-      spacing_multipliers(2, std::vector<double>(grid.size() - 1, 1.0)),
+      spacing_multipliers(2, std::vector<double>(std::max((int)grid.size() - 1, 0), 1.0)),
       extrapolation_method(extrapolation_method),
       interpolation_method(interpolation_method),
       extrapolation_limits(std::move(extrapolation_limits)) {
+  if (grid.size() == 0) {
+      showMessage(MsgLevel::MSG_ERR, "Cannot create a GridAxis from a zero-length vector.");
+  }
   check_grid_sorted();
   check_extrap_limits();
   if (interpolation_method == Method::CUBIC) {
@@ -51,6 +54,10 @@ double GridAxis::get_spacing_multiplier(const std::size_t &flavor, const std::si
 void GridAxis::calc_spacing_multipliers() {
   // "0" and "1" are the "flavors" of the calc_spacing_multipliers.
   // If you are sitting at the "0" along an edge of the hypercube, you want the "0" flavof
+  if (grid.size() == 1) {
+      set_interp_method(Method::LINEAR);
+      showMessage(MsgLevel::MSG_WARN, "A cubic interpolation method is not valid for grid axes with only one value. Interpolation method reset to linear.");
+  }
   double center_spacing;
   for (std::size_t i = 0; i < grid.size() - 1; i++) {
     center_spacing = grid[i + 1] - grid[i];
