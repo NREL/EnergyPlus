@@ -53,8 +53,8 @@
 
 // EnergyPlus Headers
 #include <DataGlobals.hh>
-#include <UnitarySystem.hh>
 #include <EnergyPlus.hh>
+#include <UnitarySystem.hh>
 
 namespace EnergyPlus {
 
@@ -233,12 +233,13 @@ namespace DataAirLoop {
         Real64 OAFrac;                // fraction of outside air to mixed air mass flow rate
         Real64 OAFlow;                // oa flow rate this time step
         bool FlowError;               // error flag for flow error message
+        Real64 BypassMassFlow;        // air loop bypass mass flow NOT entering splitter but included in mixer or plenum
 
         // Default Constructor
         AirLoopFlowData()
             : DesSupply(0.0), DesReturnFrac(1.0), SysToZoneDesFlowRatio(0.0), ReqSupplyFrac(1.0), MinOutAir(0.0), MaxOutAir(0.0), OAMinFrac(0.0),
               Previous(0.0), SupFlow(0.0), ZoneRetFlow(0.0), ZoneRetFlowRatio(1.0), SysRetFlow(0.0), RecircFlow(0.0), LeakFlow(0.0),
-              ExcessZoneExhFlow(0.0), FanPLR(0.0), OAFrac(0.0), OAFlow(0.0), FlowError(false)
+              ExcessZoneExhFlow(0.0), FanPLR(0.0), OAFrac(0.0), OAFlow(0.0), FlowError(false), BypassMassFlow(0.0)
         {
         }
     };
@@ -260,7 +261,7 @@ namespace DataAirLoop {
         Array1D_int ComponentType_Num; // Parameterized (see above) Component Types this
         // module can address
         Array1D_int ComponentIndex; // Which one in list -- updated by routines called from here
-        std::vector <UnitarySystems::UnitarySys *> compPointer;
+        std::vector<UnitarySystems::UnitarySys *> compPointer;
         Array1D_string ControllerName;
         Array1D_string ControllerType;
         Array1D_int ControllerIndex; // Which one in list -- updated by routines called from here
