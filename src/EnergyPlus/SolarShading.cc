@@ -894,7 +894,6 @@ namespace SolarShading {
         using General::RoundSigDigits;
 
         int SurfLoop;
-        int ZoneLoop;
         int I;
         int NumOfLayers;
 
@@ -5860,7 +5859,6 @@ namespace SolarShading {
         Real64 ShelfSolarRad;                               // Shelf diffuse solar radiation
         int BackSurfNum;                                    // Back surface number
         int IBack;                                          // Back surface counter
-        int FloorNum;                                       // Floor surface number
         Real64 CosTlt;                                      // Cosine of surface tilt angle
         int ConstrNum;                                      // Construction number
         int ConstrNumSh;                                    // Shaded construction number
@@ -11240,7 +11238,7 @@ namespace SolarShading {
         InitialDifSolInTrans = 0.0;
 
         // Loop over all zones doing initial distribution of diffuse solar to interior heat transfer surfaces
-        for (int enclosureNum = 1; enclosureNum < DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
+        for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
             auto & thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
             // Init Zone accumulators for debugging
             ZoneDifSolarTrans = 0.0;
@@ -11431,7 +11429,7 @@ namespace SolarShading {
                                     // in the adjacent zone. However, the above calculation better conserves energy, although possibly at the expense
                                     // of less accurate transmittance calcs. Preliminary tests showed fairly good agreement between the two
                                     // DifSolarTransW calculation methods, but for consistency I stuck with the above.
-                                    int AdjConstrNum = Surface(AdjSurfNum).Construction;
+                                    // int AdjConstrNum = Surface(AdjSurfNum).Construction;
                                     //              DifSolarTransW = WinDifSolar(DifTransSurfNum) &
                                     //                                * ViewFactor &
                                     //                                * Construct(AdjConstrNum)%TransDiff
@@ -11652,7 +11650,7 @@ namespace SolarShading {
                                 // Transmitted diffuse solar [W] = current exterior window transmitted diffuse solar
                                 //    * view factor from current (sending) window DifTransSurfNum to current (receiving) surface HeatTransSurfNum
                                 DifSolarTransW = AbsSolDiffBackEQL(2, CFS(EQLNum).NL + 1) * ViewFactor;
-                                int AdjConstrNum = Surface(AdjSurfNum).Construction;
+                                //int AdjConstrNum = Surface(AdjSurfNum).Construction;
                                 // Get the adjacent zone index
                                 int adjEnclosureNum = Surface(AdjSurfNum).SolarEnclIndex;
                                 // Call routine to distribute diffuse solar transmitted through this interior window into adjacent zone

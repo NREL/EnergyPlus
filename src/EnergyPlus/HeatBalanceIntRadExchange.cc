@@ -1143,10 +1143,10 @@ namespace HeatBalanceIntRadExchange {
                 auto &thisZoneList(DataHeatBalance::ZoneList(zoneListNum));
                 for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
                     auto &thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
-                    bool anyZoneFound = false;
                     bool anyZoneNotFound = false;
                     // If the number of enclosure zones is not the same as the number of zonelist zone, go to the next enclosure
-                    if (thisZoneList.NumOfZones != thisEnclosure.ZoneNums.size()) continue;
+                    int zlistNumZones = thisEnclosure.ZoneNums.size();
+                    if (thisZoneList.NumOfZones != zlistNumZones) continue;
                     for (int zListZoneNum : thisZoneList.Zone) {
                         // Search for matching zones
                         bool thisZoneFound = false;
@@ -1174,10 +1174,10 @@ namespace HeatBalanceIntRadExchange {
                     // Look for solar enclosure with same list of zones
                     for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
                         auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
-                        bool anyZoneFound = false;
                         bool anyZoneNotFound = false;
                         // If the number of enclosure zones is not the same as the number of zonelist zone, go to the next enclosure
-                        if (thisZoneList.NumOfZones != thisEnclosure.ZoneNums.size()) continue;
+                        int zlistNumZones = thisEnclosure.ZoneNums.size();
+                        if (thisZoneList.NumOfZones != zlistNumZones) continue;
                         for (int zListZoneNum : thisZoneList.Zone) {
                             // Search for matching zones
                             bool thisZoneFound = false;
