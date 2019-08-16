@@ -1762,7 +1762,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
         "Grouped Air Boundary, !- Name",
         "GroupedZones,            !- Solar and Daylighting Method",
         "GroupedZones,            !- Radiant Exchange Method",
-        "GroupedZones;            !- Air Exchange Method",
+        "None;                    !- Air Exchange Method",
 
         "Construction:AirBoundary,",
         "Non-Grouped Air Boundary, !- Name",
@@ -1814,7 +1814,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_EQ(DataHeatBalance::Construct(constrNum).TotLayers, 1);
     EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Material(DataHeatBalance::Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
     EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryACH, 0.5); // Default value from IDD
-    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryMixingSched, 0);
+    EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryMixingSched, -1);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.01);
 
     constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Grouped Air Boundary"), DataHeatBalance::Construct);
