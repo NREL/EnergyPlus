@@ -57,6 +57,7 @@
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
+#include <DataHeatBalSurface.hh>
 #include <DataLoopNode.hh>
 #include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
@@ -1583,4 +1584,173 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     EXPECT_LT(refPtIllum, 1000.0);
 }
 
+TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_Default)
+{
+    // Test various inputs for HeatBalanceAlgorithm
+    // Default is CTF if no HeatBalanceAlgorithm object is present
+
+    EXPECT_FALSE(DataHeatBalance::AnyCTF);
+    bool errorsfound = false;
+
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetProjectControlData(errorsfound);
+    EXPECT_FALSE(errorsfound);
+    EXPECT_TRUE(DataHeatBalance::AnyCTF);
+    EXPECT_FALSE(DataHeatBalance::AnyEMPD);
+    EXPECT_FALSE(DataHeatBalance::AnyCondFD);
+    EXPECT_FALSE(DataHeatBalance::AnyHAMT);
+    EXPECT_EQ(DataHeatBalance::OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CTF);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
+{
+    // Test various inputs for HeatBalanceAlgorithm
+
+    EXPECT_FALSE(DataHeatBalance::AnyCTF);
+    bool errorsfound = false;
+
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+        "  HeatBalanceAlgorithm,",
+        "  ConductionTransferFunction, !- Algorithm",
+        "  205.2,                      !- Surface Temperature Upper Limit",
+        "  0.004,                      !- Minimum Surface Convection Heat Transfer Coefficient Value",
+        "  200.6;                      !- Maximum Surface Convection Heat Transfer Coefficient Value",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetProjectControlData(errorsfound);
+    EXPECT_FALSE(errorsfound);
+    EXPECT_TRUE(DataHeatBalance::AnyCTF);
+    EXPECT_FALSE(DataHeatBalance::AnyEMPD);
+    EXPECT_FALSE(DataHeatBalance::AnyCondFD);
+    EXPECT_FALSE(DataHeatBalance::AnyHAMT);
+    EXPECT_EQ(DataHeatBalance::OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CTF);
+    EXPECT_EQ(DataHeatBalSurface::MaxSurfaceTempLimit, 205.2);
+    EXPECT_EQ(DataHeatBalance::LowHConvLimit, 0.004);
+    EXPECT_EQ(DataHeatBalance::HighHConvLimit, 200.6);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_EMPD)
+{
+    // Test various inputs for HeatBalanceAlgorithm
+
+    bool errorsfound = false;
+
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+        "  HeatBalanceAlgorithm,",
+        "  MoisturePenetrationDepthConductionTransferFunction; !- Algorithm",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetProjectControlData(errorsfound);
+    EXPECT_FALSE(errorsfound);
+    EXPECT_FALSE(DataHeatBalance::AnyCTF);
+    EXPECT_TRUE(DataHeatBalance::AnyEMPD);
+    EXPECT_FALSE(DataHeatBalance::AnyCondFD);
+    EXPECT_FALSE(DataHeatBalance::AnyHAMT);
+    EXPECT_EQ(DataHeatBalance::OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_EMPD);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
+{
+    // Test various inputs for HeatBalanceAlgorithm
+
+    bool errorsfound = false;
+
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+        "  HeatBalanceAlgorithm,",
+        "  ConductionFiniteDifference; !- Algorithm",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetProjectControlData(errorsfound);
+    EXPECT_FALSE(errorsfound);
+    EXPECT_FALSE(DataHeatBalance::AnyCTF);
+    EXPECT_FALSE(DataHeatBalance::AnyEMPD);
+    EXPECT_TRUE(DataHeatBalance::AnyCondFD);
+    EXPECT_FALSE(DataHeatBalance::AnyHAMT);
+    EXPECT_EQ(DataHeatBalance::OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CondFD);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
+{
+    // Test various inputs for HeatBalanceAlgorithm
+
+    bool errorsfound = false;
+
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+        "  HeatBalanceAlgorithm,",
+        "  CombinedHeatAndMoistureFiniteElement; !- Algorithm",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetProjectControlData(errorsfound);
+    EXPECT_FALSE(errorsfound);
+    EXPECT_FALSE(DataHeatBalance::AnyCTF);
+    EXPECT_FALSE(DataHeatBalance::AnyEMPD);
+    EXPECT_FALSE(DataHeatBalance::AnyCondFD);
+    EXPECT_TRUE(DataHeatBalance::AnyHAMT);
+    EXPECT_EQ(DataHeatBalance::OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_HAMT);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
+{
+
+    bool errorsfound = false;
+    
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+        "WindowMaterial:Glazing:EquivalentLayer,",
+        "GLZCLR,                  !- Name",
+        "SpectralAverage,         !- Optical Data Type",
+        ",                        !- Window Glass Spectral Data Set Name",
+        "0.77,                    !- Front Side Beam-Beam Solar Transmittance {dimensionless}",
+        "0.77,                    !- Back Side Beam-Beam Solar Transmittance {dimensionless}",
+        "0.07,                    !- Front Side Beam-Beam Solar Reflectance {dimensionless}",
+        "0.07,                    !- Back Side Beam-Beam Solar Reflectance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Beam Visible Solar Transmittance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Beam Visible Solar Transmittance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Beam Visible Solar Reflectance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Beam Visible Solar Reflectance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Diffuse Solar Transmittance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Diffuse Solar Transmittance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Diffuse Solar Reflectance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Diffuse Solar Reflectance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Diffuse Visible Solar Transmittance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Diffuse Visible Solar Transmittance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Diffuse Visible Solar Reflectance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Diffuse Visible Solar Reflectance {dimensionless}",
+        "0.695,                   !- Diffuse-Diffuse Solar Transmittance {dimensionless}",
+        "0.16,                    !- Front Side Diffuse-Diffuse Solar Reflectance {dimensionless}",
+        "0.16,                    !- Back Side Diffuse-Diffuse Solar Reflectance {dimensionless}",
+        "0.0,                     !- Diffuse-Diffuse Visible Solar Transmittance {dimensionless}",
+        "0.0,                     !- Front Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}",
+        "0.0,                     !- Back Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}",
+        "0.0,                     !- Infrared Transmittance (applies to front and back) {dimensionless}",
+        "0.84,                    !- Front Side Infrared Emissivity {dimensionless}",
+        "0.84;                    !- Back Side Infrared Emissivity {dimensionless}",
+    });
+    
+    EXPECT_TRUE(process_idf(idf_objects));
+    
+    HeatBalanceManager::GetMaterialData(errorsfound);
+
+    EXPECT_FALSE(errorsfound);
+    EXPECT_NEAR(DataHeatBalance::Material(1).Resistance,0.158,0.0001);
+    
+}
+    
 } // namespace EnergyPlus

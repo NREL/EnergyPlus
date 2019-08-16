@@ -118,6 +118,7 @@ SET( INCLUDED_IMAGES
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/ACBussDiagram.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/ACStorageBussDiagram.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/AirLoopComponentMatrix.png
+  ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/ChangeoverBypassVAV-ReturnPlenumOrMixer.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/DCInverterBussDiagram.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/DCInverterWithACStorageBussDiagram.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/DCInverterWithDCStorageBussDiagram.png
@@ -199,7 +200,6 @@ SET( INCLUDED_IMAGES
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image112.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image133.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image134.png
-  ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image184.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image185.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image186.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image187.png
