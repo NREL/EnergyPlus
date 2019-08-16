@@ -170,6 +170,10 @@ namespace EconomicLifeCycleCost {
 
     extern Array1D_string const MonthNames;
 
+    // arrays related to escalated energy costs
+    extern Array1D<Real64> EscalatedTotEnergy; 
+    extern Array2D<Real64> EscalatedEnergy; 
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
     // Types
@@ -310,6 +314,8 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
 
     void ExpressAsCashFlows();
+
+    void ComputeEscalatedEnergyCosts();
 
     void ComputePresentValue();
 
