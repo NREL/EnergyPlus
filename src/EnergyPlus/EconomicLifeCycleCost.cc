@@ -2419,7 +2419,7 @@ namespace EconomicLifeCycleCost {
             rowHead.deallocate();
             columnWidth.deallocate();
             tableBody.deallocate();
-            //---- Operating Cash Flow by Category
+            //---- Operating Cash Flow by Category (Without Escalation)
             rowHead.allocate(lengthStudyYears);
             columnHead.allocate(10);
             columnWidth.allocate(10);
@@ -2467,6 +2467,61 @@ namespace EconomicLifeCycleCost {
                                                                                         "Life-Cycle Cost Report",
                                                                                         "Entire Facility",
                                                                                         "Operating Cash Flow by Category (Without Escalation)");
+            }
+            columnHead.deallocate();
+            rowHead.deallocate();
+            columnWidth.deallocate();
+            tableBody.deallocate();
+            //---- Operating Cash Flow by Category (With Escalation)
+            rowHead.allocate(lengthStudyYears);
+            columnHead.allocate(10);
+            columnWidth.allocate(10);
+            columnWidth = 14; // array assignment - same for all columns
+            tableBody.allocate(10, lengthStudyYears);
+            tableBody = "";
+            columnHead(1) = "Energy";
+            columnHead(2) = "Water";
+            columnHead(3) = "Maintenance";
+            columnHead(4) = "Repair";
+            columnHead(5) = "Operation";
+            columnHead(6) = "Replacement";
+            columnHead(7) = "MinorOverhaul";
+            columnHead(8) = "MajorOverhaul";
+            columnHead(9) = "OtherOperational";
+            columnHead(10) = "Total";
+
+            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear + iYear - 1);
+                tableBody(1, iYear) = RealToStr(EscalatedTotEnergy(iYear), 2);
+                tableBody(2, iYear) = RealToStr(CashFlow(costCatWater).yrAmount(iYear), 2);
+                tableBody(3, iYear) = RealToStr(CashFlow(costCatMaintenance).yrAmount(iYear), 2);
+                tableBody(4, iYear) = RealToStr(CashFlow(costCatRepair).yrAmount(iYear), 2);
+                tableBody(5, iYear) = RealToStr(CashFlow(costCatOperation).yrAmount(iYear), 2);
+                tableBody(6, iYear) = RealToStr(CashFlow(costCatReplacement).yrAmount(iYear), 2);
+                tableBody(7, iYear) = RealToStr(CashFlow(costCatMinorOverhaul).yrAmount(iYear), 2);
+                tableBody(8, iYear) = RealToStr(CashFlow(costCatMajorOverhaul).yrAmount(iYear), 2);
+                tableBody(9, iYear) = RealToStr(CashFlow(costCatOtherOperational).yrAmount(iYear), 2);
+                Real64 yearly_total_cost =
+                    CashFlow(costCatTotOper).yrAmount(iYear) + EscalatedTotEnergy(iYear) - CashFlow(costCatTotEnergy).yrAmount(iYear);
+                tableBody(10, iYear) = RealToStr(yearly_total_cost, 2);
+            }
+            WriteSubtitle("Operating Cash Flow by Category (With Escalation)");
+            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            if (sqlite) {
+                sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                       rowHead,
+                                                       columnHead,
+                                                       "Life-Cycle Cost Report",
+                                                       "Entire Facility",
+                                                       "Operating Cash Flow by Category (With Escalation)");
+            }
+            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
+                                                                                        rowHead,
+                                                                                        columnHead,
+                                                                                        "Life-Cycle Cost Report",
+                                                                                        "Entire Facility",
+                                                                                        "Operating Cash Flow by Category (With Escalation)");
             }
             columnHead.deallocate();
             rowHead.deallocate();
