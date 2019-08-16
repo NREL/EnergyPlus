@@ -1083,7 +1083,7 @@ namespace MixedAir {
                                           cNumericFields);
             UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
             OutsideAirSys(OASysNum).Name = AlphArray(1);
-            if (!UtilityRoutines::SameString(AlphArray(2), "")) {
+            if (!AlphArray(2).empty()) {
                 GlobalNames::IntraObjUniquenessCheck(AlphArray(2), CurrentModuleObject, cAlphaFields(2), ControllerListUniqueNames, ErrorsFound);
             }
             ControllerListName = AlphArray(2);

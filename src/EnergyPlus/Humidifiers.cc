@@ -1481,39 +1481,23 @@ namespace Humidifiers {
         bool &ErrorsFound
     )
     {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Lixing Gu
-        //       DATE WRITTEN   May 2019
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
         // PURPOSE OF THIS FUNCTION:
         // This function looks up the given humidifier and returns the air outlet node number.
         // If incorrect humidifier name is given, ErrorsFound is returned as true and node number as zero.
 
-        // Return value
-        int NodeNum; // node number returned
-
-                     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int WhichHumidifier;
-
-        // Obtains and Allocates heat exchanger related parameters from input file
         if (GetInputFlag) {
             GetHumidifierInput();
             GetInputFlag = false;
         }
 
-        WhichHumidifier = UtilityRoutines::FindItemInList(HumidifierName, Humidifier);
+        int WhichHumidifier = UtilityRoutines::FindItemInList(HumidifierName, Humidifier);
         if (WhichHumidifier != 0) {
-            NodeNum = Humidifier(WhichHumidifier).AirOutNode;
-        }
-        else {
-            ShowSevereError("GetAirInletNodeNum: Could not find Humidifier = \"" + HumidifierName +"\"");
+            return Humidifier(WhichHumidifier).AirOutNode;
+        } else {
+            ShowSevereError("GetAirInletNodeNum: Could not find Humidifier = \"" + HumidifierName + "\"");
             ErrorsFound = true;
-            NodeNum = 0;
+            return 0;
         }
-
-        return NodeNum;
     }
 
 } // namespace Humidifiers

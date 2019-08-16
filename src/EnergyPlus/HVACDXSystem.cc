@@ -335,12 +335,12 @@ namespace HVACDXSystem {
         // set econo lockout flag
         // set econo lockout flag
         if (AirLoopNum != -1) { // IF the sysem is not an equipment of outdoor air unit
-            if (AirLoopNum > 0) {
+            if (AirLoopNum > 0) { // Real airloopNum called from MixedAir and SimAirServingZones 
                 if ((DXCoolingSystem(DXSystemNum).PartLoadFrac > 0.0 || DXCoolingSystem(DXSystemNum).SpeedRatio > 0.0 ||
                     DXCoolingSystem(DXSystemNum).CycRatio > 0.0) &&
                     AirLoopControlInfo(AirLoopNum).CanLockoutEconoWithCompressor) {
                     AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = true;
-                } else {
+                } else { // used for AirLoopHVACDOAS only
                     AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = false;
                 }
             }
