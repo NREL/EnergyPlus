@@ -979,10 +979,8 @@ namespace PackagedTerminalHeatPump {
             SetMinOATCompressor(PTUnitNum,
                                 PTUnit(PTUnitNum).Name,
                                 CurrentModuleObject,
-                                PTUnit(PTUnitNum).DXCoolCoilType,
-                                PTUnit(PTUnitNum).DXCoolCoilName,
-                                PTUnit(PTUnitNum).DXHeatCoilType,
-                                PTUnit(PTUnitNum).DXHeatCoilName,
+                                PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                PTUnit(PTUnitNum).DXHeatCoilIndexNum,
                                 ErrorsFound);
 
             SuppHeatCoilType = Alphas(13);
@@ -1905,10 +1903,8 @@ namespace PackagedTerminalHeatPump {
             SetMinOATCompressor(PTUnitNum,
                                 PTUnit(PTUnitNum).Name,
                                 CurrentModuleObject,
-                                PTUnit(PTUnitNum).DXCoolCoilType,
-                                PTUnit(PTUnitNum).DXCoolCoilName,
-                                PTUnit(PTUnitNum).DXHeatCoilType,
-                                PTUnit(PTUnitNum).DXHeatCoilName,
+                                PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                PTUnit(PTUnitNum).DXHeatCoilIndexNum,
                                 ErrorsFound);
 
             // Get AirTerminal mixer data
@@ -2634,10 +2630,8 @@ namespace PackagedTerminalHeatPump {
             SetMinOATCompressor(PTUnitNum,
                                 PTUnit(PTUnitNum).Name,
                                 CurrentModuleObject,
-                                PTUnit(PTUnitNum).DXCoolCoilType,
-                                PTUnit(PTUnitNum).DXCoolCoilName,
-                                PTUnit(PTUnitNum).DXHeatCoilType,
-                                PTUnit(PTUnitNum).DXHeatCoilName,
+                                PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                PTUnit(PTUnitNum).DXHeatCoilIndexNum,
                                 ErrorsFound);
 
             // Get supplemental heating coil information
@@ -8693,20 +8687,14 @@ namespace PackagedTerminalHeatPump {
         SetVSHPAirFlow(PTUnitNum, ZoneNum, PartLoadRatio, OnOffAirFlowRatio);
     }
 
-    void SetMinOATCompressor(int const PTUnitNum,                    // index to furnace
-                             std::string const PTUnitName,           // name of furnace
-                             std::string const cCurrentModuleObject, // type of furnace
-                             std::string const CoolingCoilType,      // type of cooling coil
-                             std::string const CoolingCoilName,      // name of cooling coil
-                             std::string const HeatingCoilType,      // type of heating coil
-                             std::string const HeatingCoilName,      // name of heating coil
-                             bool &ErrorsFound                       // GetInput logical that errors were found
+    void SetMinOATCompressor(int const PTUnitNum,                     // index to furnace
+                             std::string const &PTUnitName,           // name of furnace
+                             std::string const &cCurrentModuleObject, // type of furnace
+                             int const CoolingCoilIndex,              // index of cooling coil
+                             int const HeatingCoilIndex,              // index of heating coil
+                             bool &ErrorsFound                        // GetInput logical that errors were found
     )
     {
-        // Using/Aliasing
-        auto &GetMinOATDXCoilCompressor(DXCoils::GetMinOATCompressor);
-        using DXCoils::GetMinOATCompressorUsingIndex;
-        using VariableSpeedCoils::GetVSCoilMinOATCompressor;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool errFlag;
@@ -8714,11 +8702,11 @@ namespace PackagedTerminalHeatPump {
         // Set minimum OAT for heat pump compressor operation in cooling mode
         errFlag = false;
         if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingSingleSpeed) {
-            PTUnit(PTUnitNum).MinOATCompressorCooling = GetMinOATDXCoilCompressor(CoolingCoilType, CoolingCoilName, errFlag);
+            PTUnit(PTUnitNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(CoolingCoilIndex, errFlag);
         } else if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
-            PTUnit(PTUnitNum).MinOATCompressorCooling = GetMinOATCompressorUsingIndex(PTUnit(PTUnitNum).DXCoolCoilIndexNum, errFlag);
+            PTUnit(PTUnitNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(PTUnit(PTUnitNum).DXCoolCoilIndexNum, errFlag);
         } else if (PTUnit(PTUnitNum).DXHeatCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
-            PTUnit(PTUnitNum).MinOATCompressorCooling = GetVSCoilMinOATCompressor(CoolingCoilName, errFlag);
+            PTUnit(PTUnitNum).MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressorUsingIndex(CoolingCoilIndex, errFlag);
         } else {
             PTUnit(PTUnitNum).MinOATCompressorCooling = -1000.0;
         }
@@ -8730,9 +8718,9 @@ namespace PackagedTerminalHeatPump {
         // Set minimum OAT for heat pump compressor operation in heating mode
         errFlag = false;
         if (PTUnit(PTUnitNum).DXHeatCoilType_Num == Coil_HeatingAirToAirVariableSpeed) {
-            PTUnit(PTUnitNum).MinOATCompressorHeating = GetVSCoilMinOATCompressor(HeatingCoilName, errFlag);
+            PTUnit(PTUnitNum).MinOATCompressorHeating = VariableSpeedCoils::GetVSCoilMinOATCompressorUsingIndex(HeatingCoilIndex, errFlag);
         } else if (PTUnit(PTUnitNum).DXHeatCoilType_Num == CoilDX_HeatingEmpirical) {
-            PTUnit(PTUnitNum).MinOATCompressorHeating = GetMinOATDXCoilCompressor(HeatingCoilType, HeatingCoilName, errFlag);
+            PTUnit(PTUnitNum).MinOATCompressorHeating = DXCoils::GetMinOATCompressorUsingIndex(HeatingCoilIndex, errFlag);
         } else {
             PTUnit(PTUnitNum).MinOATCompressorHeating = -1000.0;
         }
