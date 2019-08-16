@@ -3932,10 +3932,12 @@ namespace SimAirServingZones {
                     // Set ReSim flag to TRUE if mass flow not conserved on this branch
                     NodeNumNext = PrimaryAirSystem(SysNum).Branch(BranchNum).NodeNum(NodeIndex + 1);
                     if (NodeNum == PrimaryAirSystem(SysNum).OASysInletNodeNum) continue; // don't enforce mass balance across OA Sys
-                    if (std::abs(Node(NodeNum).MassFlowRate - Node(NodeNumNext).MassFlowRate) > SmallMassFlow) SysReSim = true;
+                    // Changeover bypass system connected to a plenum or mixer will need to include the bypass flow rate
+                    if (std::abs(Node(NodeNum).MassFlowRate - Node(NodeNumNext).MassFlowRate - AirLoopFlow(SysNum).BypassMassFlow) > SmallMassFlow)
+                        SysReSim = true;
                 }
             } // end node loop
-            // Store the minimum MassFlowMasAvail for this branch on the branch inlet node
+            // Store the minimum MassFlowMaxAvail for this branch on the branch inlet node (AirloopHVAC supply inlet node)
             Node(PrimaryAirSystem(SysNum).Branch(BranchNum).NodeNumIn).MassFlowRateMaxAvail = BranchMassFlowMaxAvail;
         } // end branch loop
         // force resimulation for fan-cycling, nonsimple systems
