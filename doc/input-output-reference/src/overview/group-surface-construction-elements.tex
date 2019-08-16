@@ -4108,9 +4108,6 @@ This field controls how the surface is modeled for radiant exchange calculations
 
 \begin{itemize}
   \item
-  \textbf{GroupedZones} - The zone air temperature and humidity will be a volume-weighted average of the connected zones.
-  
-  \item
   \textbf{None} - There will be no air exchange modeled across this surface. Other objects, such as \hyperref[zonemixing]{ZoneMixing} and \hyperref[zonecrossmixing]{ZoneCrossMixing} or AirflowNetwork openings may be specified if desired.
   \item
   \textbf{SimpleMixing} - For each pair of zones connected by Construction:AirBoundary, a pair of ZoneMixing objects will created automatically. These mixing objects may be automatically adjusted to balance HVAC system flows using the \hyperref[zoneairmassflowconservation]{ZoneAirMassFlowConservation} object.
