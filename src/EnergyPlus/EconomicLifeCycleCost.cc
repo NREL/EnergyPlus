@@ -2293,7 +2293,7 @@ namespace EconomicLifeCycleCost {
             columnWidth.deallocate();
             tableBody.deallocate();
             //---- Energy and Water Cost Cash Flows (Without Escalation)
-            numColumns = max(1, numResourcesUsed);
+            numColumns = max(1, numResourcesUsed + 1);
             rowHead.allocate(lengthStudyYears);
             columnHead.allocate(numColumns);
             columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
@@ -2308,6 +2308,10 @@ namespace EconomicLifeCycleCost {
                 for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
                     tableBody(jObj, iYear) = RealToStr(CashFlow(curCashFlow).yrAmount(iYear), 2);
                 }
+            }
+            columnHead(numColumns) = "Total";
+            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+                tableBody(jObj, iYear) = RealToStr(CashFlow(costCatTotEnergy).yrAmount(iYear), 2);
             }
             WriteSubtitle("Energy and Water Cost Cash Flows (Without Escalation)");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
@@ -2332,7 +2336,7 @@ namespace EconomicLifeCycleCost {
             columnWidth.deallocate();
             tableBody.deallocate();
             //---- Energy and Water Cost Cash Flows (With Escalation)
-            numColumns = max(1, numResourcesUsed);
+            numColumns = max(1, numResourcesUsed + 1);
             rowHead.allocate(lengthStudyYears);
             columnHead.allocate(numColumns);
             columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
@@ -2347,6 +2351,10 @@ namespace EconomicLifeCycleCost {
                 for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
                     tableBody(jObj, iYear) = RealToStr(EscalatedEnergy(iYear, jObj), 2);
                 }
+            }
+            columnHead(numColumns) = "Total";
+            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+                tableBody(jObj, iYear) = RealToStr(EscalatedTotEnergy(iYear), 2);
             }
             WriteSubtitle("Energy and Water Cost Cash Flows (With Escalation)");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
@@ -2714,6 +2722,10 @@ namespace EconomicLifeCycleCost {
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
                 rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear + iYear - 1);
                 tableBody(1, iYear) = RealToStr(CashFlow(costCatTotGrand).yrAmount(iYear), 2);
+                // adjust for escalated energy costs
+                Real64 yearly_total_cost =
+                    CashFlow(costCatTotGrand).yrAmount(iYear) + EscalatedTotEnergy(iYear) - CashFlow(costCatTotEnergy).yrAmount(iYear);
+                tableBody(2, iYear) = RealToStr(yearly_total_cost, 2);
                 tableBody(3, iYear) = RealToStr(CashFlow(costCatTotGrand).yrPresVal(iYear), 2);
                 totalPV += CashFlow(costCatTotGrand).yrPresVal(iYear);
             }
