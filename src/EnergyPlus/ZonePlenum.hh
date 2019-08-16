@@ -238,6 +238,8 @@ namespace ZonePlenum {
 
     void GetReturnPlenumName(int const &ReturnPlenumIndex, std::string &ReturnPlenumName);
 
+    int getReturnPlenumIndexFromInletNode(int const &InNodeNum);
+
     //        End of mining functions for the ZonePlenum Module
     // *****************************************************************************
 
