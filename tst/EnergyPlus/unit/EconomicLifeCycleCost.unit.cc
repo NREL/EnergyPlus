@@ -477,3 +477,24 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
     EXPECT_NEAR(EscalatedTotEnergy(5), 115., 0.001);
 
 }
+
+TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_MonthToMonthNumber)
+{
+    ShowMessage("Begin Test: OutputReportTabularTest, ConfirmSetUnitsStyleFromString");
+
+    EXPECT_EQ(1, MonthToMonthNumber("January",1));
+    EXPECT_EQ(2, MonthToMonthNumber("February",1));
+    EXPECT_EQ(3, MonthToMonthNumber("March",1));
+    EXPECT_EQ(4, MonthToMonthNumber("April",1));
+    EXPECT_EQ(5, MonthToMonthNumber("May",1));
+    EXPECT_EQ(6, MonthToMonthNumber("June",1));
+    EXPECT_EQ(7, MonthToMonthNumber("July",1));
+    EXPECT_EQ(8, MonthToMonthNumber("August",1));
+    EXPECT_EQ(9, MonthToMonthNumber("September",1));
+    EXPECT_EQ(10, MonthToMonthNumber("October",1));
+    EXPECT_EQ(11, MonthToMonthNumber("November",1));
+    EXPECT_EQ(12, MonthToMonthNumber("December",1));
+    EXPECT_EQ(99, MonthToMonthNumber("Hexember",99));
+}
+
+
