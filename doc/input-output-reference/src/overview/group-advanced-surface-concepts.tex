@@ -662,6 +662,7 @@ BuildingSurface:Detailed,
 
 Foundation:Kiva,
   Slab Details,              !- Name
+  ,                          !- Initial Indoor Air Temperature
   XPS,                       !- Interior Horizontal Insulation Material Name
   0.2,                       !- Interior Horizontal Insulation Depth
   0.6,                       !- Interior Horizontal Insulation Width
@@ -709,6 +710,11 @@ Construction,
 
 The unique identifier of the Foundation:Kiva object. Referenced by a the
 ``Outside Boundary Condition Object'' field in a surface object.
+
+\paragraph{Field: Initial Indoor Air Temperature}
+
+Indoor air temperature used for Kiva initialization (prior to warmup period).
+If left blank, indoor air temperature during initialization will be estimated based on zone setpoints.
 
 \paragraph{Field: Interior Horizontal Insulation Material
 Name}
