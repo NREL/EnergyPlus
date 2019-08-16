@@ -1494,7 +1494,7 @@ namespace EconomicLifeCycleCost {
         int curResource;
         int nUsePriceEsc;
 
-        for (int iCashFlow = 1; iCashFlow <= numCashFlow; ++iCashFlow) {
+         for (int iCashFlow = 1; iCashFlow <= numCashFlow; ++iCashFlow) {
             if (CashFlow(iCashFlow).pvKind == pvkEnergy) {
                 curResource = CashFlow(iCashFlow).Resource - ResourceTypeInitialOffset;
                 if ((curResource >= 1) && (curResource < NumOfResourceTypes)) {

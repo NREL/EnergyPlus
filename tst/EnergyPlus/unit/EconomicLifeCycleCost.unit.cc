@@ -415,3 +415,65 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ProcessMaxInput)
     EXPECT_EQ(1.099, UseAdjustment(1).Adjustment(99));
     EXPECT_EQ(1.100, UseAdjustment(1).Adjustment(100));
 }
+
+TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
+{
+    lengthStudyYears = 5;
+
+    numCashFlow = 1;
+    CashFlow.allocate(numCashFlow);
+    CashFlow(1).pvKind = pvkEnergy;
+    CashFlow(1).Resource = 1001;
+    CashFlow(1).yrAmount.allocate(lengthStudyYears);
+    CashFlow(1).yrAmount(1) = 100;
+    CashFlow(1).yrAmount(2) = 100;
+    CashFlow(1).yrAmount(3) = 100;
+    CashFlow(1).yrAmount(4) = 100;
+    CashFlow(1).yrAmount(5) = 100;
+
+    numResourcesUsed = 1;
+
+    EscalatedEnergy.allocate(lengthStudyYears, 1);
+    EscalatedTotEnergy.allocate(lengthStudyYears);
+    EscalatedTotEnergy = 0.0;
+
+    ComputeEscalatedEnergyCosts();
+    EXPECT_NEAR(EscalatedEnergy(1, 1), 100., 0.001);
+    EXPECT_NEAR(EscalatedEnergy(2, 1), 100., 0.001);
+    EXPECT_NEAR(EscalatedEnergy(3, 1), 100., 0.001);
+    EXPECT_NEAR(EscalatedEnergy(4, 1), 100., 0.001);
+    EXPECT_NEAR(EscalatedEnergy(5, 1), 100., 0.001);
+
+    EXPECT_NEAR(EscalatedTotEnergy(1), 100., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(2), 100., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(3), 100., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(4), 100., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(5), 100., 0.001);
+
+    numUsePriceEscalation = 1;
+    UsePriceEscalation.allocate(numUsePriceEscalation);
+    UsePriceEscalation(1).resource = 1001;
+    UsePriceEscalation(1).Escalation.allocate(lengthStudyYears);
+    UsePriceEscalation(1).Escalation(1) = 1.03;
+    UsePriceEscalation(1).Escalation(2) = 1.05;
+    UsePriceEscalation(1).Escalation(3) = 1.07;
+    UsePriceEscalation(1).Escalation(4) = 1.11;
+    UsePriceEscalation(1).Escalation(5) = 1.15;
+
+    //reset this variable to zero
+    EscalatedTotEnergy = 0.0;
+
+    ComputeEscalatedEnergyCosts();
+    EXPECT_NEAR(EscalatedEnergy(1, 1), 103., 0.001);
+    EXPECT_NEAR(EscalatedEnergy(2, 1), 105., 0.001);
+    EXPECT_NEAR(EscalatedEnergy(3, 1), 107., 0.001);
+    EXPECT_NEAR(EscalatedEnergy(4, 1), 111., 0.001);
+    EXPECT_NEAR(EscalatedEnergy(5, 1), 115., 0.001);
+
+    EXPECT_NEAR(EscalatedTotEnergy(1), 103., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(2), 105., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(3), 107., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(4), 111., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(5), 115., 0.001);
+
+}
