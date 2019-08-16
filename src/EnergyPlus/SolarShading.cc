@@ -7333,7 +7333,9 @@ namespace SolarShading {
                                     // Interior beam absorptance of glass layers and beam transmittance of back exterior  &
                                     // or interior window WITHOUT SHADING this timestep
 
-                                    if (ShadeFlagBack <= 0) {
+                                    if (Construct(ConstrNumBack).TypeIsAirBoundaryInteriorWindow) {
+                                        TransBeamWin = 1.0;
+                                    } else if (ShadeFlagBack <= 0) {
                                         for (Lay = 1; Lay <= NBackGlass; ++Lay) {
                                             AbsBeamWin(Lay) = POLYF(CosIncBack, Construct(ConstrNumBack).AbsBeamBackCoef({1, 6}, Lay));
                                         }
@@ -7865,59 +7867,66 @@ namespace SolarShading {
                                     // Equivalent Layer window model has no distinction when treating windows with and
                                     // without shades (interior, inbetween and exterior shades)
 
-                                    CosIncBack = std::abs(CosIncAng(TimeStep, HourOfDay, BackSurfNum));
-                                    //  Note in equivalent layer window model if storm window exists it is defined as part of
-                                    //  window construction, hence it does not require a separate treatment
-                                    AbsBeamWinEQL = 0.0;
-                                    TransBeamWin = 0.0;
-
-                                    // Interior beam absorptance of glass layers and beam transmittance of back exterior  &
-                                    // or interior window (treates windows with/without shades as defined) for this timestep
-
-                                    // call the ASHWAT fenestration model for beam radiation here
-                                    CalcEQLOpticalProperty(BackSurfNum, isBEAM, AbsSolBeamBackEQL);
-
-                                    EQLNum = Construct(ConstrNumBack).EQLConsPtr;
-                                    AbsBeamWinEQL({1, CFS(EQLNum).NL}) = AbsSolBeamBackEQL(1, {1, CFS(EQLNum).NL});
-                                    // get the interior beam transmitted through back exterior or interior EQL window
-                                    TransBeamWin = AbsSolBeamBackEQL(1, CFS(EQLNum).NL + 1);
-                                    //   Absorbed by the interior shade layer of back exterior window
-                                    if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != ltyGLAZE) {
-                                        IntBeamAbsByShadFac(BackSurfNum) = BOverlap * AbsSolBeamBackEQL(1, CFS(EQLNum).NL) /
-                                                                           (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea);
-                                        BABSZone += BOverlap * AbsSolBeamBackEQL(1, CFS(EQLNum).NL);
+                                    if (Construct(ConstrNumBack).TypeIsAirBoundaryInteriorWindow) {
+                                        TransBeamWin = 1.0;
+                                        AbsBeamWinEQL = 0.0;
+                                        AbsBeamTotWin = 0.0;
                                     }
-                                    //   Absorbed by the exterior shade layer of back exterior window
-                                    if (CFS(EQLNum).L(1).LTYPE != ltyGLAZE) {
-                                        IntBeamAbsByShadFac(BackSurfNum) =
-                                            BOverlap * AbsSolBeamBackEQL(1, 1) / (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea);
-                                        BABSZone += BOverlap * AbsSolBeamBackEQL(1, 1);
-                                    }
+                                    else {
 
-                                    // determine the number of glass layers
-                                    NBackGlass = 0;
-                                    for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
-                                        if (CFS(EQLNum).L(Lay).LTYPE != ltyGLAZE) continue;
-                                        ++NBackGlass;
-                                    }
-                                    if (NBackGlass >= 2) {
-                                        // If the number of glass is greater than 2, in between glass shade can be present
-                                        for (Lay = 2; Lay <= CFS(EQLNum).NL - 1; ++Lay) {
-                                            if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != ltyGLAZE) {
-                                                // if there is in between shade glass determine the shade absorptance
-                                                IntBeamAbsByShadFac(BackSurfNum) += BOverlap * AbsSolBeamBackEQL(1, Lay) / Surface(BackSurfNum).Area;
-                                                BABSZone += BOverlap * AbsSolBeamBackEQL(1, Lay);
+                                        CosIncBack = std::abs(CosIncAng(TimeStep, HourOfDay, BackSurfNum));
+                                        //  Note in equivalent layer window model if storm window exists it is defined as part of
+                                        //  window construction, hence it does not require a separate treatment
+                                        AbsBeamWinEQL = 0.0;
+                                        TransBeamWin = 0.0;
+
+                                        // Interior beam absorptance of glass layers and beam transmittance of back exterior  &
+                                        // or interior window (treates windows with/without shades as defined) for this timestep
+
+                                        // call the ASHWAT fenestration model for beam radiation here
+                                        CalcEQLOpticalProperty(BackSurfNum, isBEAM, AbsSolBeamBackEQL);
+
+                                        EQLNum = Construct(ConstrNumBack).EQLConsPtr;
+                                        AbsBeamWinEQL({ 1, CFS(EQLNum).NL }) = AbsSolBeamBackEQL(1, { 1, CFS(EQLNum).NL });
+                                        // get the interior beam transmitted through back exterior or interior EQL window
+                                        TransBeamWin = AbsSolBeamBackEQL(1, CFS(EQLNum).NL + 1);
+                                        //   Absorbed by the interior shade layer of back exterior window
+                                        if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != ltyGLAZE) {
+                                            IntBeamAbsByShadFac(BackSurfNum) = BOverlap * AbsSolBeamBackEQL(1, CFS(EQLNum).NL) /
+                                                (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea);
+                                            BABSZone += BOverlap * AbsSolBeamBackEQL(1, CFS(EQLNum).NL);
+                                        }
+                                        //   Absorbed by the exterior shade layer of back exterior window
+                                        if (CFS(EQLNum).L(1).LTYPE != ltyGLAZE) {
+                                            IntBeamAbsByShadFac(BackSurfNum) =
+                                                BOverlap * AbsSolBeamBackEQL(1, 1) / (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea);
+                                            BABSZone += BOverlap * AbsSolBeamBackEQL(1, 1);
+                                        }
+
+                                        // determine the number of glass layers
+                                        NBackGlass = 0;
+                                        for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
+                                            if (CFS(EQLNum).L(Lay).LTYPE != ltyGLAZE) continue;
+                                            ++NBackGlass;
+                                        }
+                                        if (NBackGlass >= 2) {
+                                            // If the number of glass is greater than 2, in between glass shade can be present
+                                            for (Lay = 2; Lay <= CFS(EQLNum).NL - 1; ++Lay) {
+                                                if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != ltyGLAZE) {
+                                                    // if there is in between shade glass determine the shade absorptance
+                                                    IntBeamAbsByShadFac(BackSurfNum) += BOverlap * AbsSolBeamBackEQL(1, Lay) / Surface(BackSurfNum).Area;
+                                                    BABSZone += BOverlap * AbsSolBeamBackEQL(1, Lay);
+                                                }
                                             }
                                         }
+                                        // Sum of interior beam absorbed by all glass layers of back window
+                                        AbsBeamTotWin = 0.0;
+                                        for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
+                                            AbsBeamTotWin += AbsBeamWinEQL(Lay);
+                                            AWinSurf(Lay, BackSurfNum) += BOverlap * AbsBeamWinEQL(Lay) /
+                                                (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea); //[-]
+                                        }
                                     }
-                                    // Sum of interior beam absorbed by all glass layers of back window
-                                    AbsBeamTotWin = 0.0;
-                                    for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
-                                        AbsBeamTotWin += AbsBeamWinEQL(Lay);
-                                        AWinSurf(Lay, BackSurfNum) += BOverlap * AbsBeamWinEQL(Lay) /
-                                                                      (Surface(BackSurfNum).Area + SurfaceWindow(BackSurfNum).DividerArea); //[-]
-                                    }
-
                                     // To BABSZon, add interior beam glass absorption and overall beam transmission for this back window
 
                                     BABSZone += BOverlap * (AbsBeamTotWin + TransBeamWin);
@@ -11280,7 +11289,6 @@ namespace SolarShading {
                 // Loop over all heat transfer surfaces in the current zone that might receive diffuse solar
                 for (int HeatTransSurfNum : thisEnclosure.SurfacePtr) {
                     // Skip surfaces that are not heat transfer surfaces
-                    if (!Surface(HeatTransSurfNum).HeatTransSurf) continue;
                     // Skip tubular daylighting device domes
                     if (Surface(HeatTransSurfNum).Class == SurfaceClass_TDD_Dome) continue;
 
@@ -11353,7 +11361,6 @@ namespace SolarShading {
                         WinDifSolarDistReflectedTotl += DifSolarReflW;  // debug [W]
                         ZoneDifSolarDistAbsorbedTotl += DifSolarAbsW;   // debug [W]
                         ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug [W]
-
                     } else { // Exterior or Interior Window
 
                         int ConstrNumSh = Surface(HeatTransSurfNum).ShadedConstruction;

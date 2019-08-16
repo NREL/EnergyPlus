@@ -27,3 +27,5 @@ data rows will remain the same, using the zone name. For grouped zones, the encl
 may be automatically generated as "Enclosure 1" or user-specified if ZoneProperty:UserViewFactors:bySurfaceName and a
 corresponding ZoneList are included for the grouped zones.
 
+### New Solar View Factor Output
+In the eio and table output related to surface view factors, there is a new section for "Solar View Factors" which is similar to the radiant view factors above.

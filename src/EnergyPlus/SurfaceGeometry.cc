@@ -12791,6 +12791,28 @@ namespace SurfaceGeometry {
                                             ". Other side enclosure num=" + General::RoundSigDigits(otherSideEnclosureNum));
                         }
                     }
+                    if (constr.TypeIsAirBoundaryMixing) {
+                        int zoneNum1 = min(surf.Zone, Surface(surf.ExtBoundCond).Zone);
+                        int zoneNum2 = min(surf.Zone, Surface(surf.ExtBoundCond).Zone);
+                            // This pair already saved?
+                        bool found = false;
+                        for (int n = 0; n < DataHeatBalance::NumAirBoundaryMixing-1; ++n) {
+                            if ((zoneNum1 == DataHeatBalance::AirBoundaryMixingZone1[n]) && (zoneNum2 == DataHeatBalance::AirBoundaryMixingZone2[n])) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            // Store the zone pairs to use later to create cross mixing objects
+                            ++DataHeatBalance::NumAirBoundaryMixing;
+                            DataHeatBalance::AirBoundaryMixingZone1.push_back(zoneNum1);
+                            DataHeatBalance::AirBoundaryMixingZone2.push_back(zoneNum2);
+                            DataHeatBalance::AirBoundaryMixingSched.push_back(DataHeatBalance::Construct(surf.Construction).AirBoundaryMixingSched);
+                            Real64 mixingVol = Construct(surf.Construction).AirBoundaryACH * min(Zone(zoneNum1).Volume, Zone(zoneNum2).Volume) /
+                                               DataGlobals::SecInHour;
+                            DataHeatBalance::AirBoundaryMixingVol.push_back(mixingVol);
+                        }
+                    }
                 }
             }
             if (errorCount > 0) {

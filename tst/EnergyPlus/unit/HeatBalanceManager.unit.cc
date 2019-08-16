@@ -1810,7 +1810,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).IsUsedCTF);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryIRTSurface);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryLumpedAirMass);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryMixing);
     EXPECT_EQ(DataHeatBalance::Construct(constrNum).TotLayers, 1);
     EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Material(DataHeatBalance::Construct(constrNum).LayerPoint(1)).Name, "~AirBoundary-IRTMaterial"));
@@ -1826,7 +1825,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
     EXPECT_FALSE(DataHeatBalance::Construct(constrNum).IsUsedCTF);
     EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryIRTSurface);
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryLumpedAirMass);
     EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryMixing);
     EXPECT_EQ(DataHeatBalance::Construct(constrNum).TotLayers, 0);
     EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryACH, 0.0); // Not processed for GroupedZone mixing option

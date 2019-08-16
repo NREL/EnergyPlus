@@ -843,7 +843,8 @@ namespace HeatBalanceIntRadExchange {
             int enclosureSurfNum = 0;
             for (int zoneNum : thisEnclosure.ZoneNums) {
                 for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
-                    if (!Surface(surfNum).HeatTransSurf) continue;
+                    // Do not include non-heat transfer surfaces, unless it is an air boundary interior window
+                    if (!Surface(surfNum).HeatTransSurf && !Construct(Surface(surfNum).Construction).TypeIsAirBoundaryInteriorWindow) continue;
                     ++enclosureSurfNum;
                     thisEnclosure.SurfacePtr(enclosureSurfNum) = surfNum;
                     // Store pointers back to here

@@ -612,6 +612,12 @@ namespace DataHeatBalance {
 
     extern Real64 ZeroPointerVal;
 
+    extern int NumAirBoundaryMixing;                 // Number of air boundary simple mixing objects needed
+    extern std::vector<int> AirBoundaryMixingZone1;  // Air boundary simple mixing zone 1
+    extern std::vector<int> AirBoundaryMixingZone2;  // Air boundary simple mixing zone 2
+    extern std::vector<int> AirBoundaryMixingSched;  // Air boundary simple mixing schedule index
+    extern std::vector<Real64> AirBoundaryMixingVol; // Air boundary simple mixing volume flow rate [m3/s]
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalance:
 
     // Types
@@ -1028,7 +1034,6 @@ namespace DataHeatBalance {
         bool TypeIsAirBoundaryInteriorWindow; // true for Construction:AirBoundary with InteriorWindow for solar and daylighting
         bool TypeIsAirBoundaryGroupedRadiant; // true for Construction:AirBoundary with grouped zones for radiant
         bool TypeIsAirBoundaryIRTSurface;     // true for Construction:AirBoundary with IRTSurface for radiant
-        bool TypeIsAirBoundaryLumpedAirMass;  // true for Construction:AirBoundary with grouped zones for air exchange
         bool TypeIsAirBoundaryMixing;         // true for Construction:AirBoundary with SimpleMixing for air exchange
         Real64 AirBoundaryACH;                // Air boundary simple mixing air changes per hour [1/hr]
         int AirBoundaryMixingSched;           // Air boundary simple mixing schedule index
@@ -1062,7 +1067,7 @@ namespace DataHeatBalance {
               ReverseConstructionNumLayersWarning(false), ReverseConstructionLayersOrderWarning(false), WindowTypeEQL(false), EQLConsPtr(0),
               AbsDiffFrontEQL(CFSMAXNL, 0.0), AbsDiffBackEQL(CFSMAXNL, 0.0), TransDiffFrontEQL(0.0), TransDiffBackEQL(0.0), TypeIsAirBoundary(false),
               TypeIsAirBoundarySolar(false), TypeIsAirBoundaryInteriorWindow(false), TypeIsAirBoundaryGroupedRadiant(false),
-              TypeIsAirBoundaryIRTSurface(false), TypeIsAirBoundaryLumpedAirMass(false), TypeIsAirBoundaryMixing(false), AirBoundaryACH(0.0),
+              TypeIsAirBoundaryIRTSurface(false), TypeIsAirBoundaryMixing(false), AirBoundaryACH(0.0),
               AirBoundaryMixingSched(0)
         {
         }

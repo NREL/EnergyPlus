@@ -7534,6 +7534,7 @@ namespace HeatBalanceManager {
     )
     {
         cCurrentModuleObject = "Construction:AirBoundary";
+        std::string RoutineName = "CreateAirBoundaryConstructions";
         int numAirBoundaryConstructs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (numAirBoundaryConstructs > 0) {
             auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
@@ -7541,9 +7542,9 @@ namespace HeatBalanceManager {
                 // Cannot imagine how you would have numAirBoundaryConstructs > 0 and yet the instances is empty
                 // this would indicate a major problem in the input processor, not a problem here
                 // I'll still catch this with errorsFound but I cannot make a unit test for it so excluding the line from coverage
-                ShowSevereError(                                                                             // LCOV_EXCL_LINE
-                    "Construction:AirBoundary: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
-                errorsFound = true;                                                                          // LCOV_EXCL_LINE
+                ShowSevereError(                                                                            // LCOV_EXCL_LINE
+                    cCurrentModuleObject + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+                errorsFound = true;                                                                         // LCOV_EXCL_LINE
             }
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -7568,6 +7569,11 @@ namespace HeatBalanceManager {
                     thisConstruct.TypeIsAirBoundarySolar = true;
                 } else if (UtilityRoutines::SameString(solarMethod, "InteriorWindow")) {
                     thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
+                    thisConstruct.TransDiff = 1.0;
+                    thisConstruct.TransDiffVis = 1.0;
+                    thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
+                    thisConstruct.TransSolBeamCoef = 1.0;
+                    thisConstruct.ReflectSolDiffBack = 0.0;
                 }
 
                 // Radiant Exchange Method
@@ -7586,19 +7592,26 @@ namespace HeatBalanceManager {
 
                 // Air Exchange Method
                 std::string const airMethod = fields.at("air_exchange_method");
-                if (UtilityRoutines::SameString(airMethod, "GroupedZones")) {
-                    thisConstruct.TypeIsAirBoundaryLumpedAirMass = true;
-                } else if (UtilityRoutines::SameString(airMethod, "SimpleMixing")) {
+                if (UtilityRoutines::SameString(airMethod, "SimpleMixing")) {
                     thisConstruct.TypeIsAirBoundaryMixing = true;
                     if (fields.find("simple_mixing_air_changes_per_hour") != fields.end()) {
                         thisConstruct.AirBoundaryACH = fields.at("simple_mixing_air_changes_per_hour");
                     } else {
                         if (!inputProcessor->getDefaultValue(
-                                cCurrentModuleObject, "simple_mixing_air_changes_per_hour", thisConstruct.AirBoundaryACH))
+                            cCurrentModuleObject, "simple_mixing_air_changes_per_hour", thisConstruct.AirBoundaryACH)) {
                             errorsFound = true;
+                        }
                     }
                     if (fields.find("simple_mixing_schedule_name") != fields.end()) {
-                        thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(fields.at("simple_mixing_schedule_name"));
+                        auto &schedName = fields.at("simple_mixing_schedule_name");
+                        thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(UtilityRoutines::MakeUPPERCase(schedName));
+                        if (thisConstruct.AirBoundaryMixingSched == 0) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + thisConstruct.Name + "\", invalid (not found) " +
+                                            "Simple Mixing Schedule Name" + "=\"" + schedName.get<std::string>() + "\".");
+                            errorsFound = true;
+                        }
+                    } else {
+                        thisConstruct.AirBoundaryMixingSched = DataGlobals::ScheduleAlwaysOn;
                     }
                 }
             }

@@ -777,6 +777,12 @@ namespace DataHeatBalance {
 
     Real64 ZeroPointerVal(0.0);
 
+    int NumAirBoundaryMixing(0);                   // Number of air boundary simple mixing objects needed
+    std::vector<int> AirBoundaryMixingZone1(0);    // Air boundary simple mixing zone 1
+    std::vector<int> AirBoundaryMixingZone2(0);    // Air boundary simple mixing zone 2
+    std::vector<int> AirBoundaryMixingSched(0);    // Air boundary simple mixing schedule index
+    std::vector<Real64> AirBoundaryMixingVol(0.0); // Air boundary simple mixing volume flow rate [m3/s]
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalance:
 
     // Object Data
