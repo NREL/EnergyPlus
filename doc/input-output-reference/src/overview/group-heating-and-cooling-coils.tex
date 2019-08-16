@@ -5545,11 +5545,7 @@ No variables are reported for this compound object. However, outputs are provide
 
 \subsection{Coil:WaterHeating:AirToWaterHeatPump:Pumped}\label{coilwaterheatingairtowaterheatpumppumped}
 
-<<<<<<< HEAD
 EnergyPlus can model a heat pump water heater (HPWH) consisting of a water heater tank (e.g., \lstinline!WaterHeater:Mixed!), a direct expansion (DX) coil (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source. From the air-side heat transfer perspective, the water-heater receives heating energy from air. Thus it is considered as a cooling coil, and the output variable names are using "Cooling Coil".
-=======
-EnergyPlus can model a heat pump water heater (HPWH) consisting of a water heater tank (e.g., \hyperref[waterheatermixed]{\lstinline!WaterHeater:Mixed!}), a direct expansion (DX) coil (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source.
->>>>>>> develop
 
 The \hyperref[waterheaterheatpumppumpedcondenser]{\lstinline!WaterHeater:HeatPump:PumpedCondenser!} compound object, water heater tank object (e.g., \hyperref[waterheatermixed]{\lstinline!WaterHeater:Mixed!}), and fan object (e.g., \hyperref[fanonoff]{\lstinline!Fan:OnOff!}) are defined elsewhere in this reference document. \lstinline!Coil:WaterHeating:AirToWaterHeatPump:Pumped! object described here models an air-to-water DX compression system to determine its air-side and water-side performance. This DX coil object calculates the air-side sensible and latent cooling capacity at the specific operating conditions for each simulation timestep, as well as the condenser's water-side temperature difference at a given condenser water flow rate.
 
@@ -5820,11 +5816,7 @@ This output field is the electricity consumption of the DX coil compressor and c
 
 \subsection{Coil:WaterHeating:AirToWaterHeatPump:Wrapped}\label{coilwaterheatingairtowaterheatpumpwrapped}
 
-<<<<<<< HEAD
 EnergyPlus can model a heat pump water heater (HPWH) consisting of a water heater tank (e.g., \lstinline!WaterHeater:Stratified!), a direct expansion (DX) coil (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source. From the air-side heat transfer perspective, the water-heater receives heating energy from the air. Thus it is considered as a cooling coil, and the output variable names are using "Cooling Coil".
-=======
-EnergyPlus can model a heat pump water heater (HPWH) consisting of a water heater tank (e.g., \hyperref[waterheaterstratified]{\lstinline!WaterHeater:Stratified!}), a direct expansion (DX) coil (i.e., an air-to-water DX compression system which includes a water heating coil, air coil, compressor, and water pump), and a fan to provide air flow across the air coil associated with the DX compression system. These objects work together to model a system which heats water using zone air, outdoor air, or a combination of zone and outdoor air as the primary heat source.
->>>>>>> develop
 
 The \hyperref[waterheaterheatpumpwrappedcondenser]{\lstinline!WaterHeater:HeatPump:WrappedCondenser!} compound object, water heater tank object (e.g., \hyperref[waterheatermixed]{\lstinline!WaterHeater:Mixed!}), and fan object (e.g., \hyperref[fanonoff]{\lstinline!Fan:OnOff!}) are defined elsewhere in this reference document. \lstinline!Coil:WaterHeating:AirToWaterHeatPump:Wrapped! object described here models an air-to-water DX compression system to determine its air-side and water-side performance. This DX coil object calculates the air-side sensible and latent cooling capacity at the specific operating conditions for each simulation timestep, as well as the condenser's water-side temperature difference at a given condenser water flow rate.
 
@@ -6056,6 +6048,8 @@ Unlike the \lstinline!WaterHeater:HeatPump:PumpedCondenser! it has multiple, and
 It can be used in \lstinline!CoilSystem:IntegratedHeatPump:AirSource! or \lstinline!Coil:WaterHeating:AirToWaterHeatPump:Pumped! which are defined elsewhere in this document.
 
 This DX coil object calculates the air-side sensible and latent cooling capacity at the specific operating conditions for each simulation timestep, as well as the condenser's water-side temperature difference at a given condenser water flow rate.
+
+This coil draws heating energy from air to the heater. Thus it is regarded as a cooling coil, as shown in the output variable names.
 
 The heat pump water heater DX coil model performs the following major functions:
 
