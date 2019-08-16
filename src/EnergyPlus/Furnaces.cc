@@ -6719,10 +6719,8 @@ namespace Furnaces {
         if (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatPump_AirToAir) {
             if (DXCoil(Furnace(FurnaceNum).HeatingCoilIndex).IsSecondaryDXCoilInZone) { // assumes compressor is in same location as secondary coil
                 OutdoorDryBulbTemp = ZT(DXCoil(Furnace(FurnaceNum).HeatingCoilIndex).SecZonePtr);
-                //Furnace(FurnaceNum).CondenserNodeNum = 0;
             } else if (DXCoil(Furnace(FurnaceNum).CoolingCoilIndex).IsSecondaryDXCoilInZone) {
                 OutdoorDryBulbTemp = ZT(DXCoil(Furnace(FurnaceNum).CoolingCoilIndex).SecZonePtr);
-                //Furnace(FurnaceNum).CondenserNodeNum = 0;
             } else {
                 if (Furnace(FurnaceNum).CondenserNodeNum > 0) {
                     OutdoorDryBulbTemp = Node(Furnace(FurnaceNum).CondenserNodeNum).Temp;
@@ -6971,38 +6969,21 @@ namespace Furnaces {
 
                         Furnace(FurnaceNum).HeatPartLoadRatio = PartLoadRatio;
                         //       Check if Heat Pump compressor is allowed to run based on outdoor temperature
-                        //if (Furnace(FurnaceNum).CondenserNodeNum > 0) {
-                        //    if (Node(Furnace(FurnaceNum).CondenserNodeNum).Temp > Furnace(FurnaceNum).MinOATCompressorHeating) {
-                        //        Furnace(FurnaceNum).CompPartLoadRatio = PartLoadRatio;
-                        //    } else {
-                        //        Furnace(FurnaceNum).CompPartLoadRatio = 0.0;
-                        //    }
-                        //} else {
-                            if (OutdoorDryBulbTemp > Furnace(FurnaceNum).MinOATCompressorHeating) {
-                                Furnace(FurnaceNum).CompPartLoadRatio = PartLoadRatio;
-                            } else {
-                                Furnace(FurnaceNum).CompPartLoadRatio = 0.0;
-                            }
-                        //}
+                        if (OutdoorDryBulbTemp > Furnace(FurnaceNum).MinOATCompressorHeating) {
+                            Furnace(FurnaceNum).CompPartLoadRatio = PartLoadRatio;
+                        } else {
+                            Furnace(FurnaceNum).CompPartLoadRatio = 0.0;
+                        }
                     } else if (SystemSensibleLoad > FullSensibleOutput) {
                         //       SystemSensibleLoad is greater than full DX Heating coil output so heat pump runs entire
                         //       timestep and additional supplemental heating is required
                         Furnace(FurnaceNum).HeatPartLoadRatio = 1.0;
-                        //if (Furnace(FurnaceNum).CondenserNodeNum > 0) {
-                        //    if (Node(Furnace(FurnaceNum).CondenserNodeNum).Temp > Furnace(FurnaceNum).MinOATCompressorHeating) {
-                        //        //       Check to see if Heat Pump compressor was allowed to run based on outdoor temperature
-                        //        Furnace(FurnaceNum).CompPartLoadRatio = 1.0;
-                        //    } else {
-                        //        Furnace(FurnaceNum).CompPartLoadRatio = 0.0;
-                        //    }
-                        //} else {
-                            if (OutdoorDryBulbTemp > Furnace(FurnaceNum).MinOATCompressorHeating) {
-                                //       Check to see if Heat Pump compressor was allowed to run based on outdoor temperature
-                                Furnace(FurnaceNum).CompPartLoadRatio = 1.0;
-                            } else {
-                                Furnace(FurnaceNum).CompPartLoadRatio = 0.0;
-                            }
-                        //}
+                        if (OutdoorDryBulbTemp > Furnace(FurnaceNum).MinOATCompressorHeating) {
+                            //       Check to see if Heat Pump compressor was allowed to run based on outdoor temperature
+                            Furnace(FurnaceNum).CompPartLoadRatio = 1.0;
+                        } else {
+                            Furnace(FurnaceNum).CompPartLoadRatio = 0.0;
+                        }
                     } else if (SystemSensibleLoad < NoHeatOutput) {
                         //       SystemSensibleLoad is less than minimum DX Heating coil output so heat pump does not run and
                         //       the load will be met by the supplemental heater
@@ -7021,25 +7002,14 @@ namespace Furnaces {
                             HeatCoilLoad = max(0.0, (SystemSensibleLoad - FullSensibleOutput));
                             TempOutHeatingCoil = Node(FurnaceOutletNode).Temp + HeatCoilLoad / (cpair * Furnace(FurnaceNum).MdotFurnace);
                         }
-                        //if (Furnace(FurnaceNum).CondenserNodeNum > 0) {
-                        //    if (Node(Furnace(FurnaceNum).CondenserNodeNum).Temp > Furnace(FurnaceNum).MaxOATSuppHeat) {
-                        //        HeatCoilLoad = 0.0;
-                        //        if (SystemSensibleLoad < NoHeatOutput) {
-                        //            TempOutHeatingCoil = Node(FurnaceInletNode).Temp;
-                        //        } else {
-                        //            TempOutHeatingCoil = Node(FurnaceOutletNode).Temp;
-                        //        }
-                        //    }
-                        //} else {
-                            if (OutdoorDryBulbTemp > Furnace(FurnaceNum).MaxOATSuppHeat) {
-                                HeatCoilLoad = 0.0;
-                                if (SystemSensibleLoad < NoHeatOutput) {
-                                    TempOutHeatingCoil = Node(FurnaceInletNode).Temp;
-                                } else {
-                                    TempOutHeatingCoil = Node(FurnaceOutletNode).Temp;
-                                }
+                        if (OutdoorDryBulbTemp > Furnace(FurnaceNum).MaxOATSuppHeat) {
+                            HeatCoilLoad = 0.0;
+                            if (SystemSensibleLoad < NoHeatOutput) {
+                                TempOutHeatingCoil = Node(FurnaceInletNode).Temp;
+                            } else {
+                                TempOutHeatingCoil = Node(FurnaceOutletNode).Temp;
                             }
-                        //}
+                        }
                         cpair = PsyCpAirFnWTdb(Node(FurnaceInletNode).HumRat, Node(FurnaceOutletNode).Temp);
                         // TempOutHeatingCoil = Node(FurnaceOutletNode)%Temp + HeatCoilLoad/(cpair*Furnace(FurnaceNum)%MdotFurnace)
                         if ((TempOutHeatingCoil > Furnace(FurnaceNum).DesignMaxOutletTemp) && (HeatCoilLoad > 0.0)) {
