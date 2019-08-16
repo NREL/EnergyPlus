@@ -58,12 +58,18 @@
 
 // EnergyPlus Headers
 #include <DataGlobals.hh>
+#include <DataGlobalConstants.hh>
+#include <EconomicTariff.hh>
+
 #include <EconomicLifeCycleCost.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EconomicLifeCycleCost;
+
+using namespace EnergyPlus::DataGlobalConstants;
+using namespace EnergyPlus::EconomicTariff;
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput)
 {
@@ -480,8 +486,6 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_MonthToMonthNumber)
 {
-    ShowMessage("Begin Test: OutputReportTabularTest, ConfirmSetUnitsStyleFromString");
-
     EXPECT_EQ(1, MonthToMonthNumber("January",1));
     EXPECT_EQ(2, MonthToMonthNumber("February",1));
     EXPECT_EQ(3, MonthToMonthNumber("March",1));
@@ -497,4 +501,92 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_MonthToMonthNumber)
     EXPECT_EQ(99, MonthToMonthNumber("Hexember",99));
 }
 
+
+TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
+{
+    baseDateYear = 2020;
+    baseDateMonth = 1;
+
+    serviceDateYear = 2023;
+    serviceDateMonth = 1;
+
+    lengthStudyYears = 5;
+    lengthStudyTotalMonths = lengthStudyYears * 12;
+
+
+    numTariff = 1;
+    tariff.allocate(1);
+    tariff(1).isSelected = true;
+    tariff(1).resourceNum = 1001;
+    tariff(1).ptTotal = 1;
+    econVar.allocate(1);
+    econVar(1).values.allocate(12);
+    econVar(1).values(1) = 101.;
+    econVar(1).values(2) = 102.;
+    econVar(1).values(3) = 103.;
+    econVar(1).values(4) = 104.;
+    econVar(1).values(5) = 105.;
+    econVar(1).values(6) = 106.;
+    econVar(1).values(7) = 107.;
+    econVar(1).values(8) = 108.;
+    econVar(1).values(9) = 109.;
+    econVar(1).values(10) = 110.;
+    econVar(1).values(11) = 111.;
+    econVar(1).values(12) = 112.;
+
+    numNonrecurringCost = 1;
+    NonrecurringCost.allocate(1);
+    NonrecurringCost(1).name = "MiscConstruction";
+    NonrecurringCost(1).name = "MiscConstruction";
+    NonrecurringCost(1).category = costCatConstruction;
+    NonrecurringCost(1).cost = 123456.;
+    NonrecurringCost(1).startOfCosts == startServicePeriod;
+    NonrecurringCost(1).totalMonthsFromStart = 10;
+
+    ExpressAsCashFlows();
+
+    EXPECT_NEAR(CashFlow(17).mnAmount(47), 123456., 0.001);  // 36 months plus 10 months plus one month 
+
+    // first year
+    EXPECT_NEAR(CashFlow(18).mnAmount(37), 101., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(38), 102., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(39), 103., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(40), 104., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(41), 105., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(42), 106., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(43), 107., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(44), 108., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(45), 109., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(46), 110., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(47), 111., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(48), 112., 0.001);
+    // second  year
+    EXPECT_NEAR(CashFlow(18).mnAmount(49), 101., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(50), 102., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(51), 103., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(52), 104., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(53), 105., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(54), 106., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(55), 107., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(56), 108., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(57), 109., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(58), 110., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(59), 111., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(60), 112., 0.001);
+
+    EXPECT_NEAR(CashFlow(18).yrAmount(4), 1278., 0.001);
+    EXPECT_NEAR(CashFlow(18).yrAmount(5), 1278., 0.001);
+
+    EXPECT_NEAR(CashFlow(costCatEnergy).yrAmount(4), 1278., 0.001);
+    EXPECT_NEAR(CashFlow(costCatEnergy).yrAmount(5), 1278., 0.001);
+
+    EXPECT_NEAR(CashFlow(costCatTotEnergy).yrAmount(4), 1278., 0.001);
+    EXPECT_NEAR(CashFlow(costCatTotEnergy).yrAmount(5), 1278., 0.001);
+
+    EXPECT_NEAR(CashFlow(costCatConstruction).yrAmount(4), 123456, 0.001);
+    EXPECT_NEAR(CashFlow(costCatTotCaptl).yrAmount(4), 123456, 0.001);
+
+    EXPECT_NEAR(CashFlow(costCatTotGrand).yrAmount(4), 1278. + 123456., 0.001);
+    EXPECT_NEAR(CashFlow(costCatTotGrand).yrAmount(5), 1278., 0.001);
+}
 

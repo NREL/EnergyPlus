@@ -196,7 +196,7 @@ namespace EconomicLifeCycleCost {
 
         // Default Constructor
         RecurringCostsType()
-            : category(costCatMaintenance), startOfCosts(startServicePeriod), yearsFromStart(0), monthsFromStart(0), totalMonthsFromStart(0),
+            : category(costCatMaintenance), cost(0.0), startOfCosts(startServicePeriod), yearsFromStart(0), monthsFromStart(0), totalMonthsFromStart(0),
               repeatPeriodYears(0), repeatPeriodMonths(0), totalRepeatPeriodMonths(0), annualEscalationRate(0.0)
         {
         }
@@ -216,7 +216,7 @@ namespace EconomicLifeCycleCost {
 
         // Default Constructor
         NonrecurringCostType()
-            : category(costCatConstruction), startOfCosts(startServicePeriod), yearsFromStart(0), monthsFromStart(0), totalMonthsFromStart(0)
+            : category(costCatConstruction), cost(0.0), startOfCosts(startServicePeriod), yearsFromStart(0), monthsFromStart(0), totalMonthsFromStart(0)
         {
         }
     };
@@ -232,7 +232,7 @@ namespace EconomicLifeCycleCost {
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
-        UsePriceEscalationType() : escalationStartYear(0), escalationStartMonth(0)
+        UsePriceEscalationType() : resource(0), escalationStartYear(0), escalationStartMonth(0)
         {
         }
     };
@@ -246,7 +246,7 @@ namespace EconomicLifeCycleCost {
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
-        UseAdjustmentType()
+        UseAdjustmentType() : resource(0)
         {
         }
     };
@@ -267,7 +267,7 @@ namespace EconomicLifeCycleCost {
         Array1D<Real64> yrPresVal; // present value by year, first year is baseDateYear
 
         // Default Constructor
-        CashFlowType() : pvKind(0)
+        CashFlowType() : SourceKind(0), pvKind(0), Resource(0), Category(0), presentValue(0.), orginalCost(0.)
         {
         }
     };
