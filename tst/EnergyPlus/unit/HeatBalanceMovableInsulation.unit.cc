@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,7 +57,10 @@
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceMovableInsulation.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 
 using namespace EnergyPlus::HeatBalanceMovableInsulation;
 
@@ -133,5 +136,138 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulati
     EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsExt);
     EXPECT_EQ(0.55, AbsExt);
 }
+TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGlazingTest)
+{
 
+    std::string const idf_objects = delimited_string({
+
+        "  Version,9.2;",
+
+        "  Construction,",
+        "    EXTWALL80,               !- Name",
+        "    A1 - 1 IN STUCCO,        !- Outside Layer",
+        "    C4 - 4 IN COMMON BRICK,  !- Layer 2",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3",
+
+        "  Material,",
+        "    A1 - 1 IN STUCCO,        !- Name",
+        "    Smooth,                  !- Roughness",
+        "    2.5389841E-02,           !- Thickness {m}",
+        "    0.6918309,               !- Conductivity {W/m-K}",
+        "    1858.142,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    C4 - 4 IN COMMON BRICK,  !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.1014984,               !- Thickness {m}",
+        "    0.7264224,               !- Conductivity {W/m-K}",
+        "    1922.216,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7600000,               !- Solar Absorptance",
+        "    0.7600000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name",
+        "    Smooth,                  !- Roughness",
+        "    1.9050000E-02,           !- Thickness {m}",
+        "    0.7264224,               !- Conductivity {W/m-K}",
+        "    1601.846,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall001,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    EXTWALL80,               !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,4.572000,            !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,0,                   !- X,Y,Z ==> Vertex 2 {m}",
+        "    15.24000,0,0,            !- X,Y,Z ==> Vertex 3 {m}",
+        "    15.24000,0,4.572000;     !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  WindowMaterial:SimpleGlazingSystem,",
+        "    SimpleGlazingSystem,     !- Name",
+        "    2.8,                     !- U-Factor {W/m2-K}",
+        "    0.7;                     !- Solar Heat Gain Coefficient",
+
+        "  SurfaceControl:MovableInsulation,",
+        "    Outside,                 !- Insulation Type",
+        "    Zn001:Wall001,           !- Surface Name",
+        "    SimpleGlazingSystem,     !- Material Name",
+        "    ON;                      !- Schedule Name",
+
+        "  Schedule:Compact,",
+        "    ON,                      !- Name",
+        "    FRACTION,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: Alldays,            !- Field 2",
+        "    Until: 24:00,1.00;       !- Field 3",
+
+        "  ScheduleTypeLimits,",
+        "    Fraction,                !- Name",
+        "    0.0,                     !- Lower Limit Value",
+        "    1.0,                     !- Upper Limit Value",
+        "    CONTINUOUS;              !- Numeric Type",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // set error to false
+    bool ErrorsFound(false);
+    // set zone data
+    DataGlobals::NumOfZones = 1;
+    DataHeatBalance::Zone.allocate(1);
+    DataHeatBalance::Zone(1).Name = "ZONE ONE";
+    // get schedule data
+    ScheduleManager::ProcessScheduleInput();
+    // get materials data
+    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_EQ(4, DataHeatBalance::TotMaterials);
+    EXPECT_EQ(DataHeatBalance::Material(4).Group, DataHeatBalance::WindowSimpleGlazing);
+    // get construction data
+    HeatBalanceManager::GetConstructData(ErrorsFound);
+    EXPECT_EQ(1, DataHeatBalance::TotConstructs);
+    EXPECT_FALSE(ErrorsFound);
+    // set relative coordinate
+    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::CosZoneRelNorth.allocate(2);
+    SurfaceGeometry::SinZoneRelNorth.allocate(2);
+    SurfaceGeometry::CosZoneRelNorth = 1.0;
+    SurfaceGeometry::CosBldgRelNorth = 1.0;
+    SurfaceGeometry::SinZoneRelNorth = 0.0;
+    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    // set surface data
+    DataSurfaces::TotSurfaces = 1;
+    SurfaceGeometry::SurfaceTmp.allocate(1);
+    int SurfNum = 0;
+    int TotHTSurfs = DataSurfaces::TotSurfaces = 1;
+    Array1D_string const BaseSurfCls(1, {"WALL"});
+    Array1D_int const BaseSurfIDs(1, {1});
+    int NeedToAddSurfaces;
+    // get heat tranfer surface data
+    SurfaceGeometry::GetHTSurfaceData(ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    // get movable insulation object data
+    SurfaceGeometry::GetMovableInsulationData(ErrorsFound);
+    // check movable insulation material
+    EXPECT_EQ(SurfaceGeometry::SurfaceTmp(1).BaseSurfName, "ZN001:WALL001");             // base surface name
+    EXPECT_EQ(SurfaceGeometry::SurfaceTmp(1).MaterialMovInsulExt, 4);                    // index to movable insulation material
+    EXPECT_EQ(DataHeatBalance::Material(4).Name, "SIMPLEGLAZINGSYSTEM");                 // name of movable insulation material
+    EXPECT_EQ(DataHeatBalance::Material(4).Group, DataHeatBalance::WindowSimpleGlazing); // invalid material group type
+    EXPECT_TRUE(ErrorsFound);                                                            // error found due to invalid material
+}
 } // namespace EnergyPlus

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -112,31 +112,51 @@ namespace GlobalNames {
                                  std::string const &CurrentModuleObject,
                                  std::string const &FieldName,
                                  std::unordered_set<std::string> &UniqueStrings,
-                                 bool &ErrorsFound);
+                                 bool &ErrorsFound
+    );
 
     bool VerifyUniqueInterObjectName(std::unordered_map<std::string, std::string> &names,
                                      std::string &object_name,
                                      std::string const &object_type,
                                      std::string const &field_name,
-                                     bool &ErrorsFound);
+                                     bool &ErrorsFound
+    );
 
     bool VerifyUniqueInterObjectName(std::unordered_map<std::string, std::string> &names,
                                      std::string &object_name,
                                      std::string const &object_type,
-                                     bool &ErrorsFound);
+                                     bool &ErrorsFound
+    );
 
     void
-    VerifyUniqueChillerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay);
+    VerifyUniqueChillerName(std::string const &TypeToVerify,
+                            std::string const &NameToVerify,
+                            bool &ErrorsFound,                   // returns true if duplicate name found, unchanged otherwise
+                            std::string const &StringToDisplay);
 
     void
-    VerifyUniqueBaseboardName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay);
+    VerifyUniqueBaseboardName(std::string const &TypeToVerify,
+                              std::string const &NameToVerify,
+                              bool &ErrorsFound,                 // returns true if duplicate name found, unchanged otherwise
+                              std::string const &StringToDisplay);
 
     void
-    VerifyUniqueBoilerName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay);
+    VerifyUniqueBoilerName(std::string const &TypeToVerify,
+                           std::string const &NameToVerify,
+                           bool &ErrorsFound,                    // returns true if duplicate name found, unchanged otherwise
+                           std::string const &StringToDisplay);
 
-    void VerifyUniqueCoilName(std::string const &TypeToVerify, std::string &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay);
+    void
+    VerifyUniqueCoilName(std::string const &TypeToVerify,
+                         std::string &NameToVerify,
+                         bool &ErrorsFound,                      // returns true if duplicate name found, unchanged otherwise
+                         std::string const &StringToDisplay);
 
-    void VerifyUniqueADUName(std::string const &TypeToVerify, std::string const &NameToVerify, bool &ErrorFound, std::string const &StringToDisplay);
+    void
+    VerifyUniqueADUName(std::string const &TypeToVerify,
+                        std::string const &NameToVerify,
+                        bool &ErrorsFound,                       // returns true if duplicate name found, unchanged otherwise
+                        std::string const &StringToDisplay);
 
     // Clears the global data in GlobalNames.
     // Needed for unit tests, should not be normally called.

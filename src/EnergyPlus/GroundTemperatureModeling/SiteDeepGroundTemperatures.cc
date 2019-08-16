@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,8 +63,8 @@
 
 namespace EnergyPlus {
 
-static gio::Fmt fmtA("(A)");
-static gio::Fmt fmtAN("(A,$)");
+static ObjexxFCL::gio::Fmt fmtA("(A)");
+static ObjexxFCL::gio::Fmt fmtAN("(A,$)");
 
 //******************************************************************************
 
@@ -129,13 +129,13 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(int obj
     }
 
     // Write Final Ground Temp Information to the initialization output file
-    gio::write(OutputFileInits, fmtA)
+    ObjexxFCL::gio::write(OutputFileInits, fmtA)
         << "! <Site:GroundTemperature:Deep>,Jan{C},Feb{C},Mar{C},Apr{C},May{C},Jun{C},Jul{C},Aug{C},Sep{C},Oct{C},Nov{C},Dec{C}";
-    gio::write(OutputFileInits, fmtAN) << " Site:GroundTemperature:Deep";
+    ObjexxFCL::gio::write(OutputFileInits, fmtAN) << " Site:GroundTemperature:Deep";
     for (int i = 1; i <= 12; ++i) {
-        gio::write(OutputFileInits, "(', ',F6.2,$)") << thisModel->deepGroundTemps(i);
+        ObjexxFCL::gio::write(OutputFileInits, "(', ',F6.2,$)") << thisModel->deepGroundTemps(i);
     }
-    gio::write(OutputFileInits);
+    ObjexxFCL::gio::write(OutputFileInits);
 
     found = true;
 

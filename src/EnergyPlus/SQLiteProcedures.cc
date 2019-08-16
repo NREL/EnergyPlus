@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -217,6 +217,8 @@ SQLite::SQLite(std::shared_ptr<std::ostream> errorStream,
         sqliteExecuteCommand("PRAGMA locking_mode = EXCLUSIVE;");
         sqliteExecuteCommand("PRAGMA journal_mode = OFF;");
         sqliteExecuteCommand("PRAGMA synchronous = OFF;");
+        sqliteExecuteCommand("PRAGMA encoding=\"UTF-8\";");
+
         // Turn this to ON for Foreign Key constraints.
         // This must be turned ON for every connection
         // Currently, inserting into daylighting tables does not work with this ON. The ZoneIndex referenced by DaylightMaps does not exist in
@@ -970,14 +972,14 @@ void SQLite::initializeDaylightMapTables()
 
     const std::string daylightMapHourlyReportsTableSQL = "CREATE TABLE DaylightMapHourlyReports ( "
                                                          "HourlyReportIndex INTEGER PRIMARY KEY, "
-                                                         "MapNumber INTEGER, Month INTEGER, DayOfMonth INTEGER, Hour INTEGER, "
+                                                         "MapNumber INTEGER, Year INTEGER, Month INTEGER, DayOfMonth INTEGER, Hour INTEGER, "
                                                          "FOREIGN KEY(MapNumber) REFERENCES DaylightMaps(MapNumber) "
                                                          "ON DELETE CASCADE ON UPDATE CASCADE "
                                                          ");";
 
     sqliteExecuteCommand(daylightMapHourlyReportsTableSQL);
 
-    const std::string daylightMapHourlyTitleInsertSQL = "INSERT INTO DaylightMapHourlyReports VALUES(?,?,?,?,?);";
+    const std::string daylightMapHourlyTitleInsertSQL = "INSERT INTO DaylightMapHourlyReports VALUES(?,?,?,?,?,?);";
 
     sqlitePrepareStatement(m_daylightMapHourlyTitleInsertStmt, daylightMapHourlyTitleInsertSQL);
 
@@ -1803,6 +1805,7 @@ void SQLite::createSQLiteDaylightMapTitle(int const mapNum,
 }
 
 void SQLite::createSQLiteDaylightMap(int const mapNum,
+                                     int const year,
                                      int const month,
                                      int const dayOfMonth,
                                      int const hourOfDay,
@@ -1814,11 +1817,13 @@ void SQLite::createSQLiteDaylightMap(int const mapNum,
 {
     if (m_writeOutputToSQLite) {
         ++m_hourlyReportIndex;
-        sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, 1, m_hourlyReportIndex);
-        sqliteBindForeignKey(m_daylightMapHourlyTitleInsertStmt, 2, mapNum);
-        sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, 3, month);
-        sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, 4, dayOfMonth);
-        sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, 5, hourOfDay);
+        int b = 0;
+        sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, ++b, m_hourlyReportIndex);
+        sqliteBindForeignKey(m_daylightMapHourlyTitleInsertStmt, ++b, mapNum);
+        sqliteBindForeignKey(m_daylightMapHourlyTitleInsertStmt, ++b, year);
+        sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, ++b, month);
+        sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, ++b, dayOfMonth);
+        sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, ++b, hourOfDay);
 
         sqliteStepCommand(m_daylightMapHourlyTitleInsertStmt);
         sqliteResetCommand(m_daylightMapHourlyTitleInsertStmt);

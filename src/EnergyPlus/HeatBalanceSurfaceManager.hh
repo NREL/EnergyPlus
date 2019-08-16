@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -154,6 +154,12 @@ namespace HeatBalanceSurfaceManager {
     void CalcHeatBalanceOutsideSurf(Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
     void CalcHeatBalanceInsideSurf(Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
+
+    void CalcHeatBalanceInsideSurf2(const std::vector<int> &HTSurfs,          // Heat transfer surfaces to simulate (opaque and windows)
+                                    const std::vector<int> &IZSurfs,          // Interzone heat transfer surfaces to simulate
+                                    const std::vector<int> &HTNonWindowSurfs, // Non-window heat transfer surfaces to simulate
+                                    const std::vector<int> &HTWindowSurfs,    // Window heat transfer surfaces to simulate
+                                    Optional_int_const ZoneToResimulate = _);
 
     void TestSurfTempCalcHeatBalanceInsideSurf(Real64 TH12, DataSurfaces::SurfaceData &surface, DataHeatBalance::ZoneData &zone, int WarmupSurfTemp);
 

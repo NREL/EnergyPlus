@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -277,7 +277,7 @@ namespace SZVAVModel {
 
             if (HeatingLoad) { // Function UnitarySystems::calcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
                 // set the water flow ratio so water coil gets proper flow
-                SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
+                if (SZVAVModel.MaxHeatCoilFluidFlow > 0.0) SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
             }
             PackagedTerminalHeatPump::CalcPTUnit(
                 SysIndex, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
@@ -404,7 +404,7 @@ namespace SZVAVModel {
 
                 if (HeatingLoad) { // Function UnitarySystems::calcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
                     // set the water flow ratio so water coil gets proper flow
-                    SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
+                    if (SZVAVModel.MaxHeatCoilFluidFlow > 0.0) SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
                 }
                 PackagedTerminalHeatPump::CalcPTUnit(
                     SysIndex, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
@@ -475,7 +475,7 @@ namespace SZVAVModel {
                 PackagedTerminalHeatPump::CalcPTUnit(
                     SysIndex, FirstHVACIteration, PartLoadRatio, TempSensOutput, ZoneLoad, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn);
 
-                if (abs(TempSensOutput - ZoneLoad) * SZVAVModel.ControlZoneMassFlowFrac >
+                if (std::abs(TempSensOutput - ZoneLoad) * SZVAVModel.ControlZoneMassFlowFrac >
                     15.0) { // water coil can provide same output at varying water PLR (model discontinuity?)
                     if (SZVAVModel.MaxIterIndex == 0) {
                         ShowWarningMessage(MessagePrefix + "Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name);
@@ -695,7 +695,7 @@ namespace SZVAVModel {
 
             if (HeatingLoad) { // Function UnitarySystems::calcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
                 // set the water flow ratio so water coil gets proper flow
-                SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
+                if (SZVAVModel.MaxHeatCoilFluidFlow > 0.0) SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
             }
             FanCoilUnits::Calc4PipeFanCoil(SysIndex, SZVAVModel.ControlZoneNum, FirstHVACIteration, TempSensOutput, PartLoadRatio);
             coilActive = DataLoopNode::Node(coilAirInletNode).Temp - DataLoopNode::Node(coilAirOutletNode).Temp;
@@ -815,7 +815,7 @@ namespace SZVAVModel {
 
                 if (HeatingLoad) { // Function UnitarySystems::calcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
                     // set the water flow ratio so water coil gets proper flow
-                    SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
+                    if (SZVAVModel.MaxHeatCoilFluidFlow > 0.0) SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
                 }
                 FanCoilUnits::Calc4PipeFanCoil(SysIndex, SZVAVModel.ControlZoneNum, FirstHVACIteration, TempSensOutput, PartLoadRatio);
                 coilActive = DataLoopNode::Node(coilAirInletNode).Temp - DataLoopNode::Node(coilAirOutletNode).Temp;
@@ -880,7 +880,7 @@ namespace SZVAVModel {
                 // get capacity for warning
                 FanCoilUnits::Calc4PipeFanCoil(SysIndex, SZVAVModel.ControlZoneNum, FirstHVACIteration, TempSensOutput, PartLoadRatio);
 
-                if (abs(TempSensOutput - ZoneLoad) * SZVAVModel.ControlZoneMassFlowFrac >
+                if (std::abs(TempSensOutput - ZoneLoad) * SZVAVModel.ControlZoneMassFlowFrac >
                     15.0) { // water coil can provide same output at varying water PLR (model discontinuity?)
                     if (SZVAVModel.MaxIterIndex == 0) {
                         ShowWarningMessage(MessagePrefix + "Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name);
@@ -1102,7 +1102,7 @@ namespace SZVAVModel {
 
             if (CoolingLoad) { // Function CalcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
                 // set the water flow ratio so water coil gets proper flow
-                SZVAVModel.CoolCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxCoolCoilFluidFlow;
+                if (SZVAVModel.MaxCoolCoilFluidFlow > 0.0) SZVAVModel.CoolCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxCoolCoilFluidFlow;
                 thisSys.calcUnitarySystemToLoad(AirLoopNum,
                                                 FirstHVACIteration,
                                                 PartLoadRatio,
@@ -1115,7 +1115,7 @@ namespace SZVAVModel {
                                                 SupHeaterLoad,
                                                 CompressorONFlag);
             } else {
-                SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
+                if (SZVAVModel.MaxHeatCoilFluidFlow > 0.0) SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
                 thisSys.calcUnitarySystemToLoad(AirLoopNum,
                                                 FirstHVACIteration,
                                                 0.0,
@@ -1131,8 +1131,8 @@ namespace SZVAVModel {
             coilActive = DataLoopNode::Node(coilAirInletNode).Temp - DataLoopNode::Node(coilAirOutletNode).Temp;
 
             if (!coilActive) { // if the coil is schedule off or the plant cannot provide water
-                DataLoopNode::Node(coilFluidInletNode).MassFlowRate = 0.0;
-                if (coilLoopNum > 0)
+                if (coilLoopNum > 0) {
+                    DataLoopNode::Node(coilFluidInletNode).MassFlowRate = 0.0;
                     PlantUtilities::SetComponentFlowRate(DataLoopNode::Node(coilFluidInletNode).MassFlowRate,
                                                          coilFluidInletNode,
                                                          coilFluidOutletNode,
@@ -1140,6 +1140,7 @@ namespace SZVAVModel {
                                                          coilLoopSide,
                                                          coilBranchNum,
                                                          coilCompNum);
+                }
                 return;
             }
 
@@ -1205,7 +1206,7 @@ namespace SZVAVModel {
 
                 if (CoolingLoad) { // Function CalcUnitarySystemToLoad, 4th and 5th arguments are CoolPLR and HeatPLR
                     // set the water flow ratio so water coil gets proper flow
-                    SZVAVModel.CoolCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxCoolCoilFluidFlow;
+                    if (SZVAVModel.MaxCoolCoilFluidFlow > 0.0) SZVAVModel.CoolCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxCoolCoilFluidFlow;
                     thisSys.calcUnitarySystemToLoad(AirLoopNum,
                                                     FirstHVACIteration,
                                                     PartLoadRatio,
@@ -1218,7 +1219,7 @@ namespace SZVAVModel {
                                                     SupHeaterLoad,
                                                     CompressorONFlag);
                 } else {
-                    SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
+                    if (SZVAVModel.MaxHeatCoilFluidFlow > 0.0) SZVAVModel.HeatCoilWaterFlowRatio = maxCoilFluidFlow / SZVAVModel.MaxHeatCoilFluidFlow;
                     thisSys.calcUnitarySystemToLoad(AirLoopNum,
                                                     FirstHVACIteration,
                                                     0.0,
@@ -1233,8 +1234,8 @@ namespace SZVAVModel {
                 }
                 coilActive = DataLoopNode::Node(coilAirInletNode).Temp - DataLoopNode::Node(coilAirOutletNode).Temp;
                 if (!coilActive) { // if the coil is schedule off or the plant cannot provide water
-                    DataLoopNode::Node(coilFluidInletNode).MassFlowRate = 0.0;
-                    if (coilLoopNum > 0)
+                    if (coilLoopNum > 0) {
+                        DataLoopNode::Node(coilFluidInletNode).MassFlowRate = 0.0;
                         PlantUtilities::SetComponentFlowRate(DataLoopNode::Node(coilFluidInletNode).MassFlowRate,
                                                              coilFluidInletNode,
                                                              coilFluidOutletNode,
@@ -1242,6 +1243,7 @@ namespace SZVAVModel {
                                                              coilLoopSide,
                                                              coilBranchNum,
                                                              coilCompNum);
+                    }
                     return;
                 }
 
@@ -1297,7 +1299,7 @@ namespace SZVAVModel {
                                                     CompressorONFlag);
                 }
 
-                if (abs(TempSensOutput - ZoneLoad) * SZVAVModel.ControlZoneMassFlowFrac >
+                if (std::abs(TempSensOutput - ZoneLoad) * SZVAVModel.ControlZoneMassFlowFrac >
                     15.0) { // water coil can provide same output at varying water PLR (model discontinuity?)
                     if (SZVAVModel.MaxIterIndex == 0) {
                         ShowWarningMessage(MessagePrefix + "Coil control failed to converge for " + SZVAVModel.UnitType + ':' + SZVAVModel.Name);

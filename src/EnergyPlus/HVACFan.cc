@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -355,7 +355,7 @@ namespace HVACFan {
     FanSystem::FanSystem( // constructor
         std::string const &objectName)
         : availSchedIndex(0), inletNodeNum(0), outletNodeNum(0), designAirVolFlowRate(0.0), speedControl(SpeedControlMethod::NotSet), deltaPress(0.0),
-          designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), fanIsSecondaryDriver(false), m_fanType_Num(0),
+          designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), AirLoopNum(0), AirPathFlag(false), fanIsSecondaryDriver(false), m_fanType_Num(0),
           m_designAirVolFlowRateWasAutosized(false), m_minPowerFlowFrac(0.0), m_motorEff(0.0), m_motorInAirFrac(0.0),
           m_designElecPowerWasAutosized(false), m_powerSizingMethod(PowerSizingMethod::powerSizingMethodNotSet), m_elecPowerPerFlowRate(0.0),
           m_elecPowerPerFlowRatePerPressure(0.0), m_fanTotalEff(0.0), m_nightVentPressureDelta(0.0), m_nightVentFlowFraction(0.0), m_zoneNum(0),
@@ -367,7 +367,7 @@ namespace HVACFan {
           m_eMSFanEffOverrideOn(false), m_eMSFanEffValue(0.0), m_eMSMaxMassFlowOverrideOn(false), m_eMSAirMassFlowValue(0.0),
           m_faultyFilterFlag(false), m_faultyFilterIndex(0),
 
-          m_massFlowRateMaxAvail(0.0), m_massFlowRateMinAvail(0.0), m_rhoAirStdInit(0.0), m_designPointFEI(0.0)
+          m_massFlowRateMaxAvail(0.0), m_massFlowRateMinAvail(0.0), m_rhoAirStdInit(0.0), m_designPointFEI(0.0) 
     // oneTimePowerCurveCheck_( true )
     {
 
@@ -826,6 +826,8 @@ namespace HVACFan {
                                 locHiSpeedFanRunTimeFrac = locFlowRatio * locRunTimeFraction / m_flowFractionAtSpeed[0];
                                 m_fanRunTimeFractionAtSpeed[0] += locHiSpeedFanRunTimeFrac;
                             } else {
+                                lowSideSpeed = 0;  // hush up cppcheck
+                                hiSideSpeed = 0;  // hush up cppcheck
                                 for (auto loop = 0; loop < m_numSpeeds - 1; ++loop) {
                                     if ((m_flowFractionAtSpeed[loop] <= locFlowRatio) && (locFlowRatio <= m_flowFractionAtSpeed[loop + 1])) {
                                         lowSideSpeed = loop;
@@ -877,6 +879,8 @@ namespace HVACFan {
                                 locHiSpeedFanRunTimeFrac = locFanRunTimeFraction / m_flowFractionAtSpeed[0];
                                 m_fanRunTimeFractionAtSpeed[0] += locHiSpeedFanRunTimeFrac;
                             } else {
+                                lowSideSpeed = 0;  // hush up cppcheck
+                                hiSideSpeed = 0;  // hush up cppcheck
                                 for (auto loop = 0; loop < m_numSpeeds - 1; ++loop) {
                                     if ((m_flowFractionAtSpeed[loop] <= locFanRunTimeFraction) &&
                                         (locFanRunTimeFraction <= m_flowFractionAtSpeed[loop + 1])) {
@@ -1035,6 +1039,25 @@ namespace HVACFan {
         if (DataContaminantBalance::Contaminant.GenericContamSimulation) {
             DataLoopNode::Node(outletNodeNum).GenContam = DataLoopNode::Node(inletNodeNum).GenContam;
         }
+
+        if (speedControl == SpeedControlMethod::Continuous) {
+            if (AirLoopNum > 0) {
+                DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_fanRunTimeFractionAtSpeed[0];
+            }
+        } else {
+            if (AirLoopNum > 0) {
+                if (m_numSpeeds == 1) {
+                    DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_outletAirMassFlowRate / m_maxAirMassFlowRate;
+                } else {
+                    if (m_outletAirMassFlowRate <= m_massFlowAtSpeed[0]) {
+                        DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_outletAirMassFlowRate / m_massFlowAtSpeed[0];
+                    } else {
+                        DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = 1.0;
+                    }
+                }
+            }
+        }
+
     }
 
     void FanSystem::report()

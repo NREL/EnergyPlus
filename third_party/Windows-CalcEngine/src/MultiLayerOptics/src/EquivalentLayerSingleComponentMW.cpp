@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include "EquivalentLayerSingleComponentMW.hpp"
 #include "WCECommon.hpp"
 #include "EquivalentLayerSingleComponent.hpp"

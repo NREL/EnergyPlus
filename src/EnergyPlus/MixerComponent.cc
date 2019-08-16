@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -681,6 +681,34 @@ namespace MixerComponent {
             }
             ErrorsFound = true;
         }
+    }
+
+    int getZoneMixerIndexFromInletNode(int const &InNodeNum)
+    {
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int MixerNum;  // loop counter
+        int InNodeCtr; // loop counter
+        int thisMixer;
+
+        if (GetZoneMixerIndexInputFlag) { // First time subroutine has been entered
+            GetMixerInput();
+            GetZoneMixerIndexInputFlag = false;
+        }
+
+        thisMixer = 0;
+        if (NumMixers > 0) {
+            for (MixerNum = 1; MixerNum <= NumMixers; ++MixerNum) {
+                for (InNodeCtr = 1; InNodeCtr <= MixerCond(MixerNum).NumInletNodes; ++InNodeCtr) {
+                    if (InNodeNum != MixerCond(MixerNum).InletNode(InNodeCtr)) continue;
+                    thisMixer = MixerNum;
+                    break;
+                }
+                if (thisMixer > 0) break;
+            }
+        }
+
+        return thisMixer;
     }
 
     // End of Utility subroutines for the Mixer Component

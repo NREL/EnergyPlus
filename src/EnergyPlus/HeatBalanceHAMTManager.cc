@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -752,12 +752,12 @@ namespace HeatBalanceHAMTManager {
         bool DoReport;
 
         // Formats
-        static gio::Fmt Format_1966("('! <HAMT cells>, Surface Name, Construction Name, Cell Numbers')");
-        static gio::Fmt Format_1965("('! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) ')");
-        static gio::Fmt Format_1968("('HAMT cells, ',A,',',A,400(,:,',',i4))");
-        static gio::Fmt Format_1967("('HAMT origins,',A,',',A,400(,:,',',f10.7))");
-        static gio::Fmt Format_108("('! <Material Nominal Resistance>, Material Name,  Nominal R')");
-        static gio::Fmt Format_111("('Material Nominal Resistance's,2(',',A))");
+        static ObjexxFCL::gio::Fmt Format_1966("('! <HAMT cells>, Surface Name, Construction Name, Cell Numbers')");
+        static ObjexxFCL::gio::Fmt Format_1965("('! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) ')");
+        static ObjexxFCL::gio::Fmt Format_1968("('HAMT cells, ',A,',',A,400(,:,',',i4))");
+        static ObjexxFCL::gio::Fmt Format_1967("('HAMT origins,',A,',',A,400(,:,',',f10.7))");
+        static ObjexxFCL::gio::Fmt Format_108("('! <Material Nominal Resistance>, Material Name,  Nominal R')");
+        static ObjexxFCL::gio::Fmt Format_111("('Material Nominal Resistance's,2(',',A))");
 
         deltat = TimeStepZone * 3600.0;
 
@@ -997,8 +997,8 @@ namespace HeatBalanceHAMTManager {
         }
 
         // Reset surface virtual cell origins and volumes. Initialize report variables.
-        gio::write(OutputFileInits, Format_1966);
-        gio::write(OutputFileInits, Format_1965);
+        ObjexxFCL::gio::write(OutputFileInits, Format_1966);
+        ObjexxFCL::gio::write(OutputFileInits, Format_1965);
         // cCurrentModuleObject='MaterialProperty:HeatAndMoistureTransfer:*'
         for (sid = 1; sid <= TotSurfaces; ++sid) {
             if (!Surface(sid).HeatTransSurf) continue;
@@ -1028,16 +1028,16 @@ namespace HeatBalanceHAMTManager {
 
             // write cell origins to initialization output file
             conid = Surface(sid).Construction;
-            gio::write(OutputFileInits, "('HAMT cells, ',A,',',A,$)") << Surface(sid).Name << Construct(conid).Name;
+            ObjexxFCL::gio::write(OutputFileInits, "('HAMT cells, ',A,',',A,$)") << Surface(sid).Name << Construct(conid).Name;
             for (int concell = 1, concell_end = Intcell(sid) - Extcell(sid) + 1; concell <= concell_end; ++concell) {
-                gio::write(OutputFileInits, "(',',i4,$)") << concell;
+                ObjexxFCL::gio::write(OutputFileInits, "(',',i4,$)") << concell;
             }
-            gio::write(OutputFileInits);
-            gio::write(OutputFileInits, "('HAMT origins,',A,',',A,$)") << Surface(sid).Name << Construct(conid).Name;
+            ObjexxFCL::gio::write(OutputFileInits);
+            ObjexxFCL::gio::write(OutputFileInits, "('HAMT origins,',A,',',A,$)") << Surface(sid).Name << Construct(conid).Name;
             for (int cellid = Extcell(sid); cellid <= Intcell(sid); ++cellid) {
-                gio::write(OutputFileInits, "(','f10.7,$)") << cells(cellid).origin(1);
+                ObjexxFCL::gio::write(OutputFileInits, "(','f10.7,$)") << cells(cellid).origin(1);
             }
-            gio::write(OutputFileInits);
+            ObjexxFCL::gio::write(OutputFileInits);
 
             for (int cellid = Extcell(sid), concell = 1; cellid <= Intcell(sid); ++cellid, ++concell) {
                 SetupOutputVariable("HAMT Surface Temperature Cell " + TrimSigDigits(concell) + "",
@@ -1068,11 +1068,11 @@ namespace HeatBalanceHAMTManager {
         ScanForReports("Constructions", DoReport, "Constructions");
         if (DoReport) {
 
-            gio::write(OutputFileInits, Format_108);
+            ObjexxFCL::gio::write(OutputFileInits, Format_108);
 
             for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
 
-                gio::write(OutputFileInits, Format_111) << Material(MaterNum).Name << RoundSigDigits(NominalR(MaterNum), 4);
+                ObjexxFCL::gio::write(OutputFileInits, Format_111) << Material(MaterNum).Name << RoundSigDigits(NominalR(MaterNum), 4);
             }
         }
     }

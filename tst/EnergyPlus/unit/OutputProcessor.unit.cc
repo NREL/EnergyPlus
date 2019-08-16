@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3564,7 +3564,6 @@ namespace OutputProcessor {
     TEST_F(EnergyPlusFixture, OutputProcessor_ResetAccumulationWhenWarmupComplete)
     {
         std::string const idf_objects = delimited_string({
-            "Version,8.3;",
             "Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,detailed;",
             "Output:Meter:MeterFileOnly,DistrictHeating:HVAC,detailed;",
             "Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,runperiod;",
@@ -3828,7 +3827,7 @@ namespace OutputProcessor {
     TEST_F(EnergyPlusFixture, OutputProcessor_DuplicateMeterCustom)
     {
         std::string const idf_objects = delimited_string(
-            {"Version,8.6;", "Meter:Custom,", "CustomMeter1,               !- Name", "Generic,                    !- Fuel Type",
+            {"Meter:Custom,", "CustomMeter1,               !- Name", "Generic,                    !- Fuel Type",
              ",                           !- Key Name 1", "DistrictHeating:Facility;   !- Variable or Meter 1 Name", "Meter:Custom,",
              "CustomMeter2,               !- Name", "Generic,                    !- Fuel Type", ",                           !- Key Name 1",
              "CustomMeter1;               !- Variable or Meter 1 Name", "Output:Meter,CustomMeter1,Hourly;", "Output:Meter,CustomMeter2,Hourly;"});

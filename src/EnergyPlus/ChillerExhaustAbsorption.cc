@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -374,6 +374,8 @@ namespace ChillerExhaustAbsorption {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, Get_ErrorsFound);
+
+            // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), Get_ErrorsFound, cCurrentModuleObject + " Name");
 
             ExhaustAbsorber(AbsorberNum).Name = cAlphaArgs(1);
@@ -847,12 +849,12 @@ namespace ChillerExhaustAbsorption {
                                     ExhaustAbsorber(ChillNum).CWLoopSideNum,
                                     ExhaustAbsorber(ChillNum).CWBranchNum,
                                     ExhaustAbsorber(ChillNum).CWCompNum,
+                                    errFlag,
                                     ExhaustAbsorber(ChillNum).CHWLowLimitTemp,
                                     _,
                                     _,
                                     ExhaustAbsorber(ChillNum).ChillReturnNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitExhaustAbsorber: Program terminated due to previous condition(s).");
             }
@@ -863,12 +865,12 @@ namespace ChillerExhaustAbsorption {
                                     ExhaustAbsorber(ChillNum).HWLoopSideNum,
                                     ExhaustAbsorber(ChillNum).HWBranchNum,
                                     ExhaustAbsorber(ChillNum).HWCompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     ExhaustAbsorber(ChillNum).HeatReturnNodeNum,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitExhaustAbsorber: Program terminated due to previous condition(s).");
             }
@@ -880,12 +882,12 @@ namespace ChillerExhaustAbsorption {
                                         ExhaustAbsorber(ChillNum).CDLoopSideNum,
                                         ExhaustAbsorber(ChillNum).CDBranchNum,
                                         ExhaustAbsorber(ChillNum).CDCompNum,
+                                        errFlag,
                                         _,
                                         _,
                                         _,
                                         ExhaustAbsorber(ChillNum).CondReturnNodeNum,
-                                        _,
-                                        errFlag);
+                                        _);
                 if (errFlag) {
                     ShowFatalError("InitExhaustAbsorber: Program terminated due to previous condition(s).");
                 }

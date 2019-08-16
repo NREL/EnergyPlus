@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -233,10 +233,11 @@ namespace SurfaceGeometry {
                                  int const TotFinsProjection       // Number of Fins (projection) to obtain
     );
 
-    void GetIntMassSurfaceData(bool &ErrorsFound,   // Error flag indicator (true if errors found)
-                               int &SurfNum,        // Count of Current SurfaceNumber
-                               int const TotIntMass // Number of Internal Mass Surfaces to obtain
+    void GetIntMassSurfaceData(bool &ErrorsFound, // Error flag indicator (true if errors found)
+                               int &SurfNum       // Count of Current SurfaceNumber
     );
+
+    int GetNumIntMassSurfaces(); // Number of Internal Mass Surfaces to obtain
 
     void GetShadingSurfReflectanceData(bool &ErrorsFound); // If errors found in input
 
@@ -254,7 +255,7 @@ namespace SurfaceGeometry {
         void getData(bool &ErrorsFound);
         struct Data
         {
-            double exposedFraction;
+            double exposedFraction = -1; // hush up cppcheck
             std::vector<bool> isExposedPerimeter;
             bool useDetailedExposedPerimeter;
         };

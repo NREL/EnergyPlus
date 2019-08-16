@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,7 +65,10 @@ namespace HybridModel {
     // MODULE PARAMETER DEFINITIONS
 
     // MODULE VARIABLE TYPE DECLARATIONS:
-    extern bool FlagHybridModel;      // True if hybrid model is activated
+    extern bool FlagHybridModel;    // True if hybrid model is activated
+    extern bool FlagHybridModel_TM;   // User input IM option - True if hybrid model (thermal mass) is activated
+    extern bool FlagHybridModel_AI; // User input IM option - True if hybrid model (air infiltration) is activated
+    extern bool FlagHybridModel_PC;   // User input IM option - True if hybrid model (people count) is activated
     extern int NumOfHybridModelZones; // Number of hybrid model zones in the model
 
     // SUBROUTINE SPECIFICATIONS:
@@ -77,8 +80,28 @@ namespace HybridModel {
         // Members
         std::string Name;
         int ZoneMeasuredTemperatureSchedulePtr;
-        bool InternalThermalMassCalc;
-        bool InfiltrationCalc;
+        int ZoneMeasuredHumidityRatioSchedulePtr;
+        int ZoneMeasuredCO2ConcentrationSchedulePtr;
+
+        int ZonePeopleActivityLevelSchedulePtr;
+        int ZonePeopleSensibleFractionSchedulePtr;
+        int ZonePeopleRadiationFractionSchedulePtr;
+        int ZonePeopleCO2GenRateSchedulePtr;
+
+        int ZoneSupplyAirTemperatureSchedulePtr;
+        int ZoneSupplyAirMassFlowRateSchedulePtr;
+        int ZoneSupplyAirHumidityRatioSchedulePtr;
+        int ZoneSupplyAirCO2ConcentrationSchedulePtr;
+
+        bool InternalThermalMassCalc_T;     // Calculate thermal mass flag with measured temperature
+        bool InfiltrationCalc_T;            // Calculate air infiltration rate flag with measured temperature
+        bool InfiltrationCalc_H;            // Calculate air infiltration rate flag with measured humidity ratio
+        bool InfiltrationCalc_C;            // Calculate air infiltration rate flag with measured CO2 concentration
+        bool PeopleCountCalc_T;             // Calculate zone people count flag with measured temperature
+        bool PeopleCountCalc_H;             // Calculate zone people count flag with measured humidity ratio
+        bool PeopleCountCalc_C;             // Calculate zone people count flag with measured CO2 concentration
+        bool IncludeSystemSupplyParameters; // Flag to decide whether to include system supply terms
+
         int ZoneMeasuredTemperatureStartMonth;
         int ZoneMeasuredTemperatureStartDate;
         int ZoneMeasuredTemperatureEndMonth;
@@ -88,7 +111,12 @@ namespace HybridModel {
 
         // Default Constructor
         HybridModelProperties()
-            : ZoneMeasuredTemperatureSchedulePtr(0), InternalThermalMassCalc(false), InfiltrationCalc(false), ZoneMeasuredTemperatureStartMonth(0),
+            : ZoneMeasuredTemperatureSchedulePtr(0), ZoneMeasuredHumidityRatioSchedulePtr(0), ZoneMeasuredCO2ConcentrationSchedulePtr(0),
+              ZonePeopleActivityLevelSchedulePtr(0), ZonePeopleSensibleFractionSchedulePtr(0), ZonePeopleRadiationFractionSchedulePtr(0),
+              ZonePeopleCO2GenRateSchedulePtr(0), ZoneSupplyAirTemperatureSchedulePtr(0), ZoneSupplyAirMassFlowRateSchedulePtr(0),
+              ZoneSupplyAirHumidityRatioSchedulePtr(0), ZoneSupplyAirCO2ConcentrationSchedulePtr(0), InternalThermalMassCalc_T(false),
+              InfiltrationCalc_T(false), InfiltrationCalc_H(false), InfiltrationCalc_C(false), PeopleCountCalc_T(false), PeopleCountCalc_H(false),
+              PeopleCountCalc_C(false), IncludeSystemSupplyParameters(false), ZoneMeasuredTemperatureStartMonth(0),
               ZoneMeasuredTemperatureStartDate(0), ZoneMeasuredTemperatureEndMonth(0), ZoneMeasuredTemperatureEndDate(0), HybridStartDayOfYear(0),
               HybridEndDayOfYear(0)
         {

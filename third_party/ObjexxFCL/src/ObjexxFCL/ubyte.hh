@@ -196,7 +196,7 @@ public: // Math
 	ubyte
 	operator -() const
 	{
-		return ubyte( static_cast< unsigned char const >( -static_cast< short int const >( b_ ) ) );
+		return ubyte( static_cast< unsigned char >( -static_cast< short int >( b_ ) ) );
 	}
 
 	// ubyte + ubyte

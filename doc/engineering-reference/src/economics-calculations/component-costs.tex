@@ -169,7 +169,7 @@ The subtotal of individual line items, \emph{S\(_{L}\)}, is obtained by summing 
 {S_L} = \sum L
 \end{equation}
 
-For the reference building, \emph{S\(_{L,}\)}is user input (typically from a prior run of baseline building model).
+For the reference building, \emph{S\(_{L}\)}, is user input (typically from a prior run of baseline building model).
 
 The subtotal for miscellaneous construction costs (typically those costs not explicitly included as line items), \emph{S\(_{m}\)}, are calculated by multiplying the \textbf{Miscellaneous Cost Model} (per Square Meter), \emph{C\(_{m}\)},~ by the total conditioned floor area, \emph{A\(_{c}\)}:
 
@@ -177,43 +177,43 @@ The subtotal for miscellaneous construction costs (typically those costs not exp
 {S_m} = {A_c} * {C_m}
 \end{equation}
 
-The subtotal for the amount that the construction costs should be altered because of regional differences in material and labor costs (e.g.~when using national average data), \emph{S\(_{r}\)}, is determined by multiplying the Regional Adjustment Factor, \emph{R\(_{f\, ,}\)} by the sum of \emph{S\(_{L}\)}~and \emph{S\(_{m:}\)}
+The subtotal for the amount that the construction costs should be altered because of regional differences in material and labor costs (e.g.~when using national average data), \emph{S\(_{r}\)}, is determined by multiplying the Regional Adjustment Factor, \emph{R\(_{f}\)}, by the sum of \emph{S\(_{L}\)}~and \emph{S\(_{m}\)}:
 
 \begin{equation}
 {S_r} = ({S_L} + {S_m}){R_f}
 \end{equation}
 
-Remaining adjustments are applied to the subtotal for construction costs, \emph{S\(_{c}\)}, which is the sum of \emph{S\(_{L}\)}, \emph{S\(_{m,}\)}, and \emph{S\(_{r:}\)}
+Remaining adjustments are applied to the subtotal for construction costs, \emph{S\(_{c}\)}, which is the sum of \emph{S\(_{L}\)}, \emph{S\(_{m,}\)}, and \emph{S\(_{r}\)}:
 
 \begin{equation}
 {S_C} = {S_L} + {S_m} + {S_r}
 \end{equation}
 
-The \textbf{Design and Engineering Fee Fraction},\emph{F\(_{d}\)},is the fraction of construction costs, \emph{S\(_{c}\)}, attributable to costs associated with architectural and engineering services needed for the project.~ The subtotal for costs associated with these fees, \emph{S\(_{D}\)}, are determined by multiplying \emph{S\(_{C}\)} by \emph{F\(_{d}\)}:
+The \textbf{Design and Engineering Fee Fraction}, \emph{F\(_{d}\)}, is the fraction of construction costs, \emph{S\(_{c}\)}, attributable to costs associated with architectural and engineering services needed for the project.~ The subtotal for costs associated with these fees, \emph{S\(_{D}\)}, are determined by multiplying \emph{S\(_{C}\)} by \emph{F\(_{d}\)}:
 
 \begin{equation}
 {S_D} = {S_c}*{F_D}
 \end{equation}
 
-The \textbf{Contractor Fee Fraction},\emph{F\(_{c}\)},is the fraction of construction costs, \emph{S\(_{c}\)}, attributable to costs associated with the contractor's profit that should be included in the project.~ The subtotal for costs associated with contracting, \emph{S\(_{P}\)}, are determined by multiplying \emph{S\(_{C}\)} by \emph{F\(_{d}\)}:
+The \textbf{Contractor Fee Fraction}, \emph{F\(_{c}\)}, is the fraction of construction costs, \emph{S\(_{c}\)}, attributable to costs associated with the contractor's profit that should be included in the project.~ The subtotal for costs associated with contracting, \emph{S\(_{P}\)}, are determined by multiplying \emph{S\(_{C}\)} by \emph{F\(_{d}\)}:
 
 \begin{equation}
 {S_P} = {S_c}*{F_C}
 \end{equation}
 
-The \textbf{Contingency Fraction},\emph{F\(_{S}\)},is the fraction of construction costs, \emph{S\(_{c}\)}, which should be included in a cost estimate to provide for contingencies (perhaps related to errors and uncertainty in the estimate and project).~ The subtotal for contingency costs, \emph{S\(_{S}\)}, are determined by multiplying \emph{S\(_{C}\)} by \emph{F\(_{S}\)}:
+The \textbf{Contingency Fraction}, \emph{F\(_{S}\)}, is the fraction of construction costs, \emph{S\(_{c}\)}, which should be included in a cost estimate to provide for contingencies (perhaps related to errors and uncertainty in the estimate and project).~ The subtotal for contingency costs, \emph{S\(_{S}\)}, are determined by multiplying \emph{S\(_{C}\)} by \emph{F\(_{S}\)}:
 
 \begin{equation}
 {S_S} = {S_c}*{F_S}
 \end{equation}
 
-The \textbf{Permits, Bonding, Insurance Fraction,}\emph{F\(_{B}\)},is the fraction of construction costs, \emph{S\(_{c}\)}, which should be included in a cost estimate to provide for things like taxes, bonding, insurance, and permits.~ The subtotal for these extra costs, \emph{S\(_{B}\)}, are determined by multiplying \emph{S\(_{C}\)} by \emph{F\(_{B}\)}:
+The \textbf{Permits, Bonding, Insurance Fraction}, \emph{F\(_{B}\)}, is the fraction of construction costs, \emph{S\(_{c}\)}, which should be included in a cost estimate to provide for things like taxes, bonding, insurance, and permits.~ The subtotal for these extra costs, \emph{S\(_{B}\)}, are determined by multiplying \emph{S\(_{C}\)} by \emph{F\(_{B}\)}:
 
 \begin{equation}
 {S_B} = {S_c}*{F_B}
 \end{equation}
 
-The \textbf{Commissioning Fee Fraction,}\emph{F\(_{CX}\)},is the fraction of construction costs, \emph{S\(_{c}\)}, which should be included in a cost estimate to provide for commissioning the building systems.~ The subtotal for these extra costs, \emph{S\(_{CX}\)}, are determined by multiplying \emph{S\(_{C}\)} by \emph{F\(_{CX}\)}:
+The \textbf{Commissioning Fee Fraction}, \emph{F\(_{CX}\)}, is the fraction of construction costs, \emph{S\(_{c}\)}, which should be included in a cost estimate to provide for commissioning the building systems.~ The subtotal for these extra costs, \emph{S\(_{CX}\)}, are determined by multiplying \emph{S\(_{C}\)} by \emph{F\(_{CX}\)}:
 
 \begin{equation}
 {S_{CX}} = {S_c}*{F_{CX}}

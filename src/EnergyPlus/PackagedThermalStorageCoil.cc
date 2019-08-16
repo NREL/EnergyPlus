@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -278,7 +278,6 @@ namespace PackagedThermalStorageCoil {
         int NumNumbers;                 // Number of numeric items in input
         int IOStatus;                   // Input status returned from GetObjectItem
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
-        bool errFlag;
         Real64 TminRho;
         Real64 TmaxRho;
         Real64 TminCp;
@@ -305,10 +304,9 @@ namespace PackagedThermalStorageCoil {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+
             TESCoil(item).Name = cAlphaArgs(1);
             if (lAlphaFieldBlanks(2)) {
                 TESCoil(item).AvailSchedNum = ScheduleAlwaysOn;
@@ -1881,7 +1879,7 @@ namespace PackagedThermalStorageCoil {
 
             if (TESCoil(TESCoilNum).TESPlantConnectionAvailable) {
                 errFlag = false;
-                ScanPlantLoopsForObject(TESCoil(TESCoilNum).Name, TypeOf_PackagedTESCoolingCoil, plloopnum, lsnum, brnum, cpnum);
+                ScanPlantLoopsForObject(TESCoil(TESCoilNum).Name, TypeOf_PackagedTESCoolingCoil, plloopnum, lsnum, brnum, cpnum, errFlag);
 
                 // double check node names match
                 if (errFlag) {

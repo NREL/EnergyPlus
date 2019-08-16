@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -587,7 +587,7 @@ namespace UserDefinedComponents {
         using WaterManager::SetupTankSupplyComponent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool ErrorsFound(false);
@@ -617,7 +617,6 @@ namespace UserDefinedComponents {
         int MgrCountTest;
         int CtrlZone; // controlled zone do loop index
         int SupAirIn; // controlled zone supply air inlet index
-        bool errFlag;
 
         cCurrentModuleObject = "PlantComponent:UserDefined";
         inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
@@ -1023,10 +1022,10 @@ namespace UserDefinedComponents {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-                VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-                if (errFlag) {
-                    ErrorsFound = true;
-                }
+
+                // ErrorsFound will be set to True if problem was found, left untouched otherwise
+                VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+
                 UserCoil(CompLoop).Name = cAlphaArgs(1);
 
                 // now get program manager for model simulations
@@ -1528,7 +1527,7 @@ namespace UserDefinedComponents {
                         UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).HowLoadServed = HowMet_NoneDemand;
                         UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
                         // Setup Internal Variables
-                        gio::write(LoopStr, fmtLD) << ConnectionLoop;
+                        ObjexxFCL::gio::write(LoopStr, fmtLD) << ConnectionLoop;
                         strip(LoopStr);
                         // model input related internal variables
                         SetupEMSInternalVariable("Inlet Temperature for Plant Connection " + LoopStr,
@@ -2167,6 +2166,7 @@ namespace UserDefinedComponents {
                                                         UserPlantComp(CompNum).Loop(ConnectionNum).LoopSideNum,
                                                         UserPlantComp(CompNum).Loop(ConnectionNum).BranchNum,
                                                         UserPlantComp(CompNum).Loop(ConnectionNum).CompNum,
+                                                        errFlag,
                                                         _,
                                                         _,
                                                         _,
@@ -2274,7 +2274,8 @@ namespace UserDefinedComponents {
                                                         UserCoil(CompNum).Loop.LoopNum,
                                                         UserCoil(CompNum).Loop.LoopSideNum,
                                                         UserCoil(CompNum).Loop.BranchNum,
-                                                        UserCoil(CompNum).Loop.CompNum);
+                                                        UserCoil(CompNum).Loop.CompNum,
+                                                        errFlag);
                 if (errFlag) {
                     ShowFatalError("InitPlantUserComponent: Program terminated due to previous condition(s).");
                 }
@@ -2383,6 +2384,7 @@ namespace UserDefinedComponents {
                                                             UserZoneAirHVAC(CompNum).Loop(Loop).LoopSideNum,
                                                             UserZoneAirHVAC(CompNum).Loop(Loop).BranchNum,
                                                             UserZoneAirHVAC(CompNum).Loop(Loop).CompNum,
+                                                            errFlag,
                                                             _,
                                                             _,
                                                             _,
@@ -2508,6 +2510,7 @@ namespace UserDefinedComponents {
                                                             UserAirTerminal(CompNum).Loop(Loop).LoopSideNum,
                                                             UserAirTerminal(CompNum).Loop(Loop).BranchNum,
                                                             UserAirTerminal(CompNum).Loop(Loop).CompNum,
+                                                            errFlag,
                                                             _,
                                                             _,
                                                             _,

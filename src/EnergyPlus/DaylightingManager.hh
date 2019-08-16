@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -76,6 +76,7 @@ namespace DaylightingManager {
     extern int TotWindowsWithDayl;    // Total number of exterior windows in all daylit zones
     extern int OutputFileDFS;         // Unit number for daylight factors
     extern Array1D<Real64> DaylIllum; // Daylight illuminance at reference points (lux)
+    extern int maxNumRefPtInAnyZone;  // The most number of reference points that any single zone has
     extern Real64 PHSUN;              // Solar altitude (radians)
     extern Real64 SPHSUN;             // Sine of solar altitude
     extern Real64 CPHSUN;             // Cosine of solar altitude

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -198,6 +198,14 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
         objectTypeMap.emplace(std::move(key), it.key());
     }
 
+    if (idf.size() > 3) {
+        // UTF-8 Byte Order Mark
+        if (idf[0] == '\xEF' && idf[1] == '\xBB' && idf[2] == '\xBF') {
+            index += 3;
+            index_into_cur_line += 3;
+        }
+    }
+
     int idfObjectCount = 0;
     while (true) {
         token = look_ahead(idf, index);
@@ -255,19 +263,19 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
             }
             u64toa(root[obj_name].size() + 1, s);
             std::string name = obj_name + " " + s;
+
             if (!obj.is_null()) {
                 auto const &name_iter = obj.find("name");
+                // If you find a name field, use that
                 if (name_iter != obj.end()) {
                     name = name_iter.value();
                     obj.erase(name_iter);
                 } else {
-                    auto const it = obj_loc.find("name");
+                    // Otherwise, see if it should have a name field
+                    auto const &it = obj_loc.find("name");
                     if (it != obj_loc.end()) {
-                        if (obj_name == "RunPeriod") {
-                            name = obj_name + " " + s;
-                        } else {
-                            name = "";
-                        }
+                        // Let it slide, as a blank string, to be handled in the appropriate GetInput routine
+                        name = "";
                     }
                 }
             }
@@ -299,8 +307,17 @@ json IdfParser::parse_object(
     auto const &legacy_idd_extensibles_iter = legacy_idd.find("extensibles");
 
     auto const &schema_patternProperties = schema_obj_loc["patternProperties"];
-    auto const &schema_dot_star = schema_patternProperties[".*"];
-    auto const &schema_obj_props = schema_dot_star["properties"];
+    std::string patternProperty;
+    int dot_star_present = schema_patternProperties.count(".*");
+    int no_whitespace_present = schema_patternProperties.count(R"(^.*\S.*$)");
+    if (dot_star_present) {
+        patternProperty = ".*";
+    } else if (no_whitespace_present) {
+        patternProperty = R"(^.*\S.*$)";
+    } else {
+        throw std::runtime_error(R"(The patternProperties value is not a valid choice (".*", "^.*\S.*$"))");
+    }
+    auto const &schema_obj_props = schema_patternProperties[patternProperty]["properties"];
     auto key = legacy_idd.find("extension");
 
     json const *schema_obj_extensions = nullptr;
@@ -461,7 +478,7 @@ json IdfParser::parse_number(std::string const &idf, size_t &index, bool &succes
         try {
             auto const double_val = stod(num_str, nullptr);
             val = double_val;
-        } catch (std::exception e) {
+        } catch (std::exception & e) {
             auto const double_val = stold(num_str, nullptr);
             val = double_val;
         }
@@ -469,7 +486,7 @@ json IdfParser::parse_number(std::string const &idf, size_t &index, bool &succes
         try {
             auto const int_val = stoi(num_str, nullptr);
             val = int_val;
-        } catch (std::exception e) {
+        } catch (std::exception & e) {
             auto const int_val = stoll(num_str, nullptr);
             val = int_val;
         }
@@ -659,14 +676,11 @@ IdfParser::Token IdfParser::next_token(std::string const &idf, size_t &index)
     case ';':
         return Token::SEMICOLON;
     default:
-        static std::string const search_chars("-:.#/\\[]{}_@$%^&*()|+=<>?'\"~");
         static std::string const numeric(".-+0123456789");
         if (numeric.find_first_of(c) != std::string::npos) {
             return Token::NUMBER;
-        } else if (isalnum(c) || (std::string::npos != search_chars.find_first_of(c))) {
-            return Token::STRING;
         }
-        break;
+        return Token::STRING;
     }
     decrement_both_index(index, index_into_cur_line);
     return Token::NONE;

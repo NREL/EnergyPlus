@@ -10,7 +10,7 @@
 ! System:   None.
 ! Plant:    PLANT LOAD PROFILE with DistrictHeating.
 
-  Version,9.0;
+  Version,9.2;
 
   Building,
     Plant Load Profile Example,  !- Name
@@ -97,7 +97,7 @@
     0.00;                    !- Sky Clearness
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year

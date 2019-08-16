@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -210,6 +210,7 @@ namespace OutputReportTabular {
     extern bool displayLifeCycleCostReport;
     extern bool displayTariffReport;
     extern bool displayEconomicResultSummary;
+    extern bool displayHeatEmissionsSummary;
     extern bool displayEioSummary;
 
     // BEPS Report Related Variables
@@ -589,7 +590,7 @@ namespace OutputReportTabular {
         Array2D_bool cellUsed;     // flag if the cell is used for the table of results (column, row)
         std::string peakDateHrMin; // string containing peak timestamp
         Real64 outsideDryBulb;     // outside dry bulb temperature at peak
-        Real64 outsideWebBulb;     // outside web bulb temperature at peak
+        Real64 outsideWetBulb;     // outside wet bulb temperature at peak
         Real64 outsideHumRatio;    // outside humidity ratio at peak
         Real64 zoneDryBulb;        // zone dry bulb temperature at peak
         Real64 zoneRelHum;         // zone relative humidity at peak
@@ -619,7 +620,7 @@ namespace OutputReportTabular {
 
         // default constructor
         CompLoadTablesType()
-            : desDayNum(0), timeStepMax(0), outsideDryBulb(0.), outsideWebBulb(0.), outsideHumRatio(0.), zoneDryBulb(0.), zoneRelHum(0.),
+            : desDayNum(0), timeStepMax(0), outsideDryBulb(0.), outsideWetBulb(0.), outsideHumRatio(0.), zoneDryBulb(0.), zoneRelHum(0.),
               supAirTemp(0.), mixAirTemp(0.), mainFanAirFlow(0.), outsideAirFlow(0.), designPeakLoad(0.), diffDesignPeak(0.), peakDesSensLoad(0.),
               estInstDelSensLoad(0.), diffPeakEst(0.), outsideAirRatio(0.), floorArea(0.), airflowPerFlrArea(0.), airflowPerTotCap(0.),
               areaPerTotCap(0.), totCapPerArea(0.), chlPumpPerFlow(0.), cndPumpPerFlow(0.), numPeople(0.)
@@ -743,6 +744,8 @@ namespace OutputReportTabular {
 
     void GatherHeatGainReport(int const IndexTypeKey); // What kind of data to update (Zone, HVAC)
 
+    void GatherHeatEmissionReport(int const IndexTypeKey);
+
     //======================================================================================================================
     //======================================================================================================================
 
@@ -780,6 +783,8 @@ namespace OutputReportTabular {
     void WriteVeriSumTable();
 
     void WriteAdaptiveComfortTable();
+
+    void WriteHeatEmissionTable();
 
     void WritePredefinedTables();
 

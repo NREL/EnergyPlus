@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -174,12 +174,6 @@ namespace DataHeatBalance {
     extern int const Isotropic;
     extern int const Anisotropic;
 
-    // Parameters for HeatTransferAlgosUsed
-    extern int const UseCTF;
-    extern int const UseEMPD;
-    extern int const UseCondFD;
-    extern int const UseHAMT;
-
     // Parameters for ZoneAirSolutionAlgo
     extern int const Use3rdOrder;
     extern int const UseAnalyticalSolution;
@@ -348,18 +342,26 @@ namespace DataHeatBalance {
     extern int SolarDistribution;               // Solar Distribution Algorithm
     extern int InsideSurfIterations;            // Counts inside surface iterations
     extern int OverallHeatTransferSolutionAlgo; // UseCTF Solution, UseEMPD moisture solution, UseCondFD solution
-    extern int NumberOfHeatTransferAlgosUsed;
-    extern Array1D_int HeatTransferAlgosUsed;
+ 
+   // Flags for HeatTransfer Algorithms Used
+    extern bool AnyCTF;    // CTF used
+    extern bool AnyEMPD;   // EMPD used
+    extern bool AnyCondFD; // CondFD used
+    extern bool AnyHAMT;   // HAMT used
+    extern bool AnyKiva;   // Kiva used
+
     extern int MaxNumberOfWarmupDays;     // Maximum number of warmup days allowed
     extern int MinNumberOfWarmupDays;     // Minimum number of warmup days allowed
     extern Real64 CondFDRelaxFactor;      // Relaxation factor, for looping across all the surfaces.
     extern Real64 CondFDRelaxFactorInput; // Relaxation factor, for looping across all the surfaces, user input value
-    // LOGICAL ::  CondFDVariableProperties = .FALSE. ! if true, then variable conductivity or enthalpy in Cond FD.
 
-    extern int ZoneAirSolutionAlgo;           // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
-    extern Real64 BuildingRotationAppendixG;  // Building Rotation for Appendix G
-    extern bool ZoneAirMassBalanceSimulation; // if true, then enforces zone mass flow conservation
-
+    extern int ZoneAirSolutionAlgo;              // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
+    extern Real64 BuildingRotationAppendixG;     // Building Rotation for Appendix G
+    extern bool ZoneAirMassBalanceSimulation;    // if true, then enforces zone mass flow conservation
+    extern Real64 ZoneTotalExfiltrationHeatLoss; // Building total heat emission through zone exfiltration
+    extern Real64 ZoneTotalExhaustHeatLoss;      // Building total heat emission through zone air exhaust
+    extern Real64 SysTotalHVACReliefHeatLoss;    // Building total heat emission through HVAC system relief air
+    extern Real64 SysTotalHVACRejectHeatLoss;    // Building total heat emission through HVAC system heat rejection
     // END SiteData
 
     extern int NumOfZoneLists;             // Total number of zone lists
@@ -1130,6 +1132,10 @@ namespace DataHeatBalance {
         Real64 MaximumY;           // Maximum Y value for entire zone
         Real64 MinimumZ;           // Minimum Z value for entire zone
         Real64 MaximumZ;           // Maximum Z value for entire zone
+        std::vector<int> ZoneHTSurfaceList;          // List of HT surfaces related to this zone (includes adjacent interzone surfaces)
+        std::vector<int> ZoneIZSurfaceList;          // List of interzone surfaces in this zone
+        std::vector<int> ZoneHTNonWindowSurfaceList; // List of non-window HT surfaces related to this zone (includes adjacent interzone surfaces)
+        std::vector<int> ZoneHTWindowSurfaceList;    // List of window surfaces related to this zone (includes adjacent interzone surfaces)
 
         Real64 OutDryBulbTemp;                 // Zone outside dry bulb air temperature (C)
         bool OutDryBulbTempEMSOverrideOn;      // if true, EMS is calling to override the surface's outdoor air temp
@@ -1171,18 +1177,33 @@ namespace DataHeatBalance {
         int ZoneMaxCO2SchedIndex;           // Index for the schedule the schedule which determines maximum CO2 concentration
         int ZoneContamControllerSchedIndex; // Index for this schedule
         bool FlagCustomizedZoneCap;         // True if customized Zone Capacitance Multiplier is used
+
         // Hybrid Modeling
-        Real64 ZoneMeasuredTemperature;       // Measured zone air temperature input by user
-        Real64 ZoneVolCapMultpSens;           // Zone temperature capacity multiplier, i.e. internal thermal mass multiplier
-        Real64 ZoneVolCapMultpMoist;          // Zone humidity capacity multiplier
-        Real64 ZoneVolCapMultpCO2;            // Zone carbon dioxide capacity multiplier
-        Real64 ZoneVolCapMultpGenContam;      // Zone generic contaminant capacity multiplier
-        Real64 ZoneVolCapMultpSensHM;         // Calculated temperature capacity multiplier by hybrid model
-        Real64 ZoneVolCapMultpSensHMSum;      // for temperature capacity multiplier average calculation
-        Real64 ZoneVolCapMultpSensHMCountSum; // for temperature capacity multiplier average calculation
-        Real64 ZoneVolCapMultpSensHMAverage;  // Temperature capacity multiplier average
-        Real64 MCPIHM;                        // Calculated mass flow rate by hybrid model
-        Real64 InfilOAAirChangeRateHM;        // Calculated infiltration air change per hour by hybrid model
+        Real64 ZoneMeasuredTemperature;               // Measured zone air temperature input by user
+        Real64 ZoneMeasuredHumidityRatio;             // Measured zone air humidity ratio by user
+        Real64 ZoneMeasuredCO2Concentration;          // Measured zone air CO2 concentration input by user
+        Real64 ZoneMeasuredSupplyAirTemperature;      // Measured zone supply air temperature input by user
+        Real64 ZoneMeasuredSupplyAirFlowRate;         // Measured zone supply air flow rate input by user
+        Real64 ZoneMeasuredSupplyAirHumidityRatio;    // Measured zone supply air flow rate input by user
+        Real64 ZoneMeasuredSupplyAirCO2Concentration; // Measured zone supply air flow rate input by user
+        Real64 ZonePeopleActivityLevel;               // People activity level input by user
+        Real64 ZonePeopleSensibleHeatFraction;        // People activity level input by user
+        Real64 ZonePeopleRadiantHeatFraction;         // People activity level input by user
+        Real64 ZonePeopleCO2GenerationRate;           // People activity level input by user
+        Real64 ZoneVolCapMultpSens;                   // Zone temperature capacity multiplier, i.e. internal thermal mass multiplier
+        Real64 ZoneVolCapMultpMoist;                  // Zone humidity capacity multiplier
+        Real64 ZoneVolCapMultpCO2;                    // Zone carbon dioxide capacity multiplier
+        Real64 ZoneVolCapMultpGenContam;              // Zone generic contaminant capacity multiplier
+        Real64 ZoneVolCapMultpSensHM;                 // Calculated temperature capacity multiplier by hybrid model
+        Real64 ZoneVolCapMultpSensHMSum;              // for temperature capacity multiplier average calculation
+        Real64 ZoneVolCapMultpSensHMCountSum;         // for temperature capacity multiplier average calculation
+        Real64 ZoneVolCapMultpSensHMAverage;          // Temperature capacity multiplier average
+        Real64 MCPIHM;                                // Calculated mass flow rate by hybrid model
+        Real64 InfilOAAirChangeRateHM;                // Calculated infiltration air change per hour by hybrid model
+        Real64 NumOccHM;                              // Inversely solved people count
+        Real64 delta_T;                               // Indoor and outdoor temperature
+        Real64 delta_HumRat;                          // Indoor and outdoor humidity ratio delta
+        Real64 delta_CO2;                             // Indoor and outdoor humidity ratio delta
 
         // Default Constructor
         ZoneData()
@@ -1205,9 +1226,13 @@ namespace DataHeatBalance {
               NominalMixing(0.0), TempOutOfBoundsReported(false), EnforcedReciprocity(false), ZoneMinCO2SchedIndex(0), ZoneMaxCO2SchedIndex(0),
               ZoneContamControllerSchedIndex(0), FlagCustomizedZoneCap(false),
               // Hybrid Modeling
-              ZoneMeasuredTemperature(0.0), ZoneVolCapMultpSens(1.0), ZoneVolCapMultpMoist(1.0), ZoneVolCapMultpCO2(1.0),
-              ZoneVolCapMultpGenContam(1.0), ZoneVolCapMultpSensHM(1.0), ZoneVolCapMultpSensHMSum(0.0), ZoneVolCapMultpSensHMCountSum(0.0),
-              ZoneVolCapMultpSensHMAverage(1.0), MCPIHM(0.0), InfilOAAirChangeRateHM(0.0)
+              ZoneMeasuredTemperature(0.0), ZoneMeasuredHumidityRatio(0.0), ZoneMeasuredCO2Concentration(0.0), ZoneMeasuredSupplyAirTemperature(0.0),
+              ZoneMeasuredSupplyAirFlowRate(0.0), ZoneMeasuredSupplyAirHumidityRatio(0.0), ZoneMeasuredSupplyAirCO2Concentration(0.0),
+              ZonePeopleActivityLevel(0.0), ZonePeopleSensibleHeatFraction(0.0), ZonePeopleRadiantHeatFraction(0.0), ZonePeopleCO2GenerationRate(0.0),
+              ZoneVolCapMultpSens(1.0), ZoneVolCapMultpMoist(1.0), ZoneVolCapMultpCO2(1.0), ZoneVolCapMultpGenContam(1.0), ZoneVolCapMultpSensHM(1.0),
+              ZoneVolCapMultpSensHMSum(0.0), ZoneVolCapMultpSensHMCountSum(0.0), ZoneVolCapMultpSensHMAverage(1.0), MCPIHM(0.0),
+              InfilOAAirChangeRateHM(0.0), NumOccHM(0.0), delta_T(0.0), delta_HumRat(0.0), delta_CO2(0.0)
+
         {
         }
 
@@ -2113,38 +2138,7 @@ namespace DataHeatBalance {
         }
     };
 
-    struct HeatReclaimRefrigeratedRackData
-    {
-        // Members
-        std::string Name;       // Name of refrigerated rack
-        std::string SourceType; // object type for refrigerated rack
-        Real64 AvailCapacity;   // Total available heat reclaim capacity
-        Real64 UsedWaterHeater; // amount of avail used at plant water heater
-        Real64 UsedHVACCoil;    // amount of avail used at hvac coil
-
-        // Default Constructor
-        HeatReclaimRefrigeratedRackData() : AvailCapacity(0.0), UsedWaterHeater(0.0), UsedHVACCoil(0.0)
-        {
-        }
-    };
-
-    struct HeatReclaimRefrigCondenserData
-    {
-        // Members
-        std::string Name;        // Name of refrigeration system
-        int SourceType;          // object type for refrigeration system
-        Real64 AvailCapacity;    // Total available heat reclaim capacity
-        Real64 AvailTemperature; // Temperature of heat reclaim source
-        Real64 UsedWaterHeater;  // amount of avail used at plant water heater
-        Real64 UsedHVACCoil;     // amount of avail used at hvac coil
-
-        // Default Constructor
-        HeatReclaimRefrigCondenserData() : SourceType(0), AvailCapacity(0.0), AvailTemperature(0.0), UsedWaterHeater(0.0), UsedHVACCoil(0.0)
-        {
-        }
-    };
-
-    struct HeatReclaimDXCoilData
+    struct HeatReclaimDataBase
     {
         // Members
         std::string Name;       // Name of DX Coil
@@ -2152,7 +2146,48 @@ namespace DataHeatBalance {
         Real64 AvailCapacity;   // Total available heat reclaim capacity
 
         // Default Constructor
-        HeatReclaimDXCoilData() : AvailCapacity(0.0)
+        HeatReclaimDataBase() : AvailCapacity(0.0)
+        {
+        }
+    };
+
+    struct HeatReclaimRefrigeratedRackData : HeatReclaimDataBase // inherited from base struct
+    {
+        // Customized Members
+        Real64 UsedWaterHeater; // amount of avail used at plant water heater
+        Real64 UsedHVACCoil;    // amount of avail used at hvac coil
+
+        // Default Constructor
+        HeatReclaimRefrigeratedRackData() : UsedWaterHeater(0.0), UsedHVACCoil(0.0)
+        {
+        }
+    };
+
+    struct HeatReclaimRefrigCondenserData : HeatReclaimDataBase // inherited from base struct
+    {
+        // Customized Members
+        Real64 AvailTemperature; // Temperature of heat reclaim source
+        Real64 UsedWaterHeater;  // amount of avail used at plant water heater
+        Real64 UsedHVACCoil;     // amount of avail used at hvac coil
+
+        // Default Constructor
+        HeatReclaimRefrigCondenserData() : AvailTemperature(0.0), UsedWaterHeater(0.0), UsedHVACCoil(0.0)
+        {
+        }
+    };
+
+    struct HeatReclaimDXCoilData : HeatReclaimDataBase // inherited from base struct
+    {
+    };
+
+    struct HeatReclaimHPCoilData : HeatReclaimDataBase // inherited from base struct
+    {
+        // Customized Members
+        Real64 WaterHeatingDesuperheaterReclaimedHeatTotal;    // total reclaimed heat by water heating desuperheater coils
+        Array1D<Real64> WaterHeatingDesuperheaterReclaimedHeat; // heat reclaimed by water heating desuperheater coils
+
+        // Default Constructor
+        HeatReclaimHPCoilData() : WaterHeatingDesuperheaterReclaimedHeatTotal(0.0)
         {
         }
     };
@@ -2204,6 +2239,15 @@ namespace DataHeatBalance {
         Real64 MixLatentGain;          // Latent Loss {J} due to mixing and cross mixing and refrigeration door mixing
         Real64 MixTotalLoss;           // Total Gain {J} due to mixing and cross mixing and refrigeration door mixing
         Real64 MixTotalGain;           // Total Loss {J} due to mixing and cross mixing and refrigeration door mixing
+        Real64 SysInletMass;           // Total mass of Air {kg} from all system inlets
+        Real64 SysOutletMass;          // Total mass of Air {kg} from all system outlets
+        Real64 ExfilMass;              // Mass of Air {kg} due to exfiltration
+        Real64 ExfilTotalLoss;         // Total Loss rate {W} due to exfiltration (sensible+latent)
+        Real64 ExfilSensiLoss;         // Sensible Loss rate {W} due to exfiltration
+        Real64 ExfilLatentLoss;        // Latent Loss rate {W} due to exfiltration
+        Real64 ExhTotalLoss;           // Total Loss rate {W} due to zone exhaust air (sensible+latent)
+        Real64 ExhSensiLoss;           // Sensible Loss rate {W} due to zone exhaust air
+        Real64 ExhLatentLoss;          // Latent Loss rate {W} due to zone exhaust air
         // air heat balance component load summary results
         Real64 SumIntGains;     // Zone sum of convective internal gains
         Real64 SumHADTsurfs;    // Zone sum of Hc*Area*(Tsurf - Tz)
@@ -2243,11 +2287,12 @@ namespace DataHeatBalance {
               VentilVolumeCurDensity(0.0), VentilVolumeStdDensity(0.0), VentilVdotCurDensity(0.0), VentilVdotStdDensity(0.0), VentilMass(0.0),
               VentilMdot(0.0), VentilAirChangeRate(0.0), VentilFanElec(0.0), VentilAirTemp(0.0), MixVolume(0.0), MixVdotCurDensity(0.0),
               MixVdotStdDensity(0.0), MixMass(0.0), MixMdot(0.0), MixHeatLoss(0.0), MixHeatGain(0.0), MixLatentLoss(0.0), MixLatentGain(0.0),
-              MixTotalLoss(0.0), MixTotalGain(0.0), SumIntGains(0.0), SumHADTsurfs(0.0), SumMCpDTzones(0.0), SumMCpDtInfil(0.0), SumMCpDTsystem(0.0),
-              SumNonAirSystem(0.0), CzdTdt(0.0), imBalance(0.0), OABalanceHeatLoss(0.0), OABalanceHeatGain(0.0), OABalanceLatentLoss(0.0),
-              OABalanceLatentGain(0.0), OABalanceTotalLoss(0.0), OABalanceTotalGain(0.0), OABalanceVolumeCurDensity(0.0),
-              OABalanceVolumeStdDensity(0.0), OABalanceVdotCurDensity(0.0), OABalanceVdotStdDensity(0.0), OABalanceMass(0.0), OABalanceMdot(0.0),
-              OABalanceAirChangeRate(0.0), OABalanceFanElec(0.0), SumEnthalpyM(0.0), SumEnthalpyH(0.0)
+              MixTotalLoss(0.0), MixTotalGain(0.0), SysInletMass(0.0), SysOutletMass(0.0), ExfilMass(0.0), ExfilTotalLoss(0.0), ExfilSensiLoss(0.0),
+              ExfilLatentLoss(0.0), ExhTotalLoss(0.0), ExhSensiLoss(0.0), ExhLatentLoss(0.0), SumIntGains(0.0), SumHADTsurfs(0.0), SumMCpDTzones(0.0),
+              SumMCpDtInfil(0.0), SumMCpDTsystem(0.0), SumNonAirSystem(0.0), CzdTdt(0.0), imBalance(0.0), OABalanceHeatLoss(0.0),
+              OABalanceHeatGain(0.0), OABalanceLatentLoss(0.0), OABalanceLatentGain(0.0), OABalanceTotalLoss(0.0), OABalanceTotalGain(0.0),
+              OABalanceVolumeCurDensity(0.0), OABalanceVolumeStdDensity(0.0), OABalanceVdotCurDensity(0.0), OABalanceVdotStdDensity(0.0),
+              OABalanceMass(0.0), OABalanceMdot(0.0), OABalanceAirChangeRate(0.0), OABalanceFanElec(0.0), SumEnthalpyM(0.0), SumEnthalpyH(0.0)
         {
         }
     };
@@ -2332,6 +2377,14 @@ namespace DataHeatBalance {
         Real64 SHGSHtInfilRem;  // infiltration removal
         Real64 SHGSHtOtherRem;  // opaque surface and other removal
 
+        // heat emission
+        Real64 emiEnvelopConv;      // heat emission from envelope convection
+        Real64 emiZoneExfiltration; // heat emission from zone exfiltration
+        Real64 emiZoneExhaust;      // heat emission from zone exhaust air
+        Real64 emiHVACRelief;       // heat emission from HVAC relief air
+        Real64 emiHVACReject;       // heat emission from HVAC reject air
+        Real64 emiTotHeat;          // total building heat emission
+
         // Default Constructor
         ZonePreDefRepType()
             : isOccupied(false), NumOccAccum(0.0), NumOccAccumTime(0.0), TotTimeOcc(0.0), MechVentVolTotal(0.0), MechVentVolMin(9.9e9),
@@ -2345,7 +2398,8 @@ namespace DataHeatBalance {
               SHGSClOtherRem(0.0), htPtTimeStamp(0), htPeak(0.0), SHGSHtHvacHt(0.0), SHGSHtHvacCl(0.0), SHGSHtHvacATUHt(0.0), SHGSHtHvacATUCl(0.0),
               SHGSHtSurfHt(0.0), SHGSHtSurfCl(0.0), SHGSHtPeoplAdd(0.0), SHGSHtLiteAdd(0.0), SHGSHtEquipAdd(0.0), SHGSHtWindAdd(0.0),
               SHGSHtIzaAdd(0.0), SHGSHtInfilAdd(0.0), SHGSHtOtherAdd(0.0), SHGSHtEquipRem(0.0), SHGSHtWindRem(0.0), SHGSHtIzaRem(0.0),
-              SHGSHtInfilRem(0.0), SHGSHtOtherRem(0.0)
+              SHGSHtInfilRem(0.0), SHGSHtOtherRem(0.0), emiEnvelopConv(0.0), emiZoneExfiltration(0.0), emiZoneExhaust(0.0), emiHVACRelief(0.0),
+              emiHVACReject(0.0), emiTotHeat(0.0)
         {
         }
     };
@@ -2575,6 +2629,7 @@ namespace DataHeatBalance {
     extern Array1D<HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
     extern Array1D<HeatReclaimDXCoilData> HeatReclaimDXCoil;
     extern Array1D<HeatReclaimDXCoilData> HeatReclaimVS_DXCoil;
+    extern Array1D<HeatReclaimHPCoilData> HeatReclaimSimple_WAHPCoil;
     extern Array1D<AirReportVars> ZnAirRpt;
     extern Array1D<TCGlazingsType> TCGlazings;
     extern Array1D<ZoneEquipData> ZoneCO2Gen;

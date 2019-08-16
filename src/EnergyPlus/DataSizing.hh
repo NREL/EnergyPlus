@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -130,7 +130,7 @@ namespace DataSizing {
     extern Real64 const AutoSize;
 
     // parameter for (time-of-peak) sizing format
-    extern gio::Fmt PeakHrMinFmt;
+    extern ObjexxFCL::gio::Fmt PeakHrMinFmt;
 
     // Zone Outdoor Air Method
     extern int const ZOAM_FlowPerPerson; // set the outdoor air flow rate based on number of people in the zone
@@ -258,7 +258,7 @@ namespace DataSizing {
     extern Real64 DataCoilSizingAirOutHumRat;         // saves sizing data for use in coil object reporting
     extern Real64 DataCoilSizingFanCoolLoad;          // saves sizing data for use in coil object reporting
     extern Real64 DataCoilSizingCapFT;                // saves sizing data for use in coil object reporting
-    extern Real64 DataDesAccountForFanHeat;           // include fan heat when true
+    extern bool DataDesAccountForFanHeat;             // include fan heat when true
     extern Real64 DataDesInletWaterTemp;              // coil inlet water temperture used for warning messages
     extern Real64 DataDesInletAirHumRat;              // coil inlet air humidity ratio used for warning messages
     extern Real64 DataDesInletAirTemp;                // coil inlet air temperature used for warning messages
@@ -515,7 +515,7 @@ namespace DataSizing {
         int TimeStepNumAtHeatMax;     // time step number (in day) at Heating peak
         int TimeStepNumAtCoolMax;     // time step number (in day) at cooling peak
         int HeatDDNum;                // design day index of design day causing heating peak
-        int CoolDDNum;                // design day index of design day causing heating peak
+        int CoolDDNum;                // design day index of design day causing cooling peak
         std::string cHeatDDDate;      // date of design day causing heating peak
         std::string cCoolDDDate;      // date of design day causing cooling peak
         Real64 MinOA;                 // design minimum outside air in m3/s
@@ -1228,7 +1228,12 @@ namespace DataSizing {
     // Clears the global data in DataSizing.
     // Needed for unit tests, should not be normally called.
     void clear_state();
-    void resetHVACSizingGlobals(int const curZoneEqNum, int const curSysNum, bool &firstPassFlag);
+
+    // Resets Data globals so that prevoiusly set variables are not used in other equipment models
+    void resetHVACSizingGlobals(int const curZoneEqNum,
+                                int const curSysNum,
+                                bool &firstPassFlag     // Can be set to false during the routine
+    );
 
 } // namespace DataSizing
 

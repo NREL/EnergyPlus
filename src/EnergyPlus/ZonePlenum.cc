@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1533,6 +1533,35 @@ namespace ZonePlenum {
         if (NumZoneReturnPlenums > 0) {
             ReturnPlenumName = ZoneRetPlenCond(ReturnPlenumIndex).ZonePlenumName;
         }
+    }
+
+    int getReturnPlenumIndexFromInletNode(int const &InNodeNum)
+    {
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int PlenumNum; // loop counter
+        int InNodeCtr; // loop counter
+        int thisPlenum;
+
+        // Obtains and Allocates ZonePlenum related parameters from input file
+        if (GetInputFlag) { // First time subroutine has been entered
+            GetZonePlenumInput();
+            GetInputFlag = false;
+        }
+
+        thisPlenum = 0;
+        if (NumZoneReturnPlenums > 0) {
+            for (PlenumNum = 1; PlenumNum <= NumZoneReturnPlenums; ++PlenumNum) {
+                for (InNodeCtr = 1; InNodeCtr <= ZoneRetPlenCond(PlenumNum).NumInletNodes; ++InNodeCtr) {
+                    if (InNodeNum != ZoneRetPlenCond(PlenumNum).InletNode(InNodeCtr)) continue;
+                    thisPlenum = PlenumNum;
+                    break;
+                }
+                if (thisPlenum > 0) break;
+            }
+        }
+
+        return thisPlenum;
     }
 
 } // namespace ZonePlenum

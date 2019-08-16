@@ -132,7 +132,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.0;
+  Version,9.2;
 
   Building,
     Small Office with AirflowNetwork model,  !- Name
@@ -162,7 +162,7 @@
     No;                      !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     14,                      !- Begin Day of Month
     ,                        !- Begin Year
@@ -177,7 +177,7 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 2,            !- Name
     7,                       !- Begin Month
     7,                       !- Begin Day of Month
     ,                        !- Begin Year
@@ -1456,9 +1456,6 @@
   Schedule:Compact,
     INF-SCHED,               !- Name
     Any Number,              !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,0.0,        !- Field 3
     Through: 9/30,           !- Field 5
     For: WeekDays SummerDesignDay, !- Field 6
     Until: 6:00,1.0,         !- Field 7
@@ -1467,7 +1464,10 @@
     For: AllOtherDays,       !- Field 13
     Until: 6:00,1.0,         !- Field 14
     Until: 13:00,0.0,        !- Field 16
-    Until: 24:00,1.0;        !- Field 18
+    Until: 24:00,1.0,        !- Field 18
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,0.0;        !- Field 3
 
   People,
     West Zone People,        !- Name
@@ -2768,7 +2768,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone1TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -2776,7 +2778,9 @@
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
     Zone2TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
@@ -2784,7 +2788,9 @@
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
     Zone3DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Zone1TermReheat,         !- Name

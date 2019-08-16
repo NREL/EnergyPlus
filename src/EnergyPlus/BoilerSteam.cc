@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -282,7 +282,6 @@ namespace BoilerSteam {
         int IOStat;          // IO Status when calling get input subroutine
         int SteamFluidIndex; // Fluid Index for Steam
         static bool ErrorsFound(false);
-        bool errFlag;
         Array1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
 
         SteamFluidIndex = 0;
@@ -309,10 +308,8 @@ namespace BoilerSteam {
             inputProcessor->getObjectItem(
                 cCurrentModuleObject, BoilerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-            VerifyUniqueBoilerName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueBoilerName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
             Boiler(BoilerNum).Name = cAlphaArgs(1);
 
             {
@@ -578,12 +575,12 @@ namespace BoilerSteam {
                                     Boiler(BoilerNum).LoopSideNum,
                                     Boiler(BoilerNum).BranchNum,
                                     Boiler(BoilerNum).CompNum,
+                                    errFlag,
                                     _,
                                     _,
                                     _,
                                     _,
-                                    _,
-                                    errFlag);
+                                    _);
             if (errFlag) {
                 ShowFatalError("InitBoiler: Program terminated due to previous condition(s).");
             }

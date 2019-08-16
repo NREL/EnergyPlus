@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -202,7 +202,6 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
 TEST_F(EnergyPlusFixture, Humidifiers_GetHumidifierInput)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "Humidifier:Steam:Gas,",
         "  Main Gas Humidifier,     !- Name",
         "  ,                        !- Availability Schedule Name",
@@ -277,7 +276,6 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
     OutBaroPress = 101325.0;
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "  Curve:Quadratic,",
         "    ThermalEfficiencyFPLR,   !- Name",
         "    0.9375,                  !- Coefficient1 Constant",

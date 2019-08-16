@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,6 +57,7 @@
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataHeatBalFanSys.hh>
+#include <DataHeatBalSurface.hh>
 #include <DataLoopNode.hh>
 #include <DataSurfaces.hh>
 #include <DataZoneEquipment.hh>
@@ -133,7 +134,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir)
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         "  WindowMaterial:Gap,",
         "    Gap_1_Layer,             !- Name",
         "    0.0127,                  !- Thickness {m}",
@@ -171,7 +171,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
 TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_2)
 {
     std::string const idf_objects = delimited_string({
-        "Version,8.6;",
         "  WindowGap:DeflectionState,",
         "    DeflectionState_813_Measured_Gap_1,  !- Name",
         "    0.0120;                  !- Deflected Thickness {m}",
@@ -322,7 +321,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     //	 GLASS;        !- Layer 3
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "Construction,",
         " WINDOWWBLIND, !- Name",
         " GLASS,        !- Outside Layer",
@@ -373,7 +371,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
     // Test get input for ZoneAirMassFlowConservation object
 
     std::string const idf_objects = delimited_string({
-        "Version,8.3;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -407,8 +404,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
 {
     // Test get input for ZoneAirMassFlowConservation object
 
-    std::string const idf_objects = delimited_string({"Version,8.3;",
-                                                      "Building,",
+    std::string const idf_objects = delimited_string({"Building,",
                                                       "My Building, !- Name",
                                                       "30., !- North Axis{ deg }",
                                                       "City, !- Terrain",
@@ -491,6 +487,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneEquipConfig(1).NumReturnNodes = 1;
     ZoneEquipConfig(1).ReturnNode.allocate(1);
     ZoneEquipConfig(1).ReturnNode(1) = 4;
+    ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
     ZoneEquipConfig(1).IsControlled = true;
     ZoneEquipConfig(1).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
     ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
@@ -517,6 +514,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneEquipConfig(2).NumReturnNodes = 1;
     ZoneEquipConfig(2).ReturnNode.allocate(1);
     ZoneEquipConfig(2).ReturnNode(1) = 8;
+    ZoneEquipConfig(2).FixedReturnFlow.allocate(1);
     ZoneEquipConfig(2).IsControlled = true;
     ZoneEquipConfig(2).ReturnFlowSchedPtrNum = ScheduleAlwaysOn;
     ZoneEquipConfig(2).InletNodeAirLoopNum.allocate(1);
@@ -538,6 +536,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     PrimaryAirSystem(1).OASysExists = true;
     Node.allocate(8);
 
+    // Avoid zero values in volume flow balance check
+    DataEnvironment::StdRhoAir = 1.2;
+    DataEnvironment::OutBaroPress = 100000.0;
+    Node(ZoneEquipConfig(1).ZoneNode).Temp = 20.0;
+    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.004;
+    Node(ZoneEquipConfig(2).ZoneNode).Temp = 20.0;
+    Node(ZoneEquipConfig(2).ZoneNode).HumRat = 0.004;
+
     Node(1).MassFlowRate = 0.0; // Zone 1 zone node
     Node(2).MassFlowRate = 1.0; // Zone 1 inlet node
     Node(3).MassFlowRate = 2.0; // Zone 1 exhaust node
@@ -549,12 +555,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     Node(7).MassFlowRate = 0.0; // Zone 2 exhaust node
     Node(8).MassFlowRate = 8.0; // Zone 2 return node
     ZoneEquipConfig(2).ZoneExh = 0.0;
-    AirLoopFlow(1).MaxOutAir = Node(2).MassFlowRate + Node(6).MassFlowRate;
+    AirLoopFlow(1).OAFlow = Node(2).MassFlowRate + Node(6).MassFlowRate;
+    AirLoopFlow(1).MaxOutAir = AirLoopFlow(1).OAFlow;
     Infiltration(1).MassFlowRate = 0.5;
     Mixing(1).MixingMassFlowRate = 0.1;
 
     // call zone air mass balance
-    CalcZoneMassBalance();
+    CalcZoneMassBalance(false);
     EXPECT_EQ(Node(4).MassFlowRate, 0.0);         // Zone 1 return node (max(0.0, 1-2)
     EXPECT_EQ(Infiltration(1).MassFlowRate, 1.0); // Zone 1 infiltration flow rate (2 - 1)
     EXPECT_EQ(Mixing(1).MixingMassFlowRate, 0.1); // Zone 1 to Zone 2 mixing flow rate (unchanged)
@@ -573,8 +580,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
 {
     // Test get input for ZoneAirMassFlowConservation object
 
-    std::string const idf_objects = delimited_string({"Version,8.3;",
-                                                      "Building,",
+    std::string const idf_objects = delimited_string({"Building,",
                                                       "My Building, !- Name",
                                                       "30., !- North Axis{ deg }",
                                                       "City, !- Terrain",
@@ -607,7 +613,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
     // Test get output variables for ZoneAirMassFlowConservation object #5637
 
     std::string const idf_objects = delimited_string({
-        "Version,8.5;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -676,8 +681,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
 TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,8.6;",
-
         "  Material:RoofVegetation,",
         "    ThickSoil,               !- Name",
         "    0.5,                     !- Height of Plants {m}",
@@ -799,7 +802,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 {
 
     std::string const idf_objects =
-        delimited_string({"  Version,9.0;",
+        delimited_string({"  Version,9.2;",
 
                           "  Building,",
                           "    House with Local Air Nodes,  !- Name",
@@ -829,7 +832,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
                           "    Yes;                     !- Run Simulation for Weather File Run Periods",
 
                           "  RunPeriod,",
-                          "    ,                        !- Name",
+                          "    WinterDay,               !- Name",
                           "    1,                       !- Begin Month",
                           "    14,                      !- Begin Day of Month",
                           "    ,                        !- Begin Year",
@@ -844,7 +847,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
                           "    Yes;                     !- Use Weather File Snow Indicators",
 
                           "  RunPeriod,",
-                          "    ,                        !- Name",
+                          "    SummerDay,               !- Name",
                           "    7,                       !- Begin Month",
                           "    7,                       !- Begin Day of Month",
                           "    ,                        !- Begin Year",
@@ -1231,6 +1234,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 1;
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ReturnNode(1) = 4;
+    DataZoneEquipment::ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
     DataHeatBalance::TempEffBulkAir.allocate(6);
 
@@ -1281,7 +1285,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInput
     // Test eio output for HVACSystemRootFindingAlgorithm
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.2;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -1315,7 +1319,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
     // Test that root solver algorithm is RegulaFalsi when no HVACSystemRootFindingAlgorithm object exists
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.2;",
         "Building,",
         "My Building, !- Name",
         "30., !- North Axis{ deg }",
@@ -1347,7 +1351,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     DataIPShortCuts::lAlphaFieldBlanks = true;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.2;",
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
         "    No,                      !- Do System Sizing Calculation",
@@ -1580,4 +1584,173 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     EXPECT_LT(refPtIllum, 1000.0);
 }
 
+TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_Default)
+{
+    // Test various inputs for HeatBalanceAlgorithm
+    // Default is CTF if no HeatBalanceAlgorithm object is present
+
+    EXPECT_FALSE(DataHeatBalance::AnyCTF);
+    bool errorsfound = false;
+
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetProjectControlData(errorsfound);
+    EXPECT_FALSE(errorsfound);
+    EXPECT_TRUE(DataHeatBalance::AnyCTF);
+    EXPECT_FALSE(DataHeatBalance::AnyEMPD);
+    EXPECT_FALSE(DataHeatBalance::AnyCondFD);
+    EXPECT_FALSE(DataHeatBalance::AnyHAMT);
+    EXPECT_EQ(DataHeatBalance::OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CTF);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
+{
+    // Test various inputs for HeatBalanceAlgorithm
+
+    EXPECT_FALSE(DataHeatBalance::AnyCTF);
+    bool errorsfound = false;
+
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+        "  HeatBalanceAlgorithm,",
+        "  ConductionTransferFunction, !- Algorithm",
+        "  205.2,                      !- Surface Temperature Upper Limit",
+        "  0.004,                      !- Minimum Surface Convection Heat Transfer Coefficient Value",
+        "  200.6;                      !- Maximum Surface Convection Heat Transfer Coefficient Value",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetProjectControlData(errorsfound);
+    EXPECT_FALSE(errorsfound);
+    EXPECT_TRUE(DataHeatBalance::AnyCTF);
+    EXPECT_FALSE(DataHeatBalance::AnyEMPD);
+    EXPECT_FALSE(DataHeatBalance::AnyCondFD);
+    EXPECT_FALSE(DataHeatBalance::AnyHAMT);
+    EXPECT_EQ(DataHeatBalance::OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CTF);
+    EXPECT_EQ(DataHeatBalSurface::MaxSurfaceTempLimit, 205.2);
+    EXPECT_EQ(DataHeatBalance::LowHConvLimit, 0.004);
+    EXPECT_EQ(DataHeatBalance::HighHConvLimit, 200.6);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_EMPD)
+{
+    // Test various inputs for HeatBalanceAlgorithm
+
+    bool errorsfound = false;
+
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+        "  HeatBalanceAlgorithm,",
+        "  MoisturePenetrationDepthConductionTransferFunction; !- Algorithm",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetProjectControlData(errorsfound);
+    EXPECT_FALSE(errorsfound);
+    EXPECT_FALSE(DataHeatBalance::AnyCTF);
+    EXPECT_TRUE(DataHeatBalance::AnyEMPD);
+    EXPECT_FALSE(DataHeatBalance::AnyCondFD);
+    EXPECT_FALSE(DataHeatBalance::AnyHAMT);
+    EXPECT_EQ(DataHeatBalance::OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_EMPD);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
+{
+    // Test various inputs for HeatBalanceAlgorithm
+
+    bool errorsfound = false;
+
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+        "  HeatBalanceAlgorithm,",
+        "  ConductionFiniteDifference; !- Algorithm",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetProjectControlData(errorsfound);
+    EXPECT_FALSE(errorsfound);
+    EXPECT_FALSE(DataHeatBalance::AnyCTF);
+    EXPECT_FALSE(DataHeatBalance::AnyEMPD);
+    EXPECT_TRUE(DataHeatBalance::AnyCondFD);
+    EXPECT_FALSE(DataHeatBalance::AnyHAMT);
+    EXPECT_EQ(DataHeatBalance::OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_CondFD);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
+{
+    // Test various inputs for HeatBalanceAlgorithm
+
+    bool errorsfound = false;
+
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+        "  HeatBalanceAlgorithm,",
+        "  CombinedHeatAndMoistureFiniteElement; !- Algorithm",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    HeatBalanceManager::GetProjectControlData(errorsfound);
+    EXPECT_FALSE(errorsfound);
+    EXPECT_FALSE(DataHeatBalance::AnyCTF);
+    EXPECT_FALSE(DataHeatBalance::AnyEMPD);
+    EXPECT_FALSE(DataHeatBalance::AnyCondFD);
+    EXPECT_TRUE(DataHeatBalance::AnyHAMT);
+    EXPECT_EQ(DataHeatBalance::OverallHeatTransferSolutionAlgo, DataSurfaces::HeatTransferModel_HAMT);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
+{
+
+    bool errorsfound = false;
+    
+    std::string const idf_objects = delimited_string({
+        "  Building, My Building;",
+        "WindowMaterial:Glazing:EquivalentLayer,",
+        "GLZCLR,                  !- Name",
+        "SpectralAverage,         !- Optical Data Type",
+        ",                        !- Window Glass Spectral Data Set Name",
+        "0.77,                    !- Front Side Beam-Beam Solar Transmittance {dimensionless}",
+        "0.77,                    !- Back Side Beam-Beam Solar Transmittance {dimensionless}",
+        "0.07,                    !- Front Side Beam-Beam Solar Reflectance {dimensionless}",
+        "0.07,                    !- Back Side Beam-Beam Solar Reflectance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Beam Visible Solar Transmittance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Beam Visible Solar Transmittance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Beam Visible Solar Reflectance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Beam Visible Solar Reflectance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Diffuse Solar Transmittance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Diffuse Solar Transmittance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Diffuse Solar Reflectance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Diffuse Solar Reflectance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Diffuse Visible Solar Transmittance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Diffuse Visible Solar Transmittance {dimensionless}",
+        "0.0,                     !- Front Side Beam-Diffuse Visible Solar Reflectance {dimensionless}",
+        "0.0,                     !- Back Side Beam-Diffuse Visible Solar Reflectance {dimensionless}",
+        "0.695,                   !- Diffuse-Diffuse Solar Transmittance {dimensionless}",
+        "0.16,                    !- Front Side Diffuse-Diffuse Solar Reflectance {dimensionless}",
+        "0.16,                    !- Back Side Diffuse-Diffuse Solar Reflectance {dimensionless}",
+        "0.0,                     !- Diffuse-Diffuse Visible Solar Transmittance {dimensionless}",
+        "0.0,                     !- Front Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}",
+        "0.0,                     !- Back Side Diffuse-Diffuse Visible Solar Reflectance {dimensionless}",
+        "0.0,                     !- Infrared Transmittance (applies to front and back) {dimensionless}",
+        "0.84,                    !- Front Side Infrared Emissivity {dimensionless}",
+        "0.84;                    !- Back Side Infrared Emissivity {dimensionless}",
+    });
+    
+    EXPECT_TRUE(process_idf(idf_objects));
+    
+    HeatBalanceManager::GetMaterialData(errorsfound);
+
+    EXPECT_FALSE(errorsfound);
+    EXPECT_NEAR(DataHeatBalance::Material(1).Resistance,0.158,0.0001);
+    
+}
+    
 } // namespace EnergyPlus

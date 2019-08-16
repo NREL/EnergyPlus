@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -307,6 +307,14 @@ namespace UnitVentilator {
 
     Real64 CalcUnitVentilatorResidual(Real64 const PartLoadRatio, // Coil Part Load Ratio
                                       Array1<Real64> const &Par   // Function parameters
+    );
+    
+    Real64 SetOAMassFlowRateForCoolingVariablePercent(int const UnitVentNum,        // Unit Ventilator index number
+                                                      Real64 const MinOAFrac,       // Minimum Outside Air Fraction
+                                                      Real64 const MassFlowRate,    // Design Outside Air Mass Flow Rate
+                                                      Real64 const MaxOAFrac,       // Maximum Outside Air Fraction
+                                                      Real64 const Tinlet,          // Inlet Temperature to Unit or Zone Temperature
+                                                      Real64 const Toutdoor         // Outdoor Air Temperature
     );
 
 } // namespace UnitVentilator

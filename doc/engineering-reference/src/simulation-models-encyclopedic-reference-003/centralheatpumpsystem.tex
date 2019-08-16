@@ -28,55 +28,55 @@ In simultaneous cooling-heating mode, three different operating modes (mode 3 th
 
 In heat recovery mode, both evaporator temperatures and condenser temperatures are read and a mass-weighed temperature for both chilled water and hot water is calculated. The chiller-heaters in mode 3 do not exchange heat with source water. At least one of the chiller-heaters within the system is in heat recovery mode during simultaneous cooling-heating mode. The system may be only connected to both chilled water loop and hot water loop if all operating chiller-heaters are in heat recovery mode.
 
-The following nomenclature is used in the following equations:
+The following nomenclature is used in the equations for this model shown below:
 
-\({\dot m_{cw,bypass}}\) ~ = chilled water bypass mass flow rate in the system {[}kg/s{]}
+\({\dot m_{cw,bypass}}\) is the chilled water bypass mass flow rate in the system (kg/s)
 
-\({\dot m_{hw,bypass}}\) = hot water bypass mass flow rate in the system {[}kg/s{]}
+\({\dot m_{hw,bypass}}\) is the hot water bypass mass flow rate in the system (kg/s)
 
-\({\dot m_{src,bypass}}\) ~ = source water bypass mass flow rate in the system {[}kg/s{]}
+\({\dot m_{src,bypass}}\) is the source water bypass mass flow rate in the system (kg/s)
 
-\({\dot m_{cw,CH}}\) ~ = chilled water mass flow rate of i\(^{th}\) chiller-heater's evaporator {[}kg/s{]}
+\({\dot m_{cw,CH}}\) is the chilled water mass flow rate of i\(^{th}\) chiller-heater's evaporator {[}kg/s{]}
 
-\({\dot m_{hw,CH}}\) ~ = hot water mass flow rate of i\(^{th}\) chiller-heater's condenser {[}kg/s{]}
+\({\dot m_{hw,CH}}\) is the hot water mass flow rate of i\(^{th}\) chiller-heater's condenser (kg/s)
 
-\({\dot m_{src,CH}}\) ~ = source water mass flow rate of i\(^{th}\) chiller-heater, which varies with operating modes {[}kg/s{]}
+\({\dot m_{src,CH}}\) is the source water mass flow rate of i\(^{th}\) chiller-heater, which varies with operating modes (kg/s)
 
-\({\dot m_{cw,sys}}\) ~ = chilled water mass flow rate of the system {[}kg/s{]}
+\({\dot m_{cw,sys}}\) is the chilled water mass flow rate of the system (kg/s)
 
-\({\dot m_{hw,sys}}\) ~ = hot water mass flow rate of the system {[}kg/s{]}
+\({\dot m_{hw,sys}}\) is the hot water mass flow rate of the system (kg/s)
 
-\({\dot m_{src,sys}}\) ~ = source water mass flow rate of the system {[}kg/s{]}
+\({\dot m_{src,sys}}\) is the source water mass flow rate of the system (kg/s)
 
-\({T_{cw,sys}}\) ~ = chilled water outlet temperature of the system {[}C{]}
+\({T_{cw,sys}}\) is the chilled water outlet temperature of the system (\(^{\circ}\)C)
 
-\({T_{hw,sys}}\) ~ = hot water outlet temperature of the system {[}C{]}
+\({T_{hw,sys}}\) is the hot water outlet temperature of the system (\(^{\circ}\)C)
 
-\({T_{src,sys}}\) ~ = source water outlet temperature of the system {[}C{]}
+\({T_{src,sys}}\) is the source water outlet temperature of the system (\(^{\circ}\)C)
 
-\({T_{cw,bypass}}\) ~ = mass-weighed bypass chilled water temperature in the system {[}C{]}
+\({T_{cw,bypass}}\) is the mass-weighed bypass chilled water temperature in the system (\(^{\circ}\)C)
 
-\({T_{hw,bypass}}\) ~ = mass-weighed bypass hot water temperature in the system {[}C{]}
+\({T_{hw,bypass}}\) is the mass-weighed bypass hot water temperature in the system (\(^{\circ}\)C)
 
-\({T_{src,bypass}}\) ~ = mass-weighed bypass source water temperature in the system {[}C{]}
+\({T_{src,bypass}}\) is the mass-weighed bypass source water temperature in the system (\(^{\circ}\)C)
 
-\({T_{cw,CH}}\) ~ = mass-weighed chilled water outlet temperature from chiller-heaters {[}C{]}
+\({T_{cw,CH}}\) is the mass-weighed chilled water outlet temperature from chiller-heaters (\(^{\circ}\)C)
 
-\({T_{hw,CH}}\) ~ = mass-weighed hot water outlet temperature from chiller-heaters {[}C{]}
+\({T_{hw,CH}}\) is the mass-weighed hot water outlet temperature from chiller-heaters (\(^{\circ}\)C)
 
-\({T_{src,CH}}\) ~ = mass-weighed source water outlet temperature from chiller-heaters {[}C{]}
+\({T_{src,CH}}\) is the mass-weighed source water outlet temperature from chiller-heaters (\(^{\circ}\)C)
 
-\({T_{cw,i}}\) ~ = chilled water inlet temperature of the system {[}C{]}
+\({T_{cw,i}}\) is the chilled water inlet temperature of the system (\(^{\circ}\)C)
 
-\({T_{hw,i}}\) ~ = hot water inlet temperature of the system {[}C{]}
+\({T_{hw,i}}\) is the hot water inlet temperature of the system (\(^{\circ}\)C)
 
-\({T_{src,i}}\) ~ = source water inlet temperature of the system {[}C{]}
+\({T_{src,i}}\) is the source water inlet temperature of the system (\(^{\circ}\)C)
 
-\({T_{cw,out}}\) ~ = chilled water outlet temperature of i\(^{th}\) chiller-heater {[}C{]}
+\({T_{cw,out}}\) is the chilled water outlet temperature of i\(^{th}\) chiller-heater (\(^{\circ}\)C)
 
-\({T_{hw,out}}\) ~ = hot water outlet temperature of i\(^{th}\) chiller-heater {[}C{]}
+\({T_{hw,out}}\) is the hot water outlet temperature of i\(^{th}\) chiller-heater (\(^{\circ}\)C)
 
-\({T_{src,out}}\) ~ = source water outlet temperature of i\(^{th}\) chiller-heater {[}C{]}
+\({T_{src,out}}\) is the source water outlet temperature of i\(^{th}\) chiller-heater (\(^{\circ}\)C).
 
 The model reads node information and local variables of individual chiller-heaters. The nodes and local variables vary with the operating modes as described above in order to calculate mass-weighed temperatures. In the cooling-only mode, it calculates a mass-weighed chilled water temperature (\emph{T\(_{cw,CH}\)}) and a source water temperature (\emph{T\(_{src,CH}\)}) as follows:
 
@@ -84,27 +84,43 @@ The model reads node information and local variables of individual chiller-heate
 {T_{cw,CH}} = \sum\limits_{CH = 1}^n {{T_{cw,out}}} \frac{{{{\dot m}_{cw,CH}}}}{{{m_{cw,sys}}}}
 \end{equation}
 
-\textbf{\emph{\({T_{src,CH}} = \sum\limits_{CH = 1}^n {{T_{src,out}}} \frac{{{{\dot m}_{src,CH}}}}{{{m_{src,sys}}}}\) ~}}.
+\begin{equation}
+{T_{src,CH}} = \sum\limits_{CH = 1}^n {{T_{src,out}}} \frac{{{{\dot m}_{src,CH}}}}{{{m_{src,sys}}}}
+\end{equation}
 
 In heating-only mode, it calculates a mass-weighed hot water temperature (\emph{T\(_{hw,CH}\)}) and a source water temperature (\emph{T\(_{src,CH}\)}) as follows:
 
-\textbf{\emph{\({T_{hw,CH}} = \sum\limits_{CH = 1}^n {{T_{hw,out}}} \frac{{{{\dot m}_{hw,CH}}}}{{{m_{hw,sys}}}}\) ~}}
+\begin{equation}
+{T_{hw,CH}} = \sum\limits_{CH = 1}^n {{T_{hw,out}}} \frac{{{{\dot m}_{hw,CH}}}}{{{m_{hw,sys}}}}
+\end{equation}
 
-\textbf{\emph{\({T_{src,CH}} = \sum\limits_{CH = 1}^n {{T_{src,out}}} \frac{{{{\dot m}_{src,CH}}}}{{{m_{src,sys}}}}\) ~}}.
+\begin{equation}
+{T_{src,CH}} = \sum\limits_{CH = 1}^n {{T_{src,out}}} \frac{{{{\dot m}_{src,CH}}}}{{{m_{src,sys}}}}
+\end{equation}
 
 When all chiller-heaters are in heat recovery mode, it calculates a mass-weighed chilled water temperature (\emph{T\(_{cw,CH}\)}) and hot water temperature (\emph{T\(_{hw,CH}\)}) as follows:
 
-\textbf{\emph{\({T_{cw,CH}} = \sum\limits_{CH = 1}^n {{T_{cw,out}}} \frac{{{{\dot m}_{cw,CH}}}}{{{m_{cw,sys}}}}\)}}
+\begin{equation}
+{T_{cw,CH}} = \sum\limits_{CH = 1}^n {{T_{cw,out}}} \frac{{{{\dot m}_{cw,CH}}}}{{{m_{cw,sys}}}}
+\end{equation}
 
-\textbf{\emph{\({T_{hw,CH}} = \sum\limits_{CH = 1}^n {{T_{hw,out}}} \frac{{{{\dot m}_{hw,CH}}}}{{{m_{hw,sys}}}}\) ~}}.
+\begin{equation}
+{T_{hw,CH}} = \sum\limits_{CH = 1}^n {{T_{hw,out}}} \frac{{{{\dot m}_{hw,CH}}}}{{{m_{hw,sys}}}}
+\end{equation}
 
 In cooling or heating dominant simultaneous cooling-heating mode (mode 4 and 5), at least one chiller-heater should be in heat recovery mode, and the other(s) are in either mode 4 or mode 5. The system is connected to three loops such as chilled water loop, hot water loop, and source water loop. The model thus calculates a mass-weighed chilled water temperature (\emph{T\(_{cw,CH}\)}), hot water temperature (\emph{T\(_{hw,CH}\)}), and source water temperature (\emph{T\(_{src,CH}\)}) as follows:
 
-\textbf{\emph{\({T_{cw,CH}} = \sum\limits_{CH = 1}^n {{T_{cw,out}}} \frac{{{{\dot m}_{cw,CH}}}}{{{m_{cw,sys}}}}\)}}
+\begin{equation}
+{T_{cw,CH}} = \sum\limits_{CH = 1}^n {{T_{cw,out}}} \frac{{{{\dot m}_{cw,CH}}}}{{{m_{cw,sys}}}}
+\end{equation}
 
-\textbf{\emph{\({T_{hw,CH}} = \sum\limits_{CH = 1}^n {{T_{hw,out}}} \frac{{{{\dot m}_{hw,CH}}}}{{{m_{hw,sys}}}}\)}}
+\begin{equation}
+{T_{hw,CH}} = \sum\limits_{CH = 1}^n {{T_{hw,out}}} \frac{{{{\dot m}_{hw,CH}}}}{{{m_{hw,sys}}}}
+\end{equation}
 
-\textbf{\emph{\({T_{src,CH}} = \sum\limits_{CH = 1}^n {{T_{src,out}}} \frac{{{{\dot m}_{src,CH}}}}{{{m_{src,sys}}}}\)}}~.
+\begin{equation}
+{T_{src,CH}} = \sum\limits_{CH = 1}^n {{T_{src,out}}} \frac{{{{\dot m}_{src,CH}}}}{{{m_{src,sys}}}}
+\end{equation}
 
 The model then calculates a mass-weighed temperature for the by-pass flows remained in the system as follows:
 
@@ -130,6 +146,8 @@ The outlet temperatures at each outlet node of the system are then determined as
 {T_{hw,sys}} = {T_{hw,CH}} + {T_{hw,bypass}}
 \end{equation}
 
-\({T_{src,sys}} = {T_{src,CH}} + {T_{src,bypass}}\) .
+\begin{equation}
+{T_{src,sys}} = {T_{src,CH}} + {T_{src,bypass}}
+\end{equation}
 
 The total heat transfer energy of the system is also calculated in the same manner as the temperature calculations. The model simply sums all heat transfer energy of the chiller-heaters depending on their operating modes.

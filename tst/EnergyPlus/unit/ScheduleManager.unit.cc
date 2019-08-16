@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -88,7 +88,7 @@ TEST_F(EnergyPlusFixture, ScheduleAnnualFullLoadHours_test)
     // J.Glazer - August 2017
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.2;",
         " ",
         "ScheduleTypeLimits,",
         "  Any Number;              !- Name",
@@ -161,7 +161,7 @@ TEST_F(EnergyPlusFixture, ScheduleAverageHoursPerWeek_test)
     // J.Glazer - August 2017
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.2;",
         " ",
         "ScheduleTypeLimits,",
         "  Any Number;              !- Name",
@@ -234,7 +234,7 @@ TEST_F(EnergyPlusFixture, ScheduleHoursGT1perc_test)
     // J.Glazer - August 2017
 
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
+        "Version,9.2;",
         " ",
         "ScheduleTypeLimits,",
         "  Any Number;              !- Name",
@@ -645,5 +645,23 @@ TEST_F(EnergyPlusFixture, ScheduleYearMaxItems)
     ASSERT_FALSE(process_idf(idf_objects, false));
 
     EXPECT_TRUE(compare_err_stream(delimited_string({"   ** Severe  ** <root>[Schedule:Year][SchYr_A][schedule_weeks] - Array should contain no more than 53 elements."})));
+
+}
+
+TEST_F(EnergyPlusFixture, ScheduleFileColumnSeparator)
+{
+    std::string const idf_objects = delimited_string({
+        "Schedule:File,",
+        "  Test1,                   !- Name",
+        "  ,                        !- Schedule Type Limits Name",
+        "  nofile.txt,              !- File Name",
+        "  1,                       !- Column Number",
+        "  0,                       !- Rows to Skip at Top",
+        "  8760,                    !- Number of Hours of Data",
+        "  Space,                   !- Column Separator",
+        "  No;                      !- Interpolate to Timestep"
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
 
 }

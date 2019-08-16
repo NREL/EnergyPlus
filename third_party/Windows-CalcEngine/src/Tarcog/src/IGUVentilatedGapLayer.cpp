@@ -1,6 +1,7 @@
 
 #include <cmath>
 #include <cassert>
+#include <stdexcept>
 
 #include "IGUVentilatedGapLayer.hpp"
 #include "WCEGases.hpp"

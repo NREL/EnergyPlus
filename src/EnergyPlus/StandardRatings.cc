@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -627,12 +627,12 @@ namespace StandardRatings {
         static bool MyOneTimeFlag(true);
 
         // Formats
-        static gio::Fmt Format_990(
+        static ObjexxFCL::gio::Fmt Format_990(
             "('! <Chiller Standard Rating Information>, Component Type, Component Name, ','IPLV in SI Units {W/W}, ','IPLV in IP Units {Btu/W-h}')");
-        static gio::Fmt Format_991("(' Chiller Standard Rating Information, ',A,', ',A,', ',A,', ',A)");
+        static ObjexxFCL::gio::Fmt Format_991("(' Chiller Standard Rating Information, ',A,', ',A,', ',A,', ',A)");
 
         if (MyOneTimeFlag) {
-            gio::write(OutputFileInits, Format_990);
+            ObjexxFCL::gio::write(OutputFileInits, Format_990);
             MyOneTimeFlag = false;
         }
 
@@ -640,20 +640,21 @@ namespace StandardRatings {
             auto const SELECT_CASE_var(ChillerType);
             if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
 
-                gio::write(OutputFileInits, Format_991)
+                ObjexxFCL::gio::write(OutputFileInits, Format_991)
                     << "Chiller:Electric:EIR" << ChillerName << RoundSigDigits(IPLVValueSI, 2) << RoundSigDigits(IPLVValueIP, 2);
                 PreDefTableEntry(pdchMechType, ChillerName, "Chiller:Electric:EIR");
 
             } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
 
-                gio::write(OutputFileInits, Format_991)
+                ObjexxFCL::gio::write(OutputFileInits, Format_991)
                     << "Chiller:Electric:ReformulatedEIR" << ChillerName << RoundSigDigits(IPLVValueSI, 2) << RoundSigDigits(IPLVValueIP, 2);
                 PreDefTableEntry(pdchMechType, ChillerName, "Chiller:Electric:ReformulatedEIR");
             }
         }
 
-        PreDefTableEntry(pdchMechIPLVSI, ChillerName, RoundSigDigits(IPLVValueSI, 2));
-        PreDefTableEntry(pdchMechIPLVIP, ChillerName, RoundSigDigits(IPLVValueIP, 2));
+        // Note: We don't want unit conversio, here, but it's ok since W/W will convert to itself since the column heading has "SI" as a hint
+        PreDefTableEntry(pdchMechIPLVSI, ChillerName, IPLVValueSI, 2);
+        PreDefTableEntry(pdchMechIPLVIP, ChillerName, IPLVValueIP, 2);
     }
 
     void CheckCurveLimitsForIPLV(std::string const &ChillerName, // Name of Chiller
@@ -2427,67 +2428,70 @@ namespace StandardRatings {
         static bool MyHeatOneTimeFlag(true);
 
         // Formats
-        static gio::Fmt Format_990("('! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, ','Standard Rating (Net) "
+        static ObjexxFCL::gio::Fmt Format_990("('! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, ','Standard Rating (Net) "
                                    "Cooling Capacity {W}, ','Standard Rated Net COP {W/W}, ','EER {Btu/W-h}, ','SEER {Btu/W-h}, ','IEER {Btu/W-h}')");
-        static gio::Fmt Format_991("(' DX Cooling Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
-        static gio::Fmt Format_992("('! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, ','High Temperature Heating "
+        static ObjexxFCL::gio::Fmt Format_991("(' DX Cooling Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
+        static ObjexxFCL::gio::Fmt Format_992("('! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, ','High Temperature Heating "
                                    "(net) Rating Capacity {W}, ','Low Temperature Heating (net) Rating Capacity {W}, ','HSPF {Btu/W-h}, ','Region "
                                    "Number')");
-        static gio::Fmt Format_993("(' DX Heating Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
-        static gio::Fmt Format_994("('! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, ','Standard Rating (Net) "
+        static ObjexxFCL::gio::Fmt Format_993("(' DX Heating Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
+        static ObjexxFCL::gio::Fmt Format_994("('! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, ','Standard Rating (Net) "
                                    "Cooling Capacity {W}, ','Standard Rated Net COP {W/W}, ','EER {Btu/W-h}, ','SEER {Btu/W-h}, ','IEER {Btu/W-h}')");
-        static gio::Fmt Format_995("(' DX Cooling Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
+        static ObjexxFCL::gio::Fmt Format_995("(' DX Cooling Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
 
         {
             auto const SELECT_CASE_var(CompTypeNum);
 
             if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) {
                 if (MyCoolOneTimeFlag) {
-                    gio::write(OutputFileInits, Format_990);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_990);
                     MyCoolOneTimeFlag = false;
                 }
 
-                gio::write(OutputFileInits, Format_991)
+                ObjexxFCL::gio::write(OutputFileInits, Format_991)
                     << CompType << CompName << RoundSigDigits(CoolCapVal, 1) << RoundSigDigits(EERValueSI, 2) << RoundSigDigits(EERValueIP, 2)
                     << RoundSigDigits(SEERValueIP, 2) << RoundSigDigits(IEERValueIP, 2);
 
                 PreDefTableEntry(pdchDXCoolCoilType, CompName, CompType);
                 PreDefTableEntry(pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
-                PreDefTableEntry(pdchDXCoolCoilCOP, CompName, RoundSigDigits(EERValueSI, 2));
-                PreDefTableEntry(pdchDXCoolCoilEERIP, CompName, RoundSigDigits(EERValueIP, 2));
-                PreDefTableEntry(pdchDXCoolCoilSEERIP, CompName, RoundSigDigits(SEERValueIP, 2));
-                PreDefTableEntry(pdchDXCoolCoilIEERIP, CompName, RoundSigDigits(IEERValueIP, 2));
+                // W/W is the same as Btuh/Btuh so that's fine too
+                PreDefTableEntry(pdchDXCoolCoilCOP, CompName, EERValueSI, 2);
+                // Btu/W-h will convert to itself
+                PreDefTableEntry(pdchDXCoolCoilEERIP, CompName, EERValueIP, 2);
+                PreDefTableEntry(pdchDXCoolCoilSEERIP, CompName, SEERValueIP, 2);
+                PreDefTableEntry(pdchDXCoolCoilIEERIP, CompName, IEERValueIP, 2);
                 addFootNoteSubTable(pdstDXCoolCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
 
             } else if ((SELECT_CASE_var == CoilDX_HeatingEmpirical) || (SELECT_CASE_var == CoilDX_MultiSpeedHeating)) {
                 if (MyHeatOneTimeFlag) {
-                    gio::write(OutputFileInits, Format_992);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_992);
                     MyHeatOneTimeFlag = false;
                 }
 
-                gio::write(OutputFileInits, Format_993)
+                ObjexxFCL::gio::write(OutputFileInits, Format_993)
                     << CompType << CompName << RoundSigDigits(HighHeatingCapVal, 1) << RoundSigDigits(LowHeatingCapVal, 1)
                     << RoundSigDigits(HSPFValueIP, 2) << RoundSigDigits(RegionNum);
 
                 PreDefTableEntry(pdchDXHeatCoilType, CompName, CompType);
                 PreDefTableEntry(pdchDXHeatCoilHighCap, CompName, HighHeatingCapVal, 1);
                 PreDefTableEntry(pdchDXHeatCoilLowCap, CompName, LowHeatingCapVal, 1);
-                PreDefTableEntry(pdchDXHeatCoilHSPFIP, CompName, RoundSigDigits(HSPFValueIP, 2));
-                PreDefTableEntry(pdchDXHeatCoilRegionNum, CompName, RoundSigDigits(RegionNum));
+                // Btu/W-h will convert to itself
+                PreDefTableEntry(pdchDXHeatCoilHSPFIP, CompName, HSPFValueIP, 2);
+                PreDefTableEntry(pdchDXHeatCoilRegionNum, CompName, RegionNum);
                 addFootNoteSubTable(pdstDXHeatCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
 
             } else if (SELECT_CASE_var == CoilDX_MultiSpeedCooling) {
                 if (MyCoolOneTimeFlag) {
-                    gio::write(OutputFileInits, Format_994);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_994);
                     MyCoolOneTimeFlag = false;
                 }
 
-                gio::write(OutputFileInits, Format_995)
+                ObjexxFCL::gio::write(OutputFileInits, Format_995)
                     << CompType << CompName << RoundSigDigits(CoolCapVal, 1) << ' ' << ' ' << RoundSigDigits(SEERValueIP, 2) << ' ';
 
                 PreDefTableEntry(pdchDXCoolCoilType, CompName, CompType);
                 PreDefTableEntry(pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
-                PreDefTableEntry(pdchDXCoolCoilSEERIP, CompName, RoundSigDigits(SEERValueIP, 2));
+                PreDefTableEntry(pdchDXCoolCoilSEERIP, CompName, SEERValueIP, 2);
                 addFootNoteSubTable(pdstDXCoolCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
 
             } else {
@@ -2549,12 +2553,12 @@ namespace StandardRatings {
         static std::string CompNameNew;
 
         // Formats
-        static gio::Fmt Format_101("('! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 "
+        static ObjexxFCL::gio::Fmt Format_101("('! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 "
                                    "Classification, ','Rated Net Cooling Capacity Test A {W}, ','Rated Total Electric Power Test A {W}, ','Rated Net "
                                    "Cooling Capacity Test B {W}, ','Rated Total Electric Power Test B {W}, ','Rated Net Cooling Capacity Test C {W}, "
                                    "','Rated Total Electric Power Test C {W}, ','Rated Net Cooling Capacity Test D {W}, ','Rated Total Electric "
                                    "Power Test D {W} ')");
-        static gio::Fmt Format_102(
+        static ObjexxFCL::gio::Fmt Format_102(
             "(' DX Cooling Coil ASHRAE 127 Standard Ratings Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
 
         {
@@ -2562,28 +2566,35 @@ namespace StandardRatings {
 
             if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) {
                 if (MyCoolOneTimeFlag) {
-                    gio::write(OutputFileInits, Format_101);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_101);
                     MyCoolOneTimeFlag = false;
                 }
                 for (ClassNum = 1; ClassNum <= 4; ++ClassNum) {
                     Num = (ClassNum - 1) * 4;
                     ClassName = "Class " + RoundSigDigits(ClassNum);
                     CompNameNew = CompName + "(" + ClassName + ")";
-                    gio::write(OutputFileInits, Format_102)
+                    ObjexxFCL::gio::write(OutputFileInits, Format_102)
                         << CompType << CompName << ClassName << RoundSigDigits(NetCoolingCapRated(Num + 1), 1)
                         << RoundSigDigits(TotElectricPowerRated(Num + 1), 1) << RoundSigDigits(NetCoolingCapRated(Num + 2), 1)
                         << RoundSigDigits(TotElectricPowerRated(Num + 2), 1) << RoundSigDigits(NetCoolingCapRated(Num + 3), 1)
                         << RoundSigDigits(TotElectricPowerRated(Num + 3), 1) << RoundSigDigits(NetCoolingCapRated(Num + 4), 1)
                         << RoundSigDigits(TotElectricPowerRated(Num + 4), 1);
                     PreDefTableEntry(pdchDXCoolCoilType, CompNameNew, CompType);
-                    PreDefTableEntry(pdchDXCoolCoilNetCapSIA, CompNameNew, RoundSigDigits(NetCoolingCapRated(Num + 1), 1));
-                    PreDefTableEntry(pdchDXCoolCoilElecPowerA, CompNameNew, RoundSigDigits(TotElectricPowerRated(Num + 1), 1));
-                    PreDefTableEntry(pdchDXCoolCoilNetCapSIB, CompNameNew, RoundSigDigits(NetCoolingCapRated(Num + 2), 1));
-                    PreDefTableEntry(pdchDXCoolCoilElecPowerB, CompNameNew, RoundSigDigits(TotElectricPowerRated(Num + 2), 1));
-                    PreDefTableEntry(pdchDXCoolCoilNetCapSIC, CompNameNew, RoundSigDigits(NetCoolingCapRated(Num + 3), 1));
-                    PreDefTableEntry(pdchDXCoolCoilElecPowerC, CompNameNew, RoundSigDigits(TotElectricPowerRated(Num + 3), 1));
-                    PreDefTableEntry(pdchDXCoolCoilNetCapSID, CompNameNew, RoundSigDigits(NetCoolingCapRated(Num + 4), 1));
-                    PreDefTableEntry(pdchDXCoolCoilElecPowerD, CompNameNew, RoundSigDigits(TotElectricPowerRated(Num + 4), 1));
+                    // Note: If you call RoundSigDigits(NetCoolingCapRated(Num + 1), 1),
+                    // Then it's not the OutputReportPredefined::PreDefTableEntry prototype with Real64 that is called.
+                    // As a result, the entry isn't marked as being Real (origEntryIsReal) and unit conversion does not occur
+                    // Bad: PreDefTableEntry(pdchDXCoolCoilNetCapSIA, CompNameNew, RoundSigDigits(NetCoolingCapRated(Num + 1), 1));
+                    PreDefTableEntry(pdchDXCoolCoilNetCapSIA, CompNameNew, NetCoolingCapRated(Num + 1), 1);
+                    PreDefTableEntry(pdchDXCoolCoilNetCapSIB, CompNameNew, NetCoolingCapRated(Num + 2), 1);
+                    PreDefTableEntry(pdchDXCoolCoilNetCapSIC, CompNameNew, NetCoolingCapRated(Num + 3), 1);
+                    PreDefTableEntry(pdchDXCoolCoilNetCapSID, CompNameNew, NetCoolingCapRated(Num + 4), 1);
+
+                    // These will stay in W, so it doesn't matter as much, but let's be consistent
+                    PreDefTableEntry(pdchDXCoolCoilElecPowerA, CompNameNew, TotElectricPowerRated(Num + 1), 1);
+                    PreDefTableEntry(pdchDXCoolCoilElecPowerB, CompNameNew, TotElectricPowerRated(Num + 2), 1);
+                    PreDefTableEntry(pdchDXCoolCoilElecPowerC, CompNameNew, TotElectricPowerRated(Num + 3), 1);
+                    PreDefTableEntry(pdchDXCoolCoilElecPowerD, CompNameNew, TotElectricPowerRated(Num + 4), 1);
+
                     addFootNoteSubTable(pdstDXCoolCoil2, "ANSI/ASHRAE Standard 127 includes supply fan heat effect and electric power.");
                 }
 

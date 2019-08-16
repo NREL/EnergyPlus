@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -71,8 +71,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     // this test is related to issue #4385 and #4972, test change that added plant loop interconnects
     // entire IDF file from defect file used to set up model and run it some.
     std::string const idf_objects =
-        delimited_string({"Version,8.3;",
-                          "Schedule:Constant,Radiator massflow temporary,Any value sch,1;",
+        delimited_string({"Schedule:Constant,Radiator massflow temporary,Any value sch,1;",
                           "Schedule:Constant,Radiator supply temperature temporary,Any value sch,40;",
                           "Schedule:Constant,Radiator power demand temporary,Any value sch,3000;",
 
@@ -814,8 +813,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
 {
     // this test is for checking autosizing of heating WWHP. derived from unit test PlantLoopSourceSideTest
     std::string const idf_objects =
-        delimited_string({"Version,8.6;",
-                          "Schedule:Constant,Radiator massflow temporary,Any value sch,1;",
+        delimited_string({"Schedule:Constant,Radiator massflow temporary,Any value sch,1;",
                           "Schedule:Constant,Radiator supply temperature temporary,Any value sch,40;",
                           "Schedule:Constant,Radiator power demand temporary,Any value sch,3000;",
 

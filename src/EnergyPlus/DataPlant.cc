@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -146,7 +146,7 @@ namespace DataPlant {
     Array1D_string const PressureSimType(4, {"NONE", "PUMPPOWERCORRECTION", "LOOPFLOWCORRECTION", "PRESSURESIMULATION"});
 
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
-    int const NumSimPlantEquipTypes(94);
+    int const NumSimPlantEquipTypes(96);
     Array1D_string const SimPlantEquipTypes(NumSimPlantEquipTypes,
                                             {"BOILER:HOTWATER",
                                              "BOILER:STEAM",
@@ -241,7 +241,9 @@ namespace DataPlant {
                                              "GROUNDHEATEXCHANGER:SLINKY",
                                              "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER",
                                              "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEBEAM",
-                                             "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER"});
+                                             "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER",
+                                             "HEATPUMP:WATERTOWATER:EIR:COOLING",
+                                             "HEATPUMP:WATERTOWATER:EIR:HEATING"});
 
     Array1D_string const ccSimPlantEquipTypes(NumSimPlantEquipTypes,
                                               {"Boiler:HotWater",
@@ -337,7 +339,9 @@ namespace DataPlant {
                                                "GroundHeatExchanger:Slinky",
                                                "WaterHeater:HeatPump:WrappedCondenser",
                                                "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam",
-                                               "ZoneHVAC:CoolingPanel:RadiantConvective:Water"});
+                                               "ZoneHVAC:CoolingPanel:RadiantConvective:Water",
+                                               "HeatPump:WaterToWater:EIR:Cooling",
+                                               "HeatPump:WaterToWater:EIR:Heating"});
 
     Array1D_int const ValidLoopEquipTypes(
         NumSimPlantEquipTypes,
@@ -352,7 +356,7 @@ namespace DataPlant {
          LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant,
          LoopType_Plant, LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,
          LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant, LoopType_Plant, LoopType_Both,
-         LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant, LoopType_Plant, LoopType_Plant});
+         LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Both,  LoopType_Both});
 
     int const TypeOf_Other(-1);
     int const TypeOf_Boiler_Simple(1);
@@ -449,6 +453,8 @@ namespace DataPlant {
     int const TypeOf_HeatPumpWtrHeaterWrapped(92);
     int const TypeOf_FourPipeBeamAirTerminal(93);
     int const TypeOf_CoolingPanel_Simple(94);
+    int const TypeOf_HeatPumpEIRCooling(95);
+    int const TypeOf_HeatPumpEIRHeating(96);
 
     // Parameters for General Equipment Types
     int const NumGeneralEquipTypes(23);

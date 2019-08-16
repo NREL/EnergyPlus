@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -513,16 +513,16 @@ namespace DataRuntimeLanguage {
     void ValidateEMSVariableName(std::string const &cModuleObject, // the current object name
                                  std::string const &cFieldValue,   // the field value
                                  std::string const &cFieldName,    // the current field name
-                                 bool &errFlag,                    // true if errors found in this routine.
-                                 bool &ErrorsFound                 // true if errors found in this routine.
+                                 bool &errFlag,                    // true if errors found in this routine, false otherwise.
+                                 bool &ErrorsFound                 // true if errors found in this routine, untouched otherwise.
     );
 
     void ValidateEMSProgramName(std::string const &cModuleObject, // the current object name
                                 std::string const &cFieldValue,   // the field value
                                 std::string const &cFieldName,    // the current field name
                                 std::string const &cSubType,      // sub type = Program or Subroutine
-                                bool &errFlag,                    // true if errors found in this routine.
-                                bool &ErrorsFound                 // true if errors found in this routine.
+                                bool &errFlag,                    // true if errors found in this routine, false otherwise.
+                                bool &ErrorsFound                 // true if errors found in this routine, untouched otherwise.
     );
 
 } // namespace DataRuntimeLanguage

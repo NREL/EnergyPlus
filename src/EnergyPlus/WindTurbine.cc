@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -694,7 +694,7 @@ namespace WindTurbine {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static char const TabChr('\t'); // Tab character
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -721,7 +721,7 @@ namespace WindTurbine {
             wsStatFound = false;
             {
                 IOFlags flags;
-                gio::inquire(DataStringGlobals::inStatFileName, flags);
+                ObjexxFCL::gio::inquire(DataStringGlobals::inStatFileName, flags);
                 fileExists = flags.exists();
             }
             if (fileExists) {
@@ -730,7 +730,7 @@ namespace WindTurbine {
                 {
                     IOFlags flags;
                     flags.ACTION("READ");
-                    gio::open(statFile, DataStringGlobals::inStatFileName, flags);
+                    ObjexxFCL::gio::open(statFile, DataStringGlobals::inStatFileName, flags);
                     ReadStatus = flags.ios();
                 }
                 if (ReadStatus != 0) {
@@ -739,7 +739,7 @@ namespace WindTurbine {
                 while (ReadStatus == 0) { // end of file
                     {
                         IOFlags flags;
-                        gio::read(statFile, fmtA, flags) >> lineIn;
+                        ObjexxFCL::gio::read(statFile, fmtA, flags) >> lineIn;
                         ReadStatus = flags.ios();
                     }
                     // reconcile line with different versions of stat file
@@ -749,7 +749,7 @@ namespace WindTurbine {
                     while (ReadStatus == 0) { // find daily avg line
                         {
                             IOFlags flags;
-                            gio::read(statFile, fmtA, flags) >> lineIn;
+                            ObjexxFCL::gio::read(statFile, fmtA, flags) >> lineIn;
                             ReadStatus = flags.ios();
                         }
                         lnPtr = index(lineIn, "Daily Avg");
@@ -764,7 +764,7 @@ namespace WindTurbine {
                             if (lnPtr != 1) {
                                 if ((lnPtr == std::string::npos) || (!stripped(lineIn.substr(0, lnPtr)).empty())) {
                                     if (lnPtr != std::string::npos) {
-                                        gio::read(lineIn.substr(0, lnPtr), "*") >> MonthWS(mon);
+                                        ObjexxFCL::gio::read(lineIn.substr(0, lnPtr), "*") >> MonthWS(mon);
                                         lineIn.erase(0, lnPtr + 1);
                                     }
                                 } else { // blank field
@@ -788,7 +788,7 @@ namespace WindTurbine {
                     }
                     if (wsStatFound) break;
                 }
-                gio::close(statFile);
+                ObjexxFCL::gio::close(statFile);
                 if (wsStatFound) {
                     AnnualTMYWS = sum(MonthWS) / 12.0;
                 } else {

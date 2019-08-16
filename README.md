@@ -12,7 +12,7 @@ This is the EnergyPlus Development Repository.  EnergyPlus™ is a whole buildin
 
 ## Releases [![](https://img.shields.io/github/release/NREL/energyplus.svg?colorB=FF7300)](https://github.com/NREL/EnergyPlus/releases/latest)
 
-EnergyPlus is typically released twice annually, usually in March and September.
+EnergyPlus is released twice annually, usually in March and September.
 It is recommended all use of EnergyPlus is production workflows use these formal, public releases.
 Iteration **(pre-)releases** may be created during a development cycle, however users should generally avoid these, as input syntax may change which won't be supported by the major release version transition tools, and could require manual intervention to remedy.
 If an interim release is intended for active use by users, such as a bug-fix-only or performance-only re-release, it will be clearly specified on the release notes and a public announcement will accompany this type of release.

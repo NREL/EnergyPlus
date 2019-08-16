@@ -1,6 +1,7 @@
 
 #include <cmath>
 #include <cassert>
+#include <stdexcept>
 
 #include "VenetianSlat.hpp"
 #include "WCEViewer.hpp"

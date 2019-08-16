@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2018, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataPrecisionGlobals.hh>
+#include <DataSurfaces.hh>
 #include <General.hh>
 #include <UtilityRoutines.hh>
 
@@ -211,12 +212,6 @@ namespace DataHeatBalance {
     // Parameters for Sky Radiance Distribution
     int const Isotropic(0);
     int const Anisotropic(1);
-
-    // Parameters for HeatTransferAlgosUsed
-    int const UseCTF(1);
-    int const UseEMPD(2);
-    int const UseCondFD(5);
-    int const UseHAMT(6);
 
     // Parameters for ZoneAirSolutionAlgo
     int const Use3rdOrder(0);
@@ -493,17 +488,25 @@ namespace DataHeatBalance {
     int DefaultOutsideConvectionAlgo(1);         // 1 = simple (ASHRAE); 2 = detailed; etc (BLAST, TARP, MOWITT, DOE-2)
     int SolarDistribution(0);                    // Solar Distribution Algorithm
     int InsideSurfIterations(0);                 // Counts inside surface iterations
-    int OverallHeatTransferSolutionAlgo(UseCTF); // UseCTF Solution, UseEMPD moisture solution, UseCondFD solution
-    int NumberOfHeatTransferAlgosUsed(1);
-    Array1D_int HeatTransferAlgosUsed;
+    int OverallHeatTransferSolutionAlgo(DataSurfaces::HeatTransferModel_CTF); // Global HeatBalanceAlgorithm setting 
+   // Flags for HeatTransfer Algorithms Used
+    bool AnyCTF(false);    // CTF used
+    bool AnyEMPD(false);   // EMPD used
+    bool AnyCondFD(false); // CondFD used
+    bool AnyHAMT(false);   // HAMT used
+    bool AnyKiva(false);   // Kiva used
     int MaxNumberOfWarmupDays(25);      // Maximum number of warmup days allowed
     int MinNumberOfWarmupDays(6);       // Minimum number of warmup days allowed
     Real64 CondFDRelaxFactor(1.0);      // Relaxation factor, for looping across all the surfaces.
     Real64 CondFDRelaxFactorInput(1.0); // Relaxation factor, for looping across all the surfaces, user input value
     // LOGICAL ::  CondFDVariableProperties = .FALSE. ! if true, then variable conductivity or enthalpy in Cond FD.
 
-    int ZoneAirSolutionAlgo(Use3rdOrder);  // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
-    Real64 BuildingRotationAppendixG(0.0); // Building Rotation for Appendix G
+    int ZoneAirSolutionAlgo(Use3rdOrder);      // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
+    Real64 BuildingRotationAppendixG(0.0);     // Building Rotation for Appendix G
+    Real64 ZoneTotalExfiltrationHeatLoss(0.0); // Building total heat emission through zone exfiltration;
+    Real64 ZoneTotalExhaustHeatLoss(0.0);      // Building total heat emission through zone air exhaust;
+    Real64 SysTotalHVACReliefHeatLoss(0.0);    // Building total heat emission through HVAC system relief air;
+    Real64 SysTotalHVACRejectHeatLoss(0.0);    // Building total heat emission through HVAC system heat rejection;
 
     // END SiteData
 
@@ -813,6 +816,7 @@ namespace DataHeatBalance {
     Array1D<HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
     Array1D<HeatReclaimDXCoilData> HeatReclaimDXCoil;
     Array1D<HeatReclaimDXCoilData> HeatReclaimVS_DXCoil;
+    Array1D<HeatReclaimHPCoilData> HeatReclaimSimple_WAHPCoil;
     Array1D<AirReportVars> ZnAirRpt;
     Array1D<TCGlazingsType> TCGlazings;
     Array1D<ZoneEquipData> ZoneCO2Gen;
@@ -849,15 +853,22 @@ namespace DataHeatBalance {
         DefaultOutsideConvectionAlgo = 1;
         SolarDistribution = 0;
         InsideSurfIterations = 0;
-        OverallHeatTransferSolutionAlgo = UseCTF;
-        NumberOfHeatTransferAlgosUsed = 1;
-        HeatTransferAlgosUsed.deallocate();
+        OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+        AnyCTF = false;
+        AnyEMPD = false;
+        AnyCondFD = false;
+        AnyHAMT = false;
+        AnyKiva = false;
         MaxNumberOfWarmupDays = 25;
         MinNumberOfWarmupDays = 6;
         CondFDRelaxFactor = 1.0;
         CondFDRelaxFactorInput = 1.0;
         ZoneAirSolutionAlgo = Use3rdOrder;
         BuildingRotationAppendixG = 0.0;
+        ZoneTotalExfiltrationHeatLoss = 0.0;
+        ZoneTotalExhaustHeatLoss = 0.0;
+        SysTotalHVACReliefHeatLoss = 0.0;
+        SysTotalHVACRejectHeatLoss = 0.0;
         NumOfZoneLists = 0;
         NumOfZoneGroups = 0;
         NumPeopleStatements = 0;
@@ -1073,6 +1084,7 @@ namespace DataHeatBalance {
         HeatReclaimRefrigCondenser.deallocate();
         HeatReclaimDXCoil.deallocate();
         HeatReclaimVS_DXCoil.deallocate();
+        HeatReclaimSimple_WAHPCoil.deallocate();
         ZnAirRpt.deallocate();
         TCGlazings.deallocate();
         ZoneCO2Gen.deallocate();
