@@ -2848,6 +2848,12 @@ namespace ScheduleManager {
             if (WhichHour <= 24) {
                 Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour);
             } else if (TimeStep <= NumOfTimeStepInHour) {
+                WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule + 1);
+                if (DayOfWeek <= 7 && HolidayIndex > 0) {
+                    DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
+                } else {
+                    DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
+                }
                 Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour - 24);
             } else {
                 Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour - 24);
@@ -4985,6 +4991,12 @@ namespace ScheduleManager {
             if (WhichHour <= 24) {
                 Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour);
             } else if (TimeStep <= NumOfTimeStepInHour) {
+                WeekSchedulePointer = Schedule(ScheduleIndex).WeekSchedulePointer(DayOfYear_Schedule + 1);
+                if (DayOfWeek <= 7 && HolidayIndex > 0) {
+                    DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(7 + HolidayIndex);
+                } else {
+                    DaySchedulePointer = WeekSchedule(WeekSchedulePointer).DaySchedulePointer(DayOfWeek);
+                }
                 Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(TimeStep, WhichHour - 24);
             } else {
                 Schedule(ScheduleIndex).CurrentValue = DaySchedule(DaySchedulePointer).TSValue(NumOfTimeStepInHour, WhichHour - 24);
