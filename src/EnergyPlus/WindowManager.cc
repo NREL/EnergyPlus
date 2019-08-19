@@ -467,7 +467,6 @@ namespace WindowManager {
 
         // Using/Aliasing
         using namespace Vectors;
-        using CurveManager::PerfCurve;
         using General::TrimSigDigits;
         using WindowEquivalentLayer::InitEquivalentLayerWindowCalculations;
 

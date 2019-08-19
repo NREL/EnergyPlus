@@ -1494,7 +1494,6 @@ namespace HeatBalanceManager {
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
         using CurveManager::GetCurveMinMaxValues;
-        using CurveManager::PerfCurve;
         using General::RoundSigDigits;
         using General::ScanForReports;
         using General::TrimSigDigits;
