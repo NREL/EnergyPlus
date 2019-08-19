@@ -1845,7 +1845,7 @@
   Table:Lookup,
     HPACCoolCapFFF,          !- Name
     HPACCoolCapFFF_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     0.8,                     !- Minimum Output
     1.5,                     !- Maximum Output
@@ -1883,7 +1883,7 @@
   Table:Lookup,
     HPACCoolCapFFF2,         !- Name
     HPACCoolCapFFF2_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     0.8,                     !- Minimum Output
     1.5,                     !- Maximum Output
@@ -1920,7 +1920,7 @@
   Table:Lookup,
     HPACCoolCapFFF3,         !- Name
     HPACCoolCapFFF3_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     0.8,                     !- Minimum Output
     1.5,                     !- Maximum Output
@@ -1963,7 +1963,7 @@
   Table:Lookup,
     HPACEIRFFF,              !- Name
     HPACEIRFFF_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.5,                     !- Maximum Output
@@ -2001,7 +2001,7 @@
   Table:Lookup,
     HPACEIRFFF2,             !- Name
     HPACEIRFFF2_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.5,                     !- Maximum Output
@@ -2039,7 +2039,7 @@
   Table:Lookup,
     HPACEIRFFF3,             !- Name
     HPACEIRFFF3_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.5,                     !- Maximum Output
@@ -2082,7 +2082,7 @@
   Table:Lookup,
     HPACPLFFPLR,             !- Name
     HPACPLFFPLR_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     0.85,                    !- Minimum Output
     1.0,                     !- Maximum Output
@@ -2117,7 +2117,7 @@
   Table:Lookup,
     HPACPLFFPLR2,            !- Name
     HPACPLFFPLR2_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     0.85,                    !- Minimum Output
     1.0,                     !- Maximum Output
@@ -2153,7 +2153,7 @@
   Table:Lookup,
     HPACPLFFPLR3,            !- Name
     HPACPLFFPLR3_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     0.85,                    !- Minimum Output
     1.0,                     !- Maximum Output
@@ -2199,7 +2199,7 @@
   Table:Lookup,
     HPACHeatEIRFFF,          !- Name
     HPACHeatEIRFFF_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.5,                     !- Maximum Output
@@ -2239,7 +2239,7 @@
   Table:Lookup,
     HPACHeatEIRFFF2,         !- Name
     HPACHeatEIRFFF2_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.5,                     !- Maximum Output
@@ -2279,7 +2279,7 @@
   Table:Lookup,
     HPACHeatEIRFFF3,         !- Name
     HPACHeatEIRFFF3_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.5,                     !- Maximum Output
@@ -2323,7 +2323,7 @@
   Table:Lookup,
     HPACCOOLPLFFPLR,         !- Name
     HPACCOOLPLFFPLR_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     0.75,                    !- Minimum Output
     1.0,                     !- Maximum Output
@@ -2357,7 +2357,7 @@
   Table:Lookup,
     HPACCOOLPLFFPLR2,        !- Name
     HPACCOOLPLFFPLR2_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     0.75,                    !- Minimum Output
     1.0,                     !- Maximum Output
@@ -2392,7 +2392,7 @@
   Table:Lookup,
     HPACCOOLPLFFPLR3,        !- Name
     HPACCOOLPLFFPLR3_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     0.75,                    !- Minimum Output
     1.0,                     !- Maximum Output
@@ -2443,7 +2443,7 @@
   Table:Lookup,
     HPACHeatCapFT,           !- Name
     HPACHeatCapFT_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
@@ -2483,7 +2483,7 @@
   Table:Lookup,
     HPACHeatCapFT2,          !- Name
     HPACHeatCapFT2_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
@@ -2523,7 +2523,7 @@
   Table:Lookup,
     HPACHeatCapFT3,          !- Name
     HPACHeatCapFT3_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
@@ -2571,7 +2571,7 @@
   Table:Lookup,
     HPACHeatCapFFF,          !- Name
     HPACHeatCapFFF_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
@@ -2610,7 +2610,7 @@
   Table:Lookup,
     HPACHeatCapFFF2,         !- Name
     HPACHeatCapFFF2_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
@@ -2648,7 +2648,7 @@
   Table:Lookup,
     HPACHeatCapFFF3,         !- Name
     HPACHeatCapFFF3_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
@@ -2702,7 +2702,7 @@
   Table:Lookup,
     HPACHeatEIRFT,           !- Name
     HPACHeatEIRFT_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
@@ -2745,7 +2745,7 @@
   Table:Lookup,
     HPACHeatEIRFT2,          !- Name
     HPACHeatEIRFT2_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
@@ -2785,7 +2785,7 @@
   Table:Lookup,
     HPACHeatEIRFT3,          !- Name
     HPACHeatEIRFT3_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
@@ -2847,7 +2847,7 @@
   Table:Lookup,
     FanEffRatioCurve,        !- Name
     FanEffRatioCurve_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     0.3,                     !- Minimum Output
     1.0,                     !- Maximum Output
@@ -2912,7 +2912,7 @@
   Table:Lookup,
     FanPowerRatioCurve,      !- Name
     FanPowerRatioCurve_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
@@ -2994,7 +2994,7 @@
   Table:Lookup,
     HPACCoolCapFT,           !- Name
     HPACCoolCapFT_IndependentVariableList,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
+    AutomaticWithDivisor,    !- Normalization Method
     ,                        !- Normalization Divisor
     0,                       !- Minimum Output
     40000,                   !- Maximum Output
@@ -3091,7 +3091,7 @@
   Table:Lookup,
     HPACCoolCapFT2,          !- Name
     HPACCoolCapFT2_IndependentVariableList,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
+    AutomaticWithDivisor,    !- Normalization Method
     ,                        !- Normalization Divisor
     0,                       !- Minimum Output
     40000,                   !- Maximum Output
@@ -3188,7 +3188,7 @@
   Table:Lookup,
     HPACCoolCapFT3,          !- Name
     HPACCoolCapFT3_IndependentVariableList,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
+    AutomaticWithDivisor,    !- Normalization Method
     ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
@@ -3291,7 +3291,7 @@
   Table:Lookup,
     HPACEIRFT,               !- Name
     HPACEIRFT_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
@@ -3343,7 +3343,7 @@
   Table:Lookup,
     HPACEIRFT2,              !- Name
     HPACEIRFT2_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
@@ -3427,7 +3427,7 @@
   Table:Lookup,
     HPACEIRFT3,              !- Name
     HPACEIRFT3_IndependentVariableList,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
+    AutomaticWithDivisor,    !- Normalization Method
     ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
@@ -3570,7 +3570,7 @@
   Table:Lookup,
     My5VariableLookupTable,  !- Name
     My5VariableLookupTable_IndependentVariableList,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
+    ,                        !- Normalization Method
     ,                        !- Normalization Divisor
     0,                       !- Minimum Output
     10,                      !- Maximum Output
