@@ -469,7 +469,6 @@ namespace WindowEquivalentLayer {
                             Real64 const HCOUT, // outdoor convective heat transfer
                             Real64 const TRMOUT,
                             Real64 const TRMIN,           // indoor / outdoor mean radiant temp, K
-                            Real64 const ISOL,            // total incident solar, W/m2 (values used for SOURCE derivation)
                             Array1S<Real64> const SOURCE, // absorbed solar by layer,  W/m2
                             Real64 const TOL,             // convergence tolerance, usually
                             Array1A<Real64> QOCF,         // returned: heat flux to layer i from gaps i-1 and i

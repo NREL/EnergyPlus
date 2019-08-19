@@ -832,10 +832,9 @@ namespace WindowEquivalentLayer {
         Array1D<Real64> H({0, CFSMAXNL + 1});
         Array1D<Real64> QAllSWwinAbs({1, CFSMAXNL + 1});
 
-        bool ASHWAT_ThermalR; // net long wave radiation flux on the inside face of window
-        int EQLNum;           // equivalent layer window index
-        int ZoneNum;          // Zone number corresponding to SurfNum
-        int ConstrNum;        // Construction number
+        int EQLNum;    // equivalent layer window index
+        int ZoneNum;   // Zone number corresponding to SurfNum
+        int ConstrNum; // Construction number
 
         int ZoneEquipConfigNum;
         int NodeNum;
@@ -1022,7 +1021,7 @@ namespace WindowEquivalentLayer {
         QAllSWwinAbs({1, NL + 1}) = QRadSWwinAbs({1, NL + 1}, SurfNum);
         //  Solve energy balance(s) for temperature at each node/layer and
         //  heat flux, including components, between each pair of nodes/layers
-        ASHWAT_ThermalCalc(CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, 0.0, QAllSWwinAbs({1, NL + 1}), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+        ASHWAT_ThermalCalc(CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, QAllSWwinAbs({1, NL + 1}), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
 
         // effective surface temperature is set to surface temperature calculated
         // by the fenestration layers temperature solver
@@ -5009,7 +5008,6 @@ namespace WindowEquivalentLayer {
                             Real64 const HCOUT,
                             Real64 const TRMOUT,
                             Real64 const TRMIN,           // indoor / outdoor mean radiant temp, K
-                            Real64 const ISOL,            // total incident solar, W/m2 (values used for SOURCE derivation)
                             Array1S<Real64> const SOURCE, // absorbed solar by layer, W/m2
                             Real64 const TOL,             // convergence tolerance, usually
                             Array1A<Real64> QOCF,         // returned: heat flux to layer i from gaps i-1 and i
@@ -5072,8 +5070,7 @@ namespace WindowEquivalentLayer {
         //   0=outside, 1=betw layer 1-2, ..., NL=inside
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Real64 const Height(1.0); // Window height (m) for standard ratings calculation
-        int const MaxIter(100);   // maximum number of iterations allowed
+        int const MaxIter(100); // maximum number of iterations allowed
         static std::string const RoutineName("ASHWAT_ThermalCalc: ");
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -5108,29 +5105,18 @@ namespace WindowEquivalentLayer {
         int ITRY;
         int hin_scheme;                   // flags different schemes for indoor convection coefficients
         Array1D_int ISDL({0, FS.NL + 1}); // Flag to mark diathermanous layers, 0=opaque
-        int NDLIAR;                       // Number of Diathermanous Layers In A Row (i.e., consecutive)
-        int IB;                           // Counter begin and end limits
-        int IE;
-        int IDV;                       // Integer dummy variable, general utility
-        Array1D<Real64> QOCF_F(FS.NL); // heat flux to outdoor-facing surface of layer i, from gap i-1,
-                                       //   due to open channel flow, W/m2
-        Array1D<Real64> QOCF_B(FS.NL); // heat flux to indoor-facing surface of layer i, from gap i,
-                                       //   due to open channel flow, W/m2
-        Real64 Rvalue;                 // R-value in IP units [hr.ft2.F/BTU]
-        Real64 TAE_IN;                 // Indoor and outdoor effective ambient temperatures [K]
-        Real64 TAE_OUT;
-        Array1D<Real64> HR({0, FS.NL}); // Radiant heat transfer coefficient [W/m2K]
-        Array1D<Real64> HJR(FS.NL);     // radiative and convective jump heat transfer coefficients
+        Array1D<Real64> QOCF_F(FS.NL);    // heat flux to outdoor-facing surface of layer i, from gap i-1,
+                                          //   due to open channel flow, W/m2
+        Array1D<Real64> QOCF_B(FS.NL);    // heat flux to indoor-facing surface of layer i, from gap i,
+                                          //   due to open channel flow, W/m2
+        Array1D<Real64> HR({0, FS.NL});   // Radiant heat transfer coefficient [W/m2K]
+        Array1D<Real64> HJR(FS.NL);       // radiative and convective jump heat transfer coefficients
         Array1D<Real64> HJC(FS.NL);
-        Real64 FHR_OUT; // hre/(hre+hce) fraction radiant h, outdoor or indoor, used for TAE
-        Real64 FHR_IN;
-        Real64 Q_IN;                          // net gain to the room [W/m2], including transmitted solar
         Array1D<Real64> RHOF({0, FS.NL + 1}); // longwave reflectance, front    !  these variables help simplify
         Array1D<Real64> RHOB({0, FS.NL + 1}); // longwave reflectance, back     !  the code because it is useful to
         Array1D<Real64> EPSF({0, FS.NL + 1}); // longwave emisivity,   front    !  increase the scope of the arrays
         Array1D<Real64> EPSB({0, FS.NL + 1}); // longwave emisivity,   back     !  to include indoor and outdoor
         Array1D<Real64> TAU({0, FS.NL + 1});  // longwave transmittance         !  nodes - more general
-        Real64 RTOT;                          // total resistance from TAE_OUT to TAE_IN [m2K/W]
         Array2D<Real64> HC2D(6, 6);           // convective heat transfer coefficients between layers i and j
         Array2D<Real64> HR2D(6, 6);           // radiant heat transfer coefficients between layers i and j
         Array1D<Real64> HCIout(6);            // convective and radiant heat transfer coefficients between
@@ -5139,24 +5125,15 @@ namespace WindowEquivalentLayer {
         Array1D<Real64> HCIin(6); // convective and radiant heat transfer coefficients between
         Array1D<Real64> HRIin(6);
         // layer i and indoor air or mean radiant temperature, resp.
-        Real64 HCinout; // convective and radiant heat transfer coefficients between
-        Real64 HRinout;
-        // indoor and outdoor air or mean radiant temperatures
-        // (almost always zero)
         //  Indoor side convection coefficients - used for Open Channel Flow on indoor side
-        Real64 HFS;     // nominal height of fen system (assumed 1 m)
-        Real64 TOC_EFF; // effective thickness of open channel, m
-        Real64 ConvF;   // convection factor: accounts for enhanced convection
-                        //   for e.g. VB adjacent to open channel
-        Real64 HC_GA;   // convection - glass to air
-        Real64 HC_SA;   // convection - shade (both sides) to air
-        Real64 HC_GS;   // convection - glass to shade (one side)
-        Real64 TINdv;   // dummy variables used
-        Real64 TOUTdv;
-        Real64 TRMINdv; // for boundary conditions in calculating
-        Real64 TRMOUTdv;
+        Real64 HFS;                          // nominal height of fen system (assumed 1 m)
+        Real64 TOC_EFF;                      // effective thickness of open channel, m
+        Real64 ConvF;                        // convection factor: accounts for enhanced convection
+                                             //   for e.g. VB adjacent to open channel
+        Real64 HC_GA;                        // convection - glass to air
+        Real64 HC_SA;                        // convection - shade (both sides) to air
+        Real64 HC_GS;                        // convection - glass to shade (one side)
         Array1D<Real64> SOURCEdv(FS.NL + 1); // indices of merit
-        Real64 SUMERR;                       // error summation used to check validity of code/model
         Real64 QGAIN;                        // total gain to conditioned space [[W/m2]
                                              // Flow
 
@@ -5642,7 +5619,6 @@ namespace WindowEquivalentLayer {
         Real64 TRMINdv; // for boundary conditions in calculating
         Real64 TRMOUTdv;
         Array1D<Real64> SOURCEdv(FS.NL + 1); // indices of merit
-        Real64 SUMERR;                       // error summation used to check validity of code/model
         Real64 QGAIN;                        // total gain to conditioned space [[W/m2]
         Real64 SaveHCNLm;                    // place to save HC(NL-1) - two resistance networks differ
         Real64 SaveHCNL;                     // place to save HC(NL)   - two resistance networks differ
