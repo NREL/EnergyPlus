@@ -1418,11 +1418,15 @@ namespace BranchNodeConnections {
             if (InletNode != "UNDEFINED") {
                 if (CompSets(Count).InletNodeName != "UNDEFINED") {
                     if (InletNode != CompSets(Count).InletNodeName) continue;
+                } else {
+                    CompSets(Count).InletNodeName = InletNode;
                 }
             }
             if (OutletNode != "UNDEFINED") {
                 if (CompSets(Count).OutletNodeName != "UNDEFINED") {
                     if (OutletNode != CompSets(Count).OutletNodeName) continue;
+                } else {
+                    CompSets(Count).OutletNodeName = OutletNode;
                 }
             }
             //  See if something undefined and set here

@@ -19,6 +19,8 @@ SET( SRC
   "${CMAKE_SOURCE_DIR}/third_party/milo/ieee754.h"
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
+  AirLoopHVACDOAS.cc
+  AirLoopHVACDOAS.hh
   AirTerminalUnit.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
