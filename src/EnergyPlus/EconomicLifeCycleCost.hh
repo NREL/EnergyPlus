@@ -267,7 +267,7 @@ namespace EconomicLifeCycleCost {
         Array1D<Real64> yrPresVal; // present value by year, first year is baseDateYear
 
         // Default Constructor
-        CashFlowType() : SourceKind(0), pvKind(0), Resource(0), Category(0), presentValue(0.), orginalCost(0.)
+        CashFlowType() : SourceKind(0), Resource(0), Category(0), pvKind(0), presentValue(0.), orginalCost(0.)
         {
         }
     };
