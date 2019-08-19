@@ -15,6 +15,7 @@ set( test_src
   AirflowNetworkSimulationControl.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
+  AirLoopHVACDOAS.unit.cc
   AirTerminalSingleDuct.unit.cc
   AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
@@ -72,6 +73,7 @@ set( test_src
   GeneralRoutines.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceAirManager.unit.cc
+  HeatBalanceKivaManager.unit.cc
   HeatBalanceManager.unit.cc
   HeatBalanceMovableInsulation.unit.cc
   HeatBalanceIntRadExchange.unit.cc
