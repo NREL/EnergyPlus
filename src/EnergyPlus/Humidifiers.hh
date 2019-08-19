@@ -190,6 +190,14 @@ namespace Humidifiers {
 
     void GetHumidifierInput();
 
+    int GetAirInletNodeNum(std::string const &HumidifierName,
+        bool &ErrorsFound
+    );
+
+    int GetAirOutletNodeNum(std::string const &HumidifierName,
+        bool &ErrorsFound
+    );
+
 } // namespace Humidifiers
 
 } // namespace EnergyPlus
