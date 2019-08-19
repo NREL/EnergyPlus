@@ -44,9 +44,9 @@ public:
 
   double get_vertex_weight(const std::vector<short> &v);
 
-  void normalize_grid_values_at_target(std::size_t table_num);
+  void normalize_grid_values_at_target(std::size_t table_num, const double scalar = 1.0);
 
-  void normalize_grid_values_at_target();
+  void normalize_grid_values_at_target(const double scalar = 1.0);
 
   void set_floor();
 

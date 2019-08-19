@@ -194,7 +194,7 @@ TEST_F(TwoDFixture, normalize) {
   test_rgi.set_new_target(target);
 
   // All values, current target
-  test_rgi.normalize_values_at_target(0); // normalize first value table
+  test_rgi.normalize_values_at_target((std::size_t)0); // normalize first value table
   std::vector<double> result = test_rgi.get_values_at_target();
   EXPECT_THAT(result, testing::ElementsAre(testing::DoubleEq(1.0), testing::DoubleEq(8.832)));
   Btwxt::LOG_LEVEL = 1;

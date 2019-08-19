@@ -6347,7 +6347,7 @@
     Constant,                !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.0,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -6362,8 +6362,8 @@
   Table:Lookup,
     HPACCOOLPLFFPLR_table,   !- Name
     HPACCOOLPLFFPLR_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Method
+    ,                        !- Normalization Divisor
     0.75,                    !- Minimum Output
     1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type

@@ -1911,14 +1911,14 @@ namespace CurveManager {
 
                         varListLimits[varListName].push_back({min_val,max_val});
 
-                        Real64 normalizationValue;
-                        if (indVarInstance.count("normalization_value")) {
-                            normalizationValue = indVarInstance.at("normalization_value");
+                        Real64 normalizationRefValue;
+                        if (indVarInstance.count("normalization_reference_value")) {
+                            normalizationRefValue = indVarInstance.at("normalization_reference_value");
                         } else {
-                            normalizationValue = std::numeric_limits<double>::quiet_NaN();
+                            normalizationRefValue = std::numeric_limits<double>::quiet_NaN();
                         }
 
-                        varListNormalizeTargets[varListName].push_back(normalizationValue);
+                        varListNormalizeTargets[varListName].push_back(normalizationRefValue);
 
                         // reset limits passed to Btwxt to avoid warnings related to different handling of limits
                         min_val = min(min_val, min_grid_value);
@@ -2010,19 +2010,22 @@ namespace CurveManager {
                 }
 
                 // Normalize data
-                Real64 normalizationFactor = 1.0;
-                bool normalize = false;
-                if (fields.count("normalize_output")) {
-                    if (UtilityRoutines::SameString(fields.at("normalize_output"), "YES")) {
-                        normalize = true;
+                Real64 normalizationDivisor = 1.0;
+                enum NormalizationMethod {NM_NONE, NM_DIVISOR_ONLY, NM_AUTO_WITH_DIVISOR};
+                NormalizationMethod normalizeMethod = NM_NONE;
+                if (fields.count("normalization_method")) {
+                    if (UtilityRoutines::SameString(fields.at("normalization_method"), "DIVISORONLY")) {
+                        normalizeMethod = NM_DIVISOR_ONLY;
+                    } else if (UtilityRoutines::SameString(fields.at("normalization_method"), "AUTOMATICWITHDIVISOR")) {
+                        normalizeMethod = NM_AUTO_WITH_DIVISOR;
                     }
                 }
 
-                if (normalize && fields.count("normalization_value")) {
-                    normalizationFactor = fields.at("normalization_value");
+                if (normalizeMethod != NM_NONE && fields.count("normalization_divisor")) {
+                    normalizationDivisor = fields.at("normalization_divisor");
                 }
 
-                PerfCurve(CurveNum).NormalizationValue = normalizationFactor;
+                PerfCurve(CurveNum).NormalizationValue = normalizationDivisor;  // TODO: Remove/Fix use in Hybrid Unitary
 
                 std::vector<double> lookupValues;
                 if (fields.count("external_file_name")) {
@@ -2051,7 +2054,7 @@ namespace CurveManager {
 
                 } else if (fields.count("values")) {
                     for (auto value : fields.at("values")) {
-                        lookupValues.push_back(value.at("output_value").get<Real64>() / normalizationFactor);
+                        lookupValues.push_back(value.at("output_value").get<Real64>() / normalizationDivisor);
                     }
                 } else {
                     ShowSevereError(contextString + ": No values defined.");
@@ -2060,7 +2063,7 @@ namespace CurveManager {
 
                 PerfCurve(CurveNum).GridValueIndex = btwxtManager.addOutputValues(gridIndex, lookupValues);
 
-                if (normalize) {
+                if (normalizeMethod == NM_AUTO_WITH_DIVISOR) {
                     auto const normalizeTarget = varListNormalizeTargets.at(indVarListName);
 
                     bool pointsSpecified = false;
@@ -2075,12 +2078,14 @@ namespace CurveManager {
                     if (pointsSpecified && pointsUnspecified) {
                         ShowSevereError(
                             contextString +
-                            ": Table is to be normalized, but not all independent variables define a normalization value. Make sure either:");
-                        ShowContinueError("  a) a normalization value is defined for each independent variable, or");
-                        ShowContinueError("  b) no normalization values are defined (to use the Table:Lookup normalization value).");
+                            ": Table is to be normalized using AutomaticWithDivisor, but not all independent variables define a normalization reference value. Make sure either:");
+                        ShowContinueError("  Make sure either:");
+                        ShowContinueError("    a) a normalization reference value is defined for each independent variable, or");
+                        ShowContinueError("    b) no normalization reference values are defined.");
                         ErrorsFound = true;
                     } else if (pointsSpecified) {
-                        btwxtManager.normalizeGridValues(gridIndex, PerfCurve(CurveNum).GridValueIndex, normalizeTarget);
+                        // normalizeGridValues normalizes to 1.0 at the reference values. We must redivide by passing in the 1.0/normalizationDivisor as the scalar here.
+                        btwxtManager.normalizeGridValues(gridIndex, PerfCurve(CurveNum).GridValueIndex, normalizeTarget, 1.0/normalizationDivisor);
                     }
 
               }
@@ -2119,8 +2124,8 @@ namespace CurveManager {
         return grids[gridIndex](target)[outputIndex];
     }
 
-    void BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target) {
-        grids[gridIndex].normalize_values_at_target(outputIndex, target);
+    void BtwxtManager::normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target, const double scalar) {
+        grids[gridIndex].normalize_values_at_target(outputIndex, target, scalar);
     }
 
     void BtwxtManager::clear() {

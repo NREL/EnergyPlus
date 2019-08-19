@@ -277,26 +277,26 @@ double GridPoint::get_vertex_weight(const std::vector<short> &v) {
   return weight;
 }
 
-void GridPoint::normalize_grid_values_at_target() {
+void GridPoint::normalize_grid_values_at_target(const double scalar) {
   if (!target_is_set) {
     showMessage(MsgLevel::MSG_WARN,
                 stringify("Cannot normalize grid values. No target has been set."));
     return;
   }
   for (std::size_t table_index = 0; table_index < grid_data->num_tables; ++table_index) {
-    grid_data->normalize_value_table(table_index,results[table_index]);
+    grid_data->normalize_value_table(table_index,results[table_index]*scalar);
   }
   hypercube_cache.clear();
   set_results();
 }
 
-void GridPoint::normalize_grid_values_at_target(std::size_t table_num) {
+void GridPoint::normalize_grid_values_at_target(std::size_t table_num, const double scalar) {
   if (!target_is_set) {
     showMessage(MsgLevel::MSG_WARN,
                 stringify("Cannot normalize grid values. No target has been set."));
     return;
   }
-  grid_data->normalize_value_table(table_num,results[table_num]);
+  grid_data->normalize_value_table(table_num,results[table_num]*scalar);
   hypercube_cache.clear();
   set_results();
 }

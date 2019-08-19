@@ -6253,7 +6253,7 @@
     Linear,                  !- Extrapolation Method
     -34.5,                   !- Minimum Value
     10.,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -6283,7 +6283,7 @@
     Linear,                  !- Extrapolation Method
     4.,                      !- Minimum Value
     12.,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -6304,7 +6304,7 @@
     Linear,                  !- Extrapolation Method
     0.65,                    !- Minimum Value
     0.95,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -6323,8 +6323,8 @@
   Table:Lookup,
     ColmacCoilInc,           !- Name
     ColmacCoilInc_IndependentVariableList,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
-    1.,                      !- Normalization Value
+    DivisorOnly,             !- Normalization Method
+    1.,                      !- Normalization Divisor
     0.35,                    !- Minimum Output
     1.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type

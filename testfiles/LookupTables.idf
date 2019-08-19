@@ -1829,7 +1829,7 @@
     Constant,                !- Extrapolation Method
     0.5,                     !- Minimum Value
     1.5,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -1846,7 +1846,7 @@
     HPACCoolCapFFF,          !- Name
     HPACCoolCapFFF_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0.8,                     !- Minimum Output
     1.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -1867,7 +1867,7 @@
     Constant,                !- Extrapolation Method
     0.5,                     !- Minimum Value
     1.5,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -1884,7 +1884,7 @@
     HPACCoolCapFFF2,         !- Name
     HPACCoolCapFFF2_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0.8,                     !- Minimum Output
     1.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -1905,7 +1905,7 @@
     Constant,                !- Extrapolation Method
     0.5,                     !- Minimum Value
     1.5,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -1921,7 +1921,7 @@
     HPACCoolCapFFF3,         !- Name
     HPACCoolCapFFF3_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0.8,                     !- Minimum Output
     1.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -1946,7 +1946,7 @@
     Linear,                  !- Extrapolation Method
     0.5,                     !- Minimum Value
     1.5,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -1964,7 +1964,7 @@
     HPACEIRFFF,              !- Name
     HPACEIRFFF_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -1984,7 +1984,7 @@
     Constant,                !- Extrapolation Method
     0.5,                     !- Minimum Value
     1.5,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2002,7 +2002,7 @@
     HPACEIRFFF2,             !- Name
     HPACEIRFFF2_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2022,7 +2022,7 @@
     Constant,                !- Extrapolation Method
     0.5,                     !- Minimum Value
     1.5,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2040,7 +2040,7 @@
     HPACEIRFFF3,             !- Name
     HPACEIRFFF3_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2067,7 +2067,7 @@
     Constant,                !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.0,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2083,7 +2083,7 @@
     HPACPLFFPLR,             !- Name
     HPACPLFFPLR_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0.85,                    !- Minimum Output
     1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2101,7 +2101,7 @@
     Constant,                !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.0,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2118,7 +2118,7 @@
     HPACPLFFPLR2,            !- Name
     HPACPLFFPLR2_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0.85,                    !- Minimum Output
     1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2137,7 +2137,7 @@
     Linear,                  !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.0,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2154,7 +2154,7 @@
     HPACPLFFPLR3,            !- Name
     HPACPLFFPLR3_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0.85,                    !- Minimum Output
     1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2181,7 +2181,7 @@
     Constant,                !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.0,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2200,7 +2200,7 @@
     HPACHeatEIRFFF,          !- Name
     HPACHeatEIRFFF_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2221,7 +2221,7 @@
     Constant,                !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.0,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2240,7 +2240,7 @@
     HPACHeatEIRFFF2,         !- Name
     HPACHeatEIRFFF2_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2261,7 +2261,7 @@
     Linear,                  !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.0,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2280,7 +2280,7 @@
     HPACHeatEIRFFF3,         !- Name
     HPACHeatEIRFFF3_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2308,7 +2308,7 @@
     Constant,                !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.0,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2324,7 +2324,7 @@
     HPACCOOLPLFFPLR,         !- Name
     HPACCOOLPLFFPLR_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0.75,                    !- Minimum Output
     1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2342,7 +2342,7 @@
     Linear,                  !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.0,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2358,7 +2358,7 @@
     HPACCOOLPLFFPLR2,        !- Name
     HPACCOOLPLFFPLR2_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0.75,                    !- Minimum Output
     1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2376,7 +2376,7 @@
     Constant,                !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.0,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2393,7 +2393,7 @@
     HPACCOOLPLFFPLR3,        !- Name
     HPACCOOLPLFFPLR3_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0.75,                    !- Minimum Output
     1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2424,7 +2424,7 @@
     Constant,                !- Extrapolation Method
     -20.0,                   !- Minimum Value
     20.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2444,7 +2444,7 @@
     HPACHeatCapFT,           !- Name
     HPACHeatCapFT_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2464,7 +2464,7 @@
     Linear,                  !- Extrapolation Method
     -20.0,                   !- Minimum Value
     20.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2484,7 +2484,7 @@
     HPACHeatCapFT2,          !- Name
     HPACHeatCapFT2_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2504,7 +2504,7 @@
     Constant,                !- Extrapolation Method
     -20.0,                   !- Minimum Value
     20.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2524,7 +2524,7 @@
     HPACHeatCapFT3,          !- Name
     HPACHeatCapFT3_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2554,7 +2554,7 @@
     Linear,                  !- Extrapolation Method
     0.5,                     !- Minimum Value
     1.5,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2572,7 +2572,7 @@
     HPACHeatCapFFF,          !- Name
     HPACHeatCapFFF_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2593,7 +2593,7 @@
     Constant,                !- Extrapolation Method
     0.5,                     !- Minimum Value
     1.5,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2611,7 +2611,7 @@
     HPACHeatCapFFF2,         !- Name
     HPACHeatCapFFF2_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2631,7 +2631,7 @@
     Constant,                !- Extrapolation Method
     0.5,                     !- Minimum Value
     1.5,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2649,7 +2649,7 @@
     HPACHeatCapFFF3,         !- Name
     HPACHeatCapFFF3_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2683,7 +2683,7 @@
     Constant,                !- Extrapolation Method
     -20.0,                   !- Minimum Value
     20.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2703,7 +2703,7 @@
     HPACHeatEIRFT,           !- Name
     HPACHeatEIRFT_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2727,7 +2727,7 @@
     Constant,                !- Extrapolation Method
     -20.0,                   !- Minimum Value
     20.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2746,7 +2746,7 @@
     HPACHeatEIRFT2,          !- Name
     HPACHeatEIRFT2_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2767,7 +2767,7 @@
     Linear,                  !- Extrapolation Method
     -20.0,                   !- Minimum Value
     20.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2786,7 +2786,7 @@
     HPACHeatEIRFT3,          !- Name
     HPACHeatEIRFT3_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2818,7 +2818,7 @@
     Constant,                !- Extrapolation Method
     0.5,                     !- Minimum Value
     1.5,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2848,7 +2848,7 @@
     FanEffRatioCurve,        !- Name
     FanEffRatioCurve_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0.3,                     !- Minimum Output
     1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2891,7 +2891,7 @@
     Linear,                  !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.5,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2913,7 +2913,7 @@
     FanPowerRatioCurve,      !- Name
     FanPowerRatioCurve_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2955,7 +2955,7 @@
     Constant,                !- Extrapolation Method
     12.77778,                !- Minimum Value
     23.88889,                !- Maximum Value
-    19.44449,                !- Normalization Value
+    19.44449,                !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2973,7 +2973,7 @@
     Constant,                !- Extrapolation Method
     18.0,                    !- Minimum Value
     46.11111,                !- Maximum Value
-    35.00000,                !- Normalization Value
+    35.00000,                !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2995,7 +2995,7 @@
     HPACCoolCapFT,           !- Name
     HPACCoolCapFT_IndependentVariableList,  !- Independent Variable List Name
     Yes,                     !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0,                       !- Minimum Output
     40000,                   !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -3052,7 +3052,7 @@
     Linear,                  !- Extrapolation Method
     12.77778,                !- Minimum Value
     23.88889,                !- Maximum Value
-    19.44449,                !- Normalization Value
+    19.44449,                !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -3070,7 +3070,7 @@
     Linear,                  !- Extrapolation Method
     18.0,                    !- Minimum Value
     46.11111,                !- Maximum Value
-    35.00000,                !- Normalization Value
+    35.00000,                !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -3092,7 +3092,7 @@
     HPACCoolCapFT2,          !- Name
     HPACCoolCapFT2_IndependentVariableList,  !- Independent Variable List Name
     Yes,                     !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0,                       !- Minimum Output
     40000,                   !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -3149,7 +3149,7 @@
     Linear,                  !- Extrapolation Method
     12.77778,                !- Minimum Value
     23.88889,                !- Maximum Value
-    19.44449,                !- Normalization Value
+    19.44449,                !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -3167,7 +3167,7 @@
     Linear,                  !- Extrapolation Method
     18.0,                    !- Minimum Value
     46.11111,                !- Maximum Value
-    35,                      !- Normalization Value
+    35,                      !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -3189,7 +3189,7 @@
     HPACCoolCapFT3,          !- Name
     HPACCoolCapFT3_IndependentVariableList,  !- Independent Variable List Name
     Yes,                     !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -3265,7 +3265,7 @@
     Constant,                !- Extrapolation Method
     12.77778,                !- Minimum Value
     23.88889,                !- Maximum Value
-    19.44449,                !- Normalization Value
+    19.44449,                !- Normalization Reference Value
     Temperature,             !- Unit Type
     LookupTable.csv,         !- External File Name
     1,                       !- External File Column Number
@@ -3277,7 +3277,7 @@
     Constant,                !- Extrapolation Method
     18.0,                    !- Minimum Value
     46.11111,                !- Maximum Value
-    35.00000,                !- Normalization Value
+    35.00000,                !- Normalization Reference Value
     Temperature,             !- Unit Type
     LookupTable.csv,         !- External File Name
     2,                       !- External File Column Number
@@ -3292,7 +3292,7 @@
     HPACEIRFT,               !- Name
     HPACEIRFT_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -3306,7 +3306,7 @@
     Linear,                  !- Extrapolation Method
     12.77778,                !- Minimum Value
     23.88889,                !- Maximum Value
-    19.44449,                !- Normalization Value
+    19.44449,                !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -3323,7 +3323,7 @@
     Linear,                  !- Extrapolation Method
     18.0,                    !- Minimum Value
     46.11111,                !- Maximum Value
-    35.00000,                !- Normalization Value
+    35.00000,                !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -3344,7 +3344,7 @@
     HPACEIRFT2,              !- Name
     HPACEIRFT2_IndependentVariableList,  !- Independent Variable List Name
     ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -3390,7 +3390,7 @@
     Constant,                !- Extrapolation Method
     12.77778,                !- Minimum Value
     23.88889,                !- Maximum Value
-    19.44449,                !- Normalization Value
+    19.44449,                !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -3407,7 +3407,7 @@
     Constant,                !- Extrapolation Method
     18.0,                    !- Minimum Value
     46.11111,                !- Maximum Value
-    35.00000,                !- Normalization Value
+    35.00000,                !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -3428,7 +3428,7 @@
     HPACEIRFT3,              !- Name
     HPACEIRFT3_IndependentVariableList,  !- Independent Variable List Name
     Yes,                     !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -3478,7 +3478,7 @@
     Linear,                  !- Extrapolation Method
     60,                      !- Minimum Value
     120,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -3495,7 +3495,7 @@
     Linear,                  !- Extrapolation Method
     0,                       !- Minimum Value
     1,                       !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -3513,7 +3513,7 @@
     Linear,                  !- Extrapolation Method
     0,                       !- Minimum Value
     1,                       !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -3534,7 +3534,7 @@
     Linear,                  !- Extrapolation Method
     60,                      !- Minimum Value
     120,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -3551,7 +3551,7 @@
     Linear,                  !- Extrapolation Method
     30,                      !- Minimum Value
     60,                      !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -3571,7 +3571,7 @@
     My5VariableLookupTable,  !- Name
     My5VariableLookupTable_IndependentVariableList,  !- Independent Variable List Name
     Yes,                     !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Divisor
     0,                       !- Minimum Output
     10,                      !- Maximum Output
     Dimensionless,           !- Output Unit Type

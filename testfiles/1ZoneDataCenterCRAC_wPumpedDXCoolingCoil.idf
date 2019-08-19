@@ -416,7 +416,7 @@
     Constant,                !- Extrapolation Method
     13.0,                    !- Minimum Value
     23.89,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -433,7 +433,7 @@
     Constant,                !- Extrapolation Method
     -10.0,                   !- Minimum Value
     46.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -455,8 +455,8 @@
   Table:Lookup,
     Cool Cap Mod func of Temperature,  !- Name
     Cool Cap Mod func of Temperature_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Method
+    ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -536,7 +536,7 @@
     Constant,                !- Extrapolation Method
     12.7,                    !- Minimum Value
     23.8,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -550,7 +550,7 @@
     Constant,                !- Extrapolation Method
     -50,                     !- Minimum Value
     50,                      !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -581,8 +581,8 @@
   Table:Lookup,
     Liebert Econophase EIR Func T,  !- Name
     Liebert Econophase EIR Func T_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Method
+    ,                        !- Normalization Divisor
     0.03,                    !- Minimum Output
     1.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type

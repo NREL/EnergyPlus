@@ -4203,7 +4203,7 @@
     Linear,                  !- Extrapolation Method
     -100,                    !- Minimum Value
     100,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -4226,7 +4226,7 @@
     Linear,                  !- Extrapolation Method
     0,                       !- Minimum Value
     1,                       !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -4261,8 +4261,8 @@
   Table:Lookup,
     ChargeOnly-Cap-fT,       !- Name
     ChargeOnly-Cap-fT_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Method
+    ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -4507,7 +4507,7 @@
     Linear,                  !- Extrapolation Method
     -100,                    !- Minimum Value
     100,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -4530,7 +4530,7 @@
     Linear,                  !- Extrapolation Method
     0,                       !- Minimum Value
     1,                       !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -4565,8 +4565,8 @@
   Table:Lookup,
     ChargeOnly-EIR-fT,       !- Name
     ChargeOnly-EIR-fT_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Method
+    ,                        !- Normalization Divisor
     ,                        !- Minimum Output
     ,                        !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -5074,7 +5074,7 @@
     Linear,                  !- Extrapolation Method
     -100.0,                  !- Minimum Value
     100.0,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -5088,7 +5088,7 @@
     Linear,                  !- Extrapolation Method
     -30.0,                   !- Minimum Value
     50.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -5111,7 +5111,7 @@
     Linear,                  !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.0,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -5147,8 +5147,8 @@
   Table:Lookup,
     CoolCharge-Charge-Cap-fT,!- Name
     CoolCharge-Charge-Cap-fT_IndependentVariableList,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
-    1.0,                     !- Normalization Value
+    DivisorOnly,             !- Normalization Method
+    1.0,                     !- Normalization Divisor
     0.5,                     !- Minimum Output
     1.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -5624,7 +5624,7 @@
     Linear,                  !- Extrapolation Method
     -100.0,                  !- Minimum Value
     100.0,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -5638,7 +5638,7 @@
     Linear,                  !- Extrapolation Method
     -30.0,                   !- Minimum Value
     50.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -5661,7 +5661,7 @@
     Linear,                  !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.0,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -5697,8 +5697,8 @@
   Table:Lookup,
     CoolCharge-Charge-EIR-fT,!- Name
     CoolCharge-Charge-EIR-fT_IndependentVariableList,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
-    1.0,                     !- Normalization Value
+    DivisorOnly,             !- Normalization Method
+    1.0,                     !- Normalization Divisor
     0.5,                     !- Minimum Output
     2.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -6648,7 +6648,7 @@
     Linear,                  !- Extrapolation Method
     16.67,                   !- Minimum Value
     22.22,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -6663,7 +6663,7 @@
     Linear,                  !- Extrapolation Method
     23.89,                   !- Minimum Value
     46.11,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -6678,7 +6678,7 @@
     Linear,                  !- Extrapolation Method
     -10.0,                   !- Minimum Value
     50.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -6696,8 +6696,8 @@
   Table:Lookup,
     TESCapTempModFac_CoolAndDischarge_SCU,  !- Name
     TESCapTempModFac_CoolAndDischarge_SCU_IndependentVariableList,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
-    1.,                      !- Normalization Value
+    DivisorOnly,             !- Normalization Method
+    1.,                      !- Normalization Divisor
     0.0,                     !- Minimum Output
     3.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -6763,7 +6763,7 @@
     Linear,                  !- Extrapolation Method
     16.67,                   !- Minimum Value
     22.22,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -6778,7 +6778,7 @@
     Linear,                  !- Extrapolation Method
     23.89,                   !- Minimum Value
     46.11,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -6793,7 +6793,7 @@
     Linear,                  !- Extrapolation Method
     -10.0,                   !- Minimum Value
     50.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -6811,8 +6811,8 @@
   Table:Lookup,
     EIRTempModFac_CoolandDischarge_SCU,  !- Name
     EIRTempModFac_CoolandDischarge_SCU_IndependentVariableList,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
-    1.,                      !- Normalization Value
+    DivisorOnly,             !- Normalization Method
+    1.,                      !- Normalization Divisor
     0.5,                     !- Minimum Output
     1.7,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -6853,7 +6853,7 @@
     Linear,                  !- Extrapolation Method
     16.67,                   !- Minimum Value
     22.22,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -6868,7 +6868,7 @@
     Linear,                  !- Extrapolation Method
     23.89,                   !- Minimum Value
     46.11,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -6883,7 +6883,7 @@
     Linear,                  !- Extrapolation Method
     -10.0,                   !- Minimum Value
     50.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -6901,8 +6901,8 @@
   Table:Lookup,
     EvapCapTempModFac_CoolandDischarge_SCU,  !- Name
     EvapCapTempModFac_CoolandDischarge_SCU_IndependentVariableList,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
-    1.,                      !- Normalization Value
+    DivisorOnly,             !- Normalization Method
+    1.,                      !- Normalization Divisor
     0.7,                     !- Minimum Output
     1.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -6955,7 +6955,7 @@
     Linear,                  !- Extrapolation Method
     16.67,                   !- Minimum Value
     22.22,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -6970,7 +6970,7 @@
     Linear,                  !- Extrapolation Method
     23.89,                   !- Minimum Value
     46.11,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -6985,7 +6985,7 @@
     Linear,                  !- Extrapolation Method
     -10.0,                   !- Minimum Value
     50.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -7003,8 +7003,8 @@
   Table:Lookup,
     EvapCapTempModFac_CoolAndCharge_SCU,  !- Name
     EvapCapTempModFac_CoolAndCharge_SCU_IndependentVariableList,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
-    1.,                      !- Normalization Value
+    DivisorOnly,             !- Normalization Method
+    1.,                      !- Normalization Divisor
     0.8,                     !- Minimum Output
     1.27,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -7057,7 +7057,7 @@
     Linear,                  !- Extrapolation Method
     16.67,                   !- Minimum Value
     22.22,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -7072,7 +7072,7 @@
     Linear,                  !- Extrapolation Method
     23.89,                   !- Minimum Value
     46.11,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -7087,7 +7087,7 @@
     Linear,                  !- Extrapolation Method
     -10.0,                   !- Minimum Value
     50.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -7105,8 +7105,8 @@
   Table:Lookup,
     EIRTempModFac_CoolAndCharge_SCU,  !- Name
     EIRTempModFac_CoolAndCharge_SCU_IndependentVariableList,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
-    1.,                      !- Normalization Value
+    DivisorOnly,             !- Normalization Method
+    1.,                      !- Normalization Divisor
     0.6,                     !- Minimum Output
     1.6,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -7172,7 +7172,7 @@
     Linear,                  !- Extrapolation Method
     16.67,                   !- Minimum Value
     22.22,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -7187,7 +7187,7 @@
     Linear,                  !- Extrapolation Method
     23.89,                   !- Minimum Value
     46.11,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -7202,7 +7202,7 @@
     Linear,                  !- Extrapolation Method
     -10.0,                   !- Minimum Value
     50.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -7220,8 +7220,8 @@
   Table:Lookup,
     TESCapTempModFac_CoolAndCharge_SCU,  !- Name
     TESCapTempModFac_CoolAndCharge_SCU_IndependentVariableList,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
-    1.,                      !- Normalization Value
+    DivisorOnly,             !- Normalization Method
+    1.,                      !- Normalization Divisor
     0.0,                     !- Minimum Output
     3.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -7375,7 +7375,7 @@
     Linear,                  !- Extrapolation Method
     16.67,                   !- Minimum Value
     22.22,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -7390,7 +7390,7 @@
     Linear,                  !- Extrapolation Method
     23.8889,                 !- Minimum Value
     29.4444,                 !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -7405,7 +7405,7 @@
     Linear,                  !- Extrapolation Method
     -10.0,                   !- Minimum Value
     50.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -7423,8 +7423,8 @@
   Table:Lookup,
     SHRTempModFac_coolAndCharge_SCU,  !- Name
     SHRTempModFac_coolAndCharge_SCU_IndependentVariableList,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
-    1.,                      !- Normalization Value
+    DivisorOnly,             !- Normalization Method
+    1.,                      !- Normalization Divisor
     0.0,                     !- Minimum Output
     3.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -7465,7 +7465,7 @@
     Linear,                  !- Extrapolation Method
     16.67,                   !- Minimum Value
     22.22,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -7480,7 +7480,7 @@
     Linear,                  !- Extrapolation Method
     23.8889,                 !- Minimum Value
     29.4444,                 !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -7495,7 +7495,7 @@
     Linear,                  !- Extrapolation Method
     -10.0,                   !- Minimum Value
     50.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Temperature,             !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -7513,8 +7513,8 @@
   Table:Lookup,
     SHRTempModFac_coolAndDischarge_SCU,  !- Name
     SHRTempModFac_coolAndDischarge_SCU_IndependentVariableList,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
-    1.,                      !- Normalization Value
+    DivisorOnly,             !- Normalization Method
+    1.,                      !- Normalization Divisor
     0.0,                     !- Minimum Output
     3.5,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type

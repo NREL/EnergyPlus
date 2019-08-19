@@ -1111,7 +1111,7 @@
     Linear,                  !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.875,                   !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -1140,8 +1140,8 @@
   Table:Lookup,
     IECEffWBFlowMod,         !- Name
     IECEffWBFlowMod_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Method
+    ,                        !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.15,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -1174,7 +1174,7 @@
     Linear,                  !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.1,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -1202,8 +1202,8 @@
   Table:Lookup,
     IECEffDBFlowMod,         !- Name
     IECEffDBFlowMod_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Method
+    ,                        !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -1234,7 +1234,7 @@
     Linear,                  !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.0,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -1256,8 +1256,8 @@
   Table:Lookup,
     IECFanPowerMod,          !- Name
     IECFanPowerMod_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Method
+    ,                        !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -1282,7 +1282,7 @@
     Linear,                  !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.0,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -1304,8 +1304,8 @@
   Table:Lookup,
     IECPumpPowerMod,         !- Name
     IECPumpPowerMod_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Method
+    ,                        !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type

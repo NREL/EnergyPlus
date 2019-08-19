@@ -79,13 +79,13 @@ public:
 
   void set_new_target(const std::vector<double> &target);
 
-  void normalize_values_at_target();
+  void normalize_values_at_target(const double scalar = 1.0);
 
-  void normalize_values_at_target(const std::vector<double> &target);
+  void normalize_values_at_target(const std::vector<double> &target, const double scalar = 1.0);
 
-  void normalize_values_at_target(std::size_t table_index);
+  void normalize_values_at_target(std::size_t table_index, const double scalar = 1.0);
 
-  void normalize_values_at_target(std::size_t table_index, const std::vector<double> &target);
+  void normalize_values_at_target(std::size_t table_index, const std::vector<double> &target, const double scalar = 1.0);
 
   std::vector<double> get_current_target();
 

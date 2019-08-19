@@ -413,7 +413,7 @@
     Constant,                !- Extrapolation Method
     0.0,                     !- Minimum Value
     90.0,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Angle,                   !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -427,7 +427,7 @@
     Constant,                !- Extrapolation Method
     0.30,                    !- Minimum Value
     2.50,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -534,8 +534,8 @@
   Table:Lookup,
     TransmittanceData,       !- Name
     Spectral and Angular Data,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
-    1.0,                     !- Normalization Value
+    DivisorOnly,             !- Normalization Method
+    1.0,                     !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -732,8 +732,8 @@
   Table:Lookup,
     FrontReflectanceData,    !- Name
     Spectral and Angular Data,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
-    1.0,                     !- Normalization Value
+    DivisorOnly,             !- Normalization Method
+    1.0,                     !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -930,8 +930,8 @@
   Table:Lookup,
     BackRefelectanceData,    !- Name
     Spectral and Angular Data,  !- Independent Variable List Name
-    Yes,                     !- Normalize Output
-    1.0,                     !- Normalization Value
+    DivisorOnly,             !- Normalization Method
+    1.0,                     !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type

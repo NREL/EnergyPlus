@@ -1267,7 +1267,7 @@
     Linear,                  !- Extrapolation Method
     -20,                     !- Minimum Value
     100,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -1282,7 +1282,7 @@
     Linear,                  !- Extrapolation Method
     0,                       !- Minimum Value
     0.03,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -1297,7 +1297,7 @@
     Linear,                  !- Extrapolation Method
     -20,                     !- Minimum Value
     100,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -1312,7 +1312,7 @@
     Linear,                  !- Extrapolation Method
     0,                       !- Minimum Value
     0.03,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -1327,7 +1327,7 @@
     Linear,                  !- Extrapolation Method
     0,                       !- Minimum Value
     1,                       !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -1342,7 +1342,7 @@
     Linear,                  !- Extrapolation Method
     0,                       !- Minimum Value
     1,                       !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -1364,7 +1364,7 @@
     Mode0_Power_lookup,      !- Name
     Mode0_IndependentVariableList,  !- Independent Variable List Name
     Yes,                     !- Normalize Output
-    3.0176,                  !- Normalization Value
+    3.0176,                  !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -2108,7 +2108,7 @@
     Linear,                  !- Extrapolation Method
     -20,                     !- Minimum Value
     100,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2123,7 +2123,7 @@
     Linear,                  !- Extrapolation Method
     0,                       !- Minimum Value
     0.03,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2140,7 +2140,7 @@
     Linear,                  !- Extrapolation Method
     -20,                     !- Minimum Value
     100,                     !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2155,7 +2155,7 @@
     Linear,                  !- Extrapolation Method
     0,                       !- Minimum Value
     0.03,                    !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2170,7 +2170,7 @@
     Linear,                  !- Extrapolation Method
     0,                       !- Minimum Value
     1,                       !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2185,7 +2185,7 @@
     Linear,                  !- Extrapolation Method
     0,                       !- Minimum Value
     1,                       !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     Dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -2207,7 +2207,7 @@
     Mode1_ESP_lookup,        !- Name
     Mode1_IndependentVariableList,  !- Independent Variable List Name
     Yes,                     !- Normalize Output
-    3.0176,                  !- Normalization Value
+    3.0176,                  !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -3434,7 +3434,7 @@
     Mode1_TSA_lookup,        !- Name
     Mode1_IndependentVariableList,  !- Independent Variable List Name
     Yes,                     !- Normalize Output
-    3.0176,                  !- Normalization Value
+    3.0176,                  !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type
@@ -4662,7 +4662,7 @@
     Mode1_wSA_lookup,        !- Name
     Mode1_IndependentVariableList,  !- Independent Variable List Name
     Yes,                     !- Normalize Output
-    3.0176,                  !- Normalization Value
+    3.0176,                  !- Normalization Divisor
     -9999,                   !- Minimum Output
     9999,                    !- Maximum Output
     Dimensionless,           !- Output Unit Type

@@ -45,22 +45,22 @@ std::vector<double> RegularGridInterpolator::get_values_at_target() {
   return grid_point.get_results();
 }
 
-void RegularGridInterpolator::normalize_values_at_target(std::size_t table_index, const std::vector<double> &target) {
+void RegularGridInterpolator::normalize_values_at_target(std::size_t table_index, const std::vector<double> &target, const double scalar) {
   set_new_target(target);
-  normalize_values_at_target(table_index);
+  normalize_values_at_target(table_index, scalar);
 }
 
-void RegularGridInterpolator::normalize_values_at_target(std::size_t table_index) {
-  grid_point.normalize_grid_values_at_target(table_index);
+void RegularGridInterpolator::normalize_values_at_target(std::size_t table_index, const double scalar) {
+  grid_point.normalize_grid_values_at_target(table_index, scalar);
 }
 
-void RegularGridInterpolator::normalize_values_at_target(const std::vector<double> &target) {
+void RegularGridInterpolator::normalize_values_at_target(const std::vector<double> &target, const double scalar) {
   set_new_target(target);
-  normalize_values_at_target();
+  normalize_values_at_target(scalar);
 }
 
-void RegularGridInterpolator::normalize_values_at_target() {
-  grid_point.normalize_grid_values_at_target();
+void RegularGridInterpolator::normalize_values_at_target(const double scalar) {
+  grid_point.normalize_grid_values_at_target(scalar);
 }
 
 void RegularGridInterpolator::set_new_target(const std::vector<double> &target) {

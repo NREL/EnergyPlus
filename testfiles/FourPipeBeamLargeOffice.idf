@@ -5087,7 +5087,7 @@
     Constant,                !- Extrapolation Method
     0.714,                   !- Minimum Value
     1.2857,                  !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -5103,8 +5103,8 @@
   Table:Lookup,
     CoolCapModFuncOfSAFlow,  !- Name
     CoolCapModFuncOfSAFlow_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Method
+    ,                        !- Normalization Divisor
     0.8234,                  !- Minimum Output
     1.1256,                  !- Maximum Output
     dimensionless,           !- Output Unit Type
@@ -5121,7 +5121,7 @@
     Constant,                !- Extrapolation Method
     0.0,                     !- Minimum Value
     1.333333,                !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -5142,8 +5142,8 @@
   Table:Lookup,
     CapModFuncOfWaterFlow,   !- Name
     CapModFuncOfWaterFlow_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Method
+    ,                        !- Normalization Divisor
     0.0,                     !- Minimum Output
     1.04,                    !- Maximum Output
     dimensionless,           !- Output Unit Type
@@ -5165,7 +5165,7 @@
     Constant,                !- Extrapolation Method
     0.714,                   !- Minimum Value
     1.2857,                  !- Maximum Value
-    ,                        !- Normalization Value
+    ,                        !- Normalization Reference Value
     dimensionless,           !- Unit Type
     ,                        !- External File Name
     ,                        !- External File Column Number
@@ -5181,8 +5181,8 @@
   Table:Lookup,
     HeatCapModFuncOfSAFlow,  !- Name
     HeatCapModFuncOfSAFlow_IndependentVariableList,  !- Independent Variable List Name
-    ,                        !- Normalize Output
-    ,                        !- Normalization Value
+    ,                        !- Normalization Method
+    ,                        !- Normalization Divisor
     0.8554,                  !- Minimum Output
     1.0778,                  !- Maximum Output
     dimensionless,           !- Output Unit Type

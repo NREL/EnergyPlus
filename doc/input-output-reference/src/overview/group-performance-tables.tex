@@ -21,42 +21,40 @@ Name}\label{field-independent-variable-list-name}
 The name of a Table:IndependentVariableList object that defines the
 independent variables that comprise the dimensions of the tabular data.
 
-\paragraph{Field: Normalize Output}\label{field-normalize-output}
+\paragraph{Field: Normalization Method}\label{field-normalization-method}
 
-Determines whether or not this output will be normalized, either through:
+Determines if and how this output will be normalized. Choices are:
 
 \begin{enumerate}
-  \item automatic normalization to 1.0 at the normalized reference conditions defined by each
-  independent variable in the associated independent variable list, or
-  \item use of the Normalization Value field, below.
+  \item \emph{No}: Do not normalize output.
+  \item \emph{DivisorOnly}: Normalize the output using only the value entered into the Normalization Divisor field, below.
+  \item \emph{AutomaticWithDivisor}: Normalize the output by dividing the output data by the value of the table at each of the independent variable normalization reference values in the associated independent variable list AND dividing by the value entered into the Normalization Divisor field, below.
 \end{enumerate}
 
-If both methods are defined, the automatic normalization will take precedence.
-
 Normalization applies to the Output Value fields as well as the Minimum
-and Maximum Output fields. Choices are: \emph{Yes} or \emph{No}.
+and Maximum Output fields.
 
-\paragraph{Field: Normalization Value}\label{field-normalization-value}
+\paragraph{Field: Normalization Divisor}\label{field-normalization-divisor}
 
-Defines a value by which output values are normalized if the Normalize Output
-field is set to \emph{Yes}. Default is 1.0.
+Defines a value by which output values are normalized if the Normalization Method
+field is set to \emph{DivisorOnly} or \emph{AutomaticWithDivisor}. Default is 1.0.
 
 \paragraph{Field: Minimum Output}\label{field-minimum-output}
 
-The minimum allowable value of the evaluated table after interpolation
+The (non-normalized) minimum allowable value of the evaluated table after interpolation
 and extrapolation. Values less than the minimum will be replaced by the
 minimum. If this field is left blank, no limit is imposed.
 
 \paragraph{Field: Maximum Output}\label{field-maximum-output}
 
-The maximum allowable value of the evaluated table after interpolation
+The (non-normalized) maximum allowable value of the evaluated table after interpolation
 and extrapolation. Values greater than the maximum will be replaced by
 the maximum. If this field is left blank, no limit is imposed.
 
 \paragraph{Field: Output Unit Type}\label{field-output-unit-type}
 
 This field is used to indicate the kind of units that may be associated
-with the output values. It is used by IDF Editor to display the
+with the output values. It is used by interfaces or input editors (e.g., IDF Editor) to display the
 appropriate SI and IP units for the Minimum Output and Maximum Output.
 If none of these options are appropriate, select \emph{Dimensionless}
 which will have no unit conversion. Options are:
@@ -229,8 +227,8 @@ for three independent variables (\texttt{iv1}, \texttt{iv2},
 Table:Lookup,
   HPACCoolCapFT,           !- Name
   HPACCoolCapFT_IndependentVariableList,  !- Independent Variable List Name
-  Yes,                     !- Normalize Output
-  ,                        !- Normalization Value
+  AutomaticWithDivisor,    !- Normalization Method
+  ,                        !- Normalization Divisor
   0,                       !- Minimum Output
   40000,                   !- Maximum Output
   Dimensionless,           !- Output Unit Type
@@ -431,22 +429,21 @@ extrapolation method is ``Unavailable'', the corresponding equipment
 will be disabled for all values greater than the highest independent
 variable value, regardless of the maximum value set here.
 
-\paragraph{Field: Normalization
-Value}\label{field-normalization-value}
+\paragraph{Field: Normalization Reference Value}\label{field-normalization--reference-value}
 
 The value of this independent variable where nominal or rated output is
 defined. This will be used to normalize the data so that the outputs of
 any Table:Lookup at this value (and the corresponding Normalization
-Values of the other independent variables described in the same
+Reference Values of the other independent variables described in the same
 Table:IndependentVariableList object) are equal to 1.0. If left blank, no
-normalization will be calculated. If this field is left blank all other
-Table:IndependentVariable objects within the same Table:IndependentVariableList
-must also be left blank.
+normalization will be calculated. If this field is left blank the Normalization
+Reference Value of all other Table:IndependentVariable objects within the same
+Table:IndependentVariableList must also be left blank.
 
 \paragraph{Field: Unit Type}\label{field-unit-type}
 
 This field is used to indicate the kind of units that may be associated
-with this independent variable. It is used by IDF Editor to display the
+with this independent variable. It is used by interfaces or input editors (e.g., IDF Editor) to display the
 appropriate SI and IP units for the Minimum Value and Maximum Value. The
 available options are shown below. If none of these options are
 appropriate, select \emph{Dimensionless} which will have no unit
@@ -615,7 +612,7 @@ Table:IndependentVariable,
   Constant,                !- Extrapolation Method
   12.77778,                !- Minimum Value
   23.88889,                !- Maximum Value
-  19.44449,                !- Normalization Value
+  19.44449,                !- Normalization Reference Value
   Temperature,             !- Unit Type
   ,                        !- External File Name
   ,                        !- External File Column Number

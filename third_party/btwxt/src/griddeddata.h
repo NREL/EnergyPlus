@@ -81,7 +81,7 @@ public:
 
   std::vector<Method> get_extrap_methods();
 
-  void normalize_value_table(std::size_t table_num, double scalar);
+  void normalize_value_table(std::size_t table_num, double scalar = 1.0);
 
   void set_axis_extrap_method(const std::size_t &dim, Method);
 

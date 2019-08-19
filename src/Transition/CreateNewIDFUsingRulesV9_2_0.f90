@@ -562,7 +562,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   POutArgs(3) = Blank
                   POutArgs(4) = Blank
                 ELSE
-                  POutArgs(3) = 'Yes'
+                  POutArgs(3) = 'DivisorOnly'
                   POutArgs(4) = InArgs(10)
                 END IF
                 POutArgs(5:6) = InArgs(6:7)
@@ -669,7 +669,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   POutArgs(3) = Blank
                   POutArgs(4) = Blank
                 ELSE
-                  POutArgs(3) = 'Yes'
+                  POutArgs(3) = 'DivisorOnly'
                   POutArgs(4) = InArgs(13)
                 END IF
                 POutArgs(5:6) = InArgs(8:9) ! Min/Max
@@ -768,7 +768,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   POutArgs(3) = Blank
                   POutArgs(4) = Blank
                 ELSE
-                  POutArgs(3) = 'Yes'
+                  POutArgs(3) = 'DivisorOnly'
                   POutArgs(4) = InArgs(9)  ! Normalization Value
                 END IF
                 POutArgs(5:6) = InArgs(22:23) ! Min/Max
