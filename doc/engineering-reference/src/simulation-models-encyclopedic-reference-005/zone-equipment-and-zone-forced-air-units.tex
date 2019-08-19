@@ -1504,7 +1504,7 @@ Dependent variables (yi) for the model include:
  \item y8 = external static pressure (Pa) = PESP
 \end{itemize}
 
-The relationship between the independent variables and each dependent variable must be specified as lookup tables using Table:Lookup objects. A table must be created for each relevant dependent variable in each operating mode. Every operating mode must have a table for supply air temperature and a table for supply air humidity ratio. If tables are omitted for other dependent variables the model will assume that they are not relevant for the associated operating mode. The model can accommodate up to 26 discrete operating modes, including a standby mode.
+The relationship between the independent variables and each dependent variable must be specified as lookup tables using \hyperref[table-lookup]{Table:Lookup} objects. A table must be created for each relevant dependent variable in each operating mode. Every operating mode must have a table for supply air temperature and a table for supply air humidity ratio. If tables are omitted for other dependent variables the model will assume that they are not relevant for the associated operating mode. The model can accommodate up to 26 discrete operating modes, including a standby mode.
 
 To permit scaling of performance data, all extensive dependent variables are normalized by the system maximum supply air mass flow rate.  To rescale performance data, extensive parameters are multiplied by a desired maximum supply air flow rate, which is specified as an input to each ZoneHVAC:HybridUnitaryHVAC object.
 
