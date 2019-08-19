@@ -1798,6 +1798,7 @@ namespace CurveManager {
             for (auto &instance : indVarInstances.items()) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
+                inputProcessor->markObjectAsUsed("Table:IndependentVariable", thisObjectName);
                 btwxtManager.independentVarRefs.emplace(UtilityRoutines::MakeUPPERCase(thisObjectName),fields);
             }
         }
@@ -1813,6 +1814,7 @@ namespace CurveManager {
 
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
+                inputProcessor->markObjectAsUsed("Table:IndependentVariableList", thisObjectName);
                 std::string varListName = UtilityRoutines::MakeUPPERCase(thisObjectName);
 
                 std::vector<Btwxt::GridAxis > gridAxes;
@@ -1945,6 +1947,7 @@ namespace CurveManager {
 
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
+                inputProcessor->markObjectAsUsed("Table:Lookup", thisObjectName);
                 ++CurveNum;
                 PerfCurve(CurveNum).Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
                 PerfCurve(CurveNum).ObjectType = "Table:Lookup";
