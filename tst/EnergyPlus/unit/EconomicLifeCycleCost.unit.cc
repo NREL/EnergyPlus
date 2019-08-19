@@ -540,7 +540,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
     NonrecurringCost(1).name = "MiscConstruction";
     NonrecurringCost(1).category = costCatConstruction;
     NonrecurringCost(1).cost = 123456.;
-    NonrecurringCost(1).startOfCosts == startServicePeriod;
+    NonrecurringCost(1).startOfCosts = startServicePeriod;
     NonrecurringCost(1).totalMonthsFromStart = 10;
 
     ExpressAsCashFlows();
