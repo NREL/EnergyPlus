@@ -1302,7 +1302,7 @@ namespace EconomicLifeCycleCost {
             resourceCostAnnual(iResource) = annualCost;
         }
         // allocate the escalated energy cost arrays
-        EscalatedEnergy.allocate(lengthStudyYears, numResourcesUsed);
+        EscalatedEnergy.allocate(lengthStudyYears, NumOfResourceTypes);
         EscalatedEnergy = 0.0;
         EscalatedTotEnergy.allocate(lengthStudyYears);
         EscalatedTotEnergy = 0.0;
@@ -1496,7 +1496,13 @@ namespace EconomicLifeCycleCost {
 
          for (int iCashFlow = 1; iCashFlow <= numCashFlow; ++iCashFlow) {
             if (CashFlow(iCashFlow).pvKind == pvkEnergy) {
-                curResource = CashFlow(iCashFlow).Resource - ResourceTypeInitialOffset;
+                // make sure this is not water
+                int curResource_iRT = CashFlow(iCashFlow).Resource;
+                if (CashFlow(iCashFlow).Resource == iRT_Water ||
+                    (CashFlow(iCashFlow).Resource >= iRT_OnSiteWater && CashFlow(iCashFlow).Resource <= iRT_Condensate)) {
+                    continue;
+                }
+                curResource = curResource_iRT - ResourceTypeInitialOffset;
                 if ((curResource >= 1) && (curResource < NumOfResourceTypes)) {
                     int found = 0;
                     for (nUsePriceEsc = 1; nUsePriceEsc <= numUsePriceEscalation; ++nUsePriceEsc) {
