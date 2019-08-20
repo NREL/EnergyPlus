@@ -979,6 +979,13 @@ namespace WeatherManager {
                 ErrorsFound = true;
                 ShowSevereError(RoutineName + "Requested Reverse Design Days (ReverseDD) but only 1 Design Day specified, program will terminate.");
             }
+
+            // Throw a Fatal now that we have said it'll terminalte
+            if (ErrorsFound) {
+                CloseWeatherFile(); // will only close if opened.
+                ShowFatalError(RoutineName + "Errors found in Weater Data Input. Program terminates.");
+            }
+
             CurrentOverallSimDay = 0;
             TotalOverallSimDays = 0;
             MaxNumberSimYears = 1;
@@ -1083,7 +1090,7 @@ namespace WeatherManager {
                                 for (int year = Environment(Envrn).StartYear; year <= Environment(Envrn).EndYear; year++) {
                                     if (isLeapYear(year)) {
                                         ShowSevereError(
-                                            "GetNextEnvironment: Weatherfile does not support leap years but runperiod includes a leap year (" +
+                                            RoutineName + "Weatherfile does not support leap years but runperiod includes a leap year (" +
                                             std::to_string(year) + ")");
                                         missingLeap = true;
                                     }
@@ -1098,7 +1105,7 @@ namespace WeatherManager {
                                     int runStartJulian = dataperiod.DataStJDay;
                                     int runEndJulian = dataperiod.DataEnJDay;
                                     if (!dataperiod.HasYearData) {
-                                        ShowSevereError("GetNextEnvironment: Actual weather runperiod has been entered but weatherfile DATA PERIOD "
+                                        ShowSevereError(RoutineName + "Actual weather runperiod has been entered but weatherfile DATA PERIOD "
                                                         "does not have year included in start/end date.");
                                         ShowContinueError("...to match the RunPeriod, the DATA PERIOD should be mm/dd/yyyy for both, or");
                                         ShowContinueError("...set \"Treat Weather as Actual\" to \"No\".");
@@ -2489,7 +2496,8 @@ namespace WeatherManager {
 
         UpdateScheduleValues();
 
-        std::sprintf(time_stamp, "%02d/%02d %02d:", Month, DayOfMonth, HourOfDay - 1);
+        std::sprintf(time_stamp, "%02d/%02d %02hu", Month, DayOfMonth, (unsigned short)(HourOfDay - 1));
+
         CurMnDyHr = time_stamp;
         std::sprintf(day_stamp, "%02d/%02d", Month, DayOfMonth);
         CurMnDy = day_stamp;

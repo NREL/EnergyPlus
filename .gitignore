@@ -48,6 +48,7 @@ cmake-build-*
 .idea
 .se
 .vs
+.vscode
 
 # vim temp file:
 *.swp
