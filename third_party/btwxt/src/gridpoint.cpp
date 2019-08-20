@@ -102,16 +102,16 @@ void GridPoint::set_dim_floor(std::size_t dim) {
     point_floor[dim] = 0u;
   } else if (target[dim] > axis.extrapolation_limits.second) {
     is_inbounds[dim] = Bounds::OUTLAW;
-    point_floor[dim] = l - 2; // l-2 because that's the left side of the (l-2, l-1) edge.
+    point_floor[dim] = std::max((int)l - 2, 0); // l-2 because that's the left side of the (l-2, l-1) edge.
   } else if (target[dim] < axis.grid[0]) {
     is_inbounds[dim] = Bounds::OUTBOUNDS;
     point_floor[dim] = 0;
   } else if (target[dim] > axis.grid.back()) {
     is_inbounds[dim] = Bounds::OUTBOUNDS;
-    point_floor[dim] = l - 2; // l-2 because that's the left side of the (l-2, l-1) edge.
+    point_floor[dim] = std::max((int)l - 2, 0); // l-2 because that's the left side of the (l-2, l-1) edge.
   } else if (target[dim] == axis.grid.back()) {
     is_inbounds[dim] = Bounds::INBOUNDS;
-    point_floor[dim] = l - 2; // l-2 because that's the left side of the (l-2, l-1) edge.
+    point_floor[dim] = std::max((int)l - 2, 0); // l-2 because that's the left side of the (l-2, l-1) edge.
   } else {
     is_inbounds[dim] = Bounds::INBOUNDS;
     std::vector<double>::const_iterator upper =
@@ -122,9 +122,13 @@ void GridPoint::set_dim_floor(std::size_t dim) {
 
 void GridPoint::calculate_weights() {
   for (std::size_t dim = 0; dim < ndims; ++dim) {
-    double edge[] = {grid_data->grid_axes[dim].grid[point_floor[dim]],
-                     grid_data->grid_axes[dim].grid[point_floor[dim] + 1]};
-    weights[dim] = compute_fraction(target[dim], edge);
+    if (grid_data->grid_axes[dim].grid.size() > 1) {
+      double edge[] = {grid_data->grid_axes[dim].grid[point_floor[dim]],
+                       grid_data->grid_axes[dim].grid[point_floor[dim] + 1]};
+      weights[dim] = compute_fraction(target[dim], edge);
+    } else {
+      weights[dim] = 1.0;
+    }
   }
 }
 
