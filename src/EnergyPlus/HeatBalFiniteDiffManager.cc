@@ -120,7 +120,6 @@ namespace HeatBalFiniteDiffManager {
     using DataHeatBalance::RegularMaterial;
     using DataHeatBalance::TotConstructs;
     using DataHeatBalance::TotMaterials;
-    using DataHeatBalance::UseCondFD;
     using DataHeatBalance::Zone;
     using DataHeatBalFanSys::MAT;
     using DataHeatBalFanSys::QCoolingPanelSurf;
@@ -767,7 +766,7 @@ namespace HeatBalFiniteDiffManager {
 
                     Alpha = kt / (Material(CurrentLayer).Density * Material(CurrentLayer).SpecHeat);
                     mAlpha = 0.0;
-                } else if (Construct(ConstrNum).TypeIsIRT) { // make similar to air? (that didn't seem to work well)
+                } else if (Construct(ConstrNum).TypeIsIRT || Construct(ConstrNum).TypeIsAirBoundaryIRTSurface) { // make similar to air? (that didn't seem to work well)
                     ShowSevereError("InitHeatBalFiniteDiff: Construction =\"" + Construct(ConstrNum).Name +
                                     "\" uses Material:InfraredTransparent. Cannot be used currently with finite difference calculations.");
                     if (Construct(ConstrNum).IsUsed) {
@@ -1214,7 +1213,6 @@ namespace HeatBalFiniteDiffManager {
 
         // Using/Aliasing
         using DataHeatBalance::CondFDRelaxFactorInput;
-        using DataHeatBalance::HeatTransferAlgosUsed;
         using DataHeatBalance::MaxAllowedDelTempCondFD;
         using General::RoundSigDigits;
         using General::ScanForReports;
@@ -1251,13 +1249,14 @@ namespace HeatBalFiniteDiffManager {
             ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Material CondFD Summary>,Material Name,Thickness {m},#Layer Elements,Layer Delta X,Layer "
                                                  "Alpha*Delt/Delx**2,Layer Moisture Stability";
             // HT Algo issue
-            if (any_eq(HeatTransferAlgosUsed, UseCondFD))
+            if (DataHeatBalance::AnyCondFD)
                 ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <ConductionFiniteDifference Node>,Node Identifier, Node Distance From Outside Face {m}, "
                                                      "Construction Name, Outward Material Name (or Face), Inward Material Name (or Face)";
             for (ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum) {
 
                 if (Construct(ThisNum).TypeIsWindow) continue;
                 if (Construct(ThisNum).TypeIsIRT) continue;
+                if (Construct(ThisNum).TypeIsAirBoundaryIRTSurface) continue;
 
                 ObjexxFCL::gio::write(OutputFileInits, Format_700)
                     << Construct(ThisNum).Name << RoundSigDigits(ThisNum) << RoundSigDigits(Construct(ThisNum).TotLayers)

@@ -64,7 +64,7 @@ namespace EnergyPlus {
 
 namespace HVACFan {
 
-    int getFanObjectVectorIndex(std::string const &objectName);
+    int getFanObjectVectorIndex(std::string const &objectName, bool const CheckFlag = true);
 
     bool checkIfFanNameIsAFanSystem(std::string const &objectName);
 
@@ -132,6 +132,8 @@ namespace HVACFan {
         Real64 deltaPress;                      // Delta Pressure Across the Fan [N/m2]
         Real64 designElecPower;                 // design electric power consumption [W]
         int powerModFuncFlowFractionCurveIndex; // pointer to performance curve or table
+        int AirLoopNum;                         // AirLoop number
+        bool AirPathFlag;                       // Yes, this fan is a part of airpath
 
         // Mass Flow Rate Control Variables
         bool fanIsSecondaryDriver; // true if this fan is used to augment flow and may pass air when off.

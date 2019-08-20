@@ -259,6 +259,8 @@ namespace DataGlobals {
     bool ShowDecayCurvesInEIO(false);    // true if the Radiant to Convective Decay Curves should appear in the EIO file
     bool AnySlabsInModel(false);         // true if there are any zone-coupled ground domains in the input file
     bool AnyBasementsInModel(false);     // true if there are any basements in the input file
+    // Performance tradeoff globals
+    bool DoCoilDirectSolutions(false);       //true if use coil direction solutions
 
     int Progress(0); // current progress (0-100)
     void (*fProgressPtr)(int const);
@@ -356,6 +358,7 @@ namespace DataGlobals {
         ShowDecayCurvesInEIO = false;
         AnySlabsInModel = false;
         AnyBasementsInModel = false;
+        DoCoilDirectSolutions = false;
         Progress = 0;
         eso_stream = nullptr;
         mtr_stream = nullptr;

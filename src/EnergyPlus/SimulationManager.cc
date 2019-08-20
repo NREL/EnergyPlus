@@ -1150,6 +1150,22 @@ namespace SimulationManager {
             DoWeathSim = true;
         }
 
+
+        auto const instances = inputProcessor->epJSON.find("PerformancePrecisionTradeoffs");
+        if (instances != inputProcessor->epJSON.end()) {
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed("PerformancePrecisionTradeoffs", thisObjectName);
+                if (fields.find("use_coil_direct_solutions") != fields.end()) {
+                    if (UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES") {
+                        DoCoilDirectSolutions = true;
+                    }
+                }
+            }
+        }
+
         if (ErrorsFound) {
             ShowFatalError("Errors found getting Project Input");
         }
@@ -1679,8 +1695,6 @@ namespace SimulationManager {
         using DataBranchNodeConnections::NumOfNodeConnections;
         using DataHeatBalance::CondFDRelaxFactor;
         using DataHeatBalance::CondFDRelaxFactorInput;
-        using DataHeatBalance::HeatTransferAlgosUsed;
-        using DataHeatBalance::UseCondFD;
         using General::RoundSigDigits;
         using namespace DataSystemVariables; // , ONLY: MaxNumberOfThreads,NumberIntRadThreads,iEnvSetThreads
         using DataSurfaces::MaxVerticesPerSurface;
@@ -1780,7 +1794,7 @@ namespace SimulationManager {
         }
         eso_stream = nullptr;
 
-        if (any_eq(HeatTransferAlgosUsed, UseCondFD)) { // echo out relaxation factor, it may have been changed by the program
+        if (DataHeatBalance::AnyCondFD) { // echo out relaxation factor, it may have been changed by the program
             ObjexxFCL::gio::write(OutputFileInits, fmtA)
                 << "! <ConductionFiniteDifference Numerical Parameters>, Starting Relaxation Factor, Final Relaxation Factor";
             ObjexxFCL::gio::write(OutputFileInits, fmtA) << "ConductionFiniteDifference Numerical Parameters, " + RoundSigDigits(CondFDRelaxFactorInput, 3) +

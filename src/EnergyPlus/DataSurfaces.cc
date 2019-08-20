@@ -180,7 +180,7 @@ namespace DataSurfaces {
 
     // Parameters to indicate heat transfer model to use for surface
     int const HeatTransferModel_NotSet(-1);
-    int const HeatTransferModel_None(0); // shading surfaces for example
+    int const HeatTransferModel_None(0); // shading surfaces for example and non-heat transfer air boundaries
     int const HeatTransferModel_CTF(1);
     int const HeatTransferModel_EMPD(2);
     int const HeatTransferModel_CondFD(5);
@@ -189,6 +189,8 @@ namespace DataSurfaces {
     int const HeatTransferModel_ComplexFenestration(8); // BSDF
     int const HeatTransferModel_TDD(9);                 // tubular daylighting device
     int const HeatTransferModel_Kiva(10);               // Kiva ground calculations
+    int const HeatTransferModel_AirBoundaryNoHT(11);    // Construction:AirBoundary - not IRT or interior window
+    int const HeatTransferModel_AirBoundaryIntWin(12);  // Construction:AirBoundary - interior window for solar/daylighting
 
     // Parameters for classification of outside face of surfaces
     int const OutConvClass_WindwardVertWall(101);
@@ -497,6 +499,14 @@ namespace DataSurfaces {
     Array1D<Real64> WinShadingAbsorbedSolarEnergy; // Energy of WinShadingAbsorbedSolar [J]
     Array1D<Real64> WinGapConvHtFlowRepEnergy;     // Energy of WinGapConvHtFlowRep [J]
     Array1D<Real64> WinHeatTransferRepEnergy;      // Energy of WinHeatTransfer [J]
+
+    std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
+    std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
+    std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
+    std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
+
+    bool AnyHeatBalanceInsideSourceTerm(false);  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
+    bool AnyHeatBalanceOutsideSourceTerm(false); // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
@@ -846,7 +856,7 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave incident to the surface
 
-        return QRadSWOutIncident(t_SurfNum) + QS(Surface(t_SurfNum).Zone);
+        return QRadSWOutIncident(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
     Real64 SurfaceData::getSWBeamIncident(const int t_SurfNum)
@@ -874,7 +884,7 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave diffuse incident to the surface
 
-        return QRadSWOutIncidentSkyDiffuse(t_SurfNum) + QRadSWOutIncidentGndDiffuse(t_SurfNum) + QS(Surface(t_SurfNum).Zone);
+        return QRadSWOutIncidentSkyDiffuse(t_SurfNum) + QRadSWOutIncidentGndDiffuse(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
     int SurfaceData::getTotLayers() const
@@ -1148,6 +1158,12 @@ namespace DataSurfaces {
         WinShadingAbsorbedSolarEnergy.deallocate();
         WinGapConvHtFlowRepEnergy.deallocate();
         WinHeatTransferRepEnergy.deallocate();
+        AllHTSurfaceList.clear();
+        AllIZSurfaceList.clear();
+        AllHTNonWindowSurfaceList.clear();
+        AllHTWindowSurfaceList.clear();
+        AnyHeatBalanceInsideSourceTerm = false;
+        AnyHeatBalanceOutsideSourceTerm = false;
         Surface.deallocate();
         SurfaceWindow.deallocate();
         FrameDivider.deallocate();

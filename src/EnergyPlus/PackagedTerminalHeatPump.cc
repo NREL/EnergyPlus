@@ -4446,7 +4446,7 @@ namespace PackagedTerminalHeatPump {
                         }
                     }
                 } else if (NoCompOutput < QZnReq) {
-                    //       If the net cooling capacity meets the zone cooling load but does not overshoot heating set piont, turn off coil
+                    //       If the net cooling capacity meets the zone cooling load but does not overshoot heating set point, turn off coil
                     QZnReq = 0.0;
                     CoolingLoad = false;
                     PartLoadFrac = 0.0;
