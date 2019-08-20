@@ -133,6 +133,7 @@ include(cmake/CompilerFlags.cmake)
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party )
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/btwxt/src )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/re2 )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/doj )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/nlohmann )
@@ -161,14 +162,16 @@ set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 if( BUILD_TESTING )
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
   set(BUILD_GTEST ON CACHE BOOL "" FORCE)
-  set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+  set(BUILD_GMOCK ON CACHE BOOL "" FORCE)
   option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
   enable_testing()
   include(CTest)
+  ADD_SUBDIRECTORY(third_party/gtest)
 endif()
 
 # E+ required libraries
 ADD_SUBDIRECTORY(idd)
+
 ADD_SUBDIRECTORY(third_party/SQLite)
 ADD_SUBDIRECTORY(third_party/ObjexxFCL)
 ADD_SUBDIRECTORY(third_party/BCVTB)
@@ -177,14 +180,17 @@ ADD_SUBDIRECTORY(third_party/FMI)
 ADD_SUBDIRECTORY(third_party/zlib)
 ADD_SUBDIRECTORY(third_party/DElight)
 ADD_SUBDIRECTORY(third_party/re2)
+
 ADD_SUBDIRECTORY(scripts/dev/generate_embeddable_epJSON_schema)
 IF( NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
 ENDIF()
 ADD_SUBDIRECTORY(third_party/Windows-CalcEngine)
-if( BUILD_TESTING )
-  ADD_SUBDIRECTORY(third_party/gtest)
-endif()
+
+# Btwxt
+INCLUDE_DIRECTORIES( ${gtest_SOURCE_DIR}/include/ SYSTEM )
+set(BUILD_BTWXT_TESTING ${BUILD_TESTING} CACHE BOOL "" FORCE)
+ADD_SUBDIRECTORY(third_party/btwxt)
 
 # Kiva
 INCLUDE(third_party/cmake/kiva.cmake)
