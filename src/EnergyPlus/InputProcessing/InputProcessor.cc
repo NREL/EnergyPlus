@@ -241,7 +241,7 @@ void InputProcessor::markObjectAsUsed(const std::string &objectType, const std::
 void cleanEPJSON(json &epjson)
 {
     if (epjson.type() == json::value_t::object) {
- 
+
         epjson.erase("idf_order");
         epjson.erase("idf_max_fields");
         epjson.erase("idf_max_extensible_fields");
@@ -250,7 +250,7 @@ void cleanEPJSON(json &epjson)
             cleanEPJSON(epjson[it.key()]);
         }
     }
-    
+
 }
 
 void InputProcessor::processInput()
