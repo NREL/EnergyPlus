@@ -325,7 +325,6 @@ namespace OutputReportTabular {
     extern int DesignDayCount;
 
     // arrays related to pulse and load component reporting
-    extern Array2D<Real64> radiantPulseUsed;
     extern Array2D_int radiantPulseTimestep;
     extern Array2D<Real64> radiantPulseReceived;
     extern Array3D<Real64> loadConvectedNormal;
