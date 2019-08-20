@@ -1603,7 +1603,7 @@ namespace WindowAC {
             return;
         }
 
-        // If the QZnReq <= FullOutput and a HXAssisted coil is used, check the node setpoint for a maximum humidity ratio set piont
+        // If the QZnReq <= FullOutput and a HXAssisted coil is used, check the node setpoint for a maximum humidity ratio set point
         // HumRatMax will be equal to -999 if no setpoint exists or some set point managers may still use 0 as a no moisture load indicator
         if (QZnReq <= FullOutput && WindAC(WindACNum).DXCoilType_Num == CoilDX_CoolingHXAssisted &&
             Node(WindAC(WindACNum).CoilOutletNodeNum).HumRatMax <= 0.0) {

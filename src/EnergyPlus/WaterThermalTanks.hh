@@ -110,6 +110,7 @@ namespace WaterThermalTanks {
     extern int const COIL_DX_MULTIMODE;               // reclaim heating source is DX multimode coil
     extern int const CONDENSER_REFRIGERATION;         // reclaim heating source is detailed refrigeration system condenser
     extern int const COIL_DX_VARIABLE_COOLING;        // reclaim heating source is Variable Speed DX cooling coil
+    extern int const COIL_AIR_WATER_HEATPUMP_EQ;      // reclaim heating source is Water to air heat pump cooling coil
 
     extern int const UseSide;    // Indicates Use side of water heater
     extern int const SourceSide; // Indicates Source side of water heater
@@ -791,7 +792,7 @@ namespace WaterThermalTanks {
                                 Array1<Real64> const &Par //
     );
 
-    Real64 PLRResidualMixedTank(Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 PLRResidualWaterThermalTank(Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                 Array1<Real64> const &Par     // par(1) = HP set point temperature [C]
     );
 

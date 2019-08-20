@@ -108,7 +108,7 @@ namespace ResultsFramework {
         Variable() = default;
         Variable(const std::string &VarName,
                  const OutputProcessor::ReportingFrequency reportFrequency,
-                 const int IndexType,
+                 const OutputProcessor::TimeStepType timeStepType,
                  const int ReportID,
                  const OutputProcessor::Unit &units);
 
@@ -119,8 +119,8 @@ namespace ResultsFramework {
         OutputProcessor::ReportingFrequency iReportFrequency();
         void setReportFrequency(const OutputProcessor::ReportingFrequency reportFrequency);
 
-        int indexType() const;
-        void setIndexType(const int IndexType);
+        OutputProcessor::TimeStepType timeStepType() const;
+        void setTimeStepType(const OutputProcessor::TimeStepType timeStepType);
 
         int reportID() const;
         void setReportID(const int Id);
@@ -137,10 +137,10 @@ namespace ResultsFramework {
     protected:
         std::string varName;
         std::string sReportFreq;
-        OutputProcessor::Unit Units;
         OutputProcessor::ReportingFrequency iReportFreq = OutputProcessor::ReportingFrequency::EachCall;
-        int idxType = -1;
+        OutputProcessor::TimeStepType m_timeStepType = OutputProcessor::TimeStepType::TimeStepZone;
         int rptID = -1;
+        OutputProcessor::Unit Units;
         std::vector<double> Values;
     };
 
@@ -149,7 +149,7 @@ namespace ResultsFramework {
     public:
         OutputVariable(const std::string &VarName,
                        const OutputProcessor::ReportingFrequency reportFrequency,
-                       const int IndexType,
+                       const OutputProcessor::TimeStepType timeStepType,
                        const int ReportID,
                        const OutputProcessor::Unit &units);
     };
@@ -290,11 +290,11 @@ namespace ResultsFramework {
         void initializeRTSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
                                     const Array1D<OutputProcessor::RealVariableType> &RVariableTypes,
                                     const int NumOfRVariable,
-                                    const int IndexType = OutputProcessor::ZoneVar);
+                                    const OutputProcessor::TimeStepType timeStepType = OutputProcessor::TimeStepType::TimeStepZone);
         void initializeITSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
                                     const Array1D<OutputProcessor::IntegerVariableType> &IVariableTypes,
                                     const int NumOfIVariable,
-                                    const int IndexType = OutputProcessor::ZoneVar);
+                                    const OutputProcessor::TimeStepType timeStepType = OutputProcessor::TimeStepType::TimeStepZone);
         void initializeMeters(const Array1D<OutputProcessor::MeterType> &EnergyMeters, const OutputProcessor::ReportingFrequency reportFrequency);
 
         DataFrame RIDetailedZoneTSData = DataFrame("Detailed-Zone");

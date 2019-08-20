@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/SQLiteFixture.hh"
+#include "OutputProcessor.hh"
 
 namespace EnergyPlus {
 
@@ -232,12 +233,12 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord)
     EnergyPlus::sqlite->sqliteCommit();
 
     ASSERT_EQ(5ul, result.size());
-    std::vector<std::string> testResult0{"1",      "0", "Avg", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature",
+    std::vector<std::string> testResult0{"1",      "0", "Avg", "Zone", "Zone", "Environment", "Site Outdoor Air Drybulb Temperature",
                                          "Hourly", "",  "C"};
-    std::vector<std::string> testResult1{"2", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Facility:Electricity", "Hourly", "", "J"};
-    std::vector<std::string> testResult2{"3", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Facility:Electricity", "Monthly", "", "J"};
-    std::vector<std::string> testResult3{"4", "0", "Avg", "HVAC", "Zone", "", "AHU-1", "Hourly", "", ""};
-    std::vector<std::string> testResult4{"5", "0", "Avg", "HVAC", "Zone", "", "AHU-1", "Hourly", "test schedule", ""};
+    std::vector<std::string> testResult1{"2", "1", "Sum", "Facility:Electricity", "Zone", "", "Facility:Electricity", "Hourly", "", "J"};
+    std::vector<std::string> testResult2{"3", "1", "Sum", "Facility:Electricity", "Zone", "", "Facility:Electricity", "Monthly", "", "J"};
+    std::vector<std::string> testResult3{"4", "0", "Avg", "HVAC", "HVAC System", "", "AHU-1", "Hourly", "", ""};
+    std::vector<std::string> testResult4{"5", "0", "Avg", "HVAC", "HVAC System", "", "AHU-1", "Hourly", "test schedule", ""};
     EXPECT_EQ(testResult0, result[0]);
     EXPECT_EQ(testResult1, result[1]);
     EXPECT_EQ(testResult2, result[2]);
@@ -253,11 +254,11 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord)
     EnergyPlus::sqlite->sqliteCommit();
 
     ASSERT_EQ(9ul, result.size());
-    std::vector<std::string> testResult5{"6",      "0", "Unknown!!!", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature",
+    std::vector<std::string> testResult5{"6",      "0", "Unknown!!!", "Zone", "Zone", "Environment", "Site Outdoor Air Drybulb Temperature",
                                          "Hourly", "",  "C"};
     std::vector<std::string> testResult6{"7", "1", "Sum", "Facility:Electricity", "Unknown!!!", "", "Facility:Electricity", "Hourly", "", "J"};
-    std::vector<std::string> testResult7{"8", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Facility:Electricity", "Unknown!!!", "", "J"};
-    std::vector<std::string> testResult8{"9", "0", "Avg", "HVAC", "Zone", "", "AHU-1", "Unknown!!!", "", ""};
+    std::vector<std::string> testResult7{"8", "1", "Sum", "Facility:Electricity", "Zone", "", "Facility:Electricity", "Unknown!!!", "", "J"};
+    std::vector<std::string> testResult8{"9", "0", "Avg", "HVAC", "HVAC System", "", "AHU-1", "Unknown!!!", "", ""};
     EXPECT_EQ(testResult5, result[5]);
     EXPECT_EQ(testResult6, result[6]);
     EXPECT_EQ(testResult7, result[7]);
@@ -433,10 +434,13 @@ TEST_F(SQLiteFixture, SQLiteProcedures_privateMethods)
     EXPECT_EQ("Unknown!!!", storageType(-1));
 
     // test timestepTypeName
-    EXPECT_EQ("HVAC System", timestepTypeName(1));
-    EXPECT_EQ("Zone", timestepTypeName(2));
+    EXPECT_EQ("Zone", timestepTypeName(1));
+    EXPECT_EQ("HVAC System", timestepTypeName(2));
     EXPECT_EQ("Unknown!!!", timestepTypeName(3));
     EXPECT_EQ("Unknown!!!", timestepTypeName(-1));
+    // Let's ensure we never get an unexpected change of mapping between enum and the corresponding int value
+    EXPECT_EQ(1, static_cast<int>(OutputProcessor::TimeStepType::TimeStepZone));
+    EXPECT_EQ(2, static_cast<int>(OutputProcessor::TimeStepType::TimeStepSystem));
 
     // test reportingFreqName
     EXPECT_EQ("HVAC System Timestep", reportingFreqName(-1));

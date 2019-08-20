@@ -1201,6 +1201,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     FinalSysSizing(CurSysNum).HeatSupTemp = 16.7;
     UnitarySysEqSizing(CurSysNum).CoolingCapacity = false;
     UnitarySysEqSizing(CurSysNum).HeatingCapacity = false;
+    DataHVACGlobals::NumPrimaryAirSys = 1;
     SizeWaterCoil(1);
     EXPECT_NEAR(WaterCoil(1).MaxWaterMassFlowRate, .258323, 0.00001);
     EXPECT_NEAR(WaterCoil(1).UACoil, 239.835, 0.01);
