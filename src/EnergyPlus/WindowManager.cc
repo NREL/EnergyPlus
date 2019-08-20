@@ -4029,10 +4029,10 @@ namespace WindowManager {
             } else if (ShadeFlag == SwitchableGlazing) {
                 TransDiff = InterpSw(SurfaceWindow(SurfNum).SwitchingFactor, Construct(ConstrNum).TransDiff, Construct(ConstrNumSh).TransDiff);
             }
-            WinHeatGain(SurfNum) -= QS(Surface(SurfNum).Zone) * Surface(SurfNum).Area * TransDiff;
-            WinHeatTransfer(SurfNum) -= QS(Surface(SurfNum).Zone) * Surface(SurfNum).Area * TransDiff;
+            WinHeatGain(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            WinHeatTransfer(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
             // shouldn't this be + outward flowing fraction of absorbed SW? -- do not know whose comment this is?  LKL (9/2012)
-            WinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).Zone) * Surface(SurfNum).Area * TransDiff;
+            WinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
 
             if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn ||
                 ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn) {
