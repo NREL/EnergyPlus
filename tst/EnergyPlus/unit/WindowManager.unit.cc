@@ -889,7 +889,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "  0,                         !- Minimum Value",
         "  90,                        !- Maximum Value",
         "  ,                          !- Normalization Reference Value",
-        "  Angle,                     !- Unit Type",
+        "  ,                          !- Unit Type",
         "  ,                          !- External File Name",
         "  ,                          !- External File Column Number",
         "  ,                          !- External File Starting Row Number",
