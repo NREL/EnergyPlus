@@ -1508,6 +1508,7 @@ namespace EconomicLifeCycleCost {
                     for (nUsePriceEsc = 1; nUsePriceEsc <= numUsePriceEscalation; ++nUsePriceEsc) {
                         if (UsePriceEscalation(nUsePriceEsc).resource - ResourceTypeInitialOffset == curResource) {
                             found = nUsePriceEsc;
+                            break;
                         }
                     }
                     if (found > 0) {

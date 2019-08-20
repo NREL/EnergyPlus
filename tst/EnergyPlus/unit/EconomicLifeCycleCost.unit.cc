@@ -432,10 +432,10 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
     CashFlow(1).Resource = 1001;
     CashFlow(1).yrAmount.allocate(lengthStudyYears);
     CashFlow(1).yrAmount(1) = 100;
-    CashFlow(1).yrAmount(2) = 100;
-    CashFlow(1).yrAmount(3) = 100;
-    CashFlow(1).yrAmount(4) = 100;
-    CashFlow(1).yrAmount(5) = 100;
+    CashFlow(1).yrAmount(2) = 110;
+    CashFlow(1).yrAmount(3) = 120;
+    CashFlow(1).yrAmount(4) = 130;
+    CashFlow(1).yrAmount(5) = 140;
 
     numResourcesUsed = 1;
 
@@ -445,16 +445,16 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
 
     ComputeEscalatedEnergyCosts();
     EXPECT_NEAR(EscalatedEnergy(1, 1), 100., 0.001);
-    EXPECT_NEAR(EscalatedEnergy(2, 1), 100., 0.001);
-    EXPECT_NEAR(EscalatedEnergy(3, 1), 100., 0.001);
-    EXPECT_NEAR(EscalatedEnergy(4, 1), 100., 0.001);
-    EXPECT_NEAR(EscalatedEnergy(5, 1), 100., 0.001);
+    EXPECT_NEAR(EscalatedEnergy(2, 1), 110., 0.001);
+    EXPECT_NEAR(EscalatedEnergy(3, 1), 120., 0.001);
+    EXPECT_NEAR(EscalatedEnergy(4, 1), 130., 0.001);
+    EXPECT_NEAR(EscalatedEnergy(5, 1), 140., 0.001);
 
     EXPECT_NEAR(EscalatedTotEnergy(1), 100., 0.001);
-    EXPECT_NEAR(EscalatedTotEnergy(2), 100., 0.001);
-    EXPECT_NEAR(EscalatedTotEnergy(3), 100., 0.001);
-    EXPECT_NEAR(EscalatedTotEnergy(4), 100., 0.001);
-    EXPECT_NEAR(EscalatedTotEnergy(5), 100., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(2), 110., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(3), 120., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(4), 130., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(5), 140., 0.001);
 
     numUsePriceEscalation = 1;
     UsePriceEscalation.allocate(numUsePriceEscalation);
@@ -470,17 +470,17 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
     EscalatedTotEnergy = 0.0;
 
     ComputeEscalatedEnergyCosts();
-    EXPECT_NEAR(EscalatedEnergy(1, 1), 103., 0.001);
-    EXPECT_NEAR(EscalatedEnergy(2, 1), 105., 0.001);
-    EXPECT_NEAR(EscalatedEnergy(3, 1), 107., 0.001);
-    EXPECT_NEAR(EscalatedEnergy(4, 1), 111., 0.001);
-    EXPECT_NEAR(EscalatedEnergy(5, 1), 115., 0.001);
+    EXPECT_NEAR(EscalatedEnergy(1, 1), 103.0, 0.001);
+    EXPECT_NEAR(EscalatedEnergy(2, 1), 115.5, 0.001);
+    EXPECT_NEAR(EscalatedEnergy(3, 1), 128.4, 0.001);
+    EXPECT_NEAR(EscalatedEnergy(4, 1), 144.3, 0.001);
+    EXPECT_NEAR(EscalatedEnergy(5, 1), 161.0, 0.001);
 
     EXPECT_NEAR(EscalatedTotEnergy(1), 103., 0.001);
-    EXPECT_NEAR(EscalatedTotEnergy(2), 105., 0.001);
-    EXPECT_NEAR(EscalatedTotEnergy(3), 107., 0.001);
-    EXPECT_NEAR(EscalatedTotEnergy(4), 111., 0.001);
-    EXPECT_NEAR(EscalatedTotEnergy(5), 115., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(2), 115.5, 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(3), 128.4, 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(4), 144.3, 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(5), 161.0, 0.001);
 
 }
 
