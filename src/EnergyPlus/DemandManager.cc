@@ -306,8 +306,8 @@ namespace DemandManager {
         DemandManagerList(ListNum).ScheduledLimit = GetCurrentScheduleValue(DemandManagerList(ListNum).LimitSchedule);
         DemandManagerList(ListNum).DemandLimit = DemandManagerList(ListNum).ScheduledLimit * DemandManagerList(ListNum).SafetyFraction;
 
-        DemandManagerList(ListNum).MeterDemand = GetInstantMeterValue(DemandManagerList(ListNum).Meter, 1) / TimeStepZoneSec +
-                                                 GetInstantMeterValue(DemandManagerList(ListNum).Meter, 2) / (TimeStepSys * SecInHour);
+        DemandManagerList(ListNum).MeterDemand = GetInstantMeterValue(DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::TimeStepZone) / TimeStepZoneSec +
+                                                 GetInstantMeterValue(DemandManagerList(ListNum).Meter, OutputProcessor::TimeStepType::TimeStepSystem) / (TimeStepSys * SecInHour);
 
         // Calculate average demand over the averaging window including the current timestep meter demand
         AverageDemand = DemandManagerList(ListNum).AverageDemand +
