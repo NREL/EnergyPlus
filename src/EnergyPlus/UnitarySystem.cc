@@ -5489,9 +5489,9 @@ namespace UnitarySystems {
                     }
                 }
 
-                // Users may not provide SA flow input fields (below) and leave them blank. Check if other coil isDataSizing::AutoSized first to
+                // Users may not provide SA flow input fields (below) and leave them blank. Check if other coil is AutoSized first to
                 // alieviate input requirements. check if coil has no air flow input (VolFlow = 0) and other coil isDataSizing::AutoSized. If so,
-                // useDataSizing::AutoSize for coil with 0 air flow rate. This means that the coils MUST mine the air flow rate if it exists
+                // use AutoSize for coil with 0 air flow rate. This means that the coils MUST mine the air flow rate if it exists
                 if (thisSys.m_CoolCoilExists && thisSys.m_HeatCoilExists) {
                     if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize && thisSys.m_MaxHeatAirVolFlow == 0 && loc_m_HeatingSAFMethod == "") {
                         thisSys.m_MaxHeatAirVolFlow = DataSizing::AutoSize;
