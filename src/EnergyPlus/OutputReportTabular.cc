@@ -175,7 +175,6 @@ namespace OutputReportTabular {
     using DataGlobals::DoOutputReporting;
     using DataGlobals::DoWeathSim;
     using DataGlobals::HourOfDay;
-    using DataGlobals::HVACTSReporting;
     using DataGlobals::KindOfSim;
     using DataGlobals::ksDesignDay;
     using DataGlobals::ksRunPeriodDesign;
@@ -187,7 +186,6 @@ namespace OutputReportTabular {
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataGlobals::TimeStepZoneSec;
-    using DataGlobals::ZoneTSReporting;
     using namespace DataGlobalConstants;
     using namespace OutputReportPredefined;
     using namespace DataHeatBalance;
@@ -225,9 +223,6 @@ namespace OutputReportTabular {
     int const unitsStyleJtoGJ(3);
     int const unitsStyleInchPound(4);
     int const unitsStyleNotFound(5);
-
-    int const stepTypeZone(ZoneTSReporting);
-    int const stepTypeHVAC(HVACTSReporting);
 
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
@@ -729,7 +724,7 @@ namespace OutputReportTabular {
         OutputReportTabular::ResetTabularReports();
     }
 
-    void UpdateTabularReports(int const IndexTypeKey) // What kind of data to update (Zone, HVAC)
+    void UpdateTabularReports(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -764,7 +759,7 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        if (IndexTypeKey != ZoneTSReporting && IndexTypeKey != HVACTSReporting) {
+        if (t_timeStepType != OutputProcessor::TimeStepType::TimeStepZone && t_timeStepType != OutputProcessor::TimeStepType::TimeStepSystem) {
             ShowFatalError("Invalid reporting requested -- UpdateTabularReports");
         }
 
@@ -787,18 +782,18 @@ namespace OutputReportTabular {
             date_and_time(_, _, _, td);
         }
         if (DoOutputReporting && WriteTabularFiles && (KindOfSim == ksRunPeriodWeather)) {
-            if (IndexTypeKey == stepTypeZone) {
+            if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
                 gatherElapsedTimeBEPS += TimeStepZone;
             }
             if (DoWeathSim) {
-                GatherMonthlyResultsForTimestep(IndexTypeKey);
-                OutputReportTabularAnnual::GatherAnnualResultsForTimeStep(IndexTypeKey);
-                GatherBinResultsForTimestep(IndexTypeKey);
-                GatherBEPSResultsForTimestep(IndexTypeKey);
-                GatherSourceEnergyEndUseResultsForTimestep(IndexTypeKey);
-                GatherPeakDemandForTimestep(IndexTypeKey);
-                GatherHeatGainReport(IndexTypeKey);
-                GatherHeatEmissionReport(IndexTypeKey);
+                GatherMonthlyResultsForTimestep(t_timeStepType);
+                OutputReportTabularAnnual::GatherAnnualResultsForTimeStep(t_timeStepType);
+                GatherBinResultsForTimestep(t_timeStepType);
+                GatherBEPSResultsForTimestep(t_timeStepType);
+                GatherSourceEnergyEndUseResultsForTimestep(t_timeStepType);
+                GatherPeakDemandForTimestep(t_timeStepType);
+                GatherHeatGainReport(t_timeStepType);
+                GatherHeatEmissionReport(t_timeStepType);
             }
         }
     }
@@ -1097,7 +1092,7 @@ namespace OutputReportTabular {
         int KeyCount;
         int TypeVar;
         OutputProcessor::StoreType AvgSumVar;
-        int StepTypeVar;
+        OutputProcessor::TimeStepType StepTypeVar;
         OutputProcessor::Unit UnitsVar(OutputProcessor::Unit::None); // Units enum
         // CHARACTER(len=MaxNameLength), DIMENSION(:), ALLOCATABLE :: NamesOfKeys      ! Specific key name
         // INTEGER, DIMENSION(:) , ALLOCATABLE                     :: IndexesForKeyVar ! Array index
@@ -1242,7 +1237,7 @@ namespace OutputReportTabular {
             e.varNum = 0;
             e.typeOfVar = 0;
             e.avgSum = OutputProcessor::StoreType::Averaged;
-            e.stepType = 0;
+            e.stepType = OutputProcessor::TimeStepType::TimeStepZone;
             e.units = OutputProcessor::Unit::None;
             e.aggType = 0;
         }
@@ -1457,7 +1452,7 @@ namespace OutputReportTabular {
                         MonthlyColumns(mColumn).varNum = 0;
                         MonthlyColumns(mColumn).typeOfVar = 0;
                         MonthlyColumns(mColumn).avgSum = OutputProcessor::StoreType::Averaged;
-                        MonthlyColumns(mColumn).stepType = 0;
+                        MonthlyColumns(mColumn).stepType = OutputProcessor::TimeStepType::TimeStepZone;
                         MonthlyColumns(mColumn).units = OutputProcessor::Unit::None;
                         MonthlyColumns(mColumn).aggType = aggTypeSumOrAvg;
                     }
@@ -3915,7 +3910,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GatherBinResultsForTimestep(int const IndexTypeKey) // What kind of data to update (Zone, HVAC)
+    void GatherBinResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -3961,7 +3956,7 @@ namespace OutputReportTabular {
         Real64 topValue;
         int binNum;
         int repIndex;
-        int curStepType;
+        OutputProcessor::TimeStepType curStepType;
 
         // REAL(r64), external :: GetInternalVariableValue
 
@@ -3992,12 +3987,12 @@ namespace OutputReportTabular {
             if (gatherThisTime) {
                 for (jTable = 1; jTable <= curNumTables; ++jTable) {
                     repIndex = curResIndex + (jTable - 1);
-                    if (((curStepType == stepTypeZone) && (IndexTypeKey == ZoneTSReporting)) ||
-                        ((curStepType == stepTypeHVAC) && (IndexTypeKey == HVACTSReporting))) {
+                    if (((curStepType == OutputProcessor::TimeStepType::TimeStepZone) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) ||
+                        ((curStepType == OutputProcessor::TimeStepType::TimeStepSystem) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem))) {
                         // put actual value from OutputProcesser arrays
                         curValue = GetInternalVariableValue(curTypeOfVar, BinObjVarID(repIndex).varMeterNum);
                         // per MJW when a summed variable is used divide it by the length of the time step
-                        if (IndexTypeKey == HVACTSReporting) {
+                        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                             elapsedTime = TimeStepSys;
                         } else {
                             elapsedTime = TimeStepZone;
@@ -4043,7 +4038,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherMonthlyResultsForTimestep(int const IndexTypeKey) // What kind of data to update (Zone, HVAC)
+    void GatherMonthlyResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -4093,7 +4088,7 @@ namespace OutputReportTabular {
         // LOGICAL,SAVE  :: activeHoursShown=.FALSE.  !fix by LKL addressing CR6482
         bool activeHoursShown;
         bool activeNewValue;
-        int curStepType;
+        OutputProcessor::TimeStepType curStepType;
         int minuteCalculated;
         int kOtherColumn; // variable used in loop to scan through additional columns
         int scanColumn;
@@ -4105,7 +4100,7 @@ namespace OutputReportTabular {
         // profiling showed that they were slow.
 
         static Array1D_int MonthlyColumnsTypeOfVar;
-        static Array1D_int MonthlyColumnsStepType;
+        static Array1D<OutputProcessor::TimeStepType> MonthlyColumnsStepType;
         static Array1D_int MonthlyColumnsAggType;
         static Array1D_int MonthlyColumnsVarNum;
         static Array1D_int MonthlyTablesNumColumns;
@@ -4139,7 +4134,7 @@ namespace OutputReportTabular {
         }
 
         elapsedTime = TimeStepSys;
-        if (IndexTypeKey == HVACTSReporting) {
+        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
             elapsedTime = TimeStepSys;
         } else {
             elapsedTime = TimeStepZone;
@@ -4153,8 +4148,8 @@ namespace OutputReportTabular {
                 curCol = jColumn + curFirstColumn - 1;
                 curTypeOfVar = MonthlyColumnsTypeOfVar(curCol);
                 curStepType = MonthlyColumnsStepType(curCol);
-                if (((curStepType == stepTypeZone) && (IndexTypeKey == ZoneTSReporting)) ||
-                    ((curStepType == stepTypeHVAC) && (IndexTypeKey == HVACTSReporting))) {
+                if (((curStepType == OutputProcessor::TimeStepType::TimeStepZone) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) ||
+                    ((curStepType == OutputProcessor::TimeStepType::TimeStepSystem) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem))) {
                     //  the above condition used to include the following prior to new scan method
                     //  (MonthlyColumns(curCol)%aggType .EQ. aggTypeValueWhenMaxMin)
                     curVarNum = MonthlyColumnsVarNum(curCol);
@@ -4169,9 +4164,9 @@ namespace OutputReportTabular {
                     newDuration = 0.0;
                     activeNewValue = false;
                     // the current timestamp
-                    minuteCalculated = DetermineMinuteForReporting(IndexTypeKey);
+                    minuteCalculated = DetermineMinuteForReporting(t_timeStepType);
                     //      minuteCalculated = (CurrentTime - INT(CurrentTime))*60
-                    //      IF (IndexTypeKey .EQ. stepTypeHVAC) minuteCalculated = minuteCalculated + SysTimeElapsed * 60
+                    //      IF (t_timeStepType .EQ. OutputProcessor::TimeStepType::TimeStepSystem) minuteCalculated = minuteCalculated + SysTimeElapsed * 60
                     //      minuteCalculated = INT((TimeStep-1) * TimeStepZone * 60) + INT((SysTimeElapsed + TimeStepSys) * 60)
                     EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, minuteCalculated);
                     // perform the selected aggregation type
@@ -4189,7 +4184,7 @@ namespace OutputReportTabular {
                         } else if (SELECT_CASE_var == aggTypeMaximum) {
                             // per MJW when a summed variable is used divide it by the length of the time step
                             if (MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                if (IndexTypeKey == HVACTSReporting) {
+                                if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                     curValue /= (TimeStepSys * SecInHour);
                                 } else {
                                     curValue /= TimeStepZoneSec;
@@ -4206,7 +4201,7 @@ namespace OutputReportTabular {
                         } else if (SELECT_CASE_var == aggTypeMinimum) {
                             // per MJW when a summed variable is used divide it by the length of the time step
                             if (MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                if (IndexTypeKey == HVACTSReporting) {
+                                if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                     curValue /= (TimeStepSys * SecInHour);
                                 } else {
                                     curValue /= TimeStepZoneSec;
@@ -4303,7 +4298,7 @@ namespace OutputReportTabular {
                                     scanValue = GetInternalVariableValue(scanTypeOfVar, scanVarNum);
                                     // When a summed variable is used divide it by the length of the time step
                                     if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                        if (IndexTypeKey == HVACTSReporting) {
+                                        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                             scanValue /= (TimeStepSys * SecInHour);
                                         } else {
                                             scanValue /= TimeStepZoneSec;
@@ -4347,7 +4342,7 @@ namespace OutputReportTabular {
                                     MonthlyColumns(scanColumn).duration(Month) += elapsedTime;
                                 } else if (SELECT_CASE_var == aggTypeMaximumDuringHoursShown) {
                                     if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                        if (IndexTypeKey == HVACTSReporting) {
+                                        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                             scanValue /= (TimeStepSys * SecInHour);
                                         } else {
                                             scanValue /= TimeStepZoneSec;
@@ -4359,7 +4354,7 @@ namespace OutputReportTabular {
                                     }
                                 } else if (SELECT_CASE_var == aggTypeMinimumDuringHoursShown) {
                                     if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                        if (IndexTypeKey == HVACTSReporting) {
+                                        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                             scanValue /= (TimeStepSys * SecInHour);
                                         } else {
                                             scanValue /= TimeStepZoneSec;
@@ -4381,7 +4376,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherBEPSResultsForTimestep(int const IndexTypeKey) // What kind of data to update (Zone, HVAC)
+    void GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -4461,7 +4456,7 @@ namespace OutputReportTabular {
 
         // if no beps report is called then skip
 
-        if ((displayTabularBEPS || displayLEEDSummary) && (IndexTypeKey == stepTypeZone)) {
+        if ((displayTabularBEPS || displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // add the current time to the total elapsed time
             // FOLLOWING LINE MOVED TO UPDATETABULARREPORTS because used even when beps is not called
             // gatherElapsedTimeBEPS = gatherElapsedTimeBEPS + TimeStepZone
@@ -4533,7 +4528,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherSourceEnergyEndUseResultsForTimestep(int const IndexTypeKey) // What kind of data to update (Zone, HVAC)
+    void GatherSourceEnergyEndUseResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mangesh Basarkar
@@ -4622,7 +4617,7 @@ namespace OutputReportTabular {
 
         // if no beps by source report is called then skip
 
-        if ((displaySourceEnergyEndUseSummary) && (IndexTypeKey == stepTypeZone)) {
+        if ((displaySourceEnergyEndUseSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // loop through all of the resources and end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
 
@@ -4661,7 +4656,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherPeakDemandForTimestep(int const IndexTypeKey) // What kind of data to update (Zone, HVAC)
+    void GatherPeakDemandForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -4746,7 +4741,7 @@ namespace OutputReportTabular {
         int minuteCalculated;
         int timestepTimeStamp;
 
-        if ((displayDemandEndUse) && (IndexTypeKey == stepTypeZone)) {
+        if ((displayDemandEndUse) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // loop through all of the resources and end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
                 curMeterNumber = meterNumTotalsBEPS(iResource);
@@ -4757,7 +4752,7 @@ namespace OutputReportTabular {
                         gatherDemandTotal(iResource) = curDemandValue;
                         // save the time that the peak demand occurred
                         //        minuteCalculated = (CurrentTime - INT(CurrentTime))*60
-                        minuteCalculated = DetermineMinuteForReporting(IndexTypeKey);
+                        minuteCalculated = DetermineMinuteForReporting(t_timeStepType);
                         EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, minuteCalculated);
                         gatherDemandTimeStamp(iResource) = timestepTimeStamp;
                         // if new peak demand is set, then gather all of the end use values at this particular
@@ -4782,7 +4777,7 @@ namespace OutputReportTabular {
         }
 
         // gather the peak demands of each individual enduse subcategory for the LEED report
-        if ((displayLEEDSummary) && (IndexTypeKey == stepTypeZone)) {
+        if ((displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // loop through all of the resources and end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
                 for (jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse) {
@@ -4808,7 +4803,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherHeatEmissionReport(int const IndexTypeKey)
+    void GatherHeatEmissionReport(OutputProcessor::TimeStepType t_timeStepType)
     {
         // PURPOSE OF THIS SUBROUTINE:
         // Gathers the data each zone timestep for the heat gain report.
@@ -4892,7 +4887,7 @@ namespace OutputReportTabular {
         if (!displayHeatEmissionsSummary) return; // don't gather data if report isn't requested
 
         // Only gather zone report at zone time steps
-        if (IndexTypeKey == stepTypeZone) {
+        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
             BuildingPreDefRep.emiEnvelopConv += SumSurfaceHeatEmission * convertJtoGJ;
             return;
         }
@@ -5065,7 +5060,7 @@ namespace OutputReportTabular {
                                        BuildingPreDefRep.emiHVACRelief + BuildingPreDefRep.emiHVACReject;
     }
 
-    void GatherHeatGainReport(int const IndexTypeKey) // What kind of data to update (Zone, HVAC)
+    void GatherHeatGainReport(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -5193,7 +5188,7 @@ namespace OutputReportTabular {
 
         if (!reportName(pdrSensibleGain).show) return; // don't gather data if report isn't requested
 
-        if (IndexTypeKey == stepTypeZone) return; // only add values over the HVAC timestep basis
+        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) return; // only add values over the HVAC timestep basis
 
         if (GatherHeatGainReportfirstTime) {
             radiantHeat.allocate(NumOfZones);
@@ -5353,7 +5348,7 @@ namespace OutputReportTabular {
                     //      ActualtimeE = ActualTimeS+TimeStepSys
                     //      ActualTimeHrS=INT(ActualTimeS)
                     //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
-                    ActualTimeMin = DetermineMinuteForReporting(IndexTypeKey);
+                    ActualTimeMin = DetermineMinuteForReporting(t_timeStepType);
                     EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, ActualTimeMin);
                     ZonePreDefRep(iZone).htPtTimeStamp = timestepTimeStamp;
                     // HVAC Input Sensible Air Heating
@@ -5432,7 +5427,7 @@ namespace OutputReportTabular {
                     //      ActualtimeE = ActualTimeS+TimeStepSys
                     //      ActualTimeHrS=INT(ActualTimeS)
                     //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
-                    ActualTimeMin = DetermineMinuteForReporting(IndexTypeKey);
+                    ActualTimeMin = DetermineMinuteForReporting(t_timeStepType);
                     EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, ActualTimeMin);
                     ZonePreDefRep(iZone).clPtTimeStamp = timestepTimeStamp;
                     // HVAC Input Sensible Air Heating
@@ -5523,7 +5518,7 @@ namespace OutputReportTabular {
             //  ActualtimeE = ActualTimeS+TimeStepSys
             //  ActualTimeHrS=INT(ActualTimeS)
             //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
-            ActualTimeMin = DetermineMinuteForReporting(IndexTypeKey);
+            ActualTimeMin = DetermineMinuteForReporting(t_timeStepType);
             EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, ActualTimeMin);
             BuildingPreDefRep.htPtTimeStamp = timestepTimeStamp;
             // reset building level results to zero prior to accumulating across zones
@@ -5611,7 +5606,7 @@ namespace OutputReportTabular {
             //  ActualtimeE = ActualTimeS+TimeStepSys
             //  ActualTimeHrS=INT(ActualTimeS)
             //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
-            ActualTimeMin = DetermineMinuteForReporting(IndexTypeKey);
+            ActualTimeMin = DetermineMinuteForReporting(t_timeStepType);
             EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, ActualTimeMin);
             BuildingPreDefRep.clPtTimeStamp = timestepTimeStamp;
             // reset building level results to zero prior to accumulating across zones
