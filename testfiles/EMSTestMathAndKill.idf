@@ -6340,21 +6340,38 @@
     Curve_Quadratic_Ptr,     !- Name
     HPACCOOLPLFFPLR_curve;   !- Curve or Table Object Name
 
-  Table:OneIndependentVariable,
+
+  Table:IndependentVariable,
+    HPACCOOLPLFFPLR_IndependentVariable1,  !- Name
+    Linear,                  !- Interpolation Method
+    Constant,                !- Extrapolation Method
+    0.0,                     !- Minimum Value
+    1.0,                     !- Maximum Value
+    ,                        !- Normalization Reference Value
+    Dimensionless,           !- Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    0.0,                     !- Value 1
+    1.0;                     !- Extended Field
+
+  Table:IndependentVariableList,
+    HPACCOOLPLFFPLR_IndependentVariableList,  !- Name
+    HPACCOOLPLFFPLR_IndependentVariable1;  !- Independent Variable 1 Name
+
+  Table:Lookup,
     HPACCOOLPLFFPLR_table,   !- Name
-    Quadratic,               !- Curve Type
-    LinearInterpolationOfTable,  !- Interpolation Method
-    0.0,                     !- Minimum Value of X
-    1.0,                     !- Maximum Value of X
-    0.75,                    !- Minimum Table Output
-    1.0,                     !- Maximum Table Output
-    Dimensionless,           !- Input Unit Type for X
+    HPACCOOLPLFFPLR_IndependentVariableList,  !- Independent Variable List Name
+    ,                        !- Normalization Method
+    ,                        !- Normalization Divisor
+    0.75,                    !- Minimum Output
+    1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
-    ,                        !- Normalization Reference
-    0.0,                     !- X Value #1
-    0.75,                    !- Output Value #1
-    1.0,                     !- X Value #2
-    1.0;                     !- Output Value #2
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    0.75,                    !- Output Value 1
+    1.0;                     !- Extended Field
 
   EnergyManagementSystem:CurveOrTableIndexVariable,
     Table_Quadratic_Ptr,     !- Name
