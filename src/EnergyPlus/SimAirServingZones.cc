@@ -4136,7 +4136,10 @@ namespace SimAirServingZones {
             }
 
             if (PrimaryAirSystem(AirLoopNum).DesignVolFlowRate < SmallAirVolFlow) {
-                ShowSevereError("AirLoopHVAC " + PrimaryAirSystem(AirLoopNum).Name + " has no air flow");
+                ShowSevereError("SizeAirLoopBranches: AirLoopHVAC " + PrimaryAirSystem(AirLoopNum).Name + " has air flow less than " +
+                                General::RoundSigDigits(DataHVACGlobals::SmallAirVolFlow, 4) + " m3/s.");
+                ShowContinueError("Primary air system volumetric flow rate = " +
+                                  General::RoundSigDigits(PrimaryAirSystem(AirLoopNum).DesignVolFlowRate, 4) + " m3/s.");
                 ShowContinueError("Check flow rate inputs for components in this air loop and,");
                 ShowContinueError("if autosized, check Sizing:Zone and Sizing:System objects and related inputs.");
                 ShowFatalError("Previous condition causes termination.");
