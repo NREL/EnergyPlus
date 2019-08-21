@@ -6200,59 +6200,29 @@ namespace AirflowNetworkBalanceManager {
         return AFNPressureResidual;
     }
 
-    static int makeTable(const std::string &name, const std::vector<Real64> &x, const std::vector<Real64> &y)
+    static int makeTable(const std::string &name, const int gridIndex, const std::vector<Real64> &y)
     {
         // Add a new table and performance curve
-        int N = std::min(x.size(), y.size());
-        int TableNum = CurveManager::TableData.size() + 1;
-        CurveManager::TableData.push_back(CurveManager::TableDataStruct());
-        CurveManager::TableLookup.push_back(CurveManager::TableLookupData());
-        CurveManager::PerfCurveTableData.push_back(CurveManager::PerfCurveTableDataStruct());
+        std::string contextString = "CalcWindPressureCoeffs: Creating table \"" + name + "\"";
+        Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &contextString);
+
         int CurveNum = CurveManager::PerfCurve.size() + 1;
         CurveManager::PerfCurve.push_back(CurveManager::PerfomanceCurveData());
 
-        CurveManager::TableData(TableNum).X1.allocate(N);
-        CurveManager::TableData(TableNum).Y.allocate(N);
-
         CurveManager::PerfCurve(CurveNum).Name = name;
-        CurveManager::PerfCurve(CurveNum).ObjectType = "Table:OneIndependentVariable";
+        CurveManager::PerfCurve(CurveNum).ObjectType = "Table:Lookup";
         CurveManager::PerfCurve(CurveNum).NumDims = 1;
-        CurveManager::PerfCurve(CurveNum).TableIndex = TableNum;
-        CurveManager::PerfCurve(CurveNum).CurveType = CurveManager::Linear;
-        CurveManager::TableLookup(TableNum).InterpolationOrder = 2;
 
-        CurveManager::PerfCurve(CurveNum).InterpolationType = CurveManager::LinearInterpolationOfTable;
+        CurveManager::PerfCurve(CurveNum).InterpolationType = CurveManager::BtwxtMethod;
 
         CurveManager::PerfCurve(CurveNum).Var1Min = 0.0;
         CurveManager::PerfCurve(CurveNum).Var1MinPresent = true;
         CurveManager::PerfCurve(CurveNum).Var1Max = 360.0;
         CurveManager::PerfCurve(CurveNum).Var1MaxPresent = true;
 
-        CurveManager::TableData(TableNum).NormalPoint = 1.0;
+        CurveManager::PerfCurve(CurveNum).TableIndex = gridIndex;
+        CurveManager::PerfCurve(CurveNum).GridValueIndex = CurveManager::btwxtManager.addOutputValues(gridIndex, y);
 
-        CurveManager::PerfCurve(CurveNum).CurveMin = -1.0;
-        CurveManager::PerfCurve(CurveNum).CurveMinPresent = true;
-
-        CurveManager::PerfCurve(CurveNum).CurveMax = 1.0;
-        CurveManager::PerfCurve(CurveNum).CurveMaxPresent = true;
-
-        for (int TableDataIndex = 1; TableDataIndex <= N; ++TableDataIndex) {
-            CurveManager::TableData(TableNum).X1(TableDataIndex) = x[TableDataIndex - 1];
-            CurveManager::TableData(TableNum).Y(TableDataIndex) = y[TableDataIndex - 1];
-        }
-
-        // Move table data to performance curve table data structure
-        // CurveManager::PerfCurveTableData( TableNum ).X1.allocate( N - 1 );
-        CurveManager::PerfCurveTableData(TableNum).Y.allocate(1, N);
-        CurveManager::PerfCurveTableData(TableNum).X1 = CurveManager::TableData(TableNum).X1;
-        for (int VarIndex = 1; VarIndex <= N; ++VarIndex) {
-            CurveManager::PerfCurveTableData(TableNum).Y(1, VarIndex) = CurveManager::TableData(TableNum).Y(VarIndex);
-        }
-
-        // move table data to more compact array to allow interpolation using multivariable lookup table method
-        CurveManager::TableLookup(TableNum).NumX1Vars = N;
-        CurveManager::TableLookup(TableNum).X1Var = CurveManager::PerfCurveTableData(TableNum).X1;
-        // CurveManager::TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _ ) = CurveManager::PerfCurveTableData( TableNum ).Y( 1, _ );
         CurveManager::NumCurves += 1;
         return CurveNum;
     }
@@ -6416,8 +6386,10 @@ namespace AirflowNetworkBalanceManager {
         }
 
         std::vector<Real64> dirs30 = {0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360};
-        std::vector<Real64> dirs10 = {0,   10,  20,  30,  40,  50,  60,  70,  80,  90,  100, 110, 120, 130, 140, 150, 160, 170, 180,
-                                      190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360};
+        std::vector<Btwxt::GridAxis> dirs30Axes;
+        dirs30Axes.emplace_back(dirs30, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double> {0.0, 360.0});
+
+        auto dirs30GridIndex = CurveManager::btwxtManager.addGrid("30 Degree Increments", Btwxt::GriddedData(dirs30Axes));
 
         if (AirflowNetworkNumOfSingleSideZones == 0) { // do the standard surface average coefficient calculation
             // Create the array of wind directions
@@ -6489,7 +6461,7 @@ namespace AirflowNetworkBalanceManager {
                 } // End of wind direction loop
                 // Add new table
                 vals[12] = vals[0]; // Enforce periodicity
-                curveIndex[FacadeNum - 1] = makeTable("!WPCTABLE" + std::to_string(FacadeNum), dirs30, vals);
+                curveIndex[FacadeNum - 1] = makeTable("!WPCTABLE" + std::to_string(FacadeNum), dirs30GridIndex, vals);
             } // End of facade number loop
 
         } else { //-calculate the advanced single sided wind pressure coefficients
@@ -6556,16 +6528,25 @@ namespace AirflowNetworkBalanceManager {
             // Resize the curve index array
             curveIndex.resize(valsByFacade.size());
             // Create the curves
+
+            std::vector<Real64> dirs10 = {0,   10,  20,  30,  40,  50,  60,  70,  80,  90,  100, 110, 120, 130, 140, 150, 160, 170, 180,
+                                          190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360};
+
+            std::vector<Btwxt::GridAxis> dirs10Axes;
+            dirs10Axes.emplace_back(dirs10, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double> {0.0, 360.0});
+
+            auto dirs10GridIndex = CurveManager::btwxtManager.addGrid("10 Degree Increments", Btwxt::GriddedData(dirs10Axes));
+
             for (FacadeNum = 1; FacadeNum <= 4; ++FacadeNum) {
                 valsByFacade[FacadeNum - 1].push_back(valsByFacade[FacadeNum - 1][0]); // Enforce periodicity
-                curveIndex[FacadeNum - 1] = makeTable("!SSWPCTABLEFACADE" + std::to_string(FacadeNum), dirs10, valsByFacade[FacadeNum - 1]);
+                curveIndex[FacadeNum - 1] = makeTable("!SSWPCTABLEFACADE" + std::to_string(FacadeNum), dirs10GridIndex, valsByFacade[FacadeNum - 1]);
             }
             FacadeNum = 5;
             valsByFacade[FacadeNum - 1].push_back(valsByFacade[FacadeNum - 1][0]); // Enforce periodicity
-            curveIndex[FacadeNum - 1] = makeTable("!SSWPCTABLEFACADE" + std::to_string(FacadeNum), dirs30, valsByFacade[FacadeNum - 1]);
+            curveIndex[FacadeNum - 1] = makeTable("!SSWPCTABLEFACADE" + std::to_string(FacadeNum), dirs30GridIndex, valsByFacade[FacadeNum - 1]);
             for (unsigned facadeNum = 6; facadeNum <= valsByFacade.size(); ++facadeNum) {
                 valsByFacade[facadeNum - 1].push_back(valsByFacade[facadeNum - 1][0]); // Enforce periodicity
-                curveIndex[facadeNum - 1] = makeTable("!SSWPCTABLE" + std::to_string(facadeNum), dirs10, valsByFacade[facadeNum - 1]);
+                curveIndex[facadeNum - 1] = makeTable("!SSWPCTABLE" + std::to_string(facadeNum), dirs10GridIndex, valsByFacade[facadeNum - 1]);
             }
         }
         // Connect the external nodes to the new curves
