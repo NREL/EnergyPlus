@@ -9871,7 +9871,6 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation();
 
     int VRFCond(1);
