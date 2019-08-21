@@ -683,6 +683,34 @@ namespace MixerComponent {
         }
     }
 
+    int getZoneMixerIndexFromInletNode(int const &InNodeNum)
+    {
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int MixerNum;  // loop counter
+        int InNodeCtr; // loop counter
+        int thisMixer;
+
+        if (GetZoneMixerIndexInputFlag) { // First time subroutine has been entered
+            GetMixerInput();
+            GetZoneMixerIndexInputFlag = false;
+        }
+
+        thisMixer = 0;
+        if (NumMixers > 0) {
+            for (MixerNum = 1; MixerNum <= NumMixers; ++MixerNum) {
+                for (InNodeCtr = 1; InNodeCtr <= MixerCond(MixerNum).NumInletNodes; ++InNodeCtr) {
+                    if (InNodeNum != MixerCond(MixerNum).InletNode(InNodeCtr)) continue;
+                    thisMixer = MixerNum;
+                    break;
+                }
+                if (thisMixer > 0) break;
+            }
+        }
+
+        return thisMixer;
+    }
+
     // End of Utility subroutines for the Mixer Component
     // *****************************************************************************
 

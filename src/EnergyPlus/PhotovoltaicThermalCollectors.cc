@@ -139,6 +139,7 @@ namespace PhotovoltaicThermalCollectors {
     Real64 const SimplePVTWaterSizeFactor(1.905e-5); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
 
     static std::string const BlankString;
+    static bool GetInputFlag(true); // First time, input is "gotten"
 
     // DERIVED TYPE DEFINITIONS:
 
@@ -180,7 +181,6 @@ namespace PhotovoltaicThermalCollectors {
         using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool GetInputFlag(true); // First time, input is "gotten"
 
         if (GetInputFlag) {
             GetPVTcollectorsInput();
@@ -1409,6 +1409,79 @@ namespace PhotovoltaicThermalCollectors {
             ThermalPower = 0.0;
             ThermalEnergy = 0.0;
         }
+    }
+
+    int GetAirInletNodeNum(std::string const &PVTName,
+        bool &ErrorsFound
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given PVT and returns the air inlet node number.
+        // If incorrect PVT name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichPVT;
+
+        if (GetInputFlag) {
+            GetPVTcollectorsInput();
+            GetInputFlag = false;
+        }
+
+        WhichPVT = UtilityRoutines::FindItemInList(PVTName, PVT);
+        if (WhichPVT != 0) {
+            NodeNum = PVT(WhichPVT).HVACInletNodeNum;
+        } else {
+            ShowSevereError("GetAirInletNodeNum: Could not find SolarCollector FlatPlate PhotovoltaicThermal = \"" + PVTName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
+    }
+    int GetAirOutletNodeNum(std::string const &PVTName,
+        bool &ErrorsFound
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given PVT and returns the air outlet node number.
+        // If incorrect PVT name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichPVT;
+
+        if (GetInputFlag) {
+            GetPVTcollectorsInput();
+            GetInputFlag = false;
+        }
+
+        WhichPVT = UtilityRoutines::FindItemInList(PVTName, PVT);
+        if (WhichPVT != 0) {
+            NodeNum = PVT(WhichPVT).HVACOutletNodeNum;
+        } else {
+            ShowSevereError("GetAirInletNodeNum: Could not find SolarCollector FlatPlate PhotovoltaicThermal = \"" + PVTName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
     }
 
     //=====================  Utility/Other routines for module.

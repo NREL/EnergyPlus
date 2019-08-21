@@ -336,7 +336,7 @@ namespace RoomAirModelManager {
         int NumNumbers; // Number of numbers encountered
         int Status;     // Notes if there was an error in processing the input
 
-        int thisSurfinZone; // working variable for indexing surfaces within a ZoneInfo structure
+        int thisSurfinZone; // working variable for indexing surfaces within a ZoneRadiantInfo structure
         int thisHBsurfID;   // working variable for indexing surfaces in main Surface structure
         int thisPattern;
 
