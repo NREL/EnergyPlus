@@ -5613,23 +5613,15 @@ namespace UnitarySystems {
 
                 } else if (UtilityRoutines::SameString(loc_m_CoolingSAFMethod, "None") || loc_m_CoolingSAFMethod == "") {
                     thisSys.m_CoolingSAFMethod = None;
-                    if (loc_m_CoolingSAFMethod_SAFlow != -999.0) {
-                        thisSys.m_MaxCoolAirVolFlow = loc_m_CoolingSAFMethod_SAFlow;
-                        if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize) {
-                            thisSys.m_RequestAutoSize = true;
+                    if (thisSys.m_CoolCoilExists && thisSys.m_MaxCoolAirVolFlow == 0) {
+                        ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
+                        if (thisSys.m_HeatCoilExists) {
+                            ShowContinueError(
+                                "Blank field not allowed for this coil type when heating coil air flow rate is notDataSizing::AutoSized.");
                         } else {
-                            if (thisSys.m_MaxCoolAirVolFlow <= DataHVACGlobals::SmallAirVolFlow && thisSys.m_CoolCoilExists) {
-                                ShowWarningError(cCurrentModuleObject + " = " + thisObjectName);
-                                ShowContinueError("Input for Cooling Supply Air Flow Rate Method = None or Blank and relates to " +
-                                                  loc_coolingCoilType + " = " + loc_m_CoolingCoilName);
-                                ShowContinueError("Cooling Supply Air Flow Rate will be used for this cooling coil.");
-                                ShowContinueError("Suspicious Cooling Supply Air Flow Rate = " +
-                                                  General::RoundSigDigits(thisSys.m_MaxCoolAirVolFlow, 7) + " when cooling coil is present.");
-                            }
-                            if (thisSys.m_MaxCoolAirVolFlow < 0.0) errorsFound = true;
+                            ShowContinueError("Blank field not allowed for this type of cooling coil.");
                         }
-                    } else {
-                        thisSys.m_MaxCoolAirVolFlow = 0.0;
+                        errorsFound = true;
                     }
                 } else {
                     ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
@@ -5745,23 +5737,15 @@ namespace UnitarySystems {
                     }
                 } else if (UtilityRoutines::SameString(loc_m_HeatingSAFMethod, "None") || loc_m_HeatingSAFMethod == "") {
                     thisSys.m_HeatingSAFMethod = None;
-                    if (loc_m_HeatingSAFMethod_SAFlow != -999.0) {
-                        thisSys.m_MaxHeatAirVolFlow = loc_m_HeatingSAFMethod_SAFlow;
-                        if (thisSys.m_MaxHeatAirVolFlow == DataSizing::AutoSize) {
-                            thisSys.m_RequestAutoSize = true;
+                    if (thisSys.m_HeatCoilExists && thisSys.m_MaxHeatAirVolFlow == 0) {
+                        ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
+                        if (thisSys.m_CoolCoilExists) {
+                            ShowContinueError(
+                                "Blank field not allowed for this coil type when cooling coil air flow rate is notDataSizing::AutoSized.");
                         } else {
-                            if (thisSys.m_MaxHeatAirVolFlow <= DataHVACGlobals::SmallAirVolFlow && thisSys.m_HeatCoilExists) {
-                                ShowWarningError(cCurrentModuleObject + " = " + thisObjectName);
-                                ShowContinueError("Input for Heating Supply Air Flow Rate Method = None or Blank and relates to " +
-                                                  loc_heatingCoilType + " = " + loc_m_HeatingCoilName);
-                                ShowContinueError("Heating Supply Air Flow Rate will be used for this heating coil.");
-                                ShowContinueError("Suspicious Heating Supply Air Flow Rate = " +
-                                                  General::RoundSigDigits(thisSys.m_MaxHeatAirVolFlow, 7) + " when heating coil is present.");
-                            }
-                            if (thisSys.m_MaxHeatAirVolFlow < 0.0) errorsFound = true;
+                            ShowContinueError("Blank field not allowed for this type of heating coil.");
                         }
-                    } else {
-                        thisSys.m_MaxHeatAirVolFlow = 0.0;
+                        errorsFound = true;
                     }
                 } else {
                     ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
@@ -5929,22 +5913,6 @@ namespace UnitarySystems {
                     }
                 } else if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "None") || loc_m_NoCoolHeatSAFMethod == "") {
                     thisSys.m_NoCoolHeatSAFMethod = None;
-                    if (loc_m_HeatingSAFMethod_SAFlow != -999.0) {
-                        thisSys.m_MaxNoCoolHeatAirVolFlow = loc_m_NoCoolHeatSAFMethod_SAFlow;
-                        if (thisSys.m_MaxNoCoolHeatAirVolFlow == DataSizing::AutoSize) {
-                            thisSys.m_RequestAutoSize = true;
-                        } else {
-                            if (thisSys.m_MaxNoCoolHeatAirVolFlow < 0.0) {
-                                ShowWarningError(cCurrentModuleObject + " = " + thisObjectName);
-                                ShowContinueError("Input for No Load Supply Air Flow Rate Method = None or Blank");
-                                ShowContinueError("Illegal No Load Supply Air Flow Rate = " +
-                                                  General::RoundSigDigits(thisSys.m_MaxNoCoolHeatAirVolFlow, 7));
-                            }
-                            if (thisSys.m_MaxNoCoolHeatAirVolFlow < 0.0) errorsFound = true;
-                        }
-                    } else {
-                        thisSys.m_MaxNoCoolHeatAirVolFlow = 0.0;
-                    }
                 } else {
                     ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
                     ShowContinueError("Illegal No Load Supply Air Flow Rate Method = " + loc_m_NoCoolHeatSAFMethod);
