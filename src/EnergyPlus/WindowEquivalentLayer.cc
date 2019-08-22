@@ -444,6 +444,9 @@ namespace WindowEquivalentLayer {
         CalcEQLWindowStandardRatings(ConstrNum);
 
         if (CFSHasControlledShade(CFS(EQLNum)) > 0) CFS(EQLNum).ISControlled = true; // is controlled
+
+        // set internal face emissivity
+        Construct(ConstrNum).InsideAbsorpThermal = EffectiveEPSLB(CFS(EQLNum));
     }
 
     void CalcEQLWindowUvalue(CFSTY const &FS, // CFS to be calculated

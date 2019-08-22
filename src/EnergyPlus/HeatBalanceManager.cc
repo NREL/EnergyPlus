@@ -1877,7 +1877,7 @@ namespace HeatBalanceManager {
             Material(MaterNum).AbsorpVisibleInput = 0.0;
             NominalR(MaterNum) = Material(MaterNum).Resistance;
             if (GlobalNames::VerifyUniqueInterObjectName(
-                UniqueMaterialNames, Material(MaterNum).Name, CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
+                    UniqueMaterialNames, Material(MaterNum).Name, CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                 ShowContinueError("...All Material names must be unique regardless of subtype.");
                 ShowContinueError("...\"~AirBoundary-IRTMaterial\" is a reserved name used internally by Construction:AirBoundary.");
             }
@@ -3578,9 +3578,13 @@ namespace HeatBalanceManager {
                 Material(MaterNum).ReflFrontDiffDiffVis = MaterialProps(14);
                 Material(MaterNum).ReflBackDiffDiffVis = MaterialProps(15);
             }
-            if (!lNumericFieldBlanks(19) && !lNumericFieldBlanks(20) && !lNumericFieldBlanks(21)) {
+            if (!lNumericFieldBlanks(19)) {
                 Material(MaterNum).TausThermal = MaterialProps(19);
+            }
+            if (!lNumericFieldBlanks(20)) {
                 Material(MaterNum).EmissThermalFront = MaterialProps(20);
+            }
+            if (!lNumericFieldBlanks(21)) {
                 Material(MaterNum).EmissThermalBack = MaterialProps(21);
             }
             // Assumes thermal emissivity is the same as thermal absorptance
@@ -7565,7 +7569,7 @@ namespace HeatBalanceManager {
                         thisConstruct.AirBoundaryACH = fields.at("simple_mixing_air_changes_per_hour");
                     } else {
                         if (!inputProcessor->getDefaultValue(
-                            cCurrentModuleObject, "simple_mixing_air_changes_per_hour", thisConstruct.AirBoundaryACH)) {
+                                cCurrentModuleObject, "simple_mixing_air_changes_per_hour", thisConstruct.AirBoundaryACH)) {
                             errorsFound = true;
                         }
                     }
