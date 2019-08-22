@@ -4082,13 +4082,13 @@ namespace SurfaceGeometry {
 
                 if (SurfaceTmp(SurfNum).ExtBoundCond == Ground) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
-                                    "\", Exterior boundary condition = Ground is not be allowed with windows.");
+                                    "\", Exterior boundary condition = Ground is not allowed with windows.");
                     ErrorsFound = true;
                 }
 
                 if (SurfaceTmp(SurfNum).ExtBoundCond == KivaFoundation) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
-                                    "\", Exterior boundary condition = Foundation is not be allowed with windows.");
+                                    "\", Exterior boundary condition = Foundation is not allowed with windows.");
                     ErrorsFound = true;
                 }
 
@@ -4403,7 +4403,7 @@ namespace SurfaceGeometry {
 
                     if (SurfaceTmp(SurfNum).ExtBoundCond == Ground) {
                         ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
-                                        "\", Exterior boundary condition = Ground is not be allowed with windows.");
+                                        "\", Exterior boundary condition = Ground is not allowed with windows.");
                         ErrorsFound = true;
                     }
 
