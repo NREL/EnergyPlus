@@ -116,7 +116,8 @@ public:
         std::vector<Real64> m_timeInBin; // amount of time in each bin (usually 10 bins)
     };
 
-    int getVariableKeyCountandTypeFromFldSt(int &typeVar, OutputProcessor::StoreType &avgSumVar, int &stepTypeVar, OutputProcessor::Unit &unitsVar);
+    int getVariableKeyCountandTypeFromFldSt(int &typeVar, OutputProcessor::StoreType &avgSumVar,
+                                            OutputProcessor::TimeStepType &stepTypeVar, OutputProcessor::Unit &unitsVar);
 
     void getVariableKeysFromFldSt(int &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int> &indexesForKeyVar);
 
@@ -128,7 +129,7 @@ public:
     int m_typeOfVar;                  // 0=not found, 1=integer, 2=real, 3=meter
     int m_keyCount;
     OutputProcessor::StoreType m_varAvgSum; // Variable  is Averaged=1 or Summed=2
-    int m_varStepType;                      // Variable time step is Zone=1 or HVAC=2
+    OutputProcessor::TimeStepType m_varStepType; // Variable time step is Zone=1 or HVAC=2
     std::vector<std::string> m_namesOfKeys; // stored version of name of keys from getVariableKeys
     std::vector<int> m_indexesForKeyVar;    // stored version of name of keys from getVariableKeys
     std::vector<AnnualCell> m_cell;         // for each row contains the results and details for one cell of the table
