@@ -167,15 +167,12 @@ namespace ResultsFramework {
     // Class Variable
     Variable::Variable(const std::string &VarName,
                        const OutputProcessor::ReportingFrequency reportFrequency,
-                       const int IndexType,
+                       const OutputProcessor::TimeStepType timeStepType,
                        const int ReportID,
                        const OutputProcessor::Unit &units)
+        : varName(VarName), m_timeStepType(timeStepType), rptID(ReportID), Units(units)
     {
-        varName = VarName;
         setReportFrequency(reportFrequency);
-        idxType = IndexType;
-        rptID = ReportID;
-        Units = units;
     }
 
     std::string Variable::variableName() const
@@ -203,8 +200,8 @@ namespace ResultsFramework {
         iReportFreq = reportFrequency;
         switch (iReportFreq) {
         case OutputProcessor::ReportingFrequency::EachCall: // each time UpdatedataandReport is called
-            if (idxType == ZoneVar) sReportFreq = "Detailed - Zone";
-            if (idxType == HVACVar) sReportFreq = "Detailed - HVAC";
+            if (m_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) sReportFreq = "Detailed - Zone";
+            if (m_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) sReportFreq = "Detailed - HVAC";
             break;
         case OutputProcessor::ReportingFrequency::TimeStep: // at 'EndTimeStepFlag'
             sReportFreq = "Timestep";
@@ -227,14 +224,14 @@ namespace ResultsFramework {
         }
     }
 
-    int Variable::indexType() const
+    OutputProcessor::TimeStepType Variable::timeStepType() const
     {
-        return idxType;
+        return m_timeStepType;
     }
 
-    void Variable::setIndexType(int IndexType)
+    void Variable::setTimeStepType(const OutputProcessor::TimeStepType timeStepType)
     {
-        idxType = IndexType;
+        m_timeStepType = timeStepType;
     }
 
     int Variable::reportID() const
@@ -281,10 +278,10 @@ namespace ResultsFramework {
     // Class OutputVariable
     OutputVariable::OutputVariable(const std::string &VarName,
                                    const OutputProcessor::ReportingFrequency reportFrequency,
-                                   const int IndexType,
+                                   const OutputProcessor::TimeStepType timeStepType,
                                    const int ReportID,
                                    const OutputProcessor::Unit &units)
-        : Variable(VarName, reportFrequency, IndexType, ReportID, units)
+        : Variable(VarName, reportFrequency, timeStepType, ReportID, units)
     {
     }
 
@@ -294,7 +291,7 @@ namespace ResultsFramework {
                                  const int ReportID,
                                  const OutputProcessor::Unit &units,
                                  const bool Accumulative)
-        : Variable(VarName, reportFrequency, ZoneVar, ReportID, units)
+        : Variable(VarName, reportFrequency, OutputProcessor::TimeStepType::TimeStepZone, ReportID, units)
     {
         acc = Accumulative;
     }
@@ -737,7 +734,7 @@ namespace ResultsFramework {
     void ResultsSchema::initializeRTSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
                                                const Array1D<RealVariableType> &RVariableTypes,
                                                const int NumOfRVariable,
-                                               const int IndexType)
+                                               const OutputProcessor::TimeStepType timeStepType)
     {
         Reference<RealVariables> RVar;
 
@@ -749,14 +746,17 @@ namespace ResultsFramework {
                 //      reportFrequency, RVariableTypes( Loop ).IndexType,
                 //      RVariableTypes( Loop ).ReportID,
                 //      RVariableTypes( Loop ).units);
-                Variable var(RVariableTypes(Loop).VarName, reportFrequency, RVariableTypes(Loop).IndexType, RVariableTypes(Loop).ReportID,
+                Variable var(RVariableTypes(Loop).VarName, reportFrequency, RVariableTypes(Loop).timeStepType, RVariableTypes(Loop).ReportID,
                              RVariableTypes(Loop).units);
                 switch (reportFrequency) {
                 case OutputProcessor::ReportingFrequency::EachCall: // each time UpdatedataandReport is called
-                    if (IndexType == ZoneVar && RVariableTypes(Loop).IndexType == ZoneVar) {
+                    if ((timeStepType == OutputProcessor::TimeStepType::TimeStepZone) &&
+                         (RVariableTypes(Loop).timeStepType == OutputProcessor::TimeStepType::TimeStepZone))
+                    {
                         RIDetailedZoneTSData.setRDataFrameEnabled(true);
                         RIDetailedZoneTSData.addVariable(var);
-                    } else if (IndexType == HVACVar && RVariableTypes(Loop).IndexType == HVACVar) {
+                    } else if ((timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) &&
+                               (RVariableTypes(Loop).timeStepType == OutputProcessor::TimeStepType::TimeStepSystem)) {
                         RIDetailedHVACTSData.setRDataFrameEnabled(true);
                         RIDetailedHVACTSData.addVariable(var);
                     }
@@ -791,8 +791,11 @@ namespace ResultsFramework {
         // set the scanned variables to true or false
         switch (reportFrequency) {
         case OutputProcessor::ReportingFrequency::EachCall:
-            if (IndexType == ZoneVar) RIDetailedZoneTSData.setRVariablesScanned(true);
-            if (IndexType == HVACVar) RIDetailedHVACTSData.setRVariablesScanned(true);
+            if (timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
+                RIDetailedZoneTSData.setRVariablesScanned(true);
+            } else if (timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+                RIDetailedHVACTSData.setRVariablesScanned(true);
+            }
             break;
         case OutputProcessor::ReportingFrequency::TimeStep: // at 'EndTimeStepFlag'
             RITimestepTSData.setRVariablesScanned(true);
@@ -818,7 +821,7 @@ namespace ResultsFramework {
     void ResultsSchema::initializeITSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
                                                const Array1D<IntegerVariableType> &IVariableTypes,
                                                const int NumOfIVariable,
-                                               const int IndexType)
+                                               const OutputProcessor::TimeStepType timeStepType)
     {
         Reference<IntegerVariables> IVar;
 
@@ -831,14 +834,17 @@ namespace ResultsFramework {
                 //          IVariableTypes( Loop ).IndexType,
                 //          IVariableTypes( Loop ).ReportID,
                 //          IVariableTypes( Loop ).units);
-                OutputVariable var(IVariableTypes(Loop).VarName, reportFrequency, IVariableTypes(Loop).IndexType, IVariableTypes(Loop).ReportID,
+                OutputVariable var(IVariableTypes(Loop).VarName, reportFrequency, IVariableTypes(Loop).timeStepType, IVariableTypes(Loop).ReportID,
                                    IVariableTypes(Loop).units);
                 switch (reportFrequency) {
                 case OutputProcessor::ReportingFrequency::EachCall: // each time UpdatedataandReport is called
-                    if (IndexType == ZoneVar && IVariableTypes(Loop).IndexType == ZoneVar) {
+                    if ((timeStepType == OutputProcessor::TimeStepType::TimeStepZone) &&
+                        (IVariableTypes(Loop).timeStepType == OutputProcessor::TimeStepType::TimeStepZone))
+                    {
                         RIDetailedZoneTSData.setIDataFrameEnabled(true);
                         RIDetailedZoneTSData.addVariable(var);
-                    } else if (IndexType == HVACVar && IVariableTypes(Loop).IndexType == HVACVar) {
+                    } else if ((timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) &&
+                               (IVariableTypes(Loop).timeStepType == OutputProcessor::TimeStepType::TimeStepSystem)) {
                         RIDetailedHVACTSData.setIDataFrameEnabled(true);
                         RIDetailedHVACTSData.addVariable(var);
                     }
@@ -874,8 +880,11 @@ namespace ResultsFramework {
         // set the scanned variables to true or false
         switch (reportFrequency) {
         case OutputProcessor::ReportingFrequency::EachCall:
-            if (IndexType == ZoneVar) RIDetailedZoneTSData.setIVariablesScanned(true);
-            if (IndexType == HVACVar) RIDetailedHVACTSData.setIVariablesScanned(true);
+            if (timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
+                RIDetailedZoneTSData.setIVariablesScanned(true);
+            } else if (timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
+                RIDetailedHVACTSData.setIVariablesScanned(true);
+            }
             break;
         case OutputProcessor::ReportingFrequency::TimeStep: // at 'EndTimeStepFlag'
             RITimestepTSData.setIVariablesScanned(true);

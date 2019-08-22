@@ -798,7 +798,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
 
     ScheduleManager::ProcessScheduleInput(); // read schedules
 
