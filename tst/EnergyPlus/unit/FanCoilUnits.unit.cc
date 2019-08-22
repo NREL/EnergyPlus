@@ -2266,7 +2266,7 @@ TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
 
     GetZoneData(ErrorsFound);
     GetZoneEquipmentData1();

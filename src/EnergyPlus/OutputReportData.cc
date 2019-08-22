@@ -73,7 +73,7 @@ AnnualFieldSet::AnnualFieldSet(std::string varName, AnnualFieldSet::AggregationK
 
 int AnnualFieldSet::getVariableKeyCountandTypeFromFldSt(int &typeVar,
                                                         OutputProcessor::StoreType &avgSumVar,
-                                                        int &stepTypeVar,
+                                                        OutputProcessor::TimeStepType &stepTypeVar,
                                                         OutputProcessor::Unit &unitsVar)
 {
     int numkeys;
