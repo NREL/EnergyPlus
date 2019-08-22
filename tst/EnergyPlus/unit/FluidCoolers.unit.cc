@@ -244,3 +244,78 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test3)
     testResult = SimpleFluidCooler(1).validateSingleSpeedInputs(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_TRUE(testResult); // error message triggered
 }
+
+TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test4)
+{
+    int FluidCoolerNum(1);
+
+    std::string const idf_objects = delimited_string({
+        "   FluidCooler:SingleSpeed,",
+        "     FluidCooler_SingleSpeed, !- Name",
+        "     FluidCooler_SingleSpeed Water Inlet,  !- Water Inlet Node Name",
+        "     FluidCooler_SingleSpeed Water Outlet,  !- Water Outlet Node Name",
+        "     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method",
+        "     autosize,                !- Design Air Flow Rate U-factor Times Area Value {W/K}",
+        "     ,                        !- Nominal Capacity {W}",
+        "     46.0,                    !- Design Entering Water Temperature {C}",
+        "     35.0,                    !- Design Entering Air Temperature {C}",
+        "     25.5,                    !- Design Entering Air Wetbulb Temperature {C}",
+        "     5.05-03,                 !- Design Water Flow Rate {m3/s}",
+        "     autosize,                !- Design Air Flow Rate {m3/s}",
+        "     autosize;                !- Design Air Flow Rate Fan Power {W}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetFluidCoolerInput();
+    auto &thisFluidCooler = FluidCoolers::SimpleFluidCooler(FluidCoolerNum);
+    EXPECT_TRUE(thisFluidCooler.HighSpeedFluidCoolerUAWasAutoSized);
+    EXPECT_EQ(thisFluidCooler.HighSpeedFluidCoolerUA, DataSizing::AutoSize);
+    EXPECT_EQ(thisFluidCooler.FluidCoolerNominalCapacity, 0.0);
+}
+
+TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test5)
+{
+    using DataSizing::AutoSize;
+    int StringArraySize = 20;
+    Array1D_string cNumericFieldNames;
+    cNumericFieldNames.allocate(StringArraySize);
+    Array1D_string cAlphaFieldNames;
+    cAlphaFieldNames.allocate(StringArraySize);
+    Array1D_string AlphArray;
+    AlphArray.allocate(StringArraySize);
+    for (int i = 1; i <= StringArraySize; ++i) {
+        cAlphaFieldNames(i) = "AlphaField";
+        cNumericFieldNames(i) = "NumerField";
+        AlphArray(i) = "FieldValues";
+    }
+    std::string const cCurrentModuleObject("FluidCooler:SingleSpeed");
+    int FluidCoolerNum(1);
+    FluidCoolers::SimpleFluidCooler.allocate(FluidCoolerNum);
+    auto &thisFluidCooler = FluidCoolers::SimpleFluidCooler(FluidCoolerNum);
+
+    thisFluidCooler.Name = "Test";
+    thisFluidCooler.FluidCoolerMassFlowRateMultiplier = 2.5;
+    thisFluidCooler.WaterInletNodeNum = 1;
+    thisFluidCooler.WaterOutletNodeNum = 1;
+    thisFluidCooler.DesignEnteringWaterTemp = 52;
+    thisFluidCooler.DesignEnteringAirTemp = 35;
+    thisFluidCooler.DesignEnteringAirWetBulbTemp = 25;
+    thisFluidCooler.HighSpeedAirFlowRate = AutoSize;
+    thisFluidCooler.HighSpeedAirFlowRateWasAutoSized = true;
+    thisFluidCooler.HighSpeedFanPower = AutoSize;
+    thisFluidCooler.HighSpeedFanPowerWasAutoSized = true;
+    thisFluidCooler.DesignWaterFlowRateWasAutoSized = true;
+    thisFluidCooler.DesignWaterFlowRate = 1;
+    // test nominal capacity specified hard value
+    AlphArray(4) = "NominalCapacity";
+    thisFluidCooler.FluidCoolerNominalCapacity = 5000.0;
+    thisFluidCooler.HighSpeedFluidCoolerUA = 500.0;
+    thisFluidCooler.HighSpeedFluidCoolerUAWasAutoSized = false;
+    // test input error check, if the nominal capacity specified and UA value is not zero, then it does not fatal out
+    bool testResult = thisFluidCooler.validateSingleSpeedInputs(cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
+    EXPECT_FALSE(testResult); // no error message triggered
+    EXPECT_EQ(thisFluidCooler.PerformanceInputMethod_Num, PerfInputMethod::NOMINAL_CAPACITY);
+    // UA value is reset to zero if nominal capacity is specified and input method is "NOMINAL_CAPACITY"
+    EXPECT_EQ(thisFluidCooler.HighSpeedFluidCoolerUA, 0.0);
+}

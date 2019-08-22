@@ -728,12 +728,12 @@ namespace EconomicLifeCycleCost {
             RecurringCosts(iInObj).repeatPeriodYears = int(NumArray(4));
             if (RecurringCosts(iInObj).repeatPeriodYears > 100) {
                 ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(4) +
-                                 ".  This value is the number of years between occurances of the cost so a value greater than 100 is not reasonable "
+                                 ".  This value is the number of years between occurrences of the cost so a value greater than 100 is not reasonable "
                                  "for an economic evaluation. ");
             }
             if (RecurringCosts(iInObj).repeatPeriodYears < 1) {
                 ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(4) +
-                                 ".  This value is the number of years between occurances of the cost so a value less than 1 is not reasonable for "
+                                 ".  This value is the number of years between occurrences of the cost so a value less than 1 is not reasonable for "
                                  "an economic evaluation. ");
             }
             //   N5,  \field Repeat Period Months
@@ -743,12 +743,12 @@ namespace EconomicLifeCycleCost {
             RecurringCosts(iInObj).repeatPeriodMonths = int(NumArray(5));
             if (RecurringCosts(iInObj).repeatPeriodMonths > 1200) {
                 ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(5) +
-                                 ".  This value is the number of months between occurances of the cost so a value greater than 1200 is not "
+                                 ".  This value is the number of months between occurrences of the cost so a value greater than 1200 is not "
                                  "reasonable for an economic evaluation. ");
             }
             if (RecurringCosts(iInObj).repeatPeriodMonths < 0) {
                 ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(5) +
-                                 ".  This value is the number of months between occurances of the cost so a value less than 0 is not reasonable for "
+                                 ".  This value is the number of months between occurrences of the cost so a value less than 0 is not reasonable for "
                                  "an economic evaluation. ");
             }
             if ((RecurringCosts(iInObj).repeatPeriodMonths == 0) && (RecurringCosts(iInObj).repeatPeriodYears == 0)) {
