@@ -483,12 +483,36 @@ set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_BINARY_DIR}/CMakeCPackOptions.cmake")
 
 if ( BUILD_DOCS )
   # Call the build of target documentation explicitly here.
-  # Note: This is because you can't do `add_dependencies(package documentation)`
+  # Note: This is because you can't do `add_dependencies(package documentation)` (https://gitlab.kitware.com/cmake/cmake/issues/8438)
   # Adding another custom target to be added to the "ALL" one (so it runs) and make it depend on the actual "documentation" target doesn't work
   # because it'll always run if you have enabled BUILD_DOCS, regardless of whether you are calling the target "package" or not
   #  add_custom_target(run_documentation ALL)
   #  add_dependencies(run_documentation documentation)
-  install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build \"${CMAKE_BINARY_DIR}\" --target documentation)")
+  #message(FATAL_ERROR "CMAKE_COMMAND=${CMAKE_COMMAND}")
+
+  # +env will pass the current environment and will end up respecting the -j parameter
+  #                                 this ↓↓↓ here -- https://stackoverflow.com/a/41268443/531179
+  #install(CODE "execute_process(COMMAND +env \"${CMAKE_COMMAND}\" --build \"${CMAKE_BINARY_DIR}\" --target documentation)")
+  # Except it doesn't work with install(execute_process...
+
+  # Passing $(MAKE) doesn't work either, and isn't a great idea for cross platform support anyways
+  # install(CODE "execute_process(COMMAND ${MAKE} ${DOC_BUILD_FLAGS} -C \"${CMAKE_BINARY_DIR}\" documentation)")
+
+  # So instead, we just used the number of threads that are available. That's not ideal, since it ignores any "-j N" option passed by the user
+  # But LaTeX should run quickly enough to not be a major inconvenience.
+  # There no need to do that for Ninja for eg, so only do it for Make
+
+  # flag -j to cmake --build was added at 3.12
+  if(CMAKE_GENERATOR MATCHES "Make" AND (CMAKE_VERSION VERSION_GREATER "3.11"))
+    include(ProcessorCount)
+    ProcessorCount(N)
+    if(NOT N EQUAL 0)
+      set(DOC_BUILD_FLAGS "-j ${N}")
+      message("DOC_BUILD_FLAGS=${DOC_BUILD_FLAGS}")
+    endif()
+  endif()
+  install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build \"${CMAKE_BINARY_DIR}\" ${DOC_BUILD_FLAGS} --target documentation)")
+
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/Acknowledgments.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/AuxiliaryPrograms.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/EMSApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
@@ -503,9 +527,11 @@ if ( BUILD_DOCS )
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/PlantApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/TipsAndTricksUsingEnergyPlus.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/UsingEnergyPlusForCompliance.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+else()
+  message(AUTHOR_WARNING "BUILD_DOCS isn't enabled, so package won't include the PDFs")
 endif ()
 
-##########################################################   S Y S T E M    L I B R A R I E S   #############################################################
+##########################################################   S Y S T E M    L I B R A R I E S   ######################################################
 
 # TODO: is this unecessary now? I had forgotten to actually create a Libraries via cpack_add_component but everything seemed fined
 # At worse, try not to uncomment this as is, but place it inside an if(PLATFORM) statement
