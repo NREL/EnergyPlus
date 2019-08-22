@@ -53,6 +53,11 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <Psychrometrics.hh>
+#include <DataEnvironment.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <DataHVACGlobals.hh>
+#include <DataLoopNode.hh>
 #include <gtest/gtest.h>
 
 namespace EnergyPlus {
@@ -105,6 +110,60 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput());
 
     EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::iRT_Propane);
+}
+
+TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
+{
+    // 7391 Test outlet air properties for MultiStageGasHeatingCoil
+    int CoilNum = 1;
+    Real64 OffMassFlowrate = 0.2;
+    Real64 OnMassFlowrate = 0.6;
+
+    HeatingCoils::HeatingCoil.allocate(CoilNum);
+    HeatingCoils::HeatingCoil(CoilNum).InletAirTemp = 0.0;
+    HeatingCoils::HeatingCoil(CoilNum).InletAirHumRat = 0.001;
+    HeatingCoils::HeatingCoil(CoilNum).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).InletAirTemp, HeatingCoils::HeatingCoil(CoilNum).InletAirHumRat);
+    DataEnvironment::OutBaroPress = 101325.0;
+    HeatingCoils::HeatingCoil(CoilNum).SchedPtr = 1;
+    ScheduleManager::Schedule.allocate(1);
+    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    DataHVACGlobals::MSHPMassFlowRateLow = OnMassFlowrate;
+    HeatingCoils::HeatingCoil(CoilNum).MSNominalCapacity.allocate(1);
+    HeatingCoils::HeatingCoil(CoilNum).MSNominalCapacity(1) = 10000;
+    HeatingCoils::HeatingCoil(CoilNum).MSEfficiency.allocate(1);
+    HeatingCoils::HeatingCoil(CoilNum).MSEfficiency(1) = 0.9;
+    HeatingCoils::HeatingCoil(CoilNum).AirInletNodeNum = 1;
+    HeatingCoils::HeatingCoil(CoilNum).AirOutletNodeNum = 2;
+    DataLoopNode::Node.allocate(2);
+    HeatingCoils::HeatingCoil(CoilNum).MSParasiticElecLoad.allocate(1);
+    HeatingCoils::HeatingCoil(CoilNum).MSParasiticElecLoad(1) = 0.0;
+
+    HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate = OffMassFlowrate;
+    HeatingCoils::CalcMultiStageGasHeatingCoil(CoilNum, 0.0, 0.0, 1, 2);
+    Real64 HeatLoad00 =
+        HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate *
+        (Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).OutletAirTemp, HeatingCoils::HeatingCoil(CoilNum).OutletAirHumRat) - 
+            HeatingCoils::HeatingCoil(CoilNum).InletAirEnthalpy);
+    EXPECT_NEAR(HeatLoad00, HeatingCoils::HeatingCoil(CoilNum).HeatingCoilLoad, 0.0001);
+
+    HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate = 0.5 * OnMassFlowrate + (1.0 - 0.5) * OffMassFlowrate;
+    HeatingCoils::CalcMultiStageGasHeatingCoil(CoilNum, 0.0, 0.5, 1, 2);
+    Real64 HeatLoad05 =
+        HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate *
+              (Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).OutletAirTemp, HeatingCoils::HeatingCoil(CoilNum).OutletAirHumRat) -
+               HeatingCoils::HeatingCoil(CoilNum).InletAirEnthalpy);
+    EXPECT_NEAR(HeatLoad05, HeatingCoils::HeatingCoil(CoilNum).HeatingCoilLoad, 0.0001);
+
+    HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate = OnMassFlowrate;
+    HeatingCoils::CalcMultiStageGasHeatingCoil(CoilNum, 0.0, 1.0, 1, 2);
+    Real64 HeatLoad10 =
+        HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate *
+              (Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).OutletAirTemp, HeatingCoils::HeatingCoil(CoilNum).OutletAirHumRat) -
+               HeatingCoils::HeatingCoil(CoilNum).InletAirEnthalpy);
+    EXPECT_NEAR(HeatLoad10, HeatingCoils::HeatingCoil(CoilNum).HeatingCoilLoad, 0.0001);
+
+    // check linear relationship at PLR = 0.5
+    EXPECT_NEAR(HeatLoad05, 0.5 * HeatingCoils::HeatingCoil(CoilNum).MSNominalCapacity(1), 0.0001);
 }
 
 } // namespace EnergyPlus
