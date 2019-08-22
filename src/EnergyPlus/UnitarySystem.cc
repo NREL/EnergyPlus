@@ -2601,7 +2601,8 @@ namespace UnitarySystems {
                 UnitarySys thisSys;
                 if (sysNum == -1) {
                     ++numUnitarySystems;
-                    inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
+                    auto const &thisObjName = instance.key();
+                    inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjName);
                 } else {
                     thisSys = unitarySys[sysNum];
                 }
