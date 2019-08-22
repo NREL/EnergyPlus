@@ -1039,7 +1039,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOffSim)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation();
 
     EXPECT_EQ(1, NumOASystems);
@@ -2017,7 +2017,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation();
 
     EXPECT_EQ(1, NumOASystems);

@@ -524,7 +524,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2); //
+    // OutputProcessor::TimeValue.allocate(2); //
     SimulationManager::ManageSimulation();
     // re-set the hour of the day to mide day
     DataGlobals::TimeStep = 1;
@@ -881,7 +881,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation();
     // re-set the hour of the day to noon
     DataGlobals::TimeStep = 1;

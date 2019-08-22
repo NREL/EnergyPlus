@@ -167,6 +167,8 @@ namespace DataSurfaces {
     extern int const HeatTransferModel_ComplexFenestration; // BSDF
     extern int const HeatTransferModel_TDD;                 // tubular daylighting device
     extern int const HeatTransferModel_Kiva;                // Kiva ground calculations
+    extern int const HeatTransferModel_AirBoundaryNoHT;     // Construction:AirBoundary - not IRT or interior window
+    extern int const HeatTransferModel_AirBoundaryIntWin;   // Construction:AirBoundary - interior window for solar/daylighting
 
     // Parameters for classification of outside face of surfaces
     extern int const OutConvClass_WindwardVertWall;
@@ -770,6 +772,9 @@ namespace DataSurfaces {
         bool PartOfVentSlabOrRadiantSurface; // surface cannot be part of both a radiant surface & ventilated slab group
         // LG added 1/6/12
         Real64 GenericContam; // [ppm] Surface generic contaminant as a storage term for
+        // Air boundaries
+        int SolarEnclIndex;     // Pointer to solar enclosure this surface belongs to
+        int SolarEnclSurfIndex; //  Pointer to solar enclosure surface data, ZoneSolarInfo(n).SurfacePtr(RadEnclSurfIndex) points to this surface
 
         std::vector<int> DisabledShadowingZoneList; // Array of all disabled shadowing zone number to the current surface
                                                     // the surface diffusion model
@@ -804,7 +809,7 @@ namespace DataSurfaces {
               OutConvClassification(0), OutConvHfModelEq(0), OutConvHfUserCurveIndex(0), OutConvHnModelEq(0), OutConvHnUserCurveIndex(0),
               OutConvFaceArea(0.0), OutConvFacePerimeter(0.0), OutConvFaceHeight(0.0), IntConvZoneWallHeight(0.0), IntConvZonePerimLength(0.0),
               IntConvZoneHorizHydrDiam(0.0), IntConvWindowWallRatio(0.0), IntConvWindowLocation(InConvWinLoc_NotSet),
-              IntConvSurfGetsRadiantHeat(false), IntConvSurfHasActiveInIt(false), PartOfVentSlabOrRadiantSurface(false), GenericContam(0.0)
+              IntConvSurfGetsRadiantHeat(false), IntConvSurfHasActiveInIt(false), PartOfVentSlabOrRadiantSurface(false), GenericContam(0.0), SolarEnclIndex(0), SolarEnclSurfIndex(0)
         {
         }
 

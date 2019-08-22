@@ -1252,7 +1252,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
 
     ManageSimulation(); // run the design day over the warmup period (24 hrs, 25 days)
 
@@ -2451,7 +2451,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
 
     ManageSimulation(); // run the design days
 

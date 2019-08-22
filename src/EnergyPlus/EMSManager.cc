@@ -1307,7 +1307,7 @@ namespace EMSManager {
         int NumKeys;
         int KeyNum;
         OutputProcessor::StoreType AvgOrSum;
-        int StepType;
+        OutputProcessor::TimeStepType StepType;
         OutputProcessor::Unit Units(OutputProcessor::Unit::None);
         Array1D_string KeyName;
         Array1D_int KeyIndex;

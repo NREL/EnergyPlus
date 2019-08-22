@@ -194,6 +194,14 @@ namespace TranspiredCollector {
 
     void GetUTSCTsColl(int const UTSCNum, Real64 &TsColl);
 
+    int GetAirInletNodeNum(std::string const &UTSCName,
+        bool &ErrorsFound
+    );
+
+    int GetAirOutletNodeNum(std::string const &UTSCName,
+        bool &ErrorsFound
+    );
+
 } // namespace TranspiredCollector
 
 } // namespace EnergyPlus
