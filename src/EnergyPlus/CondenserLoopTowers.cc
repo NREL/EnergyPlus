@@ -3246,9 +3246,9 @@ namespace CondenserLoopTowers {
                         ShowSevereError("Error when autosizing the UA value for cooling tower = " + SimpleTower(TowerNum).Name +
                                         ". Design Loop Exit Temperature must be greater than " +
                                         TrimSigDigits(SimpleTower(TowerNum).DesInletAirWBTemp, 2) + " C when autosizing the tower UA.");
-                        ShowContinueError("The Design Loop Exit Temperature specified in Sizing:Plant object = " +
-                                          PlantSizData(PltSizCondNum).PlantLoopName
-                                          + " (" + TrimSigDigits(PlantSizData(PltSizCondNum).ExitTemp, 2)  + " C)");
+                        ShowContinueError(
+                            "The Design Loop Exit Temperature specified in Sizing:Plant object = " + PlantSizData(PltSizCondNum).PlantLoopName +
+                            " (" + TrimSigDigits(PlantSizData(PltSizCondNum).ExitTemp, 2) + " C)");
                         ShowContinueError("is less than or equal to the design inlet air wet-bulb temperature of " +
                                           TrimSigDigits(SimpleTower(TowerNum).DesInletAirWBTemp, 2) + " C.");
                         ShowContinueError(
@@ -3346,14 +3346,17 @@ namespace CondenserLoopTowers {
                         ShowContinueError("is less than or equal to the design inlet air wet-bulb temperature of " +
                                           TrimSigDigits(SimpleTower(TowerNum).DesInletAirWBTemp, 2) + " C.");
 
-                        if ( SimpleTower(TowerNum).TowerInletCondsAutoSize ) {
-                            ShowContinueError("Because you did not specify the Design Approach Temperature, and you do not have a Sizing:Plant object, "
-                                              "it was defaulted to " + TrimSigDigits(DesTowerExitWaterTemp, 2) + " C.");
+                        if (SimpleTower(TowerNum).TowerInletCondsAutoSize) {
+                            ShowContinueError(
+                                "Because you did not specify the Design Approach Temperature, and you do not have a Sizing:Plant object, "
+                                "it was defaulted to " +
+                                TrimSigDigits(DesTowerExitWaterTemp, 2) + " C.");
                         } else {
                             // Should never get there...
-                            ShowContinueError("The Design Loop Exit Temperature is the sum of the design air inlet wet-bulb temperature= "
-                                + TrimSigDigits(SimpleTower(TowerNum).DesInletAirWBTemp, 2) +
-                                " C plus the cooling tower design approach temperature = " + TrimSigDigits(SimpleTower(TowerNum).DesApproach, 2) + "C.");
+                            ShowContinueError("The Design Loop Exit Temperature is the sum of the design air inlet wet-bulb temperature= " +
+                                              TrimSigDigits(SimpleTower(TowerNum).DesInletAirWBTemp, 2) +
+                                              " C plus the cooling tower design approach temperature = " +
+                                              TrimSigDigits(SimpleTower(TowerNum).DesApproach, 2) + "C.");
                         }
                         ShowContinueError(
                             "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > " +
@@ -6549,8 +6552,13 @@ namespace CondenserLoopTowers {
             NumTransferUnits = UAactual / CapacityRatioMin;
             // calculate heat exchanger effectiveness
             if (CapacityRatio <= 0.995) {
-                effectiveness = (1.0 - std::exp(-1.0 * NumTransferUnits * (1.0 - CapacityRatio))) /
-                                (1.0 - CapacityRatio * std::exp(-1.0 * NumTransferUnits * (1.0 - CapacityRatio)));
+                Real64 Exponent = NumTransferUnits * (1.0 - CapacityRatio);
+                if (Exponent >= 700.0) {
+                    effectiveness = NumTransferUnits / (1.0 + NumTransferUnits);
+                } else {
+                    effectiveness = (1.0 - std::exp(-1.0 * NumTransferUnits * (1.0 - CapacityRatio))) /
+                                    (1.0 - CapacityRatio * std::exp(-1.0 * NumTransferUnits * (1.0 - CapacityRatio)));
+                }
             } else {
                 effectiveness = NumTransferUnits / (1.0 + NumTransferUnits);
             }

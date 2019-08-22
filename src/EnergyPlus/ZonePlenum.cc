@@ -1535,6 +1535,35 @@ namespace ZonePlenum {
         }
     }
 
+    int getReturnPlenumIndexFromInletNode(int const &InNodeNum)
+    {
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int PlenumNum; // loop counter
+        int InNodeCtr; // loop counter
+        int thisPlenum;
+
+        // Obtains and Allocates ZonePlenum related parameters from input file
+        if (GetInputFlag) { // First time subroutine has been entered
+            GetZonePlenumInput();
+            GetInputFlag = false;
+        }
+
+        thisPlenum = 0;
+        if (NumZoneReturnPlenums > 0) {
+            for (PlenumNum = 1; PlenumNum <= NumZoneReturnPlenums; ++PlenumNum) {
+                for (InNodeCtr = 1; InNodeCtr <= ZoneRetPlenCond(PlenumNum).NumInletNodes; ++InNodeCtr) {
+                    if (InNodeNum != ZoneRetPlenCond(PlenumNum).InletNode(InNodeCtr)) continue;
+                    thisPlenum = PlenumNum;
+                    break;
+                }
+                if (thisPlenum > 0) break;
+            }
+        }
+
+        return thisPlenum;
+    }
+
 } // namespace ZonePlenum
 
 } // namespace EnergyPlus

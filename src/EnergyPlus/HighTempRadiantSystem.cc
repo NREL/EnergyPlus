@@ -62,10 +62,12 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataSizing.hh>
 #include <DataSurfaces.hh>
+#include <DataViewFactorInformation.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <HeatBalanceIntRadExchange.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <HighTempRadiantSystem.hh>
 #include <InputProcessing/InputProcessor.hh>
@@ -274,7 +276,6 @@ namespace HighTempRadiantSystem {
         using DataSizing::CapacityPerFloorArea;
         using DataSizing::FractionOfAutosizedHeatingCapacity;
         using DataSizing::HeatingDesignCapacity;
-        using DataSurfaces::Surface;
         using General::TrimSigDigits;
         using ScheduleManager::GetScheduleIndex;
         using namespace DataIPShortCuts;
@@ -560,20 +561,13 @@ namespace HighTempRadiantSystem {
             AllFracsSummed = HighTempRadSys(Item).FracDistribPerson;
             for (SurfNum = 1; SurfNum <= HighTempRadSys(Item).TotSurfToDistrib; ++SurfNum) {
                 HighTempRadSys(Item).SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 7);
-                HighTempRadSys(Item).SurfacePtr(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + 7), Surface);
+                HighTempRadSys(Item).SurfacePtr(SurfNum) =
+                    HeatBalanceIntRadExchange::GetRadiantSystemSurface(cCurrentModuleObject,
+                                                                       HighTempRadSys(Item).Name,
+                                                                       HighTempRadSys(Item).ZonePtr,
+                                                                       HighTempRadSys(Item).SurfaceName(SurfNum),
+                                                                       ErrorsFound);
                 HighTempRadSys(Item).FracDistribToSurf(SurfNum) = rNumericArgs(SurfNum + 9);
-                // Error trap for surfaces that do not exist or surfaces not in the zone the radiant heater is in
-                if (HighTempRadSys(Item).SurfacePtr(SurfNum) == 0) {
-                    ShowSevereError(RoutineName + "Invalid Surface name = " + HighTempRadSys(Item).SurfaceName(SurfNum));
-                    ShowContinueError("Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                    ErrorsFound = true;
-                } else if (Surface(HighTempRadSys(Item).SurfacePtr(SurfNum)).Zone != HighTempRadSys(Item).ZonePtr) {
-                    ShowWarningError("Surface referenced in ZoneHVAC:HighTemperatureRadiant not in same zone as Radiant System, surface=" +
-                                     HighTempRadSys(Item).SurfaceName(SurfNum));
-                    ShowContinueError("Surface is in Zone=" + Zone(Surface(HighTempRadSys(Item).SurfacePtr(SurfNum)).Zone).Name +
-                                      " ZoneHVAC:HighTemperatureRadiant in Zone=" + cAlphaArgs(3));
-                    ShowContinueError("Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                }
                 // Error trap for fractions that are out of range
                 if (HighTempRadSys(Item).FracDistribToSurf(SurfNum) < MinFraction) {
                     HighTempRadSys(Item).FracDistribToSurf(SurfNum) = MinFraction;
@@ -587,7 +581,7 @@ namespace HighTempRadiantSystem {
                 }
 
                 if (HighTempRadSys(Item).SurfacePtr(SurfNum) != 0) {
-                    Surface(HighTempRadSys(Item).SurfacePtr(SurfNum)).IntConvSurfGetsRadiantHeat = true;
+                    DataSurfaces::Surface(HighTempRadSys(Item).SurfacePtr(SurfNum)).IntConvSurfGetsRadiantHeat = true;
                 }
 
                 AllFracsSummed += HighTempRadSys(Item).FracDistribToSurf(SurfNum);

@@ -129,7 +129,7 @@ namespace HeatBalanceIntRadExchange {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    int MaxNumOfZoneSurfaces(0); // Max saved to get large enough space for user input view factors
+    int MaxNumOfRadEnclosureSurfs(0); // Max saved to get large enough space for SendSurfaceTempInKto4thPrecalc
     namespace {
         bool CalcInteriorRadExchangefirstTime(true); // Logical flag for one-time initializations
     }
@@ -138,7 +138,7 @@ namespace HeatBalanceIntRadExchange {
     // Functions
     void clear_state()
     {
-        MaxNumOfZoneSurfaces = 0;
+        MaxNumOfRadEnclosureSurfs = 0;
         CalcInteriorRadExchangefirstTime = true;
     }
 
@@ -210,9 +210,8 @@ namespace HeatBalanceIntRadExchange {
         epStartTime("CalcInteriorRadExchange=");
 #endif
         if (CalcInteriorRadExchangefirstTime) {
-            InitInteriorRadExchange();
 #ifdef EP_HBIRE_SEQ
-            SendSurfaceTempInKto4thPrecalc.allocate(MaxNumOfZoneSurfaces);
+            SendSurfaceTempInKto4thPrecalc.allocate(MaxNumOfRadEnclosureSurfs);
 #else
             SendSurfaceTempInKto4thPrecalc.allocate(TotSurfaces);
 #endif
@@ -246,23 +245,24 @@ namespace HeatBalanceIntRadExchange {
 #endif
 
         ConstrNumRec = 0;
+        int startEnclosure = 1;
+        int endEnclosure = DataViewFactorInformation::NumOfRadiantEnclosures;
         if (PartialResimulate) {
-            auto const &zone(Zone(ZoneToResimulate));
-            NetLWRadToSurf({zone.SurfaceFirst, zone.SurfaceLast}) = 0.0;
-            for (int i = zone.SurfaceFirst; i <= zone.SurfaceLast; ++i)
+            startEnclosure = endEnclosure = Zone(ZoneToResimulate).RadiantEnclosureNum;
+            auto const &enclosure(ZoneRadiantInfo(startEnclosure));
+            for (int i : enclosure.SurfacePtr) {
+                NetLWRadToSurf(i) = 0.0;
                 SurfaceWindow(i).IRfromParentZone = 0.0;
+            }
         } else {
             NetLWRadToSurf = 0.0;
             for (auto &e : SurfaceWindow)
                 e.IRfromParentZone = 0.0;
         }
 
-        for (int ZoneNum = (PartialResimulate ? ZoneToResimulate() : 1), ZoneNum_end = (PartialResimulate ? ZoneToResimulate() : NumOfZones);
-             ZoneNum <= ZoneNum_end;
-             ++ZoneNum) {
+        for (int enclosureNum = startEnclosure; enclosureNum <= endEnclosure; ++enclosureNum) {
 
-            auto const &zone(Zone(ZoneNum));
-            auto &zone_info(ZoneInfo(ZoneNum));
+            auto &zone_info(ZoneRadiantInfo(enclosureNum));
             auto &zone_ScriptF(zone_info.ScriptF); // Tuned Transposed
             auto &zone_SurfacePtr(zone_info.SurfacePtr);
             int const n_zone_Surfaces(zone_info.NumOfSurfaces);
@@ -294,7 +294,8 @@ namespace HeatBalanceIntRadExchange {
                 IntMovInsulChanged = false;
 
                 if (!BeginEnvrnFlag) { // Check for change in shade/blind status
-                    for (SurfNum = zone.SurfaceFirst; SurfNum <= zone.SurfaceLast; ++SurfNum) {
+                    for (int surfCounter = 1; surfCounter <= zone_info.NumOfSurfaces; ++surfCounter) {
+                        SurfNum = zone_info.SurfacePtr(surfCounter);
                         if (IntShadeOrBlindStatusChanged || IntMovInsulChanged)
                             break; // Need only check if one window's status or one movable insulation status has changed
                         ConstrNum = Surface(SurfNum).Construction;
@@ -514,12 +515,8 @@ namespace HeatBalanceIntRadExchange {
         static ObjexxFCL::gio::Fmt AFormat("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumOfZoneSurfaces;        // total number of surfaces in the zone.
-        int ZoneNum;                  // DO loop counter for zones
-        int ZoneSurfNum;              // DO loop counter for surfaces within a zone (refers to local derived type arrays)
         int Findex;                   // index to print view factors
         int Vindex;                   // index for vertices
-        int NumZonesWithUserFbyS;     // Zones with user input,  used for flag here
         bool NoUserInputF;            // Logical flag signifying no input F's for zone
         static bool ViewFactorReport; // Flag to output view factor report in eio file
         static bool ErrorsFound(false);
@@ -534,86 +531,84 @@ namespace HeatBalanceIntRadExchange {
 
         // FLOW:
 
-        ZoneInfo.allocate(NumOfZones); // Allocate the entire derived type
-
         ScanForReports("ViewFactorInfo", ViewFactorReport, _, Option1);
 
         if (ViewFactorReport) { // Print heading
             ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Surface View Factor and Grey Interchange Information>";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <View Factor - Zone Information>,Zone Name,Number of Surfaces";
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <View Factor - Zone/Enclosure Information>,Zone/Enclosure Name,Number of Surfaces";
             ObjexxFCL::gio::write(OutputFileInits, fmtA)
                 << "! <View Factor - Surface Information>,Surface Name,Surface Class,Area {m2},Azimuth,Tilt,Thermal Emissivity,#Sides,Vertices";
             ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <View Factor / Grey Interchange Type>,Surface Name(s)";
             ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <View Factor>,Surface Name,Surface Class,Row Sum,View Factors for each Surface";
         }
 
-        cCurrentModuleObject = "ZoneProperty:UserViewFactors:bySurfaceName";
-        NumZonesWithUserFbyS = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-
-        MaxNumOfZoneSurfaces = 0;
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
-
-            if (ZoneNum == 1) {
+        MaxNumOfRadEnclosureSurfs = 0;
+        for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
+            auto & thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
+            if (enclosureNum == 1) {
                 if (DisplayAdvancedReportVariables)
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Surface View Factor Check Values>,Zone Name,Original Check Value,Calculated Fixed Check "
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Surface View Factor Check Values>,Zone/Enclosure Name,Original Check Value,Calculated Fixed Check "
                                                          "Value,Final Check Value,Number of Iterations,Fixed RowSum Convergence,Used RowSum "
                                                          "Convergence";
             }
-
-            ZoneInfo(ZoneNum).Name = Zone(ZoneNum).Name;
-
-            NumOfZoneSurfaces = 0;
-            for (int SurfNum = Zone(ZoneNum).SurfaceFirst, SurfNum_end = Zone(ZoneNum).SurfaceLast; SurfNum <= SurfNum_end; ++SurfNum) {
-                if (Surface(SurfNum).HeatTransSurf) ++NumOfZoneSurfaces;
+            int numEnclosureSurfaces = 0;
+            for (int zoneNum : thisEnclosure.ZoneNums) {
+                for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
+                    if (Surface(surfNum).HeatTransSurf) ++numEnclosureSurfaces;
+                }
             }
-            ZoneInfo(ZoneNum).NumOfSurfaces = NumOfZoneSurfaces;
-            MaxNumOfZoneSurfaces = max(MaxNumOfZoneSurfaces, NumOfZoneSurfaces);
-            if (NumOfZoneSurfaces < 1) ShowFatalError("No surfaces in a zone in InitInteriorRadExchange");
+            thisEnclosure.NumOfSurfaces = numEnclosureSurfaces;
+            MaxNumOfRadEnclosureSurfs = max(MaxNumOfRadEnclosureSurfs, numEnclosureSurfaces);
+            if (numEnclosureSurfaces < 1) ShowFatalError("No surfaces in an enclosure in InitInteriorRadExchange");
 
             // Allocate the parts of the derived type
-            ZoneInfo(ZoneNum).F.dimension(NumOfZoneSurfaces, NumOfZoneSurfaces, 0.0);
-            ZoneInfo(ZoneNum).ScriptF.dimension(NumOfZoneSurfaces, NumOfZoneSurfaces, 0.0);
-            ZoneInfo(ZoneNum).Area.dimension(NumOfZoneSurfaces, 0.0);
-            ZoneInfo(ZoneNum).Emissivity.dimension(NumOfZoneSurfaces, 0.0);
-            ZoneInfo(ZoneNum).Azimuth.dimension(NumOfZoneSurfaces, 0.0);
-            ZoneInfo(ZoneNum).Tilt.dimension(NumOfZoneSurfaces, 0.0);
-            ZoneInfo(ZoneNum).SurfacePtr.dimension(NumOfZoneSurfaces, 0);
+            thisEnclosure.F.dimension(numEnclosureSurfaces, numEnclosureSurfaces, 0.0);
+            thisEnclosure.ScriptF.dimension(numEnclosureSurfaces, numEnclosureSurfaces, 0.0);
+            thisEnclosure.Area.dimension(numEnclosureSurfaces, 0.0);
+            thisEnclosure.Emissivity.dimension(numEnclosureSurfaces, 0.0);
+            thisEnclosure.Azimuth.dimension(numEnclosureSurfaces, 0.0);
+            thisEnclosure.Tilt.dimension(numEnclosureSurfaces, 0.0);
+            thisEnclosure.SurfacePtr.dimension(numEnclosureSurfaces, 0);
 
             // Initialize the surface pointer array
-            ZoneSurfNum = 0;
-            for (int SurfNum = Zone(ZoneNum).SurfaceFirst, SurfNum_end = Zone(ZoneNum).SurfaceLast; SurfNum <= SurfNum_end; ++SurfNum) {
-                if (!Surface(SurfNum).HeatTransSurf) continue;
-                ++ZoneSurfNum;
-                ZoneInfo(ZoneNum).SurfacePtr(ZoneSurfNum) = SurfNum;
+            int enclosureSurfNum = 0;
+            for (int zoneNum : thisEnclosure.ZoneNums) {
+                for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
+                    if (!Surface(surfNum).HeatTransSurf) continue;
+                    ++enclosureSurfNum;
+                    thisEnclosure.SurfacePtr(enclosureSurfNum) = surfNum;
+                }
             }
             // Initialize the area and emissivity arrays
-            for (ZoneSurfNum = 1; ZoneSurfNum <= NumOfZoneSurfaces; ++ZoneSurfNum) {
-                int const SurfNum = ZoneInfo(ZoneNum).SurfacePtr(ZoneSurfNum);
+            for (int enclSurfNum = 1; enclSurfNum <= thisEnclosure.NumOfSurfaces; ++enclSurfNum) {
+                int const SurfNum = thisEnclosure.SurfacePtr(enclSurfNum);
                 ZoneInfo(ZoneNum).Area(ZoneSurfNum) = Surface(SurfNum).Area;
-                ZoneInfo(ZoneNum).Emissivity(ZoneSurfNum) = Construct(Surface(SurfNum).Construction).InsideAbsorpThermal;
-                ZoneInfo(ZoneNum).Azimuth(ZoneSurfNum) = Surface(SurfNum).Azimuth;
-                ZoneInfo(ZoneNum).Tilt(ZoneSurfNum) = Surface(SurfNum).Tilt;
+                thisEnclosure.Emissivity(enclSurfNum) = Construct(Surface(SurfNum).Construction).InsideAbsorpThermal;
+                thisEnclosure.Azimuth(enclSurfNum) = Surface(SurfNum).Azimuth;
+                thisEnclosure.Tilt(enclSurfNum) = Surface(SurfNum).Tilt;
             }
 
-            if (NumOfZoneSurfaces == 1) {
+            if (thisEnclosure.NumOfSurfaces == 1) {
                 // If there is only one surface in a zone, then there is no radiant exchange
-                ZoneInfo(ZoneNum).F = 0.0;
-                ZoneInfo(ZoneNum).ScriptF = 0.0;
+                thisEnclosure.F = 0.0;
+                thisEnclosure.ScriptF = 0.0;
                 if (DisplayAdvancedReportVariables)
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Surface View Factor Check Values," + Zone(ZoneNum).Name + ",0,0,0,-1,0,0";
-                continue; // Go to the next zone in the  ZoneNum DO loop
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Surface View Factor Check Values," + thisEnclosure.Name + ",0,0,0,-1,0,0";
+                continue; // Go to the next enclosure in the loop
             }
 
             //  Get user supplied view factors if available in idf.
 
             NoUserInputF = true;
 
+            std::string cCurrentModuleObject = "ZoneProperty:UserViewFactors:bySurfaceName";
+            int NumZonesWithUserFbyS = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
             if (NumZonesWithUserFbyS > 0) {
 
-                GetInputViewFactorsbyName(ZoneInfo(ZoneNum).Name,
-                                          NumOfZoneSurfaces,
-                                          ZoneInfo(ZoneNum).F,
-                                          ZoneInfo(ZoneNum).SurfacePtr,
+                GetInputViewFactorsbyName(thisEnclosure.Name,
+                                          thisEnclosure.NumOfSurfaces,
+                                          thisEnclosure.F,
+                                          thisEnclosure.SurfacePtr,
                                           NoUserInputF,
                                           ErrorsFound); // Obtains user input view factors from input file
             }
@@ -621,23 +616,24 @@ namespace HeatBalanceIntRadExchange {
             if (NoUserInputF) {
 
                 // Calculate the view factors and make sure they satisfy reciprocity
-                CalcApproximateViewFactors(NumOfZoneSurfaces,
-                                           ZoneInfo(ZoneNum).Area,
-                                           ZoneInfo(ZoneNum).Azimuth,
-                                           ZoneInfo(ZoneNum).Tilt,
-                                           ZoneInfo(ZoneNum).F,
-                                           ZoneInfo(ZoneNum).SurfacePtr);
+                CalcApproximateViewFactors(thisEnclosure.NumOfSurfaces,
+                                           thisEnclosure.Area,
+                                           thisEnclosure.Azimuth,
+                                           thisEnclosure.Tilt,
+                                           thisEnclosure.F,
+                                           thisEnclosure.SurfacePtr);
             }
 
             if (ViewFactorReport) { // Allocate and save user or approximate view factors for reporting.
-                SaveApproximateViewFactors.allocate(NumOfZoneSurfaces, NumOfZoneSurfaces);
-                SaveApproximateViewFactors = ZoneInfo(ZoneNum).F;
+                SaveApproximateViewFactors.allocate(thisEnclosure.NumOfSurfaces, thisEnclosure.NumOfSurfaces);
+                SaveApproximateViewFactors = thisEnclosure.F;
             }
 
-            FixViewFactors(NumOfZoneSurfaces,
-                           ZoneInfo(ZoneNum).Area,
-                           ZoneInfo(ZoneNum).F,
-                           ZoneNum,
+            FixViewFactors(thisEnclosure.NumOfSurfaces,
+                           thisEnclosure.Area,
+                           thisEnclosure.F,
+                           thisEnclosure.Name,
+                           thisEnclosure.ZoneNums,
                            CheckValue1,
                            CheckValue2,
                            FinalCheckValue,
@@ -645,22 +641,22 @@ namespace HeatBalanceIntRadExchange {
                            FixedRowSum);
 
             // Calculate the script F factors
-            CalcScriptF(NumOfZoneSurfaces, ZoneInfo(ZoneNum).Area, ZoneInfo(ZoneNum).F, ZoneInfo(ZoneNum).Emissivity, ZoneInfo(ZoneNum).ScriptF);
+            CalcScriptF(thisEnclosure.NumOfSurfaces, thisEnclosure.Area, thisEnclosure.F, thisEnclosure.Emissivity, thisEnclosure.ScriptF);
 
             if (ViewFactorReport) { // Write to SurfInfo File
                 // Zone Surface Information Output
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Surface View Factor - Zone Information," + ZoneInfo(ZoneNum).Name + ',' +
-                                                         RoundSigDigits(NumOfZoneSurfaces);
+                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Surface View Factor - Zone/Enclosure Information," + thisEnclosure.Name + ',' +
+                                                         RoundSigDigits(thisEnclosure.NumOfSurfaces);
 
-                for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
+                for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
                     ObjexxFCL::gio::write(OutputFileInits, "(A,',',A,$)")
-                        << "Surface View Factor - Surface Information," + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                               cSurfaceClass(Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Class)
-                        << RoundSigDigits(ZoneInfo(ZoneNum).Area(SurfNum), 4) + ',' + RoundSigDigits(ZoneInfo(ZoneNum).Azimuth(SurfNum), 4) + ',' +
-                               RoundSigDigits(ZoneInfo(ZoneNum).Tilt(SurfNum), 4) + ',' + RoundSigDigits(ZoneInfo(ZoneNum).Emissivity(SurfNum), 4) +
-                               ',' + RoundSigDigits(Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Sides);
-                    for (Vindex = 1; Vindex <= Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Sides; ++Vindex) {
-                        auto &Vertex = Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Vertex(Vindex);
+                        << "Surface View Factor - Surface Information," + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' +
+                               cSurfaceClass(Surface(thisEnclosure.SurfacePtr(SurfNum)).Class)
+                        << RoundSigDigits(thisEnclosure.Area(SurfNum), 4) + ',' + RoundSigDigits(thisEnclosure.Azimuth(SurfNum), 4) + ',' +
+                               RoundSigDigits(thisEnclosure.Tilt(SurfNum), 4) + ',' + RoundSigDigits(thisEnclosure.Emissivity(SurfNum), 4) +
+                               ',' + RoundSigDigits(Surface(thisEnclosure.SurfacePtr(SurfNum)).Sides);
+                    for (Vindex = 1; Vindex <= Surface(thisEnclosure.SurfacePtr(SurfNum)).Sides; ++Vindex) {
+                        auto &Vertex = Surface(thisEnclosure.SurfacePtr(SurfNum)).Vertex(Vindex);
                         ObjexxFCL::gio::write(OutputFileInits, "(3(',',A),$)")
                             << RoundSigDigits(Vertex.x, 4) << RoundSigDigits(Vertex.y, 4) << RoundSigDigits(Vertex.z, 4);
                     }
@@ -669,17 +665,17 @@ namespace HeatBalanceIntRadExchange {
 
                 ObjexxFCL::gio::write(OutputFileInits, "(A,A,$)") << "Approximate or User Input ViewFactors"
                                                        << ",To Surface,Surface Class,RowSum";
-                for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                    ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name;
+                for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
+                    ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(thisEnclosure.SurfacePtr(SurfNum)).Name;
                 }
                 ObjexxFCL::gio::write(OutputFileInits);
 
-                for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
+                for (Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
                     RowSum = sum(SaveApproximateViewFactors(_, Findex));
                     ObjexxFCL::gio::write(OutputFileInits, "(A,3(',',A),$)")
-                        << "View Factor" << Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name
-                        << cSurfaceClass(Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Class) << RoundSigDigits(RowSum, 4);
-                    for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
+                        << "View Factor" << Surface(thisEnclosure.SurfacePtr(Findex)).Name
+                        << cSurfaceClass(Surface(thisEnclosure.SurfacePtr(Findex)).Class) << RoundSigDigits(RowSum, 4);
+                    for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
                         ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(SaveApproximateViewFactors(SurfNum, Findex), 4);
                     }
                     ObjexxFCL::gio::write(OutputFileInits);
@@ -689,52 +685,52 @@ namespace HeatBalanceIntRadExchange {
             if (ViewFactorReport) {
                 ObjexxFCL::gio::write(OutputFileInits, "(A,A,$)") << "Final ViewFactors"
                                                        << ",To Surface,Surface Class,RowSum";
-                for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                    ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name;
+                for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
+                    ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(thisEnclosure.SurfacePtr(SurfNum)).Name;
                 }
                 ObjexxFCL::gio::write(OutputFileInits);
 
-                for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
-                    RowSum = sum(ZoneInfo(ZoneNum).F(_, Findex));
+                for (Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
+                    RowSum = sum(thisEnclosure.F(_, Findex));
                     ObjexxFCL::gio::write(OutputFileInits, "(A,3(',',A),$)")
-                        << "View Factor" << Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name
-                        << cSurfaceClass(Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Class) << RoundSigDigits(RowSum, 4);
-                    for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                        ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(ZoneInfo(ZoneNum).F(SurfNum, Findex), 4);
+                        << "View Factor" << Surface(thisEnclosure.SurfacePtr(Findex)).Name
+                        << cSurfaceClass(Surface(thisEnclosure.SurfacePtr(Findex)).Class) << RoundSigDigits(RowSum, 4);
+                    for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
+                        ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(thisEnclosure.F(SurfNum, Findex), 4);
                     }
                     ObjexxFCL::gio::write(OutputFileInits);
                 }
 
                 if (Option1 == "IDF") {
                     ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!======== original input factors ===========================";
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + ZoneInfo(ZoneNum).Name + ',';
-                    for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                        for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
-                            if (!(SurfNum == NumOfZoneSurfaces && Findex == NumOfZoneSurfaces)) {
-                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                                                                         Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
-                                                                         RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ',';
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + thisEnclosure.Name + ',';
+                    for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
+                        for (Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
+                            if (!(SurfNum == thisEnclosure.NumOfSurfaces && Findex == thisEnclosure.NumOfSurfaces)) {
+                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' +
+                                                                         Surface(thisEnclosure.SurfacePtr(Findex)).Name + ',' +
+                                                                         RoundSigDigits(thisEnclosure.F(Findex, SurfNum), 6) + ',';
                             } else {
-                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                                                                         Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
-                                                                         RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ';';
+                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' +
+                                                                         Surface(thisEnclosure.SurfacePtr(Findex)).Name + ',' +
+                                                                         RoundSigDigits(thisEnclosure.F(Findex, SurfNum), 6) + ';';
                             }
                         }
                     }
                     ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!============= end of data ======================";
 
                     ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!============ final view factors =======================";
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + ZoneInfo(ZoneNum).Name + ',';
-                    for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                        for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
-                            if (!(SurfNum == NumOfZoneSurfaces && Findex == NumOfZoneSurfaces)) {
-                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                                                                         Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
-                                                                         RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ',';
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + thisEnclosure.Name + ',';
+                    for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
+                        for (Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
+                            if (!(SurfNum == thisEnclosure.NumOfSurfaces && Findex == thisEnclosure.NumOfSurfaces)) {
+                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' +
+                                                                         Surface(thisEnclosure.SurfacePtr(Findex)).Name + ',' +
+                                                                         RoundSigDigits(thisEnclosure.F(Findex, SurfNum), 6) + ',';
                             } else {
-                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name + ',' +
-                                                                         Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name + ',' +
-                                                                         RoundSigDigits(ZoneInfo(ZoneNum).F(Findex, SurfNum), 6) + ';';
+                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' +
+                                                                         Surface(thisEnclosure.SurfacePtr(Findex)).Name + ',' +
+                                                                         RoundSigDigits(thisEnclosure.F(Findex, SurfNum), 6) + ';';
                             }
                         }
                     }
@@ -745,14 +741,14 @@ namespace HeatBalanceIntRadExchange {
             if (ViewFactorReport) {
                 ObjexxFCL::gio::write(OutputFileInits, "(A,A,$)") << "Script F Factors"
                                                        << ",X Surface";
-                for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                    ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(ZoneInfo(ZoneNum).SurfacePtr(SurfNum)).Name;
+                for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
+                    ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(thisEnclosure.SurfacePtr(SurfNum)).Name;
                 }
                 ObjexxFCL::gio::write(OutputFileInits);
-                for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
-                    ObjexxFCL::gio::write(OutputFileInits, "(A,',',A,$)") << "Script F Factor" << Surface(ZoneInfo(ZoneNum).SurfacePtr(Findex)).Name;
-                    for (int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum) {
-                        ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(ZoneInfo(ZoneNum).ScriptF(Findex, SurfNum), 4);
+                for (Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
+                    ObjexxFCL::gio::write(OutputFileInits, "(A,',',A,$)") << "Script F Factor" << Surface(thisEnclosure.SurfacePtr(Findex)).Name;
+                    for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
+                        ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(thisEnclosure.ScriptF(Findex, SurfNum), 4);
                     }
                     ObjexxFCL::gio::write(OutputFileInits);
                 }
@@ -763,13 +759,13 @@ namespace HeatBalanceIntRadExchange {
             }
 
             RowSum = 0.0;
-            for (Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex) {
-                RowSum += sum(ZoneInfo(ZoneNum).F(_, Findex));
+            for (Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
+                RowSum += sum(thisEnclosure.F(_, Findex));
             }
-            RowSum = std::abs(RowSum - NumOfZoneSurfaces);
-            FixedRowSum = std::abs(FixedRowSum - NumOfZoneSurfaces);
+            RowSum = std::abs(RowSum - thisEnclosure.NumOfSurfaces);
+            FixedRowSum = std::abs(FixedRowSum - thisEnclosure.NumOfSurfaces);
             if (DisplayAdvancedReportVariables) {
-                ObjexxFCL::gio::write(OutputFileInits, "(8A)") << "Surface View Factor Check Values," + Zone(ZoneNum).Name + ',' +
+                ObjexxFCL::gio::write(OutputFileInits, "(8A)") << "Surface View Factor Check Values," + thisEnclosure.Name + ',' +
                                                            RoundSigDigits(CheckValue1, 6) + ',' + RoundSigDigits(CheckValue2, 6) + ',' +
                                                            RoundSigDigits(FinalCheckValue, 6) + ',' + RoundSigDigits(NumIterations) + ',' +
                                                            RoundSigDigits(FixedRowSum, 6) + ',' + RoundSigDigits(RowSum, 6);
@@ -778,6 +774,252 @@ namespace HeatBalanceIntRadExchange {
 
         if (ErrorsFound) {
             ShowFatalError("InitInteriorRadExchange: Errors found during initialization of radiant exchange.  Program terminated.");
+        }
+    }
+
+    void InitSolarViewFactors()
+    {
+
+        // Initializes view factors for diffuse solar distribution between surfaces in an enclosure.
+
+        static ObjexxFCL::gio::Fmt AFormat("(A)");
+
+        Array2D<Real64> SaveApproximateViewFactors; // Save for View Factor reporting
+        std::string Option1; // view factor report option
+
+        bool ErrorsFound = false;
+        bool ViewFactorReport = false;
+        General::ScanForReports("ViewFactorInfo", ViewFactorReport, _, Option1);
+
+        if (ViewFactorReport) { // Print heading
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Solar View Factor Information>";
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Solar View Factor - Zone/Enclosure Information>,Zone/Enclosure Name,Number of Surfaces";
+            ObjexxFCL::gio::write(OutputFileInits, fmtA)
+                << "! <Solar View Factor - Surface Information>,Surface Name,Surface Class,Area {m2},Azimuth,Tilt,Solar Absorbtance,#Sides,Vertices";
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Solar View Factor / Interchange Type>,Surface Name(s)";
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Solar View Factor>,Surface Name,Surface Class,Row Sum,View Factors for each Surface";
+        }
+
+        std::string cCurrentModuleObject = "ZoneProperty:UserViewFactors:bySurfaceName";
+        int NumZonesWithUserFbyS = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        if (NumZonesWithUserFbyS > 0) AlignInputViewFactors(cCurrentModuleObject, ErrorsFound);
+
+        for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
+            auto & thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
+            if (enclosureNum == 1) {
+                if (DisplayAdvancedReportVariables)
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Solar View Factor Check Values>,Zone/Enclosure Name,Original Check Value,Calculated Fixed Check "
+                                                         "Value,Final Check Value,Number of Iterations,Fixed RowSum Convergence,Used RowSum "
+                                                         "Convergence";
+            }
+            int numEnclosureSurfaces = 0;
+            for (int zoneNum : thisEnclosure.ZoneNums) {
+                for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
+                    if (Surface(surfNum).HeatTransSurf) ++numEnclosureSurfaces;
+                }
+            }
+            thisEnclosure.NumOfSurfaces = numEnclosureSurfaces;
+            if (numEnclosureSurfaces < 1) ShowFatalError("No surfaces in an enclosure in InitSolarViewFactors");
+
+            // Allocate the parts of the derived type
+            thisEnclosure.F.dimension(numEnclosureSurfaces, numEnclosureSurfaces, 0.0);
+            thisEnclosure.Area.dimension(numEnclosureSurfaces, 0.0);
+            thisEnclosure.SolAbsorptance.dimension(numEnclosureSurfaces, 0.0);
+            thisEnclosure.Azimuth.dimension(numEnclosureSurfaces, 0.0);
+            thisEnclosure.Tilt.dimension(numEnclosureSurfaces, 0.0);
+            thisEnclosure.SurfacePtr.dimension(numEnclosureSurfaces, 0);
+
+            // Initialize the surface pointer array
+            int enclosureSurfNum = 0;
+            for (int zoneNum : thisEnclosure.ZoneNums) {
+                for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
+                    // Do not include non-heat transfer surfaces, unless it is an air boundary interior window
+                    if (!Surface(surfNum).HeatTransSurf && !Construct(Surface(surfNum).Construction).TypeIsAirBoundaryInteriorWindow) continue;
+                    ++enclosureSurfNum;
+                    thisEnclosure.SurfacePtr(enclosureSurfNum) = surfNum;
+                    // Store pointers back to here
+                    Surface(surfNum).SolarEnclSurfIndex = enclosureSurfNum;
+                    Surface(surfNum).SolarEnclIndex = enclosureNum;
+                }
+            }
+            // Initialize the area and related arrays
+            for (int enclSurfNum = 1; enclSurfNum <= thisEnclosure.NumOfSurfaces; ++enclSurfNum) {
+                int const SurfNum = thisEnclosure.SurfacePtr(enclSurfNum);
+                thisEnclosure.Area(enclSurfNum) = Surface(SurfNum).Area;
+                thisEnclosure.SolAbsorptance(enclSurfNum) = Construct(Surface(SurfNum).Construction).InsideAbsorpSolar;
+                thisEnclosure.Azimuth(enclSurfNum) = Surface(SurfNum).Azimuth;
+                thisEnclosure.Tilt(enclSurfNum) = Surface(SurfNum).Tilt;
+            }
+
+            if (thisEnclosure.NumOfSurfaces == 1) {
+                // If there is only one surface in a zone, then there is no solar distribution
+                if (DisplayAdvancedReportVariables)
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Solar View Factor Check Values," + thisEnclosure.Name + ",0,0,0,-1,0,0";
+                continue; // Go to the next enclosure in the loop
+            }
+
+            //  Get user supplied view factors if available in idf.
+
+            bool NoUserInputF = true;
+
+            if (NumZonesWithUserFbyS > 0) {
+
+                GetInputViewFactorsbyName(thisEnclosure.Name,
+                                          thisEnclosure.NumOfSurfaces,
+                                          thisEnclosure.F,
+                                          thisEnclosure.SurfacePtr,
+                                          NoUserInputF,
+                                          ErrorsFound); // Obtains user input view factors from input file
+            }
+
+            if (NoUserInputF) {
+
+                // Calculate the view factors and make sure they satisfy reciprocity
+                CalcApproximateViewFactors(thisEnclosure.NumOfSurfaces,
+                                           thisEnclosure.Area,
+                                           thisEnclosure.Azimuth,
+                                           thisEnclosure.Tilt,
+                                           thisEnclosure.F,
+                                           thisEnclosure.SurfacePtr);
+            }
+
+            if (ViewFactorReport) { // Allocate and save user or approximate view factors for reporting.
+                SaveApproximateViewFactors.allocate(thisEnclosure.NumOfSurfaces, thisEnclosure.NumOfSurfaces);
+                SaveApproximateViewFactors = thisEnclosure.F;
+            }
+
+            Real64 CheckValue1 = 0.0;
+            Real64 CheckValue2 = 0.0;
+            Real64 FinalCheckValue = 0.0;
+            Real64 FixedRowSum = 0.0;
+            int NumIterations = 0;
+
+            FixViewFactors(thisEnclosure.NumOfSurfaces,
+                           thisEnclosure.Area,
+                           thisEnclosure.F,
+                           thisEnclosure.Name,
+                           thisEnclosure.ZoneNums,
+                           CheckValue1,
+                           CheckValue2,
+                           FinalCheckValue,
+                           NumIterations,
+                           FixedRowSum);
+
+            if (ViewFactorReport) { // Write to SurfInfo File
+                // Zone Surface Information Output
+                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Solar View Factor - Zone/Enclosure Information," + thisEnclosure.Name + ',' +
+                                                         General::RoundSigDigits(thisEnclosure.NumOfSurfaces);
+
+                for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
+                    ObjexxFCL::gio::write(OutputFileInits, "(A,',',A,$)")
+                        << "Solar View Factor - Surface Information," + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' +
+                               cSurfaceClass(Surface(thisEnclosure.SurfacePtr(SurfNum)).Class)
+                        << General::RoundSigDigits(thisEnclosure.Area(SurfNum), 4) + ',' + General::RoundSigDigits(thisEnclosure.Azimuth(SurfNum), 4) + ',' +
+                               General::RoundSigDigits(thisEnclosure.Tilt(SurfNum), 4) + ',' + General::RoundSigDigits(thisEnclosure.SolAbsorptance(SurfNum), 4) +
+                               ',' + General::RoundSigDigits(Surface(thisEnclosure.SurfacePtr(SurfNum)).Sides);
+                    for (int Vindex = 1; Vindex <= Surface(thisEnclosure.SurfacePtr(SurfNum)).Sides; ++Vindex) {
+                        auto &Vertex = Surface(thisEnclosure.SurfacePtr(SurfNum)).Vertex(Vindex);
+                        ObjexxFCL::gio::write(OutputFileInits, "(3(',',A),$)")
+                            << General::RoundSigDigits(Vertex.x, 4) << General::RoundSigDigits(Vertex.y, 4) << General::RoundSigDigits(Vertex.z, 4);
+                    }
+                    ObjexxFCL::gio::write(OutputFileInits);
+                }
+
+                ObjexxFCL::gio::write(OutputFileInits, "(A,A,$)") << "Approximate or User Input Solar ViewFactors"
+                                                       << ",To Surface,Surface Class,RowSum";
+                for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
+                    ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(thisEnclosure.SurfacePtr(SurfNum)).Name;
+                }
+                ObjexxFCL::gio::write(OutputFileInits);
+
+                for (int Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
+                    Real64 RowSum = sum(SaveApproximateViewFactors(_, Findex));
+                    ObjexxFCL::gio::write(OutputFileInits, "(A,3(',',A),$)")
+                        << "Solar View Factor" << Surface(thisEnclosure.SurfacePtr(Findex)).Name
+                        << cSurfaceClass(Surface(thisEnclosure.SurfacePtr(Findex)).Class) << General::RoundSigDigits(RowSum, 4);
+                    for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
+                        ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << General::RoundSigDigits(SaveApproximateViewFactors(SurfNum, Findex), 4);
+                    }
+                    ObjexxFCL::gio::write(OutputFileInits);
+                }
+            }
+
+            if (ViewFactorReport) {
+                ObjexxFCL::gio::write(OutputFileInits, "(A,A,$)") << "Final Solar ViewFactors"
+                                                       << ",To Surface,Surface Class,RowSum";
+                for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
+                    ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(thisEnclosure.SurfacePtr(SurfNum)).Name;
+                }
+                ObjexxFCL::gio::write(OutputFileInits);
+
+                for (int Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
+                    Real64 RowSum = sum(thisEnclosure.F(_, Findex));
+                    ObjexxFCL::gio::write(OutputFileInits, "(A,3(',',A),$)")
+                        << "Solar View Factor" << Surface(thisEnclosure.SurfacePtr(Findex)).Name
+                        << cSurfaceClass(Surface(thisEnclosure.SurfacePtr(Findex)).Class) << General::RoundSigDigits(RowSum, 4);
+                    for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
+                        ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << General::RoundSigDigits(thisEnclosure.F(SurfNum, Findex), 4);
+                    }
+                    ObjexxFCL::gio::write(OutputFileInits);
+                }
+
+                if (Option1 == "IDF") {
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!======== original input factors ===========================";
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + thisEnclosure.Name + ',';
+                    for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
+                        for (int Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
+                            if (!(SurfNum == thisEnclosure.NumOfSurfaces && Findex == thisEnclosure.NumOfSurfaces)) {
+                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' +
+                                                                         Surface(thisEnclosure.SurfacePtr(Findex)).Name + ',' +
+                                                                         General::RoundSigDigits(thisEnclosure.F(Findex, SurfNum), 6) + ',';
+                            } else {
+                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' +
+                                                                         Surface(thisEnclosure.SurfacePtr(Findex)).Name + ',' +
+                                                                         General::RoundSigDigits(thisEnclosure.F(Findex, SurfNum), 6) + ';';
+                            }
+                        }
+                    }
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!============= end of data ======================";
+
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!============ final view factors =======================";
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "ZoneProperty:UserViewFactors:bySurfaceName," + thisEnclosure.Name + ',';
+                    for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
+                        for (int Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
+                            if (!(SurfNum == thisEnclosure.NumOfSurfaces && Findex == thisEnclosure.NumOfSurfaces)) {
+                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' +
+                                                                         Surface(thisEnclosure.SurfacePtr(Findex)).Name + ',' +
+                                                                         General::RoundSigDigits(thisEnclosure.F(Findex, SurfNum), 6) + ',';
+                            } else {
+                                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "  " + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' +
+                                                                         Surface(thisEnclosure.SurfacePtr(Findex)).Name + ',' +
+                                                                         General::RoundSigDigits(thisEnclosure.F(Findex, SurfNum), 6) + ';';
+                            }
+                        }
+                    }
+                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "!============= end of data ======================";
+                }
+            }
+
+            if (ViewFactorReport) { // Deallocate saved approximate/user view factors
+                SaveApproximateViewFactors.deallocate();
+            }
+
+            Real64 RowSum = 0.0;
+            for (int Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
+                RowSum += sum(thisEnclosure.F(_, Findex));
+            }
+            RowSum = std::abs(RowSum - thisEnclosure.NumOfSurfaces);
+            FixedRowSum = std::abs(FixedRowSum - thisEnclosure.NumOfSurfaces);
+            if (DisplayAdvancedReportVariables) {
+                ObjexxFCL::gio::write(OutputFileInits, "(8A)") << "Solar View Factor Check Values," + thisEnclosure.Name + ',' +
+                                                           General::RoundSigDigits(CheckValue1, 6) + ',' + General::RoundSigDigits(CheckValue2, 6) + ',' +
+                                                           General::RoundSigDigits(FinalCheckValue, 6) + ',' + General::RoundSigDigits(NumIterations) + ',' +
+                                                           General::RoundSigDigits(FixedRowSum, 6) + ',' + General::RoundSigDigits(RowSum, 6);
+            }
+        }
+
+        if (ErrorsFound) {
+            ShowFatalError("InitSolarViewFactors: Errors found during initialization of diffuse solar distribution.  Program terminated.");
         }
     }
 
@@ -852,12 +1094,128 @@ namespace HeatBalanceIntRadExchange {
         }
     }
 
-    void GetInputViewFactorsbyName(std::string const &ZoneName, // Needed to check for user input view factors.
-                                   int const N,                 // NUMBER OF SURFACES
-                                   Array2A<Real64> F,           // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-                                   Array1A_int const SPtr,      // pointer to actual surface number
-                                   bool &NoUserInputF,          // Flag signifying no input F's for this
-                                   bool &ErrorsFound            // True when errors are found in number of fields vs max args
+    void AlignInputViewFactors(std::string const &cCurrentModuleObject, // Object type
+                               bool &ErrorsFound                        // True when errors are found
+    )
+    {
+        auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
+        auto &instancesValue = instances.value();
+        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            auto const &fields = instance.value();
+            std::string const thisZoneOrZoneListName = fields.at("zone_or_zonelist_name");
+            // do not mark object as used here - let GetInputViewFactorsbyName do that
+
+            // Look for matching solar enclosure name
+            bool enclMatchFound = false;
+            for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
+                auto &thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
+                if (UtilityRoutines::SameString(thisZoneOrZoneListName, thisEnclosure.Name)) {
+                    // View factor zone name matches enclosure name
+                    enclMatchFound = true;
+                    break;
+                }
+            }
+            if (enclMatchFound) continue; // We're done with this instance
+            // Look for matching solar enclosure name
+            for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
+                auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
+                if (UtilityRoutines::SameString(thisZoneOrZoneListName, thisEnclosure.Name)) {
+                    // View factor zone name matches enclosure name
+                    enclMatchFound = true;
+                    break;
+                }
+            }
+            if (enclMatchFound) continue; // We're done with this instance
+            // Find matching ZoneList name
+            int zoneListNum = UtilityRoutines::FindItemInList(
+                UtilityRoutines::MakeUPPERCase(thisZoneOrZoneListName), DataHeatBalance::ZoneList, DataHeatBalance::NumOfZoneLists);
+            if (zoneListNum > 0) {
+                // Look for radiant enclosure with same list of zones
+                auto &thisZoneList(DataHeatBalance::ZoneList(zoneListNum));
+                for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
+                    auto &thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
+                    bool anyZoneNotFound = false;
+                    // If the number of enclosure zones is not the same as the number of zonelist zone, go to the next enclosure
+                    int zlistNumZones = thisEnclosure.ZoneNums.size();
+                    if (thisZoneList.NumOfZones != zlistNumZones) continue;
+                    for (int zListZoneNum : thisZoneList.Zone) {
+                        // Search for matching zones
+                        bool thisZoneFound = false;
+                        for (int enclZoneNum : thisEnclosure.ZoneNums) {
+                            if (enclZoneNum == zListZoneNum) {
+                                thisZoneFound = true;
+                                break;
+                            }
+                        }
+                        if (!thisZoneFound){
+                                anyZoneNotFound = true;
+                                break;
+                        }
+                    }
+                    if (anyZoneNotFound){
+                        continue; // On to the next enclosure
+                    } else {
+                        enclMatchFound = true;
+                        // If matching ZoneList found, set the enclosure name to match
+                        thisEnclosure.Name = thisZoneOrZoneListName;
+                        break; // We're done with radiant enclosures
+                    }
+                }
+                if (!enclMatchFound) {
+                    // Look for solar enclosure with same list of zones
+                    for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
+                        auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
+                        bool anyZoneNotFound = false;
+                        // If the number of enclosure zones is not the same as the number of zonelist zone, go to the next enclosure
+                        int zlistNumZones = thisEnclosure.ZoneNums.size();
+                        if (thisZoneList.NumOfZones != zlistNumZones) continue;
+                        for (int zListZoneNum : thisZoneList.Zone) {
+                            // Search for matching zones
+                            bool thisZoneFound = false;
+                            for (int enclZoneNum : thisEnclosure.ZoneNums) {
+                                if (enclZoneNum == zListZoneNum) {
+                                    thisZoneFound = true;
+                                    break;
+                                }
+                            }
+                            if (!thisZoneFound) {
+                                anyZoneNotFound = true;
+                                break;
+                            }
+                        }
+                        if (anyZoneNotFound) {
+                            continue; // On to the next enclosure
+                        }
+                        else {
+                            enclMatchFound = true;
+                            // If matching ZoneList found, set the enclosure name to match
+                            thisEnclosure.Name = thisZoneOrZoneListName;
+                            break; // We're done with radiant enclosures
+                        }
+                    }
+                }
+            }
+            if (!enclMatchFound) {
+                if (zoneListNum > 0) {
+                    ShowSevereError("AlignInputViewFactors: " + cCurrentModuleObject + "=\"" + thisZoneOrZoneListName +
+                        "\" found a matching ZoneList, but did not find a matching radiant or solar enclosure with the same zones.");
+                    ErrorsFound = true;
+
+                } else {
+                    ShowSevereError("AlignInputViewFactors: " + cCurrentModuleObject + "=\"" + thisZoneOrZoneListName +
+                        "\" did not find a matching radiant or solar enclosure name.");
+                    ErrorsFound = true;
+                }
+            }
+        }
+    }
+
+    void GetInputViewFactorsbyName(std::string const &EnclosureName, // Needed to check for user input view factors.
+                                   int const N,                      // NUMBER OF SURFACES
+                                   Array2A<Real64> F,                // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
+                                   Array1A_int const SPtr,           // pointer to actual surface number
+                                   bool &NoUserInputF,               // Flag signifying no input F's for this
+                                   bool &ErrorsFound                 // True when errors are found in number of fields vs max args
     )
     {
 
@@ -865,10 +1223,9 @@ namespace HeatBalanceIntRadExchange {
         //       AUTHOR         Curt Pedersen
         //       DATE WRITTEN   September 2005
         //       MODIFIED       Linda Lawrie;September 2010
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This routine gets the user view factor info.
+        // This routine gets the user view factor info for an enclosure which could be a zone or a group of zones
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
@@ -887,15 +1244,15 @@ namespace HeatBalanceIntRadExchange {
         int numinx1;
         int inx1;
         int inx2;
-        Array1D_string ZoneSurfaceNames;
+        Array1D_string enclosureSurfaceNames;
 
         NoUserInputF = true;
-        UserFZoneIndex = inputProcessor->getObjectItemNum("ZoneProperty:UserViewFactors:bySurfaceName", "zone_name", ZoneName);
+        UserFZoneIndex = inputProcessor->getObjectItemNum("ZoneProperty:UserViewFactors:bySurfaceName", "zone_or_zonelist_name", EnclosureName);
 
         if (UserFZoneIndex > 0) {
-            ZoneSurfaceNames.allocate(N);
+            enclosureSurfaceNames.allocate(N);
             for (index = 1; index <= N; ++index) {
-                ZoneSurfaceNames(index) = Surface(SPtr(index)).Name;
+                enclosureSurfaceNames(index) = Surface(SPtr(index)).Name;
             }
             NoUserInputF = false;
 
@@ -912,32 +1269,30 @@ namespace HeatBalanceIntRadExchange {
                                           cNumericFieldNames);
 
             if (NumNums < pow_2(N)) {
-                ShowSevereError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values.");
+                ShowWarningError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", not enough values.");
                 ShowContinueError("...Number of input values [" + TrimSigDigits(NumNums) + "] is less than the required number=[" +
-                                  TrimSigDigits(pow_2(N)) + "].");
-                ErrorsFound = true;
-                NumNums = 0; // cancel getting any coordinates
+                                  TrimSigDigits(pow_2(N)) + "] Missing surface pairs will have a zero view factor.");
             }
             F = 0.0;
             numinx1 = 0;
 
             for (index = 2; index <= NumAlphas; index += 2) {
-                inx1 = UtilityRoutines::FindItemInList(cAlphaArgs(index), ZoneSurfaceNames, N);
-                inx2 = UtilityRoutines::FindItemInList(cAlphaArgs(index + 1), ZoneSurfaceNames, N);
+                inx1 = UtilityRoutines::FindItemInList(cAlphaArgs(index), enclosureSurfaceNames, N);
+                inx2 = UtilityRoutines::FindItemInList(cAlphaArgs(index + 1), enclosureSurfaceNames, N);
                 if (inx1 == 0) {
-                    ShowSevereError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", invalid surface name.");
-                    ShowContinueError("...Surface name=\"" + cAlphaArgs(index) + "\", not in this zone.");
+                    ShowSevereError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
+                    ShowContinueError("...Surface name=\"" + cAlphaArgs(index) + "\", not in this zone or enclosure.");
                     ErrorsFound = true;
                 }
                 if (inx2 == 0) {
-                    ShowSevereError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", invalid surface name.");
-                    ShowContinueError("...Surface name=\"" + cAlphaArgs(index + 2) + "\", not in this zone.");
+                    ShowSevereError("GetInputViewFactors: " + cCurrentModuleObject + "=\"" + EnclosureName + "\", invalid surface name.");
+                    ShowContinueError("...Surface name=\"" + cAlphaArgs(index + 2) + "\", not in this zone or enclosure.");
                     ErrorsFound = true;
                 }
                 ++numinx1;
                 if (inx1 > 0 && inx2 > 0) F(inx2, inx1) = rNumericArgs(numinx1);
             }
-            ZoneSurfaceNames.deallocate();
+            enclosureSurfaceNames.deallocate();
         }
     }
 
@@ -1062,15 +1417,16 @@ namespace HeatBalanceIntRadExchange {
         ZoneArea.deallocate();
     }
 
-    void FixViewFactors(int const N,                // NUMBER OF SURFACES
-                        Array1A<Real64> const A,    // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-                        Array2A<Real64> F,          // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
-                        int const ZoneNum,          // Zone number being fixe
-                        Real64 &OriginalCheckValue, // check of SUM(F) - N
-                        Real64 &FixedCheckValue,    // check after fixed of SUM(F) - N
-                        Real64 &FinalCheckValue,    // the one to go with
-                        int &NumIterations,         // number of iterations to fixed
-                        Real64 &RowSum              // RowSum of Fixed
+    void FixViewFactors(int const N,                     // NUMBER OF SURFACES
+                        Array1A<Real64> const A,         // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                        Array2A<Real64> F,               // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
+                        std::string &enclName,           // Name of Enclosure being fixed
+                        std::vector<int> const zoneNums, // Zones which are part of this enclosure
+                        Real64 &OriginalCheckValue,      // check of SUM(F) - N
+                        Real64 &FixedCheckValue,         // check after fixed of SUM(F) - N
+                        Real64 &FinalCheckValue,         // the one to go with
+                        int &NumIterations,              // number of iterations to fixed
+                        Real64 &RowSum                   // RowSum of Fixed
     )
     {
 
@@ -1179,7 +1535,7 @@ namespace HeatBalanceIntRadExchange {
                 }
             }
 
-            ShowWarningError("Surfaces in Zone=\"" + Zone(ZoneNum).Name + "\" do not define an enclosure.");
+            ShowWarningError("Surfaces in Zone/Enclosure=\"" + enclName + "\" do not define an enclosure.");
             ShowContinueError("Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness.");
             ShowContinueError("Reciprocity means that radiant exchange between two surfaces will match and not lead to an energy loss.");
             ShowContinueError("Completeness means that all of the view factors between a surface and the other surfaces in a zone add up to unity.");
@@ -1218,7 +1574,9 @@ namespace HeatBalanceIntRadExchange {
             }
             FinalCheckValue = FixedCheckValue = std::abs(RowSum - N);
             F = FixedF;
-            Zone(ZoneNum).EnforcedReciprocity = true;
+            for (int zoneNum : zoneNums) {
+                Zone(zoneNum).EnforcedReciprocity = true;
+            }
             return; // Do not iterate, stop with reciprocity satisfied.
 
         } //  N <= 3 Case
@@ -1272,7 +1630,7 @@ namespace HeatBalanceIntRadExchange {
                 FinalCheckValue = FixedCheckValue = CheckConvergeTolerance = std::abs(sum_FixedF - N);
                 if (CheckConvergeTolerance > 0.005) {
                     ShowWarningError("FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" +
-                                     Zone(ZoneNum).Name + "\".");
+                        enclName + "\".");
                     ShowContinueError("Enforced reciprocity has tolerance (ideal is 0)=[" + RoundSigDigits(CheckConvergeTolerance, 6) +
                                       "], Row Sum (ideal is " + RoundSigDigits(N) + ")=[" + RoundSigDigits(RowSum, 2) + "].");
                     ShowContinueError("If zone is unusual, or tolerance is on the order of 0.001, view factors are probably OK.");
@@ -1297,7 +1655,7 @@ namespace HeatBalanceIntRadExchange {
                 FinalCheckValue = FixedCheckValue;
             } else {
                 ShowWarningError("FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" +
-                                 Zone(ZoneNum).Name + "\".");
+                    enclName + "\".");
             }
         }
     }
@@ -1519,6 +1877,55 @@ namespace HeatBalanceIntRadExchange {
                 }
             }
         }
+    }
+
+    int GetRadiantSystemSurface(std::string const &cCurrentModuleObject, // Calling Object type
+                                std::string const &RadSysName,           // Calling Object name
+                                int const RadSysZoneNum,                 // Radiant system zone number
+                                std::string const &SurfaceName,          // Referenced surface name
+                                bool &ErrorsFound                        // True when errors are found
+    )
+    {
+        static std::string const routineName("GetRadiantSystemSurface: "); // include trailing blank space
+
+        // For radiant zone equipment, find the referenced surface and check if it is in the same zone or radiant enclosure
+        int const surfNum = UtilityRoutines::FindItemInList(SurfaceName, DataSurfaces::Surface);
+
+        // Trap for surfaces that do not exist
+        if (surfNum == 0) {
+            ShowSevereError(routineName + "Invalid Surface name = " + SurfaceName);
+            ShowContinueError("Occurs for " + cCurrentModuleObject + " = " + RadSysName);
+            ErrorsFound = true;
+            return surfNum;
+        }
+
+        if (RadSysZoneNum == 0) {
+            ShowSevereError(routineName + "Invalid Zone number passed by " + cCurrentModuleObject + " = " + RadSysName);
+            ErrorsFound = true;
+            return surfNum;
+        }
+
+        // Check if the surface and equipment are in the same zone or radiant enclosure
+        int const surfRadEnclNum = DataHeatBalance::Zone(DataSurfaces::Surface(surfNum).Zone).RadiantEnclosureNum;
+        int const radSysEnclNum = DataHeatBalance::Zone(RadSysZoneNum).RadiantEnclosureNum;
+        if (radSysEnclNum == 0) {
+            // This should never happen - but it does in some simple unit tests that are designed to throw errors
+            ShowSevereError(routineName + "Somehow the radiant system enclosure number is zero for" + cCurrentModuleObject + " = " +
+                            RadSysName);
+            ErrorsFound = true;
+        } else if (surfRadEnclNum == 0) {
+            // This should never happen
+            ShowSevereError(routineName + "Somehow  the surface enclosure number is zero for" + cCurrentModuleObject + " = " + RadSysName +
+                            " and Surface = " + SurfaceName); // LCOV_EXCL_LINE
+            ErrorsFound = true;                              // LCOV_EXCL_LINE
+        } else if (surfRadEnclNum != radSysEnclNum) {
+            ShowSevereError(routineName + "Surface = " + SurfaceName + " is not in the same zone or enclosure as the radiant equipment.");
+            ShowContinueError("Surface zone or enclosure = " + DataViewFactorInformation::ZoneRadiantInfo(surfRadEnclNum).Name);
+            ShowContinueError("Radiant equipment zone or enclosure = " + DataViewFactorInformation::ZoneRadiantInfo(radSysEnclNum).Name);
+            ShowContinueError("Occurs for " + cCurrentModuleObject + " = " + RadSysName);
+            ErrorsFound = true;
+        }
+        return surfNum;
     }
 
 } // namespace HeatBalanceIntRadExchange
