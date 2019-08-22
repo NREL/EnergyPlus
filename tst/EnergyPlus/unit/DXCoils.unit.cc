@@ -222,7 +222,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     // Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number", 	" DX Heating Coil Standard Rating Information, , DX Heating
     // coil, 6414.3, 6414.3, 6.58, 4" } ) ) );
 
-    // set up coil operating conditions (replicates first occurance of RH > 1 warning in HVACTemplate_UnitarySytsem annual run)
+    // set up coil operating conditions (replicates first occurrence of RH > 1 warning in HVACTemplate_UnitarySytsem annual run)
     OutDryBulbTemp = 16.1;
     OutHumRat = 0.0114507065;
     OutBaroPress = 98200.0;
