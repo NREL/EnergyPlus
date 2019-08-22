@@ -582,7 +582,7 @@ namespace HeatBalanceIntRadExchange {
             // Initialize the area and emissivity arrays
             for (int enclSurfNum = 1; enclSurfNum <= thisEnclosure.NumOfSurfaces; ++enclSurfNum) {
                 int const SurfNum = thisEnclosure.SurfacePtr(enclSurfNum);
-                ZoneInfo(ZoneNum).Area(ZoneSurfNum) = Surface(SurfNum).Area;
+                thisEnclosure.Area(enclSurfNum) = Surface(SurfNum).Area;
                 thisEnclosure.Emissivity(enclSurfNum) = Construct(Surface(SurfNum).Construction).InsideAbsorpThermal;
                 thisEnclosure.Azimuth(enclSurfNum) = Surface(SurfNum).Azimuth;
                 thisEnclosure.Tilt(enclSurfNum) = Surface(SurfNum).Tilt;
