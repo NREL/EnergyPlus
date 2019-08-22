@@ -262,6 +262,9 @@ def parse_obj(data):
                 continue
 
             if token != TOKEN_FIELD:
+                eat_comment(data)
+                if comma_or_semicolon == TOKEN_SEMICOLON:
+                    return root
                 raise RuntimeError("expected /field after , or ;")
             next_token(data)
             field_name = parse_line(data)

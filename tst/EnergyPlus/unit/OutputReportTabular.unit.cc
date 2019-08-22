@@ -518,9 +518,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTes
 
     AllocateLoadComponentArrays();
 
-    // radiantPulseUsed.allocate( { 0, TotDesDays + TotRunDesPersDays }, NumOfZones );
-    EXPECT_EQ(radiantPulseUsed.size(), 24u);
-
     // radiantPulseTimestep.allocate( { 0, TotDesDays + TotRunDesPersDays }, NumOfZones );
     EXPECT_EQ(radiantPulseTimestep.size(), 24u);
 
@@ -1455,7 +1452,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
 
     ManageSimulation(); // run the design day over the warmup period (24 hrs, 25 days)
 
@@ -1470,7 +1467,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ZoneMultiplierTest)
 
     DataGlobals::DoWeathSim = true;                           // flag to trick tabular reports to scan meters
     DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
-    UpdateTabularReports(OutputReportTabular::stepTypeHVAC);
+    UpdateTabularReports(OutputProcessor::TimeStepType::TimeStepSystem);
 
     // zone equipment should report single zone magnitude, multipliers do not apply, should be > 0 or what's the point
     EXPECT_EQ(DataHeatBalance::ZnRpt(1).PeopleRadGain, DataHeatBalance::ZnRpt(2).PeopleRadGain);
@@ -2492,7 +2489,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     // DataGlobals::DDOnlySimulation = true;
 
     ManageSimulation(); // run the design day over the warmup period (24 hrs, 25 days)
@@ -2501,7 +2498,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 
     DataGlobals::DoWeathSim = true;                           // flag to trick tabular reports to scan meters
     DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
-    UpdateTabularReports(OutputReportTabular::stepTypeHVAC);
+    UpdateTabularReports(OutputProcessor::TimeStepType::TimeStepSystem);
 
     EXPECT_NEAR(1.86168, DataSizing::FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
 }
@@ -3466,7 +3463,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 
 // ASSERT_TRUE( process_idf( idf_objects ) );
 
-// OutputProcessor::TimeValue.allocate( 2 );
+// OutputProcessor::TimeValue.allocate(2);
 ////DataGlobals::DDOnlySimulation = true;
 
 // ManageSimulation(); // run the design day over the warmup period (24 hrs, 25 days)
@@ -3476,7 +3473,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
 
 // DataGlobals::DoWeathSim = true; // flag to trick tabular reports to scan meters
 // DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
-// UpdateTabularReports( OutputReportTabular::stepTypeHVAC );
+// UpdateTabularReports( OutputProcessor::TimeStepType::TimeStepSystem );
 
 // EXPECT_NEAR( 1.86168, DataSizing::FinalSysSizing( 1 ).DesOutAirVolFlow, 0.0001 );
 
@@ -3542,20 +3539,20 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
 
     DataEnvironment::Month = 12;
 
-    GatherMonthlyResultsForTimestep(1);
+    GatherMonthlyResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 1, MonthlyColumns(1).reslt(12));
 
-    GatherMonthlyResultsForTimestep(1);
+    GatherMonthlyResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 2, MonthlyColumns(1).reslt(12));
 
-    GatherMonthlyResultsForTimestep(1);
+    GatherMonthlyResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 3, MonthlyColumns(1).reslt(12));
 
     ResetMonthlyGathering();
 
     EXPECT_EQ(0., MonthlyColumns(1).reslt(12));
 
-    GatherMonthlyResultsForTimestep(1);
+    GatherMonthlyResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 1, MonthlyColumns(1).reslt(12));
 }
 
@@ -3598,15 +3595,15 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     DataGlobals::DoWeathSim = true;
     DataGlobals::TimeStepZone = 1.0;
     displayTabularBEPS = true;
-    TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
 
     auto timeStep = 1.0;
 
     SetupTimePointers("Zone", timeStep);
     SetupTimePointers("HVAC", timeStep);
 
-    TimeValue(1).TimeStep = 60;
-    TimeValue(2).TimeStep = 60;
+    TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
+    TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
 
     GetInputOutputTableSummaryReports();
 
@@ -3615,18 +3612,18 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     DataEnvironment::Month = 12;
 
     UpdateMeterReporting();
-    UpdateDataandReport(1);
-    GatherBEPSResultsForTimestep(1);
+    UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 3, gatherEndUseBEPS(1, endUseExteriorLights));
 
     UpdateMeterReporting();
-    UpdateDataandReport(1);
-    GatherBEPSResultsForTimestep(1);
+    UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 6, gatherEndUseBEPS(1, endUseExteriorLights));
 
     UpdateMeterReporting();
-    UpdateDataandReport(1);
-    GatherBEPSResultsForTimestep(1);
+    UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 9, gatherEndUseBEPS(1, endUseExteriorLights));
 
     ResetBEPSGathering();
@@ -3634,8 +3631,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     EXPECT_EQ(0., gatherEndUseBEPS(1, endUseExteriorLights));
 
     UpdateMeterReporting();
-    UpdateDataandReport(1);
-    GatherBEPSResultsForTimestep(1);
+    UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+    GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
     EXPECT_EQ(extLitUse * 3, gatherEndUseBEPS(1, endUseExteriorLights));
 }
 
@@ -3680,7 +3677,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     EnergyMeters(endUseMeterNum).CurTSValue = 47.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the end use meter
     EnergyMeters(subEndUseMeterNum).CurTSValue = 28.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(ZoneTSReporting);
+    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
 
     EXPECT_EQ(123., gatherDemandTotal(resourceNum));
 
@@ -3696,7 +3693,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     EnergyMeters(endUseMeterNum).CurTSValue = 57.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the end use meter
     EnergyMeters(subEndUseMeterNum).CurTSValue = 38.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(ZoneTSReporting);
+    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
 
     EXPECT_EQ(133., gatherDemandTotal(resourceNum));
 
@@ -3712,7 +3709,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     EnergyMeters(endUseMeterNum).CurTSValue = 61.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the end use meter
     EnergyMeters(subEndUseMeterNum).CurTSValue = 42.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(ZoneTSReporting);
+    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
 
     EXPECT_EQ(133., gatherDemandTotal(resourceNum));
 
@@ -3728,7 +3725,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherPeakDemandForTimestep)
     EnergyMeters(endUseMeterNum).CurTSValue = 59.0 * DataGlobals::TimeStepZoneSec;    // create the current value for the end use meter
     EnergyMeters(subEndUseMeterNum).CurTSValue = 39.0 * DataGlobals::TimeStepZoneSec; // create the current value for the sub end use meter
 
-    GatherPeakDemandForTimestep(ZoneTSReporting);
+    GatherPeakDemandForTimestep(OutputProcessor::TimeStepType::TimeStepZone);
 
     EXPECT_EQ(143., gatherDemandTotal(resourceNum));
 
@@ -3765,7 +3762,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     Real64 reliefEnergy = 2.0 * TimeStepSysSec;
     Real64 condenserReject = 1.0 * TimeStepSysSec + 50.0;
 
-    GatherHeatEmissionReport(HVACTSReporting);
+    GatherHeatEmissionReport(OutputProcessor::TimeStepType::TimeStepSystem);
 
     EXPECT_EQ(reliefEnergy, DataHeatBalance::SysTotalHVACReliefHeatLoss);
     EXPECT_EQ(reliefEnergy * DataGlobals::convertJtoGJ, BuildingPreDefRep.emiHVACRelief);
@@ -3791,7 +3788,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
 
     Real64 coilReject = 1.0 * TimeStepSysSec + 200.0 + 10.0;
 
-    GatherHeatEmissionReport(HVACTSReporting);
+    GatherHeatEmissionReport(OutputProcessor::TimeStepType::TimeStepSystem);
     EXPECT_EQ(reliefEnergy, DataHeatBalance::SysTotalHVACReliefHeatLoss);
     EXPECT_EQ(2 * reliefEnergy * DataGlobals::convertJtoGJ, BuildingPreDefRep.emiHVACRelief);
     EXPECT_EQ(condenserReject + coilReject, DataHeatBalance::SysTotalHVACRejectHeatLoss);
@@ -4945,7 +4942,7 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 
 // ASSERT_TRUE( process_idf( idf_objects ) );
 
-// OutputProcessor::TimeValue.allocate( 2 );
+// OutputProcessor::TimeValue.allocate(2);
 ////DataGlobals::DDOnlySimulation = true;
 
 // ManageSimulation();
@@ -6039,7 +6036,7 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 
 // ASSERT_TRUE( process_idf( idf_objects ) );
 
-// OutputProcessor::TimeValue.allocate( 2 );
+// OutputProcessor::TimeValue.allocate(2);
 ////DataGlobals::DDOnlySimulation = true;
 
 // ManageSimulation();
@@ -6841,6 +6838,7 @@ TEST(OutputReportTabularTest, GetDelaySequencesTwice_test)
 
     Zone(iZone).SurfaceFirst = 1;
     Zone(iZone).SurfaceLast = 1;
+    Zone(iZone).RadiantEnclosureNum = 1;
 
     TotSurfaces = 4;
     Surface.allocate(TotSurfaces);
