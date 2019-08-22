@@ -208,6 +208,8 @@ namespace HeatBalanceManager {
     void CheckWarmupConvergence();
 
     void ReportWarmupConvergence();
+    
+    void UpdateWindowFaceTempsNonBSDFWin();
 
     //        End of Record Keeping subroutines for the HB Module
     // *****************************************************************************
