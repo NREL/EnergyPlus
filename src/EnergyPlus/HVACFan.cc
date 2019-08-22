@@ -85,7 +85,8 @@ namespace HVACFan {
     }
 
     int getFanObjectVectorIndex(      // lookup vector index for fan object name in object array EnergyPlus::HVACFan::fanObjs
-        std::string const &objectName // IDF name in input
+        std::string const &objectName, // IDF name in input
+        bool const ErrorCheck
     )
     {
         int index = -1;
@@ -102,7 +103,7 @@ namespace HVACFan {
                 }
             }
         }
-        if (!found) {
+        if (!found && ErrorCheck) {
             ShowSevereError("getFanObjectVectorIndex: did not find Fan:SystemModel name =" + objectName + ". Check inputs");
         }
         return index;
@@ -355,7 +356,7 @@ namespace HVACFan {
     FanSystem::FanSystem( // constructor
         std::string const &objectName)
         : availSchedIndex(0), inletNodeNum(0), outletNodeNum(0), designAirVolFlowRate(0.0), speedControl(SpeedControlMethod::NotSet), deltaPress(0.0),
-          designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), fanIsSecondaryDriver(false), m_fanType_Num(0),
+          designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), AirLoopNum(0), AirPathFlag(false), fanIsSecondaryDriver(false), m_fanType_Num(0),
           m_designAirVolFlowRateWasAutosized(false), m_minPowerFlowFrac(0.0), m_motorEff(0.0), m_motorInAirFrac(0.0),
           m_designElecPowerWasAutosized(false), m_powerSizingMethod(PowerSizingMethod::powerSizingMethodNotSet), m_elecPowerPerFlowRate(0.0),
           m_elecPowerPerFlowRatePerPressure(0.0), m_fanTotalEff(0.0), m_nightVentPressureDelta(0.0), m_nightVentFlowFraction(0.0), m_zoneNum(0),
@@ -367,7 +368,7 @@ namespace HVACFan {
           m_eMSFanEffOverrideOn(false), m_eMSFanEffValue(0.0), m_eMSMaxMassFlowOverrideOn(false), m_eMSAirMassFlowValue(0.0),
           m_faultyFilterFlag(false), m_faultyFilterIndex(0),
 
-          m_massFlowRateMaxAvail(0.0), m_massFlowRateMinAvail(0.0), m_rhoAirStdInit(0.0), m_designPointFEI(0.0)
+          m_massFlowRateMaxAvail(0.0), m_massFlowRateMinAvail(0.0), m_rhoAirStdInit(0.0), m_designPointFEI(0.0) 
     // oneTimePowerCurveCheck_( true )
     {
 
@@ -1039,6 +1040,25 @@ namespace HVACFan {
         if (DataContaminantBalance::Contaminant.GenericContamSimulation) {
             DataLoopNode::Node(outletNodeNum).GenContam = DataLoopNode::Node(inletNodeNum).GenContam;
         }
+
+        if (speedControl == SpeedControlMethod::Continuous) {
+            if (AirLoopNum > 0) {
+                DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_fanRunTimeFractionAtSpeed[0];
+            }
+        } else {
+            if (AirLoopNum > 0) {
+                if (m_numSpeeds == 1) {
+                    DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_outletAirMassFlowRate / m_maxAirMassFlowRate;
+                } else {
+                    if (m_outletAirMassFlowRate <= m_massFlowAtSpeed[0]) {
+                        DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_outletAirMassFlowRate / m_massFlowAtSpeed[0];
+                    } else {
+                        DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = 1.0;
+                    }
+                }
+            }
+        }
+
     }
 
     void FanSystem::report()

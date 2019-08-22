@@ -325,7 +325,6 @@ namespace OutputReportTabular {
     extern int DesignDayCount;
 
     // arrays related to pulse and load component reporting
-    extern Array2D<Real64> radiantPulseUsed;
     extern Array2D_int radiantPulseTimestep;
     extern Array2D<Real64> radiantPulseReceived;
     extern Array3D<Real64> loadConvectedNormal;
@@ -410,7 +409,7 @@ namespace OutputReportTabular {
         int numTables;
         int typeOfVar;                     // 0=not found, 1=integer, 2=real, 3=meter
         OutputProcessor::StoreType avgSum; // Variable  is Averaged=1 or Summed=2
-        int stepType;                      // Variable time step is Zone=1 or HVAC=2
+        OutputProcessor::TimeStepType stepType;                      // Variable time step is Zone=1 or HVAC=2
         OutputProcessor::Unit units;       // the units enumeration
         std::string ScheduleName;          // the name of the schedule
         int scheduleIndex;                 // index to the schedule specified - if no schedule use zero
@@ -418,7 +417,7 @@ namespace OutputReportTabular {
         // Default Constructor
         OutputTableBinnedType()
             : intervalStart(0.0), intervalSize(0.0), intervalCount(0), resIndex(0), numTables(0), typeOfVar(0),
-              avgSum(OutputProcessor::StoreType::Averaged), stepType(0), scheduleIndex(0)
+              avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::TimeStepZone), scheduleIndex(0)
         {
         }
     };
@@ -501,14 +500,14 @@ namespace OutputReportTabular {
         int typeOfVar;                        // 0=not found, 1=integer, 2=real, 3=meter
         int keyCount;                         // noel
         OutputProcessor::StoreType varAvgSum; // Variable  is Averaged=1 or Summed=2
-        int varStepType;                      // Variable time step is Zone=1 or HVAC=2
+        OutputProcessor::TimeStepType varStepType;                      // Variable time step is Zone=1 or HVAC=2
         Array1D_string NamesOfKeys;           // keyNames !noel
         Array1D_int IndexesForKeyVar;         // keyVarIndexes !noel
 
         // Default Constructor
         MonthlyFieldSetInputType()
             : aggregate(0), varUnits(OutputProcessor::Unit::None), typeOfVar(0), keyCount(0), varAvgSum(OutputProcessor::StoreType::Averaged),
-              varStepType(1)
+              varStepType(OutputProcessor::TimeStepType::TimeStepZone)
         {
         }
     };
@@ -534,7 +533,7 @@ namespace OutputReportTabular {
         int varNum;                        // variable or meter number
         int typeOfVar;                     // 0=not found, 1=integer, 2=real, 3=meter
         OutputProcessor::StoreType avgSum; // Variable  is Averaged=1 or Summed=2
-        int stepType;                      // Variable time step is Zone=1 or HVAC=2
+        OutputProcessor::TimeStepType stepType;                      // Variable time step is Zone=1 or HVAC=2
         OutputProcessor::Unit units;       // the units string, may be blank
         int aggType;                       // index to the type of aggregation (see list of parameters)
         Array1D<Real64> reslt;             // monthly results
@@ -545,7 +544,7 @@ namespace OutputReportTabular {
 
         // Default Constructor
         MonthlyColumnsType()
-            : varNum(0), typeOfVar(0), avgSum(OutputProcessor::StoreType::Averaged), stepType(0), units(OutputProcessor::Unit::None), aggType(0),
+            : varNum(0), typeOfVar(0), avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::TimeStepZone), units(OutputProcessor::Unit::None), aggType(0),
               reslt(12, 0.0), duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
         {
         }
@@ -590,7 +589,7 @@ namespace OutputReportTabular {
         Array2D_bool cellUsed;     // flag if the cell is used for the table of results (column, row)
         std::string peakDateHrMin; // string containing peak timestamp
         Real64 outsideDryBulb;     // outside dry bulb temperature at peak
-        Real64 outsideWebBulb;     // outside web bulb temperature at peak
+        Real64 outsideWetBulb;     // outside wet bulb temperature at peak
         Real64 outsideHumRatio;    // outside humidity ratio at peak
         Real64 zoneDryBulb;        // zone dry bulb temperature at peak
         Real64 zoneRelHum;         // zone relative humidity at peak
@@ -620,7 +619,7 @@ namespace OutputReportTabular {
 
         // default constructor
         CompLoadTablesType()
-            : desDayNum(0), timeStepMax(0), outsideDryBulb(0.), outsideWebBulb(0.), outsideHumRatio(0.), zoneDryBulb(0.), zoneRelHum(0.),
+            : desDayNum(0), timeStepMax(0), outsideDryBulb(0.), outsideWetBulb(0.), outsideHumRatio(0.), zoneDryBulb(0.), zoneRelHum(0.),
               supAirTemp(0.), mixAirTemp(0.), mainFanAirFlow(0.), outsideAirFlow(0.), designPeakLoad(0.), diffDesignPeak(0.), peakDesSensLoad(0.),
               estInstDelSensLoad(0.), diffPeakEst(0.), outsideAirRatio(0.), floorArea(0.), airflowPerFlrArea(0.), airflowPerTotCap(0.),
               areaPerTotCap(0.), totCapPerArea(0.), chlPumpPerFlow(0.), cndPumpPerFlow(0.), numPeople(0.)
@@ -670,7 +669,7 @@ namespace OutputReportTabular {
     // Functions
     void clear_state();
 
-    void UpdateTabularReports(int const IndexTypeKey); // What kind of data to update (Zone, HVAC)
+    void UpdateTabularReports(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     //======================================================================================================================
     //======================================================================================================================
@@ -732,19 +731,19 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GatherBinResultsForTimestep(int const IndexTypeKey); // What kind of data to update (Zone, HVAC)
+    void GatherBinResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherMonthlyResultsForTimestep(int const IndexTypeKey); // What kind of data to update (Zone, HVAC)
+    void GatherMonthlyResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherBEPSResultsForTimestep(int const IndexTypeKey); // What kind of data to update (Zone, HVAC)
+    void GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherSourceEnergyEndUseResultsForTimestep(int const IndexTypeKey); // What kind of data to update (Zone, HVAC)
+    void GatherSourceEnergyEndUseResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherPeakDemandForTimestep(int const IndexTypeKey); // What kind of data to update (Zone, HVAC)
+    void GatherPeakDemandForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherHeatGainReport(int const IndexTypeKey); // What kind of data to update (Zone, HVAC)
+    void GatherHeatGainReport(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherHeatEmissionReport(int const IndexTypeKey);
+    void GatherHeatEmissionReport(OutputProcessor::TimeStepType t_timeStepType);
 
     //======================================================================================================================
     //======================================================================================================================

@@ -164,14 +164,14 @@ namespace DataZoneEquipment {
         int EndUse_CompMode;
         std::string Group;
         int ReportVarIndex;
-        int ReportVarIndexType;
+        OutputProcessor::TimeStepType ReportVarIndexType;
         int ReportVarType;
         Real64 CurMeterReading;
 
         // Default Constructor
         EquipMeterData()
-            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(0), EndUse_CompMode(0), ReportVarIndex(0), ReportVarIndexType(0),
-              ReportVarType(0), CurMeterReading(0.0)
+            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(0), EndUse_CompMode(0), ReportVarIndex(0),
+              ReportVarIndexType(OutputProcessor::TimeStepType::TimeStepZone), ReportVarType(0), CurMeterReading(0.0)
         {
         }
     };
@@ -399,8 +399,8 @@ namespace DataZoneEquipment {
         std::vector<UnitarySystems::UnitarySys *> compPointer;
         Array1D_int CoolingPriority;
         Array1D_int HeatingPriority;
-        Array1D<Real64> SequentialCoolingFraction;
-        Array1D<Real64> SequentialHeatingFraction;
+        Array1D_int SequentialCoolingFractionSchedPtr;
+        Array1D_int SequentialHeatingFractionSchedPtr;
         Array1D_int CoolingCapacity;      // Current cooling capacity (negative) [W]
         Array1D_int HeatingCapacity;      // Current heating capacity (positive) [W]
         Array1D<EquipmentData> EquipData; // Index of energy output report data
@@ -414,6 +414,10 @@ namespace DataZoneEquipment {
                                        int &coolingPriority,   // Cooling priority num for matching equipment
                                        int &heatingPriority    // Heating priority num for matching equipment
         );
+
+        Real64 SequentialHeatingFraction(int equipNum);
+
+        Real64 SequentialCoolingFraction(int equipNum);
     };
 
     struct ControlList

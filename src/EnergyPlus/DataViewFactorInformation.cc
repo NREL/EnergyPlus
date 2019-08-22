@@ -59,38 +59,22 @@ namespace DataViewFactorInformation {
     // MODULE INFORMATION:
     //       AUTHOR         Rob Hitchcock
     //       DATE WRITTEN   September 2007; Moved from HeatBalanceIntRadExchange
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS MODULE:
-    // <description>
-
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-    // <use statements for data only modules>
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
 
-    // <use statements for access to subroutines in other modules>
+    int NumOfRadiantEnclosures(0); // Number of radiant enclosures
+    int NumOfSolarEnclosures(0);   // Number of solar enclosures
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
+    Array1D<ZoneViewFactorInformation> ZoneRadiantInfo;
+    Array1D<ZoneViewFactorInformation> ZoneSolarInfo;
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // Object Data
-    Array1D<ZoneViewFactorInformation> ZoneInfo;
+    void clear_state()
+    {
+        NumOfRadiantEnclosures = 0;
+        NumOfSolarEnclosures = 0;
+        ZoneRadiantInfo.deallocate();
+        ZoneSolarInfo.deallocate();
+    }
 
 } // namespace DataViewFactorInformation
 
