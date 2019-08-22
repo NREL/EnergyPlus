@@ -7760,7 +7760,7 @@ namespace SetPointManager {
 
         Array1D_int VarIndexes;                     // Variable Numbers
         Array1D_int VarTypes;                       // Variable Types (1=integer, 2=real, 3=meter)
-        Array1D_int IndexTypes;                     // Variable Index Types (1=Zone,2=HVAC)
+        Array1D<OutputProcessor::TimeStepType> IndexTypes;                     // Variable Index Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
         Array1D_int ResourceTypes;                  // ResourceTypes for each variable
         Array1D_string EndUses;                     // EndUses for each variable

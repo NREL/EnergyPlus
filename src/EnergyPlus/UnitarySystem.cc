@@ -3357,7 +3357,7 @@ namespace UnitarySystems {
                             if (isNotOK) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
-                            } else { // mine data from fan object
+                            } else {                                                                  // mine data from fan object
                                 if (HVACFan::getFanObjectVectorIndex(loc_m_FanName, false) < 0) {
                                     HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(loc_m_FanName)); // call constructor
                                 }

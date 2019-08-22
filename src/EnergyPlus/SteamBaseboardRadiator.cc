@@ -71,6 +71,7 @@
 #include <General.hh>
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
+#include <HeatBalanceIntRadExchange.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -555,16 +556,32 @@ namespace SteamBaseboardRadiator {
             SteamBaseboard(BaseboardNum).FracDistribToSurf.allocate(SteamBaseboard(BaseboardNum).TotSurfToDistrib);
             SteamBaseboard(BaseboardNum).FracDistribToSurf = 0.0;
 
+            // search zone equipment list structure for zone index
+            for (int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone) {
+                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
+                    if (DataZoneEquipment::ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBSteam_Num &&
+                        DataZoneEquipment::ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == SteamBaseboard(BaseboardNum).EquipID) {
+                        SteamBaseboard(BaseboardNum).ZonePtr = ctrlZone;
+                    }
+                }
+            }
+            if (SteamBaseboard(BaseboardNum).ZonePtr <= 0) {
+                ShowSevereError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + SteamBaseboard(BaseboardNum).EquipID +
+                    "\" is not on any ZoneHVAC:EquipmentList.");
+                ErrorsFound = true;
+                continue;
+            }
+
             AllFracsSummed = SteamBaseboard(BaseboardNum).FracDistribPerson;
             for (SurfNum = 1; SurfNum <= SteamBaseboard(BaseboardNum).TotSurfToDistrib; ++SurfNum) {
                 SteamBaseboard(BaseboardNum).SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 5);
-                SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + 5), Surface);
+                SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum) =
+                    HeatBalanceIntRadExchange::GetRadiantSystemSurface(cCMO_BBRadiator_Steam,
+                                                                       SteamBaseboard(BaseboardNum).EquipID,
+                                                                       SteamBaseboard(BaseboardNum).ZonePtr,
+                                                                       SteamBaseboard(BaseboardNum).SurfaceName(SurfNum),
+                                                                       ErrorsFound);
                 SteamBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) = rNumericArgs(SurfNum + 8);
-                if (SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum) == 0) {
-                    ShowSevereError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(SurfNum + 5) + "=\"" +
-                                    cAlphaArgs(SurfNum + 5) + "\" invalid - not found.");
-                    ErrorsFound = true;
-                }
                 if (SteamBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) > MaxFraction) {
                     ShowWarningError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 8) +
                                      "was greater than the allowable maximum.");
@@ -609,15 +626,6 @@ namespace SteamBaseboardRadiator {
 
             SteamBaseboard(BaseboardNum).FluidIndex = SteamIndex;
 
-            // search zone equipment list structure for zone index
-            for (int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone) {
-                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (DataZoneEquipment::ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBElectric_Num &&
-                        DataZoneEquipment::ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == SteamBaseboard(BaseboardNum).EquipID) {
-                        SteamBaseboard(BaseboardNum).ZonePtr = ctrlZone;
-                    }
-                }
-            }
         }
 
         if (ErrorsFound) {

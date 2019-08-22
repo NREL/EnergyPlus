@@ -534,7 +534,7 @@ namespace SystemAvailabilityManager {
         int ZoneListNum;
         int ZoneNumInList;
 
-        // Get the number of occurences of each type of manager and read in data
+        // Get the number of occurrences of each type of manager and read in data
         cCurrentModuleObject = "AvailabilityManager:Scheduled";
         inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
         maxNumbers = NumNumbers;
@@ -4151,7 +4151,7 @@ namespace SystemAvailabilityManager {
         Real64 CurveMax;                // Maximum value specified in a curve
         Real64 CurveVal;                // Curve value
 
-        // Get the number of occurences of each type of System Availability Manager
+        // Get the number of occurrences of each type of System Availability Manager
         cCurrentModuleObject = "AvailabilityManager:HybridVentilation";
         NumHybridVentSysAvailMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 

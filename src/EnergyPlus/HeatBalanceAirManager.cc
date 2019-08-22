@@ -2736,265 +2736,287 @@ namespace HeatBalanceAirManager {
         }
 
         cCurrentModuleObject = "ZoneCrossMixing";
-        TotCrossMixing = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        int inputCrossMixing = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotCrossMixing = inputCrossMixing + DataHeatBalance::NumAirBoundaryMixing;
         CrossMixing.allocate(TotCrossMixing);
 
         for (Loop = 1; Loop <= TotCrossMixing; ++Loop) {
 
-            inputProcessor->getObjectItem(cCurrentModuleObject,
-                                          Loop,
-                                          cAlphaArgs,
-                                          NumAlpha,
-                                          rNumericArgs,
-                                          NumNumber,
-                                          IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
-            CrossMixing(Loop).Name = cAlphaArgs(1);
-
-            CrossMixing(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
-            if (CrossMixing(Loop).ZonePtr == 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " + cAlphaFieldNames(2) +
-                                "=\"" + cAlphaArgs(2) + "\".");
-                ErrorsFound = true;
+            if (Loop > inputCrossMixing) {
+                // Create CrossMixing object from air boundary info
+                int airBoundaryIndex = Loop - inputCrossMixing - 1; //zero-based
+                int zone1 = DataHeatBalance::AirBoundaryMixingZone1[airBoundaryIndex];
+                int zone2 = DataHeatBalance::AirBoundaryMixingZone2[airBoundaryIndex];
+                CrossMixing(Loop).Name = "Air Boundary Mixing Zones " + General::RoundSigDigits(zone1) + " and " + General::RoundSigDigits(zone2);
+                CrossMixing(Loop).ZonePtr = zone1;
+                CrossMixing(Loop).SchedPtr = DataHeatBalance::AirBoundaryMixingSched[airBoundaryIndex];
+                CrossMixing(Loop).DesignLevel = DataHeatBalance::AirBoundaryMixingVol[airBoundaryIndex];
+                CrossMixing(Loop).FromZone = zone2;
             }
+            else {
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                    Loop,
+                    cAlphaArgs,
+                    NumAlpha,
+                    rNumericArgs,
+                    NumNumber,
+                    IOStat,
+                    lNumericFieldBlanks,
+                    lAlphaFieldBlanks,
+                    cAlphaFieldNames,
+                    cNumericFieldNames);
+                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            CrossMixing(Loop).SchedPtr = GetScheduleIndex(cAlphaArgs(3));
-            if (CrossMixing(Loop).SchedPtr == 0) {
-                if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(3) +
-                                    " is required but field is blank.");
-                } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " + cAlphaFieldNames(3) +
-                                    "=\"" + cAlphaArgs(3) + "\".");
-                }
-                ErrorsFound = true;
-            }
+                CrossMixing(Loop).Name = cAlphaArgs(1);
 
-            // Mixing equipment design level calculation method.
-            {
-                auto const SELECT_CASE_var(cAlphaArgs(4));
-                if ((SELECT_CASE_var == "FLOW/ZONE") || (SELECT_CASE_var == "FLOW")) {
-                    CrossMixing(Loop).DesignLevel = rNumericArgs(1);
-                    if (lNumericFieldBlanks(1)) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
-                                         cNumericFieldNames(1) + ", but that field is blank.  0 Cross Mixing will result.");
-                    }
-
-                } else if (SELECT_CASE_var == "FLOW/AREA") {
-                    if (CrossMixing(Loop).ZonePtr != 0) {
-                        if (rNumericArgs(2) >= 0.0) {
-                            CrossMixing(Loop).DesignLevel = rNumericArgs(2) * Zone(CrossMixing(Loop).ZonePtr).FloorArea;
-                            if (Zone(CrossMixing(Loop).ZonePtr).FloorArea <= 0.0) {
-                                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                                 " specifies " + cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Cross Mixing will result.");
-                            }
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                            "\", invalid flow/person specification [<0.0]=" + RoundSigDigits(rNumericArgs(2), 3));
-                            ErrorsFound = true;
-                        }
-                    }
-                    if (lNumericFieldBlanks(2)) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
-                                         cNumericFieldNames(2) + ", but that field is blank.  0 Cross Mixing will result.");
-                    }
-
-                } else if (SELECT_CASE_var == "FLOW/PERSON") {
-                    if (CrossMixing(Loop).ZonePtr != 0) {
-                        if (rNumericArgs(3) >= 0.0) {
-                            CrossMixing(Loop).DesignLevel = rNumericArgs(3) * Zone(CrossMixing(Loop).ZonePtr).TotOccupants;
-                            if (Zone(CrossMixing(Loop).ZonePtr).TotOccupants <= 0.0) {
-                                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                                 " specifies " + cNumericFieldNames(3) +
-                                                 ", but Zone Total Occupants = 0.  0 Cross Mixing will result.");
-                            }
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                            "\", invalid flow/person specification [<0.0]=" + RoundSigDigits(rNumericArgs(3), 3));
-                            ErrorsFound = true;
-                        }
-                    }
-                    if (lNumericFieldBlanks(3)) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
-                                         cNumericFieldNames(3) + ", but that field is blank.  0 Cross Mixing will result.");
-                    }
-
-                } else if (SELECT_CASE_var == "AIRCHANGES/HOUR") {
-                    if (CrossMixing(Loop).ZonePtr != 0) {
-                        if (rNumericArgs(4) >= 0.0) {
-                            CrossMixing(Loop).DesignLevel = rNumericArgs(4) * Zone(CrossMixing(Loop).ZonePtr).Volume / SecInHour;
-                            if (Zone(CrossMixing(Loop).ZonePtr).Volume <= 0.0) {
-                                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                                 " specifies " + cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Cross Mixing will result.");
-                            }
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                            "\", invalid flow/person specification [<0.0]=" + RoundSigDigits(rNumericArgs(4), 3));
-                            ErrorsFound = true;
-                        }
-                    }
-                    if (lNumericFieldBlanks(4)) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
-                                         cNumericFieldNames(4) + ", but that field is blank.  0 Cross Mixing will result.");
-                    }
-
-                } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid calculation method=" + cAlphaArgs(4));
+                CrossMixing(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
+                if (CrossMixing(Loop).ZonePtr == 0) {
+                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " + cAlphaFieldNames(2) +
+                        "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
-            }
 
-            CrossMixing(Loop).FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), Zone);
-            if (CrossMixing(Loop).FromZone == 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " + cAlphaFieldNames(5) +
-                                "=\"" + cAlphaArgs(5) + "\".");
-                ErrorsFound = true;
-            }
-            CrossMixing(Loop).DeltaTemperature = rNumericArgs(5);
+                CrossMixing(Loop).SchedPtr = GetScheduleIndex(cAlphaArgs(3));
+                if (CrossMixing(Loop).SchedPtr == 0) {
+                    if (lAlphaFieldBlanks(3)) {
+                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(3) +
+                            " is required but field is blank.");
+                    }
+                    else {
+                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " + cAlphaFieldNames(3) +
+                            "=\"" + cAlphaArgs(3) + "\".");
+                    }
+                    ErrorsFound = true;
+                }
 
-            if (NumAlpha > 5) {
-                CrossMixing(Loop).DeltaTempSchedPtr = GetScheduleIndex(cAlphaArgs(6));
-                if (CrossMixing(Loop).DeltaTempSchedPtr > 0) {
-                    if (!lNumericFieldBlanks(5))
-                        ShowWarningError(RoutineName +
-                                         "The Delta Temperature value and schedule are provided. The scheduled temperature will be used in the " +
-                                         cCurrentModuleObject + " object = " + cAlphaArgs(1));
-                    if (GetScheduleMinValue(CrossMixing(Loop).DeltaTempSchedPtr) < 0.0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                        " must have a delta temperature equal to or above 0 C defined in the schedule = " + cAlphaArgs(6));
-                        ErrorsFound = true;
-                    }
-                }
-            }
-            if (CrossMixing(Loop).DeltaTempSchedPtr == 0 && lNumericFieldBlanks(5) && (!lAlphaFieldBlanks(6))) {
-                ShowWarningError(RoutineName + cNumericFieldNames(5) +
-                                 ": the value field is blank and schedule field is invalid. The default value will be used (" +
-                                 RoundSigDigits(rNumericArgs(5), 1) + ") ");
-                ShowContinueError("in " + cCurrentModuleObject + " = " + cAlphaArgs(1) + " and the simulation continues...");
-            }
-            if (!lNumericFieldBlanks(5) && ((!lAlphaFieldBlanks(6)) && CrossMixing(Loop).DeltaTempSchedPtr == 0)) {
-                ShowWarningError(RoutineName + cAlphaFieldNames(6) + " = " + cAlphaArgs(6) + " is invalid. The constant value will be used at " +
-                                 RoundSigDigits(rNumericArgs(5), 1) + " degrees C ");
-                ShowContinueError("in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
-            }
+                // Mixing equipment design level calculation method.
+                {
+                    auto const SELECT_CASE_var(cAlphaArgs(4));
+                    if ((SELECT_CASE_var == "FLOW/ZONE") || (SELECT_CASE_var == "FLOW")) {
+                        CrossMixing(Loop).DesignLevel = rNumericArgs(1);
+                        if (lNumericFieldBlanks(1)) {
+                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
+                                cNumericFieldNames(1) + ", but that field is blank.  0 Cross Mixing will result.");
+                        }
 
-            if (NumAlpha > 6) {
-                CrossMixing(Loop).MinIndoorTempSchedPtr = GetScheduleIndex(cAlphaArgs(7));
-                if (CrossMixing(Loop).MinIndoorTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(7))) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(7) +
-                                        " not found=" + cAlphaArgs(7) + "\".");
-                        ErrorsFound = true;
                     }
-                }
-                if (CrossMixing(Loop).MinIndoorTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(CrossMixing(Loop).MinIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                        " must have a minimum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(7));
-                        ErrorsFound = true;
-                    }
-                }
-            }
+                    else if (SELECT_CASE_var == "FLOW/AREA") {
+                        if (CrossMixing(Loop).ZonePtr != 0) {
+                            if (rNumericArgs(2) >= 0.0) {
+                                CrossMixing(Loop).DesignLevel = rNumericArgs(2) * Zone(CrossMixing(Loop).ZonePtr).FloorArea;
+                                if (Zone(CrossMixing(Loop).ZonePtr).FloorArea <= 0.0) {
+                                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                        " specifies " + cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Cross Mixing will result.");
+                                }
+                            }
+                            else {
+                                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                    "\", invalid flow/person specification [<0.0]=" + RoundSigDigits(rNumericArgs(2), 3));
+                                ErrorsFound = true;
+                            }
+                        }
+                        if (lNumericFieldBlanks(2)) {
+                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
+                                cNumericFieldNames(2) + ", but that field is blank.  0 Cross Mixing will result.");
+                        }
 
-            if (NumAlpha > 7) {
-                CrossMixing(Loop).MaxIndoorTempSchedPtr = GetScheduleIndex(cAlphaArgs(8));
-                if (CrossMixing(Loop).MaxIndoorTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(8))) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(8) + " not found=\"" +
-                                        cAlphaArgs(8) + "\".");
-                        ErrorsFound = true;
                     }
-                }
-                if (CrossMixing(Loop).MaxIndoorTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(CrossMixing(Loop).MaxIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                        " must have a maximum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(8));
-                        ErrorsFound = true;
-                    }
-                }
-            }
+                    else if (SELECT_CASE_var == "FLOW/PERSON") {
+                        if (CrossMixing(Loop).ZonePtr != 0) {
+                            if (rNumericArgs(3) >= 0.0) {
+                                CrossMixing(Loop).DesignLevel = rNumericArgs(3) * Zone(CrossMixing(Loop).ZonePtr).TotOccupants;
+                                if (Zone(CrossMixing(Loop).ZonePtr).TotOccupants <= 0.0) {
+                                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                        " specifies " + cNumericFieldNames(3) +
+                                        ", but Zone Total Occupants = 0.  0 Cross Mixing will result.");
+                                }
+                            }
+                            else {
+                                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                    "\", invalid flow/person specification [<0.0]=" + RoundSigDigits(rNumericArgs(3), 3));
+                                ErrorsFound = true;
+                            }
+                        }
+                        if (lNumericFieldBlanks(3)) {
+                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
+                                cNumericFieldNames(3) + ", but that field is blank.  0 Cross Mixing will result.");
+                        }
 
-            if (NumAlpha > 8) {
-                CrossMixing(Loop).MinSourceTempSchedPtr = GetScheduleIndex(cAlphaArgs(9));
-                if (CrossMixing(Loop).MinSourceTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(9))) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(9) + " not found=\"" +
-                                        cAlphaArgs(9) + "\".");
-                        ErrorsFound = true;
                     }
-                }
-                if (CrossMixing(Loop).MinSourceTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(CrossMixing(Loop).MinSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                        " must have a minimum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(9));
-                        ErrorsFound = true;
-                    }
-                }
-            }
+                    else if (SELECT_CASE_var == "AIRCHANGES/HOUR") {
+                        if (CrossMixing(Loop).ZonePtr != 0) {
+                            if (rNumericArgs(4) >= 0.0) {
+                                CrossMixing(Loop).DesignLevel = rNumericArgs(4) * Zone(CrossMixing(Loop).ZonePtr).Volume / SecInHour;
+                                if (Zone(CrossMixing(Loop).ZonePtr).Volume <= 0.0) {
+                                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                        " specifies " + cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Cross Mixing will result.");
+                                }
+                            }
+                            else {
+                                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                    "\", invalid flow/person specification [<0.0]=" + RoundSigDigits(rNumericArgs(4), 3));
+                                ErrorsFound = true;
+                            }
+                        }
+                        if (lNumericFieldBlanks(4)) {
+                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
+                                cNumericFieldNames(4) + ", but that field is blank.  0 Cross Mixing will result.");
+                        }
 
-            if (NumAlpha > 9) {
-                CrossMixing(Loop).MaxSourceTempSchedPtr = GetScheduleIndex(cAlphaArgs(10));
-                if (CrossMixing(Loop).MaxSourceTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(10))) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(10) + " not found=\"" +
-                                        cAlphaArgs(9) + "\".");
+                    }
+                    else {
+                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid calculation method=" + cAlphaArgs(4));
                         ErrorsFound = true;
                     }
                 }
-                if (CrossMixing(Loop).MaxSourceTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(CrossMixing(Loop).MaxSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                        " must have a maximum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(10));
-                        ErrorsFound = true;
-                    }
-                }
-            }
 
-            if (NumAlpha > 10) {
-                CrossMixing(Loop).MinOutdoorTempSchedPtr = GetScheduleIndex(cAlphaArgs(11));
-                if (CrossMixing(Loop).MinOutdoorTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(11))) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(11) + " not found=\"" +
-                                        cAlphaArgs(9) + "\".");
-                        ErrorsFound = true;
-                    }
+                CrossMixing(Loop).FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), Zone);
+                if (CrossMixing(Loop).FromZone == 0) {
+                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " + cAlphaFieldNames(5) +
+                        "=\"" + cAlphaArgs(5) + "\".");
+                    ErrorsFound = true;
                 }
-                if (CrossMixing(Loop).MinOutdoorTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(CrossMixing(Loop).MinOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(
-                            RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                            " must have a minimum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(11));
-                        ErrorsFound = true;
-                    }
-                }
-            }
+                CrossMixing(Loop).DeltaTemperature = rNumericArgs(5);
 
-            if (NumAlpha > 11) {
-                CrossMixing(Loop).MaxOutdoorTempSchedPtr = GetScheduleIndex(cAlphaArgs(12));
-                if (CrossMixing(Loop).MaxOutdoorTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(12))) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(12) + " not found=\"" +
-                                        cAlphaArgs(9) + "\".");
-                        ErrorsFound = true;
+                if (NumAlpha > 5) {
+                    CrossMixing(Loop).DeltaTempSchedPtr = GetScheduleIndex(cAlphaArgs(6));
+                    if (CrossMixing(Loop).DeltaTempSchedPtr > 0) {
+                        if (!lNumericFieldBlanks(5))
+                            ShowWarningError(RoutineName +
+                                "The Delta Temperature value and schedule are provided. The scheduled temperature will be used in the " +
+                                cCurrentModuleObject + " object = " + cAlphaArgs(1));
+                        if (GetScheduleMinValue(CrossMixing(Loop).DeltaTempSchedPtr) < 0.0) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                " must have a delta temperature equal to or above 0 C defined in the schedule = " + cAlphaArgs(6));
+                            ErrorsFound = true;
+                        }
                     }
                 }
-                if (CrossMixing(Loop).MaxOutdoorTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(CrossMixing(Loop).MaxOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(
-                            RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                            " must have a maximum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(12));
-                        ErrorsFound = true;
+                if (CrossMixing(Loop).DeltaTempSchedPtr == 0 && lNumericFieldBlanks(5) && (!lAlphaFieldBlanks(6))) {
+                    ShowWarningError(RoutineName + cNumericFieldNames(5) +
+                        ": the value field is blank and schedule field is invalid. The default value will be used (" +
+                        RoundSigDigits(rNumericArgs(5), 1) + ") ");
+                    ShowContinueError("in " + cCurrentModuleObject + " = " + cAlphaArgs(1) + " and the simulation continues...");
+                }
+                if (!lNumericFieldBlanks(5) && ((!lAlphaFieldBlanks(6)) && CrossMixing(Loop).DeltaTempSchedPtr == 0)) {
+                    ShowWarningError(RoutineName + cAlphaFieldNames(6) + " = " + cAlphaArgs(6) + " is invalid. The constant value will be used at " +
+                        RoundSigDigits(rNumericArgs(5), 1) + " degrees C ");
+                    ShowContinueError("in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
+                }
+
+                if (NumAlpha > 6) {
+                    CrossMixing(Loop).MinIndoorTempSchedPtr = GetScheduleIndex(cAlphaArgs(7));
+                    if (CrossMixing(Loop).MinIndoorTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(7))) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(7) +
+                                " not found=" + cAlphaArgs(7) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (CrossMixing(Loop).MinIndoorTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(CrossMixing(Loop).MinIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                " must have a minimum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(7));
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+
+                if (NumAlpha > 7) {
+                    CrossMixing(Loop).MaxIndoorTempSchedPtr = GetScheduleIndex(cAlphaArgs(8));
+                    if (CrossMixing(Loop).MaxIndoorTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(8))) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(8) + " not found=\"" +
+                                cAlphaArgs(8) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (CrossMixing(Loop).MaxIndoorTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(CrossMixing(Loop).MaxIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                " must have a maximum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(8));
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+
+                if (NumAlpha > 8) {
+                    CrossMixing(Loop).MinSourceTempSchedPtr = GetScheduleIndex(cAlphaArgs(9));
+                    if (CrossMixing(Loop).MinSourceTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(9))) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(9) + " not found=\"" +
+                                cAlphaArgs(9) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (CrossMixing(Loop).MinSourceTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(CrossMixing(Loop).MinSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                " must have a minimum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(9));
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+
+                if (NumAlpha > 9) {
+                    CrossMixing(Loop).MaxSourceTempSchedPtr = GetScheduleIndex(cAlphaArgs(10));
+                    if (CrossMixing(Loop).MaxSourceTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(10))) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(10) + " not found=\"" +
+                                cAlphaArgs(9) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (CrossMixing(Loop).MaxSourceTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(CrossMixing(Loop).MaxSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                " must have a maximum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(10));
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+
+                if (NumAlpha > 10) {
+                    CrossMixing(Loop).MinOutdoorTempSchedPtr = GetScheduleIndex(cAlphaArgs(11));
+                    if (CrossMixing(Loop).MinOutdoorTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(11))) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(11) + " not found=\"" +
+                                cAlphaArgs(9) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (CrossMixing(Loop).MinOutdoorTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(CrossMixing(Loop).MinOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(
+                                RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                " must have a minimum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(11));
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+
+                if (NumAlpha > 11) {
+                    CrossMixing(Loop).MaxOutdoorTempSchedPtr = GetScheduleIndex(cAlphaArgs(12));
+                    if (CrossMixing(Loop).MaxOutdoorTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(12))) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(12) + " not found=\"" +
+                                cAlphaArgs(9) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (CrossMixing(Loop).MaxOutdoorTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(CrossMixing(Loop).MaxOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(
+                                RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                " must have a maximum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(12));
+                            ErrorsFound = true;
+                        }
                     }
                 }
             }

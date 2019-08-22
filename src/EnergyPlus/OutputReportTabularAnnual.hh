@@ -76,7 +76,7 @@ namespace OutputReportTabularAnnual {
 
     void checkAggregationOrderForAnnual();
 
-    void GatherAnnualResultsForTimeStep(int kindOfTypeStep);
+    void GatherAnnualResultsForTimeStep(OutputProcessor::TimeStepType kindOfTypeStep);
 
     void ResetAnnualGathering();
 
@@ -115,7 +115,7 @@ namespace OutputReportTabularAnnual {
 
         bool invalidAggregationOrder();
 
-        void gatherForTimestep(int kindOfTypeStep);
+        void gatherForTimestep(OutputProcessor::TimeStepType kindOfTypeStep);
 
         void resetGathering();
 
@@ -142,9 +142,9 @@ namespace OutputReportTabularAnnual {
         std::vector<std::string> m_objectNames;     // for each row of annual table
         std::vector<AnnualFieldSet> m_annualFields; // for each column
 
-        Real64 getElapsedTime(int);
+        Real64 getElapsedTime(OutputProcessor::TimeStepType kindOfTimeStep);
 
-        Real64 getSecondsInTimeStep(int);
+        Real64 getSecondsInTimeStep(OutputProcessor::TimeStepType kindOfTimeStep);
 
         void computeBinColumns();
 

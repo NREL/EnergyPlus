@@ -86,7 +86,8 @@ namespace HVACFan {
 
     int getFanObjectVectorIndex(      // lookup vector index for fan object name in object array EnergyPlus::HVACFan::fanObjs
         std::string const &objectName, // IDF name in input
-        bool const ErrorCheck)
+        bool const ErrorCheck
+    )
     {
         int index = -1;
         bool found = false;
