@@ -177,6 +177,8 @@ public:
 
     void reportOrphanRecordObjects();
 
+    const json& getObjectInstances(std::string const &ObjType);
+
 private:
     struct ObjectInfo
     {

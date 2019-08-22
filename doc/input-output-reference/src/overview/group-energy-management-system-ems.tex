@@ -574,7 +574,7 @@ EnergyManagementSystem:InternalVariable,
 
 \subsection{EnergyManagementSystem:CurveOrTableIndexVariable}\label{energymanagementsystemcurveortableindexvariable}
 
-The EMS provides a method for reusing curve and table input objects from elsewhere in the model. Input objects, such as \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curvebiquadratic]{Curve:Biquadratic}, or Table:TwoIndependetVariables, are used by various component models to describe performance relationships in a generic way. By using an EnergyManagementSystem:CurveOrTableIndexVariable input object, these curves and tables can be used in your own Erl programs. This object sets up an Erl variable that contains an index that points to specific curve or table. This index variable is then used as the first argument in a call to the built-in function called @CurveValue so that the correct curve or table is evaluated.
+The EMS provides a method for reusing curve and table input objects from elsewhere in the model. Input objects, such as \hyperref[curvecubic]{Curve:Cubic}, \hyperref[curvebiquadratic]{Curve:Biquadratic}, or \hyperref[tablelookup]{Table:Lookup}, are used by various component models to describe performance relationships in a generic way. By using an EnergyManagementSystem:CurveOrTableIndexVariable input object, these curves and tables can be used in your own Erl programs. This object sets up an Erl variable that contains an index that points to specific curve or table. This index variable is then used as the first argument in a call to the built-in function called @CurveValue so that the correct curve or table is evaluated.
 
 \subsubsection{Inputs}\label{inputs-9-005}
 

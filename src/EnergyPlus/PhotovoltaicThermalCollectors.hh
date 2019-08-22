@@ -208,6 +208,13 @@ namespace PhotovoltaicThermalCollectors {
     void GetPVTThermalPowerProduction(int const PVindex, // index of PV generator (not PVT collector)
                                       Real64 &ThermalPower,
                                       Real64 &ThermalEnergy);
+    int GetAirInletNodeNum(std::string const &PVTName,
+        bool &ErrorsFound
+    );
+
+    int GetAirOutletNodeNum(std::string const &PVTName,
+        bool &ErrorsFound
+    );
 
     //=====================  Utility/Other routines for module.
     // Insert as appropriate
