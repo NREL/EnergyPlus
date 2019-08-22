@@ -3287,7 +3287,7 @@ namespace HeatBalanceSurfaceManager {
             if (!Surface(SurfNum).HeatTransSurf) continue;
             //!!! Following may need to be removed or changed when shelves are considered in adjacent reflection calculations
             if (Surface(SurfNum).Class == SurfaceClass_Shading) continue;
-            int enclosureNum = Surface(SurfNum).SolarEnclIndex;
+            int const enclosureNum = Surface(SurfNum).SolarEnclIndex;
             IntBmIncInsSurfIntensRep(SurfNum) = ZoneBmSolFrIntWinsRep(enclosureNum) / DataViewFactorInformation::ZoneSolarInfo(enclosureNum).TotalSurfArea;
             IntBmIncInsSurfAmountRep(SurfNum) = IntBmIncInsSurfIntensRep(SurfNum) * (Surface(SurfNum).Area + SurfaceWindow(SurfNum).DividerArea);
             IntBmIncInsSurfAmountRepEnergy(SurfNum) = IntBmIncInsSurfAmountRep(SurfNum) * TimeStepZoneSec;
@@ -3307,11 +3307,11 @@ namespace HeatBalanceSurfaceManager {
         // COMPUTE RADIANT GAINS ON SURFACES
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
-            int zoneNum = Surface(SurfNum).Zone;
+            int const zoneNum = Surface(SurfNum).Zone;
             if (!Surface(SurfNum).HeatTransSurf || zoneNum == 0) continue; // Skip non-heat transfer surfaces
             if (Surface(SurfNum).Class == SurfaceClass_TDD_Dome) continue; // Skip tubular daylighting device domes
-            int radEnclosureNum = Zone(zoneNum).RadiantEnclosureNum;
-            int solEnclosureNum = Zone(zoneNum).SolarEnclosureNum;
+            int const radEnclosureNum = Zone(zoneNum).RadiantEnclosureNum;
+            int const solEnclosureNum = Zone(zoneNum).SolarEnclosureNum;
 
             ConstrNum = Surface(SurfNum).Construction;
 
@@ -3512,7 +3512,7 @@ namespace HeatBalanceSurfaceManager {
         // RJH 08/30/07 - Add InitialDifSolInAbs, InitialDifSolwinAbs, and InitialDifSolAbsByShade
         // calced in CalcWinTransDifSolInitialDistribution to QRadSWInAbs, QRadSWwinAbs, and IntSWAbsByShade here
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            int zoneNum = Surface(SurfNum).Zone;
+            int const zoneNum = Surface(SurfNum).Zone;
             if (!Surface(SurfNum).HeatTransSurf || zoneNum == 0) continue; // Skip non-heat transfer surfaces
             if (Surface(SurfNum).Class == SurfaceClass_TDD_Dome) continue; // Skip tubular daylighting device domes
             ConstrNum = Surface(SurfNum).Construction;
@@ -3569,7 +3569,7 @@ namespace HeatBalanceSurfaceManager {
             SWInAbsTotalReport(SurfNum) = 0.0;
             InitialDifSolInAbsReport(SurfNum) = 0.0;
             InitialDifSolInTransReport(SurfNum) = 0.0;
-            int zoneNum = Surface(SurfNum).Zone;
+            int const zoneNum = Surface(SurfNum).Zone;
             if (!Surface(SurfNum).HeatTransSurf || zoneNum == 0) continue; // Skip non-heat transfer surfaces
             if (Surface(SurfNum).Class == SurfaceClass_TDD_Dome) continue; // Skip tubular daylighting device domes
             ConstrNum = Surface(SurfNum).Construction;
@@ -3707,7 +3707,7 @@ namespace HeatBalanceSurfaceManager {
             Real64 SUM1 = 0.0;
             auto & thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(radEnclosureNum));
 
-            for (int SurfNum : thisEnclosure.SurfacePtr ) {
+            for (int const SurfNum : thisEnclosure.SurfacePtr ) {
 
                 if (!Surface(SurfNum).HeatTransSurf) continue;
 
@@ -3841,7 +3841,7 @@ namespace HeatBalanceSurfaceManager {
             SUM1 = 0.0;
 
 
-            for (int SurfNum : DataViewFactorInformation::ZoneSolarInfo(enclosureNum).SurfacePtr) {
+            for (int const SurfNum : DataViewFactorInformation::ZoneSolarInfo(enclosureNum).SurfacePtr) {
 
                 ConstrNum = Surface(SurfNum).Construction;
 
@@ -7294,8 +7294,7 @@ namespace HeatBalanceSurfaceManager {
                 TMULTseq(CurOverallSimDay, TimeStepInDay, enclosureNum) = TMULT(enclosureNum);
             }
             for (jSurf = 1; jSurf <= TotSurfaces; ++jSurf) {
-                int iZone = Surface(jSurf).Zone;
-                if (!Surface(jSurf).HeatTransSurf || iZone == 0) continue;   // Skip non-heat transfer surfaces
+                if (!Surface(jSurf).HeatTransSurf || Surface(jSurf).Zone == 0) continue;   // Skip non-heat transfer surfaces
                 if (Surface(jSurf).Class == SurfaceClass_TDD_Dome) continue; // Skip tubular daylighting device domes
                 ITABSFseq(CurOverallSimDay, TimeStepInDay, jSurf) = ITABSF(jSurf);
             }

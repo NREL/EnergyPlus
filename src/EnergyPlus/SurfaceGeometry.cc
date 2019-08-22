@@ -1994,8 +1994,9 @@ namespace SurfaceGeometry {
             for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (!Surface(SurfNum).HeatTransSurf) continue;                                               // ignore shading surfaces
                 if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum) continue; // interzone, not adiabatic surface
-                if (!Construct(Surface(SurfNum).Construction).TypeIsIRT)
+                if (!Construct(Surface(SurfNum).Construction).TypeIsIRT) {
                     continue;
+                }
                 if (!DisplayExtraWarnings) {
                     ++iTmp1;
                 } else {
@@ -7036,19 +7037,6 @@ namespace SurfaceGeometry {
                 surf.HeatTransferAlgorithm = HeatTransferModel_Kiva;
                 DataHeatBalance::AnyKiva = true;
             }
-            //if (surf.HeatTransSurf) {
-            //    if (DataHeatBalance::Construct(surf.Construction).TypeIsAirBoundaryIRTSurface) {
-            //        // IRT air boundaries use CTF algorithm
-            //        surf.HeatTransferAlgorithm = HeatTransferModel_CTF;
-            //        DataHeatBalance::AnyAirBoundary = true;
-            //    } else if (DataHeatBalance::Construct(surf.Construction).TypeIsAirBoundaryInteriorWindow) {
-            //        surf.HeatTransferAlgorithm = HeatTransferModel_AirBoundaryIntWin;
-            //        DataHeatBalance::AnyAirBoundary = true;
-            //    } else if (DataHeatBalance::Construct(surf.Construction).TypeIsAirBoundary) {
-            //        surf.HeatTransferAlgorithm = HeatTransferModel_AirBoundaryNoHT;
-            //        DataHeatBalance::AnyAirBoundary = true;
-            //    }
-            //}
         }
 
         // Setup Kiva instances

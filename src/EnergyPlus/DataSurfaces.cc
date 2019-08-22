@@ -180,7 +180,7 @@ namespace DataSurfaces {
 
     // Parameters to indicate heat transfer model to use for surface
     int const HeatTransferModel_NotSet(-1);
-    int const HeatTransferModel_None(0); // shading surfaces for example and non-heat transfer air boundaries
+    int const HeatTransferModel_None(0); // shading surfaces
     int const HeatTransferModel_CTF(1);
     int const HeatTransferModel_EMPD(2);
     int const HeatTransferModel_CondFD(5);
@@ -190,7 +190,6 @@ namespace DataSurfaces {
     int const HeatTransferModel_TDD(9);                 // tubular daylighting device
     int const HeatTransferModel_Kiva(10);               // Kiva ground calculations
     int const HeatTransferModel_AirBoundaryNoHT(11);    // Construction:AirBoundary - not IRT or interior window
-    int const HeatTransferModel_AirBoundaryIntWin(12);  // Construction:AirBoundary - interior window for solar/daylighting
 
     // Parameters for classification of outside face of surfaces
     int const OutConvClass_WindwardVertWall(101);
