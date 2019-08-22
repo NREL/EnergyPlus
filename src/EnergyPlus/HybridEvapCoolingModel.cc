@@ -1484,7 +1484,7 @@ namespace HybridEvapCoolingModel {
                         Supply_Air_Ventilation_Volume = Mvent / 1.225; // stored as volumetric flow for reporting
                     }
 
-                    if (Mvent > MinOA_Msa) {
+                    if (Mvent - MinOA_Msa > -0.000001) {
                         MinVRMet = MinVRMetOnce = true;
                     } else {
                         MinVRMet = false;
@@ -1872,7 +1872,7 @@ namespace HybridEvapCoolingModel {
             StepIns.RequestedCoolingLoad = 0;
         }
         // establish if ventilation needed
-        if (MinOA_Msa > 0) VentilationRequested = true;
+        if (StepIns.MinimumOA > 0) VentilationRequested = true;
         // Load required to meet dehumidifying setpoint (<0 = a dehumidify load)  [kgWater/s]
         if (StepIns.ZoneDehumidificationLoad < 0) {
             DehumidificationRequested = true;
