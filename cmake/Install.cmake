@@ -443,7 +443,7 @@ elseif(WIN32)
   # You need at least one "install(..." command for it to be registered as a component
   install(CODE "MESSAGE(\"Registering filetypes.\")" COMPONENT RegisterFileType)
   install(CODE "MESSAGE(\"Copying and Registering DLLs\")" COMPONENT CopyAndRegisterSystemDLLs)
-
+  install(CODE "MESSAGE(\"Creating start menu.\")" COMPONENT CreateStartMenu)
 
 endif()
 
@@ -559,6 +559,12 @@ cpack_add_component(Licenses
   DESCRIPTION "License files for EnergyPlus"
   REQUIRED)
 
+# No need for system privileges for this
+cpack_add_component(CreateStartMenu
+  DISPLAY_NAME "Start Menu links"
+  DESCRIPTION "Create Start Menu Links"
+)
+
 cpack_add_component(RegisterFileType
   DISPLAY_NAME "Associate with EP-Launch and IDFEditor"
   DESCRIPTION "Associate *.idf, *.imf, and *.epg files with EP-Launch, *.ddy and *.expidf with IDFEditor.exe"
@@ -583,6 +589,10 @@ cpack_ifw_configure_component(Unspecified
 cpack_ifw_configure_component(Symlinks
     SCRIPT cmake/qtifw/install_mac_createsymlinks.qs
     REQUIRES_ADMIN_RIGHTS
+)
+
+cpack_ifw_configure_component(CreateStartMenu
+    SCRIPT cmake/qtifw/install_win_createstartmenu.qs
 )
 
 cpack_ifw_configure_component(RegisterFileType
