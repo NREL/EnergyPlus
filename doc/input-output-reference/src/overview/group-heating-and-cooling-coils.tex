@@ -5735,84 +5735,61 @@ Coil:WaterHeating:AirToWaterHeatPump:Pumped,
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Coil Total Cooling Rate {[}W{]}
+  HVAC,Average,Heating Coil Total Heating Rate {[}W{]}
 \item
-  HVAC,Sum,Cooling Coil Total Cooling Energy {[}J{]}
+  HVAC,Sum,Heating Coil Total Heating Energy {[}J{]}
 \item
-  HVAC,Average,Cooling Coil Sensible Cooling Rate {[}W{]}
+  HVAC,Average,Heating Coil Runtime Fraction {[]}
 \item
-  HVAC,Sum,Cooling Coil Sensible Cooling Energy {[}J{]}
+  HVAC,Average,Heating Coil Crankcase Heater Electric Power {[}W{]}
 \item
-  HVAC,Average,Cooling Coil Latent Cooling Rate {[}W{]}
+  HVAC,Sum,Heating Coil Crankcase Heater Electric Energy {[}J{]}
 \item
-  HVAC,Sum,Cooling Coil Latent Cooling Energy {[}J{]}
+  HVAC,Average,Heating Coil Total Water Heating Rate {[}W{]}
 \item
-  HVAC,Average, Cooling Coil Runtime Fraction {[]}
+  HVAC,Sum,Heating Coil Total Water Heating Energy {[}J{]}
 \item
-  HVAC,Average,DX Cooling Coil Crankcase Heater Electric Power {[}W{]}
+  HVAC,Average,Heating Coil Water Heating Electric Power{[}W{]}
 \item
-  HVAC,Sum, Cooling Coil Crankcase Heater Electric Energy {[}J{]}
-\item
-  HVAC,Average,Cooling Coil Total Water Heating Rate {[}W{]}
-\item
-  HVAC,Sum,Cooling Coil Total Water Heating Energy {[}J{]}
-\item
-  HVAC,Average,Cooling Coil Water Heating Electric Power{[}W{]}
-\item
-  HVAC,Sum,Cooling Coil Water Heating Electric Energy {[}J{]}
+  HVAC,Sum,Heating Coil Water Heating Electric Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Cooling Coil Total Cooling Rate {[}W{]}}\label{cooling-coil-total-cooling-rate-w-6}
+\paragraph{Heating Coil Total Heating Rate {[}W{]}}\label{heating-coil-total-heating-rate-w-6}
 
-This output field is the average total (sensible and latent) cooling rate output of the DX coil in Watts for the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
+This output field is the average total heating rate output of the DX coil in Watts for the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{Cooling Coil Total Cooling Energy {[}J{]}}\label{cooling-coil-total-cooling-energy-j-6}
+\paragraph{Heating Coil Total Heating Energy {[}J{]}}\label{heating-coil-total-heating-energy-j-6}
 
-This output field is the total (sensible plus latent) cooling output of the DX coil in Joules for the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
+This output field is the total heating output of the DX coil in Joules for the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{Cooling Coil Sensible Cooling Rate {[}W{]}}\label{cooling-coil-sensible-cooling-rate-w-6}
-
-This output field is the average moist air sensible cooling rate output of the DX coil in Watts for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
-
-\paragraph{Cooling Coil Sensible Cooling Energy {[}J{]}}\label{cooling-coil-sensible-cooling-energy-j-6}
-
-This output field is the moist air sensible cooling output of the DX coil in Joules for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
-
-\paragraph{DX Coil Latent Cooling Rate {[}W{]}}\label{dx-coil-latent-cooling-rate-w}
-
-This output field is the average latent cooling rate output of the DX coil in Watts for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
-
-\paragraph{Cooling Coil Latent Cooling Energy {[}J{]}}\label{cooling-coil-latent-cooling-energy-j-4}
-
-This output field is the latent cooling output of the DX coil in Joules for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
-
-\paragraph{Cooling Coil Runtime Fraction {[]}}\label{cooling-coil-runtime-fraction-4}
+\paragraph{Heating Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-4}
 
 This output field is the average runtime fraction of the DX coil compressor for the timestep being reported. This also represents the runtime fraction of the condenser water pump.
 
-\paragraph{Cooling Coil Crankcase Heater Electric Power{[}W{]}}\label{cooling-coil-crankcase-heater-electric-powerw-1}
+\paragraph{Heating Coil Crankcase Heater Electric Power{[}W{]}}\label{heating-coil-crankcase-heater-electric-powerw-1}
 
 This output field is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. The crankcase heater operates only when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation, otherwise this output variable is set equal to 0.
 
-\paragraph{Cooling Coil Crankcase Heater Electric Energy {[}J{]}}\label{cooling-coil-crankcase-heater-electric-energy-j-2}
+\paragraph{Heating Coil Crankcase Heater Electric Energy {[}J{]}}\label{heating-coil-crankcase-heater-electric-energy-j-2}
 
 This output field is the total electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
-\paragraph{Cooling Coil Total Water Heating Rate {[}W{]}}\label{cooling-coil-total-water-heating-rate-w}
+\paragraph{Heating Coil Total Water Heating Rate {[}W{]}}\label{heating-coil-total-water-heating-rate-w}
 
 This output field is the average water heating rate output of the DX coil (condenser coil plus condenser water pump) in Watts for the timestep being reported. This is determined using the inlet and outlet water temperatures and the water mass flow rate through the condenser coil.
 
-\paragraph{Cooling Coil Total Water Heating Energy {[}J{]}}\label{cooling-coil-total-water-heating-energy-j}
+\paragraph{Heating Coil Total Water Heating Energy {[}J{]}}\label{heating-coil-total-water-heating-energy-j}
 
 This output field is the total water heating output of the DX coil (condenser coil plus condenser water pump) in Joules for the timestep being reported. This is determined using the inlet and outlet water temperatures and the water mass flow rate through the condenser coil.
 
-\paragraph{Cooling Coil Water Heating Electric Power{[}W{]}}\label{cooling-coil-water-heating-electric-powerw}
+\paragraph{Heating Coil Water Heating Electric Power{[}W{]}}\label{heating-coil-water-heating-electric-powerw}
 
 This output field is the average electricity consumption rate of the DX coil compressor and condenser pump in Watts for the timestep being reported.
 
-\paragraph{Cooling Coil Water Heating Electric Energy {[}J{]}}\label{cooling-coil-water-heating-electric-energy-j}
+\paragraph{Heating Coil Water Heating Electric Energy {[}J{]}}\label{heating-coil-water-heating-electric-energy-j}
 
 This output field is the electricity consumption of the DX coil compressor and condenser pump in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
+
 
 \subsection{Coil:WaterHeating:AirToWaterHeatPump:Wrapped}\label{coilwaterheatingairtowaterheatpumpwrapped}
 
@@ -5959,82 +5936,58 @@ Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Coil Total Cooling Rate {[}W{]}
+  HVAC,Average,Heating Coil Total Heating Rate {[}W{]}
 \item
-  HVAC,Sum,Cooling Coil Total Cooling Energy {[}J{]}
+  HVAC,Sum,Heating Coil Total Heating Energy {[}J{]}
 \item
-  HVAC,Average,Cooling Coil Sensible Cooling Rate {[}W{]}
+  HVAC,Average, Heating Coil Runtime Fraction {[]}
 \item
-  HVAC,Sum,Cooling Coil Sensible Cooling Energy {[}J{]}
+  HVAC,Average,Heating Coil Crankcase Heater Electric Power {[}W{]}
 \item
-  HVAC,Average,Cooling Coil Latent Cooling Rate {[}W{]}
+  HVAC,Sum, Heating Coil Crankcase Heater Electric Energy {[}J{]}
 \item
-  HVAC,Sum,Cooling Coil Latent Cooling Energy {[}J{]}
+  HVAC,Average,Heating Coil Total Water Heating Rate {[}W{]}
 \item
-  HVAC,Average, Cooling Coil Runtime Fraction {[]}
+  HVAC,Sum,Heating Coil Total Water Heating Energy {[}J{]}
 \item
-  HVAC,Average,DX Cooling Coil Crankcase Heater Electric Power {[}W{]}
+  HVAC,Average,Heating Coil Water Heating Electric Power{[}W{]}
 \item
-  HVAC,Sum, Cooling Coil Crankcase Heater Electric Energy {[}J{]}
-\item
-  HVAC,Average,Cooling Coil Total Water Heating Rate {[}W{]}
-\item
-  HVAC,Sum,Cooling Coil Total Water Heating Energy {[}J{]}
-\item
-  HVAC,Average,Cooling Coil Water Heating Electric Power{[}W{]}
-\item
-  HVAC,Sum,Cooling Coil Water Heating Electric Energy {[}J{]}
+  HVAC,Sum,Heating Coil Water Heating Electric Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Cooling Coil Total Cooling Rate {[}W{]}}\label{cooling-coil-total-cooling-rate-w-7}
+\paragraph{Heating Coil Total Heating Rate {[}W{]}}\label{heating-coil-total-heating-rate-w-7}
 
-This output field is the average total (sensible and latent) cooling rate output of the DX coil in Watts for the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
+This output field is the average total heating rate output of the DX coil in Watts for the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{Cooling Coil Total Cooling Energy {[}J{]}}\label{cooling-coil-total-cooling-energy-j-7}
+\paragraph{Heating Coil Total Heating Energy {[}J{]}}\label{heating-coil-total-heating-energy-j-7}
 
-This output field is the total (sensible plus latent) cooling output of the DX coil in Joules for the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
+This output field is the total heating output of the DX coil in Joules for the timestep being reported. This is determined by the coil inlet and outlet air conditions and the air mass flow rate through the coil.
 
-\paragraph{Cooling Coil Sensible Cooling Rate {[}W{]}}\label{cooling-coil-sensible-cooling-rate-w-7}
-
-This output field is the average moist air sensible cooling rate output of the DX coil in Watts for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
-
-\paragraph{Cooling Coil Sensible Cooling Energy {[}J{]}}\label{cooling-coil-sensible-cooling-energy-j-7}
-
-This output field is the moist air sensible cooling output of the DX coil in Joules for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
-
-\paragraph{DX Coil Latent Cooling Rate {[}W{]}}\label{dx-coil-latent-cooling-rate-w-1}
-
-This output field is the average latent cooling rate output of the DX coil in Watts for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
-
-\paragraph{Cooling Coil Latent Cooling Energy {[}J{]}}\label{cooling-coil-latent-cooling-energy-j-5}
-
-This output field is the latent cooling output of the DX coil in Joules for the timestep being reported. This is determined by the inlet and outlet air conditions and the air mass flow rate through the coil.
-
-\paragraph{Cooling Coil Runtime Fraction {[]}}\label{cooling-coil-runtime-fraction-5}
+\paragraph{Heating Coil Runtime Fraction {[]}}\label{heating-coil-runtime-fraction-5}
 
 This output field is the average runtime fraction of the DX coil compressor for the timestep being reported. This also represents the runtime fraction of the condenser water pump.
 
-\paragraph{Cooling Coil Crankcase Heater Electric Power{[}W{]}}\label{cooling-coil-crankcase-heater-electric-powerw-2}
+\paragraph{Heating Coil Crankcase Heater Electric Power{[}W{]}}\label{heating-coil-crankcase-heater-electric-powerw-2}
 
 This output field is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. The crankcase heater operates only when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation, otherwise this output variable is set equal to 0.
 
-\paragraph{Cooling Coil Crankcase Heater Electric Energy {[}J{]}}\label{cooling-coil-crankcase-heater-electric-energy-j-3}
+\paragraph{Heating Coil Crankcase Heater Electric Energy {[}J{]}}\label{heating-coil-crankcase-heater-electric-energy-j-3}
 
 This output field is the total electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
-\paragraph{Cooling Coil Total Water Heating Rate {[}W{]}}\label{cooling-coil-total-water-heating-rate-w-1}
+\paragraph{Heating Coil Total Water Heating Rate {[}W{]}}\label{heating-coil-total-water-heating-rate-w-1}
 
 This output field is the average water heating rate output of the DX coil (condenser coil plus condenser water pump) in Watts for the timestep being reported.
 
-\paragraph{Cooling Coil Total Water Heating Energy {[}J{]}}\label{cooling-coil-total-water-heating-energy-j-1}
+\paragraph{Heating Coil Total Water Heating Energy {[}J{]}}\label{heating-coil-total-water-heating-energy-j-1}
 
 This output field is the total water heating output of the DX coil (condenser coil plus condenser water pump) in Joules for the timestep being reported.
 
-\paragraph{Cooling Coil Water Heating Electric Power{[}W{]}}\label{cooling-coil-water-heating-electric-powerw-1}
+\paragraph{Heating Coil Water Heating Electric Power{[}W{]}}\label{heating-coil-water-heating-electric-powerw-1}
 
 This output field is the average electricity consumption rate of the DX coil compressor in Watts for the timestep being reported.
 
-\paragraph{Cooling Coil Water Heating Electric Energy {[}J{]}}\label{cooling-coil-water-heating-electric-energy-j-1}
+\paragraph{Heating Coil Water Heating Electric Energy {[}J{]}}\label{heating-coil-water-heating-electric-energy-j-1}
 
 This output field is the electricity consumption of the DX coil compressor in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = DHW, Group Key = Plant (ref. Output:Meter objects).
 
