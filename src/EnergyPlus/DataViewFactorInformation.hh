@@ -81,9 +81,10 @@ namespace DataViewFactorInformation {
         Real64 ExtWindowArea;               // Exterior window area
         Real64 TotalSurfArea;               // Total surface area
         Array1D<Real64> SolAbsorptance;     // Surface solar absorptance
+        int TotalEnclosureDaylRefPoints;    // Total number of daylighting reference points in enclosure
 
         // Default Constructor
-        ZoneViewFactorInformation() : NumOfSurfaces(0), FloorArea(0.0), ExtWindowArea(0.0), TotalSurfArea(0.0)
+        ZoneViewFactorInformation() : NumOfSurfaces(0), FloorArea(0.0), ExtWindowArea(0.0), TotalSurfArea(0.0), TotalEnclosureDaylRefPoints(0)
         {
         }
     };
