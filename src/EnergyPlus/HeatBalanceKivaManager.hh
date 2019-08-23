@@ -88,19 +88,21 @@ namespace HeatBalanceKivaManager {
         std::string name;
         std::vector<int> surfaces;
         int wallConstructionIndex;
+        Real64 assumedIndoorTemperature;
     };
 
     class KivaInstanceMap
     {
     public:
         KivaInstanceMap(
-            Kiva::Foundation &foundation, int floorSurface, std::vector<int> wallSurfaces, int zoneNum, Real64 floorWeight, int constructionNum, class KivaManager* kmPtr = nullptr);
+            Kiva::Foundation &foundation, int floorSurface, std::vector<int> wallSurfaces, int zoneNum, Real64 zoneAssumedTemperature, Real64 floorWeight, int constructionNum, class KivaManager* kmPtr = nullptr);
         Kiva::Instance instance;
         int floorSurface;
         std::vector<int> wallSurfaces;
         int zoneNum;
         int zoneControlType; // Uncontrolled=0, Temperature=1, Operative=2, Comfort=3, HumidityAndTemperature=4
         int zoneControlNum;
+        Real64 zoneAssumedTemperature;
         void initGround(const KivaWeatherData &kivaWeather);
         void setInitialBoundaryConditions(const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
         void setBoundaryConditions();

@@ -4612,7 +4612,12 @@ namespace WeatherManager {
                             auto const SELECT_CASE_var(DesDayInput(EnvrnNum).SolarModel);
 
                             if (SELECT_CASE_var == ASHRAE_ClearSky) {
-                                TotHoriz = DesDayInput(EnvrnNum).SkyClear * A * (C + CosZenith) * std::exp(-B / CosZenith);
+                                Real64 Exponent = B / CosZenith;
+                                if (Exponent > 700.0) {
+                                    TotHoriz = 0.0;
+                                } else {
+                                    TotHoriz = DesDayInput(EnvrnNum).SkyClear * A * (C + CosZenith) * std::exp(-B / CosZenith);
+                                }
                                 HO = GlobalSolarConstant * AVSC * CosZenith;
                                 KT = TotHoriz / HO;
                                 KT = min(KT, 0.75);

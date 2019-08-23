@@ -1,4 +1,4 @@
-﻿! HeatPumpWaterToAirEquationFit_WaterHeatingDesuperheater_StratifiedTank.idf
+! HeatPumpWaterToAirEquationFit_WaterHeatingDesuperheater_StratifiedTank.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
 ! Highlights:              Examples ground source heat pumps serving a total of 5 zones. These heat pumps are modeled
