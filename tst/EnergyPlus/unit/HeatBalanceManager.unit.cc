@@ -1832,4 +1832,32 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.0);
 }
 
+TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialData_IRTSurfaces)
+{
+    std::string const idf_objects = delimited_string({
+        "Material:InfraredTransparent,",
+        "IRTMaterial1;            !- Name",
+    });
+    
+    ASSERT_TRUE(process_idf(idf_objects));
+    
+    bool ErrorsFound(false); // If errors detected in input
+
+    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    
+    ASSERT_FALSE(ErrorsFound);
+    
+    int MaterNum = 1;
+    
+    EXPECT_EQ(Material(MaterNum).ROnly, true);
+    EXPECT_NEAR(Material(MaterNum).Resistance, 0.01, 0.00001);
+    EXPECT_NEAR(Material(MaterNum).AbsorpThermal, 0.9999, 0.00001);
+    EXPECT_NEAR(Material(MaterNum).AbsorpThermalInput, 0.9999, 0.00001);
+    EXPECT_NEAR(Material(MaterNum).AbsorpSolar, 1.0, 0.00001);
+    EXPECT_NEAR(Material(MaterNum).AbsorpSolarInput, 1.0, 0.00001);
+    EXPECT_NEAR(Material(MaterNum).AbsorpVisible, 1.0, 0.00001);
+    EXPECT_NEAR(Material(MaterNum).AbsorpVisibleInput, 1.0, 0.00001);
+    
+}
+
 } // namespace EnergyPlus
