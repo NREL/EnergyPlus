@@ -9862,7 +9862,7 @@ namespace AirflowNetworkBalanceManager {
                     }
                     if (i == GetOAMixerReliefNodeNumber(1)) {
                         NodeFound(i) = true;
-                    } else if (i == GetOAMixerInletNodeNumber(OAMixerNum)) {
+                    } else if (i == GetOAMixerInletNodeNumber(1)) {
                         NodeFound(i) = true;
                     } else {
                         ShowSevereError(RoutineName + "'" + NodeID(i) + "' is not defined as an AirflowNetwork:Distribution:Node object.");
