@@ -1548,8 +1548,8 @@ void ReportCoilSelection::setCoilHeatingCapacity(
 
         if (DataSizing::ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
             c->oaPeakVolFlow = DataSizing::ZoneEqSizing(curZoneEqNum).OAVolFlow;
-        } else if (DataSizing::ZoneEqSizing(curZoneEqNum).ATMixerVolFlow > 0.0) {     // TRANE AT Mixer Sizing
-            c->oaPeakVolFlow = DataSizing::ZoneEqSizing(curZoneEqNum).ATMixerVolFlow; // TRANE AT Mixer Sizing
+        } else if (DataSizing::ZoneEqSizing(curZoneEqNum).ATMixerVolFlow > 0.0) {
+            c->oaPeakVolFlow = DataSizing::ZoneEqSizing(curZoneEqNum).ATMixerVolFlow;
         } else {
             c->oaPeakVolFlow = 0.0;
         }

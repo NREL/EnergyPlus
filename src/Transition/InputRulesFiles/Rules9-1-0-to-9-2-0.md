@@ -4,6 +4,11 @@ Input Changes
 This file documents the structural changes on the input of EnergyPlus that could affect interfaces, etc.
 This was previously an Excel workbook that made for very difficult version control, especially during busy times around code freezes.
 
+# Object Change: `Foundation:Kiva`
+Field 1 remains the same.  
+After F1, insert new numeric input field (N1) 'Initial Indoor Air Temperature'.  The field is blank by default.
+Shift all later fields down by 1. The old input fields F2-F56 become the new F3-F57.
+
 # Object Change: `RunPeriod`
 Field A1 "Name" is now a required field. If blank, add a name. If the old idf has more than one RunPeriod object, all of the Name fields must be unique.
 
@@ -34,4 +39,3 @@ Repeat this for each equipment group of 6 fields; fields 13 & 14, 19 & 20, etc.
 # Object Change: `ObjectNameE`
 
 # Object Change: `ObjectNameF`
-
