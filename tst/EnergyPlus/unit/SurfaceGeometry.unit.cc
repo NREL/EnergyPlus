@@ -4432,3 +4432,15 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
     EXPECT_EQ("TFLOORZONESINTMASS", DataSurfaces::IntMassObjects(3).Name);
     EXPECT_EQ("T SW APARTMENT TFLOORZONESINTMASS", SurfaceTmp(17).Name);
 }
+
+TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test)
+{
+    bool ErrorsFound(false);
+
+    // A warning message is expected, when Coordinate System = World & Rectangular Surface Coordinate System = Relative(default) in GlobalGeometryRules
+    DataSurfaces::WorldCoordSystem = true;
+    RectSurfRefWorldCoordSystem = false;
+
+    GetGeometryParameters(ErrorsFound);
+    EXPECT_TRUE(has_err_output(false));
+}
