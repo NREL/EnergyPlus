@@ -1965,7 +1965,7 @@ namespace HybridEvapCoolingModel {
         // Test system availbility status
         UnitOn = 1;
         StandBy = false;
-        if (GetCurrentScheduleValue(SchedPtr) <= 0) {
+        if (GetCurrentScheduleValue(SchedPtr) <= 0 || AvailStatus == 1) {
             UnitOn = 0;
         }
         // Go into standby if unit is off or not needed

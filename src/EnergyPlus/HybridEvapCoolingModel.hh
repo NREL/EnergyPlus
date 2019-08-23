@@ -239,6 +239,8 @@ namespace HybridEvapCoolingModel {
         int ZoneNum;  // stores the current zone associated with the system, this is currently not used but is expected to be used in the next set of
                       // functionality additions.
         int SchedPtr; // Pointer to the correct schedule
+        std::string AvailManagerListName; // Name of an availability manager list object
+        int AvailStatus;
 
         Real64 SystemMaximumSupplyAirFlowRate;           // taken from IDF N1, the system max supply flow rate in m3/s.
         Real64 ScalingFactor;                            // taken from IDF N3, linear scaling factor.

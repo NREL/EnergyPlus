@@ -206,6 +206,8 @@ namespace HybridUnitaryAirConditioners {
         // Using/Aliasing
         using namespace DataLoopNode;
         using namespace Psychrometrics;
+        using DataHVACGlobals::ZoneComp;
+        using DataZoneEquipment::ZoneHybridEvaporativeCooler_Num;
         using Fans::GetFanVolFlow;
 
         // Locals
@@ -245,6 +247,17 @@ namespace HybridUnitaryAirConditioners {
         ZoneHybridUnitaryAirConditioner(UnitNum).UnitSensibleCoolingEnergy = 0.0;
         ZoneHybridUnitaryAirConditioner(UnitNum).UnitLatentCoolingRate = 0.0;
         ZoneHybridUnitaryAirConditioner(UnitNum).UnitLatentCoolingEnergy = 0.0;
+        ZoneHybridUnitaryAirConditioner(UnitNum).AvailStatus = 0;
+
+        if (allocated(ZoneComp)) {
+            if (MyZoneEqFlag(UnitNum)) { // initialize the name of each availability manager list and zone number
+                ZoneComp(ZoneHybridEvaporativeCooler_Num).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
+                    ZoneHybridUnitaryAirConditioner(UnitNum).AvailManagerListName;
+                ZoneComp(ZoneHybridEvaporativeCooler_Num).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
+                MyZoneEqFlag(UnitNum) = false;
+            }
+            ZoneHybridUnitaryAirConditioner(UnitNum).AvailStatus = ZoneComp(ZoneHybridEvaporativeCooler_Num).ZoneCompAvailMgrs(UnitNum).AvailStatus;
+        }
 
         ZoneHybridUnitaryAirConditioner(UnitNum).InitializeModelParams();
         // Do the following initializations (every time step): This should be the info from
@@ -484,6 +497,9 @@ namespace HybridUnitaryAirConditioners {
                     }
                 }
                 // A3, \field Availability Manager List Name
+                if (!lAlphaBlanks(3)) {
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).AvailManagerListName = Alphas(3);
+                }
 
                 // A4, \field Minimum Supply Air Temperature Schedule Named
                 ZoneHybridUnitaryAirConditioner(UnitLoop).TsaMin_schedule_pointer = GetScheduleIndex(Alphas(4));
