@@ -174,7 +174,7 @@ namespace SurfaceGeometry {
     // outside environment are used but no ground temperature object was input.
     bool NoFCGroundTempObjWarning(true); // This will cause a warning to be issued if surfaces with "GroundFCfactorMethod"
     // outside environment are used but no FC ground temperatures was input.
-    bool RectSurfRefWorldCoordSystem(false); //GlobalGeometryRules:Field Rectangular Surface Coordinate System (A5) = World (true) or Relative (false)
+    bool RectSurfRefWorldCoordSystem(false); // GlobalGeometryRules:Field Rectangular Surface Coordinate System (A5) = World (true) or Relative (false)
     int Warning1Count(0);                    // counts of Modify Window 5/6 windows
     int Warning2Count(0);                    // counts of overriding exterior windows with Window 5/6 glazing systems
     int Warning3Count(0);                    // counts of overriding interior windows with Window 5/6 glazing systems
