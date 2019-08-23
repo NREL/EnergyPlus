@@ -5718,37 +5718,50 @@ namespace PollutionModule {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         FuelType.ElecFacility =
-            GetInstantMeterValue(FuelType.ElecFacilityIndex, 1) * FracTimeStepZone + GetInstantMeterValue(FuelType.ElecFacilityIndex, 2);
+            GetInstantMeterValue(FuelType.ElecFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
+            GetInstantMeterValue(FuelType.ElecFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
         FuelType.DieselFacility =
-            GetInstantMeterValue(FuelType.DieselFacilityIndex, 1) * FracTimeStepZone + GetInstantMeterValue(FuelType.DieselFacilityIndex, 2);
+            GetInstantMeterValue(FuelType.DieselFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
+            GetInstantMeterValue(FuelType.DieselFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
         FuelType.PurchCoolFacility =
-            GetInstantMeterValue(FuelType.PurchCoolFacilityIndex, 1) * FracTimeStepZone + GetInstantMeterValue(FuelType.PurchCoolFacilityIndex, 2);
+            GetInstantMeterValue(FuelType.PurchCoolFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
+            GetInstantMeterValue(FuelType.PurchCoolFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
         FuelType.PurchHeatFacility =
-            GetInstantMeterValue(FuelType.PurchHeatFacilityIndex, 1) * FracTimeStepZone + GetInstantMeterValue(FuelType.PurchHeatFacilityIndex, 2);
+            GetInstantMeterValue(FuelType.PurchHeatFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
+            GetInstantMeterValue(FuelType.PurchHeatFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
         FuelType.NatGasFacility =
-            GetInstantMeterValue(FuelType.NatGasFacilityIndex, 1) * FracTimeStepZone + GetInstantMeterValue(FuelType.NatGasFacilityIndex, 2);
+            GetInstantMeterValue(FuelType.NatGasFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
+            GetInstantMeterValue(FuelType.NatGasFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
         FuelType.GasolineFacility =
-            GetInstantMeterValue(FuelType.GasolineFacilityIndex, 1) * FracTimeStepZone + GetInstantMeterValue(FuelType.GasolineFacilityIndex, 2);
+            GetInstantMeterValue(FuelType.GasolineFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
+            GetInstantMeterValue(FuelType.GasolineFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
         FuelType.CoalFacility =
-            GetInstantMeterValue(FuelType.CoalFacilityIndex, 1) * FracTimeStepZone + GetInstantMeterValue(FuelType.CoalFacilityIndex, 2);
+            GetInstantMeterValue(FuelType.CoalFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
+            GetInstantMeterValue(FuelType.CoalFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
         FuelType.FuelOil1Facility =
-            GetInstantMeterValue(FuelType.FuelOil1FacilityIndex, 1) * FracTimeStepZone + GetInstantMeterValue(FuelType.FuelOil1FacilityIndex, 2);
+            GetInstantMeterValue(FuelType.FuelOil1FacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
+            GetInstantMeterValue(FuelType.FuelOil1FacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
         FuelType.FuelOil2Facility =
-            GetInstantMeterValue(FuelType.FuelOil2FacilityIndex, 1) * FracTimeStepZone + GetInstantMeterValue(FuelType.FuelOil2FacilityIndex, 2);
+            GetInstantMeterValue(FuelType.FuelOil2FacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
+            GetInstantMeterValue(FuelType.FuelOil2FacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
         FuelType.PropaneFacility =
-            GetInstantMeterValue(FuelType.PropaneFacilityIndex, 1) * FracTimeStepZone + GetInstantMeterValue(FuelType.PropaneFacilityIndex, 2);
+            GetInstantMeterValue(FuelType.PropaneFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
+            GetInstantMeterValue(FuelType.PropaneFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
         FuelType.OtherFuel1Facility =
-            GetInstantMeterValue(FuelType.OtherFuel1FacilityIndex, 1) * FracTimeStepZone + GetInstantMeterValue(FuelType.OtherFuel1FacilityIndex, 2);
+            GetInstantMeterValue(FuelType.OtherFuel1FacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
+            GetInstantMeterValue(FuelType.OtherFuel1FacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
         FuelType.OtherFuel2Facility =
-            GetInstantMeterValue(FuelType.OtherFuel2FacilityIndex, 1) * FracTimeStepZone + GetInstantMeterValue(FuelType.OtherFuel2FacilityIndex, 2);
-        FuelType.ElecProducedFacility = GetInstantMeterValue(FuelType.ElecProducedFacilityIndex, 1) * FracTimeStepZone +
-                                        GetInstantMeterValue(FuelType.ElecProducedFacilityIndex, 2);
+            GetInstantMeterValue(FuelType.OtherFuel2FacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
+            GetInstantMeterValue(FuelType.OtherFuel2FacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
+        FuelType.ElecProducedFacility = GetInstantMeterValue(FuelType.ElecProducedFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
+                                        GetInstantMeterValue(FuelType.ElecProducedFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
         FuelType.SteamFacility =
-            GetInstantMeterValue(FuelType.SteamFacilityIndex, 1) * FracTimeStepZone + GetInstantMeterValue(FuelType.SteamFacilityIndex, 2);
-        FuelType.ElecPurchasedFacility = GetInstantMeterValue(FuelType.ElecPurchasedFacilityIndex, 1) * FracTimeStepZone +
-                                         GetInstantMeterValue(FuelType.ElecPurchasedFacilityIndex, 2);
-        FuelType.ElecSurplusSoldFacility = GetInstantMeterValue(FuelType.ElecSurplusSoldFacilityIndex, 1) * FracTimeStepZone +
-                                           GetInstantMeterValue(FuelType.ElecSurplusSoldFacilityIndex, 2);
+            GetInstantMeterValue(FuelType.SteamFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
+            GetInstantMeterValue(FuelType.SteamFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
+        FuelType.ElecPurchasedFacility = GetInstantMeterValue(FuelType.ElecPurchasedFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
+                                         GetInstantMeterValue(FuelType.ElecPurchasedFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
+        FuelType.ElecSurplusSoldFacility = GetInstantMeterValue(FuelType.ElecSurplusSoldFacilityIndex, OutputProcessor::TimeStepType::TimeStepZone) * FracTimeStepZone +
+                                           GetInstantMeterValue(FuelType.ElecSurplusSoldFacilityIndex, OutputProcessor::TimeStepType::TimeStepSystem);
 
         // Now these fuel types have to be sorted and summed into categories that we have pollution factors for.
         // The Off-Site Electricity is the total needed by the facility minus the amount generated on-site.

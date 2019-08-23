@@ -10998,7 +10998,7 @@ namespace HVACVariableRefrigerantFlow {
                 if (OnOffAirFlowRatio > 0.0) {
                     HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(1.0 / OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 } else {
-                    HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(1.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(PartLoadRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
             } else {
                 Fans::SimulateFanComponents("", FirstHVACIteration, this->FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
@@ -11045,7 +11045,7 @@ namespace HVACVariableRefrigerantFlow {
                 if (OnOffAirFlowRatio > 0.0) {
                     HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(1.0 / OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 } else {
-                    HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(1.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(PartLoadRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
 
             } else {
@@ -11346,7 +11346,11 @@ namespace HVACVariableRefrigerantFlow {
         // Simulate the blow-through fan if there is any
         if (VRFTU(VRFTUNum).FanPlace == BlowThru) {
             if (VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(1.0 / temp, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                if (temp > 0) {
+                    HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(1.0 / temp, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                } else {
+                    HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(PartLoadRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                }
             } else {
                 Fans::SimulateFanComponents("", false, VRFTU(VRFTUNum).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             }

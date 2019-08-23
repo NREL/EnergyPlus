@@ -932,7 +932,7 @@ The name of the HVAC system node which is the inlet node of the unit's heating c
 
 \paragraph{Field: Zone Mixer Name}\label{field-zone-mixer-name}
 
-The name of an zone mixer component (object: \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer}) which composes part of the unit. Note that some of the input for the mixer will duplicate input fields of the powered induction unit. One of the zone mixer inlet nodes should be the same as the supply air inlet node of the PIU; the other inlet node of the zone mixer should be the same as the secondary air inlet node of the PIU. The outlet node of the zone mixer should be the same as the inlet node of the PIU fan.
+The name of a zone mixer component (object: \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer}) which composes part of the unit. Note that some of the input for the mixer will duplicate input fields of the powered induction unit. One of the zone mixer inlet nodes should be the same as the supply air inlet node of the PIU; the other inlet node of the zone mixer should be the same as the secondary air inlet node of the PIU. The outlet node of the zone mixer should be the same as the inlet node of the PIU fan.
 
 \paragraph{Field: Fan Name}\label{field-fan-name-1}
 
@@ -1493,73 +1493,6 @@ An example input follows:
     CapModFuncOfTempDiff, !- Beam Heating Capacity Temperature Difference Modification Factor Curve or Table Name
     HeatCapModFuncOfSAFlow, !- Beam Heating Capacity Air Flow Modification Factor Curve or Table Name
     CapModFuncOfWaterFlow; !- Beam Heating Capacity Hot Water Flow Modification Factor Curve or Table Name
-\end{lstlisting}
-
-\begin{lstlisting}
-  Curve:Linear,  ! y = x
-    CapModFuncOfTempDiff, !-Name
-    0, !_ Coef Const
-    1, !- Coef x
-    0,  !- min x
-    1.5, !- max x
-    0.0 , !- min y
-    1.5; ! max y
-\end{lstlisting}
-
-\begin{lstlisting}
-  Table:OneIndependentVariable,
-    CoolCapModFuncOfSAFlow, !- Name
-    quadratic,!- Curve Type
-    EvaluateCurveToLimits,!- Interpolation Method
-    0.714,!- min x
-    1.2857,!- max x
-    0.8234,!- min y
-    1.1256,!- max y
-    dimensionless, !-
-    dimensionless, !-
-    , !- normalization ref
-    0.714286, 0.823403,
-    1.0,      1.0,
-    1.2857,   1.1256;
-\end{lstlisting}
-
-\begin{lstlisting}
-  Table:OneIndependentVariable,
-    CapModFuncOfWaterFlow, !- Name
-    quadratic,!- Curve Type
-    EvaluateCurveToLimits,!- Interpolation Method
-    0.0,!- min x
-    1.333333,!- max x
-    0.0,!- min y
-    1.04,!- max y
-    dimensionless, !-
-    dimensionless, !-
-     , !- normalization ref
-    0.0,      0.0,
-    0.05,     0.001,
-    0.33333,  0.71,
-    0.5,      0.85,
-    0.666667, 0.92,
-    0.833333, 0.97,
-    1.0,      1.0,
-    1.333333, 1.04;
-\end{lstlisting}
-
-\begin{lstlisting}
-  Table:OneIndependentVariable,
-    HeatCapModFuncOfSAFlow, !- Name
-    quadratic,!- Curve Type
-    EvaluateCurveToLimits,!- Interpolation Method
-    0.714,!- min x
-    1.2857,!- max x
-    0.8554,!- min y
-    1.0778,!- max y
-    dimensionless, !-
-    dimensionless, !-
-    , !- normalization ref
-    0.714286, 0.8554,
-    1.0,      1.0,
-    1.2857,   1.0778;
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-10}

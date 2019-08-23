@@ -87,6 +87,7 @@
 #include <Plant/PlantManager.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
+#include <SimulationManager.hh>
 #include <SizingManager.hh>
 #include <SteamCoils.hh>
 #include <WaterCoils.hh>
@@ -120,6 +121,7 @@ using namespace EnergyPlus::OutputReportPredefined;
 using namespace EnergyPlus::PlantManager;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
+using namespace EnergyPlus::SimulationManager;
 using namespace EnergyPlus::SizingManager;
 
 namespace EnergyPlus {
@@ -3482,16 +3484,17 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     SimulateVRF(
         VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
     EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.0); // system should be off
-    EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate, 0.0); // flow should be = 0 at no load flow rate for constant fan mode in this example
-    EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate, 0.0); // flow should be = 0 at no load flow rate for constant fan mode in this example
+    EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate,
+              0.0); // flow should be = 0 at no load flow rate for constant fan mode in this example
+    EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate,
+              0.0); // flow should be = 0 at no load flow rate for constant fan mode in this example
 
     Schedule(VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
     SimulateVRF(
         VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
-    EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.0); // system should also be off
-    EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate, 0.0); // flow should be = 0 for cycling fan mode
+    EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.0);                               // system should also be off
+    EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate, 0.0);  // flow should be = 0 for cycling fan mode
     EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate, 0.0); // flow should be = 0 for cycling fan mode
-
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
@@ -5064,8 +5067,8 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 21.0;
     SimulateVRF(
         VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
-    EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.0); // system should be off
-    EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate, 0.0); // flow should be = 0 for cycling fan mode
+    EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.0);                               // system should be off
+    EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate, 0.0);  // flow should be = 0 for cycling fan mode
     EXPECT_EQ(Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate, 0.0); // flow should be = 0 for cycling fan mode
 
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -5075,9 +5078,10 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     SimulateVRF(
         VRFTU(VRFTUNum).Name, CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
     EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.0); // system should also be off
-    EXPECT_GT(Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate, 0.0); // flow should be > 0 at no load flow rate for constant fan mode in this example
-    EXPECT_GT(Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate, 0.0); // flow should be > 0 at no load flow rate for constant fan mode in this example
-
+    EXPECT_GT(Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate,
+              0.0); // flow should be > 0 at no load flow rate for constant fan mode in this example
+    EXPECT_GT(Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate,
+              0.0); // flow should be > 0 at no load flow rate for constant fan mode in this example
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
@@ -8230,6 +8234,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     EXPECT_NEAR(368.1510, thisFan.FanPower, 0.0001);
     EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
 }
+  
 TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
 {
     //   PURPOSE OF THIS TEST:

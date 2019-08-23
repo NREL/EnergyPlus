@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -1236,8 +1237,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(ErrorsFound);
+    SurfaceGeometry::SetupZoneGeometry(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
+
+    HeatBalanceIntRadExchange::InitSolarViewFactors();
+    EXPECT_FALSE(has_err_output(true));
 
     EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
 
@@ -1812,8 +1816,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(ErrorsFound);
+    SurfaceGeometry::SetupZoneGeometry(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
+
+    HeatBalanceIntRadExchange::InitSolarViewFactors();
+    EXPECT_FALSE(has_err_output(true));
 
     EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
 
@@ -2372,8 +2379,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(ErrorsFound);
+    SurfaceGeometry::SetupZoneGeometry(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
+
+    // Clear schedule type warnings
+    EXPECT_TRUE(has_err_output(true));
+
+    HeatBalanceIntRadExchange::InitSolarViewFactors();
+    EXPECT_TRUE(compare_err_stream(""));
+    EXPECT_FALSE(has_err_output(true));
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "LIVING ZONE";

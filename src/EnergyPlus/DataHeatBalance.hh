@@ -344,11 +344,12 @@ namespace DataHeatBalance {
     extern int OverallHeatTransferSolutionAlgo; // UseCTF Solution, UseEMPD moisture solution, UseCondFD solution
  
    // Flags for HeatTransfer Algorithms Used
-    extern bool AnyCTF;    // CTF used
-    extern bool AnyEMPD;   // EMPD used
-    extern bool AnyCondFD; // CondFD used
-    extern bool AnyHAMT;   // HAMT used
-    extern bool AnyKiva;   // Kiva used
+    extern bool AnyCTF;         // CTF used
+    extern bool AnyEMPD;        // EMPD used
+    extern bool AnyCondFD;      // CondFD used
+    extern bool AnyHAMT;        // HAMT used
+    extern bool AnyKiva;        // Kiva used
+    extern bool AnyAirBoundary; // Construction:AirBoundary used
 
     extern int MaxNumberOfWarmupDays;     // Maximum number of warmup days allowed
     extern int MinNumberOfWarmupDays;     // Minimum number of warmup days allowed
@@ -584,7 +585,7 @@ namespace DataHeatBalance {
     extern Array1D<Real64> QSDifSol;                // Like QS, but diffuse solar short-wave only.
     extern Array1D<Real64> ITABSF;                  // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
     extern Array1D<Real64> TMULT;                   // TMULT  - MULTIPLIER TO COMPUTE 'ITABSF'
-    extern Array1D<Real64> QL;                      // TOTAL THERMAL RADIATION ADDED TO ZONE
+    extern Array1D<Real64> QL;                      // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
     extern Array2D<Real64> SunlitFracHR;            // Hourly fraction of heat transfer surface that is sunlit
     extern Array2D<Real64> CosIncAngHR;             // Hourly cosine of beam radiation incidence angle on surface
     extern Array3D<Real64> SunlitFrac;              // TimeStep fraction of heat transfer surface that is sunlit
@@ -610,6 +611,12 @@ namespace DataHeatBalance {
     extern Array1D<Real64> const GasSpecificHeatRatio; // Gas specific heat ratios.  Used for gasses in low pressure
 
     extern Real64 ZeroPointerVal;
+
+    extern int NumAirBoundaryMixing;                 // Number of air boundary simple mixing objects needed
+    extern std::vector<int> AirBoundaryMixingZone1;  // Air boundary simple mixing zone 1
+    extern std::vector<int> AirBoundaryMixingZone2;  // Air boundary simple mixing zone 2
+    extern std::vector<int> AirBoundaryMixingSched;  // Air boundary simple mixing schedule index
+    extern std::vector<Real64> AirBoundaryMixingVol; // Air boundary simple mixing volume flow rate [m3/s]
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalance:
 
@@ -1021,6 +1028,15 @@ namespace DataHeatBalance {
         Array1D<Real64> AbsDiffBackEQL;  // Diffuse layer system back absorptance for EQL window
         Real64 TransDiffFrontEQL;        // Diffuse system front transmittance for EQL window
         Real64 TransDiffBackEQL;         // Diffuse system back transmittance for EQL window
+        // Air boundary
+        bool TypeIsAirBoundary;               // true for Construction:AirBoundary
+        bool TypeIsAirBoundarySolar;          // true for Construction:AirBoundary with grouped zones for solar and daylighting
+        bool TypeIsAirBoundaryInteriorWindow; // true for Construction:AirBoundary with InteriorWindow for solar and daylighting
+        bool TypeIsAirBoundaryGroupedRadiant; // true for Construction:AirBoundary with grouped zones for radiant
+        bool TypeIsAirBoundaryIRTSurface;     // true for Construction:AirBoundary with IRTSurface for radiant
+        bool TypeIsAirBoundaryMixing;         // true for Construction:AirBoundary with SimpleMixing for air exchange
+        Real64 AirBoundaryACH;                // Air boundary simple mixing air changes per hour [1/hr]
+        int AirBoundaryMixingSched;           // Air boundary simple mixing schedule index
 
         // Default Constructor
         ConstructionData()
@@ -1049,7 +1065,10 @@ namespace DataHeatBalance {
               WindowTypeBSDF(false), TypeIsEcoRoof(false), TypeIsIRT(false), TypeIsCfactorWall(false), TypeIsFfactorFloor(false), TCFlag(0),
               TCLayer(0), TCMasterConst(0), TCLayerID(0), TCGlassID(0), CFactor(0.0), Height(0.0), FFactor(0.0), Area(0.0), PerimeterExposed(0.0),
               ReverseConstructionNumLayersWarning(false), ReverseConstructionLayersOrderWarning(false), WindowTypeEQL(false), EQLConsPtr(0),
-              AbsDiffFrontEQL(CFSMAXNL, 0.0), AbsDiffBackEQL(CFSMAXNL, 0.0), TransDiffFrontEQL(0.0), TransDiffBackEQL(0.0)
+              AbsDiffFrontEQL(CFSMAXNL, 0.0), AbsDiffBackEQL(CFSMAXNL, 0.0), TransDiffFrontEQL(0.0), TransDiffBackEQL(0.0), TypeIsAirBoundary(false),
+              TypeIsAirBoundarySolar(false), TypeIsAirBoundaryInteriorWindow(false), TypeIsAirBoundaryGroupedRadiant(false),
+              TypeIsAirBoundaryIRTSurface(false), TypeIsAirBoundaryMixing(false), AirBoundaryACH(0.0),
+              AirBoundaryMixingSched(0)
         {
         }
 
@@ -1136,6 +1155,8 @@ namespace DataHeatBalance {
         std::vector<int> ZoneIZSurfaceList;          // List of interzone surfaces in this zone
         std::vector<int> ZoneHTNonWindowSurfaceList; // List of non-window HT surfaces related to this zone (includes adjacent interzone surfaces)
         std::vector<int> ZoneHTWindowSurfaceList;    // List of window surfaces related to this zone (includes adjacent interzone surfaces)
+        int RadiantEnclosureNum;                     // Radiant exchange enclosure this zone belongs to (related to air boundaries)
+        int SolarEnclosureNum;                       // Solar distribution enclosure this zone belongs to (related to air boundaries)
 
         Real64 OutDryBulbTemp;                 // Zone outside dry bulb air temperature (C)
         bool OutDryBulbTempEMSOverrideOn;      // if true, EMS is calling to override the surface's outdoor air temp
@@ -1215,7 +1236,7 @@ namespace DataHeatBalance {
               SystemZoneNodeNumber(0), IsControlled(false), IsSupplyPlenum(false), IsReturnPlenum(false), ZoneEqNum(0), PlenumCondNum(0),
               TempControlledZoneIndex(0), SurfaceFirst(0), SurfaceLast(0), InsideConvectionAlgo(ASHRAESimple), NumSurfaces(0), NumSubSurfaces(0),
               NumShadingSurfaces(0), OutsideConvectionAlgo(ASHRAESimple), Centroid(0.0, 0.0, 0.0), MinimumX(0.0), MaximumX(0.0), MinimumY(0.0),
-              MaximumY(0.0), MinimumZ(0.0), MaximumZ(0.0),
+              MaximumY(0.0), MinimumZ(0.0), MaximumZ(0.0), RadiantEnclosureNum(0), SolarEnclosureNum(0),
 
               OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false), OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0),
               OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0), WindSpeedEMSOverrideOn(false),
