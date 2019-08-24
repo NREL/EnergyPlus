@@ -317,7 +317,6 @@ namespace DaylightingManager {
         Real64 AREA;                // Inside surface area (m2)
         Real64 AInsTot;             // Total inside surface area of a zone (m2)
         Real64 ARHTOT;              // Sum over surfaces of AREA*(inside visible reflectance) (m2)
-        int IWin;                   // Window number
         int ITILT;                  // Surface tilt category (1 = floor, 2 = wall, 3 = ceiling)
         int IT;                     // Tilt index
         static Vector3<Real64> AR;  // Inside surface area sum for floor/wall/ceiling (m2)
@@ -328,7 +327,6 @@ namespace DaylightingManager {
         //  a selected floor/wall/ceiling (m2)
         Real64 ATWL;   // Opaque surface area (m2)
         Real64 ARHTWL; // ATWL times inside visible reflectance of surface (m2)
-        int IWinDr;    // Window/door surface number
         Real64 ETA;    // Ratio of floor-to-window-center height and average floor-to-ceiling height
 
         // Total inside surface area, including windows
