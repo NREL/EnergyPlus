@@ -2582,27 +2582,27 @@ namespace HeatBalanceSurfaceManager {
             // Flux of diffuse solar in each zone
 
             QSDifSol = 0.0;
-            for (int ZoneNum = 1; ZoneNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++ZoneNum) {
-                QSDifSol(ZoneNum) = QDforDaylight(ZoneNum);
+            for (int enclNum = 1; enclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclNum) {
+                QSDifSol(enclNum) = QDforDaylight(enclNum);
             }
 
             if (InterZoneWindow) {
-                for (int ZoneNum = 1; ZoneNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++ZoneNum) {
-                    if (RecDifShortFromZ(ZoneNum)) {
+                for (int enclNum = 1; enclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclNum) {
+                    if (RecDifShortFromZ(enclNum)) {
                         Real64 QSDifSol_sum(0.0);                        // Accumulator
-                        auto lZone(FractDifShortZtoZ.index(ZoneNum, 1)); // Tuned Linear indexing
-                        for (int OtherZoneNum = 1; OtherZoneNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++OtherZoneNum, ++lZone) {
-                            if ((OtherZoneNum != ZoneNum) && (RecDifShortFromZ(OtherZoneNum))) {
-                                QSDifSol_sum += FractDifShortZtoZ[lZone] * QDforDaylight(OtherZoneNum); // [ lZone ] == ( ZoneNum, OtherZoneNum )
+                        auto lZone(FractDifShortZtoZ.index(enclNum, 1)); // Tuned Linear indexing
+                        for (int otherEnclNum = 1; otherEnclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++otherEnclNum, ++lZone) {
+                            if ((otherEnclNum != enclNum) && (RecDifShortFromZ(otherEnclNum))) {
+                                QSDifSol_sum += FractDifShortZtoZ[lZone] * QDforDaylight(otherEnclNum); // [ lZone ] == ( enclNum, otherEnclNum )
                             }
                         }
-                        QSDifSol(ZoneNum) += QSDifSol_sum;
+                        QSDifSol(enclNum) += QSDifSol_sum;
                     }
                 }
             }
 
-            for (int ZoneNum = 1; ZoneNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++ZoneNum) {
-                QSDifSol(ZoneNum) *= FractDifShortZtoZ(ZoneNum, ZoneNum) * VMULT(ZoneNum);
+            for (int enclNum = 1; enclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclNum) {
+                QSDifSol(enclNum) *= FractDifShortZtoZ(enclNum, enclNum) * VMULT(enclNum);
             }
 
             //    RJH - 09-12-07 commented out report varariable calcs here since they refer to old distribution method
@@ -6365,7 +6365,7 @@ namespace HeatBalanceSurfaceManager {
                         Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
                         (Sigma_Temp_4 - (SurfaceWindow(SurfNum).IRfromParentZone + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) +
                                          QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum)));
-                    WinLossSWZoneToOutWinRep(SurfNum) = QS(surface.Zone) * surface.Area * Construct(surface.Construction).TransDiff;
+                    WinLossSWZoneToOutWinRep(SurfNum) = QS(surface.SolarEnclIndex) * surface.Area * Construct(surface.Construction).TransDiff;
                 } else {                             // Regular window
                     if (InsideSurfIterations == 0) { // Do windows only once
                         if (SurfaceWindow(SurfNum).StormWinFlag == 1) ConstrNum = surface.StormWinConstruction;

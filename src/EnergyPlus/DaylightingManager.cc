@@ -192,6 +192,7 @@ namespace DaylightingManager {
     int OutputFileDFS(0);              // Unit number for daylight factors
     Array1D<Real64> DaylIllum;         // Daylight illuminance at reference points (lux)
     int maxNumRefPtInAnyZone(0);       // The most number of reference points that any single zone has
+    int maxNumRefPtInAnyEncl(0);       // The most number of reference points that any single enclosure has
     Real64 PHSUN(0.0);                 // Solar altitude (radians)
     Real64 SPHSUN(0.0);                // Sine of solar altitude
     Real64 CPHSUN(0.0);                // Cosine of solar altitude
@@ -270,6 +271,7 @@ namespace DaylightingManager {
         OutputFileDFS = 0;
         DaylIllum.deallocate();
         maxNumRefPtInAnyZone = 0;
+        maxNumRefPtInAnyEncl = 0;
         PHSUN = 0.0;
         SPHSUN = 0.0;
         CPHSUN = 0.0;
@@ -4414,41 +4416,17 @@ namespace DaylightingManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   Oct 2004
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine provides a simple structure to get all daylighting
         // parameters.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using namespace DataIPShortCuts;
-
-        // RJH DElight Modification Begin
         using namespace DElightManagerF; // Module for managing DElight subroutines
-        // RJH DElight Modification End
         using DataSystemVariables::GoodIOStatValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
         static ObjexxFCL::gio::Fmt fmtA("(A)");
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TotDaylightingControls;  // Total Daylighting:Controls inputs (splitflux or delight type)
         bool ErrorsFound;            // Error flag
         Real64 dLatitude;       // double for argument passing
@@ -4479,18 +4457,18 @@ namespace DaylightingManager {
         }
 
         maxNumRefPtInAnyZone = 0;
+        maxNumRefPtInAnyEncl = 0;
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (Surface(SurfNum).Class != SurfaceClass_Window) continue;
             // Loop through all zones in the same enclosure to find total reference points
             int numEnclRefPoints = 0;
             int surfEnclNum = Surface(SurfNum).SolarEnclIndex;
-            for (int zoneNum : DataViewFactorInformation::ZoneSolarInfo(surfEnclNum).ZoneNums) {
+            for (int const zoneNum : DataViewFactorInformation::ZoneSolarInfo(surfEnclNum).ZoneNums) {
                 int numRefPoints = ZoneDaylight(zoneNum).TotalDaylRefPoints;
                 numEnclRefPoints += numRefPoints;
-                if (numRefPoints > maxNumRefPtInAnyZone) {
-                    maxNumRefPtInAnyZone = numRefPoints;
-                }
+                maxNumRefPtInAnyZone = max(numRefPoints, maxNumRefPtInAnyZone);
             }
+            maxNumRefPtInAnyEncl = max(numEnclRefPoints, maxNumRefPtInAnyEncl);
             DataViewFactorInformation::ZoneSolarInfo(surfEnclNum).TotalEnclosureDaylRefPoints = numEnclRefPoints;
             if (numEnclRefPoints > 0) {
                 if (!SurfaceWindow(SurfNum).SurfDayLightInit) {
@@ -4516,7 +4494,7 @@ namespace DaylightingManager {
                     // Loop through all zones in the adjacent enclosure to find total reference points
                     int numAdjEnclRefPoints = 0;
                     int adjSurfEnclNum = Surface(SurfNumAdj).SolarEnclIndex;
-                    for (int adjZoneNum : DataViewFactorInformation::ZoneSolarInfo(adjSurfEnclNum).ZoneNums) {
+                    for (int const adjZoneNum : DataViewFactorInformation::ZoneSolarInfo(adjSurfEnclNum).ZoneNums) {
                         numAdjEnclRefPoints += ZoneDaylight(adjZoneNum).TotalDaylRefPoints;
                     }
                     DataViewFactorInformation::ZoneSolarInfo(adjSurfEnclNum).TotalEnclosureDaylRefPoints = numAdjEnclRefPoints;
@@ -4558,8 +4536,8 @@ namespace DaylightingManager {
                         // Error if GlareControlIsActive and window is in a Daylighting:Detailed zone/enclosure with
                         // an interior window adjacent to another Daylighting:Detailed zone/enclosure
                         if (thisSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
-                            for (int intWin : thisSurfEnclosure.SurfacePtr) {
-                                int SurfNumAdj = Surface(intWin).ExtBoundCond;
+                            for (int const intWin : thisSurfEnclosure.SurfacePtr) {
+                                int const SurfNumAdj = Surface(intWin).ExtBoundCond;
                                 if (Surface(intWin).Class == SurfaceClass_Window && SurfNumAdj > 0) {
                                     auto & adjSurfEnclosure(DataViewFactorInformation::ZoneSolarInfo(Surface(SurfNumAdj).SolarEnclIndex));
                                     if (adjSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
@@ -4586,8 +4564,8 @@ namespace DaylightingManager {
                         // Error if window has ShadingControlType = MeetDaylightIlluminanceSetpoint and is in a &
                         // Daylighting:Detailed zone with an interior window adjacent to another Daylighting:Detailed zone
                         if (thisSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
-                            for (int intWin : thisSurfEnclosure.SurfacePtr) {
-                                int SurfNumAdj = Surface(intWin).ExtBoundCond;
+                            for (int const intWin : thisSurfEnclosure.SurfacePtr) {
+                                int const SurfNumAdj = Surface(intWin).ExtBoundCond;
                                 if (Surface(intWin).Class == SurfaceClass_Window && SurfNumAdj > 0) {
                                     auto & adjSurfEnclosure(DataViewFactorInformation::ZoneSolarInfo(Surface(SurfNumAdj).SolarEnclIndex));
                                     if (adjSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
@@ -4597,6 +4575,61 @@ namespace DaylightingManager {
                                         ShowContinueError("Adjacent Zone or enclosure indicated=" + adjSurfEnclosure.Name);
                                         ErrorsFound = true;
                                     }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!DataHeatBalance::AnyAirBoundaryGroupedSolar) {
+            for (int SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
+                if (Surface(SurfLoop).Class == SurfaceClass_Window && Surface(SurfLoop).ExtSolar) {
+                    int const zoneOfSurf = Surface(SurfLoop).Zone;
+                    if (ZoneDaylight(zoneOfSurf).TotalDaylRefPoints > 0 && !Zone(zoneOfSurf).HasInterZoneWindow &&
+                        ZoneDaylight(zoneOfSurf).DaylightMethod == SplitFluxDaylighting) {
+                        for (int refPtNum = 1; refPtNum <= ZoneDaylight(zoneOfSurf).TotalDaylRefPoints; ++refPtNum) {
+                            SetupOutputVariable("Daylighting Window Reference Point " + std::to_string(refPtNum) + " Illuminance",
+                                                OutputProcessor::Unit::lux,
+                                                SurfaceWindow(SurfLoop).IllumFromWinAtRefPtRep(refPtNum),
+                                                "Zone",
+                                                "Average",
+                                                Surface(SurfLoop).Name);
+                            SetupOutputVariable("Daylighting Window Reference Point " + std::to_string(refPtNum) + " View Luminance",
+                                                OutputProcessor::Unit::cd_m2,
+                                                SurfaceWindow(SurfLoop).LumWinFromRefPtRep(refPtNum),
+                                                "Zone",
+                                                "Average",
+                                                Surface(SurfLoop).Name);
+                        }
+                    }
+                }
+            }
+        } else {
+            for (int enclNum = 1; enclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclNum) {
+                for (int const enclSurfNum : DataViewFactorInformation::ZoneSolarInfo(enclNum).SurfacePtr) {
+                    if (Surface(enclSurfNum).Class == SurfaceClass_Window && Surface(enclSurfNum).ExtSolar) {
+                        int refPtCount = 0;
+                        for (int const enclZoneNum : DataViewFactorInformation::ZoneSolarInfo(enclNum).ZoneNums) {
+                            if (DataViewFactorInformation::ZoneSolarInfo(enclNum).TotalEnclosureDaylRefPoints > 0 &&
+                                !Zone(enclZoneNum).HasInterZoneWindow && ZoneDaylight(enclZoneNum).DaylightMethod == SplitFluxDaylighting) {
+                                for (int refPtNum = 1; refPtNum <= ZoneDaylight(enclZoneNum).TotalDaylRefPoints; ++refPtNum) {
+                                    ++refPtCount; // Count reference points across each zone in the same enclosure
+                                    std::string const varKey =
+                                        Surface(enclSurfNum).Name + " to " + DaylRefPt(ZoneDaylight(enclZoneNum).DaylRefPtNum(refPtNum)).Name;
+                                    SetupOutputVariable("Daylighting Window Reference Point Illuminance",
+                                                        OutputProcessor::Unit::lux,
+                                                        SurfaceWindow(enclSurfNum).IllumFromWinAtRefPtRep(refPtCount),
+                                                        "Zone",
+                                                        "Average",
+                                                        varKey);
+                                    SetupOutputVariable("Daylighting Window Reference Point View Luminance",
+                                                        OutputProcessor::Unit::cd_m2,
+                                                        SurfaceWindow(enclSurfNum).LumWinFromRefPtRep(refPtCount),
+                                                        "Zone",
+                                                        "Average",
+                                                        varKey);
                                 }
                             }
                         }
@@ -5103,13 +5136,9 @@ namespace DaylightingManager {
         int IOStat;
         int NumAlpha;
         int NumNumber;
-        int iDaylCntrl;
-        int refPtNum;
-        int SurfLoop;
-        int ZoneFound;
 
         cCurrentModuleObject = "Daylighting:Controls";
-        for (iDaylCntrl = 1; iDaylCntrl <= TotDaylightingControls; ++iDaylCntrl) {
+        for (int iDaylCntrl = 1; iDaylCntrl <= TotDaylightingControls; ++iDaylCntrl) {
             cAlphaArgs = "";
             rNumericArgs = 0.0;
             inputProcessor->getObjectItem(cCurrentModuleObject,
@@ -5123,7 +5152,7 @@ namespace DaylightingManager {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            ZoneFound = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
+            int const ZoneFound = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             if (ZoneFound == 0) {
                 ShowSevereError(cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
@@ -5238,7 +5267,7 @@ namespace DaylightingManager {
             zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt = 0.0;
 
             int countRefPts = 0;
-            for (refPtNum = 1; refPtNum <= curTotalDaylRefPts; ++refPtNum) {
+            for (int refPtNum = 1; refPtNum <= curTotalDaylRefPts; ++refPtNum) {
                 zone_daylight.DaylRefPtNum(refPtNum) = UtilityRoutines::FindItemInList(
                     cAlphaArgs(6 + refPtNum), DaylRefPt, &RefPointData::Name); // Field: Daylighting Reference Point Name
                 if (zone_daylight.DaylRefPtNum(refPtNum) == 0) {
@@ -5307,31 +5336,6 @@ namespace DaylightingManager {
                                 "Zone",
                                 "Average",
                                 zone_daylight.Name);
-        }
-
-        for (SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
-            if (Surface(SurfLoop).Class == SurfaceClass_Window && Surface(SurfLoop).ExtSolar) {
-                int zoneOfSurf = Surface(SurfLoop).Zone;
-                if (ZoneDaylight(zoneOfSurf).TotalDaylRefPoints > 0 && !Zone(zoneOfSurf).HasInterZoneWindow &&
-                    ZoneDaylight(zoneOfSurf).DaylightMethod == SplitFluxDaylighting) {
-                    SurfaceWindow(SurfLoop).IllumFromWinAtRefPtRep.allocate(ZoneDaylight(zoneOfSurf).TotalDaylRefPoints);
-                    SurfaceWindow(SurfLoop).LumWinFromRefPtRep.allocate(ZoneDaylight(zoneOfSurf).TotalDaylRefPoints);
-                    for (refPtNum = 1; refPtNum <= ZoneDaylight(zoneOfSurf).TotalDaylRefPoints; ++refPtNum) {
-                        SetupOutputVariable("Daylighting Window Reference Point " + std::to_string(refPtNum) + " Illuminance",
-                                            OutputProcessor::Unit::lux,
-                                            SurfaceWindow(SurfLoop).IllumFromWinAtRefPtRep(refPtNum),
-                                            "Zone",
-                                            "Average",
-                                            Surface(SurfLoop).Name);
-                        SetupOutputVariable("Daylighting Window Reference Point " + std::to_string(refPtNum) + " View Luminance",
-                                            OutputProcessor::Unit::cd_m2,
-                                            SurfaceWindow(SurfLoop).LumWinFromRefPtRep(refPtNum),
-                                            "Zone",
-                                            "Average",
-                                            Surface(SurfLoop).Name);
-                    }
-                }
-            }
         }
     }
 
@@ -7285,9 +7289,13 @@ namespace DaylightingManager {
                 IS = 1;
                 if (SurfaceWindow(IWin).ShadingFlag > 0 || SurfaceWindow(IWin).SolarDiffusing) IS = 2;
                 if (ZoneDaylight(ZoneNum).DaylightMethod == SplitFluxDaylighting) {
-                    for (int refPtNum = 1; refPtNum <= ZoneDaylight(ZoneNum).TotalDaylRefPoints; ++refPtNum) {
-                        SurfaceWindow(IWin).IllumFromWinAtRefPtRep(refPtNum) = ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, refPtNum);
-                        SurfaceWindow(IWin).LumWinFromRefPtRep(refPtNum) = ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, IS, refPtNum);
+                    int refPtCount = 0;
+                    for (int const enclZoneNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).ZoneNums) {
+                        for (int refPtNum = 1; refPtNum <= ZoneDaylight(enclZoneNum).TotalDaylRefPoints; ++refPtNum) {
+                            ++refPtCount; // Count reference points across each zone in the same enclosure
+                            SurfaceWindow(IWin).IllumFromWinAtRefPtRep(refPtCount) = ZoneDaylight(enclZoneNum).IllumFromWinAtRefPt(loop, IS, refPtNum);
+                            SurfaceWindow(IWin).LumWinFromRefPtRep(refPtCount) = ZoneDaylight(enclZoneNum).SourceLumFromWinAtRefPt(loop, IS, refPtNum);
+                        }
                     }
                 }
             }
@@ -10429,8 +10437,8 @@ namespace DaylightingManager {
         // windows with Z. Used in calculation of daylighting through interior windows.
 
         // Sets the daylighting factor pointers for each Daylighting:Detailed zone. The pointer
-        // may be associated with an exterior window in a daylit target zone or an exterior window in
-        // an adjacent zone, daylit or not, that shares interior windows with the target zone.
+        // may be associated with an exterior window in a daylit target zone's enclosure or an exterior window in
+        // an adjacent enclosure, daylit or not, that shares interior windows with the target zone's enclosure.
 
         using General::RoundSigDigits;
 
@@ -10451,7 +10459,7 @@ namespace DaylightingManager {
         // Count number of exterior Windows (use to allocate arrays)
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             // Count exterior windows in this zone or shared solar enclosure
-            for (int surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
+            for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
                 if ((Surface(surfNum).Class == SurfaceClass_Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
                     SurfaceWindow(surfNum).OriginalClass == SurfaceClass_TDD_Diffuser) {
                     ++ZoneDaylight(ZoneNum).TotalExtWindows;
@@ -10464,7 +10472,7 @@ namespace DaylightingManager {
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0) continue;
             // This is a Daylighting:Detailed zone
             // Find adjacent zones
-            int thisZoneEnclNum = Zone(ZoneNum).SolarEnclosureNum;
+            int const thisZoneEnclNum = Zone(ZoneNum).SolarEnclosureNum;
             for (int adjEnclNum = 1; adjEnclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++adjEnclNum) {
                 if (adjEnclNum == thisZoneEnclNum) continue;
                 for (int ZoneNumAdj : DataViewFactorInformation::ZoneSolarInfo(adjEnclNum).ZoneNums) {
@@ -10499,7 +10507,7 @@ namespace DaylightingManager {
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0) continue;
             // This is a Daylighting:Detailed zone
             // Find adjacent zones
-            int thisZoneEnclNum = Zone(ZoneNum).SolarEnclosureNum;
+            int const thisZoneEnclNum = Zone(ZoneNum).SolarEnclosureNum;
             for (int adjEnclNum = 1; adjEnclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++adjEnclNum) {
                 if (adjEnclNum == thisZoneEnclNum) continue;
                 for (int ZoneNumAdj : DataViewFactorInformation::ZoneSolarInfo(adjEnclNum).ZoneNums) {
@@ -10552,7 +10560,7 @@ namespace DaylightingManager {
             // now fill nested structure
             int ExtWinIndex = 0;
             for (int ZoneAdjLoop = 1; ZoneAdjLoop <= ZoneDaylight(ZoneNum).NumOfIntWinAdjZones; ++ZoneAdjLoop) {
-                int ZoneNumAdj = ZoneDaylight(ZoneNum).AdjIntWinZoneNums(ZoneAdjLoop);
+                int const ZoneNumAdj = ZoneDaylight(ZoneNum).AdjIntWinZoneNums(ZoneAdjLoop);
                 for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                     if (Surface(SurfNumAdj).Class == SurfaceClass_Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
                         ++ExtWinIndex;
@@ -10594,8 +10602,8 @@ namespace DaylightingManager {
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0) {
                 // This is a Daylighting:Detailed zone
 
-                // Get exterior windows in this zone ro shared solar enclosure
-                for (int surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
+                // Get exterior windows in this zone or shared solar enclosure
+                for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
                     if ((Surface(surfNum).Class == SurfaceClass_Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
                         SurfaceWindow(surfNum).OriginalClass == SurfaceClass_TDD_Diffuser) {
                         ++ZoneExtWin(ZoneNum);
@@ -10663,7 +10671,7 @@ namespace DaylightingManager {
 
                 int ZoneExtWinCtr = 0;
 
-                for (int surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
+                for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
                     if ((Surface(surfNum).Class == SurfaceClass_Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
                         SurfaceWindow(surfNum).OriginalClass == SurfaceClass_TDD_Diffuser) {
                         ++ZoneExtWinCtr;
@@ -10674,7 +10682,7 @@ namespace DaylightingManager {
                 // Get exterior windows in adjacent zones that share interior windows with ZoneNum
                 if (ZoneDaylight(ZoneNum).NumOfIntWinAdjZones > 0) {
                     for (int loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfIntWinAdjZones; ++loop) {
-                        int ZoneNumAdj = ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop);
+                        int const ZoneNumAdj = ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop);
                         // Get exterior windows in ZoneNumAdj -- there must be at least one, otherwise
                         // it would not be an "AdjIntWinZone"
                         for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
@@ -10838,8 +10846,6 @@ namespace DaylightingManager {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   Mar. 2004
-        //       MODIFIED:na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates the inter-reflected illuminance in a daylit zone from beam
@@ -10847,42 +10853,22 @@ namespace DaylightingManager {
         // is determined by the split-flux method and is assumed to be uniform, i.e., the same
         // at all reference points.
 
-        // METHODOLOGY EMPLOYED:na
-        // REFERENCES:na
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int IWin;                      // Window number
-        int ConstrNum;                 // Window construction number
-        int AdjZoneNum;                // Adjacent zone number
-        Real64 QDifTrans;              // Luminous flux transmitted through an int win from adjacent zone (lumens)
+        Real64 QDifTrans;              // Luminous flux transmitted through an int win from adjacent zone's enclosure (lumens)
         Real64 QDifTransUp;            // Upgoing part of QDifTrans (lumens)
         Real64 QDifTransDn;            // Downgoing part of QDifTrans (lumens)
         Real64 DifInterReflIllThisWin; // Inter-reflected illuminance due to QDifTrans (lux)
-        Real64 BmInterReflIll;         // Inter-reflected illuminance due to beam solar entering ZoneNum
+        Real64 BmInterReflIll;         // Inter-reflected illuminance due to beam solar entering ZoneNum's enclosure
         //  through its interior windows (lux)
-        // FLOW:
 
         ZoneDaylight(ZoneNum).InterReflIllFrIntWins = 0.0;
 
-        for (IWin = Zone(ZoneNum).SurfaceFirst; IWin <= Zone(ZoneNum).SurfaceLast; ++IWin) {
+        auto &thisEnclSurfaces(DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr);
+        for (int const IWin : thisEnclSurfaces) {
             if (Surface(IWin).Class == SurfaceClass_Window && Surface(IWin).ExtBoundCond >= 1) {
                 // This is an interior window in ZoneNum
-                ConstrNum = Surface(IWin).Construction;
-                AdjZoneNum = Surface(Surface(IWin).ExtBoundCond).Zone;
-                QDifTrans = QSDifSol(AdjZoneNum) * Construct(ConstrNum).TransDiffVis * Surface(IWin).Area * PDIFLW;
+                int const ConstrNum = Surface(IWin).Construction;
+                int const adjEnclNum = Surface(Surface(IWin).ExtBoundCond).SolarEnclIndex;
+                QDifTrans = QSDifSol(adjEnclNum) * Construct(ConstrNum).TransDiffVis * Surface(IWin).Area * PDIFLW;
                 QDifTransUp = QDifTrans * SurfaceWindow(IWin).FractionUpgoing;
                 QDifTransDn = QDifTrans * (1.0 - SurfaceWindow(IWin).FractionUpgoing);
                 if (ZoneDaylight(ZoneNum).TotInsSurfArea * (1.0 - ZoneDaylight(ZoneNum).AveVisDiffReflect) != 0.0) {

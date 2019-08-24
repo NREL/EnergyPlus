@@ -344,12 +344,13 @@ namespace DataHeatBalance {
     extern int OverallHeatTransferSolutionAlgo; // UseCTF Solution, UseEMPD moisture solution, UseCondFD solution
  
    // Flags for HeatTransfer Algorithms Used
-    extern bool AnyCTF;         // CTF used
-    extern bool AnyEMPD;        // EMPD used
-    extern bool AnyCondFD;      // CondFD used
-    extern bool AnyHAMT;        // HAMT used
-    extern bool AnyKiva;        // Kiva used
-    extern bool AnyAirBoundary; // Construction:AirBoundary used
+    extern bool AnyCTF;                     // CTF used
+    extern bool AnyEMPD;                    // EMPD used
+    extern bool AnyCondFD;                  // CondFD used
+    extern bool AnyHAMT;                    // HAMT used
+    extern bool AnyKiva;                    // Kiva used
+    extern bool AnyAirBoundary;             // Construction:AirBoundary used
+    extern bool AnyAirBoundaryGroupedSolar; // Construction:AirBoundary with GroupedZones for solar used somewhere
 
     extern int MaxNumberOfWarmupDays;     // Maximum number of warmup days allowed
     extern int MinNumberOfWarmupDays;     // Minimum number of warmup days allowed

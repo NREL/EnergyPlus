@@ -1085,6 +1085,10 @@ namespace SurfaceGeometry {
 
         TotSurfaces = SurfNum + AddedSubSurfaces + NeedToAddSurfaces + NeedToAddSubSurfaces;
 
+        if (ErrorsFound) {
+            ShowFatalError(RoutineName + "Errors discovered, program terminates.");
+        }
+
         // Have to make room for added surfaces, if needed
         FirstTotalSurfaces = SurfNum + AddedSubSurfaces;
         if (NeedToAddSurfaces + NeedToAddSubSurfaces > 0) {
@@ -12721,7 +12725,6 @@ namespace SurfaceGeometry {
 
     void SetupSolarEnclosuresAndAirBoundaries(bool &ErrorsFound)
     {
-        bool anySolarGroupedZones = false;
         int enclosureNum = 0;
         if (std::any_of(Construct.begin(), Construct.end(), [](DataHeatBalance::ConstructionData const &e) { return e.TypeIsAirBoundary; })) {
             std::string RoutineName = "SetupSolarEnclosuresAndAirBoundaries";
@@ -12741,7 +12744,7 @@ namespace SurfaceGeometry {
                     // Solar distribution
                     if (constr.TypeIsAirBoundarySolar) {
                         // Boundary is grouped - assign solar enclosure
-                        anySolarGroupedZones = true;
+                        DataHeatBalance::AnyAirBoundaryGroupedSolar = true;
                         auto &thisSideEnclosureNum(Zone(surf.Zone).SolarEnclosureNum);
                         auto &otherSideEnclosureNum(Zone(Surface(surf.ExtBoundCond).Zone).SolarEnclosureNum);
                         if ((thisSideEnclosureNum == 0) && (otherSideEnclosureNum == 0)) {
@@ -12817,7 +12820,7 @@ namespace SurfaceGeometry {
                 ShowContinueError("For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
             }
         }
-        if (anySolarGroupedZones) {
+        if (DataHeatBalance::AnyAirBoundaryGroupedSolar) {
             // All grouped solar zones have been assigned to an enclosure, now assign remaining zones
             for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
                 if (Zone(zoneNum).SolarEnclosureNum == 0) {
