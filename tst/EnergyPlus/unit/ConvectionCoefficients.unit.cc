@@ -848,7 +848,6 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestWindward)
 {
 
     bool AgainstWind;
-    bool ExpectedResult;
     
     Real64 CosTilt;
     Real64 Azimuth;
@@ -858,24 +857,21 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestWindward)
     CosTilt = 1.0;
     Azimuth = 180.0;
     WindDirection = 180.0;
-    ExpectedResult = true;
     AgainstWind = Windward(CosTilt,Azimuth,WindDirection);
-    EXPECT_EQ(ExpectedResult, AgainstWind);
+    EXPECT_TRUE(AgainstWind);
     
     // Test 2: Vertical surface, Azimuth and WindDiretion within 90 degrees of one another (windward or against wind)
     CosTilt = 0.5;
     Azimuth = 269.0;
     WindDirection = 180.0;
-    ExpectedResult = true;
     AgainstWind = Windward(CosTilt,Azimuth,WindDirection);
-    EXPECT_EQ(ExpectedResult, AgainstWind);
+    EXPECT_TRUE(AgainstWind);
 
     // Test 3: Vertical surface, Azimuth and WindDiretion not within 90 degrees of one another (leeward or not against wind)
     CosTilt = 0.5;
     Azimuth = 271.0;
     WindDirection = 180.0;
-    ExpectedResult = false;
     AgainstWind = Windward(CosTilt,Azimuth,WindDirection);
-    EXPECT_EQ(ExpectedResult, AgainstWind);
+    EXPECT_FALSE(AgainstWind);
 
 }
