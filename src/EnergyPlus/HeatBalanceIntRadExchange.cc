@@ -292,7 +292,7 @@ namespace HeatBalanceIntRadExchange {
                                 (ShadeFlagPrev == IntShadeOn && ShadeFlag != IntShadeOn) || (ShadeFlagPrev == IntBlindOn && ShadeFlag != IntBlindOn))
                                 IntShadeOrBlindStatusChanged = true;
                             if (SurfaceWindow(SurfNum).WindowModelType == WindowEQLModel &&
-                                DataWindowEquivalentLayer::CFS(Construct(ConstrNum).EQLConsPtr).ISControlled) {
+                                DataWindowEquivalentLayer::CFS(Construct(Surface(SurfNum).Construction).EQLConsPtr).ISControlled) {
                                 IntShadeOrBlindStatusChanged = true;
                             }
                         } else {
