@@ -2174,8 +2174,10 @@ namespace ReportSizingManager {
                                 setOAFracForZoneEqSizing(DesMassFlow, zoneEqSizing), zoneEqSizing, finalZoneSizing);
                         } else if (TermUnitIU && (CurTermUnitSizingNum > 0)) {
                             CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak;
+                            CoilInHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneHumRatAtHeatPeak;
                         } else if (TermUnitSingDuct && (CurTermUnitSizingNum > 0)) {
                             CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU;
+                            CoilInHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInHumRatTU;
                         } else {
                             if (DesVolFlow > 0.0) {
                                 DesMassFlow = DesVolFlow * StdRhoAir;

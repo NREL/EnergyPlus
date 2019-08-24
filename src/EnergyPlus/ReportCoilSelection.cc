@@ -1619,11 +1619,11 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             }
         }
 
-        c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
-
-            c->coilDesEntTemp, c->coilDesEntHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
-
-        c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW(c->coilDesEntTemp, c->coilDesEntHumRat);
+        if ( c->coilDesEntTemp > -999.0 && c->coilDesEntHumRat > -999.0 ) {
+            c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
+                c->coilDesEntTemp, c->coilDesEntHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
+            c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW(c->coilDesEntTemp, c->coilDesEntHumRat);
+        }
 
         if (c->coilDesLvgTemp == -999.0) { // don't overwrite if already set directly by setCoilLvgAirTemp
             c->coilDesLvgTemp = DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesTemp;
