@@ -2695,13 +2695,16 @@ The second option for specifying view factors requires user input values. These 
 
 \subsection{ZoneProperty:UserViewFactors:bySurfaceName}\label{zonepropertyuserviewfactorsbysurfacename}
 
-The method of entering user view factors is to entere each surface name and its view factor value to other surfaces in the zone
+The method of entering user view factors is to enter each surface name and its view factor value to other
+surfaces in a zone or group of zones connected by air boundaries (see ``\hyperref[constructionairboundary]{Construction:AirBoundary}'').
 
 \subsubsection{Inputs}\label{inputs-17}
 
-\paragraph{Field: Zone Name}\label{zonepropertyuserviewfactorsbysurfacename-field-zone-name}
+\paragraph{Field: Zone or ZoneList Name}\label{zonepropertyuserviewfactorsbysurfacename-field-zone-name}
 
-This field is the zone name for the view factors.
+An enclosure for radiant exchange may be a single zone, or a group of zones connected by one or more air boundaries (see ``\hyperref[constructionairboundary]{Construction:AirBoundary}''). If a ZoneList name is specified, the referenced ``\hyperref[zonelist]{ZoneList}'') must match a group of zones connected with Construction:AirBoundary using the \textit{GroupedZones} option for Radiant Exchange Method.
+
+Enter the applicable surface pairs with non-zero view factors. Any omitted surface pair is assumed to have a zero view factor.
 
 \paragraph{Field: From Surface 1}\label{field-from-surface-1}
 

@@ -67,6 +67,8 @@
 #include <General.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <UtilityRoutines.hh>
+// TODO: move DetermineMinuteForReporting to avoid bringing this one in
+#include <OutputProcessor.hh>
 
 #if defined(_WIN32) && _MSC_VER < 1900
 #define snprintf _snprintf
@@ -2968,7 +2970,7 @@ namespace General {
         Minute = mod(TmpItem, DecHr);
     }
 
-    int DetermineMinuteForReporting(int const IndexTypeKey) // kind of reporting, Zone Timestep or System
+    int DetermineMinuteForReporting(OutputProcessor::TimeStepType t_timeStepType) // kind of reporting, Zone Timestep or System
     {
 
         // FUNCTION INFORMATION:
@@ -2990,7 +2992,6 @@ namespace General {
         // Using/Aliasing
         using namespace DataPrecisionGlobals;
         using DataGlobals::CurrentTime;
-        using DataGlobals::HVACTSReporting;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -3015,7 +3016,7 @@ namespace General {
         Real64 ActualTimeE; // End of current interval (HVAC time step)
         int ActualTimeHrS;
 
-        if (IndexTypeKey == HVACTSReporting) {
+        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
             ActualTimeS = CurrentTime - TimeStepZone + SysTimeElapsed;
             ActualTimeE = ActualTimeS + TimeStepSys;
             ActualTimeHrS = int(ActualTimeS);
@@ -3922,6 +3923,23 @@ namespace General {
         return results;
     }
 
+    Real64 epexp(Real64 x)
+    {
+        if (x < -70.0) {
+            return 0.0;
+        }
+        return std::exp(x);
+    }
+
+    Real64 epexp(Real64 x, Real64 defaultHigh)
+    {
+        if (x < -70.0) {
+            return 0.0;
+        } else if (x > defaultHigh) {
+            return std::exp(defaultHigh);
+        }
+        return std::exp(x);
+    }
 } // namespace General
 
 } // namespace EnergyPlus

@@ -1069,7 +1069,7 @@ namespace RuntimeLanguageProcessor {
 
         if (!MyOneTimeFlag) {
             ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "****  Begin EMS Language Processor Error and Trace Output  *** ";
-            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "<Erl program name, line #, line text, result, occurance timing information ... >";
+            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "<Erl program name, line #, line text, result, occurrence timing information ... >";
             MyOneTimeFlag = true;
         }
         // if have not return'd yet then write out full trace

@@ -618,6 +618,15 @@ namespace ConvectionCoefficients {
                                                Real64 const height,
                                                bool const isWindow=false);
 
+    Real64 CalcFisherPedersenCeilDiffuserNatConv(Real64 const Hforced,
+                                                 Real64 const ACH,
+                                                 Real64 const Tsurf,
+                                                 Real64 const Tair,
+                                                 Real64 const cosTilt,
+                                                 Real64 const humRat,
+                                                 Real64 const height,
+                                                 bool const isWindow);
+    
     Real64 CalcAlamdariHammondUnstableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
                                                    Real64 const HydraulicDiameter  // [m] characteristic size, = (4 * area) / perimeter
     );

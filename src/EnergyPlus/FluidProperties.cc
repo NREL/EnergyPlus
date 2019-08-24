@@ -714,7 +714,7 @@ namespace FluidProperties {
                 if (FluidTemps(Loop).Temps(TempLoop) <= FluidTemps(Loop).Temps(TempLoop - 1)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " name=" + FluidTemps(Loop).Name +
                                     ", lists must have data in ascending order");
-                    ShowContinueError("First out of order occurance at Temperature #(" + RoundSigDigits(TempLoop - 1) + ") {" +
+                    ShowContinueError("First out of order occurrence at Temperature #(" + RoundSigDigits(TempLoop - 1) + ") {" +
                                       RoundSigDigits(FluidTemps(Loop).Temps(TempLoop - 1), 3) + "} >= Temp(" + RoundSigDigits(TempLoop) + ") {" +
                                       RoundSigDigits(FluidTemps(Loop).Temps(TempLoop), 3) + '}');
                     ErrorsFound = true;
@@ -1255,7 +1255,7 @@ namespace FluidProperties {
             //          String2=ADJUSTL(String2)
             //          String4=TrimSigDigits(RefrigData(Loop)%CpTemps(TempLoop),3)
             //          String4=ADJUSTL(String4)
-            //          CALL ShowContinueError('First Occurance at CpTemp('//TRIM(String1)//') {'//TRIM(String2)//'} /= {'//TRIM(String4)//'}')
+            //          CALL ShowContinueError('First Occurrence at CpTemp('//TRIM(String1)//') {'//TRIM(String2)//'} /= {'//TRIM(String4)//'}')
             //          ErrorsFound=.TRUE.
             //          EXIT
             //        ENDIF
@@ -1446,7 +1446,7 @@ namespace FluidProperties {
                     if (RefrigData(Loop).SHPress(InData) <= RefrigData(Loop).SHPress(InData - 1)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
                         ShowContinueError("Pressures must be entered in ascending order for fluid property data");
-                        ShowContinueError("First Occurance at Pressure(" + RoundSigDigits(InData - 1) + ") {" +
+                        ShowContinueError("First Occurrence at Pressure(" + RoundSigDigits(InData - 1) + ") {" +
                                           RoundSigDigits(RefrigData(Loop).SHPress(InData - 1), 3) + "} >= Pressure(" + RoundSigDigits(InData) +
                                           ") {" + RoundSigDigits(RefrigData(Loop).SHPress(InData), 3) + '}');
                         ErrorsFound = true;

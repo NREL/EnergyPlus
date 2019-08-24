@@ -437,7 +437,7 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     bool errorsFound(false);
     HeatBalanceManager::GetProjectControlData(errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
     SimulationManager::GetProjectData();
