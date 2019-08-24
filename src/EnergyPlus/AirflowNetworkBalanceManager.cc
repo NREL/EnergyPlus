@@ -617,7 +617,8 @@ namespace AirflowNetworkBalanceManager {
                         auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
                         if (result == referenceConditions.end()) {
                             ShowSevereError(RoutineName + CurrentModuleObject + ": " + thisObjectName +
-                                            ". Cannot find reference crack conditions object \"" + fields.at("reference_crack_conditions").get<std::string>() + "\".");
+                                            ". Cannot find reference crack conditions object \"" +
+                                            fields.at("reference_crack_conditions").get<std::string>() + "\".");
                             success = false;
                         } else {
                             refT = result->second.temperature;
@@ -692,7 +693,8 @@ namespace AirflowNetworkBalanceManager {
                         auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
                         if (result == referenceConditions.end()) {
                             ShowSevereError(RoutineName + CurrentModuleObject + ": " + thisObjectName +
-                                            ". Cannot find reference crack conditions object \"" + fields.at("reference_crack_conditions").get<std::string>() + "\".");
+                                            ". Cannot find reference crack conditions object \"" +
+                                            fields.at("reference_crack_conditions").get<std::string>() + "\".");
                             success = false;
                         } else {
                             refT = result->second.temperature;
@@ -1641,8 +1643,9 @@ namespace AirflowNetworkBalanceManager {
         Real64 baseratio;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_110("('! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/','Multizone "
-                                   "without Distribution/Multizone with Distribution only during Fan Operation')");
+        static ObjexxFCL::gio::Fmt Format_110(
+            "('! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/','Multizone "
+            "without Distribution/Multizone with Distribution only during Fan Operation')");
         static ObjexxFCL::gio::Fmt Format_120("('AirflowNetwork Model:Control,',A)");
 
         // Set the maximum numbers of input fields
@@ -1829,7 +1832,7 @@ namespace AirflowNetworkBalanceManager {
                 // Check continuity of both curves at boundary point
                 if (OccupantVentilationControl(i).ComfortLowTempCurveNum > 0 && OccupantVentilationControl(i).ComfortHighTempCurveNum) {
                     if (std::abs(CurveValue(OccupantVentilationControl(i).ComfortLowTempCurveNum, Numbers(3)) -
-                            CurveValue(OccupantVentilationControl(i).ComfortHighTempCurveNum, Numbers(3))) > 0.1) {
+                                 CurveValue(OccupantVentilationControl(i).ComfortHighTempCurveNum, Numbers(3))) > 0.1) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " object: The difference of both curve values at boundary point > 0.1");
                         ShowContinueError("Both curve names are = " + cAlphaFields(2) + " and " + cAlphaFields(3));
                         ShowContinueError("The input value of " + cNumericFields(3) + " = " +
@@ -2841,8 +2844,9 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
             if (MultizoneSurfaceData(i).NonRectangular) {
                 if (found) {
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <AirflowNetwork Model:Equivalent Rectangle Surface>, Name, Equivalent Height {m}, "
-                                                         "Equivalent Width {m} AirflowNetwork Model:Equivalent Rectangle";
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA)
+                        << "! <AirflowNetwork Model:Equivalent Rectangle Surface>, Name, Equivalent Height {m}, "
+                           "Equivalent Width {m} AirflowNetwork Model:Equivalent Rectangle";
                     found = false;
                 }
                 StringOut = "AirflowNetwork Model:Equivalent Rectangle Surface, " + MultizoneSurfaceData(i).SurfName;
@@ -8282,8 +8286,14 @@ namespace AirflowNetworkBalanceManager {
                 ZN2 = AirflowNetworkNodeData(M).EPlusZoneNum;
                 // Find a linkage from a zone to outdoors
                 if (ZN1 > 0 && ZN2 == 0) {
-                    Tamb = Zone(ZN1).OutDryBulbTemp;
-                    CpAir = PsyCpAirFnWTdb(OutHumRat, Tamb);
+                    if (Surface(MultizoneSurfaceData(i).SurfNum).HasLinkedOutAirNode) {
+                        Tamb = Surface(MultizoneSurfaceData(i).SurfNum).OutDryBulbTemp;
+                        CpAir = PsyCpAirFnWTdb(
+                            Psychrometrics::PsyWFnTdbTwbPb(Tamb, Surface(MultizoneSurfaceData(i).SurfNum).OutWetBulbTemp, OutBaroPress), Tamb);
+                    } else {
+                        Tamb = Zone(ZN1).OutDryBulbTemp;
+                        CpAir = PsyCpAirFnWTdb(OutHumRat, Tamb);
+                    }
                     if (Tamb > MAT(ZN1)) {
                         AirflowNetworkReportData(ZN1).MultiZoneInfiSenGainW += (AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (Tamb - MAT(ZN1)));
                         AirflowNetworkReportData(ZN1).MultiZoneInfiSenGainJ +=
@@ -8304,8 +8314,14 @@ namespace AirflowNetworkBalanceManager {
                     }
                 }
                 if (ZN1 == 0 && ZN2 > 0) {
-                    Tamb = Zone(ZN2).OutDryBulbTemp;
-                    CpAir = PsyCpAirFnWTdb(OutHumRat, Tamb);
+                    if (Surface(MultizoneSurfaceData(i).SurfNum).HasLinkedOutAirNode) {
+                        Tamb = Surface(MultizoneSurfaceData(i).SurfNum).OutDryBulbTemp;
+                        CpAir = PsyCpAirFnWTdb(
+                            Psychrometrics::PsyWFnTdbTwbPb(Tamb, Surface(MultizoneSurfaceData(i).SurfNum).OutWetBulbTemp, OutBaroPress), Tamb);
+                    } else {
+                        Tamb = Zone(ZN2).OutDryBulbTemp;
+                        CpAir = PsyCpAirFnWTdb(OutHumRat, Tamb);
+                    }
                     if (Tamb > MAT(ZN2)) {
                         AirflowNetworkReportData(ZN2).MultiZoneInfiSenGainW += (AirflowNetworkLinkSimu(i).FLOW * CpAir * (Tamb - MAT(ZN2)));
                         AirflowNetworkReportData(ZN2).MultiZoneInfiSenGainJ +=
@@ -9103,9 +9119,9 @@ namespace AirflowNetworkBalanceManager {
                         NodeMass = Node(AirflowNetworkNodeData(Node3).EPlusNodeNum).MassFlowRate;
                         AFNMass = AirflowNetworkLinkSimu(i).FLOW;
                         if (NodeMass > 0.0 && AFNMass > NodeMass + 0.01) {
-                            ShowWarningError(
-                                "The mass flow rate difference is found between System Node = '" + NodeID(AirflowNetworkNodeData(Node3).EPlusNodeNum) +
-                                "' and AFN Link = '" + AirflowNetworkLinkageData(i).Name + "'.");
+                            ShowWarningError("The mass flow rate difference is found between System Node = '" +
+                                             NodeID(AirflowNetworkNodeData(Node3).EPlusNodeNum) + "' and AFN Link = '" +
+                                             AirflowNetworkLinkageData(i).Name + "'.");
                             ShowContinueError("The system node max mass flow rate = " + RoundSigDigits(NodeMass, 3) +
                                               " kg/s. The AFN node mass flow rate = " + RoundSigDigits(AFNMass, 3) + " kg.s.");
                             WriteFlag = true;
@@ -9830,7 +9846,8 @@ namespace AirflowNetworkBalanceManager {
                             break;
                         } else {
                             if (OAMixerNum == GetNumOAMixers()) {
-                                ShowSevereError(RoutineName + "'" + NodeID(i) + "' is not defined as an AirflowNetwork:Distribution:Node object.");
+                                ShowSevereError(RoutineName + "'" + NodeID(i) +
+                                                "' is not defined as an AirflowNetwork:Distribution:Node object.");
                                 ErrorsFound = true;
                             }
                         }
@@ -10215,6 +10232,7 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
+
         for (i = NumOfNodesMultiZone + 1; i <= AirflowNetworkNumOfNodes; ++i) {
             if (AirflowNetworkNodeData(i).EPlusTypeNum == EPlusTypeNum_SPL) {
                 LocalError = false;
@@ -10233,6 +10251,7 @@ namespace AirflowNetworkBalanceManager {
             for (j = 1; j <= SplitterNodeNumbers(2); ++j) {
                 if (AirflowNetworkNodeData(i).EPlusNodeNum == SplitterNodeNumbers(j + 2)) {
                     if (AirflowNetworkNodeData(i).EPlusTypeNum == 0) AirflowNetworkNodeData(i).EPlusTypeNum = EPlusTypeNum_SPO;
+
                 }
             }
         }
