@@ -1619,7 +1619,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             }
         }
 
-        if ( c->coilDesEntTemp > -999.0 && c->coilDesEntHumRat > -999.0 ) {
+        if (c->coilDesEntTemp > -999.0 && c->coilDesEntHumRat > -999.0) {
             c->coilDesEntWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
                 c->coilDesEntTemp, c->coilDesEntHumRat, DataEnvironment::StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
             c->coilDesEntEnth = Psychrometrics::PsyHFnTdbW(c->coilDesEntTemp, c->coilDesEntHumRat);
