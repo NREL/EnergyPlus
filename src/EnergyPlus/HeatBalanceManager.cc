@@ -1828,35 +1828,16 @@ namespace HeatBalanceManager {
 
             // Load the material derived type from the input data.
             Material(MaterNum).Name = MaterialNames(1);
-
-            if (MaterialNumProp >= 1) {
-                Material(MaterNum).Resistance = MaterialProps(1);
-                Material(MaterNum).ROnly = true;
-            } else {
-                Material(MaterNum).Resistance = 0.01;
-                Material(MaterNum).ROnly = true;
-            }
-            if (MaterialNumProp >= 2) {
-                Material(MaterNum).AbsorpThermal = MaterialProps(2);
-                Material(MaterNum).AbsorpThermalInput = MaterialProps(2);
-            } else {
-                Material(MaterNum).AbsorpThermal = 0.9999;
-                Material(MaterNum).AbsorpThermalInput = 0.9999;
-            }
-            if (MaterialNumProp >= 3) {
-                Material(MaterNum).AbsorpSolar = MaterialProps(3);
-                Material(MaterNum).AbsorpSolarInput = MaterialProps(3);
-            } else {
-                Material(MaterNum).AbsorpSolar = 1.0;
-                Material(MaterNum).AbsorpSolarInput = 1.0;
-            }
-            if (MaterialNumProp >= 4) {
-                Material(MaterNum).AbsorpVisible = MaterialProps(4);
-                Material(MaterNum).AbsorpVisibleInput = MaterialProps(4);
-            } else {
-                Material(MaterNum).AbsorpVisible = 1.0;
-                Material(MaterNum).AbsorpVisibleInput = 1.0;
-            }
+            
+            // Load data for other properties that need defaults
+            Material(MaterNum).ROnly = true;
+            Material(MaterNum).Resistance = 0.01;
+            Material(MaterNum).AbsorpThermal = 0.9999;
+            Material(MaterNum).AbsorpThermalInput = 0.9999;
+            Material(MaterNum).AbsorpSolar = 1.0;
+            Material(MaterNum).AbsorpSolarInput = 1.0;
+            Material(MaterNum).AbsorpVisible = 1.0;
+            Material(MaterNum).AbsorpVisibleInput = 1.0;
 
             NominalR(MaterNum) = Material(MaterNum).Resistance;
         }
@@ -1877,7 +1858,7 @@ namespace HeatBalanceManager {
             Material(MaterNum).AbsorpVisibleInput = 0.0;
             NominalR(MaterNum) = Material(MaterNum).Resistance;
             if (GlobalNames::VerifyUniqueInterObjectName(
-                UniqueMaterialNames, Material(MaterNum).Name, CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
+                    UniqueMaterialNames, Material(MaterNum).Name, CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
                 ShowContinueError("...All Material names must be unique regardless of subtype.");
                 ShowContinueError("...\"~AirBoundary-IRTMaterial\" is a reserved name used internally by Construction:AirBoundary.");
             }
@@ -3578,9 +3559,13 @@ namespace HeatBalanceManager {
                 Material(MaterNum).ReflFrontDiffDiffVis = MaterialProps(14);
                 Material(MaterNum).ReflBackDiffDiffVis = MaterialProps(15);
             }
-            if (!lNumericFieldBlanks(19) && !lNumericFieldBlanks(20) && !lNumericFieldBlanks(21)) {
+            if (!lNumericFieldBlanks(19)) {
                 Material(MaterNum).TausThermal = MaterialProps(19);
+            }
+            if (!lNumericFieldBlanks(20)) {
                 Material(MaterNum).EmissThermalFront = MaterialProps(20);
+            }
+            if (!lNumericFieldBlanks(21)) {
                 Material(MaterNum).EmissThermalBack = MaterialProps(21);
             }
             // Assumes thermal emissivity is the same as thermal absorptance
@@ -7565,7 +7550,7 @@ namespace HeatBalanceManager {
                         thisConstruct.AirBoundaryACH = fields.at("simple_mixing_air_changes_per_hour");
                     } else {
                         if (!inputProcessor->getDefaultValue(
-                            cCurrentModuleObject, "simple_mixing_air_changes_per_hour", thisConstruct.AirBoundaryACH)) {
+                                cCurrentModuleObject, "simple_mixing_air_changes_per_hour", thisConstruct.AirBoundaryACH)) {
                             errorsFound = true;
                         }
                     }
