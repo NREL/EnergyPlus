@@ -1737,6 +1737,7 @@ namespace PurchasedAirManager {
                 SizingString = PurchAirNumericFields(PurchAirNum).FieldNames(FieldNum) + " [m3/s]";
                 IsAutoSize = false;
                 PrintFlag = true;
+                ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
                 if ((PurchAir(PurchAirNum).MaxHeatVolFlowRate == AutoSize) &&
                     ((PurchAir(PurchAirNum).HeatingLimit == LimitFlowRate) || (PurchAir(PurchAirNum).HeatingLimit == LimitFlowRateAndCapacity))) {
                     IsAutoSize = true;
