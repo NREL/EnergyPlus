@@ -2377,8 +2377,6 @@ TEST_F(EnergyPlusFixture, TestAFNPressureStat)
     EXPECT_NEAR(36.7133377, AirflowNetwork::AirflowNetworkReportData(2).MultiZoneMixLatGainW, 0.0001);
     EXPECT_NEAR(89.3450925, AirflowNetwork::AirflowNetworkReportData(3).MultiZoneInfiLatLossW, 0.0001);
 
-    AirflowNetwork::AirflowNetworkExchangeData.deallocate();
-    Node.deallocate();
 }
 TEST_F(EnergyPlusFixture, TestZoneVentingSchWithAdaptiveCtrl)
 {
