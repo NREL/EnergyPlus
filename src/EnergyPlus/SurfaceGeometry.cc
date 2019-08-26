@@ -2374,8 +2374,7 @@ namespace SurfaceGeometry {
             }
         } else {
             if (!RectSurfRefWorldCoordSystem) {
-                ShowWarningError(cCurrentModuleObject + ": Potential mismatch of coordinate specifications. Note that the rectangular surfaces are "
-                                                        "relying on the default SurfaceGeometry for 'Relative to zone' coordinate.");
+                ShowWarningError(cCurrentModuleObject + ": Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on the default SurfaceGeometry for 'Relative to zone' coordinate.");
                 ShowContinueError(cAlphaFieldNames(3) + "=\"" + GAlphas(3) + "\"; while ");
                 ShowContinueError(cAlphaFieldNames(5) + "=\"" + GAlphas(5) + "\".");
             }

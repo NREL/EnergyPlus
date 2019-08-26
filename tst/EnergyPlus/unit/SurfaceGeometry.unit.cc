@@ -66,7 +66,7 @@ using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::SurfaceGeometry;
 using namespace EnergyPlus::HeatBalanceManager;
-// using namespace ObjexxFCL;
+//using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 {
@@ -4435,12 +4435,21 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
 
 TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test)
 {
-    bool ErrorsFound(false);
-
     // A warning message is expected, when Coordinate System = World & Rectangular Surface Coordinate System = Relative(default) in GlobalGeometryRules
-    DataSurfaces::WorldCoordSystem = true;
-    RectSurfRefWorldCoordSystem = false;
+       
+    std::string const idf_objects = delimited_string({
+    
+        "GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    World,                   !- Coordinate System",
+        "    Relative,                !- Daylighting Reference Point Coordinate System",
+        "    Relative;                !- Rectangular Surface Coordinate System",
+    
+    });
 
+    bool ErrorsFound(false);
+    
     GetGeometryParameters(ErrorsFound);
     EXPECT_TRUE(has_err_output(false));
 }
