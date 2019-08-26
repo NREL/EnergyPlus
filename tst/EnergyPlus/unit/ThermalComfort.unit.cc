@@ -952,169 +952,61 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
 {
     
-    std::string const idf_objects = delimited_string({
-        "  People,                                                                 ",
-        "    Space People,   !- Name                                      ",
-        "    Space,     !- Zone or ZoneList Name                     ",
-        "    PeopleSchedule,          !- Number of People Schedule Name            ",
-        "    People,                  !- Number of People Calculation Method       ",
-        "    5.0,                     !- Number of People                          ",
-        "    ,                        !- People per Zone Floor Area {person/m2}    ",
-        "    ,                        !- Zone Floor Area per Person {m2/person}    ",
-        "    0.3,                     !- Fraction Radiant                          ",
-        "    AUTOCALCULATE,           !- Sensible Heat Fraction                    ",
-        "    Activity Schedule,       !- Activity Level Schedule Name              ",
-        "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}   ",
-        "    Yes,                     !- Enable ASHRAE 55 Comfort Warnings         ",
-        "    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type ",
-        "    ,                        !- Surface Name/Angle Factor List Name       ",
-        "    Work efficiency,         !- Work Efficiency Schedule Name             ",
-        "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
-        "    ,                        !- Clothing Insulation Calculation Method Sch",
-        "    Clothing Schedule,       !- Clothing Insulation Schedule Name         ",
-        "    AirVelocitySchedule,     !- Air Velocity Schedule Name                ",
-        "    Pierce;                  !- Thermal Comfort Model 1 Type              ",
-        "                                                                          ",
-        "  Schedule:Compact,                                                       ",
-        "    PeopleSchedule,          !- Name                                      ",
-        "    Any Number,              !- Schedule Type Limits Name                 ",
-        "    Through: 12/30,          !- Field 1                                   ",
-        "    For: AllDays,            !- Field 2                                   ",
-        "    Until: 24:00,1.0,        !- Field 3                                   ",
-        "    Through: 12/31,          !- Field 1                                   ",
-        "    For: AllDays,            !- Field 2                                   ",
-        "    Until: 24:00,0.3;        !- Field 3                                   ",
-        "                                                                          ",
-        "  Schedule:Compact,                                                       ",
-        "    Activity Schedule,       !- Name                                      ",
-        "    Any Number,              !- Schedule Type Limits Name                 ",
-        "    Through: 12/31,          !- Field 1                                   ",
-        "    For: AllDays,            !- Field 2                                   ",
-        "    Until: 24:00,70;         !- Field 3                                   ",
-        "                                                                          ",
-        "  Schedule:Compact,                                                       ",
-        "    Clothing Schedule,       !- Name                                      ",
-        "    Any Number,              !- Schedule Type Limits Name                 ",
-        "    Through: 12/31,          !- Field 9                                   ",
-        "    For: AllDays,            !- Field 10                                  ",
-        "    Until: 24:00,1.0;         !- Field 11                                 ",
-        "                                                                          ",
-        "  Schedule:Compact,                                                       ",
-        "    AirVelocitySchedule,     !- Name                                      ",
-        "    Any Number,              !- Schedule Type Limits Name                 ",
-        "    Through: 12/31,          !- Field 1                                   ",
-        "    For: AllDays,            !- Field 2                                   ",
-        "    Until: 24:00,0.0;        !- Field 3                                   ",
-        "                                                                          ",
-        "  Schedule:Compact,                                                       ",
-        "    Work efficiency,         !- Name                                      ",
-        "    Any Number,              !- Schedule Type Limits Name                 ",
-        "    Through: 12/31,          !- Field 9                                   ",
-        "    For: AllDays,            !- Field 10                                  ",
-        "    Until: 24:00,0.0;         !- Field 11                                 ",
-        "                                                                          ",
-        " Output:Diagnostics, DisplayExtraWarnings;",
-        " Timestep, 4;",
-        " BUILDING, AirloopHVAC_VentilationRateProcedure, 0.0, Suburbs, .04, .4, FullExterior, 25, 6;",
-        " SimulationControl, NO, NO, NO, YES, NO;",
-        "ScheduleTypeLimits,",
-        "  Any Number;              !- Name",
-        "  Site:Location,",
-        "    Miami Intl Ap FL USA TMY3 WMO=722020E,    !- Name",
-        "    25.82,                 !- Latitude {deg}",
-        "    -80.30,                !- Longitude {deg}",
-        "    -5.00,                 !- Time Zone {hr}",
-        "    11;                    !- Elevation {m}",
-        
-        "SizingPeriod:DesignDay,",
-        " Miami Intl Ap Ann Clg .4% Condns DB/MCWB, !- Name",
-        " 7,                        !- Month",
-        " 21,                       !- Day of Month",
-        " SummerDesignDay,          !- Day Type",
-        " 31.7,                     !- Maximum Dry - Bulb Temperature{ C }",
-        " 10.0,                      !- Daily Dry - Bulb Temperature Range{ deltaC }",
-        " ,                         !- Dry - Bulb Temperature Range Modifier Type",
-        " ,                         !- Dry - Bulb Temperature Range Modifier Day Schedule Name",
-        " Wetbulb,                  !- Humidity Condition Type",
-        " 22.7,                     !- Wetbulb or DewPoint at Maximum Dry - Bulb{ C }",
-        " ,                         !- Humidity Condition Day Schedule Name",
-        " ,                         !- Humidity Ratio at Maximum Dry - Bulb{ kgWater / kgDryAir }",
-        " ,                         !- Enthalpy at Maximum Dry - Bulb{ J / kg }",
-        " ,                         !- Daily Wet - Bulb Temperature Range{ deltaC }",
-        " 101217.,                  !- Barometric Pressure{ Pa }",
-        " 3.8,                      !- Wind Speed{ m / s }",
-        " 340,                      !- Wind Direction{ deg }",
-        " No,                       !- Rain Indicator",
-        " No,                       !- Snow Indicator",
-        " No,                       !- Daylight Saving Time Indicator",
-        " ASHRAEClearSky,           !- Solar Model Indicator",
-        " ,                         !- Beam Solar Day Schedule Name",
-        " ,                         !- Diffuse Solar Day Schedule Name",
-        " ,                         !- ASHRAE Clear Sky Optical Depth for Beam Irradiance( taub ) { dimensionless }",
-        " ,                         !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance( taud ) { dimensionless }",
-        " 1.00;                     !- Sky Clearness",
-        
-        "SizingPeriod:DesignDay,",
-        " Miami Intl Ap Ann Htg 99.6% Condns DB, !- Name",
-        " 1,                        !- Month",
-        " 21,                       !- Day of Month",
-        " WinterDesignDay,          !- Day Type",
-        " 8.7,                      !- Maximum Dry - Bulb Temperature{ C }",
-        " 0.0,                      !- Daily Dry - Bulb Temperature Range{ deltaC }",
-        " ,                         !- Dry - Bulb Temperature Range Modifier Type",
-        " ,                         !- Dry - Bulb Temperature Range Modifier Day Schedule Name",
-        " Wetbulb,                  !- Humidity Condition Type",
-        " 8.7,                      !- Wetbulb or DewPoint at Maximum Dry - Bulb{ C }",
-        " ,                         !- Humidity Condition Day Schedule Name",
-        " ,                         !- Humidity Ratio at Maximum Dry - Bulb{ kgWater / kgDryAir }",
-        " ,                         !- Enthalpy at Maximum Dry - Bulb{ J / kg }",
-        " ,                         !- Daily Wet - Bulb Temperature Range{ deltaC }",
-        " 101217.,                  !- Barometric Pressure{ Pa }",
-        " 3.8,                      !- Wind Speed{ m / s }",
-        " 340,                      !- Wind Direction{ deg }",
-        " No,                       !- Rain Indicator",
-        " No,                       !- Snow Indicator",
-        " No,                       !- Daylight Saving Time Indicator",
-        " ASHRAEClearSky,           !- Solar Model Indicator",
-        " ,                         !- Beam Solar Day Schedule Name",
-        " ,                         !- Diffuse Solar Day Schedule Name",
-        " ,                         !- ASHRAE Clear Sky Optical Depth for Beam Irradiance( taub ) { dimensionless }",
-        " ,                         !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance( taud ) { dimensionless }",
-        " 0.00;                     !- Sky Clearness",
-        
-        "Zone,",
-        "  Space,                   !- Name",
-        "  0.0000,                  !- Direction of Relative North {deg}",
-        "  0.0000,                  !- X Origin {m}",
-        "  0.0000,                  !- Y Origin {m}",
-        "  0.0000,                  !- Z Origin {m}",
-        "  1,                       !- Type",
-        "  1,                       !- Multiplier",
-        "  2.4,                     !- Ceiling Height {m}",
-        "  ,                        !- Volume {m3}",
-        "  autocalculate,           !- Floor Area {m2}",
-        "  ,                        !- Zone Inside Convection Algorithm",
-        "  ,                        !- Zone Outside Convection Algorithm",
-        "  Yes;                     !- Part of Total Floor Area",
-        
-        " ",
-        
-    });
+    InternalHeatGains::clear_state();
+    DataHeatBalance::clear_state();
+    DataHeatBalFanSys::clear_state();
+    ThermalComfort::clear_state();
     
-    ASSERT_TRUE(process_idf(idf_objects));
-    
-    DataGlobals::DDOnlySimulation = true;
-    
-    
-    //    compare_err_stream( "" );
+    // Set the data for the test    
+    TotPeople = 1;
+    People.allocate(TotPeople);
+    ThermalComfortData.allocate(TotPeople);
+    NumOfZones = 1;
+    Zone.allocate(NumOfZones);
+    ZTAVComf.allocate(NumOfZones);
+    MRT.allocate(NumOfZones);
+    ZoneAirHumRatAvgComf.allocate(NumOfZones);
+    IsZoneDV.allocate(NumOfZones);
+    IsZoneUI.allocate(NumOfZones);
+    QHTRadSysToPerson.allocate(NumOfZones);
+    QCoolingPanelToPerson.allocate(NumOfZones);
+    QHWBaseboardToPerson.allocate(NumOfZones);
+    QSteamBaseboardToPerson.allocate(NumOfZones);
+    QElecBaseboardToPerson.allocate(NumOfZones);
+        
+    People(1).ZonePtr = 1;
+    People(1).NumberOfPeoplePtr = -1;
+    People(1).NumberOfPeople = 5.0;
+    People(1).NomMinNumberPeople = 5.0;
+    People(1).NomMaxNumberPeople = 5.0;
+    Zone(People(1).ZonePtr).TotOccupants = People(1).NumberOfPeople;
+    People(1).FractionRadiant = 0.3;
+    People(1).FractionConvected = 1.0 - People(1).FractionRadiant;
+    People(1).UserSpecSensFrac = AutoCalculate;
+    People(1).CO2RateFactor = 3.82e-8;
+    People(1).ActivityLevelPtr = -1;
+    People(1).Show55Warning = true;
+    People(1).Pierce = true;
+    People(1).MRTCalcType = ZoneAveraged;
+    People(1).WorkEffPtr = 0;
+    People(1).ClothingType = 1;
+    People(1).ClothingPtr = -1;
+    People(1).AirVelocityPtr = 0;
     
     ZTAVComf(1) = 25.0;
     MRT(1) = 26.0;
-    ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
-    
+    ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006    
+    DataEnvironment::OutBaroPress = 101217.;
+    IsZoneDV(1) = IsZoneUI(1) = false;
+    QHTRadSysToPerson(1) = 0.0;
+    QCoolingPanelToPerson(1) = 0.0;
+    QHWBaseboardToPerson(1) = 0.0;
+    QSteamBaseboardToPerson(1) = 0.0;
+    QElecBaseboardToPerson(1) = 0.0;
+
     CalcThermalComfortPierce();
     
-    EXPECT_NEAR(ThermalComfortData(1).PiercePMVSET, 0.446, 0.005);
-    EXPECT_NEAR(ThermalComfortData(1).PierceSET, 26.1, 0.1);
+    EXPECT_NEAR(ThermalComfortData(1).PiercePMVSET, -3.350, 0.005);
+    EXPECT_NEAR(ThermalComfortData(1).PierceSET, 23.62, 0.01);
 
 }
