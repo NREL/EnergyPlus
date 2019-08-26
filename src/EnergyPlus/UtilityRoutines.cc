@@ -1652,7 +1652,7 @@ void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Messag
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine stores a recurring ErrorMessage with a Severe designation
     // for output at the end of the simulation with automatic tracking of number
-    // of occurences and optional tracking of associated min, max, and sum values
+    // of occurrences and optional tracking of associated min, max, and sum values
 
     // METHODOLOGY EMPLOYED:
     // Calls StoreRecurringErrorMessage utility routine.
@@ -1664,7 +1664,7 @@ void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Messag
 
     // INTERFACE BLOCK SPECIFICATIONS
     //  Use for recurring "severe" error messages shown once at end of simulation
-    //  with count of occurences and optional max, min, sum
+    //  with count of occurrences and optional max, min, sum
 
     for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
         if (has(Message, MessageSearch(Loop))) {
@@ -1707,7 +1707,7 @@ void ShowRecurringWarningErrorAtEnd(std::string const &Message,         // Messa
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine stores a recurring ErrorMessage with a Warning designation
     // for output at the end of the simulation with automatic tracking of number
-    // of occurences and optional tracking of associated min, max, and sum values
+    // of occurrences and optional tracking of associated min, max, and sum values
 
     // METHODOLOGY EMPLOYED:
     // Calls StoreRecurringErrorMessage utility routine.
@@ -1719,7 +1719,7 @@ void ShowRecurringWarningErrorAtEnd(std::string const &Message,         // Messa
 
     // INTERFACE BLOCK SPECIFICATIONS
     //  Use for recurring "warning" error messages shown once at end of simulation
-    //  with count of occurences and optional max, min, sum
+    //  with count of occurrences and optional max, min, sum
 
     for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
         if (has(Message, MessageSearch(Loop))) {
@@ -1762,7 +1762,7 @@ void ShowRecurringContinueErrorAtEnd(std::string const &Message,         // Mess
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine stores a recurring ErrorMessage with a continue designation
     // for output at the end of the simulation with automatic tracking of number
-    // of occurences and optional tracking of associated min, max, and sum values
+    // of occurrences and optional tracking of associated min, max, and sum values
 
     // METHODOLOGY EMPLOYED:
     // Calls StoreRecurringErrorMessage utility routine.
@@ -1774,7 +1774,7 @@ void ShowRecurringContinueErrorAtEnd(std::string const &Message,         // Mess
 
     // INTERFACE BLOCK SPECIFICATIONS
     //  Use for recurring "continue" error messages shown once at end of simulation
-    //  with count of occurences and optional max, min, sum
+    //  with count of occurrences and optional max, min, sum
 
     for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
         if (has(Message, MessageSearch(Loop))) {
@@ -1817,7 +1817,7 @@ void StoreRecurringErrorMessage(std::string const &ErrorMessage,         // Mess
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine stores a recurring ErrorMessage with
     // for output at the end of the simulation with automatic tracking of number
-    // of occurences and optional tracking of associated min, max, and sum values
+    // of occurrences and optional tracking of associated min, max, and sum values
 
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
