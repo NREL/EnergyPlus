@@ -851,6 +851,7 @@ namespace Psychrometrics {
     void PsyWFnTdpPb_error(Real64 const TDP,             // dew-point temperature {C}
                            Real64 const PB,              // barometric pressure {Pascals}
                            Real64 const W,               // humidity ratio
+                           Real64 const DeltaT,          // Reduced temperature difference of dew point
                            std::string const &CalledFrom // routine this function was called from (error messages)
     );
 #endif
@@ -886,10 +887,20 @@ namespace Psychrometrics {
 
         // Validity test
         if (W < 0.0) {
+            Real64 DeltaT = 0.0;
+            Real64 PDEW1 = PDEW;
+            while (PDEW1 >= PB) {
+                DeltaT++;
+                PDEW1 = PsyPsatFnTemp(TDP - DeltaT,
+                                      (CalledFrom.empty() ? RoutineName : CalledFrom)); // saturation pressure at dew-point temperature {Pascals}
+            }
+            Real64 W1 = PDEW1 * 0.62198 / (PB - PDEW1);
 #ifdef EP_psych_errors
-            if (W <= -0.0001) PsyWFnTdpPb_error(TDP, PB, W, CalledFrom);
+            if (W <= -0.0001) {
+                PsyWFnTdpPb_error(TDP, PB, W1, DeltaT, CalledFrom);
+            }
 #endif
-            return 1.0e-5;
+            return W1;
         } else {
             return W;
         }
