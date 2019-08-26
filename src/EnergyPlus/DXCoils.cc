@@ -10153,11 +10153,8 @@ namespace DXCoils {
             //! Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
             //  HeatReclaimDXCoil(DXCoilNum)%AvailCapacity = DXCoil(DXCoilNum)%TotalCoolingEnergyRate + DXCoil(DXCoilNum)%ElecCoolingPower
 
-            //MinAirHumRat = min(InletAirHumRat, OutletAirHumRat);
-            //DXCoil(DXCoilNum).SensCoolingEnergyRate =
-            //    AirMassFlow * (PsyHFnTdbW(InletAirDryBulbTemp, MinAirHumRat) - PsyHFnTdbW(OutletAirTemp, MinAirHumRat));
             DXCoil(DXCoilNum).SensCoolingEnergyRate =
-                AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(OutletAirTemp, OutletAirHumRat, InletAirDryBulbTemp, InletAirHumRat); // sensible {W};
+                AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(InletAirDryBulbTemp, InletAirHumRat, OutletAirTemp, OutletAirHumRat); // sensible {W};
 
             //  Don't let sensible capacity be greater than total capacity
             if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
@@ -16150,7 +16147,7 @@ namespace DXCoils {
 
             // Coil sensible cooling
             DXCoil(DXCoilNum).SensCoolingEnergyRate =
-                AirMassFlowRate * PsyDeltaHSenFnTdb2W2Tdb1W1(OutletAirTemp, OutletAirHumRat, InletAirDryBulbTemp, InletAirHumRat); // sensible {W};
+                AirMassFlowRate * PsyDeltaHSenFnTdb2W2Tdb1W1(InletAirDryBulbTemp, InletAirHumRat, OutletAirTemp, OutletAirHumRat); // sensible {W};
 
             //  Don't let sensible capacity be greater than total capacity
             if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
