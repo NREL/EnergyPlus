@@ -1770,6 +1770,7 @@ namespace PurchasedAirManager {
                     }
                 } else {
                     TempSize = PurchAir(PurchAirNum).MaxHeatSensCap;
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
                     ZoneHeatingOnlyFan = true;
                     PrintFlag = false;
                     RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
@@ -1855,6 +1856,7 @@ namespace PurchasedAirManager {
                     }
                 } else {
                     ZoneCoolingOnlyFan = true;
+                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
                     PrintFlag = false;
                     TempSize = PurchAir(PurchAirNum).MaxCoolTotCap;
                     RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
