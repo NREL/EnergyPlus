@@ -596,7 +596,7 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_EvaluateIntHcModelsFisherPe
 
 
     // Case 1 - Low ACH (should default to CalcASHRAETARPNatural)
-    Real64 ACH = 1.;
+    Real64 ACH = 0.25;
     DataHeatBalance::Zone( 1 ).Volume = 125.0;
     DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0 * DataHeatBalance::Zone( 1 ).Volume * ACH;
 
@@ -759,4 +759,119 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestCalcZoneSystemACH)
     ACHAnswer = CalcZoneSystemACH(ZoneNum);
     EXPECT_NEAR(ACHExpected, ACHAnswer, 0.0001);
     
+}
+
+TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestCalcFisherPedersenCeilDiffuserNatConv)
+{
+
+    Real64 Hforced;
+    Real64 ACH;
+    Real64 Tsurf;
+    Real64 Tair;
+    Real64 cosTilt;
+    Real64 humRat;
+    Real64 height;
+    bool isWindow;
+    Real64 ExpectedHconv;
+    Real64 CalculatedHconv;
+    
+    DataEnvironment::OutBaroPress = 101325.0;
+
+    // Test 1: Non-window, all natural
+    Hforced = 10.0;
+    ACH = 0.25;
+    Tsurf = 23.0;
+    Tair = 18.0;
+    cosTilt = 1.0;
+    humRat = 0.08;
+    height = 1.0;
+    isWindow = false;
+    ExpectedHconv = 1.2994;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+    
+    // Test 2: Window, all natural
+    Hforced = 10.0;
+    ACH = 0.25;
+    Tsurf = 23.0;
+    Tair = 18.0;
+    cosTilt = 1.0;
+    humRat = 0.08;
+    height = 1.0;
+    isWindow = true;
+    ExpectedHconv = 0.8067;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+
+    // Test 3: Non-window, all natural
+    Hforced = 10.0;
+    ACH = 0.5;
+    Tsurf = 23.0;
+    Tair = 18.0;
+    cosTilt = 1.0;
+    humRat = 0.08;
+    height = 1.0;
+    isWindow = false;
+    ExpectedHconv = 1.2994;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+
+    // Test 4: Non-window, transition
+    Hforced = 10.0;
+    ACH = 0.75;
+    Tsurf = 23.0;
+    Tair = 18.0;
+    cosTilt = 1.0;
+    humRat = 0.08;
+    height = 1.0;
+    isWindow = false;
+    ExpectedHconv = 5.6497;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+
+    // Test 5: Non-window, all ceiling diffuser correlation
+    Hforced = 10.0;
+    ACH = 1.0;
+    Tsurf = 23.0;
+    Tair = 18.0;
+    cosTilt = 1.0;
+    humRat = 0.08;
+    height = 1.0;
+    isWindow = false;
+    ExpectedHconv = 10.0;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+    
+}
+
+TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_TestWindward)
+{
+
+    bool AgainstWind;
+    
+    Real64 CosTilt;
+    Real64 Azimuth;
+    Real64 WindDirection;
+    
+    // Test 1: Horizontal surface
+    CosTilt = 1.0;
+    Azimuth = 180.0;
+    WindDirection = 180.0;
+    AgainstWind = Windward(CosTilt,Azimuth,WindDirection);
+    EXPECT_TRUE(AgainstWind);
+    
+    // Test 2: Vertical surface, Azimuth and WindDiretion within 90 degrees of one another (windward or against wind)
+    CosTilt = 0.5;
+    Azimuth = 269.0;
+    WindDirection = 180.0;
+    AgainstWind = Windward(CosTilt,Azimuth,WindDirection);
+    EXPECT_TRUE(AgainstWind);
+
+    // Test 3: Vertical surface, Azimuth and WindDiretion not within 90 degrees of one another (leeward or not against wind)
+    CosTilt = 0.5;
+    Azimuth = 271.0;
+    WindDirection = 180.0;
+    AgainstWind = Windward(CosTilt,Azimuth,WindDirection);
+    EXPECT_FALSE(AgainstWind);
+
 }
