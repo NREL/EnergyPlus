@@ -1278,6 +1278,24 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     EXPECT_EQ(20.0, Zone(1).OutWetBulbTemp);
     EXPECT_EQ(1.5, Zone(1).WindSpeed);
     EXPECT_EQ(90.0, Zone(1).WindDir);
+
+    // Add a test for #7308 without inputs of schedule names
+    DataLoopNode::Node(1).OutAirDryBulbSchedNum = 0;
+    DataLoopNode::Node(1).OutAirWetBulbSchedNum = 0;
+    DataLoopNode::Node(1).OutAirWindSpeedSchedNum = 0;
+    DataLoopNode::Node(1).OutAirWindDirSchedNum = 0;
+    DataEnvironment::OutDryBulbTemp = 25.0;
+    DataEnvironment::OutWetBulbTemp = 20.0;
+    DataEnvironment::WindSpeed = 1.5;
+    DataEnvironment::WindDir = 90.0;
+
+    InitHeatBalance();
+
+    // Test if local value correctly overwritten
+    EXPECT_EQ(25.0, Zone(1).OutDryBulbTemp);
+    EXPECT_EQ(20.0, Zone(1).OutWetBulbTemp);
+    EXPECT_EQ(1.5, Zone(1).WindSpeed);
+    EXPECT_EQ(90.0, Zone(1).WindDir);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInputTest)
@@ -1830,6 +1848,34 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryACH, 0.0); // Not processed for GroupedZone mixing option
     EXPECT_EQ(DataHeatBalance::Construct(constrNum).AirBoundaryMixingSched, 0);
     EXPECT_EQ(DataHeatBalance::NominalRforNominalUCalculation(constrNum), 0.0);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialData_IRTSurfaces)
+{
+    std::string const idf_objects = delimited_string({
+        "Material:InfraredTransparent,",
+        "IRTMaterial1;            !- Name",
+    });
+    
+    ASSERT_TRUE(process_idf(idf_objects));
+    
+    bool ErrorsFound(false); // If errors detected in input
+
+    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    
+    ASSERT_FALSE(ErrorsFound);
+    
+    int MaterNum = 1;
+    
+    EXPECT_EQ(Material(MaterNum).ROnly, true);
+    EXPECT_NEAR(Material(MaterNum).Resistance, 0.01, 0.00001);
+    EXPECT_NEAR(Material(MaterNum).AbsorpThermal, 0.9999, 0.00001);
+    EXPECT_NEAR(Material(MaterNum).AbsorpThermalInput, 0.9999, 0.00001);
+    EXPECT_NEAR(Material(MaterNum).AbsorpSolar, 1.0, 0.00001);
+    EXPECT_NEAR(Material(MaterNum).AbsorpSolarInput, 1.0, 0.00001);
+    EXPECT_NEAR(Material(MaterNum).AbsorpVisible, 1.0, 0.00001);
+    EXPECT_NEAR(Material(MaterNum).AbsorpVisibleInput, 1.0, 0.00001);
+    
 }
 
 } // namespace EnergyPlus
