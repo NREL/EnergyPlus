@@ -511,7 +511,12 @@ if ( BUILD_DOCS )
       message("DOC_BUILD_FLAGS=${DOC_BUILD_FLAGS}")
     endif()
   endif()
-  install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build \"${CMAKE_BINARY_DIR}\" ${DOC_BUILD_FLAGS} --target documentation)")
+  if(WIN32)
+    # Win32 is multi config, so you must specify a config when calling cmake.
+	# Let's just use Release, it won't have any effect on LaTeX anyways.
+	set(DOC_CONFIG_FLAG "--config Release")
+  endif()
+  install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" ${DOC_CONFIG_FLAG} --build \"${CMAKE_BINARY_DIR}\" ${DOC_BUILD_FLAGS} --target documentation)")
 
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/Acknowledgments.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/AuxiliaryPrograms.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
