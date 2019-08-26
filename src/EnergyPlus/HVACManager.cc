@@ -150,7 +150,6 @@ namespace HVACManager {
     using DataGlobals::emsCallFromHVACIterationLoop;
     using DataGlobals::EndHourFlag;
     using DataGlobals::HourOfDay;
-    using DataGlobals::HVACTSReporting;
     using DataGlobals::isPulseZoneSizing;
     using DataGlobals::KickOffSimulation;
     using DataGlobals::MetersHaveBeenInitialized;
@@ -334,8 +333,9 @@ namespace HVACManager {
         bool DummyLogical;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_10("('node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       ','MassMax        MassSP    Press "
-                                  "       Enthal     HumRat Fluid Type')");
+        static ObjexxFCL::gio::Fmt Format_10(
+            "('node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       ','MassMax        MassSP    Press "
+            "       Enthal     HumRat Fluid Type')");
         static ObjexxFCL::gio::Fmt Format_11("('node #   Name')");
         static ObjexxFCL::gio::Fmt Format_20("(1x,I3,1x,F8.2,2(2x,F8.3),2x,F8.2,4(1x,F13.2),2x,F8.0,2x,F11.2,2x,F9.5,2x,A)");
         static ObjexxFCL::gio::Fmt Format_30("(1x,I3,5x,A)");
@@ -508,7 +508,7 @@ namespace HVACManager {
             }
 
             DetectOscillatingZoneTemp();
-            UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(HVACTSReporting)
+            UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem)
             UpdateIceFractions();          // Update fraction of ice stored in TES
             ManageWater();
             // update electricity data for net, purchased, sold etc.
@@ -534,11 +534,11 @@ namespace HVACManager {
                 }
                 if (DoOutputReporting) {
                     ReportMaxVentilationLoads();
-                    UpdateDataandReport(HVACTSReporting);
+                    UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
                     if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                         if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
                     }
-                    UpdateTabularReports(HVACTSReporting);
+                    UpdateTabularReports(OutputProcessor::TimeStepType::TimeStepSystem);
                 }
                 if (ZoneSizingCalc) {
                     UpdateZoneSizing(DuringDay);
@@ -569,7 +569,7 @@ namespace HVACManager {
                     PrintedWarmup = true;
                 }
                 CalcMoreNodeInfo();
-                UpdateDataandReport(HVACTSReporting);
+                UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
                 if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                     if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
                 }
@@ -596,7 +596,7 @@ namespace HVACManager {
                     }
                     PrintedWarmup = true;
                 }
-                UpdateDataandReport(HVACTSReporting);
+                UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
             }
             ManageEMS(emsCallFromEndSystemTimestepAfterHVACReporting, anyEMSRan); // EMS calling point
             // UPDATE SYSTEM CLOCKS
@@ -2011,7 +2011,9 @@ namespace HVACManager {
                     // node mass flow max avail to what air loop can supply
                     SupplyNode = AirToZoneNodeInfo(AirLoopIndex).AirLoopSupplyNodeNum(SupplyIndex);
                     if (Node(SupplyNode).MassFlowRate > 0.0) {
-                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate) > HVACFlowRateToler * 0.01) {
+                        // must include bypass flow for ChangeoverBypass system so that terminal units are not restricted (e.g., MaxAvail is lowered)
+                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - AirLoopFlow(AirLoopIndex).BypassMassFlow) >
+                            HVACFlowRateToler * 0.01) {
                             FlowRatio = Node(SupplyNode).MassFlowRate / Node(SupplyNode).MassFlowRateSetPoint;
                             for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled; ++ZonesCooledIndex) {
                                 TermInletNode = AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
@@ -2020,7 +2022,8 @@ namespace HVACManager {
                                     min(Node(TermInletNode).MassFlowRateMaxAvail, Node(TermInletNode).MassFlowRateMinAvail);
                             }
                         }
-                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate) < -HVACFlowRateToler * 0.01) {
+                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - AirLoopFlow(AirLoopIndex).BypassMassFlow) <
+                            -HVACFlowRateToler * 0.01) {
                             if (Node(SupplyNode).MassFlowRateSetPoint == 0.0) {
                                 //               CALL ShowFatalError('ResolveAirLoopFlowLimits: Node MassFlowRateSetPoint = 0.0, Node='//  &
                                 //                                   TRIM(NodeID(SupplyNode))//  &
@@ -2051,7 +2054,9 @@ namespace HVACManager {
                     // node mass flow max avail to what air loop can supply
                     SupplyNode = AirToZoneNodeInfo(AirLoopIndex).AirLoopSupplyNodeNum(SupplyIndex);
                     if (Node(SupplyNode).MassFlowRate > 0.0) {
-                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate) > HVACFlowRateToler * 0.01) {
+                        // must include bypass flow for ChangeoverBypass system so that terminal units are not restricted (e.g., MaxAvail is lowered)
+                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - AirLoopFlow(AirLoopIndex).BypassMassFlow) >
+                            HVACFlowRateToler * 0.01) {
                             FlowRatio = Node(SupplyNode).MassFlowRate / Node(SupplyNode).MassFlowRateSetPoint;
                             for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated; ++ZonesHeatedIndex) {
                                 TermInletNode = AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
@@ -2060,7 +2065,8 @@ namespace HVACManager {
                                     min(Node(TermInletNode).MassFlowRateMaxAvail, Node(TermInletNode).MassFlowRateMinAvail);
                             }
                         }
-                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate) < -HVACFlowRateToler * 0.01) {
+                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - AirLoopFlow(AirLoopIndex).BypassMassFlow) <
+                            -HVACFlowRateToler * 0.01) {
                             if (Node(SupplyNode).MassFlowRateSetPoint == 0.0) {
                                 // CALL ShowFatalError('ResolveAirLoopFlowLimits: Node MassFlowRateSetPoint = 0.0, Node='//  &
                                 // TRIM(NodeID(SupplyNode))//  &
@@ -3092,11 +3098,12 @@ namespace HVACManager {
                     Real64 unbalancedExhaustDelta = thisAirLoopFlow.SupFlow - thisAirLoopFlow.OAFlow - thisAirLoopFlow.SysRetFlow;
                     if (unbalancedExhaustDelta > SmallMassFlow) {
                         ShowSevereError("CheckAirLoopFlowBalance: AirLoopHVAC " + DataAirSystems::PrimaryAirSystem(AirLoopNum).Name +
-                            " is unbalanced. Supply is > return plus outdoor air.");
+                                        " is unbalanced. Supply is > return plus outdoor air.");
                         ShowContinueErrorTimeStamp("");
-                        ShowContinueError("  Flows [m3/s at standard density]: Supply=" + General::RoundSigDigits(thisAirLoopFlow.SupFlow / DataEnvironment::StdRhoAir, 6) +
-                            "  Return=" + General::RoundSigDigits(thisAirLoopFlow.SysRetFlow / DataEnvironment::StdRhoAir, 6) +
-                            "  Outdoor Air=" + General::RoundSigDigits(thisAirLoopFlow.OAFlow / DataEnvironment::StdRhoAir, 6));
+                        ShowContinueError("  Flows [m3/s at standard density]: Supply=" +
+                                          General::RoundSigDigits(thisAirLoopFlow.SupFlow / DataEnvironment::StdRhoAir, 6) +
+                                          "  Return=" + General::RoundSigDigits(thisAirLoopFlow.SysRetFlow / DataEnvironment::StdRhoAir, 6) +
+                                          "  Outdoor Air=" + General::RoundSigDigits(thisAirLoopFlow.OAFlow / DataEnvironment::StdRhoAir, 6));
                         ShowContinueError("  Imbalance=" + General::RoundSigDigits(unbalancedExhaustDelta / DataEnvironment::StdRhoAir, 6));
                         ShowContinueError("  This error will only be reported once per system.");
                         thisAirLoopFlow.FlowError = true;

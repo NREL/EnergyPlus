@@ -833,7 +833,7 @@ namespace ConvectionCoefficients {
         if (std::abs(CosTilt) < 0.98) { // Surface is not horizontal
             Diff = std::abs(WindDirection - Azimuth);
             if ((Diff - 180.0) > 0.001) Diff -= 360.0;
-            if ((std::abs(Diff) - 100.0) > 0.001) AgainstWind = false; // Surface is leeward
+            if ((std::abs(Diff) - 90.0) > 0.001) AgainstWind = false; // Surface is leeward
         }
 
         return AgainstWind;
@@ -1454,11 +1454,30 @@ namespace ConvectionCoefficients {
             }
         }
 
+        // Reserve space for air boundary IRT inside convection override
+        if (DataHeatBalance::AnyAirBoundary) ++TotIntConvCoeff;
+
         UserIntConvectionCoeffs.allocate(TotIntConvCoeff);
         UserExtConvectionCoeffs.allocate(TotExtConvCoeff);
 
         TotIntConvCoeff = 0;
         TotExtConvCoeff = 0;
+
+        // Preset inside convection coefficient override for air boundary IRT surfaces
+        // Doing this here rather than try to add a new convection type for this
+        if (DataHeatBalance::AnyAirBoundary) {
+            ++TotIntConvCoeff;
+            UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefValue;
+            UserIntConvectionCoeffs(TotIntConvCoeff).OverrideValue = LowHConvLimit;
+            UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = "Air Boundary IRT Surfaces";
+            UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
+            for (int surfNum : DataSurfaces::AllHTSurfaceList) {
+                auto & surf = Surface(surfNum);
+                if (DataHeatBalance::Construct(surf.Construction).TypeIsAirBoundaryIRTSurface) {
+                    surf.IntConvCoeff = TotIntConvCoeff;
+                }
+            }
+        }
 
         //   Now, get for real and check for consistency
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
@@ -8019,32 +8038,20 @@ namespace ConvectionCoefficients {
                                                bool const isWindow)
     {
 
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Brent Griffith
-        //       DATE WRITTEN   Aug 2010
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
+        // AUTHOR: Brent Griffith (Aug 2010)
+        // PURPOSE OF THIS FUNCTION: Calculate the model equation by Fisher and Pedersen for floors with ceiling diffusers
+        // REFERENCE: Fisher, D.E. and C.O. Pedersen, Convective Heat Transfer in Building Energy and Thermal Load Calculations,
+        //            ASHRAE Transactions, vol. 103, Pt. 2, 1997, p.13
 
-        // PURPOSE OF THIS FUNCTION:
-        // Calculate the model equation by Fisher and Pedersen for floors with ceiling diffusers
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // Fisher, D.E. and C.O. Pedersen, Convective Heat Transfer in Building Energy and
-        //       Thermal Load Calculations, ASHRAE Transactions, vol. 103, Pt. 2, 1997, p.13
-
-        if (ACH > 3.0) {
-            return 3.873 + 0.082 * std::pow(ACH, 0.98);
+        Real64 Hforced;
+        
+        Hforced = 3.873 + 0.082 * std::pow(ACH, 0.98);
+        
+        if (ACH > 1.0) {
+            return Hforced;
         }
-        else {
-            if (isWindow) {  // Unlikely for a floor, but okay...
-                Real64 const tilt = acos(cosTilt); // outward facing tilt
-                Real64 const sinTilt = sin(tilt);
-                return CalcISO15099WindowIntConvCoeff(Tsurf, Tair, humRat, height, tilt, sinTilt);
-            } else {
-                return CalcASHRAETARPNatural(Tsurf, Tair, -cosTilt);  // negative cosTilt because interior of surface
-            }
+        else { // Revert to purely natural convection
+            return CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
         }
     }
 
@@ -8057,32 +8064,20 @@ namespace ConvectionCoefficients {
                                                  bool const isWindow)
     {
 
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Brent Griffith
-        //       DATE WRITTEN   Aug 2010
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
+        // AUTHOR: Brent Griffith (Aug 2010)
+        // PURPOSE OF THIS FUNCTION: Calculate the model equation by Fisher and Pedersen for floors with ceiling diffusers
+        // REFERENCE: Fisher, D.E. and C.O. Pedersen, Convective Heat Transfer in Building Energy and Thermal Load Calculations,
+        //            ASHRAE Transactions, vol. 103, Pt. 2, 1997, p.13
 
-        // PURPOSE OF THIS FUNCTION:
-        // Calculate the model equation by Fisher and Pedersen for ceilings with ceiling diffusers
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // Fisher, D.E. and C.O. Pedersen, Convective Heat Transfer in Building Energy and
-        //       Thermal Load Calculations, ASHRAE Transactions, vol. 103, Pt. 2, 1997, p.13
-
-        if (ACH > 3.0) {
-            return 2.234 + 4.099 * std::pow(ACH, 0.503);
+        Real64 Hforced;
+        
+        Hforced = 2.234 + 4.099 * std::pow(ACH, 0.503);
+        
+        if (ACH > 1.0) {
+            return Hforced;
         }
-        else {
-            if (isWindow) {  // Unlikely for a floor, but okay...
-                Real64 const tilt = acos(cosTilt); // outward facing tilt
-                Real64 const sinTilt = sin(tilt);
-                return CalcISO15099WindowIntConvCoeff(Tsurf, Tair, humRat, height, tilt, sinTilt);
-            } else {
-                return CalcASHRAETARPNatural(Tsurf, Tair, -cosTilt);  // negative cosTilt because interior of surface
-            }
+        else { // Revert to purely natural convection
+            return CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
         }
     }
 
@@ -8095,35 +8090,50 @@ namespace ConvectionCoefficients {
                                                bool const isWindow)
     {
 
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Brent Griffith
-        //       DATE WRITTEN   Aug 2010
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
+        // AUTHOR: Brent Griffith (Aug 2010)
+        // PURPOSE OF THIS FUNCTION: Calculate the model equation by Fisher and Pedersen for floors with ceiling diffusers
+        // REFERENCE: Fisher, D.E. and C.O. Pedersen, Convective Heat Transfer in Building Energy and Thermal Load Calculations,
+        //            ASHRAE Transactions, vol. 103, Pt. 2, 1997, p.13
 
-        // PURPOSE OF THIS FUNCTION:
-        // Calculate the model equation by Fisher and Pedersen for walls with ceiling diffusers
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-        // Fisher, D.E. and C.O. Pedersen, Convective Heat Transfer in Building Energy and
-        //       Thermal Load Calculations, ASHRAE Transactions, vol. 103, Pt. 2, 1997, p.13
-
-        if (ACH > 3.0) {
-            return 1.208 + 1.012 * std::pow(ACH, 0.604);
+        Real64 Hforced;
+        
+        Hforced = 1.208 + 1.012 * std::pow(ACH, 0.604);
+        
+        if (ACH > 1.0) {
+            return Hforced;
         }
         else { // Revert to purely natural convection
-            if (isWindow) {  // Unlikely for a floor, but okay...
-                Real64 const tilt = acos(cosTilt); // outward facing tilt
-                Real64 const sinTilt = sin(tilt);
-                return CalcISO15099WindowIntConvCoeff(Tsurf, Tair, humRat, height, tilt, sinTilt);
-            } else {
-                return CalcASHRAETARPNatural(Tsurf, Tair, -cosTilt);  // negative cosTilt because interior of surface
-            }
+            return CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
         }
     }
 
+    Real64 CalcFisherPedersenCeilDiffuserNatConv(Real64 const Hforced,
+                                                 Real64 const ACH,
+                                                 Real64 const Tsurf,
+                                                 Real64 const Tair,
+                                                 Real64 const cosTilt,
+                                                 Real64 const humRat,
+                                                 Real64 const height,
+                                                 bool const isWindow)
+    {
+        
+        Real64 Hnatural;
+        
+        if (isWindow) {  // Unlikely for a floor, but okay...
+            Real64 const tilt = acos(cosTilt); // outward facing tilt
+            Real64 const sinTilt = sin(tilt);
+            Hnatural = CalcISO15099WindowIntConvCoeff(Tsurf, Tair, humRat, height, tilt, sinTilt);
+        } else {
+            Hnatural = CalcASHRAETARPNatural(Tsurf, Tair, -cosTilt);  // negative cosTilt because interior of surface
+        }
+        if (ACH <= 0.5) {
+            return Hnatural;
+        } else {
+            return Hnatural + ((Hforced-Hnatural)*((ACH-0.5)/0.5));
+        }
+
+    }
+    
     Real64 CalcAlamdariHammondUnstableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
                                                    Real64 const HydraulicDiameter  // [m] characteristic size, = (4 * area) / perimeter
     )

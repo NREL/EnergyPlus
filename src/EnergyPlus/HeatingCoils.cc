@@ -2329,9 +2329,13 @@ namespace HeatingCoils {
                     OutletAirHumRat = FullLoadOutAirHumRat;
                     OutletAirTemp = FullLoadOutAirTemp;
                 } else {
-                    OutletAirEnthalpy = PartLoadRat * FullLoadOutAirEnth + (1.0 - PartLoadRat) * InletAirEnthalpy;
-                    OutletAirHumRat = PartLoadRat * FullLoadOutAirHumRat + (1.0 - PartLoadRat) * InletAirHumRat;
-                    OutletAirTemp = PartLoadRat * FullLoadOutAirTemp + (1.0 - PartLoadRat) * InletAirDryBulbTemp;
+                    OutletAirEnthalpy =
+                        PartLoadRat * AirMassFlow / HeatingCoil(CoilNum).InletAirMassFlowRate * (FullLoadOutAirEnth - InletAirEnthalpy) +
+                        InletAirEnthalpy;
+                    OutletAirHumRat =
+                        PartLoadRat * AirMassFlow / HeatingCoil(CoilNum).InletAirMassFlowRate * (FullLoadOutAirHumRat - InletAirHumRat) +
+                        InletAirHumRat;
+                    OutletAirTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
                 }
 
                 EffLS = HeatingCoil(CoilNum).MSEfficiency(StageNumLS);

@@ -236,6 +236,10 @@ namespace HeatBalanceManager {
                                      bool &ErrorsFound // If errors found in input
     );
 
+    void CreateAirBoundaryConstructions(int &ConstrNum,   // Counter for Constructions
+        bool &ErrorsFound // If errors found in input
+    );
+
     void GetScheduledSurfaceGains(bool &ErrorsFound); // If errors found in input
 
     void CheckScheduledSurfaceGains(int const ZoneNum); // Zone number for which error check will be performed
