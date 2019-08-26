@@ -468,7 +468,7 @@ namespace ThermalComfort {
                                     "State",
                                     People(Loop).Name);
                 SetupOutputVariable("Zone Thermal Comfort Pierce Model Standard Effective Temperature",
-                                    OutputProcessor::Unit::None,
+                                    OutputProcessor::Unit::C,
                                     ThermalComfortData(Loop).PierceSET,
                                     "Zone",
                                     "State",
