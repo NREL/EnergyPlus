@@ -57,12 +57,15 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/StandardRatings.hh>
+#include <EnergyPlus/ChillerElectricEIR.hh>
+#include <DataPlant.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::StandardRatings;
 using namespace EnergyPlus::CurveManager;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DXCoils;
+using namespace EnergyPlus::ChillerElectricEIR;
 
 namespace EnergyPlus {
 
@@ -235,5 +238,95 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     EXPECT_GT(EIRTempModFacH3Test, 0.0);
     // if one of the CAP or EIR curves value is less than zero, then HSPF is set to zero
     EXPECT_DOUBLE_EQ(HSPF, 0.0);
+}
+
+TEST_F(EnergyPlusFixture, ChillerIPLVTest)
+{
+
+    using CurveManager::Cubic;
+    using CurveManager::BiQuadratic;
+    using CurveManager::NumCurves;
+    using StandardRatings::CalcChillerIPLV;
+    using DataPlant::TypeOf_Chiller_ElectricEIR;
+    
+    // Setup an air-cooled Chiller:Electric:EIR chiller
+    ChillerElectricEIR::ElectricEIRChiller.allocate(1);
+    ChillerElectricEIR::ElectricEIRChiller(1).Name = "Air Cooled Chiller";
+    ChillerElectricEIR::ElectricEIRChiller(1).RefCap = 216000; // W
+    ChillerElectricEIR::ElectricEIRChiller(1).RefCOP = 2.81673861898309; // W/W
+    ChillerElectricEIR::ElectricEIRChiller(1).CondenserType = ChillerElectricEIR::AirCooled;
+    ChillerElectricEIR::ElectricEIRChiller(1).MinUnloadRat = 0.15;
+
+    int CurveNum;
+    NumCurves = 3;
+    PerfCurve.allocate(NumCurves);
+
+    // Cap=f(T)
+    CurveNum = 1;
+    PerfCurve(CurveNum).CurveType = BiQuadratic;
+    PerfCurve(CurveNum).NumDims = 2;
+    PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
+    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpCapfT";
+    PerfCurve(CurveNum).Coeff1 = 0.98898813;
+    PerfCurve(CurveNum).Coeff2 = 0.036832851;
+    PerfCurve(CurveNum).Coeff3 = 0.000174006;
+    PerfCurve(CurveNum).Coeff4 = -0.000275634;
+    PerfCurve(CurveNum).Coeff5 = -0.000143667;
+    PerfCurve(CurveNum).Coeff6 = -0.000246286;
+    PerfCurve(CurveNum).Var1Min = 4.44;
+    PerfCurve(CurveNum).Var1Max = 10;
+    PerfCurve(CurveNum).Var2Min = 23.89;
+    PerfCurve(CurveNum).Var2Max = 46.11;
+    ChillerElectricEIR::ElectricEIRChiller(1).ChillerCapFT = 1;
+
+    // EIR=f(T)
+    CurveNum = 2;
+    PerfCurve(CurveNum).CurveType = BiQuadratic;
+    PerfCurve(CurveNum).NumDims = 2;
+    PerfCurve(CurveNum).ObjectType = "Curve:BiQuadratic";
+    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpEIRfT";
+    PerfCurve(CurveNum).Coeff1 = 0.814058418;
+    PerfCurve(CurveNum).Coeff2 = 0.002335553;
+    PerfCurve(CurveNum).Coeff3 = 0.000817786;
+    PerfCurve(CurveNum).Coeff4 = -0.017129784;
+    PerfCurve(CurveNum).Coeff5 = 0.000773288;
+    PerfCurve(CurveNum).Coeff6 = -0.000922024;
+    PerfCurve(CurveNum).Var1Min = 4.44;
+    PerfCurve(CurveNum).Var1Max = 10;
+    PerfCurve(CurveNum).Var2Min = 10;
+    PerfCurve(CurveNum).Var2Max = 46.11;
+    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFT = 2;
+
+    // EIR=f(PLR)
+    CurveNum = 3;
+    PerfCurve(CurveNum).CurveType = Cubic;
+    PerfCurve(CurveNum).NumDims = 1;
+    PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
+    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).Name = "AirCooledChillerScrewCmpEIRfPLR";
+    PerfCurve(CurveNum).Coeff1 = -0.08117804;
+    PerfCurve(CurveNum).Coeff2 = 1.433532026;
+    PerfCurve(CurveNum).Coeff3 = -0.762289434;
+    PerfCurve(CurveNum).Coeff4 = 0.412199944;
+    PerfCurve(CurveNum).Var1Min = 0;
+    PerfCurve(CurveNum).Var1Max = 1;
+    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFPLR = 3;
+
+    Real64 IPLV;
+    CalcChillerIPLV(ChillerElectricEIR::ElectricEIRChiller(1).Name,
+                    TypeOf_Chiller_ElectricEIR, 
+                    ChillerElectricEIR::ElectricEIRChiller(1).RefCap, 
+                    ChillerElectricEIR::ElectricEIRChiller(1).RefCOP, 
+                    ChillerElectricEIR::ElectricEIRChiller(1).CondenserType,
+                    ChillerElectricEIR::ElectricEIRChiller(1).ChillerCapFT,
+                    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFT,
+                    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFPLR,
+                    ChillerElectricEIR::ElectricEIRChiller(1).MinUnloadRat,
+                    IPLV);
+
+    EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 3.87); // 13.20 IPLV
+
 }
 } // namespace EnergyPlus
