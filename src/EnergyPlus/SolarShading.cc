@@ -1316,24 +1316,30 @@ namespace SolarShading {
                         NumOfLayers = Construct(Surface(SurfLoop).Construction).TotLayers;
                     }
                     for (I = 1; I <= NumOfLayers; ++I) {
-                        SetupOutputVariable("Surface Window Total Absorbed Shortwave Radiation Rate Layer " + RoundSigDigits(I) + "",
-                                            OutputProcessor::Unit::W,
-                                            QRadSWwinAbsLayer(I, SurfLoop),
-                                            "Zone",
-                                            "Average",
-                                            Surface(SurfLoop).Name);
-                        SetupOutputVariable("Surface Window Front Face Temperature Layer " + RoundSigDigits(I) + "",
-                                            OutputProcessor::Unit::C,
-                                            FenLaySurfTempFront(I, SurfLoop),
-                                            "Zone",
-                                            "Average",
-                                            Surface(SurfLoop).Name);
-                        SetupOutputVariable("Surface Window Back Face Temperature Layer " + RoundSigDigits(I) + "",
-                                            OutputProcessor::Unit::C,
-                                            FenLaySurfTempBack(I, SurfLoop),
-                                            "Zone",
-                                            "Average",
-                                            Surface(SurfLoop).Name);
+                        if (Construct(Surface(SurfLoop).Construction).WindowTypeBSDF) {
+                            SetupOutputVariable("Surface Window Total Absorbed Shortwave Radiation Rate Layer " + RoundSigDigits(I) + "",
+                                                OutputProcessor::Unit::W,
+                                                QRadSWwinAbsLayer(I, SurfLoop),
+                                                "Zone",
+                                                "Average",
+                                                Surface(SurfLoop).Name);
+                        }
+                        if (Construct(Surface(SurfLoop).Construction).WindowTypeBSDF || (I == 1)) {
+                            SetupOutputVariable("Surface Window Front Face Temperature Layer " + RoundSigDigits(I) + "",
+                                                OutputProcessor::Unit::C,
+                                                FenLaySurfTempFront(I, SurfLoop),
+                                                "Zone",
+                                                "Average",
+                                                Surface(SurfLoop).Name);
+                        }
+                        if (Construct(Surface(SurfLoop).Construction).WindowTypeBSDF || (I == NumOfLayers)) {
+                            SetupOutputVariable("Surface Window Back Face Temperature Layer " + RoundSigDigits(I) + "",
+                                                OutputProcessor::Unit::C,
+                                                FenLaySurfTempBack(I, SurfLoop),
+                                                "Zone",
+                                                "Average",
+                                                Surface(SurfLoop).Name);
+                        }
                     }
 
                     SetupOutputVariable("Surface Window Transmitted Solar Radiation Rate",

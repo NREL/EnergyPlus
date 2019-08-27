@@ -1878,4 +1878,55 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialData_IRTSurfaces)
     
 }
 
+TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
+{
+
+    DataSurfaces::TotSurfaces = 3;
+    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
+    DataHeatBalance::TotConstructs = 3;
+    DataHeatBalance::Construct.allocate( DataHeatBalance::TotConstructs);
+    
+    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass_Wall;
+    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass_Window;
+    DataSurfaces::Surface(3).Class = DataSurfaces::SurfaceClass_Window;
+    DataSurfaces::Surface(1).Construction = 1;
+    DataSurfaces::Surface(2).Construction = 2;
+    DataSurfaces::Surface(3).Construction = 3;
+    DataHeatBalance::Construct(1).WindowTypeBSDF = false;
+    DataHeatBalance::Construct(2).WindowTypeBSDF = false;
+    DataHeatBalance::Construct(3).WindowTypeBSDF = true;
+    int SurfsForRegWindow = 3;
+    DataHeatBalance::Construct(1).TotLayers = 1;
+    DataHeatBalance::Construct(2).TotLayers = SurfsForRegWindow;
+    DataHeatBalance::Construct(3).TotLayers = 1;
+
+    FenLaySurfTempFront.dimension(10, DataSurfaces::TotSurfaces, 0.0);
+    FenLaySurfTempBack.dimension(10, DataSurfaces::TotSurfaces, 0.0);
+    DataHeatBalSurface::TH.dimension(2, MaxCTFTerms, DataSurfaces::TotSurfaces, 0.0);
+
+    DataHeatBalSurface::TH(1,1,1) = 21.0;
+    DataHeatBalSurface::TH(1,1,2) = 22.0;
+    DataHeatBalSurface::TH(1,1,3) = 23.0;
+    DataHeatBalSurface::TH(2,1,1) = 34.0;
+    DataHeatBalSurface::TH(2,1,2) = 35.0;
+    DataHeatBalSurface::TH(2,1,3) = 36.0;
+    
+    Real64 ZeroResult = 0.0;
+
+    HeatBalanceManager::UpdateWindowFaceTempsNonBSDFWin();
+    
+    // First surface is NOT a window so these should NOT be set
+    EXPECT_NEAR(FenLaySurfTempFront(1,1),ZeroResult,0.0001);
+    EXPECT_NEAR(FenLaySurfTempBack(1,1),ZeroResult,0.0001);
+    
+    // Second surface is a window so these should be set
+    EXPECT_NEAR(FenLaySurfTempFront(1,2),DataHeatBalSurface::TH(1,1,2),0.0001);
+    EXPECT_NEAR(FenLaySurfTempBack(SurfsForRegWindow,2),DataHeatBalSurface::TH(2,1,2),0.0001);
+
+    // Third surface is a window but is also a BSDF (complex window) so these should NOT be set
+    EXPECT_NEAR(FenLaySurfTempFront(1,3),ZeroResult,0.0001);
+    EXPECT_NEAR(FenLaySurfTempBack(1,3),ZeroResult,0.0001);
+
+}
+    
 } // namespace EnergyPlus
