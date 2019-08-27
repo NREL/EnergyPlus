@@ -518,6 +518,7 @@ if ( BUILD_DOCS )
   endif()
 
   install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build \"${CMAKE_BINARY_DIR}\" ${DOC_CONFIG_FLAG} ${DOC_BUILD_FLAGS} --target documentation)")
+  install(CODE "message(COMMAND \"${CMAKE_COMMAND}\" --build \"${CMAKE_BINARY_DIR}\" ${DOC_CONFIG_FLAG} ${DOC_BUILD_FLAGS} --target documentation)")
 
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/Acknowledgments.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/AuxiliaryPrograms.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
