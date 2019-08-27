@@ -503,7 +503,7 @@ if ( BUILD_DOCS )
   # There no need to do that for Ninja for eg, so only do it for Make
 
   # flag -j to cmake --build was added at 3.12
-  if(CMAKE_GENERATOR MATCHES "Make" AND (CMAKE_VERSION VERSION_GREATER "3.11"))
+  if((CMAKE_VERSION VERSION_GREATER "3.11") AND ((CMAKE_GENERATOR MATCHES "Make") OR WIN32))
     include(ProcessorCount)
     ProcessorCount(N)
     if(NOT N EQUAL 0)
@@ -517,8 +517,8 @@ if ( BUILD_DOCS )
     set(DOC_CONFIG_FLAG "--config Release")
   endif()
 
-  install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build \"${CMAKE_BINARY_DIR}\" ${DOC_CONFIG_FLAG} ${DOC_BUILD_FLAGS} --target documentation)")
-  install(CODE "message(COMMAND \"${CMAKE_COMMAND}\" --build \"${CMAKE_BINARY_DIR}\" ${DOC_CONFIG_FLAG} ${DOC_BUILD_FLAGS} --target documentation)")
+  install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build \"${CMAKE_BINARY_DIR}\" ${DOC_CONFIG_FLAG} ${DOC_BUILD_FLAGS} --target documentation)"
+          COMPONENT Documentation)
 
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/Acknowledgments.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/AuxiliaryPrograms.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
