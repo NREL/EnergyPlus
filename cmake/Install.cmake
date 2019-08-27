@@ -502,8 +502,8 @@ if ( BUILD_DOCS )
   # But LaTeX should run quickly enough to not be a major inconvenience.
   # There no need to do that for Ninja for eg, so only do it for Make and MSVC
 
-  # flag -j to cmake --build was added at 3.12
-  if((CMAKE_VERSION VERSION_GREATER "3.11") AND ((CMAKE_GENERATOR MATCHES "Make") OR WIN32))
+  # flag -j to cmake --build was added at 3.12 (VERSION_GREATER_EQUAL need cmake >= 3.7, we apparently support 2.8...)
+  if(NOT(CMAKE_VERSION VERSION_LESS "3.12") AND ((CMAKE_GENERATOR MATCHES "Make") OR WIN32))
     include(ProcessorCount)
     ProcessorCount(N)
     if(NOT N EQUAL 0)
