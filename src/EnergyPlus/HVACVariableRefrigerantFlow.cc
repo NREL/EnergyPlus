@@ -8056,6 +8056,7 @@ namespace HVACVariableRefrigerantFlow {
                 TempIn = Node(ZoneNode).Temp;
                 SpecHumOut = Node(ATMixOutNode).HumRat;
                 SpecHumIn = Node(ZoneNode).HumRat;
+                AirMassFlow = Node( ATMixOutNode ).MassFlowRate;
             } else {
                 // Air terminal inlet side mixer
                 TempOut = Node(VRFTUOutletNodeNum).Temp;
@@ -8071,7 +8072,7 @@ namespace HVACVariableRefrigerantFlow {
         }
         // calculate sensible load met using delta enthalpy
         LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
-        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {W}
+        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {kgH2O/s}
         if (present(LatOutputProvided)) {
             //   CR9155 Remove specific humidity calculations
             LatOutputProvided = LatentLoadMet;
@@ -11084,6 +11085,7 @@ namespace HVACVariableRefrigerantFlow {
                 TempIn = Node(ZoneNode).Temp;
                 SpecHumOut = Node(ATMixOutNode).HumRat;
                 SpecHumIn = Node(ZoneNode).HumRat;
+                AirMassFlow = Node( ATMixOutNode ).MassFlowRate;
             } else {
                 // Air terminal inlet side mixer
                 TempOut = Node(VRFTUOutletNodeNum).Temp;
@@ -11099,7 +11101,7 @@ namespace HVACVariableRefrigerantFlow {
         }
         // calculate sensible load met using delta enthalpy
         LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
-        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {W}
+        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {kgH2O/s}
         if (present(LatOutputProvided)) {
             //   CR9155 Remove specific humidity calculations
             LatOutputProvided = LatentLoadMet;

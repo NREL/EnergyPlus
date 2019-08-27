@@ -1185,7 +1185,7 @@ namespace Psychrometrics {
         Real64 const dW1   // humidity ratio  at state 1
     )
     {
-        // calculate sensible enthalpy difference
+        // returns sensible enthalpy difference of moist air going from state 1 to state 2
         Real64 dWavg = 0.5 * (max(dW2, 1.0e-5) + max(dW1, 1.0e-5));
         return (1.00484e3 + dWavg * 1.85895e3) * (TDB2 - TDB1);
     }
@@ -1194,7 +1194,7 @@ namespace Psychrometrics {
         Real64 const TDB1 // dry-bulb temperature at  at state 1 {C}
     )
     {
-        // calculate average latent heat of vaporization of water
+        // calculate average latent heat of vaporization of water vapor in moist air
         return (2.50094e6 + 0.5 * (TDB2 + TDB1) * 1.85895e3);
     }
 } // namespace Psychrometrics
