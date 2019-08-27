@@ -500,7 +500,7 @@ if ( BUILD_DOCS )
 
   # So instead, we just used the number of threads that are available. That's not ideal, since it ignores any "-j N" option passed by the user
   # But LaTeX should run quickly enough to not be a major inconvenience.
-  # There no need to do that for Ninja for eg, so only do it for Make
+  # There no need to do that for Ninja for eg, so only do it for Make and MSVC
 
   # flag -j to cmake --build was added at 3.12
   if((CMAKE_VERSION VERSION_GREATER "3.11") AND ((CMAKE_GENERATOR MATCHES "Make") OR WIN32))
@@ -508,7 +508,6 @@ if ( BUILD_DOCS )
     ProcessorCount(N)
     if(NOT N EQUAL 0)
       set(DOC_BUILD_FLAGS "-j ${N}")
-      message("DOC_BUILD_FLAGS=${DOC_BUILD_FLAGS}")
     endif()
   endif()
   if(WIN32)
