@@ -356,7 +356,7 @@ This is a component of the CeilingDiffuser overall algorithm described below.
 
 \subsubsection{Fisher Pedersen Ceiling Diffuser Floor}\label{fisher-pedersen-ceiling-diffuser-floor}
 
-Fisher and Pedersen 1997) developed the following equation from laboratory chamber measurements.
+Fisher and Pedersen (1997) developed the following equation from laboratory chamber measurements.
 
 \begin{equation}
 h = 3.873 + 0.082 * AC{H^{0.98}}
@@ -837,6 +837,8 @@ The correlation for walls is illustrated in Figure~\ref{fig:ceiling-diffuser-cor
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image382.png}
 \caption{Ceiling Diffuser Correlation for Walls \protect \label{fig:ceiling-diffuser-correlation-for-walls}}
 \end{figure}
+
+It should be noted that the conditions under which the correlations were developed included ACH values down to around 3.0.  However, extrapolation of the data down to ACH=1.0 is reasonable and so within EnergyPlus, for ACH values of 1.0 or greater, the ceiling diffuser correlations as shown above are used.  Below ACH values of 0.5, the natural convection algorithm is used.  Between ACH values of 0.5 and 1.0, there is a linear interpolation between the two models to avoid any discontinuities in the convection coefficient calculated.
 
 \subsubsection{Trombe Wall Algorithm}\label{trombe-wall-algorithm}
 

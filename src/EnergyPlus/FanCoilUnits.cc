@@ -3594,8 +3594,7 @@ namespace FanCoilUnits {
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(
-                        FanCoil(FanCoilNum).LowSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
             } else if (FanCoil(FanCoilNum).SpeedFanSel == 2) {
 
@@ -3607,15 +3606,22 @@ namespace FanCoilUnits {
                                                 ZoneCompTurnFansOn,
                                                 ZoneCompTurnFansOff);
                 } else {
-                    HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(
-                        FanCoil(FanCoilNum).MedSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
-            } else { // using 1.0 here for fan speed ratio seems wrong if FCU max flow rate is different than the fan maximum flow rate
+            } else if (FanCoil(FanCoilNum).SpeedFanSel == 3) {
+
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(
                         FanCoil(FanCoilNum).FanName, FirstHVACIteration, FanCoil(FanCoilNum).FanIndex, 1.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
                 } else {
-                    HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(1.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                }
+            } else { // using 1.0 here for fan speed ratio seems wrong if FCU max flow rate is different than the fan maximum flow rate
+                if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                    Fans::SimulateFanComponents(
+                        FanCoil(FanCoilNum).FanName, FirstHVACIteration, FanCoil(FanCoilNum).FanIndex, 0.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                } else {
+                    HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->simulate(0.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
             }
             if (FanCoil(FanCoilNum).CCoilType_Num == CCoil_HXAssist) {
