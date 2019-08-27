@@ -3619,7 +3619,7 @@ namespace WindowComplexManager {
         // direct solar radiation
         if (CalcCondition == noCondition) {
             ShadeFlag = SurfaceWindow(SurfNum).ShadingFlag;
-            dir = QRadSWOutIncident(SurfNum) + QS(Surface(SurfNum).Zone); // TODO, check , !
+            dir = QRadSWOutIncident(SurfNum) + QS(Surface(SurfNum).SolarEnclIndex); // TODO, check , !
             //                  currently using Exterior beam plus diffuse solar incident on surface
             //                  plus zone short wave.  CHECK
             // if (dir.ne.0.0d0) then
@@ -3966,9 +3966,9 @@ namespace WindowComplexManager {
             //  TransDiff = InterpSW(SurfaceWindow(SurfNum)%SwitchingFactor,Construct(ConstrNum)%TransDiff, &
             //                             Construct(ConstrNumSh)%TransDiff)
             // END IF
-            WinHeatGain(SurfNum) -= QS(Surface(SurfNum).Zone) * Surface(SurfNum).Area * TransDiff;
-            WinHeatTransfer(SurfNum) -= QS(Surface(SurfNum).Zone) * Surface(SurfNum).Area * TransDiff;
-            WinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).Zone) * Surface(SurfNum).Area * TransDiff;
+            WinHeatGain(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            WinHeatTransfer(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            WinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
 
             if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn) {
                 WinShadingAbsorbedSolar(SurfNum) = (SurfaceWindow(SurfNum).ExtBeamAbsByShade + SurfaceWindow(SurfNum).ExtDiffAbsByShade) *

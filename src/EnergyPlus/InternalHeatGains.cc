@@ -72,6 +72,7 @@
 #include <DataRoomAirModel.hh>
 #include <DataSizing.hh>
 #include <DataSurfaces.hh>
+#include <DataViewFactorInformation.hh>
 #include <DataZoneEquipment.hh>
 #include <DaylightingDevices.hh>
 #include <EMSManager.hh>
@@ -5647,7 +5648,6 @@ namespace InternalHeatGains {
         using OutputReportTabular::AllocateLoadComponentArrays;
         using OutputReportTabular::radiantPulseReceived;
         using OutputReportTabular::radiantPulseTimestep;
-        using OutputReportTabular::radiantPulseUsed;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using RefrigeratedCase::FigureRefrigerationZoneGains;
         using WaterThermalTanks::CalcWaterThermalTankZoneGains;
@@ -6025,12 +6025,22 @@ namespace InternalHeatGains {
         UpdateInternalGainValues();
 
         for (NZ = 1; NZ <= NumOfZones; ++NZ) {
-            SumAllInternalRadiationGains(NZ, QL(NZ));
 
             SumAllInternalLatentGains(NZ, ZoneLatentGain(NZ));
             // Added for hybrid model
             if (HybridModel::FlagHybridModel_PC) {
                 SumAllInternalLatentGainsExceptPeople(NZ, ZoneLatentGainExceptPeople(NZ));
+            }
+        }
+
+        // QL is per radiant enclosure (one or more zones if grouped by air boundaries)
+        for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
+            auto & thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
+            QL(enclosureNum) = 0.0;
+            for (int zoneNum : thisEnclosure.ZoneNums) {
+                Real64 zoneQL;
+                SumAllInternalRadiationGains(zoneNum, zoneQL);
+                QL(enclosureNum) += zoneQL;
             }
         }
 
@@ -6041,23 +6051,23 @@ namespace InternalHeatGains {
             AllocateLoadComponentArrays();
         }
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            NZ = Surface(SurfNum).Zone;
+            int NZ = Surface(SurfNum).Zone;
             if (!Surface(SurfNum).HeatTransSurf || NZ == 0) continue; // Skip non-heat transfer surfaces
+            int radEnclosureNum = Zone(Surface(SurfNum).Zone).RadiantEnclosureNum;
             if (!doLoadComponentPulseNow) {
-                QRadThermInAbs(SurfNum) = QL(NZ) * TMULT(NZ) * ITABSF(SurfNum);
+                QRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
             } else {
-                curQL = QL(NZ);
+                curQL = QL(radEnclosureNum);
                 // for the loads component report during the special sizing run increase the radiant portion
                 // a small amount to create a "pulse" of heat that is used for the
-                adjQL = curQL + Zone(NZ).FloorArea * pulseMultipler;
+                adjQL = curQL + DataViewFactorInformation::ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
                 // ITABSF is the Inside Thermal Absorptance
                 // TMULT is a mulipliter for each zone
                 // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
-                QRadThermInAbs(SurfNum) = adjQL * TMULT(NZ) * ITABSF(SurfNum);
+                QRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
                 // store the magnitude and time of the pulse
-                radiantPulseUsed(CurOverallSimDay, NZ) = adjQL - curQL;
                 radiantPulseTimestep(CurOverallSimDay, NZ) = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
-                radiantPulseReceived(CurOverallSimDay, SurfNum) = (adjQL - curQL) * TMULT(NZ) * ITABSF(SurfNum) * Surface(SurfNum).Area;
+                radiantPulseReceived(CurOverallSimDay, SurfNum) = (adjQL - curQL) * TMULT(radEnclosureNum) * ITABSF(SurfNum) * Surface(SurfNum).Area;
             }
         }
     }

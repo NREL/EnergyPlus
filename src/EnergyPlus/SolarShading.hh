@@ -388,9 +388,9 @@ namespace SolarShading {
     void CalcWinTransDifSolInitialDistribution();
 
     void CalcInteriorWinTransDifSolInitialDistribution(
-        int const ZoneNum,                // Zone index number
-        int const IntWinSurfNum,          // Interior Window Surface number in Zone ZoneNum
-        Real64 const IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent zone [W]
+        int const IntWinEnclosureNum,     // Interior Window Enclosure index number
+        int const IntWinSurfNum,          // Interior Window Surface number
+        Real64 const IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent enclosure [W]
     );
 
     void CalcComplexWindowOverlap(BSDFGeomDescr &Geom,               // State Geometry
