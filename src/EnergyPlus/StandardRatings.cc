@@ -491,7 +491,6 @@ namespace StandardRatings {
 
         // Writes the IPLV value to the EIO file and standard tabular output tables
         ReportChillerIPLV(ChillerName, ChillerType, IPLV, IPLV * ConvFromSIToIP);
-        return;
     }
 
     Real64
