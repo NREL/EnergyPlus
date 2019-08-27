@@ -1881,10 +1881,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialData_IRTSurfaces)
 TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
 {
 
-    DataHeatBalance::clear_state();
-    DataSurfaces::clear_state();
-    DataHeatBalSurface::clear_state();
-    
     DataSurfaces::TotSurfaces = 3;
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataHeatBalance::TotConstructs = 3;
