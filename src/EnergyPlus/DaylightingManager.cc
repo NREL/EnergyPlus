@@ -5601,7 +5601,8 @@ namespace DaylightingManager {
             SurfNum = TDDPipe(PipeNum).Diffuser;
             if (SurfNum > 0) {
                 bool daylightControlFound = false;
-                for (int const zoneNum : DataViewFactorInformation::ZoneSolarInfo(Surface(SurfNum).SolarEnclSurfIndex).ZoneNums) {
+                int const pipeEnclNum = Zone(Surface(SurfNum).Zone).SolarEnclosureNum;
+                for (int const zoneNum : DataViewFactorInformation::ZoneSolarInfo(pipeEnclNum).ZoneNums) {
                     if (ZoneDaylight(zoneNum).DaylightMethod != NoDaylighting) {
                         daylightControlFound = true;
                     }
