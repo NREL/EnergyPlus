@@ -9153,7 +9153,6 @@ namespace OutputReportTabular {
         int jEndUse;
         Real64 largeConversionFactor;
         Real64 areaConversionFactor;
-        Real64 convBldgCondFloorArea;
 
         if (displaySourceEnergyEndUseSummary) {
             // show the headers of the report
@@ -9208,9 +9207,6 @@ namespace OutputReportTabular {
                     areaConversionFactor = 1.0;
                 }
             }
-
-            // convert floor areas
-            convBldgCondFloorArea = buildingConditionedFloorArea / areaConversionFactor;
 
             // convert units into MJ (divide by 1,000,000) if J otherwise kWh
             for (iResource = 1; iResource <= 5; ++iResource) { // don't do water
@@ -9317,7 +9313,8 @@ namespace OutputReportTabular {
                                                                                         "Source Energy End Use Components Summary");
             }
 
-            //---- Normalized by Conditioned Area Sub-Table
+
+            // Normalized by Area tables
 
             {
                 auto const SELECT_CASE_var(unitsStyle);
@@ -9342,69 +9339,79 @@ namespace OutputReportTabular {
                 }
             }
 
-            tableBody = "";
-            if (convBldgCondFloorArea > 0) {
-                for (iResource = 1; iResource <= 5; ++iResource) {
-                    for (jEndUse = 1; jEndUse <= 14; ++jEndUse) {
-                        tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgCondFloorArea, 2);
+            //---- Normalized by Conditioned Area Sub-Table
+            {
+                tableBody = "";
+                // convert floor area
+                Real64 convBldgCondFloorArea = buildingConditionedFloorArea / areaConversionFactor;
+                if (convBldgCondFloorArea > 0) {
+                    for (iResource = 1; iResource <= 5; ++iResource) {
+                        for (jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                            tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgCondFloorArea, 2);
+                        }
+                        tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgCondFloorArea, 2);
                     }
-                    tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgCondFloorArea, 2);
                 }
-            }
 
-            WriteTextLine("Normalized Metrics", true);
+                WriteTextLine("Normalized Metrics", true);
 
-            // heading for the entire sub-table
-            WriteSubtitle("Source Energy End Use Components Per Conditioned Floor Area");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                       rowHead,
-                                                       columnHead,
-                                                       "SourceEnergyEndUseComponentsSummary",
-                                                       "Entire Facility",
-                                                       "Source Energy End Use Component Per Conditioned Floor Area");
-            }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                        rowHead,
-                                                                                        columnHead,
-                                                                                        "Source Energy End Use Components Summary",
-                                                                                        "Entire Facility",
-                                                                                        "Source Energy End Use Component Per Conditioned Floor Area");
-            }
+                // heading for the entire sub-table
+                WriteSubtitle("Source Energy End Use Components Per Conditioned Floor Area");
+                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                if (sqlite) {
+                    sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                           rowHead,
+                                                           columnHead,
+                                                           "SourceEnergyEndUseComponentsSummary",
+                                                           "Entire Facility",
+                                                           "Source Energy End Use Component Per Conditioned Floor Area");
+                }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Source Energy End Use Components Summary",
+                                                                                            "Entire Facility",
+                                                                                            "Source Energy End Use Component Per Conditioned Floor Area");
+                }
+            } // End of Normalized by Conditioned Area
 
             //---- Normalized by Total Area Sub-Table
-            tableBody = "";
-            if (convBldgCondFloorArea > 0) {
-                for (iResource = 1; iResource <= 5; ++iResource) {
-                    for (jEndUse = 1; jEndUse <= 14; ++jEndUse) {
-                        tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgCondFloorArea, 2);
-                    }
-                    tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgCondFloorArea, 2);
-                }
-            }
+            {
+                tableBody = "";
+                Real64 convBldgGrossFloorArea = buildingGrossFloorArea / areaConversionFactor;
 
-            // heading for the entire sub-table
-            WriteSubtitle("Source Energy End Use Components Per Total Floor Area");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                       rowHead,
-                                                       columnHead,
-                                                       "SourceEnergyEndUseComponentsSummary",
-                                                       "Entire Facility",
-                                                       "Source Energy End Use Components Per Total Floor Area");
-            }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                        rowHead,
-                                                                                        columnHead,
-                                                                                        "Source Energy End Use Components Summary",
-                                                                                        "Entire Facility",
-                                                                                        "Source Energy End Use Components Per Total Floor Area");
-            }
-        }
+                if (convBldgGrossFloorArea > 0) {
+                    for (iResource = 1; iResource <= 5; ++iResource) {
+                        for (jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                            tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgGrossFloorArea, 2);
+                        }
+                        tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgGrossFloorArea, 2);
+                    }
+                }
+
+                // heading for the entire sub-table
+                WriteSubtitle("Source Energy End Use Components Per Total Floor Area");
+                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                if (sqlite) {
+                    sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                           rowHead,
+                                                           columnHead,
+                                                           "SourceEnergyEndUseComponentsSummary",
+                                                           "Entire Facility",
+                                                           "Source Energy End Use Components Per Total Floor Area");
+                }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Source Energy End Use Components Summary",
+                                                                                            "Entire Facility",
+                                                                                            "Source Energy End Use Components Per Total Floor Area");
+                }
+            } // End of Normalized by Total Area
+
+        } // end if displaySourceEnergyEndUseSummary
     }
 
     void WriteDemandEndUseSummary()

@@ -149,7 +149,7 @@ if( WIN32 AND NOT UNIX )
   set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
   include(InstallRequiredSystemLibraries)
   if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
-  install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./")
+    install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./")
   endif()
 endif()
 
@@ -443,7 +443,7 @@ elseif(WIN32)
   # You need at least one "install(..." command for it to be registered as a component
   install(CODE "MESSAGE(\"Registering filetypes.\")" COMPONENT RegisterFileType)
   install(CODE "MESSAGE(\"Copying and Registering DLLs\")" COMPONENT CopyAndRegisterSystemDLLs)
-
+  install(CODE "MESSAGE(\"Creating start menu.\")" COMPONENT CreateStartMenu)
 
 endif()
 
@@ -500,18 +500,25 @@ if ( BUILD_DOCS )
 
   # So instead, we just used the number of threads that are available. That's not ideal, since it ignores any "-j N" option passed by the user
   # But LaTeX should run quickly enough to not be a major inconvenience.
-  # There no need to do that for Ninja for eg, so only do it for Make
+  # There no need to do that for Ninja for eg, so only do it for Make and MSVC
 
-  # flag -j to cmake --build was added at 3.12
-  if(CMAKE_GENERATOR MATCHES "Make" AND (CMAKE_VERSION VERSION_GREATER "3.11"))
+  # flag -j to cmake --build was added at 3.12 (VERSION_GREATER_EQUAL need cmake >= 3.7, we apparently support 2.8...)
+  if(NOT(CMAKE_VERSION VERSION_LESS "3.12") AND ((CMAKE_GENERATOR MATCHES "Make") OR WIN32))
     include(ProcessorCount)
     ProcessorCount(N)
     if(NOT N EQUAL 0)
       set(DOC_BUILD_FLAGS "-j ${N}")
-      message("DOC_BUILD_FLAGS=${DOC_BUILD_FLAGS}")
     endif()
   endif()
-  install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build \"${CMAKE_BINARY_DIR}\" ${DOC_BUILD_FLAGS} --target documentation)")
+  if(WIN32)
+    # Win32 is multi config, so you must specify a config when calling cmake.
+    # Let's just use Release, it won't have any effect on LaTeX anyways.
+    set(DOC_CONFIG_FLAG "--config Release")
+  endif()
+
+  # Getting these commands to work (especially with macro expansion) is tricky. Check the resulting `cmake_install.cmake` file in your build folder if need to debug this
+  install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build \"${CMAKE_BINARY_DIR}\" ${DOC_CONFIG_FLAG} ${DOC_BUILD_FLAGS} --target documentation)"
+          COMPONENT Documentation)
 
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/Acknowledgments.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/AuxiliaryPrograms.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
@@ -592,6 +599,12 @@ cpack_add_component(Licenses
   DESCRIPTION "License files for EnergyPlus"
   REQUIRED)
 
+# No need for system privileges for this
+cpack_add_component(CreateStartMenu
+  DISPLAY_NAME "Start Menu links"
+  DESCRIPTION "Create Start Menu Links"
+)
+
 cpack_add_component(RegisterFileType
   DISPLAY_NAME "Associate with EP-Launch and IDFEditor"
   DESCRIPTION "Associate *.idf, *.imf, and *.epg files with EP-Launch, *.ddy and *.expidf with IDFEditor.exe"
@@ -616,6 +629,10 @@ cpack_ifw_configure_component(Unspecified
 cpack_ifw_configure_component(Symlinks
     SCRIPT cmake/qtifw/install_mac_createsymlinks.qs
     REQUIRES_ADMIN_RIGHTS
+)
+
+cpack_ifw_configure_component(CreateStartMenu
+    SCRIPT cmake/qtifw/install_win_createstartmenu.qs
 )
 
 cpack_ifw_configure_component(RegisterFileType
