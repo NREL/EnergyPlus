@@ -3656,7 +3656,7 @@ namespace SimAirServingZones {
                 // Evap Cooler Types for the air system simulation
             } else if (SELECT_CASE_var == EvapCooler) { // 'EvaporativeCooler:Direct:CelDekPad', 'EvaporativeCooler:Indirect:CelDekPad'
                 // 'EvaporativeCooler:Indirect:WetCoil', 'EvaporativeCooler:Indirect:ResearchSpecial'
-                SimEvapCooler(CompName, CompIndex);
+                SimEvapCooler(CompName, CompIndex, AirLoopFlow(AirLoopNum).FanPLR);
 
                 // Desiccant Dehumidifier Types for the air system simulation
             } else if (SELECT_CASE_var == Desiccant) { // 'Dehumidifier:Desiccant:NoFans', 'Dehumidifier:Desiccant:System'
