@@ -5602,15 +5602,15 @@ namespace DaylightingManager {
             if (SurfNum > 0) {
                 bool daylightControlFound = false;
                 for (int const zoneNum : DataViewFactorInformation::ZoneSolarInfo(Surface(SurfNum).SolarEnclSurfIndex).ZoneNums) {
-                    if (ZoneDaylight(Surface(SurfNum).Zone).DaylightMethod != NoDaylighting) {
+                    if (ZoneDaylight(zoneNum).DaylightMethod != NoDaylighting) {
                         daylightControlFound = true;
                     }
                 }
                 if (!daylightControlFound) {
                     ShowSevereError("DaylightingDevice:Tubular = " + TDDPipe(PipeNum).Name + ":  is not connected to a Zone that has Daylighting.  ");
                     ShowContinueError("Add Daylighting:Controls one of the following zones in the same enclosure:  ");
-                    for (int const zoneNum : DataViewFactorInformation::ZoneSolarInfo(Surface(SurfNum).SolarEnclSurfIndex).ZoneNums) {
-                        ShowContinueError(Zone(zoneNum).Name);
+                    for (int const zoneNum2 : DataViewFactorInformation::ZoneSolarInfo(Surface(SurfNum).SolarEnclSurfIndex).ZoneNums) {
+                        ShowContinueError(Zone(zoneNum2).Name);
                     }
                     ErrorsFound = true;
                     CheckTDDZone(Surface(SurfNum).Zone) = false;
