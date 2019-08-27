@@ -946,9 +946,9 @@ namespace EnergyPlus {
                                 thisDomain.HorizInsMaterialNum).SpecHeat;
                         thisDomain.HorizInsProperties.Conductivity = DataHeatBalance::Material(
                                 thisDomain.HorizInsMaterialNum).Conductivity;
-                        if (SiteGroundDomainUsingNoMassMat(thisDomain.HorizInsThickness,thisDomain.HorizInsMaterialNum)) {
+                        if (SiteGroundDomainUsingNoMassMat(thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
                             ErrorsFound = true;
-                            SiteGroundDomainNoMassMatError(DataIPShortCuts::cAlphaFieldNames(8),DataIPShortCuts::cAlphaArgs(8),thisDomain.Name);
+                            SiteGroundDomainNoMassMatError(DataIPShortCuts::cAlphaFieldNames(8), DataIPShortCuts::cAlphaArgs(8), thisDomain.Name);
                         }
                     }
 
@@ -1003,9 +1003,9 @@ namespace EnergyPlus {
                                 thisDomain.VertInsMaterialNum).SpecHeat;
                         thisDomain.VertInsProperties.Conductivity = DataHeatBalance::Material(
                                 thisDomain.VertInsMaterialNum).Conductivity;
-                        if (SiteGroundDomainUsingNoMassMat(thisDomain.VertInsThickness,thisDomain.VertInsMaterialNum)) {
+                        if (SiteGroundDomainUsingNoMassMat(thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
                             ErrorsFound = true;
-                            SiteGroundDomainNoMassMatError(DataIPShortCuts::cAlphaFieldNames(11),DataIPShortCuts::cAlphaArgs(11),thisDomain.Name);
+                            SiteGroundDomainNoMassMatError(DataIPShortCuts::cAlphaFieldNames(11), DataIPShortCuts::cAlphaArgs(11), thisDomain.Name);
                         }
                     }
 
