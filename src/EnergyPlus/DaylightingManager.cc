@@ -7224,10 +7224,10 @@ namespace DaylightingManager {
 
         // Loop again over windows and reset remaining shading flags that
         // are 10 or higher (i.e., conditionally off) to off
-        for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
-            if (Surface(loop).Class != SurfaceClass_Window) continue;
-            if (Surface(loop).ExtBoundCond != ExternalEnvironment) continue;
-            if (SurfaceWindow(loop).ShadingFlag >= 10) SurfaceWindow(loop).ShadingFlag = ShadeOff;
+        for (IWin = Zone(ZoneNum).SurfaceFirst; IWin <= Zone(ZoneNum).SurfaceLast; ++IWin) {
+            if (Surface(IWin).Class != SurfaceClass_Window) continue;
+            if (Surface(IWin).ExtBoundCond != ExternalEnvironment) continue;
+            if (SurfaceWindow(IWin).ShadingFlag >= 10) SurfaceWindow(IWin).ShadingFlag = ShadeOff;
         }
 
         // Variables for reporting
