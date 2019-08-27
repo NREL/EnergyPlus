@@ -56,6 +56,7 @@
 #include <AirflowNetwork/Solver.hpp>
 #include <AirflowNetwork/Elements.hpp>
 #include <DataSurfaces.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 
@@ -68,6 +69,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -4520,44 +4522,60 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirPrandtl)
 
 TEST_F(EnergyPlusFixture, TestWindPressureTable)
 {
-    // Test a Table:OneIV object as a wind pressure curve
-    std::string const idf_objects = delimited_string({"Table:OneIndependentVariable,",
-                                                      "  EFacade_WPCCurve,        !- Name",
-                                                      "  Linear,                  !- Curve Type",
-                                                      "  LinearInterpolationOfTable,  !- Interpolation Method",
-                                                      "  0,                       !- Minimum Value of X",
-                                                      "  360,                     !- Maximum Value of X",
-                                                      "  -1,                      !- Minimum Table Output",
-                                                      "  1,                       !- Maximum Table Output",
-                                                      "  Dimensionless,           !- Input Unit Type for X",
-                                                      "  Dimensionless,           !- Output Unit Type",
-                                                      "  1,                       !- Normalization Reference",
-                                                      "  0,                       !- X Value #1",
-                                                      "  -0.56,                   !- Output Value #1",
-                                                      "  30,                      !- X Value #2",
-                                                      "  0.04,                    !- Output Value #2",
-                                                      "  60,                      !- X Value #3",
-                                                      "  0.48,                    !- Output Value #3",
-                                                      "  90,                      !- X Value #4",
-                                                      "  0.6,                     !- Output Value #4",
-                                                      "  120,                     !- X Value #5",
-                                                      "  0.48,                    !- Output Value #5",
-                                                      "  150,                     !- X Value #6",
-                                                      "  0.04,                    !- Output Value #6",
-                                                      "  180,                     !- X Value #7",
-                                                      "  -0.56,                   !- Output Value #7",
-                                                      "  210,                     !- N20",
-                                                      "  -0.56,                   !- N21",
-                                                      "  240,                     !- N22",
-                                                      "  -0.42,                   !- N23",
-                                                      "  270,                     !- N24",
-                                                      "  -0.37,                   !- N25",
-                                                      "  300,                     !- N26",
-                                                      "  -0.42,                   !- N27",
-                                                      "  330,                     !- N28",
-                                                      "  -0.56,                   !- N29",
-                                                      "  360,                     !- N30",
-                                                      "  -0.56;                   !- N31"});
+    // Test a Table:Lookup object as a wind pressure curve
+    std::string const idf_objects = delimited_string({"Table:IndependentVariable,",
+                                                      "  Wind_Direction_30_deg,     !- Name",
+                                                      "  Linear,                    !- Interpolation Method",
+                                                      "  Constant,                  !- Extrapolation Method",
+                                                      "  0,                         !- Minimum Value",
+                                                      "  360,                       !- Maximum Value",
+                                                      "  ,                          !- Normalization Reference Value",
+                                                      "  Dimensionless,             !- Unit Type",
+                                                      "  ,                          !- External File Name",
+                                                      "  ,                          !- External File Column Number",
+                                                      "  ,                          !- External File Starting Row Number",
+                                                      "  0,                         !- Value 1",
+                                                      "  30,",
+                                                      "  60,",
+                                                      "  90,",
+                                                      "  120,",
+                                                      "  150,",
+                                                      "  180,",
+                                                      "  210,",
+                                                      "  240,",
+                                                      "  270,",
+                                                      "  300,",
+                                                      "  330,",
+                                                      "  360;",
+
+                                                      "Table:IndependentVariableList,",
+                                                      "  Wind_Pressure_Variables,   !- Name",
+                                                      "  Wind_Direction_30_deg;     !- Independent Variable 1 Name",
+
+                                                      "Table:Lookup,",
+                                                      "  EFacade_WPCCurve,          !- Name",
+                                                      "  Wind_Pressure_Variables,   !- Independent Variable List Name",
+                                                      "  ,                          !- Normalization Method",
+                                                      "  ,                          !- Normalization Divisor",
+                                                      "  -1,                        !- Minimum Output",
+                                                      "  1,                         !- Maximum Output",
+                                                      "  Dimensionless,             !- Output Unit Type",
+                                                      "  ,                          !- External File Name",
+                                                      "  ,                          !- External File Column Number",
+                                                      "  ,                          !- External File Starting Row Number",
+                                                      "  -0.56,                     !- Output Value 1",
+                                                      "  0.04,",
+                                                      "  0.48,",
+                                                      "  0.6,",
+                                                      "  0.48,",
+                                                      "  0.04,",
+                                                      "  -0.56,",
+                                                      "  -0.56,",
+                                                      "  -0.42,",
+                                                      "  -0.37,",
+                                                      "  -0.42,",
+                                                      "  -0.56,",
+                                                      "  -0.56;"});
 
     // Load and verify the table
     ASSERT_TRUE(process_idf(idf_objects));
@@ -4568,7 +4586,7 @@ TEST_F(EnergyPlusFixture, TestWindPressureTable)
     EXPECT_EQ(1, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("EFACADE_WPCCURVE", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("EFACADE_WPCCURVE"));
-    EXPECT_EQ("Table:OneIndependentVariable", CurveManager::PerfCurve(1).ObjectType);
+    EXPECT_EQ("Table:Lookup", CurveManager::PerfCurve(1).ObjectType);
     EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(1, 0.0));   // In-range value
     EXPECT_DOUBLE_EQ(0.54, CurveManager::CurveValue(1, 105.0));  // In-range value
     EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(1, -10.0)); // Minimum x
@@ -4610,7 +4628,7 @@ TEST_F(EnergyPlusFixture, TestWindPressureTable)
 
 TEST_F(EnergyPlusFixture, TestWPCValue)
 {
-    // Test loading a WPC object into a Table:OneIV
+    // Test loading a WPC object into a Table:Lookup
     std::string const idf_objects = delimited_string({"AirflowNetwork:MultiZone:WindPressureCoefficientArray,",
                                                       "  Every 30 Degrees,        !- Name",
                                                       "  0,                       !- Wind Direction 1 {deg}",
@@ -6123,54 +6141,86 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithTables)
          "  0.01,                    !- Air Mass Flow Coefficient at Reference Conditions{ kg / s }",
          "  0.667,                   !- Air Mass Flow Exponent{ dimensionless }",
          "  ReferenceCrackConditions;!- Reference Crack Conditions",
-         "Table:OneIndependentVariable,",
-         "  NFacade_WPCCurve,        !- Name",
-         "  Linear,                  !- Curve Type",
-         "  LinearInterpolationOfTable,  !- Interpolation Method",
-         "  0,                       !- Minimum Value of X",
-         "  360,                     !- Maximum Value of X",
-         "  -1,                      !- Minimum Table Output",
-         "  1,                       !- Maximum Table Output",
-         "  Dimensionless,           !- Input Unit Type for X",
-         "  Dimensionless,           !- Output Unit Type",
-         "  1,                       !- Normalization Reference",
-         "  0, 0.60,                 !- X,Y Pair #1",
-         "  30, 0.48,                !- X,Y Pair #2",
-         "  60, 0.04,                !- X,Y Pair #3",
-         "  90, -0.56,               !- X,Y Pair #4",
-         "  120, -0.56,              !- X,Y Pair #5",
-         "  150, -0.42,              !- X,Y Pair #6",
-         "  180, -0.37,              !- X,Y Pair #7",
-         "  210, -0.42,              !- X,Y Pair #8",
-         "  240, -0.56,              !- X,Y Pair #9",
-         "  270, -0.56,              !- X,Y Pair #10",
-         "  300, 0.04,               !- X,Y Pair #11",
-         "  330, 0.48,               !- X,Y Pair #12",
-         "  360, 0.60;               !- X,Y Pair #13",
-         "Table:OneIndependentVariable,",
-         "  SFacade_WPCCurve,        !- Name",
-         "  Linear,                  !- Curve Type",
-         "  LinearInterpolationOfTable,  !- Interpolation Method",
-         "  0,                       !- Minimum Value of X",
-         "  360,                     !- Maximum Value of X",
-         "  -1,                      !- Minimum Table Output",
-         "  1,                       !- Maximum Table Output",
-         "  Dimensionless,           !- Input Unit Type for X",
-         "  Dimensionless,           !- Output Unit Type",
-         "  1,                       !- Normalization Reference",
-         "  0, -0.37,                !- X,Y Pair #1",
-         "  30, -0.42,               !- X,Y Pair #2",
-         "  60, -0.56,               !- X,Y Pair #3",
-         "  90, -0.56,               !- X,Y Pair #4",
-         "  120, 0.04,               !- X,Y Pair #5",
-         "  150, 0.48,               !- X,Y Pair #6",
-         "  180, 0.60,               !- X,Y Pair #7",
-         "  210, 0.48,               !- X,Y Pair #8",
-         "  240, 0.04,               !- X,Y Pair #9",
-         "  270, -0.56,              !- X,Y Pair #10",
-         "  300, -0.56,              !- X,Y Pair #11",
-         "  330, -0.42,              !- X,Y Pair #12",
-         "  360, -0.37;              !- X,Y Pair #13",
+
+         "Table:IndependentVariable,",
+         "  Wind_Direction_30_deg,     !- Name",
+         "  Linear,                    !- Interpolation Method",
+         "  Constant,                  !- Extrapolation Method",
+         "  0,                         !- Minimum Value",
+         "  360,                       !- Maximum Value",
+         "  ,                          !- Normalization Reference Value",
+         "  Dimensionless,             !- Unit Type",
+         "  ,                          !- External File Name",
+         "  ,                          !- External File Column Number",
+         "  ,                          !- External File Starting Row Number",
+         "  0,                         !- Value 1",
+         "  30,",
+         "  60,",
+         "  90,",
+         "  120,",
+         "  150,",
+         "  180,",
+         "  210,",
+         "  240,",
+         "  270,",
+         "  300,",
+         "  330,",
+         "  360;",
+
+         "Table:IndependentVariableList,",
+         "  Wind_Pressure_Variables,   !- Name",
+         "  Wind_Direction_30_deg;     !- Independent Variable 1 Name",
+
+         "Table:Lookup,",
+         "  NFacade_WPCCurve,          !- Name",
+         "  Wind_Pressure_Variables,   !- Independent Variable List Name",
+         "  ,                          !- Normalization Method",
+         "  ,                          !- Normalization Divisor",
+         "  -1,                        !- Minimum Output",
+         "  1,                         !- Maximum Output",
+         "  Dimensionless,             !- Output Unit Type",
+         "  ,                          !- External File Name",
+         "  ,                          !- External File Column Number",
+         "  ,                          !- External File Starting Row Number",
+         "  0.60,                      !- Output Value 1",
+         "  0.48,",
+         "  0.04,",
+         "  -0.56,",
+         "  -0.56,",
+         "  -0.42,",
+         "  -0.37,",
+         "  -0.42,",
+         "  -0.56,",
+         "  -0.56,",
+         "  0.04,",
+         "  0.48,",
+         "  0.60;",
+
+         "Table:Lookup,",
+         "  SFacade_WPCCurve,          !- Name",
+         "  Wind_Pressure_Variables,   !- Independent Variable List Name",
+         "  ,                          !- Normalization Method",
+         "  ,                          !- Normalization Divisor",
+         "  -1,                        !- Minimum Output",
+         "  1,                         !- Maximum Output",
+         "  Dimensionless,             !- Output Unit Type",
+         "  ,                          !- External File Name",
+         "  ,                          !- External File Column Number",
+         "  ,                          !- External File Starting Row Number",
+         "  -0.37,                     !- Output Value 1",
+         "  -0.42,",
+         "  -0.56,",
+         "  -0.56,",
+         "  0.04,",
+         "  0.48,",
+         "  0.60,",
+         "  0.48,",
+         "  0.04,",
+         "  -0.56,",
+         "  -0.56,",
+         "  -0.42,",
+         "  -0.37;",
+
          "SurfaceConvectionAlgorithm:Inside,TARP;",
          "SurfaceConvectionAlgorithm:Outside,DOE-2;",
          "HeatBalanceAlgorithm,ConductionTransferFunction;",
@@ -7378,24 +7428,49 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricTable)
          "  0.01,                    !- Air Mass Flow Coefficient at Reference Conditions{ kg / s }",
          "  0.667,                   !- Air Mass Flow Exponent{ dimensionless }",
          "  ReferenceCrackConditions;!- Reference Crack Conditions",
-         "Table:OneIndependentVariable,",
-         "  NFacade_WPCCurve,        !- Name",
-         "  Linear,                  !- Curve Type",
-         "  LinearInterpolationOfTable,  !- Interpolation Method",
-         "  0,                       !- Minimum Value of X",
-         "  180,                     !- Maximum Value of X",
-         "  -1,                      !- Minimum Table Output",
-         "  1,                       !- Maximum Table Output",
-         "  Dimensionless,           !- Input Unit Type for X",
-         "  Dimensionless,           !- Output Unit Type",
-         "  1,                       !- Normalization Reference",
-         "  0, 0.60,                 !- X,Y Pair #1",
-         "  30, 0.48,                !- X,Y Pair #2",
-         "  60, 0.04,                !- X,Y Pair #3",
-         "  90, -0.56,               !- X,Y Pair #4",
-         "  120, -0.56,              !- X,Y Pair #5",
-         "  150, -0.42,              !- X,Y Pair #6",
-         "  180, -0.37;              !- X,Y Pair #7",
+
+         "Table:IndependentVariable,",
+         "  Wind_Direction_30_deg,     !- Name",
+         "  Linear,                    !- Interpolation Method",
+         "  Constant,                  !- Extrapolation Method",
+         "  0,                         !- Minimum Value",
+         "  180,                       !- Maximum Value",
+         "  ,                          !- Normalization Reference Value",
+         "  Dimensionless,             !- Unit Type",
+         "  ,                          !- External File Name",
+         "  ,                          !- External File Column Number",
+         "  ,                          !- External File Starting Row Number",
+         "  0,                         !- Value 1",
+         "  30,",
+         "  60,",
+         "  90,",
+         "  120,",
+         "  150,",
+         "  180;",
+
+         "Table:IndependentVariableList,",
+         "  Wind_Pressure_Variables,   !- Name",
+         "  Wind_Direction_30_deg;     !- Independent Variable 1 Name",
+
+         "Table:Lookup,",
+         "  NFacade_WPCCurve,          !- Name",
+         "  Wind_Pressure_Variables,   !- Independent Variable List Name",
+         "  ,                          !- Normalization Method",
+         "  ,                          !- Normalization Divisor",
+         "  -1,                        !- Minimum Output",
+         "  1,                         !- Maximum Output",
+         "  Dimensionless,             !- Output Unit Type",
+         "  ,                          !- External File Name",
+         "  ,                          !- External File Column Number",
+         "  ,                          !- External File Starting Row Number",
+         "  0.60,                      !- Output Value 1",
+         "  0.48,",
+         "  0.04,",
+         "  -0.56,",
+         "  -0.56,",
+         "  -0.42,",
+         "  -0.37;",
+
          "SurfaceConvectionAlgorithm:Inside,TARP;",
          "SurfaceConvectionAlgorithm:Outside,DOE-2;",
          "HeatBalanceAlgorithm,ConductionTransferFunction;",
@@ -8664,54 +8739,86 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
          "  0.01,                    !- Air Mass Flow Coefficient at Reference Conditions{ kg / s }",
          "  0.667,                   !- Air Mass Flow Exponent{ dimensionless }",
          "  ReferenceCrackConditions;!- Reference Crack Conditions",
-         "Table:OneIndependentVariable,",
-         "  NFacade_WPCCurve,        !- Name",
-         "  Linear,                  !- Curve Type",
-         "  LinearInterpolationOfTable,  !- Interpolation Method",
-         "  0,                       !- Minimum Value of X",
-         "  360,                     !- Maximum Value of X",
-         "  -1,                      !- Minimum Table Output",
-         "  1,                       !- Maximum Table Output",
-         "  Dimensionless,           !- Input Unit Type for X",
-         "  Dimensionless,           !- Output Unit Type",
-         "  1,                       !- Normalization Reference",
-         "  0, 0.60,                 !- X,Y Pair #1",
-         "  30, 0.48,                !- X,Y Pair #2",
-         "  60, 0.04,                !- X,Y Pair #3",
-         "  90, -0.56,               !- X,Y Pair #4",
-         "  120, -0.56,              !- X,Y Pair #5",
-         "  150, -0.42,              !- X,Y Pair #6",
-         "  180, -0.37,              !- X,Y Pair #7",
-         "  210, -0.42,              !- X,Y Pair #8",
-         "  240, -0.56,              !- X,Y Pair #9",
-         "  270, -0.56,              !- X,Y Pair #10",
-         "  300, 0.04,               !- X,Y Pair #11",
-         "  330, 0.48,               !- X,Y Pair #12",
-         "  360, 0.60;               !- X,Y Pair #13",
-         "Table:OneIndependentVariable,",
-         "  SFacade_WPCCurve,        !- Name",
-         "  Linear,                  !- Curve Type",
-         "  LinearInterpolationOfTable,  !- Interpolation Method",
-         "  0,                       !- Minimum Value of X",
-         "  360,                     !- Maximum Value of X",
-         "  -1,                      !- Minimum Table Output",
-         "  1,                       !- Maximum Table Output",
-         "  Dimensionless,           !- Input Unit Type for X",
-         "  Dimensionless,           !- Output Unit Type",
-         "  1,                       !- Normalization Reference",
-         "  0, -0.37,                !- X,Y Pair #1",
-         "  30, -0.42,               !- X,Y Pair #2",
-         "  60, -0.56,               !- X,Y Pair #3",
-         "  90, -0.56,               !- X,Y Pair #4",
-         "  120, 0.04,               !- X,Y Pair #5",
-         "  150, 0.48,               !- X,Y Pair #6",
-         "  180, 0.60,               !- X,Y Pair #7",
-         "  210, 0.48,               !- X,Y Pair #8",
-         "  240, 0.04,               !- X,Y Pair #9",
-         "  270, -0.56,              !- X,Y Pair #10",
-         "  300, -0.56,              !- X,Y Pair #11",
-         "  330, -0.42,              !- X,Y Pair #12",
-         "  360, -0.37;              !- X,Y Pair #13",
+
+         "Table:IndependentVariable,",
+         "  Wind_Direction_30_deg,     !- Name",
+         "  Linear,                    !- Interpolation Method",
+         "  Constant,                  !- Extrapolation Method",
+         "  0,                         !- Minimum Value",
+         "  360,                       !- Maximum Value",
+         "  ,                          !- Normalization Reference Value",
+         "  Dimensionless,             !- Unit Type",
+         "  ,                          !- External File Name",
+         "  ,                          !- External File Column Number",
+         "  ,                          !- External File Starting Row Number",
+         "  0,                         !- Value 1",
+         "  30,",
+         "  60,",
+         "  90,",
+         "  120,",
+         "  150,",
+         "  180,",
+         "  210,",
+         "  240,",
+         "  270,",
+         "  300,",
+         "  330,",
+         "  360;",
+
+         "Table:IndependentVariableList,",
+         "  Wind_Pressure_Variables,   !- Name",
+         "  Wind_Direction_30_deg;     !- Independent Variable 1 Name",
+
+         "Table:Lookup,",
+         "  NFacade_WPCCurve,          !- Name",
+         "  Wind_Pressure_Variables,   !- Independent Variable List Name",
+         "  ,                          !- Normalization Method",
+         "  ,                          !- Normalization Divisor",
+         "  -1,                        !- Minimum Output",
+         "  1,                         !- Maximum Output",
+         "  Dimensionless,             !- Output Unit Type",
+         "  ,                          !- External File Name",
+         "  ,                          !- External File Column Number",
+         "  ,                          !- External File Starting Row Number",
+         "  0.60,                      !- Output Value 1",
+         "  0.48,",
+         "  0.04,",
+         "  -0.56,",
+         "  -0.56,",
+         "  -0.42,",
+         "  -0.37,",
+         "  -0.42,",
+         "  -0.56,",
+         "  -0.56,",
+         "  0.04,",
+         "  0.48,",
+         "  0.60;",
+
+         "Table:Lookup,",
+         "  SFacade_WPCCurve,          !- Name",
+         "  Wind_Pressure_Variables,   !- Independent Variable List Name",
+         "  ,                          !- Normalization Method",
+         "  ,                          !- Normalization Divisor",
+         "  -1,                        !- Minimum Output",
+         "  1,                         !- Maximum Output",
+         "  Dimensionless,             !- Output Unit Type",
+         "  ,                          !- External File Name",
+         "  ,                          !- External File Column Number",
+         "  ,                          !- External File Starting Row Number",
+         "  -0.37,                     !- Output Value 1",
+         "  -0.42,",
+         "  -0.56,",
+         "  -0.56,",
+         "  0.04,",
+         "  0.48,",
+         "  0.60,",
+         "  0.48,",
+         "  0.04,",
+         "  -0.56,",
+         "  -0.56,",
+         "  -0.42,",
+         "  -0.37;",
+
          "SurfaceConvectionAlgorithm:Inside,TARP;",
          "SurfaceConvectionAlgorithm:Outside,DOE-2;",
          "HeatBalanceAlgorithm,ConductionTransferFunction;",
@@ -9245,15 +9352,17 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
     EXPECT_EQ(270.0, AirflowNetwork::MultizoneExternalNodeData(3).azimuth);
 
     // Check the curve values for the left window, taken from v8.6.0 on Windows
-    unsigned i = 0;
-    for (auto value : CurveManager::PerfCurveTableData(7).Y) {
-        EXPECT_NEAR(valsForLeftWindow[i++], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
+    for (unsigned i = 0; i <= 36; i++) {
+        Real64 angle = i*10.0;
+        Real64 value = CurveManager::CurveValue(7, angle);
+        EXPECT_NEAR(valsForLeftWindow[i], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
     }
 
     // Check the curve values for the left window, taken from v8.6.0 on Windows
-    i = 0;
-    for (auto value : CurveManager::PerfCurveTableData(6).Y) {
-        EXPECT_NEAR(valsForRightWindow[i++], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
+    for (unsigned i = 0; i <= 36; i++) {
+        Real64 angle = i*10.0;
+        Real64 value = CurveManager::CurveValue(6, angle);
+        EXPECT_NEAR(valsForRightWindow[i], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
     }
 }
 
@@ -15237,14 +15346,14 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
     for (i = 1; i <= 21; ++i) {
         AirflowNetwork::AirflowNetworkNodeSimu(i).TZ = 23.0;
         AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = 0.0008400;
-        if ((i >= 4 && i <= 7)) { 
+        if ((i >= 4 && i <= 7)) {
             AirflowNetwork::AirflowNetworkNodeSimu(i).TZ =
                 DataEnvironment::OutDryBulbTempAt(AirflowNetwork::AirflowNetworkNodeData(i).NodeHeight); // AirflowNetworkNodeData vals differ
             AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = DataEnvironment::OutHumRat;
         }
     }
     DataAirLoop::AirLoopAFNInfo.allocate(1);
-    DataAirLoop::AirLoopAFNInfo(1).LoopFanOperationMode = 1;   
+    DataAirLoop::AirLoopAFNInfo(1).LoopFanOperationMode = 1;
     DataAirLoop::AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
     DataAirLoop::AirLoopAFNInfo(1).LoopSystemOnMassFlowrate = 1.23;
     AirflowNetwork::AirflowNetworkLinkageData(17).AirLoopNum = 1;
@@ -15270,6 +15379,153 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
     EXPECT_NEAR(1.23, AirflowNetwork::AirflowNetworkLinkSimu(20).FLOW, 0.0001);
 
     DataAirLoop::AirLoopAFNInfo.deallocate();
+}
+
+
+
+// Missing an AirflowNetwork:Distribution:Node for the Zone Air Node
+TEST_F(EnergyPlusFixture, AFN_CheckMultiZoneNodes_NoZoneNode)
+{
+    DataGlobals::NumOfZones = 1;
+    DataHeatBalance::Zone.allocate(1);
+    DataHeatBalance::Zone(1).Name = "ATTIC ZONE";
+
+    DataSurfaces::Surface.allocate(1);
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF001";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ATTIC ZONE";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF002";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ATTIC ZONE";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+
+    DataSurfaces::SurfaceWindow.allocate(1);
+    DataSurfaces::SurfaceWindow(1).OriginalClass = DataSurfaces::SurfaceClass_Window;
+
+    DataAirSystems::PrimaryAirSystem.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
+    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    DataLoopNode::NumOfNodes = 1;
+    DataLoopNode::Node.allocate(1);
+    DataLoopNode::Node(1).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::NodeID.allocate(1);
+    DataLoopNode::NodeID(1) = "ATTIC ZONE AIR NODE";
+    bool errFlag{false};
+    BranchNodeConnections::RegisterNodeConnection(1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    EXPECT_FALSE(errFlag);
+
+    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
+    DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "ATTIC ZONE";
+    DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum = 1;
+    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;
+    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
+
+    ASSERT_THROW(ValidateDistributionSystem(), std::runtime_error);
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** ValidateDistributionSystem: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   **   ~~~   ** This Node is the zone air node for Zone 'ATTIC ZONE'.",
+        "   ** Severe  ** ValidateDistributionSystem: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=2",
+        "   ..... Last severe error=ValidateDistributionSystem: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+// Can't find an inlet node for a Zone referenced in AirflowNetwork:MultiZone:Zone object
+TEST_F(EnergyPlusFixture, AFN_CheckMultiZoneNodes_NoInletNode)
+{
+    DataGlobals::NumOfZones = 1;
+    DataHeatBalance::Zone.allocate(1);
+    DataHeatBalance::Zone(1).Name = "ATTIC ZONE";
+
+    DataSurfaces::Surface.allocate(1);
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF001";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ATTIC ZONE";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF002";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ATTIC ZONE";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+
+    DataSurfaces::SurfaceWindow.allocate(1);
+    DataSurfaces::SurfaceWindow(1).OriginalClass = DataSurfaces::SurfaceClass_Window;
+
+    DataAirSystems::PrimaryAirSystem.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
+    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    DataLoopNode::NumOfNodes = 1;
+    DataLoopNode::Node.allocate(2);
+    DataLoopNode::Node(1).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::NodeID.allocate(1);
+    DataLoopNode::NodeID(1) = "ATTIC ZONE AIR NODE";
+    bool errFlag{false};
+    BranchNodeConnections::RegisterNodeConnection(1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    EXPECT_FALSE(errFlag);
+
+    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
+    DataZoneEquipment::ZoneEquipConfig(1).ZoneName = "ATTIC ZONE";
+    DataZoneEquipment::ZoneEquipConfig(1).ActualZoneNum = 1;
+    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;
+    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
+    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
+
+    // One AirflowNetwork:MultiZone:Zone object
+    AirflowNetwork::AirflowNetworkNumOfZones = 1;
+    AirflowNetwork::MultizoneZoneData.allocate(1);
+    AirflowNetwork::MultizoneZoneData(1).ZoneNum = 1;
+    AirflowNetwork::MultizoneZoneData(1).ZoneName = "ATTIC ZONE";
+
+
+    // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
+    AirflowNetwork::AirflowNetworkNumOfNodes = 1;
+    AirflowNetwork::AirflowNetworkNodeData.allocate(1);
+    AirflowNetwork::AirflowNetworkNodeData(1).Name = "ATTIC ZONE";
+    AirflowNetwork::AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+
+    AirflowNetworkBalanceManager::SplitterNodeNumbers.allocate(2);
+    AirflowNetworkBalanceManager::SplitterNodeNumbers(1) = 0;
+    AirflowNetworkBalanceManager::SplitterNodeNumbers(2) = 0;
+
+
+    // MixedAir::NumOAMixers.allocate(1);
+    ValidateDistributionSystem();
+
+    EXPECT_TRUE(compare_err_stream("", true));
 }
 
 } // namespace EnergyPlus

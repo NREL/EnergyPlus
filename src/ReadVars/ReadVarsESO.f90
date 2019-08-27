@@ -420,7 +420,7 @@
               ! We add these and it works, but it could potentially leave a trailing character from the prior string
               ! So we'll add a space to that trailing point
               line(1:pos-2)=line(2:pos-1)
-              line(pos-1:pos-1) = ' '
+              line(pos-1:len(line)) = ' '
             else
               line=line(2:)
             endif

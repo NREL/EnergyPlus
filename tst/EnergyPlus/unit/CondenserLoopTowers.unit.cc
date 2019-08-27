@@ -491,7 +491,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     SimulationManager::GetProjectData();
     OutputReportPredefined::SetPredefinedTables();
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
@@ -883,7 +883,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     SimulationManager::GetProjectData();
     OutputReportPredefined::SetPredefinedTables();
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
@@ -1315,7 +1315,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     SimulationManager::GetProjectData();
     OutputReportPredefined::SetPredefinedTables();
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
@@ -1730,7 +1730,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     SimulationManager::GetProjectData();
     OutputReportPredefined::SetPredefinedTables();
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
@@ -2214,7 +2214,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
     SimulationManager::GetProjectData();
     OutputReportPredefined::SetPredefinedTables();
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
@@ -2641,7 +2641,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     SimulationManager::GetProjectData();
     OutputReportPredefined::SetPredefinedTables();
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
@@ -3037,7 +3037,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     SimulationManager::GetProjectData();
     OutputReportPredefined::SetPredefinedTables();
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
@@ -3437,7 +3437,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     SimulationManager::GetProjectData();
     OutputReportPredefined::SetPredefinedTables();
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
