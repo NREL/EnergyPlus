@@ -439,7 +439,8 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
 
     numResourcesUsed = 1;
 
-    EscalatedEnergy.allocate(lengthStudyYears, 1);
+    EscalatedEnergy.allocate(lengthStudyYears, NumOfResourceTypes);
+    EscalatedEnergy = 0.0;
     EscalatedTotEnergy.allocate(lengthStudyYears);
     EscalatedTotEnergy = 0.0;
 
