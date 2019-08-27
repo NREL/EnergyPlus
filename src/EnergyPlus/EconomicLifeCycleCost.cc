@@ -1523,7 +1523,7 @@ namespace EconomicLifeCycleCost {
                 }
             }
         }
-        for (int kResource = 1; kResource <= numResourcesUsed; ++kResource) {
+        for (int kResource = 1; kResource <= NumOfResourceTypes; ++kResource) {
             for (int jYear = 1; jYear <= lengthStudyYears; ++jYear) {
                 EscalatedTotEnergy(jYear) += EscalatedEnergy(jYear, kResource);
             }
@@ -2318,7 +2318,7 @@ namespace EconomicLifeCycleCost {
             }
             columnHead(numColumns) = "Total";
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                tableBody(jObj, iYear) = RealToStr(CashFlow(costCatTotEnergy).yrAmount(iYear), 2);
+                tableBody(jObj, iYear) = RealToStr(CashFlow(costCatTotEnergy).yrAmount(iYear) + CashFlow(costCatWater).yrAmount(iYear), 2);
             }
             WriteSubtitle("Energy and Water Cost Cash Flows (Without Escalation)");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
@@ -2355,13 +2355,20 @@ namespace EconomicLifeCycleCost {
             for (int jObj = 1; jObj <= numResourcesUsed; ++jObj) {
                 curCashFlow = countOfCostCat + numRecurringCosts + numNonrecurringCost + jObj;
                 columnHead(jObj) = CashFlow(curCashFlow).name;
-                for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                    tableBody(jObj, iYear) = RealToStr(EscalatedEnergy(iYear, jObj), 2);
+                int curResource = CashFlow(curCashFlow).Resource - ResourceTypeInitialOffset;
+                if (CashFlow(curCashFlow).Resource != iRT_Water) {
+                    for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+                        tableBody(jObj, iYear) = RealToStr(EscalatedEnergy(iYear, curResource), 2);
+                    }
+                } else { // for water just use the original cashflow since not involved in escalation
+                    for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+                        tableBody(jObj, iYear) = RealToStr(CashFlow(curCashFlow).yrAmount(iYear), 2);
+                    }
                 }
             }
             columnHead(numColumns) = "Total";
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                tableBody(jObj, iYear) = RealToStr(EscalatedTotEnergy(iYear), 2);
+                tableBody(jObj, iYear) = RealToStr(EscalatedTotEnergy(iYear) + CashFlow(costCatWater).yrAmount(iYear), 2);
             }
             WriteSubtitle("Energy and Water Cost Cash Flows (With Escalation)");
             WriteTable(tableBody, rowHead, columnHead, columnWidth);
