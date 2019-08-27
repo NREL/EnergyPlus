@@ -7557,7 +7557,7 @@ namespace WaterThermalTanks {
                 ShowContinueErrorTimeStamp("");
             }
             ShowRecurringWarningErrorAtEnd(Tank.Type +" = '" + Tank.Name + "':  Temperature of tank < 2C indicates of possibility of freeze",
-                                           Tank.MaxCycleErrorIndex,
+                                           Tank.FreezingErrorIndex,
                                            Tank.TankTemp, // Report Max
                                            Tank.TankTemp, // Report Min
                                            _,             // Don't report Sum
@@ -8347,7 +8347,7 @@ namespace WaterThermalTanks {
                 ShowContinueErrorTimeStamp("");
             }
             ShowRecurringWarningErrorAtEnd(Tank.Type +" = '" + Tank.Name + "':  Temperature of tank < 2C indicates of possibility of freeze",
-                                           Tank.MaxCycleErrorIndex,
+                                           Tank.FreezingErrorIndex,
                                            Tank.TankTemp, // Report Max
                                            Tank.TankTemp, // Report Min
                                            _,             // Don't report Sum
@@ -9116,7 +9116,7 @@ namespace WaterThermalTanks {
             } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {
                 DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
             } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_AIR_WATER_HEATPUMP_EQ) {
-                DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate; 
+                DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
                 DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeat(DesuperheaterNum) = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
             }
         }
