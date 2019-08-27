@@ -149,7 +149,7 @@ if( WIN32 AND NOT UNIX )
   set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
   include(InstallRequiredSystemLibraries)
   if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
-  install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./")
+    install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./")
   endif()
 endif()
 
@@ -517,6 +517,7 @@ if ( BUILD_DOCS )
     set(DOC_CONFIG_FLAG "--config Release")
   endif()
 
+  # Getting these commands to work (especially with macro expansion) is tricky. Check the resulting `cmake_install.cmake` file in your build folder if need to debug this
   install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build \"${CMAKE_BINARY_DIR}\" ${DOC_CONFIG_FLAG} ${DOC_BUILD_FLAGS} --target documentation)"
           COMPONENT Documentation)
 
