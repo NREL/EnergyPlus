@@ -12728,7 +12728,6 @@ namespace SurfaceGeometry {
         int enclosureNum = 0;
         if (std::any_of(Construct.begin(), Construct.end(), [](DataHeatBalance::ConstructionData const &e) { return e.TypeIsAirBoundary; })) {
             std::string RoutineName = "SetupSolarEnclosuresAndAirBoundaries";
-            int errorCount = 0;
             for (int surfNum = 1; surfNum <= DataSurfaces::TotSurfaces; ++surfNum) {
                 auto &surf(Surface(surfNum));
                 if (surf.Construction == 0) continue;
@@ -12813,11 +12812,6 @@ namespace SurfaceGeometry {
                         }
                     }
                 }
-            }
-            if (errorCount > 0) {
-                ShowSevereError(RoutineName + ": " + General::TrimSigDigits(errorCount) +
-                                " surfaces use Construction:AirBoundary in non-interzone surfaces.");
-                ShowContinueError("For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
             }
         }
         if (DataHeatBalance::AnyAirBoundaryGroupedSolar) {
