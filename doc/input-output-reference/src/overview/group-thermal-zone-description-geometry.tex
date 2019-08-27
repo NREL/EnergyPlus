@@ -2622,7 +2622,7 @@ If the user requests to display advanced report/output variables (e.g.~see \hype
 Zone,Average, Surface Window Inside Face Other Convection Heat Gain Rate [W]
 \end{lstlisting}
 
-Output variables applicable to interior and exterior windows and doors are:
+Output variables applicable to interior and exterior windows and doors under certain conditions (see next three subsections for more information) are:
 
 \begin{lstlisting}
 Zone,Average,Surface Window Total Absorbed Shortwave Radiation Rate Layer <x> [W]
@@ -2632,15 +2632,16 @@ Zone,Average,Surface Window Back Face Temperature Layer <x> [C]
 
 \subsubsection{Surface Window Total Absorbed Shortwave Radiation Rate Layer \textless{}x\textgreater{} {[}W{]}}\label{surface-window-total-absorbed-shortwave-radiation-rate-layer-x-w}
 
-This will output shortwave radiation absorbed in a window layer. The key values for this output variable are the surface name. Layers are numbered from the outside to the inside of the surface. The full listing will appear in the RDD file.
+This will output shortwave radiation absorbed in a window layer. The key values for this output variable are the surface name. Layers are numbered from the outside to the inside of the surface. The full listing will appear in the RDD file. Note that this variable is only defined for constructions defined by a \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState}.
 
 \subsubsection{Surface Window Front Face Temperature Layer \textless{}x\textgreater{} {[}C{]}}\label{surface-window-front-face-temperature-layer-x-c}
 
-This will output a temperature for the front face of the layer. The layer front face is considered to be the face closest to the outside environment. The full listing will appear in the RDD file.
+This will output a temperature for the front face of the layer. The layer front face is considered to be the face closest to the outside environment. The full listing will appear in the RDD file. Note that this variable is only defined for constructions defined by a \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState}.  For other window constructions, this variable is also defined for the outer layer (Layer 1) only. The value will be identical to the \hyperref[surface-outside-face-temperature-c]{Surface Outside Face Temperature}.
+
 
 \subsubsection{Surface Window Back Face Temperature Layer \textless{}x\textgreater{} {[}C{]}}\label{surface-window-back-face-temperature-layer-x-c}
 
-This will output a temperature for the back face of the layer. The layer back face is considered to be the face closest to the inside environment. The full listing will appear in the RDD file.
+This will output a temperature for the back face of the layer. The layer back face is considered to be the face closest to the inside environment. The full listing will appear in the RDD file. Note that this variable is only defined for constructions defined by a \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState}.  For other window constructions, this variable is also defined for the inner layer only. The value will be identical to the \hyperref[surface-inside-face-temperature-c]{Surface Inside Face Temperature}.
 
 \subsection{Surface Output Variables (all heat transfer surfaces)}\label{surface-output-variables-all-heat-transfer-surfaces}
 
