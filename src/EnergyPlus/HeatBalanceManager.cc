@@ -5608,6 +5608,10 @@ namespace HeatBalanceManager {
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             DataSurfaces::Surface(SurfNum).MovInsulIntPresentPrevTS = DataSurfaces::Surface(SurfNum).MovInsulIntPresent;
         }
+        
+        // For non-complex windows, update a report variable so this shows up in the output as something other than zero
+        UpdateWindowFaceTempsNonBSDFWin();
+        
     }
 
     void CheckWarmupConvergence()
@@ -5881,6 +5885,23 @@ namespace HeatBalanceManager {
         }
     }
 
+    void UpdateWindowFaceTempsNonBSDFWin()
+    {
+        
+        int SurfNum;
+        
+        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            auto &thisSurface(DataSurfaces::Surface(SurfNum));
+            if (thisSurface.Class == DataSurfaces::SurfaceClass_Window) {
+                auto &thisConstruct(thisSurface.Construction);
+                if (!Construct(thisConstruct).WindowTypeBSDF) {
+                    FenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
+                    FenLaySurfTempBack(Construct(thisConstruct).TotLayers,SurfNum) = TH(2, 1, SurfNum);
+                }
+            }
+        }
+    }
+    
     //        End of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
