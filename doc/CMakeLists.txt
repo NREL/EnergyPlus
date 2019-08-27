@@ -7,6 +7,9 @@ file(COPY ${CMAKE_SOURCE_DIR}/doc/index.html DESTINATION ${CMAKE_BINARY_DIR}/doc
 # add a configure rule to the header file though
 configure_file(${CMAKE_SOURCE_DIR}/doc/title.tex.in ${CMAKE_SOURCE_DIR}/doc/title.tex)
 
+# Because we don't want to rebuild doc automatically, we add a custom target called "documentation", which will depends on all individual PDFs
+add_custom_target(documentation)
+
 # add each of the documents, they have their own CMakeLists.txt files
 add_subdirectory(acknowledgments)
 add_subdirectory(auxiliary-programs)

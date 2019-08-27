@@ -149,14 +149,11 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
     DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(24);
     CurSysNum = 0;
-    ZoneHVACSizing.allocate(1);
-    ZoneHVACSizing(1).CoolingSAFMethod = SupplyAirFlowRate;
-    ZoneHVACSizing(1).HeatingSAFMethod = SupplyAirFlowRate;
 
-    ZoneEqSizing(CurZoneEqNum).AirVolFlow = 0.0;
     FinalZoneSizing.allocate(1);
+    FinalZoneSizing(CurZoneEqNum).MinOA = 0.0;
+    FinalZoneSizing(CurZoneEqNum).OutTempAtHeatPeak = 5.0;
     FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 1.0;
-    ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow = 1.0;
     FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 30.0;
     FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak = 30.0;
     FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 80.0;
@@ -164,8 +161,8 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
     FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow * DataEnvironment::StdRhoAir;
 
     FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 2.0;
-    ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow = 2.0;
     FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 60.0;
+    FinalZoneSizing(CurZoneEqNum).OutTempAtCoolPeak = 70.0;
     FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 50.0;
     FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.008;
     FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.010;
@@ -179,7 +176,6 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
     PurchAirNumericFields(PurchAirNum).FieldNames(7) = "Maximum Cooling Air Flow Rate";
     PurchAirNumericFields(PurchAirNum).FieldNames(8) = "Maximum Total Cooling Capacity";
 
-    ZoneEqSizing(CurZoneEqNum).SizingMethod(HeatingAirflowSizing) = SupplyAirFlowRate;
     ZoneSizingRunDone = true;
 
     PurchAir(PurchAirNum).HeatingLimit = LimitFlowRateAndCapacity;
@@ -191,22 +187,65 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
     PurchAir(PurchAirNum).cObjectName = "ZONEHVAC:IDEALLOADSAIRSYSTEM";
     PurchAir(PurchAirNum).Name = "Ideal Loads 1";
 
-    // Need this to prevent crash in RequestSizing
-    UnitarySysEqSizing.allocate(10);
-
     SizePurchasedAir(PurchAirNum);
     EXPECT_DOUBLE_EQ(1.0, PurchAir(PurchAirNum).MaxHeatVolFlowRate);
     EXPECT_NEAR(50985.58, PurchAir(PurchAirNum).MaxHeatSensCap, 0.1);
     EXPECT_DOUBLE_EQ(2.0, PurchAir(PurchAirNum).MaxCoolVolFlowRate);
     EXPECT_NEAR(30844.14, PurchAir(PurchAirNum).MaxCoolTotCap, 0.1);
+}
 
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.deallocate();
-    ZoneEqSizing.deallocate();
-    ZoneHVACSizing.deallocate();
-    FinalZoneSizing.deallocate();
-    PurchAir.deallocate();
-    PurchAirNumericFields.deallocate();
-    UnitarySysEqSizing.deallocate();
+TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test2)
+{
+
+    int PurchAirNum = 1;
+    ZoneEqSizing.allocate(1);
+    CurZoneEqNum = 1;
+    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
+    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(24);
+    CurSysNum = 0;
+
+    FinalZoneSizing.allocate(1);
+    FinalZoneSizing(CurZoneEqNum).MinOA = 0.5;
+    FinalZoneSizing(CurZoneEqNum).OutTempAtHeatPeak = 5.0;
+    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 1.0;
+    FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 30.0; // this isn't used so don't change it
+    FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak = 30.0;
+    FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 80.0;
+    FinalZoneSizing(CurZoneEqNum).HeatDesHumRat = 0.008;
+    FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow * DataEnvironment::StdRhoAir;
+
+    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 2.0;
+    FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 65.0; // this is used, so make it higher
+    FinalZoneSizing(CurZoneEqNum).OutTempAtCoolPeak = 70.0; // this is not currently used for cooling
+    FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 50.0;
+    FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.008;
+    FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.010;
+    FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * DataEnvironment::StdRhoAir;
+
+    PurchAir.allocate(10);
+    PurchAirNumericFields.allocate(10);
+    PurchAirNumericFields(PurchAirNum).FieldNames.allocate(8);
+    PurchAirNumericFields(PurchAirNum).FieldNames(5) = "Maximum Heating Air Flow Rate";
+    PurchAirNumericFields(PurchAirNum).FieldNames(6) = "Maximum Sensible Heating Capacity";
+    PurchAirNumericFields(PurchAirNum).FieldNames(7) = "Maximum Cooling Air Flow Rate";
+    PurchAirNumericFields(PurchAirNum).FieldNames(8) = "Maximum Total Cooling Capacity";
+
+    ZoneSizingRunDone = true;
+
+    PurchAir(PurchAirNum).HeatingLimit = LimitFlowRateAndCapacity;
+    PurchAir(PurchAirNum).MaxHeatVolFlowRate = AutoSize;
+    PurchAir(PurchAirNum).MaxHeatSensCap = AutoSize;
+    PurchAir(PurchAirNum).CoolingLimit = LimitFlowRateAndCapacity;
+    PurchAir(PurchAirNum).MaxCoolVolFlowRate = AutoSize;
+    PurchAir(PurchAirNum).MaxCoolTotCap = AutoSize;
+    PurchAir(PurchAirNum).cObjectName = "ZONEHVAC:IDEALLOADSAIRSYSTEM";
+    PurchAir(PurchAirNum).Name = "Ideal Loads 1";
+
+    SizePurchasedAir(PurchAirNum);
+    EXPECT_DOUBLE_EQ(1.0, PurchAir(PurchAirNum).MaxHeatVolFlowRate);
+    EXPECT_NEAR(63731.97, PurchAir(PurchAirNum).MaxHeatSensCap, 0.1); // larger than test 1 above
+    EXPECT_DOUBLE_EQ(2.0, PurchAir(PurchAirNum).MaxCoolVolFlowRate);
+    EXPECT_NEAR(41078.43, PurchAir(PurchAirNum).MaxCoolTotCap, 0.1); // larger than test1 above
 }
 
 TEST_F(EnergyPlusFixture, IdealLoadsAirSystem_GetInput)
