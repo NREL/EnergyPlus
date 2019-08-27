@@ -1893,8 +1893,7 @@ TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest) {
     bool ExpectedResult;
     Real64 Thickness;
     int MaterialIndex;
-    
-    DataHeatBalance::clear_state();
+
     DataHeatBalance::Material.allocate(1);
     
     // Test 1: Material has a valid thickness and is not R-only, result should be false
