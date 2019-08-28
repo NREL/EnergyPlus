@@ -58,6 +58,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 
 #include <Plant/PlantLocation.hh>
 
@@ -1886,3 +1887,51 @@ TEST_F(EnergyPlusFixture, PipingSystem_Check_Correct_Pipe_Diameters) {
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
+TEST_F(EnergyPlusFixture, PipingSystem_SiteGroundDomainUsingNoMassMatTest) {
+    
+    bool TestResult;
+    bool ExpectedResult;
+    Real64 Thickness;
+    int MaterialIndex;
+
+    DataHeatBalance::Material.allocate(1);
+    
+    // Test 1: Material has a valid thickness and is not R-only, result should be false
+    MaterialIndex = 1;
+    DataHeatBalance::Material(MaterialIndex).ROnly = false;
+    Thickness = 0.01;
+    ExpectedResult = false;
+    TestResult = SiteGroundDomainUsingNoMassMat(Thickness, MaterialIndex);
+    
+    EXPECT_EQ(TestResult, ExpectedResult);
+    
+    // Test 2a: Material has a valid thickness but is R-only, result should be true
+    //         Note that generally this case would not be encountered in EnergyPlus
+    MaterialIndex = 1;
+    DataHeatBalance::Material(MaterialIndex).ROnly = true;
+    Thickness = 0.01;
+    ExpectedResult = true;
+    TestResult = SiteGroundDomainUsingNoMassMat(Thickness, MaterialIndex);
+    
+    EXPECT_EQ(TestResult, ExpectedResult);
+
+    // Test 2b: Material does not have a valid thickness but is not R-only, result should be true
+    //         Note that generally this case would not be encountered in EnergyPlus
+    MaterialIndex = 1;
+    DataHeatBalance::Material(MaterialIndex).ROnly = false;
+    Thickness = 0.0;
+    ExpectedResult = true;
+    TestResult = SiteGroundDomainUsingNoMassMat(Thickness, MaterialIndex);
+    
+    EXPECT_EQ(TestResult, ExpectedResult);
+
+    // Test 3: Material does not have a valid thickness and is not R-only, result should be true
+    MaterialIndex = 1;
+    DataHeatBalance::Material(MaterialIndex).ROnly = true;
+    Thickness = 0.0;
+    ExpectedResult = true;
+    TestResult = SiteGroundDomainUsingNoMassMat(Thickness, MaterialIndex);
+    
+    EXPECT_EQ(TestResult, ExpectedResult);
+
+}
