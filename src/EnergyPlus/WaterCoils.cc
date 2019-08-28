@@ -3449,8 +3449,8 @@ namespace WaterCoils {
             }
 
             // Set the outlet conditions
-            WaterCoil(CoilNum).TotWaterCoolingCoilRate = TotWaterCoilLoad * 1000.0;
-            WaterCoil(CoilNum).SenWaterCoolingCoilRate = SenWaterCoilLoad * 1000.0;
+            WaterCoil(CoilNum).TotWaterCoolingCoilRate = max(0.0, TotWaterCoilLoad * 1000.0);
+            WaterCoil(CoilNum).SenWaterCoolingCoilRate = max(0.0, SenWaterCoilLoad * 1000.0);
             WaterCoil(CoilNum).OutletAirTemp = TempAirOut;
             WaterCoil(CoilNum).OutletWaterTemp = TempWaterOut;
             WaterCoil(CoilNum).OutletAirEnthalpy = OutletAirEnthalpy * 1000.0;
@@ -3687,8 +3687,8 @@ namespace WaterCoils {
                 SenWaterCoilLoad *= PartLoadRatio;
             }
 
-            WaterCoil(CoilNum).TotWaterCoolingCoilRate = TotWaterCoilLoad;
-            WaterCoil(CoilNum).SenWaterCoolingCoilRate = SenWaterCoilLoad;
+            WaterCoil(CoilNum).TotWaterCoolingCoilRate = max(0.0, TotWaterCoilLoad);
+            WaterCoil(CoilNum).SenWaterCoolingCoilRate = max(0.0, SenWaterCoilLoad);
             WaterCoil(CoilNum).SurfAreaWetFraction = SurfAreaWetFraction;
             //       WaterCoil(CoilNum)%OutletWaterEnthalpy = WaterCoil(CoilNum)%InletWaterEnthalpy+ &
             //                                WaterCoil(CoilNum)%TotWaterCoolingCoilRate/WaterCoil(CoilNum)%InletWaterMassFlowRate
