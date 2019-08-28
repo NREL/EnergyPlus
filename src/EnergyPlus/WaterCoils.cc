@@ -3449,8 +3449,8 @@ namespace WaterCoils {
             }
 
             // Set the outlet conditions
-            WaterCoil(CoilNum).TotWaterCoolingCoilRate = max(0.0, TotWaterCoilLoad * 1000.0);
-            WaterCoil(CoilNum).SenWaterCoolingCoilRate = max(0.0, SenWaterCoilLoad * 1000.0);
+            WaterCoil(CoilNum).TotWaterCoolingCoilRate = TotWaterCoilLoad * 1000.0;
+            WaterCoil(CoilNum).SenWaterCoolingCoilRate = SenWaterCoilLoad * 1000.0;
             WaterCoil(CoilNum).OutletAirTemp = TempAirOut;
             WaterCoil(CoilNum).OutletWaterTemp = TempWaterOut;
             WaterCoil(CoilNum).OutletAirEnthalpy = OutletAirEnthalpy * 1000.0;
@@ -3676,6 +3676,18 @@ namespace WaterCoils {
                 }
             }
 
+            if ((TotWaterCoilLoad <= 0) || (OutletAirTemp >= WaterCoil(CoilNum).InletAirTemp) ||
+                (OutletAirHumRat >= WaterCoil(CoilNum).InletAirHumRat)) {
+                // Either there is a negative load or the air temperature/humidity ratio is increasing which means the coil is heating
+                // So, the cooling coil should not be running
+                OutletAirTemp = WaterCoil(CoilNum).InletAirTemp;
+                OutletAirHumRat = WaterCoil(CoilNum).InletAirHumRat;
+                OutletWaterTemp = WaterCoil(CoilNum).InletWaterTemp;
+                TotWaterCoilLoad = 0.0;
+                SenWaterCoilLoad = 0.0;
+                SurfAreaWetFraction = 0.0;
+            }
+            
             // Report outlet variables at nodes
             WaterCoil(CoilNum).OutletAirTemp = OutletAirTemp;
             WaterCoil(CoilNum).OutletAirHumRat = OutletAirHumRat;
@@ -3687,8 +3699,8 @@ namespace WaterCoils {
                 SenWaterCoilLoad *= PartLoadRatio;
             }
 
-            WaterCoil(CoilNum).TotWaterCoolingCoilRate = max(0.0, TotWaterCoilLoad);
-            WaterCoil(CoilNum).SenWaterCoolingCoilRate = max(0.0, SenWaterCoilLoad);
+            WaterCoil(CoilNum).TotWaterCoolingCoilRate = TotWaterCoilLoad;
+            WaterCoil(CoilNum).SenWaterCoolingCoilRate = SenWaterCoilLoad;
             WaterCoil(CoilNum).SurfAreaWetFraction = SurfAreaWetFraction;
             //       WaterCoil(CoilNum)%OutletWaterEnthalpy = WaterCoil(CoilNum)%InletWaterEnthalpy+ &
             //                                WaterCoil(CoilNum)%TotWaterCoolingCoilRate/WaterCoil(CoilNum)%InletWaterMassFlowRate
