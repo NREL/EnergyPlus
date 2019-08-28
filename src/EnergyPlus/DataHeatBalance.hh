@@ -437,6 +437,7 @@ namespace DataHeatBalance {
 
     extern bool NoFfactorConstructionsUsed;
     extern bool NoCfactorConstructionsUsed;
+    extern bool NoRegularMaterialsUsed;
 
     extern int NumRefrigeratedRacks; // Total number of refrigerated case compressor racks in input
     extern int NumRefrigSystems;     // Total number of detailed refrigeration systems in input

@@ -584,6 +584,7 @@ namespace DataHeatBalance {
 
     bool NoFfactorConstructionsUsed(true);
     bool NoCfactorConstructionsUsed(true);
+    bool NoRegularMaterialsUsed(true);
 
     int NumRefrigeratedRacks(0); // Total number of refrigerated case compressor racks in input
     int NumRefrigSystems(0);     // Total number of detailed refrigeration systems in input
@@ -945,6 +946,7 @@ namespace DataHeatBalance {
         AdaptiveComfortRequested_ASH55 = false;
         NoFfactorConstructionsUsed = true;
         NoCfactorConstructionsUsed = true;
+        NoRegularMaterialsUsed = true;
         NumRefrigeratedRacks = 0;
         NumRefrigSystems = 0;
         NumRefrigCondensers = 0;

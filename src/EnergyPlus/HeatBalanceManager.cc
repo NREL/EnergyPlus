@@ -4176,7 +4176,6 @@ namespace HeatBalanceManager {
         bool ConstructionFound;   // True if input window construction name is found in the
         //  Window5 data file
         bool EOFonW5File; // True if EOF encountered reading Window5 data file
-        static bool NoRegularMaterialsUsed(true);
         int MaterialLayerGroup; // window construction layer material group index
 
         int iMatGlass; // number of glass layers
