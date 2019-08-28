@@ -1567,6 +1567,7 @@ namespace ChillerReformulatedEIR {
 
         if (PlantFinalSizesOkayToReport) {
             if (MyFlag(EIRChillNum)) {
+                Real64 IPLV;
                 CalcChillerIPLV(ElecReformEIRChiller(EIRChillNum).Name,
                                 TypeOf_Chiller_ElectricReformEIR,
                                 ElecReformEIRChiller(EIRChillNum).RefCap,
@@ -1576,6 +1577,7 @@ namespace ChillerReformulatedEIR {
                                 ElecReformEIRChiller(EIRChillNum).ChillerEIRFT,
                                 ElecReformEIRChiller(EIRChillNum).ChillerEIRFPLR,
                                 ElecReformEIRChiller(EIRChillNum).MinUnloadRat,
+                                IPLV,
                                 ElecReformEIRChiller(EIRChillNum).EvapVolFlowRate,
                                 ElecReformEIRChiller(EIRChillNum).CDLoopNum,
                                 ElecReformEIRChiller(EIRChillNum).CompPowerToCondenserFrac);
