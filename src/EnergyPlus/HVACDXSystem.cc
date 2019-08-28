@@ -335,10 +335,10 @@ namespace HVACDXSystem {
         }
         // set econo lockout flag
         // set econo lockout flag
-        if (AirLoopNum != -1) { // IF the sysem is not an equipment of outdoor air unit
-            if (AirLoopNum > 0) { // Real airloopNum called from MixedAir and SimAirServingZones 
+        if (AirLoopNum != -1) {   // IF the sysem is not an equipment of outdoor air unit
+            if (AirLoopNum > 0) { // Real airloopNum called from MixedAir and SimAirServingZones
                 if ((DXCoolingSystem(DXSystemNum).PartLoadFrac > 0.0 || DXCoolingSystem(DXSystemNum).SpeedRatio > 0.0 ||
-                    DXCoolingSystem(DXSystemNum).CycRatio > 0.0) &&
+                     DXCoolingSystem(DXSystemNum).CycRatio > 0.0) &&
                     AirLoopControlInfo(AirLoopNum).CanLockoutEconoWithCompressor) {
                     AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = true;
                 } else { // used for AirLoopHVACDOAS only
@@ -661,7 +661,7 @@ namespace HVACDXSystem {
                 SetCoilSystemCoolingData(DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).Name);
             }
 
-            if (DoCoilDirectSolutions && DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
+            if (DataGlobals::DoCoilDirectSolutions && DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
                 DXCoils::DisableLatentDegradation(DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex);
             }
 
@@ -3829,8 +3829,7 @@ namespace HVACDXSystem {
         return Residuum;
     }
 
-    int GetCoolingCoilInletNodeNum(
-        std::string const &DXCoilSysName)
+    int GetCoolingCoilInletNodeNum(std::string const &DXCoilSysName)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, FSEC
@@ -3860,8 +3859,7 @@ namespace HVACDXSystem {
         return NodeNum;
     }
 
-    int GetCoolingCoilOutletNodeNum(
-        std::string const &DXCoilSysName)
+    int GetCoolingCoilOutletNodeNum(std::string const &DXCoilSysName)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, FSEC

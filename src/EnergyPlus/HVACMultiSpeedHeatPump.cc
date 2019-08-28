@@ -53,12 +53,12 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <AirflowNetwork/Elements.hpp>
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <AirflowNetwork/Elements.hpp>
 #include <DataBranchNodeConnections.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
@@ -1422,7 +1422,7 @@ namespace HVACMultiSpeedHeatPump {
                 }
             }
 
-            if (DoCoilDirectSolutions) {
+            if (DataGlobals::DoCoilDirectSolutions) {
                 int MaxNumber = std::max(MSHeatPump(MSHPNum).NumOfSpeedCooling, MSHeatPump(MSHPNum).NumOfSpeedHeating);
                 MSHeatPump(MSHPNum).FullOutput.allocate(MaxNumber);
                 DXCoils::DisableLatentDegradation(MSHeatPump(MSHPNum).DXCoolCoilIndex);
@@ -2842,7 +2842,6 @@ namespace HVACMultiSpeedHeatPump {
         using General::TrimSigDigits;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using Psychrometrics::PsyCpAirFnWTdb;
-        using DataGlobals::DoCoilDirectSolutions;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2951,7 +2950,7 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         // Direct solution
-        if (DoCoilDirectSolutions && !MSHeatPump(MSHeatPumpNum).Staged) {
+        if (DataGlobals::DoCoilDirectSolutions && !MSHeatPump(MSHeatPumpNum).Staged) {
             Real64 TempOutput0 = 0.0;
             MSHeatPump(MSHeatPumpNum).FullOutput = 0.0;
 
@@ -3264,7 +3263,6 @@ namespace HVACMultiSpeedHeatPump {
                 }
             }
         }
-
 
         // if the DX heating coil cannot meet the load, trim with supplemental heater
         // occurs with constant fan mode when compressor is on or off
