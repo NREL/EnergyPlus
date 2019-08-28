@@ -11,11 +11,11 @@ The heat balance on the inside face can be written as follows:
 
 where:
 
-\({q''_{LWX}}\) = Net longwave radiant exchange flux between zone surfaces.
+\({q''_{LWX}}\) = Net longwave radiant exchange flux between surfaces in a zone or group of zones (enclosure).
 
 \({q''_{SW}}\) ~ = Net short wave radiation flux to surface from lights.
 
-\({q''_{LWS}}\) = Longwave radiation flux from equipment in zone.
+\({q''_{LWS}}\) = Longwave radiation flux from equipment in a zone or group of zones (enclosure).
 
 \({q''_{ki}}\) ~ = Conduction flux through the wall.
 
@@ -32,6 +32,8 @@ Each of these heat balance components is introduced briefly below.
 \end{figure}
 
 \subsection{Internal Long-Wave Radiation Exchange}\label{internal-long-wave-radiation-exchange}
+
+Long-wave radiation exchange is balanced within an enclosure which may be a single zone or a group of zones connected by air boundaries (see Construction:AirBoundary) using the \textit{GroupedZone} radiant exchange method. Throughout this section, "Zone" refers to either type of enclosure.
 
 \subsubsection{LW Radiation Exchange Among Zone Surfaces}\label{lw-radiation-exchange-among-zone-surfaces}
 
@@ -354,7 +356,7 @@ This is a component of the CeilingDiffuser overall algorithm described below.
 
 \subsubsection{Fisher Pedersen Ceiling Diffuser Floor}\label{fisher-pedersen-ceiling-diffuser-floor}
 
-Fisher and Pedersen 1997) developed the following equation from laboratory chamber measurements.
+Fisher and Pedersen (1997) developed the following equation from laboratory chamber measurements.
 
 \begin{equation}
 h = 3.873 + 0.082 * AC{H^{0.98}}
@@ -835,6 +837,8 @@ The correlation for walls is illustrated in Figure~\ref{fig:ceiling-diffuser-cor
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image382.png}
 \caption{Ceiling Diffuser Correlation for Walls \protect \label{fig:ceiling-diffuser-correlation-for-walls}}
 \end{figure}
+
+It should be noted that the conditions under which the correlations were developed included ACH values down to around 3.0.  However, extrapolation of the data down to ACH=1.0 is reasonable and so within EnergyPlus, for ACH values of 1.0 or greater, the ceiling diffuser correlations as shown above are used.  Below ACH values of 0.5, the natural convection algorithm is used.  Between ACH values of 0.5 and 1.0, there is a linear interpolation between the two models to avoid any discontinuities in the convection coefficient calculated.
 
 \subsubsection{Trombe Wall Algorithm}\label{trombe-wall-algorithm}
 

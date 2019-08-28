@@ -1413,7 +1413,7 @@ namespace WaterCoils {
 
                     // Total Coil Load from Inlet and Outlet Air States.
                     WaterCoil(CoilNum).DesTotWaterCoilLoad = WaterCoil(CoilNum).DesAirMassFlowRate * (DesInletAirEnth - DesOutletAirEnth);
-                    if (CurSysNum > 0) {
+                    if (CurSysNum > 0 && CurSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
                         WaterCoil(CoilNum).DesTotWaterCoilLoad = WaterCoil(CoilNum).DesTotWaterCoilLoad + PrimaryAirSystem(CurSysNum).FanDesCoolLoad;
                     }
 
@@ -2426,7 +2426,7 @@ namespace WaterCoils {
                     PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(DataWaterLoopNum).FluidIndex, RoutineName);
                 if (WaterCoil(CoilNum).DesTotWaterCoilLoad > 0.0) {
                     NomCapUserInp = true;
-                } else if (CurSysNum > 0) {
+                } else if (CurSysNum > 0 && CurSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
                     if (FinalSysSizing(CurSysNum).HeatingCapMethod == CapacityPerFloorArea) {
                         NomCapUserInp = true;
                     } else if (FinalSysSizing(CurSysNum).HeatingCapMethod == HeatingDesignCapacity &&
