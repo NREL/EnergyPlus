@@ -12936,7 +12936,7 @@ namespace UnitarySystems {
                 if (this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil) {
                     DataAirLoop::AirLoopFlow(AirLoopNum).FanPLR = this->FanPartLoadRatio;
                 } else {
-                    DataAirLoop::AirLoopFlow(AirLoopNum).FanPLR = 0.0;
+                    DataAirLoop::AirLoopFlow(AirLoopNum).FanPLR = 1.0;
                 }
             }
         }

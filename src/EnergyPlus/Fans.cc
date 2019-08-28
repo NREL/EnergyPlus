@@ -52,10 +52,10 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <AirflowNetwork/Elements.hpp>
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DataAirLoop.hh>
-#include <AirflowNetwork/Elements.hpp>
 #include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
 #include <DataLoopNode.hh>
@@ -1639,8 +1639,8 @@ namespace Fans {
         // Determine the Fan Schedule for the Time step
         if ((GetCurrentScheduleValue(Fan(FanNum).AvailSchedPtrNum) > 0.0 || LocalTurnFansOn) && !LocalTurnFansOff && MassFlow > 0.0) {
             // Fan is operating
-            Fan(FanNum).FanPower = MassFlow * DeltaPress / (FanEff * RhoAir); // total fan power
-            FanShaftPower = MotEff * Fan(FanNum).FanPower;                    // power delivered to shaft
+            Fan(FanNum).FanPower = max(0.0, MassFlow * DeltaPress / (FanEff * RhoAir)); // total fan power
+            FanShaftPower = MotEff * Fan(FanNum).FanPower;                              // power delivered to shaft
             Fan(FanNum).PowerLossToAir = FanShaftPower + (Fan(FanNum).FanPower - FanShaftPower) * MotInAirFrac;
             Fan(FanNum).OutletAirEnthalpy = Fan(FanNum).InletAirEnthalpy + Fan(FanNum).PowerLossToAir / MassFlow;
             // This fan does not change the moisture or Mass Flow across the component
@@ -1815,7 +1815,7 @@ namespace Fans {
                                Fan(FanNum).FanCoeff(5) * pow_4(FlowFracForPower);
             }
 
-            Fan(FanNum).FanPower = PartLoadFrac * MaxAirMassFlowRate * DeltaPress / (FanEff * RhoAir); // total fan power (PH 7/13/03)
+            Fan(FanNum).FanPower = max(0.0, PartLoadFrac * MaxAirMassFlowRate * DeltaPress / (FanEff * RhoAir)); // total fan power (PH 7/13/03)
 
             FanShaftPower = MotEff * Fan(FanNum).FanPower; // power delivered to shaft
             Fan(FanNum).PowerLossToAir = FanShaftPower + (Fan(FanNum).FanPower - FanShaftPower) * MotInAirFrac;
@@ -1841,14 +1841,14 @@ namespace Fans {
                                            Fan(FanNum).FanCoeff(4) * pow_3(MinFlowFracLimitFanHeat) +
                                            Fan(FanNum).FanCoeff(5) * pow_4(MinFlowFracLimitFanHeat);
                     FanPoweratLowMinimum = PartLoadFracatLowMin * MaxAirMassFlowRate * DeltaPress / (FanEff * RhoAir);
-                    Fan(FanNum).FanPower = FlowFracForPower * FanPoweratLowMinimum / MinFlowFracLimitFanHeat;
+                    Fan(FanNum).FanPower = max(0.0, FlowFracForPower * FanPoweratLowMinimum / MinFlowFracLimitFanHeat);
                 } else if (FlowFracActual < MinFlowFracLimitFanHeat) {
                     PartLoadFracatLowMin = Fan(FanNum).FanCoeff(1) + Fan(FanNum).FanCoeff(2) * MinFlowFracLimitFanHeat +
                                            Fan(FanNum).FanCoeff(3) * pow_2(MinFlowFracLimitFanHeat) +
                                            Fan(FanNum).FanCoeff(4) * pow_3(MinFlowFracLimitFanHeat) +
                                            Fan(FanNum).FanCoeff(5) * pow_4(MinFlowFracLimitFanHeat);
                     FanPoweratLowMinimum = PartLoadFracatLowMin * MaxAirMassFlowRate * DeltaPress / (FanEff * RhoAir);
-                    Fan(FanNum).FanPower = FlowFracActual * FanPoweratLowMinimum / MinFlowFracLimitFanHeat;
+                    Fan(FanNum).FanPower = max(0.0, FlowFracActual * FanPoweratLowMinimum / MinFlowFracLimitFanHeat);
                 }
                 FanShaftPower = MotEff * Fan(FanNum).FanPower; // power delivered to shaft
                 Fan(FanNum).PowerLossToAir = FanShaftPower + (Fan(FanNum).FanPower - FanShaftPower) * MotInAirFrac;
@@ -2000,7 +2000,7 @@ namespace Fans {
             // The fan speed ratio (passed from parent) determines the fan power according to fan laws
             if (present(SpeedRatio)) {
                 //    Fan(FanNum)%FanPower = MassFlow*DeltaPress/(FanEff*RhoAir*OnOffFanPartLoadFraction)! total fan power
-                Fan(FanNum).FanPower = MaxAirMassFlowRate * Fan(FanNum).FanRuntimeFraction * DeltaPress / (FanEff * RhoAir);
+                Fan(FanNum).FanPower = max(0.0, MaxAirMassFlowRate * Fan(FanNum).FanRuntimeFraction * DeltaPress / (FanEff * RhoAir));
 
                 //    Do not modify fan power calculation unless fan power vs speed ratio curve is used.
                 if (Fan(FanNum).FanPowerRatAtSpeedRatCurveIndex > 0) {
@@ -2044,7 +2044,8 @@ namespace Fans {
                     Fan(FanNum).FanPower *= SpeedRaisedToPower / EffRatioAtSpeedRatio;
                 }
             } else {
-                Fan(FanNum).FanPower = MaxAirMassFlowRate * Fan(FanNum).FanRuntimeFraction * DeltaPress / (FanEff * RhoAir); // total fan power
+                Fan(FanNum).FanPower =
+                    max(0.0, MaxAirMassFlowRate * Fan(FanNum).FanRuntimeFraction * DeltaPress / (FanEff * RhoAir)); // total fan power
             }
 
             // OnOffFanPartLoadFraction is passed via DataHVACGlobals from the cooling or heating coil that is
@@ -2169,7 +2170,7 @@ namespace Fans {
 
         if (FanIsRunning) {
             // Fan is operating
-            Fan(FanNum).FanPower = MassFlow * DeltaPress / (FanEff * RhoAir); // total fan power
+            Fan(FanNum).FanPower = max(0.0, MassFlow * DeltaPress / (FanEff * RhoAir)); // total fan power
             Fan(FanNum).PowerLossToAir = Fan(FanNum).FanPower;
             Fan(FanNum).OutletAirEnthalpy = Fan(FanNum).InletAirEnthalpy + Fan(FanNum).PowerLossToAir / MassFlow;
             // This fan does not change the moisture or Mass Flow across the component
