@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <DataAirLoop.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -59,7 +60,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <DataAirLoop.hh>
 #include <SimAirServingZones.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -870,7 +870,7 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerAutosizeWithoutSysSizingRunDone)
 
 TEST_F(EnergyPlusFixture, EvapCoolerAirLoopPumpCycling)
 {
-    
+
     bool ErrorsFound = false;
 
     std::string const idf_objects = delimited_string({
@@ -891,7 +891,7 @@ TEST_F(EnergyPlusFixture, EvapCoolerAirLoopPumpCycling)
 
     EvaporativeCoolers::GetEvapInput();
     ASSERT_FALSE(ErrorsFound);
-    
+
     int AirLoopNum = 1;
     int EvapCoolNum = 1;
     int Evap_Cooler_CompType = 18;
@@ -902,21 +902,20 @@ TEST_F(EnergyPlusFixture, EvapCoolerAirLoopPumpCycling)
     DataAirLoop::AirLoopControlInfo.allocate(AirLoopNum);
     DataAirLoop::AirLoopFlow(1).FanPLR = 0.8;
 
-    //Evap cooler conditions
+    // Evap cooler conditions
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).MassFlowRate = 0.5;
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).Temp = 28.0;
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).HumRat = 0.001;
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).Press = DataEnvironment::OutBaroPress;
 
     DataGlobals::BeginEnvrnFlag = true;
-    
-    //Simulate air loop component calls SimEvapCooler
-    //SimEvapCooler calls InitEvapCooler(EvapCoolNum) and CalcDirectEvapCooler
-    SimAirServingZones::SimAirLoopComponent(EvapCond(EvapCoolNum).EvapCoolerName, Evap_Cooler_CompType, false, AirLoopNum, EvapCoolNum, 0);
-    
-    //air loop FanPLR successfully passed for pump power calculation
-    EXPECT_EQ(EvapCond(EvapCoolNum).EvapCoolerPower, 60 * 0.8);
 
+    // Simulate air loop component calls SimEvapCooler
+    // SimEvapCooler calls InitEvapCooler(EvapCoolNum) and CalcDirectEvapCooler
+    SimAirServingZones::SimAirLoopComponent(EvapCond(EvapCoolNum).EvapCoolerName, Evap_Cooler_CompType, false, AirLoopNum, EvapCoolNum, 0);
+
+    // air loop FanPLR successfully passed for pump power calculation
+    EXPECT_EQ(EvapCond(EvapCoolNum).EvapCoolerPower, 60 * 0.8);
 }
 
 } // namespace EnergyPlus

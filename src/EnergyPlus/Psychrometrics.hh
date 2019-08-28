@@ -334,8 +334,8 @@ namespace Psychrometrics {
         return 1.00484e3 * TDB + dW * (2.50094e6 + 1.85895e3 * TDB); // enthalpy {J/kg}
     }
 
-    inline Real64 PsyCpAirFnWTdb(Real64 const dw, // humidity ratio {kgWater/kgDryAir}
-                                 Real64 const T   // input temperature {Celsius}
+    inline Real64 PsyCpAirFnWTdb(Real64 const dw,          // humidity ratio {kgWater/kgDryAir}
+                                 Real64 const EP_UNUSED(T) // input temperature {Celsius}
     )
     {
         // FUNCTION INFORMATION:
@@ -356,26 +356,24 @@ namespace Psychrometrics {
 
         // Static locals
         static Real64 dwSave(-100.0);
-        static Real64 Tsave(-100.0);
         static Real64 cpaSave(-100.0);
 
         // check if last call had the same input and if it did just use the saved output
-        if ((Tsave == T) && (dwSave == dw)) return cpaSave;
+        if (dwSave == dw) return cpaSave;
 
         // compute heat capacity of air
         Real64 const w(max(dw, 1.0e-5));
-        Real64 const cpa((PsyHFnTdbW(T + 0.1, w) - PsyHFnTdbW(T, w)) * 10.0); // result => heat capacity of air {J/kg-C}
+        Real64 const cpa((1.00484e3 + w * 1.85895e3)); // result => heat capacity of moist air {J/kg-C}
 
         // save values for next call
         dwSave = dw;
-        Tsave = T;
         cpaSave = cpa;
 
         return cpa;
     }
 
-    inline Real64 PsyCpAirFnWTdb_fast(Real64 const dw, // humidity ratio {kgWater/kgDryAir}
-                                      Real64 const T   // input temperature {Celsius}
+    inline Real64 PsyCpAirFnWTdb_fast(Real64 const dw,          // humidity ratio {kgWater/kgDryAir}
+                                      Real64 const EP_UNUSED(T) // input temperature {Celsius}
     )
     {
         // Faster version with humidity ratio already adjusted
@@ -383,18 +381,16 @@ namespace Psychrometrics {
 
         // Static locals
         static Real64 dwSave(-100.0);
-        static Real64 Tsave(-100.0);
         static Real64 cpaSave(-100.0);
 
         // check if last call had the same input and if it did just use the saved output
-        if ((Tsave == T) && (dwSave == dw)) return cpaSave;
+        if (dwSave == dw) return cpaSave;
 
         // compute heat capacity of air
-        Real64 const cpa((PsyHFnTdbW_fast(T + 0.1, dw) - PsyHFnTdbW_fast(T, dw)) * 10.0); // result => heat capacity of air {J/kg-C}
+        Real64 const cpa((1.00484e3 + dw * 1.85895e3)); // result => heat capacity of moist air {J/kg-C}
 
         // save values for next call
         dwSave = dw;
-        Tsave = T;
         cpaSave = cpa;
 
         return cpa;
@@ -680,8 +676,7 @@ namespace Psychrometrics {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-        Int64 const Tdb_tag(
-            bit_shift(bit_transfer(T, Grid_Shift), -Grid_Shift)); // Note that 2nd arg to TRANSFER is not used: Only type matters
+        Int64 const Tdb_tag(bit_shift(bit_transfer(T, Grid_Shift), -Grid_Shift)); // Note that 2nd arg to TRANSFER is not used: Only type matters
         //		Int64 const hash( bit::bit_and( Tdb_tag, psatcache_mask ) ); //Tuned Replaced by below
         Int64 const hash(Tdb_tag & psatcache_mask);
         auto &cPsat(cached_Psat(hash));
@@ -1180,9 +1175,9 @@ namespace Psychrometrics {
     }
 
     inline Real64 PsyDeltaHSenFnTdb2W2Tdb1W1(Real64 const TDB2, // dry-bulb temperature at state 2 {C}
-        Real64 const dW2,   // humidity ratio at  at state 2
-        Real64 const TDB1, // dry-bulb temperature at  at state 1 {C}
-        Real64 const dW1   // humidity ratio  at state 1
+                                             Real64 const dW2,  // humidity ratio at  at state 2
+                                             Real64 const TDB1, // dry-bulb temperature at  at state 1 {C}
+                                             Real64 const dW1   // humidity ratio  at state 1
     )
     {
         // returns sensible enthalpy difference of moist air going from state 1 to state 2
@@ -1191,7 +1186,7 @@ namespace Psychrometrics {
     }
 
     inline Real64 PsyHfgAvgFnTdb2Tdb1(Real64 const TDB2, // dry-bulb temperature at  at state 2 {C}
-        Real64 const TDB1 // dry-bulb temperature at  at state 1 {C}
+                                      Real64 const TDB1  // dry-bulb temperature at  at state 1 {C}
     )
     {
         // calculate average latent heat of vaporization of water vapor in moist air
