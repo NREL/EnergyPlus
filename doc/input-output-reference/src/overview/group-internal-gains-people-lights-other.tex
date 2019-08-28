@@ -274,7 +274,19 @@ People,
   ,                     !- Zone Floor Area per Person {m2/person}
   0.3,                  !- Fraction Radiant
   ,                     !- Sensible Heat Fraction
-  ActSchd;              !- Activity Level Schedule Name
+  ActSchd,              !- Activity Level Schedule Name
+  3.82E-8,              !- Carbon Dioxide Generation Rate {m3/s-W}
+  No,                   !- Enable ASHRAE 55 Comfort Warnings
+  surfaceweighted,      !- Mean Radiant Temperature Calculation Type
+  Zn001:Wall001,        !- Surface Name/Angle Factor List Name
+  Work Eff Sch,         !- Work Efficiency Schedule Name
+  ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
+  ,                     !- Clothing Insulation Calculation Method Schedule Name
+  Clothing Sch,         !- Clothing Insulation Schedule Name
+  Air Velo Sch,         !- Air Velocity Schedule Name
+  FANGER,               !- Thermal Comfort Model 1 Type
+  PIERCE,               !- Thermal Comfort Model 2 Type
+  KSU;                  !- Thermal Comfort Model 3 Type
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-017}
@@ -492,7 +504,7 @@ This field is the ``thermal sensation index'' (PMV) calculated using the Pierce 
 
 \paragraph{Zone Thermal Comfort Pierce Model Standard Effective Temperature {[C]}}\label{zone-thermal-comfort-pierce-model-standard-effective-temperature}
 
-This field is the ``standard effective temperature'' (SET) calculated using the Pierce two-node thermal comfort model.  Note that if a user wishes that have SET reported that it must be done using the Pierce two-node model and the user must select "Pierce" as one of the Thermal Comfort model types as shown above in the input syntax for the People statement.
+This field is the ``standard effective temperature'' (SET) calculated using the Pierce two-node thermal comfort model.  Note that if a user wishes to report the Pierce Model SET that it must be done using the Pierce two-node model and the user must select "Pierce" as one of the Thermal Comfort model types as shown above in the input syntax for the People statement.
 
 \paragraph{Zone Thermal Comfort KSU Model Thermal Sensation Vote {[]}}\label{zone-thermal-comfort-ksu-model-thermal-sensation-vote}
 

@@ -952,11 +952,6 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
 {
     
-    InternalHeatGains::clear_state();
-    DataHeatBalance::clear_state();
-    DataHeatBalFanSys::clear_state();
-    ThermalComfort::clear_state();
-    
     // Set the data for the test    
     TotPeople = 1;
     People.allocate(TotPeople);
