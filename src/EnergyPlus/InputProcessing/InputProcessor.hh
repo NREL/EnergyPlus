@@ -72,6 +72,8 @@ class Validation;
 
 namespace EnergyPlus {
 
+void cleanEPJSON(nlohmann::json &epjson);
+
 class InputProcessor
 {
 public:
