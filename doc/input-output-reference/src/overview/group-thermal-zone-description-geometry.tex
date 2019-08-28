@@ -248,20 +248,41 @@ This output variable represents the sensible heating energy in Joules that is ac
 \begin{callout}
 Zone Air System Sensible Heating (and Cooling) Energy (and Rate) all report the heating or cooling delivered by the HVAC system to a zone. These values are calculated by multiplying the supply air mass flow rate by the difference between the supply air temperature and the zone air temperature. This does not always indicate the operation of heating or cooling coils. For example, cooling will be reported if the supply air is cooled due to the introduction of outside air, even if all coils are off.
 
-Note that these variables are calculated at the system timestep. When reported at the ``detailed'' reporting frequency, these variables will never show heating and cooling both in the same system timestep. If reported at a frequency less than ``Detailed'' (for example, Hourly) values may appear in both the heating and cooling variable for the same hour if the system cooled the zone for part of the reporting period and heated the zone for another part of the reporting period.
+In addition, certain "non-air" zone-based systems will also add their heating or cooling contribution to this output variable.  For example, the following zone equipment will also add their output to the appropriate heating or cooling energy/rate output variable:
+
+\begin{itemize}
+\item
+ZoneHVAC:Baseboard:RadiantConvective:Water
+\item
+ZoneHVAC:Baseboard:RadiantConvective:Steam
+\item
+ZoneHVAC:Baseboard:RadiantConvective:Electric
+\item
+ZoneHVAC:Baseboard:Convective:Water
+\item
+ZoneHVAC:Baseboard:Convective:Electric
+\item
+ZoneHVAC:CoolingPanel:RadiantConvective:Water
+\item
+ZoneHVAC:RefrigerationChillerSet
+\end{itemize}
+
+This means that system output from equipment such as high and low temperature radiant systems are NOT included in this output variable as the control of these radiant systems are handled separately with their own unique controls.
+
+Finally, note that these variables are calculated at the system timestep. When reported at the ``detailed'' reporting frequency, these variables will never show heating and cooling both in the same system timestep. If reported at a frequency less than ``Detailed'' (for example, Hourly) values may appear in both the heating and cooling variable for the same hour if the system cooled the zone for part of the reporting period and heated the zone for another part of the reporting period.
 \end{callout}
 
 \subsubsection{Zone Air System Sensible Cooling Energy {[}J{]}}\label{zone-air-system-sensible-cooling-energy-j}
 
-This output variable represents the sensible cooling energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible cooling rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
+This output variable represents the sensible cooling energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible cooling rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. For additional information on this output variable, see the note that accompanies the Zone Air System Sensible Heating Energy output variable above.
 
 \subsubsection{Zone Air System Sensible Heating Rate {[}W{]}}\label{zone-air-system-sensible-heating-rate-w}
 
-This output variable represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
+This output variable represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. For additional information on this output variable, see the note that accompanies the Zone Air System Sensible Heating Energy output variable above.
 
 \subsubsection{Zone Air System Sensible Cooling Rate {[}W{]}}\label{zone-air-system-sensible-cooling-rate-w}
 
-This output variable represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
+This output variable represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. For additional information on this output variable, see the note that accompanies the Zone Air System Sensible Heating Energy output variable above.
 
 \subsubsection{Zone Air Humidity Ratio {[}kgWater/kgDryAir{]}}\label{zone-air-humidity-ratio-kgwaterkgdryair}
 
@@ -2601,7 +2622,7 @@ If the user requests to display advanced report/output variables (e.g.~see \hype
 Zone,Average, Surface Window Inside Face Other Convection Heat Gain Rate [W]
 \end{lstlisting}
 
-Output variables applicable to interior and exterior windows and doors are:
+Output variables applicable to interior and exterior windows and doors under certain conditions (see next three subsections for more information) are:
 
 \begin{lstlisting}
 Zone,Average,Surface Window Total Absorbed Shortwave Radiation Rate Layer <x> [W]
@@ -2611,15 +2632,16 @@ Zone,Average,Surface Window Back Face Temperature Layer <x> [C]
 
 \subsubsection{Surface Window Total Absorbed Shortwave Radiation Rate Layer \textless{}x\textgreater{} {[}W{]}}\label{surface-window-total-absorbed-shortwave-radiation-rate-layer-x-w}
 
-This will output shortwave radiation absorbed in a window layer. The key values for this output variable are the surface name. Layers are numbered from the outside to the inside of the surface. The full listing will appear in the RDD file.
+This will output shortwave radiation absorbed in a window layer. The key values for this output variable are the surface name. Layers are numbered from the outside to the inside of the surface. The full listing will appear in the RDD file. Note that this variable is only defined for constructions defined by a \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState}.
 
 \subsubsection{Surface Window Front Face Temperature Layer \textless{}x\textgreater{} {[}C{]}}\label{surface-window-front-face-temperature-layer-x-c}
 
-This will output a temperature for the front face of the layer. The layer front face is considered to be the face closest to the outside environment. The full listing will appear in the RDD file.
+This will output a temperature for the front face of the layer. The layer front face is considered to be the face closest to the outside environment. The full listing will appear in the RDD file. Note that this variable is only defined for constructions defined by a \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState}.  For other window constructions, this variable is also defined for the outer layer (Layer 1) only. The value will be identical to the \hyperref[surface-outside-face-temperature-c]{Surface Outside Face Temperature}.
+
 
 \subsubsection{Surface Window Back Face Temperature Layer \textless{}x\textgreater{} {[}C{]}}\label{surface-window-back-face-temperature-layer-x-c}
 
-This will output a temperature for the back face of the layer. The layer back face is considered to be the face closest to the inside environment. The full listing will appear in the RDD file.
+This will output a temperature for the back face of the layer. The layer back face is considered to be the face closest to the inside environment. The full listing will appear in the RDD file. Note that this variable is only defined for constructions defined by a \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState}.  For other window constructions, this variable is also defined for the inner layer only. The value will be identical to the \hyperref[surface-inside-face-temperature-c]{Surface Inside Face Temperature}.
 
 \subsection{Surface Output Variables (all heat transfer surfaces)}\label{surface-output-variables-all-heat-transfer-surfaces}
 

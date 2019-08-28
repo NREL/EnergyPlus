@@ -109,9 +109,6 @@ namespace DataGlobals {
     int const ksHVACSizeRunPeriodDesign(5); // a weather period design day run during HVAC Sizing Simulation
     int const ksReadAllWeatherData(6);      // a weather period for reading all weather data prior to the simulation
 
-    int const ZoneTSReporting(1); // value for Zone Time Step Reporting (UpdateDataAndReport)
-    int const HVACTSReporting(2); // value for HVAC Time Step Reporting (UpdateDataAndReport)
-
     Real64 const MaxEXPArg(709.78);       // maximum exponent in EXP() function
     Real64 const Pi(3.14159265358979324); // Pi 3.1415926535897932384626435
     Real64 const PiOvr2(Pi / 2.0);        // Pi/2
@@ -259,6 +256,8 @@ namespace DataGlobals {
     bool ShowDecayCurvesInEIO(false);    // true if the Radiant to Convective Decay Curves should appear in the EIO file
     bool AnySlabsInModel(false);         // true if there are any zone-coupled ground domains in the input file
     bool AnyBasementsInModel(false);     // true if there are any basements in the input file
+    // Performance tradeoff globals
+    bool DoCoilDirectSolutions(false);       //true if use coil direction solutions
 
     int Progress(0); // current progress (0-100)
     void (*fProgressPtr)(int const);
@@ -356,6 +355,7 @@ namespace DataGlobals {
         ShowDecayCurvesInEIO = false;
         AnySlabsInModel = false;
         AnyBasementsInModel = false;
+        DoCoilDirectSolutions = false;
         Progress = 0;
         eso_stream = nullptr;
         mtr_stream = nullptr;

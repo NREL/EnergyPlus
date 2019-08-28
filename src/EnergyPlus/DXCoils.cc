@@ -7082,12 +7082,12 @@ namespace DXCoils {
                         SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum) + " [m3/s]";
                     } else {
                         CompName = DXCoil(DXCoilNum).Name;
-                        FieldNum = 11;
+                        FieldNum = 12; // (High Speed) Evaporative Condenser Air Flow Rate
                         SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum) + " [m3/s]";
                     }
                     SizingMethod = AutoCalculateSizing;
                     CompType = DXCoil(DXCoilNum).DXCoilType;
-                    //					// Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
+                    // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
                     DataConstantUsedForSizing = DXCoil(DXCoilNum).RatedTotCap(Mode);
                     DataFractionUsedForSizing = 0.000114;
                     TempSize = DXCoil(DXCoilNum).EvapCondAirFlow(Mode);
@@ -7140,7 +7140,7 @@ namespace DXCoils {
                 if (DXCoil(DXCoilNum).CondenserType(1) == EvapCooled && DXCoil(DXCoilNum).EvapCondAirFlow2 != 0.0 &&
                     DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoSpeed) {
                     CompName = DXCoil(DXCoilNum).Name;
-                    FieldNum = 14;
+                    FieldNum = 15; // Low Speed Evaporative Condenser Air Flow Rate
                     SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum) + " [m3/s]";
                     SizingMethod = AutoCalculateSizing;
                     CompType = DXCoil(DXCoilNum).DXCoilType;
@@ -7161,11 +7161,11 @@ namespace DXCoils {
 
                     if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl) {
                         CompName = DXCoil(DXCoilNum).Name + ":" + DXCoil(DXCoilNum).CoilPerformanceName(Mode);
-                        FieldNum = 12;
+                        FieldNum = 12; // Evaporative Condenser Pump Rated Power Consumption
                         SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum) + " [W]";
                     } else {
                         CompName = DXCoil(DXCoilNum).Name;
-                        FieldNum = 12;
+                        FieldNum = 13; // (High Speed) Evaporative Condenser Pump Rated Power Consumption
                         SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum) + " [W]";
                     }
                     SizingMethod = AutoCalculateSizing;
@@ -7184,7 +7184,7 @@ namespace DXCoils {
                 if (DXCoil(DXCoilNum).CondenserType(1) == EvapCooled && DXCoil(DXCoilNum).EvapCondPumpElecNomPower2 != 0.0 &&
                     DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoSpeed) {
                     CompName = DXCoil(DXCoilNum).Name;
-                    FieldNum = 15;
+                    FieldNum = 16; // Low Speed Evaporative Condenser Pump Rated Power Consumption
                     SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum) + " [W]";
                     SizingMethod = AutoCalculateSizing;
                     CompType = DXCoil(DXCoilNum).DXCoilType;
@@ -9602,7 +9602,7 @@ namespace DXCoils {
         Real64 OutdoorPressure; // Outdoor barometric pressure at condenser (Pa)
 
         static Real64 CurrentEndTime(0.0); // end time of time step for current simulation time step
-        static Real64 MinAirHumRat(0.0);   // minimum of the inlet air humidity ratio and the outlet air humidity ratio
+        //static Real64 MinAirHumRat(0.0);   // minimum of the inlet air humidity ratio and the outlet air humidity ratio
         int Mode;                          // Performance mode for Multimode DX coil; Always 1 for other coil types
         Real64 OutletAirTemp;              // Supply air temperature (average value if constant fan, full output if cycling fan)
         Real64 OutletAirHumRat;            // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
@@ -10092,9 +10092,9 @@ namespace DXCoils {
             //! Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
             //  HeatReclaimDXCoil(DXCoilNum)%AvailCapacity = DXCoil(DXCoilNum)%TotalCoolingEnergyRate + DXCoil(DXCoilNum)%ElecCoolingPower
 
-            MinAirHumRat = min(InletAirHumRat, OutletAirHumRat);
             DXCoil(DXCoilNum).SensCoolingEnergyRate =
-                AirMassFlow * (PsyHFnTdbW(InletAirDryBulbTemp, MinAirHumRat) - PsyHFnTdbW(OutletAirTemp, MinAirHumRat));
+                AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(InletAirDryBulbTemp, InletAirHumRat, OutletAirTemp, OutletAirHumRat); // sensible {W};
+
             //  Don't let sensible capacity be greater than total capacity
             if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
                 DXCoil(DXCoilNum).SensCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate;
@@ -15737,15 +15737,10 @@ namespace DXCoils {
         Real64 InletAirDryBulbTemp;   // inlet air dry bulb temperature [C]
         Real64 InletAirEnthalpy;      // inlet air enthalpy [J/kg]
         Real64 InletAirHumRat;        // inlet air humidity ratio [kg/kg]
-        Real64 InletAirHumRatTemp;    // inlet air humidity ratio used in ADP/BF loop [kg/kg]
         //  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
         Real64 RatedCBF;      // coil bypass factor at rated conditions
-        Real64 SHR;           // Sensible Heat Ratio (sensible/total) of the cooling coil
         Real64 CBF;           // coil bypass factor at off rated conditions
         Real64 A0;            // NTU * air mass flow rate, used in CBF calculation
-        Real64 hDelta;        // Change in air enthalpy across the cooling coil [J/kg]
-        Real64 hADP;          // Apparatus dew point enthalpy [J/kg]
-        Real64 hTinwADP;      // Enthalpy at inlet dry-bulb and wADP [J/kg]
         Real64 PLF;           // Part load factor, accounts for thermal lag at compressor startup, used in power calculation
         Real64 CondInletTemp; // Condenser inlet temperature (C). Outdoor dry-bulb temp for air-cooled condenser.
         // Outdoor Wetbulb +(1 - effectiveness)*(outdoor drybulb - outdoor wetbulb) for evap condenser.
@@ -15762,11 +15757,8 @@ namespace DXCoils {
         Real64 OutdoorWetBulb;  // Outdoor wet-bulb temperature at condenser (C)
         Real64 OutdoorHumRat;   // Outdoor humidity ratio at condenser (kg/kg)
         Real64 OutdoorPressure; // Outdoor barometric pressure at condenser (Pa)
-        Real64 tADP;            // Apparatus dew point temperature [C]
-        Real64 wADP;            // Apparatus dew point humidity ratio [kg/kg]
 
         static Real64 CurrentEndTime(0.0); // end time of time step for current simulation time step
-        static Real64 MinAirHumRat(0.0);   // minimum of the inlet air humidity ratio and the outlet air humidity ratio
         int Mode;                          // Performance mode for Multimode DX coil; Always 1 for other coil types
         Real64 OutletAirTemp;              // Supply air temperature (average value if constant fan, full output if cycling fan)
         Real64 OutletAirHumRat;            // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
@@ -16002,23 +15994,26 @@ namespace DXCoils {
 
             //  Get total capacity modifying factor (function of temperature) for off-rated conditions
             //  InletAirHumRat may be modified in this ADP/BF loop, use temporary varible for calculations
-            InletAirHumRatTemp = InletAirHumRat;
 
-            // Calculate apparatus dew point conditions using TotCap and CBF
-            hDelta = TotCap / AirMassFlow;
-            // there is an issue here with using CBF to calculate the ADP enthalpy.
-            // at low loads the bypass factor increases significantly.
-            hADP = InletAirEnthalpy - hDelta / (1.0 - CBF);
-            tADP = PsyTsatFnHPb(hADP, OutdoorPressure, RoutineName);
-            //  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
-            //  tADP = PsyTsatFnHPb(hADP,InletAirPressure)
-            wADP = min(InletAirHumRat, PsyWFnTdbH(tADP, hADP, RoutineName));
-            hTinwADP = PsyHFnTdbW(InletAirDryBulbTemp, wADP);
-            if ((InletAirEnthalpy - hADP) > 1.e-10) {
-                SHR = min((hTinwADP - hADP) / (InletAirEnthalpy - hADP), 1.0);
-            } else {
-                SHR = 1.0;
-            }
+            // commented, not used issue #6950
+            //InletAirHumRatTemp = InletAirHumRat;
+
+            //// Calculate apparatus dew point conditions using TotCap and CBF
+            //hDelta = TotCap / AirMassFlow;
+            //// there is an issue here with using CBF to calculate the ADP enthalpy.
+            //// at low loads the bypass factor increases significantly.
+            //hADP = InletAirEnthalpy - hDelta / (1.0 - CBF);
+            //tADP = PsyTsatFnHPb(hADP, OutdoorPressure, RoutineName);
+            ////  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
+            ////  tADP = PsyTsatFnHPb(hADP,InletAirPressure)
+            //wADP = min(InletAirHumRat, PsyWFnTdbH(tADP, hADP, RoutineName));
+            //hTinwADP = PsyHFnTdbW(InletAirDryBulbTemp, wADP);
+            //if ((InletAirEnthalpy - hADP) > 1.e-10) {
+            //    SHR = min((hTinwADP - hADP) / (InletAirEnthalpy - hADP), 1.0);
+            //} else {
+            //    SHR = 1.0;
+            //}
+            // commented, not used issue #6950 ends here
 
             if (DXCoil(DXCoilNum).PLFFPLR(Mode) > 0 && CompCycRatio < 1.0) {
                 PLF = CurveValue(DXCoil(DXCoilNum).PLFFPLR(Mode), CompCycRatio); // Calculate part-load factor
@@ -16089,11 +16084,13 @@ namespace DXCoils {
             }
 
             // Coil total cooling
-            DXCoil(DXCoilNum).TotalCoolingEnergyRate = AirMassFlow * (InletAirEnthalpy - OutletAirEnthalpy);
+            Real64 AirMassFlowRate = DXCoil(DXCoilNum).InletAirMassFlowRate;
+            DXCoil(DXCoilNum).TotalCoolingEnergyRate = AirMassFlowRate * (InletAirEnthalpy - OutletAirEnthalpy);
 
             // Coil sensible cooling
-            MinAirHumRat = min(InletAirHumRat, OutletAirHumRat);
-            DXCoil(DXCoilNum).SensCoolingEnergyRate = AirMassFlow * 1005.0 * (InletAirDryBulbTemp - OutletAirTemp);
+            DXCoil(DXCoilNum).SensCoolingEnergyRate =
+                AirMassFlowRate * PsyDeltaHSenFnTdb2W2Tdb1W1(InletAirDryBulbTemp, InletAirHumRat, OutletAirTemp, OutletAirHumRat); // sensible {W};
+
             //  Don't let sensible capacity be greater than total capacity
             if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
                 DXCoil(DXCoilNum).SensCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate;
@@ -16518,6 +16515,7 @@ namespace DXCoils {
         MaxSH = 15;
         MaxSC = 20;
         Garate = DXCoil(CoilIndex).RatedAirMassFlowRate(1);
+        // why always limit the minimum fan speed ratio to 0.65?
         FanSpdRatioMin = min(max(OAMassFlow / Garate, 0.65), 1.0); // ensure that coil flow rate is higher than OA flow rate
 
         if (QCoil == 0) {

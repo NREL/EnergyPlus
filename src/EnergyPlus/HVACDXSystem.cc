@@ -335,13 +335,14 @@ namespace HVACDXSystem {
         // set econo lockout flag
         // set econo lockout flag
         if (AirLoopNum != -1) { // IF the sysem is not an equipment of outdoor air unit
-
-            if ((DXCoolingSystem(DXSystemNum).PartLoadFrac > 0.0 || DXCoolingSystem(DXSystemNum).SpeedRatio > 0.0 ||
-                 DXCoolingSystem(DXSystemNum).CycRatio > 0.0) &&
-                AirLoopControlInfo(AirLoopNum).CanLockoutEconoWithCompressor) {
-                AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = true;
-            } else {
-                AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = false;
+            if (AirLoopNum > 0) { // Real airloopNum called from MixedAir and SimAirServingZones 
+                if ((DXCoolingSystem(DXSystemNum).PartLoadFrac > 0.0 || DXCoolingSystem(DXSystemNum).SpeedRatio > 0.0 ||
+                    DXCoolingSystem(DXSystemNum).CycRatio > 0.0) &&
+                    AirLoopControlInfo(AirLoopNum).CanLockoutEconoWithCompressor) {
+                    AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = true;
+                } else { // used for AirLoopHVACDOAS only
+                    AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = false;
+                }
             }
         }
 
@@ -910,7 +911,11 @@ namespace HVACDXSystem {
 
             OutNode = DXCoolingSystem(DXSystemNum).DXCoolingCoilOutletNodeNum;
             ControlNode = DXCoolingSystem(DXSystemNum).DXSystemControlNodeNum;
-            EconomizerFlag = AirLoopControlInfo(AirLoopNum).EconoActive;
+            if (AirLoopNum == 0) {
+                EconomizerFlag = false;
+            } else {
+                EconomizerFlag = AirLoopControlInfo(AirLoopNum).EconoActive;
+            }
             if (ControlNode == 0) {
                 DXCoolingSystem(DXSystemNum).DesiredOutletTemp = 0.0;
                 DXCoolingSystem(DXSystemNum).DesiredOutletHumRat = 1.0;
@@ -3762,6 +3767,67 @@ namespace HVACDXSystem {
         return Residuum;
     }
 
+    int GetCoolingCoilInletNodeNum(
+        std::string const &DXCoilSysName)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Lixing Gu, FSEC
+        //       DATE WRITTEN   Apr. 2019
+        // PURPOSE OF THIS SUBROUTINE:
+        // Get inlet node number
+
+        // Using/Aliasing
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int NodeNum;
+        int DXCoolSysNum;
+
+        if (GetInputFlag) { // First time subroutine has been entered
+            GetDXCoolingSystemInput();
+            GetInputFlag = false;
+        }
+
+        NodeNum = 0;
+        if (NumDXSystem > 0) {
+            DXCoolSysNum = UtilityRoutines::FindItemInList(DXCoilSysName, DXCoolingSystem);
+            if (DXCoolSysNum > 0 && DXCoolSysNum <= NumDXSystem) {
+                NodeNum = DXCoolingSystem(DXCoolSysNum).DXCoolingCoilInletNodeNum;
+            }
+        }
+
+        return NodeNum;
+    }
+
+    int GetCoolingCoilOutletNodeNum(
+        std::string const &DXCoilSysName)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Lixing Gu, FSEC
+        //       DATE WRITTEN   Apr. 2019
+        // PURPOSE OF THIS SUBROUTINE:
+        // Get Outlet node number
+
+        // Using/Aliasing
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int NodeNum;
+        int DXCoolSysNum;
+
+        if (GetInputFlag) { // First time subroutine has been entered
+            GetDXCoolingSystemInput();
+            GetInputFlag = false;
+        }
+
+        NodeNum = 0;
+        if (NumDXSystem > 0) {
+            DXCoolSysNum = UtilityRoutines::FindItemInList(DXCoilSysName, DXCoolingSystem);
+            if (DXCoolSysNum > 0 && DXCoolSysNum <= NumDXSystem) {
+                NodeNum = DXCoolingSystem(DXCoolSysNum).DXCoolingCoilOutletNodeNum;
+            }
+        }
+
+        return NodeNum;
+    }
     //        End of Calculation subroutines for the DXCoolingSystem Module
     // *****************************************************************************
 

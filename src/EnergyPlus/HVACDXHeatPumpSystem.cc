@@ -1253,6 +1253,68 @@ namespace HVACDXHeatPumpSystem {
         return Residuum;
     }
 
+    int GetHeatingCoilInletNodeNum(
+        std::string const &DXHeatCoilSysName)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Lixing Gu, FSEC
+        //       DATE WRITTEN   Apr. 2019
+        // PURPOSE OF THIS SUBROUTINE:
+        // Get inlet node number
+
+        // Using/Aliasing
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int NodeNum;
+        int DXHeatSysNum;
+
+        if (GetInputFlag) { // First time subroutine has been entered
+            GetDXHeatPumpSystemInput();
+            GetInputFlag = false;
+        }
+
+        NodeNum = 0;
+        if (NumDXHeatPumpSystems > 0) {
+            DXHeatSysNum = UtilityRoutines::FindItemInList(DXHeatCoilSysName, DXHeatPumpSystem);
+            if (DXHeatSysNum > 0 && DXHeatSysNum <= NumDXHeatPumpSystems) {
+                NodeNum = DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum;
+            }
+        }
+
+        return NodeNum;
+    }
+
+    int GetHeatingCoilOutletNodeNum(
+        std::string const &DXHeatCoilSysName)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Lixing Gu, FSEC
+        //       DATE WRITTEN   Apr. 2019
+        // PURPOSE OF THIS SUBROUTINE:
+        // Get Outlet node number
+
+        // Using/Aliasing
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int NodeNum;
+        int DXHeatSysNum;
+
+        if (GetInputFlag) { // First time subroutine has been entered
+            GetDXHeatPumpSystemInput();
+            GetInputFlag = false;
+        }
+
+        NodeNum = 0;
+        if (NumDXHeatPumpSystems > 0) {
+            DXHeatSysNum = UtilityRoutines::FindItemInList(DXHeatCoilSysName, DXHeatPumpSystem);
+            if (DXHeatSysNum > 0 && DXHeatSysNum <= NumDXHeatPumpSystems) {
+                NodeNum = DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum;
+            }
+        }
+
+        return NodeNum;
+    }
+
 } // namespace HVACDXHeatPumpSystem
 
 } // namespace EnergyPlus

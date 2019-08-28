@@ -1258,10 +1258,10 @@ std::string SQLite::storageType(const int storageTypeIndex)
     std::string result;
 
     switch (storageTypeIndex) {
-    case 1:
+    case 1: // static_cast<int>(OutputProcessor::StoreType::Averaged)
         result = "Avg";
         break;
-    case 2:
+    case 2: // static_cast<int>(OutputProcessor::StoreType::Summed)
         result = "Sum";
         break;
     default:
@@ -1276,11 +1276,11 @@ std::string SQLite::timestepTypeName(const int timestepType)
     std::string result;
 
     switch (timestepType) {
-    case 1:
-        result = "HVAC System";
-        break;
-    case 2:
+    case 1: // static_cast<int>(OutputProcessor::TimeStepType::TimeStepZone)
         result = "Zone";
+        break;
+    case 2: // static_cast<int>(OutputProcessor::TimeStepType::TimeStepSystem)
+        result = "HVAC System";
         break;
     default:
         result = "Unknown!!!";

@@ -1200,7 +1200,7 @@ If Optical Data Type = SpectralAverage, the values you enter for solar transmitt
 
 If Optical Data Type = Spectral, then, in the following field, you must enter the name of a spectral data set defined with the WindowGlassSpectralData object. In this case, the values of~ solar and visible transmittance and reflectance in the fields below should be blank.
 
-If Optical Data Type = SpectralAndAngle, then, in the last 3 fields, you must enter the name of a spectral and angle data set defined with the \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} object. In this case, the Window Glass Spectral Data Set Name should be blank, and the values of solar and visible transmittance and reflectance in the fields below should be blank.
+If Optical Data Type = SpectralAndAngle, then, in the last 3 fields, you must enter the name of a spectral and angle data set defined with a curve or table object with two independent variables. In this case, the Window Glass Spectral Data Set Name should be blank, and the values of solar and visible transmittance and reflectance in the fields below should be blank.
 
 If Optical Data Type = BSDF, the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object must be used to define the window construction layers. The \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object contains references to the BSDF files which contain the optical properties of the Complex Fenestration layers. In this case,
 
@@ -1312,15 +1312,15 @@ The ratio, when a sample object is stretched, of the contraction or transverse s
 
 \paragraph{Field: Window Glass Spectral and Incident Angle Transmittance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-transmittance-data}
 
-If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of transmittance defined with a \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of transmittance defined with a curve or table object with two independent variables. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
 
 \paragraph{Field: Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-front-reflectance-data}
 
-If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of front reflectance defined with a \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of front reflectance defined with a curve or table object with two independent variables. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
 
 \paragraph{Field: Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-back-reflectance-data}
 
-If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of back reflectance defined with a \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of back reflectance defined with a curve or table object with two independent variables. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
 
 It should be pointed out that when Optical Data Type = SpectralAndAngle for a glass layer in a construction, the table input data are converted into polynomial curve fits with 6 coefficients, so that all outputs of optical properties for the same construction will be curve values for a given incident angle. Therefore, the values may be slightly different from input values.
 
@@ -3386,6 +3386,10 @@ This value is the front side long-wave hemispherical emissivity of the glazing. 
 
 This value is the back side long-wave hemispherical emissivity of the glazing. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.84.
 
+\paragraph{Field: Thermal Resistance}\label{field-thermal-resistance-equivglazing}
+
+This field is used to enter the thermal resistance (R-value) of the material layer. Units for this parameter are (m\(^{2}\)-K)/W. Thermal resistance must be greater than zero. The default value is 0.158 which is roughly equivalent to a single layer of 1/4" glass. This field is only used if this equivalent layer of glazing is being referenced for movable insulation.
+
 An IDF example for this object, is shown below:
 
 \begin{lstlisting}
@@ -3418,7 +3422,8 @@ WindowMaterial:Glazing:EquivalentLayer,
     0.0,                     !- Back Side Diffuse-Diffuse Visible Reflectance
     0.0,                     !- Infrared Transmittance
     0.84,                    !- Front Side Infrared Emissivity
-    0.84;                    !- Back Side Infrared Emissivity
+    0.84,                    !- Back Side Infrared Emissivity
+    0.158;                   !- Thermal Resistance (used for movable insulation only)
 \end{lstlisting}
 
 \subsection{WindowMaterial:Gap:EquivalentLayer}\label{windowmaterialgapequivalentlayer}
@@ -4061,6 +4066,73 @@ This output is the temperature within the surface at the location of the source/
 
 This output is the temperature within the surface at the location requested by the user.
 
+\subsection{Construction:AirBoundary}\label{constructionairboundary}
+
+Construction:AirBoundary indicates an open boundary between two zones. It may be used for base surfaces and fenestration surfaces.
+When this construction type is used, the Outside Boundary Condition of the surface (or the base surface of a fenestration surface)
+must be either \textit{Surface} or \textit{Zone}. A base surface with Construction:AirBoundary cannot hold any fenestration surfaces.
+
+\subsubsection{Inputs}\label{inputs-38-01}
+
+\paragraph{Field: Name}\label{field-name-31-0001}
+
+The name of the construction.
+
+\paragraph{Field: Solar and Daylighting Method}\label{field-solar and-daylighting-method}
+
+This field controls how the surface is modeled for solar distribution and daylighting calculations. There are two
+choices:
+\begin{itemize}
+  \item
+  \textbf{GroupedZones} - The two zones separated by this air boundary will be grouped together into a combined zone for solar distribution and daylighting. If a given zone has an air boundary with more than one zone, then all of the connected zones will be grouped together. For example, if there is an air  boundary between zones A and B, and another air boundary between zones B and C, all three zones (A, B, and C) will be grouped into a single zone.
+  
+  \item
+  \textbf{InteriorWindow} - The air boundary will be modeled as a perfectly transmitting interior window. As with other interior windows, all direct solar passing through the interior window will be diffuse in the adjacent zone.
+\end{itemize}
+
+\paragraph{Field: Radiant Exchange Method}\label{field-radiant-exchange-method}
+
+This field controls how the surface is modeled for radiant exchange calculations. There are two choices:
+
+\begin{itemize}
+  \item
+  \textbf{GroupedZones} - The two zones separated by this air boundary will be grouped together into a combined zone for radiant exchange between surfaces and distribution of radiant internal gains. If a given zone has an air boundary with more than one zone, then all of the connected zones will be grouped together. For example, if there is an air boundary between zones A and B, and another air boundary between zones B and C, all three zones (A, B, and C) will be grouped into a single zone. Normal default simplified view factors will apply unless detailed view factors are specified using \hyperref[zonepropertyuserviewfactorsbysurfacename]{ZoneProperty:UserViewFactors:bySurfaceName}.
+  
+  \item
+  \textbf{IRTSurface} - The air boundary will be modeled as blackbody surface between the adjacent zones (similar to, but not exactly the same as, \hyperref[materialinfraredtransparent]{Material:InfraredTransparent}. The surface participates in the radiant exchange within each zone and receives long-wave radiant energy from internal sources. The surface does not absorb any visible or solar radiation, has no thermal resistance, and has zero convective heat transfer coefficients on both sides.
+\end{itemize}
+
+\paragraph{Field: Air Exchange Method}\label{field-air-exchange-method}
+
+This field controls how the surface is modeled for radiant exchange calculations. There are two choices:
+
+\begin{itemize}
+  \item
+  \textbf{None} - There will be no air exchange modeled across this surface. Other objects, such as \hyperref[zonemixing]{ZoneMixing} and \hyperref[zonecrossmixing]{ZoneCrossMixing} or AirflowNetwork openings may be specified if desired.
+  \item
+  \textbf{SimpleMixing} - For each pair of zones connected by Construction:AirBoundary, a pair of ZoneMixing objects will created automatically. These mixing objects may be automatically adjusted to balance HVAC system flows using the \hyperref[zoneairmassflowconservation]{ZoneAirMassFlowConservation} object.
+
+\end{itemize}
+
+\paragraph{Field: Simple Mixing Air Changes per Hour}\label{field-simple-mixing-air-changes-per-hour}
+
+If the Air Exchange Method is \textit{SimpleMixing}* then this field specifies the air change rate [1/hr] using the volume of the smaller zone as the basis. The default is 0.5. If an AirflowNetwork simulation is active this field is ignored.
+
+\paragraph{Field:Simple Mixing Schedule Name}\label{field-Simple-mixing-schedule-name}
+
+If the Air Exchange Method is \textit{SimpleMixing} then this field specifies the schedule name for the air mixing across this boundary. If this field is blank, then the schedule defaults to always 1.0. If an AirflowNetwork simulation is active this field is ignored.
+
+IDF Example:
+
+\begin{lstlisting}
+  Construction:AirBoundary,
+    Air Wall,                !- Name
+    GroupedZones,            !- Solar and Daylighting Method
+    GroupedZones,            !- Radiant Exchange Method
+    SimpleMixing,            !- Air Exchange Method
+    0.5,                     !- Simple Mixing Air Changes per Hour {1/hr}
+    ;                        !- Simple Mixing Schedule Name
+\end{lstlisting}
 
 \subsection{Composite Wall Constructions}\label{composite-wall-constructions}
 
