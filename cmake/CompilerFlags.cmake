@@ -255,3 +255,10 @@ if("Ninja" STREQUAL ${CMAKE_GENERATOR})
   endif()
 endif()
 
+# Xcode/Ninja generators undefined MAKE
+if(CMAKE_GENERATOR MATCHES "Make")
+  set(MAKE "$(MAKE)")
+else()
+  set(MAKE make)
+endif()
+

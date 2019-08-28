@@ -4338,6 +4338,7 @@ namespace HVACVariableRefrigerantFlow {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
                         if (VRFTU(VRFTUNum).VRFTUInletNodeNum == ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
+                            VRFTU(VRFTUNum).ZoneAirNode = ZoneEquipConfig(CtrlZone).ZoneNode;
                             ZoneNodeNotFound = false;
                             break;
                         }
@@ -4368,6 +4369,7 @@ namespace HVACVariableRefrigerantFlow {
                     if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                         if (VRFTU(VRFTUNum).VRFTUOutletNodeNum == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
+                            VRFTU(VRFTUNum).ZoneAirNode = ZoneEquipConfig(CtrlZone).ZoneNode;
                             ZoneNodeNotFound = false;
                             break;
                         }
@@ -7925,7 +7927,6 @@ namespace HVACVariableRefrigerantFlow {
         int VRFTUOutletNodeNum;     // TU air outlet node
         int VRFTUInletNodeNum;      // TU air inlet node
         Real64 AirMassFlow;         // total supply air mass flow [m3/s]
-        Real64 MinHumRat;           // minimum humidity ratio for sensible capacity calculation (kg/kg)
         int OpMode;                 // fan operating mode, CycFanCycCoil or ContFanCycCoil
         int VRFCond;                // index to VRF condenser
         Real64 SpecHumOut;          // specific humidity ratio at outlet node
@@ -7942,7 +7943,7 @@ namespace HVACVariableRefrigerantFlow {
         VRFTUOutletNodeNum = this->VRFTUOutletNodeNum;
         VRFTUInletNodeNum = this->VRFTUInletNodeNum;
         OpMode = this->OpMode;
-        ZoneNode = ZoneEquipConfig(this->ZoneNum).ZoneNode;
+        ZoneNode = this->ZoneAirNode;
 
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
         SetAverageAirFlow(VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
@@ -8044,35 +8045,37 @@ namespace HVACVariableRefrigerantFlow {
             }
         }
 
-        // If there is a supply side air terminal mixer, calculate its output
+        Real64 LatentLoadMet = 0.0; // latent load deleivered [kgH2O/s]
+        Real64 TempOut = 0.0;
+        Real64 TempIn = 0.0;
         if (this->ATMixerExists) {
             if (this->ATMixerType == ATMixer_SupplySide) {
+                // Air terminal supply side mixer, calculate supply side mixer output
                 SimATMixer(this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
-            }
-        }
-        // calculate sensible load met
-        if (this->ATMixerExists) {
-            if (this->ATMixerType == ATMixer_SupplySide) {
-                // Air terminal supply side mixer
-                MinHumRat = min(Node(ZoneNode).HumRat, Node(ATMixOutNode).HumRat);
-                LoadMet =
-                    Node(ATMixOutNode).MassFlowRate * (PsyHFnTdbW(Node(ATMixOutNode).Temp, MinHumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, MinHumRat));
+                TempOut = Node(ATMixOutNode).Temp;
+                TempIn = Node(ZoneNode).Temp;
+                SpecHumOut = Node(ATMixOutNode).HumRat;
+                SpecHumIn = Node(ZoneNode).HumRat;
+                AirMassFlow = Node( ATMixOutNode ).MassFlowRate;
             } else {
                 // Air terminal inlet side mixer
-                MinHumRat = min(Node(ZoneNode).HumRat, Node(VRFTUOutletNodeNum).HumRat);
-                LoadMet = AirMassFlow * (PsyHFnTdbW(Node(VRFTUOutletNodeNum).Temp, MinHumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, MinHumRat));
+                TempOut = Node(VRFTUOutletNodeNum).Temp;
+                TempIn = Node(ZoneNode).Temp;
+                SpecHumOut = Node(VRFTUOutletNodeNum).HumRat;
+                SpecHumIn = Node(ZoneNode).HumRat;
             }
         } else {
-            // calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio
-            MinHumRat = min(Node(VRFTUInletNodeNum).HumRat, Node(VRFTUOutletNodeNum).HumRat);
-            LoadMet = AirMassFlow * (PsyHFnTdbW(Node(VRFTUOutletNodeNum).Temp, MinHumRat) -
-                                     PsyHFnTdbW(Node(VRFTUInletNodeNum).Temp, MinHumRat)); // sensible load met by TU
-        }
-        if (present(LatOutputProvided)) {
-            //   CR9155 Remove specific humidity calculations
+            TempOut = Node(VRFTUOutletNodeNum).Temp;
+            TempIn = Node(VRFTUInletNodeNum).Temp;
             SpecHumOut = Node(VRFTUOutletNodeNum).HumRat;
             SpecHumIn = Node(VRFTUInletNodeNum).HumRat;
-            LatOutputProvided = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate, kg/s (dehumid = negative)
+        }
+        // calculate sensible load met using delta enthalpy
+        LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
+        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {kgH2O/s}
+        if (present(LatOutputProvided)) {
+            //   CR9155 Remove specific humidity calculations
+            LatOutputProvided = LatentLoadMet;
         }
     }
 
@@ -8107,7 +8110,6 @@ namespace HVACVariableRefrigerantFlow {
         Real64 LatentConditioning;   // - latent rate
         Real64 ReportingConstant;    // - used to convert watts to joules
         int VRFCond;                 // - index to VRF condenser
-        Real64 H2OHtOfVap;           // - Heat of vaporization of air (J/kg)
         int TUListIndex;             // - index to terminal unit list
         int IndexToTUInTUList;       // - index to the TU in the list
         bool HRHeatRequestFlag;      // - indicates TU could be in heat mode
@@ -8194,8 +8196,25 @@ namespace HVACVariableRefrigerantFlow {
 
         SensibleConditioning = VRFTU(VRFTUNum).TerminalUnitSensibleRate;
         LatentConditioning = VRFTU(VRFTUNum).TerminalUnitLatentRate;
+        Real64 TempOut = 0.0;
+        Real64 TempIn = 0.0;
+        if (VRFTU(VRFTUNum).ATMixerExists) {
+            if (VRFTU(VRFTUNum).ATMixerType == ATMixer_SupplySide) {
+                // Air terminal supply side mixer
+                TempOut = Node(VRFTU(VRFTUNum).ATMixerOutNode).Temp;
+                TempIn = Node(VRFTU(VRFTUNum).ZoneAirNode).Temp;
+            } else {
+                // Air terminal inlet side mixer
+                TempOut = Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
+                TempIn = Node(VRFTU(VRFTUNum).ZoneAirNode).Temp;
+            }
+        } else {
+            TempOut = Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
+            TempIn = Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp;
+        }
+        // latent heat vaporization/condensation used in moist air psychometrics
+        Real64 const H2OHtOfVap = PsyHfgAvgFnTdb2Tdb1(TempOut, TempIn);
         // convert latent in kg/s to watts
-        H2OHtOfVap = PsyHfgAirFnWTdb(Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).HumRat, Node(VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp);
         TotalConditioning = SensibleConditioning + (LatentConditioning * H2OHtOfVap);
 
         if (TotalConditioning <= 0.0) {
@@ -10925,7 +10944,6 @@ namespace HVACVariableRefrigerantFlow {
         int VRFTUOutletNodeNum;     // TU air outlet node
         int VRFTUInletNodeNum;      // TU air inlet node
         Real64 AirMassFlow;         // total supply air mass flow [m3/s]
-        Real64 MinHumRat;           // minimum humidity ratio for sensible capacity calculation (kg/kg)
         int OpMode;                 // fan operating mode, CycFanCycCoil or ContFanCycCoil
         int VRFCond;                // index to VRF condenser
         Real64 SpecHumOut;          // specific humidity ratio at outlet node
@@ -10936,7 +10954,6 @@ namespace HVACVariableRefrigerantFlow {
         Real64 CondTemp;            // condensing temperature
         static int ATMixOutNode(0); // outlet node of ATM Mixer
         int ZoneNode;               // Zone node of VRFTU is serving
-
         // FLOW
 
         VRFCond = this->VRFSysNum;
@@ -10947,7 +10964,7 @@ namespace HVACVariableRefrigerantFlow {
         OpMode = this->OpMode;
         EvapTemp = VRF(VRFCond).IUEvaporatingTemp;
         CondTemp = VRF(VRFCond).IUCondensingTemp;
-        ZoneNode = ZoneEquipConfig(this->ZoneNum).ZoneNode;
+        ZoneNode = this->ZoneAirNode;
 
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
         if (PartLoadRatio == 0) {
@@ -10982,7 +10999,7 @@ namespace HVACVariableRefrigerantFlow {
                 if (OnOffAirFlowRatio > 0.0) {
                     HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(1.0 / OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 } else {
-                    HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(1.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(PartLoadRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
             } else {
                 Fans::SimulateFanComponents("", FirstHVACIteration, this->FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
@@ -11029,7 +11046,7 @@ namespace HVACVariableRefrigerantFlow {
                 if (OnOffAirFlowRatio > 0.0) {
                     HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(1.0 / OnOffAirFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 } else {
-                    HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(1.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(PartLoadRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
 
             } else {
@@ -11057,35 +11074,37 @@ namespace HVACVariableRefrigerantFlow {
             }
         }
 
-        // calculate supply side terminal unit OA mixer
+        Real64 LatentLoadMet = 0.0;
+        Real64 TempOut = 0.0;
+        Real64 TempIn = 0.0;
         if (this->ATMixerExists) {
             if (this->ATMixerType == ATMixer_SupplySide) {
+                // Air terminal supply side mixer, calculate supply side mixer output
                 SimATMixer(this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
-            }
-        }
-        // calculate sensible load met
-        if (this->ATMixerExists) {
-            if (this->ATMixerType == ATMixer_SupplySide) {
-                // Air terminal supply side mixer
-                MinHumRat = min(Node(ZoneNode).HumRat, Node(ATMixOutNode).HumRat);
-                LoadMet =
-                    Node(ATMixOutNode).MassFlowRate * (PsyHFnTdbW(Node(ATMixOutNode).Temp, MinHumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, MinHumRat));
+                TempOut = Node(ATMixOutNode).Temp;
+                TempIn = Node(ZoneNode).Temp;
+                SpecHumOut = Node(ATMixOutNode).HumRat;
+                SpecHumIn = Node(ZoneNode).HumRat;
+                AirMassFlow = Node( ATMixOutNode ).MassFlowRate;
             } else {
                 // Air terminal inlet side mixer
-                MinHumRat = min(Node(ZoneNode).HumRat, Node(VRFTUOutletNodeNum).HumRat);
-                LoadMet = AirMassFlow * (PsyHFnTdbW(Node(VRFTUOutletNodeNum).Temp, MinHumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, MinHumRat));
+                TempOut = Node(VRFTUOutletNodeNum).Temp;
+                TempIn = Node(ZoneNode).Temp;
+                SpecHumOut = Node(VRFTUOutletNodeNum).HumRat;
+                SpecHumIn = Node(ZoneNode).HumRat;
             }
         } else {
-            // calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio
-            MinHumRat = min(Node(VRFTUInletNodeNum).HumRat, Node(VRFTUOutletNodeNum).HumRat);
-            LoadMet = AirMassFlow * (PsyHFnTdbW(Node(VRFTUOutletNodeNum).Temp, MinHumRat) -
-                                     PsyHFnTdbW(Node(VRFTUInletNodeNum).Temp, MinHumRat)); // sensible load met by TU
-        }
-        if (present(LatOutputProvided)) {
-            //   CR9155 Remove specific humidity calculations
+            TempOut = Node(VRFTUOutletNodeNum).Temp;
+            TempIn = Node(VRFTUInletNodeNum).Temp;
             SpecHumOut = Node(VRFTUOutletNodeNum).HumRat;
             SpecHumIn = Node(VRFTUInletNodeNum).HumRat;
-            LatOutputProvided = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate, kg/s (dehumid = negative)
+        }
+        // calculate sensible load met using delta enthalpy
+        LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
+        LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {kgH2O/s}
+        if (present(LatOutputProvided)) {
+            //   CR9155 Remove specific humidity calculations
+            LatOutputProvided = LatentLoadMet;
         }
     }
 
@@ -11156,7 +11175,7 @@ namespace HVACVariableRefrigerantFlow {
             (VRF(VRFCond).HeatRecoveryUsed && TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList))) {
             // VRF terminal unit is on cooling mode
             DXCoilNum = this->CoolCoilIndex;
-            QCoilReq = -PartLoadRatio * DXCoil(DXCoilNum).RatedTotCap(Mode); // positive for heating; negative for cooling
+            QCoilReq = -PartLoadRatio * DXCoil(DXCoilNum).RatedTotCap(Mode);
             TeTc = VRF(VRFCond).IUEvaporatingTemp;
 
             // For HR operations, Te is lower than the outdoor air temperature because of outdoor evaporator operations
@@ -11167,7 +11186,7 @@ namespace HVACVariableRefrigerantFlow {
                    (VRF(VRFCond).HeatRecoveryUsed && TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList))) {
             // VRF terminal unit is on heating mode
             DXCoilNum = this->HeatCoilIndex;
-            QCoilReq = PartLoadRatio * DXCoil(DXCoilNum).RatedTotCap(Mode); // positive for heating; negative for cooling
+            QCoilReq = PartLoadRatio * DXCoil(DXCoilNum).RatedTotCap(Mode);
             TeTc = VRF(VRFCond).IUCondensingTemp;
 
         } else {
@@ -11329,7 +11348,11 @@ namespace HVACVariableRefrigerantFlow {
         // Simulate the blow-through fan if there is any
         if (VRFTU(VRFTUNum).FanPlace == BlowThru) {
             if (VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(1.0 / temp, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                if (temp > 0) {
+                    HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(1.0 / temp, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                } else {
+                    HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->simulate(PartLoadRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                }
             } else {
                 Fans::SimulateFanComponents("", false, VRFTU(VRFTUNum).FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             }
