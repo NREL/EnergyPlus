@@ -161,8 +161,6 @@
     1,                       !- Upper Limit Value
     Discrete;                !- Numeric Type
 
-  Schedule:Constant,AlwaysOn,OnOff,1;
-
   BuildingSurface:Detailed,
     Zn001:Wall001,           !- Name
     Wall,                    !- Surface Type
