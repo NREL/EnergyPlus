@@ -1199,12 +1199,12 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         // Decide what day and time to use for zone/room averages
         int SysPeakDDnum(0);
         int SysPeakTimeStepInDay(0);
-        if (DataSizing::FinalSysSizing(curSysNum).LoadSizeType == DataSizing::Total) {
+        if (DataSizing::FinalSysSizing(curSysNum).CoolingPeakLoadType == DataSizing::TotalCoolingLoad) {
             SysPeakDDnum = DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD;
             if (SysPeakDDnum > 0)
                 SysPeakTimeStepInDay =
                     DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtTotCoolPk(DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD);
-        } else if (DataSizing::FinalSysSizing(curSysNum).LoadSizeType == DataSizing::Sensible) {
+        } else if (DataSizing::FinalSysSizing(curSysNum).CoolingPeakLoadType == DataSizing::SensibleCoolingLoad) {
             SysPeakDDnum = DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD;
             if (SysPeakDDnum > 0)
                 SysPeakTimeStepInDay =
