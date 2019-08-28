@@ -535,7 +535,7 @@ namespace ScheduleManager {
         NumAlphas = 0;
         NumNumbers = 0;
         if (NumCommaFileShading > 1) {
-            ShowWarningError(CurrentModuleObject + ": More than 1 occurence of this object found, only first will be used.");
+            ShowWarningError(CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
         }
 
         NumCSVAllColumnsSchedules = 0;

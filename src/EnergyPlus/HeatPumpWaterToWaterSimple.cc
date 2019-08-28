@@ -1251,7 +1251,7 @@ namespace HeatPumpWaterToWaterSimple {
             // create predefined report
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, this->Name, "HeatPump:WaterToWater:EquationFit:Cooling");
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, this->Name, this->refCOP);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, this->Name, this->RatedPowerCool);
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, this->Name, this->RatedCapCool);
         }
 
         if (errorsFound) {
@@ -1576,7 +1576,7 @@ namespace HeatPumpWaterToWaterSimple {
             // create predefined report
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechType, this->Name, "HeatPump:WaterToWater:EquationFit:Heating");
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomEff, this->Name, this->refCOP);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, this->Name, this->RatedPowerHeat);
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchMechNomCap, this->Name, this->RatedCapHeat);
         }
         if (errorsFound) {
             ShowFatalError("Preceding sizing errors cause program termination");

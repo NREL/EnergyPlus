@@ -1839,6 +1839,7 @@ namespace ChillerElectricEIR {
 
         if (PlantFinalSizesOkayToReport) {
             if (ChillerIPLVFlagArr(EIRChillNum)) {
+                Real64 IPLV;
                 CalcChillerIPLV(ElectricEIRChiller(EIRChillNum).Name,
                                 TypeOf_Chiller_ElectricEIR,
                                 ElectricEIRChiller(EIRChillNum).RefCap,
@@ -1847,7 +1848,8 @@ namespace ChillerElectricEIR {
                                 ElectricEIRChiller(EIRChillNum).ChillerCapFT,
                                 ElectricEIRChiller(EIRChillNum).ChillerEIRFT,
                                 ElectricEIRChiller(EIRChillNum).ChillerEIRFPLR,
-                                ElectricEIRChiller(EIRChillNum).MinUnloadRat);
+                                ElectricEIRChiller(EIRChillNum).MinUnloadRat,
+                                IPLV);
                 ChillerIPLVFlagArr(EIRChillNum) = false;
             }
             // create predefined report

@@ -232,15 +232,16 @@ namespace DataWindowEquivalentLayer {
     struct CFSTY
     {
         // Members
-        std::string Name;    // ID (Fenestration Name)
-        int NL;              // number of layers
-        Array1D<CFSLAYER> L; // layer array, L(1) is outside layer
-        Array1D<CFSGAP> G;   // gap array, G(1) is outside-most, betw L(1) and L(2)
-        bool ISControlled;   // CFS is not controlled, or has no controlled VB layer
-        int VBLayerPtr;      // Venetian blind layer pointer
+        std::string Name;         // ID (Fenestration Name)
+        int NL;                   // number of layers
+        Array1D<CFSLAYER> L;      // layer array, L(1) is outside layer
+        Array1D<CFSGAP> G;        // gap array, G(1) is outside-most, betw L(1) and L(2)
+        bool ISControlled;        // CFS is not controlled, or has no controlled VB layer
+        int VBLayerPtr;           // Venetian blind layer pointer
+        int WEQLSolverErrorIndex; // recurring error index
 
         // Default Constructor
-        CFSTY() : NL(0), L(CFSMAXNL), G(CFSMAXNL - 1), ISControlled(false), VBLayerPtr(0)
+        CFSTY() : NL(0), L(CFSMAXNL), G(CFSMAXNL - 1), ISControlled(false), VBLayerPtr(0), WEQLSolverErrorIndex(0)
         {
         }
     };
