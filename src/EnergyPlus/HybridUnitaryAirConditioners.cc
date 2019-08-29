@@ -296,6 +296,7 @@ namespace HybridUnitaryAirConditioners {
                                                                             ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat,
                                                                             ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure,
                                                                             "InitZoneHybridUnitaryAirConditioners");
+        ZoneHybridUnitaryAirConditioner(UnitNum).SecInletMassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).SupplyVentilationAir;
     }
 
     void CalcZoneHybridUnitaryAirConditioners(int const UnitNum,              // unit number
@@ -391,7 +392,7 @@ namespace HybridUnitaryAirConditioners {
         using namespace Psychrometrics;
         ZoneHybridUnitaryAirConditioner(UnitNum).PrimaryMode = ZoneHybridUnitaryAirConditioner(UnitNum).PrimaryMode;
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).InletNode).MassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate;
-        Node(ZoneHybridUnitaryAirConditioner(UnitNum).InletNode).MassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate;
+        Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).MassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).SecInletMassFlowRate;
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).OutletNode).Temp = ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp;
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).OutletNode).HumRat = ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat;
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).OutletNode).MassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).OutletMassFlowRate;
@@ -617,13 +618,6 @@ namespace HybridUnitaryAirConditioners {
                           ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
                           NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).InletNode),
                           NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).OutletNode));
-            SetUpCompSets(CurrentModuleObject,
-                          ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                          CurrentModuleObject,
-                          ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                          NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryInletNode),
-                          NodeID(ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryOutletNode));
-
             SetUpCompSets(CurrentModuleObject,
                           ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
                           CurrentModuleObject,
@@ -1111,6 +1105,163 @@ namespace HybridUnitaryAirConditioners {
             ShowContinueError("... Preceding condition causes termination.");
         }
     }
+    int GetHybridUnitaryACOutAirNode(int const CompNum)
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         M Larson
+        //       DATE WRITTEN   Aug  2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // lookup function for OA inlet node
+
+        // METHODOLOGY EMPLOYED:
+        // <description>
+
+        // REFERENCES:
+        // na
+
+        // USE STATEMENTS:
+        // na
+
+        // Return value
+        int GetHybridUnitaryACOutAirNode;
+
+        // Locals
+        // FUNCTION ARGUMENT DEFINITIONS:
+
+        // FUNCTION PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        // na
+        bool errorsfound = false;
+        if (GetInputZoneHybridEvap) {
+            GetInputZoneHybridUnitaryAirConditioners(errorsfound);
+            GetInputZoneHybridEvap = false;
+        }
+
+        GetHybridUnitaryACOutAirNode = 0;
+        if (CompNum > 0 && CompNum <= NumZoneHybridEvap) {
+            GetHybridUnitaryACOutAirNode = ZoneHybridUnitaryAirConditioner(CompNum).SecondaryInletNode;
+        }
+
+        return GetHybridUnitaryACOutAirNode;
+    }
+
+    int GetHybridUnitaryACZoneInletNode(int const CompNum)
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         M Larson
+        //       DATE WRITTEN   Aug  2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // lookup function for zone inlet node
+
+        // METHODOLOGY EMPLOYED:
+        // <description>
+
+        // REFERENCES:
+        // na
+
+        // USE STATEMENTS:
+        // na
+
+        // Return value
+        int GetHybridUnitaryACZoneInletNode;
+
+        // Locals
+        // FUNCTION ARGUMENT DEFINITIONS:
+
+        // FUNCTION PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        // na
+        bool errorsfound = false;
+        if (GetInputZoneHybridEvap) {
+            GetInputZoneHybridUnitaryAirConditioners(errorsfound);
+            GetInputZoneHybridEvap = false;
+        }
+
+        GetHybridUnitaryACZoneInletNode = 0;
+        if (CompNum > 0 && CompNum <= NumZoneHybridEvap) {
+            GetHybridUnitaryACZoneInletNode = ZoneHybridUnitaryAirConditioner(CompNum).OutletNode;
+        }
+
+        return GetHybridUnitaryACZoneInletNode;
+    }
+
+    int GetHybridUnitaryACReturnAirNode(int const CompNum)
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         M Larson
+        //       DATE WRITTEN   Aug  2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // lookup function for OA inlet node
+
+        // METHODOLOGY EMPLOYED:
+        // <description>
+
+        // REFERENCES:
+        // na
+
+        // USE STATEMENTS:
+        // na
+
+        // Return value
+        int GetHybridUnitaryACReturnAirNode;
+
+        // Locals
+        // FUNCTION ARGUMENT DEFINITIONS:
+
+        // FUNCTION PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        // na
+        bool errorsfound = false;
+        if (GetInputZoneHybridEvap) {
+            GetInputZoneHybridUnitaryAirConditioners(errorsfound);
+            GetInputZoneHybridEvap = false;
+        }
+
+        GetHybridUnitaryACReturnAirNode = 0;
+        if (CompNum > 0 && CompNum <= NumZoneHybridEvap) {
+            GetHybridUnitaryACReturnAirNode = ZoneHybridUnitaryAirConditioner(CompNum).InletNode;
+        }
+
+        return GetHybridUnitaryACReturnAirNode;
+    }
+
+    //*****************************************************************************************
 
 } // namespace HybridUnitaryAirConditioners
 } // namespace EnergyPlus
