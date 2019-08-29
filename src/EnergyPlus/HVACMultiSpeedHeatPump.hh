@@ -243,6 +243,7 @@ namespace HVACMultiSpeedHeatPump {
         int HeatCountAvail;            // Counter used to minimize the occurrence of output warnings
         int HeatIndexAvail;            // Index used to minimize the occurrence of output warnings
         bool FirstPass;                // used to determine when first call is made
+        Array1D<Real64> FullOutput;    // Full output for different speed
 
         // Default Constructor
         MSHeatPumpData()

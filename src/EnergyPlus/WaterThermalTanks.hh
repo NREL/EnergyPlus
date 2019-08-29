@@ -426,6 +426,7 @@ namespace WaterThermalTanks {
         int DesuperheaterNum;          // Index to desuperheating coil
         bool ShowSetPointWarning;      // Warn when set point is greater than max tank temp limit
         int MaxCycleErrorIndex;        // recurring error index
+        int FreezingErrorIndex;        // recurring error index for freeze conditions
         WaterHeaterSizingData Sizing;  // ancillary data for autosizing
 
         // Default Constructor
@@ -460,7 +461,7 @@ namespace WaterThermalTanks {
               HeaterEnergy(0.0), HeaterEnergy1(0.0), HeaterEnergy2(0.0), FuelEnergy(0.0), FuelEnergy1(0.0), FuelEnergy2(0.0), VentEnergy(0.0),
               OffCycParaFuelEnergy(0.0), OffCycParaEnergyToTank(0.0), OnCycParaFuelEnergy(0.0), OnCycParaEnergyToTank(0.0),
               NetHeatTransferEnergy(0.0), FirstRecoveryDone(false), FirstRecoveryFuel(0.0), HeatPumpNum(0), DesuperheaterNum(0),
-              ShowSetPointWarning(true), MaxCycleErrorIndex(0)
+              ShowSetPointWarning(true), MaxCycleErrorIndex(0), FreezingErrorIndex(0)
         {
         }
 
