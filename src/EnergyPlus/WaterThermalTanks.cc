@@ -7547,6 +7547,25 @@ namespace WaterThermalTanks {
 
         Tank.TankTemp = TankTemp;            // Final tank temperature for carry-over to next timestep
         Tank.TankTempAvg = TankTempAvg;      // Average tank temperature over the timestep for reporting
+
+        if (!WarmupFlag) {
+            // Warn for potential freezing when avg of final temp over all nodes is below 2°C (nearing 0°C)
+            if (Tank.TankTemp < 2) {
+                if (Tank.FreezingErrorIndex == 0) {
+                    ShowWarningError(RoutineName + ": " + Tank.Type +" = '"
+                            + Tank.Name + "':  Temperature of tank < 2C indicates of possibility of freeze. Tank Temperature = "
+                            + General::RoundSigDigits(Tank.TankTemp, 2) + " C.");
+                    ShowContinueErrorTimeStamp("");
+                }
+                ShowRecurringWarningErrorAtEnd(Tank.Type +" = '" + Tank.Name + "':  Temperature of tank < 2C indicates of possibility of freeze",
+                                               Tank.FreezingErrorIndex,
+                                               Tank.TankTemp, // Report Max
+                                               Tank.TankTemp, // Report Min
+                                               _,             // Don't report Sum
+                                               "{C}",         // Max Unit
+                                               "{C}");        // Min Unit
+            }
+        }
         Tank.UseOutletTemp = TankTempAvg;    // Because entire tank is at same temperature
         Tank.SourceOutletTemp = TankTempAvg; // Because entire tank is at same temperature
         if (Tank.HeatPumpNum > 0) {
@@ -7895,6 +7914,7 @@ namespace WaterThermalTanks {
         using DataGlobals::HourOfDay;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
+        using DataGlobals::WarmupFlag;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using FluidProperties::GetDensityGlycol;
@@ -8418,6 +8438,25 @@ namespace WaterThermalTanks {
 
         Tank.TankTemp = sum(Tank.Node, &StratifiedNodeData::Temp) / Tank.Nodes;
         Tank.TankTempAvg = sum(Tank.Node, &StratifiedNodeData::TempAvg) / Tank.Nodes;
+
+        if (!WarmupFlag) {
+            // Warn for potential freezing when avg of final temp over all nodes is below 2°C (nearing 0°C)
+            if (Tank.TankTemp < 2) {
+                if (Tank.FreezingErrorIndex == 0) {
+                    ShowWarningError(RoutineName + ": " + Tank.Type +" = '"
+                            + Tank.Name + "':  Temperature of tank < 2C indicates of possibility of freeze. Tank Temperature = "
+                            + General::RoundSigDigits(Tank.TankTemp, 2) + " C.");
+                    ShowContinueErrorTimeStamp("");
+                }
+                ShowRecurringWarningErrorAtEnd(Tank.Type +" = '" + Tank.Name + "':  Temperature of tank < 2C indicates of possibility of freeze",
+                                               Tank.FreezingErrorIndex,
+                                               Tank.TankTemp, // Report Max
+                                               Tank.TankTemp, // Report Min
+                                               _,             // Don't report Sum
+                                               "{C}",         // Max Unit
+                                               "{C}");        // Min Unit
+            }
+        }
 
         if (Tank.UseOutletStratNode > 0) {
             Tank.UseOutletTemp = Tank.Node(Tank.UseOutletStratNode).TempAvg;
@@ -9180,7 +9219,7 @@ namespace WaterThermalTanks {
             } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {
                 DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
             } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_AIR_WATER_HEATPUMP_EQ) {
-                DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate; 
+                DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
                 DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeat(DesuperheaterNum) = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
             }
         }

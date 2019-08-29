@@ -89,6 +89,7 @@ namespace DataHeatBalSurface {
     extern Array1D<Real64> TempSource;            // Temperature at the source location for each heat transfer surface
     extern Array1D<Real64> TempUserLoc;           // Temperature at the user specified location for each heat transfer surface
     extern Array1D<Real64> TempSurfInRep;         // Temperature of the Inside Surface for each heat transfer surface
+    extern Array1D<Real64> TempSurfInMovInsRep;   // Temperature of interior movable insulation on the side facing the zone
     // (report)
     extern Array1D<Real64> QConvInReport; // Surface convection heat gain at inside face [J]
     extern Array1D<Real64> QdotConvInRep; // Surface convection heat transfer rate at inside face surface [W]

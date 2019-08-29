@@ -3867,6 +3867,48 @@ TEST_F(InputProcessorFixture, FalseDuplicates_LowestLevel_AlphaNum) {
 
 }
 
+TEST_F(InputProcessorFixture, clean_epjson)
+{
+    std::string const input("{\"Building\":{"
+                            "\"Zone1\":{"
+                            "\"idf_max_extensible_fields\":0,"
+                            "\"idf_max_fields\":8,"
+                            "\"idf_order\":1"
+                            "}"
+                            "},"
+                            "\"GlobalGeometryRules\":{"
+                            "\"\":{"
+                            "\"coordinate_system\":\"Relative\","
+                            "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+                            "\"idf_order\":0,"
+                            "\"rectangular_surface_coordinate_system\":\"Relative\","
+                            "\"starting_vertex_position\":\"UpperLeftCorner\","
+                            "\"vertex_entry_direction\":\"Counterclockwise\""
+                            "}"
+                            "}}");
+
+    std::string const expected("{\"Building\":{"
+                               "\"Zone1\":{"
+                               "}"
+                               "},"
+                               "\"GlobalGeometryRules\":{"
+                               "\"\":{"
+                               "\"coordinate_system\":\"Relative\","
+                               "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+                               "\"rectangular_surface_coordinate_system\":\"Relative\","
+                               "\"starting_vertex_position\":\"UpperLeftCorner\","
+                               "\"vertex_entry_direction\":\"Counterclockwise\""
+                               "}"
+                               "}}");
+
+    json cleanInput = json::parse(input);
+
+    cleanEPJSON(cleanInput);
+    std::string cleanstring = cleanInput.dump();
+
+    EXPECT_EQ(expected, cleanstring);
+}
+
 /*
    TEST_F( InputProcessorFixture, processIDF_json )
    {

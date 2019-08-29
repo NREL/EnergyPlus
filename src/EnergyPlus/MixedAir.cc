@@ -3330,6 +3330,13 @@ namespace MixedAir {
                     thisOAController.MixMassFlow = AirLoopFlow(AirLoopNum).ReqSupplyFrac * AirLoopFlow(AirLoopNum).DesSupply;
                 } else {
                     thisOAController.MixMassFlow = Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow;
+
+                    // The following was commented out after discussion on PR 7382, it can be reopened for discussion anytime
+                    // found this equation results in flow that exceeds the design flow rate when there is exhaust flow rate is greater than
+                    // the design supply air flow rate. Capped the mixed air flow rate at design supply air flow rate, issue #77379
+                    // thisOAController.MixMassFlow = Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow;
+                    // thisOAController.MixMassFlow =
+                    //     min(Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow, AirLoopFlow(AirLoopNum).DesSupply);
                 }
             } else {
                 thisOAController.ExhMassFlow = 0.0;
@@ -3807,6 +3814,8 @@ namespace MixedAir {
                 } else {
                     curAirLoopControlInfo.ResimAirLoopFlag = false;
                 }
+            } else if (curAirLoopControlInfo.HeatingActiveFlag) {
+                this->HRHeatingCoilActive = 1;
             } else {
                 this->HRHeatingCoilActive = 0;
             }
@@ -4735,7 +4744,8 @@ namespace MixedAir {
                 } else if (this->HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum) {
                     Real64 OAMassFlowMin = OutAirMinFrac * AirLoopFlow(AirLoopNum).DesSupply;
                     Real64 OAMassFlowActual = OASignal * this->MixMassFlow;
-                    if (OAMassFlowActual > OAMassFlowMin) {
+                    Real64 reasonablySmallMassFlow = 1e-6;
+                    if (OAMassFlowActual > (OAMassFlowMin + reasonablySmallMassFlow)) {
                         AirLoopControlInfo(AirLoopNum).HeatRecoveryBypass = true;
                         this->HeatRecoveryBypassStatus = 1;
                     }
