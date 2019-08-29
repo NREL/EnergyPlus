@@ -2224,6 +2224,8 @@ namespace SurfaceGeometry {
         bool OK;
         int Found;
         std::string OutMsg;
+        int ZoneNum; // DO loop counter (zones)
+        static bool RelWarning(false);
 
         // Formats
         static ObjexxFCL::gio::Fmt Format_720("(A)");
@@ -2373,7 +2375,13 @@ namespace SurfaceGeometry {
                 ShowContinueError(cAlphaFieldNames(5) + "=\"" + GAlphas(5) + "\".");
             }
         } else {
-            if (!RectSurfRefWorldCoordSystem) {
+            RelWarning = false;
+            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                if (Zone(ZoneNum).OriginX != 0.0) RelWarning = true;
+                if (Zone(ZoneNum).OriginY != 0.0) RelWarning = true;
+                if (Zone(ZoneNum).OriginZ != 0.0) RelWarning = true;
+            }
+            if (RelWarning && !RectSurfRefWorldCoordSystem) {
                 ShowWarningError(cCurrentModuleObject + ": Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on the default SurfaceGeometry for 'Relative to zone' coordinate.");
                 ShowContinueError(cAlphaFieldNames(3) + "=\"" + GAlphas(3) + "\"; while ");
                 ShowContinueError(cAlphaFieldNames(5) + "=\"" + GAlphas(5) + "\".");

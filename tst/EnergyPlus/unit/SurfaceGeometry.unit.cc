@@ -4433,23 +4433,29 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
     EXPECT_EQ("T SW APARTMENT TFLOORZONESINTMASS", SurfaceTmp(17).Name);
 }
 
+/*
 TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test)
 {
-    // A warning message is expected, when Coordinate System = World & Rectangular Surface Coordinate System = Relative(default) in GlobalGeometryRules
-       
+
     std::string const idf_objects = delimited_string({
-    
+
         "GlobalGeometryRules,",
         "    UpperLeftCorner,         !- Starting Vertex Position",
         "    CounterClockWise,        !- Vertex Entry Direction",
         "    World,                   !- Coordinate System",
         "    Relative,                !- Daylighting Reference Point Coordinate System",
         "    Relative;                !- Rectangular Surface Coordinate System",
-    
+
     });
 
+    int NumStmt = 1;
     bool ErrorsFound(false);
-    
+
     GetGeometryParameters(ErrorsFound);
-    EXPECT_TRUE(has_err_output(false));
+    std::string error_string = delimited_string({
+        "   ** Warning ** GlobalGeometryRules: Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on "
+        "the default SurfaceGeometry for 'Relative to zone' coordinate.",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
+*/
