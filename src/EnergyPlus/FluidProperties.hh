@@ -359,21 +359,21 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    void InterpDefValuesForGlycolConc(int const NumOfConcs,              // number of concentrations (dimension of raw data)
-                                      int const NumOfTemps,              // number of temperatures (dimension of raw data)
-                                      Array1S<Real64> const RawConcData, // concentrations for raw data
-                                      Array2S<Real64> const RawPropData, // raw property data (concentration, temperature)
-                                      Real64 const Concentration,        // concentration of actual fluid mix
+    void InterpDefValuesForGlycolConc(int NumOfConcs,              // number of concentrations (dimension of raw data)
+                                      int NumOfTemps,              // number of temperatures (dimension of raw data)
+                                      Array1S<Real64> RawConcData, // concentrations for raw data
+                                      Array2S<Real64> RawPropData, // raw property data (concentration, temperature)
+                                      Real64 Concentration,        // concentration of actual fluid mix
                                       Array1S<Real64> InterpData         // interpolated output data at proper concentration
     );
 
     //*****************************************************************************
 
-    void InterpValuesForGlycolConc(int const NumOfConcs,              // number of concentrations (dimension of raw data)
-                                   int const NumOfTemps,              // number of temperatures (dimension of raw data)
-                                   Array1S<Real64> const RawConcData, // concentrations for raw data
-                                   Array2S<Real64> const RawPropData, // raw property data (temperature,concentration)
-                                   Real64 const Concentration,        // concentration of actual fluid mix
+    void InterpValuesForGlycolConc(int NumOfConcs,              // number of concentrations (dimension of raw data)
+                                   int NumOfTemps,              // number of temperatures (dimension of raw data)
+                                   Array1S<Real64> RawConcData, // concentrations for raw data
+                                   Array2S<Real64> RawPropData, // raw property data (temperature,concentration)
+                                   Real64 Concentration,        // concentration of actual fluid mix
                                    Array1S<Real64> InterpData         // interpolated output data at proper concentration
     );
 
@@ -396,7 +396,7 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSatPressureRefrig(std::string const &Refrigerant, // carries in substance name
-                                Real64 const Temperature,       // actual temperature given as input
+                                Real64 Temperature,       // actual temperature given as input
                                 int &RefrigIndex,               // Index to Refrigerant Properties
                                 std::string const &CalledFrom   // routine this function was called from (error messages)
     );
@@ -404,7 +404,7 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSatTemperatureRefrig(std::string const &Refrigerant, // carries in substance name
-                                   Real64 const Pressure,          // actual temperature given as input
+                                   Real64 Pressure,          // actual temperature given as input
                                    int &RefrigIndex,               // Index to Refrigerant Properties
                                    std::string const &CalledFrom   // routine this function was called from (error messages)
     );
@@ -412,8 +412,8 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSatEnthalpyRefrig(std::string const &Refrigerant, // carries in substance name
-                                Real64 const Temperature,       // actual temperature given as input
-                                Real64 const Quality,           // actual quality given as input
+                                Real64 Temperature,       // actual temperature given as input
+                                Real64 Quality,           // actual quality given as input
                                 int &RefrigIndex,               // Index to Refrigerant Properties
                                 std::string const &CalledFrom   // routine this function was called from (error messages)
     );
@@ -421,8 +421,8 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSatDensityRefrig(std::string const &Refrigerant, // carries in substance name
-                               Real64 const Temperature,       // actual temperature given as input
-                               Real64 const Quality,           // actual quality given as input
+                               Real64 Temperature,       // actual temperature given as input
+                               Real64 Quality,           // actual quality given as input
                                int &RefrigIndex,               // Index to Refrigerant Properties
                                std::string const &CalledFrom   // routine this function was called from (error messages)
     );
@@ -430,8 +430,8 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSatSpecificHeatRefrig(std::string const &Refrigerant, // carries in substance name
-                                    Real64 const Temperature,       // actual temperature given as input
-                                    Real64 const Quality,           // actual quality given as input
+                                    Real64 Temperature,       // actual temperature given as input
+                                    Real64 Quality,           // actual quality given as input
                                     int &RefrigIndex,               // Index to Refrigerant Properties
                                     std::string const &CalledFrom   // routine this function was called from (error messages)
     );
@@ -439,8 +439,8 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSupHeatEnthalpyRefrig(std::string const &Refrigerant, // carries in substance name
-                                    Real64 const Temperature,       // actual temperature given as input
-                                    Real64 const Pressure,          // actual pressure given as input
+                                    Real64 Temperature,       // actual temperature given as input
+                                    Real64 Pressure,          // actual pressure given as input
                                     int &RefrigIndex,               // Index to Refrigerant Properties
                                     std::string const &CalledFrom   // routine this function was called from (error messages)
     );
@@ -448,8 +448,8 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSupHeatPressureRefrig(std::string const &Refrigerant, // carries in substance name
-                                    Real64 const Temperature,       // actual temperature given as input
-                                    Real64 const Enthalpy,          // actual enthalpy given as input
+                                    Real64 Temperature,       // actual temperature given as input
+                                    Real64 Enthalpy,          // actual enthalpy given as input
                                     int &RefrigIndex,               // Index to Refrigerant Properties
                                     std::string const &CalledFrom   // routine this function was called from (error messages)
     );
@@ -457,22 +457,22 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSupHeatTempRefrig(std::string const &Refrigerant, // carries in substance name
-                                Real64 const Pressure,          // actual pressure given as input
-                                Real64 const Enthalpy,          // actual enthalpy given as input
+                                Real64 Pressure,          // actual pressure given as input
+                                Real64 Enthalpy,          // actual enthalpy given as input
                                 Real64 TempLow,                 // lower bound of temperature in the iteration
                                 Real64 TempUp,                  // upper bound of temperature in the iteration
                                 int &RefrigIndex,               // Index to Refrigerant Properties
                                 std::string const &CalledFrom   // routine this function was called from (error messages)
     );
 
-    Real64 GetSupHeatTempRefrigResidual(Real64 const Temperature, // temperature of the refrigerant
+    Real64 GetSupHeatTempRefrigResidual(Real64 Temperature, // temperature of the refrigerant
                                         Array1<Real64> const &Par);
 
     //*****************************************************************************
 
     Real64 GetSupHeatDensityRefrig(std::string const &Refrigerant, // carries in substance name
-                                   Real64 const Temperature,       // actual temperature given as input
-                                   Real64 const Pressure,          // actual pressure given as input
+                                   Real64 Temperature,       // actual temperature given as input
+                                   Real64 Pressure,          // actual pressure given as input
                                    int &RefrigIndex,               // Index to Refrigerant Properties
                                    std::string const &CalledFrom   // routine this function was called from (error messages)
     );
@@ -480,7 +480,7 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSpecificHeatGlycol(std::string const &Glycol,    // carries in substance name
-                                 Real64 const Temperature,     // actual temperature given as input
+                                 Real64 Temperature,     // actual temperature given as input
                                  int &GlycolIndex,             // Index to Glycol Properties
                                  std::string const &CalledFrom // routine this function was called from (error messages)
     );
@@ -488,7 +488,7 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetDensityGlycol(std::string const &Glycol,    // carries in substance name
-                            Real64 const Temperature,     // actual temperature given as input
+                            Real64 Temperature,     // actual temperature given as input
                             int &GlycolIndex,             // Index to Glycol Properties
                             std::string const &CalledFrom // routine this function was called from (error messages)
     );
@@ -496,7 +496,7 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetConductivityGlycol(std::string const &Glycol,    // carries in substance name
-                                 Real64 const Temperature,     // actual temperature given as input
+                                 Real64 Temperature,     // actual temperature given as input
                                  int &GlycolIndex,             // Index to Glycol Properties
                                  std::string const &CalledFrom // routine this function was called from (error messages)
     );
@@ -504,7 +504,7 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetViscosityGlycol(std::string const &Glycol,    // carries in substance name
-                              Real64 const Temperature,     // actual temperature given as input
+                              Real64 Temperature,     // actual temperature given as input
                               int &GlycolIndex,             // Index to Glycol Properties
                               std::string const &CalledFrom // routine this function was called from (error messages)
     );
@@ -578,8 +578,8 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetQualityRefrig(std::string const &Refrigerant, // carries in substance name
-                            Real64 const Temperature,       // actual temperature given as input
-                            Real64 const Enthalpy,          // actual enthalpy given as input
+                            Real64 Temperature,       // actual temperature given as input
+                            Real64 Enthalpy,          // actual enthalpy given as input
                             int &RefrigIndex,               // Index to Refrigerant Properties
                             std::string const &CalledFrom   // routine this function was called from (error messages)
     );
@@ -594,30 +594,30 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    std::string GetGlycolNameByIndex(int const Idx); // carries in substance index
+    std::string GetGlycolNameByIndex(int Idx); // carries in substance index
 
     //*****************************************************************************
 
-    int FindArrayIndex(Real64 const Value,           // Value to be placed/found within the array of values
+    int FindArrayIndex(Real64 Value,           // Value to be placed/found within the array of values
                        Array1D<Real64> const &Array, // Array of values in ascending order
-                       int const LowBound,           // Valid values lower bound (set by calling program)
-                       int const UpperBound          // Valid values upper bound (set by calling program)
+                       int LowBound,           // Valid values lower bound (set by calling program)
+                       int UpperBound          // Valid values upper bound (set by calling program)
     );
 
-    int FindArrayIndex(Real64 const Value,          // Value to be placed/found within the array of values
+    int FindArrayIndex(Real64 Value,          // Value to be placed/found within the array of values
                        Array1D<Real64> const &Array // Array of values in ascending order
     );
 
     //*****************************************************************************
 
-    Real64 GetInterpolatedSatProp(Real64 const Temperature,         // Saturation Temp.
+    Real64 GetInterpolatedSatProp(Real64 Temperature,         // Saturation Temp.
                                   Array1D<Real64> const &PropTemps, // Array of temperature at which props are available
                                   Array1D<Real64> const &LiqProp,   // Array of saturated liquid properties
                                   Array1D<Real64> const &VapProp,   // Array of saturatedvapour properties
-                                  Real64 const Quality,             // Quality
+                                  Real64 Quality,             // Quality
                                   std::string const &CalledFrom,    // routine this function was called from (error messages)
-                                  int const LowBound,               // Valid values lower bound (set by calling program)
-                                  int const UpperBound              // Valid values upper bound (set by calling program)
+                                  int LowBound,               // Valid values lower bound (set by calling program)
+                                  int UpperBound              // Valid values upper bound (set by calling program)
     );
 
     //*****************************************************************************
@@ -626,27 +626,27 @@ namespace FluidProperties {
 
     void ReportOrphanFluids();
 
-    void ReportFatalGlycolErrors(int const NumGlycols,           // Number of Glycols in input/data
-                                 int const GlycolNum,            // Glycol Index
-                                 bool const DataPresent,         // data is present for this fluid.
+    void ReportFatalGlycolErrors(int NumGlycols,           // Number of Glycols in input/data
+                                 int GlycolNum,            // Glycol Index
+                                 bool DataPresent,         // data is present for this fluid.
                                  std::string const &GlycolName,  // Name being reported
                                  std::string const &RoutineName, // Routine name to show
                                  std::string const &Property,    // Property being requested
                                  std::string const &CalledFrom   // original called from (external to fluid properties)
     );
 
-    void ReportFatalRefrigerantErrors(int const NumRefrigerants,          // Number of Refrigerants in input/data
-                                      int const RefrigerantNum,           // Refrigerant Index
-                                      bool const DataPresent,             // data is present for this fluid.
+    void ReportFatalRefrigerantErrors(int NumRefrigerants,          // Number of Refrigerants in input/data
+                                      int RefrigerantNum,           // Refrigerant Index
+                                      bool DataPresent,             // data is present for this fluid.
                                       std::string const &RefrigerantName, // Name being reported
                                       std::string const &RoutineName,     // Routine name to show
                                       std::string const &Property,        // Property being requested
                                       std::string const &CalledFrom       // original called from (external to fluid properties)
     );
 
-    void GetFluidDensityTemperatureLimits(int const FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit);
+    void GetFluidDensityTemperatureLimits(int FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit);
 
-    void GetFluidSpecificHeatTemperatureLimits(int const FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit);
+    void GetFluidSpecificHeatTemperatureLimits(int FluidIndex, Real64 &MinTempLimit, Real64 &MaxTempLimit);
 
 } // namespace FluidProperties
 

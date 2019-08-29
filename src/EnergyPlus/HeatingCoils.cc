@@ -437,10 +437,10 @@ namespace HeatingCoils {
             HeatingCoilNumericFields(CoilNum).FieldNames = cNumericFields;
 
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, InputErrorsFound);
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), errFlag, CurrentModuleObject + " Name");
-            if (errFlag) {
-                InputErrorsFound = true;
-            }
+
+            // InputErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), InputErrorsFound, CurrentModuleObject + " Name");
+
             HeatingCoil(CoilNum).Name = Alphas(1);
             HeatingCoil(CoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
@@ -539,10 +539,8 @@ namespace HeatingCoils {
             HeatingCoilNumericFields(CoilNum).FieldNames = cNumericFields;
 
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, InputErrorsFound);
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), errFlag, CurrentModuleObject + " Name");
-            if (errFlag) {
-                InputErrorsFound = true;
-            }
+            // InputErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), InputErrorsFound, CurrentModuleObject + " Name");
             HeatingCoil(CoilNum).Name = Alphas(1);
             HeatingCoil(CoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
@@ -650,10 +648,8 @@ namespace HeatingCoils {
             HeatingCoilNumericFields(CoilNum).FieldNames = cNumericFields;
 
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, InputErrorsFound);
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), errFlag, CurrentModuleObject + " Name");
-            if (errFlag) {
-                InputErrorsFound = true;
-            }
+            // InputErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), InputErrorsFound, CurrentModuleObject + " Name");
             coil.Name = Alphas(1);
             coil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
@@ -788,10 +784,8 @@ namespace HeatingCoils {
             HeatingCoilNumericFields(CoilNum).FieldNames = cNumericFields;
 
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, InputErrorsFound);
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), errFlag, CurrentModuleObject + " Name");
-            if (errFlag) {
-                InputErrorsFound = true;
-            }
+            // InputErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), InputErrorsFound, CurrentModuleObject + " Name");
             HeatingCoil(CoilNum).Name = Alphas(1);
             HeatingCoil(CoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
@@ -946,10 +940,8 @@ namespace HeatingCoils {
             HeatingCoilNumericFields(CoilNum).FieldNames = cNumericFields;
 
             UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, InputErrorsFound);
-            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), errFlag, CurrentModuleObject + " Name");
-            if (errFlag) {
-                InputErrorsFound = true;
-            }
+            // InputErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, Alphas(1), InputErrorsFound, CurrentModuleObject + " Name");
             HeatingCoil(CoilNum).Name = Alphas(1);
             HeatingCoil(CoilNum).Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
@@ -1122,34 +1114,21 @@ namespace HeatingCoils {
                     HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum == HeatingCoil(RemainingCoils).ReclaimHeatingSourceIndexNum) {
                     SourceIndexNum = HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum;
                     if (HeatingCoil(CoilNum).ReclaimHeatingSource == COMPRESSORRACK_REFRIGERATEDCASE) {
-                        SourceTypeString = "Refrigeration:CompressorRack";
+                        SourceTypeString = HeatReclaimRefrigeratedRack(SourceIndexNum).SourceType;
                         SourceNameString = HeatReclaimRefrigeratedRack(SourceIndexNum).Name;
                     }
                     if (HeatingCoil(CoilNum).ReclaimHeatingSource == CONDENSER_REFRIGERATION) {
+                        SourceTypeString = HeatReclaimRefrigCondenser(SourceIndexNum).SourceType;
                         SourceNameString = HeatReclaimRefrigCondenser(SourceIndexNum).Name;
-                        if (HeatReclaimRefrigCondenser(SourceIndexNum).SourceType == RefrigCondenserTypeAir)
-                            SourceTypeString = "Refrigeration:Condenser:AirCooled";
-                        if (HeatReclaimRefrigCondenser(SourceIndexNum).SourceType == RefrigCondenserTypeEvap)
-                            SourceTypeString = "Refrigeration:Condenser:EvaporativeCooled";
-                        if (HeatReclaimRefrigCondenser(SourceIndexNum).SourceType == RefrigCondenserTypeWater)
-                            SourceTypeString = "Refrigeration:Condenser:WaterCooled";
                     }
-                    if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_COOLING) {
-                        SourceTypeString = "Coil:Cooling:DX:SingleSpeed";
+                    if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_COOLING || 
+                        HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_MULTISPEED || 
+                        HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_MULTIMODE ||
+                        HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {
+                        SourceTypeString = HeatReclaimDXCoil(SourceIndexNum).SourceType;
                         SourceNameString = HeatReclaimDXCoil(SourceIndexNum).Name;
                     }
-                    if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_MULTISPEED) {
-                        SourceTypeString = "Coil:Cooling:DX:TwoSpeed";
-                        SourceNameString = HeatReclaimDXCoil(SourceIndexNum).Name;
-                    }
-                    if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_MULTIMODE) {
-                        SourceTypeString = "Coil:Cooling:DX:TwoStageWithHumidityControlMode";
-                        SourceNameString = HeatReclaimDXCoil(SourceIndexNum).Name;
-                    }
-                    if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {
-                        SourceTypeString = "Coil:Cooling:DX:VariableSpeed";
-                        SourceNameString = DataHeatBalance::HeatReclaimVS_DXCoil(SourceIndexNum).Name;
-                    }
+
                     ShowSevereError("Coil:Heating:Desuperheater, \"" + HeatingCoil(CoilNum).Name + "\" and \"" + HeatingCoil(RemainingCoils).Name +
                                     "\" cannot use the same");
                     ShowContinueError(" heat source object " + SourceTypeString + ", \"" + SourceNameString + "\"");
@@ -2350,9 +2329,13 @@ namespace HeatingCoils {
                     OutletAirHumRat = FullLoadOutAirHumRat;
                     OutletAirTemp = FullLoadOutAirTemp;
                 } else {
-                    OutletAirEnthalpy = PartLoadRat * FullLoadOutAirEnth + (1.0 - PartLoadRat) * InletAirEnthalpy;
-                    OutletAirHumRat = PartLoadRat * FullLoadOutAirHumRat + (1.0 - PartLoadRat) * InletAirHumRat;
-                    OutletAirTemp = PartLoadRat * FullLoadOutAirTemp + (1.0 - PartLoadRat) * InletAirDryBulbTemp;
+                    OutletAirEnthalpy =
+                        PartLoadRat * AirMassFlow / HeatingCoil(CoilNum).InletAirMassFlowRate * (FullLoadOutAirEnth - InletAirEnthalpy) +
+                        InletAirEnthalpy;
+                    OutletAirHumRat =
+                        PartLoadRat * AirMassFlow / HeatingCoil(CoilNum).InletAirMassFlowRate * (FullLoadOutAirHumRat - InletAirHumRat) +
+                        InletAirHumRat;
+                    OutletAirTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
                 }
 
                 EffLS = HeatingCoil(CoilNum).MSEfficiency(StageNumLS);

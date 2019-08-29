@@ -97,12 +97,16 @@ AirLoopHVAC,
 This field is the availability status of an AirLoopHVAC. This status flag is a result of the calculations made by the System Availability Manager(s) listed in a System Availability Manager List. When a single availability manager is used in a System Availability Manager List, this is also the availability status reported by the specific availability manager (Ref. System Availability Manager Outputs). When multiple availability managers are used in a System Availability Manager List, the loop availability status is determine by the rules associated with AirLoopHVACs (see rules described for Group -- System Availability Managers). The control status outputs are represented using integers 0 through 3.. These integers represent \emph{NoAction} (0), \emph{ForceOff} (1), \emph{CycleOn} (2), and \emph{CycleOnZoneFansOnly} (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
 \paragraph{HVAC System Solver Iteration Count {[]}}\label{hvac-system-solver-iteration-count}
+This field reports the total number of HVAC System solver iterations in the current system time step or the maximum iterations possible for this solver if the simulation has not yet converged before it reached the maximum iterations.
 
 \paragraph{Air System Solver Iteration Count {[]}}\label{air-system-solver-iteration-count}
+This field reports the total number of Air System solver iterations in the current system time step or the maximum iterations possible for this solver if the simulation has not yet converged before it reached the maximum iterations.
 
 \paragraph{Air System Simulation Maximum Iteration Count {[]}}\label{air-system-simulation-maximum-iteration-count}
+This field reports the maximum number of iterations possible for an Air System simulation.
 
 \paragraph{Air System Simulation Iteration Count {[]}}\label{air-system-simulation-iteration-count}
+This field reports the total number of Air System iterations in the current system time step or the maximum iterations possible for this solver if the simulation has not yet converged before it reached the maximum iterations.
 
 \paragraph{Air System Component Model Simulation Calls {[]}}\label{air-system-component-model-simulation-calls}
 
@@ -630,6 +634,8 @@ The input for the Outside Air System consists of a system name, a controller lis
 
 The equipment inlet/outlet must be sequential with no loops - the simulation can only handle a straight-through air path, both on the primary air side and on the secondary air side, if any. Heat exchanger secondary air inlets need to be independent of the primary air stream -- usually relief air is used.
 
+The Outside Air System (object AirLoopHVAC:OutdoorAirSystem) can also be defined as a subsystem of an \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem}. When this subsystem is referred in AirLoopHVAC:DedicatedOutdoorAirSystem, the \hyperref[controlleroutdoorair]{Controller:OutdoorAir} can not be listed in the \hyperref[airloophvaccontrollerlist]{AirLoopHVAC:ControllerList}, because the outdoor air flow rate will not be determined by Controller:OutdoorAir. Instead, the outdoor air flow rate will be specified by \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem}.  In addition, the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} will not be allowed in the \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} as a component, because no mix is needed due to 100\% outdoor incoming airflow determined by AirLoopHVAC:DedicatedOutdoorAirSystem.     
+
 \subsubsection{Inputs}\label{inputs-3-001}
 
 \paragraph{Field: Name}\label{field-name-3-001}
@@ -640,9 +646,13 @@ The unique, user assigned name for a single instance of an Outside Air System. A
 
 This field is the name of a \hyperref[airloophvaccontrollerlist]{AirLoopHVAC:ControllerList} object. A \hyperref[airloophvaccontrollerlist]{AirLoopHVAC:ControllerList} is simply a list of controllers giving both controller name and type. This Controller List specifies all the controllers that will act on this outside air system. The order of the controllers in the list is significant: controllers are simulated sequentially in the order given in the Controller List. Typically the Controller List would contain a \hyperref[controlleroutdoorair]{Controller:OutdoorAir}. If there are chilled water or hot water coils in the outdoor air system, each such coil will need a \hyperref[controllerwatercoil]{Controller:WaterCoil}.
 
+When this object is referred in \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem}, the \hyperref[controlleroutdoorair]{Controller:OutdoorAir} will not be allowed in the list, becauseAirLoopHVAC:DedicatedOutdoorAirSystem does not need Controller:OutdoorAir to determine the amount of outdoor air flow rate. 
+
 \paragraph{Field: Outdoor Air Equipment List Name}\label{field-outdoor-air-equipment-list-name}
 
 This field is the name of an \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} object. An \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} is simply a list of components giving both component name and type. This Outdoor Air Equipment List specifies all the components that will be simulated in this outside air system. The order of the components in the list is significant: components are simulated sequentially in the order given in the Outdoor Air Equipment List. Typically the equipment list would contain at least an \hyperref[outdoorairmixer]{OutdoorAir:Mixer}. If there is more than one component, the components must be listed in order from the outside air to the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} (the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} is last).
+
+When this object is referred in \hyperref[airloophvacdedicatedoutdoorairsystem]{AirLoopHVAC:DedicatedOutdoorAirSystem}, the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} will not be allowed as a component, because all the incoming airflow is from outdoor, and no mixing is needed. 
 
 \paragraph{Field: Availability Manager List Name}\label{field-availability-manager-list-name-1}
 

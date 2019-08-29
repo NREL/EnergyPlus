@@ -37,3 +37,5 @@ add_test(NAME unit.CellFixture.cell_basics COMMAND $<TARGET_FILE:kiva_tests> "--
 add_test(NAME unit.AggregatorFixture.validation COMMAND $<TARGET_FILE:kiva_tests> "--gtest_filter=AggregatorFixture.validation")
 
 add_test(NAME unit.TypicalFixture.convectionCallback COMMAND $<TARGET_FILE:kiva_tests> "--gtest_filter=TypicalFixture.convectionCallback")
+
+add_test(NAME unit.FoundationFixture.foundationSurfaces COMMAND $<TARGET_FILE:kiva_tests> "--gtest_filter=FoundationFixture.foundationSurfaces")

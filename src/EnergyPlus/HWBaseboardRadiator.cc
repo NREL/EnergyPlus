@@ -72,6 +72,7 @@
 #include <GeneralRoutines.hh>
 #include <GlobalNames.hh>
 #include <HWBaseboardRadiator.hh>
+#include <HeatBalanceIntRadExchange.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -335,7 +336,6 @@ namespace HWBaseboardRadiator {
         int SurfNum;           // Surface number Do loop counter
         int IOStat;
         static bool ErrorsFound(false); // If errors detected in input
-        bool errFlag;
 
         NumHWBaseboards = inputProcessor->getNumObjectsFound(cCMO_BBRadiator_Water);
 
@@ -366,10 +366,8 @@ namespace HWBaseboardRadiator {
             HWBaseboardNumericFields(BaseboardNum).FieldNames = cNumericFieldNames;
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            VerifyUniqueBaseboardName(cCMO_BBRadiator_Water, cAlphaArgs(1), errFlag, cCMO_BBRadiator_Water + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueBaseboardName(cCMO_BBRadiator_Water, cAlphaArgs(1), ErrorsFound, cCMO_BBRadiator_Water + " Name");
 
             HWBaseboard(BaseboardNum).EquipID = cAlphaArgs(1);                     // Name of this baseboard
             HWBaseboard(BaseboardNum).EquipType = TypeOf_Baseboard_Rad_Conv_Water; //'ZoneHVAC:Baseboard:RadiantConvective:Water'
@@ -564,16 +562,32 @@ namespace HWBaseboardRadiator {
             HWBaseboard(BaseboardNum).FracDistribToSurf.allocate(HWBaseboard(BaseboardNum).TotSurfToDistrib);
             HWBaseboard(BaseboardNum).FracDistribToSurf = 0.0;
 
+            // search zone equipment list structure for zone index
+            for (int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone) {
+                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
+                    if (DataZoneEquipment::ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBWater_Num &&
+                        DataZoneEquipment::ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == HWBaseboard(BaseboardNum).EquipID) {
+                        HWBaseboard(BaseboardNum).ZonePtr = ctrlZone;
+                    }
+                }
+            }
+            if (HWBaseboard(BaseboardNum).ZonePtr <= 0) {
+                ShowSevereError(RoutineName + cCMO_BBRadiator_Water + "=\"" + HWBaseboard(BaseboardNum).EquipID +
+                                "\" is not on any ZoneHVAC:EquipmentList.");
+                ErrorsFound = true;
+                continue;
+            }
+
             AllFracsSummed = HWBaseboard(BaseboardNum).FracDistribPerson;
             for (SurfNum = 1; SurfNum <= HWBaseboard(BaseboardNum).TotSurfToDistrib; ++SurfNum) {
                 HWBaseboard(BaseboardNum).SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 5);
-                HWBaseboard(BaseboardNum).SurfacePtr(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + 5), Surface);
+                HWBaseboard(BaseboardNum).SurfacePtr(SurfNum) =
+                    HeatBalanceIntRadExchange::GetRadiantSystemSurface(cCMO_BBRadiator_Water,
+                                                                       HWBaseboard(BaseboardNum).EquipID,
+                                                                       HWBaseboard(BaseboardNum).ZonePtr,
+                                                                       HWBaseboard(BaseboardNum).SurfaceName(SurfNum),
+                                                                       ErrorsFound);
                 HWBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) = rNumericArgs(SurfNum + 9);
-                if (HWBaseboard(BaseboardNum).SurfacePtr(SurfNum) == 0) {
-                    ShowSevereError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(SurfNum + 5) + "=\"" +
-                                    cAlphaArgs(SurfNum + 5) + "\" invalid - not found.");
-                    ErrorsFound = true;
-                }
                 if (HWBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) > MaxFraction) {
                     ShowWarningError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 9) +
                                      "was greater than the allowable maximum.");
@@ -603,15 +617,6 @@ namespace HWBaseboardRadiator {
                 ShowWarningError(RoutineName + cCMO_BBRadiator_Water + "=\"" + cAlphaArgs(1) +
                                  "\", Summed radiant fractions for people + surface groups < 1.0");
                 ShowContinueError("The rest of the radiant energy delivered by the baseboard heater will be lost");
-            }
-            // search zone equipment list structure for zone index
-            for (int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone) {
-                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (DataZoneEquipment::ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBElectric_Num &&
-                        DataZoneEquipment::ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == HWBaseboard(BaseboardNum).EquipID) {
-                        HWBaseboard(BaseboardNum).ZonePtr = ctrlZone;
-                    }
-                }
             }
         }
 

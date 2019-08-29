@@ -389,7 +389,6 @@ namespace WaterCoils {
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         //  certain object in the input file
         static bool ErrorsFound(false); // If errors detected in input
-        bool errFlag;
         static int j1(0);
 
         // Flow
@@ -446,10 +445,9 @@ namespace WaterCoils {
             WaterCoilNumericFields(CoilNum).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
-            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), errFlag, CurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+
             WaterCoil(CoilNum).Name = AlphArray(1);
             WaterCoil(CoilNum).Schedule = AlphArray(2);
             if (lAlphaBlanks(2)) {
@@ -593,10 +591,10 @@ namespace WaterCoils {
             WaterCoilNumericFields(CoilNum).FieldNames = "";
             WaterCoilNumericFields(CoilNum).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
-            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), errFlag, CurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+
             WaterCoil(CoilNum).Name = AlphArray(1);
             WaterCoil(CoilNum).Schedule = AlphArray(2);
             if (lAlphaBlanks(2)) {
@@ -775,10 +773,9 @@ namespace WaterCoils {
             WaterCoilNumericFields(CoilNum).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
-            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), errFlag, CurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+
             WaterCoil(CoilNum).Name = AlphArray(1);
             WaterCoil(CoilNum).Schedule = AlphArray(2);
             if (lAlphaBlanks(2)) {
@@ -1416,7 +1413,7 @@ namespace WaterCoils {
 
                     // Total Coil Load from Inlet and Outlet Air States.
                     WaterCoil(CoilNum).DesTotWaterCoilLoad = WaterCoil(CoilNum).DesAirMassFlowRate * (DesInletAirEnth - DesOutletAirEnth);
-                    if (CurSysNum > 0) {
+                    if (CurSysNum > 0 && CurSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
                         WaterCoil(CoilNum).DesTotWaterCoilLoad = WaterCoil(CoilNum).DesTotWaterCoilLoad + PrimaryAirSystem(CurSysNum).FanDesCoolLoad;
                     }
 
@@ -2429,7 +2426,7 @@ namespace WaterCoils {
                     PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(DataWaterLoopNum).FluidIndex, RoutineName);
                 if (WaterCoil(CoilNum).DesTotWaterCoilLoad > 0.0) {
                     NomCapUserInp = true;
-                } else if (CurSysNum > 0) {
+                } else if (CurSysNum > 0 && CurSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
                     if (FinalSysSizing(CurSysNum).HeatingCapMethod == CapacityPerFloorArea) {
                         NomCapUserInp = true;
                     } else if (FinalSysSizing(CurSysNum).HeatingCapMethod == HeatingDesignCapacity &&

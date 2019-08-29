@@ -64,6 +64,11 @@
 
 namespace EnergyPlus {
 
+// Forward declaration
+namespace OutputProcessor {
+    enum class TimeStepType;
+}
+
 namespace General {
 
     // Data
@@ -312,7 +317,8 @@ namespace General {
                            int &Minute     // minute in integer format (0:59)
     );
 
-    int DetermineMinuteForReporting(int const IndexTypeKey); // kind of reporting, Zone Timestep or System
+    // TODO: this probably shouldn't be here
+    int DetermineMinuteForReporting(OutputProcessor::TimeStepType t_timeStepType); // kind of reporting, Zone Timestep or System
 
     void EncodeMonDayHrMin(int &Item,       // word containing encoded month, day, hour, minute
                            int const Month, // month in integer format (1:12)
@@ -383,6 +389,9 @@ namespace General {
 
     std::vector<std::string> splitString(const std::string &string, char delimiter);
 
+    Real64 epexp(Real64 x);
+
+    Real64 epexp(Real64 x, Real64 defaultHigh);
 } // namespace General
 
 } // namespace EnergyPlus

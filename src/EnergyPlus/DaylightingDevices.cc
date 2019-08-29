@@ -573,6 +573,7 @@ namespace DaylightingDevices {
                     }
 
                     TDDPipe(PipeNum).Dome = SurfNum;
+                    SurfaceWindow(SurfNum).TDDPipeNum = PipeNum;
                 }
 
                 // Get TDD:DIFFUSER object
@@ -644,6 +645,7 @@ namespace DaylightingDevices {
                     // Window multiplier is already handled in SurfaceGeometry.cc
 
                     TDDPipe(PipeNum).Diffuser = SurfNum;
+                    SurfaceWindow(SurfNum).TDDPipeNum = PipeNum;
                 }
 
                 // Construction
@@ -1475,7 +1477,7 @@ namespace DaylightingDevices {
             QRefl = (QRadSWOutIncident(DiffSurf) - QRadSWwinAbsTot(DiffSurf)) * Surface(DiffSurf).Area - WinTransSolar(DiffSurf);
 
             // Add diffuse interior shortwave reflected from zone surfaces and from zone sources, lights, etc.
-            QRefl += QS(Surface(DiffSurf).Zone) * Surface(DiffSurf).Area * transDiff;
+            QRefl += QS(Surface(DiffSurf).SolarEnclIndex) * Surface(DiffSurf).Area * transDiff;
 
             TotTDDPipeGain = WinTransSolar(TDDPipe(PipeNum).Dome) - QRadSWOutIncident(DiffSurf) * Surface(DiffSurf).Area +
                              QRefl * (1.0 - TDDPipe(PipeNum).TransSolIso / transDiff) +

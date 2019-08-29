@@ -851,6 +851,7 @@ namespace Psychrometrics {
     void PsyWFnTdpPb_error(Real64 const TDP,             // dew-point temperature {C}
                            Real64 const PB,              // barometric pressure {Pascals}
                            Real64 const W,               // humidity ratio
+                           Real64 const DeltaT,          // Reduced temperature difference of dew point
                            std::string const &CalledFrom // routine this function was called from (error messages)
     );
 #endif
@@ -886,10 +887,20 @@ namespace Psychrometrics {
 
         // Validity test
         if (W < 0.0) {
+            Real64 DeltaT = 0.0;
+            Real64 PDEW1 = PDEW;
+            while (PDEW1 >= PB) {
+                DeltaT++;
+                PDEW1 = PsyPsatFnTemp(TDP - DeltaT,
+                                      (CalledFrom.empty() ? RoutineName : CalledFrom)); // saturation pressure at dew-point temperature {Pascals}
+            }
+            Real64 W1 = PDEW1 * 0.62198 / (PB - PDEW1);
 #ifdef EP_psych_errors
-            if (W <= -0.0001) PsyWFnTdpPb_error(TDP, PB, W, CalledFrom);
+            if (W <= -0.0001) {
+                PsyWFnTdpPb_error(TDP, PB, W1, DeltaT, CalledFrom);
+            }
 #endif
-            return 1.0e-5;
+            return W1;
         } else {
             return W;
         }
@@ -1168,6 +1179,24 @@ namespace Psychrometrics {
         return 1000.1207 + 8.3215874e-04 * TB - 4.929976e-03 * pow_2(TB) + 8.4791863e-06 * pow_3(TB);
     }
 
+    inline Real64 PsyDeltaHSenFnTdb2W2Tdb1W1(Real64 const TDB2, // dry-bulb temperature at state 2 {C}
+        Real64 const dW2,   // humidity ratio at  at state 2
+        Real64 const TDB1, // dry-bulb temperature at  at state 1 {C}
+        Real64 const dW1   // humidity ratio  at state 1
+    )
+    {
+        // returns sensible enthalpy difference of moist air going from state 1 to state 2
+        Real64 dWavg = 0.5 * (max(dW2, 1.0e-5) + max(dW1, 1.0e-5));
+        return (1.00484e3 + dWavg * 1.85895e3) * (TDB2 - TDB1);
+    }
+
+    inline Real64 PsyHfgAvgFnTdb2Tdb1(Real64 const TDB2, // dry-bulb temperature at  at state 2 {C}
+        Real64 const TDB1 // dry-bulb temperature at  at state 1 {C}
+    )
+    {
+        // calculate average latent heat of vaporization of water vapor in moist air
+        return (2.50094e6 + 0.5 * (TDB2 + TDB1) * 1.85895e3);
+    }
 } // namespace Psychrometrics
 
 } // namespace EnergyPlus

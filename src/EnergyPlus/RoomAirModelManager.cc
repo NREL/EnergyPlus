@@ -336,7 +336,7 @@ namespace RoomAirModelManager {
         int NumNumbers; // Number of numbers encountered
         int Status;     // Notes if there was an error in processing the input
 
-        int thisSurfinZone; // working variable for indexing surfaces within a ZoneInfo structure
+        int thisSurfinZone; // working variable for indexing surfaces within a ZoneRadiantInfo structure
         int thisHBsurfID;   // working variable for indexing surfaces in main Surface structure
         int thisPattern;
 
@@ -2738,7 +2738,7 @@ namespace RoomAirModelManager {
     void GetRAFNNodeNum(std::string const &RAFNNodeName, // Name of RoomAir:Node:AirflowNetwork
                         int &ZoneNum,                    // The zone number associate with the node name
                         int &RAFNNodeNum,                // RoomAir:Node:AirflowNetwork Number
-                        bool &Errorfound                 // true if an error is found
+                        bool &Errorfound                 // true if an error is found (TODO: Useless, RAFNodeNum is 0 when Errorfound is true)
     )
     {
 

@@ -77,6 +77,7 @@
 #include <DataStringGlobals.hh>
 #include <DataSurfaces.hh>
 #include <DataSystemVariables.hh>
+#include <DataViewFactorInformation.hh>
 #include <DataWindowEquivalentLayer.hh>
 #include <DaylightingDevices.hh>
 #include <DaylightingManager.hh>
@@ -86,6 +87,7 @@
 #include <General.hh>
 #include <GlobalNames.hh>
 #include <HVACSizingSimulationManager.hh>
+#include <HeatBalanceIntRadExchange.hh>
 #include <HeatBalanceManager.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <HybridModel.hh>
@@ -331,6 +333,7 @@ namespace HeatBalanceManager {
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
             GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
+            HeatBalanceIntRadExchange::InitSolarViewFactors();
 
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
@@ -1010,19 +1013,18 @@ namespace HeatBalanceManager {
                                           cNumericFieldNames);
             {
                 auto const SELECT_CASE_var(AlphaName(1));
-                // The default is CTF = 0.  Then the moisture solution is EMPD =2
-                if ((SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") || (SELECT_CASE_var == "DEFAULT") || (SELECT_CASE_var == "CTF")) {
-                    OverallHeatTransferSolutionAlgo = UseCTF;
-                    AlphaName(1) = "CTF - Conduction Transfer Function";
+                // The default is CTF
+                if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
+                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+                    DataHeatBalance::AnyCTF = true;
 
-                } else if ((SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") || (SELECT_CASE_var == "EMPD")) {
-                    OverallHeatTransferSolutionAlgo = UseEMPD;
-                    AlphaName(1) = "EMPD - Effective Moisture Penetration Depth";
+                } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
+                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_EMPD;
+                    DataHeatBalance::AnyEMPD = true;
 
-                } else if ((SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") || (SELECT_CASE_var == "CONDFD") ||
-                           (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCEDETAILED")) {
-                    OverallHeatTransferSolutionAlgo = UseCondFD;
-                    AlphaName(1) = "CONDFD - Conduction Finite Difference";
+                } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
+                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CondFD;
+                    DataHeatBalance::AnyCondFD = true;
                     if (NumOfTimeStepInHour < 20) {
                         ShowSevereError("GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Conduction Finite Difference but Number of TimeSteps in Hour < 20, Value is " +
@@ -1031,9 +1033,9 @@ namespace HeatBalanceManager {
                                           "Errors or inaccurate calculations may occur.");
                     }
 
-                } else if ((SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") || (SELECT_CASE_var == "HAMT")) {
-                    OverallHeatTransferSolutionAlgo = UseHAMT;
-                    AlphaName(1) = "HAMT - Combined Heat and Moisture Transfer Finite Element";
+                } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
+                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_HAMT;
+                    DataHeatBalance::AnyHAMT = true;
                     if (NumOfTimeStepInHour < 20) {
                         ShowSevereError("GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Combined Heat and Moisture Finite Element but Number of TimeSteps in Hour < 20, Value is " +
@@ -1045,8 +1047,8 @@ namespace HeatBalanceManager {
                     }
 
                 } else {
-                    OverallHeatTransferSolutionAlgo = UseCTF;
-                    AlphaName(1) = "CTF - Conduction Transfer Function";
+                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+                    DataHeatBalance::AnyCTF = true;
                 }
             }
 
@@ -1068,14 +1070,11 @@ namespace HeatBalanceManager {
             }
 
         } else {
-            OverallHeatTransferSolutionAlgo = UseCTF;
-            AlphaName(1) = "ConductionTransferFunction";
+            OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+            DataHeatBalance::AnyCTF = true;
             MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
             MaxSurfaceTempLimitBeforeFatal = MaxSurfaceTempLimit * 2.5;
         }
-
-        HeatTransferAlgosUsed.allocate(1);
-        HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
 
         // algorithm input checks now deferred until surface properties are read in,
         //  moved to SurfaceGeometry.cc routine GetSurfaceHeatTransferAlgorithmOverrides
@@ -1497,11 +1496,7 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveInterpolationMethodNum;
         using CurveManager::GetCurveMinMaxValues;
-        using CurveManager::LinearInterpolationOfTable;
-        using CurveManager::PerfCurve;
-        using CurveManager::SetSameIndeVariableValues;
         using General::RoundSigDigits;
         using General::ScanForReports;
         using General::TrimSigDigits;
@@ -1562,6 +1557,7 @@ namespace HeatBalanceManager {
         static ObjexxFCL::gio::Fmt Format_702("(' Material:Air',2(',',A))");
 
         // FLOW:
+        std::string RoutineName("GetMaterialData: ");
 
         RegMat = inputProcessor->getNumObjectsFound("Material");
         RegRMat = inputProcessor->getNumObjectsFound("Material:NoMass");
@@ -1605,6 +1601,10 @@ namespace HeatBalanceManager {
             // Add a new fictitious insulation layer and a thermal mass layer for each F or C factor defined construction
             TotMaterials += 1 + TotFfactorConstructs + TotCfactorConstructs;
         }
+
+        // Add an internally generated Material:InfraredTransparent if there are any Construction:AirBoundary objects
+        int totAirBoundaryConstructs = inputProcessor->getNumObjectsFound("Construction:AirBoundary");
+        if (totAirBoundaryConstructs > 0) TotMaterials += 1;
 
         Material.allocate(TotMaterials); // Allocate the array Size to the number of materials
         UniqueMaterialNames.reserve(static_cast<unsigned>(TotMaterials));
@@ -1828,36 +1828,40 @@ namespace HeatBalanceManager {
 
             // Load the material derived type from the input data.
             Material(MaterNum).Name = MaterialNames(1);
-
-            if (MaterialNumProp >= 1) {
-                Material(MaterNum).Resistance = MaterialProps(1);
-                Material(MaterNum).ROnly = true;
-            } else {
-                Material(MaterNum).Resistance = 0.01;
-            }
-            if (MaterialNumProp >= 2) {
-                Material(MaterNum).AbsorpThermal = MaterialProps(2);
-                Material(MaterNum).AbsorpThermalInput = MaterialProps(2);
-            } else {
-                Material(MaterNum).AbsorpThermal = 0.9999;
-                Material(MaterNum).AbsorpThermalInput = 0.9999;
-            }
-            if (MaterialNumProp >= 3) {
-                Material(MaterNum).AbsorpSolar = MaterialProps(3);
-                Material(MaterNum).AbsorpSolarInput = MaterialProps(3);
-            } else {
-                Material(MaterNum).AbsorpSolar = 1.0;
-                Material(MaterNum).AbsorpSolarInput = 1.0;
-            }
-            if (MaterialNumProp >= 4) {
-                Material(MaterNum).AbsorpVisible = MaterialProps(4);
-                Material(MaterNum).AbsorpVisibleInput = MaterialProps(4);
-            } else {
-                Material(MaterNum).AbsorpVisible = 1.0;
-                Material(MaterNum).AbsorpVisibleInput = 1.0;
-            }
+            
+            // Load data for other properties that need defaults
+            Material(MaterNum).ROnly = true;
+            Material(MaterNum).Resistance = 0.01;
+            Material(MaterNum).AbsorpThermal = 0.9999;
+            Material(MaterNum).AbsorpThermalInput = 0.9999;
+            Material(MaterNum).AbsorpSolar = 1.0;
+            Material(MaterNum).AbsorpSolarInput = 1.0;
+            Material(MaterNum).AbsorpVisible = 1.0;
+            Material(MaterNum).AbsorpVisibleInput = 1.0;
 
             NominalR(MaterNum) = Material(MaterNum).Resistance;
+        }
+
+        // Add an internally generated Material:InfraredTransparent if there are any Construction:AirBoundary objects
+        if (totAirBoundaryConstructs > 0) {
+            ++MaterNum;
+            Material(MaterNum).Group = IRTMaterial;
+            Material(MaterNum).Name = "~AirBoundary-IRTMaterial";
+            Material(MaterNum).ROnly = true;
+            Material(MaterNum).Resistance = 0.01;
+            Material(MaterNum).AbsorpThermal = 0.9999;
+            Material(MaterNum).AbsorpThermalInput = 0.9999;
+            // Air boundaries should not participate in solar or daylighting
+            Material(MaterNum).AbsorpSolar = 0.0;
+            Material(MaterNum).AbsorpSolarInput = 0.0;
+            Material(MaterNum).AbsorpVisible = 0.0;
+            Material(MaterNum).AbsorpVisibleInput = 0.0;
+            NominalR(MaterNum) = Material(MaterNum).Resistance;
+            if (GlobalNames::VerifyUniqueInterObjectName(
+                    UniqueMaterialNames, Material(MaterNum).Name, CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
+                ShowContinueError("...All Material names must be unique regardless of subtype.");
+                ShowContinueError("...\"~AirBoundary-IRTMaterial\" is a reserved name used internally by Construction:AirBoundary.");
+            }
         }
 
         // Glass materials, regular input: transmittance and front/back reflectance
@@ -2094,54 +2098,41 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(5) + " requires a valid table object name, entered input=" + MaterialNames(5));
                     } else {
-                        // TODO: Use CurveManager::CheckCurveDims and allow any 2D Curve/Table
-                        if (PerfCurve(Material(MaterNum).GlassSpecAngTransDataPtr).ObjectType != "Table:TwoIndependentVariables") {
+                        ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngTransDataPtr, // Curve index
+                                                                    {2},                            // Valid dimensions
+                                                                    RoutineName,                    // Routine name
+                                                                    CurrentModuleObject,            // Object Type
+                                                                    Material(MaterNum).Name,        // Object Name
+                                                                    cAlphaFieldNames(5));           // Field Name
+
+                        GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
-                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
                             ShowContinueError(cAlphaFieldNames(5) +
-                                              " requires a valid Table:TwoIndependentVariables object name, entered input=" + MaterialNames(5));
-                        } else {
-                            if (GetCurveInterpolationMethodNum(Material(MaterNum).GlassSpecAngTransDataPtr) != LinearInterpolationOfTable) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid Interpolation Method.");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires LinearInterpolationOfTable, entered table name=" + MaterialNames(5));
-                            }
-                            if (!PerfCurve(Material(MaterNum).GlassSpecAngTransDataPtr).OpticalProperty) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid Table input.");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires X unit is Angle and Y unit is Wavelength, entered table name=" + MaterialNames(5));
-                            }
-                            GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
-                            if (minAngValue > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (minLamValue < 0.1) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
-                            }
-                            if (maxLamValue > 4.0) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
-                            }
+                                              " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (minLamValue < 0.1) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
+                        }
+                        if (maxLamValue > 4.0) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
                         }
                     }
                 }
@@ -2156,48 +2147,41 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(6) + " requires a valid table object name, entered input=" + MaterialNames(6));
                     } else {
-                        // TODO: Use CurveManager::CheckCurveDims and allow any 2D Curve/Table
-                        if (PerfCurve(Material(MaterNum).GlassSpecAngFRefleDataPtr).ObjectType != "Table:TwoIndependentVariables") {
+                        ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngFRefleDataPtr, // Curve index
+                                                                    {2},                            // Valid dimensions
+                                                                    RoutineName,                    // Routine name
+                                                                    CurrentModuleObject,            // Object Type
+                                                                    Material(MaterNum).Name,        // Object Name
+                                                                    cAlphaFieldNames(6));           // Field Name
+
+                        GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngFRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
-                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
-                            ShowContinueError(cAlphaFieldNames(6) +
-                                              " requires a valid Table:TwoIndependentVariables object name, entered input=" + MaterialNames(6));
-                        } else {
-                            if (GetCurveInterpolationMethodNum(Material(MaterNum).GlassSpecAngFRefleDataPtr) != LinearInterpolationOfTable) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid Interpolation Method.");
-                                ShowContinueError(cAlphaFieldNames(6) +
-                                                  " requires LinearInterpolationOfTable, entered table name=" + MaterialNames(6));
-                            }
-                            GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
-                            if (minAngValue > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (minLamValue < 0.1) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
-                            }
-                            if (maxLamValue > 4.0) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
-                            }
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (minLamValue < 0.1) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
+                        }
+                        if (maxLamValue > 4.0) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
                         }
                     }
                 }
@@ -2212,54 +2196,44 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(7) + " requires a valid table object name, entered input=" + MaterialNames(7));
                     } else {
-                        // TODO: Use CurveManager::CheckCurveDims and allow any 2D Curve/Table
-                        if (PerfCurve(Material(MaterNum).GlassSpecAngBRefleDataPtr).ObjectType != "Table:TwoIndependentVariables") {
+                        ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngBRefleDataPtr, // Curve index
+                                                                    {2},                            // Valid dimensions
+                                                                    RoutineName,                    // Routine name
+                                                                    CurrentModuleObject,            // Object Type
+                                                                    Material(MaterNum).Name,        // Object Name
+                                                                    cAlphaFieldNames(7));           // Field Name
+
+                        GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngBRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
-                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
-                            ShowContinueError(cAlphaFieldNames(7) +
-                                              " requires a valid Table:TwoIndependentVariables object name, entered input=" + MaterialNames(7));
-                        } else {
-                            if (GetCurveInterpolationMethodNum(Material(MaterNum).GlassSpecAngBRefleDataPtr) != LinearInterpolationOfTable) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid Interpolation Method.");
-                                ShowContinueError(cAlphaFieldNames(7) +
-                                                  " requires LinearInterpolationOfTable, entered table name=" + MaterialNames(7));
-                            }
-                            GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
-                            if (minAngValue > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (minLamValue < 0.1) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
-                            }
-                            if (maxLamValue > 4.0) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
-                            }
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (minLamValue < 0.1) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
+                        }
+                        if (maxLamValue > 4.0) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
                         }
                     }
                 }
-                SetSameIndeVariableValues(Material(MaterNum).GlassSpecAngTransDataPtr,
-                                          Material(MaterNum).GlassSpecAngFRefleDataPtr,
-                                          Material(MaterNum).GlassSpecAngBRefleDataPtr);
             }
         }
 
@@ -2402,6 +2376,8 @@ namespace HeatBalanceManager {
             Material(MaterNum).TausThermal = MaterialProps(23);
             Material(MaterNum).EmissThermalFront = MaterialProps(24);
             Material(MaterNum).EmissThermalBack = MaterialProps(25);
+            Material(MaterNum).Resistance = MaterialProps(26);
+            if (Material(MaterNum).Resistance <= 0.0) Material(MaterNum).Resistance = 0.158; // equivalent to single pane of 1/4" inch standard glass
             // Assumes thermal emissivity is the same as thermal absorptance
             Material(MaterNum).AbsorpThermalFront = Material(MaterNum).EmissThermalFront;
             Material(MaterNum).AbsorpThermalBack = Material(MaterNum).EmissThermalBack;
@@ -3583,9 +3559,13 @@ namespace HeatBalanceManager {
                 Material(MaterNum).ReflFrontDiffDiffVis = MaterialProps(14);
                 Material(MaterNum).ReflBackDiffDiffVis = MaterialProps(15);
             }
-            if (!lNumericFieldBlanks(19) && !lNumericFieldBlanks(20) && !lNumericFieldBlanks(21)) {
+            if (!lNumericFieldBlanks(19)) {
                 Material(MaterNum).TausThermal = MaterialProps(19);
+            }
+            if (!lNumericFieldBlanks(20)) {
                 Material(MaterNum).EmissThermalFront = MaterialProps(20);
+            }
+            if (!lNumericFieldBlanks(21)) {
                 Material(MaterNum).EmissThermalBack = MaterialProps(21);
             }
             // Assumes thermal emissivity is the same as thermal absorptance
@@ -4207,6 +4187,7 @@ namespace HeatBalanceManager {
         // Get the Total number of Constructions from the input
         TotRegConstructs = inputProcessor->getNumObjectsFound("Construction");
         TotSourceConstructs = inputProcessor->getNumObjectsFound("Construction:InternalSource");
+        int totAirBoundaryConstructs = inputProcessor->getNumObjectsFound("Construction:AirBoundary");
 
         TotFfactorConstructs = inputProcessor->getNumObjectsFound("Construction:FfactorGroundFloor");
         TotCfactorConstructs = inputProcessor->getNumObjectsFound("Construction:CfactorUndergroundWall");
@@ -4225,8 +4206,8 @@ namespace HeatBalanceManager {
 
         WConstructNames.allocate(TotWindow5Constructs);
 
-        TotConstructs =
-            TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + TotSourceConstructs + TotComplexFenStates + TotWinEquivLayerConstructs;
+        TotConstructs = TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + TotSourceConstructs + totAirBoundaryConstructs +
+                        TotComplexFenStates + TotWinEquivLayerConstructs;
 
         NominalRforNominalUCalculation.dimension(TotConstructs, 0.0);
         NominalU.dimension(TotConstructs, 0.0);
@@ -4348,6 +4329,14 @@ namespace HeatBalanceManager {
                 ShowSevereError("Errors found in creating the constructions defined with Ffactor or Cfactor method");
             }
             TotRegConstructs += TotFfactorConstructs + TotCfactorConstructs;
+        }
+
+        if (totAirBoundaryConstructs >= 1) {
+            CreateAirBoundaryConstructions(ConstrNum, ErrorsFound);
+            if (ErrorsFound) {
+                ShowSevereError("Errors found in creating the constructions defined with Construction:AirBoundary.");
+            }
+            TotRegConstructs += totAirBoundaryConstructs;
         }
 
         // Added BG 6/2010 for complex fenestration
@@ -4502,6 +4491,18 @@ namespace HeatBalanceManager {
                                     ", missing material = " + ConstructAlphas(Layer));
                     ErrorsFound = true;
                 } else {
+                    MaterialLayerGroup = Material(Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer)).Group;
+                    if (!((MaterialLayerGroup == GlassEquivalentLayer) || (MaterialLayerGroup == ShadeEquivalentLayer) ||
+                          (MaterialLayerGroup == DrapeEquivalentLayer) || (MaterialLayerGroup == BlindEquivalentLayer) ||
+                          (MaterialLayerGroup == ScreenEquivalentLayer) || (MaterialLayerGroup == GapEquivalentLayer))) {
+                        ShowSevereError("Invalid material layer type in window " + CurrentModuleObject + " = " +
+                                        Construct(TotRegConstructs + ConstrNum).Name);
+                        ShowContinueError("...Window layer = " + ConstructAlphas(Layer) +
+                                          " is not allowed in Construction:WindowEquivalentLayer window object.");
+                        ShowContinueError("Only materials of type Material:*:EquivalentLayer are allowed");
+                        ErrorsFound = true;
+                    }
+
                     if (ConstructNumAlpha <= 2) {
 
                     } else {
@@ -4583,6 +4584,8 @@ namespace HeatBalanceManager {
         // set some (default) properties of the Construction Derived Type
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
 
+            // For air boundaries, skip TypeIsAirBoundaryGroupedRadiant, process TypeIsAirBoundaryIRTSurface
+            if (Construct(ConstrNum).TypeIsAirBoundaryGroupedRadiant) continue;
             if (NominalRforNominalUCalculation(ConstrNum) != 0.0) {
                 NominalU(ConstrNum) = 1.0 / NominalRforNominalUCalculation(ConstrNum);
             } else {
@@ -4692,7 +4695,8 @@ namespace HeatBalanceManager {
         NumOfZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
         Zone.allocate(NumOfZones);
-
+        DataViewFactorInformation::ZoneRadiantInfo.allocate(NumOfZones);
+        DataViewFactorInformation::ZoneSolarInfo.allocate(NumOfZones);
         ZoneDaylight.allocate(NumOfZones);
 
         ZoneLoop = 0;
@@ -5211,7 +5215,7 @@ namespace HeatBalanceManager {
 
         if (BeginSimFlag) {
             AllocateHeatBalArrays(); // Allocate the Module Arrays
-            if (any_eq(HeatTransferAlgosUsed, UseCTF) || any_eq(HeatTransferAlgosUsed, UseEMPD)) {
+            if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
                 DisplayString("Initializing Response Factors");
                 InitConductionTransferFunctions(); // Initialize the response factors
             }
@@ -5337,10 +5341,26 @@ namespace HeatBalanceManager {
             SetOutAirNodes();
             for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 if (Zone(ZoneNum).HasLinkedOutAirNode) {
-                    Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
-                    Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum);
-                    Zone(ZoneNum).WindSpeed = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum);
-                    Zone(ZoneNum).WindDir = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum);
+                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum > 0) {
+                        Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
+                    } else {
+                        Zone(ZoneNum).OutDryBulbTemp = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulb;
+                    }
+                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum > 0) {
+                        Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum);
+                    } else {
+                        Zone(ZoneNum).OutWetBulbTemp = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulb;
+                    }
+                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum > 0) {
+                        Zone(ZoneNum).WindSpeed = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum);
+                    } else {
+                        Zone(ZoneNum).WindSpeed = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeed;
+                    }
+                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum > 0) {
+                        Zone(ZoneNum).WindDir = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum);
+                    } else {
+                        Zone(ZoneNum).WindDir = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDir;
+                    }
                 }
             }
         }
@@ -5588,6 +5608,10 @@ namespace HeatBalanceManager {
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             DataSurfaces::Surface(SurfNum).MovInsulIntPresentPrevTS = DataSurfaces::Surface(SurfNum).MovInsulIntPresent;
         }
+        
+        // For non-complex windows, update a report variable so this shows up in the output as something other than zero
+        UpdateWindowFaceTempsNonBSDFWin();
+        
     }
 
     void CheckWarmupConvergence()
@@ -5861,6 +5885,23 @@ namespace HeatBalanceManager {
         }
     }
 
+    void UpdateWindowFaceTempsNonBSDFWin()
+    {
+        
+        int SurfNum;
+        
+        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            auto &thisSurface(DataSurfaces::Surface(SurfNum));
+            if (thisSurface.Class == DataSurfaces::SurfaceClass_Window) {
+                auto &thisConstruct(thisSurface.Construction);
+                if (!Construct(thisConstruct).WindowTypeBSDF) {
+                    FenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
+                    FenLaySurfTempBack(Construct(thisConstruct).TotLayers,SurfNum) = TH(2, 1, SurfNum);
+                }
+            }
+        }
+    }
+    
     //        End of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
@@ -5922,12 +5963,12 @@ namespace HeatBalanceManager {
 
         if (!WarmupFlag && DoOutputReporting) {
             CalcMoreNodeInfo();
-            UpdateDataandReport(ZoneTSReporting);
+            UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
 
-            UpdateTabularReports(ZoneTSReporting);
+            UpdateTabularReports(OutputProcessor::TimeStepType::TimeStepZone);
             UpdateUtilityBills();
         } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
             if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
@@ -5952,13 +5993,13 @@ namespace HeatBalanceManager {
                 }
             }
             CalcMoreNodeInfo();
-            UpdateDataandReport(ZoneTSReporting);
+            UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
 
         } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
-            UpdateDataandReport(ZoneTSReporting);
+            UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
@@ -7474,6 +7515,95 @@ namespace HeatBalanceManager {
             // Reff includes the wall itself and soil, but excluding thermal resistance of inside or outside air film
             // 1/Reff gets reported as the "U-Factor no Film" in the summary report Envelope Summary | Opaque Exterior
             NominalRforNominalUCalculation(ConstrNum) = Reff;
+        }
+    }
+
+    void CreateAirBoundaryConstructions(int &constrNum,   // Counter for Constructions
+                                        bool &errorsFound // If errors found in input
+    )
+    {
+        cCurrentModuleObject = "Construction:AirBoundary";
+        std::string RoutineName = "CreateAirBoundaryConstructions";
+        int numAirBoundaryConstructs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        if (numAirBoundaryConstructs > 0) {
+            auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
+            if (instances == inputProcessor->epJSON.end()) {
+                // Cannot imagine how you would have numAirBoundaryConstructs > 0 and yet the instances is empty
+                // this would indicate a major problem in the input processor, not a problem here
+                // I'll still catch this with errorsFound but I cannot make a unit test for it so excluding the line from coverage
+                ShowSevereError(                                                                            // LCOV_EXCL_LINE
+                    cCurrentModuleObject + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+                errorsFound = true;                                                                         // LCOV_EXCL_LINE
+            }
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto thisObjectName = instance.key();
+                inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
+
+                if (GlobalNames::VerifyUniqueInterObjectName(UniqueConstructNames, thisObjectName, cCurrentModuleObject, "Name", errorsFound)) {
+                    continue;
+                }
+
+                ++constrNum;
+                auto &thisConstruct = Construct(constrNum);
+
+                thisConstruct.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                thisConstruct.TypeIsAirBoundary = true;
+                thisConstruct.IsUsedCTF = false;
+
+                // Solar and Daylighting Method
+                std::string const solarMethod = fields.at("solar_and_daylighting_method");
+                if (UtilityRoutines::SameString(solarMethod, "GroupedZones")) {
+                    thisConstruct.TypeIsAirBoundarySolar = true;
+                } else if (UtilityRoutines::SameString(solarMethod, "InteriorWindow")) {
+                    thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
+                    thisConstruct.TransDiff = 1.0;
+                    thisConstruct.TransDiffVis = 1.0;
+                    thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
+                    thisConstruct.TransSolBeamCoef = 1.0;
+                    thisConstruct.ReflectSolDiffBack = 0.0;
+                }
+
+                // Radiant Exchange Method
+                std::string const radMethod = fields.at("radiant_exchange_method");
+                if (UtilityRoutines::SameString(radMethod, "GroupedZones")) {
+                    thisConstruct.TypeIsAirBoundaryGroupedRadiant = true;
+                } else if (UtilityRoutines::SameString(radMethod, "IRTSurface")) {
+                    thisConstruct.IsUsedCTF = true;
+                    thisConstruct.TypeIsAirBoundaryIRTSurface = true;
+                    thisConstruct.TotLayers = 1;
+                    // Find the auto-generated special IRT material for air boundaries
+                    int materNum = UtilityRoutines::FindItemInList("~AirBoundary-IRTMaterial", DataHeatBalance::Material);
+                    thisConstruct.LayerPoint(1) = materNum;
+                    NominalRforNominalUCalculation(constrNum) = NominalR(materNum);
+                }
+
+                // Air Exchange Method
+                std::string const airMethod = fields.at("air_exchange_method");
+                if (UtilityRoutines::SameString(airMethod, "SimpleMixing")) {
+                    thisConstruct.TypeIsAirBoundaryMixing = true;
+                    if (fields.find("simple_mixing_air_changes_per_hour") != fields.end()) {
+                        thisConstruct.AirBoundaryACH = fields.at("simple_mixing_air_changes_per_hour");
+                    } else {
+                        if (!inputProcessor->getDefaultValue(
+                                cCurrentModuleObject, "simple_mixing_air_changes_per_hour", thisConstruct.AirBoundaryACH)) {
+                            errorsFound = true;
+                        }
+                    }
+                    if (fields.find("simple_mixing_schedule_name") != fields.end()) {
+                        auto &schedName = fields.at("simple_mixing_schedule_name");
+                        thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(UtilityRoutines::MakeUPPERCase(schedName));
+                        if (thisConstruct.AirBoundaryMixingSched == 0) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + thisConstruct.Name + "\", invalid (not found) " +
+                                            "Simple Mixing Schedule Name" + "=\"" + schedName.get<std::string>() + "\".");
+                            errorsFound = true;
+                        }
+                    } else {
+                        thisConstruct.AirBoundaryMixingSched = DataGlobals::ScheduleAlwaysOn;
+                    }
+                }
+            }
         }
     }
 

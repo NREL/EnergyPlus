@@ -236,6 +236,7 @@ namespace SimulationManager {
         // Using/Aliasing
         using DataEnvironment::CurMnDy;
         using DataEnvironment::CurrentOverallSimDay;
+        using DataEnvironment::CurrentYearIsLeapYear;
         using DataEnvironment::EndMonthFlag;
         using DataEnvironment::EnvironmentName;
         using DataEnvironment::TotalOverallSimDays;
@@ -502,10 +503,16 @@ namespace SimulationManager {
             DayOfSim = 0;
             DayOfSimChr = "0";
             NumOfWarmupDays = 0;
-            if (NumOfDayInEnvrn <= 365) {
-                isFinalYear = true;
+            if (CurrentYearIsLeapYear) {
+                if (NumOfDayInEnvrn <= 366) {
+                    isFinalYear = true;
+                }
+            } else {
+                if (NumOfDayInEnvrn <= 365) {
+                    isFinalYear = true;
+                }
             }
-
+            
             HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
             bool anyEMSRan;
@@ -1150,6 +1157,21 @@ namespace SimulationManager {
             DoWeathSim = true;
         }
 
+        auto const instances = inputProcessor->epJSON.find("PerformancePrecisionTradeoffs");
+        if (instances != inputProcessor->epJSON.end()) {
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed("PerformancePrecisionTradeoffs", thisObjectName);
+                if (fields.find("use_coil_direct_solutions") != fields.end()) {
+                    if (UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES") {
+                        DoCoilDirectSolutions = true;
+                    }
+                }
+            }
+        }
+
         if (ErrorsFound) {
             ShowFatalError("Errors found getting Project Input");
         }
@@ -1679,8 +1701,6 @@ namespace SimulationManager {
         using DataBranchNodeConnections::NumOfNodeConnections;
         using DataHeatBalance::CondFDRelaxFactor;
         using DataHeatBalance::CondFDRelaxFactorInput;
-        using DataHeatBalance::HeatTransferAlgosUsed;
-        using DataHeatBalance::UseCondFD;
         using General::RoundSigDigits;
         using namespace DataSystemVariables; // , ONLY: MaxNumberOfThreads,NumberIntRadThreads,iEnvSetThreads
         using DataSurfaces::MaxVerticesPerSurface;
@@ -1780,7 +1800,7 @@ namespace SimulationManager {
         }
         eso_stream = nullptr;
 
-        if (any_eq(HeatTransferAlgosUsed, UseCondFD)) { // echo out relaxation factor, it may have been changed by the program
+        if (DataHeatBalance::AnyCondFD) { // echo out relaxation factor, it may have been changed by the program
             ObjexxFCL::gio::write(OutputFileInits, fmtA)
                 << "! <ConductionFiniteDifference Numerical Parameters>, Starting Relaxation Factor, Final Relaxation Factor";
             ObjexxFCL::gio::write(OutputFileInits, fmtA) << "ConductionFiniteDifference Numerical Parameters, " + RoundSigDigits(CondFDRelaxFactorInput, 3) +
@@ -2798,7 +2818,7 @@ namespace SimulationManager {
         int NumVariables;
         Array1D_int VarIndexes;
         Array1D_int VarIDs;
-        Array1D_int IndexTypes;
+        Array1D<OutputProcessor::TimeStepType> IndexTypes;
         Array1D_int VarTypes;
         Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
         Array1D_string VarNames;
@@ -2837,7 +2857,9 @@ namespace SimulationManager {
             for (Loop1 = 1; Loop1 <= NumVariables; ++Loop1) {
                 ObjexxFCL::gio::write(OutputFileDebug, "(1X,'RepVar,',I5,',',I5,',',A,',[',A,'],',A,',',A,',',A,',',I5)")
                     << VarIndexes(Loop1) << VarIDs(Loop1) << VarNames(Loop1) << unitEnumToString(unitsForVar(Loop1))
-                    << GetResourceTypeChar(ResourceTypes(Loop1)) << EndUses(Loop1) << Groups(Loop1) << IndexTypes(Loop1);
+                    << GetResourceTypeChar(ResourceTypes(Loop1)) << EndUses(Loop1) << Groups(Loop1)
+                    // TODO: Should call OutputProcessor::StandardTimeStepTypeKey(IndexTypes(Loop1)) to return "Zone" or "HVAC"
+                    << static_cast<int>(IndexTypes(Loop1));
             }
             VarIndexes.deallocate();
             IndexTypes.deallocate();

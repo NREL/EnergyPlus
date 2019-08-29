@@ -144,7 +144,6 @@ namespace LowTempRadiantSystem {
     using DataHeatBalance::Construct;
     using DataHeatBalance::Material;
     using DataHeatBalance::MaxLayersInConstruct;
-    using DataHeatBalance::QRadThermInAbs;
     using DataHeatBalance::RegularMaterial;
     using DataHeatBalance::TotConstructs;
     using DataHeatBalance::TotMaterials;
