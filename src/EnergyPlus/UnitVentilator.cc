@@ -3433,7 +3433,7 @@ namespace UnitVentilator {
 
             if (UnitVent(UnitVentNum).CCoilPresent) {
 
-                mdot = CalcMdotCCoilCycFan(QZnReq,UnitVentNum,PartLoadRatio);
+                CalcMdotCCoilCycFan(mdot,QCoilReq,QZnReq,UnitVentNum,PartLoadRatio);
                 SetComponentFlowRate(mdot,
                                      UnitVent(UnitVentNum).ColdControlNode,
                                      UnitVent(UnitVentNum).ColdCoilOutNodeNum,
@@ -4026,20 +4026,31 @@ namespace UnitVentilator {
         return ActualOAMassFlowRate;
     }
 
-    Real64 CalcMdotCCoilCycFan(Real64 const QZnReq,         // Zone load to setpoint
-                               int const UnitVentNum,       // Unit Ventilator index
-                               Real64 const PartLoadRatio   // Part load ratio for unit ventilator
+    void CalcMdotCCoilCycFan(Real64 &mdot,                 // mass flow rate
+                             Real64 &QCoilReq,             // Remaining load to cooling coil
+                             Real64 const QZnReq,         // Zone load to setpoint
+                             int const UnitVentNum,       // Unit Ventilator index
+                             Real64 const PartLoadRatio   // Part load ratio for unit ventilator
     )
     {
-        Real64 mdot(0.0);   // Result or return value
 
-        if (QZnReq >= 0.0) {
+        if (QZnReq >= 0.0) {    // Heating requested so no cooling coil needed
             mdot = 0.0;
-        } else {
+        } else {                // Cooling so set first guess at flow rate
             mdot = UnitVent(UnitVentNum).MaxColdWaterFlow * PartLoadRatio;
         }
         
-        return mdot;
+            // Check to see what outside air will do, "turn off" cooling coil if OA can handle the load
+        int CCoilInAirNode = UnitVent(UnitVentNum).FanOutletNode;
+        int AirInNode = UnitVent(UnitVentNum).AirInNode;
+        Real64 const SmallLoad = -1.0;  // Watts
+        Real64 CpAirZn = PsyCpAirFnWTdb(Node(AirInNode).HumRat, Node(AirInNode).Temp);
+        QCoilReq = QZnReq - Node(CCoilInAirNode).MassFlowRate * CpAirZn * (Node(CCoilInAirNode).Temp - Node(AirInNode).Temp);
+        if (QCoilReq > SmallLoad) {
+            QCoilReq = 0.0;
+            mdot = 0.0;
+        }
+        
     }
     
 } // namespace UnitVentilator

@@ -3675,18 +3675,6 @@ namespace WaterCoils {
                     } // End if for dry coil
                 }
             }
-
-            if ((TotWaterCoilLoad <= 0) || (OutletAirTemp >= WaterCoil(CoilNum).InletAirTemp) ||
-                (OutletAirHumRat >= WaterCoil(CoilNum).InletAirHumRat)) {
-                // Either there is a negative load or the air temperature/humidity ratio is increasing which means the coil is heating
-                // So, the cooling coil should not be running
-                OutletAirTemp = WaterCoil(CoilNum).InletAirTemp;
-                OutletAirHumRat = WaterCoil(CoilNum).InletAirHumRat;
-                OutletWaterTemp = WaterCoil(CoilNum).InletWaterTemp;
-                TotWaterCoilLoad = 0.0;
-                SenWaterCoilLoad = 0.0;
-                SurfAreaWetFraction = 0.0;
-            }
             
             // Report outlet variables at nodes
             WaterCoil(CoilNum).OutletAirTemp = OutletAirTemp;
