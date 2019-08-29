@@ -93,6 +93,7 @@
 #include <EnergyPlus/DataMoistureBalance.hh>
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/DataPhotovoltaics.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
@@ -339,6 +340,7 @@ void EnergyPlusFixture::clear_all_states()
     DataMoistureBalance::clear_state();
     DataMoistureBalanceEMPD::clear_state();
     DataOutputs::clear_state();
+    DataPhotovoltaics::clear_state();
     DataPlant::clear_state();
     DataRoomAirModel::clear_state();
     DataRuntimeLanguage::clear_state();

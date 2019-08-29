@@ -690,6 +690,8 @@ namespace HVACDXHeatPumpSystem {
             // If DXHeatingSystem runs with a heating load then set PartLoadFrac on Heating System
             if (SensibleLoad) {
                 {
+                    Real64 TempOut1;
+
                     auto const SELECT_CASE_var(DXHeatPumpSystem(DXSystemNum).HeatPumpCoilType_Num);
 
                     if (SELECT_CASE_var == CoilDX_HeatingEmpirical) { // Coil:Heating:DX:SingleSpeed
@@ -709,7 +711,7 @@ namespace HVACDXHeatPumpSystem {
 
                         ReqOutput = Node(InletNode).MassFlowRate *
                                     (PsyHFnTdbW(DesOutTemp, Node(InletNode).HumRat) - PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
-
+                        TempOut1 = Node(OutletNode).Temp;
                         //         IF NoOutput is higher than (more heating than required) or very near the ReqOutput, do not run the compressor
                         if ((NoOutput - ReqOutput) > Acc) {
                             PartLoadFrac = 0.0;
@@ -726,52 +728,58 @@ namespace HVACDXHeatPumpSystem {
                             if (OutletTempDXCoil < DesOutTemp) {
                                 PartLoadFrac = 1.0;
                             } else {
-                                Par(1) = double(DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex);
-                                Par(2) = DesOutTemp;
-                                Par(3) = 1.0; // OnOffAirFlowFrac assume = 1.0 for continuous fan dx system
-                                Par(5) = double(FanOpMode);
-                                SolveRoot(Acc, MaxIte, SolFla, PartLoadFrac, DXHeatingCoilResidual, 0.0, 1.0, Par);
-                                if (SolFla == -1) {
-                                    if (!WarmupFlag) {
-                                        if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
-                                            ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter;
-                                            ShowWarningError(DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType +
-                                                             " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
-                                                             DXHeatPumpSystem(DXSystemNum).Name);
-                                            ShowContinueError("Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
-                                            ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                            ShowContinueErrorTimeStamp(
-                                                "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
-                                        } else {
-                                            ShowRecurringWarningErrorAtEnd(
-                                                DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
-                                                    "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible "
-                                                    "PLR statistics follow.",
-                                                DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIterIndex,
-                                                PartLoadFrac,
-                                                PartLoadFrac);
+                                if (DataGlobals::DoCoilDirectSolutions) {
+                                    PartLoadFrac = (DesOutTemp - Node(InletNode).Temp) / (TempOut1 - Node(InletNode).Temp);
+                                    SimDXCoil(
+                                        CompName, On, FirstHVACIteration, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, FanOpMode, PartLoadFrac);
+                                } else {
+                                    Par(1) = double(DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex);
+                                    Par(2) = DesOutTemp;
+                                    Par(3) = 1.0; // OnOffAirFlowFrac assume = 1.0 for continuous fan dx system
+                                    Par(5) = double(FanOpMode);
+                                    SolveRoot(Acc, MaxIte, SolFla, PartLoadFrac, DXHeatingCoilResidual, 0.0, 1.0, Par);
+                                    if (SolFla == -1) {
+                                        if (!WarmupFlag) {
+                                            if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
+                                                ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter;
+                                                ShowWarningError(DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType +
+                                                                 " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
+                                                                 DXHeatPumpSystem(DXSystemNum).Name);
+                                                ShowContinueError("Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
+                                                ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                ShowContinueErrorTimeStamp(
+                                                    "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
+                                            } else {
+                                                ShowRecurringWarningErrorAtEnd(
+                                                    DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
+                                                        "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible "
+                                                        "PLR statistics follow.",
+                                                    DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIterIndex,
+                                                    PartLoadFrac,
+                                                    PartLoadFrac);
+                                            }
                                         }
-                                    }
-                                } else if (SolFla == -2) {
-                                    PartLoadFrac = ReqOutput / FullOutput;
-                                    if (!WarmupFlag) {
-                                        if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
-                                            ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail;
-                                            ShowWarningError(DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType +
-                                                             " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
-                                                             "exceeded, for unit = " +
-                                                             DXHeatPumpSystem(DXSystemNum).Name);
-                                            ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                            ShowContinueErrorTimeStamp(
-                                                "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
-                                        } else {
-                                            ShowRecurringWarningErrorAtEnd(
-                                                DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
-                                                    "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR "
-                                                    "statistics follow.",
-                                                DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFailIndex,
-                                                PartLoadFrac,
-                                                PartLoadFrac);
+                                    } else if (SolFla == -2) {
+                                        PartLoadFrac = ReqOutput / FullOutput;
+                                        if (!WarmupFlag) {
+                                            if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
+                                                ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail;
+                                                ShowWarningError(DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType +
+                                                                 " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
+                                                                 "exceeded, for unit = " +
+                                                                 DXHeatPumpSystem(DXSystemNum).Name);
+                                                ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                ShowContinueErrorTimeStamp(
+                                                    "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
+                                            } else {
+                                                ShowRecurringWarningErrorAtEnd(
+                                                    DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
+                                                        "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR "
+                                                        "statistics follow.",
+                                                    DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFailIndex,
+                                                    PartLoadFrac,
+                                                    PartLoadFrac);
+                                            }
                                         }
                                     }
                                 }
@@ -888,6 +896,7 @@ namespace HVACDXHeatPumpSystem {
                                     // Check to see which speed to meet the load
                                     PartLoadFrac = 1.0;
                                     SpeedRatio = 1.0;
+                                    TempOut1 = TempSpeedOut;
                                     for (I = 2; I <= NumOfSpeeds; ++I) {
                                         SpeedNum = I;
                                         SimVariableSpeedCoils(CompName,
@@ -910,105 +919,140 @@ namespace HVACDXHeatPumpSystem {
                                             SpeedNum = I;
                                             break;
                                         }
+                                        TempOut1 = TempSpeedOut;
                                     }
-                                    Par(1) = double(VSCoilIndex);
-                                    Par(2) = DesOutTemp;
-                                    Par(5) = double(FanOpMode);
-                                    Par(3) = double(SpeedNum);
-                                    SolveRoot(Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
+                                    if (DataGlobals::DoCoilDirectSolutions) {
+                                        SpeedRatio = (DesOutTemp - TempOut1) / (TempSpeedOut - TempOut1);
+                                        SimVariableSpeedCoils(CompName,
+                                                              VSCoilIndex,
+                                                              FanOpMode,
+                                                              MaxONOFFCyclesperHour,
+                                                              HPTimeConstant,
+                                                              FanDelayTime,
+                                                              On,
+                                                              PartLoadFrac,
+                                                              SpeedNum,
+                                                              SpeedRatio,
+                                                              QZnReq,
+                                                              QLatReq,
+                                                              OnOffAirFlowRatio);
+                                    } else {
+                                        Par(1) = double(VSCoilIndex);
+                                        Par(2) = DesOutTemp;
+                                        Par(5) = double(FanOpMode);
+                                        Par(3) = double(SpeedNum);
+                                        SolveRoot(Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
 
-                                    if (SolFla == -1) {
-                                        if (!WarmupFlag) {
-                                            if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
-                                                ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter;
-                                                ShowWarningError(
-                                                    DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType +
-                                                    " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
-                                                    DXHeatPumpSystem(DXSystemNum).Name);
-                                                ShowContinueError("Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
-                                                ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
-                                                    "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
-                                            } else {
-                                                ShowRecurringWarningErrorAtEnd(
-                                                    DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
-                                                        "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
-                                                        "Sensible PLR statistics follow.",
-                                                    DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIterIndex,
-                                                    PartLoadFrac,
-                                                    PartLoadFrac);
+                                        if (SolFla == -1) {
+                                            if (!WarmupFlag) {
+                                                if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
+                                                    ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter;
+                                                    ShowWarningError(
+                                                        DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType +
+                                                        " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
+                                                        DXHeatPumpSystem(DXSystemNum).Name);
+                                                    ShowContinueError("Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
+                                                    ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                    ShowContinueErrorTimeStamp(
+                                                        "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
+                                                } else {
+                                                    ShowRecurringWarningErrorAtEnd(
+                                                        DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
+                                                            "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
+                                                            "Sensible PLR statistics follow.",
+                                                        DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIterIndex,
+                                                        PartLoadFrac,
+                                                        PartLoadFrac);
+                                                }
                                             }
-                                        }
-                                    } else if (SolFla == -2) {
-                                        PartLoadFrac = ReqOutput / FullOutput;
-                                        if (!WarmupFlag) {
-                                            if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
-                                                ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail;
-                                                ShowWarningError(DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType +
-                                                                 " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
-                                                                 "exceeded, for unit = " +
-                                                                 DXHeatPumpSystem(DXSystemNum).Name);
-                                                ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
-                                                    "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
-                                            } else {
-                                                ShowRecurringWarningErrorAtEnd(
-                                                    DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
-                                                        "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR "
-                                                        "statistics follow.",
-                                                    DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFailIndex,
-                                                    PartLoadFrac,
-                                                    PartLoadFrac);
+                                        } else if (SolFla == -2) {
+                                            PartLoadFrac = ReqOutput / FullOutput;
+                                            if (!WarmupFlag) {
+                                                if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
+                                                    ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail;
+                                                    ShowWarningError(DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType +
+                                                                     " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
+                                                                     "exceeded, for unit = " +
+                                                                     DXHeatPumpSystem(DXSystemNum).Name);
+                                                    ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                    ShowContinueErrorTimeStamp(
+                                                        "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
+                                                } else {
+                                                    ShowRecurringWarningErrorAtEnd(
+                                                        DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
+                                                            "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR "
+                                                            "statistics follow.",
+                                                        DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFailIndex,
+                                                        PartLoadFrac,
+                                                        PartLoadFrac);
+                                                }
                                             }
                                         }
                                     }
                                 } else {
-                                    Par(1) = double(VSCoilIndex);
-                                    Par(2) = DesOutTemp;
-                                    Par(5) = double(FanOpMode);
-                                    SolveRoot(Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
-                                    if (SolFla == -1) {
-                                        if (!WarmupFlag) {
-                                            if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
-                                                ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter;
-                                                ShowWarningError(
-                                                    DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType +
-                                                    " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
-                                                    DXHeatPumpSystem(DXSystemNum).Name);
-                                                ShowContinueError("Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
-                                                ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
-                                                    "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
-                                            } else {
-                                                ShowRecurringWarningErrorAtEnd(
-                                                    DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
-                                                        "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
-                                                        "Sensible PLR statistics follow.",
-                                                    DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIterIndex,
-                                                    PartLoadFrac,
-                                                    PartLoadFrac);
+                                    if (DataGlobals::DoCoilDirectSolutions) {
+                                        PartLoadFrac = (DesOutTemp - Node(InletNode).Temp) / (TempSpeedOut - Node(InletNode).Temp);
+                                        SimVariableSpeedCoils(CompName,
+                                                              VSCoilIndex,
+                                                              FanOpMode,
+                                                              MaxONOFFCyclesperHour,
+                                                              HPTimeConstant,
+                                                              FanDelayTime,
+                                                              On,
+                                                              PartLoadFrac,
+                                                              SpeedNum,
+                                                              SpeedRatio,
+                                                              QZnReq,
+                                                              QLatReq,
+                                                              OnOffAirFlowRatio);
+                                    } else {
+                                        Par(1) = double(VSCoilIndex);
+                                        Par(2) = DesOutTemp;
+                                        Par(5) = double(FanOpMode);
+                                        SolveRoot(Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
+                                        if (SolFla == -1) {
+                                            if (!WarmupFlag) {
+                                                if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
+                                                    ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter;
+                                                    ShowWarningError(
+                                                        DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType +
+                                                        " - Iteration limit exceeded calculating DX unit sensible part-load ratio for unit = " +
+                                                        DXHeatPumpSystem(DXSystemNum).Name);
+                                                    ShowContinueError("Estimated part-load ratio  = " + RoundSigDigits((ReqOutput / FullOutput), 3));
+                                                    ShowContinueError("Calculated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                    ShowContinueErrorTimeStamp(
+                                                        "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
+                                                } else {
+                                                    ShowRecurringWarningErrorAtEnd(
+                                                        DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
+                                                            "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. "
+                                                            "Sensible PLR statistics follow.",
+                                                        DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIterIndex,
+                                                        PartLoadFrac,
+                                                        PartLoadFrac);
+                                                }
                                             }
-                                        }
-                                    } else if (SolFla == -2) {
-                                        PartLoadFrac = ReqOutput / FullOutput;
-                                        if (!WarmupFlag) {
-                                            if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
-                                                ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail;
-                                                ShowWarningError(DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType +
-                                                                 " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
-                                                                 "exceeded, for unit = " +
-                                                                 DXHeatPumpSystem(DXSystemNum).Name);
-                                                ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
-                                                ShowContinueErrorTimeStamp(
-                                                    "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
-                                            } else {
-                                                ShowRecurringWarningErrorAtEnd(
-                                                    DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
-                                                        "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR "
-                                                        "statistics follow.",
-                                                    DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFailIndex,
-                                                    PartLoadFrac,
-                                                    PartLoadFrac);
+                                        } else if (SolFla == -2) {
+                                            PartLoadFrac = ReqOutput / FullOutput;
+                                            if (!WarmupFlag) {
+                                                if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail < 1) {
+                                                    ++DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFail;
+                                                    ShowWarningError(DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType +
+                                                                     " - DX unit sensible part-load ratio calculation failed: part-load ratio limits "
+                                                                     "exceeded, for unit = " +
+                                                                     DXHeatPumpSystem(DXSystemNum).Name);
+                                                    ShowContinueError("Estimated part-load ratio = " + RoundSigDigits(PartLoadFrac, 3));
+                                                    ShowContinueErrorTimeStamp(
+                                                        "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
+                                                } else {
+                                                    ShowRecurringWarningErrorAtEnd(
+                                                        DXHeatPumpSystem(DXSystemNum).DXHeatPumpSystemType + " \"" + DXHeatPumpSystem(DXSystemNum).Name +
+                                                            "\" - DX unit sensible part-load ratio calculation failed error continues. Sensible PLR "
+                                                            "statistics follow.",
+                                                        DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRFailIndex,
+                                                        PartLoadFrac,
+                                                        PartLoadFrac);
+                                                }
                                             }
                                         }
                                     }
