@@ -161,8 +161,6 @@
     1,                       !- Upper Limit Value
     Discrete;                !- Numeric Type
 
-  Schedule:Constant,AlwaysOn,OnOff,1;
-
   BuildingSurface:Detailed,
     Zn001:Wall001,           !- Name
     Wall,                    !- Surface Type
@@ -279,17 +277,17 @@
     PVWatts1,                !- Generator 1 Name
     Generator:PVWatts,       !- Generator 1 Object Type
     4000,                    !- Generator 1 Rated Electric Power Output {W}
-    AlwaysOn,                !- Generator 1 Availability Schedule Name
+    ,                        !- Generator 1 Availability Schedule Name
     ,                        !- Generator 1 Rated Thermal to Electrical Power Ratio
     PVWatts2,                !- Generator 2 Name
     Generator:PVWatts,       !- Generator 2 Object Type
     3000,                    !- Generator 2 Rated Electric Power Output {W}
-    AlwaysOn,                !- Generator 2 Availability Schedule Name
+    ,                        !- Generator 2 Availability Schedule Name
     ,                        !- Generator 2 Rated Thermal to Electrical Power Ratio
     PVWatts3,                !- Generator 3 Name
     Generator:PVWatts,       !- Generator 3 Object Type
     3000,                    !- Generator 3 Rated Electric Power Output {W}
-    AlwaysOn,                !- Generator 3 Availability Schedule Name
+    ,                        !- Generator 3 Availability Schedule Name
     ;                        !- Generator 3 Rated Thermal to Electrical Power Ratio
 
   Generator:PVWatts,
