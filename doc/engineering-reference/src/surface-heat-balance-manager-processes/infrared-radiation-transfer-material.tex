@@ -61,9 +61,13 @@ A is the plate area in m\(^{2}\), and
 
 T is the temperature in K.
 
-Equation~\ref{eq:RadExchangeBlackBodyInBetween} shows that the presence of a black body surface between a source and a sink reduces the heat flux by a factor of two. The same result occurs when the IRT surface is between two zones in EnergyPlus. In that case the adjacent zones behave as black body cavities at some equivalent temperature. In order to account for this reduction, the IRT area must be doubled. This can be done without any difficulty in the EnergyPlus radiant exchange routine because the radiation view factors are determined by an approximate procedure that is based on the areas of the surfaces. Thus, doubling the surface area of the IRT surface results in the correct transfer of radiation through the IRT surface. The doubling will occur automatically in the program as described in the Input Output Reference document.
+Equation~\ref{eq:RadExchangeBlackBodyInBetween} shows that the presence of a black body surface between a source and a sink reduces the heat flux by a factor of two.
 
-It should be noted that, because of the black body behavior of the IRT surface, any visible or solar short wavelength radiation incident on the surface will be absorbed and included with the long wavelength (IR) exchange with the adjacent zone. No energy will be lost, but zones with IRT surfaces should not be used in any lighting analyses.
+\subsection{IRT Radiation Exchange in EnergyPlus}\label{irt-radiation-exchange-in-energyplus}
+
+Ideally, this same doubling of radiation would need to occur when an IRT surface is between two zones in EnergyPlus. However, due to the complexity of the EnergyPlus heat balances and the treatment of an IRT as equivalent to any other surface in EnergyPlus, simply doubling the impact of the IRT on either zone is not possible.  In testing, this resulted in either net radiation imbalances within the zones or potentially unstable conditions. So, the radiation is not doubled in EnergyPlus as in the simple example in the previous subsection. Despite this difference between the theory of the ideal case and the actual implementation in EnergyPlus, an IRT surface will still allow a zone to be separated into two separate zones with two different air temperature and the adjacent zones behave as black body cavities at some equivalent temperature.
+
+It should be noted that for IRT surfaces any visible or solar short wavelength radiation incident on the surface will be absorbed and included with the long wavelength (IR) exchange with the adjacent zone. No energy will be lost, but zones with IRT surfaces should not be used in any lighting analyses.
 
 \subsection{Radiation Transfer Surface Details}\label{radiation-transfer-surface-details}
 
@@ -72,6 +76,8 @@ It should be noted that, because of the black body behavior of the IRT surface, 
 The Infrared Transparent (IRT) surface is similar to a resistance-only surface. The idd object for this type of surface is shown below. The fields indicate that the surface will actually participate in the transfer of visible and solar radiation by doing a wavelength transformation and making all short wavelength radiation that is incident on the surface into long wavelength radiation and having it participate in the long wavelength radiant exchange. The Material:InfraredTransparent object requires only a name. All other parameters are set internally.
 
 The Infrared Transparent surface should not participate in a convective/conductive exchange between the zones it separates. In order to minimize this effect, the SurfaceProperty:ConvectionCoefficients object must be used. Outside and Inside values for the surface's convection coefficients should be on the order of .1.~ Further examples are given in the Input Output Reference document.
+
+Infrared transparent surfaces may also be specified using Construction:AirBoundary with the \textit{IRTSurface} option for radiant exchange. This method automatically generates an internal material layer with IRT properties and sets the inside convection coefficient to the Minimum Surface Convection Heat Transfer Coefficient Value specified in the HeatBalanceAlgorithm object which defaults to 0.1 [W/m2-K].
 
 \subsection{Behavior Checks}\label{behavior-checks}
 

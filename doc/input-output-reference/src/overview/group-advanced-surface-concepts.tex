@@ -215,7 +215,7 @@ Movable insulation can be used/scheduled on any surface regular surface (such as
 
 Exterior and interior movable insulation have undergone some testing and appears to producing expected results. The underlying principle has been implemented in EnergyPlus for both interior and exterior movable insulation with the possibility for exterior movable insulation to be transparent (transparent insulation material or TIM).
 
-TIM exterior layers can be used with the ConductionFiniteDifference (CondFD) solution algorithm. With this addition, TIM layers can be used in conjunction with wall layers that have phase change materials (PCM) included, or any other advanced capability of the CondFD algorithm such as variable conductivity. The input requirements are exactly the same as when used with the CTF algorithm. The Solution Algorithm needs to be changed to CondFD, and as with CTF, the ``SurfaceControl:MovableInsulation'' object must be completed to specify the insulated surface and the ``\hyperref[windowmaterialglazing]{WindowMaterial:Glazing}'' object is needed to provide the TIM layer properties.
+TIM exterior layers can be used with the ConductionFiniteDifference (CondFD) solution algorithm. With this addition, TIM layers can be used in conjunction with wall layers that have phase change materials (PCM) included, or any other advanced capability of the CondFD algorithm such as variable conductivity. The input requirements are exactly the same as when used with the CTF algorithm. The Solution Algorithm needs to be changed to CondFD, and as with CTF, the ``SurfaceControl:MovableInsulation'' object must be completed to specify the insulated surface and the ``\hyperref[windowmaterialglazing]{WindowMaterial:Glazing}'' or ``\hyperref[windowmaterialglazingequivalentlayer]{WindowMaterial:Glazing:EquivalentLayer}'' object is needed to provide the TIM layer properties.
 
 Basically, the addition of movable insulation allows the user to schedule an extra amount of insulation on either the inside or outside surface of a wall (or both). The insulation must be a simple, homogenous material layer (linked to a material definition within the input data file). Note that EnergyPlus allows the exterior movable insulation layer to be transparent to short wavelength radiation (solar). In this case, incident solar is split between the plane between the movable insulation and the surface and the plane between the movable insulation and the surrounding air. This calculation is fairly basic and based on the solar transmittance of the insulation layer (material properties). Using transparent layers for exterior movable insulation allows solar energy to penetrate deeper into a construction where it can be stored for later use in the building (similar in concept to a Trombe Wall).
 
@@ -229,7 +229,7 @@ This field refers the movable insulation back to a particular surface (ref: Buil
 
 \subsubsection{Field: Material Name}\label{field-material-name}
 
-This field refers to a material layer (e.g., \hyperref[material]{Material}, \hyperref[materialnomass]{Material:NoMass}, or \hyperref[windowmaterialglazing]{WindowMaterial:Glazing}; transparent layers are only valid for outside movable insulation) via its user assigned name. This provides the program with a full complement of material properties so that the effect of the insulation (R-value and solar transmittance) can be correctly taken into account by EnergyPlus.  Note that for non-glazing materials the solar absorptivity of the layer will be used directly in the calculations.  For glazing material layers, the solar absorptivity will be calculated by subtracting both the transmissivity and the front side reflectivity from unity for the material.
+This field refers to a material layer (e.g., \hyperref[material]{Material}, \hyperref[materialnomass]{Material:NoMass}, \hyperref[windowmaterialglazing]{WindowMaterial:Glazing}, or \hyperref[windowmaterialglazingequivalentlayer]{WindowMaterial:Glazing:EquivalentLayer}; transparent layers are only valid for outside movable insulation) via its user assigned name. This provides the program with a full complement of material properties so that the effect of the insulation (R-value and solar transmittance) can be correctly taken into account by EnergyPlus.  Note that for non-glazing materials the solar absorptivity of the layer will be used directly in the calculations.  For glazing material layers, the solar absorptivity will be calculated by subtracting both the transmissivity and the front side reflectivity from unity for the material.
 
 \subsubsection{Field: Schedule Name}\label{field-schedule-name}
 
@@ -662,6 +662,7 @@ BuildingSurface:Detailed,
 
 Foundation:Kiva,
   Slab Details,              !- Name
+  ,                          !- Initial Indoor Air Temperature
   XPS,                       !- Interior Horizontal Insulation Material Name
   0.2,                       !- Interior Horizontal Insulation Depth
   0.6,                       !- Interior Horizontal Insulation Width
@@ -709,6 +710,11 @@ Construction,
 
 The unique identifier of the Foundation:Kiva object. Referenced by a the
 ``Outside Boundary Condition Object'' field in a surface object.
+
+\paragraph{Field: Initial Indoor Air Temperature}
+
+Indoor air temperature used for Kiva initialization (prior to warmup period).
+If left blank, indoor air temperature during initialization will be estimated based on zone setpoints.
 
 \paragraph{Field: Interior Horizontal Insulation Material
 Name}
@@ -2689,13 +2695,16 @@ The second option for specifying view factors requires user input values. These 
 
 \subsection{ZoneProperty:UserViewFactors:bySurfaceName}\label{zonepropertyuserviewfactorsbysurfacename}
 
-The method of entering user view factors is to entere each surface name and its view factor value to other surfaces in the zone
+The method of entering user view factors is to enter each surface name and its view factor value to other
+surfaces in a zone or group of zones connected by air boundaries (see ``\hyperref[constructionairboundary]{Construction:AirBoundary}'').
 
 \subsubsection{Inputs}\label{inputs-17}
 
-\paragraph{Field: Zone Name}\label{zonepropertyuserviewfactorsbysurfacename-field-zone-name}
+\paragraph{Field: Zone or ZoneList Name}\label{zonepropertyuserviewfactorsbysurfacename-field-zone-name}
 
-This field is the zone name for the view factors.
+An enclosure for radiant exchange may be a single zone, or a group of zones connected by one or more air boundaries (see ``\hyperref[constructionairboundary]{Construction:AirBoundary}''). If a ZoneList name is specified, the referenced ``\hyperref[zonelist]{ZoneList}'') must match a group of zones connected with Construction:AirBoundary using the \textit{GroupedZones} option for Radiant Exchange Method.
+
+Enter the applicable surface pairs with non-zero view factors. Any omitted surface pair is assumed to have a zero view factor.
 
 \paragraph{Field: From Surface 1}\label{field-from-surface-1}
 

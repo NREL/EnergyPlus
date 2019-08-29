@@ -116,9 +116,8 @@ public:
         Environment(4).DesignDayNum = 2;
         Environment(4).SeedEnvrnNum = 2;
 
-        TimeValue.allocate(2);
-        TimeValue(1).TimeStep >>= TimeStepZone;
-        TimeValue(2).TimeStep >>= DataHVACGlobals::TimeStepSys;
+        OutputProcessor::SetupTimePointers("ZONE", TimeStepZone);
+        OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
 
         PlantSizData.allocate(1);
 
@@ -149,7 +148,7 @@ public:
         PlantLoop.deallocate();
         Environment.deallocate();
         PlantSizData.deallocate();
-        TimeValue.deallocate();
+        TimeValue.clear();
     }
 };
 
@@ -410,18 +409,17 @@ TEST_F(SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour)
         HourofDay = hr;
         for (int timeStp = 1; timeStp <= 4; ++timeStp) {              // 15 minute zone timestep
             for (int subTimeStp = 1; subTimeStp <= 5; ++subTimeStp) { // 5 system substeps, so 3 minute system timestep
-                int const sysIndex(2);
                 Real64 const minutesPerHour(60.0);
                 ZoneTimestepObject tmpztStepStamp(KindOfSim, Envrn, DayOfSim, HourofDay, timeStp, zoneTimeStepDuration,
                                                   numTimeStepsInHour); // call constructor
                 SystemTimestepObject tmpSysStepStamp;
                 tmpSysStepStamp.CurMinuteEnd = (timeStp - 1) * (minutesPerHour * zoneTimeStepDuration) +
-                                               (subTimeStp)*OutputProcessor::TimeValue(sysIndex).TimeStep * minutesPerHour;
+                                               (subTimeStp)*OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep * minutesPerHour;
                 if (tmpSysStepStamp.CurMinuteEnd == 0.0) {
                     tmpSysStepStamp.CurMinuteEnd = minutesPerHour;
                 }
-                tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - OutputProcessor::TimeValue(sysIndex).TimeStep * minutesPerHour;
-                tmpSysStepStamp.TimeStepDuration = OutputProcessor::TimeValue(sysIndex).TimeStep;
+                tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep * minutesPerHour;
+                tmpSysStepStamp.TimeStepDuration = OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
                 TestLogObj.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
             }
 
@@ -437,18 +435,17 @@ TEST_F(SizingAnalysisObjectsTest, LoggingSubStep4stepPerHour)
         HourofDay = hr;
         for (int timeStp = 1; timeStp <= 4; ++timeStp) {              // 15 minute zone timestep
             for (int subTimeStp = 1; subTimeStp <= 5; ++subTimeStp) { // 5 system substeps, so 3 minute system timestep
-                int const sysIndex(2);
                 Real64 const minutesPerHour(60.0);
                 ZoneTimestepObject tmpztStepStamp(KindOfSim, Envrn, DayOfSim, HourofDay, timeStp, zoneTimeStepDuration,
                                                   numTimeStepsInHour); // call constructor
                 SystemTimestepObject tmpSysStepStamp;
                 tmpSysStepStamp.CurMinuteEnd = (timeStp - 1) * (minutesPerHour * zoneTimeStepDuration) +
-                                               (subTimeStp)*OutputProcessor::TimeValue(sysIndex).TimeStep * minutesPerHour;
+                                               (subTimeStp)*OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep * minutesPerHour;
                 if (tmpSysStepStamp.CurMinuteEnd == 0.0) {
                     tmpSysStepStamp.CurMinuteEnd = minutesPerHour;
                 }
-                tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - OutputProcessor::TimeValue(sysIndex).TimeStep * minutesPerHour;
-                tmpSysStepStamp.TimeStepDuration = OutputProcessor::TimeValue(sysIndex).TimeStep;
+                tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep * minutesPerHour;
+                tmpSysStepStamp.TimeStepDuration = OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
                 TestLogObj.FillSysStep(tmpztStepStamp, tmpSysStepStamp);
             }
 

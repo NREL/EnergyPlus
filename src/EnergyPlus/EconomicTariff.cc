@@ -402,7 +402,7 @@ namespace EconomicTariff {
         int KeyCount;
         int TypeVar;
         OutputProcessor::StoreType AvgSumVar;
-        int StepTypeVar;
+        OutputProcessor::TimeStepType StepTypeVar;
         OutputProcessor::Unit UnitsVar(OutputProcessor::Unit::None); // Units sting, may be blank
         Array1D_string NamesOfKeys;                                  // Specific key name
         Array1D_int IndexesForKeyVar;                                // Array index
