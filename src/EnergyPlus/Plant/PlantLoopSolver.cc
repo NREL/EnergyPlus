@@ -1991,7 +1991,7 @@ namespace EnergyPlus {
                             SplitterBranchOut = this_loopside.Splitter.BranchNumOut(OutletNum);
                             FirstNodeOnBranch = this_loopside.Branch(SplitterBranchOut).NodeNumIn;
                             bool branchIsActive = this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_Active;
-                            bool branchIsSeriesActiveAndRequesting = this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_SeriesActive || this_loopside.Branch(SplitterBranchOut).RequestedMassFlow > 0.0;
+                            bool branchIsSeriesActiveAndRequesting = this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_SeriesActive && this_loopside.Branch(SplitterBranchOut).RequestedMassFlow > 0.0;
                             if (branchIsActive || branchIsSeriesActiveAndRequesting) { // only series active branches that want to be "on"
                                 // check Remaining flow (should be correct!)
                                 ActiveFlowRate = min(ActiveFlowRate, FlowRemaining);
