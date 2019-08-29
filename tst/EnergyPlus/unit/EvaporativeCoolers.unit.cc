@@ -109,7 +109,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SecondaryAirOutletCondition)
     CalcSecondaryAirOutletCondition(EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
 
     // check outputs for dry operating condition
-    EXPECT_DOUBLE_EQ(25.0, EvapCond(EvapCoolNum).SecOutletTemp);
+    EXPECT_NEAR(25.0, EvapCond(EvapCoolNum).SecOutletTemp, 0.000001);
     EXPECT_DOUBLE_EQ(0.0, QHXLatent);
 
     // wet operating mode and non zero secondary air flow rate
@@ -357,7 +357,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcSecondaryAirOutletCondition)
         EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
 
     // check outputs for dry operating condition
-    EXPECT_DOUBLE_EQ(25.0, EvaporativeCoolers::EvapCond(EvapCoolNum).SecOutletTemp);
+    EXPECT_NEAR(25.0, EvaporativeCoolers::EvapCond(EvapCoolNum).SecOutletTemp, 0.000001);
     EXPECT_DOUBLE_EQ(0.0, QHXLatent);
 
     // wet operating mode and non zero secondary air flow rate

@@ -3318,11 +3318,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
 
         thisSys.sizeUnitarySystem(FirstHVACIteration, AirLoopNum);
 
-        EXPECT_EQ(1.005, thisSys.m_DesignFanVolFlowRate);
-        EXPECT_EQ(1.005, thisSys.m_MaxCoolAirVolFlow);
+        EXPECT_NEAR(1.005, thisSys.m_DesignFanVolFlowRate, 0.0000000001);
+        EXPECT_NEAR(1.005, thisSys.m_MaxCoolAirVolFlow, 0.0000000001);
         EXPECT_EQ(1.005, thisSys.m_MaxHeatAirVolFlow);
         EXPECT_EQ(1.005, thisSys.m_MaxNoCoolHeatAirVolFlow);
-        EXPECT_EQ(15148.243236712493, DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).DesHeatingLoad);
+        EXPECT_NEAR(15148.243236712493, DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).DesHeatingLoad, 0.0000000001);
     }
 
     // #6200 defect file shows fan flow rate when cooling coil is off and no cooling coil exists. Allow user to set flow rate = 0 when coil does not
@@ -3341,7 +3341,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     EXPECT_EQ(0.0, thisSys.m_MaxCoolAirVolFlow);
     EXPECT_EQ(1.005, thisSys.m_MaxHeatAirVolFlow);
     EXPECT_EQ(1.005, thisSys.m_MaxNoCoolHeatAirVolFlow);
-    EXPECT_EQ(15148.243236712493, DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).DesHeatingLoad);
+    EXPECT_NEAR(15148.243236712493, DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).DesHeatingLoad, 0.0000000001);
 
     // continue with unit testing of cooling and heating system
     thisSys.m_CoolCoilExists = true;
@@ -3393,12 +3393,12 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
 
         thisSys.sizeUnitarySystem(FirstHVACIteration, AirLoopNum);
 
-        EXPECT_EQ(1.005, thisSys.m_DesignFanVolFlowRate);
-        EXPECT_EQ(1.005, thisSys.m_MaxCoolAirVolFlow);
-        EXPECT_EQ(1.005, thisSys.m_MaxHeatAirVolFlow);
-        EXPECT_EQ(1.005, thisSys.m_MaxNoCoolHeatAirVolFlow);
+        EXPECT_NEAR(1.005, thisSys.m_DesignFanVolFlowRate, 0.0000000001);
+        EXPECT_NEAR(1.005, thisSys.m_MaxCoolAirVolFlow, 0.0000000001);
+        EXPECT_NEAR(1.005, thisSys.m_MaxHeatAirVolFlow, 0.0000000001);
+        EXPECT_NEAR(1.005, thisSys.m_MaxNoCoolHeatAirVolFlow, 0.0000000001);
         EXPECT_EQ(18827.616766698276, DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).DesCoolingLoad);
-        EXPECT_EQ(1431.9234900374995, DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).DesHeatingLoad);
+        EXPECT_NEAR(1431.9234900374995, DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).DesHeatingLoad, 0.0000000001);
     }
 }
 
