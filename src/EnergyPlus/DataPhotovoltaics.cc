@@ -121,6 +121,18 @@ namespace DataPhotovoltaics {
     // Object Data
     Array1D<PVArrayStruct> PVarray;
 
+
+    void clear_state()
+    {
+        NumPVs = 0;
+        Num1DiodePVModuleTypes = 0;
+        NumSimplePVModuleTypes = 0;
+        NumSNLPVModuleTypes = 0;
+
+        ShuntResistance = 0;
+
+        PVarray.deallocate();
+    }
     // ___________________________________________________________________________
 
     //     EnergyPlus V1.2 and beyond include models for photovoltaic calculations called

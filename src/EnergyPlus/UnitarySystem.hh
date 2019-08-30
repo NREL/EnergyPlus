@@ -428,6 +428,7 @@ namespace UnitarySystems {
         std::vector<Real64> m_MSHeatingSpeedRatio;
         std::vector<Real64> m_HeatingVolFlowRatio;
         std::vector<int> m_IterationMode; // array of operating mode each iteration
+        std::vector<Real64> FullOutput;   // Full output for different speed
 
         struct WarnMessages
         {
