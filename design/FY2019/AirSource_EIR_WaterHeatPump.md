@@ -17,7 +17,7 @@ N/A
 
 ## Overview
 
-Since there is an already-existing EIR-WWHP model, this work should integrated with it rather than createing a new object. The current object is:
+Since there is an already-existing EIR-WWHP model, this work should integrated with it rather than creating a new object. The current object is:
 
 - HeatPump:WaterToWater:EIR:(Cooling/Heating)
 
@@ -104,8 +104,8 @@ HeatPump:PlantLoop:EIR:Cooling,
   CC Load Inlet Node,      !- Load Side Inlet Node Name
   CC Load Outlet Node,     !- Load Side Outlet Node Name
   AirSource,               !- Condenser Type
-  CC Source Inlet Node,    !- Source Side Inlet Node Name
-  CC Source Outlet Node,   !- Source Side Outlet Node Name
+  Outdoor Air HP Inlet Node,    !- Source Side Inlet Node Name
+  Outdoor Air HP  Outlet Node,  !- Source Side Outlet Node Name
   Heating Coil,            !- Companion Heating Heat Pump Name
   0.005,                   !- Load Side Design Volume Flow Rate {m3/s}
   0.003,                   !- Source Side Design Volume Flow Rate {m3/s}
@@ -123,8 +123,8 @@ HeatPump:PlantLoop:EIR:Heating,
   HC Load Inlet Node,      !- Load Side Inlet Node Name
   HC Load Outlet Node,     !- Load Side Outlet Node Name
   AirSource,               !- Evaporator Type
-  HC Source Inlet Node,    !- Source Side Inlet Node Name
-  HC Source Outlet N0de,   !- Source Side Outlet Node Name
+  Outdoor Air HP Inlet Node,    !- Source Side Inlet Node Name
+  Outdoor Air HP  Outlet Node,  !- Source Side Outlet Node Name
   Cooling Coil,            !- Companion Coil Name
   0.005,                   !- Load Side Design Volume Flow Rate {m3/s}
   0.002,                   !- Source Side Design Volume Flow Rate {m3/s}
