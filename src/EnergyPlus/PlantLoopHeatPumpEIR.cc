@@ -66,7 +66,7 @@
 #include <PlantUtilities.hh>
 #include <ReportSizingManager.hh>
 #include <UtilityRoutines.hh>
-#include <WaterToWaterHeatPumpEIR.hh>
+#include <PlantLoopHeatPumpEIR.hh>
 #include "CurveManager.hh"
 
 namespace EnergyPlus {

@@ -61,7 +61,7 @@
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/PlantComponent.hh>
-#include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
+#include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EIRWaterToWaterHeatPumps;

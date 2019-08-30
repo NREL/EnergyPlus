@@ -95,7 +95,7 @@
 #include <SurfaceGroundHeatExchanger.hh>
 #include <SystemAvailabilityManager.hh>
 #include <UtilityRoutines.hh>
-#include <WaterToWaterHeatPumpEIR.hh>
+#include <PlantLoopHeatPumpEIR.hh>
 
 namespace EnergyPlus {
 

@@ -109,7 +109,7 @@
 #include <HVACSizingSimulationManager.hh>
 #include <UtilityRoutines.hh>
 #include <WaterManager.hh>
-#include <WaterToWaterHeatPumpEIR.hh>
+#include <PlantLoopHeatPumpEIR.hh>
 #include <ZoneContaminantPredictorCorrector.hh>
 #include <ZoneEquipmentManager.hh>
 #include <ZoneTempPredictorCorrector.hh>
