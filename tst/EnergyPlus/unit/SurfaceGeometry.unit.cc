@@ -66,7 +66,7 @@ using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::SurfaceGeometry;
 using namespace EnergyPlus::HeatBalanceManager;
-//using namespace ObjexxFCL;
+// using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 {
@@ -3643,7 +3643,6 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     zoneNum = UtilityRoutines::FindItemInList("ZONE1", DataHeatBalance::Zone);
     EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneHTSurfaceList.size(), 4u);
     EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
-
 }
 
 // Test for #7071: if a Surface references an outside boundary surface that cannot be found, we handle it gracefully with an error message
@@ -4435,118 +4434,39 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
 
 TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test1)
 {
+    // Case 1) NOT world coordinate system (Relative) - No error
+
     std::string const idf_objects = delimited_string({
-
-        "Zone,",
-        "    ZONE 1,                  !- Name",
-        "    0.0000000E+00,           !- Direction of Relative North {deg}",
-        "    0.0          ,           !- X Origin {m}", //All zero zone origin
-        "    0.0          ,           !- Y Origin {m}",
-        "    0.0          ,           !- Z Origin {m}",
-        "    1,                       !- Type",
-        "    1,                       !- Multiplier",
-        "    AutoCalculate,           !- Ceiling Height {m}",
-        "    AutoCalculate;           !- Volume {m3}",
-
-        "Zone,",
-        "    ZONE 2,                  !- Name",
-        "    0.0000000E+00,           !- Direction of Relative North {deg}",
-        "    0.0          ,           !- X Origin {m}",
-        "    0.0          ,           !- Y Origin {m}",
-        "    0.0          ,           !- Z Origin {m}",
-        "    1,                       !- Type",
-        "    1,                       !- Multiplier",
-        "    AutoCalculate,           !- Ceiling Height {m}",
-        "    AutoCalculate;           !- Volume {m3}",
-
-        "Zone,",
-        "    ZONE 3,                  !- Name",
-        "    0.0000000E+00,           !- Direction of Relative North {deg}",
-        "    0.0          ,           !- X Origin {m}",
-        "    0.0          ,           !- Y Origin {m}",
-        "    0.0          ,           !- Z Origin {m}",
-        "    1,                       !- Type",
-        "    1,                       !- Multiplier",
-        "    AutoCalculate,           !- Ceiling Height {m}",
-        "    AutoCalculate;           !- Volume {m3}",
-
-        "Zone,",
-        "    ZONE 4,                  !- Name",
-        "    0.0000000E+00,           !- Direction of Relative North {deg}",
-        "    0.0          ,           !- X Origin {m}",
-        "    0.0          ,           !- Y Origin {m}",
-        "    0.0          ,           !- Z Origin {m}",
-        "    1,                       !- Type",
-        "    1,                       !- Multiplier",
-        "    AutoCalculate,           !- Ceiling Height {m}",
-        "    AutoCalculate;           !- Volume {m3}",
 
         "GlobalGeometryRules,",
         "    UpperLeftCorner,         !- Starting Vertex Position",
         "    CounterClockWise,        !- Vertex Entry Direction",
-        "    World,                   !- Coordinate System",
+        "    Relative,                !- Coordinate System",
         "    Relative,                !- Daylighting Reference Point Coordinate System",
         "    Relative;                !- Rectangular Surface Coordinate System",
 
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-
+    
     bool ErrorsFound(false);
 
-    GetSurfaceData(ErrorsFound);
+    DataGlobals::NumOfZones = 1;
+    Zone.allocate(1);
+    Zone(1).Name = "ZONE 1";
+    Zone(1).OriginX = 0;
+    Zone(1).OriginY = 0;
+    Zone(1).OriginZ = 0;
+
     GetGeometryParameters(ErrorsFound);
     EXPECT_FALSE(has_err_output(true));
-
 }
 
 TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test2)
 {
+    // Case 2) World coordinate system & All zero zone origins - No error
+
     std::string const idf_objects = delimited_string({
-
-        "Zone,",
-        "    ZONE 1,                  !- Name",
-        "    0.0000000E+00,           !- Direction of Relative North {deg}",
-        "    6.000000,                !- X Origin {m}",
-        "    6.000000,                !- Y Origin {m}",
-        "    0.0000000E+00,           !- Z Origin {m}",
-        "    1,                       !- Type",
-        "    1,                       !- Multiplier",
-        "    AutoCalculate,           !- Ceiling Height {m}",
-        "    AutoCalculate;           !- Volume {m3}",
-
-        "Zone,",
-        "    ZONE 2,                  !- Name",
-        "    0.0000000E+00,           !- Direction of Relative North {deg}",
-        "    26.00000,                !- X Origin {m}",
-        "    6.000000,                !- Y Origin {m}",
-        "    0.0000000E+00,           !- Z Origin {m}",
-        "    1,                       !- Type",
-        "    1,                       !- Multiplier",
-        "    AutoCalculate,           !- Ceiling Height {m}",
-        "    AutoCalculate;           !- Volume {m3}",
-
-        "Zone,",
-        "    ZONE 3,                  !- Name",
-        "    0.0000000E+00,           !- Direction of Relative North {deg}",
-        "    6.000000,                !- X Origin {m}",
-        "    6.000000,                !- Y Origin {m}",
-        "    10.00000,                !- Z Origin {m}",
-        "    1,                       !- Type",
-        "    1,                       !- Multiplier",
-        "    AutoCalculate,           !- Ceiling Height {m}",
-        "    AutoCalculate;           !- Volume {m3}",
-
-        "Zone,",
-        "    ZONE 4,                  !- Name",
-        "    0.0000000E+00,           !- Direction of Relative North {deg}",
-        "    26.00000,                !- X Origin {m}",
-        "    6.000000,                !- Y Origin {m}",
-        "    10.00000,                !- Z Origin {m}",
-        "    1,                       !- Type",
-        "    1,                       !- Multiplier",
-        "    AutoCalculate,           !- Ceiling Height {m}",
-        "    AutoCalculate;           !- Volume {m3}",
 
         "GlobalGeometryRules,",
         "    UpperLeftCorner,         !- Starting Vertex Position",
@@ -4561,12 +4481,50 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test2)
 
     bool ErrorsFound(false);
 
-    GetSurfaceData(ErrorsFound);
+    DataGlobals::NumOfZones = 1;
+    Zone.allocate(1);
+    Zone(1).Name = "ZONE 1";
+    Zone(1).OriginX = 0;
+    Zone(1).OriginY = 0;
+    Zone(1).OriginZ = 0;
+
+    GetGeometryParameters(ErrorsFound);
+    EXPECT_FALSE(has_err_output(true));
+}
+
+TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test3)
+{
+    // Case 3) World coordinate system & Non-zero zone origin
+
+    std::string const idf_objects = delimited_string({
+     
+        "GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    World,                   !- Coordinate System",
+        "    Relative,                !- Daylighting Reference Point Coordinate System",
+        "    Relative;                !- Rectangular Surface Coordinate System",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+
+    DataGlobals::NumOfZones = 1;
+    Zone.allocate(1);
+    Zone(1).Name = "ZONE 1";
+    Zone(1).OriginX = 6;
+    Zone(1).OriginY = 6;
+    Zone(1).OriginZ = 0;
+
     GetGeometryParameters(ErrorsFound);
     EXPECT_TRUE(has_err_output(false));
-    // std::string error_string = delimited_string({
-    //    "   ** Warning ** GlobalGeometryRules: Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on
-    //    the default SurfaceGeometry for 'Relative to zone' coordinate.",
-    //});
-    // EXPECT_TRUE(compare_err_stream(error_string, true));
+    
+    std::string error_string = delimited_string({
+        "   ** Warning ** GlobalGeometryRules: Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on the default SurfaceGeometry for 'Relative to zone' coordinate.",
+        "   **   ~~~   ** Coordinate System=\"WORLD\"; while ",
+        "   **   ~~~   ** Rectangular Surface Coordinate System=\"RELATIVE\".",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
