@@ -64,7 +64,7 @@
 #include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::EIRWaterToWaterHeatPumps;
+using namespace EnergyPlus::EIRPlantLoopHeatPumps;
 
 class EIRWWHPFixture : public EnergyPlusFixture {};
 
@@ -72,10 +72,11 @@ TEST_F(EIRWWHPFixture, ConstructionFullObjectsHeatingAndCooling) {
     std::string const idf_objects =
             delimited_string(
                     {
-                            "HeatPump:WaterToWater:EIR:Heating,",
+                            "HeatPump:PlantLoop:EIR:Heating,",
                             "  hp heating side,",
                             "  node 1,",
                             "  node 2,",
+                            "  WaterSource,",
                             "  node 3,",
                             "  node 4,",
                             "  hp cooling side,",
@@ -87,7 +88,7 @@ TEST_F(EIRWWHPFixture, ConstructionFullObjectsHeatingAndCooling) {
                             "  dummyCurve,",
                             "  dummyCurve,",
                             "  dummyCurve;",
-                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "HeatPump:PlantLoop:EIR:Cooling,",
                             "  hp cooling side,",
                             "  node 1,",
                             "  node 2,",
@@ -113,14 +114,14 @@ TEST_F(EIRWWHPFixture, ConstructionFullObjectsHeatingAndCooling) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(2u, eir_wwhp.size());
+    EXPECT_EQ(2u, eir_plhp.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRWaterToWaterHeatPump *thisHeatingWWHP = &eir_wwhp[1];
-    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[0];
+    EIRPlantLoopHeatPump *thisHeatingWWHP = &eir_plhp[1];
+    EIRPlantLoopHeatPump *thisCoolingWWHP = &eir_plhp[0];
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingWWHP->name);
@@ -140,27 +141,27 @@ TEST_F(EIRWWHPFixture, ConstructionFullObjectsHeatingAndCooling) {
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
     EXPECT_THROW(
-            EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "fake"),
+            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "fake"),
             std::runtime_error
     );
     EXPECT_THROW(
-            EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"),
+            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"),
             std::runtime_error
     );
     EXPECT_THROW(
-            EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"),
+            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"),
             std::runtime_error
     );
     EXPECT_THROW(
-            EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
+            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
             std::runtime_error
     );
 }
 
 TEST_F(EIRWWHPFixture, PairingCompanionCoils) {
-    eir_wwhp.resize(2);
-    EIRWaterToWaterHeatPump *coil1 = &eir_wwhp[0];
-    EIRWaterToWaterHeatPump *coil2 = &eir_wwhp[1];
+    eir_plhp.resize(2);
+    EIRPlantLoopHeatPump *coil1 = &eir_plhp[0];
+    EIRPlantLoopHeatPump *coil2 = &eir_plhp[1];
 
     {
         // a successful try
@@ -172,7 +173,7 @@ TEST_F(EIRWWHPFixture, PairingCompanionCoils) {
         coil2->companionCoilName = "name1";
         coil2->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRHeating;
         coil2->companionHeatPumpCoil = nullptr;
-        EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::pairUpCompanionCoils();
+        EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils();
         EXPECT_EQ(coil2, coil1->companionHeatPumpCoil);
         EXPECT_EQ(coil1, coil2->companionHeatPumpCoil);
     }
@@ -187,7 +188,7 @@ TEST_F(EIRWWHPFixture, PairingCompanionCoils) {
         coil2->companionCoilName = "name1";
         coil2->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRHeating;
         coil2->companionHeatPumpCoil = nullptr;
-        EXPECT_THROW(EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::pairUpCompanionCoils(), std::runtime_error);
+        EXPECT_THROW(EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils(), std::runtime_error);
     }
 
     {
@@ -200,7 +201,7 @@ TEST_F(EIRWWHPFixture, PairingCompanionCoils) {
         coil2->companionCoilName = "name1";
         coil2->plantTypeOfNum = DataPlant::TypeOf_HeatPumpEIRCooling;
         coil2->companionHeatPumpCoil = nullptr;
-        EXPECT_THROW(EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::pairUpCompanionCoils(), std::runtime_error);
+        EXPECT_THROW(EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::pairUpCompanionCoils(), std::runtime_error);
     }
 
 }
@@ -209,10 +210,11 @@ TEST_F(EIRWWHPFixture, HeatingConstructionFullObjectsNoCompanion) {
     std::string const idf_objects =
             delimited_string(
                     {
-                            "HeatPump:WaterToWater:EIR:Heating,",
+                            "HeatPump:PlantLoop:EIR:Heating,",
                             "  hp heating side,",
                             "  node 1,",
                             "  node 2,",
+                            "  WaterSource,",
                             "  node 3,",
                             "  node 4,",
                             "  ,",
@@ -235,13 +237,13 @@ TEST_F(EIRWWHPFixture, HeatingConstructionFullObjectsNoCompanion) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_wwhp.size());
+    EXPECT_EQ(1u, eir_plhp.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRWaterToWaterHeatPump *thisHeatingWWHP = &eir_wwhp[0];
+    EIRPlantLoopHeatPump *thisHeatingWWHP = &eir_plhp[0];
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingWWHP->name);
@@ -253,11 +255,11 @@ TEST_F(EIRWWHPFixture, HeatingConstructionFullObjectsNoCompanion) {
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
     EXPECT_THROW(
-            EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "fake"),
+            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "fake"),
             std::runtime_error
     );
     EXPECT_THROW(
-            EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"),
+            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"),
             std::runtime_error
     );
 }
@@ -266,10 +268,11 @@ TEST_F(EIRWWHPFixture, CoolingConstructionFullObjectsNoCompanion) {
     std::string const idf_objects =
             delimited_string(
                     {
-                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "HeatPump:PlantLoop:EIR:Cooling,",
                             "  hp cooling side,",
                             "  node 1,",
                             "  node 2,",
+                            "  WaterSource,",
                             "  node 3,",
                             "  node 4,",
                             "  ,",
@@ -292,13 +295,13 @@ TEST_F(EIRWWHPFixture, CoolingConstructionFullObjectsNoCompanion) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_wwhp.size());
+    EXPECT_EQ(1u, eir_plhp.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[0];
+    EIRPlantLoopHeatPump *thisCoolingWWHP = &eir_plhp[0];
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingWWHP->name);
@@ -310,11 +313,11 @@ TEST_F(EIRWWHPFixture, CoolingConstructionFullObjectsNoCompanion) {
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
     EXPECT_THROW(
-            EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"),
+            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"),
             std::runtime_error
     );
     EXPECT_THROW(
-            EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
+            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
             std::runtime_error
     );
 }
@@ -323,10 +326,11 @@ TEST_F(EIRWWHPFixture, CoolingConstructionFullObjectWithDefaults) {
     std::string const idf_objects =
             delimited_string(
                     {
-                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "HeatPump:PlantLoop:EIR:Cooling,",
                             "  hp cooling side,",
                             "  node 1,",
                             "  node 2,",
+                            "  WaterSource,",
                             "  node 3,",
                             "  node 4,",
                             "  ,",
@@ -349,13 +353,13 @@ TEST_F(EIRWWHPFixture, CoolingConstructionFullObjectWithDefaults) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_wwhp.size());
+    EXPECT_EQ(1u, eir_plhp.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[0];
+    EIRPlantLoopHeatPump *thisCoolingWWHP = &eir_plhp[0];
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingWWHP->name);
@@ -368,10 +372,11 @@ TEST_F(EIRWWHPFixture, CoolingConstructionFullyAutoSized) {
     std::string const idf_objects =
             delimited_string(
                     {
-                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "HeatPump:PlantLoop:EIR:Cooling,",
                             "  hp cooling side,",
                             "  node 1,",
                             "  node 2,",
+                            "  WaterSource,",
                             "  node 3,",
                             "  node 4,",
                             "  ,",
@@ -394,13 +399,13 @@ TEST_F(EIRWWHPFixture, CoolingConstructionFullyAutoSized) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_wwhp.size());
+    EXPECT_EQ(1u, eir_plhp.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[0];
+    EIRPlantLoopHeatPump *thisCoolingWWHP = &eir_plhp[0];
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingWWHP->name);
@@ -412,11 +417,11 @@ TEST_F(EIRWWHPFixture, CoolingConstructionFullyAutoSized) {
 
     // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
     EXPECT_THROW(
-            EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"),
+            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"),
             std::runtime_error
     );
     EXPECT_THROW(
-            EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
+            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
             std::runtime_error
     );
 }
@@ -425,10 +430,11 @@ TEST_F(EIRWWHPFixture, CatchErrorsOnBadCurves) {
     std::string const idf_objects =
             delimited_string(
                     {
-                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "HeatPump:PlantLoop:EIR:Cooling,",
                             "  hp cooling side,",
                             "  node 1,",
                             "  node 2,",
+                            "  WaterSource,",
                             "  node 3,",
                             "  node 4,",
                             "  ,",
@@ -444,17 +450,18 @@ TEST_F(EIRWWHPFixture, CatchErrorsOnBadCurves) {
             );
     ASSERT_TRUE(process_idf(idf_objects));
     // call the factory with a valid name to trigger reading inputs, it should throw for the bad curves
-    EXPECT_THROW(EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE"), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE"), std::runtime_error);
 }
 
 TEST_F(EIRWWHPFixture, Initialization) {
     std::string const idf_objects =
             delimited_string(
                     {
-                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "HeatPump:PlantLoop:EIR:Cooling,",
                             "  hp cooling side,",
                             "  node 1,",
                             "  node 2,",
+                            "  WaterSource,",
                             "  node 3,",
                             "  node 4,",
                             "  ,",
@@ -500,13 +507,13 @@ TEST_F(EIRWWHPFixture, Initialization) {
     PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_wwhp.size());
+    EXPECT_EQ(1u, eir_plhp.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[0];
+    EIRPlantLoopHeatPump *thisCoolingWWHP = &eir_plhp[0];
 
     // do a bit of extra wiring up to the plant
     wwhpPlantLoadSideComp.Name = thisCoolingWWHP->name;
@@ -595,10 +602,11 @@ TEST_F(EIRWWHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion) {
     std::string const idf_objects =
             delimited_string(
                     {
-                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "HeatPump:PlantLoop:EIR:Cooling,",
                             "  hp cooling side,",
                             "  node 1,",
                             "  node 2,",
+                            "  WaterSource,",
                             "  node 3,",
                             "  node 4,",
                             "  hp heating side,",
@@ -610,10 +618,11 @@ TEST_F(EIRWWHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion) {
                             "  dummyCurve,",
                             "  dummyCurve,",
                             "  dummyCurve;",
-                            "HeatPump:WaterToWater:EIR:Heating,",
+                            "HeatPump:PlantLoop:EIR:Heating,",
                             "  hp heating side,",
                             "  node 5,",
                             "  node 6,",
+                            "  WaterSource,",
                             "  node 7,",
                             "  node 8,",
                             "  hp cooling side,",
@@ -636,14 +645,14 @@ TEST_F(EIRWWHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(2u, eir_wwhp.size());
+    EXPECT_EQ(2u, eir_plhp.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[0];
-    EIRWaterToWaterHeatPump *thisHeatingWWHP = &eir_wwhp[1];
+    EIRPlantLoopHeatPump *thisCoolingWWHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisHeatingWWHP = &eir_plhp[1];
 
     // validate that we have the right ones
     EXPECT_EQ("HP COOLING SIDE", thisCoolingWWHP->name);
@@ -781,10 +790,11 @@ TEST_F(EIRWWHPFixture, TestSizing_FullyHardsizedHeatingWithCompanion) {
     std::string const idf_objects =
             delimited_string(
                     {
-                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "HeatPump:PlantLoop:EIR:Cooling,",
                             "  hp cooling side,",
                             "  node 1,",
                             "  node 2,",
+                            "  WaterSource,",
                             "  node 3,",
                             "  node 4,",
                             "  hp heating side,",
@@ -796,10 +806,11 @@ TEST_F(EIRWWHPFixture, TestSizing_FullyHardsizedHeatingWithCompanion) {
                             "  dummyCurve,",
                             "  dummyCurve,",
                             "  dummyCurve;",
-                            "HeatPump:WaterToWater:EIR:Heating,",
+                            "HeatPump:PlantLoop:EIR:Heating,",
                             "  hp heating side,",
                             "  node 5,",
                             "  node 6,",
+                            "  WaterSource,",
                             "  node 7,",
                             "  node 8,",
                             "  hp cooling side,",
@@ -822,14 +833,14 @@ TEST_F(EIRWWHPFixture, TestSizing_FullyHardsizedHeatingWithCompanion) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(2u, eir_wwhp.size());
+    EXPECT_EQ(2u, eir_plhp.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[0];
-    EIRWaterToWaterHeatPump *thisHeatingWWHP = &eir_wwhp[1];
+    EIRPlantLoopHeatPump *thisCoolingWWHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisHeatingWWHP = &eir_plhp[1];
 
     // validate that we have the right ones
     EXPECT_EQ("HP COOLING SIDE", thisCoolingWWHP->name);
@@ -919,10 +930,11 @@ TEST_F(EIRWWHPFixture, TestSizing_WithCompanionNoPlantSizing) {
     std::string const idf_objects =
             delimited_string(
                     {
-                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "HeatPump:PlantLoop:EIR:Cooling,",
                             "  hp cooling side,",
                             "  node 1,",
                             "  node 2,",
+                            "  WaterSource,",
                             "  node 3,",
                             "  node 4,",
                             "  hp heating side,",
@@ -934,10 +946,11 @@ TEST_F(EIRWWHPFixture, TestSizing_WithCompanionNoPlantSizing) {
                             "  dummyCurve,",
                             "  dummyCurve,",
                             "  dummyCurve;",
-                            "HeatPump:WaterToWater:EIR:Heating,",
+                            "HeatPump:PlantLoop:EIR:Heating,",
                             "  hp heating side,",
                             "  node 5,",
                             "  node 6,",
+                            "  WaterSource,",
                             "  node 7,",
                             "  node 8,",
                             "  hp cooling side,",
@@ -960,14 +973,14 @@ TEST_F(EIRWWHPFixture, TestSizing_WithCompanionNoPlantSizing) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(2u, eir_wwhp.size());
+    EXPECT_EQ(2u, eir_plhp.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[0];
-    EIRWaterToWaterHeatPump *thisHeatingWWHP = &eir_wwhp[1];
+    EIRPlantLoopHeatPump *thisCoolingWWHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisHeatingWWHP = &eir_plhp[1];
 
     // validate that we have the right ones
     EXPECT_EQ("HP COOLING SIDE", thisCoolingWWHP->name);
@@ -1049,10 +1062,11 @@ TEST_F(EIRWWHPFixture, TestSizing_NoCompanionNoPlantSizingError) {
     std::string const idf_objects =
             delimited_string(
                     {
-                            "HeatPump:WaterToWater:EIR:Heating,",
+                            "HeatPump:PlantLoop:EIR:Heating,",
                             "  hp heating side,",
                             "  node 5,",
                             "  node 6,",
+                            "  WaterSource,",
                             "  node 7,",
                             "  node 8,",
                             "  ,",
@@ -1075,13 +1089,13 @@ TEST_F(EIRWWHPFixture, TestSizing_NoCompanionNoPlantSizingError) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_wwhp.size());
+    EXPECT_EQ(1u, eir_plhp.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRWaterToWaterHeatPump *thisHeatingWWHP = &eir_wwhp[0];
+    EIRPlantLoopHeatPump *thisHeatingWWHP = &eir_plhp[0];
 
     // validate that we have the right ones
     EXPECT_EQ("HP HEATING SIDE", thisHeatingWWHP->name);
@@ -1142,11 +1156,12 @@ TEST_F(EIRWWHPFixture, TestSizing_NoCompanionNoPlantSizingHardSized) {
     std::string const idf_objects =
             delimited_string(
                     {
-                            "HeatPump:WaterToWater:EIR:Heating,",
+                            "HeatPump:PlantLoop:EIR:Heating,",
                             "  hp heating side,",
                             "  node 5,",
                             "  node 6,",
                             "  node 7,",
+                            "  WaterSource,",
                             "  node 8,",
                             "  ,",
                             "  0.1,",
@@ -1168,13 +1183,13 @@ TEST_F(EIRWWHPFixture, TestSizing_NoCompanionNoPlantSizingHardSized) {
     ASSERT_TRUE(process_idf(idf_objects));
 
     // call the factory with a valid name to trigger reading inputs
-    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_wwhp.size());
+    EXPECT_EQ(1u, eir_plhp.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRWaterToWaterHeatPump *thisHeatingWWHP = &eir_wwhp[0];
+    EIRPlantLoopHeatPump *thisHeatingWWHP = &eir_plhp[0];
 
     // validate that we have the right ones
     EXPECT_EQ("HP HEATING SIDE", thisHeatingWWHP->name);
@@ -1237,10 +1252,11 @@ TEST_F(EIRWWHPFixture, CoolingOutletSetpointWorker) {
     std::string const idf_objects =
             delimited_string(
                     {
-                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "HeatPump:PlantLoop:EIR:Cooling,",
                             "  hp cooling side,",
                             "  node 1,",
                             "  node 2,",
+                            "  WaterSource,",
                             "  node 3,",
                             "  node 4,",
                             "  ,",
@@ -1276,13 +1292,13 @@ TEST_F(EIRWWHPFixture, CoolingOutletSetpointWorker) {
     wwhpPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // call the factory with a valid name to trigger reading inputs
-    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_wwhp.size());
+    EXPECT_EQ(1u, eir_plhp.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[0];
+    EIRPlantLoopHeatPump *thisCoolingWWHP = &eir_plhp[0];
 
     // do a little setup here
     thisCoolingWWHP->loadSideLocation.loopNum = 1;
@@ -1336,10 +1352,11 @@ TEST_F(EIRWWHPFixture, Initialization2) {
     std::string const idf_objects =
             delimited_string(
                     {
-                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "HeatPump:PlantLoop:EIR:Cooling,",
                             "  hp cooling side,",
                             "  node 1,",
                             "  node 2,",
+                            "  WaterSource,",
                             "  node 3,",
                             "  node 4,",
                             "  ,",
@@ -1385,13 +1402,13 @@ TEST_F(EIRWWHPFixture, Initialization2) {
     PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_wwhp.size());
+    EXPECT_EQ(1u, eir_plhp.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[0];
+    EIRPlantLoopHeatPump *thisCoolingWWHP = &eir_plhp[0];
 
     // do a bit of extra wiring up to the plant
     wwhpPlantLoadSideComp.Name = thisCoolingWWHP->name;
@@ -1529,10 +1546,11 @@ TEST_F(EIRWWHPFixture, OnInitLoopEquipTopologyErrorCases) {
     std::string const idf_objects =
             delimited_string(
                     {
-                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "HeatPump:PlantLoop:EIR:Cooling,",
                             "  hp cooling side,",
                             "  node 1,",
                             "  node 2,",
+                            "  WaterSource,",
                             "  node 3,",
                             "  node 4,",
                             "  ,",
@@ -1587,9 +1605,9 @@ TEST_F(EIRWWHPFixture, OnInitLoopEquipTopologyErrorCases) {
     extraWwhpPlantDemandSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // call the factory with a valid name to trigger reading inputs
-    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
-    EXPECT_EQ(1u, eir_wwhp.size());
-    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[0];
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EXPECT_EQ(1u, eir_plhp.size());
+    EIRPlantLoopHeatPump *thisCoolingWWHP = &eir_plhp[0];
 
     // init the plant component data with the name we have now from the factory call
     wwhpPlantSupplySideComp.Name = thisCoolingWWHP->name;
@@ -1650,10 +1668,11 @@ TEST_F(EIRWWHPFixture, CoolingSimulate) {
     std::string const idf_objects =
             delimited_string(
                     {
-                            "HeatPump:WaterToWater:EIR:Cooling,",
+                            "HeatPump:PlantLoop:EIR:Cooling,",
                             "  hp cooling side,",
                             "  node 1,",
                             "  node 2,",
+                            "  WaterSource,",
                             "  node 3,",
                             "  node 4,",
                             "  ,",
@@ -1702,13 +1721,13 @@ TEST_F(EIRWWHPFixture, CoolingSimulate) {
     PlantLocation mySourceLocation = PlantLocation(2, 1, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_wwhp.size());
+    EXPECT_EQ(1u, eir_plhp.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRWaterToWaterHeatPump *thisCoolingWWHP = &eir_wwhp[0];
+    EIRPlantLoopHeatPump *thisCoolingWWHP = &eir_plhp[0];
 
     // do a bit of extra wiring up to the plant
     wwhpPlantLoadSideComp.Name = thisCoolingWWHP->name;
@@ -1790,10 +1809,11 @@ TEST_F(EIRWWHPFixture, HeatingSimulate) {
     std::string const idf_objects =
             delimited_string(
                     {
-                            "HeatPump:WaterToWater:EIR:Heating,",
+                            "HeatPump:PlantLoop:EIR:Heating,",
                             "  hp heating side,",
                             "  node 1,",
                             "  node 2,",
+                            "  WaterSource,",
                             "  node 3,",
                             "  node 4,",
                             "  ,",
@@ -1841,13 +1861,13 @@ TEST_F(EIRWWHPFixture, HeatingSimulate) {
     PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
 
     // call the factory with a valid name to trigger reading inputs
-    EIRWaterToWaterHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_wwhp.size());
+    EXPECT_EQ(1u, eir_plhp.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRWaterToWaterHeatPump *thisHeatingWWHP = &eir_wwhp[0];
+    EIRPlantLoopHeatPump *thisHeatingWWHP = &eir_plhp[0];
 
     // do a bit of extra wiring up to the plant
     wwhpPlantLoadSideComp.Name = thisHeatingWWHP->name;
@@ -1918,11 +1938,11 @@ TEST_F(EIRWWHPFixture, HeatingSimulate) {
 }
 
 TEST_F(EIRWWHPFixture, TestConcurrentOperationChecking) {
-    eir_wwhp.resize(4);
-    EIRWaterToWaterHeatPump *coil1 = &eir_wwhp[0];
-    EIRWaterToWaterHeatPump *coil2 = &eir_wwhp[1];
-    EIRWaterToWaterHeatPump *coil3 = &eir_wwhp[2];
-    EIRWaterToWaterHeatPump *coil4 = &eir_wwhp[3];
+    eir_plhp.resize(4);
+    EIRPlantLoopHeatPump *coil1 = &eir_plhp[0];
+    EIRPlantLoopHeatPump *coil2 = &eir_plhp[1];
+    EIRPlantLoopHeatPump *coil3 = &eir_plhp[2];
+    EIRPlantLoopHeatPump *coil4 = &eir_plhp[3];
 
     // pair up the last two
     coil3->companionHeatPumpCoil = coil4;
@@ -1935,7 +1955,7 @@ TEST_F(EIRWWHPFixture, TestConcurrentOperationChecking) {
     coil4->running = true;
 
     // check to warn about concurrent operation
-    EIRWaterToWaterHeatPump::checkConcurrentOperation();
+    EIRPlantLoopHeatPump::checkConcurrentOperation();
 
     // that will just add a recurring warning to the end, so to check whether
     //  a warning was actually made, I'll just check the warning index values

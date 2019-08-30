@@ -58,7 +58,7 @@
 
 namespace EnergyPlus {
 
-    namespace EIRWaterToWaterHeatPumps {
+    namespace EIRPlantLoopHeatPumps {
 
         struct InOutNodePair {
             int inlet;
@@ -68,13 +68,13 @@ namespace EnergyPlus {
             }
         };
 
-        struct EIRWaterToWaterHeatPump : public EnergyPlus::BaseWaterToWaterHeatPump {
+        struct EIRPlantLoopHeatPump : public EnergyPlus::BasePlantLoopHeatPump {
 
             // fixed configuration parameters
             std::string name = "";
             int plantTypeOfNum = -1;
             std::string companionCoilName = "";
-            EIRWaterToWaterHeatPump *companionHeatPumpCoil = nullptr;
+            EIRPlantLoopHeatPump *companionHeatPumpCoil = nullptr;
             Real64 sizingFactor = 1.0;
 
             // reference data
@@ -129,9 +129,9 @@ namespace EnergyPlus {
             std::function<Real64 (Real64, Real64)> calcQsource;
             std::function<Real64 (Real64, Real64)> calcSourceOutletTemp;
 
-            virtual ~EIRWaterToWaterHeatPump() = default;
+            virtual ~EIRPlantLoopHeatPump() = default;
 
-            EIRWaterToWaterHeatPump() = default;
+            EIRPlantLoopHeatPump() = default;
 
             void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                           bool RunFlag) override;
@@ -153,11 +153,11 @@ namespace EnergyPlus {
 
             void resetReportingVariables();
 
-            static PlantComponent *factory(int wwhp_type_of_num, std::string eir_wwhp_name);
+            static PlantComponent *factory(int plhp_type_of_num, std::string eir_plhp_name);
 
             static void pairUpCompanionCoils();
 
-            static void processInputForEIRWWHP();
+            static void processInputForEIRPLHP();
 
             static void clear_state();
 
@@ -168,8 +168,8 @@ namespace EnergyPlus {
             static Real64 subtract(Real64 const a, Real64 const b) {return a - b;}
         };
 
-        extern std::vector<EIRWaterToWaterHeatPump> eir_wwhp;
-    } // namespace EIRWaterToWaterHeatPumps
+        extern std::vector<EIRPlantLoopHeatPump> eir_plhp;
+    } // namespace EIRPlantLoopHeatPumps
 } // namespace EnergyPlus
 
 #endif //ENERGYPLUS_PLANTLOOPHEATPUMPEIR_HH
