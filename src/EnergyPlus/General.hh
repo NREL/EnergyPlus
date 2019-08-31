@@ -389,6 +389,9 @@ namespace General {
 
     std::vector<std::string> splitString(const std::string &string, char delimiter);
 
+    Real64 epexp(Real64 x);
+
+    Real64 epexp(Real64 x, Real64 defaultHigh);
 } // namespace General
 
 } // namespace EnergyPlus

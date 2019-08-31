@@ -629,6 +629,7 @@ namespace HVACVariableRefrigerantFlow {
         int TUListIndex;                     // index to VRF Terminal Unit List
         int IndexToTUInTUList;               // index to TU in VRF Terminal Unit List
         int ZoneNum;                         // index to zone where VRF Terminal Unit resides
+        int ZoneAirNode;                     // zone air node number
         int VRFTUInletNodeNum;               // VRF Terminal Unit inlet node number
         int VRFTUOutletNodeNum;              // VRF Terminal Unit outlet node number
         int VRFTUOAMixerOANodeNum;           // OA node number for this TU's OA mixer
@@ -730,7 +731,7 @@ namespace HVACVariableRefrigerantFlow {
         bool MySuppCoilPlantScanFlag;    // flag used to initialize plant comp for water and steam heating coils
         // Default Constructor
         VRFTerminalUnitEquipment()
-            : VRFTUType_Num(0), SchedPtr(-1), VRFSysNum(0), TUListIndex(0), IndexToTUInTUList(0), ZoneNum(0), VRFTUInletNodeNum(0),
+            : VRFTUType_Num(0), SchedPtr(-1), VRFSysNum(0), TUListIndex(0), IndexToTUInTUList(0), ZoneNum(0), ZoneAirNode(0), VRFTUInletNodeNum(0),
               VRFTUOutletNodeNum(0), VRFTUOAMixerOANodeNum(0), VRFTUOAMixerRelNodeNum(0), VRFTUOAMixerRetNodeNum(0), MaxCoolAirVolFlow(0.0),
               MaxHeatAirVolFlow(0.0), MaxNoCoolAirVolFlow(0.0), MaxNoHeatAirVolFlow(0.0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0),
               MaxNoCoolAirMassFlow(0.0), MaxNoHeatAirMassFlow(0.0), CoolOutAirVolFlow(0.0), HeatOutAirVolFlow(0.0), NoCoolHeatOutAirVolFlow(0.0),

@@ -800,3 +800,229 @@ TEST_F(EnergyPlusFixture, ManageElectricPowerTest_TransformerLossTest)
     // check the transformer loss rate for load and no load condition
     EXPECT_EQ(expectedtransformerObjLossRate, 0.0);
 }
+
+
+// #7151: If an ElectricLoadCenter:Generators lists a Generator:Phototoltaic of type Simple PV with an availability schedule, warn that it will be unused.
+// Any other performance type shouldn't warn
+TEST_F(EnergyPlusFixture, ElectricLoadCenter_WarnAvailabilitySchedule_Photovoltaic_Simple)
+{
+
+    std::string const idf_objects = delimited_string({
+      "ElectricLoadCenter:Distribution,",
+      "  PV Electric Load Center, !- Name",
+      "  PV Generator List,       !- Generator List Name",
+      "  Baseload,                !- Generator Operation Scheme Type",
+      "  0,                       !- Generator Demand Limit Scheme Purchased Electric Demand Limit {W}",
+      "  ,                        !- Generator Track Schedule Name Scheme Schedule Name",
+      "  ,                        !- Generator Track Meter Scheme Meter Name",
+      "  DirectCurrentWithInverter,  !- Electrical Buss Type",
+      "  Simple Ideal Inverter;   !- Inverter Name",
+
+      "ElectricLoadCenter:Inverter:Simple,",
+      "  Simple Ideal Inverter,   !- Name",
+      "  PV_ON,                   !- Availability Schedule Name",
+      "  ,                        !- Zone Name",
+      "  0.0,                     !- Radiative Fraction",
+      "  1.0;                     !- Inverter Efficiency",
+
+      "ScheduleTypeLimits,",
+      "  OnOff,                   !- Name",
+      "  0,                       !- Lower Limit Value",
+      "  1,                       !- Upper Limit Value",
+      "  Discrete;                !- Numeric Type",
+
+      "Schedule:Compact,",
+      "  PV_ON,                   !- Name",
+      "  OnOff,                   !- Schedule Type Limits Name",
+      "  Through: 12/31,          !- Field 1",
+      "  For: AllDays,            !- Field 2",
+      "  Until: 11:00,            !- Field 3",
+      "  0.0,                     !- Field 4",
+      "  Until: 15:00,            !- Field 5",
+      "  1.0,                     !- Field 6",
+      "  Until: 24:00,            !- Field 7",
+      "  0.0;                     !- Field 8",
+
+      "ElectricLoadCenter:Generators,",
+      "  PV Generator List,       !- Name",
+      "  SimplePV,                !- Generator 1 Name",
+      "  Generator:Photovoltaic,  !- Generator 1 Object Type",
+      "  20000,                   !- Generator 1 Rated Electric Power Output {W}",
+      "  PV_ON,                   !- Generator 1 Availability Schedule Name",
+      "  ,                        !- Generator 1 Rated Thermal to Electrical Power Ratio",
+      "  SimplePV2,               !- Generator 2 Name",
+      "  Generator:Photovoltaic,  !- Generator 2 Object Type",
+      "  20000,                   !- Generator 2 Rated Electric Power Output {W}",
+      "  ,                        !- Generator 2 Availability Schedule Name",
+      "  ,                        !- Generator 2 Rated Thermal to Electrical Power Ratio",
+      "  TRNSYSPV INTEGRATED PV,  !- Generator 3 Name",
+      "  Generator:Photovoltaic,  !- Generator 3 Object Type",
+      "  20000,                   !- Generator 3 Rated Electric Power Output {W}",
+      "  ,                        !- Generator 3 Availability Schedule Name",
+      "  ;                        !- Generator 3 Rated Thermal to Electrical Power Ratio",
+
+      "Shading:Site:Detailed,",
+      "  FlatSurface,             !- Name",
+      "  ,                        !- Transmittance Schedule Name",
+      "  4,                       !- Number of Vertices",
+      "  40.0,2.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+      "  40.0,0.00,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+      "  45.0,0.00,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+      "  45.0,2.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+      "PhotovoltaicPerformance:Simple,",
+      "  12percentEffPVFullArea,  !- Name",
+      "  1.0,                     !- Fraction of Surface Area with Active Solar Cells {dimensionless}",
+      "  Fixed,                   !- Conversion Efficiency Input Mode",
+      "  0.12;                    !- Value for Cell Efficiency if Fixed",
+
+      "Generator:Photovoltaic,",
+      "  SimplePV,                !- Name",
+      "  FlatSurface,             !- Surface Name",
+      "  PhotovoltaicPerformance:Simple,  !- Photovoltaic Performance Object Type",
+      "  12percentEffPVFullArea,  !- Module Performance Name",
+      "  Decoupled,               !- Heat Transfer Integration Mode",
+      "  1.0,                     !- Number of Series Strings in Parallel {dimensionless}",
+      "  1.0;                     !- Number of Modules in Series {dimensionless}",
+
+      "Generator:Photovoltaic,",
+      "  SimplePV2,               !- Name",
+      "  FlatSurface,             !- Surface Name",
+      "  PhotovoltaicPerformance:Simple,  !- Photovoltaic Performance Object Type",
+      "  12percentEffPVFullArea,  !- Module Performance Name",
+      "  Decoupled,               !- Heat Transfer Integration Mode",
+      "  1.0,                     !- Number of Series Strings in Parallel {dimensionless}",
+      "  1.0;                     !- Number of Modules in Series {dimensionless}",
+
+      "Generator:Photovoltaic,",
+      "  TRNSYSPV INTEGRATED PV,  !- Name",
+      "  FlatSurface,          !- Surface Name",
+      "  PhotovoltaicPerformance:EquivalentOne-Diode,  !- Photovoltaic Performance Object Type",
+      "  Example PV Model Inputs, !- Module Performance Name",
+      "  IntegratedSurfaceOutsideFace,  !- Heat Transfer Integration Mode",
+      "  3.0,                     !- Number of Series Strings in Parallel {dimensionless}",
+      "  6.0;                     !- Number of Modules in Series {dimensionless}",
+
+      "PhotovoltaicPerformance:EquivalentOne-Diode,",
+      "  Example PV Model Inputs, !- Name",
+      "  CrystallineSilicon,      !- Cell type",
+      "  36,                      !- Number of Cells in Series {dimensionless}",
+      "  0.63,                    !- Active Area {m2}",
+      "  0.9,                     !- Transmittance Absorptance Product {dimensionless}",
+      "  1.12,                    !- Semiconductor Bandgap {eV}",
+      "  1000000,                 !- Shunt Resistance {ohms}",
+      "  4.75,                    !- Short Circuit Current {A}",
+      "  21.4,                    !- Open Circuit Voltage {V}",
+      "  25.0,                    !- Reference Temperature {C}",
+      "  1000.0,                  !- Reference Insolation {W/m2}",
+      "  4.45,                    !- Module Current at Maximum Power {A}",
+      "  17,                      !- Module Voltage at Maximum Power {V}",
+      "  0.00065,                 !- Temperature Coefficient of Short Circuit Current {A/K}",
+      "  -0.08,                   !- Temperature Coefficient of Open Circuit Voltage {V/K}",
+      "  20,                      !- Nominal Operating Cell Temperature Test Ambient Temperature {C}",
+      "  47,                      !- Nominal Operating Cell Temperature Test Cell Temperature {C}",
+      "  800.0,                   !- Nominal Operating Cell Temperature Test Insolation {W/m2}",
+      "  30.0,                    !- Module Heat Loss Coefficient {W/m2-K}",
+      "  50000;                   !- Total Heat Capacity {J/m2-K}",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    createFacilityElectricPowerServiceObject();
+    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(1));
+
+    // Should warn only for SimplePV because SimplePV2 doesn't have a schedule, and the other one is a Perf One-Diode and not "Simple"
+    std::string const error_string = delimited_string({
+      "   ** Warning ** GeneratorController constructor ElectricLoadCenter:Generators, Availability Schedule for Generator:Photovoltaics 'SIMPLEPV' of Type PhotovoltaicPerformance:Simple will be be ignored (runs all the time).",
+      "   **   ~~~   ** To limit this Generator:Photovoltaic's output, please use the Inverter's availability schedule instead.",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+}
+
+// #7151: If an ElectricLoadCenter:Generators lists a Generator:PVWatts with an availability schedule, warn that it will be unused
+TEST_F(EnergyPlusFixture, ElectricLoadCenter_WarnAvailabilitySchedule_PVWatts)
+{
+
+    std::string const idf_objects = delimited_string({
+      "ElectricLoadCenter:Distribution,",
+      "  PVWatts Electric Load Center,  !- Name",
+      "  PVWatts Generator List,  !- Generator List Name",
+      "  Baseload,                !- Generator Operation Scheme Type",
+      "  0,                       !- Generator Demand Limit Scheme Purchased Electric Demand Limit {W}",
+      "  ,                        !- Generator Track Schedule Name Scheme Schedule Name",
+      "  ,                        !- Generator Track Meter Scheme Meter Name",
+      "  DirectCurrentWithInverter,  !- Electrical Buss Type",
+      "  PVWatts Inverter;        !- Inverter Name",
+
+      "ElectricLoadCenter:Inverter:PVWatts,",
+      "  PVWatts Inverter,        !- Name",
+      "  1.10,                    !- DC to AC Size Ratio",
+      "  0.96;                    !- Inverter Efficiency",
+
+      "ScheduleTypeLimits,",
+      "  OnOff,                   !- Name",
+      "  0,                       !- Lower Limit Value",
+      "  1,                       !- Upper Limit Value",
+      "  Discrete;                !- Numeric Type",
+
+      "Schedule:Compact,",
+      "  PV_ON,                   !- Name",
+      "  OnOff,                   !- Schedule Type Limits Name",
+      "  Through: 12/31,          !- Field 1",
+      "  For: AllDays,            !- Field 2",
+      "  Until: 11:00,            !- Field 3",
+      "  0.0,                     !- Field 4",
+      "  Until: 15:00,            !- Field 5",
+      "  1.0,                     !- Field 6",
+      "  Until: 24:00,            !- Field 7",
+      "  0.0;                     !- Field 8",
+
+      "ElectricLoadCenter:Generators,",
+      "  PVWatts Generator List,  !- Name",
+      "  PVWatts1,                !- Generator 1 Name",
+      "  Generator:PVWatts,       !- Generator 1 Object Type",
+      "  4000,                    !- Generator 1 Rated Electric Power Output {W}",
+      "  PV_ON,                   !- Generator 1 Availability Schedule Name",
+      "  ,                        !- Generator 1 Rated Thermal to Electrical Power Ratio",
+      "  PVWatts2,                !- Generator 2 Name",
+      "  Generator:PVWatts,       !- Generator 2 Object Type",
+      "  3000,                    !- Generator 2 Rated Electric Power Output {W}",
+      "  ,                        !- Generator 2 Availability Schedule Name",
+      "  ;                        !- Generator 2 Rated Thermal to Electrical Power Ratio",
+
+      "Generator:PVWatts,",
+      "  PVWatts1,                !- Name",
+      "  5,                       !- PVWatts Version",
+      "  4000,                    !- DC System Capacity {W}",
+      "  Standard,                !- Module Type",
+      "  FixedOpenRack,           !- Array Type",
+      "  0.14,                    !- System Losses",
+      "  TiltAzimuth,             !- Array Geometry Type",
+      "  20,                      !- Tilt Angle {deg}",
+      "  180;                     !- Azimuth Angle {deg}",
+
+      "Generator:PVWatts,",
+      "  PVWatts2,                !- Name",
+      "  5,                       !- PVWatts Version",
+      "  4000,                    !- DC System Capacity {W}",
+      "  Standard,                !- Module Type",
+      "  FixedOpenRack,           !- Array Type",
+      "  0.14,                    !- System Losses",
+      "  TiltAzimuth,             !- Array Geometry Type",
+      "  20,                      !- Tilt Angle {deg}",
+      "  180;                     !- Azimuth Angle {deg}",   });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    createFacilityElectricPowerServiceObject();
+    facilityElectricServiceObj->elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(1));
+
+    // Should warn only for PVWatts1 because PVWatts2 doesn't have a schedule
+    std::string const error_string = delimited_string({
+      "   ** Warning ** GeneratorController constructor ElectricLoadCenter:Generators, Availability Schedule for Generator:PVWatts 'PVWATTS1' will be be ignored (runs all the time).",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+}

@@ -149,7 +149,7 @@ if( WIN32 AND NOT UNIX )
   set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
   include(InstallRequiredSystemLibraries)
   if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
-  install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./")
+    install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./")
   endif()
 endif()
 
@@ -443,7 +443,7 @@ elseif(WIN32)
   # You need at least one "install(..." command for it to be registered as a component
   install(CODE "MESSAGE(\"Registering filetypes.\")" COMPONENT RegisterFileType)
   install(CODE "MESSAGE(\"Copying and Registering DLLs\")" COMPONENT CopyAndRegisterSystemDLLs)
-
+  install(CODE "MESSAGE(\"Creating start menu.\")" COMPONENT CreateStartMenu)
 
 endif()
 
@@ -482,6 +482,44 @@ set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_BINARY_DIR}/CMakeCPackOptions.cmake")
 ##########################################################   D O C U M E N T A T I O N   #############################################################
 
 if ( BUILD_DOCS )
+  # Call the build of target documentation explicitly here.
+  # Note: This is because you can't do `add_dependencies(package documentation)` (https://gitlab.kitware.com/cmake/cmake/issues/8438)
+  # Adding another custom target to be added to the "ALL" one (so it runs) and make it depend on the actual "documentation" target doesn't work
+  # because it'll always run if you have enabled BUILD_DOCS, regardless of whether you are calling the target "package" or not
+  #  add_custom_target(run_documentation ALL)
+  #  add_dependencies(run_documentation documentation)
+  #message(FATAL_ERROR "CMAKE_COMMAND=${CMAKE_COMMAND}")
+
+  # +env will pass the current environment and will end up respecting the -j parameter
+  #                                 this ↓↓↓ here -- https://stackoverflow.com/a/41268443/531179
+  #install(CODE "execute_process(COMMAND +env \"${CMAKE_COMMAND}\" --build \"${CMAKE_BINARY_DIR}\" --target documentation)")
+  # Except it doesn't work with install(execute_process...
+
+  # Passing $(MAKE) doesn't work either, and isn't a great idea for cross platform support anyways
+  # install(CODE "execute_process(COMMAND ${MAKE} ${DOC_BUILD_FLAGS} -C \"${CMAKE_BINARY_DIR}\" documentation)")
+
+  # So instead, we just used the number of threads that are available. That's not ideal, since it ignores any "-j N" option passed by the user
+  # But LaTeX should run quickly enough to not be a major inconvenience.
+  # There no need to do that for Ninja for eg, so only do it for Make and MSVC
+
+  # flag -j to cmake --build was added at 3.12 (VERSION_GREATER_EQUAL need cmake >= 3.7, we apparently support 2.8...)
+  if(NOT(CMAKE_VERSION VERSION_LESS "3.12") AND ((CMAKE_GENERATOR MATCHES "Make") OR WIN32))
+    include(ProcessorCount)
+    ProcessorCount(N)
+    if(NOT N EQUAL 0)
+      set(DOC_BUILD_FLAGS "-j ${N}")
+    endif()
+  endif()
+  if(WIN32)
+    # Win32 is multi config, so you must specify a config when calling cmake.
+    # Let's just use Release, it won't have any effect on LaTeX anyways.
+    set(DOC_CONFIG_FLAG "--config Release")
+  endif()
+
+  # Getting these commands to work (especially with macro expansion) is tricky. Check the resulting `cmake_install.cmake` file in your build folder if need to debug this
+  install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build \"${CMAKE_BINARY_DIR}\" ${DOC_CONFIG_FLAG} ${DOC_BUILD_FLAGS} --target documentation)"
+          COMPONENT Documentation)
+
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/Acknowledgments.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/AuxiliaryPrograms.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/EMSApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
@@ -496,9 +534,11 @@ if ( BUILD_DOCS )
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/PlantApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/TipsAndTricksUsingEnergyPlus.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${CMAKE_BINARY_DIR}/doc-pdf/UsingEnergyPlusForCompliance.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+else()
+  message(AUTHOR_WARNING "BUILD_DOCS isn't enabled, so package won't include the PDFs")
 endif ()
 
-##########################################################   S Y S T E M    L I B R A R I E S   #############################################################
+##########################################################   S Y S T E M    L I B R A R I E S   ######################################################
 
 # TODO: is this unecessary now? I had forgotten to actually create a Libraries via cpack_add_component but everything seemed fined
 # At worse, try not to uncomment this as is, but place it inside an if(PLATFORM) statement
@@ -559,6 +599,12 @@ cpack_add_component(Licenses
   DESCRIPTION "License files for EnergyPlus"
   REQUIRED)
 
+# No need for system privileges for this
+cpack_add_component(CreateStartMenu
+  DISPLAY_NAME "Start Menu links"
+  DESCRIPTION "Create Start Menu Links"
+)
+
 cpack_add_component(RegisterFileType
   DISPLAY_NAME "Associate with EP-Launch and IDFEditor"
   DESCRIPTION "Associate *.idf, *.imf, and *.epg files with EP-Launch, *.ddy and *.expidf with IDFEditor.exe"
@@ -583,6 +629,10 @@ cpack_ifw_configure_component(Unspecified
 cpack_ifw_configure_component(Symlinks
     SCRIPT cmake/qtifw/install_mac_createsymlinks.qs
     REQUIRES_ADMIN_RIGHTS
+)
+
+cpack_ifw_configure_component(CreateStartMenu
+    SCRIPT cmake/qtifw/install_win_createstartmenu.qs
 )
 
 cpack_ifw_configure_component(RegisterFileType
