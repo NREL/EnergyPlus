@@ -2042,6 +2042,8 @@
 
   Output:Variable,*,Zone Thermal Comfort Pierce Model Thermal Sensation Index,timestep;
 
+  Output:Variable,*,Zone Thermal Comfort Pierce Model Standard Effective Temperature,timestep;
+
   Output:Variable,*,Zone Thermal Comfort KSU Model Thermal Sensation Vote,timestep;
 
   Output:Variable,*,HVAC System Solver Iteration Count,timestep;
