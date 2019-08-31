@@ -1369,11 +1369,11 @@ namespace UnitarySystems {
             if ((this->m_DehumidControlType_Num != DehumCtrlType::None) &&
                 (DataLoopNode::Node(ControlNode).HumRatMax == DataLoopNode::SensedNodeFlagValue) && this->m_ControlType == ControlType::Setpoint &&
                 CoilType == CoolingCoil) {
-                if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                if (!DataGlobals::AnyEnergyManagementSystemInModel && DataLoopNode::Node(this->CoolCoilOutletNodeNum).HumRatMax == DataLoopNode::SensedNodeFlagValue) {
                     ShowSevereError(this->UnitType + ": Missing humidity ratio setpoint (HUMRATMAX) for unitary system = " + this->Name);
                     ShowContinueError("  use a Setpoint Manager to establish a setpoint at the coil control node.");
                     SetPointErrorFlag = true;
-                } else {
+                } else if (DataGlobals::AnyEnergyManagementSystemInModel) {
                     EMSManager::CheckIfNodeSetPointManagedByEMS(ControlNode, EMSManager::iHumidityRatioMaxSetPoint, SetPointErrorFlag);
                     if (SetPointErrorFlag) {
                         ShowSevereError(this->UnitType + ": Missing maximum humidity ratio setpoint (HUMRATMAX) for unitary system = " + this->Name);
@@ -7335,44 +7335,53 @@ namespace UnitarySystems {
 
                     if (ControlNode == 0) {
                         this->m_DesiredOutletTemp = OAUCoilOutletTemp;
-                        this->m_DesiredOutletHumRat = 1.0;
                     } else if (ControlNode == OutNode) {
                         this->m_DesiredOutletTemp = OAUCoilOutletTemp;
                     }
-                    // If the unitary system is an equipment of Outdoor Air Unit, the desired coil outlet humidity level is set to zero
+                    // If the unitary system is an Outdoor Air Unit, the desired coil outlet humidity level is set to 1.0 (no dehum)
                     this->m_DesiredOutletHumRat = 1.0;
 
-                } else { // Not Outdoor Air Unit or zone equipment
+                } else { // Not Outdoor Air Unit. Either airloop or zone equipment
                     if (AirLoopNum > 0) economizerFlag = DataAirLoop::AirLoopControlInfo(AirLoopNum).EconoActive;
+                    Real64 humRatMaxSP = 1.0;
+                    this->m_DesiredOutletHumRat = humRatMaxSP;
                     if (ControlNode == 0) {
                         this->m_DesiredOutletTemp = 0.0;
-                        this->m_DesiredOutletHumRat = 1.0;
+                        if (OutNode > 0) {
+                            if (DataLoopNode::Node(OutNode).HumRatMax > 0.0) {
+                                this->m_DesiredOutletHumRat = DataLoopNode::Node(OutNode).HumRatMax;
+                            }
+                        }
                     } else if (ControlNode == OutNode) {
                         if (this->m_ISHundredPercentDOASDXCoil && this->m_RunOnSensibleLoad) {
+                            if (DataLoopNode::Node(ControlNode).HumRatMax > 0.0) humRatMaxSP = DataLoopNode::Node(ControlNode).HumRatMax;
                             this->frostControlSetPointLimit(DataLoopNode::Node(ControlNode).TempSetPoint,
-                                                            DataLoopNode::Node(ControlNode).HumRatMax,
+                                                            humRatMaxSP,
                                                             DataEnvironment::OutBaroPress,
                                                             this->DesignMinOutletTemp,
                                                             1);
                         }
                         this->m_DesiredOutletTemp = DataLoopNode::Node(ControlNode).TempSetPoint;
                         //  IF HumRatMax is zero, then there is no request from SetpointManager:SingleZone:Humidity:Maximum
-                        if ((this->m_DehumidControlType_Num != DehumCtrlType::None) && (DataLoopNode::Node(ControlNode).HumRatMax > 0.0)) {
+                        // user might place temp SP at system outlet and HumRat set point at coil outlet
+                        if (this->m_DehumidControlType_Num != DehumCtrlType::None) {
+                            if (DataLoopNode::Node(this->AirOutNode).HumRatMax > 0.0) humRatMaxSP = DataLoopNode::Node(this->AirOutNode).HumRatMax;
+                            if (DataLoopNode::Node(ControlNode).HumRatMax > 0.0) humRatMaxSP = DataLoopNode::Node(ControlNode).HumRatMax;
                             if (this->m_ISHundredPercentDOASDXCoil && this->m_RunOnLatentLoad) {
                                 this->frostControlSetPointLimit(DataLoopNode::Node(ControlNode).TempSetPoint,
-                                                                DataLoopNode::Node(ControlNode).HumRatMax,
+                                                                humRatMaxSP,
                                                                 DataEnvironment::OutBaroPress,
                                                                 this->DesignMinOutletTemp,
                                                                 2);
                             }
-                            this->m_DesiredOutletHumRat = DataLoopNode::Node(ControlNode).HumRatMax;
-                        } else {
-                            this->m_DesiredOutletHumRat = 1.0;
+                            this->m_DesiredOutletHumRat = humRatMaxSP; // should this be outside so as to capture humrat for 100%DOASDXCoil ?
                         }
                     } else {
+                        if (DataLoopNode::Node(ControlNode).HumRatMax > 0.0) humRatMaxSP = DataLoopNode::Node(ControlNode).HumRatMax;
+                        if (DataLoopNode::Node(OutNode).HumRatMax > 0.0) humRatMaxSP = DataLoopNode::Node(OutNode).HumRatMax;
                         if (this->m_ISHundredPercentDOASDXCoil && this->m_RunOnSensibleLoad) {
                             this->frostControlSetPointLimit(DataLoopNode::Node(ControlNode).TempSetPoint,
-                                                            DataLoopNode::Node(ControlNode).HumRatMax,
+                                                            humRatMaxSP,
                                                             DataEnvironment::OutBaroPress,
                                                             this->DesignMinOutletTemp,
                                                             1);
@@ -7382,21 +7391,19 @@ namespace UnitarySystems {
                         if (this->m_DehumidControlType_Num != DehumCtrlType::None) {
                             if (this->m_ISHundredPercentDOASDXCoil && this->m_RunOnLatentLoad) {
                                 this->frostControlSetPointLimit(DataLoopNode::Node(ControlNode).TempSetPoint,
-                                                                DataLoopNode::Node(ControlNode).HumRatMax,
+                                                                humRatMaxSP,
                                                                 DataEnvironment::OutBaroPress,
                                                                 this->DesignMinOutletTemp,
                                                                 2);
                             }
-                            this->m_DesiredOutletHumRat = DataLoopNode::Node(ControlNode).HumRatMax -
-                                                          (DataLoopNode::Node(ControlNode).HumRat - DataLoopNode::Node(OutNode).HumRat);
-                        } else {
-                            this->m_DesiredOutletHumRat = 1.0;
+                            this->m_DesiredOutletHumRat = humRatMaxSP; // should this be outside so as to capture humrat for 100%DOASDXCoil ?
                         }
                     }
                 }
                 this->m_DesiredOutletTemp = min(this->m_DesiredOutletTemp, MaxOutletTemp);
 
             } else {
+                // should never get here, only 3 control types
             }
         }
     }
