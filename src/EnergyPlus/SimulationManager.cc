@@ -1157,7 +1157,6 @@ namespace SimulationManager {
             DoWeathSim = true;
         }
 
-
         auto const instances = inputProcessor->epJSON.find("PerformancePrecisionTradeoffs");
         if (instances != inputProcessor->epJSON.end()) {
             auto &instancesValue = instances.value();
