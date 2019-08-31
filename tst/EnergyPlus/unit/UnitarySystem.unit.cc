@@ -2165,6 +2165,11 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                   // expect no errors
 
+    // Verify UnitarySystem air flow rates are read in as AutoSized
+    EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, DataSizing::AutoSize);
+    EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, DataSizing::AutoSize);
+    EXPECT_EQ(thisSys->m_MaxNoCoolHeatAirVolFlow, DataSizing::AutoSize);
+
     OutputReportPredefined::SetPredefinedTables();
 
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
@@ -2490,6 +2495,11 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
     DataZoneEquipment::ZoneEquipInputsFilled = true;                             // indicate zone data is available
     thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                   // expect no errors
+
+    // Verify UnitarySystem air flow rates are read in as input
+    EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, 1.6);
+    EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, 1.6);
+    EXPECT_EQ(thisSys->m_MaxNoCoolHeatAirVolFlow, 0.8);
 
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "WATER COOLING COIL";
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;

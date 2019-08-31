@@ -4243,17 +4243,30 @@ namespace PackagedTerminalHeatPump {
 
             //   set fluid-side hardware limits
             if (PTUnit(PTUnitNum).HeatCoilFluidInletNode > 0) {
-                // If water coil max water flow rate is autosized, simulate once in order to mine max water flow rate
+                // If coil max fluid flow rate is autosized, simulate once in order to mine max flow rate
                 if (PTUnit(PTUnitNum).MaxHeatCoilFluidFlow == AutoSize) {
-                    SimulateWaterCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex);
-                    CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", PTUnit(PTUnitNum).ACHeatCoilName, ErrorsFound);
-                    if (CoilMaxVolFlowRate != AutoSize) {
-
-                        rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidName,
-                                               DataGlobals::HWInitConvTemp,
-                                               PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidIndex,
-                                               RoutineNameSpace);
-                        PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
+                    if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
+                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex);
+                        CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", PTUnit(PTUnitNum).ACHeatCoilName, ErrorsFound);
+                        if (CoilMaxVolFlowRate != AutoSize) {
+                            rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidName,
+                                                   DataGlobals::HWInitConvTemp,
+                                                   PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidIndex,
+                                                   RoutineNameSpace);
+                            PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
+                        }
+                    } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
+                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    PTUnit(PTUnitNum).ACHeatCoilIndex,
+                                                    1.0,
+                                                    QActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
+                        CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate(PTUnit(PTUnitNum).ACHeatCoilIndex, ErrorsFound);
+                        if (CoilMaxVolFlowRate != AutoSize) {
+                            SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
+                            SteamDensity = GetSatDensityRefrig(fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
+                            PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
+                        }
                     }
                 }
                 InitComponentNodes(0.0,
@@ -4267,16 +4280,31 @@ namespace PackagedTerminalHeatPump {
             }
 
             if (PTUnit(PTUnitNum).SuppCoilFluidInletNode > 0) {
-
+                // If coil max fluid flow rate is autosized, simulate once in order to mine max flow rate
                 if (PTUnit(PTUnitNum).MaxSuppCoilFluidFlow == AutoSize) {
-                    SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex);
-                    CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", PTUnit(PTUnitNum).SuppHeatCoilName, ErrorsFound);
-                    if (CoilMaxVolFlowRate != AutoSize) {
-                        rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidName,
-                                               DataGlobals::HWInitConvTemp,
-                                               PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidIndex,
-                                               RoutineNameSpace);
-                        PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
+                    if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
+                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex);
+                        CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", PTUnit(PTUnitNum).SuppHeatCoilName, ErrorsFound);
+                        if (CoilMaxVolFlowRate != AutoSize) {
+                            rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidName,
+                                                   DataGlobals::HWInitConvTemp,
+                                                   PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidIndex,
+                                                   RoutineNameSpace);
+                            PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
+                        }
+                    } else if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
+                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                    1.0,
+                                                    QActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
+                        CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate(PTUnit(PTUnitNum).SuppHeatCoilIndex, ErrorsFound);
+
+                        if (CoilMaxVolFlowRate != AutoSize) {
+                            SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
+                            SteamDensity = GetSatDensityRefrig(fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
+                            PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
+                        }
                     }
                 }
                 InitComponentNodes(0.0,
@@ -4287,57 +4315,6 @@ namespace PackagedTerminalHeatPump {
                                    PTUnit(PTUnitNum).SuppCoilLoopSide,
                                    PTUnit(PTUnitNum).SuppCoilBranchNum,
                                    PTUnit(PTUnitNum).SuppCoilCompNum);
-            }
-            if (PTUnit(PTUnitNum).HeatCoilFluidInletNode > 0) {
-                //     If steam coil max steam flow rate is autosized, simulate once in order to mine max steam flow rate
-                if (PTUnit(PTUnitNum).MaxHeatCoilFluidFlow == AutoSize) {
-                    SimulateSteamCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
-                                                FirstHVACIteration,
-                                                PTUnit(PTUnitNum).ACHeatCoilIndex,
-                                                1.0,
-                                                QActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
-                    CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate(PTUnit(PTUnitNum).ACHeatCoilIndex, ErrorsFound);
-
-                    if (CoilMaxVolFlowRate != AutoSize) {
-                        SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                        SteamDensity = GetSatDensityRefrig(fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
-                        PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
-                    }
-                    // why is this inside the autosize IF block? Shouldn't the fluid flow rate be initialized all the time?
-                    InitComponentNodes(0.0,
-                                       PTUnit(PTUnitNum).MaxHeatCoilFluidFlow,
-                                       PTUnit(PTUnitNum).HeatCoilFluidInletNode,
-                                       PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                       PTUnit(PTUnitNum).HeatCoilLoopNum,
-                                       PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                       PTUnit(PTUnitNum).HeatCoilBranchNum,
-                                       PTUnit(PTUnitNum).HeatCoilCompNum);
-                }
-            }
-            if (PTUnit(PTUnitNum).SuppCoilFluidInletNode > 0) {
-                if (PTUnit(PTUnitNum).MaxSuppCoilFluidFlow == AutoSize) {
-                    SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                FirstHVACIteration,
-                                                PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                1.0,
-                                                QActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
-                    CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate(PTUnit(PTUnitNum).SuppHeatCoilIndex, ErrorsFound);
-
-                    if (CoilMaxVolFlowRate != AutoSize) {
-                        SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                        SteamDensity = GetSatDensityRefrig(fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
-                        PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
-                    }
-                    // why is this inside the autosize IF block? Shouldn't the fluid flow rate be initialized all the time?
-                    InitComponentNodes(0.0,
-                                       PTUnit(PTUnitNum).MaxSuppCoilFluidFlow,
-                                       PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                       PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                       PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                       PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                       PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                       PTUnit(PTUnitNum).SuppCoilCompNum);
-                }
             }
         } // end one time inits
 
