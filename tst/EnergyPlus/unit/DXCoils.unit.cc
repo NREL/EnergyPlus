@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include "Fixtures/SQLiteFixture.hh"
 #include <CurveManager.hh>
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
@@ -66,6 +67,7 @@
 #include <OutputReportPredefined.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
+#include <OutputReportTabular.hh>
 
 using namespace EnergyPlus;
 using namespace DXCoils;
@@ -222,7 +224,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     // Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number", 	" DX Heating Coil Standard Rating Information, , DX Heating
     // coil, 6414.3, 6414.3, 6.58, 4" } ) ) );
 
-    // set up coil operating conditions (replicates first occurance of RH > 1 warning in HVACTemplate_UnitarySytsem annual run)
+    // set up coil operating conditions (replicates first occurrence of RH > 1 warning in HVACTemplate_UnitarySytsem annual run)
     OutDryBulbTemp = 16.1;
     OutHumRat = 0.0114507065;
     OutBaroPress = 98200.0;
@@ -2076,5 +2078,450 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
     ASSERT_EQ("MAIN COOLING COIL 1", DXCoil(1).Name); // Cooling Coil Two Speed
     ASSERT_EQ(-25.0, DXCoil(1).MinOATCompressor);     // use default value at -25C
 }
+
+
+TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
+{
+    EnergyPlus::sqlite->sqliteBegin();
+    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    std::string const idf_objects = delimited_string({
+
+        "Version,9.2;",
+
+        "Schedule:Compact,",
+        "  FanAvailSched,           !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.0;        !- Field 3",
+
+        "Curve:Biquadratic,",
+        "  WindACCoolCapFT,         !- Name",
+        "  0.942587793,             !- Coefficient1 Constant",
+        "0.009543347,             !- Coefficient2 x",
+        "0.000683770,             !- Coefficient3 x**2",
+        "-0.011042676,            !- Coefficient4 y",
+        "0.000005249,             !- Coefficient5 y**2",
+        "-0.000009720,            !- Coefficient6 x*y",
+        "12.77778,                !- Minimum Value of x",
+        "23.88889,                !- Maximum Value of x",
+        "23.88889,                !- Minimum Value of y",
+        "46.11111,                !- Maximum Value of y",
+        ",                        !- Minimum Curve Output",
+        ",                        !- Maximum Curve Output",
+        "Temperature,             !- Input Unit Type for X",
+        "Temperature,             !- Input Unit Type for Y",
+        "Dimensionless;           !- Output Unit Type",
+
+        "Curve:Cubic,",
+        "  RATED - CCAP - FFLOW,          !- Name",
+        "  0.84,                    !- Coefficient1 Constant",
+        "  0.16,                    !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.0,                     !- Coefficient4 x**3",
+        "  0.5,                     !- Minimum Value of x",
+        "  1.5;                     !- Maximum Value of x",
+
+        "Curve:Biquadratic,",
+        "  WindACEIRFT,         !- Name",
+        "  0.942587793,             !- Coefficient1 Constant",
+        "  0.009543347,             !- Coefficient2 x",
+        "  0.000683770,             !- Coefficient3 x**2",
+        "  -0.011042676,            !- Coefficient4 y",
+        "  0.000005249,             !- Coefficient5 y**2",
+        "  -0.000009720,            !- Coefficient6 x*y",
+        "  12.77778,                !- Minimum Value of x",
+        "  23.88889,                !- Maximum Value of x",
+        "  23.88889,                !- Minimum Value of y",
+        "  46.11111,                !- Maximum Value of y",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Temperature,             !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
+
+        "Curve:Quadratic,",
+        "  RATED - CEIR - FFLOW,          !- Name",
+        "  1.3824,                  !- Coefficient1 Constant",
+        "  -0.4336,                 !- Coefficient2 x",
+        "  0.0512,                  !- Coefficient3 x**2",
+        "  0.0,                     !- Minimum Value of x",
+        "  1.0;                     !- Maximum Value of x",
+
+        "Curve:Quadratic,",
+        "  WindACPLFFPLR,         !- Name",
+        "  0.75,                    !- Coefficient1 Constant",
+        "  0.25,                    !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.0,                     !- Minimum Value of x",
+        "  1.0;                     !- Maximum Value of x",
+
+        "Coil:Cooling:DX:TwoSpeed,",
+        "  Main Cooling Coil 1,     !- Name",
+        "  FanAvailSched,           !- Availability Schedule Name",
+        "  autosize,                !- High Speed Gross Rated Total Cooling Capacity{ W }",
+        "  0.8,                     !- High Speed Rated Sensible Heat Ratio",
+        "  3.0,                     !- High Speed Gross Rated Cooling COP{ W / W }",
+        "  autosize,                !- High Speed Rated Air Flow Rate{ m3 / s }",
+        "  ,                        !- Unit Internal Static Air Pressure{ Pa }",
+        "  Mixed Air Node 1,        !- Air Inlet Node Name",
+        "  Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name",
+        "  WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name",
+        "  RATED - CCAP - FFLOW,    !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "  WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name",
+        "  RATED - CEIR - FFLOW,    !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name",
+        "  autosize,                !- Low Speed Gross Rated Total Cooling Capacity{ W }",
+        "  0.8,                     !- Low Speed Gross Rated Sensible Heat Ratio",
+        "  4.2,                     !- Low Speed Gross Rated Cooling COP{ W / W }",
+        "  autosize,                !- Low Speed Rated Air Flow Rate{ m3 / s }",
+        "  WindACCoolCapFT,         !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
+        "  WindACEIRFT,             !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
+        "  Main Cooling Coil 1 Condenser Node,  !- Condenser Air Inlet Node Name",
+        "  EvaporativelyCooled,     !- Condenser Type",
+        "  ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "  ,                        !- High Speed Evaporative Condenser Effectiveness {dimensionless}",
+        "  autosize,                !- High Speed Evaporative Condenser Air Flow Rate {m3/s}",
+        "  autosize,                !- High Speed Evaporative Condenser Pump Rated Power Consumption {W}",
+        "  ,                        !- Low Speed Evaporative Condenser Effectiveness {dimensionless}",
+        "  autosize,                !- Low Speed Evaporative Condenser Air Flow Rate {m3/s}",
+        "  autosize,                !- Low Speed Evaporative Condenser Pump Rated Power Consumption {W}",
+        "  ,                        !- Supply Water Storage Tank Name",
+        "  ,                        !- Condensate Collection Water Storage Tank Name",
+        "  200,                     !- Basin Heater Capacity {W/K}",
+        "  2,                       !- Basin Heater Setpoint Temperature {C}",
+        "  BasinHeaterSched;        !- Basin Heater Operating Schedule Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ScheduleManager::ProcessScheduleInput();
+    DXCoils::GetDXCoils();
+    EXPECT_EQ(1, DXCoils::NumDXCoils);
+
+    DataSizing::CurZoneEqNum = 0;
+    DataSizing::CurOASysNum = 0;
+    DataSizing::CurSysNum = 1;
+    DataSizing::FinalSysSizing.allocate(1);
+    DataSizing::FinalSysSizing(CurSysNum).CoolSupTemp = 12.0;
+    DataSizing::FinalSysSizing(CurSysNum).CoolSupHumRat = 0.0085;
+    DataSizing::FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 28.0;
+    DataSizing::FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak = 0.0075;
+    DataSizing::FinalSysSizing(CurSysNum).DesCoolVolFlow = 1.00;
+    DataSizing::FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.2;
+
+    DataAirSystems::PrimaryAirSystem.allocate(1);
+    DataAirSystems::PrimaryAirSystem(CurSysNum).NumOACoolCoils = 0;
+    DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum = 0;
+    DataAirSystems::PrimaryAirSystem(CurSysNum).RetFanNum = 0;
+
+    DataSizing::SysSizingRunDone = true;
+    DataSizing::SysSizInput.allocate(1);
+    DataSizing::SysSizInput(1).AirLoopNum = CurSysNum;
+    DataSizing::NumSysSizInput = 1;
+
+    DataEnvironment::StdBaroPress = 101325.0;
+    Psychrometrics::InitializePsychRoutines();
+
+    // Need this to prevent crash in RequestSizing
+    DataSizing::UnitarySysEqSizing.allocate(1);
+    DataSizing::OASysEqSizing.allocate(1);
+
+    // Fake having a parent coil setting the size
+    // UnitarySysEqSizing(DXCoilNum).CoolingCapacity = true;
+    DataSizing::CurDuctType = DataHVACGlobals::Cooling;
+
+    // We aim to test resulting values that are in this report, so request it
+    // We actually don't need this because ReportSizingOutput also outputs to the "ComponentSizes" table
+    // OutputReportTabular::displayEioSummary = true;
+
+    // Setting predefined tables is needed though
+    OutputReportPredefined::SetPredefinedTables();
+
+    // SizeDXCoil is the one doing the sizing AND the reporting
+    DXCoils::SizeDXCoil(1);
+    // Ensure we have a RatedTotCap size to begin with
+    Real64 ratedTotCap = DXCoils::DXCoil(1).RatedTotCap(1);
+    EXPECT_GT(ratedTotCap, 0.0);
+
+    // High Speed Condenser Air Flow = RatedTotCap * 0.000114 m3/s/W (850 CFM/ton)
+    Real64 highSpeedCondAirFlow = DXCoils::DXCoil(1).RatedTotCap(1) * 0.000114;
+    EXPECT_NEAR(highSpeedCondAirFlow, DXCoils::DXCoil(1).EvapCondAirFlow(1), 0.1);
+
+    // Low Speed Condenser Air Flow: 1/3 Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
+    Real64 lowSpeedCondAirFlow = DXCoils::DXCoil(1).RatedTotCap(1) * 0.000114 * 0.3333;
+    EXPECT_NEAR(lowSpeedCondAirFlow, DXCoils::DXCoil(1).EvapCondAirFlow2, 0.1);
+
+    // High Speed Condenser Pump Power = Total Capacity * 0.004266 W/W (15 W/ton)
+    Real64 highSpeedCondPumpPower = DXCoils::DXCoil(1).RatedTotCap(1) * 0.004266;
+    EXPECT_NEAR(highSpeedCondPumpPower, DXCoils::DXCoil(1).EvapCondPumpElecNomPower(1), 0.1);
+
+    // Low Speed Condenser Pump Power = Total Capacity * 0.004266 W/W (15 W/ton) * 1/3
+    Real64 lowSpeedCondPumpPower = DXCoils::DXCoil(1).RatedTotCap(1) * 0.004266 * 0.3333;
+    EXPECT_NEAR(lowSpeedCondPumpPower, DXCoils::DXCoil(1).EvapCondPumpElecNomPower2, 0.1);
+
+    // Write the EIO Table we need
+    // We actually don't need this because ReportSizingOutput also outputs to the "ComponentSizes" table
+    // OutputReportTabular::WriteEioTables();
+
+    // Now check output tables / EIO
+    const std::string compType = DXCoils::DXCoil(1).DXCoilType;
+    EXPECT_EQ(compType, "Coil:Cooling:DX:TwoSpeed");
+    const std::string compName = DXCoils::DXCoil(1).Name;
+    EXPECT_EQ(compName, "MAIN COOLING COIL 1");
+
+    struct TestQuery {
+        TestQuery(std::string t_description, std::string t_units, Real64 t_value)
+            : description(t_description), units(t_units), expectedValue(t_value),
+              displayString("Description='" + description + "'; Units='" + units + "'") {};
+
+        const std::string description;
+        const std::string units;
+        const Real64 expectedValue;
+        const std::string displayString;
+    };
+
+    std::vector<TestQuery> testQueries({
+        TestQuery("Design Size High Speed Gross Rated Total Cooling Capacity", "W", ratedTotCap),
+        TestQuery("Design Size High Speed Evaporative Condenser Air Flow Rate", "m3/s", highSpeedCondAirFlow),
+        TestQuery("Design Size Low Speed Evaporative Condenser Air Flow Rate", "m3/s", lowSpeedCondAirFlow),
+        TestQuery("Design Size High Speed Evaporative Condenser Pump Rated Power Consumption", "W", highSpeedCondPumpPower),
+        TestQuery("Design Size Low Speed Evaporative Condenser Pump Rated Power Consumption", "W", lowSpeedCondPumpPower),
+    });
+
+    for (auto& testQuery : testQueries) {
+
+        std::string query("SELECT Value From ComponentSizes"
+                          "  WHERE CompType = '" + compType + "'"
+                          "  AND CompName = '" + compName + "'"
+                          "  AND Description = '" + testQuery.description + "'" +
+                          "  AND Units = '" + testQuery.units + "'");
+
+        // execAndReturnFirstDouble returns -10000.0 if not found
+        Real64 return_val = SQLiteFixture::execAndReturnFirstDouble(query);
+
+        if (return_val < 0) {
+            EXPECT_TRUE(false) << "Query returned nothing for " << testQuery.displayString;
+        } else {
+            EXPECT_NEAR(testQuery.expectedValue, return_val, 0.01) << "Failed for " << testQuery.displayString;
+        }
+    }
+
+    EnergyPlus::sqlite->sqliteCommit();
+}
+
+TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
+{
+    EnergyPlus::sqlite->sqliteBegin();
+    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    std::string const idf_objects = delimited_string({
+
+        "Version, 9.2;",
+
+        "Schedule:Compact,",
+        "  FanAndCoilAvailSched, !- Name",
+        "  Fraction,             !- Schedule Type Limits Name",
+        "  Through: 12/31,       !- Field 1",
+        "  For: AllDays,         !- Field 2",
+        "  Until: 24:00, 1.0;    !- Field 3",
+
+        "Curve:Biquadratic,",
+        "  WindACCoolCapFT, !- Name",
+        "  0.942587793,     !- Coefficient1 Constant",
+        "  0.009543347,     !- Coefficient2 x",
+        "  0.000683770,     !- Coefficient3 x**2",
+        "  -0.011042676,    !- Coefficient4 y",
+        "  0.000005249,     !- Coefficient5 y**2",
+        "  -0.000009720,    !- Coefficient6 x*y",
+        "  12.77778,        !- Minimum Value of x",
+        "  23.88889,        !- Maximum Value of x",
+        "  18.0,            !- Minimum Value of y",
+        "  46.11111,        !- Maximum Value of y",
+        "  ,                !- Minimum Curve Output",
+        "  ,                !- Maximum Curve Output",
+        "  Temperature,     !- Input Unit Type for X",
+        "  Temperature,     !- Input Unit Type for Y",
+        "  Dimensionless;   !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  WindACEIRFT,   !- Name",
+        "  0.342414409,   !- Coefficient1 Constant",
+        "  0.034885008,   !- Coefficient2 x",
+        "  -0.000623700,  !- Coefficient3 x**2",
+        "  0.004977216,   !- Coefficient4 y",
+        "  0.000437951,   !- Coefficient5 y**2",
+        "  -0.000728028,  !- Coefficient6 x*y",
+        "  12.77778,      !- Minimum Value of x",
+        "  23.88889,      !- Maximum Value of x",
+        "  18.0,          !- Minimum Value of y",
+        "  46.11111,      !- Maximum Value of y",
+        "  ,              !- Minimum Curve Output",
+        "  ,              !- Maximum Curve Output",
+        "  Temperature,   !- Input Unit Type for X",
+        "  Temperature,   !- Input Unit Type for Y",
+        "  Dimensionless; !- Output Unit Type",
+
+        "Curve:Quadratic,",
+        "  WindACCoolCapFFF, !- Name",
+        "  0.8,              !- Coefficient1 Constant",
+        "  0.2,              !- Coefficient2 x",
+        "  0.0,              !- Coefficient3 x**2",
+        "  0.5,              !- Minimum Value of x",
+        "  1.5;              !- Maximum Value of x",
+
+        "Curve:Quadratic,",
+        "  WindACEIRFFF, !- Name",
+        "  1.1552,       !- Coefficient1 Constant",
+        " -0.1808,       !- Coefficient2 x",
+        "  0.0256,       !- Coefficient3 x**2",
+        "  0.5,          !- Minimum Value of x",
+        "  1.5;          !- Maximum Value of x",
+
+        "Curve:Quadratic,",
+        "  WindACPLFFPLR, !- Name",
+        "  0.85,          !- Coefficient1 Constant",
+        "  0.15,          !- Coefficient2 x",
+        "  0.0,           !- Coefficient3 x**2",
+        "  0.0,           !- Minimum Value of x",
+        "  1.0;           !- Maximum Value of x",
+
+        "Coil:Cooling:DX:SingleSpeed,",
+        "  Furnace ACDXCoil 1,   !- Name",
+        "  FanAndCoilAvailSched, !- Availability Schedule Name",
+        "  autosize,             !- Gross Rated Total Cooling Capacity { W }",
+        "  0.75,                 !- Gross Rated Sensible Heat Ratio",
+        "  4.40,                 !- Gross Rated Cooling COP { W / W }",
+        "  1.30,                 !- Rated Air Flow Rate { m3 / s }",
+        "  ,                     !- Rated Evaporator Fan Power Per Volume Flow Rate { W / ( m3 / s ) }",
+        "  DX Cooling Coil Air Inlet Node, !- Air Inlet Node Name",
+        "  Heating Coil Air Inlet Node,    !- Air Outlet Node Name",
+        "  WindACCoolCapFT,      !- Total Cooling Capacity Function of Temperature Curve Name",
+        "  WindACCoolCapFFF,     !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "  WindACEIRFT,          !- Energy Input Ratio Function of Temperature Curve Name",
+        "  WindACEIRFFF,         !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  WindACPLFFPLR,        !- Part Load Fraction Correlation Curve Name",
+        "  ,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "  0.0,                  !- Nominal Time for Condensate Removal to Begin",
+        "  0.0,                  !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
+        "  0.0,                  !- Maximum Cycling Rate",
+        "  0.0,                  !- Latent Capacity Time Constant",
+        "  Split TSW Cooling Coil Condenser Inlet, !- Condenser Air Inlet Node Name",
+        "  EvaporativelyCooled,  !- Condenser Type",
+        "  ,                     !- Evaporative Condenser Effectiveness",
+        "  autosize,             !- Evaporative Condenser Air Flow Rate",
+        "  autosize,             !- Evaporative Condenser Pump Rated Power Consumption",
+        "  0.0,                  !- Crankcase Heater Capacity",
+        "  10.0;                 !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ScheduleManager::ProcessScheduleInput();
+    DXCoils::GetDXCoils();
+    EXPECT_EQ(1, DXCoils::NumDXCoils);
+
+    // All of this is to basically manage to get RatedTotCap to be autosized
+    DataSizing::CurZoneEqNum = 0;
+    DataSizing::CurOASysNum = 0;
+    DataSizing::CurSysNum = 1;
+    DataSizing::FinalSysSizing.allocate(1);
+    DataSizing::FinalSysSizing(CurSysNum).CoolSupTemp = 12.0;
+    DataSizing::FinalSysSizing(CurSysNum).CoolSupHumRat = 0.0085;
+    DataSizing::FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 28.0;
+    DataSizing::FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak = 0.0075;
+    DataSizing::FinalSysSizing(CurSysNum).DesCoolVolFlow = 1.00;
+    DataSizing::FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.2;
+
+    DataAirSystems::PrimaryAirSystem.allocate(1);
+    DataAirSystems::PrimaryAirSystem(CurSysNum).NumOACoolCoils = 0;
+    DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum = 0;
+    DataAirSystems::PrimaryAirSystem(CurSysNum).RetFanNum = 0;
+
+    DataSizing::SysSizingRunDone = true;
+    DataSizing::SysSizInput.allocate(1);
+    DataSizing::SysSizInput(1).AirLoopNum = CurSysNum;
+    DataSizing::NumSysSizInput = 1;
+
+    DataEnvironment::StdBaroPress = 101325.0;
+    Psychrometrics::InitializePsychRoutines();
+
+    // Need this to prevent crash in RequestSizing
+    DataSizing::UnitarySysEqSizing.allocate(1);
+    DataSizing::OASysEqSizing.allocate(1);
+
+    // Get into a block so that it sets the RatedTotCap
+    DataSizing::CurDuctType = DataHVACGlobals::Cooling;
+
+    // We aim to test resulting values that are in this report, so request it
+    // We actually don't need this because ReportSizingOutput also outputs to the "ComponentSizes" table
+    // OutputReportTabular::displayEioSummary = true;
+
+    // Setting predefined tables is needed though
+    OutputReportPredefined::SetPredefinedTables();
+
+    // SizeDXCoil is the one doing the sizing AND the reporting
+    DXCoils::SizeDXCoil(1);
+    // Ensure we have a RatedTotCap size to begin with
+    Real64 ratedTotCap = DXCoils::DXCoil(1).RatedTotCap(1);
+    EXPECT_GT(ratedTotCap, 0.0);
+
+    // Condenser Air Flow = RatedTotCap * 0.000114 m3/s/W (850 CFM/ton)
+    Real64 condAirFlow = DXCoils::DXCoil(1).RatedTotCap(1) * 0.000114;
+    EXPECT_NEAR(condAirFlow, DXCoils::DXCoil(1).EvapCondAirFlow(1), 0.1);
+
+    // Condenser Pump Power = Total Capacity * 0.004266 W/W (15 W/ton)
+    Real64 condPumpPower = DXCoils::DXCoil(1).RatedTotCap(1) * 0.004266;
+    EXPECT_NEAR(condPumpPower, DXCoils::DXCoil(1).EvapCondPumpElecNomPower(1), 0.1);
+
+    // Write the EIO Table we need
+    // We actually don't need this because ReportSizingOutput also outputs to the "ComponentSizes" table
+    // OutputReportTabular::WriteEioTables();
+
+    // Now check output tables / EIO
+    const std::string compType = DXCoils::DXCoil(1).DXCoilType;
+    EXPECT_EQ(compType, "Coil:Cooling:DX:SingleSpeed");
+    const std::string compName = DXCoils::DXCoil(1).Name;
+    EXPECT_EQ(compName, "FURNACE ACDXCOIL 1");
+
+    struct TestQuery {
+        TestQuery(std::string t_description, std::string t_units, Real64 t_value)
+            : description(t_description), units(t_units), expectedValue(t_value),
+              displayString("Description='" + description + "'; Units='" + units + "'") {};
+
+        const std::string description;
+        const std::string units;
+        const Real64 expectedValue;
+        const std::string displayString;
+    };
+
+    std::vector<TestQuery> testQueries({
+        TestQuery("Design Size Gross Rated Total Cooling Capacity", "W", ratedTotCap),
+        TestQuery("Design Size Evaporative Condenser Air Flow Rate", "m3/s", condAirFlow),
+        TestQuery("Design Size Evaporative Condenser Pump Rated Power Consumption", "W", condPumpPower),
+    });
+
+    for (auto& testQuery : testQueries) {
+
+        std::string query("SELECT Value From ComponentSizes"
+                          "  WHERE CompType = '" + compType + "'"
+                          "  AND CompName = '" + compName + "'"
+                          "  AND Description = '" + testQuery.description + "'" +
+                          "  AND Units = '" + testQuery.units + "'");
+
+        // execAndReturnFirstDouble returns -10000.0 if not found
+        Real64 return_val = SQLiteFixture::execAndReturnFirstDouble(query);
+
+        if (return_val < 0) {
+            EXPECT_TRUE(false) << "Query returned nothing for " << testQuery.displayString;
+        } else {
+            EXPECT_NEAR(testQuery.expectedValue, return_val, 0.01) << "Failed for " << testQuery.displayString;
+        }
+    }
+
+    EnergyPlus::sqlite->sqliteCommit();
+}
+
 
 } // namespace EnergyPlus

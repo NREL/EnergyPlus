@@ -7547,6 +7547,25 @@ namespace WaterThermalTanks {
 
         Tank.TankTemp = TankTemp;            // Final tank temperature for carry-over to next timestep
         Tank.TankTempAvg = TankTempAvg;      // Average tank temperature over the timestep for reporting
+
+        if (!WarmupFlag) {
+            // Warn for potential freezing when avg of final temp over all nodes is below 2°C (nearing 0°C)
+            if (Tank.TankTemp < 2) {
+                if (Tank.FreezingErrorIndex == 0) {
+                    ShowWarningError(RoutineName + ": " + Tank.Type +" = '"
+                            + Tank.Name + "':  Temperature of tank < 2C indicates of possibility of freeze. Tank Temperature = "
+                            + General::RoundSigDigits(Tank.TankTemp, 2) + " C.");
+                    ShowContinueErrorTimeStamp("");
+                }
+                ShowRecurringWarningErrorAtEnd(Tank.Type +" = '" + Tank.Name + "':  Temperature of tank < 2C indicates of possibility of freeze",
+                                               Tank.FreezingErrorIndex,
+                                               Tank.TankTemp, // Report Max
+                                               Tank.TankTemp, // Report Min
+                                               _,             // Don't report Sum
+                                               "{C}",         // Max Unit
+                                               "{C}");        // Min Unit
+            }
+        }
         Tank.UseOutletTemp = TankTempAvg;    // Because entire tank is at same temperature
         Tank.SourceOutletTemp = TankTempAvg; // Because entire tank is at same temperature
         if (Tank.HeatPumpNum > 0) {
@@ -7887,12 +7906,15 @@ namespace WaterThermalTanks {
 
         static std::string const RoutineName("CalcWaterThermalTankStratified");
         const Real64 TemperatureConvergenceCriteria = 0.0001;
-        const Real64 maxDt = 60.0;
+        const Real64 SubTimestepMax = 60.0 * 10.0; // seconds
+        const Real64 SubTimestepMin = 10.0; // seconds
+        Real64 dt;
 
         // Using/Aliasing
         using DataGlobals::HourOfDay;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
+        using DataGlobals::WarmupFlag;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using FluidProperties::GetDensityGlycol;
@@ -7928,6 +7950,9 @@ namespace WaterThermalTanks {
         // Reset node temperatures to what they were at the beginning of the system timestep.
         for (auto &e : Tank.Node)
             e.Temp = e.SavedTemp;
+
+        Tank.HeaterOn1 = Tank.SavedHeaterOn1;
+        Tank.HeaterOn2 = Tank.SavedHeaterOn2;
 
         // Condenser configuration of heat pump water heater
         const int HPWHCondenserConfig = Tank.HeatPumpNum > 0 ? HPWaterHeater(Tank.HeatPumpNum).TypeNum : 0;
@@ -8003,7 +8028,14 @@ namespace WaterThermalTanks {
         std::vector<Real64> Tavg;
         Tavg.resize(nTankNodes);
 
+        int SubTimestepCount = 0;
+
         while(TimeRemaining > 0.0) {
+
+            ++SubTimestepCount;
+
+            bool PrevHeaterOn1 = Tank.HeaterOn1;
+            bool PrevHeaterOn2 = Tank.HeaterOn2;
 
             if (Tank.InletMode == InletModeSeeking) CalcNodeMassFlows(WaterThermalTankNum, InletModeSeeking);
 
@@ -8065,8 +8097,95 @@ namespace WaterThermalTanks {
                 }
             }
 
-            // Determine the internal time step
-            Real64 dt = min(TimeRemaining, maxDt);
+            if (SubTimestepCount == 1) {
+                dt = SubTimestepMin;
+            } else {
+
+                // Set the maximum tank temperature change allowed
+                Real64 dT_max = std::numeric_limits<Real64>::max();
+                if (Tank.HeaterOn1) {
+                    if (Tank.Node(Tank.HeaterNode1).Temp < Tank.SetPointTemp) {
+                        // Node temperature is less than setpoint and heater is on
+                        dT_max = min(dT_max, Tank.SetPointTemp - Tank.Node(Tank.HeaterNode1).Temp);
+                    } else {
+                        // Node temperature is greater than or equal to setpoint and heater is on
+                        // Heater will turn off next time around, calculate assuming that
+                        dT_max = min(dT_max, Tank.Node(Tank.HeaterNode1).Temp - MinTemp1);
+                    }
+                } else { // Heater off
+                    if (Tank.Node(Tank.HeaterNode1).Temp >= MinTemp1) {
+                        // Node temperature is greater than or equal to cut in temperature and heater is off
+                        dT_max = min(dT_max, Tank.Node(Tank.HeaterNode1).Temp - MinTemp1);
+                    } else {
+                        // Heater will turn on next time around, calculate to setpoint
+                        dT_max = min(dT_max, Tank.SetPointTemp - Tank.Node(Tank.HeaterNode1).Temp);
+                    }
+                }
+                if (Tank.HeaterOn2) {
+                    if (Tank.Node(Tank.HeaterNode2).Temp < Tank.SetPointTemp2) {
+                        // Node temperature is less than setpoint and heater is on
+                        dT_max = min(dT_max, Tank.SetPointTemp2 - Tank.Node(Tank.HeaterNode2).Temp);
+                    } else {
+                        // Node temperature is greater than or equal to setpoint and heater is on
+                        // Heater will turn off next time around, calculate assuming that
+                        dT_max = min(dT_max, Tank.Node(Tank.HeaterNode2).Temp - MinTemp2);
+                    }
+                } else { // Heater off
+                    if (Tank.Node(Tank.HeaterNode2).Temp >= MinTemp2) {
+                        // Node temperature is greater than or equal to cut in temperature and heater is off
+                        dT_max = min(dT_max, Tank.Node(Tank.HeaterNode2).Temp - MinTemp2);
+                    } else {
+                        // Heater will turn on next time around, calculate to setpoint
+                        dT_max = min(dT_max, Tank.SetPointTemp2 - Tank.Node(Tank.HeaterNode2).Temp);
+                    }
+                }
+
+                // Make adjustments to A and B to account for heaters being on or off now
+                if (Tank.HeaterOn1 and !PrevHeaterOn1) {
+                    // If heater 1 is on now and wasn't before add the heat rate to the B term
+                    B[Tank.HeaterNode1 - 1] += Qheater1 / (Tank.Node(Tank.HeaterNode1).Mass * Cp);
+                } else if (!Tank.HeaterOn1 and PrevHeaterOn1) {
+                    // If heater 1 is off now and was on before, remove the heat rate from the B term
+                    B[Tank.HeaterNode1 - 1] -= Tank.MaxCapacity / (Tank.Node(Tank.HeaterNode1).Mass * Cp);
+                }
+                if (Tank.HeaterOn2 and !PrevHeaterOn2) {
+                    // If heater 2 is on now and wasn't before add the heat rate to the B term
+                    B[Tank.HeaterNode2 - 1] += Qheater2 / (Tank.Node(Tank.HeaterNode2).Mass * Cp);
+                } else if (!Tank.HeaterOn2 and PrevHeaterOn2) {
+                    // If heater 1 is off now and was on before, remove the heat rate from the B term
+                    B[Tank.HeaterNode2 - 1] -= Tank.MaxCapacity / (Tank.Node(Tank.HeaterNode2).Mass * Cp);
+                }
+
+                if ((Tank.HeaterOn1 || Tank.HeaterOn2) and !(PrevHeaterOn1 || PrevHeaterOn2)) {
+                    // Remove off cycle loads
+                    // Apply on cycle loads
+                    for (int i = 0; i < nTankNodes; i++) {
+                        auto &node(Tank.Node[i]);
+                        Real64 NodeCapacitance = node.Mass * Cp;
+                        A[i] += (node.OffCycLossCoeff - node.OnCycLossCoeff) / NodeCapacitance;
+                        B[i] += (- node.OffCycParaLoad + node.OnCycParaLoad + (node.OnCycLossCoeff - node.OffCycLossCoeff) * Tank.AmbientTemp) / NodeCapacitance;
+                    }
+                } else if (!(Tank.HeaterOn1 || Tank.HeaterOn2) and (PrevHeaterOn1 || PrevHeaterOn2)) {
+                    // Remove on cycle loads
+                    // Apply off cycle loads
+                    for (int i = 0; i < nTankNodes; i++) {
+                        auto &node(Tank.Node[i]);
+                        Real64 NodeCapacitance = node.Mass * Cp;
+                        A[i] -= (node.OffCycLossCoeff - node.OnCycLossCoeff) / NodeCapacitance;
+                        B[i] -= (- node.OffCycParaLoad + node.OnCycParaLoad + (node.OnCycLossCoeff - node.OffCycLossCoeff) * Tank.AmbientTemp) / NodeCapacitance;
+                    }
+                }
+
+                // Set the sub timestep (dt)
+                dt = TimeRemaining;
+                for (int i = 0; i < nTankNodes; ++i) {
+                    const Real64 Denominator = fabs(A[i] * Tavg[i] + B[i]);
+                    if (Denominator != 0.0)
+                        dt = min(dt, dT_max / Denominator);
+                }
+                dt = max(min(SubTimestepMin, TimeRemaining), dt);
+                dt = min(SubTimestepMax, dt);
+            }
 
             // Make initial guess that average and final temperatures over the timestep are equal to the starting temperatures
             for (int i = 0; i < nTankNodes; i++) {
@@ -8319,6 +8438,25 @@ namespace WaterThermalTanks {
 
         Tank.TankTemp = sum(Tank.Node, &StratifiedNodeData::Temp) / Tank.Nodes;
         Tank.TankTempAvg = sum(Tank.Node, &StratifiedNodeData::TempAvg) / Tank.Nodes;
+
+        if (!WarmupFlag) {
+            // Warn for potential freezing when avg of final temp over all nodes is below 2°C (nearing 0°C)
+            if (Tank.TankTemp < 2) {
+                if (Tank.FreezingErrorIndex == 0) {
+                    ShowWarningError(RoutineName + ": " + Tank.Type +" = '"
+                            + Tank.Name + "':  Temperature of tank < 2C indicates of possibility of freeze. Tank Temperature = "
+                            + General::RoundSigDigits(Tank.TankTemp, 2) + " C.");
+                    ShowContinueErrorTimeStamp("");
+                }
+                ShowRecurringWarningErrorAtEnd(Tank.Type +" = '" + Tank.Name + "':  Temperature of tank < 2C indicates of possibility of freeze",
+                                               Tank.FreezingErrorIndex,
+                                               Tank.TankTemp, // Report Max
+                                               Tank.TankTemp, // Report Min
+                                               _,             // Don't report Sum
+                                               "{C}",         // Max Unit
+                                               "{C}");        // Min Unit
+            }
+        }
 
         if (Tank.UseOutletStratNode > 0) {
             Tank.UseOutletTemp = Tank.Node(Tank.UseOutletStratNode).TempAvg;
@@ -9081,7 +9219,7 @@ namespace WaterThermalTanks {
             } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {
                 DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
             } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == COIL_AIR_WATER_HEATPUMP_EQ) {
-                DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate; 
+                DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
                 DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeat(DesuperheaterNum) = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
             }
         }
@@ -10629,6 +10767,85 @@ namespace WaterThermalTanks {
         return PLRResidualHPWH;
     }
 
+    bool SourceHeatNeed(WaterThermalTankData const Tank,
+                        Real64 const OutletTemp,
+                        Real64 const DeadBandTemp,
+                        Real64 const SetPointTemp
+        ){
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Yueyue Zhou
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // Determine by tank type, tank temperature and control mode if source side flow is needed
+
+
+        //return value initialization
+        bool NeedsHeatOrCool = false;
+
+        if (!Tank.IsChilledWaterTank) {
+            if (Tank.SourceSideControlMode == SourceSideIndirectHeatPrimarySetpoint) {
+                if (OutletTemp < DeadBandTemp) {
+                    NeedsHeatOrCool = true;
+                } else if ((OutletTemp >= DeadBandTemp) && (OutletTemp < SetPointTemp)) {
+                    // inside the deadband, use saved mode from water heater calcs
+                    if (Tank.SavedMode == HeatMode) {
+                        NeedsHeatOrCool = true;
+                    } else if (Tank.SavedMode == FloatMode) {
+                        NeedsHeatOrCool = false;
+                    }
+
+                } else if (OutletTemp >= SetPointTemp) {
+                    NeedsHeatOrCool = false;
+                }
+            } else if (Tank.SourceSideControlMode == SourceSideIndirectHeatAltSetpoint) {
+                // get alternate setpoint
+                Real64 const AltSetpointTemp = ScheduleManager::GetCurrentScheduleValue(Tank.SourceSideAltSetpointSchedNum);
+                Real64 const AltDeadBandTemp = AltSetpointTemp - Tank.DeadBandDeltaTemp;
+                if (OutletTemp < AltDeadBandTemp) {
+                    NeedsHeatOrCool = true;
+                } else if ((OutletTemp >= AltDeadBandTemp) && (OutletTemp < AltSetpointTemp)) {
+                    // inside the deadband, use saved mode from water heater calcs
+                    if (Tank.SavedMode == HeatMode) {
+                        NeedsHeatOrCool = true;
+                    } else if (Tank.SavedMode == FloatMode) {
+                        NeedsHeatOrCool = false;
+                    }
+
+                } else if (OutletTemp >= AltSetpointTemp) {
+                    NeedsHeatOrCool = false;
+                }
+            } else if (Tank.SourceSideControlMode == SourceSideStorageTank) {
+                if (OutletTemp < Tank.TankTempLimit) {
+                    NeedsHeatOrCool = true;
+                } else {
+                    NeedsHeatOrCool = false;
+                }
+            }
+        } else { // is a chilled water tank so flip logic
+            if (OutletTemp > DeadBandTemp) {
+                NeedsHeatOrCool = true;
+            } else if ((OutletTemp <= DeadBandTemp) && (OutletTemp > SetPointTemp)) {
+                // inside the deadband, use saved mode from water thermal tank calcs (modes only for mixed)
+                if (Tank.TypeNum == MixedChilledWaterStorage) {
+                    if (Tank.SavedMode == CoolMode) {
+                        NeedsHeatOrCool = true;
+                    } else if (Tank.SavedMode == FloatMode) {
+                        NeedsHeatOrCool = false;
+                    }
+                } else if (Tank.TypeNum == StratifiedChilledWaterStorage) {
+                    NeedsHeatOrCool = true;
+                }
+
+            } else if (OutletTemp <= SetPointTemp) {
+                NeedsHeatOrCool = false;
+            }
+        }
+        return NeedsHeatOrCool;
+    }
+
     Real64 PlantMassFlowRatesFunc(int const WaterThermalTankNum,
                                   int const InNodeNum,
                                   bool const FirstHVACIteration,
@@ -10682,15 +10899,9 @@ namespace WaterThermalTanks {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int CurrentMode;
         Real64 MassFlowRequest(0.0);
-        bool NeedsHeat;
-        bool NeedsCool;
+        bool NeedsHeatOrCool;
         Real64 FlowResult(0.0);
         bool ScheduledAvail;
-        Real64 AltSetpointTemp;
-        Real64 AltDeadBandTemp;
-
-        NeedsHeat = false; // init
-        NeedsCool = false; // init
 
         // determine current mode.  there are three possible
         //  1.  passing thru what was given to inlet node
@@ -10787,44 +10998,13 @@ namespace WaterThermalTanks {
                 }
 
                 // next determine if tank temperature is such that source side flow might be requested
-                if (!WaterThermalTank(WaterThermalTankNum).IsChilledWaterTank) {
-                    if (OutletTemp < DeadBandTemp) {
-                        NeedsHeat = true;
-                    } else if ((OutletTemp >= DeadBandTemp) && (OutletTemp < SetPointTemp)) {
-                        // inside the deadband, use saved mode from water heater calcs
-                        if (WaterThermalTank(WaterThermalTankNum).SavedMode == HeatMode) {
-                            NeedsHeat = true;
-                        } else if (WaterThermalTank(WaterThermalTankNum).SavedMode == FloatMode) {
-                            NeedsHeat = false;
-                        }
-                    } else if (OutletTemp >= SetPointTemp) {
-                        NeedsHeat = false;
-                    }
-                } else { // is a chilled water tank so flip logic
-                    if (OutletTemp > DeadBandTemp) {
-                        NeedsCool = true;
-                    } else if ((OutletTemp <= DeadBandTemp) && (OutletTemp > SetPointTemp)) {
-                        // inside the deadband, use saved mode from water thermal tank calcs (modes only for mixed)
-                        if (WaterThermalTank(WaterThermalTankNum).TypeNum == MixedChilledWaterStorage) {
-                            if (WaterThermalTank(WaterThermalTankNum).SavedMode == CoolMode) {
-                                NeedsCool = true;
-                            } else if (WaterThermalTank(WaterThermalTankNum).SavedMode == FloatMode) {
-                                NeedsCool = false;
-                            }
-                        } else if (WaterThermalTank(WaterThermalTankNum).TypeNum == StratifiedChilledWaterStorage) {
-                            NeedsCool = true;
-                        }
-
-                    } else if (OutletTemp <= SetPointTemp) {
-                        NeedsCool = false;
-                    }
-                }
+                NeedsHeatOrCool = SourceHeatNeed(WaterThermalTank(WaterThermalTankNum), OutletTemp, DeadBandTemp, SetPointTemp);
 
                 if (MassFlowRequest > 0.0) {
                     if (WaterThermalTankSide == UseSide) {
                         FlowResult = MassFlowRequest;
                     } else if (WaterThermalTankSide == SourceSide) {
-                        if (NeedsHeat || NeedsCool) {
+                        if (NeedsHeatOrCool) {
                             FlowResult = MassFlowRequest;
                         } else {
                             FlowResult = 0.0;
@@ -10869,68 +11049,9 @@ namespace WaterThermalTanks {
                 }
 
                 if (WaterThermalTankSide == SourceSide) { // temperature dependent controls for indirect heating/cooling
-                    if (!WaterThermalTank(WaterThermalTankNum).IsChilledWaterTank) {
-                        // next determine if tank temperature is such that flow is requested depending on mode
-                        if (WaterThermalTank(WaterThermalTankNum).SourceSideControlMode == SourceSideIndirectHeatPrimarySetpoint) {
-                            if (OutletTemp < DeadBandTemp) {
-                                NeedsHeat = true;
-                            } else if ((OutletTemp >= DeadBandTemp) && (OutletTemp < SetPointTemp)) {
-                                // inside the deadband, use saved mode from water heater calcs
-                                if (WaterThermalTank(WaterThermalTankNum).SavedMode == HeatMode) {
-                                    NeedsHeat = true;
-                                } else if (WaterThermalTank(WaterThermalTankNum).SavedMode == FloatMode) {
-                                    NeedsHeat = false;
-                                }
-
-                            } else if (OutletTemp >= SetPointTemp) {
-                                NeedsHeat = false;
-                            }
-                        } else if (WaterThermalTank(WaterThermalTankNum).SourceSideControlMode == SourceSideIndirectHeatAltSetpoint) {
-                            // get alternate setpoint
-                            AltSetpointTemp = GetCurrentScheduleValue(WaterThermalTank(WaterThermalTankNum).SourceSideAltSetpointSchedNum);
-                            AltDeadBandTemp = AltSetpointTemp - WaterThermalTank(WaterThermalTankNum).DeadBandDeltaTemp;
-                            if (OutletTemp < AltDeadBandTemp) {
-                                NeedsHeat = true;
-                            } else if ((OutletTemp >= AltDeadBandTemp) && (OutletTemp < AltSetpointTemp)) {
-                                // inside the deadband, use saved mode from water heater calcs
-                                if (WaterThermalTank(WaterThermalTankNum).SavedMode == HeatMode) {
-                                    NeedsHeat = true;
-                                } else if (WaterThermalTank(WaterThermalTankNum).SavedMode == FloatMode) {
-                                    NeedsHeat = false;
-                                }
-
-                            } else if (OutletTemp >= AltSetpointTemp) {
-                                NeedsHeat = false;
-                            }
-                        } else if (WaterThermalTank(WaterThermalTankNum).SourceSideControlMode == SourceSideStorageTank) {
-                            if (OutletTemp < WaterThermalTank(WaterThermalTankNum).TankTempLimit) {
-                                NeedsHeat = true;
-                            } else {
-                                NeedsHeat = false;
-                            }
-                        }
-                    } else { // is a chilled water tank so flip logic
-                        if (OutletTemp > DeadBandTemp) {
-                            NeedsCool = true;
-                        } else if ((OutletTemp <= DeadBandTemp) && (OutletTemp > SetPointTemp)) {
-                            // inside the deadband, use saved mode from water thermal tank calcs (modes only for mixed)
-                            if (WaterThermalTank(WaterThermalTankNum).TypeNum == MixedChilledWaterStorage) {
-                                if (WaterThermalTank(WaterThermalTankNum).SavedMode == CoolMode) {
-                                    NeedsCool = true;
-                                } else if (WaterThermalTank(WaterThermalTankNum).SavedMode == FloatMode) {
-                                    NeedsCool = false;
-                                }
-                            } else if (WaterThermalTank(WaterThermalTankNum).TypeNum == StratifiedChilledWaterStorage) {
-                                NeedsCool = true;
-                            }
-                        } else if (OutletTemp >= SetPointTemp) {
-                            NeedsCool = false;
-                        }
-
-                    } // chilled water
-
+                    NeedsHeatOrCool = SourceHeatNeed(WaterThermalTank(WaterThermalTankNum), OutletTemp, DeadBandTemp, SetPointTemp);
                     if (MassFlowRequest > 0.0) {
-                        if (NeedsHeat || NeedsCool) {
+                        if (NeedsHeatOrCool) {
                             FlowResult = MassFlowRequest;
                         } else {
                             FlowResult = 0.0;

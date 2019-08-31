@@ -712,7 +712,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
@@ -1462,7 +1462,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
@@ -1489,5 +1489,18 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedSourceVolFlowHeat, 0.00025, 0.0000001);
     EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedCapHeat, 7200.71, 0.1);
     EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedPowerHeat, 2151.07, 0.1);
+
+    // Check that we are outputing the correct values
+    EXPECT_EQ("HeatPump:WaterToWater:EquationFit:Heating",
+              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechType,
+                                                               HeatPumpWaterToWaterSimple::GSHP(1).Name));
+
+    EXPECT_EQ("3.35",
+              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechNomEff,
+                                                               HeatPumpWaterToWaterSimple::GSHP(1).Name));
+
+    EXPECT_EQ("7200.71",
+              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechNomCap,
+                                                               HeatPumpWaterToWaterSimple::GSHP(1).Name));
 }
 } // namespace EnergyPlus
