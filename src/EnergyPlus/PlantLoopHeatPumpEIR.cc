@@ -60,6 +60,7 @@
 #include <General.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
+#include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <PlantComponent.hh>
@@ -384,50 +385,55 @@ namespace EnergyPlus {
                 }
 
                 thisErrFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(this->name,
-                                                        this->plantTypeOfNum,
-                                                        this->sourceSideLocation.loopNum,
-                                                        this->sourceSideLocation.loopSideNum,
-                                                        this->sourceSideLocation.branchNum,
-                                                        this->sourceSideLocation.compNum,
-                                                        thisErrFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        this->sourceSideNodes.inlet,
-                                                        _);
+                if (this->waterSource) {
+                    PlantUtilities::ScanPlantLoopsForObject(this->name,
+                                                            this->plantTypeOfNum,
+                                                            this->sourceSideLocation.loopNum,
+                                                            this->sourceSideLocation.loopSideNum,
+                                                            this->sourceSideLocation.branchNum,
+                                                            this->sourceSideLocation.compNum,
+                                                            thisErrFlag,
+                                                            _,
+                                                            _,
+                                                            _,
+                                                            this->sourceSideNodes.inlet,
+                                                            _);
 
-                if (thisErrFlag) {
-                    ShowSevereError(routineName + ": Plant topology problem for " +
-                                    DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
-                                    this->name + "\"");
-                    ShowContinueError("Could not locate component's source side connections on a plant loop");
-                    errFlag = true;
-                } else if (this->sourceSideLocation.loopSideNum !=
-                           DataPlant::DemandSide) { // only check if !thisErrFlag
-                    ShowSevereError(routineName + ": Invalid connections for " +
-                                    DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
-                                    this->name + "\"");
-                    ShowContinueError("The source side connections are not on the Demand Side of a plant loop");
-                    errFlag = true;
-                }
+                    if (thisErrFlag) {
+                        ShowSevereError(routineName + ": Plant topology problem for " +
+                                        DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                                        this->name + "\"");
+                        ShowContinueError("Could not locate component's source side connections on a plant loop");
+                        errFlag = true;
+                    } else if (this->sourceSideLocation.loopSideNum !=
+                               DataPlant::DemandSide) { // only check if !thisErrFlag
+                        ShowSevereError(routineName + ": Invalid connections for " +
+                                        DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                                        this->name + "\"");
+                        ShowContinueError("The source side connections are not on the Demand Side of a plant loop");
+                        errFlag = true;
+                    }
 
-                // make sure it is not the same loop on both sides.
-                if (this->loadSideLocation.loopNum ==
-                    this->sourceSideLocation.loopNum) { // user is being too tricky, don't allow
-                    ShowSevereError(routineName + ": Invalid connections for " +
-                                    DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
-                                    this->name + "\"");
-                    ShowContinueError("The load and source sides need to be on different loops.");
-                    errFlag = true;
-                } else {
+                    // make sure it is not the same loop on both sides.
+                    if (this->loadSideLocation.loopNum ==
+                        this->sourceSideLocation.loopNum) { // user is being too tricky, don't allow
+                        ShowSevereError(routineName + ": Invalid connections for " +
+                                        DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                                        this->name + "\"");
+                        ShowContinueError("The load and source sides need to be on different loops.");
+                        errFlag = true;
+                    } else {
 
-                    PlantUtilities::InterConnectTwoPlantLoopSides(this->loadSideLocation.loopNum,
-                                                                  this->loadSideLocation.loopSideNum,
-                                                                  this->sourceSideLocation.loopNum,
-                                                                  this->sourceSideLocation.loopSideNum,
-                                                                  this->plantTypeOfNum,
-                                                                  true);
+                        PlantUtilities::InterConnectTwoPlantLoopSides(this->loadSideLocation.loopNum,
+                                                                      this->loadSideLocation.loopSideNum,
+                                                                      this->sourceSideLocation.loopNum,
+                                                                      this->sourceSideLocation.loopSideNum,
+                                                                      this->plantTypeOfNum,
+                                                                      true);
+                    }
+                } else if (this->airSource) {
+                    bool isValid;
+                    OutAirNodeManager::CheckAndAddAirNodeNumber(this->sourceSideNodes.inlet, isValid);
                 }
 
                 if (errFlag) {
@@ -939,6 +945,9 @@ namespace EnergyPlus {
                         std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(
                                 fields.at("load_side_outlet_node_name")
                         );
+                        std::string condenserType = UtilityRoutines::MakeUPPERCase(
+                                fields.at("condenser_type")
+                        );
                         std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(
                                 fields.at("source_side_inlet_node_name")
                         );
@@ -1050,11 +1059,23 @@ namespace EnergyPlus {
                                                                                             DataLoopNode::NodeConnectionType_Outlet,
                                                                                             flowPath1,
                                                                                             DataLoopNode::ObjectIsNotParent);
+                        int condenserNodeType = 0;
+                        if (condenserType == "WATERSOURCE") {
+                            thisPLHP.waterSource = true;
+                            condenserNodeType = DataLoopNode::NodeType_Water;
+                        } else if (condenserType == "AIRSOURCE") {
+                            thisPLHP.airSource = true;
+                            condenserNodeType = DataLoopNode::NodeType_Air;
+                        } else {
+                            ShowErrorMessage("Invalid heat pump condenser type (name=" + thisPLHP.name +
+                            "; entered type: " + condenserType);
+                            errorsFound = true;
+                        }
                         thisPLHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(sourceSideInletNodeName,
                                                                                              nodeErrorsFound,
                                                                                              cCurrentModuleObject,
                                                                                              thisPLHP.name,
-                                                                                             DataLoopNode::NodeType_Water,
+                                                                                             condenserNodeType,
                                                                                              DataLoopNode::NodeConnectionType_Inlet,
                                                                                              flowPath2,
                                                                                              DataLoopNode::ObjectIsNotParent);
@@ -1062,7 +1083,7 @@ namespace EnergyPlus {
                                                                                               nodeErrorsFound,
                                                                                               cCurrentModuleObject,
                                                                                               thisPLHP.name,
-                                                                                              DataLoopNode::NodeType_Water,
+                                                                                              condenserNodeType,
                                                                                               DataLoopNode::NodeConnectionType_Outlet,
                                                                                               flowPath2,
                                                                                               DataLoopNode::ObjectIsNotParent);

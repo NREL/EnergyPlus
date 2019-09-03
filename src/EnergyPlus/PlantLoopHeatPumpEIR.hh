@@ -76,6 +76,8 @@ namespace EnergyPlus {
             std::string companionCoilName = "";
             EIRPlantLoopHeatPump *companionHeatPumpCoil = nullptr;
             Real64 sizingFactor = 1.0;
+            bool waterSource = false;
+            bool airSource = false;
 
             // reference data
             Real64 referenceCapacity = 0.0;
