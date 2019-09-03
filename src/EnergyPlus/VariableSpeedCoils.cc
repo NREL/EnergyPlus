@@ -7084,19 +7084,19 @@ namespace VariableSpeedCoils {
 
         // PURPOSE OF THIS FUNCTION:
         // This function looks up the the min oat for the cooling coil compressor and returns it.  If
-        // incorrect coil type or name is given, ErrorsFound is returned as true and value is returned
-        // as negative.
+        // incorrect coil index is given, ErrorsFound is returned as true and value is returned
+        // as negative 1000.
 
         // Return value
         Real64 MinOAT; // returned min oa temperature of matched coil
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
-        if ( GetCoilsInputFlag ) { // First time subroutine has been entered
+        if (GetCoilsInputFlag) { // First time subroutine has been entered
             GetVarSpeedCoilInput();
             GetCoilsInputFlag = false;
         }
 
-        if ( CoilIndex == 0 ) {
+        if (CoilIndex == 0) {
 
             ShowSevereError("GetVSCoilMinOATCompressorUsingIndex: Index passed = 0");
             ShowContinueError("... returning Min OAT as -1000.");
