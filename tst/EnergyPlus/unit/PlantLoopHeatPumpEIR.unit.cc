@@ -66,9 +66,9 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::EIRPlantLoopHeatPumps;
 
-class EIRWWHPFixture : public EnergyPlusFixture {};
+class EIRPLHPFixture : public EnergyPlusFixture {};
 
-TEST_F(EIRWWHPFixture, ConstructionFullObjectsHeatingAndCooling) {
+TEST_F(EIRPLHPFixture, ConstructionFullObjectsHeatingAndCooling) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -92,6 +92,7 @@ TEST_F(EIRWWHPFixture, ConstructionFullObjectsHeatingAndCooling) {
                             "  hp cooling side,",
                             "  node 1,",
                             "  node 2,",
+                            "  WaterSource",
                             "  node 3,",
                             "  node 4,",
                             "  hp heating side,",
@@ -158,7 +159,7 @@ TEST_F(EIRWWHPFixture, ConstructionFullObjectsHeatingAndCooling) {
     );
 }
 
-TEST_F(EIRWWHPFixture, PairingCompanionCoils) {
+TEST_F(EIRPLHPFixture, PairingCompanionCoils) {
     eir_plhp.resize(2);
     EIRPlantLoopHeatPump *coil1 = &eir_plhp[0];
     EIRPlantLoopHeatPump *coil2 = &eir_plhp[1];
@@ -206,7 +207,7 @@ TEST_F(EIRWWHPFixture, PairingCompanionCoils) {
 
 }
 
-TEST_F(EIRWWHPFixture, HeatingConstructionFullObjectsNoCompanion) {
+TEST_F(EIRPLHPFixture, HeatingConstructionFullObjectsNoCompanion) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -264,7 +265,7 @@ TEST_F(EIRWWHPFixture, HeatingConstructionFullObjectsNoCompanion) {
     );
 }
 
-TEST_F(EIRWWHPFixture, CoolingConstructionFullObjectsNoCompanion) {
+TEST_F(EIRPLHPFixture, CoolingConstructionFullObjectsNoCompanion) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -322,7 +323,7 @@ TEST_F(EIRWWHPFixture, CoolingConstructionFullObjectsNoCompanion) {
     );
 }
 
-TEST_F(EIRWWHPFixture, CoolingConstructionFullObjectWithDefaults) {
+TEST_F(EIRPLHPFixture, CoolingConstructionFullObjectWithDefaults) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -368,7 +369,7 @@ TEST_F(EIRWWHPFixture, CoolingConstructionFullObjectWithDefaults) {
 
 }
 
-TEST_F(EIRWWHPFixture, CoolingConstructionFullyAutoSized) {
+TEST_F(EIRPLHPFixture, CoolingConstructionFullyAutoSized) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -426,7 +427,7 @@ TEST_F(EIRWWHPFixture, CoolingConstructionFullyAutoSized) {
     );
 }
 
-TEST_F(EIRWWHPFixture, CatchErrorsOnBadCurves) {
+TEST_F(EIRPLHPFixture, CatchErrorsOnBadCurves) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -453,7 +454,7 @@ TEST_F(EIRWWHPFixture, CatchErrorsOnBadCurves) {
     EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE"), std::runtime_error);
 }
 
-TEST_F(EIRWWHPFixture, Initialization) {
+TEST_F(EIRPLHPFixture, Initialization) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -598,7 +599,7 @@ TEST_F(EIRWWHPFixture, Initialization) {
 
 }
 
-TEST_F(EIRWWHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion) {
+TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -786,7 +787,7 @@ TEST_F(EIRWWHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion) {
     EXPECT_NEAR(expectedCapacity, thisHeatingWWHP->referenceCapacity, 0.0001);
 }
 
-TEST_F(EIRWWHPFixture, TestSizing_FullyHardsizedHeatingWithCompanion) {
+TEST_F(EIRPLHPFixture, TestSizing_FullyHardsizedHeatingWithCompanion) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -926,7 +927,7 @@ TEST_F(EIRWWHPFixture, TestSizing_FullyHardsizedHeatingWithCompanion) {
 
 }
 
-TEST_F(EIRWWHPFixture, TestSizing_WithCompanionNoPlantSizing) {
+TEST_F(EIRPLHPFixture, TestSizing_WithCompanionNoPlantSizing) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -1058,7 +1059,7 @@ TEST_F(EIRWWHPFixture, TestSizing_WithCompanionNoPlantSizing) {
     EXPECT_NEAR(1000.0, thisCoolingWWHP->referenceCapacity, 0.0001);
 }
 
-TEST_F(EIRWWHPFixture, TestSizing_NoCompanionNoPlantSizingError) {
+TEST_F(EIRPLHPFixture, TestSizing_NoCompanionNoPlantSizingError) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -1152,7 +1153,7 @@ TEST_F(EIRWWHPFixture, TestSizing_NoCompanionNoPlantSizingError) {
 
 }
 
-TEST_F(EIRWWHPFixture, TestSizing_NoCompanionNoPlantSizingHardSized) {
+TEST_F(EIRPLHPFixture, TestSizing_NoCompanionNoPlantSizingHardSized) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -1248,7 +1249,7 @@ TEST_F(EIRWWHPFixture, TestSizing_NoCompanionNoPlantSizingHardSized) {
     EXPECT_NEAR(1000, thisHeatingWWHP->referenceCapacity, 0.0001);
 }
 
-TEST_F(EIRWWHPFixture, CoolingOutletSetpointWorker) {
+TEST_F(EIRPLHPFixture, CoolingOutletSetpointWorker) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -1348,7 +1349,7 @@ TEST_F(EIRWWHPFixture, CoolingOutletSetpointWorker) {
 
 }
 
-TEST_F(EIRWWHPFixture, Initialization2) {
+TEST_F(EIRPLHPFixture, Initialization2) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -1542,7 +1543,7 @@ TEST_F(EIRWWHPFixture, Initialization2) {
 
 }
 
-TEST_F(EIRWWHPFixture, OnInitLoopEquipTopologyErrorCases) {
+TEST_F(EIRPLHPFixture, OnInitLoopEquipTopologyErrorCases) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -1664,7 +1665,7 @@ TEST_F(EIRWWHPFixture, OnInitLoopEquipTopologyErrorCases) {
 
 }
 
-TEST_F(EIRWWHPFixture, CoolingSimulate) {
+TEST_F(EIRPLHPFixture, CoolingSimulate) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -1805,7 +1806,7 @@ TEST_F(EIRWWHPFixture, CoolingSimulate) {
 
 }
 
-TEST_F(EIRWWHPFixture, HeatingSimulate) {
+TEST_F(EIRPLHPFixture, HeatingSimulate) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -1937,7 +1938,7 @@ TEST_F(EIRWWHPFixture, HeatingSimulate) {
 
 }
 
-TEST_F(EIRWWHPFixture, TestConcurrentOperationChecking) {
+TEST_F(EIRPLHPFixture, TestConcurrentOperationChecking) {
     eir_plhp.resize(4);
     EIRPlantLoopHeatPump *coil1 = &eir_plhp[0];
     EIRPlantLoopHeatPump *coil2 = &eir_plhp[1];
