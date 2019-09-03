@@ -285,7 +285,7 @@ namespace HeatBalanceAirManager {
         using ScheduleManager::GetScheduleIndex;
 
         // Formats
-        static gio::Fmt Format_720("('! <AirFlow Model>, Simple',/,' AirFlow Model, ',A)");
+        static ObjexxFCL::gio::Fmt Format_720("('! <AirFlow Model>, Simple',/,' AirFlow Model, ',A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -293,7 +293,7 @@ namespace HeatBalanceAirManager {
 
         GetSimpleAirModelInputs(ErrorsFound);
         if (TotInfiltration + TotVentilation + TotMixing + TotCrossMixing + TotRefDoorMixing > 0) {
-            gio::write(OutputFileInits, Format_720) << "Simple";
+            ObjexxFCL::gio::write(OutputFileInits, Format_720) << "Simple";
         }
     }
 
@@ -369,7 +369,7 @@ namespace HeatBalanceAirManager {
         using SystemAvailabilityManager::GetHybridVentilationControlStatus;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
         Real64 const VentilTempLimit(100.0);                               // degrees Celsius
         Real64 const MixingTempLimit(100.0);                               // degrees Celsius
         Real64 const VentilWSLimit(40.0);                                  // m/s
@@ -428,11 +428,11 @@ namespace HeatBalanceAirManager {
         int IsSourceZone;
 
         // Formats
-        static gio::Fmt Format_720("(' ',A,' Airflow Stats Nominal, ',A,',',A,',',A,',',A,',',A,',')");
-        static gio::Fmt Format_721("('! <',A,' Airflow Stats Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, # Zone Occupants,',A)");
-        static gio::Fmt Format_722("(' ',A,', ',A)");
-        static gio::Fmt Format_723("(' ',A,' Airflow Stats Nominal, ',A,',',A,',',A,',',A,',',A,',',A,',',A)");
-        static gio::Fmt Format_724("('! <',A,' Airflow Stats Nominal>, ',A)");
+        static ObjexxFCL::gio::Fmt Format_720("(' ',A,' Airflow Stats Nominal, ',A,',',A,',',A,',',A,',',A,',')");
+        static ObjexxFCL::gio::Fmt Format_721("('! <',A,' Airflow Stats Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, # Zone Occupants,',A)");
+        static ObjexxFCL::gio::Fmt Format_722("(' ',A,', ',A)");
+        static ObjexxFCL::gio::Fmt Format_723("(' ',A,' Airflow Stats Nominal, ',A,',',A,',',A,',',A,',',A,',',A,',',A)");
+        static ObjexxFCL::gio::Fmt Format_724("('! <',A,' Airflow Stats Nominal>, ',A)");
 
         RepVarSet.dimension(NumOfZones, true);
 
@@ -2736,265 +2736,287 @@ namespace HeatBalanceAirManager {
         }
 
         cCurrentModuleObject = "ZoneCrossMixing";
-        TotCrossMixing = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        int inputCrossMixing = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        TotCrossMixing = inputCrossMixing + DataHeatBalance::NumAirBoundaryMixing;
         CrossMixing.allocate(TotCrossMixing);
 
         for (Loop = 1; Loop <= TotCrossMixing; ++Loop) {
 
-            inputProcessor->getObjectItem(cCurrentModuleObject,
-                                          Loop,
-                                          cAlphaArgs,
-                                          NumAlpha,
-                                          rNumericArgs,
-                                          NumNumber,
-                                          IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-
-            CrossMixing(Loop).Name = cAlphaArgs(1);
-
-            CrossMixing(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
-            if (CrossMixing(Loop).ZonePtr == 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " + cAlphaFieldNames(2) +
-                                "=\"" + cAlphaArgs(2) + "\".");
-                ErrorsFound = true;
+            if (Loop > inputCrossMixing) {
+                // Create CrossMixing object from air boundary info
+                int airBoundaryIndex = Loop - inputCrossMixing - 1; //zero-based
+                int zone1 = DataHeatBalance::AirBoundaryMixingZone1[airBoundaryIndex];
+                int zone2 = DataHeatBalance::AirBoundaryMixingZone2[airBoundaryIndex];
+                CrossMixing(Loop).Name = "Air Boundary Mixing Zones " + General::RoundSigDigits(zone1) + " and " + General::RoundSigDigits(zone2);
+                CrossMixing(Loop).ZonePtr = zone1;
+                CrossMixing(Loop).SchedPtr = DataHeatBalance::AirBoundaryMixingSched[airBoundaryIndex];
+                CrossMixing(Loop).DesignLevel = DataHeatBalance::AirBoundaryMixingVol[airBoundaryIndex];
+                CrossMixing(Loop).FromZone = zone2;
             }
+            else {
+                inputProcessor->getObjectItem(cCurrentModuleObject,
+                    Loop,
+                    cAlphaArgs,
+                    NumAlpha,
+                    rNumericArgs,
+                    NumNumber,
+                    IOStat,
+                    lNumericFieldBlanks,
+                    lAlphaFieldBlanks,
+                    cAlphaFieldNames,
+                    cNumericFieldNames);
+                UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            CrossMixing(Loop).SchedPtr = GetScheduleIndex(cAlphaArgs(3));
-            if (CrossMixing(Loop).SchedPtr == 0) {
-                if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(3) +
-                                    " is required but field is blank.");
-                } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " + cAlphaFieldNames(3) +
-                                    "=\"" + cAlphaArgs(3) + "\".");
-                }
-                ErrorsFound = true;
-            }
+                CrossMixing(Loop).Name = cAlphaArgs(1);
 
-            // Mixing equipment design level calculation method.
-            {
-                auto const SELECT_CASE_var(cAlphaArgs(4));
-                if ((SELECT_CASE_var == "FLOW/ZONE") || (SELECT_CASE_var == "FLOW")) {
-                    CrossMixing(Loop).DesignLevel = rNumericArgs(1);
-                    if (lNumericFieldBlanks(1)) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
-                                         cNumericFieldNames(1) + ", but that field is blank.  0 Cross Mixing will result.");
-                    }
-
-                } else if (SELECT_CASE_var == "FLOW/AREA") {
-                    if (CrossMixing(Loop).ZonePtr != 0) {
-                        if (rNumericArgs(2) >= 0.0) {
-                            CrossMixing(Loop).DesignLevel = rNumericArgs(2) * Zone(CrossMixing(Loop).ZonePtr).FloorArea;
-                            if (Zone(CrossMixing(Loop).ZonePtr).FloorArea <= 0.0) {
-                                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                                 " specifies " + cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Cross Mixing will result.");
-                            }
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                            "\", invalid flow/person specification [<0.0]=" + RoundSigDigits(rNumericArgs(2), 3));
-                            ErrorsFound = true;
-                        }
-                    }
-                    if (lNumericFieldBlanks(2)) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
-                                         cNumericFieldNames(2) + ", but that field is blank.  0 Cross Mixing will result.");
-                    }
-
-                } else if (SELECT_CASE_var == "FLOW/PERSON") {
-                    if (CrossMixing(Loop).ZonePtr != 0) {
-                        if (rNumericArgs(3) >= 0.0) {
-                            CrossMixing(Loop).DesignLevel = rNumericArgs(3) * Zone(CrossMixing(Loop).ZonePtr).TotOccupants;
-                            if (Zone(CrossMixing(Loop).ZonePtr).TotOccupants <= 0.0) {
-                                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                                 " specifies " + cNumericFieldNames(3) +
-                                                 ", but Zone Total Occupants = 0.  0 Cross Mixing will result.");
-                            }
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                            "\", invalid flow/person specification [<0.0]=" + RoundSigDigits(rNumericArgs(3), 3));
-                            ErrorsFound = true;
-                        }
-                    }
-                    if (lNumericFieldBlanks(3)) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
-                                         cNumericFieldNames(3) + ", but that field is blank.  0 Cross Mixing will result.");
-                    }
-
-                } else if (SELECT_CASE_var == "AIRCHANGES/HOUR") {
-                    if (CrossMixing(Loop).ZonePtr != 0) {
-                        if (rNumericArgs(4) >= 0.0) {
-                            CrossMixing(Loop).DesignLevel = rNumericArgs(4) * Zone(CrossMixing(Loop).ZonePtr).Volume / SecInHour;
-                            if (Zone(CrossMixing(Loop).ZonePtr).Volume <= 0.0) {
-                                ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
-                                                 " specifies " + cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Cross Mixing will result.");
-                            }
-                        } else {
-                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
-                                            "\", invalid flow/person specification [<0.0]=" + RoundSigDigits(rNumericArgs(4), 3));
-                            ErrorsFound = true;
-                        }
-                    }
-                    if (lNumericFieldBlanks(4)) {
-                        ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
-                                         cNumericFieldNames(4) + ", but that field is blank.  0 Cross Mixing will result.");
-                    }
-
-                } else {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid calculation method=" + cAlphaArgs(4));
+                CrossMixing(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
+                if (CrossMixing(Loop).ZonePtr == 0) {
+                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " + cAlphaFieldNames(2) +
+                        "=\"" + cAlphaArgs(2) + "\".");
                     ErrorsFound = true;
                 }
-            }
 
-            CrossMixing(Loop).FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), Zone);
-            if (CrossMixing(Loop).FromZone == 0) {
-                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " + cAlphaFieldNames(5) +
-                                "=\"" + cAlphaArgs(5) + "\".");
-                ErrorsFound = true;
-            }
-            CrossMixing(Loop).DeltaTemperature = rNumericArgs(5);
+                CrossMixing(Loop).SchedPtr = GetScheduleIndex(cAlphaArgs(3));
+                if (CrossMixing(Loop).SchedPtr == 0) {
+                    if (lAlphaFieldBlanks(3)) {
+                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(3) +
+                            " is required but field is blank.");
+                    }
+                    else {
+                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " + cAlphaFieldNames(3) +
+                            "=\"" + cAlphaArgs(3) + "\".");
+                    }
+                    ErrorsFound = true;
+                }
 
-            if (NumAlpha > 5) {
-                CrossMixing(Loop).DeltaTempSchedPtr = GetScheduleIndex(cAlphaArgs(6));
-                if (CrossMixing(Loop).DeltaTempSchedPtr > 0) {
-                    if (!lNumericFieldBlanks(5))
-                        ShowWarningError(RoutineName +
-                                         "The Delta Temperature value and schedule are provided. The scheduled temperature will be used in the " +
-                                         cCurrentModuleObject + " object = " + cAlphaArgs(1));
-                    if (GetScheduleMinValue(CrossMixing(Loop).DeltaTempSchedPtr) < 0.0) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                        " must have a delta temperature equal to or above 0 C defined in the schedule = " + cAlphaArgs(6));
-                        ErrorsFound = true;
-                    }
-                }
-            }
-            if (CrossMixing(Loop).DeltaTempSchedPtr == 0 && lNumericFieldBlanks(5) && (!lAlphaFieldBlanks(6))) {
-                ShowWarningError(RoutineName + cNumericFieldNames(5) +
-                                 ": the value field is blank and schedule field is invalid. The default value will be used (" +
-                                 RoundSigDigits(rNumericArgs(5), 1) + ") ");
-                ShowContinueError("in " + cCurrentModuleObject + " = " + cAlphaArgs(1) + " and the simulation continues...");
-            }
-            if (!lNumericFieldBlanks(5) && ((!lAlphaFieldBlanks(6)) && CrossMixing(Loop).DeltaTempSchedPtr == 0)) {
-                ShowWarningError(RoutineName + cAlphaFieldNames(6) + " = " + cAlphaArgs(6) + " is invalid. The constant value will be used at " +
-                                 RoundSigDigits(rNumericArgs(5), 1) + " degrees C ");
-                ShowContinueError("in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
-            }
+                // Mixing equipment design level calculation method.
+                {
+                    auto const SELECT_CASE_var(cAlphaArgs(4));
+                    if ((SELECT_CASE_var == "FLOW/ZONE") || (SELECT_CASE_var == "FLOW")) {
+                        CrossMixing(Loop).DesignLevel = rNumericArgs(1);
+                        if (lNumericFieldBlanks(1)) {
+                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
+                                cNumericFieldNames(1) + ", but that field is blank.  0 Cross Mixing will result.");
+                        }
 
-            if (NumAlpha > 6) {
-                CrossMixing(Loop).MinIndoorTempSchedPtr = GetScheduleIndex(cAlphaArgs(7));
-                if (CrossMixing(Loop).MinIndoorTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(7))) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(7) +
-                                        " not found=" + cAlphaArgs(7) + "\".");
-                        ErrorsFound = true;
                     }
-                }
-                if (CrossMixing(Loop).MinIndoorTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(CrossMixing(Loop).MinIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                        " must have a minimum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(7));
-                        ErrorsFound = true;
-                    }
-                }
-            }
+                    else if (SELECT_CASE_var == "FLOW/AREA") {
+                        if (CrossMixing(Loop).ZonePtr != 0) {
+                            if (rNumericArgs(2) >= 0.0) {
+                                CrossMixing(Loop).DesignLevel = rNumericArgs(2) * Zone(CrossMixing(Loop).ZonePtr).FloorArea;
+                                if (Zone(CrossMixing(Loop).ZonePtr).FloorArea <= 0.0) {
+                                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                        " specifies " + cNumericFieldNames(2) + ", but Zone Floor Area = 0.  0 Cross Mixing will result.");
+                                }
+                            }
+                            else {
+                                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                    "\", invalid flow/person specification [<0.0]=" + RoundSigDigits(rNumericArgs(2), 3));
+                                ErrorsFound = true;
+                            }
+                        }
+                        if (lNumericFieldBlanks(2)) {
+                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
+                                cNumericFieldNames(2) + ", but that field is blank.  0 Cross Mixing will result.");
+                        }
 
-            if (NumAlpha > 7) {
-                CrossMixing(Loop).MaxIndoorTempSchedPtr = GetScheduleIndex(cAlphaArgs(8));
-                if (CrossMixing(Loop).MaxIndoorTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(8))) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(8) + " not found=\"" +
-                                        cAlphaArgs(8) + "\".");
-                        ErrorsFound = true;
                     }
-                }
-                if (CrossMixing(Loop).MaxIndoorTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(CrossMixing(Loop).MaxIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                        " must have a maximum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(8));
-                        ErrorsFound = true;
-                    }
-                }
-            }
+                    else if (SELECT_CASE_var == "FLOW/PERSON") {
+                        if (CrossMixing(Loop).ZonePtr != 0) {
+                            if (rNumericArgs(3) >= 0.0) {
+                                CrossMixing(Loop).DesignLevel = rNumericArgs(3) * Zone(CrossMixing(Loop).ZonePtr).TotOccupants;
+                                if (Zone(CrossMixing(Loop).ZonePtr).TotOccupants <= 0.0) {
+                                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                        " specifies " + cNumericFieldNames(3) +
+                                        ", but Zone Total Occupants = 0.  0 Cross Mixing will result.");
+                                }
+                            }
+                            else {
+                                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                    "\", invalid flow/person specification [<0.0]=" + RoundSigDigits(rNumericArgs(3), 3));
+                                ErrorsFound = true;
+                            }
+                        }
+                        if (lNumericFieldBlanks(3)) {
+                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
+                                cNumericFieldNames(3) + ", but that field is blank.  0 Cross Mixing will result.");
+                        }
 
-            if (NumAlpha > 8) {
-                CrossMixing(Loop).MinSourceTempSchedPtr = GetScheduleIndex(cAlphaArgs(9));
-                if (CrossMixing(Loop).MinSourceTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(9))) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(9) + " not found=\"" +
-                                        cAlphaArgs(9) + "\".");
-                        ErrorsFound = true;
                     }
-                }
-                if (CrossMixing(Loop).MinSourceTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(CrossMixing(Loop).MinSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                        " must have a minimum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(9));
-                        ErrorsFound = true;
-                    }
-                }
-            }
+                    else if (SELECT_CASE_var == "AIRCHANGES/HOUR") {
+                        if (CrossMixing(Loop).ZonePtr != 0) {
+                            if (rNumericArgs(4) >= 0.0) {
+                                CrossMixing(Loop).DesignLevel = rNumericArgs(4) * Zone(CrossMixing(Loop).ZonePtr).Volume / SecInHour;
+                                if (Zone(CrossMixing(Loop).ZonePtr).Volume <= 0.0) {
+                                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
+                                        " specifies " + cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Cross Mixing will result.");
+                                }
+                            }
+                            else {
+                                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                    "\", invalid flow/person specification [<0.0]=" + RoundSigDigits(rNumericArgs(4), 3));
+                                ErrorsFound = true;
+                            }
+                        }
+                        if (lNumericFieldBlanks(4)) {
+                            ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) + " specifies " +
+                                cNumericFieldNames(4) + ", but that field is blank.  0 Cross Mixing will result.");
+                        }
 
-            if (NumAlpha > 9) {
-                CrossMixing(Loop).MaxSourceTempSchedPtr = GetScheduleIndex(cAlphaArgs(10));
-                if (CrossMixing(Loop).MaxSourceTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(10))) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(10) + " not found=\"" +
-                                        cAlphaArgs(9) + "\".");
+                    }
+                    else {
+                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid calculation method=" + cAlphaArgs(4));
                         ErrorsFound = true;
                     }
                 }
-                if (CrossMixing(Loop).MaxSourceTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(CrossMixing(Loop).MaxSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                                        " must have a maximum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(10));
-                        ErrorsFound = true;
-                    }
-                }
-            }
 
-            if (NumAlpha > 10) {
-                CrossMixing(Loop).MinOutdoorTempSchedPtr = GetScheduleIndex(cAlphaArgs(11));
-                if (CrossMixing(Loop).MinOutdoorTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(11))) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(11) + " not found=\"" +
-                                        cAlphaArgs(9) + "\".");
-                        ErrorsFound = true;
-                    }
+                CrossMixing(Loop).FromZone = UtilityRoutines::FindItemInList(cAlphaArgs(5), Zone);
+                if (CrossMixing(Loop).FromZone == 0) {
+                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid (not found) " + cAlphaFieldNames(5) +
+                        "=\"" + cAlphaArgs(5) + "\".");
+                    ErrorsFound = true;
                 }
-                if (CrossMixing(Loop).MinOutdoorTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(CrossMixing(Loop).MinOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(
-                            RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                            " must have a minimum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(11));
-                        ErrorsFound = true;
-                    }
-                }
-            }
+                CrossMixing(Loop).DeltaTemperature = rNumericArgs(5);
 
-            if (NumAlpha > 11) {
-                CrossMixing(Loop).MaxOutdoorTempSchedPtr = GetScheduleIndex(cAlphaArgs(12));
-                if (CrossMixing(Loop).MaxOutdoorTempSchedPtr == 0) {
-                    if ((!lAlphaFieldBlanks(12))) {
-                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(12) + " not found=\"" +
-                                        cAlphaArgs(9) + "\".");
-                        ErrorsFound = true;
+                if (NumAlpha > 5) {
+                    CrossMixing(Loop).DeltaTempSchedPtr = GetScheduleIndex(cAlphaArgs(6));
+                    if (CrossMixing(Loop).DeltaTempSchedPtr > 0) {
+                        if (!lNumericFieldBlanks(5))
+                            ShowWarningError(RoutineName +
+                                "The Delta Temperature value and schedule are provided. The scheduled temperature will be used in the " +
+                                cCurrentModuleObject + " object = " + cAlphaArgs(1));
+                        if (GetScheduleMinValue(CrossMixing(Loop).DeltaTempSchedPtr) < 0.0) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                " must have a delta temperature equal to or above 0 C defined in the schedule = " + cAlphaArgs(6));
+                            ErrorsFound = true;
+                        }
                     }
                 }
-                if (CrossMixing(Loop).MaxOutdoorTempSchedPtr > 0) {
-                    // Check min and max values in the schedule to ensure both values are within the range
-                    if (!CheckScheduleValueMinMax(CrossMixing(Loop).MaxOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
-                        ShowSevereError(
-                            RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
-                            " must have a maximum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(12));
-                        ErrorsFound = true;
+                if (CrossMixing(Loop).DeltaTempSchedPtr == 0 && lNumericFieldBlanks(5) && (!lAlphaFieldBlanks(6))) {
+                    ShowWarningError(RoutineName + cNumericFieldNames(5) +
+                        ": the value field is blank and schedule field is invalid. The default value will be used (" +
+                        RoundSigDigits(rNumericArgs(5), 1) + ") ");
+                    ShowContinueError("in " + cCurrentModuleObject + " = " + cAlphaArgs(1) + " and the simulation continues...");
+                }
+                if (!lNumericFieldBlanks(5) && ((!lAlphaFieldBlanks(6)) && CrossMixing(Loop).DeltaTempSchedPtr == 0)) {
+                    ShowWarningError(RoutineName + cAlphaFieldNames(6) + " = " + cAlphaArgs(6) + " is invalid. The constant value will be used at " +
+                        RoundSigDigits(rNumericArgs(5), 1) + " degrees C ");
+                    ShowContinueError("in the " + cCurrentModuleObject + " object = " + cAlphaArgs(1) + " and the simulation continues...");
+                }
+
+                if (NumAlpha > 6) {
+                    CrossMixing(Loop).MinIndoorTempSchedPtr = GetScheduleIndex(cAlphaArgs(7));
+                    if (CrossMixing(Loop).MinIndoorTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(7))) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(7) +
+                                " not found=" + cAlphaArgs(7) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (CrossMixing(Loop).MinIndoorTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(CrossMixing(Loop).MinIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                " must have a minimum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(7));
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+
+                if (NumAlpha > 7) {
+                    CrossMixing(Loop).MaxIndoorTempSchedPtr = GetScheduleIndex(cAlphaArgs(8));
+                    if (CrossMixing(Loop).MaxIndoorTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(8))) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(8) + " not found=\"" +
+                                cAlphaArgs(8) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (CrossMixing(Loop).MaxIndoorTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(CrossMixing(Loop).MaxIndoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                " must have a maximum zone temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(8));
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+
+                if (NumAlpha > 8) {
+                    CrossMixing(Loop).MinSourceTempSchedPtr = GetScheduleIndex(cAlphaArgs(9));
+                    if (CrossMixing(Loop).MinSourceTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(9))) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(9) + " not found=\"" +
+                                cAlphaArgs(9) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (CrossMixing(Loop).MinSourceTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(CrossMixing(Loop).MinSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                " must have a minimum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(9));
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+
+                if (NumAlpha > 9) {
+                    CrossMixing(Loop).MaxSourceTempSchedPtr = GetScheduleIndex(cAlphaArgs(10));
+                    if (CrossMixing(Loop).MaxSourceTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(10))) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(10) + " not found=\"" +
+                                cAlphaArgs(9) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (CrossMixing(Loop).MaxSourceTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(CrossMixing(Loop).MaxSourceTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                " must have a maximum source temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(10));
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+
+                if (NumAlpha > 10) {
+                    CrossMixing(Loop).MinOutdoorTempSchedPtr = GetScheduleIndex(cAlphaArgs(11));
+                    if (CrossMixing(Loop).MinOutdoorTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(11))) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(11) + " not found=\"" +
+                                cAlphaArgs(9) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (CrossMixing(Loop).MinOutdoorTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(CrossMixing(Loop).MinOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(
+                                RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                " must have a minimum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(11));
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+
+                if (NumAlpha > 11) {
+                    CrossMixing(Loop).MaxOutdoorTempSchedPtr = GetScheduleIndex(cAlphaArgs(12));
+                    if (CrossMixing(Loop).MaxOutdoorTempSchedPtr == 0) {
+                        if ((!lAlphaFieldBlanks(12))) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"," + cAlphaFieldNames(12) + " not found=\"" +
+                                cAlphaArgs(9) + "\".");
+                            ErrorsFound = true;
+                        }
+                    }
+                    if (CrossMixing(Loop).MaxOutdoorTempSchedPtr > 0) {
+                        // Check min and max values in the schedule to ensure both values are within the range
+                        if (!CheckScheduleValueMinMax(CrossMixing(Loop).MaxOutdoorTempSchedPtr, ">=", -MixingTempLimit, "<=", MixingTempLimit)) {
+                            ShowSevereError(
+                                RoutineName + cCurrentModuleObject + " = " + cAlphaArgs(1) +
+                                " must have a maximum outdoor temperature between -100C and 100C defined in the schedule = " + cAlphaArgs(12));
+                            ErrorsFound = true;
+                        }
                     }
                 }
             }
@@ -3503,7 +3525,7 @@ namespace HeatBalanceAirManager {
 
         for (Loop = 1; Loop <= TotInfiltration; ++Loop) {
             if (Loop == 1)
-                gio::write(OutputFileInits, Format_721)
+                ObjexxFCL::gio::write(OutputFileInits, Format_721)
                     << "ZoneInfiltration"
                     << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/Exterior Surface Area {m3/s-m2},ACH - "
                        "Air Changes per Hour,Equation A - Constant Term Coefficient {},Equation B - Temperature Term Coefficient {1/C},Equation C - "
@@ -3511,14 +3533,14 @@ namespace HeatBalanceAirManager {
 
             ZoneNum = Infiltration(Loop).ZonePtr;
             if (ZoneNum == 0) {
-                gio::write(OutputFileInits, Format_722) << "Infiltration-Illegal Zone specified" << Infiltration(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_722) << "Infiltration-Illegal Zone specified" << Infiltration(Loop).Name;
                 continue;
             }
             TotInfilVentFlow(ZoneNum) += Infiltration(Loop).DesignLevel;
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_720, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_720, flags)
                     << "ZoneInfiltration" << Infiltration(Loop).Name << GetScheduleName(Infiltration(Loop).SchedPtr) << Zone(ZoneNum).Name
                     << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
             }
@@ -3526,7 +3548,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).FloorArea > 0.0) {
                 StringOut = RoundSigDigits(Infiltration(Loop).DesignLevel / Zone(ZoneNum).FloorArea, 3);
@@ -3536,7 +3558,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).ExteriorTotalSurfArea > 0.0) {
                 StringOut = RoundSigDigits(Infiltration(Loop).DesignLevel / Zone(ZoneNum).ExteriorTotalSurfArea, 3);
@@ -3546,7 +3568,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).Volume > 0.0) {
                 StringOut = RoundSigDigits(Infiltration(Loop).DesignLevel * SecInHour / Zone(ZoneNum).Volume, 3);
@@ -3556,28 +3578,28 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Infiltration(Loop).ConstantTermCoef, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Infiltration(Loop).TemperatureTermCoef, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Infiltration(Loop).VelocityTermCoef, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Infiltration(Loop).VelocitySQTermCoef, 3);
-            gio::write(OutputFileInits, fmtA) << StringOut;
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
         }
 
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
@@ -3589,7 +3611,7 @@ namespace HeatBalanceAirManager {
 
         for (Loop = 1; Loop <= TotVentilation; ++Loop) {
             if (Loop == 1)
-                gio::write(OutputFileInits, Format_721)
+                ObjexxFCL::gio::write(OutputFileInits, Format_721)
                     << "ZoneVentilation"
                     << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/person Area {m3/s-person},ACH - Air "
                        "Changes per Hour,Fan Type {Exhaust;Intake;Natural},Fan Pressure Rise {Pa},Fan Efficiency {},Equation A - Constant Term "
@@ -3600,14 +3622,14 @@ namespace HeatBalanceAirManager {
 
             ZoneNum = Ventilation(Loop).ZonePtr;
             if (ZoneNum == 0) {
-                gio::write(OutputFileInits, Format_722) << "Ventilation-Illegal Zone specified" << Ventilation(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_722) << "Ventilation-Illegal Zone specified" << Ventilation(Loop).Name;
                 continue;
             }
             TotInfilVentFlow(ZoneNum) += Ventilation(Loop).DesignLevel;
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_720, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_720, flags)
                     << "ZoneVentilation" << Ventilation(Loop).Name << GetScheduleName(Ventilation(Loop).SchedPtr) << Zone(ZoneNum).Name
                     << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
             }
@@ -3615,7 +3637,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).FloorArea > 0.0) {
                 StringOut = RoundSigDigits(Ventilation(Loop).DesignLevel / Zone(ZoneNum).FloorArea, 3);
@@ -3625,7 +3647,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).TotOccupants > 0.0) {
                 StringOut = RoundSigDigits(Ventilation(Loop).DesignLevel / (Zone(ZoneNum).TotOccupants), 3);
@@ -3635,7 +3657,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).Volume > 0.0) {
                 StringOut = RoundSigDigits(Ventilation(Loop).DesignLevel * SecInHour / Zone(ZoneNum).Volume, 3);
@@ -3645,7 +3667,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Ventilation(Loop).FanType == ExhaustVentilation) {
                 StringOut = "Exhaust";
@@ -3659,43 +3681,43 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Ventilation(Loop).FanPressure, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Ventilation(Loop).FanEfficiency, 1);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Ventilation(Loop).ConstantTermCoef, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Ventilation(Loop).TemperatureTermCoef, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Ventilation(Loop).VelocityTermCoef, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Ventilation(Loop).VelocitySQTermCoef, 3);
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Ventilation(Loop).MinIndoorTempSchedPtr > 0) {
                 StringOut = GetScheduleName(Ventilation(Loop).MinIndoorTempSchedPtr);
@@ -3705,7 +3727,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Ventilation(Loop).MaxIndoorTempSchedPtr > 0) {
                 StringOut = "Schedule: " + GetScheduleName(Ventilation(Loop).MaxIndoorTempSchedPtr);
@@ -3715,7 +3737,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Ventilation(Loop).DeltaTempSchedPtr > 0) {
                 StringOut = "Schedule: " + GetScheduleName(Ventilation(Loop).DeltaTempSchedPtr);
@@ -3725,7 +3747,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Ventilation(Loop).MinOutdoorTempSchedPtr > 0) {
                 StringOut = "Schedule: " + GetScheduleName(Ventilation(Loop).MinOutdoorTempSchedPtr);
@@ -3735,7 +3757,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Ventilation(Loop).MaxOutdoorTempSchedPtr > 0) {
                 StringOut = "Schedule: " + GetScheduleName(Ventilation(Loop).MaxOutdoorTempSchedPtr);
@@ -3745,30 +3767,30 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             StringOut = RoundSigDigits(Ventilation(Loop).MaxWindSpeed, 2);
-            gio::write(OutputFileInits, fmtA) << StringOut;
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
         }
 
         TotMixingFlow.dimension(NumOfZones, 0.0);
         for (Loop = 1; Loop <= TotMixing; ++Loop) {
             if (Loop == 1)
-                gio::write(OutputFileInits, Format_721)
+                ObjexxFCL::gio::write(OutputFileInits, Format_721)
                     << "Mixing"
                     << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/person Area {m3/s-person},ACH - Air "
                        "Changes per Hour,From/Source Zone,Delta Temperature {C}";
 
             ZoneNum = Mixing(Loop).ZonePtr;
             if (ZoneNum == 0) {
-                gio::write(OutputFileInits, Format_722) << "Mixing-Illegal Zone specified" << Mixing(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_722) << "Mixing-Illegal Zone specified" << Mixing(Loop).Name;
                 continue;
             }
             TotMixingFlow(ZoneNum) += Mixing(Loop).DesignLevel;
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_720, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_720, flags)
                     << "Mixing" << Mixing(Loop).Name << GetScheduleName(Mixing(Loop).SchedPtr) << Zone(ZoneNum).Name
                     << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
             }
@@ -3776,7 +3798,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).FloorArea > 0.0) {
                 StringOut = RoundSigDigits(Mixing(Loop).DesignLevel / Zone(ZoneNum).FloorArea, 3);
@@ -3786,7 +3808,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).TotOccupants > 0.0) {
                 StringOut = RoundSigDigits(Mixing(Loop).DesignLevel / (Zone(ZoneNum).TotOccupants), 3);
@@ -3796,7 +3818,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).Volume > 0.0) {
                 StringOut = RoundSigDigits(Mixing(Loop).DesignLevel * SecInHour / Zone(ZoneNum).Volume, 3);
@@ -3806,34 +3828,34 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << Zone(Mixing(Loop).FromZone).Name + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << Zone(Mixing(Loop).FromZone).Name + ',';
             }
             StringOut = RoundSigDigits(Mixing(Loop).DeltaTemperature, 2);
-            gio::write(OutputFileInits, fmtA) << StringOut;
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
         }
 
         for (Loop = 1; Loop <= TotCrossMixing; ++Loop) {
             if (Loop == 1)
-                gio::write(OutputFileInits, Format_721)
+                ObjexxFCL::gio::write(OutputFileInits, Format_721)
                     << "CrossMixing"
                     << "Design Volume Flow Rate {m3/s},Volume Flow Rate/Floor Area {m3/s-m2},Volume Flow Rate/person Area {m3/s-person},ACH - Air "
                        "Changes per Hour,From/Source Zone,Delta Temperature {C}";
 
             ZoneNum = CrossMixing(Loop).ZonePtr;
             if (ZoneNum == 0) {
-                gio::write(OutputFileInits, Format_722) << "CrossMixing-Illegal Zone specified" << CrossMixing(Loop).Name;
+                ObjexxFCL::gio::write(OutputFileInits, Format_722) << "CrossMixing-Illegal Zone specified" << CrossMixing(Loop).Name;
                 continue;
             }
             TotMixingFlow(ZoneNum) += CrossMixing(Loop).DesignLevel;
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, Format_720, flags)
+                ObjexxFCL::gio::write(OutputFileInits, Format_720, flags)
                     << "CrossMixing" << CrossMixing(Loop).Name << GetScheduleName(CrossMixing(Loop).SchedPtr) << Zone(ZoneNum).Name
                     << RoundSigDigits(Zone(ZoneNum).FloorArea, 2) << RoundSigDigits(Zone(ZoneNum).TotOccupants, 1);
             }
@@ -3841,7 +3863,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).FloorArea > 0.0) {
                 StringOut = RoundSigDigits(CrossMixing(Loop).DesignLevel / Zone(ZoneNum).FloorArea, 3);
@@ -3851,7 +3873,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).TotOccupants > 0.0) {
                 StringOut = RoundSigDigits(CrossMixing(Loop).DesignLevel / (Zone(ZoneNum).TotOccupants), 3);
@@ -3861,7 +3883,7 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             if (Zone(ZoneNum).Volume > 0.0) {
                 StringOut = RoundSigDigits(CrossMixing(Loop).DesignLevel * SecInHour / Zone(ZoneNum).Volume, 3);
@@ -3871,19 +3893,19 @@ namespace HeatBalanceAirManager {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
             }
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileInits, fmtA, flags) << Zone(CrossMixing(Loop).FromZone).Name + ',';
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << Zone(CrossMixing(Loop).FromZone).Name + ',';
             }
             StringOut = RoundSigDigits(CrossMixing(Loop).DeltaTemperature, 2);
-            gio::write(OutputFileInits, fmtA) << StringOut;
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
         }
 
         if (TotRefDoorMixing > 0) {
-            gio::write(OutputFileInits, Format_724)
+            ObjexxFCL::gio::write(OutputFileInits, Format_724)
                 << "RefrigerationDoorMixing "
                 << "Name, Zone 1 Name,Zone 2 Name,Door Opening Schedule Name,Door Height {m},Door Area {m2},Door Protection Type";
             for (ZoneNumA = 1; ZoneNumA <= (NumOfZones - 1); ++ZoneNumA) {
@@ -3891,7 +3913,7 @@ namespace HeatBalanceAirManager {
                 for (ConnectionNumber = 1; ConnectionNumber <= RefDoorMixing(ZoneNumA).NumRefDoorConnections; ++ConnectionNumber) {
                     ZoneNumB = RefDoorMixing(ZoneNumA).MateZonePtr(ConnectionNumber);
                     // TotMixingFlow(ZoneNum)=TotMixingFlow(ZoneNum)+RefDoorMixing(Loop)%!DesignLevel
-                    gio::write(OutputFileInits, Format_723)
+                    ObjexxFCL::gio::write(OutputFileInits, Format_723)
                         << "RefrigerationDoorMixing" << RefDoorMixing(ZoneNumA).DoorMixingObjectName(ConnectionNumber) << Zone(ZoneNumA).Name
                         << Zone(ZoneNumB).Name << GetScheduleName(RefDoorMixing(ZoneNumA).OpenSchedPtr(ConnectionNumber))
                         << RoundSigDigits(RefDoorMixing(ZoneNumA).DoorHeight(ConnectionNumber), 3)
@@ -4019,8 +4041,8 @@ namespace HeatBalanceAirManager {
         using DataRoomAirModel::UserDefinedUsed;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt RoomAirHeader("('! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined')");
-        static gio::Fmt RoomAirZoneFmt("('RoomAir Model,',A,',',A)");
+        static ObjexxFCL::gio::Fmt RoomAirHeader("('! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined')");
+        static ObjexxFCL::gio::Fmt RoomAirZoneFmt("('RoomAir Model,',A,',',A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas; // States which alpha value to read from a
@@ -4184,26 +4206,26 @@ namespace HeatBalanceAirManager {
         }
 
         // Write RoomAir Model details onto EIO file
-        gio::write(OutputFileInits, RoomAirHeader);
+        ObjexxFCL::gio::write(OutputFileInits, RoomAirHeader);
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             {
                 auto const SELECT_CASE_var(AirModel(ZoneNum).AirModelType);
                 if (SELECT_CASE_var == RoomAirModel_Mixing) {
-                    gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "Mixing/Well-Stirred";
+                    ObjexxFCL::gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "Mixing/Well-Stirred";
                 } else if (SELECT_CASE_var == RoomAirModel_Mundt) {
-                    gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "OneNodeDisplacementVentilation";
+                    ObjexxFCL::gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "OneNodeDisplacementVentilation";
                 } else if (SELECT_CASE_var == RoomAirModel_UCSDDV) {
-                    gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "ThreeNodeDisplacementVentilation";
+                    ObjexxFCL::gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "ThreeNodeDisplacementVentilation";
                 } else if (SELECT_CASE_var == RoomAirModel_UCSDCV) {
-                    gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "CrossVentilation";
+                    ObjexxFCL::gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "CrossVentilation";
                 } else if (SELECT_CASE_var == RoomAirModel_UCSDUFI) {
-                    gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "UnderFloorAirDistributionInterior";
+                    ObjexxFCL::gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "UnderFloorAirDistributionInterior";
                 } else if (SELECT_CASE_var == RoomAirModel_UCSDUFE) {
-                    gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "UnderFloorAirDistributionExterior";
+                    ObjexxFCL::gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "UnderFloorAirDistributionExterior";
                 } else if (SELECT_CASE_var == RoomAirModel_UserDefined) {
-                    gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "UserDefined";
+                    ObjexxFCL::gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "UserDefined";
                 } else if (SELECT_CASE_var == RoomAirModel_AirflowNetwork) {
-                    gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "AirflowNetwork";
+                    ObjexxFCL::gio::write(OutputFileInits, RoomAirZoneFmt) << Zone(ZoneNum).Name << "AirflowNetwork";
                 }
             }
         }

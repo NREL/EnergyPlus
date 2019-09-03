@@ -771,7 +771,7 @@ namespace MoistureBalanceEMPDManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -786,13 +786,13 @@ namespace MoistureBalanceEMPDManager {
         int MatNum;
 
         // Formats
-        static gio::Fmt Format_700("(' Construction EMPD, ',A,', ',F8.4,', ',4(F8.4,', '),F8.4,', ',F8.4,', ',F8.4,', ',F8.4)");
+        static ObjexxFCL::gio::Fmt Format_700("(' Construction EMPD, ',A,', ',F8.4,', ',4(F8.4,', '),F8.4,', ',F8.4,', ',F8.4,', ',F8.4)");
 
         ScanForReports("Constructions", DoReport, "Constructions");
 
         if (!DoReport) return;
         //   Write Descriptions
-        gio::write(OutputFileInits, fmtA) << "! <Construction EMPD>, Construction Name, Inside Layer Material Name, Vapor Resistance Factor, a, b, "
+        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Construction EMPD>, Construction Name, Inside Layer Material Name, Vapor Resistance Factor, a, b, "
                                              "c, d, Surface Penetration Depth {m}, Deep Penetration Depth {m}, Coating Vapor Resistance Factor, "
                                              "Coating Thickness {m}";
 
@@ -800,7 +800,7 @@ namespace MoistureBalanceEMPDManager {
             if (Construct(ConstrNum).TypeIsWindow) continue;
             MatNum = Construct(ConstrNum).LayerPoint(Construct(ConstrNum).TotLayers);
             if (Material(MatNum).EMPDMaterialProps) {
-                gio::write(OutputFileInits, Format_700)
+                ObjexxFCL::gio::write(OutputFileInits, Format_700)
                     << Construct(ConstrNum).Name << Material(MatNum).Name << Material(MatNum).EMPDmu << Material(MatNum).MoistACoeff
                     << Material(MatNum).MoistBCoeff << Material(MatNum).MoistCCoeff << Material(MatNum).MoistDCoeff
                     << Material(MatNum).EMPDSurfaceDepth << Material(MatNum).EMPDDeepDepth << Material(MatNum).EMPDmuCoating

@@ -281,6 +281,22 @@ namespace DesiccantDehumidifiers {
                                 Array1<Real64> const &Par // Par(5) is the requested coil load
     );
 
+    int GetProcAirInletNodeNum(std::string const &DesicDehumName,
+        bool &ErrorsFound
+    );
+
+    int GetProcAirOutletNodeNum(std::string const &DesicDehumName,
+        bool &ErrorsFound
+    );
+
+    int GetRegAirInletNodeNum(std::string const &DesicDehumName,
+        bool &ErrorsFound
+    );
+
+    int GetRegAirOutletNodeNum(std::string const &DesicDehumName,
+        bool &ErrorsFound
+    );
+
     // Clears the global data in HeatingCoils.
     // Needed for unit tests, should not be normally called.
     void clear_state();

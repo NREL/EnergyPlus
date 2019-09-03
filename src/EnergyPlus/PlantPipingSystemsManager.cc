@@ -205,9 +205,9 @@ namespace EnergyPlus {
 
             static std::string const RoutineName("InitAndSimGroundDomain");
 
-            static gio::Fmt DomainCellsToEIOHeader(
+            static ObjexxFCL::gio::Fmt DomainCellsToEIOHeader(
                     "('! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells')");
-            static gio::Fmt DomainCellsToEIO("(A,',',I5',',I5',',I5)");
+            static ObjexxFCL::gio::Fmt DomainCellsToEIO("(A,',',I5',',I5',',I5)");
 
             // Read input if necessary
             if (GetInputFlag) {
@@ -323,7 +323,7 @@ namespace EnergyPlus {
                                 // Zone interface cells
                                 if (thisDomain.Cells(X, yMax, Z).cellType == CellType::ZoneGroundInterface) {
                                     thisDomain.WeightingFactor(X, Z) =
-                                            abs((ZoneTemp - thisDomain.Cells(X, yMax, Z).Temperature_PrevTimeStep) /
+                                            std::abs((ZoneTemp - thisDomain.Cells(X, yMax, Z).Temperature_PrevTimeStep) /
                                                 (ZoneTemp - AvgSlabTemp));
                                 }
                             }
@@ -394,11 +394,11 @@ namespace EnergyPlus {
 
             if (WriteEIOFlag) {
                 // Write eio header
-                gio::write(DataGlobals::OutputFileInits, DomainCellsToEIOHeader);
+                ObjexxFCL::gio::write(DataGlobals::OutputFileInits, DomainCellsToEIOHeader);
 
                 // Write eio data
                 for (auto &thisDomain : domains) {
-                    gio::write(DataGlobals::OutputFileInits, DomainCellsToEIO)
+                    ObjexxFCL::gio::write(DataGlobals::OutputFileInits, DomainCellsToEIO)
                             << thisDomain.Name << thisDomain.NumDomainCells << thisDomain.NumGroundSurfCells
                             << thisDomain.NumInsulationCells;
                 }
@@ -946,6 +946,10 @@ namespace EnergyPlus {
                                 thisDomain.HorizInsMaterialNum).SpecHeat;
                         thisDomain.HorizInsProperties.Conductivity = DataHeatBalance::Material(
                                 thisDomain.HorizInsMaterialNum).Conductivity;
+                        if (SiteGroundDomainUsingNoMassMat(thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
+                            ErrorsFound = true;
+                            SiteGroundDomainNoMassMatError(DataIPShortCuts::cAlphaFieldNames(8), DataIPShortCuts::cAlphaArgs(8), thisDomain.Name);
+                        }
                     }
 
                     // Set flag for horizontal insulation extents
@@ -999,6 +1003,10 @@ namespace EnergyPlus {
                                 thisDomain.VertInsMaterialNum).SpecHeat;
                         thisDomain.VertInsProperties.Conductivity = DataHeatBalance::Material(
                                 thisDomain.VertInsMaterialNum).Conductivity;
+                        if (SiteGroundDomainUsingNoMassMat(thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
+                            ErrorsFound = true;
+                            SiteGroundDomainNoMassMatError(DataIPShortCuts::cAlphaFieldNames(11), DataIPShortCuts::cAlphaArgs(11), thisDomain.Name);
+                        }
                     }
 
                     // vertical insulation depth
@@ -1334,6 +1342,10 @@ namespace EnergyPlus {
                                 thisDomain.HorizInsMaterialNum).SpecHeat;
                         thisDomain.HorizInsProperties.Conductivity = DataHeatBalance::Material(
                                 thisDomain.HorizInsMaterialNum).Conductivity;
+                        if (SiteGroundDomainUsingNoMassMat(thisDomain.HorizInsThickness, thisDomain.HorizInsMaterialNum)) {
+                            ErrorsFound = true;
+                            SiteGroundDomainNoMassMatError(DataIPShortCuts::cAlphaFieldNames(6), DataIPShortCuts::cAlphaArgs(6), thisDomain.Name);
+                        }
                     }
 
                     // Set flag for horizontal insulation extents
@@ -1392,6 +1404,10 @@ namespace EnergyPlus {
                                 thisDomain.VertInsMaterialNum).SpecHeat;
                         thisDomain.VertInsProperties.Conductivity = DataHeatBalance::Material(
                                 thisDomain.VertInsMaterialNum).Conductivity;
+                        if (SiteGroundDomainUsingNoMassMat(thisDomain.VertInsThickness, thisDomain.VertInsMaterialNum)) {
+                            ErrorsFound = true;
+                            SiteGroundDomainNoMassMatError(DataIPShortCuts::cAlphaFieldNames(10), DataIPShortCuts::cAlphaArgs(10), thisDomain.Name);
+                        }
                     }
                 }
 
@@ -1457,6 +1473,29 @@ namespace EnergyPlus {
             }
         }
 
+        bool SiteGroundDomainUsingNoMassMat(Real64 const MaterialThickness,
+                                            int const MaterialNum) {
+            
+            if ( (MaterialThickness <= 0.0) || (DataHeatBalance::Material(MaterialNum).ROnly) ) {
+                return true;
+            } else {
+                return false;
+            }
+
+        }
+        
+        void SiteGroundDomainNoMassMatError(std::string const &FieldName,
+                                            std::string const &UserInputField,
+                                            std::string const &ObjectName) {
+
+            ShowSevereError("Invalid " + FieldName + "=" + UserInputField + " was found in: " + ObjectName);
+            ShowContinueError("The user of no mass materials or ones with no thickness are not allowed for the insulation fields of the following objects:");
+            ShowContinueError("  " + ObjName_ZoneCoupled_Slab + " or " + ObjName_ZoneCoupled_Basement);
+            ShowContinueError("Change any insulation designations in these objects from no mass materials to regular materials that have a thickness, etc.");
+
+        }
+
+        
         void ReadPipeCircuitInputs(bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
@@ -1851,7 +1890,7 @@ namespace EnergyPlus {
                 //******* We'll first set up the domain ********
                 // the extents will be: zMax = axial length; yMax = burial depth*2; xMax = ( NumPipes+1 )*HorizontalPipeSpacing
                 thisDomain.IsActuallyPartOfAHorizontalTrench = true;
-                gio::write(thisDomain.Name, "( 'HorizontalTrenchDomain',I4 )") << HorizontalGHXCtr;
+                ObjexxFCL::gio::write(thisDomain.Name, "( 'HorizontalTrenchDomain',I4 )") << HorizontalGHXCtr;
                 thisDomain.Extents.xMax = (double(NumPipeSegments) + 1.0) * thisInterPipeSpacing;
                 thisDomain.Extents.yMax = 2.0 * thisBurialDepth;
                 thisDomain.Extents.zMax = DataIPShortCuts::rNumericArgs(2);

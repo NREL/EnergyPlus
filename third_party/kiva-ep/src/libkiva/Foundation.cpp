@@ -221,13 +221,24 @@ void Foundation::createMeshData() {
       showMessage(MSG_ERR, "'Material Block' cannot be above the wall top.");
     }
 
+    // Blocks along the top may be part of a wall.
     if (isEqual(bZmax, zMax)) {
-      if (std::abs(b.width) <= wall.totalWidth() / 2. || foundationDepth > 0.0) {
-        xyWallTopInterior = std::min(bXmin, xyWallTopInterior);
+      if (isGreaterOrEqual(bXmax,xyWallTopInterior) && isLessThan(bXmin,xyWallTopInterior)) {
+        // Block is likely part of wall if it's narrow relative to wall or if there is any foundation depth
+        if (std::abs(b.width) <= wall.totalWidth() / 2. || foundationDepth > 0.0) {
+          xyWallTopInterior = std::min(bXmin, xyWallTopInterior);
+        }
       }
-      if (std::abs(b.width) <= wall.totalWidth() / 2. ||
-          (hasWall ? (wall.heightAboveGrade > 0.0) : false)) {
-        xyWallTopExterior = std::max(bXmax, xyWallTopExterior);
+      if (isLessOrEqual(bXmin,xyWallTopExterior) && isGreaterThan(bXmax,xyWallTopExterior)) {
+        // Block is likely part of wall if it's narrow relative to wall or if the wall top is above grade
+        if (std::abs(b.width) <= wall.totalWidth() / 2. ||
+            (hasWall && wall.heightAboveGrade > 0.0)) {
+          xyWallTopExterior = std::max(bXmax, xyWallTopExterior);
+          // Also move the grade surface since part of it is now the wall top
+          if (hasWall && wall.heightAboveGrade == 0.0 && isLessOrEqual(bZmin, zGrade)) {
+            xyGradeNear = xyWallTopExterior;
+          }
+        }
       }
     }
 

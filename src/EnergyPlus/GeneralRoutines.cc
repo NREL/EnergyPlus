@@ -98,7 +98,7 @@
 
 namespace EnergyPlus {
 
-static gio::Fmt fmtLD("*");
+static ObjexxFCL::gio::Fmt fmtLD("*");
 
 // Integer constants for different system types handled by the routines in this file
 enum GeneralRoutinesEquipNums
@@ -1573,30 +1573,30 @@ void TestSupplyAirPathIntegrity(bool &ErrFound)
     int WAirLoop;
 
     // Formats
-    static gio::Fmt Format_700("('! <#Supply Air Paths>,<Number of Supply Air Paths>')");
-    static gio::Fmt Format_701("(A)");
-    static gio::Fmt Format_702("('! <Supply Air Path>,<Supply Air Path Count>,<Supply Air Path Name>,<AirLoopHVAC Name>')");
-    static gio::Fmt Format_703("('! <#Components on Supply Air Path>,<Number of Components>')");
-    static gio::Fmt Format_704("('! <Supply Air Path Component>,<Component Count>,<Component Type>,<Component Name>,','<AirLoopHVAC Name>')");
-    static gio::Fmt Format_705("('! <#Nodes on Supply Air Path>,<Number of Nodes>')");
-    static gio::Fmt Format_706("('! <Supply Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>')");
-    static gio::Fmt Format_707("('! <#Outlet Nodes on Supply Air Path Component>,<Number of Nodes>')");
-    static gio::Fmt Format_708("('! <Supply Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,','<Inlet Node Name>,<Outlet "
+    static ObjexxFCL::gio::Fmt Format_700("('! <#Supply Air Paths>,<Number of Supply Air Paths>')");
+    static ObjexxFCL::gio::Fmt Format_701("(A)");
+    static ObjexxFCL::gio::Fmt Format_702("('! <Supply Air Path>,<Supply Air Path Count>,<Supply Air Path Name>,<AirLoopHVAC Name>')");
+    static ObjexxFCL::gio::Fmt Format_703("('! <#Components on Supply Air Path>,<Number of Components>')");
+    static ObjexxFCL::gio::Fmt Format_704("('! <Supply Air Path Component>,<Component Count>,<Component Type>,<Component Name>,','<AirLoopHVAC Name>')");
+    static ObjexxFCL::gio::Fmt Format_705("('! <#Nodes on Supply Air Path>,<Number of Nodes>')");
+    static ObjexxFCL::gio::Fmt Format_706("('! <Supply Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>')");
+    static ObjexxFCL::gio::Fmt Format_707("('! <#Outlet Nodes on Supply Air Path Component>,<Number of Nodes>')");
+    static ObjexxFCL::gio::Fmt Format_708("('! <Supply Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,','<Inlet Node Name>,<Outlet "
                                "Node Name>,<AirLoopHVAC Name>')");
 
     // Do by Paths
     ShowMessage("Testing Individual Supply Air Path Integrity");
     ErrFound = false;
 
-    gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
-    gio::write(OutputFileBNDetails, Format_700);
-    gio::write(ChrOut, fmtLD) << NumSupplyAirPaths;
-    gio::write(OutputFileBNDetails, Format_701) << " #Supply Air Paths," + stripped(ChrOut);
-    gio::write(OutputFileBNDetails, Format_702);
-    gio::write(OutputFileBNDetails, Format_703);
-    gio::write(OutputFileBNDetails, Format_704);
-    gio::write(OutputFileBNDetails, Format_707);
-    gio::write(OutputFileBNDetails, Format_708);
+    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
+    ObjexxFCL::gio::write(OutputFileBNDetails, Format_700);
+    ObjexxFCL::gio::write(ChrOut, fmtLD) << NumSupplyAirPaths;
+    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " #Supply Air Paths," + stripped(ChrOut);
+    ObjexxFCL::gio::write(OutputFileBNDetails, Format_702);
+    ObjexxFCL::gio::write(OutputFileBNDetails, Format_703);
+    ObjexxFCL::gio::write(OutputFileBNDetails, Format_704);
+    ObjexxFCL::gio::write(OutputFileBNDetails, Format_707);
+    ObjexxFCL::gio::write(OutputFileBNDetails, Format_708);
 
     for (BCount = 1; BCount <= NumSupplyAirPaths; ++BCount) {
 
@@ -1612,12 +1612,12 @@ void TestSupplyAirPathIntegrity(bool &ErrFound)
         }
         if (Found == 0) PrimaryAirLoopName = "**Unknown**";
 
-        gio::write(ChrOut, fmtLD) << BCount;
-        gio::write(OutputFileBNDetails, Format_701)
+        ObjexxFCL::gio::write(ChrOut, fmtLD) << BCount;
+        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
             << " Supply Air Path," + stripped(ChrOut) + ',' + SupplyAirPath(BCount).Name + ',' + PrimaryAirLoopName;
 
-        gio::write(ChrOut, fmtLD) << SupplyAirPath(BCount).NumOfComponents;
-        gio::write(OutputFileBNDetails, Format_701) << "   #Components on Supply Air Path," + stripped(ChrOut);
+        ObjexxFCL::gio::write(ChrOut, fmtLD) << SupplyAirPath(BCount).NumOfComponents;
+        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   #Components on Supply Air Path," + stripped(ChrOut);
 
         AirPathNodeName = NodeID(SupplyAirPath(BCount).InletNodeNum);
 
@@ -1625,9 +1625,9 @@ void TestSupplyAirPathIntegrity(bool &ErrFound)
 
         for (Count = 1; Count <= SupplyAirPath(BCount).NumOfComponents; ++Count) {
 
-            gio::write(ChrOut, fmtLD) << Count;
+            ObjexxFCL::gio::write(ChrOut, fmtLD) << Count;
             strip(ChrOut);
-            gio::write(OutputFileBNDetails, Format_701) << "   Supply Air Path Component," + ChrOut + ',' +
+            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   Supply Air Path Component," + ChrOut + ',' +
                                                                SupplyAirPath(BCount).ComponentType(Count) + ',' +
                                                                SupplyAirPath(BCount).ComponentName(Count) + ',' + PrimaryAirLoopName;
 
@@ -1645,11 +1645,11 @@ void TestSupplyAirPathIntegrity(bool &ErrFound)
                             ErrFound = true;
                             ++NumErr;
                         }
-                        gio::write(ChrOut, fmtLD) << ZoneSupPlenCond(Count2).NumOutletNodes;
-                        gio::write(OutputFileBNDetails, Format_701) << "     #Outlet Nodes on Supply Air Path Component," + stripped(ChrOut);
+                        ObjexxFCL::gio::write(ChrOut, fmtLD) << ZoneSupPlenCond(Count2).NumOutletNodes;
+                        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "     #Outlet Nodes on Supply Air Path Component," + stripped(ChrOut);
                         for (Count1 = 1; Count1 <= ZoneSupPlenCond(Count2).NumOutletNodes; ++Count1) {
-                            gio::write(ChrOut, fmtLD) << Count1;
-                            gio::write(OutputFileBNDetails, Format_701)
+                            ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
+                            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
                                 << "     Supply Air Path Component Nodes," + stripped(ChrOut) + ',' + SupplyAirPath(BCount).ComponentType(Count) +
                                        ',' + SupplyAirPath(BCount).ComponentName(Count) + ',' + NodeID(ZoneSupPlenCond(Count2).InletNode) + ',' +
                                        NodeID(ZoneSupPlenCond(Count2).OutletNode(Count1)) + ',' + PrimaryAirLoopName;
@@ -1667,11 +1667,11 @@ void TestSupplyAirPathIntegrity(bool &ErrFound)
                             ErrFound = true;
                             ++NumErr;
                         }
-                        gio::write(ChrOut, fmtLD) << SplitterCond(Count2).NumOutletNodes;
-                        gio::write(OutputFileBNDetails, Format_701) << "     #Outlet Nodes on Supply Air Path Component," + stripped(ChrOut);
+                        ObjexxFCL::gio::write(ChrOut, fmtLD) << SplitterCond(Count2).NumOutletNodes;
+                        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "     #Outlet Nodes on Supply Air Path Component," + stripped(ChrOut);
                         for (Count1 = 1; Count1 <= SplitterCond(Count2).NumOutletNodes; ++Count1) {
-                            gio::write(ChrOut, fmtLD) << Count1;
-                            gio::write(OutputFileBNDetails, Format_701)
+                            ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
+                            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
                                 << "     Supply Air Path Component Nodes," + stripped(ChrOut) + ',' + SupplyAirPath(BCount).ComponentType(Count) +
                                        ',' + SupplyAirPath(BCount).ComponentName(Count) + ',' + NodeID(SplitterCond(Count2).InletNode) + ',' +
                                        NodeID(SplitterCond(Count2).OutletNode(Count1)) + ',' + PrimaryAirLoopName;
@@ -1687,22 +1687,22 @@ void TestSupplyAirPathIntegrity(bool &ErrFound)
         }
 
         if (SupplyAirPath(BCount).NumNodes > 0) {
-            gio::write(OutputFileBNDetails, Format_705);
-            gio::write(OutputFileBNDetails, Format_706);
-            gio::write(ChrOut, fmtLD) << SupplyAirPath(BCount).NumNodes;
+            ObjexxFCL::gio::write(OutputFileBNDetails, Format_705);
+            ObjexxFCL::gio::write(OutputFileBNDetails, Format_706);
+            ObjexxFCL::gio::write(ChrOut, fmtLD) << SupplyAirPath(BCount).NumNodes;
             strip(ChrOut);
-            gio::write(OutputFileBNDetails, Format_701) << "#Nodes on Supply Air Path," + ChrOut;
+            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "#Nodes on Supply Air Path," + ChrOut;
             for (Count2 = 1; Count2 <= SupplyAirPath(BCount).NumNodes; ++Count2) {
-                gio::write(ChrOut, fmtLD) << Count2;
+                ObjexxFCL::gio::write(ChrOut, fmtLD) << Count2;
                 strip(ChrOut);
                 if (SupplyAirPath(BCount).NodeType(Count2) == PathInlet) {
-                    gio::write(OutputFileBNDetails, Format_701) << "   Supply Air Path Node,Inlet Node," + ChrOut + ',' +
+                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   Supply Air Path Node,Inlet Node," + ChrOut + ',' +
                                                                        NodeID(SupplyAirPath(BCount).Node(Count2)) + ',' + PrimaryAirLoopName;
                 } else if (SupplyAirPath(BCount).NodeType(Count2) == Intermediate) {
-                    gio::write(OutputFileBNDetails, Format_701) << "   Supply Air Path Node,Through Node," + ChrOut + ',' +
+                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   Supply Air Path Node,Through Node," + ChrOut + ',' +
                                                                        NodeID(SupplyAirPath(BCount).Node(Count2)) + ',' + PrimaryAirLoopName;
                 } else if (SupplyAirPath(BCount).NodeType(Count2) == Outlet) {
-                    gio::write(OutputFileBNDetails, Format_701) << "   Supply Air Path Node,Outlet Node," + ChrOut + ',' +
+                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   Supply Air Path Node,Outlet Node," + ChrOut + ',' +
                                                                        NodeID(SupplyAirPath(BCount).Node(Count2)) + ',' + PrimaryAirLoopName;
                 }
             }
@@ -1866,15 +1866,15 @@ void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
     int WAirLoop;
 
     // Formats
-    static gio::Fmt Format_700("('! <#Return Air Paths>,<Number of Return Air Paths>')");
-    static gio::Fmt Format_701("(A)");
-    static gio::Fmt Format_702("('! <Return Air Path>,<Return Air Path Count>,<Return Air Path Name>,<AirLoopHVAC Name>')");
-    static gio::Fmt Format_703("('! <#Components on Return Air Path>,<Number of Components>')");
-    static gio::Fmt Format_704("('! <Return Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>')");
-    static gio::Fmt Format_705("('! <#Nodes on Return Air Path>,<Number of Nodes>')");
-    static gio::Fmt Format_706("('! <Return Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>')");
-    static gio::Fmt Format_707("('! <#Inlet Nodes on Return Air Path Component>,<Number of Nodes>')");
-    static gio::Fmt Format_708("('! <Return Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,','<Inlet Node Name>,<Outlet "
+    static ObjexxFCL::gio::Fmt Format_700("('! <#Return Air Paths>,<Number of Return Air Paths>')");
+    static ObjexxFCL::gio::Fmt Format_701("(A)");
+    static ObjexxFCL::gio::Fmt Format_702("('! <Return Air Path>,<Return Air Path Count>,<Return Air Path Name>,<AirLoopHVAC Name>')");
+    static ObjexxFCL::gio::Fmt Format_703("('! <#Components on Return Air Path>,<Number of Components>')");
+    static ObjexxFCL::gio::Fmt Format_704("('! <Return Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>')");
+    static ObjexxFCL::gio::Fmt Format_705("('! <#Nodes on Return Air Path>,<Number of Nodes>')");
+    static ObjexxFCL::gio::Fmt Format_706("('! <Return Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>')");
+    static ObjexxFCL::gio::Fmt Format_707("('! <#Inlet Nodes on Return Air Path Component>,<Number of Nodes>')");
+    static ObjexxFCL::gio::Fmt Format_708("('! <Return Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,','<Inlet Node Name>,<Outlet "
                                "Node Name>,<AirLoopHVAC Name>')");
 
     // Do by Paths
@@ -1882,15 +1882,15 @@ void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
     ErrFound = false;
     NumErr = 0;
 
-    gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
-    gio::write(OutputFileBNDetails, Format_700);
-    gio::write(ChrOut, fmtLD) << NumReturnAirPaths;
-    gio::write(OutputFileBNDetails, Format_701) << " #Return Air Paths," + stripped(ChrOut);
-    gio::write(OutputFileBNDetails, Format_702);
-    gio::write(OutputFileBNDetails, Format_703);
-    gio::write(OutputFileBNDetails, Format_704);
-    gio::write(OutputFileBNDetails, Format_707);
-    gio::write(OutputFileBNDetails, Format_708);
+    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
+    ObjexxFCL::gio::write(OutputFileBNDetails, Format_700);
+    ObjexxFCL::gio::write(ChrOut, fmtLD) << NumReturnAirPaths;
+    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " #Return Air Paths," + stripped(ChrOut);
+    ObjexxFCL::gio::write(OutputFileBNDetails, Format_702);
+    ObjexxFCL::gio::write(OutputFileBNDetails, Format_703);
+    ObjexxFCL::gio::write(OutputFileBNDetails, Format_704);
+    ObjexxFCL::gio::write(OutputFileBNDetails, Format_707);
+    ObjexxFCL::gio::write(OutputFileBNDetails, Format_708);
 
     AllNodes.allocate(NumOfNodes);
 
@@ -1907,13 +1907,13 @@ void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
         }
         if (Found == 0) PrimaryAirLoopName = "**Unknown**";
 
-        gio::write(ChrOut, fmtLD) << BCount;
-        gio::write(OutputFileBNDetails, Format_701)
+        ObjexxFCL::gio::write(ChrOut, fmtLD) << BCount;
+        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
             << " Return Air Path," + stripped(ChrOut) + ',' + ReturnAirPath(BCount).Name + ',' + PrimaryAirLoopName;
 
         NumComp = ReturnAirPath(BCount).NumOfComponents;
-        gio::write(ChrOut, fmtLD) << NumComp;
-        gio::write(OutputFileBNDetails, Format_701) << "   #Components on Return Air Path," + stripped(ChrOut);
+        ObjexxFCL::gio::write(ChrOut, fmtLD) << NumComp;
+        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   #Components on Return Air Path," + stripped(ChrOut);
 
         AirPathNodeName = NodeID(ReturnAirPath(BCount).OutletNodeNum);
 
@@ -1921,9 +1921,9 @@ void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
         MixerComp = 0;
         MixerCount = 0;
         for (Count = 1; Count <= NumComp; ++Count) {
-            gio::write(ChrOut, fmtLD) << Count;
+            ObjexxFCL::gio::write(ChrOut, fmtLD) << Count;
             strip(ChrOut);
-            gio::write(OutputFileBNDetails, Format_701) << "   Return Air Path Component," + ChrOut + ',' +
+            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   Return Air Path Component," + ChrOut + ',' +
                                                                ReturnAirPath(BCount).ComponentType(Count) + ',' +
                                                                ReturnAirPath(BCount).ComponentName(Count) + ',' + PrimaryAirLoopName;
 
@@ -1969,11 +1969,11 @@ void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
                                 AllNodes(CountNodes) = MixerCond(Count2).InletNode(Loop);
                             }
                         }
-                        gio::write(ChrOut, fmtLD) << MixerCond(Count2).NumInletNodes;
-                        gio::write(OutputFileBNDetails, Format_701) << "     #Inlet Nodes on Return Air Path Component," + stripped(ChrOut);
+                        ObjexxFCL::gio::write(ChrOut, fmtLD) << MixerCond(Count2).NumInletNodes;
+                        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "     #Inlet Nodes on Return Air Path Component," + stripped(ChrOut);
                         for (Count1 = 1; Count1 <= MixerCond(Count2).NumInletNodes; ++Count1) {
-                            gio::write(ChrOut, fmtLD) << Count1;
-                            gio::write(OutputFileBNDetails, Format_701)
+                            ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
+                            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
                                 << "     Return Air Path Component Nodes," + stripped(ChrOut) + ',' + ReturnAirPath(BCount).ComponentType(NumComp) +
                                        ',' + ReturnAirPath(BCount).ComponentName(NumComp) + ',' + NodeID(MixerCond(Count2).InletNode(Count1)) + ',' +
                                        NodeID(MixerCond(Count2).OutletNode) + ',' + PrimaryAirLoopName;
@@ -1998,11 +1998,11 @@ void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
                                 AllNodes(CountNodes) = ZoneRetPlenCond(Count2).InletNode(Loop);
                             }
                         }
-                        gio::write(ChrOut, fmtLD) << ZoneRetPlenCond(Count2).NumInletNodes;
-                        gio::write(OutputFileBNDetails, Format_701) << "     #Inlet Nodes on Return Air Path Component," + stripped(ChrOut);
+                        ObjexxFCL::gio::write(ChrOut, fmtLD) << ZoneRetPlenCond(Count2).NumInletNodes;
+                        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "     #Inlet Nodes on Return Air Path Component," + stripped(ChrOut);
                         for (Count1 = 1; Count1 <= ZoneRetPlenCond(Count2).NumInletNodes; ++Count1) {
-                            gio::write(ChrOut, fmtLD) << Count1;
-                            gio::write(OutputFileBNDetails, Format_701)
+                            ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
+                            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
                                 << "     Return Air Path Component Nodes," + stripped(ChrOut) + ',' + ReturnAirPath(BCount).ComponentType(NumComp) +
                                        ',' + ReturnAirPath(BCount).ComponentName(NumComp) + ',' + NodeID(ZoneRetPlenCond(Count2).InletNode(Count1)) +
                                        ',' + NodeID(ZoneRetPlenCond(Count2).OutletNode) + ',' + PrimaryAirLoopName;
@@ -2045,19 +2045,19 @@ void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
             }
         }
         if (CountNodes > 0) {
-            gio::write(OutputFileBNDetails, Format_705);
-            gio::write(OutputFileBNDetails, Format_706);
-            gio::write(ChrOut, fmtLD) << CountNodes;
+            ObjexxFCL::gio::write(OutputFileBNDetails, Format_705);
+            ObjexxFCL::gio::write(OutputFileBNDetails, Format_706);
+            ObjexxFCL::gio::write(ChrOut, fmtLD) << CountNodes;
             strip(ChrOut);
-            gio::write(OutputFileBNDetails, Format_701) << "   #Nodes on Return Air Path," + ChrOut;
+            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   #Nodes on Return Air Path," + ChrOut;
             for (Count2 = 1; Count2 <= CountNodes; ++Count2) {
-                gio::write(ChrOut, fmtLD) << Count2;
+                ObjexxFCL::gio::write(ChrOut, fmtLD) << Count2;
                 strip(ChrOut);
                 if (Count2 == 1) {
-                    gio::write(OutputFileBNDetails, Format_701)
+                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
                         << "   Return Air Path Node,Outlet Node," + ChrOut + ',' + NodeID(AllNodes(Count2)) + ',' + PrimaryAirLoopName;
                 } else {
-                    gio::write(OutputFileBNDetails, Format_701)
+                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
                         << "   Return Air Path Node,Inlet Node," + ChrOut + ',' + NodeID(AllNodes(Count2)) + ',' + PrimaryAirLoopName;
                 }
             }

@@ -587,7 +587,7 @@ namespace UserDefinedComponents {
         using WaterManager::SetupTankSupplyComponent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool ErrorsFound(false);
@@ -617,7 +617,6 @@ namespace UserDefinedComponents {
         int MgrCountTest;
         int CtrlZone; // controlled zone do loop index
         int SupAirIn; // controlled zone supply air inlet index
-        bool errFlag;
 
         cCurrentModuleObject = "PlantComponent:UserDefined";
         inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
@@ -1023,10 +1022,10 @@ namespace UserDefinedComponents {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-                VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), errFlag, cCurrentModuleObject + " Name");
-                if (errFlag) {
-                    ErrorsFound = true;
-                }
+
+                // ErrorsFound will be set to True if problem was found, left untouched otherwise
+                VerifyUniqueCoilName(cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
+
                 UserCoil(CompLoop).Name = cAlphaArgs(1);
 
                 // now get program manager for model simulations
@@ -1528,7 +1527,7 @@ namespace UserDefinedComponents {
                         UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).HowLoadServed = HowMet_NoneDemand;
                         UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
                         // Setup Internal Variables
-                        gio::write(LoopStr, fmtLD) << ConnectionLoop;
+                        ObjexxFCL::gio::write(LoopStr, fmtLD) << ConnectionLoop;
                         strip(LoopStr);
                         // model input related internal variables
                         SetupEMSInternalVariable("Inlet Temperature for Plant Connection " + LoopStr,

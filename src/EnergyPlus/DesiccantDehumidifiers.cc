@@ -2588,7 +2588,7 @@ namespace DesiccantDehumidifiers {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const MinVolFlowPerRatedTotQ(0.00002684); // m3/s per W = 200 cfm/ton,
         // min vol flow per rated evaporator capacity
-        static gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -3046,14 +3046,14 @@ namespace DesiccantDehumidifiers {
             VolFlowPerRatedTotQ = (Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate + ExhaustFanMassFlowRate) /
                                   max(0.00001, (DesicDehum(DesicDehumNum).CompanionCoilCapacity * DDPartLoadRatio * RhoAirStdInit));
             if (!WarmupFlag && (VolFlowPerRatedTotQ < MinVolFlowPerRatedTotQ)) {
-                gio::write(VolFlowChar, fmtLD) << VolFlowPerRatedTotQ;
+                ObjexxFCL::gio::write(VolFlowChar, fmtLD) << VolFlowPerRatedTotQ;
                 ++DesicDehum(DesicDehumNum).ErrCount;
                 if (DesicDehum(DesicDehumNum).ErrCount < 2) {
                     ShowWarningError(DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).Name +
                                      "\" - Air volume flow rate per watt of total condenser waste heat is below the minimum recommended at " +
                                      VolFlowChar + " m3/s/W.");
                     ShowContinueErrorTimeStamp("");
-                    gio::write(MinVol, fmtLD) << MinVolFlowPerRatedTotQ;
+                    ObjexxFCL::gio::write(MinVol, fmtLD) << MinVolFlowPerRatedTotQ;
                     ShowContinueError("Expected minimum for VolumeFlowperRatedTotalCondenserWasteHeat = [" + MinVol + ']');
                     ShowContinueError("Possible causes include inconsistent air flow rates in system components ");
                     ShowContinueError("on the regeneration side of the desiccant dehumidifier.");
@@ -3478,6 +3478,151 @@ namespace DesiccantDehumidifiers {
         InitDesiccantDehumidifierOneTimeFlag = true;
         DesicDehum.deallocate();
         UniqueDesicDehumNames.clear();
+    }
+
+    int GetProcAirInletNodeNum(std::string const &DesicDehumName, bool &ErrorsFound)
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given Desiccant Dehumidifier and returns the process air inlet node number.
+        // If incorrect Desiccant Dehumidifier name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+                                // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichDesicDehum;
+
+        // Obtains and Allocates heat exchanger related parameters from input file
+        if (GetInputDesiccantDehumidifier) {
+            GetDesiccantDehumidifierInput();
+            GetInputDesiccantDehumidifier = false;
+        }
+
+        WhichDesicDehum = UtilityRoutines::FindItemInList(DesicDehumName, DesicDehum);
+        if (WhichDesicDehum != 0) {
+            NodeNum = DesicDehum(WhichDesicDehum).ProcAirInNode;
+        } else {
+            ShowSevereError("GetProcAirInletNodeNum: Could not find Desciccant Dehumidifier = \"" + DesicDehumName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }        
+
+        return NodeNum;
+    }
+
+    int GetProcAirOutletNodeNum(std::string const &DesicDehumName, bool &ErrorsFound)
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given Desiccant Dehumidifier and returns the process air outlet node number.
+        // If incorrect Desiccant Dehumidifier name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+                     // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichDesicDehum;
+
+        // Obtains and Allocates heat exchanger related parameters from input file
+        if (GetInputDesiccantDehumidifier) {
+            GetDesiccantDehumidifierInput();
+            GetInputDesiccantDehumidifier = false;
+        }
+
+        WhichDesicDehum = UtilityRoutines::FindItemInList(DesicDehumName, DesicDehum);
+        if (WhichDesicDehum != 0) {
+            NodeNum = DesicDehum(WhichDesicDehum).ProcAirOutNode;
+        } else {
+            ShowSevereError("GetProcAirInletNodeNum: Could not find Desciccant Dehumidifier = \"" + DesicDehumName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
+    }
+
+    int GetRegAirInletNodeNum(std::string const &DesicDehumName, bool &ErrorsFound)
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given Desiccant Dehumidifier and returns the regeneration air inlet node number.
+        // If incorrect Desiccant Dehumidifier name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+                     // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichDesicDehum;
+
+        // Obtains and Allocates heat exchanger related parameters from input file
+        if (GetInputDesiccantDehumidifier) {
+            GetDesiccantDehumidifierInput();
+            GetInputDesiccantDehumidifier = false;
+        }
+
+        WhichDesicDehum = UtilityRoutines::FindItemInList(DesicDehumName, DesicDehum);
+        if (WhichDesicDehum != 0) {
+            NodeNum = DesicDehum(WhichDesicDehum).RegenAirInNode;
+        } else {
+            ShowSevereError("GetRegAirInletNodeNum: Could not find Desciccant Dehumidifier = \"" + DesicDehumName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
+    }
+
+    int GetRegAirOutletNodeNum(std::string const &DesicDehumName, bool &ErrorsFound)
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given Desiccant Dehumidifier and returns the regeneration air outlet node number.
+        // If incorrect Desiccant Dehumidifier name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+                     // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichDesicDehum;
+
+        // Obtains and Allocates heat exchanger related parameters from input file
+        if (GetInputDesiccantDehumidifier) {
+            GetDesiccantDehumidifierInput();
+            GetInputDesiccantDehumidifier = false;
+        }
+
+        WhichDesicDehum = UtilityRoutines::FindItemInList(DesicDehumName, DesicDehum);
+        if (WhichDesicDehum != 0) {
+            NodeNum = DesicDehum(WhichDesicDehum).RegenAirOutNode;
+        } else {
+            ShowSevereError("GetRegAirOutletNodeNum: Could not find Desciccant Dehumidifier = \"" + DesicDehumName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
     }
 
     //        End of Reporting subroutines for the SimAir Module

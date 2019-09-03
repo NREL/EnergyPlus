@@ -1100,7 +1100,7 @@ namespace BranchNodeConnections {
 
     void GetComponentData(std::string const &ComponentType,
                           std::string const &ComponentName,
-                          bool &IsParent,
+                          bool &IsParent,                    // true or false
                           int &NumInlets,
                           Array1D_string &InletNodeNames,
                           Array1D_int &InletNodeNums,
@@ -1109,7 +1109,8 @@ namespace BranchNodeConnections {
                           Array1D_string &OutletNodeNames,
                           Array1D_int &OutletNodeNums,
                           Array1D_int &OutletFluidStreams,
-                          bool &ErrorsFound)
+                          bool &ErrorsFound                  // set to true if errors found, unchanged otherwise
+    )
     {
 
         // SUBROUTINE INFORMATION:
@@ -1417,11 +1418,15 @@ namespace BranchNodeConnections {
             if (InletNode != "UNDEFINED") {
                 if (CompSets(Count).InletNodeName != "UNDEFINED") {
                     if (InletNode != CompSets(Count).InletNodeName) continue;
+                } else {
+                    CompSets(Count).InletNodeName = InletNode;
                 }
             }
             if (OutletNode != "UNDEFINED") {
                 if (CompSets(Count).OutletNodeName != "UNDEFINED") {
                     if (OutletNode != CompSets(Count).OutletNodeName) continue;
+                } else {
+                    CompSets(Count).OutletNodeName = OutletNode;
                 }
             }
             //  See if something undefined and set here

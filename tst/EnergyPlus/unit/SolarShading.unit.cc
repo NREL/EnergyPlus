@@ -318,7 +318,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
                                                       "  HeatBalanceAlgorithm,ConductionTransferFunction;                                   ",
                                                       "  Timestep,6;                                                                        ",
                                                       "  RunPeriod,                                                                         ",
-                                                      "    ,                        !- Name                                                 ",
+                                                      "    RP1,                     !- Name                                                 ",
                                                       "    1,                       !- Begin Month                                          ",
                                                       "    1,                       !- Begin Day of Month                                   ",
                                                       "    ,                        !- Begin Year                                           ",
@@ -674,7 +674,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 {
-    std::string const idf_objects = delimited_string({"  Version,9.1;                                                                       ",
+    std::string const idf_objects = delimited_string({"  Version, 9.2;                                                                      ",
                                                       "  Building,                                                                          ",
                                                       "    DemoFDT,                 !- Name                                                 ",
                                                       "    0,                       !- North Axis {deg}                                     ",
@@ -697,7 +697,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
                                                       "  HeatBalanceAlgorithm,ConductionTransferFunction;                                   ",
                                                       "  Timestep,6;                                                                        ",
                                                       "  RunPeriod,                                                                         ",
-                                                      "    ,                        !- Name                                                 ",
+                                                      "    RP1,                     !- Name                                                 ",
                                                       "    1,                       !- Begin Month                                          ",
                                                       "    1,                       !- Begin Day of Month                                   ",
                                                       "    ,                        !- Begin Year                                           ",
@@ -1080,7 +1080,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 {
-    std::string const idf_objects = delimited_string({"  Version,9.1;                                                                       ",
+    std::string const idf_objects = delimited_string({"  Version,9.2;                                                                       ",
                                                       "  Building,                                                                          ",
                                                       "    DemoFDT,                 !- Name                                                 ",
                                                       "    0,                       !- North Axis {deg}                                     ",
@@ -1106,7 +1106,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
                                                       "  HeatBalanceAlgorithm,ConductionTransferFunction;                                   ",
                                                       "  Timestep,6;                                                                        ",
                                                       "  RunPeriod,                                                                         ",
-                                                      "    ,                        !- Name                                                 ",
+                                                      "    RP1,                     !- Name                                                 ",
                                                       "    1,                       !- Begin Month                                          ",
                                                       "    1,                       !- Begin Day of Month                                   ",
                                                       "    ,                        !- Begin Year",

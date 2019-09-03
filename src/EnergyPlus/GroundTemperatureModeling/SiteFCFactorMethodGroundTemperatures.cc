@@ -63,8 +63,8 @@
 
 namespace EnergyPlus {
 
-static gio::Fmt fmtA("(A)");
-static gio::Fmt fmtAN("(A,$)");
+static ObjexxFCL::gio::Fmt fmtA("(A)");
+static ObjexxFCL::gio::Fmt fmtAN("(A,$)");
 
 //******************************************************************************
 
@@ -143,13 +143,13 @@ std::shared_ptr<SiteFCFactorMethodGroundTemps> SiteFCFactorMethodGroundTemps::FC
 
     // Write Final Ground Temp Information to the initialization output file
     if (FCGroundTemps) {
-        gio::write(OutputFileInits, fmtA)
+        ObjexxFCL::gio::write(OutputFileInits, fmtA)
             << "! <Site:GroundTemperature:FCfactorMethod>,Jan{C},Feb{C},Mar{C},Apr{C},May{C},Jun{C},Jul{C},Aug{C},Sep{C},Oct{C},Nov{C},Dec{C}";
-        gio::write(OutputFileInits, fmtAN) << " Site:GroundTemperature:FCfactorMethod";
+        ObjexxFCL::gio::write(OutputFileInits, fmtAN) << " Site:GroundTemperature:FCfactorMethod";
         for (int i = 1; i <= 12; ++i) {
-            gio::write(OutputFileInits, "(', ',F6.2,$)") << thisModel->fcFactorGroundTemps(i);
+            ObjexxFCL::gio::write(OutputFileInits, "(', ',F6.2,$)") << thisModel->fcFactorGroundTemps(i);
         }
-        gio::write(OutputFileInits);
+        ObjexxFCL::gio::write(OutputFileInits);
     }
 
     if (found && !thisModel->errorsFound) {

@@ -130,7 +130,7 @@ namespace DataSizing {
     extern Real64 const AutoSize;
 
     // parameter for (time-of-peak) sizing format
-    extern gio::Fmt PeakHrMinFmt;
+    extern ObjexxFCL::gio::Fmt PeakHrMinFmt;
 
     // Zone Outdoor Air Method
     extern int const ZOAM_FlowPerPerson; // set the outdoor air flow rate based on number of people in the zone
@@ -1228,7 +1228,12 @@ namespace DataSizing {
     // Clears the global data in DataSizing.
     // Needed for unit tests, should not be normally called.
     void clear_state();
-    void resetHVACSizingGlobals(int const curZoneEqNum, int const curSysNum, bool &firstPassFlag);
+
+    // Resets Data globals so that prevoiusly set variables are not used in other equipment models
+    void resetHVACSizingGlobals(int const curZoneEqNum,
+                                int const curSysNum,
+                                bool &firstPassFlag     // Can be set to false during the routine
+    );
 
 } // namespace DataSizing
 

@@ -972,14 +972,14 @@ void SQLite::initializeDaylightMapTables()
 
     const std::string daylightMapHourlyReportsTableSQL = "CREATE TABLE DaylightMapHourlyReports ( "
                                                          "HourlyReportIndex INTEGER PRIMARY KEY, "
-                                                         "MapNumber INTEGER, Month INTEGER, DayOfMonth INTEGER, Hour INTEGER, "
+                                                         "MapNumber INTEGER, Year INTEGER, Month INTEGER, DayOfMonth INTEGER, Hour INTEGER, "
                                                          "FOREIGN KEY(MapNumber) REFERENCES DaylightMaps(MapNumber) "
                                                          "ON DELETE CASCADE ON UPDATE CASCADE "
                                                          ");";
 
     sqliteExecuteCommand(daylightMapHourlyReportsTableSQL);
 
-    const std::string daylightMapHourlyTitleInsertSQL = "INSERT INTO DaylightMapHourlyReports VALUES(?,?,?,?,?);";
+    const std::string daylightMapHourlyTitleInsertSQL = "INSERT INTO DaylightMapHourlyReports VALUES(?,?,?,?,?,?);";
 
     sqlitePrepareStatement(m_daylightMapHourlyTitleInsertStmt, daylightMapHourlyTitleInsertSQL);
 
@@ -1258,10 +1258,10 @@ std::string SQLite::storageType(const int storageTypeIndex)
     std::string result;
 
     switch (storageTypeIndex) {
-    case 1:
+    case 1: // static_cast<int>(OutputProcessor::StoreType::Averaged)
         result = "Avg";
         break;
-    case 2:
+    case 2: // static_cast<int>(OutputProcessor::StoreType::Summed)
         result = "Sum";
         break;
     default:
@@ -1276,11 +1276,11 @@ std::string SQLite::timestepTypeName(const int timestepType)
     std::string result;
 
     switch (timestepType) {
-    case 1:
-        result = "HVAC System";
-        break;
-    case 2:
+    case 1: // static_cast<int>(OutputProcessor::TimeStepType::TimeStepZone)
         result = "Zone";
+        break;
+    case 2: // static_cast<int>(OutputProcessor::TimeStepType::TimeStepSystem)
+        result = "HVAC System";
         break;
     default:
         result = "Unknown!!!";
@@ -1805,6 +1805,7 @@ void SQLite::createSQLiteDaylightMapTitle(int const mapNum,
 }
 
 void SQLite::createSQLiteDaylightMap(int const mapNum,
+                                     int const year,
                                      int const month,
                                      int const dayOfMonth,
                                      int const hourOfDay,
@@ -1816,11 +1817,13 @@ void SQLite::createSQLiteDaylightMap(int const mapNum,
 {
     if (m_writeOutputToSQLite) {
         ++m_hourlyReportIndex;
-        sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, 1, m_hourlyReportIndex);
-        sqliteBindForeignKey(m_daylightMapHourlyTitleInsertStmt, 2, mapNum);
-        sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, 3, month);
-        sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, 4, dayOfMonth);
-        sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, 5, hourOfDay);
+        int b = 0;
+        sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, ++b, m_hourlyReportIndex);
+        sqliteBindForeignKey(m_daylightMapHourlyTitleInsertStmt, ++b, mapNum);
+        sqliteBindForeignKey(m_daylightMapHourlyTitleInsertStmt, ++b, year);
+        sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, ++b, month);
+        sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, ++b, dayOfMonth);
+        sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, ++b, hourOfDay);
 
         sqliteStepCommand(m_daylightMapHourlyTitleInsertStmt);
         sqliteResetCommand(m_daylightMapHourlyTitleInsertStmt);

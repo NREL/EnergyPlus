@@ -72,6 +72,8 @@ class Validation;
 
 namespace EnergyPlus {
 
+void cleanEPJSON(nlohmann::json &epjson);
+
 class InputProcessor
 {
 public:
@@ -177,6 +179,8 @@ public:
 
     void reportOrphanRecordObjects();
 
+    const json& getObjectInstances(std::string const &ObjType);
+
 private:
     struct ObjectInfo
     {
@@ -236,6 +240,8 @@ private:
     json const &getFields(std::string const &objectType, std::string const &objectName);
 
     json const &getFields(std::string const &objectType);
+
+    json const &getPatternProperties(json const &schema_obj);
 
     inline std::string convertToUpper(std::string s)
     {

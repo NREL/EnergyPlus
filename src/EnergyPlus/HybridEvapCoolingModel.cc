@@ -256,6 +256,7 @@ namespace HybridEvapCoolingModel {
 
             if (ValidPointer(HRsa_curve_pointer)) {
                 Y_val = NormalizationReference * CurveValue(HRsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+                Y_val = max(min(Y_val,1.0),0.0);
             } else {
                 Y_val = X_4; // return HR
             }
@@ -473,6 +474,7 @@ namespace HybridEvapCoolingModel {
     bool CMode::CheckNormalizationReference(int CurveID, std::string cCurrentModuleObject)
     {
 
+        // Note: This is abusing the table normalization value
         Real64 CheckNormalizationReference = GetNormalPoint(CurveID);
         if (NormalizationReference == -1) {
             // should never happen, because to get to this function we need a valid curve but check anyway.
@@ -1279,14 +1281,14 @@ namespace HybridEvapCoolingModel {
         PartRuntimeFraction = PLVentRatio;
 
         if (SensibleRoomORZone > 0) {
-            PLSensibleCoolingRatio = abs(RequestedCoolingLoad) / abs(SensibleRoomORZone);
+            PLSensibleCoolingRatio = std::abs(RequestedCoolingLoad) / std::abs(SensibleRoomORZone);
         }
         if (PLSensibleCoolingRatio > PartRuntimeFraction) {
             PartRuntimeFraction = PLSensibleCoolingRatio;
         }
 
         if (SensibleRoomORZone < 0) {
-            PLSensibleHeatingRatio = abs(RequestedHeatingLoad) / abs(SensibleRoomORZone);
+            PLSensibleHeatingRatio = std::abs(RequestedHeatingLoad) / std::abs(SensibleRoomORZone);
         }
 
         if (PLSensibleHeatingRatio > PartRuntimeFraction) {
@@ -1294,7 +1296,7 @@ namespace HybridEvapCoolingModel {
         }
 
         if (RequestedDehumidificationLoad > 0) {
-            PLDehumidRatio = abs(RequestedDehumidificationLoad) / abs(LatentRoomORZone);
+            PLDehumidRatio = std::abs(RequestedDehumidificationLoad) / std::abs(LatentRoomORZone);
         }
 
         if (PLDehumidRatio > PartRuntimeFraction) {
@@ -1302,7 +1304,7 @@ namespace HybridEvapCoolingModel {
         }
 
         if (RequestedMoistureLoad > 0) {
-            PLHumidRatio = abs(RequestedMoistureLoad) / abs(LatentRoomORZone);
+            PLHumidRatio = std::abs(RequestedMoistureLoad) / std::abs(LatentRoomORZone);
         }
         if (PLHumidRatio > PartRuntimeFraction) {
             PartRuntimeFraction = PLHumidRatio;
@@ -1449,7 +1451,7 @@ namespace HybridEvapCoolingModel {
                 return -2;
             }
             // Check that in this mode the //Outdoor Air Relative Humidity(0 - 100 % )	//Outdoor Air Humidity Ratio(g / g)//Outdoor Air
-            // Temperature(�C)
+            // Temperature(degC)
             if (Mode.MeetsOAEnvConstraints(StepIns.Tosa, Wosa, 100 * StepIns.RHosa)) {
                 EnvironmentConditionsMet = EnvironmentConditionsMetOnce = true;
             } else {

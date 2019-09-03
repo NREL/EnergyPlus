@@ -226,6 +226,7 @@ namespace StandardRatings {
                          int const EIRFTempCurveIndex,           // Index for the energy input ratio modifier curve
                          int const EIRFPLRCurveIndex,            // Index for the EIR vs part-load ratio curve
                          Real64 const MinUnloadRat,              // Minimum unloading ratio
+                         Real64 &IPLV,
                          Optional<Real64 const> EvapVolFlowRate, // Reference water volumetric flow rate through the evaporator [m3/s]
                          Optional_int_const CondLoopNum,         // condenser water plant loop index number
                          Optional<Real64 const> OpenMotorEff     // Open chiller motor efficiency [fraction, 0 to 1]
@@ -308,7 +309,6 @@ namespace StandardRatings {
         // to EnteringWaterTempReduced above [C]
         static Real64 Cp(0.0);         // Water specific heat [J/(kg*C)]
         static Real64 Rho(0.0);        // Water density [kg/m3]
-        static Real64 IPLV(0.0);       // Integerated Part Load Value in SI [W/W]
         static Real64 EIR(0.0);        // Inverse of COP at reduced capacity test conditions (100%, 75%, 50%, and 25%)
         static Real64 Power(0.0);      // Power at reduced capacity test conditions (100%, 75%, 50%, and 25%)
         static Real64 COPReduced(0.0); // COP at reduced capacity test conditions (100%, 75%, 50%, and 25%)
@@ -380,9 +380,10 @@ namespace StandardRatings {
 
                     ChillerEIRFT = CurveValue(EIRFTempCurveIndex, EvapOutletTemp, CondenserInletTemp);
 
-                    if (ReducedPLR(RedCapNum) >= MinUnloadRat) {
-                        ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, ReducedPLR(RedCapNum));
-                        PartLoadRatio = ReducedPLR(RedCapNum);
+                    PartLoadRatio = ReducedPLR(RedCapNum) / ChillerCapFT;
+
+                    if (PartLoadRatio >= MinUnloadRat) {
+                        ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, PartLoadRatio);
                     } else {
                         ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, MinUnloadRat);
                         PartLoadRatio = MinUnloadRat;
@@ -428,9 +429,10 @@ namespace StandardRatings {
 
                     ChillerEIRFT = CurveValue(EIRFTempCurveIndex, EvapOutletTemp, CondenserOutletTemp);
 
-                    if (ReducedPLR(RedCapNum) >= MinUnloadRat) {
-                        ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, CondenserOutletTemp, ReducedPLR(RedCapNum));
-                        PartLoadRatio = ReducedPLR(RedCapNum);
+                    PartLoadRatio = ReducedPLR(RedCapNum) / ChillerCapFT;
+
+                    if (PartLoadRatio >= MinUnloadRat) {
+                        ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, CondenserOutletTemp, PartLoadRatio);
                     } else {
                         ChillerEIRFPLR = CurveValue(EIRFPLRCurveIndex, CondenserOutletTemp, MinUnloadRat);
                         PartLoadRatio = MinUnloadRat;
@@ -627,12 +629,12 @@ namespace StandardRatings {
         static bool MyOneTimeFlag(true);
 
         // Formats
-        static gio::Fmt Format_990(
+        static ObjexxFCL::gio::Fmt Format_990(
             "('! <Chiller Standard Rating Information>, Component Type, Component Name, ','IPLV in SI Units {W/W}, ','IPLV in IP Units {Btu/W-h}')");
-        static gio::Fmt Format_991("(' Chiller Standard Rating Information, ',A,', ',A,', ',A,', ',A)");
+        static ObjexxFCL::gio::Fmt Format_991("(' Chiller Standard Rating Information, ',A,', ',A,', ',A,', ',A)");
 
         if (MyOneTimeFlag) {
-            gio::write(OutputFileInits, Format_990);
+            ObjexxFCL::gio::write(OutputFileInits, Format_990);
             MyOneTimeFlag = false;
         }
 
@@ -640,13 +642,13 @@ namespace StandardRatings {
             auto const SELECT_CASE_var(ChillerType);
             if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
 
-                gio::write(OutputFileInits, Format_991)
+                ObjexxFCL::gio::write(OutputFileInits, Format_991)
                     << "Chiller:Electric:EIR" << ChillerName << RoundSigDigits(IPLVValueSI, 2) << RoundSigDigits(IPLVValueIP, 2);
                 PreDefTableEntry(pdchMechType, ChillerName, "Chiller:Electric:EIR");
 
             } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
 
-                gio::write(OutputFileInits, Format_991)
+                ObjexxFCL::gio::write(OutputFileInits, Format_991)
                     << "Chiller:Electric:ReformulatedEIR" << ChillerName << RoundSigDigits(IPLVValueSI, 2) << RoundSigDigits(IPLVValueIP, 2);
                 PreDefTableEntry(pdchMechType, ChillerName, "Chiller:Electric:ReformulatedEIR");
             }
@@ -2428,27 +2430,27 @@ namespace StandardRatings {
         static bool MyHeatOneTimeFlag(true);
 
         // Formats
-        static gio::Fmt Format_990("('! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, ','Standard Rating (Net) "
+        static ObjexxFCL::gio::Fmt Format_990("('! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, ','Standard Rating (Net) "
                                    "Cooling Capacity {W}, ','Standard Rated Net COP {W/W}, ','EER {Btu/W-h}, ','SEER {Btu/W-h}, ','IEER {Btu/W-h}')");
-        static gio::Fmt Format_991("(' DX Cooling Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
-        static gio::Fmt Format_992("('! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, ','High Temperature Heating "
+        static ObjexxFCL::gio::Fmt Format_991("(' DX Cooling Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
+        static ObjexxFCL::gio::Fmt Format_992("('! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, ','High Temperature Heating "
                                    "(net) Rating Capacity {W}, ','Low Temperature Heating (net) Rating Capacity {W}, ','HSPF {Btu/W-h}, ','Region "
                                    "Number')");
-        static gio::Fmt Format_993("(' DX Heating Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
-        static gio::Fmt Format_994("('! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, ','Standard Rating (Net) "
+        static ObjexxFCL::gio::Fmt Format_993("(' DX Heating Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
+        static ObjexxFCL::gio::Fmt Format_994("('! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, ','Standard Rating (Net) "
                                    "Cooling Capacity {W}, ','Standard Rated Net COP {W/W}, ','EER {Btu/W-h}, ','SEER {Btu/W-h}, ','IEER {Btu/W-h}')");
-        static gio::Fmt Format_995("(' DX Cooling Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
+        static ObjexxFCL::gio::Fmt Format_995("(' DX Cooling Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
 
         {
             auto const SELECT_CASE_var(CompTypeNum);
 
             if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) {
                 if (MyCoolOneTimeFlag) {
-                    gio::write(OutputFileInits, Format_990);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_990);
                     MyCoolOneTimeFlag = false;
                 }
 
-                gio::write(OutputFileInits, Format_991)
+                ObjexxFCL::gio::write(OutputFileInits, Format_991)
                     << CompType << CompName << RoundSigDigits(CoolCapVal, 1) << RoundSigDigits(EERValueSI, 2) << RoundSigDigits(EERValueIP, 2)
                     << RoundSigDigits(SEERValueIP, 2) << RoundSigDigits(IEERValueIP, 2);
 
@@ -2464,11 +2466,11 @@ namespace StandardRatings {
 
             } else if ((SELECT_CASE_var == CoilDX_HeatingEmpirical) || (SELECT_CASE_var == CoilDX_MultiSpeedHeating)) {
                 if (MyHeatOneTimeFlag) {
-                    gio::write(OutputFileInits, Format_992);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_992);
                     MyHeatOneTimeFlag = false;
                 }
 
-                gio::write(OutputFileInits, Format_993)
+                ObjexxFCL::gio::write(OutputFileInits, Format_993)
                     << CompType << CompName << RoundSigDigits(HighHeatingCapVal, 1) << RoundSigDigits(LowHeatingCapVal, 1)
                     << RoundSigDigits(HSPFValueIP, 2) << RoundSigDigits(RegionNum);
 
@@ -2482,11 +2484,11 @@ namespace StandardRatings {
 
             } else if (SELECT_CASE_var == CoilDX_MultiSpeedCooling) {
                 if (MyCoolOneTimeFlag) {
-                    gio::write(OutputFileInits, Format_994);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_994);
                     MyCoolOneTimeFlag = false;
                 }
 
-                gio::write(OutputFileInits, Format_995)
+                ObjexxFCL::gio::write(OutputFileInits, Format_995)
                     << CompType << CompName << RoundSigDigits(CoolCapVal, 1) << ' ' << ' ' << RoundSigDigits(SEERValueIP, 2) << ' ';
 
                 PreDefTableEntry(pdchDXCoolCoilType, CompName, CompType);
@@ -2553,12 +2555,12 @@ namespace StandardRatings {
         static std::string CompNameNew;
 
         // Formats
-        static gio::Fmt Format_101("('! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 "
+        static ObjexxFCL::gio::Fmt Format_101("('! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 "
                                    "Classification, ','Rated Net Cooling Capacity Test A {W}, ','Rated Total Electric Power Test A {W}, ','Rated Net "
                                    "Cooling Capacity Test B {W}, ','Rated Total Electric Power Test B {W}, ','Rated Net Cooling Capacity Test C {W}, "
                                    "','Rated Total Electric Power Test C {W}, ','Rated Net Cooling Capacity Test D {W}, ','Rated Total Electric "
                                    "Power Test D {W} ')");
-        static gio::Fmt Format_102(
+        static ObjexxFCL::gio::Fmt Format_102(
             "(' DX Cooling Coil ASHRAE 127 Standard Ratings Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)");
 
         {
@@ -2566,14 +2568,14 @@ namespace StandardRatings {
 
             if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) {
                 if (MyCoolOneTimeFlag) {
-                    gio::write(OutputFileInits, Format_101);
+                    ObjexxFCL::gio::write(OutputFileInits, Format_101);
                     MyCoolOneTimeFlag = false;
                 }
                 for (ClassNum = 1; ClassNum <= 4; ++ClassNum) {
                     Num = (ClassNum - 1) * 4;
                     ClassName = "Class " + RoundSigDigits(ClassNum);
                     CompNameNew = CompName + "(" + ClassName + ")";
-                    gio::write(OutputFileInits, Format_102)
+                    ObjexxFCL::gio::write(OutputFileInits, Format_102)
                         << CompType << CompName << ClassName << RoundSigDigits(NetCoolingCapRated(Num + 1), 1)
                         << RoundSigDigits(TotElectricPowerRated(Num + 1), 1) << RoundSigDigits(NetCoolingCapRated(Num + 2), 1)
                         << RoundSigDigits(TotElectricPowerRated(Num + 2), 1) << RoundSigDigits(NetCoolingCapRated(Num + 3), 1)

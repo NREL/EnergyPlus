@@ -231,7 +231,7 @@ namespace DaylightingDevices {
 
         // DERIVED TYPE DEFINITIONS:
 
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PipeNum;   // TDD pipe object number
@@ -443,11 +443,11 @@ namespace DaylightingDevices {
 
                 // Report calculated view factor so that user knows what to make the view factor to ground
                 if (!ShelfReported) {
-                    gio::write(OutputFileInits, fmtA)
+                    ObjexxFCL::gio::write(OutputFileInits, fmtA)
                         << "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground";
                     ShelfReported = true;
                 }
-                gio::write(OutputFileInits, fmtA) << Shelf(ShelfNum).Name + ',' + RoundSigDigits(Shelf(ShelfNum).ViewFactor, 2) + ',' +
+                ObjexxFCL::gio::write(OutputFileInits, fmtA) << Shelf(ShelfNum).Name + ',' + RoundSigDigits(Shelf(ShelfNum).ViewFactor, 2) + ',' +
                                                          Surface(WinSurf).Name + ',' + RoundSigDigits(Surface(WinSurf).ViewFactorSky, 2) + ',' +
                                                          RoundSigDigits(Surface(WinSurf).ViewFactorGround, 2);
                 //      CALL SetupOutputVariable('View Factor To Outside Shelf []', &
@@ -573,6 +573,7 @@ namespace DaylightingDevices {
                     }
 
                     TDDPipe(PipeNum).Dome = SurfNum;
+                    SurfaceWindow(SurfNum).TDDPipeNum = PipeNum;
                 }
 
                 // Get TDD:DIFFUSER object
@@ -644,6 +645,7 @@ namespace DaylightingDevices {
                     // Window multiplier is already handled in SurfaceGeometry.cc
 
                     TDDPipe(PipeNum).Diffuser = SurfNum;
+                    SurfaceWindow(SurfNum).TDDPipeNum = PipeNum;
                 }
 
                 // Construction
@@ -1475,7 +1477,7 @@ namespace DaylightingDevices {
             QRefl = (QRadSWOutIncident(DiffSurf) - QRadSWwinAbsTot(DiffSurf)) * Surface(DiffSurf).Area - WinTransSolar(DiffSurf);
 
             // Add diffuse interior shortwave reflected from zone surfaces and from zone sources, lights, etc.
-            QRefl += QS(Surface(DiffSurf).Zone) * Surface(DiffSurf).Area * transDiff;
+            QRefl += QS(Surface(DiffSurf).SolarEnclIndex) * Surface(DiffSurf).Area * transDiff;
 
             TotTDDPipeGain = WinTransSolar(TDDPipe(PipeNum).Dome) - QRadSWOutIncident(DiffSurf) * Surface(DiffSurf).Area +
                              QRefl * (1.0 - TDDPipe(PipeNum).TransSolIso / transDiff) +

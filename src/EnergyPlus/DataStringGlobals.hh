@@ -185,6 +185,9 @@ namespace DataStringGlobals {
     extern std::string MatchVersion;         // String to be matched by Version object
     extern std::string CurrentDateTime;      // For printing current date and time at start of run
 
+    // Functions
+    void clear_state();
+
 } // namespace DataStringGlobals
 
 } // namespace EnergyPlus

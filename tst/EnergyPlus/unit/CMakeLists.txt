@@ -15,6 +15,7 @@ set( test_src
   AirflowNetworkSimulationControl.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
+  AirLoopHVACDOAS.unit.cc
   AirTerminalSingleDuct.unit.cc
   AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
@@ -72,6 +73,7 @@ set( test_src
   GeneralRoutines.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceAirManager.unit.cc
+  HeatBalanceKivaManager.unit.cc
   HeatBalanceManager.unit.cc
   HeatBalanceMovableInsulation.unit.cc
   HeatBalanceIntRadExchange.unit.cc
@@ -96,6 +98,7 @@ set( test_src
   HVACVariableRefrigerantFlow.unit.cc
   HWBaseboardRadiator.unit.cc
   HybridModel.unit.cc
+  IceThermalStorage.unit.cc
   ICSCollector.unit.cc
   IdfParser.unit.cc
   InputProcessor.unit.cc
@@ -131,6 +134,7 @@ set( test_src
   PlantCondLoopOperation.unit.cc
   PlantUtilities.unit.cc
   PoweredInductionUnits.unit.cc
+  Psychrometrics.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
   PVWatts.unit.cc
@@ -168,6 +172,7 @@ set( test_src
   UnitaryHybridAirConditioner.unit.cc
   UnitarySystem.unit.cc
   UnitHeater.unit.cc
+  UnitVentilator.unit.cc
   UtilityRoutines.unit.cc
   VariableSpeedCoils.unit.cc
   VAVDefMinMaxFlow.unit.cc
@@ -188,6 +193,7 @@ set( test_src
   XingGroundTemperatureModel.unit.cc
   ZoneContaminantPredictorCorrector.unit.cc
   ZoneEquipmentManager.unit.cc
+  ZoneHVACEvaporativeCooler.unit
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc

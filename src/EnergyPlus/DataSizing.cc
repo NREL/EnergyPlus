@@ -149,7 +149,7 @@ namespace DataSizing {
     Real64 const AutoSize(-99999.0);
 
     // parameter for (time-of-peak) sizing format
-    gio::Fmt PeakHrMinFmt("(I2.2,':',I2.2,':00')");
+    ObjexxFCL::gio::Fmt PeakHrMinFmt("(I2.2,':',I2.2,':00')");
 
     // Zone Outdoor Air Method
     int const ZOAM_FlowPerPerson(1); // set the outdoor air flow rate based on number of people in the zone

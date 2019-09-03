@@ -538,6 +538,8 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     Real64 OnOffAirFlowRatio(1.0); // ratio of compressor ON airflow to average airflow over timestep
     Real64 ZoneLoad(0.0);          // cooling or heating needed by zone [watts]
 
+    // Also set BeginEnvrnFlag so code is tested for coil initialization and does not crash
+    DataGlobals::BeginEnvrnFlag = true;
     InitPTUnit(1, DataSizing::CurZoneEqNum, true, OnOffAirFlowRatio, ZoneLoad);
 
     // check that an intermediate speed has the correct flow ratio
@@ -579,7 +581,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     int PTUnitNum(1);
 
     std::string const idf_objects = delimited_string({
-        "Version,9.1;",
+        "Version,9.2;",
 
         "Schedule:Compact,",
         "    FanAvailSched,           !- Name",

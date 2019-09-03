@@ -467,6 +467,12 @@ namespace ThermalComfort {
                                     "Zone",
                                     "State",
                                     People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort Pierce Model Standard Effective Temperature",
+                                    OutputProcessor::Unit::C,
+                                    ThermalComfortData(Loop).PierceSET,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
             }
 
             if (People(Loop).KSU) {
@@ -1071,7 +1077,7 @@ namespace ThermalComfort {
 
             CloCond = 1.0 / (CloUnit * 0.155);
 
-            // INITIALIZE THE POLLOWING VARIABLES
+            // INITIALIZE THE FOLLOWING VARIABLES
             if (AirVel < 0.137) AirVel = 0.137;
 
             Hc = 8.6 * std::pow(AirVel, 0.53);
@@ -1367,6 +1373,7 @@ namespace ThermalComfort {
 
             ThermalComfortData(PeopleNum).ThermalComfortMRT = RadTemp;
             ThermalComfortData(PeopleNum).ThermalComfortOpTemp = (RadTemp + AirTemp) / 2.0;
+            ThermalComfortData(PeopleNum).PierceSET = SET;
         }
     }
 
@@ -2600,7 +2607,7 @@ namespace ThermalComfort {
         using OutputReportTabular::StrToReal;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string lineIn;
@@ -2643,12 +2650,12 @@ namespace ThermalComfort {
         if (initiate && weathersimulation) {
             {
                 IOFlags flags;
-                gio::inquire(DataStringGlobals::inStatFileName, flags);
+                ObjexxFCL::gio::inquire(DataStringGlobals::inStatFileName, flags);
                 statFileExists = flags.exists();
             }
             {
                 IOFlags flags;
-                gio::inquire(DataStringGlobals::inputWeatherFileName, flags);
+                ObjexxFCL::gio::inquire(DataStringGlobals::inputWeatherFileName, flags);
                 epwFileExists = flags.exists();
             }
             readStat = 0;
@@ -2657,7 +2664,7 @@ namespace ThermalComfort {
                 {
                     IOFlags flags;
                     flags.ACTION("READ");
-                    gio::open(statFile, DataStringGlobals::inStatFileName, flags);
+                    ObjexxFCL::gio::open(statFile, DataStringGlobals::inStatFileName, flags);
                     readStat = flags.ios();
                 }
                 if (readStat != 0) {
@@ -2667,26 +2674,26 @@ namespace ThermalComfort {
                 while (readStat == 0) {
                     {
                         IOFlags flags;
-                        gio::read(statFile, fmtA, flags) >> lineIn;
+                        ObjexxFCL::gio::read(statFile, fmtA, flags) >> lineIn;
                         readStat = flags.ios();
                     }
                     if (has(lineIn, "Monthly Statistics for Dry Bulb temperatures")) {
                         for (i = 1; i <= 7; ++i) {
                             {
                                 IOFlags flags;
-                                gio::read(statFile, fmtA, flags);
+                                ObjexxFCL::gio::read(statFile, fmtA, flags);
                                 readStat = flags.ios();
                             }
                         }
                         {
                             IOFlags flags;
-                            gio::read(statFile, fmtA, flags) >> lineAvg;
+                            ObjexxFCL::gio::read(statFile, fmtA, flags) >> lineAvg;
                             readStat = flags.ios();
                         }
                         break;
                     }
                 }
-                gio::close(statFile);
+                ObjexxFCL::gio::close(statFile);
                 for (i = 1; i <= 12; ++i) {
                     monthlyTemp(i) = StrToReal(GetColumnUsingTabs(lineAvg, i + 2));
                 }
@@ -2704,7 +2711,7 @@ namespace ThermalComfort {
                 {
                     IOFlags flags;
                     flags.ACTION("READ");
-                    gio::open(epwFile, DataStringGlobals::inputWeatherFileName, flags);
+                    ObjexxFCL::gio::open(epwFile, DataStringGlobals::inputWeatherFileName, flags);
                     readStat = flags.ios();
                 }
                 if (readStat != 0) {
@@ -2714,7 +2721,7 @@ namespace ThermalComfort {
                 for (i = 1; i <= 8; ++i) { // Headers
                     {
                         IOFlags flags;
-                        gio::read(epwFile, fmtA, flags) >> epwLine;
+                        ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
                         readStat = flags.ios();
                     }
                 }
@@ -2725,7 +2732,7 @@ namespace ThermalComfort {
                     for (i = 1; i <= calcStartHr - 1; ++i) {
                         {
                             IOFlags flags;
-                            gio::read(epwFile, fmtA, flags);
+                            ObjexxFCL::gio::read(epwFile, fmtA, flags);
                             readStat = flags.ios();
                         }
                     }
@@ -2734,7 +2741,7 @@ namespace ThermalComfort {
                         for (j = 1; j <= 24; ++j) {
                             {
                                 IOFlags flags;
-                                gio::read(epwFile, fmtA, flags) >> epwLine;
+                                ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
                                 readStat = flags.ios();
                             }
                             for (ind = 1; ind <= 6; ++ind) {
@@ -2757,7 +2764,7 @@ namespace ThermalComfort {
                         for (j = 1; j <= 24; ++j) {
                             {
                                 IOFlags flags;
-                                gio::read(epwFile, fmtA, flags) >> epwLine;
+                                ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
                                 readStat = flags.ios();
                             }
                             for (ind = 1; ind <= 6; ++ind) {
@@ -2773,7 +2780,7 @@ namespace ThermalComfort {
                     for (i = calcEndHr + 1; i <= calcStartHr - 1; ++i) {
                         {
                             IOFlags flags;
-                            gio::read(epwFile, fmtA, flags) >> epwLine;
+                            ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
                             readStat = flags.ios();
                         }
                     }
@@ -2782,7 +2789,7 @@ namespace ThermalComfort {
                         for (j = 1; j <= 24; ++j) {
                             {
                                 IOFlags flags;
-                                gio::read(epwFile, fmtA, flags) >> epwLine;
+                                ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
                                 readStat = flags.ios();
                             }
                             for (ind = 1; ind <= 6; ++ind) {
@@ -2796,7 +2803,7 @@ namespace ThermalComfort {
                         DailyAveOutTemp(i) = avgDryBulbASH;
                     }
                 }
-                gio::close(epwFile);
+                ObjexxFCL::gio::close(epwFile);
                 useEpwData = true;
             }
         } else if (initiate && !weathersimulation) {
@@ -2910,7 +2917,7 @@ namespace ThermalComfort {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Real64 const alpha(0.8);
         static Array1D<Real64> const alpha_pow({pow_6(alpha), pow_5(alpha), pow_4(alpha), pow_3(alpha), pow_2(alpha), alpha, 1.0}); // alpha^(7-i)
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string epwLine;
@@ -2950,7 +2957,7 @@ namespace ThermalComfort {
         if (initiate && weathersimulation) {
             {
                 IOFlags flags;
-                gio::inquire(DataStringGlobals::inputWeatherFileName, flags);
+                ObjexxFCL::gio::inquire(DataStringGlobals::inputWeatherFileName, flags);
                 epwFileExists = flags.exists();
             }
             readStat = 0;
@@ -2959,7 +2966,7 @@ namespace ThermalComfort {
                 {
                     IOFlags flags;
                     flags.ACTION("READ");
-                    gio::open(epwFile, DataStringGlobals::inputWeatherFileName, flags);
+                    ObjexxFCL::gio::open(epwFile, DataStringGlobals::inputWeatherFileName, flags);
                     readStat = flags.ios();
                 }
                 if (readStat != 0) {
@@ -2969,7 +2976,7 @@ namespace ThermalComfort {
                 for (i = 1; i <= 9; ++i) { // Headers
                     {
                         IOFlags flags;
-                        gio::read(epwFile, fmtA, flags);
+                        ObjexxFCL::gio::read(epwFile, fmtA, flags);
                         readStat = flags.ios();
                     }
                 }
@@ -2980,7 +2987,7 @@ namespace ThermalComfort {
                     for (i = 1; i <= calcStartHr - 1; ++i) {
                         {
                             IOFlags flags;
-                            gio::read(epwFile, fmtA, flags);
+                            ObjexxFCL::gio::read(epwFile, fmtA, flags);
                             readStat = flags.ios();
                         }
                     }
@@ -2990,7 +2997,7 @@ namespace ThermalComfort {
                         for (j = 1; j <= 24; ++j) {
                             {
                                 IOFlags flags;
-                                gio::read(epwFile, fmtA, flags) >> epwLine;
+                                ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
                                 readStat = flags.ios();
                             }
                             for (ind = 1; ind <= 6; ++ind) {
@@ -3013,7 +3020,7 @@ namespace ThermalComfort {
                         for (j = 1; j <= 24; ++j) {
                             {
                                 IOFlags flags;
-                                gio::read(epwFile, fmtA, flags) >> epwLine;
+                                ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
                                 readStat = flags.ios();
                             }
                             for (ind = 1; ind <= 6; ++ind) {
@@ -3029,7 +3036,7 @@ namespace ThermalComfort {
                     for (i = calcEndHr + 1; i <= calcStartHr - 1; ++i) {
                         {
                             IOFlags flags;
-                            gio::read(epwFile, fmtA, flags);
+                            ObjexxFCL::gio::read(epwFile, fmtA, flags);
                             readStat = flags.ios();
                         }
                     }
@@ -3038,7 +3045,7 @@ namespace ThermalComfort {
                         for (j = 1; j <= 24; ++j) {
                             {
                                 IOFlags flags;
-                                gio::read(epwFile, fmtA, flags) >> epwLine;
+                                ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
                                 readStat = flags.ios();
                             }
                             for (ind = 1; ind <= 6; ++ind) {
@@ -3054,7 +3061,7 @@ namespace ThermalComfort {
                 }
                 runningAverageCEN *= (1.0 - alpha);
                 avgDryBulbCEN = 0.0;
-                gio::close(epwFile);
+                ObjexxFCL::gio::close(epwFile);
                 useEpwData = true;
                 firstDaySet = true;
             }

@@ -60,7 +60,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.1;
+  Version,9.2;
 
   Building,
     LBuildingAppGPar,        !- Name
@@ -99,7 +99,7 @@
     World;                   !- Rectangular Surface Coordinate System
 
   RunPeriod,
-    ,                        !- Name
+    Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year

@@ -144,7 +144,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
         "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
 
         "  RunPeriod,",
-        "    ,                        !- Name",
+        "    WinterDay,               !- Name",
         "    1,                       !- Begin Month",
         "    14,                      !- Begin Day of Month",
         "    ,                        !- Begin Year",
@@ -1112,7 +1112,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     HeatBalanceManager::GetProjectControlData(ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
     GetProjectData();
@@ -1384,7 +1384,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
 {
 
     std::string const idf_objects = delimited_string({
-        "Version,9.1;",
+        "Version,9.2;",
 
         "Timestep,1;",
 
@@ -2425,7 +2425,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
     ManageSimulation();

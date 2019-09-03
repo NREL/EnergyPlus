@@ -69,6 +69,7 @@
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
+#include <HeatBalanceIntRadExchange.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
@@ -595,16 +596,28 @@ namespace CoolingPanelSimple {
             ThisCP.FracDistribToSurf.allocate(ThisCP.TotSurfToDistrib);
             ThisCP.FracDistribToSurf = 0.0;
 
+            // search zone equipment list structure for zone index
+            for (int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone) {
+                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
+                    if (DataZoneEquipment::ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::CoolingPanel_Num &&
+                        DataZoneEquipment::ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == ThisCP.EquipID) {
+                        ThisCP.ZonePtr = ctrlZone;
+                    }
+                }
+            }
+            if (ThisCP.ZonePtr <= 0) {
+                ShowSevereError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + ThisCP.EquipID +
+                    "\" is not on any ZoneHVAC:EquipmentList.");
+                ErrorsFound = true;
+                continue;
+            }
+
             AllFracsSummed = ThisCP.FracDistribPerson;
             for (SurfNum = 1; SurfNum <= ThisCP.TotSurfToDistrib; ++SurfNum) {
                 ThisCP.SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 8);
-                ThisCP.SurfacePtr(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + 8), Surface);
+                ThisCP.SurfacePtr(SurfNum) = HeatBalanceIntRadExchange::GetRadiantSystemSurface(
+                    cCMO_CoolingPanel_Simple, ThisCP.EquipID, ThisCP.ZonePtr, ThisCP.SurfaceName(SurfNum), ErrorsFound);
                 ThisCP.FracDistribToSurf(SurfNum) = rNumericArgs(SurfNum + 11);
-                if (ThisCP.SurfacePtr(SurfNum) == 0) {
-                    ShowSevereError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(SurfNum + 8) + "=\"" +
-                                    cAlphaArgs(SurfNum + 8) + "\" invalid - not found.");
-                    ErrorsFound = true;
-                }
                 if (ThisCP.FracDistribToSurf(SurfNum) > MaxFraction) {
                     ShowWarningError(RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 8) +
                                      "was greater than the allowable maximum.");

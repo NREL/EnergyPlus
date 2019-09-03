@@ -148,12 +148,6 @@ function( ADD_SIMULATION_TEST )
     -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
   )
 
-  # MSVC's profile generator does not work with parallel runs
-  #if( MSVC AND PROFILE_GENERATE )
-    #set_tests_properties("integration.${IDF_NAME}" PROPERTIES RUN_SERIAL true)
-  #endif()
-
-
   if (ADD_SIM_TEST_COST AND NOT ADD_SIM_TEST_COST STREQUAL "" )
     set_tests_properties("${TEST_CATEGORY}.${IDF_NAME}" PROPERTIES COST ${ADD_SIM_TEST_COST})
   endif()

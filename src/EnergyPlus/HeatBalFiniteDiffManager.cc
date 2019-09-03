@@ -120,7 +120,6 @@ namespace HeatBalFiniteDiffManager {
     using DataHeatBalance::RegularMaterial;
     using DataHeatBalance::TotConstructs;
     using DataHeatBalance::TotMaterials;
-    using DataHeatBalance::UseCondFD;
     using DataHeatBalance::Zone;
     using DataHeatBalFanSys::MAT;
     using DataHeatBalFanSys::QCoolingPanelSurf;
@@ -767,7 +766,7 @@ namespace HeatBalFiniteDiffManager {
 
                     Alpha = kt / (Material(CurrentLayer).Density * Material(CurrentLayer).SpecHeat);
                     mAlpha = 0.0;
-                } else if (Construct(ConstrNum).TypeIsIRT) { // make similar to air? (that didn't seem to work well)
+                } else if (Construct(ConstrNum).TypeIsIRT || Construct(ConstrNum).TypeIsAirBoundaryIRTSurface) { // make similar to air? (that didn't seem to work well)
                     ShowSevereError("InitHeatBalFiniteDiff: Construction =\"" + Construct(ConstrNum).Name +
                                     "\" uses Material:InfraredTransparent. Cannot be used currently with finite difference calculations.");
                     if (Construct(ConstrNum).IsUsed) {
@@ -1214,14 +1213,13 @@ namespace HeatBalFiniteDiffManager {
 
         // Using/Aliasing
         using DataHeatBalance::CondFDRelaxFactorInput;
-        using DataHeatBalance::HeatTransferAlgosUsed;
         using DataHeatBalance::MaxAllowedDelTempCondFD;
         using General::RoundSigDigits;
         using General::ScanForReports;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtLD("*");
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtLD("*");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool DoReport;
@@ -1233,13 +1231,13 @@ namespace HeatBalFiniteDiffManager {
         int Inodes;
 
         // Formats
-        static gio::Fmt Format_700("(' Construction CondFD,',A,2(',',A),',',A,',',A)");
-        static gio::Fmt Format_701("(' Material CondFD Summary,',A,',',A,',',A,',',A,',',A,',',A)");
-        static gio::Fmt Format_702("(' ConductionFiniteDifference Node,',A,',',A,',',A,',',A,',',A)");
+        static ObjexxFCL::gio::Fmt Format_700("(' Construction CondFD,',A,2(',',A),',',A,',',A)");
+        static ObjexxFCL::gio::Fmt Format_701("(' Material CondFD Summary,',A,',',A,',',A,',',A,',',A,',',A)");
+        static ObjexxFCL::gio::Fmt Format_702("(' ConductionFiniteDifference Node,',A,',',A,',',A,',',A,',',A)");
 
-        gio::write(OutputFileInits, fmtA) << "! <ConductionFiniteDifference HeatBalanceSettings>,Scheme Type,Space Discretization "
+        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <ConductionFiniteDifference HeatBalanceSettings>,Scheme Type,Space Discretization "
                                              "Constant,Relaxation Factor,Inside Face Surface Temperature Convergence Criteria";
-        gio::write(OutputFileInits, fmtA) << " ConductionFiniteDifference HeatBalanceSettings," + cCondFDSchemeType(CondFDSchemeType) + ',' +
+        ObjexxFCL::gio::write(OutputFileInits, fmtA) << " ConductionFiniteDifference HeatBalanceSettings," + cCondFDSchemeType(CondFDSchemeType) + ',' +
                                                  RoundSigDigits(SpaceDescritConstant, 2) + ',' + RoundSigDigits(CondFDRelaxFactorInput, 2) + ',' +
                                                  RoundSigDigits(MaxAllowedDelTempCondFD, 4);
         ScanForReports("Constructions", DoReport, "Constructions");
@@ -1247,24 +1245,25 @@ namespace HeatBalFiniteDiffManager {
         if (DoReport) {
 
             //                                      Write Descriptions
-            gio::write(OutputFileInits, fmtA) << "! <Construction CondFD>,Construction Name,Index,#Layers,#Nodes,Time Step {hours}";
-            gio::write(OutputFileInits, fmtA) << "! <Material CondFD Summary>,Material Name,Thickness {m},#Layer Elements,Layer Delta X,Layer "
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Construction CondFD>,Construction Name,Index,#Layers,#Nodes,Time Step {hours}";
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Material CondFD Summary>,Material Name,Thickness {m},#Layer Elements,Layer Delta X,Layer "
                                                  "Alpha*Delt/Delx**2,Layer Moisture Stability";
             // HT Algo issue
-            if (any_eq(HeatTransferAlgosUsed, UseCondFD))
-                gio::write(OutputFileInits, fmtA) << "! <ConductionFiniteDifference Node>,Node Identifier, Node Distance From Outside Face {m}, "
+            if (DataHeatBalance::AnyCondFD)
+                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <ConductionFiniteDifference Node>,Node Identifier, Node Distance From Outside Face {m}, "
                                                      "Construction Name, Outward Material Name (or Face), Inward Material Name (or Face)";
             for (ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum) {
 
                 if (Construct(ThisNum).TypeIsWindow) continue;
                 if (Construct(ThisNum).TypeIsIRT) continue;
+                if (Construct(ThisNum).TypeIsAirBoundaryIRTSurface) continue;
 
-                gio::write(OutputFileInits, Format_700)
+                ObjexxFCL::gio::write(OutputFileInits, Format_700)
                     << Construct(ThisNum).Name << RoundSigDigits(ThisNum) << RoundSigDigits(Construct(ThisNum).TotLayers)
                     << RoundSigDigits(int(ConstructFD(ThisNum).TotNodes + 1)) << RoundSigDigits(ConstructFD(ThisNum).DeltaTime / SecInHour, 6);
 
                 for (Layer = 1; Layer <= Construct(ThisNum).TotLayers; ++Layer) {
-                    gio::write(OutputFileInits, Format_701)
+                    ObjexxFCL::gio::write(OutputFileInits, Format_701)
                         << ConstructFD(ThisNum).Name(Layer) << RoundSigDigits(ConstructFD(ThisNum).Thickness(Layer), 4)
                         << RoundSigDigits(ConstructFD(ThisNum).NodeNumPoint(Layer)) << RoundSigDigits(ConstructFD(ThisNum).DelX(Layer), 8)
                         << RoundSigDigits(ConstructFD(ThisNum).TempStability(Layer), 8)
@@ -1278,22 +1277,22 @@ namespace HeatBalFiniteDiffManager {
                     OutwardMatLayerNum = Layer - 1;
                     for (LayerNode = 1; LayerNode <= ConstructFD(ThisNum).NodeNumPoint(Layer); ++LayerNode) {
                         ++Inodes;
-                        gio::write(InodesChar, fmtLD) << Inodes;
+                        ObjexxFCL::gio::write(InodesChar, fmtLD) << Inodes;
                         if (Inodes == 1) {
-                            gio::write(OutputFileInits, Format_702)
+                            ObjexxFCL::gio::write(OutputFileInits, Format_702)
                                 << "Node #" + stripped(InodesChar) << RoundSigDigits(ConstructFD(ThisNum).NodeXlocation(Inodes), 8)
                                 << Construct(ThisNum).Name << "Surface Outside Face" << ConstructFD(ThisNum).Name(Layer);
 
                         } else if (LayerNode == 1) {
 
                             if (OutwardMatLayerNum > 0 && OutwardMatLayerNum <= Construct(ThisNum).TotLayers) {
-                                gio::write(OutputFileInits, Format_702)
+                                ObjexxFCL::gio::write(OutputFileInits, Format_702)
                                     << "Node #" + stripped(InodesChar) << RoundSigDigits(ConstructFD(ThisNum).NodeXlocation(Inodes), 8)
                                     << Construct(ThisNum).Name << ConstructFD(ThisNum).Name(OutwardMatLayerNum) << ConstructFD(ThisNum).Name(Layer);
                             }
                         } else if (LayerNode > 1) {
                             OutwardMatLayerNum = Layer;
-                            gio::write(OutputFileInits, Format_702)
+                            ObjexxFCL::gio::write(OutputFileInits, Format_702)
                                 << "Node #" + stripped(InodesChar) << RoundSigDigits(ConstructFD(ThisNum).NodeXlocation(Inodes), 8)
                                 << Construct(ThisNum).Name << ConstructFD(ThisNum).Name(OutwardMatLayerNum) << ConstructFD(ThisNum).Name(Layer);
                         }
@@ -1302,8 +1301,8 @@ namespace HeatBalFiniteDiffManager {
 
                 Layer = Construct(ThisNum).TotLayers;
                 ++Inodes;
-                gio::write(InodesChar, fmtLD) << Inodes;
-                gio::write(OutputFileInits, Format_702)
+                ObjexxFCL::gio::write(InodesChar, fmtLD) << Inodes;
+                ObjexxFCL::gio::write(OutputFileInits, Format_702)
                     << "Node #" + stripped(InodesChar) << RoundSigDigits(ConstructFD(ThisNum).NodeXlocation(Inodes), 8) << Construct(ThisNum).Name
                     << ConstructFD(ThisNum).Name(Layer) << "Surface Inside Face";
             }

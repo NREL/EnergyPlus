@@ -389,7 +389,6 @@ namespace WaterCoils {
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         //  certain object in the input file
         static bool ErrorsFound(false); // If errors detected in input
-        bool errFlag;
         static int j1(0);
 
         // Flow
@@ -446,10 +445,9 @@ namespace WaterCoils {
             WaterCoilNumericFields(CoilNum).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
-            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), errFlag, CurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+
             WaterCoil(CoilNum).Name = AlphArray(1);
             WaterCoil(CoilNum).Schedule = AlphArray(2);
             if (lAlphaBlanks(2)) {
@@ -593,10 +591,10 @@ namespace WaterCoils {
             WaterCoilNumericFields(CoilNum).FieldNames = "";
             WaterCoilNumericFields(CoilNum).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
-            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), errFlag, CurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+
             WaterCoil(CoilNum).Name = AlphArray(1);
             WaterCoil(CoilNum).Schedule = AlphArray(2);
             if (lAlphaBlanks(2)) {
@@ -775,10 +773,9 @@ namespace WaterCoils {
             WaterCoilNumericFields(CoilNum).FieldNames = cNumericFields;
             UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
-            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), errFlag, CurrentModuleObject + " Name");
-            if (errFlag) {
-                ErrorsFound = true;
-            }
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+
             WaterCoil(CoilNum).Name = AlphArray(1);
             WaterCoil(CoilNum).Schedule = AlphArray(2);
             if (lAlphaBlanks(2)) {
@@ -1014,7 +1011,7 @@ namespace WaterCoils {
         int const itmax(10);
         int const MaxIte(500); // Maximum number of iterations
         static std::string const RoutineName("InitWaterCoil");
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int tempCoilNum;                   // loop variable
@@ -1396,6 +1393,16 @@ namespace WaterCoils {
                                 ShowContinueError("                                   Wair,out = " + RoundSigDigits(WOutNew, 6));
                                 WaterCoil(CoilNum).DesOutletAirHumRat = WOutNew;
                                 WaterCoil(CoilNum).DesOutletAirTemp = TOutNew;
+                                // update outlet air conditions used for sizing
+                                std::string CompType;                                              
+                                if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) {        
+                                    CompType = cAllCoilTypes(Coil_CoolingWaterDetailed);             
+                                } else {                                                           
+                                    CompType = cAllCoilTypes(Coil_CoolingWater);                         
+                                }                                                                          
+                                coilSelectionReportObj->setCoilLvgAirTemp(WaterCoil(CoilNum).Name, CompType, TOutNew); 
+                                coilSelectionReportObj->setCoilLvgAirHumRat(WaterCoil(CoilNum).Name, CompType, WOutNew); 
+                                // end update outlet air conditions used for sizing
                             }
                         }
                     }
@@ -1416,7 +1423,7 @@ namespace WaterCoils {
 
                     // Total Coil Load from Inlet and Outlet Air States.
                     WaterCoil(CoilNum).DesTotWaterCoilLoad = WaterCoil(CoilNum).DesAirMassFlowRate * (DesInletAirEnth - DesOutletAirEnth);
-                    if (CurSysNum > 0) {
+                    if (CurSysNum > 0 && CurSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
                         WaterCoil(CoilNum).DesTotWaterCoilLoad = WaterCoil(CoilNum).DesTotWaterCoilLoad + PrimaryAirSystem(CurSysNum).FanDesCoolLoad;
                     }
 
@@ -1699,7 +1706,7 @@ namespace WaterCoils {
                     auto const SELECT_CASE_var(WaterCoil(CoilNum).WaterCoilType_Num);
                     if (SELECT_CASE_var == WaterCoil_SimpleHeating) {
                         if (RptCoilHeaderFlag(1)) {
-                            gio::write(OutputFileInits, fmtA)
+                            ObjexxFCL::gio::write(OutputFileInits, fmtA)
                                 << "! <Water Heating Coil Capacity Information>,Component Type,Name,Nominal Total Capacity {W}";
                             RptCoilHeaderFlag(1) = false;
                         }
@@ -1710,7 +1717,7 @@ namespace WaterCoils {
                         addFootNoteSubTable(
                             pdstHeatCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
-                        gio::write(OutputFileInits, fmtA) << "Water Heating Coil Capacity Information,Coil:Heating:Water," + WaterCoil(CoilNum).Name +
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Water Heating Coil Capacity Information,Coil:Heating:Water," + WaterCoil(CoilNum).Name +
                                                                  ',' + RoundSigDigits(WaterCoil(CoilNum).TotWaterHeatingCoilRate, 2);
                         coilSelectionReportObj->setCoilAirFlow(WaterCoil(CoilNum).Name,
                                                                "Coil:Heating:Water",
@@ -1718,14 +1725,14 @@ namespace WaterCoils {
                                                                WaterCoil(CoilNum).RequestingAutoSize);
                         coilSelectionReportObj->setCoilWaterHeaterCapacityNodeNums(WaterCoil(CoilNum).Name,
                                                                                    "Coil:Heating:Water",
-                                                                                   WaterCoil(CoilNum).TotWaterHeatingCoilRate,
+                                                                                   WaterCoil(CoilNum).DesWaterHeatingCoilRate,
                                                                                    WaterCoil(CoilNum).RequestingAutoSize,
                                                                                    WaterCoil(CoilNum).WaterInletNodeNum,
                                                                                    WaterCoil(CoilNum).WaterOutletNodeNum,
                                                                                    WaterCoil(CoilNum).WaterLoopNum); // coil report
                     } else if (SELECT_CASE_var == WaterCoil_DetFlatFinCooling) {
                         if (RptCoilHeaderFlag(2)) {
-                            gio::write(OutputFileInits, fmtA) << "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total "
+                            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total "
                                                                  "Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W},Nominal "
                                                                  "Sensible Heat Ratio";
                             RptCoilHeaderFlag(2) = false;
@@ -1742,7 +1749,7 @@ namespace WaterCoils {
                         addFootNoteSubTable(
                             pdstCoolCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
-                        gio::write(OutputFileInits, fmtA) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water:DetailedGeometry," +
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water:DetailedGeometry," +
                                                                  WaterCoil(CoilNum).Name + ',' +
                                                                  RoundSigDigits(WaterCoil(CoilNum).TotWaterCoolingCoilRate, 2) + ',' +
                                                                  RoundSigDigits(WaterCoil(CoilNum).SenWaterCoolingCoilRate, 2) + ',' +
@@ -1760,7 +1767,7 @@ namespace WaterCoils {
                                                                             WaterCoil(CoilNum).WaterLoopNum); // Coil Report
                     } else if (SELECT_CASE_var == WaterCoil_Cooling) {
                         if (RptCoilHeaderFlag(2)) {
-                            gio::write(OutputFileInits, fmtA) << "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total "
+                            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total "
                                                                  "Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W},Nominal "
                                                                  "Sensible Heat Ratio, Nominal Coil UA Value {W/C}, Nominal Coil Surface Area {m2}";
                             RptCoilHeaderFlag(2) = false;
@@ -1779,7 +1786,7 @@ namespace WaterCoils {
                         addFootNoteSubTable(
                             pdstCoolCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
-                        gio::write(OutputFileInits, fmtA) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water," + WaterCoil(CoilNum).Name +
+                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water," + WaterCoil(CoilNum).Name +
                                                                  ',' + RoundSigDigits(WaterCoil(CoilNum).TotWaterCoolingCoilRate, 2) + ',' +
                                                                  RoundSigDigits(WaterCoil(CoilNum).SenWaterCoolingCoilRate, 2) + ',' +
                                                                  RoundSigDigits(RatedLatentCapacity, 2) + ',' + RoundSigDigits(RatedSHR, 2) + ',' +
@@ -2429,7 +2436,7 @@ namespace WaterCoils {
                     PlantLoop(DataWaterLoopNum).FluidName, DataGlobals::HWInitConvTemp, PlantLoop(DataWaterLoopNum).FluidIndex, RoutineName);
                 if (WaterCoil(CoilNum).DesTotWaterCoilLoad > 0.0) {
                     NomCapUserInp = true;
-                } else if (CurSysNum > 0) {
+                } else if (CurSysNum > 0 && CurSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
                     if (FinalSysSizing(CurSysNum).HeatingCapMethod == CapacityPerFloorArea) {
                         NomCapUserInp = true;
                     } else if (FinalSysSizing(CurSysNum).HeatingCapMethod == HeatingDesignCapacity &&
@@ -3678,7 +3685,7 @@ namespace WaterCoils {
                     } // End if for dry coil
                 }
             }
-
+            
             // Report outlet variables at nodes
             WaterCoil(CoilNum).OutletAirTemp = OutletAirTemp;
             WaterCoil(CoilNum).OutletAirHumRat = OutletAirHumRat;

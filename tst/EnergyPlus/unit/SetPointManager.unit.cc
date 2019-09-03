@@ -1183,7 +1183,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
     bool ErrorsFound = false;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.1;",
+        "Version,9.2;",
 
         "  SetpointManager:OutdoorAirReset,",
         "    Hot Water Loop Setpoint Manager,  !- Name",
@@ -1241,7 +1241,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
     bool ErrorsFound = false;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.1;",
+        "Version,9.2;",
 
         "  SetpointManager:OutdoorAirReset,",
         "    Hot Water Loop Setpoint Manager,  !- Name",

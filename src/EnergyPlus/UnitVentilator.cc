@@ -1508,7 +1508,7 @@ namespace UnitVentilator {
         UnitVent(UnitVentNum).FanPartLoadRatio = 0.0;
 
         if (UnitVent(UnitVentNum).FanSchedPtr > 0) {
-            if (GetCurrentScheduleValue(UnitVent(UnitVentNum).FanSchedPtr) == 0.0 && UnitVent(UnitVentNum).FanType_Num == FanType_SimpleOnOff) {
+            if (GetCurrentScheduleValue(UnitVent(UnitVentNum).FanSchedPtr) == 0.0) {
                 UnitVent(UnitVentNum).OpMode = CycFanCycCoil;
             } else {
                 UnitVent(UnitVentNum).OpMode = ContFanCycCoil;
@@ -3048,22 +3048,11 @@ namespace UnitVentilator {
                             OAMassFlowRate = MinOAFrac * Node(OutsideAirNode).MassFlowRate;
 
                         } else if (SELECT_CASE_var == VariablePercent) {
-                            // This algorithm is probably a bit simplistic in that it just bounces
-                            // back and forth between the maximum outside air and the minimum.  In
-                            // REAL(r64)ity, a system *might* vary between the two based on the load in
-                            // the zone.  This simple flow control might cause some overcooling but
-                            // chances are that if there is a cooling load and the zone temperature
-                            // gets above the outside temperature that overcooling won't be significant.
-                            if (Tinlet <= Toutdoor) {
-
-                                OAMassFlowRate = MinOAFrac * Node(OutsideAirNode).MassFlowRate;
-
-                            } else { // Tinlet > Toutdoor
-
-                                MaxOAFrac = GetCurrentScheduleValue(UnitVent(UnitVentNum).MaxOASchedPtr);
-                                OAMassFlowRate = MaxOAFrac * Node(OutsideAirNode).MassFlowRate;
-                            }
-
+                            
+                            OAMassFlowRate = SetOAMassFlowRateForCoolingVariablePercent(UnitVentNum,MinOAFrac,Node(OutsideAirNode).MassFlowRate,
+                                                                                        GetCurrentScheduleValue(UnitVent(UnitVentNum).MaxOASchedPtr),
+                                                                                        Tinlet,Toutdoor);
+                            
                         } else if (SELECT_CASE_var == FixedTemperature) {
                             // This is basically the same algorithm as for the heating case...
                             Tdesired = GetCurrentScheduleValue(UnitVent(UnitVentNum).TempSchedPtr);
@@ -3128,8 +3117,10 @@ namespace UnitVentilator {
                             OAMassFlowRate = MinOAFrac * Node(OutsideAirNode).MassFlowRate;
 
                         } else if (SELECT_CASE_var == VariablePercent) {
-                            // A cooling coil is present so let it try to do the cooling...
-                            OAMassFlowRate = MinOAFrac * Node(OutsideAirNode).MassFlowRate;
+
+                            OAMassFlowRate = SetOAMassFlowRateForCoolingVariablePercent(UnitVentNum,MinOAFrac,Node(OutsideAirNode).MassFlowRate,
+                                                                                        GetCurrentScheduleValue(UnitVent(UnitVentNum).MaxOASchedPtr),
+                                                                                        Tinlet,Toutdoor);
 
                         } else if (SELECT_CASE_var == FixedTemperature) {
                             // This is basically the same algorithm as for the heating case...
@@ -3442,7 +3433,7 @@ namespace UnitVentilator {
 
             if (UnitVent(UnitVentNum).CCoilPresent) {
 
-                mdot = UnitVent(UnitVentNum).MaxColdWaterFlow * PartLoadRatio;
+                CalcMdotCCoilCycFan(mdot,QCoilReq,QZnReq,UnitVentNum,PartLoadRatio);
                 SetComponentFlowRate(mdot,
                                      UnitVent(UnitVentNum).ColdControlNode,
                                      UnitVent(UnitVentNum).ColdCoilOutNodeNum,
@@ -3991,7 +3982,77 @@ namespace UnitVentilator {
         }
         return Residuum;
     }
+    
+    Real64 SetOAMassFlowRateForCoolingVariablePercent(int const UnitVentNum,        // Unit Ventilator index
+                                                      Real64 const MinOAFrac,       // Minimum Outside Air Fraction
+                                                      Real64 const MassFlowRate,    // Design Outside Air Mass Flow Rate
+                                                      Real64 const MaxOAFrac,       // Maximum Outside Air Fraction
+                                                      Real64 const Tinlet,          // Inlet Temperature to Unit or Zone Temperature
+                                                      Real64 const Toutdoor         // Outdoor Air Temperature
+    )
+    {
 
+        Real64 ActualOAMassFlowRate(0.0);   // Result or return value
+        
+        if (Tinlet <= Toutdoor) {
+            
+            ActualOAMassFlowRate = MinOAFrac * MassFlowRate;
+            
+        } else { // Tinlet > Toutdoor
+            // Use cooler outside air to provide "free" cooling without over-cooling.
+            // First, use a simple load equals mass flow times Cp time Delta T equation to find OA Mass Flow Rate.
+            // This must include the enthalpy difference across the fan.  Otherwise, this will potentially put a
+            // small load on the cooling coil (if it exists) or will leave a small load that is not met when it could be.
+            // Then, limit the OA Mass Flow Rate between the MinOA flow and the MaxOA flow.
+
+            Real64 EnthDiffAcrossFan(0.0);      // Temperature difference across the fan
+            if (!UnitVent(UnitVentNum).ATMixerExists) {
+                EnthDiffAcrossFan = Node(UnitVent(UnitVentNum).FanOutletNode).Enthalpy - Node(UnitVent(UnitVentNum).OAMixerOutNode).Enthalpy;
+            } else {
+                if (UnitVent(UnitVentNum).ATMixerType == ATMixer_InletSide) {
+                    EnthDiffAcrossFan = Node(UnitVent(UnitVentNum).FanOutletNode).Enthalpy - Node(UnitVent(UnitVentNum).ATMixerOutNode).Enthalpy;
+                }
+                if (UnitVent(UnitVentNum).ATMixerType == ATMixer_SupplySide) {
+                    EnthDiffAcrossFan = Node(UnitVent(UnitVentNum).FanOutletNode).Enthalpy - Node(UnitVent(UnitVentNum).AirInNode).Enthalpy;
+                }
+            }
+
+            ActualOAMassFlowRate = (std::abs(QZnReq)+(MassFlowRate*std::abs(EnthDiffAcrossFan))) / (PsyCpAirFnWTdb(DataEnvironment::OutHumRat,Tinlet) * (Tinlet-Toutdoor));
+            
+            ActualOAMassFlowRate = max(ActualOAMassFlowRate,(MinOAFrac*MassFlowRate));
+            ActualOAMassFlowRate = min(ActualOAMassFlowRate,(MaxOAFrac*MassFlowRate));
+        }
+        
+        return ActualOAMassFlowRate;
+    }
+
+    void CalcMdotCCoilCycFan(Real64 &mdot,                 // mass flow rate
+                             Real64 &QCoilReq,             // Remaining load to cooling coil
+                             Real64 const QZnReq,         // Zone load to setpoint
+                             int const UnitVentNum,       // Unit Ventilator index
+                             Real64 const PartLoadRatio   // Part load ratio for unit ventilator
+    )
+    {
+
+        if (QZnReq >= 0.0) {    // Heating requested so no cooling coil needed
+            mdot = 0.0;
+        } else {                // Cooling so set first guess at flow rate
+            mdot = UnitVent(UnitVentNum).MaxColdWaterFlow * PartLoadRatio;
+        }
+        
+            // Check to see what outside air will do, "turn off" cooling coil if OA can handle the load
+        int CCoilInAirNode = UnitVent(UnitVentNum).FanOutletNode;
+        int AirInNode = UnitVent(UnitVentNum).AirInNode;
+        Real64 const SmallLoad = -1.0;  // Watts
+        Real64 CpAirZn = PsyCpAirFnWTdb(Node(AirInNode).HumRat, Node(AirInNode).Temp);
+        QCoilReq = QZnReq - Node(CCoilInAirNode).MassFlowRate * CpAirZn * (Node(CCoilInAirNode).Temp - Node(AirInNode).Temp);
+        if (QCoilReq > SmallLoad) {
+            QCoilReq = 0.0;
+            mdot = 0.0;
+        }
+        
+    }
+    
 } // namespace UnitVentilator
 
 } // namespace EnergyPlus

@@ -1,6 +1,0 @@
-#!/bin/bash
-
-export ENERGYPLUS_EXE_PATH=${CMAKE_BINARY_DIR}/Products/energyplus
-export PATH=$PATH:${CMAKE_BINARY_DIR}/openstudio/usr/bin
-ruby2.0 ./run_all_generate_reports.rb
-

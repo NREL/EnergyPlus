@@ -308,6 +308,21 @@ namespace UnitVentilator {
     Real64 CalcUnitVentilatorResidual(Real64 const PartLoadRatio, // Coil Part Load Ratio
                                       Array1<Real64> const &Par   // Function parameters
     );
+    
+    Real64 SetOAMassFlowRateForCoolingVariablePercent(int const UnitVentNum,        // Unit Ventilator index number
+                                                      Real64 const MinOAFrac,       // Minimum Outside Air Fraction
+                                                      Real64 const MassFlowRate,    // Design Outside Air Mass Flow Rate
+                                                      Real64 const MaxOAFrac,       // Maximum Outside Air Fraction
+                                                      Real64 const Tinlet,          // Inlet Temperature to Unit or Zone Temperature
+                                                      Real64 const Toutdoor         // Outdoor Air Temperature
+    );
+    
+    void CalcMdotCCoilCycFan(Real64 &mdot,                  // mass flow rate
+                             Real64 &QCoilReq,              // Remaining cooling coil load
+                             Real64 const QZnReq,           // Zone load to setpoint
+                               int const UnitVentNum,       // Unit Ventilator index
+                               Real64 const PartLoadRatio   // Part load ratio for unit ventilator
+    );
 
 } // namespace UnitVentilator
 

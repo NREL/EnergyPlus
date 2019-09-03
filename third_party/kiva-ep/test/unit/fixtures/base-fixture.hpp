@@ -9,8 +9,6 @@
 
 using namespace Kiva;
 
-Foundation typical_fnd();
-
 
 class BaseFixture : public testing::Test {
 protected:

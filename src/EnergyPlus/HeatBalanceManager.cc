@@ -77,6 +77,7 @@
 #include <DataStringGlobals.hh>
 #include <DataSurfaces.hh>
 #include <DataSystemVariables.hh>
+#include <DataViewFactorInformation.hh>
 #include <DataWindowEquivalentLayer.hh>
 #include <DaylightingDevices.hh>
 #include <DaylightingManager.hh>
@@ -86,6 +87,7 @@
 #include <General.hh>
 #include <GlobalNames.hh>
 #include <HVACSizingSimulationManager.hh>
+#include <HeatBalanceIntRadExchange.hh>
 #include <HeatBalanceManager.hh>
 #include <HeatBalanceSurfaceManager.hh>
 #include <HybridModel.hh>
@@ -177,7 +179,7 @@ namespace HeatBalanceManager {
     // Data
     // MODULE PARAMETER DEFINITIONS
     static std::string const BlankString;
-    static gio::Fmt fmtA("(A)");
+    static ObjexxFCL::gio::Fmt fmtA("(A)");
 
     Array1D_string const PassFail(2, {"Fail", "Pass"});
 
@@ -331,6 +333,7 @@ namespace HeatBalanceManager {
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
             GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
+            HeatBalanceIntRadExchange::InitSolarViewFactors();
 
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
@@ -351,7 +354,7 @@ namespace HeatBalanceManager {
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
-        InitHeatBalance(); // Initialize all heat balance related parameters
+        InitHeatBalance();                                                                // Initialize all heat balance related parameters
         ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
@@ -699,27 +702,32 @@ namespace HeatBalanceManager {
         std::string::size_type TMP;
 
         // Formats
-        static gio::Fmt Format_721("('! <Building Information>, Building Name,North Axis {deg},Terrain, ',' Loads Convergence Tolerance "
-                                   "Value,Temperature Convergence Tolerance Value, ',' Solar Distribution,Maximum Number of Warmup Days,Minimum "
-                                   "Number of Warmup Days')");
-        static gio::Fmt Format_720("(' Building Information',8(',',A))");
-        static gio::Fmt Format_722("('! <Inside Convection Algorithm>, Algorithm {Simple | TARP | CeilingDiffuser | "
-                                   "AdaptiveConvectionAlgorithm}',/,'Inside Convection Algorithm,',A)");
-        static gio::Fmt Format_723("('! <Outside Convection Algorithm>, ','Algorithm {SimpleCombined | TARP | MoWitt | DOE-2 | "
-                                   "AdaptiveConvectionAlgorithm}',/,'Outside Convection Algorithm,',A)");
-        static gio::Fmt Format_724("('! <Sky Radiance Distribution>, Value {Anisotropic}',/,'Sky Radiance Distribution,Anisotropic')");
-        static gio::Fmt Format_726("('! <Zone Air Solution Algorithm>, Value {ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}')");
-        static gio::Fmt Format_727("(' Zone Air Solution Algorithm, ',A)");
-        static gio::Fmt Format_728("('! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {Yes/No}, Carbon Dioxide Concentration')");
-        static gio::Fmt Format_730("(' Zone Air Carbon Dioxide Balance Simulation, ',A,',',A)");
-        static gio::Fmt Format_729("('! <Zone Air Generic Contaminant Balance Simulation>, Simulation {Yes/No}, Generic Contaminant Concentration')");
-        static gio::Fmt Format_731("(' Zone Air Generic Contaminant Balance Simulation, ',A,',',A)");
-        static gio::Fmt Format_732("('! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing, Adjust Zone Infiltration "
-                                   "{AddInfiltration | AdjustInfiltration | None}, Infiltration Zones {MixingSourceZonesOnly | AllZones}')");
-        static gio::Fmt Format_733("(' Zone Air Mass Flow Balance Simulation, ',A,',',A,',',A,',',A)");
-        static gio::Fmt Format_734(
+        static ObjexxFCL::gio::Fmt Format_721(
+            "('! <Building Information>, Building Name,North Axis {deg},Terrain, ',' Loads Convergence Tolerance "
+            "Value,Temperature Convergence Tolerance Value, ',' Solar Distribution,Maximum Number of Warmup Days,Minimum "
+            "Number of Warmup Days')");
+        static ObjexxFCL::gio::Fmt Format_720("(' Building Information',8(',',A))");
+        static ObjexxFCL::gio::Fmt Format_722("('! <Inside Convection Algorithm>, Algorithm {Simple | TARP | CeilingDiffuser | "
+                                              "AdaptiveConvectionAlgorithm}',/,'Inside Convection Algorithm,',A)");
+        static ObjexxFCL::gio::Fmt Format_723("('! <Outside Convection Algorithm>, ','Algorithm {SimpleCombined | TARP | MoWitt | DOE-2 | "
+                                              "AdaptiveConvectionAlgorithm}',/,'Outside Convection Algorithm,',A)");
+        static ObjexxFCL::gio::Fmt Format_724("('! <Sky Radiance Distribution>, Value {Anisotropic}',/,'Sky Radiance Distribution,Anisotropic')");
+        static ObjexxFCL::gio::Fmt Format_726(
+            "('! <Zone Air Solution Algorithm>, Value {ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}')");
+        static ObjexxFCL::gio::Fmt Format_727("(' Zone Air Solution Algorithm, ',A)");
+        static ObjexxFCL::gio::Fmt Format_728(
+            "('! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {Yes/No}, Carbon Dioxide Concentration')");
+        static ObjexxFCL::gio::Fmt Format_730("(' Zone Air Carbon Dioxide Balance Simulation, ',A,',',A)");
+        static ObjexxFCL::gio::Fmt Format_729(
+            "('! <Zone Air Generic Contaminant Balance Simulation>, Simulation {Yes/No}, Generic Contaminant Concentration')");
+        static ObjexxFCL::gio::Fmt Format_731("(' Zone Air Generic Contaminant Balance Simulation, ',A,',',A)");
+        static ObjexxFCL::gio::Fmt Format_732(
+            "('! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing, Adjust Zone Infiltration "
+            "{AddInfiltration | AdjustInfiltration | None}, Infiltration Zones {MixingSourceZonesOnly | AllZones}')");
+        static ObjexxFCL::gio::Fmt Format_733("(' Zone Air Mass Flow Balance Simulation, ',A,',',A,',',A,',',A)");
+        static ObjexxFCL::gio::Fmt Format_734(
             "('! <HVACSystemRootFindingAlgorithm>, Value {RegulaFalsi | Bisection | BisectionThenRegulaFalsi | RegulaFalsiThenBisection}')");
-        static gio::Fmt Format_735("(' HVACSystemRootFindingAlgorithm, ',A)");
+        static ObjexxFCL::gio::Fmt Format_735("(' HVACSystemRootFindingAlgorithm, ',A)");
 
         // Assign the values to the building data
 
@@ -875,11 +883,11 @@ namespace HeatBalanceManager {
         }
 
         // Write Building Information to the initialization output file
-        gio::write(OutputFileInits, Format_721);
+        ObjexxFCL::gio::write(OutputFileInits, Format_721);
 
-        gio::write(OutputFileInits, Format_720) << BuildingName << RoundSigDigits(BuildingAzimuth, 3) << AlphaName(2)
-                                                << RoundSigDigits(LoadsConvergTol, 5) << RoundSigDigits(TempConvergTol, 5) << AlphaName(3)
-                                                << RoundSigDigits(MaxNumberOfWarmupDays) << RoundSigDigits(MinNumberOfWarmupDays);
+        ObjexxFCL::gio::write(OutputFileInits, Format_720)
+            << BuildingName << RoundSigDigits(BuildingAzimuth, 3) << AlphaName(2) << RoundSigDigits(LoadsConvergTol, 5)
+            << RoundSigDigits(TempConvergTol, 5) << AlphaName(3) << RoundSigDigits(MaxNumberOfWarmupDays) << RoundSigDigits(MinNumberOfWarmupDays);
         // Above should be validated...
 
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside";
@@ -934,7 +942,7 @@ namespace HeatBalanceManager {
             DefaultInsideConvectionAlgo = ASHRAETARP;
             AlphaName(1) = "TARP";
         }
-        gio::write(OutputFileInits, Format_722) << AlphaName(1);
+        ObjexxFCL::gio::write(OutputFileInits, Format_722) << AlphaName(1);
 
         // Get only the first (if more were input)
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside";
@@ -987,7 +995,7 @@ namespace HeatBalanceManager {
             AlphaName(1) = "DOE-2";
         }
 
-        gio::write(OutputFileInits, Format_723) << AlphaName(1);
+        ObjexxFCL::gio::write(OutputFileInits, Format_723) << AlphaName(1);
 
         CurrentModuleObject = "HeatBalanceAlgorithm";
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
@@ -1005,19 +1013,18 @@ namespace HeatBalanceManager {
                                           cNumericFieldNames);
             {
                 auto const SELECT_CASE_var(AlphaName(1));
-                // The default is CTF = 0.  Then the moisture solution is EMPD =2
-                if ((SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") || (SELECT_CASE_var == "DEFAULT") || (SELECT_CASE_var == "CTF")) {
-                    OverallHeatTransferSolutionAlgo = UseCTF;
-                    AlphaName(1) = "CTF - Conduction Transfer Function";
+                // The default is CTF
+                if (SELECT_CASE_var == "CONDUCTIONTRANSFERFUNCTION") {
+                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+                    DataHeatBalance::AnyCTF = true;
 
-                } else if ((SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") || (SELECT_CASE_var == "EMPD")) {
-                    OverallHeatTransferSolutionAlgo = UseEMPD;
-                    AlphaName(1) = "EMPD - Effective Moisture Penetration Depth";
+                } else if (SELECT_CASE_var == "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION") {
+                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_EMPD;
+                    DataHeatBalance::AnyEMPD = true;
 
-                } else if ((SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") || (SELECT_CASE_var == "CONDFD") ||
-                           (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCEDETAILED")) {
-                    OverallHeatTransferSolutionAlgo = UseCondFD;
-                    AlphaName(1) = "CONDFD - Conduction Finite Difference";
+                } else if (SELECT_CASE_var == "CONDUCTIONFINITEDIFFERENCE") {
+                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CondFD;
+                    DataHeatBalance::AnyCondFD = true;
                     if (NumOfTimeStepInHour < 20) {
                         ShowSevereError("GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Conduction Finite Difference but Number of TimeSteps in Hour < 20, Value is " +
@@ -1026,9 +1033,9 @@ namespace HeatBalanceManager {
                                           "Errors or inaccurate calculations may occur.");
                     }
 
-                } else if ((SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") || (SELECT_CASE_var == "HAMT")) {
-                    OverallHeatTransferSolutionAlgo = UseHAMT;
-                    AlphaName(1) = "HAMT - Combined Heat and Moisture Transfer Finite Element";
+                } else if (SELECT_CASE_var == "COMBINEDHEATANDMOISTUREFINITEELEMENT") {
+                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_HAMT;
+                    DataHeatBalance::AnyHAMT = true;
                     if (NumOfTimeStepInHour < 20) {
                         ShowSevereError("GetSolutionAlgorithm: " + CurrentModuleObject + ' ' + cAlphaFieldNames(1) +
                                         " is Combined Heat and Moisture Finite Element but Number of TimeSteps in Hour < 20, Value is " +
@@ -1040,8 +1047,8 @@ namespace HeatBalanceManager {
                     }
 
                 } else {
-                    OverallHeatTransferSolutionAlgo = UseCTF;
-                    AlphaName(1) = "CTF - Conduction Transfer Function";
+                    OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+                    DataHeatBalance::AnyCTF = true;
                 }
             }
 
@@ -1063,19 +1070,16 @@ namespace HeatBalanceManager {
             }
 
         } else {
-            OverallHeatTransferSolutionAlgo = UseCTF;
-            AlphaName(1) = "ConductionTransferFunction";
+            OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
+            DataHeatBalance::AnyCTF = true;
             MaxSurfaceTempLimit = DefaultSurfaceTempLimit;
             MaxSurfaceTempLimitBeforeFatal = MaxSurfaceTempLimit * 2.5;
         }
 
-        HeatTransferAlgosUsed.allocate(1);
-        HeatTransferAlgosUsed(1) = OverallHeatTransferSolutionAlgo;
-
         // algorithm input checks now deferred until surface properties are read in,
         //  moved to SurfaceGeometry.cc routine GetSurfaceHeatTransferAlgorithmOverrides
 
-        gio::write(OutputFileInits, Format_724);
+        ObjexxFCL::gio::write(OutputFileInits, Format_724);
 
         CurrentModuleObject = "Compliance:Building";
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
@@ -1138,8 +1142,8 @@ namespace HeatBalanceManager {
         }
 
         // Write Solution Algorithm to the initialization output file for User Verification
-        gio::write(OutputFileInits, Format_726);
-        gio::write(OutputFileInits, Format_727) << AlphaName(1);
+        ObjexxFCL::gio::write(OutputFileInits, Format_726);
+        ObjexxFCL::gio::write(OutputFileInits, Format_727) << AlphaName(1);
 
         // A new object is added by L. Gu, 06/10
         CurrentModuleObject = "ZoneAirContaminantBalance";
@@ -1220,20 +1224,20 @@ namespace HeatBalanceManager {
 
         WindowManager::initWindowModel();
 
-        gio::write(OutputFileInits, Format_728);
+        ObjexxFCL::gio::write(OutputFileInits, Format_728);
         if (Contaminant.SimulateContaminants && Contaminant.CO2Simulation) {
-            gio::write(OutputFileInits, Format_730) << "Yes" << AlphaName(1);
+            ObjexxFCL::gio::write(OutputFileInits, Format_730) << "Yes" << AlphaName(1);
         } else {
-            gio::write(OutputFileInits, Format_730) << "No"
-                                                    << "N/A";
+            ObjexxFCL::gio::write(OutputFileInits, Format_730) << "No"
+                                                               << "N/A";
         }
 
-        gio::write(OutputFileInits, Format_729);
+        ObjexxFCL::gio::write(OutputFileInits, Format_729);
         if (Contaminant.SimulateContaminants && Contaminant.GenericContamSimulation) {
-            gio::write(OutputFileInits, Format_731) << "Yes" << AlphaName(3);
+            ObjexxFCL::gio::write(OutputFileInits, Format_731) << "Yes" << AlphaName(3);
         } else {
-            gio::write(OutputFileInits, Format_731) << "No"
-                                                    << "N/A";
+            ObjexxFCL::gio::write(OutputFileInits, Format_731) << "No"
+                                                               << "N/A";
         }
 
         // A new object is added by B. Nigusse, 02/14
@@ -1327,14 +1331,14 @@ namespace HeatBalanceManager {
             ZoneAirMassFlow.EnforceZoneMassBalance = false;
         }
 
-        gio::write(OutputFileInits, Format_732);
+        ObjexxFCL::gio::write(OutputFileInits, Format_732);
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-            gio::write(OutputFileInits, Format_733) << "Yes" << AlphaName(1) << AlphaName(2) << AlphaName(3);
+            ObjexxFCL::gio::write(OutputFileInits, Format_733) << "Yes" << AlphaName(1) << AlphaName(2) << AlphaName(3);
         } else {
-            gio::write(OutputFileInits, Format_733) << "No"
-                                                    << "N/A"
-                                                    << "N/A"
-                                                    << "N/A";
+            ObjexxFCL::gio::write(OutputFileInits, Format_733) << "No"
+                                                               << "N/A"
+                                                               << "N/A"
+                                                               << "N/A";
         }
 
         // A new object is added by L. Gu, 4/17
@@ -1384,8 +1388,8 @@ namespace HeatBalanceManager {
         }
 
         // Write Solution Algorithm to the initialization output file for User Verification
-        gio::write(OutputFileInits, Format_734);
-        gio::write(OutputFileInits, Format_735) << HVACSystemRootFinding.Algorithm;
+        ObjexxFCL::gio::write(OutputFileInits, Format_734);
+        ObjexxFCL::gio::write(OutputFileInits, Format_735) << HVACSystemRootFinding.Algorithm;
     }
 
     void GetSiteAtmosphereData(bool &ErrorsFound)
@@ -1412,7 +1416,7 @@ namespace HeatBalanceManager {
         Array1D<Real64> NumArray(3); // Numeric data
 
         // Formats
-        static gio::Fmt Format_720("('Environment:Site Atmospheric Variation',3(',',A))");
+        static ObjexxFCL::gio::Fmt Format_720("('Environment:Site Atmospheric Variation',3(',',A))");
 
         // FLOW:
         CurrentModuleObject = "Site:HeightVariation";
@@ -1448,11 +1452,12 @@ namespace HeatBalanceManager {
         }
 
         // Write to the initialization output file
-        gio::write(OutputFileInits, fmtA) << "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {},Wind Speed Profile Boundary "
-                                             "Layer Thickness {m},Air Temperature Gradient Coefficient {K/m}";
+        ObjexxFCL::gio::write(OutputFileInits, fmtA)
+            << "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {},Wind Speed Profile Boundary "
+               "Layer Thickness {m},Air Temperature Gradient Coefficient {K/m}";
 
-        gio::write(OutputFileInits, Format_720) << RoundSigDigits(SiteWindExp, 3) << RoundSigDigits(SiteWindBLHeight, 3)
-                                                << RoundSigDigits(SiteTempGradient, 6);
+        ObjexxFCL::gio::write(OutputFileInits, Format_720)
+            << RoundSigDigits(SiteWindExp, 3) << RoundSigDigits(SiteWindBLHeight, 3) << RoundSigDigits(SiteTempGradient, 6);
     }
 
     void GetMaterialData(bool &ErrorsFound) // set to true if errors found in input
@@ -1491,11 +1496,7 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveInterpolationMethodNum;
         using CurveManager::GetCurveMinMaxValues;
-        using CurveManager::LinearInterpolationOfTable;
-        using CurveManager::PerfCurve;
-        using CurveManager::SetSameIndeVariableValues;
         using General::RoundSigDigits;
         using General::ScanForReports;
         using General::TrimSigDigits;
@@ -1552,10 +1553,11 @@ namespace HeatBalanceManager {
         int TotCfactorConstructs; // Number of underground wall constructions defined with C factors
 
         // Formats
-        static gio::Fmt Format_701("(' Material Details',10(',',A))");
-        static gio::Fmt Format_702("(' Material:Air',2(',',A))");
+        static ObjexxFCL::gio::Fmt Format_701("(' Material Details',10(',',A))");
+        static ObjexxFCL::gio::Fmt Format_702("(' Material:Air',2(',',A))");
 
         // FLOW:
+        std::string RoutineName("GetMaterialData: ");
 
         RegMat = inputProcessor->getNumObjectsFound("Material");
         RegRMat = inputProcessor->getNumObjectsFound("Material:NoMass");
@@ -1599,6 +1601,10 @@ namespace HeatBalanceManager {
             // Add a new fictitious insulation layer and a thermal mass layer for each F or C factor defined construction
             TotMaterials += 1 + TotFfactorConstructs + TotCfactorConstructs;
         }
+
+        // Add an internally generated Material:InfraredTransparent if there are any Construction:AirBoundary objects
+        int totAirBoundaryConstructs = inputProcessor->getNumObjectsFound("Construction:AirBoundary");
+        if (totAirBoundaryConstructs > 0) TotMaterials += 1;
 
         Material.allocate(TotMaterials); // Allocate the array Size to the number of materials
         UniqueMaterialNames.reserve(static_cast<unsigned>(TotMaterials));
@@ -1822,36 +1828,40 @@ namespace HeatBalanceManager {
 
             // Load the material derived type from the input data.
             Material(MaterNum).Name = MaterialNames(1);
-
-            if (MaterialNumProp >= 1) {
-                Material(MaterNum).Resistance = MaterialProps(1);
-                Material(MaterNum).ROnly = true;
-            } else {
-                Material(MaterNum).Resistance = 0.01;
-            }
-            if (MaterialNumProp >= 2) {
-                Material(MaterNum).AbsorpThermal = MaterialProps(2);
-                Material(MaterNum).AbsorpThermalInput = MaterialProps(2);
-            } else {
-                Material(MaterNum).AbsorpThermal = 0.9999;
-                Material(MaterNum).AbsorpThermalInput = 0.9999;
-            }
-            if (MaterialNumProp >= 3) {
-                Material(MaterNum).AbsorpSolar = MaterialProps(3);
-                Material(MaterNum).AbsorpSolarInput = MaterialProps(3);
-            } else {
-                Material(MaterNum).AbsorpSolar = 1.0;
-                Material(MaterNum).AbsorpSolarInput = 1.0;
-            }
-            if (MaterialNumProp >= 4) {
-                Material(MaterNum).AbsorpVisible = MaterialProps(4);
-                Material(MaterNum).AbsorpVisibleInput = MaterialProps(4);
-            } else {
-                Material(MaterNum).AbsorpVisible = 1.0;
-                Material(MaterNum).AbsorpVisibleInput = 1.0;
-            }
+            
+            // Load data for other properties that need defaults
+            Material(MaterNum).ROnly = true;
+            Material(MaterNum).Resistance = 0.01;
+            Material(MaterNum).AbsorpThermal = 0.9999;
+            Material(MaterNum).AbsorpThermalInput = 0.9999;
+            Material(MaterNum).AbsorpSolar = 1.0;
+            Material(MaterNum).AbsorpSolarInput = 1.0;
+            Material(MaterNum).AbsorpVisible = 1.0;
+            Material(MaterNum).AbsorpVisibleInput = 1.0;
 
             NominalR(MaterNum) = Material(MaterNum).Resistance;
+        }
+
+        // Add an internally generated Material:InfraredTransparent if there are any Construction:AirBoundary objects
+        if (totAirBoundaryConstructs > 0) {
+            ++MaterNum;
+            Material(MaterNum).Group = IRTMaterial;
+            Material(MaterNum).Name = "~AirBoundary-IRTMaterial";
+            Material(MaterNum).ROnly = true;
+            Material(MaterNum).Resistance = 0.01;
+            Material(MaterNum).AbsorpThermal = 0.9999;
+            Material(MaterNum).AbsorpThermalInput = 0.9999;
+            // Air boundaries should not participate in solar or daylighting
+            Material(MaterNum).AbsorpSolar = 0.0;
+            Material(MaterNum).AbsorpSolarInput = 0.0;
+            Material(MaterNum).AbsorpVisible = 0.0;
+            Material(MaterNum).AbsorpVisibleInput = 0.0;
+            NominalR(MaterNum) = Material(MaterNum).Resistance;
+            if (GlobalNames::VerifyUniqueInterObjectName(
+                    UniqueMaterialNames, Material(MaterNum).Name, CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
+                ShowContinueError("...All Material names must be unique regardless of subtype.");
+                ShowContinueError("...\"~AirBoundary-IRTMaterial\" is a reserved name used internally by Construction:AirBoundary.");
+            }
         }
 
         // Glass materials, regular input: transmittance and front/back reflectance
@@ -2088,54 +2098,41 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(5) + " requires a valid table object name, entered input=" + MaterialNames(5));
                     } else {
-                        // TODO: Use CurveManager::CheckCurveDims and allow any 2D Curve/Table
-                        if (PerfCurve(Material(MaterNum).GlassSpecAngTransDataPtr).ObjectType != "Table:TwoIndependentVariables") {
+                        ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngTransDataPtr, // Curve index
+                                                                    {2},                            // Valid dimensions
+                                                                    RoutineName,                    // Routine name
+                                                                    CurrentModuleObject,            // Object Type
+                                                                    Material(MaterNum).Name,        // Object Name
+                                                                    cAlphaFieldNames(5));           // Field Name
+
+                        GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
-                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
                             ShowContinueError(cAlphaFieldNames(5) +
-                                              " requires a valid Table:TwoIndependentVariables object name, entered input=" + MaterialNames(5));
-                        } else {
-                            if (GetCurveInterpolationMethodNum(Material(MaterNum).GlassSpecAngTransDataPtr) != LinearInterpolationOfTable) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid Interpolation Method.");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires LinearInterpolationOfTable, entered table name=" + MaterialNames(5));
-                            }
-                            if (!PerfCurve(Material(MaterNum).GlassSpecAngTransDataPtr).OpticalProperty) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid Table input.");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires X unit is Angle and Y unit is Wavelength, entered table name=" + MaterialNames(5));
-                            }
-                            GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
-                            if (minAngValue > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (abs(maxAngValue - 90.0) > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (minLamValue < 0.1) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
-                            }
-                            if (maxLamValue > 4.0) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
-                            }
+                                              " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (minLamValue < 0.1) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
+                        }
+                        if (maxLamValue > 4.0) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
                         }
                     }
                 }
@@ -2150,48 +2147,41 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(6) + " requires a valid table object name, entered input=" + MaterialNames(6));
                     } else {
-                        // TODO: Use CurveManager::CheckCurveDims and allow any 2D Curve/Table
-                        if (PerfCurve(Material(MaterNum).GlassSpecAngFRefleDataPtr).ObjectType != "Table:TwoIndependentVariables") {
+                        ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngFRefleDataPtr, // Curve index
+                                                                    {2},                            // Valid dimensions
+                                                                    RoutineName,                    // Routine name
+                                                                    CurrentModuleObject,            // Object Type
+                                                                    Material(MaterNum).Name,        // Object Name
+                                                                    cAlphaFieldNames(6));           // Field Name
+
+                        GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngFRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
-                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
-                            ShowContinueError(cAlphaFieldNames(6) +
-                                              " requires a valid Table:TwoIndependentVariables object name, entered input=" + MaterialNames(6));
-                        } else {
-                            if (GetCurveInterpolationMethodNum(Material(MaterNum).GlassSpecAngFRefleDataPtr) != LinearInterpolationOfTable) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid Interpolation Method.");
-                                ShowContinueError(cAlphaFieldNames(6) +
-                                                  " requires LinearInterpolationOfTable, entered table name=" + MaterialNames(6));
-                            }
-                            GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
-                            if (minAngValue > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (abs(maxAngValue - 90.0) > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (minLamValue < 0.1) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
-                            }
-                            if (maxLamValue > 4.0) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
-                            }
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (minLamValue < 0.1) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
+                        }
+                        if (maxLamValue > 4.0) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
                         }
                     }
                 }
@@ -2206,54 +2196,44 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(7) + " requires a valid table object name, entered input=" + MaterialNames(7));
                     } else {
-                        // TODO: Use CurveManager::CheckCurveDims and allow any 2D Curve/Table
-                        if (PerfCurve(Material(MaterNum).GlassSpecAngBRefleDataPtr).ObjectType != "Table:TwoIndependentVariables") {
+                        ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngBRefleDataPtr, // Curve index
+                                                                    {2},                            // Valid dimensions
+                                                                    RoutineName,                    // Routine name
+                                                                    CurrentModuleObject,            // Object Type
+                                                                    Material(MaterNum).Name,        // Object Name
+                                                                    cAlphaFieldNames(7));           // Field Name
+
+                        GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngBRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
-                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
-                            ShowContinueError(cAlphaFieldNames(7) +
-                                              " requires a valid Table:TwoIndependentVariables object name, entered input=" + MaterialNames(7));
-                        } else {
-                            if (GetCurveInterpolationMethodNum(Material(MaterNum).GlassSpecAngBRefleDataPtr) != LinearInterpolationOfTable) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid Interpolation Method.");
-                                ShowContinueError(cAlphaFieldNames(7) +
-                                                  " requires LinearInterpolationOfTable, entered table name=" + MaterialNames(7));
-                            }
-                            GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
-                            if (minAngValue > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (abs(maxAngValue - 90.0) > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (minLamValue < 0.1) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
-                            }
-                            if (maxLamValue > 4.0) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
-                            }
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (minLamValue < 0.1) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
+                        }
+                        if (maxLamValue > 4.0) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
                         }
                     }
                 }
-                SetSameIndeVariableValues(Material(MaterNum).GlassSpecAngTransDataPtr,
-                                          Material(MaterNum).GlassSpecAngFRefleDataPtr,
-                                          Material(MaterNum).GlassSpecAngBRefleDataPtr);
             }
         }
 
@@ -2396,6 +2376,8 @@ namespace HeatBalanceManager {
             Material(MaterNum).TausThermal = MaterialProps(23);
             Material(MaterNum).EmissThermalFront = MaterialProps(24);
             Material(MaterNum).EmissThermalBack = MaterialProps(25);
+            Material(MaterNum).Resistance = MaterialProps(26);
+            if (Material(MaterNum).Resistance <= 0.0) Material(MaterNum).Resistance = 0.158; // equivalent to single pane of 1/4" inch standard glass
             // Assumes thermal emissivity is the same as thermal absorptance
             Material(MaterNum).AbsorpThermalFront = Material(MaterNum).EmissThermalFront;
             Material(MaterNum).AbsorpThermalBack = Material(MaterNum).EmissThermalBack;
@@ -3577,9 +3559,13 @@ namespace HeatBalanceManager {
                 Material(MaterNum).ReflFrontDiffDiffVis = MaterialProps(14);
                 Material(MaterNum).ReflBackDiffDiffVis = MaterialProps(15);
             }
-            if (!lNumericFieldBlanks(19) && !lNumericFieldBlanks(20) && !lNumericFieldBlanks(21)) {
+            if (!lNumericFieldBlanks(19)) {
                 Material(MaterNum).TausThermal = MaterialProps(19);
+            }
+            if (!lNumericFieldBlanks(20)) {
                 Material(MaterNum).EmissThermalFront = MaterialProps(20);
+            }
+            if (!lNumericFieldBlanks(21)) {
                 Material(MaterNum).EmissThermalBack = MaterialProps(21);
             }
             // Assumes thermal emissivity is the same as thermal absorptance
@@ -3864,20 +3850,22 @@ namespace HeatBalanceManager {
 
         if (DoReport) {
 
-            gio::write(OutputFileInits, fmtA) << "! <Material Details>,Material Name,ThermalResistance {m2-K/w},Roughness,Thickness {m},Conductivity "
-                                                 "{w/m-K},Density {kg/m3},Specific Heat "
-                                                 "{J/kg-K},Absorptance:Thermal,Absorptance:Solar,Absorptance:Visible";
+            ObjexxFCL::gio::write(OutputFileInits, fmtA)
+                << "! <Material Details>,Material Name,ThermalResistance {m2-K/w},Roughness,Thickness {m},Conductivity "
+                   "{w/m-K},Density {kg/m3},Specific Heat "
+                   "{J/kg-K},Absorptance:Thermal,Absorptance:Solar,Absorptance:Visible";
 
-            gio::write(OutputFileInits, fmtA) << "! <Material:Air>,Material Name,ThermalResistance {m2-K/w}";
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Material:Air>,Material Name,ThermalResistance {m2-K/w}";
 
             for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
 
                 {
                     auto const SELECT_CASE_var(Material(MaterNum).Group);
                     if (SELECT_CASE_var == Air) {
-                        gio::write(OutputFileInits, Format_702) << Material(MaterNum).Name << RoundSigDigits(Material(MaterNum).Resistance, 4);
+                        ObjexxFCL::gio::write(OutputFileInits, Format_702)
+                            << Material(MaterNum).Name << RoundSigDigits(Material(MaterNum).Resistance, 4);
                     } else {
-                        gio::write(OutputFileInits, Format_701)
+                        ObjexxFCL::gio::write(OutputFileInits, Format_701)
                             << Material(MaterNum).Name << RoundSigDigits(Material(MaterNum).Resistance, 4)
                             << DisplayMaterialRoughness(Material(MaterNum).Roughness) << RoundSigDigits(Material(MaterNum).Thickness, 4)
                             << RoundSigDigits(Material(MaterNum).Conductivity, 3) << RoundSigDigits(Material(MaterNum).Density, 3)
@@ -4199,6 +4187,7 @@ namespace HeatBalanceManager {
         // Get the Total number of Constructions from the input
         TotRegConstructs = inputProcessor->getNumObjectsFound("Construction");
         TotSourceConstructs = inputProcessor->getNumObjectsFound("Construction:InternalSource");
+        int totAirBoundaryConstructs = inputProcessor->getNumObjectsFound("Construction:AirBoundary");
 
         TotFfactorConstructs = inputProcessor->getNumObjectsFound("Construction:FfactorGroundFloor");
         TotCfactorConstructs = inputProcessor->getNumObjectsFound("Construction:CfactorUndergroundWall");
@@ -4217,8 +4206,8 @@ namespace HeatBalanceManager {
 
         WConstructNames.allocate(TotWindow5Constructs);
 
-        TotConstructs =
-            TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + TotSourceConstructs + TotComplexFenStates + TotWinEquivLayerConstructs;
+        TotConstructs = TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + TotSourceConstructs + totAirBoundaryConstructs +
+                        TotComplexFenStates + TotWinEquivLayerConstructs;
 
         NominalRforNominalUCalculation.dimension(TotConstructs, 0.0);
         NominalU.dimension(TotConstructs, 0.0);
@@ -4340,6 +4329,14 @@ namespace HeatBalanceManager {
                 ShowSevereError("Errors found in creating the constructions defined with Ffactor or Cfactor method");
             }
             TotRegConstructs += TotFfactorConstructs + TotCfactorConstructs;
+        }
+
+        if (totAirBoundaryConstructs >= 1) {
+            CreateAirBoundaryConstructions(ConstrNum, ErrorsFound);
+            if (ErrorsFound) {
+                ShowSevereError("Errors found in creating the constructions defined with Construction:AirBoundary.");
+            }
+            TotRegConstructs += totAirBoundaryConstructs;
         }
 
         // Added BG 6/2010 for complex fenestration
@@ -4494,6 +4491,18 @@ namespace HeatBalanceManager {
                                     ", missing material = " + ConstructAlphas(Layer));
                     ErrorsFound = true;
                 } else {
+                    MaterialLayerGroup = Material(Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer)).Group;
+                    if (!((MaterialLayerGroup == GlassEquivalentLayer) || (MaterialLayerGroup == ShadeEquivalentLayer) ||
+                          (MaterialLayerGroup == DrapeEquivalentLayer) || (MaterialLayerGroup == BlindEquivalentLayer) ||
+                          (MaterialLayerGroup == ScreenEquivalentLayer) || (MaterialLayerGroup == GapEquivalentLayer))) {
+                        ShowSevereError("Invalid material layer type in window " + CurrentModuleObject + " = " +
+                                        Construct(TotRegConstructs + ConstrNum).Name);
+                        ShowContinueError("...Window layer = " + ConstructAlphas(Layer) +
+                                          " is not allowed in Construction:WindowEquivalentLayer window object.");
+                        ShowContinueError("Only materials of type Material:*:EquivalentLayer are allowed");
+                        ErrorsFound = true;
+                    }
+
                     if (ConstructNumAlpha <= 2) {
 
                     } else {
@@ -4575,6 +4584,8 @@ namespace HeatBalanceManager {
         // set some (default) properties of the Construction Derived Type
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
 
+            // For air boundaries, skip TypeIsAirBoundaryGroupedRadiant, process TypeIsAirBoundaryIRTSurface
+            if (Construct(ConstrNum).TypeIsAirBoundaryGroupedRadiant) continue;
             if (NominalRforNominalUCalculation(ConstrNum) != 0.0) {
                 NominalU(ConstrNum) = 1.0 / NominalRforNominalUCalculation(ConstrNum);
             } else {
@@ -4684,7 +4695,8 @@ namespace HeatBalanceManager {
         NumOfZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
         Zone.allocate(NumOfZones);
-
+        DataViewFactorInformation::ZoneRadiantInfo.allocate(NumOfZones);
+        DataViewFactorInformation::ZoneSolarInfo.allocate(NumOfZones);
         ZoneDaylight.allocate(NumOfZones);
 
         ZoneLoop = 0;
@@ -5196,14 +5208,14 @@ namespace HeatBalanceManager {
         int SurfNum;     // Surface number
         int ZoneNum;
         static bool ChangeSet(true); // Toggle for checking storm windows
-        static gio::Fmt ShdFracFmt1("(' ',I2.2,'/',I2.2,' ',I2.2, ':',I2.2, ',')");
-        static gio::Fmt ShdFracFmt2("(f10.8,',')");
+        static ObjexxFCL::gio::Fmt ShdFracFmt1("(' ',I2.2,'/',I2.2,' ',I2.2, ':',I2.2, ',')");
+        static ObjexxFCL::gio::Fmt ShdFracFmt2("(f10.8,',')");
 
         // FLOW:
 
         if (BeginSimFlag) {
             AllocateHeatBalArrays(); // Allocate the Module Arrays
-            if (any_eq(HeatTransferAlgosUsed, UseCTF) || any_eq(HeatTransferAlgosUsed, UseEMPD)) {
+            if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
                 DisplayString("Initializing Response Factors");
                 InitConductionTransferFunctions(); // Initialize the response factors
             }
@@ -5294,21 +5306,21 @@ namespace HeatBalanceManager {
                         IOFlags flags;
                         flags.ADVANCE("No");
                         if (TS == NumOfTimeStepInHour) {
-                            gio::write(OutputFileShadingFrac, ShdFracFmt1, flags) << Month << DayOfMonth << iHour << 0;
+                            ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmt1, flags) << Month << DayOfMonth << iHour << 0;
                         } else {
-                            gio::write(OutputFileShadingFrac, ShdFracFmt1, flags) << Month << DayOfMonth << iHour - 1 << (60 / NumOfTimeStepInHour) * TS;
+                            ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmt1, flags)
+                                << Month << DayOfMonth << iHour - 1 << (60 / NumOfTimeStepInHour) * TS;
                         }
                     }
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                         IOFlags flags;
                         flags.ADVANCE("No");
-                        gio::write(OutputFileShadingFrac, ShdFracFmt2, flags)
-                                << SunlitFrac(TS, iHour, SurfNum);
+                        ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmt2, flags) << SunlitFrac(TS, iHour, SurfNum);
                     }
                     {
                         IOFlags flags;
                         flags.ADVANCE("YES");
-                        gio::write(OutputFileShadingFrac, "()", flags);
+                        ObjexxFCL::gio::write(OutputFileShadingFrac, "()", flags);
                     }
                 }
             }
@@ -5329,10 +5341,26 @@ namespace HeatBalanceManager {
             SetOutAirNodes();
             for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 if (Zone(ZoneNum).HasLinkedOutAirNode) {
-                    Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
-                    Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum);
-                    Zone(ZoneNum).WindSpeed = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum);
-                    Zone(ZoneNum).WindDir = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum);
+                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum > 0) {
+                        Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
+                    } else {
+                        Zone(ZoneNum).OutDryBulbTemp = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulb;
+                    }
+                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum > 0) {
+                        Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum);
+                    } else {
+                        Zone(ZoneNum).OutWetBulbTemp = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulb;
+                    }
+                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum > 0) {
+                        Zone(ZoneNum).WindSpeed = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum);
+                    } else {
+                        Zone(ZoneNum).WindSpeed = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeed;
+                    }
+                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum > 0) {
+                        Zone(ZoneNum).WindDir = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum);
+                    } else {
+                        Zone(ZoneNum).WindDir = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDir;
+                    }
                 }
             }
         }
@@ -5523,9 +5551,9 @@ namespace HeatBalanceManager {
         static bool FirstWarmupWrite(true);
 
         // Formats
-        static gio::Fmt Format_731("(' Warmup Convergence Information, ',A,',',A,',',A,',',A,',',A)");
-        static gio::Fmt Format_732("('! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature Difference "
-                                   "{deltaC},','Warmup Load Difference {W}')");
+        static ObjexxFCL::gio::Fmt Format_731("(' Warmup Convergence Information, ',A,',',A,',',A,',',A,',',A)");
+        static ObjexxFCL::gio::Fmt Format_732("('! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature Difference "
+                                              "{deltaC},','Warmup Load Difference {W}')");
 
         // FLOW:
 
@@ -5564,11 +5592,11 @@ namespace HeatBalanceManager {
                 if (ReportDetailedWarmupConvergence) { // only do this detailed thing when requested by user is on
                     // Write Warmup Convergence Information to the initialization output file
                     if (FirstWarmupWrite) {
-                        gio::write(OutputFileInits, Format_732);
+                        ObjexxFCL::gio::write(OutputFileInits, Format_732);
                         FirstWarmupWrite = false;
                     }
 
-                    gio::write(OutputFileInits, Format_731)
+                    ObjexxFCL::gio::write(OutputFileInits, Format_731)
                         << Zone(ZoneNum).Name << RoundSigDigits(TimeStep) << RoundSigDigits(HourOfDay) << RoundSigDigits(WarmupTempDiff(ZoneNum), 10)
                         << RoundSigDigits(WarmupLoadDiff(ZoneNum), 10);
                 }
@@ -5580,6 +5608,10 @@ namespace HeatBalanceManager {
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             DataSurfaces::Surface(SurfNum).MovInsulIntPresentPrevTS = DataSurfaces::Surface(SurfNum).MovInsulIntPresent;
         }
+        
+        // For non-complex windows, update a report variable so this shows up in the output as something other than zero
+        UpdateWindowFaceTempsNonBSDFWin();
+        
     }
 
     void CheckWarmupConvergence()
@@ -5801,16 +5833,17 @@ namespace HeatBalanceManager {
         int Num; // loop control
 
         // Formats
-        static gio::Fmt Format_730("('! <Warmup Convergence Information>,Zone Name,Environment Type/Name,','Average Warmup Temperature Difference "
-                                   "{deltaC},','Std Dev Warmup Temperature Difference {deltaC},Max Temperature Pass/Fail Convergence,','Min "
-                                   "Temperature Pass/Fail Convergence,Average Warmup Load Difference {W},Std Dev Warmup Load Difference "
-                                   "{W},','Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence')");
-        static gio::Fmt Format_731("(' Warmup Convergence Information',10(',',A))");
+        static ObjexxFCL::gio::Fmt Format_730(
+            "('! <Warmup Convergence Information>,Zone Name,Environment Type/Name,','Average Warmup Temperature Difference "
+            "{deltaC},','Std Dev Warmup Temperature Difference {deltaC},Max Temperature Pass/Fail Convergence,','Min "
+            "Temperature Pass/Fail Convergence,Average Warmup Load Difference {W},Std Dev Warmup Load Difference "
+            "{W},','Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence')");
+        static ObjexxFCL::gio::Fmt Format_731("(' Warmup Convergence Information',10(',',A))");
 
         if (!WarmupFlag) { // Report out average/std dev
             // Write Warmup Convervence Information to the initialization output file
             if (FirstWarmupWrite && NumOfZones > 0) {
-                gio::write(OutputFileInits, Format_730);
+                ObjexxFCL::gio::write(OutputFileInits, Format_730);
                 FirstWarmupWrite = false;
             }
 
@@ -5842,7 +5875,7 @@ namespace HeatBalanceManager {
                 StdDevZoneTemp = std::sqrt(sum(TempZoneRptStdDev({1, CountWarmupDayPoints})) / double(CountWarmupDayPoints));
                 StdDevZoneLoad = std::sqrt(sum(LoadZoneRptStdDev({1, CountWarmupDayPoints})) / double(CountWarmupDayPoints));
 
-                gio::write(OutputFileInits, Format_731)
+                ObjexxFCL::gio::write(OutputFileInits, Format_731)
                     << Zone(ZoneNum).Name << EnvHeader + ' ' + EnvironmentName << RoundSigDigits(AverageZoneTemp, 10)
                     << RoundSigDigits(StdDevZoneTemp, 10) << PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(1))
                     << PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(2)) << RoundSigDigits(AverageZoneLoad, 10)
@@ -5852,6 +5885,23 @@ namespace HeatBalanceManager {
         }
     }
 
+    void UpdateWindowFaceTempsNonBSDFWin()
+    {
+        
+        int SurfNum;
+        
+        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            auto &thisSurface(DataSurfaces::Surface(SurfNum));
+            if (thisSurface.Class == DataSurfaces::SurfaceClass_Window) {
+                auto &thisConstruct(thisSurface.Construction);
+                if (!Construct(thisConstruct).WindowTypeBSDF) {
+                    FenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
+                    FenLaySurfTempBack(Construct(thisConstruct).TotLayers,SurfNum) = TH(2, 1, SurfNum);
+                }
+            }
+        }
+    }
+    
     //        End of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
@@ -5893,9 +5943,9 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt EndOfHeaderFormat("('End of Data Dictionary')");          // End of data dictionary marker
-        static gio::Fmt EnvironmentStampFormat("(a,',',a,3(',',f7.2),',',f7.2)"); // Format descriptor for environ stamp
-        static gio::Fmt EndOfDataFormat("(\"End of Data\")");                     // Signifies the end of the data block in the output file
+        static ObjexxFCL::gio::Fmt EndOfHeaderFormat("('End of Data Dictionary')");          // End of data dictionary marker
+        static ObjexxFCL::gio::Fmt EnvironmentStampFormat("(a,',',a,3(',',f7.2),',',f7.2)"); // Format descriptor for environ stamp
+        static ObjexxFCL::gio::Fmt EndOfDataFormat("(\"End of Data\")");                     // Signifies the end of the data block in the output file
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -5913,12 +5963,12 @@ namespace HeatBalanceManager {
 
         if (!WarmupFlag && DoOutputReporting) {
             CalcMoreNodeInfo();
-            UpdateDataandReport(ZoneTSReporting);
+            UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
 
-            UpdateTabularReports(ZoneTSReporting);
+            UpdateTabularReports(OutputProcessor::TimeStepType::TimeStepZone);
             UpdateUtilityBills();
         } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
             if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
@@ -5928,28 +5978,28 @@ namespace HeatBalanceManager {
             if (!BeginDayFlag) PrintEnvrnStampWarmupPrinted = false;
             if (PrintEnvrnStampWarmup) {
                 if (PrintEndDataDictionary && DoOutputReporting) {
-                    gio::write(OutputFileStandard, EndOfHeaderFormat);
-                    gio::write(OutputFileMeters, EndOfHeaderFormat);
+                    ObjexxFCL::gio::write(OutputFileStandard, EndOfHeaderFormat);
+                    ObjexxFCL::gio::write(OutputFileMeters, EndOfHeaderFormat);
                     PrintEndDataDictionary = false;
                 }
                 if (DoOutputReporting) {
-                    gio::write(OutputFileStandard, EnvironmentStampFormat)
+                    ObjexxFCL::gio::write(OutputFileStandard, EnvironmentStampFormat)
                         << "1"
                         << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
-                    gio::write(OutputFileMeters, EnvironmentStampFormat)
+                    ObjexxFCL::gio::write(OutputFileMeters, EnvironmentStampFormat)
                         << "1"
                         << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
                     PrintEnvrnStampWarmup = false;
                 }
             }
             CalcMoreNodeInfo();
-            UpdateDataandReport(ZoneTSReporting);
+            UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
 
         } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
-            UpdateDataandReport(ZoneTSReporting);
+            UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
@@ -5981,14 +6031,14 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int write_stat;
         int SurfNum;
-        static gio::Fmt ShdFracFmtName("(A, A)");
+        static ObjexxFCL::gio::Fmt ShdFracFmtName("(A, A)");
 
         OutputFileShadingFrac = GetNewUnitNumber();
         {
             IOFlags flags;
             flags.ACTION("write");
             flags.STATUS("UNKNOWN");
-            gio::open(OutputFileShadingFrac, DataStringGlobals::outputExtShdFracFileName, flags);
+            ObjexxFCL::gio::open(OutputFileShadingFrac, DataStringGlobals::outputExtShdFracFileName, flags);
             write_stat = flags.ios();
         }
         if (write_stat != 0) {
@@ -5997,19 +6047,19 @@ namespace HeatBalanceManager {
         {
             IOFlags flags;
             flags.ADVANCE("No");
-            gio::write(OutputFileShadingFrac, fmtA, flags) << "Surface Name,";
+            ObjexxFCL::gio::write(OutputFileShadingFrac, fmtA, flags) << "Surface Name,";
         }
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             {
                 IOFlags flags;
                 flags.ADVANCE("No");
-                gio::write(OutputFileShadingFrac, ShdFracFmtName, flags) << Surface(SurfNum).Name << ",";
+                ObjexxFCL::gio::write(OutputFileShadingFrac, ShdFracFmtName, flags) << Surface(SurfNum).Name << ",";
             }
         }
         {
             IOFlags flags;
             flags.ADVANCE("YES");
-            gio::write(OutputFileShadingFrac, "()", flags);
+            ObjexxFCL::gio::write(OutputFileShadingFrac, "()", flags);
         }
     }
     void GetFrameAndDividerData(bool &ErrorsFound) // set to true if errors found in input
@@ -6282,10 +6332,10 @@ namespace HeatBalanceManager {
         {
             IOFlags flags;
             flags.ACTION("read");
-            gio::open(W5DataFileNum, TempFullFileName, flags);
+            ObjexxFCL::gio::open(W5DataFileNum, TempFullFileName, flags);
             if (flags.err()) goto Label999;
         }
-        gio::read(W5DataFileNum, fmtA) >> NextLine;
+        ObjexxFCL::gio::read(W5DataFileNum, fmtA) >> NextLine;
         endcol = len(NextLine);
         if (endcol > 0) {
             if (int(NextLine[endcol - 1]) == iUnicode_end) {
@@ -6296,12 +6346,12 @@ namespace HeatBalanceManager {
             }
         }
 
-        gio::rewind(W5DataFileNum);
+        ObjexxFCL::gio::rewind(W5DataFileNum);
         FileLineCount = 0;
 
         {
             IOFlags flags;
-            gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+            ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
             ReadStat = flags.ios();
         }
         if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -6315,7 +6365,7 @@ namespace HeatBalanceManager {
         for (LineNum = 2; LineNum <= 5; ++LineNum) {
             {
                 IOFlags flags;
-                gio::read(W5DataFileNum, fmtA, flags) >> DataLine(LineNum);
+                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> DataLine(LineNum);
                 ReadStat = flags.ios();
             }
             if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -6323,14 +6373,14 @@ namespace HeatBalanceManager {
         }
 
         // Get window name and check for match
-        gio::read(DataLine(4).substr(19), fmtA) >> W5Name;
+        ObjexxFCL::gio::read(DataLine(4).substr(19), fmtA) >> W5Name;
         WindowNameInW5DataFile = UtilityRoutines::MakeUPPERCase(W5Name);
         if (DesiredConstructionName != WindowNameInW5DataFile) {
             // Doesn't match; read through file until next window entry is found
         Label20:;
             {
                 IOFlags flags;
-                gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                 ReadStat = flags.ios();
             }
             if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -6347,19 +6397,19 @@ namespace HeatBalanceManager {
 
             {
                 IOFlags flags;
-                gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                 ReadStat = flags.ios();
             }
             if (ReadStat < GoodIOStatValue) goto Label1000;
             ++FileLineCount;
-            gio::read(NextLine.substr(19), "*") >> NGlSys;
+            ObjexxFCL::gio::read(NextLine.substr(19), "*") >> NGlSys;
             if (NGlSys <= 0 || NGlSys > 2) {
                 ShowFatalError("Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used: it has " +
                                TrimSigDigits(NGlSys) + " glazing systems; only 1 or 2 are allowed.");
             }
             {
                 IOFlags flags;
-                gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                 ReadStat = flags.ios();
             }
             if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -6367,15 +6417,15 @@ namespace HeatBalanceManager {
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 {
                     IOFlags flags;
-                    gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+                    ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                     ReadStat = flags.ios();
                 }
                 if (ReadStat < GoodIOStatValue) goto Label1000;
                 ++FileLineCount;
                 {
                     IOFlags flags;
-                    gio::read(NextLine.substr(19), "*", flags) >> WinHeight(IGlSys) >> WinWidth(IGlSys) >> NGlass(IGlSys) >> UValCenter(IGlSys) >>
-                        SCCenter(IGlSys) >> SHGCCenter(IGlSys) >> TVisCenter(IGlSys);
+                    ObjexxFCL::gio::read(NextLine.substr(19), "*", flags) >> WinHeight(IGlSys) >> WinWidth(IGlSys) >> NGlass(IGlSys) >>
+                        UValCenter(IGlSys) >> SCCenter(IGlSys) >> SHGCCenter(IGlSys) >> TVisCenter(IGlSys);
                     ReadStat = flags.ios();
                 }
                 if (ReadStat != 0) {
@@ -6419,7 +6469,7 @@ namespace HeatBalanceManager {
             for (LineNum = 1; LineNum <= 11; ++LineNum) {
                 {
                     IOFlags flags;
-                    gio::read(W5DataFileNum, fmtA, flags) >> DataLine(LineNum);
+                    ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> DataLine(LineNum);
                     ReadStat = flags.ios();
                 }
                 if (ReadStat == -1) goto Label1000;
@@ -6431,7 +6481,7 @@ namespace HeatBalanceManager {
             if (NGlSys == 2) {
                 {
                     IOFlags flags;
-                    gio::read(DataLine(10).substr(19), "*", flags) >> MullionWidth;
+                    ObjexxFCL::gio::read(DataLine(10).substr(19), "*", flags) >> MullionWidth;
                     ReadStat = flags.ios();
                 }
                 if (ReadStat != 0) {
@@ -6443,7 +6493,7 @@ namespace HeatBalanceManager {
                 MullionWidth *= 0.001;
                 {
                     IOFlags flags;
-                    gio::read(DataLine(10).substr(88), "*", flags) >> MullionOrientation;
+                    ObjexxFCL::gio::read(DataLine(10).substr(88), "*", flags) >> MullionOrientation;
                     ReadStat = flags.ios();
                 }
                 if (ReadStat != 0) {
@@ -6466,8 +6516,8 @@ namespace HeatBalanceManager {
             FrameEmis = 0.0;
             {
                 IOFlags flags;
-                gio::read(DataLine(11).substr(19), "*", flags) >> FrameWidth >> FrameProjectionOut >> FrameProjectionIn >> FrameConductance >>
-                    FrEdgeToCenterGlCondRatio >> FrameSolAbsorp >> FrameVisAbsorp >> FrameEmis;
+                ObjexxFCL::gio::read(DataLine(11).substr(19), "*", flags) >> FrameWidth >> FrameProjectionOut >> FrameProjectionIn >>
+                    FrameConductance >> FrEdgeToCenterGlCondRatio >> FrameSolAbsorp >> FrameVisAbsorp >> FrameEmis;
                 ReadStat = flags.ios();
             }
             if (ReadStat != 0) {
@@ -6505,7 +6555,7 @@ namespace HeatBalanceManager {
 
             {
                 IOFlags flags;
-                gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                 ReadStat = flags.ios();
             }
             if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -6515,14 +6565,14 @@ namespace HeatBalanceManager {
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 {
                     IOFlags flags;
-                    gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+                    ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                     ReadStat = flags.ios();
                 }
                 if (ReadStat < GoodIOStatValue) goto Label1000;
                 ++FileLineCount;
                 {
                     IOFlags flags;
-                    gio::read(NextLine.substr(19), "*", flags) >> DividerWidth(IGlSys) >> DividerProjectionOut(IGlSys) >>
+                    ObjexxFCL::gio::read(NextLine.substr(19), "*", flags) >> DividerWidth(IGlSys) >> DividerProjectionOut(IGlSys) >>
                         DividerProjectionIn(IGlSys) >> DividerConductance(IGlSys) >> DivEdgeToCenterGlCondRatio(IGlSys) >> DividerSolAbsorp(IGlSys) >>
                         DividerVisAbsorp(IGlSys) >> DividerEmis(IGlSys) >> DividerType(IGlSys) >> HorDividers(IGlSys) >> VertDividers(IGlSys);
                     ReadStat = flags.ios();
@@ -6667,7 +6717,7 @@ namespace HeatBalanceManager {
             // Glass objects
             {
                 IOFlags flags;
-                gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                 ReadStat = flags.ios();
             }
             if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -6680,11 +6730,11 @@ namespace HeatBalanceManager {
                     Material(MaterNum).Group = WindowGlass;
                     {
                         IOFlags flags;
-                        gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+                        ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                         ReadStat = flags.ios();
                     }
                     ++FileLineCount;
-                    gio::read(NextLine.substr(25), "*") >> Material(MaterNum).Thickness >> Material(MaterNum).Conductivity >>
+                    ObjexxFCL::gio::read(NextLine.substr(25), "*") >> Material(MaterNum).Thickness >> Material(MaterNum).Conductivity >>
                         Material(MaterNum).Trans >> Material(MaterNum).ReflectSolBeamFront >> Material(MaterNum).ReflectSolBeamBack >>
                         Material(MaterNum).TransVis >> Material(MaterNum).ReflectVisBeamFront >> Material(MaterNum).ReflectVisBeamBack >>
                         Material(MaterNum).TransThermal >> Material(MaterNum).AbsorpThermalFront >> Material(MaterNum).AbsorpThermalBack >> LayerName;
@@ -6711,7 +6761,7 @@ namespace HeatBalanceManager {
             // Gap objects
             {
                 IOFlags flags;
-                gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                 ReadStat = flags.ios();
             }
             if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -6722,11 +6772,11 @@ namespace HeatBalanceManager {
                     MaterNumSysGap(IGap, IGlSys) = MaterNum;
                     {
                         IOFlags flags;
-                        gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+                        ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                         ReadStat = flags.ios();
                     }
                     ++FileLineCount;
-                    gio::read(NextLine.substr(23), "*") >> Material(MaterNum).Thickness >> NumGases(IGap, IGlSys);
+                    ObjexxFCL::gio::read(NextLine.substr(23), "*") >> Material(MaterNum).Thickness >> NumGases(IGap, IGlSys);
                     if (NGlSys == 1) {
                         Material(MaterNum).Name = "W5:" + DesiredConstructionName + ":GAP" + NumName(IGap);
                     } else {
@@ -6739,7 +6789,7 @@ namespace HeatBalanceManager {
 
             {
                 IOFlags flags;
-                gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                 ReadStat = flags.ios();
             }
             if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -6753,11 +6803,11 @@ namespace HeatBalanceManager {
                     for (IGas = 1; IGas <= NumGases(IGap, IGlSys); ++IGas) {
                         {
                             IOFlags flags;
-                            gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+                            ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                             ReadStat = flags.ios();
                         }
                         ++FileLineCount;
-                        gio::read(NextLine.substr(19), "*") >> GasName(IGas) >> Material(MaterNum).GasFract(IGas) >>
+                        ObjexxFCL::gio::read(NextLine.substr(19), "*") >> GasName(IGas) >> Material(MaterNum).GasFract(IGas) >>
                             Material(MaterNum).GasWght(IGas) >> Material(MaterNum).GasCon(_, IGas) >> Material(MaterNum).GasVis(_, IGas) >>
                             Material(MaterNum).GasCp(_, IGas);
                         // Nominal resistance of gap at room temperature (based on first gas in mixture)
@@ -6778,7 +6828,7 @@ namespace HeatBalanceManager {
 
             {
                 IOFlags flags;
-                gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                 ReadStat = flags.ios();
             }
             if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -6879,7 +6929,7 @@ namespace HeatBalanceManager {
 
                 {
                     IOFlags flags;
-                    gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+                    ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                     ReadStat = flags.ios();
                 }
                 if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -6887,7 +6937,7 @@ namespace HeatBalanceManager {
                 if (IGlSys == 1) {
                     {
                         IOFlags flags;
-                        gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+                        ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                         ReadStat = flags.ios();
                     }
                     if (ReadStat < GoodIOStatValue) goto Label1000;
@@ -6895,14 +6945,14 @@ namespace HeatBalanceManager {
                 }
                 {
                     IOFlags flags;
-                    gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+                    ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                     ReadStat = flags.ios();
                 }
                 if (ReadStat < GoodIOStatValue) goto Label1000;
                 ++FileLineCount;
                 {
                     IOFlags flags;
-                    gio::read(NextLine.substr(5), "*", flags) >> Tsol;
+                    ObjexxFCL::gio::read(NextLine.substr(5), "*", flags) >> Tsol;
                     ReadStat = flags.ios();
                 }
                 if (ReadStat != 0) {
@@ -6917,13 +6967,13 @@ namespace HeatBalanceManager {
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
                     {
                         IOFlags flags;
-                        gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
+                        ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
                         ReadStat = flags.ios();
                     }
                     ++FileLineCount;
                     {
                         IOFlags flags;
-                        gio::read(NextLine.substr(5), "*", flags) >> AbsSol(_, IGlass);
+                        ObjexxFCL::gio::read(NextLine.substr(5), "*", flags) >> AbsSol(_, IGlass);
                         ReadStat = flags.ios();
                     }
                     if (ReadStat != 0) {
@@ -6941,13 +6991,13 @@ namespace HeatBalanceManager {
                 for (ILine = 1; ILine <= 5; ++ILine) {
                     {
                         IOFlags flags;
-                        gio::read(W5DataFileNum, fmtA, flags) >> DataLine(ILine);
+                        ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> DataLine(ILine);
                         ReadStat = flags.ios();
                     }
                 }
                 {
                     IOFlags flags;
-                    gio::read(DataLine(1).substr(5), "*", flags) >> Rfsol;
+                    ObjexxFCL::gio::read(DataLine(1).substr(5), "*", flags) >> Rfsol;
                     ReadStat = flags.ios();
                 }
                 if (ReadStat != 0) {
@@ -6963,7 +7013,7 @@ namespace HeatBalanceManager {
                 }
                 {
                     IOFlags flags;
-                    gio::read(DataLine(2).substr(5), "*", flags) >> Rbsol;
+                    ObjexxFCL::gio::read(DataLine(2).substr(5), "*", flags) >> Rbsol;
                     ReadStat = flags.ios();
                 }
                 if (ReadStat != 0) {
@@ -6979,7 +7029,7 @@ namespace HeatBalanceManager {
                 }
                 {
                     IOFlags flags;
-                    gio::read(DataLine(3).substr(5), "*", flags) >> Tvis;
+                    ObjexxFCL::gio::read(DataLine(3).substr(5), "*", flags) >> Tvis;
                     ReadStat = flags.ios();
                 }
                 if (ReadStat != 0) {
@@ -6995,7 +7045,7 @@ namespace HeatBalanceManager {
                 }
                 {
                     IOFlags flags;
-                    gio::read(DataLine(4).substr(5), "*", flags) >> Rfvis;
+                    ObjexxFCL::gio::read(DataLine(4).substr(5), "*", flags) >> Rfvis;
                     ReadStat = flags.ios();
                 }
                 if (ReadStat != 0) {
@@ -7011,7 +7061,7 @@ namespace HeatBalanceManager {
                 }
                 {
                     IOFlags flags;
-                    gio::read(DataLine(5).substr(5), "*", flags) >> Rbvis;
+                    ObjexxFCL::gio::read(DataLine(5).substr(5), "*", flags) >> Rbvis;
                     ReadStat = flags.ios();
                 }
                 if (ReadStat != 0) {
@@ -7140,7 +7190,7 @@ namespace HeatBalanceManager {
             }
         }
 
-        gio::close(W5DataFileNum);
+        ObjexxFCL::gio::close(W5DataFileNum);
         return;
 
     Label999:;
@@ -7149,7 +7199,7 @@ namespace HeatBalanceManager {
 
     Label1000:;
         EOFonFile = true;
-        gio::close(W5DataFileNum);
+        ObjexxFCL::gio::close(W5DataFileNum);
     }
 
     void SetStormWindowControl()
@@ -7465,6 +7515,95 @@ namespace HeatBalanceManager {
             // Reff includes the wall itself and soil, but excluding thermal resistance of inside or outside air film
             // 1/Reff gets reported as the "U-Factor no Film" in the summary report Envelope Summary | Opaque Exterior
             NominalRforNominalUCalculation(ConstrNum) = Reff;
+        }
+    }
+
+    void CreateAirBoundaryConstructions(int &constrNum,   // Counter for Constructions
+                                        bool &errorsFound // If errors found in input
+    )
+    {
+        cCurrentModuleObject = "Construction:AirBoundary";
+        std::string RoutineName = "CreateAirBoundaryConstructions";
+        int numAirBoundaryConstructs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        if (numAirBoundaryConstructs > 0) {
+            auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
+            if (instances == inputProcessor->epJSON.end()) {
+                // Cannot imagine how you would have numAirBoundaryConstructs > 0 and yet the instances is empty
+                // this would indicate a major problem in the input processor, not a problem here
+                // I'll still catch this with errorsFound but I cannot make a unit test for it so excluding the line from coverage
+                ShowSevereError(                                                                            // LCOV_EXCL_LINE
+                    cCurrentModuleObject + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+                errorsFound = true;                                                                         // LCOV_EXCL_LINE
+            }
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto thisObjectName = instance.key();
+                inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
+
+                if (GlobalNames::VerifyUniqueInterObjectName(UniqueConstructNames, thisObjectName, cCurrentModuleObject, "Name", errorsFound)) {
+                    continue;
+                }
+
+                ++constrNum;
+                auto &thisConstruct = Construct(constrNum);
+
+                thisConstruct.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                thisConstruct.TypeIsAirBoundary = true;
+                thisConstruct.IsUsedCTF = false;
+
+                // Solar and Daylighting Method
+                std::string const solarMethod = fields.at("solar_and_daylighting_method");
+                if (UtilityRoutines::SameString(solarMethod, "GroupedZones")) {
+                    thisConstruct.TypeIsAirBoundarySolar = true;
+                } else if (UtilityRoutines::SameString(solarMethod, "InteriorWindow")) {
+                    thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
+                    thisConstruct.TransDiff = 1.0;
+                    thisConstruct.TransDiffVis = 1.0;
+                    thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
+                    thisConstruct.TransSolBeamCoef = 1.0;
+                    thisConstruct.ReflectSolDiffBack = 0.0;
+                }
+
+                // Radiant Exchange Method
+                std::string const radMethod = fields.at("radiant_exchange_method");
+                if (UtilityRoutines::SameString(radMethod, "GroupedZones")) {
+                    thisConstruct.TypeIsAirBoundaryGroupedRadiant = true;
+                } else if (UtilityRoutines::SameString(radMethod, "IRTSurface")) {
+                    thisConstruct.IsUsedCTF = true;
+                    thisConstruct.TypeIsAirBoundaryIRTSurface = true;
+                    thisConstruct.TotLayers = 1;
+                    // Find the auto-generated special IRT material for air boundaries
+                    int materNum = UtilityRoutines::FindItemInList("~AirBoundary-IRTMaterial", DataHeatBalance::Material);
+                    thisConstruct.LayerPoint(1) = materNum;
+                    NominalRforNominalUCalculation(constrNum) = NominalR(materNum);
+                }
+
+                // Air Exchange Method
+                std::string const airMethod = fields.at("air_exchange_method");
+                if (UtilityRoutines::SameString(airMethod, "SimpleMixing")) {
+                    thisConstruct.TypeIsAirBoundaryMixing = true;
+                    if (fields.find("simple_mixing_air_changes_per_hour") != fields.end()) {
+                        thisConstruct.AirBoundaryACH = fields.at("simple_mixing_air_changes_per_hour");
+                    } else {
+                        if (!inputProcessor->getDefaultValue(
+                                cCurrentModuleObject, "simple_mixing_air_changes_per_hour", thisConstruct.AirBoundaryACH)) {
+                            errorsFound = true;
+                        }
+                    }
+                    if (fields.find("simple_mixing_schedule_name") != fields.end()) {
+                        auto &schedName = fields.at("simple_mixing_schedule_name");
+                        thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(UtilityRoutines::MakeUPPERCase(schedName));
+                        if (thisConstruct.AirBoundaryMixingSched == 0) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + thisConstruct.Name + "\", invalid (not found) " +
+                                            "Simple Mixing Schedule Name" + "=\"" + schedName.get<std::string>() + "\".");
+                            errorsFound = true;
+                        }
+                    } else {
+                        thisConstruct.AirBoundaryMixingSched = DataGlobals::ScheduleAlwaysOn;
+                    }
+                }
+            }
         }
     }
 

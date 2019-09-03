@@ -76,6 +76,7 @@
 #include <FaultsManager.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
+#include <HeatBalFiniteDiffManager.hh>
 #include <HybridModel.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
@@ -490,9 +491,9 @@ namespace ZoneTempPredictorCorrector {
         Array1D<NeededComfortControlTypes> TComfortControlTypes;
 
         // Formats
-        static gio::Fmt Format_700("('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, "
+        static ObjexxFCL::gio::Fmt Format_700("('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, "
                                    "','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')");
-        static gio::Fmt Format_701("('Zone Volume Capacitance Multiplier,',F8.3,' ,',F8.3,',',F8.3,',',F8.3)");
+        static ObjexxFCL::gio::Fmt Format_701("('Zone Volume Capacitance Multiplier,',F8.3,' ,',F8.3,',',F8.3,',',F8.3)");
 
         // FLOW:
         cCurrentModuleObject = cZControlTypes(iZC_TStat);
@@ -1883,8 +1884,8 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        gio::write(OutputFileInits, Format_700);
-        gio::write(OutputFileInits, Format_701) << ZoneVolCapMultpSens << ZoneVolCapMultpMoist << ZoneVolCapMultpCO2 << ZoneVolCapMultpGenContam;
+        ObjexxFCL::gio::write(OutputFileInits, Format_700);
+        ObjexxFCL::gio::write(OutputFileInits, Format_701) << ZoneVolCapMultpSens << ZoneVolCapMultpMoist << ZoneVolCapMultpCO2 << ZoneVolCapMultpGenContam;
 
         cCurrentModuleObject = cZControlTypes(iZC_OTTStat);
         NumOpTempControlledZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -2515,7 +2516,7 @@ namespace ZoneTempPredictorCorrector {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static gio::Fmt fmtA("(A)");
+        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -2543,7 +2544,7 @@ namespace ZoneTempPredictorCorrector {
         readStat = 0;
         {
             IOFlags flags;
-            gio::inquire(DataStringGlobals::inputWeatherFileName, flags);
+            ObjexxFCL::gio::inquire(DataStringGlobals::inputWeatherFileName, flags);
             epwFileExists = flags.exists();
         }
 
@@ -2553,7 +2554,7 @@ namespace ZoneTempPredictorCorrector {
             {
                 IOFlags flags;
                 flags.ACTION("READ");
-                gio::open(epwFile, DataStringGlobals::inputWeatherFileName, flags);
+                ObjexxFCL::gio::open(epwFile, DataStringGlobals::inputWeatherFileName, flags);
                 readStat = flags.ios();
             }
             if (readStat != 0) {
@@ -2562,7 +2563,7 @@ namespace ZoneTempPredictorCorrector {
             for (i = 1; i <= 9; ++i) { // Headers
                 {
                     IOFlags flags;
-                    gio::read(epwFile, fmtA, flags);
+                    ObjexxFCL::gio::read(epwFile, fmtA, flags);
                     readStat = flags.ios();
                 }
             }
@@ -2571,7 +2572,7 @@ namespace ZoneTempPredictorCorrector {
                 for (j = 1; j <= 24; ++j) {
                     {
                         IOFlags flags;
-                        gio::read(epwFile, fmtA, flags) >> epwLine;
+                        ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
                         readStat = flags.ios();
                     }
                     for (ind = 1; ind <= 6; ++ind) {
@@ -2584,7 +2585,7 @@ namespace ZoneTempPredictorCorrector {
                 }
                 dailyDryTemp(i) = avgDryBulb;
             }
-            gio::close(epwFile);
+            ObjexxFCL::gio::close(epwFile);
 
             // Calculate monthly running average dry bulb temperature.
             int dayOfYear = 0;
@@ -5204,10 +5205,9 @@ namespace ZoneTempPredictorCorrector {
                                       ZnAirRpt(ZoneNum).SumMCpDTsystem,
                                       ZnAirRpt(ZoneNum).SumNonAirSystem,
                                       ZnAirRpt(ZoneNum).CzdTdt,
-                                      ZnAirRpt(ZoneNum).imBalance); // convection part of internal gains | surface convection heat transfer |
-                                                                    // interzone mixing | OA of various kinds except via system | air system | non air
-                                                                    // system | air mass energy storage term | measure of imbalance in zone air heat
-                                                                    // balance
+                                      ZnAirRpt(ZoneNum).imBalance,
+                                      ZnAirRpt(ZoneNum).SumEnthalpyM,
+                                      ZnAirRpt(ZoneNum).SumEnthalpyH);
 
         } // ZoneNum
     }
@@ -5882,7 +5882,7 @@ namespace ZoneTempPredictorCorrector {
                 Zone(ZoneNum).delta_T = delta_T;
 
                 // s4 - Set ACH to 0 when delta_T <= 0.5, add max and min limits to ach
-                if (abs(delta_T) <= 0.5) {
+                if (std::abs(delta_T) <= 0.5) {
                     M_inf = 0.0;
                 } else {
                     M_inf = (BB + CC * DD - ((11.0 / 6.0) * CC + AA) * Zone(ZoneNum).ZoneMeasuredTemperature) / (CpAir * delta_T);
@@ -5929,7 +5929,7 @@ namespace ZoneTempPredictorCorrector {
                 }
 
                 // Calculate multiplier
-                if (abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) > 0.05) { // Filter
+                if (std::abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) > 0.05) { // Filter
                     MultpHM = AirCapHM /
                               (Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum)) *
                                PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum))) *
@@ -6116,7 +6116,7 @@ namespace ZoneTempPredictorCorrector {
                 CpAir = PsyCpAirFnWTdb(OutHumRat, Zone(ZoneNum).OutDryBulbTemp);
                 AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineName);
 
-                if (abs(Zone(ZoneNum).ZoneMeasuredHumidityRatio - OutHumRat) < 0.0000001) {
+                if (std::abs(Zone(ZoneNum).ZoneMeasuredHumidityRatio - OutHumRat) < 0.0000001) {
                     M_inf = 0.0;
                 } else {
                     M_inf = (CC * DD + BB - ((11.0 / 6.0) * CC + AA) * Zone(ZoneNum).ZoneMeasuredHumidityRatio) / delta_HR;
@@ -6487,7 +6487,9 @@ namespace ZoneTempPredictorCorrector {
                                    Real64 &SumMCpDTsystem,   // Zone sum of air system MassFlowRate*Cp*(Tsup - Tz)
                                    Real64 &SumNonAirSystem,  // Zone sum of non air system convective heat gains
                                    Real64 &CzdTdt,           // Zone air energy storage term.
-                                   Real64 &imBalance         // put all terms in eq. 5 on RHS , should be zero
+                                   Real64 &imBalance,        // put all terms in eq. 5 on RHS , should be zero
+                                   Real64 &SumEnthalpyM,     // Zone sum of phase change material melting enthlpy
+                                   Real64 &SumEnthalpyH      // Zone sum of phase change material freezing enthalpy
     )
     {
 
@@ -6569,6 +6571,8 @@ namespace ZoneTempPredictorCorrector {
         SumNonAirSystem = 0.0;
         CzdTdt = 0.0;
         imBalance = 0.0;
+        SumEnthalpyM = 0.0;
+        SumEnthalpyH = 0.0;
         SumSysMCp = 0.0;
         SumSysMCpT = 0.0;
         ADUHeatAddRate = 0.0;
@@ -6788,6 +6792,11 @@ namespace ZoneTempPredictorCorrector {
 
             SumHADTsurfs += HConvIn(SurfNum) * Area * (TempSurfInTmp(SurfNum) - RefAirTemp);
 
+            // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
+            if (DataSurfaces::Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel_CondFD) {
+                ZnAirRpt(ZoneNum).SumEnthalpyM += HeatBalFiniteDiffManager::SurfaceFD(SurfNum).EnthalpyM;
+                ZnAirRpt(ZoneNum).SumEnthalpyH += HeatBalFiniteDiffManager::SurfaceFD(SurfNum).EnthalpyF;
+            }
         } // SurfNum
 
         // now calculate air energy storage source term.

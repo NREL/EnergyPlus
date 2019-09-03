@@ -708,7 +708,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
     ManageSimulation();
@@ -946,5 +946,62 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).totalNotMetHeatingOccupied);
     EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).totalNotMetCooling);
     EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).totalNotMetCoolingOccupied);
+
+}
+
+TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
+{
+    
+    // Set the data for the test    
+    TotPeople = 1;
+    People.allocate(TotPeople);
+    ThermalComfortData.allocate(TotPeople);
+    NumOfZones = 1;
+    Zone.allocate(NumOfZones);
+    ZTAVComf.allocate(NumOfZones);
+    MRT.allocate(NumOfZones);
+    ZoneAirHumRatAvgComf.allocate(NumOfZones);
+    IsZoneDV.allocate(NumOfZones);
+    IsZoneUI.allocate(NumOfZones);
+    QHTRadSysToPerson.allocate(NumOfZones);
+    QCoolingPanelToPerson.allocate(NumOfZones);
+    QHWBaseboardToPerson.allocate(NumOfZones);
+    QSteamBaseboardToPerson.allocate(NumOfZones);
+    QElecBaseboardToPerson.allocate(NumOfZones);
+        
+    People(1).ZonePtr = 1;
+    People(1).NumberOfPeoplePtr = -1;
+    People(1).NumberOfPeople = 5.0;
+    People(1).NomMinNumberPeople = 5.0;
+    People(1).NomMaxNumberPeople = 5.0;
+    Zone(People(1).ZonePtr).TotOccupants = People(1).NumberOfPeople;
+    People(1).FractionRadiant = 0.3;
+    People(1).FractionConvected = 1.0 - People(1).FractionRadiant;
+    People(1).UserSpecSensFrac = AutoCalculate;
+    People(1).CO2RateFactor = 3.82e-8;
+    People(1).ActivityLevelPtr = -1;
+    People(1).Show55Warning = true;
+    People(1).Pierce = true;
+    People(1).MRTCalcType = ZoneAveraged;
+    People(1).WorkEffPtr = 0;
+    People(1).ClothingType = 1;
+    People(1).ClothingPtr = -1;
+    People(1).AirVelocityPtr = 0;
+    
+    ZTAVComf(1) = 25.0;
+    MRT(1) = 26.0;
+    ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006    
+    DataEnvironment::OutBaroPress = 101217.;
+    IsZoneDV(1) = IsZoneUI(1) = false;
+    QHTRadSysToPerson(1) = 0.0;
+    QCoolingPanelToPerson(1) = 0.0;
+    QHWBaseboardToPerson(1) = 0.0;
+    QSteamBaseboardToPerson(1) = 0.0;
+    QElecBaseboardToPerson(1) = 0.0;
+
+    CalcThermalComfortPierce();
+    
+    EXPECT_NEAR(ThermalComfortData(1).PiercePMVSET, -3.350, 0.005);
+    EXPECT_NEAR(ThermalComfortData(1).PierceSET, 23.62, 0.01);
 
 }

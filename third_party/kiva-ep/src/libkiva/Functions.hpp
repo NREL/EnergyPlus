@@ -13,12 +13,14 @@
 
 namespace Kiva {
 
-bool LIBKIVA_EXPORT isLessThan(double first, double second);
-bool LIBKIVA_EXPORT isLessOrEqual(double first, double second);
-bool LIBKIVA_EXPORT isEqual(double first, double second);
-bool LIBKIVA_EXPORT isEqual(double first, double second, double epsilon);
-bool LIBKIVA_EXPORT isGreaterThan(double first, double second);
-bool LIBKIVA_EXPORT isGreaterOrEqual(double first, double second);
+static const double EPSILON = 1E-7;
+
+
+bool LIBKIVA_EXPORT isLessThan(double first, double second, double epsilon=EPSILON);
+bool LIBKIVA_EXPORT isLessOrEqual(double first, double second, double epsilon=EPSILON);
+bool LIBKIVA_EXPORT isEqual(double first, double second, double epsilon=EPSILON);
+bool LIBKIVA_EXPORT isGreaterThan(double first, double second, double epsilon=EPSILON);
+bool LIBKIVA_EXPORT isGreaterOrEqual(double first, double second, double epsilon=EPSILON);
 bool LIBKIVA_EXPORT isEven(int N);
 bool LIBKIVA_EXPORT isOdd(int N);
 void solveTDM(const std::vector<double> &a1, const std::vector<double> &a2, std::vector<double> &a3,

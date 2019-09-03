@@ -402,7 +402,7 @@ namespace EconomicTariff {
         int KeyCount;
         int TypeVar;
         OutputProcessor::StoreType AvgSumVar;
-        int StepTypeVar;
+        OutputProcessor::TimeStepType StepTypeVar;
         OutputProcessor::Unit UnitsVar(OutputProcessor::Unit::None); // Units sting, may be blank
         Array1D_string NamesOfKeys;                                  // Specific key name
         Array1D_int IndexesForKeyVar;                                // Array index
@@ -2955,7 +2955,7 @@ namespace EconomicTariff {
                             pushStack(c, noVar);
                         } else if (SELECT_CASE_var == opABSOLUTE) {
                             popStack(a, aPt);
-                            pushStack(abs(a), noVar);
+                            pushStack(ObjexxFCL::abs(a), noVar);
                         } else if (SELECT_CASE_var == opINTEGER) {
                             popStack(a, aPt);
                             pushStack(Array1D_double(Array1D_int(a)), noVar);
