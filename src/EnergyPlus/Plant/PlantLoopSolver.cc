@@ -1812,32 +1812,21 @@ namespace EnergyPlus {
                     BranchFlowReq = DataPlant::PlantLoop(LoopNum).loopSolver.DetermineBranchFlowRequest(LoopNum,
                                                                                                         LoopSideNum,
                                                                                                         BranchNum);
-
+                    this_branch.RequestedMassFlow = BranchFlowReq; // store this for later use in logic for remaining flow allocations
                     // now, if we are have branch pumps, here is the situation:
                     // constant speed pumps lock in a flow request on the inlet node
                     // variable speed pumps which have other components on the branch do not log a request themselves
                     // the DetermineBranchFlowRequest routine only looks at the branch inlet node
                     // for variable speed branch pumps then, this won't work because the branch will be requesting zero
                     // so let's adjust for this here to make sure these branches get good representation
-                    for (CompCounter = 1; CompCounter <= this_branch.TotalComponents; ++CompCounter) {
-
-                        auto &this_comp(this_branch.Comp(CompCounter));
-
-                        // if this isn't a variable speed pump then just keep cycling
-                        if ((this_comp.TypeOf_Num != TypeOf_PumpVariableSpeed) &&
-                            (this_comp.TypeOf_Num != TypeOf_PumpBankVariableSpeed)) {
-                            continue;
-                        }
-
-                        CompInletNode = this_comp.NodeNumIn;
-                        BranchFlowReq = max(BranchFlowReq, Node(CompInletNode).MassFlowRateRequest);
-                    }
-
+                    // This comment above is not true, for series active branches, DetermineBranchFlowRequest does scan down the branch's
+                    // components already, no need to loop over components
                     BranchMinAvail = Node(LastNodeOnBranch).MassFlowRateMinAvail;
                     BranchMaxAvail = Node(LastNodeOnBranch).MassFlowRateMaxAvail;
                     //            !sum the branch flow requests to a total parallel branch flow request
-                    if (this_splitter_outlet_branch.ControlType == ControlType_Active ||
-                        this_splitter_outlet_branch.ControlType == ControlType_SeriesActive) {
+                    bool activeBranch = this_splitter_outlet_branch.ControlType == ControlType_Active;
+                    bool isSeriesActiveAndRequesting = (this_splitter_outlet_branch.ControlType == ControlType_SeriesActive) && (BranchFlowReq > 0.0);
+                    if (activeBranch || isSeriesActiveAndRequesting ) { // revised logic for series active
                         TotParallelBranchFlowReq += BranchFlowReq;
                         ++NumActiveBranches;
                     }
@@ -1994,14 +1983,16 @@ namespace EnergyPlus {
                     // IF the bypass take the remaining loop flow, return
                     if (FlowRemaining == 0.0) return;
 
-                    // 4) If PASSIVE branches and BYPASS are at max and there's still flow, distribute remaining flow to ACTIVE branches
+                    // 4) If PASSIVE branches and BYPASS are at max and there's still flow, distribute remaining flow to ACTIVE branches but only those
+                    // that had a non-zero flow request. Try to leave branches off that wanted to be off.
                     if (NumActiveBranches > 0) {
-                        ActiveFlowRate = FlowRemaining / NumActiveBranches;
+                        ActiveFlowRate = FlowRemaining / NumActiveBranches;  // denominator now only includes active branches that wanted to be "on"
                         for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
                             SplitterBranchOut = this_loopside.Splitter.BranchNumOut(OutletNum);
                             FirstNodeOnBranch = this_loopside.Branch(SplitterBranchOut).NodeNumIn;
-                            if (this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_Active ||
-                                this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_SeriesActive) {
+                            bool branchIsActive = this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_Active;
+                            bool branchIsSeriesActiveAndRequesting = this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_SeriesActive && this_loopside.Branch(SplitterBranchOut).RequestedMassFlow > 0.0;
+                            if (branchIsActive || branchIsSeriesActiveAndRequesting) { // only series active branches that want to be "on"
                                 // check Remaining flow (should be correct!)
                                 ActiveFlowRate = min(ActiveFlowRate, FlowRemaining);
                                 // set the flow rate to the MIN((MassFlowRate+AvtiveFlowRate), MaxAvail)

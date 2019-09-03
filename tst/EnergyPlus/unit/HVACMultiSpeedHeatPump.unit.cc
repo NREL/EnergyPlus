@@ -1320,6 +1320,12 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     EXPECT_DOUBLE_EQ(0.0, MSHeatPump(2).TotHeatEnergyRate);
     EXPECT_DOUBLE_EQ(0.0, MSHeatPump(2).TotCoolEnergyRate);
 
+    // verify min OAT from coil inputs
+    EXPECT_EQ(MSHeatPump(1).MinOATCompressorCooling, -25.0);
+    EXPECT_EQ(MSHeatPump(1).MinOATCompressorHeating, -8.0);
+    EXPECT_EQ(MSHeatPump(2).MinOATCompressorCooling, -25.0);
+    EXPECT_EQ(MSHeatPump(2).MinOATCompressorHeating, -8.0);
+
     DataLoopNode::Node(9).Temp = 24.0;
     DataLoopNode::Node(9).HumRat = 0.008;
     DataLoopNode::Node(6).Temp = 24.0;
