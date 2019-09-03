@@ -202,5 +202,75 @@ TEST_F(EnergyPlusFixture, UnitVentilatorSetOAMassFlowRateForCoolingVariablePerce
     EXPECT_NEAR(ExpectedOAMassFlowRate,OAMassFlowRate, 0.0001);
 
 }
+    
+TEST_F(EnergyPlusFixture, UnitVentilatorCalcMdotCCoilCycFanTest)
+{
+ 
+    Real64 QZnReq;
+    Real64 QCoilReq;
+    int UnitVentNum;
+    Real64 PartLoadRatio;
+    Real64 mdot;
+    Real64 ExpectedResult;
 
+    UnitVentNum = 1;
+    UnitVentilator::UnitVent.allocate(UnitVentNum);
+    UnitVentilator::UnitVent(UnitVentNum).FanOutletNode = 1;
+    UnitVentilator::UnitVent(UnitVentNum).AirInNode = 2;
+    DataLoopNode::Node.allocate(2);
+    DataLoopNode::Node(2).HumRat = 0.006;
+    DataLoopNode::Node(2).Temp = 23.0;
+    DataLoopNode::Node(1).Temp = 23.0;
+    DataLoopNode::Node(1).MassFlowRate = 1.0;
+
+    // Test 1: QZnReq is greater than zero (heating) so mdot should be zero after the call
+    UnitVentilator::UnitVent(1).MaxColdWaterFlow = 0.1234;
+    mdot = -0.9999;
+    QCoilReq = 5678.9;
+    QZnReq = 5678.9;
+    PartLoadRatio = 1.0;
+    ExpectedResult = 0.0;
+    UnitVentilator::CalcMdotCCoilCycFan(mdot,QCoilReq,QZnReq,UnitVentNum, PartLoadRatio);
+    
+    EXPECT_NEAR(ExpectedResult,mdot,0.0001);
+    EXPECT_NEAR(ExpectedResult,QCoilReq,0.0001);
+    
+    // Test 2: QZnReq is zero (no conditioning) so mdot should be zero after the call
+    UnitVentilator::UnitVent(1).MaxColdWaterFlow = 0.1234;
+    mdot = -0.9999;
+    QCoilReq = 0.0;
+    QZnReq = 0.0;
+    PartLoadRatio = 1.0;
+    ExpectedResult = 0.0;
+    UnitVentilator::CalcMdotCCoilCycFan(mdot,QCoilReq,QZnReq,UnitVentNum, PartLoadRatio);
+
+    EXPECT_NEAR(ExpectedResult,mdot,0.0001);
+    EXPECT_NEAR(ExpectedResult,QCoilReq,0.0001);
+
+    // Test 3a: QZnReq is less than zero (cooling) so mdot should be non-zero, calculated based on the other variables
+    UnitVentilator::UnitVent(1).MaxColdWaterFlow = 0.1234;
+    mdot = -0.9999;
+    QCoilReq = -5678.9;
+    QZnReq = -5678.9;
+    PartLoadRatio = 1.0;
+    ExpectedResult = 0.1234;
+    UnitVentilator::CalcMdotCCoilCycFan(mdot,QCoilReq,QZnReq,UnitVentNum, PartLoadRatio);
+
+    EXPECT_NEAR(ExpectedResult,mdot,0.0001);
+    EXPECT_NEAR(QCoilReq,QZnReq,0.1);
+
+    // Test 3b: QZnReq is less than zero (cooling) so mdot should be non-zero, calculated based on the other variables
+    UnitVentilator::UnitVent(1).MaxColdWaterFlow = 1.6;
+    mdot = -0.9999;
+    QCoilReq = -5678.9;
+    QZnReq = -5678.9;
+    PartLoadRatio = 0.5;
+    ExpectedResult = 0.8;
+    UnitVentilator::CalcMdotCCoilCycFan(mdot,QCoilReq,QZnReq,UnitVentNum, PartLoadRatio);
+
+    EXPECT_NEAR(ExpectedResult,mdot,0.0001);
+    EXPECT_NEAR(QCoilReq,QZnReq,0.1);
+
+}
+    
 } // namespace EnergyPlus
