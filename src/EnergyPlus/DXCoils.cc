@@ -10375,7 +10375,7 @@ namespace DXCoils {
         }
 
         if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(DXCoil(DXCoilNum).SchedPtr) > 0.0) && (PartLoadRatio > 0.0) &&
-            CompAmbTemp > DXCoil(DXCoilNum).MinOATCompressor) {
+            OutdoorDryBulb > DXCoil(DXCoilNum).MinOATCompressor) {
             // for cycling fan, reset mass flow to full on rate
             if (FanOpMode == CycFanCycCoil) AirMassFlow /= PartLoadRatio;
             if (FanOpMode == ContFanCycCoil) AirMassFlow *= AirFlowRatio;
