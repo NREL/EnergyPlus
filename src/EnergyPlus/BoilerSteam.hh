@@ -59,14 +59,6 @@ namespace EnergyPlus {
 
 namespace BoilerSteam {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-
     // MODULE VARIABLE DECLARATIONS:
     extern Real64 FuelUsed;           // W - Boiler fuel used
     extern Real64 BoilerLoad;         // W - Boiler Load
@@ -78,10 +70,6 @@ namespace BoilerSteam {
     extern Real64 BoilerMassFlowMinAvail; // kg/s - Boiler mass flow rate
 
     extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
-
-    // Types
 
     struct BoilerSpecs
     {
@@ -191,8 +179,6 @@ namespace BoilerSteam {
                              int const Num,                // boiler number
                              bool const FirstHVACIteration // TRUE if First iteration of simulation
     );
-
-    // End of Record Keeping subroutines for the BOILER:STEAM Module
 
 } // namespace BoilerSteam
 

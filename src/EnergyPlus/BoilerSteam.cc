@@ -90,12 +90,6 @@ namespace BoilerSteam {
     // PURPOSE OF THIS MODULE:
     // Performs steam boiler simulation for plant simulation
 
-    // METHODOLOGY EMPLOYED:
-    // The steam boiler based on
-
-    // REFERENCES:
-    // none
-
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using DataGlobals::BeginEnvrnFlag;
@@ -106,12 +100,6 @@ namespace BoilerSteam {
     using DataBranchAirLoopPlant::MassFlowTolerance;
     using General::RoundSigDigits;
     using General::TrimSigDigits;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
     Real64 FuelUsed(0.0);           // W - Boiler fuel used
@@ -125,18 +113,8 @@ namespace BoilerSteam {
     static std::string const FluidNameSteam("STEAM");
 
     Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
-
-    // Object Data
     Array1D<BoilerSpecs> Boiler; // dimension to number of machines
     Array1D<ReportVars> BoilerReport;
-
-    // MODULE SUBROUTINES:
-
-    // Beginning of Boiler Module Driver Subroutines
-
-    // Functions
 
     void clear_state()
     {
@@ -177,21 +155,8 @@ namespace BoilerSteam {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine controls the boiler component simulation
 
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES: na
-
         // Using/Aliasing
         using namespace FluidProperties;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool GetInput(true); // if TRUE read user input
@@ -259,8 +224,6 @@ namespace BoilerSteam {
         // METHODOLOGY EMPLOYED:
         // standard EnergyPlus input retrieval using input Processor
 
-        // REFERENCES: na
-
         // Using/Aliasing
         using namespace DataGlobalConstants;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
@@ -272,7 +235,6 @@ namespace BoilerSteam {
         using NodeInputManager::GetOnlySingleNode;
 
         // Locals
-        // PARAMETERS
         static std::string const RoutineName("GetBoilerInput: ");
 
         // LOCAL VARIABLES
@@ -510,11 +472,6 @@ namespace BoilerSteam {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        // REFERENCES:
-        // Na
-
-        // USE STATEMENTS:
-
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataPlant::DualSetPointDeadBand;
@@ -530,17 +487,8 @@ namespace BoilerSteam {
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitBoiler");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true);
@@ -618,11 +566,8 @@ namespace BoilerSteam {
             Boiler(BoilerNum).BoilerPressCheck = 0.0;
             FuelUsed = 0.0;
             BoilerLoad = 0.0;
-            //         BoilerMassFlowRate = 0.0
             BoilerOutletTemp = 0.0;
             BoilerMaxPress = 0.0;
-            //        BoilerMassFlowMaxAvail = 0.0
-            //        BoilerMassFlowMinAvail = 0.0
 
             if ((Node(Boiler(BoilerNum).BoilerOutletNodeNum).TempSetPoint == SensedNodeFlagValue) &&
                 (Node(Boiler(BoilerNum).BoilerOutletNodeNum).TempSetPointLo == SensedNodeFlagValue)) {
@@ -691,9 +636,6 @@ namespace BoilerSteam {
         // Obtains Steam flow rate from the plant sizing array. Calculates nominal capacity from
         // the hot water flow rate and the hot water loop design delta T.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataSizing;
         using DataPlant::PlantFinalSizesOkayToReport;
@@ -706,17 +648,8 @@ namespace BoilerSteam {
         using namespace OutputReportPredefined;
         using ReportSizingManager::ReportSizingOutput;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeBoiler");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizNum(0);        // Plant Sizing index corresponding to CurLoopNum
@@ -794,9 +727,6 @@ namespace BoilerSteam {
             }
         }
 
-        //  model has no volume flow rate, may need something else for steam loop sizing DSU??
-        // DSU?      CALL RegisterPlantCompDesignFlow(Boiler(BoilerNum)%BoilerInletNodeNum,Boiler(BoilerNum)%VolFlowRate)
-
         if (PlantFinalSizesOkayToReport) {
             // create predefined report
             equipName = Boiler(BoilerNum).Name;
@@ -831,9 +761,6 @@ namespace BoilerSteam {
         // and a second order polynomial fit of performance data to obtain part
         // load performance
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataBranchAirLoopPlant::ControlType_SeriesActive;
         using DataPlant::DualSetPointDeadBand;
@@ -845,14 +772,8 @@ namespace BoilerSteam {
         using General::RoundSigDigits;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcBoilerModel");
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 BoilerEff;             // boiler efficiency
@@ -872,8 +793,6 @@ namespace BoilerSteam {
         Real64 CpWater;              // Heat capacity of condensed steam
         int BoilerInletNode;         // Boiler inlet node number
         int BoilerOutletNode;        // Boiler outlet node number
-        //      CHARACTER(len=25) CErrCount                        !
-        //      INTEGER,SAVE :: PressErrCount=0                    !
         int LoopNum;
         int LoopSideNum;
 
@@ -956,10 +875,6 @@ namespace BoilerSteam {
             LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
 
             BoilerMassFlowRate = BoilerLoad / (LatentEnthSteam + (CpWater * BoilerDeltaTemp));
-            // Check to see if the Maximum is exceeded, if so set to maximum
-            //       BoilerMassFlowRate = MIN(BoilerMassFlowRateMax, BoilerMassFlowRate)
-            //       BoilerMassFlowRate = MIN(BoilerMassFlowRate,Node(BoilerInletNode)%MassFlowRateMaxAvail)  !CRBranchPump
-            //       BoilerMassFlowRate = MAX(BoilerMassFlowRate,Node(BoilerInletNode)%MassFlowRateMinAvail)     !CRBranchPump
 
             SetComponentFlowRate(BoilerMassFlowRate,
                                  BoilerInletNode,
@@ -1114,28 +1029,7 @@ namespace BoilerSteam {
         // PURPOSE OF THIS SUBROUTINE:
         // Boiler simulation reporting
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        //     USE DataPlant, ONLY : PlantLoop
-        // Using/Aliasing
         using PlantUtilities::SafeCopyPlantNode;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BoilerInletNode;  // Boiler inlet node number
@@ -1181,8 +1075,6 @@ namespace BoilerSteam {
         BoilerReport(Num).BoilerEnergy = BoilerReport(Num).BoilerLoad * ReportingConstant;
         BoilerReport(Num).FuelConsumed = BoilerReport(Num).FuelUsed * ReportingConstant;
     }
-
-    // End of Record Keeping subroutines for the BOILER:STEAM Module
 
 } // namespace BoilerSteam
 
