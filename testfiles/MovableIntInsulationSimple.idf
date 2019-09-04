@@ -497,6 +497,8 @@
 
   Output:Variable,*,Surface Inside Face Temperature,timestep;
 
+  Output:Variable,Zn001:Wall001,Surface Inside Face Interior Movable Insulation Temperature,timestep;
+
   Output:Variable,*,Surface Outside Face Temperature,timestep;
 
   Output:VariableDictionary,Regular;
