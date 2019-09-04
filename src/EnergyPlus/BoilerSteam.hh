@@ -60,11 +60,6 @@ namespace EnergyPlus {
 namespace BoilerSteam {
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Real64 modFuelUsed;           // W - Boiler fuel used
-    extern Real64 modBoilerLoad;         // W - Boiler Load
-    extern Real64 modBoilerMassFlowRate; // kg/s - Boiler mass flow rate
-    extern Real64 modBoilerOutletTemp;   // W - Boiler outlet temperature
-    extern Real64 modBoilerMaxPress;
     extern int NumBoilers;                // Number of boilers
 
     extern Array1D_bool CheckEquipName;
@@ -105,13 +100,20 @@ namespace BoilerSteam {
         bool myFlag;
         bool myEnvrnFlag;
 
+        Real64 modFuelUsed;           // W - Boiler fuel used
+        Real64 modBoilerLoad;         // W - Boiler Load
+        Real64 modBoilerMassFlowRate; // kg/s - Boiler mass flow rate
+        Real64 modBoilerOutletTemp;   // W - Boiler outlet temperature
+        Real64 modBoilerMaxPress;
+
         // Default Constructor
         BoilerSpecs()
             : FuelType(0), Available(false), ON(false), MissingSetPointErrDone(false), UseLoopSetPoint(false), DesMassFlowRate(0.0),
               MassFlowRate(0.0), NomCap(0.0), NomCapWasAutoSized(false), Effic(0.0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0),
               OperPartLoadRat(0.0), TempUpLimitBoilerOut(0.0), BoilerMaxOperPress(0.0), BoilerPressCheck(0.0), SizFac(0.0), BoilerInletNodeNum(0),
               BoilerOutletNodeNum(0), FullLoadCoef(3, 0.0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), PressErrIndex(0),
-              FluidIndex(0), myFlag(true), myEnvrnFlag(true)
+              FluidIndex(0), myFlag(true), myEnvrnFlag(true), modFuelUsed(0.0), modBoilerLoad(0.0), modBoilerMassFlowRate(0.0), modBoilerOutletTemp(0.0),
+              modBoilerMaxPress(0.0)
         {
         }
     };
