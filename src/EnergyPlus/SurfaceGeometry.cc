@@ -1441,6 +1441,7 @@ namespace SurfaceGeometry {
                                                     Surface(SurfNum).Name +
                                                     " does not have the same materials in the reverse order as the construction " +
                                                     Construct(ConstrNumFound).Name + " of adjacent surface " + Surface(Found).Name);
+                                    ShowContinueError("or the properties of the reversed layers are not correct due to differing layer front and back side values");
                                     if (!Construct(ConstrNum).ReverseConstructionLayersOrderWarning ||
                                         !Construct(ConstrNumFound).ReverseConstructionLayersOrderWarning) {
                                         ShowContinueError("...this problem for this pair will not be reported again.");
@@ -1453,6 +1454,7 @@ namespace SurfaceGeometry {
                                                      Surface(SurfNum).Name +
                                                      " does not have the same materials in the reverse order as the construction " +
                                                      Construct(ConstrNumFound).Name + " of adjacent surface " + Surface(Found).Name);
+                                    ShowContinueError("or the properties of the reversed layers are not correct due to differing layer front and back side values");
                                     ShowContinueError("...but Nominal U values are similar, diff=[" +
                                                       RoundSigDigits(std::abs(NominalU(ConstrNum) - NominalU(ConstrNumFound)), 4) +
                                                       "] ... simulation proceeds.");
@@ -13274,13 +13276,17 @@ namespace SurfaceGeometry {
         for (LayerNo = 1; LayerNo <= TotalLayers; ++LayerNo) {
             auto &thisConstLayer(Construct(ConstrNum).LayerPoint(LayerNo));
             auto &revConstLayer(Construct(ConstrNumRev).LayerPoint(TotalLayers - LayerNo + 1));
-            if (thisConstLayer != revConstLayer) {  // Not pointing to the same layer
+            auto &thisMatLay(Material(thisConstLayer));
+            auto &revMatLay(Material(revConstLayer));
+            if ((thisConstLayer != revConstLayer) ||    // Not pointing to the same layer
+                (thisMatLay.Group == WindowGlass) ||    // Not window glass or glass equivalent layer which have
+                (revMatLay.Group == WindowGlass) ||     // to have certain properties flipped from front to back
+                (thisMatLay.Group == GlassEquivalentLayer) ||
+                (revMatLay.Group == GlassEquivalentLayer)) {
                 // If not point to the same layer, check to see if this is window glass which might need to have
                 // front and back material properties reversed.
-                auto &thisMatLay(Material(thisConstLayer));
-                auto &revMatLay(Material(revConstLayer));
                 Real64 const SmallDiff = 0.0001;
-                if ((thisMatLay.Group = WindowGlass) && (thisMatLay.Group = WindowGlass)) {
+                if ((thisMatLay.Group == WindowGlass) && (revMatLay.Group == WindowGlass)) {
                     // Both layers are window glass, so need to check to see if the properties are reversed
                     if ((abs(thisMatLay.Thickness - revMatLay.Thickness) > SmallDiff) ||
                         (abs(thisMatLay.ReflectSolBeamBack - revMatLay.ReflectSolBeamFront) > SmallDiff) ||
@@ -13299,7 +13305,7 @@ namespace SurfaceGeometry {
                         RevLayerDiffs = true;
                         break; // exit when diff
                     }   // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
-                } else if ((thisMatLay.Group = GlassEquivalentLayer) && (thisMatLay.Group = GlassEquivalentLayer)) {
+                } else if ((thisMatLay.Group == GlassEquivalentLayer) && (revMatLay.Group == GlassEquivalentLayer)) {
                     auto &thisMatLay(Material(thisConstLayer));
                     auto &revMatLay(Material(revConstLayer));
                     Real64 const SmallDiff = 0.0001;
@@ -13318,7 +13324,7 @@ namespace SurfaceGeometry {
                         (abs(thisMatLay.TausBackBeamDiffVis - revMatLay.TausFrontBeamDiffVis) > SmallDiff) ||
                         (abs(thisMatLay.TausFrontBeamDiffVis - revMatLay.TausBackBeamDiffVis) > SmallDiff) ||
                         (abs(thisMatLay.ReflBackBeamDiffVis - revMatLay.ReflFrontBeamDiffVis) > SmallDiff) ||
-                        (abs(thisMatLay.ReflFrontBeamDiffVis - revMatLay.ReflBackBeamDiffVis) > SmallDiff) || // 16
+                        (abs(thisMatLay.ReflFrontBeamDiffVis - revMatLay.ReflBackBeamDiffVis) > SmallDiff) ||
                         (abs(thisMatLay.TausDiffDiff - revMatLay.TausDiffDiff) > SmallDiff) ||
                         (abs(thisMatLay.ReflBackDiffDiff - revMatLay.ReflFrontDiffDiff) > SmallDiff) ||
                         (abs(thisMatLay.ReflFrontDiffDiff - revMatLay.ReflBackDiffDiff) > SmallDiff) ||
