@@ -871,7 +871,6 @@ namespace SurfaceGeometry {
         int Found;                    // For matching interzone surfaces
         int ConstrNumFound;           // Construction number of matching interzone surface
         static bool NonMatch(false);  // Error for non-matching interzone surfaces
-        int Lay;                      // Layer number
         int MovedSurfs;               // Number of Moved Surfaces (when sorting into hierarchical structure)
         static bool SurfError(false); // General Surface Error, causes fatal error at end of routine
         int Loop;
