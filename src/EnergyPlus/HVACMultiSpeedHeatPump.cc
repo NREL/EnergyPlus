@@ -847,6 +847,11 @@ namespace HVACMultiSpeedHeatPump {
                     ErrorsFound = true;
                     LocalError = false;
                 }
+                MSHeatPump(MSHPNum).MinOATCompressorHeating = DXCoils::GetMinOATCompressorUsingIndex(MSHeatPump(MSHPNum).DXHeatCoilIndex, LocalError);
+                if ( LocalError ) {
+                    ShowContinueError("...for heating coil. Occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
+                    LocalError = false;
+                }
                 SetUpCompSets(CurrentModuleObject,
                               MSHeatPump(MSHPNum).Name,
                               "Coil:Heating:DX:MultiSpeed",
@@ -1034,13 +1039,12 @@ namespace HVACMultiSpeedHeatPump {
                 ErrorsFound = true;
             }
 
-            MSHeatPump(MSHPNum).MinOATCompressor = Numbers(1);
+            //MSHeatPump(MSHPNum).MinOATCompressor = Numbers(1); // deprecated, now uses coil MinOAT inputs
 
             if (UtilityRoutines::SameString(Alphas(12), "Coil:Cooling:DX:MultiSpeed")) {
                 MSHeatPump(MSHPNum).CoolCoilType = MultiSpeedCoolingCoil;
-                MSHeatPump(MSHPNum).CoolCoilNum = inputProcessor->getObjectItemNum("Coil:Cooling:DX:MultiSpeed", Alphas(13));
                 MSHeatPump(MSHPNum).DXCoolCoilName = Alphas(13);
-                if (MSHeatPump(MSHPNum).CoolCoilNum <= 0) {
+                if (inputProcessor->getObjectItemNum("Coil:Cooling:DX:MultiSpeed", Alphas(13)) <= 0) {
                     ShowSevereError("Configuration error in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ShowContinueError(cAlphaFields(13) + " \"" + Alphas(13) + "\" not found.");
                     ShowContinueError(cAlphaFields(12) + " must be Coil:Cooling:DX:MultiSpeed ");
@@ -1068,6 +1072,11 @@ namespace HVACMultiSpeedHeatPump {
                     ShowSevereError("The outlet node number of " + cAlphaFields(13) + " is not found \"" + Alphas(13) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ErrorsFound = true;
+                    LocalError = false;
+                }
+                MSHeatPump(MSHPNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(MSHeatPump(MSHPNum).DXCoolCoilIndex, LocalError);
+                if (LocalError) {
+                    ShowContinueError("...for cooling coil. Occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     LocalError = false;
                 }
             } else {
@@ -3404,7 +3413,7 @@ namespace HVACMultiSpeedHeatPump {
         if (MSHeatPump(MSHeatPumpNum).FanPlaceType == BlowThru) {
             SimulateFanComponents(MSHeatPump(MSHeatPumpNum).FanName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).FanNum, FanSpeedRatio);
             if (QZnReq < (-1.0 * SmallLoad)) {
-                if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressor) {
+                if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorCooling) {
                     SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
                                         SpeedRatio,
                                         PartLoadFrac,
@@ -3435,7 +3444,7 @@ namespace HVACMultiSpeedHeatPump {
             }
             if (MSHeatPump(MSHeatPumpNum).HeatCoilType == MultiSpeedHeatingCoil) {
                 if (QZnReq > SmallLoad) {
-                    if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressor) {
+                    if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorHeating) {
                         SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
                                             SpeedRatio,
                                             PartLoadFrac,
@@ -3487,7 +3496,7 @@ namespace HVACMultiSpeedHeatPump {
             // Call twice to ensure the fan outlet conditions are updated
             SimulateFanComponents(MSHeatPump(MSHeatPumpNum).FanName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).FanNum, FanSpeedRatio);
             if (QZnReq < (-1.0 * SmallLoad)) {
-                if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressor) {
+                if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorCooling) {
                     SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
                                         SpeedRatio,
                                         PartLoadFrac,
@@ -3518,7 +3527,7 @@ namespace HVACMultiSpeedHeatPump {
             }
             if (MSHeatPump(MSHeatPumpNum).HeatCoilType == MultiSpeedHeatingCoil) {
                 if (QZnReq > SmallLoad) {
-                    if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressor) {
+                    if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorHeating) {
                         SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
                                             SpeedRatio,
                                             PartLoadFrac,
@@ -3573,7 +3582,7 @@ namespace HVACMultiSpeedHeatPump {
             }
         } else { // otherwise simulate DX coils then fan then supplemental heater
             if (QZnReq < (-1.0 * SmallLoad)) {
-                if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressor) {
+                if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorCooling) {
                     SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
                                         SpeedRatio,
                                         PartLoadFrac,
@@ -3604,7 +3613,7 @@ namespace HVACMultiSpeedHeatPump {
             }
             if (MSHeatPump(MSHeatPumpNum).HeatCoilType == MultiSpeedHeatingCoil) {
                 if (QZnReq > SmallLoad) {
-                    if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressor) {
+                    if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorHeating) {
                         SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
                                             SpeedRatio,
                                             PartLoadFrac,

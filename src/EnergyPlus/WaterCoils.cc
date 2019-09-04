@@ -3685,7 +3685,7 @@ namespace WaterCoils {
                     } // End if for dry coil
                 }
             }
-
+            
             // Report outlet variables at nodes
             WaterCoil(CoilNum).OutletAirTemp = OutletAirTemp;
             WaterCoil(CoilNum).OutletAirHumRat = OutletAirHumRat;

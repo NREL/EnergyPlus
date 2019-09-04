@@ -8769,7 +8769,7 @@ namespace DXCoils {
             CompAmbTemp = OutdoorDryBulb;
             if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
                 CondInletTemp = ZT(DXCoil(DXCoilNum).SecZonePtr);
-                CompAmbTemp = CondInletTemp;
+                CompAmbTemp = CondInletTemp; // assumes compressor is in same location as secondary coil
                 OutdoorDryBulb = CondInletTemp;
                 OutdoorHumRat = ZoneAirHumRat(DXCoil(DXCoilNum).SecZonePtr);
                 OutdoorWetBulb = DXCoil(DXCoilNum).EvapInletWetBulb;
@@ -8781,9 +8781,10 @@ namespace DXCoils {
             // (Outdoor wet-bulb temp from DataEnvironment) + (1.0-EvapCondEffectiveness) * (drybulb - wetbulb)
             CondInletTemp = OutdoorWetBulb + (OutdoorDryBulb - OutdoorWetBulb) * (1.0 - DXCoil(DXCoilNum).EvapCondEffect(Mode));
             CondInletHumRat = PsyWFnTdbTwbPb(CondInletTemp, OutdoorWetBulb, OutdoorPressure);
-            CompAmbTemp = CondInletTemp;
+            CompAmbTemp = OutdoorDryBulb;
         } else if (DXCoil(DXCoilNum).CondenserType(Mode) == WaterHeater) {
             CompAmbTemp = HPWHCrankcaseDBTemp; // Temperature at HP water heater compressor
+            CondInletTemp = HPWHCrankcaseDBTemp; // Temperature at HP water heater compressor
         }
 
         // Initialize crankcase heater, operates below OAT defined in input deck for HP DX cooling coil
@@ -10304,6 +10305,7 @@ namespace DXCoils {
         Real64 OutletAirTemp;             // Supply air temperature (average value if constant fan, full output if cycling fan)
         Real64 OutletAirHumRat;           // Supply air humidity ratio (average value if constant fan, full output if cycling fan)
         Real64 OutletAirEnthalpy;         // Supply air enthalpy (average value if constant fan, full output if cycling fan)
+        static Real64 CompAmbTemp(0.0); // Ambient temperature at compressor
 
         if (present(OnOffAirFlowRatio)) {
             AirFlowRatio = OnOffAirFlowRatio;
@@ -10314,10 +10316,12 @@ namespace DXCoils {
         // Get condenser outdoor node info from DX Heating Coil
         if (DXCoil(DXCoilNum).CondenserInletNodeNum(1) != 0) {
             OutdoorDryBulb = Node(DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Temp;
+            CompAmbTemp = OutdoorDryBulb;
             if (DXCoil(DXCoilNum).CondenserType(Mode) == WaterCooled) {
                 OutdoorHumRat = OutHumRat;
                 OutdoorPressure = OutBaroPress;
                 OutdoorWetBulb = OutWetBulbTemp;
+                CompAmbTemp = OutDryBulbTemp;
             } else {
                 OutdoorPressure = Node(DXCoil(DXCoilNum).CondenserInletNodeNum(1)).Press;
                 // If node is not connected to anything, pressure = default, use weather data
@@ -10336,6 +10340,7 @@ namespace DXCoils {
                     OutdoorHumRat = ZoneAirHumRat(DXCoil(DXCoilNum).SecZonePtr);
                     OutdoorWetBulb = DXCoil(DXCoilNum).EvapInletWetBulb;
                     OutdoorPressure = OutBaroPress;
+                    CompAmbTemp = OutdoorDryBulb;
                 }
             }
         } else if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
@@ -10343,11 +10348,13 @@ namespace DXCoils {
             OutdoorHumRat = ZoneAirHumRat(DXCoil(DXCoilNum).SecZonePtr);
             OutdoorWetBulb = DXCoil(DXCoilNum).EvapInletWetBulb;
             OutdoorPressure = OutBaroPress;
+            CompAmbTemp = OutdoorDryBulb;
         } else {
             OutdoorDryBulb = OutDryBulbTemp;
             OutdoorHumRat = OutHumRat;
             OutdoorPressure = OutBaroPress;
             OutdoorWetBulb = OutWetBulbTemp;
+            CompAmbTemp = OutdoorDryBulb;
         }
 
         AirMassFlow = DXCoil(DXCoilNum).InletAirMassFlowRate;
@@ -10361,7 +10368,7 @@ namespace DXCoils {
         PLRHeating = 0.0;
         DXCoil(DXCoilNum).HeatingCoilRuntimeFraction = 0.0;
         // Initialize crankcase heater, operates below OAT defined in input deck for HP DX heating coil
-        if (OutdoorDryBulb < DXCoil(DXCoilNum).MaxOATCrankcaseHeater) {
+        if (CompAmbTemp < DXCoil(DXCoilNum).MaxOATCrankcaseHeater) {
             CrankcaseHeatingPower = DXCoil(DXCoilNum).CrankcaseHeaterCapacity;
         } else {
             CrankcaseHeatingPower = 0.0;
@@ -10773,6 +10780,7 @@ namespace DXCoils {
         Real64 OutdoorPressure;          // Outdoor barometric pressure at condenser (Pa)
         bool LocalForceOn;
         Real64 AirMassFlowRatio2; // Ratio of low speed air mass flow to rated air mass flow
+        static Real64 CompAmbTemp(0.0); // Ambient temperature at compressor
 
         if (present(ForceOn)) {
             LocalForceOn = true;
@@ -10793,22 +10801,26 @@ namespace DXCoils {
                 OutdoorHumRat = Node(DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).HumRat;
                 OutdoorWetBulb = PsyTwbFnTdbWPb(OutdoorDryBulb, OutdoorHumRat, OutdoorPressure);
             }
+            CompAmbTemp = OutdoorDryBulb;
             if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
                 OutdoorDryBulb = ZT(DXCoil(DXCoilNum).SecZonePtr);
                 OutdoorHumRat = ZoneAirHumRat(DXCoil(DXCoilNum).SecZonePtr);
                 OutdoorWetBulb = DXCoil(DXCoilNum).EvapInletWetBulb;
                 OutdoorPressure = OutBaroPress;
+                CompAmbTemp = OutdoorDryBulb;
             }
         } else if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
             OutdoorDryBulb = ZT(DXCoil(DXCoilNum).SecZonePtr);
             OutdoorHumRat = ZoneAirHumRat(DXCoil(DXCoilNum).SecZonePtr);
             OutdoorWetBulb = DXCoil(DXCoilNum).EvapInletWetBulb;
             OutdoorPressure = OutBaroPress;
+            CompAmbTemp = OutdoorDryBulb;
         } else {
             OutdoorDryBulb = OutDryBulbTemp;
             OutdoorHumRat = OutHumRat;
             OutdoorPressure = OutBaroPress;
             OutdoorWetBulb = OutWetBulbTemp;
+            CompAmbTemp = OutdoorDryBulb;
         }
 
         AirMassFlow = DXCoil(DXCoilNum).InletAirMassFlowRate;
@@ -10830,7 +10842,7 @@ namespace DXCoils {
             CondInletHumRat = PsyWFnTdbTwbPb(CondInletTemp, OutdoorWetBulb, OutdoorPressure);
         }
 
-        if ((AirMassFlow > 0.0 && CondInletTemp >= DXCoil(DXCoilNum).MinOATCompressor) &&
+        if ((AirMassFlow > 0.0 && CompAmbTemp >= DXCoil(DXCoilNum).MinOATCompressor) &&
             ((GetCurrentScheduleValue(DXCoil(DXCoilNum).SchedPtr) > 0.0) || (LocalForceOn)) && (SpeedRatio > 0.0 || CycRatio > 0.0)) {
 
             RhoAir = PsyRhoAirFnPbTdbW(OutdoorPressure, OutdoorDryBulb, OutdoorHumRat);
@@ -14603,7 +14615,7 @@ namespace DXCoils {
         if (CoilIndex == 0) {
 
             ShowSevereError("GetMinOATCompressorUsingIndex: Index passed = 0");
-            ShowContinueError("... returning Min OAT as -1000.");
+            ShowContinueError("... returning Min OAT for compressor operation as -1000.");
             ErrorsFound = true;
             MinOAT = -1000.0;
 
