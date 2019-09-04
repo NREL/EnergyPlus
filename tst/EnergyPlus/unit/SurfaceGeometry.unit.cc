@@ -4557,8 +4557,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test4)
     EXPECT_TRUE(has_err_output(false));
 
     std::string error_string = delimited_string({
-        "   ** Warning ** GlobalGeometryRules: Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on "
-        "the default SurfaceGeometry for 'Relative to zone' coordinate.",
+        "   ** Warning ** GlobalGeometryRules: Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on the default SurfaceGeometry for 'Relative to zone' coordinate.",
         "   **   ~~~   ** Coordinate System=\"WORLD\"; while ",
         "   **   ~~~   ** Rectangular Surface Coordinate System=\"defaults to RELATIVE\".",
     });
