@@ -104,7 +104,6 @@ namespace BoilerSteam {
         Real64 BoilerLoad;         // W - Boiler Load
         Real64 BoilerMassFlowRate; // kg/s - Boiler mass flow rate
         Real64 BoilerOutletTemp;   // W - Boiler outlet temperature
-        Real64 BoilerMaxPress;
 
         Real64 BoilerEnergy;     // J - Boiler energy integrated over time
         Real64 FuelConsumed;     // J - Boiler Fuel consumed integrated over time
@@ -117,7 +116,7 @@ namespace BoilerSteam {
               OperPartLoadRat(0.0), TempUpLimitBoilerOut(0.0), BoilerMaxOperPress(0.0), BoilerPressCheck(0.0), SizFac(0.0), BoilerInletNodeNum(0),
               BoilerOutletNodeNum(0), FullLoadCoef(3, 0.0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), PressErrIndex(0),
               FluidIndex(0), myFlag(true), myEnvrnFlag(true), FuelUsed(0.0), BoilerLoad(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0),
-              BoilerMaxPress(0.0), BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0)
+              BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0)
         {
         }
     };
