@@ -100,11 +100,15 @@ namespace BoilerSteam {
         bool myFlag;
         bool myEnvrnFlag;
 
-        Real64 modFuelUsed;           // W - Boiler fuel used
-        Real64 modBoilerLoad;         // W - Boiler Load
-        Real64 modBoilerMassFlowRate; // kg/s - Boiler mass flow rate
-        Real64 modBoilerOutletTemp;   // W - Boiler outlet temperature
-        Real64 modBoilerMaxPress;
+        Real64 FuelUsed;           // W - Boiler fuel used
+        Real64 BoilerLoad;         // W - Boiler Load
+        Real64 BoilerMassFlowRate; // kg/s - Boiler mass flow rate
+        Real64 BoilerOutletTemp;   // W - Boiler outlet temperature
+        Real64 BoilerMaxPress;
+
+        Real64 BoilerEnergy;     // J - Boiler energy integrated over time
+        Real64 FuelConsumed;     // J - Boiler Fuel consumed integrated over time
+        Real64 BoilerInletTemp;  // C - Boiler inlet temperature
 
         // Default Constructor
         BoilerSpecs()
@@ -112,35 +116,14 @@ namespace BoilerSteam {
               MassFlowRate(0.0), NomCap(0.0), NomCapWasAutoSized(false), Effic(0.0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0),
               OperPartLoadRat(0.0), TempUpLimitBoilerOut(0.0), BoilerMaxOperPress(0.0), BoilerPressCheck(0.0), SizFac(0.0), BoilerInletNodeNum(0),
               BoilerOutletNodeNum(0), FullLoadCoef(3, 0.0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), PressErrIndex(0),
-              FluidIndex(0), myFlag(true), myEnvrnFlag(true), modFuelUsed(0.0), modBoilerLoad(0.0), modBoilerMassFlowRate(0.0), modBoilerOutletTemp(0.0),
-              modBoilerMaxPress(0.0)
-        {
-        }
-    };
-
-    struct ReportVars
-    {
-        // Members
-        Real64 BoilerLoad;       // W - Boiler operating load
-        Real64 BoilerEnergy;     // J - Boiler energy integrated over time
-        Real64 FuelUsed;         // W - Boiler fuel used
-        Real64 FuelConsumed;     // J - Boiler Fuel consumed integrated over time
-        Real64 BoilerInletTemp;  // C - Boiler inlet temperature
-        Real64 BoilerOutletTemp; // C - Boiler outlet temperature
-        Real64 Mdot;             // kg/s - Boiler mass flow rate
-        Real64 BoilerMaxOperPress;
-
-        // Default Constructor
-        ReportVars()
-            : BoilerLoad(0.0), BoilerEnergy(0.0), FuelUsed(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), BoilerOutletTemp(0.0), Mdot(0.0),
-              BoilerMaxOperPress(0.0)
+              FluidIndex(0), myFlag(true), myEnvrnFlag(true), FuelUsed(0.0), BoilerLoad(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0),
+              BoilerMaxPress(0.0), BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0)
         {
         }
     };
 
     // Object Data
     extern Array1D<BoilerSpecs> Boiler; // dimension to number of machines
-    extern Array1D<ReportVars> BoilerReport;
 
     // Functions
 
