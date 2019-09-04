@@ -55,6 +55,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -1039,6 +1040,8 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOffSim)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
+    FluidProperties::InitializeGlycRoutines();
+
     // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation();
 
@@ -2016,6 +2019,8 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
         "    ;                        !- Rated Ratio for Air and Water Convection",
     });
     ASSERT_TRUE(process_idf(idf_objects));
+
+    FluidProperties::InitializeGlycRoutines();
 
     // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation();

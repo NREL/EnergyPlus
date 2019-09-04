@@ -223,6 +223,13 @@ namespace FluidProperties {
 
     // Functions
 
+    void InitializeGlycRoutines()
+    {
+#ifdef EP_cache_GlycolSpecificHeat
+        cached_t_sh.allocate({0, t_sh_cache_size});
+#endif
+    }
+
     void GetFluidPropertiesData()
     {
 
@@ -589,9 +596,6 @@ namespace FluidProperties {
         cNumericFieldNames = "";
         lNumericFieldBlanks = false;
 
-#ifdef EP_cache_GlycolSpecificHeat
-        cached_t_sh.allocate({0, t_sh_cache_size});
-#endif
         // Check to see if there is any FluidName input.  If not, this is okay as
         // long as the user only desires to simulate loops with water.  More than
         // one FluidName input is not allowed.

@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -437,6 +438,8 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+
+    FluidProperties::InitializeGlycRoutines();
 
     // Test for #7053:
     // Fake that there is at least one UnitarySystemPerformance:Multispeed object

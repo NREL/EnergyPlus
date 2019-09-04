@@ -57,6 +57,7 @@
 #include <DataAirLoop.hh>
 #include <DataConvergParams.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -196,6 +197,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
+    FluidProperties::InitializeGlycRoutines();
 
     GetSetPointManagerInputs();
     // check specified control variable type is "HumidityRatio"

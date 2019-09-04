@@ -73,6 +73,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataStringGlobals.hh>
 #include <DataSystemVariables.hh>
+#include <FluidProperties.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
 #include <InputProcessing/InputProcessor.hh>

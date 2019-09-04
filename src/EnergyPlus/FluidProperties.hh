@@ -381,6 +381,8 @@ namespace FluidProperties {
 
     void clear_state();
 
+    void InitializeGlycRoutines();
+
     void GetFluidPropertiesData();
 
     //*****************************************************************************

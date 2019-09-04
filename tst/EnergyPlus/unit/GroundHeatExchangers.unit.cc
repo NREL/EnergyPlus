@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
@@ -181,6 +182,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_GetGFunc)
 TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcHXResistance)
 {
     // Initializations
+    FluidProperties::InitializeGlycRoutines();
     GLHESlinky thisGLHE;
 
     PlantLoop.allocate(1);
@@ -1187,6 +1189,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
 
+    FluidProperties::InitializeGlycRoutines();
+
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
     Node(thisGLHE.inletNodeNum).Temp = 20;
@@ -1669,6 +1673,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
 
+    FluidProperties::InitializeGlycRoutines();
+
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
     Node(thisGLHE.inletNodeNum).Temp = 13.0;
@@ -1973,6 +1979,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
 
+    FluidProperties::InitializeGlycRoutines();
+
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
     Node(thisGLHE.inletNodeNum).Temp = 13.0;
@@ -2268,6 +2276,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
     GetPlantInput();
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
+
+    FluidProperties::InitializeGlycRoutines();
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -2571,6 +2581,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
     thisGLHE.loopNum = 1;
     Node(thisGLHE.inletNodeNum).Temp = 20.0;
     thisGLHE.massFlowRate = 1;
+    FluidProperties::InitializeGlycRoutines();
 
     Real64 const tolerance = 0.00001;
 
@@ -2864,6 +2875,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
     GetPlantInput();
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
+
+    FluidProperties::InitializeGlycRoutines();
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -3170,6 +3183,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
 
     Real64 const tolerance = 0.00001;
 
+    FluidProperties::InitializeGlycRoutines();
+
     // Flow rate and pipe thickness picked to fix pipe resistance at 0.05
     EXPECT_NEAR(thisGLHE.theta_1, 0.33333, tolerance);
     EXPECT_NEAR(thisGLHE.theta_2, 3.0, tolerance);
@@ -3460,6 +3475,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     GetPlantInput();
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
+
+    FluidProperties::InitializeGlycRoutines();
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;
@@ -3758,6 +3775,8 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     GetPlantInput();
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
+
+    FluidProperties::InitializeGlycRoutines();
 
     auto &thisGLHE(verticalGLHE[0]);
     thisGLHE.loopNum = 1;

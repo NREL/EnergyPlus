@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -1212,6 +1213,8 @@ TEST_F(EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest)
     DataEnvironment::DayOfWeek = 1;
     DataEnvironment::DayOfYear_Schedule = 1;
     ScheduleManager::UpdateScheduleValues();
+
+    FluidProperties::InitializeGlycRoutines();
 
     GetOASysInputFlag = true;
     DataGlobals::BeginEnvrnFlag = true;

@@ -554,6 +554,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     DataGlobals::DoingSizing = true;
 
     InitializePsychRoutines();
+    FluidProperties::InitializeGlycRoutines();
 
     bool ErrorsFound(false);
     GetZoneData(ErrorsFound);
@@ -860,6 +861,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     DataGlobals::DoingSizing = true;
 
     InitializePsychRoutines();
+    FluidProperties::InitializeGlycRoutines();
 
     bool ErrorsFound(false);
     GetZoneData(ErrorsFound);

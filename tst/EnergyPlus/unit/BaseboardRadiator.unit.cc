@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -77,6 +78,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     int BaseboardNum(0);
     int CntrlZoneNum(0);
     bool FirstHVACIteration(false);
+    FluidProperties::InitializeGlycRoutines();
 
     std::string const idf_objects = delimited_string({
         "  Zone,",

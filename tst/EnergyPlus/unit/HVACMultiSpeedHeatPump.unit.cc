@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DirectAirManager.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -1328,6 +1329,8 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_HeatRecoveryTest)
     DataPlant::PlantLoop.allocate(1);
     DataPlant::PlantLoop(1).FluidName = "WATER";
     DataPlant::PlantLoop(1).FluidIndex = 1;
+
+    FluidProperties::InitializeGlycRoutines();
 
     DataLoopNode::Node(HeatRecInNode).MassFlowRate = 0.0; // test heat recovery result with 0 water flow rate
     HVACMultiSpeedHeatPump::MSHPHeatRecovery(1);

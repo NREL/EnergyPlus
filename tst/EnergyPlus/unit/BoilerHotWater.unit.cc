@@ -64,6 +64,8 @@ using namespace EnergyPlus::DataSizing;
 
 TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
 {
+
+    FluidProperties::InitializeGlycRoutines();
     // unit test for autosizing boiler nominal capacity in Boiler:HotWater
     Boilers::Boiler.allocate(1);
     // Hardsized Hot Water Boiler
@@ -110,6 +112,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterAutoSizeTempTest)
 {
     // unit test for checking hot water temperature for autosizing
     // boiler nominal capacity in Boiler:HotWater
+    FluidProperties::InitializeGlycRoutines();
 
     Boilers::Boiler.allocate(1);
     // Autosized Hot Water Boiler

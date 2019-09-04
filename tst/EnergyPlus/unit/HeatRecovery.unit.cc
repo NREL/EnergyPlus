@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -490,6 +491,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
     Real64 Qhr_HeatingRateTot(0.0);
     int InletNode(0);  // Heat Recovery primary air inlet node number
     int OutletNode(0); // Heat Recovery primary air outlet node number
+    FluidProperties::InitializeGlycRoutines();
 
     std::string const idf_objects = delimited_string({
 

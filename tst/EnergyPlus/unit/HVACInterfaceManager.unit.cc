@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>
+#include <EnergyPlus/FluidProperties.hh>
 
 namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
@@ -85,6 +86,7 @@ TEST_F(EnergyPlusFixture, ExcessiveHeatStorage_Test)
     DataLoopNode::Node.allocate(TotNumLoops);
     DataLoopNode::Node(1).Temp = 100;
     DataLoopNode::Node(1).MassFlowRate = 10;
+    FluidProperties::InitializeGlycRoutines();
 
     // LoopSideInlet_MdotCpDeltaT should be < LoopSideInlet_McpDTdt
     // Therefore CapExcessStorageTime AND TotalTime will increase by 1 timestep

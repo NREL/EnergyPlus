@@ -70,6 +70,7 @@
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DirectAirManager.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
@@ -118,6 +119,8 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineReturnWaterChWSetPointManager)
     mySPM.minimumChilledWaterSetpoint = 7;
     mySPM.maximumChilledWaterSetpoint = 10;
     mySPM.returnTemperatureConstantTarget = 12;
+
+    FluidProperties::InitializeGlycRoutines();
 
     // test 1: normal, in range
     DataLoopNode::Node(1).Temp = 11;

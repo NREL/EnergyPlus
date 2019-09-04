@@ -56,8 +56,8 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
@@ -99,6 +99,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_TestOutletNodeConditions)
 TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
 {
     // unit test for autosizing heat recovery in Chiller:Electric:EIR
+    FluidProperties::InitializeGlycRoutines();
     ChillerElectricEIR::ElectricEIRChiller.allocate(1);
 
     ChillerElectricEIR::ElectricEIRChiller(1).SizFac = 1.0;
@@ -130,6 +131,8 @@ TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
 
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
+    FluidProperties::InitializeGlycRoutines();
+
     // now call sizing routine
     ChillerElectricEIR::SizeElectricEIRChiller(1);
     // see if heat recovery flow rate is as expected
@@ -154,6 +157,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     DataGlobals::MinutesPerTimeStep = 60;
 
     Psychrometrics::InitializePsychRoutines();
+    FluidProperties::InitializeGlycRoutines();
 
     std::string const idf_objects = delimited_string({
         "Chiller:Electric:EIR,",

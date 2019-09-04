@@ -104,6 +104,8 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
     PlantLoop(1).FluidType = 2;
     QBBRadSource(1) = 0.0;
 
+    FluidProperties::InitializeGlycRoutines();
+
     CalcHWBaseboard(BBNum, LoadMet);
 
     EXPECT_NEAR(14746.226690452937, HWBaseboard(1).TotPower, 0.000001);
