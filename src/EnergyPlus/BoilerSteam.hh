@@ -60,11 +60,11 @@ namespace EnergyPlus {
 namespace BoilerSteam {
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Real64 FuelUsed;           // W - Boiler fuel used
-    extern Real64 BoilerLoad;         // W - Boiler Load
-    extern Real64 BoilerMassFlowRate; // kg/s - Boiler mass flow rate
-    extern Real64 BoilerOutletTemp;   // W - Boiler outlet temperature
-    extern Real64 BoilerMaxPress;
+    extern Real64 modFuelUsed;           // W - Boiler fuel used
+    extern Real64 modBoilerLoad;         // W - Boiler Load
+    extern Real64 modBoilerMassFlowRate; // kg/s - Boiler mass flow rate
+    extern Real64 modBoilerOutletTemp;   // W - Boiler outlet temperature
+    extern Real64 modBoilerMaxPress;
     extern int NumBoilers;                // Number of boilers
 
     extern Array1D_bool CheckEquipName;
