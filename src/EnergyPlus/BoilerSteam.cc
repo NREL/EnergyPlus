@@ -475,7 +475,7 @@ namespace BoilerSteam {
                 ShowFatalError("InitBoiler: Program terminated due to previous condition(s).");
             }
 
-            Boiler(BoilerNum).myFlag;
+            Boiler(BoilerNum).myFlag = false;
         }
 
         BoilerInletNode = Boiler(BoilerNum).BoilerInletNodeNum;
