@@ -83,7 +83,6 @@ namespace BoilerSteam {
         Real64 NomCap;               // W - design nominal capacity of Boiler
         bool NomCapWasAutoSized;     // true if Nominal capacity was autosize on input
         Real64 Effic;                // boiler efficiency at design conditions
-        //       REAL(r64)         :: TempDesBoilerOut    =0.0d0      ! C - Boiler design outlet temperature
         Real64 MinPartLoadRat;         // Minimum allowed operating part load ratio
         Real64 MaxPartLoadRat;         // Maximum allowed operating part load ratio
         Real64 OptPartLoadRat;         // Optimal operating part load ratio
@@ -145,37 +144,37 @@ namespace BoilerSteam {
 
     void SimSteamBoiler(std::string const &BoilerType, // boiler type (used in CASE statement)
                         std::string const &BoilerName, // boiler identifier
-                        int const EquipFlowCtrl,       // Flow control mode for the equipment
+                        int EquipFlowCtrl,       // Flow control mode for the equipment
                         int &CompIndex,                // boiler counter/identifier
-                        bool const RunFlag,            // if TRUE run boiler simulation--boiler is ON
-                        bool const FirstHVACIteration, // TRUE if First iteration of simulation
+                        bool RunFlag,            // if TRUE run boiler simulation--boiler is ON
+                        bool FirstHVACIteration, // TRUE if First iteration of simulation
                         bool &InitLoopEquip,           // If not zero, calculate the max load for operating conditions
                         Real64 &MyLoad,                // W - Actual demand boiler must satisfy--calculated by load dist. routine
                         Real64 &MaxCap,                // W - maximum boiler operating capacity
                         Real64 &MinCap,                // W - minimum boiler operating capacity
                         Real64 &OptCap,                // W - optimal boiler operating capacity
-                        bool const GetSizingFactor,    // TRUE when just the sizing factor is requested
+                        bool GetSizingFactor,    // TRUE when just the sizing factor is requested
                         Real64 &SizingFactor           // sizing factor
     );
 
     void GetBoilerInput();
 
-    void InitBoiler(int const BoilerNum); // number of the current electric chiller being simulated
+    void InitBoiler(int BoilerNum); // number of the current electric chiller being simulated
 
-    void SizeBoiler(int const BoilerNum);
+    void SizeBoiler(int BoilerNum);
 
     void CalcBoilerModel(int &BoilerNum,         // boiler identifier
                          Real64 &MyLoad,         // W - hot water demand to be met by boiler
-                         bool const RunFlag,     // TRUE if boiler operating
-                         int const EquipFlowCtrl // Flow control mode for the equipment
+                         bool RunFlag,     // TRUE if boiler operating
+                         int EquipFlowCtrl // Flow control mode for the equipment
     );
 
     // Beginning of Record Keeping subroutines for the BOILER:SIMPLE Module
 
-    void UpdateBoilerRecords(Real64 const MyLoad,          // boiler operating load
-                             bool const RunFlag,           // boiler on when TRUE
-                             int const Num,                // boiler number
-                             bool const FirstHVACIteration // TRUE if First iteration of simulation
+    void UpdateBoilerRecords(Real64 MyLoad,          // boiler operating load
+                             bool RunFlag,           // boiler on when TRUE
+                             int Num,                // boiler number
+                             bool FirstHVACIteration // TRUE if First iteration of simulation
     );
 
 } // namespace BoilerSteam
