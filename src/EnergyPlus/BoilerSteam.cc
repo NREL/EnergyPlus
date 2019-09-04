@@ -394,7 +394,7 @@ namespace BoilerSteam {
                 ErrorsFound = true;
             }
 
-            if (rNumericArgs(5) == 0.0) {
+            if (rNumericArgs(5) < 0.0) {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + cNumericFieldNames(5) + '=' + RoundSigDigits(rNumericArgs(5), 3));
                 ErrorsFound = true;

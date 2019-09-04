@@ -313,6 +313,14 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystem)
     ReportSizingManager::RequestSizing(CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
     EXPECT_NEAR(18882.0, SizingResult, 0.1);
 
+    // confirm that sizing data is saved for use by parent object
+    EXPECT_NEAR(DataSizing::DataCoilSizingAirInTemp, 28.0, 0.0000001);
+    EXPECT_NEAR(DataSizing::DataCoilSizingAirInHumRat, 0.0075, 0.0000001);
+    EXPECT_NEAR(DataSizing::DataCoilSizingAirOutTemp,12.0, 0.0000001);
+    EXPECT_NEAR(DataSizing::DataCoilSizingAirOutHumRat, 0.0075, 0.0000001);
+    EXPECT_NEAR(DataSizing::DataCoilSizingFanCoolLoad, 0.0, 0.0000001);
+    EXPECT_NEAR(DataSizing::DataCoilSizingCapFT, 1.0, 0.0000001);
+
     CompType = "COIL:COOLING:WATER";
     CompName = "Chilled Water Cooling Coil";
     SizingResult = DataSizing::AutoSize;
