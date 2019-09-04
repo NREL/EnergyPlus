@@ -50,6 +50,7 @@
 #include <utility>
 
 #include <BranchNodeConnections.hh>
+#include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
@@ -60,11 +61,11 @@
 #include <General.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
 #include <PlantComponent.hh>
 #include <PlantUtilities.hh>
+#include <Psychrometrics.hh>
 #include <ReportSizingManager.hh>
 #include <UtilityRoutines.hh>
 #include <PlantLoopHeatPumpEIR.hh>
@@ -91,20 +92,24 @@ namespace EnergyPlus {
 
             // Call initialize to set flow rates, run flag, and entering temperatures
             this->running = RunFlag;
-            this->setOperatingFlowRates();
 
-            if (calledFromLocation.loopNum == this->sourceSideLocation.loopNum) { // condenser side
-                PlantUtilities::UpdateChillerComponentCondenserSide(this->sourceSideLocation.loopNum,
-                                                                    this->sourceSideLocation.loopSideNum,
-                                                                    this->plantTypeOfNum,
-                                                                    this->sourceSideNodes.inlet,
-                                                                    this->sourceSideNodes.outlet,
-                                                                    this->sourceSideHeatTransfer,
-                                                                    this->sourceSideInletTemp,
-                                                                    this->sourceSideOutletTemp,
-                                                                    this->sourceSideMassFlowRate,
-                                                                    FirstHVACIteration);
-                return;
+            if (this->waterSource) {
+                this->setOperatingFlowRatesWSHP();
+                if (calledFromLocation.loopNum == this->sourceSideLocation.loopNum) { // condenser side
+                    PlantUtilities::UpdateChillerComponentCondenserSide(this->sourceSideLocation.loopNum,
+                                                                        this->sourceSideLocation.loopSideNum,
+                                                                        this->plantTypeOfNum,
+                                                                        this->sourceSideNodes.inlet,
+                                                                        this->sourceSideNodes.outlet,
+                                                                        this->sourceSideHeatTransfer,
+                                                                        this->sourceSideInletTemp,
+                                                                        this->sourceSideOutletTemp,
+                                                                        this->sourceSideMassFlowRate,
+                                                                        FirstHVACIteration);
+                    return;
+                }
+            } else if (this->airSource) {
+                this->setOperatingFlowRatesASHP();
             }
 
             if (this->running) {
@@ -157,7 +162,7 @@ namespace EnergyPlus {
             this->sourceSideEnergy = 0.0;
         }
 
-        void EIRPlantLoopHeatPump::setOperatingFlowRates() {
+        void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP() {
             if (!this->running) {
                 this->loadSideMassFlowRate = 0.0;
                 this->sourceSideMassFlowRate = 0.0;
@@ -235,6 +240,45 @@ namespace EnergyPlus {
             }
         }
 
+        void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP() {
+            if (!this->running) {
+                this->loadSideMassFlowRate = 0.0;
+                this->sourceSideMassFlowRate = 0.0;
+                PlantUtilities::SetComponentFlowRate(this->loadSideMassFlowRate,
+                                                     this->loadSideNodes.inlet,
+                                                     this->loadSideNodes.outlet,
+                                                     this->loadSideLocation.loopNum,
+                                                     this->loadSideLocation.loopSideNum,
+                                                     this->loadSideLocation.branchNum,
+                                                     this->loadSideLocation.compNum);
+                // Set flows if the heat pump is running
+            } else { // the heat pump must run
+                this->loadSideMassFlowRate = this->loadSideDesignMassFlowRate;
+                this->sourceSideMassFlowRate = this->sourceSideDesignMassFlowRate;
+                PlantUtilities::SetComponentFlowRate(this->loadSideMassFlowRate,
+                                                     this->loadSideNodes.inlet,
+                                                     this->loadSideNodes.outlet,
+                                                     this->loadSideLocation.loopNum,
+                                                     this->loadSideLocation.loopSideNum,
+                                                     this->loadSideLocation.branchNum,
+                                                     this->loadSideLocation.compNum);
+
+                // if there's no flow in one, try to turn the entire heat pump off
+                if (this->loadSideMassFlowRate <= 0.0 || this->sourceSideMassFlowRate <= 0.0) {
+                    this->loadSideMassFlowRate = 0.0;
+                    this->sourceSideMassFlowRate = 0.0;
+                    this->running = false;
+                    PlantUtilities::SetComponentFlowRate(this->loadSideMassFlowRate,
+                                                         this->loadSideNodes.inlet,
+                                                         this->loadSideNodes.outlet,
+                                                         this->loadSideLocation.loopNum,
+                                                         this->loadSideLocation.loopSideNum,
+                                                         this->loadSideLocation.branchNum,
+                                                         this->loadSideLocation.compNum);
+                }
+            }
+        }
+
         void EIRPlantLoopHeatPump::doPhysics(Real64 currentLoad) {
 
             Real64 const reportingInterval = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -308,49 +352,49 @@ namespace EnergyPlus {
 
                 // setup output variables
                 SetupOutputVariable(
-                        "Water to Water Heat Pump Load Side Heat Transfer Rate", OutputProcessor::Unit::W,
+                        "Plant Loop Heat Pump Load Side Heat Transfer Rate", OutputProcessor::Unit::W,
                         this->loadSideHeatTransfer,
                         "System", "Average", this->name);
                 SetupOutputVariable(
-                        "Water to Water Heat Pump Load Side Heat Transfer Energy", OutputProcessor::Unit::J,
+                        "Plant Loop Heat Pump Load Side Heat Transfer Energy", OutputProcessor::Unit::J,
                         this->loadSideEnergy,
                         "System", "Sum", this->name);
                 SetupOutputVariable(
-                        "Water to Water Heat Pump Source Side Heat Transfer Rate", OutputProcessor::Unit::W,
+                        "Plant Loop Heat Pump Source Side Heat Transfer Rate", OutputProcessor::Unit::W,
                         this->sourceSideHeatTransfer,
                         "System", "Average", this->name);
                 SetupOutputVariable(
-                        "Water to Water Heat Pump Source Side Heat Transfer Energy", OutputProcessor::Unit::J,
+                        "Plant Loop Heat Pump Source Side Heat Transfer Energy", OutputProcessor::Unit::J,
                         this->sourceSideEnergy,
                         "System", "Sum", this->name);
                 SetupOutputVariable(
-                        "Water to Water Heat Pump Load Side Inlet Temperature", OutputProcessor::Unit::C,
+                        "Plant Loop Heat Pump Load Side Inlet Temperature", OutputProcessor::Unit::C,
                         this->loadSideInletTemp,
                         "System", "Average", this->name);
                 SetupOutputVariable(
-                        "Water to Water Heat Pump Load Side Outlet Temperature", OutputProcessor::Unit::C,
+                        "Plant Loop Heat Pump Load Side Outlet Temperature", OutputProcessor::Unit::C,
                         this->loadSideOutletTemp,
                         "System", "Average", this->name);
                 SetupOutputVariable(
-                        "Water to Water Heat Pump Source Side Inlet Temperature", OutputProcessor::Unit::C,
+                        "Plant Loop Heat Pump Source Side Inlet Temperature", OutputProcessor::Unit::C,
                         this->sourceSideInletTemp,
                         "System", "Average", this->name);
                 SetupOutputVariable(
-                        "Water to Water Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C,
+                        "Plant Loop Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C,
                         this->sourceSideOutletTemp,
                         "System", "Average", this->name);
                 SetupOutputVariable(
-                        "Water to Water Heat Pump Electric Power", OutputProcessor::Unit::W, this->powerUsage, "System",
+                        "Plant Loop Heat Pump Electric Power", OutputProcessor::Unit::W, this->powerUsage, "System",
                         "Average", this->name);
                 SetupOutputVariable(
-                        "Water to Water Heat Pump Electric Energy", OutputProcessor::Unit::J, this->powerEnergy,
+                        "Plant Loop Heat Pump Electric Energy", OutputProcessor::Unit::J, this->powerEnergy,
                         "System", "Sum", this->name);
                 SetupOutputVariable(
-                        "Water to Water Heat Pump Load Side Mass Flow Rate", OutputProcessor::Unit::kg_s,
+                        "Plant Loop Heat Pump Load Side Mass Flow Rate", OutputProcessor::Unit::kg_s,
                         this->loadSideMassFlowRate,
                         "System", "Average", this->name);
                 SetupOutputVariable(
-                        "Water to Water Heat Pump Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s,
+                        "Plant Loop Heat Pump Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s,
                         this->sourceSideMassFlowRate,
                         "System", "Average", this->name);
 
@@ -432,8 +476,7 @@ namespace EnergyPlus {
                                                                       true);
                     }
                 } else if (this->airSource) {
-                    bool isValid;
-                    OutAirNodeManager::CheckAndAddAirNodeNumber(this->sourceSideNodes.inlet, isValid);
+                    // nothing to do here ?
                 }
 
                 if (errFlag) {
@@ -458,20 +501,29 @@ namespace EnergyPlus {
                                                    this->loadSideLocation.branchNum,
                                                    this->loadSideLocation.compNum);
 
-                rho = FluidProperties::GetDensityGlycol(
-                        DataPlant::PlantLoop(this->sourceSideLocation.loopNum).FluidName,
-                        DataGlobals::InitConvTemp,
-                        DataPlant::PlantLoop(this->sourceSideLocation.loopNum).FluidIndex,
-                        routineName);
-                this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
-                PlantUtilities::InitComponentNodes(0.0,
-                                                   this->sourceSideDesignMassFlowRate,
-                                                   this->sourceSideNodes.inlet,
-                                                   this->sourceSideNodes.outlet,
-                                                   this->sourceSideLocation.loopNum,
-                                                   this->sourceSideLocation.loopSideNum,
-                                                   this->sourceSideLocation.branchNum,
-                                                   this->sourceSideLocation.compNum);
+                if (this->waterSource) {
+                    rho = FluidProperties::GetDensityGlycol(
+                            DataPlant::PlantLoop(this->sourceSideLocation.loopNum).FluidName,
+                            DataGlobals::InitConvTemp,
+                            DataPlant::PlantLoop(this->sourceSideLocation.loopNum).FluidIndex,
+                            routineName);
+                    this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
+                    PlantUtilities::InitComponentNodes(0.0,
+                                                       this->sourceSideDesignMassFlowRate,
+                                                       this->sourceSideNodes.inlet,
+                                                       this->sourceSideNodes.outlet,
+                                                       this->sourceSideLocation.loopNum,
+                                                       this->sourceSideLocation.loopSideNum,
+                                                       this->sourceSideLocation.branchNum,
+                                                       this->sourceSideLocation.compNum);
+                } else if (this->airSource) {
+                    rho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress,
+                            DataEnvironment::OutDryBulbTemp,
+                            0.0,
+                            routineName);
+                    this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
+                }
+
                 this->envrnInit = false;
             }
             if (!DataGlobals::BeginEnvrnFlag) {
@@ -484,7 +536,12 @@ namespace EnergyPlus {
                                                        Real64 &MinLoad,
                                                        Real64 &OptLoad) {
             if (calledFromLocation.loopNum == this->loadSideLocation.loopNum) {
-                this->size();
+                this->sizeLoadSide();
+                if (this->waterSource) {
+                    this->sizeSrcSideWSHP();
+                } else if (this->airSource) {
+                    this->sizeSrcSideASHP();
+                }
                 MinLoad = 0.0;
                 MaxLoad = this->referenceCapacity;
                 OptLoad = this->referenceCapacity;
@@ -495,7 +552,7 @@ namespace EnergyPlus {
             }
         }
 
-        void EIRPlantLoopHeatPump::size() {
+        void EIRPlantLoopHeatPump::sizeLoadSide() {
             // Tries to size the load side flow rate and capacity, source side flow, and the rated power usage
             // There are two major sections to this function, one if plant sizing is available, and one if not
             // If plant sizing is available, then we can generate sizes for the equipment.  This is done for not-only
@@ -508,14 +565,11 @@ namespace EnergyPlus {
             // these variables will be used throughout this function as a temporary value of that physical state
             Real64 tmpCapacity = this->referenceCapacity;
             Real64 tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
-            Real64 tmpSourceVolFlow = this->sourceSideDesignVolFlowRate;
 
             std::string const typeName = DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum);
             Real64 loadSideInitTemp = DataGlobals::CWInitConvTemp;
-            Real64 sourceSideInitTemp = DataGlobals::HWInitConvTemp;
             if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) {
                 loadSideInitTemp = DataGlobals::HWInitConvTemp;
-                sourceSideInitTemp = DataGlobals::CWInitConvTemp;
             }
 
             Real64 const rho = FluidProperties::GetDensityGlycol(
@@ -526,16 +580,6 @@ namespace EnergyPlus {
             Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(
                     DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
                     loadSideInitTemp,
-                    DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
-                    "EIRPlantLoopHeatPump::size()");
-            Real64 const rhoSrc = FluidProperties::GetDensityGlycol(
-                    DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
-                    sourceSideInitTemp,
-                    DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
-                    "EIRPlantLoopHeatPump::size()");
-            Real64 const CpSrc = FluidProperties::GetSpecificHeatGlycol(
-                    DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
-                    sourceSideInitTemp,
                     DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
                     "EIRPlantLoopHeatPump::size()");
 
@@ -720,12 +764,40 @@ namespace EnergyPlus {
                                                             this->loadSideDesignVolFlowRate);
                 }
                 if (!this->referenceCapacityWasAutoSized && DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(typeName, this->name, "User-Specified Nominal Capacity [W]",
-                                                            this->referenceCapacity);
+                    ReportSizingManager::ReportSizingOutput(typeName, this->name,
+                            "User-Specified Nominal Capacity [W]",
+                            this->referenceCapacity);
                 }
             }
+        }
 
-            // now we need to move on to the source side.  To start we need to override the calculated load side flow
+        void EIRPlantLoopHeatPump::sizeSrcSideWSHP() {
+            // size the source-side for the water-source HP
+            bool errorsFound = false;
+
+            // these variables will be used throughout this function as a temporary value of that physical state
+            Real64 tmpCapacity = this->referenceCapacity;
+            Real64 tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
+            Real64 tmpSourceVolFlow;
+
+            std::string const typeName = DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum);
+            Real64 sourceSideInitTemp = DataGlobals::HWInitConvTemp;
+            if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) {
+                sourceSideInitTemp = DataGlobals::CWInitConvTemp;
+            }
+
+            Real64 const rhoSrc = FluidProperties::GetDensityGlycol(
+                    DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                    sourceSideInitTemp,
+                    DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                    "EIRPlantLoopHeatPump::size()");
+            Real64 const CpSrc = FluidProperties::GetSpecificHeatGlycol(
+                    DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidName,
+                    sourceSideInitTemp,
+                    DataPlant::PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
+                    "EIRPlantLoopHeatPump::size()");
+
+            // To start we need to override the calculated load side flow
             // rate if it was actually hard-sized
             if (!this->loadSideDesignVolFlowRateWasAutoSized) tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
 
@@ -818,6 +890,67 @@ namespace EnergyPlus {
 
         }
 
+        void EIRPlantLoopHeatPump::sizeSrcSideASHP() {
+            // size the source-side for the air-source HP
+            bool errorsFound = false;
+
+            // these variables will be used throughout this function as a temporary value of that physical state
+            Real64 tmpCapacity = this->referenceCapacity;
+            Real64 tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
+            Real64 tmpSourceVolFlow = 0.0;
+
+            std::string const typeName = DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum);
+
+            // will leave like this for now
+            // need to update these to better values later
+            Real64 sourceSideInitTemp = 20;
+            Real64 sourceSideHumRat = 0.0;
+            if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) {
+                // same here; update later
+                sourceSideInitTemp = 20;
+            }
+
+            Real64 const rhoSrc = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress,sourceSideInitTemp,
+                    sourceSideHumRat);
+            Real64 const CpSrc = Psychrometrics::PsyCpAirFnWTdb(sourceSideHumRat, sourceSideInitTemp);
+
+            // set the source-side flow rate
+            if (this->sourceSideDesignVolFlowRateWasAutoSized) {
+                // load-side capacity should already be set, so unless the flow rate is specified, we can set
+                // an assumed reasonable flow rate since this doesn't affect downstream components
+                Real64 DeltaT_src = 10;
+                // to get the source flow, we first must calculate the required heat impact on the source side
+                // First the definition of COP: COP = Qload/Power, therefore Power = Qload/COP
+                // Then the energy balance:     Qsrc = Qload + Power
+                // Substituting for Power:      Qsrc = Qload + Qload/COP, therefore Qsrc = Qload (1 + 1/COP)
+                Real64 const designSourceSideHeatTransfer = tmpCapacity * (1 + 1 / this->referenceCOP);
+                // To get the design source flow rate, just apply the sensible heat rate equation:
+                //                              Qsrc = rho_src * Vdot_src * Cp_src * DeltaT_src
+                //                              Vdot_src = Q_src / (rho_src * Cp_src * DeltaT_src)
+                tmpSourceVolFlow = designSourceSideHeatTransfer / (rhoSrc * CpSrc * DeltaT_src);
+            } else if (!this->sourceSideDesignVolFlowRateWasAutoSized && this->sourceSideDesignVolFlowRate > 0) {
+                // given the value by the user
+                // set it directly
+                tmpSourceVolFlow = this->sourceSideDesignVolFlowRate;
+            } else if (!this->sourceSideDesignVolFlowRateWasAutoSized && this->sourceSideDesignVolFlowRate == 0) {
+                // user gave a flow rate of 0
+                // error out
+                errorsFound = true;
+                ShowSevereError("Invalid condenser flow rate for EIR PLHP (name="
+                + this->name + "; entered value: " + std::to_string(this->sourceSideDesignVolFlowRate));
+            } else {
+                // can't imagine how it would ever get to this point
+                // just assume it's the same as the load side if we don't have any sizing information
+                tmpSourceVolFlow = tmpLoadVolFlow;
+            }
+
+            this->sourceSideDesignVolFlowRate = tmpSourceVolFlow;
+
+            if (errorsFound) {
+                ShowFatalError("Preceding sizing errors cause program termination");
+            }
+        }
+
         PlantComponent *EIRPlantLoopHeatPump::factory(int plhp_type_of_num, std::string eir_plhp_name) {
             if (getInputsPLHP) {
                 EIRPlantLoopHeatPump::processInputForEIRPLHP();
@@ -831,7 +964,7 @@ namespace EnergyPlus {
                 }
             }
 
-            ShowFatalError("EIR_PLHP factory: Error getting inputs for plhp named: " + eir_plhp_name);
+            ShowFatalError("EIR_PLHP factory: Error getting inputs for PLHP named: " + eir_plhp_name);
             return nullptr;  // LCOV_EXCL_LINE
         }
 
@@ -851,7 +984,7 @@ namespace EnergyPlus {
                         if (potentialCompanionName == targetCompanionName) {
                             if (thisCoilType == potentialCompanionType) {
                                 ShowSevereError(
-                                        "Invalid companion specification for EIR Water to Water Heat Pump named \"" +
+                                        "Invalid companion specification for EIR Plant Loop Heat Pump named \"" +
                                         thisCoilName + "\"");
                                 ShowContinueError(
                                         "For heating objects, the companion must be a cooling object, and vice-versa");

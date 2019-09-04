@@ -147,11 +147,18 @@ namespace EnergyPlus {
 
             void doPhysics(Real64 currentLoad);
 
-            void size();
+            void sizeLoadSide();
+
+            void sizeSrcSideWSHP();
+
+            void sizeSrcSideASHP();
 
             Real64 getLoadSideOutletSetPointTemp();
 
-            void setOperatingFlowRates();
+            void setOperatingFlowRatesASHP();
+
+            void setOperatingFlowRatesWSHP();
+
 
             void resetReportingVariables();
 

@@ -1988,7 +1988,7 @@ namespace ChillerElectricEIR {
         // calculate end time of current time step
         CurrentEndTime = CurrentTime + SysTimeElapsed;
 
-        // Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
+        // Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         // Wait for next time step to print warnings. If simulation iterates, print out
         // the warning for the last iteration only. Must wait for next time step to accomplish this.
         // If a warning occurs and the simulation down shifts, the warning is not valid.

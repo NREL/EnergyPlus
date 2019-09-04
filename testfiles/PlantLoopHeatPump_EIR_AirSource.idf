@@ -1,7 +1,7 @@
 ! PlantLoopHeatPump_EIR_AirSource.idf
 !
 ! Basic file description:
-! The EIR formulated water-to-water heat pump is demonstrated using a simple collection of plant loops.  Building loads
+! The EIR formulated air-to-water heat pump is demonstrated using a simple collection of plant loops.  Building loads
 !  are represented using Plant Load Profile objects
 ! Run:      1 design day.
 ! Building: None.
