@@ -4486,7 +4486,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     Material(4).AbsorpThermalBack = 0.23;
     Material(4).Conductivity = 0.43;
     Material(4).GlassTransDirtFactor = 0.67;
-    Material(4).SolarDiffusing = 0.12;
+    Material(4).SolarDiffusing = true;
     Material(4).YoungModulus = 0.89;
     Material(4).PoissonsRatio = 1.11;
     Material(5).Group = WindowGlass;
@@ -4501,7 +4501,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     Material(5).AbsorpThermalBack = 0.33;
     Material(5).Conductivity = 0.43;
     Material(5).GlassTransDirtFactor = 0.67;
-    Material(5).SolarDiffusing = 0.12;
+    Material(5).SolarDiffusing = true;
     Material(5).YoungModulus = 0.89;
     Material(5).PoissonsRatio = 1.11;
     RevLayerDiffs = true;
