@@ -4494,7 +4494,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test2)
 
 TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test3)
 {
-    // Case 3) World coordinate system & Non-zero zone origin
+    // Case 3) World coordinate system & Relative Rect. surf, coordinate system & Non-zero zone origin
 
     std::string const idf_objects = delimited_string({
      
@@ -4525,6 +4525,42 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test3)
         "   ** Warning ** GlobalGeometryRules: Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on the default SurfaceGeometry for 'Relative to zone' coordinate.",
         "   **   ~~~   ** Coordinate System=\"WORLD\"; while ",
         "   **   ~~~   ** Rectangular Surface Coordinate System=\"RELATIVE\".",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test4)
+{
+    // Case 4) World coordinate system & Defalut Rect. surf, coordinate system & Non-zero zone origin
+
+    std::string const idf_objects = delimited_string({
+
+        "GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    World,                   !- Coordinate System",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+
+    DataGlobals::NumOfZones = 1;
+    Zone.allocate(1);
+    Zone(1).Name = "ZONE 1";
+    Zone(1).OriginX = 6;
+    Zone(1).OriginY = 6;
+    Zone(1).OriginZ = 0;
+
+    GetGeometryParameters(ErrorsFound);
+    EXPECT_TRUE(has_err_output(false));
+
+    std::string error_string = delimited_string({
+        "   ** Warning ** GlobalGeometryRules: Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on "
+        "the default SurfaceGeometry for 'Relative to zone' coordinate.",
+        "   **   ~~~   ** Coordinate System=\"WORLD\"; while ",
+        "   **   ~~~   ** Rectangular Surface Coordinate System=\"defaults to RELATIVE\".",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
