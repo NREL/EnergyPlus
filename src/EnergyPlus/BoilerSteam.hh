@@ -66,8 +66,6 @@ namespace BoilerSteam {
     extern Real64 BoilerOutletTemp;   // W - Boiler outlet temperature
     extern Real64 BoilerMaxPress;
     extern int NumBoilers;                // Number of boilers
-    extern Real64 BoilerMassFlowMaxAvail; // kg/s - Boiler mass flow rate
-    extern Real64 BoilerMassFlowMinAvail; // kg/s - Boiler mass flow rate
 
     extern Array1D_bool CheckEquipName;
 
