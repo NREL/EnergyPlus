@@ -96,6 +96,7 @@ namespace BoilerSteam {
     Real64 BoilerOutletTemp(0.0);   // W - Boiler outlet temperature
     Real64 BoilerMaxPress(0.0);
     int NumBoilers(0);                  // Number of boilers
+    bool getSteamBoilerInput = true;
     static std::string const FluidNameSteam("STEAM");
 
     Array1D_bool CheckEquipName;
@@ -110,6 +111,7 @@ namespace BoilerSteam {
         BoilerOutletTemp = 0.0;
         BoilerMaxPress = 0.0;
         NumBoilers = 0;
+        getSteamBoilerInput = true;
         CheckEquipName.deallocate();
         Boiler.deallocate();
         BoilerReport.deallocate();
@@ -140,13 +142,12 @@ namespace BoilerSteam {
         // This subroutine controls the boiler component simulation
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool GetInput(true); // if TRUE read user input
         int BoilerNum;              // boiler counter/identifier
 
         // Get Input
-        if (GetInput) {
+        if (getSteamBoilerInput) {
             GetBoilerInput();
-            GetInput = false;
+            getSteamBoilerInput = false;
         }
 
         // Find the correct Equipment
@@ -211,7 +212,7 @@ namespace BoilerSteam {
         int NumNums;         // Number of elements in the numeric array
         int IOStat;          // IO Status when calling get input subroutine
         int SteamFluidIndex; // Fluid Index for Steam
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         Array1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
 
         SteamFluidIndex = 0;
@@ -444,9 +445,6 @@ namespace BoilerSteam {
         static std::string const RoutineName("InitBoiler");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
-        static Array1D_bool MyFlag;
-        static Array1D_bool MyEnvrnFlag;
         bool FatalError;
         Real64 TempUpLimitBoilerOut; // C - Boiler outlet maximum temperature limit
         Real64 EnthSteamOutWet;
@@ -457,17 +455,8 @@ namespace BoilerSteam {
         int BoilerOutletNode; // Boiler outlet node number
         bool errFlag;
 
-        // Do the one time initializations
-        if (MyOneTimeFlag) {
-            MyFlag.allocate(NumBoilers);
-            MyEnvrnFlag.allocate(NumBoilers);
-            MyFlag = true;
-            MyEnvrnFlag = true;
-            MyOneTimeFlag = false;
-        }
-
         // Init more variables
-        if (MyFlag(BoilerNum)) {
+        if (Boiler(BoilerNum).myFlag) {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(Boiler(BoilerNum).Name,
@@ -486,13 +475,13 @@ namespace BoilerSteam {
                 ShowFatalError("InitBoiler: Program terminated due to previous condition(s).");
             }
 
-            MyFlag(BoilerNum) = false;
+            Boiler(BoilerNum).myFlag;
         }
 
         BoilerInletNode = Boiler(BoilerNum).BoilerInletNodeNum;
         BoilerOutletNode = Boiler(BoilerNum).BoilerOutletNodeNum;
 
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag(BoilerNum) && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (DataGlobals::BeginEnvrnFlag && Boiler(BoilerNum).myEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             // BoilerOutletTemp     = Node(BoilerOutletNode)%TempSetPoint
             // TempUpLimitBoilerOut =Boiler(BoilerNum)%TempUpLimitBoilerOut
@@ -549,12 +538,12 @@ namespace BoilerSteam {
                 Boiler(BoilerNum).UseLoopSetPoint = true; // this is for backward compatibility and could be removed
             }
 
-            MyEnvrnFlag(BoilerNum) = false;
+            Boiler(BoilerNum).myEnvrnFlag = false;
 
         } // End If for the Begin Environment initializations
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(BoilerNum) = true;
+            Boiler(BoilerNum).myEnvrnFlag = true;
         }
 
         if (Boiler(BoilerNum).UseLoopSetPoint) {
