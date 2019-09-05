@@ -1208,12 +1208,18 @@ namespace EnergyPlus {
                                                                                             flowPath1,
                                                                                             DataLoopNode::ObjectIsNotParent);
                         int condenserNodeType = 0;
+                        int condenserNodeConnectionType_Inlet = 0;
+                        int condenserNodeConnectionType_Outlet = 0;
                         if (condenserType == "WATERSOURCE") {
                             thisPLHP.waterSource = true;
                             condenserNodeType = DataLoopNode::NodeType_Water;
+                            condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType_Inlet;
+                            condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType_Outlet;
                         } else if (condenserType == "AIRSOURCE") {
                             thisPLHP.airSource = true;
                             condenserNodeType = DataLoopNode::NodeType_Air;
+                            condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType_OutsideAir;
+                            condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType_OutsideAir;
                         } else {
                             ShowErrorMessage("Invalid heat pump condenser type (name=" + thisPLHP.name +
                             "; entered type: " + condenserType);
@@ -1224,7 +1230,7 @@ namespace EnergyPlus {
                                                                                              cCurrentModuleObject,
                                                                                              thisPLHP.name,
                                                                                              condenserNodeType,
-                                                                                             DataLoopNode::NodeConnectionType_Inlet,
+                                                                                             condenserNodeConnectionType_Inlet,
                                                                                              flowPath2,
                                                                                              DataLoopNode::ObjectIsNotParent);
                         thisPLHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(sourceSideOutletNodeName,
@@ -1232,16 +1238,19 @@ namespace EnergyPlus {
                                                                                               cCurrentModuleObject,
                                                                                               thisPLHP.name,
                                                                                               condenserNodeType,
-                                                                                              DataLoopNode::NodeConnectionType_Outlet,
+                                                                                              condenserNodeConnectionType_Outlet,
                                                                                               flowPath2,
                                                                                               DataLoopNode::ObjectIsNotParent);
                         if (nodeErrorsFound) errorsFound = true;
                         BranchNodeConnections::TestCompSet(
                                 cCurrentModuleObject, thisPLHP.name, loadSideInletNodeName, loadSideOutletNodeName,
                                 classToInput.nodesType);
-                        BranchNodeConnections::TestCompSet(
-                                cCurrentModuleObject, thisPLHP.name, sourceSideInletNodeName, sourceSideOutletNodeName,
-                                "Condenser Water Nodes");
+
+                        if (thisPLHP.waterSource) {
+                            BranchNodeConnections::TestCompSet(
+                                    cCurrentModuleObject, thisPLHP.name, sourceSideInletNodeName, sourceSideOutletNodeName,
+                                    "Condenser Water Nodes");
+                        }
 
                         // store the worker functions that generalized the heating/cooling sides
                         thisPLHP.calcLoadOutletTemp = classToInput.calcLoadOutletTemp;

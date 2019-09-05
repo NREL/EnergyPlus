@@ -260,7 +260,7 @@
     Outdoor Air Outlet Node, !- Source Side Outlet Node Name
     Cooling Coil,            !- Companion Coil Name
     0.005,                   !- Load Side Design Volume Flow Rate {m3/s}
-    0.002,                   !- Source Side Design Volume Flow Rate {m3/s}
+    2,                       !- Source Side Design Volume Flow Rate {m3/s}
     80000,                   !- Reference Capacity
     3.5,                     !- Reference COP
     ,                        !- Sizing Factor
@@ -419,7 +419,7 @@
     Outdoor Air Outlet Node, !- Source Side Outlet Node Name
     Heating Coil,            !- Companion Heating Heat Pump Name
     0.005,                   !- Load Side Design Volume Flow Rate {m3/s}
-    0.003,                   !- Source Side Design Volume Flow Rate {m3/s}
+    20,                      !- Source Side Design Volume Flow Rate {m3/s}
     400000,                  !- Reference Capacity
     3.5,                     !- Reference COP
     ,                        !- Sizing Factor
@@ -490,6 +490,9 @@
     Cooling Coil Load Profile Load Schedule,  !- Load Schedule Name
     0.005,                   !- Peak Flow Rate {m3/s}
     Cooling Coil Load Profile Flow Frac Schedule;  !- Flow Rate Fraction Schedule Name
+
+  OutdoorAir:Node,
+    Outdoor Air Inlet Node;  !- Name
 
   Output:VariableDictionary, IDF;
 
