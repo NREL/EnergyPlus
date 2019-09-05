@@ -60,23 +60,22 @@ namespace EnergyPlus {
 
 namespace BoilerSteam {
 
-    extern int NumBoilers;                // Number of boilers
-    extern Array1D_bool CheckEquipName;
+    extern int NumBoilers; // Number of boilers
 
     struct BoilerSpecs : PlantComponent
     {
         // Members
-        std::string Name;            // user identifier
-        int FuelType;                // resource type
-        bool Available;              // TRUE if machine available in current time step
-        bool ON;                     // TRUE: simulate the machine at it's operating part load ratio
-        bool MissingSetPointErrDone; // Missing outlet node setpoint message flag
-        bool UseLoopSetPoint;        // Flag to use setpoint from loop
-        Real64 DesMassFlowRate;      // kg/s - Boiler water design mass flow rate
-        Real64 MassFlowRate;         // kg/s - Boiler water mass flow rate
-        Real64 NomCap;               // W - design nominal capacity of Boiler
-        bool NomCapWasAutoSized;     // true if Nominal capacity was autosize on input
-        Real64 Effic;                // boiler efficiency at design conditions
+        std::string Name;              // user identifier
+        int FuelType;                  // resource type
+        bool Available;                // TRUE if machine available in current time step
+        bool ON;                       // TRUE: simulate the machine at it's operating part load ratio
+        bool MissingSetPointErrDone;   // Missing outlet node setpoint message flag
+        bool UseLoopSetPoint;          // Flag to use setpoint from loop
+        Real64 DesMassFlowRate;        // kg/s - Boiler water design mass flow rate
+        Real64 MassFlowRate;           // kg/s - Boiler water mass flow rate
+        Real64 NomCap;                 // W - design nominal capacity of Boiler
+        bool NomCapWasAutoSized;       // true if Nominal capacity was autosize on input
+        Real64 Effic;                  // boiler efficiency at design conditions
         Real64 MinPartLoadRat;         // Minimum allowed operating part load ratio
         Real64 MaxPartLoadRat;         // Maximum allowed operating part load ratio
         Real64 OptPartLoadRat;         // Optimal operating part load ratio
@@ -104,9 +103,9 @@ namespace BoilerSteam {
         Real64 BoilerMassFlowRate; // kg/s - Boiler mass flow rate
         Real64 BoilerOutletTemp;   // W - Boiler outlet temperature
 
-        Real64 BoilerEnergy;     // J - Boiler energy integrated over time
-        Real64 FuelConsumed;     // J - Boiler Fuel consumed integrated over time
-        Real64 BoilerInletTemp;  // C - Boiler inlet temperature
+        Real64 BoilerEnergy;    // J - Boiler energy integrated over time
+        Real64 FuelConsumed;    // J - Boiler Fuel consumed integrated over time
+        Real64 BoilerInletTemp; // C - Boiler inlet temperature
 
         std::string BoilerFuelTypeForOutputVariable;
 
@@ -121,20 +120,20 @@ namespace BoilerSteam {
         {
         }
 
-        void InitBoiler();
+        void initialize();
 
         void setupOutputVars();
 
-        void SizeBoiler();
+        void autosize();
 
-        void CalcBoilerModel(Real64 &MyLoad,         // W - hot water demand to be met by boiler
-                             bool RunFlag,     // TRUE if boiler operating
-                             int EquipFlowCtrl // Flow control mode for the equipment
+        void calculate(Real64 &MyLoad,   // W - hot water demand to be met by boiler
+                       bool RunFlag,     // TRUE if boiler operating
+                       int EquipFlowCtrl // Flow control mode for the equipment
         );
 
-        void UpdateBoilerRecords(Real64 MyLoad,          // boiler operating load
-                                 bool RunFlag,           // boiler on when TRUE
-                                 bool FirstHVACIteration // TRUE if First iteration of simulation
+        void update(Real64 MyLoad,          // boiler operating load
+                    bool RunFlag,           // boiler on when TRUE
+                    bool FirstHVACIteration // TRUE if First iteration of simulation
         );
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;

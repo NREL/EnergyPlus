@@ -90,19 +90,63 @@ namespace BoilerSteam {
     // Performs steam boiler simulation for plant simulation
 
     // MODULE VARIABLE DECLARATIONS:
-    int NumBoilers(0);                  // Number of boilers
+    int NumBoilers(0); // Number of boilers
     bool getSteamBoilerInput = true;
     static std::string const FluidNameSteam("STEAM");
 
-    Array1D_bool CheckEquipName;
     Array1D<BoilerSpecs> Boiler; // dimension to number of machines
 
     void clear_state()
     {
         NumBoilers = 0;
         getSteamBoilerInput = true;
-        CheckEquipName.deallocate();
         Boiler.deallocate();
+    }
+
+    PlantComponent *BoilerSpecs::factory(std::string const &objectName)
+    {
+        // Process the input data for boilers if it hasn't been done already
+        if (getSteamBoilerInput) {
+            GetBoilerInput();
+            getSteamBoilerInput = false;
+        }
+
+        // Now look for this particular pipe in the list
+        for (auto &boiler : Boiler) {
+            if (boiler.Name == objectName) {
+                return &boiler;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalBoilerSteamFactory: Error getting inputs for steam boiler named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    void BoilerSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    {
+        this->initialize();
+        auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
+        this->calculate(CurLoad, RunFlag, sim_component.FlowCtrl);
+        this->update(CurLoad, RunFlag, FirstHVACIteration);
+    }
+
+    void BoilerSpecs::getDesignCapacities(const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    {
+        MinLoad = this->NomCap * this->MinPartLoadRat;
+        MaxLoad = this->NomCap * this->MaxPartLoadRat;
+        OptLoad = this->NomCap * this->OptPartLoadRat;
+    }
+
+    void BoilerSpecs::getSizingFactor(Real64 &_SizFac)
+    {
+        _SizFac = this->SizFac;
+    }
+
+    void BoilerSpecs::onInitLoopEquip(const PlantLocation &)
+    {
+        this->initialize();
+        this->autosize();
     }
 
     void GetBoilerInput()
@@ -141,15 +185,24 @@ namespace BoilerSteam {
 
         // Boiler will have fuel input to it , that is it !
         Boiler.allocate(NumBoilers);
-        CheckEquipName.dimension(NumBoilers, true);
 
         // LOAD ARRAYS WITH CURVE FIT Boiler DATA
         for (BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum) {
-            inputProcessor->getObjectItem(
-                DataIPShortCuts::cCurrentModuleObject, BoilerNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, _, _, DataIPShortCuts::cAlphaFieldNames, DataIPShortCuts::cNumericFieldNames);
+            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                          BoilerNum,
+                                          DataIPShortCuts::cAlphaArgs,
+                                          NumAlphas,
+                                          DataIPShortCuts::rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          _,
+                                          _,
+                                          DataIPShortCuts::cAlphaFieldNames,
+                                          DataIPShortCuts::cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
-            GlobalNames::VerifyUniqueBoilerName(DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
+            GlobalNames::VerifyUniqueBoilerName(
+                DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
             Boiler(BoilerNum).Name = DataIPShortCuts::cAlphaArgs(1);
 
             {
@@ -236,20 +289,38 @@ namespace BoilerSteam {
 
             if (DataIPShortCuts::rNumericArgs(5) < 0.0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
-                ShowContinueError("Invalid " + DataIPShortCuts::cNumericFieldNames(5) + '=' + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(5), 3));
+                ShowContinueError("Invalid " + DataIPShortCuts::cNumericFieldNames(5) + '=' +
+                                  General::RoundSigDigits(DataIPShortCuts::rNumericArgs(5), 3));
                 ErrorsFound = true;
             }
 
             if (DataIPShortCuts::rNumericArgs(3) == 0.0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
-                ShowContinueError("Invalid " + DataIPShortCuts::cNumericFieldNames(3) + '=' + General::RoundSigDigits(DataIPShortCuts::rNumericArgs(3), 3));
+                ShowContinueError("Invalid " + DataIPShortCuts::cNumericFieldNames(3) + '=' +
+                                  General::RoundSigDigits(DataIPShortCuts::rNumericArgs(3), 3));
                 ErrorsFound = true;
             }
-            Boiler(BoilerNum).BoilerInletNodeNum = NodeInputManager::GetOnlySingleNode(
-                DataIPShortCuts::cAlphaArgs(3), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataLoopNode::NodeType_Steam, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
-            Boiler(BoilerNum).BoilerOutletNodeNum = NodeInputManager::GetOnlySingleNode(
-                DataIPShortCuts::cAlphaArgs(4), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataLoopNode::NodeType_Steam, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
-            BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaArgs(3), DataIPShortCuts::cAlphaArgs(4), "Hot Steam Nodes");
+            Boiler(BoilerNum).BoilerInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+                                                                                       ErrorsFound,
+                                                                                       DataIPShortCuts::cCurrentModuleObject,
+                                                                                       DataIPShortCuts::cAlphaArgs(1),
+                                                                                       DataLoopNode::NodeType_Steam,
+                                                                                       DataLoopNode::NodeConnectionType_Inlet,
+                                                                                       1,
+                                                                                       DataLoopNode::ObjectIsNotParent);
+            Boiler(BoilerNum).BoilerOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
+                                                                                        ErrorsFound,
+                                                                                        DataIPShortCuts::cCurrentModuleObject,
+                                                                                        DataIPShortCuts::cAlphaArgs(1),
+                                                                                        DataLoopNode::NodeType_Steam,
+                                                                                        DataLoopNode::NodeConnectionType_Outlet,
+                                                                                        1,
+                                                                                        DataLoopNode::ObjectIsNotParent);
+            BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+                                               DataIPShortCuts::cAlphaArgs(1),
+                                               DataIPShortCuts::cAlphaArgs(3),
+                                               DataIPShortCuts::cAlphaArgs(4),
+                                               "Hot Steam Nodes");
 
             if (SteamFluidIndex == 0 && BoilerNum == 1) {
                 SteamFluidIndex = FluidProperties::FindRefrigerant("Steam");
@@ -272,10 +343,9 @@ namespace BoilerSteam {
         if (ErrorsFound) {
             ShowFatalError(RoutineName + "Errors found in processing " + DataIPShortCuts::cCurrentModuleObject + " input.");
         }
-
     }
 
-    void BoilerSpecs::InitBoiler() // number of the current electric chiller being simulated
+    void BoilerSpecs::initialize() // number of the current electric chiller being simulated
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
@@ -298,18 +368,8 @@ namespace BoilerSteam {
             this->setupOutputVars();
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
-                                    DataPlant::TypeOf_Boiler_Steam,
-                                    this->LoopNum,
-                                    this->LoopSideNum,
-                                    this->BranchNum,
-                                    this->CompNum,
-                                    errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                this->Name, DataPlant::TypeOf_Boiler_Steam, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("InitBoiler: Program terminated due to previous condition(s).");
             }
@@ -322,23 +382,26 @@ namespace BoilerSteam {
 
         if (DataGlobals::BeginEnvrnFlag && this->myEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
-            Real64 EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->TempUpLimitBoilerOut, 1.0, this->FluidIndex, RoutineName);
-            Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->TempUpLimitBoilerOut, 0.0, this->FluidIndex, RoutineName);
+            Real64 EnthSteamOutDry =
+                FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->TempUpLimitBoilerOut, 1.0, this->FluidIndex, RoutineName);
+            Real64 EnthSteamOutWet =
+                FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->TempUpLimitBoilerOut, 0.0, this->FluidIndex, RoutineName);
             Real64 LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
 
-            Real64 CpWater = FluidProperties::GetSatSpecificHeatRefrig(FluidNameSteam, this->TempUpLimitBoilerOut, 0.0, this->FluidIndex, RoutineName);
+            Real64 CpWater =
+                FluidProperties::GetSatSpecificHeatRefrig(FluidNameSteam, this->TempUpLimitBoilerOut, 0.0, this->FluidIndex, RoutineName);
 
             this->DesMassFlowRate =
                 this->NomCap / (LatentEnthSteam + CpWater * (this->TempUpLimitBoilerOut - DataLoopNode::Node(BoilerInletNode).Temp));
 
             PlantUtilities::InitComponentNodes(0.0,
-                               this->DesMassFlowRate,
-                               this->BoilerInletNodeNum,
-                               this->BoilerOutletNodeNum,
-                               this->LoopNum,
-                               this->LoopSideNum,
-                               this->BranchNum,
-                               this->CompNum);
+                                               this->DesMassFlowRate,
+                                               this->BoilerInletNodeNum,
+                                               this->BoilerOutletNodeNum,
+                                               this->LoopNum,
+                                               this->LoopSideNum,
+                                               this->BranchNum,
+                                               this->CompNum);
 
             this->BoilerPressCheck = 0.0;
             this->FuelUsed = 0.0;
@@ -387,17 +450,19 @@ namespace BoilerSteam {
             {
                 auto const SELECT_CASE_var(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
                 if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                    DataLoopNode::Node(BoilerOutletNode).TempSetPoint = DataLoopNode::Node(DataPlant::PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPoint;
+                    DataLoopNode::Node(BoilerOutletNode).TempSetPoint =
+                        DataLoopNode::Node(DataPlant::PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPoint;
                 } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                    DataLoopNode::Node(BoilerOutletNode).TempSetPointLo = DataLoopNode::Node(DataPlant::PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPointLo;
+                    DataLoopNode::Node(BoilerOutletNode).TempSetPointLo =
+                        DataLoopNode::Node(DataPlant::PlantLoop(this->LoopNum).TempSetPointNodeNum).TempSetPointLo;
                 }
             }
         }
     }
 
-    void BoilerSpecs::setupOutputVars() {
-        SetupOutputVariable(
-            "Boiler Heating Rate", OutputProcessor::Unit::W, this->BoilerLoad, "System", "Average", this->Name);
+    void BoilerSpecs::setupOutputVars()
+    {
+        SetupOutputVariable("Boiler Heating Rate", OutputProcessor::Unit::W, this->BoilerLoad, "System", "Average", this->Name);
         SetupOutputVariable("Boiler Heating Energy",
                             OutputProcessor::Unit::J,
                             this->BoilerEnergy,
@@ -435,27 +500,12 @@ namespace BoilerSteam {
                             "Heating",
                             this->EndUseSubcategory,
                             "Plant");
-        SetupOutputVariable("Boiler Steam Inlet Temperature",
-                            OutputProcessor::Unit::C,
-                            this->BoilerInletTemp,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Boiler Steam Outlet Temperature",
-                            OutputProcessor::Unit::C,
-                            this->BoilerOutletTemp,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Boiler Steam Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
-                            this->BoilerMassFlowRate,
-                            "System",
-                            "Average",
-                            this->Name);
+        SetupOutputVariable("Boiler Steam Inlet Temperature", OutputProcessor::Unit::C, this->BoilerInletTemp, "System", "Average", this->Name);
+        SetupOutputVariable("Boiler Steam Outlet Temperature", OutputProcessor::Unit::C, this->BoilerOutletTemp, "System", "Average", this->Name);
+        SetupOutputVariable("Boiler Steam Mass Flow Rate", OutputProcessor::Unit::kg_s, this->BoilerMassFlowRate, "System", "Average", this->Name);
     }
-    
-    void BoilerSpecs::SizeBoiler()
+
+    void BoilerSpecs::autosize()
     {
 
         // SUBROUTINE INFORMATION:
@@ -488,9 +538,9 @@ namespace BoilerSteam {
                 Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, SizingTemp, 0.0, this->FluidIndex, RoutineName);
                 Real64 LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
                 Real64 CpWater = FluidProperties::GetSatSpecificHeatRefrig(FluidNameSteam, SizingTemp, 0.0, this->FluidIndex, RoutineName);
-                tmpNomCap =
-                    (CpWater * SteamDensity * this->SizFac * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate +
-                        DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * SteamDensity * LatentEnthSteam);
+                tmpNomCap = (CpWater * SteamDensity * this->SizFac * DataSizing::PlantSizData(PltSizNum).DeltaT *
+                                 DataSizing::PlantSizData(PltSizNum).DesVolFlowRate +
+                             DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * SteamDensity * LatentEnthSteam);
             } else {
                 if (this->NomCapWasAutoSized) tmpNomCap = 0.0;
             }
@@ -508,16 +558,17 @@ namespace BoilerSteam {
                         Real64 NomCapUser = this->NomCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput("Boiler:Steam",
-                                               this->Name,
-                                               "Design Size Nominal Capacity [W]",
-                                               tmpNomCap,
-                                               "User-Specified Nominal Capacity [W]",
-                                               NomCapUser);
+                                                                    this->Name,
+                                                                    "Design Size Nominal Capacity [W]",
+                                                                    tmpNomCap,
+                                                                    "User-Specified Nominal Capacity [W]",
+                                                                    NomCapUser);
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage("SizePump: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError("User-Specified Nominal Capacity of " + General::RoundSigDigits(NomCapUser, 2) + " [W]");
-                                    ShowContinueError("differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpNomCap, 2) + " [W]");
+                                    ShowContinueError("differs from Design Size Nominal Capacity of " + General::RoundSigDigits(tmpNomCap, 2) +
+                                                      " [W]");
                                     ShowContinueError("This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -549,9 +600,9 @@ namespace BoilerSteam {
         }
     }
 
-    void BoilerSpecs::CalcBoilerModel(Real64 &MyLoad,         // W - hot water demand to be met by boiler
-                         bool const RunFlag,     // TRUE if boiler operating
-                         int const EquipFlowCtrl // Flow control mode for the equipment
+    void BoilerSpecs::calculate(Real64 &MyLoad,         // W - hot water demand to be met by boiler
+                                bool const RunFlag,     // TRUE if boiler operating
+                                int const EquipFlowCtrl // Flow control mode for the equipment
     )
     {
         // SUBROUTINE INFORMATION:
@@ -573,7 +624,7 @@ namespace BoilerSteam {
         static std::string const RoutineName("CalcBoilerModel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 BoilerDeltaTemp(0.0);  // C - boiler inlet to outlet temperature difference
+        Real64 BoilerDeltaTemp(0.0); // C - boiler inlet to outlet temperature difference
         Real64 CpWater;              // Heat capacity of condensed steam
 
         // Loading the variables derived type in to local variables
@@ -592,7 +643,8 @@ namespace BoilerSteam {
         // if the component control is SERIESACTIVE we set the component flow to inlet flow so that flow resolver
         // will not shut down the branch
         if (MyLoad <= 0.0 || !RunFlag) {
-            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive) this->BoilerMassFlowRate = DataLoopNode::Node(this->BoilerInletNodeNum).MassFlowRate;
+            if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType_SeriesActive)
+                this->BoilerMassFlowRate = DataLoopNode::Node(this->BoilerInletNodeNum).MassFlowRate;
             return;
         }
 
@@ -618,7 +670,8 @@ namespace BoilerSteam {
                                           "[Pa]");
         }
 
-        CpWater = FluidProperties::GetSatSpecificHeatRefrig(FluidNameSteam, DataLoopNode::Node(this->BoilerInletNodeNum).Temp, 0.0, this->FluidIndex, RoutineName);
+        CpWater = FluidProperties::GetSatSpecificHeatRefrig(
+            FluidNameSteam, DataLoopNode::Node(this->BoilerInletNodeNum).Temp, 0.0, this->FluidIndex, RoutineName);
 
         if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) { // TODO: Components shouldn't check FlowLock
             // Calculate the flow for the boiler
@@ -628,25 +681,28 @@ namespace BoilerSteam {
                 if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
                     BoilerDeltaTemp = DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
                 } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                    BoilerDeltaTemp = DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
+                    BoilerDeltaTemp =
+                        DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
                 } else {
                     assert(false);
                 }
             }
             this->BoilerOutletTemp = BoilerDeltaTemp + DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
 
-            Real64 const EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 1.0, this->FluidIndex, RoutineName);
-            Real64 const EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 0.0, this->FluidIndex, RoutineName);
+            Real64 const EnthSteamOutDry =
+                FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 1.0, this->FluidIndex, RoutineName);
+            Real64 const EnthSteamOutWet =
+                FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 0.0, this->FluidIndex, RoutineName);
             Real64 const LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
             this->BoilerMassFlowRate = this->BoilerLoad / (LatentEnthSteam + (CpWater * BoilerDeltaTemp));
 
             PlantUtilities::SetComponentFlowRate(this->BoilerMassFlowRate,
                                                  this->BoilerInletNodeNum,
                                                  this->BoilerOutletNodeNum,
-                                 this->LoopNum,
-                                 this->LoopSideNum,
-                                 this->BranchNum,
-                                 this->CompNum);
+                                                 this->LoopNum,
+                                                 this->LoopSideNum,
+                                                 this->BranchNum,
+                                                 this->CompNum);
 
         } else { // If FlowLock is True
             // Set the boiler flow rate from inlet node and then check performance
@@ -657,7 +713,8 @@ namespace BoilerSteam {
                 if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
                     BoilerDeltaTemp = DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
                 } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                    BoilerDeltaTemp = DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
+                    BoilerDeltaTemp =
+                        DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
                 }
             }
             // If boiler outlet temp is already greater than setpoint than it does not need to operate this iteration
@@ -670,8 +727,10 @@ namespace BoilerSteam {
                         this->BoilerOutletTemp = DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo;
                     }
                 }
-                Real64 const EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 1.0, this->FluidIndex, RoutineName);
-                Real64 const EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 0.0, this->FluidIndex, RoutineName);
+                Real64 const EnthSteamOutDry =
+                    FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 1.0, this->FluidIndex, RoutineName);
+                Real64 const EnthSteamOutWet =
+                    FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 0.0, this->FluidIndex, RoutineName);
                 Real64 const LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
                 this->BoilerLoad = (this->BoilerMassFlowRate * LatentEnthSteam);
 
@@ -686,10 +745,13 @@ namespace BoilerSteam {
                     }
                 }
 
-                Real64 const EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 1.0, this->FluidIndex, RoutineName);
-                Real64 const EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 0.0, this->FluidIndex, RoutineName);
+                Real64 const EnthSteamOutDry =
+                    FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 1.0, this->FluidIndex, RoutineName);
+                Real64 const EnthSteamOutWet =
+                    FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 0.0, this->FluidIndex, RoutineName);
                 Real64 const LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
-                this->BoilerLoad = std::abs(this->BoilerMassFlowRate * LatentEnthSteam) + std::abs(this->BoilerMassFlowRate * CpWater * BoilerDeltaTemp);
+                this->BoilerLoad =
+                    std::abs(this->BoilerMassFlowRate * LatentEnthSteam) + std::abs(this->BoilerMassFlowRate * CpWater * BoilerDeltaTemp);
             }
 
             // If load exceeds the distributed load set to the distributed load
@@ -706,8 +768,10 @@ namespace BoilerSteam {
                     }
                 }
 
-                Real64 const EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 1.0, this->FluidIndex, RoutineName);
-                Real64 const EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 0.0, this->FluidIndex, RoutineName);
+                Real64 const EnthSteamOutDry =
+                    FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 1.0, this->FluidIndex, RoutineName);
+                Real64 const EnthSteamOutWet =
+                    FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 0.0, this->FluidIndex, RoutineName);
                 Real64 const LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
                 BoilerDeltaTemp = this->BoilerOutletTemp - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
                 this->BoilerMassFlowRate = this->BoilerLoad / (LatentEnthSteam + CpWater * BoilerDeltaTemp);
@@ -715,10 +779,10 @@ namespace BoilerSteam {
                 PlantUtilities::SetComponentFlowRate(this->BoilerMassFlowRate,
                                                      this->BoilerInletNodeNum,
                                                      this->BoilerOutletNodeNum,
-                                     this->LoopNum,
-                                     this->LoopSideNum,
-                                     this->BranchNum,
-                                     this->CompNum);
+                                                     this->LoopNum,
+                                                     this->LoopSideNum,
+                                                     this->BranchNum,
+                                                     this->CompNum);
             }
 
             // Checks Boiler Load on the basis of the machine limits.
@@ -726,8 +790,10 @@ namespace BoilerSteam {
                 if (this->BoilerMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                     this->BoilerLoad = this->NomCap;
 
-                    Real64 const EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 1.0, this->FluidIndex, RoutineName);
-                    Real64 const EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 0.0, this->FluidIndex, RoutineName);
+                    Real64 const EnthSteamOutDry =
+                        FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 1.0, this->FluidIndex, RoutineName);
+                    Real64 const EnthSteamOutWet =
+                        FluidProperties::GetSatEnthalpyRefrig(FluidNameSteam, this->BoilerOutletTemp, 0.0, this->FluidIndex, RoutineName);
                     Real64 const LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
                     BoilerDeltaTemp = this->BoilerOutletTemp - DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
                     this->BoilerMassFlowRate = this->BoilerLoad / (LatentEnthSteam + CpWater * BoilerDeltaTemp);
@@ -735,10 +801,10 @@ namespace BoilerSteam {
                     PlantUtilities::SetComponentFlowRate(this->BoilerMassFlowRate,
                                                          this->BoilerInletNodeNum,
                                                          this->BoilerOutletNodeNum,
-                                         this->LoopNum,
-                                         this->LoopSideNum,
-                                         this->BranchNum,
-                                         this->CompNum);
+                                                         this->LoopNum,
+                                                         this->LoopSideNum,
+                                                         this->BranchNum,
+                                                         this->CompNum);
                 } else {
                     this->BoilerLoad = 0.0;
                     this->BoilerOutletTemp = DataLoopNode::Node(this->BoilerInletNodeNum).Temp;
@@ -765,7 +831,7 @@ namespace BoilerSteam {
 
     // Beginning of Record Keeping subroutines for the BOILER:SIMPLE Module
 
-    void BoilerSpecs::UpdateBoilerRecords(Real64 const MyLoad,                     // boiler operating load
+    void BoilerSpecs::update(Real64 const MyLoad,                     // boiler operating load
                              bool const RunFlag,                      // boiler on when TRUE
                              bool const EP_UNUSED(FirstHVACIteration) // TRUE if First iteration of simulation
     )
@@ -808,52 +874,6 @@ namespace BoilerSteam {
         this->BoilerMassFlowRate = DataLoopNode::Node(BoilerOutletNode).MassFlowRate;
         this->BoilerEnergy = this->BoilerLoad * ReportingConstant;
         this->FuelConsumed = this->FuelUsed * ReportingConstant;
-    }
-
-    PlantComponent *BoilerSpecs::factory(std::string const &objectName)
-    {
-        // Process the input data for boilers if it hasn't been done already
-        if (getSteamBoilerInput) {
-            GetBoilerInput();
-            getSteamBoilerInput = false;
-        }
-
-        // Now look for this particular pipe in the list
-        for (auto &boiler : Boiler) {
-            if (boiler.Name == objectName) {
-                return &boiler;
-            }
-        }
-        // If we didn't find it, fatal
-        ShowFatalError("LocalBoilerSteamFactory: Error getting inputs for steam boiler named: " + objectName); // LCOV_EXCL_LINE
-        // Shut up the compiler
-        return nullptr; // LCOV_EXCL_LINE
-    }
-
-    void BoilerSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
-    {
-        this->InitBoiler();
-        auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
-        this->CalcBoilerModel(CurLoad, RunFlag, sim_component.FlowCtrl);
-        this->UpdateBoilerRecords(CurLoad, RunFlag, FirstHVACIteration);
-    }
-
-    void BoilerSpecs::getDesignCapacities(const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
-    {
-        MinLoad = this->NomCap * this->MinPartLoadRat;
-        MaxLoad = this->NomCap * this->MaxPartLoadRat;
-        OptLoad = this->NomCap * this->OptPartLoadRat;
-    }
-
-    void BoilerSpecs::getSizingFactor(Real64 &_SizFac)
-    {
-        _SizFac = this->SizFac;
-    }
-
-    void BoilerSpecs::onInitLoopEquip(const PlantLocation &)
-    {
-        this->InitBoiler();
-        this->SizeBoiler();
     }
 
 } // namespace BoilerSteam
