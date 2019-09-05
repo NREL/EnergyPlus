@@ -777,7 +777,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    Relative;                !- Coordinate System
+    World;                   !- Coordinate System
 
   BuildingSurface:Detailed,
     ZnWest:Wall001,          !- Name
