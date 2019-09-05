@@ -107,6 +107,8 @@ namespace BoilerSteam {
         Real64 FuelConsumed;     // J - Boiler Fuel consumed integrated over time
         Real64 BoilerInletTemp;  // C - Boiler inlet temperature
 
+        std::string BoilerFuelTypeForOutputVariable;
+
         // Default Constructor
         BoilerSpecs()
             : FuelType(0), Available(false), ON(false), MissingSetPointErrDone(false), UseLoopSetPoint(false), DesMassFlowRate(0.0),
@@ -114,11 +116,13 @@ namespace BoilerSteam {
               OperPartLoadRat(0.0), TempUpLimitBoilerOut(0.0), BoilerMaxOperPress(0.0), BoilerPressCheck(0.0), SizFac(0.0), BoilerInletNodeNum(0),
               BoilerOutletNodeNum(0), FullLoadCoef(3, 0.0), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), PressErrIndex(0),
               FluidIndex(0), myFlag(true), myEnvrnFlag(true), FuelUsed(0.0), BoilerLoad(0.0), BoilerMassFlowRate(0.0), BoilerOutletTemp(0.0),
-              BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0)
+              BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0), BoilerFuelTypeForOutputVariable("")
         {
         }
 
         void InitBoiler();
+
+        void setupOutputVars();
 
         void SizeBoiler();
 

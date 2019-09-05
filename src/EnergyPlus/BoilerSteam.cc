@@ -203,7 +203,6 @@ namespace BoilerSteam {
         int IOStat;          // IO Status when calling get input subroutine
         int SteamFluidIndex; // Fluid Index for Steam
         bool ErrorsFound(false);
-        Array1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
 
         SteamFluidIndex = 0;
         DataIPShortCuts::cCurrentModuleObject = "Boiler:Steam";
@@ -220,7 +219,6 @@ namespace BoilerSteam {
         // Boiler will have fuel input to it , that is it !
         Boiler.allocate(NumBoilers);
         CheckEquipName.dimension(NumBoilers, true);
-        BoilerFuelTypeForOutputVariable.allocate(NumBoilers);
 
         // LOAD ARRAYS WITH CURVE FIT Boiler DATA
         for (BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum) {
@@ -235,45 +233,45 @@ namespace BoilerSteam {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(2));
 
                 if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "Electric";
+                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Electric";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
 
                 } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "Gas";
+                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Gas";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
 
                 } else if (SELECT_CASE_var == "DIESEL") {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "Diesel";
+                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Diesel";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("DIESEL");
 
                 } else if (SELECT_CASE_var == "GASOLINE") {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "Gasoline";
+                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Gasoline";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("GASOLINE");
 
                 } else if (SELECT_CASE_var == "COAL") {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "Coal";
+                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Coal";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("COAL");
 
                 } else if ((SELECT_CASE_var == "FUEL OIL #1") || (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL") ||
                            (SELECT_CASE_var == "DISTILLATE OIL")) {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "FuelOil#1";
+                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#1";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("DISTILLATE OIL");
 
                 } else if ((SELECT_CASE_var == "FUEL OIL #2") || (SELECT_CASE_var == "FUELOIL#2") || (SELECT_CASE_var == "RESIDUAL OIL")) {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "FuelOil#2";
+                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#2";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("RESIDUAL OIL");
 
                 } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
                            (SELECT_CASE_var == "PROPANE GAS")) {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "Propane";
+                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Propane";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("PROPANE");
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "OtherFuel1";
+                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "OtherFuel1";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL1");
 
                 } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "OtherFuel2";
+                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "OtherFuel2";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("OTHERFUEL2");
 
                 } else {
@@ -281,7 +279,7 @@ namespace BoilerSteam {
                     ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
 
                     // Set to Electric to avoid errors when setting up output variables
-                    BoilerFuelTypeForOutputVariable(BoilerNum) = "Electric";
+                    Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Electric";
                     ErrorsFound = true;
                 }
             }
@@ -352,67 +350,6 @@ namespace BoilerSteam {
             ShowFatalError(RoutineName + "Errors found in processing " + DataIPShortCuts::cCurrentModuleObject + " input.");
         }
 
-        for (BoilerNum = 1; BoilerNum <= NumBoilers; ++BoilerNum) {
-            SetupOutputVariable(
-                "Boiler Heating Rate", OutputProcessor::Unit::W, Boiler(BoilerNum).BoilerLoad, "System", "Average", Boiler(BoilerNum).Name);
-            SetupOutputVariable("Boiler Heating Energy",
-                                OutputProcessor::Unit::J,
-                                Boiler(BoilerNum).BoilerEnergy,
-                                "System",
-                                "Sum",
-                                Boiler(BoilerNum).Name,
-                                _,
-                                "ENERGYTRANSFER",
-                                "BOILERS",
-                                _,
-                                "Plant");
-            if (UtilityRoutines::SameString(BoilerFuelTypeForOutputVariable(BoilerNum), "Electric")) {
-                SetupOutputVariable("Boiler " + BoilerFuelTypeForOutputVariable(BoilerNum) + " Power",
-                                    OutputProcessor::Unit::W,
-                                    Boiler(BoilerNum).FuelUsed,
-                                    "System",
-                                    "Average",
-                                    Boiler(BoilerNum).Name);
-            } else {
-                SetupOutputVariable("Boiler " + BoilerFuelTypeForOutputVariable(BoilerNum) + " Rate",
-                                    OutputProcessor::Unit::W,
-                                    Boiler(BoilerNum).FuelUsed,
-                                    "System",
-                                    "Average",
-                                    Boiler(BoilerNum).Name);
-            }
-            SetupOutputVariable("Boiler " + BoilerFuelTypeForOutputVariable(BoilerNum) + " Energy",
-                                OutputProcessor::Unit::J,
-                                Boiler(BoilerNum).FuelConsumed,
-                                "System",
-                                "Sum",
-                                Boiler(BoilerNum).Name,
-                                _,
-                                BoilerFuelTypeForOutputVariable(BoilerNum),
-                                "Heating",
-                                Boiler(BoilerNum).EndUseSubcategory,
-                                "Plant");
-            SetupOutputVariable("Boiler Steam Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                Boiler(BoilerNum).BoilerInletTemp,
-                                "System",
-                                "Average",
-                                Boiler(BoilerNum).Name);
-            SetupOutputVariable("Boiler Steam Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                Boiler(BoilerNum).BoilerOutletTemp,
-                                "System",
-                                "Average",
-                                Boiler(BoilerNum).Name);
-            SetupOutputVariable("Boiler Steam Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                Boiler(BoilerNum).BoilerMassFlowRate,
-                                "System",
-                                "Average",
-                                Boiler(BoilerNum).Name);
-        }
-
-        BoilerFuelTypeForOutputVariable.deallocate();
     }
 
     void BoilerSpecs::InitBoiler() // number of the current electric chiller being simulated
@@ -434,6 +371,8 @@ namespace BoilerSteam {
 
         // Init more variables
         if (this->myFlag) {
+            // setup output variables once here
+            this->setupOutputVars();
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(this->Name,
@@ -533,6 +472,66 @@ namespace BoilerSteam {
         }
     }
 
+    void BoilerSpecs::setupOutputVars() {
+        SetupOutputVariable(
+            "Boiler Heating Rate", OutputProcessor::Unit::W, this->BoilerLoad, "System", "Average", this->Name);
+        SetupOutputVariable("Boiler Heating Energy",
+                            OutputProcessor::Unit::J,
+                            this->BoilerEnergy,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "ENERGYTRANSFER",
+                            "BOILERS",
+                            _,
+                            "Plant");
+        if (UtilityRoutines::SameString(this->BoilerFuelTypeForOutputVariable, "Electric")) {
+            SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Power",
+                                OutputProcessor::Unit::W,
+                                this->FuelUsed,
+                                "System",
+                                "Average",
+                                this->Name);
+        } else {
+            SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
+                                OutputProcessor::Unit::W,
+                                this->FuelUsed,
+                                "System",
+                                "Average",
+                                this->Name);
+        }
+        SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Energy",
+                            OutputProcessor::Unit::J,
+                            this->FuelConsumed,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            this->BoilerFuelTypeForOutputVariable,
+                            "Heating",
+                            this->EndUseSubcategory,
+                            "Plant");
+        SetupOutputVariable("Boiler Steam Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->BoilerInletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Boiler Steam Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->BoilerOutletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Boiler Steam Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->BoilerMassFlowRate,
+                            "System",
+                            "Average",
+                            this->Name);
+    }
+    
     void BoilerSpecs::SizeBoiler()
     {
 
