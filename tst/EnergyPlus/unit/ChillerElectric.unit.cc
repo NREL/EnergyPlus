@@ -56,7 +56,6 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -75,7 +74,6 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    FluidProperties::InitializeGlycRoutines();
 
     std::string const idf_objects = delimited_string({
         "  Chiller:Electric,",

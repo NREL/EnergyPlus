@@ -54,7 +54,6 @@
 #include <DataLoopNode.hh>
 #include <ElectricPowerServiceManager.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <FluidProperties.hh>
 #include <HeatBalanceManager.hh>
 #include <HeatPumpWaterToWaterSimple.hh>
 #include <OutputProcessor.hh>
@@ -722,8 +721,6 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
     BranchInputManager::ManageBranchInput(); // just gets input and
 
-    FluidProperties::InitializeGlycRoutines();
-
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
@@ -815,7 +812,6 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
 {
     // this test is for checking autosizing of heating WWHP. derived from unit test PlantLoopSourceSideTest
-    FluidProperties::InitializeGlycRoutines();
     std::string const idf_objects =
         delimited_string({"Schedule:Constant,Radiator massflow temporary,Any value sch,1;",
                           "Schedule:Constant,Radiator supply temperature temporary,Any value sch,40;",

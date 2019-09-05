@@ -55,7 +55,6 @@
 #include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -71,7 +70,6 @@ using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
 {
-    FluidProperties::InitializeGlycRoutines();
     std::string const idf_objects = delimited_string({
         "  Version,9.2;",
 

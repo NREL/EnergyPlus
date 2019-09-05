@@ -60,7 +60,6 @@
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
 #include <ElectricPowerServiceManager.hh>
-#include <FluidProperties.hh>
 #include <GeneralRoutines.hh>
 #include <HVACFourPipeBeam.hh>
 #include <HeatBalanceManager.hh>
@@ -1734,8 +1733,6 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    FluidProperties::InitializeGlycRoutines();
-
     WeatherManager::ResetEnvironmentCounter();
     TestAirPathIntegrity(ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
     SimulationManager::SetupSimulation(ErrorsFound);
@@ -3295,8 +3292,6 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
 
     DataGlobals::BeginSimFlag = true;
     SimulationManager::GetProjectData();
-
-    FluidProperties::InitializeGlycRoutines();
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early

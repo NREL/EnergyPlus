@@ -1102,8 +1102,6 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    InitializeGlycRoutines();
-
     GetProjectControlData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -1811,8 +1809,6 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     Real64 TubeDiameter;
     Real64 HXEffectFuncResult;
     int GlycolIndex = 0;
-
-    InitializeGlycRoutines();
 
     // Set values of items that will stay constant for all calls to HX Effectiveness function
     RadSysNum = 1;

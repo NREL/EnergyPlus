@@ -59,7 +59,6 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
@@ -80,7 +79,6 @@ TEST_F(EnergyPlusFixture, Humidifiers_Sizing)
     NumElecSteamHums = 0;
     NumGasSteamHums = 1;
     NumHumidifiers = 1;
-    FluidProperties::InitializeGlycRoutines();
 
     HumidifierData thisHum;
 
@@ -116,7 +114,6 @@ TEST_F(EnergyPlusFixture, Humidifiers_AutoSizing)
     NumElecSteamHums = 0;
     NumGasSteamHums = 1;
     NumHumidifiers = 1;
-    FluidProperties::InitializeGlycRoutines();
 
     HumidifierData thisHum;
 
@@ -157,7 +154,6 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
     TimeStepSys = 0.25;
     SysSizingRunDone = true;
     CurSysNum = 1;
-    FluidProperties::InitializeGlycRoutines();
 
     NumElecSteamHums = 0;
     NumGasSteamHums = 1;
@@ -233,7 +229,6 @@ TEST_F(EnergyPlusFixture, Humidifiers_GetHumidifierInput)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    FluidProperties::InitializeGlycRoutines();
 
     GetHumidifierInput();
     ASSERT_EQ(1, NumHumidifiers);
@@ -249,7 +244,6 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
     TimeStepSys = 0.25;
     SysSizingRunDone = true;
     CurSysNum = 1;
-    FluidProperties::InitializeGlycRoutines();
 
     NumElecSteamHums = 0;
     NumGasSteamHums = 1;

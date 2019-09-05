@@ -4943,8 +4943,6 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
 
-    InitializeGlycRoutines();
-
     Array2D<Real64> DummyArray; // Sky temperature
     DataGlobals::NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
@@ -5770,8 +5768,6 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    InitializeGlycRoutines();
-
     DataZoneEquipment::GetZoneEquipmentData(); // read equipment list and connections
     HVACVariableRefrigerantFlow::MyEnvrnFlag = true;
     ZoneInletAirNode = GetVRFTUZoneInletAirNode(VRFTUNum);  // trigger GetVRFInput by calling a mining function
@@ -5834,7 +5830,6 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
     CurveManager::GetCurveInput();
-    InitializeGlycRoutines();
 
     int VRFCond = 1;
     VRF.allocate(1);
@@ -7184,7 +7179,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SupplementalHeatingCoilGetInput)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    InitializeGlycRoutines();
+
     // get zone data
     bool ErrorsFound(false);
     GetZoneData(ErrorsFound);
@@ -7273,7 +7268,6 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
     DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).HumRat = 0.0070;
     DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(
         DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).Temp, DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).HumRat);
-    InitializeGlycRoutines();
 
     bool FirstHVACIteration(false);
     Real64 SuppHeatCoilLoad = 10000.0;
@@ -7338,8 +7332,6 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
     DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).HumRat = 0.0070;
     DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(
         DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).Temp, DataLoopNode::Node(HeatingCoil(CoilNum).AirInletNodeNum).HumRat);
-
-    InitializeGlycRoutines();
 
     bool FirstHVACIteration(false);
     Real64 SuppHeatCoilLoad = 10000.0;
@@ -7414,8 +7406,6 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     PlantSizData(NumPltSizInput).PlantLoopName = "HotWaterLoop";
     PlantSizData(NumPltSizInput).ExitTemp = 60.0; // hot water coil inlet water temp
     PlantSizData(NumPltSizInput).DeltaT = 10.0;   // loop temperature difference
-
-    InitializeGlycRoutines();
 
     // set up plant loop
     TotNumLoops = 1;

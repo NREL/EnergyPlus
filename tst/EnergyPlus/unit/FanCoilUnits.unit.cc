@@ -65,7 +65,6 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -134,7 +133,6 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
     DataGlobals::MinutesPerTimeStep = 60;
 
     InitializePsychRoutines();
-    FluidProperties::InitializeGlycRoutines();
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -446,7 +444,6 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
     DataGlobals::MinutesPerTimeStep = 60;
 
     InitializePsychRoutines();
-    FluidProperties::InitializeGlycRoutines();
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -760,7 +757,6 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     DataGlobals::MinutesPerTimeStep = 60;
 
     InitializePsychRoutines();
-    FluidProperties::InitializeGlycRoutines();
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -1148,7 +1144,6 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     DataGlobals::MinutesPerTimeStep = 60;
 
     InitializePsychRoutines();
-    FluidProperties::InitializeGlycRoutines();
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -1457,7 +1452,6 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     DataGlobals::MinutesPerTimeStep = 60;
 
     InitializePsychRoutines();
-    FluidProperties::InitializeGlycRoutines();
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -1811,7 +1805,6 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     DataSizing::CurZoneEqNum = 1;
 
     InitializePsychRoutines();
-    FluidProperties::InitializeGlycRoutines();
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -2226,7 +2219,6 @@ TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
     DataGlobals::MinutesPerTimeStep = 60;
 
     InitializePsychRoutines();
-    FluidProperties::InitializeGlycRoutines();
 
     std::string const idf_objects = delimited_string({
         " Zone, EAST ZONE, 0, 0, 0, 0, 1, 1, autocalculate, autocalculate;",
@@ -2513,7 +2505,6 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     DataSizing::CurZoneEqNum = 1;
 
     InitializePsychRoutines();
-    FluidProperties::InitializeGlycRoutines();
 
     std::string const idf_objects = delimited_string({
         "	Zone,",
@@ -2917,7 +2908,6 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     DataSizing::CurZoneEqNum = 1;
 
     InitializePsychRoutines();
-    FluidProperties::InitializeGlycRoutines();
 
     std::string const idf_objects = delimited_string({
         "	Zone,",

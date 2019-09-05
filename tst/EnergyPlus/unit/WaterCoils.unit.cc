@@ -162,7 +162,6 @@ public:
 
 TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
 {
-    InitializeGlycRoutines();
     OutBaroPress = 101325.0;
     StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 20.0, 0.0);
 
@@ -821,7 +820,6 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
 TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
 {
     InitializePsychRoutines();
-    InitializeGlycRoutines();
     OutBaroPress = 101325.0;
     StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 20.0, 0.0);
     ShowMessage("Begin Test: WaterCoilsTest, CoilCoolingWaterSimpleSizing");
@@ -923,7 +921,6 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
 TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
 {
     InitializePsychRoutines();
-    InitializeGlycRoutines();
     OutBaroPress = 101325.0;
     StdRhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, 20.0, 0.0);
     ShowMessage("Begin Test: WaterCoilsTest, CoilCoolingWaterDetailedSizing");

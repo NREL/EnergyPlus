@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
-#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -5425,8 +5424,6 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
 
     DataSizing::CurSysNum = 1;
     DataSizing::CurOASysNum = 0;
-
-    FluidProperties::InitializeGlycRoutines();
 
     GetDesiccantDehumidifierInput();
     EXPECT_EQ(1, NumDesicDehums);

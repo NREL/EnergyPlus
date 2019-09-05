@@ -56,7 +56,6 @@
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
 #include <DataSizing.hh>
-#include <FluidProperties.hh>
 #include <ElectricPowerServiceManager.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportPredefined.hh>
@@ -491,7 +490,6 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     DataGlobals::BeginSimFlag = true;
     SimulationManager::GetProjectData();
     OutputReportPredefined::SetPredefinedTables();
-    FluidProperties::InitializeGlycRoutines();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
@@ -884,8 +882,6 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     DataGlobals::BeginSimFlag = true;
     SimulationManager::GetProjectData();
     OutputReportPredefined::SetPredefinedTables();
-
-    FluidProperties::InitializeGlycRoutines();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
@@ -1319,8 +1315,6 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     SimulationManager::GetProjectData();
     OutputReportPredefined::SetPredefinedTables();
 
-    FluidProperties::InitializeGlycRoutines();
-
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
@@ -1735,8 +1729,6 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     DataGlobals::BeginSimFlag = true;
     SimulationManager::GetProjectData();
     OutputReportPredefined::SetPredefinedTables();
-
-    FluidProperties::InitializeGlycRoutines();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
@@ -2222,8 +2214,6 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
     SimulationManager::GetProjectData();
     OutputReportPredefined::SetPredefinedTables();
 
-    FluidProperties::InitializeGlycRoutines();
-
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
@@ -2651,8 +2641,6 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     SimulationManager::GetProjectData();
     OutputReportPredefined::SetPredefinedTables();
 
-    FluidProperties::InitializeGlycRoutines();
-
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
@@ -3048,8 +3036,6 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     DataGlobals::BeginSimFlag = true;
     SimulationManager::GetProjectData();
     OutputReportPredefined::SetPredefinedTables();
-
-    FluidProperties::InitializeGlycRoutines();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
@@ -3450,8 +3436,6 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     DataGlobals::BeginSimFlag = true;
     SimulationManager::GetProjectData();
     OutputReportPredefined::SetPredefinedTables();
-
-    FluidProperties::InitializeGlycRoutines();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
