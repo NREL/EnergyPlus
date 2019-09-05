@@ -56,6 +56,7 @@
 
 // EnergyPlus Headers
 #include <Boilers.hh>
+#include <BoilerSteam.hh>
 #include <BranchInputManager.hh>
 #include <DataBranchAirLoopPlant.hh>
 #include <DataConvergParams.hh>
@@ -1090,6 +1091,7 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_Boiler_Steam;
                                 this_comp.GeneralEquipType = GenEquipTypes_Boiler;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                                this_comp.compPtr = BoilerSteam::BoilerSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Absorption:Indirect")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_Indirect_Absorption;
                                 this_comp.GeneralEquipType = GenEquipTypes_Chiller;
