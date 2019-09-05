@@ -59,9 +59,7 @@ namespace EnergyPlus {
 
 namespace BoilerSteam {
 
-    // MODULE VARIABLE DECLARATIONS:
     extern int NumBoilers;                // Number of boilers
-
     extern Array1D_bool CheckEquipName;
 
     struct BoilerSpecs
@@ -119,12 +117,25 @@ namespace BoilerSteam {
               BoilerEnergy(0.0), FuelConsumed(0.0), BoilerInletTemp(0.0)
         {
         }
+
+        void InitBoiler();
+
+        void SizeBoiler();
+
+        void CalcBoilerModel(Real64 &MyLoad,         // W - hot water demand to be met by boiler
+                             bool RunFlag,     // TRUE if boiler operating
+                             int EquipFlowCtrl // Flow control mode for the equipment
+        );
+
+        void UpdateBoilerRecords(Real64 MyLoad,          // boiler operating load
+                                 bool RunFlag,           // boiler on when TRUE
+                                 bool FirstHVACIteration // TRUE if First iteration of simulation
+        );
+
     };
 
     // Object Data
     extern Array1D<BoilerSpecs> Boiler; // dimension to number of machines
-
-    // Functions
 
     void clear_state();
 
@@ -144,24 +155,6 @@ namespace BoilerSteam {
     );
 
     void GetBoilerInput();
-
-    void InitBoiler(int BoilerNum); // number of the current electric chiller being simulated
-
-    void SizeBoiler(int BoilerNum);
-
-    void CalcBoilerModel(int &BoilerNum,         // boiler identifier
-                         Real64 &MyLoad,         // W - hot water demand to be met by boiler
-                         bool RunFlag,     // TRUE if boiler operating
-                         int EquipFlowCtrl // Flow control mode for the equipment
-    );
-
-    // Beginning of Record Keeping subroutines for the BOILER:SIMPLE Module
-
-    void UpdateBoilerRecords(Real64 MyLoad,          // boiler operating load
-                             bool RunFlag,           // boiler on when TRUE
-                             int Num,                // boiler number
-                             bool FirstHVACIteration // TRUE if First iteration of simulation
-    );
 
 } // namespace BoilerSteam
 
