@@ -887,6 +887,26 @@ namespace BoilerSteam {
         this->FuelConsumed = this->FuelUsed * ReportingConstant;
     }
 
+    void BoilerSpecs::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    {
+
+    }
+
+    void BoilerSpecs::getDesignCapacities(const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    {
+
+    }
+
+    void BoilerSpecs::getSizingFactor(Real64 &SizFac)
+    {
+
+    }
+
+    void BoilerSpecs::onInitLoopEquip(const PlantLocation &)
+    {
+
+    }
+
 } // namespace BoilerSteam
 
 } // namespace EnergyPlus
