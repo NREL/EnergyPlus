@@ -939,6 +939,13 @@ namespace EnergyPlus {
         void ReadZoneCoupledDomainInputs(int StartingDomainNumForZone, int NumZoneCoupledDomains, bool &ErrorsFound);
 
         void ReadBasementInputs(int StartingDomainNumForBasement, int NumBasements, bool &ErrorsFound);
+        
+        bool SiteGroundDomainUsingNoMassMat(Real64 const MaterialThickness,
+                                            int const MaterialNum);
+        
+        void SiteGroundDomainNoMassMatError(std::string const &FieldName,
+                                            std::string const &UserInputField,
+                                            std::string const &ObjectName);
 
         void ReadPipeCircuitInputs(bool &ErrorsFound);
 
