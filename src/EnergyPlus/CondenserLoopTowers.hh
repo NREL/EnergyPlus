@@ -59,15 +59,9 @@ namespace EnergyPlus {
 
 namespace CondenserLoopTowers {
 
-    // Using/Aliasing
-
-    // Data
     // MODULE PARAMETER DEFINITIONS
     // Empirical Model Type
     extern int const CoolToolsXFModel;
-    // CoolTools counterflow model does not work properly. The empirical model seems flawed since the tower
-    // operates in the free convection regime on the design day.
-    // INTEGER, PARAMETER             :: CoolToolsCFModel     = 2
     extern int const CoolToolsUserDefined;
     extern int const YorkCalcModel;
     extern int const YorkCalcUserDefined;
@@ -97,24 +91,13 @@ namespace CondenserLoopTowers {
     extern int const CellCtrl_MinCell;
     extern int const CellCtrl_MaxCell;
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
     extern int NumSimpleTowers; // Number of similar towers
-
-    //? The following block of variables are used to carry model results for a tower instance
-    //   across sim, update, and report routines.  Simulation manager must be careful
-    //   in models with multiple towers.
 
     extern Real64 InletWaterTemp;    // CW temperature at tower inlet
     extern Real64 OutletWaterTemp;   // CW temperature at tower outlet
     extern int WaterInletNode;       // Node number at tower inlet
     extern int WaterOutletNode;      // Node number at tower outlet
     extern Real64 WaterMassFlowRate; // WaterMassFlowRate through tower
-    // DSU this is plant level stuff now REAL(r64)         :: TowerMassFlowRateMax     = 0.0d0    ! Max Hardware Mass Flow Rate
-    // DSU this is plant level stuff now REAL(r64)         :: TowerMassFlowRateMin     = 0.0d0    ! Min Hardware Mass Flow Rate
-    // DSU this is plant level stuff now REAL(r64)         :: LoopMassFlowRateMaxAvail = 0.0d0    ! Max Loop Mass Flow Rate available
-    // DSU this is plant level stuff now REAL(r64)         :: LoopMassFlowRateMinAvail = 0.0d0    ! Min Loop Mass Flow Rate available
     extern Real64 Qactual;          // Tower heat transfer
     extern Real64 CTFanPower;       // Tower fan power used
     extern Real64 AirFlowRateRatio; // Ratio of air flow rate through VS cooling tower to design air flow rate
@@ -124,18 +107,6 @@ namespace CondenserLoopTowers {
 
     extern bool GetInput; // When TRUE, calls subroutine to read input file
     extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE CondenserLoopTowers
-
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Update routines to check convergence and update nodes
-
-    // Types
 
     struct Towerspecs
     {
@@ -461,19 +432,7 @@ namespace CondenserLoopTowers {
                    Real64 &SizingFactor        // sizing factor
     );
 
-    // End CondenserLoopTowers Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of CondenserLoopTowers Module Get Input subroutines
-    //******************************************************************************
-
     void GetTowerInput();
-
-    // End of Get Input subroutines for the CondenserLoopTowers Module
-    //******************************************************************************
-
-    // Beginning Initialization Section for the CondenserLoopTowers Module
-    //******************************************************************************
 
     void InitSimVars();
 
@@ -484,12 +443,6 @@ namespace CondenserLoopTowers {
     void SizeTower(int const TowerNum);
 
     void SizeVSMerkelTower(int const TowerNum);
-
-    // End Initialization Section for the CondenserLoopTowers Module
-    //******************************************************************************
-
-    // Beginning of the CondenserLoopTowers Module Simulation Subroutines
-    // *****************************************************************************
 
     void CalcSingleSpeedTower(int &TowerNum);
 
@@ -543,22 +496,9 @@ namespace CondenserLoopTowers {
                                        Array1<Real64> const &Par // par(1) = tower number
     );
 
-    // End of the CondenserLoopTowers Module Simulation Subroutines
-
-    // *****************************************************************************
-
     void CalculateWaterUseage(int const TowerNum);
 
-    // Beginning of Record Keeping subroutines for the Tower Module
-    // *****************************************************************************
-
     void UpdateTowers(int const TowerNum);
-
-    // End of Record Keeping subroutines for the Tower Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the Tower Module
-    // *****************************************************************************
 
     void ReportTowers(bool const RunFlag, int const TowerNum);
 

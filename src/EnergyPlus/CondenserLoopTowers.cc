@@ -130,9 +130,6 @@ namespace CondenserLoopTowers {
 
     // Empirical Model Type
     int const CoolToolsXFModel(1);
-    // CoolTools counterflow model does not work properly. The empirical model seems flawed since the tower
-    // operates in the free convection regime on the design day.
-    // INTEGER, PARAMETER             :: CoolToolsCFModel     = 2
     int const CoolToolsUserDefined(3);
     int const YorkCalcModel(4);
     int const YorkCalcUserDefined(5);
@@ -164,22 +161,15 @@ namespace CondenserLoopTowers {
 
     static std::string const BlankString;
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
     int NumSimpleTowers(0); // Number of similar towers
     bool GetInput(true);
     bool InitTowerOneTimeFlag(true);
-    //? The following block of variables are used to carry model results for a tower instance
-    //   across sim, update, and report routines.  Simulation manager must be careful
-    //   in models with multiple towers.
 
     Real64 InletWaterTemp(0.0);    // CW temperature at tower inlet
     Real64 OutletWaterTemp(0.0);   // CW temperature at tower outlet
     int WaterInletNode(0);         // Node number at tower inlet
     int WaterOutletNode(0);        // Node number at tower outlet
     Real64 WaterMassFlowRate(0.0); // WaterMassFlowRate through tower
-
     Real64 Qactual(0.0);          // Tower heat transfer
     Real64 CTFanPower(0.0);       // Tower fan power used
     Real64 AirFlowRateRatio(0.0); // Ratio of air flow rate through VS cooling tower to design air flow rate
@@ -189,27 +179,12 @@ namespace CondenserLoopTowers {
 
     Array1D_bool CheckEquipName;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE CondenserLoopTowers
-
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Update routines to check convergence and update nodes
-
     // Object Data
     Array1D<Towerspecs> SimpleTower;           // dimension to number of machines
     Array1D<TowerInletConds> SimpleTowerInlet; // inlet conditions
     Array1D<ReportVars> SimpleTowerReport;     // report variables
     Array1D<VSTowerData> VSTower;              // model coefficients and specific variables for VS tower
     std::unordered_map<std::string, std::string> UniqueSimpleTowerNames;
-
-    // MODULE SUBROUTINES:
-
-    // Beginning of CondenserLoopTowers Module Driver Subroutines
-    //*************************************************************************
 
     // Functions
     void clear_state()
@@ -265,8 +240,6 @@ namespace CondenserLoopTowers {
         // calls GetTowerInput to get all cooling tower input info (one time only),
         // then calls the appropriate subroutine to calculate tower performance,
         // update records (node info) and writes output report info.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int TowerNum;
 
@@ -386,12 +359,6 @@ namespace CondenserLoopTowers {
             }
         } // TypeOfEquip
     }
-
-    // End CondenserLoopTowers Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of CondenserLoopTowers Module Get Input subroutines
-    //******************************************************************************
 
     void GetTowerInput()
     {
@@ -1284,43 +1251,6 @@ namespace CondenserLoopTowers {
             if (UtilityRoutines::SameString(AlphArray(4), "CoolToolsCrossFlow")) {
                 SimpleTower(TowerNum).TowerModelType = CoolToolsXFModel;
                 //     set cross-flow model coefficients
-                //       Outputs approach in F
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(1)  = -2.1985908408527
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(2)  = -24.3108065555106
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(3)  = 21.9333667825398
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(4)  = -4.94979078884808
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(5)  = 14.6788552214526
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(6)  = -15.4612468065777
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(7)  = 2.83753688605444
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(8)  = 10.0023162199558
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(9)  = 2.70780345372045
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(10) = -5.91993527180418
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(11) = 0.194222288920726
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(12) = 0.142543400927955
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(13) = -0.0818947291400898
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(14) = -0.169584760441541
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(15) = 0.0186741309635284
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(16) = 0.0536824177590012
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(17) = -0.00375848174056975
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(18) = 0.000623763881051551
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(19) = -0.000709769430542879
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(20) = 0.0000234697776728891
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(21) = 2.45541543720225
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(22) = -0.607566456611435
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(23) = 0.117339576910507
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(24) = 1.64648551160799
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(25) = -0.135898905926974
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(26) = -0.152577581866506
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(27) = -0.034055419164321
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(28) = 0.00274052705314173
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(29) = -0.00442366885652332
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(30) = 0.0000687098236486247
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(31) = -0.0416435261408276
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(32) = 0.00263481599534274
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(33) = -0.010325259545311
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(34) = 0.000356999078067433
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(35) = 0.000249188476685273
-
                 //       Outputs approach in C
                 VSTower(SimpleTower(TowerNum).VSTower).Coeff(1) = 0.52049709836241;
                 VSTower(SimpleTower(TowerNum).VSTower).Coeff(2) = -10.617046395344;
@@ -1368,126 +1298,9 @@ namespace CondenserLoopTowers {
                 VSTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio = 0.75;
                 VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio = 1.25;
 
-                //    CoolTools counterflow model does not work properly. The empirical model seems flawed since the tower
-                //    operates in the free convection regime on the design day.
-                //    ELSEIF(UtilityRoutines::SameString(AlphArray(5),'COOLTOOLS COUNTERFLOW'))THEN
-                //      SimpleTower(TowerNum)%TowerModelType               = CoolToolsCFModel
-                //!     set counter-flow model coefficients
-                //!       Outputs approach in F
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(1)  = -4.48760943345722
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(2)  = 0.741749875850003
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(3)  = 1.74679844252553
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(4)  = -0.397320959632943
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(5)  = 19.5106208955792
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(6)  = -9.79489761472574
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(7)  = 1.96690857354709
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(8)  = -1.40803729637148
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(9)  = 0.633867141219563
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(10) = -0.517255742412696
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(11) = 0.0546335532842876
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(12) = 0.0468060318806566
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(13) = -0.0244033403339062
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(14) = -0.267365212754448
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(15) = 0.0385664546399435
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(16) = 0.037765628073743
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(17) = -0.000928698541521428
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(18) = -0.000122211107650076
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(19) = 0.000682937021895334
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(20) = 0.00000679217734960548
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(21) = 1.47274732178792
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(22) = -0.869303590626237
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(23) = 0.149995781695274
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(24) = 2.4548219494635
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(25) = -0.161092120908292
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(26) = -0.0830303891087807
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(27) = -0.0251101427687245
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(28) = 0.00430042875730149
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(29) = -0.013969370453107
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(30) = 0.000096171182587938
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(31) = -0.0251558254472348
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(32) = 0.0077094706621763
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(33) = -0.0173842428341529
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(34) = 0.000244578460749651
-                //!        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(35) = 0.000123026859143619
-                //!       Outputs approach in C
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(1)  =  -1.92653164860338
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(2)  =   1.17466595655408
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(3)  =   0.536606417689184
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(4)  =  -0.220733866462746
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(5)  =   6.4745897765876
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(6)  =  -4.75598392569308
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(7)  =   1.09272698530394
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(8)  =  -0.110853998895391
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(9)  =   0.352148411788646
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(10) =  -0.287364301340387
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(11) =   0.0160624154449042
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(12) =   0.0389845209910517
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(13) =  -0.0244033403339062
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(14) =  -0.223657243353147
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(15) =   0.0385664546399435
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(16) =   0.037765628073743
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(17) =  -0.000497969128726743
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(18) =  -0.000219979993770137
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(19) =   0.0012292866394116
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(20) =   0.0000220066546127218
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(21) =   0.767702044158785
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(22) =  -0.731689870392589
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(23) =   0.149995781695274
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(24) =   2.00780209496408
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(25) =  -0.161092120908292
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(26) =  -0.0830303891087807
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(27) =  -0.0341193367495736
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(28) =   0.00774077176314268
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(29) =  -0.0251448668155926
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(30) =   0.000311594631584919
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(31) =  -0.0311927664658427
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(32) =   0.0138770471919173
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(33) =  -0.0312916371014752
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(34) =   0.000792434212828869
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(35) =   0.000398607023625325
-
-                //!       set minimum and maximum boundaries for CoolTools counterflow model input variables
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%MinInletAirWBTemp = -1.0
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%MaxInletAirWBTemp = 26.6667
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%MinRangeTemp      = 1.1111
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%MaxRangeTemp      = 11.1111
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%MinApproachTemp   = 1.1111
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%MaxApproachTemp   = 11.1111
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%MinWaterFlowRatio = 0.75
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%MaxWaterFlowRatio = 1.25
-
             } else if (UtilityRoutines::SameString(AlphArray(4), "YorkCalc")) {
                 SimpleTower(TowerNum).TowerModelType = YorkCalcModel;
                 //     set counter-flow model coefficients
-                //       Outputs approach in F
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(1)  = 2.471005863
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(2)  = -0.139855144
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(3)  = 0.001325024
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(4)  = 0.768721437
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(5)  = -0.023370562
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(6)  = 0.000149476
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(7)  = -0.01116139
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(8)  = 0.000325406
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(9)  = -0.00000230183
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(10) = 9.852803844
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(11) = -0.173673565
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(12) = 0.000811069
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(13) = 1.749920395
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(14) = 0.004930143
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(15) = -0.00022193
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(16) = -0.009865402
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(17) = -0.000283361
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(18) = 0.00000466261
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(19) = 0.09746009
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(20) = -0.011167959
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(21) = 0.000138903
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(22) = -0.135414837
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(23) = 0.001004747
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(24) = 0.0000119203
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(25) = -0.002255673
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(26) = 0.0000192893
-                //        VSTower(SimpleTower(TowerNum)%VSTower)%Coeff(27) = -0.000000260086
-
                 //       Outputs approach in C
                 VSTower(SimpleTower(TowerNum).VSTower).Coeff(1) = -0.359741205;
                 VSTower(SimpleTower(TowerNum).VSTower).Coeff(2) = -0.055053608;
@@ -1606,8 +1419,7 @@ namespace CondenserLoopTowers {
                 }
             } else {
                 ShowSevereError(cCurrentModuleObject + " \"" + SimpleTower(TowerNum).Name + "\". Illegal Tower Model Type = " + AlphArray(5));
-                ShowContinueError(
-                    " Tower Model Type must be \"CoolToolsCrossFlow\", \"YorkCalc\", \"CoolToolsUserDefined\", or \"YorkCalcUserDefined.");
+                ShowContinueError(R"( Tower Model Type must be "CoolToolsCrossFlow", "YorkCalc", "CoolToolsUserDefined", or "YorkCalcUserDefined.)");
                 ErrorsFound = true;
             }
 
@@ -1746,14 +1558,6 @@ namespace CondenserLoopTowers {
             // for autosizing calculations (see SizeTower)
             SimpleTower(TowerNum).PerformanceInputMethod_Num = PIM_UFactor;
 
-            //   Makeup water drift percentage must be greater than or equal to 0
-            //    SimpleTower(TowerNum)%MakeupWaterDrift          = NumArray(10)/100.0
-            //     IF(NumArray(10) .LT. 0.0) THEN
-            //       CALL ShowSevereError('COOLING TOWER:VARIABLE SPEED, "'//TRIM(SimpleTower(TowerNum)%Name)//&
-            //                       '" Makeup Water Drift as a percentage of design water flow rate must be >= 0')
-            //       ErrorsFound = .TRUE.
-            //     END IF
-
             if (!AlphArray(7).empty()) {
                 SimpleTower(TowerNum).BasinHeaterSchedulePtr = GetScheduleIndex(AlphArray(7));
                 if (SimpleTower(TowerNum).BasinHeaterSchedulePtr == 0) {
@@ -1761,15 +1565,6 @@ namespace CondenserLoopTowers {
                                      "\" was not found. Basin heater operation will not be modeled and the simulation continues");
                 }
             }
-
-            //    IF(AlphArray(9) .NE. ' ')THEN
-            //      SimpleTower(TowerNum)%BlowDownSchedulePtr       = GetScheduleIndex(AlphArray(9))
-            //      IF(SimpleTower(TowerNum)%BlowDownSchedulePtr .EQ. 0)THEN
-            //        CALL ShowWarningError('COOLING TOWER:VARIABLE SPEED, "'//TRIM(SimpleTower(TowerNum)%Name)//&
-            //                       '" blowdown schedule name "'//TRIM(AlphArray(9)) &
-            //                       //'" was not found. Basin blowdown will not be modeled and the simulation continues')
-            //      END IF
-            //    END IF
 
             // begin water use and systems get input
             if (UtilityRoutines::SameString(AlphArray(8), "LossFactor")) {
@@ -1951,11 +1746,7 @@ namespace CondenserLoopTowers {
             if (SimpleTower(TowerNum).HighSpeedAirFlowRate == AutoSize) {
                 SimpleTower(TowerNum).HighSpeedAirFlowRateWasAutoSized = true;
             }
-            if (lNumericFieldBlanks(8)) {
-                SimpleTower(TowerNum).DefaultedDesignAirFlowScalingFactor = true;
-            } else {
-                SimpleTower(TowerNum).DefaultedDesignAirFlowScalingFactor = false;
-            }
+            SimpleTower(TowerNum).DefaultedDesignAirFlowScalingFactor = lNumericFieldBlanks(8);
             SimpleTower(TowerNum).DesignAirFlowPerUnitNomCap = NumArray(8);
             SimpleTower(TowerNum).MinimumVSAirFlowFrac = NumArray(9);
             SimpleTower(TowerNum).HighSpeedFanPower = NumArray(10);
@@ -2431,9 +2222,6 @@ namespace CondenserLoopTowers {
                                     "Plant");
             }
 
-            //    CALL SetupOutputVariable('Tower Makeup Water Consumption [m3]', &
-            //          SimpleTowerReport(TowerNum)%WaterAmountUsed,'System','Sum',SimpleTower(TowerNum)%Name, &
-            //                                  ResourceTypeKey='Water',EndUseKey='HeatRejection',GroupKey='Plant')
         }
 
         // CurrentModuleObject='CoolingTower:VariableSpeed:Merkel'
@@ -2639,12 +2427,6 @@ namespace CondenserLoopTowers {
         } // loop all towers
     }
 
-    // End of Get Input subroutines for the CondenserLoopTowers Module
-    //******************************************************************************
-
-    // Beginning Initialization Section for the CondenserLoopTowers Module
-    //******************************************************************************
-
     void InitSimVars()
     {
 
@@ -2657,41 +2439,11 @@ namespace CondenserLoopTowers {
         // PURPOSE OF THIS SUBROUTINE:
         // Initialize the simulation variables.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // INITIALIZE MODULE LEVEL VARIABLES
-
         InletWaterTemp = 0.0;    // CW temperature at tower inlet
         OutletWaterTemp = 0.0;   // CW temperature at tower outlet
         WaterInletNode = 0;      // Node number at tower inlet
         WaterOutletNode = 0;     // Node number at tower outlet
         WaterMassFlowRate = 0.0; // WaterMassFlowRate through tower
-        // TowerMassFlowRateMax     = 0.0    ! Max Hardware Mass Flow Rate
-        // TowerMassFlowRateMin     = 0.0    ! Min Hardware Mass Flow Rate
-        // LoopMassFlowRateMaxAvail = 0.0    ! Max Loop Mass Flow Rate available
-        // LoopMassFlowRateMinAvail = 0.0    ! Min Loop Mass Flow Rate available
         Qactual = 0.0;          // Tower heat transfer
         CTFanPower = 0.0;       // Tower fan power used
         AirFlowRateRatio = 0.0; // Ratio of air flow rate through VS cooling tower to design air flow rate
@@ -2745,10 +2497,6 @@ namespace CondenserLoopTowers {
         static Array1D_bool OneTimeFlagForEachTower;
         //  LOGICAL                                 :: FatalError
         int TypeOf_Num(0);
-        int LoopNum;
-        int LoopSideNum;
-        int BranchIndex;
-        int CompIndex;
         Real64 rho; // local density of fluid
 
         // Do the one time initializations
@@ -2793,12 +2541,8 @@ namespace CondenserLoopTowers {
             }
 
             // check if setpoint on outlet node
-            if ((Node(SimpleTower(TowerNum).WaterOutletNodeNum).TempSetPoint == SensedNodeFlagValue) &&
-                (Node(SimpleTower(TowerNum).WaterOutletNodeNum).TempSetPointHi == SensedNodeFlagValue)) {
-                SimpleTower(TowerNum).SetpointIsOnOutlet = false;
-            } else {
-                SimpleTower(TowerNum).SetpointIsOnOutlet = true;
-            }
+            SimpleTower(TowerNum).SetpointIsOnOutlet = !((Node(SimpleTower(TowerNum).WaterOutletNodeNum).TempSetPoint == SensedNodeFlagValue) &&
+                                                         (Node(SimpleTower(TowerNum).WaterOutletNodeNum).TempSetPointHi == SensedNodeFlagValue));
 
             OneTimeFlagForEachTower(TowerNum) = false;
         }
@@ -2846,11 +2590,6 @@ namespace CondenserLoopTowers {
             SimpleTowerInlet(TowerNum).AirPress = OutBaroPress;
             SimpleTowerInlet(TowerNum).AirWetBulb = OutWetBulbTemp;
         }
-
-        LoopNum = SimpleTower(TowerNum).LoopNum;
-        LoopSideNum = SimpleTower(TowerNum).LoopSideNum;
-        BranchIndex = SimpleTower(TowerNum).BranchNum;
-        CompIndex = SimpleTower(TowerNum).CompNum;
 
         WaterMassFlowRate =
             RegulateCondenserCompFlowReqOp(SimpleTower(TowerNum).LoopNum,
@@ -2904,21 +2643,12 @@ namespace CondenserLoopTowers {
         using ReportSizingManager::ReportSizingOutput;
         using namespace OutputReportPredefined;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static ObjexxFCL::gio::Fmt OutputFormat2("(F9.6)");
         int const MaxIte(500);    // Maximum number of iterations
         Real64 const Acc(0.0001); // Accuracy of result
         static std::string const RoutineName("SizeTower");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizCondNum(0);           // Plant Sizing index for condenser loop
@@ -2954,8 +2684,6 @@ namespace CondenserLoopTowers {
         bool ErrorsFound;
         Real64 OutWaterTemp;              // outlet water temperature during sizing [C]
         Real64 CoolingOutput;             // tower capacity during sizing [W]
-        Real64 DesTowerInletAirDBTemp;    // design tower inlet air dry-bulb temperature
-        Real64 DesTowerInletAirWBTemp;    // design tower inlet air wet-bulb temperature
         Real64 DesTowerInletWaterTemp;    // design tower inlet water temperature
         Real64 DesTowerExitWaterTemp;     // design tower exit water temperature
         Real64 DesTowerWaterDeltaT;       // design tower temperature range
@@ -2967,8 +2695,6 @@ namespace CondenserLoopTowers {
         tmpHighSpeedFanPower = SimpleTower(TowerNum).HighSpeedFanPower;
         tmpHighSpeedAirFlowRate = SimpleTower(TowerNum).HighSpeedAirFlowRate;
         tmpLowSpeedAirFlowRate = SimpleTower(TowerNum).LowSpeedAirFlowRate;
-        DesTowerInletAirWBTemp = SimpleTower(TowerNum).DesInletAirWBTemp;
-        DesTowerInletAirDBTemp = SimpleTower(TowerNum).DesInletAirDBTemp;
 
         // Find the appropriate Plant Sizing object
         PltSizCondNum = PlantLoop(SimpleTower(TowerNum).LoopNum).PlantSizNum;
@@ -3949,15 +3675,6 @@ namespace CondenserLoopTowers {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataSizing;
         using DataPlant::PlantFinalSizesOkayToReport;
@@ -3968,19 +3685,10 @@ namespace CondenserLoopTowers {
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using ReportSizingManager::ReportSizingOutput;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500);    // Maximum number of iterations
         Real64 const Acc(0.0001); // Accuracy of result
         static std::string const RoutineName("SizeTower");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizCondNum; // Plant Sizing index for condenser loop
@@ -4942,12 +4650,6 @@ namespace CondenserLoopTowers {
         }
     } // namespace CondenserLoopTowers
 
-    // End Initialization Section for the CondenserLoopTowers Module
-    //******************************************************************************
-
-    // Beginning of the CondenserLoopTowers Module Simulation Subroutines
-    // *****************************************************************************
-
     void CalcSingleSpeedTower(int &TowerNum)
     {
 
@@ -5024,9 +4726,6 @@ namespace CondenserLoopTowers {
         using FaultsManager::FaultsCondenserSWTSensor;
         using FaultsManager::FaultsTowerFouling;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcSingleSpeedTower");
         int const MaxIteration(100); // Maximum fluid bypass iteration calculations
@@ -5036,12 +4735,6 @@ namespace CondenserLoopTowers {
         //  calculation to avoid fluid freezing. For water, it is 0 degreeC,
         //  for glycols, it can be much lower. The fluid type is stored at the loop.
         //  Current choices are Water and Steam, needs to expand for glycols
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirFlowRate;
@@ -5165,7 +4858,7 @@ namespace CondenserLoopTowers {
 
         // MassFlowTolerance is a parameter to indicate a no flow condition
         if (WaterMassFlowRate <= MassFlowTolerance) {
-            // for multiple cells, we assume that it's a commun bassin
+            // for multiple cells, we assume that it's a common basin
             CalcBasinHeaterPower(SimpleTower(TowerNum).BasinHeaterPowerFTempDiff,
                                  SimpleTower(TowerNum).BasinHeaterSchedulePtr,
                                  SimpleTower(TowerNum).BasinHeaterSetPointTemp,
@@ -5394,17 +5087,8 @@ namespace CondenserLoopTowers {
         using FaultsManager::FaultsCondenserSWTSensor;
         using FaultsManager::FaultsTowerFouling;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcTwoSpeedTower");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirFlowRate;
@@ -5622,9 +5306,6 @@ namespace CondenserLoopTowers {
         // METHODOLOGY EMPLOYED:
         // Find a fan speed that operates the tower to meet MyLoad
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using CurveManager::CurveValue;
         using DataBranchAirLoopPlant::MassFlowTolerance;
@@ -5638,20 +5319,11 @@ namespace CondenserLoopTowers {
         using General::RoundSigDigits;
         using General::SolveRoot;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const DesignWetBulb(25.56); // tower outdoor air entering wetbulb for design [C]
         int const MaxIte(500);             // Maximum number of iterations for solver
         Real64 const Acc(1.e-3);           // Accuracy of solver result
         static std::string const RoutineName("CalcMerkelVariableSpeedTower");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D<Real64> Par(8); // Parameter array passed to solver
@@ -5956,22 +5628,11 @@ namespace CondenserLoopTowers {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS FUNCTION:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using CurveManager::CurveValue;
 
         // Return value
         Real64 Residuum; // residual to be minimized to zero
-
-        // Argument array dimensioning
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -5982,15 +5643,6 @@ namespace CondenserLoopTowers {
         // par(6) = UA adjust factor for water flow rate
         // par(7) = specific heat of water at inlet temp
         // par(8) = water mass flow rate, total [kg/s]
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int TowerNum;
@@ -6093,21 +5745,12 @@ namespace CondenserLoopTowers {
         using General::CreateSysTimeIntervalString;
         using General::SolveRoot;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt OutputFormat("(F5.2)");
         static ObjexxFCL::gio::Fmt OutputFormat2("(F8.5)");
         int const MaxIte(500);    // Maximum number of iterations
         Real64 const Acc(0.0001); // Accuracy of result
         static std::string const RoutineName("CalcVariableSpeedTower");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 OutletWaterTempOFF;             // Outlet water temperature with fan OFF (C)
@@ -6451,13 +6094,8 @@ namespace CondenserLoopTowers {
         // Merkel, F. 1925.  Verduftungskuhlung. VDI Forschungsarbeiten, Nr 275, Berlin.
         // ASHRAE     1999.  HVAC1KIT: A Toolkit for Primary HVAC System Energy Calculations.
 
-        // USE STATEMENTS:
-        // na
-
         // Locals
         Real64 Qactual; // Actual heat transfer rate between tower water and air [W]
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const IterMax(50);                  // Maximum number of iterations allowed
@@ -6465,12 +6103,6 @@ namespace CondenserLoopTowers {
         // [delta K/K]
         Real64 const DeltaTwbTolerance(0.001); // Maximum error (tolerance) in DeltaTwb for iteration convergence [C]
         static std::string const RoutineName("SimSimpleTower");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Iter;                    // Number of iterations completed
@@ -6615,18 +6247,9 @@ namespace CondenserLoopTowers {
         using DataPlant::SingleSetPoint;
         using General::SolveRoot;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500);    // Maximum number of iterations
         Real64 const Acc(0.0001); // Accuracy of result
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SolFla;               // Flag of solver
@@ -6695,31 +6318,9 @@ namespace CondenserLoopTowers {
         // York International Corporation, "YORKcalcTM Software, Chiller-Plant Energy-Estimating Program",
         // Form 160.00-SG2 (0502). 2002.
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //    REAL(r64)        :: Twb                       ! Inlet air wet-bulb temperature [C] (or [F] for CoolTools Model)
-        //    REAL(r64)        :: Tr                        ! Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
-        //   (or [F] for CoolTools Model)
         static Real64 PctAirFlow(0.0); // air flow rate ratio (fan power ratio in the case of CoolTools model)
         static Real64 FlowFactor(0.0); // water flow rate to air flow rate ratio (L/G) for YorkCalc model
-
-        //    IF(SimpleTower(TowerNum)%TowerModelType .EQ. CoolToolsXFModel .OR. &
-        //        SimpleTower(TowerNum)%TowerModelType .EQ. CoolToolsCFModel .OR. &
-        //        SimpleTower(TowerNum)%TowerModelType .EQ. YorkCalcModel)THEN
-        //      Twb        = (TwbIN * 1.8) + 32.0 ! Convert Celsius to Fahrenheit for CoolTools Model
-        //      Tr         = (TrIN * 1.8)
-        // Convert air flow rate ratio to fan power ratio for CoolTools Model
-        //      IF(SimpleTower(TowerNum)%TowerModelType .NE. YorkCalcModel)PctAirFlow = (AirFlowRatio)**3.0
-        //    ELSE
-        //      Twb        = TwbIN
-        //      Tr         = TrIN
-        //      IF(SimpleTower(TowerNum)%TowerModelType .NE. YorkCalcUserDefined)PctAirFlow = (AirFlowRatio)**3.0
-        //    END IF
 
         if (SimpleTower(TowerNum).TowerModelType == YorkCalcModel || SimpleTower(TowerNum).TowerModelType == YorkCalcUserDefined) {
             PctAirFlow = AirFlowRatio;
@@ -6784,14 +6385,6 @@ namespace CondenserLoopTowers {
                 VSTower(SimpleTower(TowerNum).VSTower).Coeff(33) * PctWaterFlow * Tr * Tr +
                 VSTower(SimpleTower(TowerNum).VSTower).Coeff(34) * Twb * Tr * Tr + VSTower(SimpleTower(TowerNum).VSTower).Coeff(35) * Tr * Tr * Tr;
         }
-        //    capping approach to 0 results in failure of RegulaFalsi routine
-        //    Approach = MAX(0.0, Approach)
-
-        //    IF(SimpleTower(TowerNum)%TowerModelType .EQ. CoolToolsXFModel .OR. &
-        //        SimpleTower(TowerNum)%TowerModelType .EQ. CoolToolsCFModel .OR. &
-        //        SimpleTower(TowerNum)%TowerModelType .EQ. YorkCalcModel)THEN
-        //      Approach = (Approach / 1.8)  ! Convert from Fahrenheit to Celsius
-        //    END IF
     }
 
     void CheckModelBounds(int const TowerNum,              // index to tower
@@ -6833,19 +6426,6 @@ namespace CondenserLoopTowers {
         using DataGlobals::CurrentTime;
         using General::CreateSysTimeIntervalString;
         using General::RoundSigDigits;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        //  CHARACTER(len=*), PARAMETER :: OutputFormat  ='(F5.2)'
-        //  CHARACTER(len=*), PARAMETER :: OutputFormat2 ='(F8.5)'
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static std::string OutputChar;         // character string for warning messages
@@ -7077,31 +6657,14 @@ namespace CondenserLoopTowers {
         // Puts UA into the cooling tower data structure, calls SimSimpleTower, and calculates
         // the residual as defined above.
 
-        // REFERENCES:
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 Residuum; // residual to be minimized to zero
 
-        // Argument array dimensioning
-
-        // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // par(2) = tower number
         // par(3) = design water mass flow rate [kg/s]
         // par(4) = design air volume flow rate [m3/s]
         // par(5) = water specific heat [J/(kg*C)]
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int TowerIndex;       // index of this tower
@@ -7133,15 +6696,8 @@ namespace CondenserLoopTowers {
         // Varies tower range temperature until a balance point exists where the model output corresponds
         // to the desired independent variables
 
-        // REFERENCES:
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 Residuum; // residual to be minimized to zero
-
-        // Argument array dimensioning
 
         // Locals
         Real64 AirFlowRateRatio; // ratio of water flow rate to design water flow rate
@@ -7150,15 +6706,6 @@ namespace CondenserLoopTowers {
         // par(2) = water flow ratio
         // par(3) = air flow ratio
         // par(4) = inlet air wet-bulb temperature [C]
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int TowerIndex;            // index of this tower
@@ -7198,15 +6745,8 @@ namespace CondenserLoopTowers {
         // In SizeTower, calibrates tower water flow rate ratio at an air flow rate ratio of 1.
         // In VariableSpeedTower, calculates air flow rate ratio at the inlet water flow rate ratio.
 
-        // REFERENCES:
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 Residuum; // residual to be minimized to zero
-
-        // Argument array dimensioning
 
         // Locals
         Real64 AirFlowRateRatio; // ratio of water flow rate to design water flow rate
@@ -7217,15 +6757,6 @@ namespace CondenserLoopTowers {
         // par(4) = tower range [C]
         // par(5) = desired approach [C]
         // par(6) = 0.0 to calculate water flow rate ratio, 1.0 for air
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int TowerIndex;            // index of this tower
@@ -7255,10 +6786,6 @@ namespace CondenserLoopTowers {
         return Residuum;
     }
 
-    // End of the CondenserLoopTowers Module Simulation Subroutines
-
-    // *****************************************************************************
-
     void CalculateWaterUseage(int const TowerNum)
     {
 
@@ -7273,9 +6800,6 @@ namespace CondenserLoopTowers {
         // Collect tower water useage calculations for
         // reuse by all the tower models.
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
         // REFERENCES:
         // Code for this routine started from VariableSpeedTower
 
@@ -7285,17 +6809,8 @@ namespace CondenserLoopTowers {
         using DataWater::WaterStorage;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalculateWaterUseage");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirDensity;
@@ -7435,9 +6950,6 @@ namespace CondenserLoopTowers {
         SimpleTowerReport(TowerNum).StarvedMakeUpVol = StarvedVdot * (TimeStepSys * SecInHour);
     }
 
-    // Beginning of Record Keeping subroutines for the Tower Module
-    // *****************************************************************************
-
     void UpdateTowers(int const TowerNum)
     {
 
@@ -7450,12 +6962,6 @@ namespace CondenserLoopTowers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for passing results to the outlet water node.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataEnvironment::CurMnDy;
@@ -7463,17 +6969,8 @@ namespace CondenserLoopTowers {
         using DataPlant::PlantLoop;
         using General::TrimSigDigits;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt LowTempFmt("(' ',F6.2)");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string CharErrOut;
@@ -7546,45 +7043,7 @@ namespace CondenserLoopTowers {
                                                WaterMassFlowRate);
             }
         }
-
-        // Check if water mass flow rate is lower than loop minimum and warn user
-        //   IF(WaterMassFlowRate .LT. LoopMassFlowRateMinAvail)THEN
-        //     SimpleTower(TowerNum)%WMFRLessThanMinAvailErrCount = SimpleTower(TowerNum)%WMFRLessThanMinAvailErrCount + 1
-        //     IF (SimpleTower(TowerNum)%WMFRLessThanMinAvailErrCount < 2) THEN
-        //       CALL ShowWarningError (TRIM(SimpleTower(TowerNum)%TowerType)//' "'//TRIM(SimpleTower(TowerNum)%Name)//'"')
-        //       CALL ShowContinueError ('Cooling tower water mass flow below loop minimum.')
-        //       CALL ShowContinueErrorTimeStamp(' ')
-        //       CALL ShowContinueError('Actual Mass flow  = '//TRIM(TrimSigDigits(WaterMassFlowRate,2)))
-        //       CALL ShowContinueError('Loop Minimum flow = '//TRIM(TrimSigDigits(LoopMassFlowRateMinAvail,2)))
-        //     ELSE
-        //       CALL ShowRecurringWarningErrorAtEnd(TRIM(SimpleTower(TowerNum)%TowerType)//' "'//TRIM(SimpleTower(TowerNum)%Name)//&
-        //          '" Cooling tower water mass flow rate below loop minimum error continues...' &
-        //          , SimpleTower(TowerNum)%WMFRLessThanMinAvailErrIndex, WaterMassFlowRate, WaterMassFlowRate)
-        //     ENDIF
-        //   END IF
-
-        // Check if water mass flow rate is greater than loop maximum and warn user
-        //   IF(WaterMassFlowRate .GT. LoopMassFlowRateMaxAvail)THEN
-        //     SimpleTower(TowerNum)%WMFRGreaterThanMaxAvailErrCount = SimpleTower(TowerNum)%WMFRGreaterThanMaxAvailErrCount + 1
-        //     IF (SimpleTower(TowerNum)%WMFRGreaterThanMaxAvailErrCount < 2) THEN
-        //       CALL ShowWarningError (TRIM(SimpleTower(TowerNum)%TowerType)//' "'//TRIM(SimpleTower(TowerNum)%Name)//'"')
-        //       CALL ShowContinueError ('Cooling Tower water mass flow above loop maximum.')
-        //       CALL ShowContinueErrorTimeStamp(' ')
-        //       CALL ShowContinueError('Actual Mass flow='//TRIM(TrimSigDigits(WaterMassFlowRate,2)))
-        //       CALL ShowContinueError('Loop Maximum flow = '//TRIM(TrimSigDigits(LoopMassFlowRateMaxAvail,2)))
-        //     ELSE
-        //       CALL ShowRecurringWarningErrorAtEnd(TRIM(SimpleTower(TowerNum)%TowerType)//' "'//TRIM(SimpleTower(TowerNum)%Name)//&
-        //          '" Cooling tower water mass flow rate above loop maximum error continues...' &
-        //          , SimpleTower(TowerNum)%WMFRGreaterThanMaxAvailErrIndex, WaterMassFlowRate, WaterMassFlowRate)
-        //     ENDIF
-        //   END IF
     }
-
-    // End of Record Keeping subroutines for the Tower Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the Tower Module
-    // *****************************************************************************
 
     void ReportTowers(bool const RunFlag, int const TowerNum)
     {
@@ -7598,31 +7057,7 @@ namespace CondenserLoopTowers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the tower.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 ReportingConstant;
-
-        ReportingConstant = TimeStepSys * SecInHour;
+        Real64 const ReportingConstant = TimeStepSys * SecInHour;
 
         if (!RunFlag) {
             SimpleTowerReport(TowerNum).InletWaterTemp = Node(WaterInletNode).Temp;
