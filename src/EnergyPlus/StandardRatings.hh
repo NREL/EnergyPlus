@@ -149,6 +149,7 @@ namespace StandardRatings {
                          int const EIRFTempCurveIndex,               // Index for the energy input ratio modifier curve
                          int const EIRFPLRCurveIndex,                // Index for the EIR vs part-load ratio curve
                          Real64 const MinUnloadRat,                  // Minimum unloading ratio
+                         Real64 &IPLV,
                          Optional<Real64 const> EvapVolFlowRate = _, // Reference water volumetric flow rate through the evaporator [m3/s]
                          Optional_int_const CondLoopNum = _,         // condenser water plant loop index number
                          Optional<Real64 const> OpenMotorEff = _     // Open chiller motor efficiency [fraction, 0 to 1]

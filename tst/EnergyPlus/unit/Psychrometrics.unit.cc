@@ -55,7 +55,7 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::Psychrometrics;
 
-TEST_F(EnergyPlusFixture, PsyTsatFnHPbTest)
+TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnHPb_Test)
 {
 
     InitializePsychRoutines();
@@ -94,7 +94,7 @@ TEST_F(EnergyPlusFixture, PsyTsatFnHPbTest)
     result = PsyTsatFnHPb_raw(H, PB);
     actual_result = F6((H + 1.78637e4), -19.44, 8.53675e-4, -5.12637e-9, -9.85546e-14, -1.00102e-18, -4.2705e-24);
     EXPECT_DOUBLE_EQ(actual_result, result);
-//
+
     // Test 7: TEMP. IS <  -60 C
     H = -5.25e4 - 1.78637e4;
     result = PsyTsatFnHPb_raw(H, PB);
@@ -147,7 +147,7 @@ TEST_F(EnergyPlusFixture, PsyTsatFnHPbTest)
 
 }
 
-TEST_F(EnergyPlusFixture, PsyTsatFnPbTest)
+TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnPb_Test)
 {
 
     InitializePsychRoutines();
@@ -190,3 +190,43 @@ TEST_F(EnergyPlusFixture, PsyTsatFnPbTest)
 
 }
 
+TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
+{
+
+    Real64 TDP;
+    // Sea level pressure
+    Real64 PB = 101325.0;
+    Real64 W;
+
+    TDP = 99.0;
+    W = Psychrometrics::PsyWFnTdpPb(TDP, PB);
+
+    EXPECT_NEAR(17.5250143, W, 0.0001);
+
+    std::string const error_string = delimited_string({
+        "   ** Warning ** Calculated partial vapor pressure is greater than the barometric pressure, so that calculated humidity ratio is invalid (PsyWFnTdpPb).",
+        "   **   ~~~   **  Routine=Unknown, Environment=, at Simulation time= 00:00 - 00:00",
+        "   **   ~~~   **  Dew-Point= 100.00 Barometric Pressure= 101325.00",
+        "   **   ~~~   ** Instead, calculated Humidity Ratio at 99.0 (1 degree less) = 17.5250 will be used. Simulation continues.",
+    });
+
+    TDP = 100.0;
+    W = Psychrometrics::PsyWFnTdpPb(TDP, PB);
+    EXPECT_NEAR(17.5250143, W, 0.0001);
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    // Denver barometric pressure 
+    PB = 81000.0;
+    std::string const error_string1 = delimited_string({
+        "   ** Warning ** Calculated partial vapor pressure is greater than the barometric pressure, so that calculated humidity ratio is invalid "
+        "(PsyWFnTdpPb).",
+        "   **   ~~~   **  Routine=Unknown, Environment=, at Simulation time= 00:00 - 00:00",
+        "   **   ~~~   **  Dew-Point= 100.00 Barometric Pressure= 81000.00",
+        "   **   ~~~   ** Instead, calculated Humidity Ratio at 93.0 (7 degree less) = 20.0794 will be used. Simulation continues.",
+    });
+    Psychrometrics::iPsyErrIndex(5) = 0;
+    W = Psychrometrics::PsyWFnTdpPb(TDP, PB);
+    EXPECT_NEAR(20.07942181, W, 0.0001);
+    EXPECT_TRUE(compare_err_stream(error_string1, true));
+
+}

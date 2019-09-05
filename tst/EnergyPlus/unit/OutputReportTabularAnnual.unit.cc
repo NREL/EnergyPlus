@@ -196,7 +196,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_GatherResults)
     extLitUse = 1.01;
 
     // UpdateDataandReport( 1 ); not sure if this is needed
-    GatherAnnualResultsForTimeStep(1);
+    GatherAnnualResultsForTimeStep(OutputProcessor::TimeStepType::TimeStepZone);
 
     // STOPPPED HERE. NOT SEEING THE POWER VARIABLE SHOWING UP
 
