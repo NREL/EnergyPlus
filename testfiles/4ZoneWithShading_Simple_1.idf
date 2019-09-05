@@ -471,9 +471,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    World,                   !- Coordinate System
-	,		                 !- Daylighting Reference Point Coordinate System
-	World;                   !- Rectangular Surface Coordinate System
+    World;                   !- Coordinate System
 
   Shading:Site,
     Bushes-South,            !- Name
