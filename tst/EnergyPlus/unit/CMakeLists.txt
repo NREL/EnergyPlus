@@ -132,6 +132,7 @@ set( test_src
   PlantCondLoopOperation.unit.cc
   PlantUtilities.unit.cc
   PoweredInductionUnits.unit.cc
+  Psychrometrics.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
   PVWatts.unit.cc

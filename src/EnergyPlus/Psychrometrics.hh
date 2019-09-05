@@ -761,7 +761,7 @@ namespace Psychrometrics {
 
         Real64 Tsat_result; // result=> Sat-Temp {C}
 
-        Int64 const Grid_Shift((64 - 12 - tsat_hbp_precision_bits));
+        Int64 const Grid_Shift(64 - 12 - tsat_hbp_precision_bits);
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
