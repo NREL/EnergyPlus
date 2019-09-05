@@ -145,27 +145,13 @@ namespace BoilerSteam {
 
         void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
+        static PlantComponent *factory(std::string const &objectName);
     };
 
     // Object Data
     extern Array1D<BoilerSpecs> Boiler; // dimension to number of machines
 
     void clear_state();
-
-    void SimSteamBoiler(std::string const &BoilerType, // boiler type (used in CASE statement)
-                        std::string const &BoilerName, // boiler identifier
-                        int EquipFlowCtrl,       // Flow control mode for the equipment
-                        int &CompIndex,                // boiler counter/identifier
-                        bool RunFlag,            // if TRUE run boiler simulation--boiler is ON
-                        bool FirstHVACIteration, // TRUE if First iteration of simulation
-                        bool &InitLoopEquip,           // If not zero, calculate the max load for operating conditions
-                        Real64 &MyLoad,                // W - Actual demand boiler must satisfy--calculated by load dist. routine
-                        Real64 &MaxCap,                // W - maximum boiler operating capacity
-                        Real64 &MinCap,                // W - minimum boiler operating capacity
-                        Real64 &OptCap,                // W - optimal boiler operating capacity
-                        bool GetSizingFactor,    // TRUE when just the sizing factor is requested
-                        Real64 &SizingFactor           // sizing factor
-    );
 
     void GetBoilerInput();
 
