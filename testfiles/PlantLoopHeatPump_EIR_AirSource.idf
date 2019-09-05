@@ -495,15 +495,15 @@
 
   Output:Variable, *, Plant Load Profile Mass Flow Rate, Hourly;
   Output:Variable, *, Plant Load Profile Heat Transfer Rate, Hourly;
-  Output:Variable, *, Water to Water Heat Pump Load Side Heat Transfer Rate, Hourly;
-  Output:Variable, *, Water to Water Heat Pump Load Side Heat Transfer Energy, Hourly;
-  Output:Variable, *, Water to Water Heat Pump Source Side Heat Transfer Rate, Hourly;
-  Output:Variable, *, Water to Water Heat Pump Source Side Heat Transfer Energy, Hourly;
-  Output:Variable, *, Water to Water Heat Pump Load Side Inlet Temperature, Hourly;
-  Output:Variable, *, Water to Water Heat Pump Load Side Outlet Temperature, Hourly;
-  Output:Variable, *, Water to Water Heat Pump Source Side Inlet Temperature, Hourly;
-  Output:Variable, *, Water to Water Heat Pump Source Side Outlet Temperature, Hourly;
-  Output:Variable, *, Water to Water Heat Pump Electric Power, Hourly;
-  Output:Variable, *, Water to Water Heat Pump Electric Energy, Hourly;
-  Output:Variable, *, Water to Water Heat Pump Load Side Mass Flow Rate, Hourly;
-  Output:Variable, *, Water to Water Heat Pump Source Side Mass Flow Rate, Hourly;
+  Output:Variable, *, Plant Loop Heat Pump Load Side Heat Transfer Rate, Hourly;
+  Output:Variable, *, Plant Loop Heat Pump Load Side Heat Transfer Energy, Hourly;
+  Output:Variable, *, Plant Loop Heat Pump Source Side Heat Transfer Rate, Hourly;
+  Output:Variable, *, Plant Loop Heat Pump Source Side Heat Transfer Energy, Hourly;
+  Output:Variable, *, Plant Loop Heat Pump Load Side Inlet Temperature, Hourly;
+  Output:Variable, *, Plant Loop Heat Pump Load Side Outlet Temperature, Hourly;
+  Output:Variable, *, Plant Loop Heat Pump Source Side Inlet Temperature, Hourly;
+  Output:Variable, *, Plant Loop Heat Pump Source Side Outlet Temperature, Hourly;
+  Output:Variable, *, Plant Loop Heat Pump Electric Power, Hourly;
+  Output:Variable, *, Plant Loop Heat Pump Electric Energy, Hourly;
+  Output:Variable, *, Plant Loop Heat Pump Load Side Mass Flow Rate, Hourly;
+  Output:Variable, *, Plant Loop Heat Pump Source Side Mass Flow Rate, Hourly;

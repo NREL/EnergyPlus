@@ -834,7 +834,8 @@ TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion) {
     Real64 expectedCapacity = expectedLoadRho * expectedLoadFlow * expectedLoadCp * plantSizingLoadDeltaT;
     Real64 const baseExpectedSourceFlow = plantSizingLoadVolFlow * 2.0;
     Real64 expectedSourceFlow = baseExpectedSourceFlow * (expectedLoadRho * expectedLoadCp) / (expectedSourceRho * expectedSourceCp);
-    thisCoolingPLHP->size();
+    thisCoolingPLHP->sizeLoadSide();
+    thisCoolingPLHP->sizeSrcSideWSHP();
     EXPECT_NEAR(expectedLoadFlow, thisCoolingPLHP->loadSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(expectedSourceFlow, thisCoolingPLHP->sourceSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(expectedCapacity, thisCoolingPLHP->referenceCapacity, 0.0001);
@@ -861,7 +862,8 @@ TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion) {
     thisCoolingPLHP->sourceSideDesignVolFlowRate = DataSizing::AutoSize;
     thisCoolingPLHP->referenceCapacity = DataSizing::AutoSize;
     DataSizing::PlantSizData(1).DesVolFlowRate = 0.0;
-    thisCoolingPLHP->size();
+    thisCoolingPLHP->sizeLoadSide();
+    thisCoolingPLHP->sizeSrcSideWSHP();
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->referenceCapacity, 0.0001);
@@ -872,7 +874,8 @@ TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion) {
     thisCoolingPLHP->referenceCapacity = expectedCapacity;
     expectedSourceFlow = baseExpectedSourceFlow * (expectedSourceRho * expectedSourceCp) / (expectedLoadRho * expectedLoadCp);
     expectedCapacity = expectedSourceRho * expectedLoadFlow * expectedSourceCp * plantSizingLoadDeltaT;
-    thisHeatingPLHP->size();
+    thisHeatingPLHP->sizeLoadSide();
+    thisHeatingPLHP->sizeSrcSideWSHP();
     EXPECT_NEAR(expectedLoadFlow, thisHeatingPLHP->loadSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(expectedSourceFlow, thisHeatingPLHP->sourceSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(expectedCapacity, thisHeatingPLHP->referenceCapacity, 0.0001);
@@ -1004,14 +1007,16 @@ TEST_F(EIRPLHPFixture, TestSizing_FullyHardsizedHeatingWithCompanion) {
 
     // The values really should just come out all as the hard-sized values, this just makes sure that function didn't
     // botch something up.
-    thisHeatingPLHP->size();
+    thisHeatingPLHP->sizeLoadSide();
+    thisHeatingPLHP->sizeSrcSideWSHP();
     EXPECT_NEAR(0.01, thisHeatingPLHP->loadSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(0.02, thisHeatingPLHP->sourceSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(1200, thisHeatingPLHP->referenceCapacity, 0.0001);
 
     // Call it again, but this time with PlantSizing on, it should come out the same again
     DataGlobals::DoPlantSizing = true;
-    thisHeatingPLHP->size();
+    thisHeatingPLHP->sizeLoadSide();
+    thisHeatingPLHP->sizeSrcSideWSHP(); 
     EXPECT_NEAR(0.01, thisHeatingPLHP->loadSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(0.02, thisHeatingPLHP->sourceSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(1200, thisHeatingPLHP->referenceCapacity, 0.0001);
@@ -1144,7 +1149,8 @@ TEST_F(EIRPLHPFixture, TestSizing_WithCompanionNoPlantSizing) {
     // the load flow should be the companion load flow
     // with no source plant sizing, the source flow will actually work out to be the same as the load flow (not the source flow)
     // the capacity will be the companion capacity
-    thisCoolingPLHP->size();
+    thisCoolingPLHP->sizeLoadSide();
+    thisCoolingPLHP->sizeSrcSideWSHP();
     EXPECT_NEAR(0.1, thisCoolingPLHP->loadSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(0.1, thisCoolingPLHP->sourceSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(1000.0, thisCoolingPLHP->referenceCapacity, 0.0001);
@@ -1240,7 +1246,7 @@ TEST_F(EIRPLHPFixture, TestSizing_NoCompanionNoPlantSizingError) {
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
     // with no plant sizing available and no companion coil to size from, it should throw a fatal
-    EXPECT_THROW(thisHeatingPLHP->size(), std::runtime_error);
+    EXPECT_THROW(thisHeatingPLHP->sizeLoadSide(), std::runtime_error);
 
 }
 
@@ -1334,7 +1340,8 @@ TEST_F(EIRPLHPFixture, TestSizing_NoCompanionNoPlantSizingHardSized) {
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
     // this should report out to the sizing output, but just the user defined stuff
-    thisHeatingPLHP->size();
+    thisHeatingPLHP->sizeLoadSide();
+    thisHeatingPLHP->sizeSrcSideWSHP();
     EXPECT_NEAR(0.1, thisHeatingPLHP->loadSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(0.1, thisHeatingPLHP->sourceSideDesignVolFlowRate, 0.0001);
     EXPECT_NEAR(1000, thisHeatingPLHP->referenceCapacity, 0.0001);
@@ -1515,7 +1522,7 @@ TEST_F(EIRPLHPFixture, Initialization2) {
 
     // call with run flag off, loose limits on node min/max
     thisCoolingPLHP->running = false;
-    thisCoolingPLHP->setOperatingFlowRates();
+    thisCoolingPLHP->setOperatingFlowRatesWSHP();
     EXPECT_NEAR(
             0.0,
             thisCoolingPLHP->loadSideMassFlowRate,
@@ -1531,7 +1538,7 @@ TEST_F(EIRPLHPFixture, Initialization2) {
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMinAvail = 0.1;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail = 0.2;
     thisCoolingPLHP->running = false;
-    thisCoolingPLHP->setOperatingFlowRates();
+    thisCoolingPLHP->setOperatingFlowRatesWSHP();
     EXPECT_NEAR(
             0.1,
             thisCoolingPLHP->loadSideMassFlowRate,
@@ -1548,7 +1555,7 @@ TEST_F(EIRPLHPFixture, Initialization2) {
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.24;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail = 0.0;
     thisCoolingPLHP->running = false;
-    thisCoolingPLHP->setOperatingFlowRates();
+    thisCoolingPLHP->setOperatingFlowRatesWSHP();
     EXPECT_NEAR(
             0.24,
             thisCoolingPLHP->loadSideMassFlowRate,
@@ -1566,7 +1573,7 @@ TEST_F(EIRPLHPFixture, Initialization2) {
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.2;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRates();
+    thisCoolingPLHP->setOperatingFlowRatesWSHP();
     EXPECT_NEAR(
             0.0,
             thisCoolingPLHP->loadSideMassFlowRate,
@@ -1584,7 +1591,7 @@ TEST_F(EIRPLHPFixture, Initialization2) {
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.2;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRates();
+    thisCoolingPLHP->setOperatingFlowRatesWSHP();
     EXPECT_NEAR(
             0.2,
             thisCoolingPLHP->loadSideMassFlowRate,
@@ -1602,7 +1609,7 @@ TEST_F(EIRPLHPFixture, Initialization2) {
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRates();
+    thisCoolingPLHP->setOperatingFlowRatesWSHP();
     EXPECT_NEAR(
             0.0,
             thisCoolingPLHP->loadSideMassFlowRate,
@@ -1620,7 +1627,7 @@ TEST_F(EIRPLHPFixture, Initialization2) {
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.13;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRates();
+    thisCoolingPLHP->setOperatingFlowRatesWSHP();
     EXPECT_NEAR(
             0.14,
             thisCoolingPLHP->loadSideMassFlowRate,

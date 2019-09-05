@@ -310,7 +310,7 @@ namespace EnergyPlus {
 
             // evaluate the actual current operating load side heat transfer rate
             auto &thisLoadPlantLoop = DataPlant::PlantLoop(this->loadSideLocation.loopNum);
-            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
+            Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(
                     thisLoadPlantLoop.FluidName,
                     DataLoopNode::Node(this->loadSideNodes.inlet).Temp,
                     thisLoadPlantLoop.FluidIndex,
@@ -320,7 +320,7 @@ namespace EnergyPlus {
             this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
 
             // calculate load side outlet conditions
-            Real64 const loadMCp = this->loadSideMassFlowRate * Cp;
+            Real64 const loadMCp = this->loadSideMassFlowRate * CpLoad;
             this->loadSideOutletTemp = this->calcLoadOutletTemp(this->loadSideInletTemp,
                                                                 this->loadSideHeatTransfer / loadMCp);
 
@@ -339,7 +339,19 @@ namespace EnergyPlus {
             this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
 
             // calculate source side outlet conditions
-            Real64 const sourceMCp = this->sourceSideMassFlowRate * Cp;
+            Real64 CpSrc = 0.0;
+            if (this->waterSource) {
+                CpSrc = FluidProperties::GetSpecificHeatGlycol(
+                        thisLoadPlantLoop.FluidName,
+                        DataLoopNode::Node(this->loadSideNodes.inlet).Temp,
+                        thisLoadPlantLoop.FluidIndex,
+                        "PLHPEIR::simulate()");
+            } else if (this->airSource) {
+                CpSrc = Psychrometrics::PsyCpAirFnWTdb(
+                        DataEnvironment::OutHumRat,
+                        DataEnvironment::OutDryBulbTemp);
+            }
+            Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
             this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp,
                                                                     this->sourceSideHeatTransfer / sourceMCp);
         }
@@ -765,9 +777,12 @@ namespace EnergyPlus {
                 }
                 if (!this->referenceCapacityWasAutoSized && DataPlant::PlantFinalSizesOkayToReport) {
                     ReportSizingManager::ReportSizingOutput(typeName, this->name,
-                            "User-Specified Nominal Capacity [W]",
-                            this->referenceCapacity);
+                                                            "User-Specified Nominal Capacity [W]",
+                                                            this->referenceCapacity);
                 }
+            }
+            if (errorsFound) {
+                ShowFatalError("Preceding sizing errors cause program termination");
             }
         }
 
