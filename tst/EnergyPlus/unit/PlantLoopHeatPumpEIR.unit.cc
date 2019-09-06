@@ -1356,7 +1356,7 @@ TEST_F(EIRPLHPFixture, CoolingOutletSetpointWorker) {
 
 }
 
-TEST_F(EIRPLHPFixture, Initialization2) {
+TEST_F(EIRPLHPFixture, Initialization2_WaterSource) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -2366,6 +2366,219 @@ TEST_F(EIRPLHPFixture, CoolingConstructionFullyAutoSized_AirSource) {
             EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
             std::runtime_error
     );
+}
+
+TEST_F(EIRPLHPFixture, ClearState) {
+    std::string const idf_objects =
+            delimited_string(
+                    {
+                            "HeatPump:PlantLoop:EIR:Cooling,",
+                            "  hp cooling side,",
+                            "  node 1,",
+                            "  node 2,",
+                            "  AirSource,",
+                            "  node 3,",
+                            "  node 4,",
+                            "  ,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  ,",
+                            "  1,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "Curve:Linear,",
+                            "  dummyCurve,",
+                            "  1,",
+                            "  0,",
+                            "  1,",
+                            "  1;"
+                    }
+            );
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+    EXPECT_EQ(eir_plhp.size(), 1);
+
+    // test that vector is cleared
+    EIRPlantLoopHeatPump::clear_state();
+    EXPECT_EQ(eir_plhp.size(), 0);
+}
+
+TEST_F(EIRPLHPFixture, Initialization2_AirSource) {
+    std::string const idf_objects =
+            delimited_string(
+                    {
+                            "HeatPump:PlantLoop:EIR:Cooling,",
+                            "  hp cooling side,",
+                            "  node 1,",
+                            "  node 2,",
+                            "  AirSource,",
+                            "  node 3,",
+                            "  node 4,",
+                            "  ,",
+                            "  0.001,",
+                            "  1,",
+                            "  1000,",
+                            "  3.14,",
+                            "  ,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "Curve:Linear,",
+                            "  dummyCurve,",
+                            "  1,",
+                            "  0,",
+                            "  1,",
+                            "  1;"
+                    }
+            );
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // set up the plant loops
+    // first the load side
+    DataPlant::TotNumLoops = 1;
+    DataPlant::PlantLoop.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide.allocate(2);
+    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+
+    // the init call expects a "from" calling point
+    PlantLocation myLocation = PlantLocation(1, 2, 1, 1);
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(1u, eir_plhp.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
+
+    // do a bit of extra wiring up to the plant
+    PLHPPlantLoadSideComp.Name = thisCoolingPLHP->name;
+    PLHPPlantLoadSideComp.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
+
+    // call for all initialization
+    DataGlobals::BeginEnvrnFlag = true;
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    thisCoolingPLHP->onInitLoopEquip(myLocation);
+
+    // call with run flag off, loose limits on node min/max
+    thisCoolingPLHP->running = false;
+    thisCoolingPLHP->setOperatingFlowRatesASHP();
+    EXPECT_NEAR(
+            0.0,
+            thisCoolingPLHP->loadSideMassFlowRate,
+            0.001
+    );
+    EXPECT_NEAR(
+            0.0,
+            thisCoolingPLHP->sourceSideMassFlowRate,
+            0.001
+    );
+
+    // call with run flag off, nonzero minimums
+    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMinAvail = 0.1;
+    thisCoolingPLHP->running = false;
+    thisCoolingPLHP->setOperatingFlowRatesASHP();
+    EXPECT_NEAR(
+            0.1,
+            thisCoolingPLHP->loadSideMassFlowRate,
+            0.001
+    );
+    EXPECT_NEAR(
+            0,
+            thisCoolingPLHP->sourceSideMassFlowRate,
+            0.001
+    );
+
+    // call with run flag off, load side flow locked
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.24;
+    thisCoolingPLHP->running = false;
+    thisCoolingPLHP->setOperatingFlowRatesASHP();
+    EXPECT_NEAR(
+            0.24,
+            thisCoolingPLHP->loadSideMassFlowRate,
+            0.001
+    );
+    EXPECT_NEAR(
+            0.0,
+            thisCoolingPLHP->sourceSideMassFlowRate,
+            0.001
+    );
+
+    // call with run flag ON, flow locked at zero on load side
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
+    thisCoolingPLHP->running = true;
+    thisCoolingPLHP->setOperatingFlowRatesASHP();
+    EXPECT_NEAR(
+            0.0,
+            thisCoolingPLHP->loadSideMassFlowRate,
+            0.001
+    );
+    EXPECT_NEAR(
+            0,
+            thisCoolingPLHP->sourceSideMassFlowRate,
+            0.001
+    );
+
+    // call with run flag ON, flow locked at zero on source side
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.2;
+    thisCoolingPLHP->running = true;
+    thisCoolingPLHP->setOperatingFlowRatesASHP();
+    EXPECT_NEAR(
+            0.2,
+            thisCoolingPLHP->loadSideMassFlowRate,
+            0.001
+    );
+    EXPECT_NEAR(
+            1.29,
+            thisCoolingPLHP->sourceSideMassFlowRate,
+            0.1
+    );
+
+    // call with run flag ON, flow locked at zero on both sides
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
+    thisCoolingPLHP->running = true;
+    thisCoolingPLHP->setOperatingFlowRatesASHP();
+    EXPECT_NEAR(
+            0.0,
+            thisCoolingPLHP->loadSideMassFlowRate,
+            0.001
+    );
+    EXPECT_NEAR(
+            0.0,
+            thisCoolingPLHP->sourceSideMassFlowRate,
+            0.001
+    );
+
+    // call with run flag ON, flow locked at nonzero both
+    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
+    thisCoolingPLHP->running = true;
+    thisCoolingPLHP->setOperatingFlowRatesASHP();
+    EXPECT_NEAR(
+            0.14,
+            thisCoolingPLHP->loadSideMassFlowRate,
+            0.001
+    );
+    EXPECT_NEAR(
+            1.29,
+            thisCoolingPLHP->sourceSideMassFlowRate,
+            0.1
+    );
+
 }
 
 #pragma clang diagnostic pop
