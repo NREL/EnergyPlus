@@ -2221,7 +2221,7 @@ namespace SurfaceGeometry {
         bool OK;
         int Found;
         std::string OutMsg;
-        int ZoneNum;
+        int ZoneNum; //For loop counter
         static bool RelWarning(false);
 
         // Formats
