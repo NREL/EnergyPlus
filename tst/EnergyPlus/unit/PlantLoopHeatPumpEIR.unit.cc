@@ -159,97 +159,6 @@ TEST_F(EIRPLHPFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource) {
     );
 }
 
-TEST_F(EIRPLHPFixture, ConstructionFullObjectsHeatingAndCooling_AirSource) {
-    std::string const idf_objects =
-            delimited_string(
-                    {
-                            "HeatPump:PlantLoop:EIR:Heating,",
-                            "  hp heating side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  AirSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  hp cooling side,",
-                            "  0.001,",
-                            "  0.001,",
-                            "  1000,",
-                            "  3.14,",
-                            "  2,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "HeatPump:PlantLoop:EIR:Cooling,",
-                            "  hp cooling side,",
-                            "  node 1,",
-                            "  node 2,",
-                            "  AirSource,",
-                            "  node 3,",
-                            "  node 4,",
-                            "  hp heating side,",
-                            "  0.001,",
-                            "  0.001,",
-                            "  1000,",
-                            "  3.14,",
-                            "  2,",
-                            "  dummyCurve,",
-                            "  dummyCurve,",
-                            "  dummyCurve;",
-                            "Curve:Linear,",
-                            "  dummyCurve,",
-                            "  1,",
-                            "  0,",
-                            "  1,",
-                            "  1;"
-                    }
-            );
-    ASSERT_TRUE(process_idf(idf_objects));
-
-    // call the factory with a valid name to trigger reading inputs
-    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
-
-    // verify the size of the vector and the processed condition
-    EXPECT_EQ(2u, eir_plhp.size());
-
-    // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisHeatingPLHP = &eir_plhp[1];
-    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
-
-    // validate the heating side
-    EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRHeating, thisHeatingPLHP->plantTypeOfNum);
-    EXPECT_EQ(thisCoolingPLHP, thisHeatingPLHP->companionHeatPumpCoil);
-    EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
-    EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncTempCurveIndex);
-    EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncPLRCurveIndex);
-
-    // validate the cooling side
-    EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfNum);
-    EXPECT_EQ(thisHeatingPLHP, thisCoolingPLHP->companionHeatPumpCoil);
-    EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
-    EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
-    EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
-
-    // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "fake"),
-            std::runtime_error
-    );
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"),
-            std::runtime_error
-    );
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"),
-            std::runtime_error
-    );
-    EXPECT_THROW(
-            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
-            std::runtime_error
-    );
-}
-
 TEST_F(EIRPLHPFixture, PairingCompanionCoils) {
     eir_plhp.resize(2);
     EIRPlantLoopHeatPump *coil1 = &eir_plhp[0];
@@ -460,7 +369,7 @@ TEST_F(EIRPLHPFixture, CoolingConstructionFullObjectWithDefaults) {
 
 }
 
-TEST_F(EIRPLHPFixture, CoolingConstructionFullyAutoSized) {
+TEST_F(EIRPLHPFixture, CoolingConstructionFullyAutoSized_WaterSource) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -1763,7 +1672,7 @@ TEST_F(EIRPLHPFixture, OnInitLoopEquipTopologyErrorCases) {
 
 }
 
-TEST_F(EIRPLHPFixture, CoolingSimulate) {
+TEST_F(EIRPLHPFixture, CoolingSimulate_WaterSource) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -1904,7 +1813,7 @@ TEST_F(EIRPLHPFixture, CoolingSimulate) {
 
 }
 
-TEST_F(EIRPLHPFixture, HeatingSimulate) {
+TEST_F(EIRPLHPFixture, HeatingSimulate_WaterSource) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -2062,6 +1971,401 @@ TEST_F(EIRPLHPFixture, TestConcurrentOperationChecking) {
     ASSERT_EQ(0, coil2->recurringConcurrentOperationWarningIndex);
     ASSERT_EQ(1, coil3->recurringConcurrentOperationWarningIndex);
     ASSERT_EQ(1, coil4->recurringConcurrentOperationWarningIndex);
+}
+
+TEST_F(EIRPLHPFixture, ConstructionFullObjectsHeatingAndCooling_AirSource) {
+    std::string const idf_objects =
+            delimited_string(
+                    {
+                            "HeatPump:PlantLoop:EIR:Heating,",
+                            "  hp heating side,",
+                            "  node 1,",
+                            "  node 2,",
+                            "  AirSource,",
+                            "  node 3,",
+                            "  node 4,",
+                            "  hp cooling side,",
+                            "  0.001,",
+                            "  0.001,",
+                            "  1000,",
+                            "  3.14,",
+                            "  2,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "HeatPump:PlantLoop:EIR:Cooling,",
+                            "  hp cooling side,",
+                            "  node 1,",
+                            "  node 2,",
+                            "  AirSource,",
+                            "  node 3,",
+                            "  node 4,",
+                            "  hp heating side,",
+                            "  0.001,",
+                            "  0.001,",
+                            "  1000,",
+                            "  3.14,",
+                            "  2,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "Curve:Linear,",
+                            "  dummyCurve,",
+                            "  1,",
+                            "  0,",
+                            "  1,",
+                            "  1;"
+                    }
+            );
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(2u, eir_plhp.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRPlantLoopHeatPump *thisHeatingPLHP = &eir_plhp[1];
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
+
+    // validate the heating side
+    EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
+    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRHeating, thisHeatingPLHP->plantTypeOfNum);
+    EXPECT_EQ(thisCoolingPLHP, thisHeatingPLHP->companionHeatPumpCoil);
+    EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
+    EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncTempCurveIndex);
+    EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncPLRCurveIndex);
+
+    // validate the cooling side
+    EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
+    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfNum);
+    EXPECT_EQ(thisHeatingPLHP, thisCoolingPLHP->companionHeatPumpCoil);
+    EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
+    EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
+    EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
+
+    // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
+    EXPECT_THROW(
+            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "fake"),
+            std::runtime_error
+    );
+    EXPECT_THROW(
+            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"),
+            std::runtime_error
+    );
+    EXPECT_THROW(
+            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"),
+            std::runtime_error
+    );
+    EXPECT_THROW(
+            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
+            std::runtime_error
+    );
+}
+
+TEST_F(EIRPLHPFixture, CoolingSimulate_AirSource) {
+    std::string const idf_objects =
+            delimited_string(
+                    {
+                            "HeatPump:PlantLoop:EIR:Cooling,",
+                            "  hp cooling side,",
+                            "  node 1,",
+                            "  node 2,",
+                            "  AirSource,",
+                            "  node 3,",
+                            "  node 4,",
+                            "  ,",
+                            "  0.0001,",
+                            "  1,",
+                            "  1000,",
+                            "  3.14,",
+                            "  ,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "Curve:Linear,",
+                            "  dummyCurve,",
+                            "  0.95,",
+                            "  0,",
+                            "  1,",
+                            "  1;"
+                    }
+            );
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // set up the plant loops
+    // first the load side
+    DataPlant::TotNumLoops = 1;
+    DataPlant::PlantLoop.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide.allocate(2);
+    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
+
+    // the init call expects a "from" calling point
+    PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(1u, eir_plhp.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
+
+    // do a bit of extra wiring up to the plant
+    PLHPPlantLoadSideComp.Name = thisCoolingPLHP->name;
+    PLHPPlantLoadSideComp.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
+
+    // call for all initialization
+    DataGlobals::BeginEnvrnFlag = true;
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    thisCoolingPLHP->onInitLoopEquip(myLoadLocation);
+
+    // call from load side location, firsthvac, no load, not running, verify the unit doesn't have any values lingering
+    thisCoolingPLHP->loadSideHeatTransfer = 1000;
+    thisCoolingPLHP->loadSideInletTemp = 23.0;
+    thisCoolingPLHP->loadSideOutletTemp = 42.0;
+    thisCoolingPLHP->powerUsage = 4.0;
+    thisCoolingPLHP->sourceSideHeatTransfer = 60.0;
+    thisCoolingPLHP->sourceSideInletTemp = 43.0;
+    thisCoolingPLHP->sourceSideOutletTemp = 83.0;
+    bool firstHVAC = true;
+    Real64 curLoad = 0.0;
+    bool runFlag = false;
+    thisCoolingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+    EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideHeatTransfer, 0.001);
+    EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideHeatTransfer, 0.001);
+    EXPECT_NEAR(0.0, thisCoolingPLHP->powerUsage, 0.001);
+    EXPECT_NEAR(thisCoolingPLHP->loadSideInletTemp, thisCoolingPLHP->loadSideOutletTemp, 0.001);
+    EXPECT_NEAR(thisCoolingPLHP->sourceSideInletTemp, thisCoolingPLHP->sourceSideOutletTemp, 0.001);
+
+    // now we can call it again from the load side, but this time there is load (still firsthvac, unit can meet load)
+    {
+        firstHVAC = true;
+        curLoad = -800;
+        runFlag = true;
+        Real64 const expectedLoadMassFlowRate = 0.09999;
+        Real64 const expectedCp = 4183;
+        Real64 const specifiedLoadSetpoint = 15;
+        Real64 const calculatedLoadInletTemp =
+                specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
+        DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
+        thisCoolingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        // expect it to meet setpoint and have some pre-evaluated conditions
+        EXPECT_NEAR(specifiedLoadSetpoint, thisCoolingPLHP->loadSideOutletTemp, 0.001);
+        EXPECT_NEAR(-curLoad, thisCoolingPLHP->loadSideHeatTransfer, 0.001);
+    }
+
+    // now we can call it again from the load side, but this time there is load (still firsthvac, unit cannot meet load)
+    {
+        firstHVAC = true;
+        curLoad = -1200;
+        Real64 availableCapacity = 950.0;
+        runFlag = true;
+        Real64 const expectedLoadMassFlowRate = 0.09999;
+        Real64 const expectedCp = 4183;
+        Real64 const specifiedLoadSetpoint = 15;
+        Real64 const calculatedLoadInletTemp =
+                specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
+        DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).Temp = 30;
+        thisCoolingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        // expect it to miss setpoint and be at max capacity
+        EXPECT_NEAR(15.597, thisCoolingPLHP->loadSideOutletTemp, 0.001);
+        EXPECT_NEAR(availableCapacity, thisCoolingPLHP->loadSideHeatTransfer, 0.001);
+    }
+
+}
+
+TEST_F(EIRPLHPFixture, HeatingSimulate_AirSource) {
+    std::string const idf_objects =
+            delimited_string(
+                    {
+                            "HeatPump:PlantLoop:EIR:Heating,",
+                            "  hp heating side,",
+                            "  node 1,",
+                            "  node 2,",
+                            "  AirSource,",
+                            "  node 3,",
+                            "  node 4,",
+                            "  ,",
+                            "  0.0001,",
+                            "  1,",
+                            "  1000,",
+                            "  3.14,",
+                            "  ,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "Curve:Linear,",
+                            "  dummyCurve,",
+                            "  0.95,",
+                            "  0,",
+                            "  1,",
+                            "  1;"
+                    }
+            );
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // set up the plant loops
+    // first the load side
+    DataPlant::TotNumLoops = 1;
+    DataPlant::PlantLoop.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide.allocate(2);
+    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
+
+    // the init call expects a "from" calling point
+    PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(1u, eir_plhp.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRPlantLoopHeatPump *thisHeatingPLHP = &eir_plhp[0];
+
+    // do a bit of extra wiring up to the plant
+    PLHPPlantLoadSideComp.Name = thisHeatingPLHP->name;
+    PLHPPlantLoadSideComp.NodeNumIn = thisHeatingPLHP->loadSideNodes.inlet;
+
+    // call for all initialization
+    DataGlobals::BeginEnvrnFlag = true;
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    thisHeatingPLHP->onInitLoopEquip(myLoadLocation);
+
+    // call it from the load side, but this time there is a negative (cooling) load - shouldn't try to run
+    {
+        bool firstHVAC = true;
+        Real64 curLoad = -900;
+        bool runFlag = true;  // plant actually shouldn't do this but the component can be smart enough to handle it
+        Real64 const specifiedLoadSetpoint = 45;
+        Real64 const loadInletTemp = 46;
+        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = loadInletTemp;
+        DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
+        thisHeatingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        // expect it to meet setpoint and have some pre-evaluated conditions
+        EXPECT_NEAR(loadInletTemp, thisHeatingPLHP->loadSideOutletTemp, 0.001);
+        EXPECT_NEAR(0.0, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
+    }
+
+    // call it from the load side, but this time there is load (still firsthvac, unit can meet load)
+    {
+        bool firstHVAC = true;
+        Real64 curLoad = 800;
+        bool runFlag = true;
+        Real64 const expectedLoadMassFlowRate = 0.09999;
+        Real64 const expectedCp = 4180;
+        Real64 const specifiedLoadSetpoint = 45;
+        Real64 const calculatedLoadInletTemp =
+                specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
+        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
+        thisHeatingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        // expect it to meet setpoint and have some pre-evaluated conditions
+        EXPECT_NEAR(specifiedLoadSetpoint, thisHeatingPLHP->loadSideOutletTemp, 0.001);
+        EXPECT_NEAR(curLoad, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
+    }
+
+    // now we can call it again from the load side, but this time there is load (still firsthvac, unit cannot meet load)
+    {
+        bool firstHVAC = true;
+        Real64 curLoad = 1200;
+        Real64 availableCapacity = 950.0;
+        bool runFlag = true;
+        Real64 const expectedLoadMassFlowRate = 0.09999;
+        Real64 const expectedCp = 4180;
+        Real64 const specifiedLoadSetpoint = 45;
+        Real64 const calculatedLoadInletTemp =
+                specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
+        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        DataLoopNode::Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        DataLoopNode::Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 30;
+        thisHeatingPLHP->simulate(myLoadLocation, firstHVAC, curLoad, runFlag);
+        // expect it to miss setpoint and be at max capacity
+        EXPECT_NEAR(44.402, thisHeatingPLHP->loadSideOutletTemp, 0.001);
+        EXPECT_NEAR(availableCapacity, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
+    }
+
+}
+
+TEST_F(EIRPLHPFixture, CoolingConstructionFullyAutoSized_AirSource) {
+    std::string const idf_objects =
+            delimited_string(
+                    {
+                            "HeatPump:PlantLoop:EIR:Cooling,",
+                            "  hp cooling side,",
+                            "  node 1,",
+                            "  node 2,",
+                            "  AirSource,",
+                            "  node 3,",
+                            "  node 4,",
+                            "  ,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  ,",
+                            "  1,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "Curve:Linear,",
+                            "  dummyCurve,",
+                            "  1,",
+                            "  0,",
+                            "  1,",
+                            "  1;"
+                    }
+            );
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(1u, eir_plhp.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
+
+    // validate the cooling side
+    EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
+    EXPECT_EQ(DataPlant::TypeOf_HeatPumpEIRCooling, thisCoolingPLHP->plantTypeOfNum);
+    EXPECT_EQ(nullptr, thisCoolingPLHP->companionHeatPumpCoil);
+    EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
+    EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
+    EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncPLRCurveIndex);
+
+    // calling the factory with an invalid name or type will call ShowFatalError, which will trigger a runtime exception
+    EXPECT_THROW(
+            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "fake"),
+            std::runtime_error
+    );
+    EXPECT_THROW(
+            EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"),
+            std::runtime_error
+    );
 }
 
 #pragma clang diagnostic pop
