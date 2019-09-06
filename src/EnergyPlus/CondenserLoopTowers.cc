@@ -381,7 +381,7 @@ namespace CondenserLoopTowers {
         int NumNums2;                   // Number of elements in the numeric2 array
         int IOStat;                     // IO Status when calling get input subroutine
         int CoeffNum;                   // Index for reading user defined VS tower coefficients
-        static bool ErrorsFound(false); // Logical flag set .TRUE. if errors found while getting input data
+        bool ErrorsFound(false); // Logical flag set .TRUE. if errors found while getting input data
         std::string OutputChar;         // report variable for warning messages
         std::string OutputCharLo;       // report variable for warning messages
         std::string OutputCharHi;       // report variable for warning messages
@@ -2427,24 +2427,10 @@ namespace CondenserLoopTowers {
         static std::string const RoutineName("InitTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // Flag if input data errors are found
-
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool OneTimeFlagForEachTower;
         int TypeOf_Num(0);
         Real64 rho; // local density of fluid
 
-        // Do the one time initializations
-        if (InitTowerOneTimeFlag) {
-            MyEnvrnFlag.allocate(NumSimpleTowers);
-            OneTimeFlagForEachTower.allocate(NumSimpleTowers);
-
-            OneTimeFlagForEachTower = true;
-            MyEnvrnFlag = true;
-            InitTowerOneTimeFlag = false;
-        }
-
-        if (OneTimeFlagForEachTower(TowerNum)) {
+        if (SimpleTower(TowerNum).oneTimeFlag) {
 
             if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_SingleSpeed) {
                 TypeOf_Num = DataPlant::TypeOf_CoolingTower_SingleSpd;
@@ -2459,6 +2445,7 @@ namespace CondenserLoopTowers {
             }
 
             // Locate the tower on the plant loops for later usage
+            bool ErrorsFound = false;
             PlantUtilities::ScanPlantLoopsForObject(SimpleTower(TowerNum).Name,
                                     TypeOf_Num,
                                     SimpleTower(TowerNum).LoopNum,
@@ -2479,11 +2466,11 @@ namespace CondenserLoopTowers {
             SimpleTower(TowerNum).SetpointIsOnOutlet = !((DataLoopNode::Node(SimpleTower(TowerNum).WaterOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
                                                          (DataLoopNode::Node(SimpleTower(TowerNum).WaterOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue));
 
-            OneTimeFlagForEachTower(TowerNum) = false;
+            SimpleTower(TowerNum).oneTimeFlag = false;
         }
 
         // Begin environment initializations
-        if (MyEnvrnFlag(TowerNum) && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
+        if (SimpleTower(TowerNum).envrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleTower(TowerNum).LoopNum).FluidName,
                                    DataGlobals::InitConvTemp,
@@ -2501,11 +2488,11 @@ namespace CondenserLoopTowers {
                                SimpleTower(TowerNum).BranchNum,
                                SimpleTower(TowerNum).CompNum);
 
-            MyEnvrnFlag(TowerNum) = false;
+            SimpleTower(TowerNum).envrnFlag = false;
         }
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(TowerNum) = true;
+            SimpleTower(TowerNum).envrnFlag = true;
         }
 
         // Each time initializations
@@ -4584,7 +4571,7 @@ namespace CondenserLoopTowers {
         // Cyclic losses are neglected. The period of time required to meet the
         // leaving water temperature setpoint is used to determine the required
         // fan power and energy. Free convection regime is also modeled. This
-        // occures when the pump is operating and the fan is off. If free convection
+        // occurs when the pump is operating and the fan is off. If free convection
         // regime cooling is all that is required for a given time step, the leaving
         // water temperature is allowed to fall below the leaving water temperature
         // setpoint (free cooling). At times when the cooling tower fan is required,
@@ -4653,9 +4640,9 @@ namespace CondenserLoopTowers {
         // Added variables for multicell
         Real64 WaterMassFlowRatePerCellMin = 0.0;
         Real64 WaterMassFlowRatePerCellMax;
-        static int NumCellMin(0);
-        static int NumCellMax(0);
-        static int NumCellOn(0);
+        int NumCellMin(0);
+        int NumCellMax(0);
+        int NumCellOn(0);
         Real64 WaterMassFlowRatePerCell;
         bool IncrNumCellFlag; // determine if yes or no we increase the number of cells
 
@@ -4983,14 +4970,14 @@ namespace CondenserLoopTowers {
         int LoopNum;
         int LoopSideNum;
 
-        static int SpeedSel(0);
+        int SpeedSel(0);
 
         // Added variables for multicell
         Real64 WaterMassFlowRatePerCellMin = 0.0;
         Real64 WaterMassFlowRatePerCellMax;
-        static int NumCellMin(0);
-        static int NumCellMax(0);
-        static int NumCellOn(0);
+        int NumCellMin(0);
+        int NumCellMax(0);
+        int NumCellOn(0);
         Real64 WaterMassFlowRatePerCell;
         bool IncrNumCellFlag; // determine if yes or no we increase the number of cells
 
@@ -5595,18 +5582,16 @@ namespace CondenserLoopTowers {
         std::string OutputChar3;               // character string used for warning messages
         std::string OutputChar4;               // character string used for warning messages
         std::string OutputChar5;               // character string used for warning messages
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
         Real64 CurrentEndTime;                 // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
         int LoopNum;
         int LoopSideNum;
 
         // Added variables for multicell
         Real64 WaterMassFlowRatePerCellMin = 0.0;
         Real64 WaterMassFlowRatePerCellMax;
-        static int NumCellMin(0);
-        static int NumCellMax(0);
-        static int NumCellOn(0);
+        int NumCellMin(0);
+        int NumCellMax(0);
+        int NumCellOn(0);
         Real64 WaterMassFlowRatePerCell;
         bool IncrNumCellFlag;
 
@@ -5835,11 +5820,11 @@ namespace CondenserLoopTowers {
         //   calculate end time of current time step
         CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
 
-        //   Print warning messages only when valid and only for the first ocurrance. Let summary provide statistics.
+        //   Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= TimeStepSysLast) {
+        if (CurrentEndTime > SimpleTower(TowerNum).CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= SimpleTower(TowerNum).TimeStepSysLast) {
             if (VSTower(SimpleTower(TowerNum).VSTower).PrintLGMessage) {
                 ++VSTower(SimpleTower(TowerNum).VSTower).VSErrorCountFlowFrac;
                 //       Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
@@ -5857,8 +5842,8 @@ namespace CondenserLoopTowers {
         }
 
         //   save last system time step and last end time of current time step (used to determine if warning is valid)
-        TimeStepSysLast = DataHVACGlobals::TimeStepSys;
-        CurrentEndTimeLast = CurrentEndTime;
+        SimpleTower(TowerNum).TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        SimpleTower(TowerNum).CurrentEndTimeLast = CurrentEndTime;
 
         //   warn user on first occurrence if flow fraction is greater than maximum for the YorkCalc model, use recurring warning stats
         if (SimpleTower(TowerNum).TowerModelType == YorkCalcModel || SimpleTower(TowerNum).TowerModelType == YorkCalcUserDefined) {
@@ -6123,13 +6108,9 @@ namespace CondenserLoopTowers {
         // York International Corporation, "YORKcalcTM Software, Chiller-Plant Energy-Estimating Program",
         // Form 160.00-SG2 (0502). 2002.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 PctAirFlow(0.0); // air flow rate ratio (fan power ratio in the case of CoolTools model)
-        static Real64 FlowFactor(0.0); // water flow rate to air flow rate ratio (L/G) for YorkCalc model
-
-        if (SimpleTower(TowerNum).TowerModelType == YorkCalcModel || SimpleTower(TowerNum).TowerModelType == YorkCalcUserDefined) {
-            PctAirFlow = AirFlowRatio;
-            FlowFactor = PctWaterFlow / PctAirFlow;
+         if (SimpleTower(TowerNum).TowerModelType == YorkCalcModel || SimpleTower(TowerNum).TowerModelType == YorkCalcUserDefined) {
+            Real64 PctAirFlow = AirFlowRatio;
+            Real64 FlowFactor = PctWaterFlow / PctAirFlow;
             Approach = VSTower(SimpleTower(TowerNum).VSTower).Coeff(1) + VSTower(SimpleTower(TowerNum).VSTower).Coeff(2) * Twb +
                        VSTower(SimpleTower(TowerNum).VSTower).Coeff(3) * Twb * Twb + VSTower(SimpleTower(TowerNum).VSTower).Coeff(4) * Tr +
                        VSTower(SimpleTower(TowerNum).VSTower).Coeff(5) * Twb * Tr + VSTower(SimpleTower(TowerNum).VSTower).Coeff(6) * Twb * Twb * Tr +
@@ -6155,9 +6136,8 @@ namespace CondenserLoopTowers {
                        VSTower(SimpleTower(TowerNum).VSTower).Coeff(27) * Twb * Twb * Tr * Tr * FlowFactor * FlowFactor;
 
         } else { // empirical model is CoolTools format
-
             //     the CoolTools model actually uses PctFanPower = AirFlowRatio^3 as an input to the model
-            PctAirFlow = pow_3(AirFlowRatio);
+            Real64 PctAirFlow = pow_3(AirFlowRatio);
             Approach =
                 VSTower(SimpleTower(TowerNum).VSTower).Coeff(1) + VSTower(SimpleTower(TowerNum).VSTower).Coeff(2) * PctAirFlow +
                 VSTower(SimpleTower(TowerNum).VSTower).Coeff(3) * PctAirFlow * PctAirFlow +
@@ -6226,13 +6206,11 @@ namespace CondenserLoopTowers {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string OutputChar;         // character string for warning messages
-        static std::string OutputCharLo;       // character string for warning messages
-        static std::string OutputCharHi;       // character string for warning messages
-        static std::string TrimValue;          // character string for warning messages
-        static Real64 TimeStepSysLast(0.0);    // last system time step (used to check for downshifting)
-        static Real64 CurrentEndTime(0.0);     // end time of time step for current simulation time step
-        static Real64 CurrentEndTimeLast(0.0); // end time of time step for last simulation time step
+        std::string OutputChar;         // character string for warning messages
+        std::string OutputCharLo;       // character string for warning messages
+        std::string OutputCharHi;       // character string for warning messages
+        std::string TrimValue;          // character string for warning messages
+        Real64 CurrentEndTime(0.0);     // end time of time step for current simulation time step
         // current end time is compared with last to see if time step changed
 
         //   initialize capped variables in case independent variables are in bounds
@@ -6248,7 +6226,7 @@ namespace CondenserLoopTowers {
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= TimeStepSysLast) {
+        if (CurrentEndTime > SimpleTower(TowerNum).CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= SimpleTower(TowerNum).TimeStepSysLast) {
             if (VSTower(SimpleTower(TowerNum).VSTower).PrintTrMessage) {
                 ++VSTower(SimpleTower(TowerNum).VSTower).VSErrorCountTR;
                 if (VSTower(SimpleTower(TowerNum).VSTower).VSErrorCountTR < 2) {
@@ -6314,8 +6292,8 @@ namespace CondenserLoopTowers {
         }
 
         //   save last system time step and last end time of current time step (used to determine if warning is valid)
-        TimeStepSysLast = DataHVACGlobals::TimeStepSys;
-        CurrentEndTimeLast = CurrentEndTime;
+        SimpleTower(TowerNum).TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        SimpleTower(TowerNum).CurrentEndTimeLast = CurrentEndTime;
 
         //   check boundaries of independent variables and post warnings to individual buffers to print at end of time step
         if (Twb < VSTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp || Twb > VSTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp) {
@@ -6608,9 +6586,9 @@ namespace CondenserLoopTowers {
         Real64 AirDensity;
         Real64 AirMassFlowRate;
         Real64 AvailTankVdot;
-        static Real64 BlowDownVdot(0.0);
-        static Real64 DriftVdot(0.0);
-        static Real64 EvapVdot(0.0);
+        Real64 BlowDownVdot(0.0);
+        Real64 DriftVdot(0.0);
+        Real64 EvapVdot(0.0);
         Real64 InletAirEnthalpy;
         Real64 InSpecificHumRat;
         Real64 OutSpecificHumRat;

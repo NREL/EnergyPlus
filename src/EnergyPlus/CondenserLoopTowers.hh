@@ -250,6 +250,10 @@ namespace CondenserLoopTowers {
         int FaultyTowerFoulingIndex;     // Index of the fouling fault object corresponding to the condenser
         Real64 FaultyTowerFoulingFactor; // Tower fouling factor
         std::string EndUseSubcategory;   // identifier use for the end use subcategory
+        bool envrnFlag;
+        bool oneTimeFlag;
+        Real64 TimeStepSysLast;    // last system time step (used to check for downshifting)
+        Real64 CurrentEndTimeLast; // end time of time step for last simulation time step
 
         // Default Constructor
         Towerspecs()
@@ -280,7 +284,7 @@ namespace CondenserLoopTowers {
               VSMerkelAFRErrorFail(0), VSMerkelAFRErrorFailIndex(0), DesInletWaterTemp(0), DesOutletWaterTemp(0), DesInletAirDBTemp(0),
               DesInletAirWBTemp(0), DesApproach(0), DesRange(0), TowerInletCondsAutoSize(false), FaultyCondenserSWTFlag(false),
               FaultyCondenserSWTIndex(0), FaultyCondenserSWTOffset(0.0), FaultyTowerFoulingFlag(false), FaultyTowerFoulingIndex(0),
-              FaultyTowerFoulingFactor(1.0)
+              FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0)
         {
         }
     };
