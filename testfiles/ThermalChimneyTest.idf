@@ -477,6 +477,8 @@
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
     World;                   !- Coordinate System
+	,                        !- Daylighting Reference Point Coordinate System
+	World;                   !- Rectangular Surface Coordinate System
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE ===========
 
