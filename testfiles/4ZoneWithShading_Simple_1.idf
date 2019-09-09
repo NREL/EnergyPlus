@@ -424,8 +424,8 @@
   Zone,
     ZONE 1,                  !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    0.0000000E+00,           !- X Origin {m}
-    0.0000000E+00,           !- Y Origin {m}
+    6.000000,                !- X Origin {m}
+    6.000000,                !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -435,8 +435,8 @@
   Zone,
     ZONE 2,                  !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    0.0000000E+00,           !- X Origin {m}
-    0.0000000E+00,           !- Y Origin {m}
+    26.00000,                !- X Origin {m}
+    6.000000,                !- Y Origin {m}
     0.0000000E+00,           !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
@@ -446,9 +446,9 @@
   Zone,
     ZONE 3,                  !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    0.0000000E+00,           !- X Origin {m}
-    0.0000000E+00,           !- Y Origin {m}
-    0.0000000E+00,           !- Z Origin {m}
+    6.000000,                !- X Origin {m}
+    6.000000,                !- Y Origin {m}
+    10.00000,                !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
     AutoCalculate,           !- Ceiling Height {m}
@@ -457,9 +457,9 @@
   Zone,
     ZONE 4,                  !- Name
     0.0000000E+00,           !- Direction of Relative North {deg}
-    0.0000000E+00,           !- X Origin {m}
-    0.0000000E+00,           !- Y Origin {m}
-    0.0000000E+00,           !- Z Origin {m}
+    26.00000,                !- X Origin {m}
+    6.000000,                !- Y Origin {m}
+    10.00000,                !- Z Origin {m}
     1,                       !- Type
     1,                       !- Multiplier
     AutoCalculate,           !- Ceiling Height {m}
@@ -533,8 +533,7 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
-    10,                      !- Starting X Coordinate {m}
-    6,                       !- Starting Y Coordinate {m}
+    4,                       !- Starting X Coordinate {m}
     3,                       !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
@@ -544,8 +543,7 @@
     HOLLOW WOOD DOOR,        !- Construction Name
     Zn001:Wall001,           !- Building Surface Name
     1,                       !- Multiplier
-    20,                      !- Starting X Coordinate {m}
-    6,                       !- Starting Y Coordinate {m}
+    14,                      !- Starting X Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
@@ -661,8 +659,7 @@
     Zn002:Wall001,           !- Building Surface Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
-    30,                      !- Starting X Coordinate {m}
-    6,                       !- Starting Y Coordinate {m}
+    4,                       !- Starting X Coordinate {m}
     3,                       !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
@@ -682,8 +679,7 @@
     Zn002:Wall001,           !- Building Surface Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
-    36,                      !- Starting X Coordinate {m}
-    6,                       !- Starting Y Coordinate {m}
+    10,                      !- Starting X Coordinate {m}
     3,                       !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
@@ -706,8 +702,7 @@
     Zn002:Wall002,           !- Building Surface Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
-    35,                      !- Starting X Coordinate {m}
-    6,                       !- Starting Y Coordinate {m}
+    9,                       !- Starting X Coordinate {m}
     3,                       !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
@@ -802,9 +797,8 @@
     Zn003:Wall001,           !- Building Surface Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
-    14,                      !- Starting X Coordinate {m}
-    6,                       !- Starting Y Coordinate {m}
-    13,                      !- Starting Z Coordinate {m}
+    8,                       !- Starting X Coordinate {m}
+    3,                       !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
 
@@ -851,9 +845,8 @@
     Zn003:Wall004,           !- Building Surface Name
     Zn004:Wall004:Win001,    !- Outside Boundary Condition Object
     1,                       !- Multiplier
-    10,                      !- Starting X Coordinate {m}
-    6,                       !- Starting Y Coordinate {m}
-    13,                      !- Starting Z Coordinate {m}
+    4,                       !- Starting X Coordinate {m}
+    3,                       !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
 
@@ -900,9 +893,8 @@
     Zn004:Wall001,           !- Building Surface Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
-    34,                      !- Starting X Coordinate {m}
-    6,                       !- Starting Y Coordinate {m}
-    13,                      !- Starting Z Coordinate {m}
+    8,                      !- Starting X Coordinate {m}
+    3,                      !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
 
@@ -949,9 +941,8 @@
     Zn004:Wall004,           !- Building Surface Name
     Zn003:Wall004:Win001,    !- Outside Boundary Condition Object
     1,                       !- Multiplier
-    39,                      !- Starting X Coordinate {m}
-    6,                       !- Starting Y Coordinate {m}
-    13,                      !- Starting Z Coordinate {m}
+    13,                      !- Starting X Coordinate {m}
+    3,                       !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
 
