@@ -1,13 +1,90 @@
-\section{Surface Heat Balance With Moveable Insulation}\label{surface-heat-balance-with-moveable-insulation}
+\section{Surface Heat Balances With Moveable Insulation}\label{surface-heat-balances-with-moveable-insulation}
 
-\subsection{Basic Heat Balance Cases}\label{basic-heat-balance-cases}
+In EnergyPlus, moveable insulation can be present either on the interior or exterior side of a particular construction. Different heat balances are impacted depending on the location of the moveable insulation.  Having moveable insulation on the interior side results in a modified form of the inside surface heat balance equation.  Having moveable insulation on the exterior side results in different cases for the outside surface heat balance.  Information on the modeling equations for each of these types of moveable insulation are shown in the next several sections.
 
-A heat balance must exist at the outside surface-air interface. The incoming conductive, convective, and radiative fluxes must sum up to zero:
+\subsection{Inside Heat Balance with Interior Moveable Insulation}\label{inside-heat-balance-with-interior-moveable-insulation}
+
+There are two different heat balances which must be maintained to model interior moveable insulation.  At both the interface between the zone air and the moveable insulation and the interface between the moveable insulation and the surface (wall, roof, etc.), the following general heat balance must be maintained:
 
 \begin{equation}
 Conductive + Convective + Radiative = 0
 \label{eq:BasicSteadyStateHeatBalanceEquation}
 \end{equation}
+
+One significant complication of the inside heat balance is the fact that surfaces within the same zone can interact with each other radiatively.  This means that a solution for all surface temperatures must be done at the same time to maintain a radiation heat balance among the surfaces.  This requires some iteration of the inside surface heat balance as will be seen in the equations that are shown later in this subsection.
+
+Another complication of the inside heat balance relates to the presense of moveable insulation.  When moveable insulation is present, a second heat balance equation is required to determine the temperature at both the air-moveable insulation interface as well as the moveable insulation-surface interface.  This sets up a system of two equations with two unknowns: the temperatures at the air-moveable insulation interface and the moveable insulation-surface interface.
+
+Applying the basic steady state heat balance equation at each of these interfaces results in the following two equations:
+
+\begin{equation}
+H_c \cdot \left( T_a - T_{mi} \right) + Q_{lw} + H_{mi} \cdot  \left( T_i - T_{mi} \right) + I_t \cdot  \left( T_{old} - T_{mi} \right) = 0
+\label{eq:InsideHBAirMovInsInterface}
+\end{equation}
+
+\begin{equation}
+H_{mi} \cdot \left( T_{mi} - T_i \right) + Q_{sw} + Q_{cond} = 0
+\label{eq:InsideHBMovInsSurfInterface}
+\end{equation}
+
+where:
+
+\(H_c\) is the convective heat transfer coefficient between the moveable insulation and the air
+
+\(T_a\) is the zone air temperature
+
+\(T_{mi}\) is the temperature at the interface between the air and the moveable insulation
+
+\(Q_{lw}\) is the long wavelength radiation incident on the interface between the air and the moveable insulation
+
+\(H_{mi}\) is the U-value of the moveable insulation material
+
+\(T_i\) is the temperature at the interface between the moveable insulation and the surface
+
+\(I_t\) is a damping constant for iterating to achieve a stable radiant exchange between zone surfaces
+
+\(T_{old}\) is the previous surface temperature at the last solution iteration
+
+\(Q_{sw}\) is the short wavelength radiation incident on the interface between the moveable insulation and the surface
+
+\(Q_{cond}\) is the conduction heat transfer through the surface.
+
+Equation~\ref{eq:InsideHBAirMovInsInterface} is the heat balance at the air-moveable insulation interface and can be rearranged to solve for the temperature at this interface, T\(_{mi}\).  Equation~\ref{eq:InsideHBMovInsSurfInterface} is the heat balance at the moveable insulation-surface interface and provides a second equation for T\(_{mi}\).  Both equations leave T\(_{mi}\) as a function of T\(_{i}\) and other known quantities as shown below.
+
+It should be noted that there are some assumptions built into these equations.  First, all long wavelength radiation whether from other surfaces or other elements (such as heat sources which add radiation to the zone) is all assumed to be incident at and influence the air-moveable insulation interface.  This also means that no long wavelength radiation is transmitted through the moveable insulation to the moveable insulation-surface interface.  Second, all short wavelength radiation is assumed to be transmitted through the moveable insulation to the moveable-insulation interface.  This is a simplification that is consistent with transparent insulation and assumes that the moveable insulation material itself does not absorb any short wavelength as it passes through it.  Third, the term Q\(_{cond}\) includes several terms that all relate to the method for calculating heat conduction through the actual surface to which the moveable insulation is attached.  Finally, the moveable insulation material is sufficiently lightweight thermally that it has no thermal mass and it can be treated as an equivalent resistance.
+
+Equation~\ref{eq:InsideHBAirMovInsInterface} can be rearranged to obtain:
+
+\begin{equation}
+\left( H_c + H_{mi} + I_t \right) \cdot T_m = H_c \cdot T_a + H_m \cdot T_i + Q_{lw} + I_t \cdot T_{old}
+\label{eq:RearrangedHBAirMovIns}
+\end{equation}
+
+When Equation~\ref{eq:InsideHBMovInsSurfInterface} is rearranged to solve for \(T_m\) and this is substituted back into Equation~\ref{eq:RearrangedHBAirMovIns}, one obtains a single equation that allows for the solution of \(T_i\).  This can then be used to solve for \(T_{mi}\).
+
+The C++ code that is used to solve for \(T_i\) and \(T_{mi}\) for cases where moveable insulation is present on the interior side is shown below.
+
+\begin{lstlisting}
+F1 = HMovInsul / (HMovInsul + HConvIn_surf + IterDampConst);
+
+TempSurfIn(SurfNum) = (CTFConstInPart(SurfNum) + QRadSWInAbs(SurfNum) + construct.CTFCross(0) * TH11 +
+                       F1 * (QRadThermInAbs(SurfNum) + HConvIn_surf * RefAirTemp(SurfNum) +
+                       NetLWRadToSurf(SurfNum) + QHTRadSysSurf(SurfNum) +
+                       QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
+                       QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum) +
+                       QAdditionalHeatSourceInside(SurfNum) +
+                       IterDampConst * TempInsOld(SurfNum)))
+                       / (construct.CTFInside(0) + HMovInsul - F1 * HMovInsul); 
+
+TempSurfInTmp(SurfNum) = (construct.CTFInside(0) * TempSurfIn(SurfNum) + 
+                          HMovInsul * TempSurfIn(SurfNum) -
+                          QRadSWInAbs(SurfNum) - CTFConstInPart(SurfNum) -
+                          construct.CTFCross(0) * TH11) / (HMovInsul);
+\end{lstlisting}
+
+\subsection{Outside Heat Balance Cases for Exterior Moveable Insulation}\label{outside-heat-balance-cases-for-exterior-moveable-insulation}
+
+Just like at the inside surface-air interface, a heat balance must exist at the outside surface-air interface. The incoming conductive, convective, and radiative fluxes must sum up to zero as shown in Equation~\ref{eq:BasicSteadyStateHeatBalanceEquation}.
 
 In contrast to the internal surface heat balance that treats all surfaces simultaneously, the external thermal balance for each surface is performed independent of all other surfaces. This implies that there is no direct interaction between the individual surfaces.
 

@@ -2038,6 +2038,32 @@ GeneratorController::GeneratorController(std::string const &objectName,
             ShowContinueError("Invalid availability schedule = " + availSchedName);
             ShowContinueError("Schedule was not found ");
             errorsFound = true;
+        } else {
+            if (generatorType == GeneratorType::pvWatts) {
+                ShowWarningError(routineName + DataIPShortCuts::cCurrentModuleObject + ", Availability Schedule for Generator:PVWatts '" + objectName +  "' will be be ignored (runs all the time).");
+            } else if (generatorType == GeneratorType::pV) {
+                // It should only warn if Performance type is SimplePV (DataPhotovoltaics::iSimplePVModel).
+                // Except you need GetPVInput to have run already etc
+                // Note: you can't use DataIPShortCuts::cAlphaArgs etc or it'll override what will still need to be processed in
+                // ElectPowerLoadCenter::ElectPowerLoadCenter after this function is called
+                int PVNum = inputProcessor->getObjectItemNum(objectType, UtilityRoutines::MakeUPPERCase(objectName));
+                int NumAlphas; // Number of PV Array parameter alpha names being passed
+                int NumNums;   // Number of PV Array numeric parameters are being passed
+                int IOStat;
+                Array1D_string Alphas(5);       // Alpha items for object
+                Array1D<Real64> Numbers(2);     // Numeric items for object
+                inputProcessor->getObjectItem(objectType,
+                                              PVNum,
+                                              Alphas,
+                                              NumAlphas,
+                                              Numbers,
+                                              NumNums,
+                                              IOStat);
+                if (UtilityRoutines::SameString(Alphas(3), "PhotovoltaicPerformance:Simple")) {
+                    ShowWarningError(routineName + DataIPShortCuts::cCurrentModuleObject + ", Availability Schedule for Generator:Photovoltaics '" + objectName + "' of Type PhotovoltaicPerformance:Simple will be be ignored (runs all the time).");
+                    ShowContinueError("To limit this Generator:Photovoltaic's output, please use the Inverter's availability schedule instead.");
+                }
+            }
         }
     }
 

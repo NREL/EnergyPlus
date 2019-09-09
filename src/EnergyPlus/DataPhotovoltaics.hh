@@ -344,6 +344,8 @@ namespace DataPhotovoltaics {
     // Object Data
     extern Array1D<PVArrayStruct> PVarray;
 
+    void clear_state();
+
 } // namespace DataPhotovoltaics
 
 } // namespace EnergyPlus

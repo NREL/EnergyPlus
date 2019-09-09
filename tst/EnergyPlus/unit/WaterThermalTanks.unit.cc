@@ -1992,7 +1992,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     for (int i = 0; i < Tank.Nodes; ++i) {
         NodeTemps[i] = Tank.Node[i].Temp;
     }
-    
+
     // Verify there are no temperature inversions.
     for (int i = 0; i < Tank.Nodes - 1; ++i) {
         EXPECT_GE(NodeTemps[i], NodeTemps[i+1]);
@@ -2205,7 +2205,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck){
         "Schedule:Constant, Ambient Temp Schedule, , 20.0;",
         "Schedule:Constant, Inlet Water Temperature, , 10.0;",
         "Schedule:Constant, Desuperheater-Schedule, , 55.0;",
-        "Schedule:Constant, WH Setpoint Temp, , 50.0;",        
+        "Schedule:Constant, WH Setpoint Temp, , 50.0;",
 
         "  Zone,",
         "    Zone_TES,                !- Name",
@@ -2426,7 +2426,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck){
     Tank.SavedTankTemp = 52; // previous time step temperature
     Tank.AmbientTemp = 50.0; // Assume no loss
     Tank.UseInletTemp = 10;
-    Tank.UseMassFlowRate = 0.0; 
+    Tank.UseMassFlowRate = 0.0;
     Tank.SourceOutletTemp = 50;
     Tank.SavedSourceOutletTemp = 52;
     Tank.TimeElapsed = 0.0;
@@ -2494,7 +2494,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "Schedule:Constant, Ambient Temp Schedule, , 20.0;",
         "Schedule:Constant, Inlet Water Temperature, , 10.0;",
         "Schedule:Constant, Desuperheater-Schedule, , 60.0;",
-        "Schedule:Constant, WH Setpoint Temp, , 45.0;",        
+        "Schedule:Constant, WH Setpoint Temp, , 45.0;",
 
         "  Zone,",
         "    Zone_TES,                !- Name",
@@ -2590,7 +2590,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "    ,                        !- Water Pump Power {W}",
         "    0.2;                     !- Fraction of Pump Heat to Water",
 
-            
+
         "Coil:Cooling:WaterToAirHeatPump:EquationFit,",
         "    GSHP_COIL1,       !- Name",
         "    Node 42,                 !- Water Inlet Node Name",
@@ -2709,7 +2709,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Desuperheater.SetPointTemp = 60.0;
     Desuperheater.Mode = 1;
     Node(Desuperheater.WaterInletNode).Temp = Tank.SourceOutletTemp;
-    
+
     HourOfDay = 0;
     TimeStep = 1;
     TimeStepZone = 1. / 60.;
@@ -2721,7 +2721,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Tank.SetPointTemp = 45;
     Tank.SetPointTemp2 = 45;
     WaterThermalTanks::CalcDesuperheaterWaterHeater(TankNum, true);
-    // If there's no demand in water thermal tank, no heat is reclaimed 
+    // If there's no demand in water thermal tank, no heat is reclaimed
     EXPECT_EQ(Desuperheater.HeaterRate, 0);
 
     for (int i = 1; i <= Tank.Nodes; ++i) {
@@ -2765,7 +2765,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
         "Schedule:Constant, Ambient Temp Schedule, , 20.0;",
         "Schedule:Constant, Inlet Water Temperature, , 10.0;",
         "Schedule:Constant, Desuperheater-Schedule, , 60.0;",
-        "Schedule:Constant, WH Setpoint Temp, , 45.0;",        
+        "Schedule:Constant, WH Setpoint Temp, , 45.0;",
 
         "  Zone,",
         "    Zone_TES,                !- Name",
@@ -3124,4 +3124,215 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     EXPECT_EQ(Desuperheater.Mode, 0);
     EXPECT_EQ(Desuperheater.HeaterRate, 0.0);
     EXPECT_EQ(Tank.SourceRate, 0.0);
+}
+
+TEST_F(EnergyPlusFixture, MixedTank_WarnPotentialFreeze)
+{
+    std::string const idf_objects = delimited_string({
+        "  Schedule:Constant, Water Heater Setpoint Temperature, ,12;",
+        "  Schedule:Constant, Tank Ambient Temperature, , -40;", // That's cold!
+
+        "  WaterHeater:Mixed,",
+        "    ChilledWaterTank,        !- Name",
+        "    0.07,                    !- Tank Volume {m3}",
+        "    Water Heater Setpoint Temperature,  !- Setpoint Temperature Schedule Name",
+        "    2,                       !- Deadband Temperature Difference {deltaC}",
+        "    30,                      !- Maximum Temperature Limit {C}",
+        "    Cycle,                   !- Heater Control Type",
+        "    0,                       !- Heater Maximum Capacity {W}",
+        "    ,                        !- Heater Minimum Capacity {W}",
+        "    0,                       !- Heater Ignition Minimum Flow Rate {m3/s}",
+        "    0,                       !- Heater Ignition Delay {s}",
+        "    Electricity,             !- Heater Fuel Type",
+        "    0.8,                     !- Heater Thermal Efficiency",
+        "    ,                        !- Part Load Factor Curve Name",
+        "    0,                       !- Off Cycle Parasitic Fuel Consumption Rate {W}",
+        "    Electricity,             !- Off Cycle Parasitic Fuel Type",
+        "    0.8,                     !- Off Cycle Parasitic Heat Fraction to Tank",
+        "    0,                       !- On Cycle Parasitic Fuel Consumption Rate {W}",
+        "    Electricity,             !- On Cycle Parasitic Fuel Type",
+        "    0,                       !- On Cycle Parasitic Heat Fraction to Tank",
+        "    Schedule,                !- Ambient Temperature Indicator",
+        "    Tank Ambient Temperature,!- Ambient Temperature Schedule Name",
+        "    ,                        !- Ambient Temperature Zone Name",
+        "    ,                        !- Ambient Temperature Outdoor Air Node Name",
+        "    6,                       !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "    1,                       !- Off Cycle Loss Fraction to Zone",
+        "    6,                       !- On Cycle Loss Coefficient to Ambient Temperature {W/K}",
+        "    1,                       !- On Cycle Loss Fraction to Zone",
+        "    ,                        !- Peak Use Flow Rate {m3/s}",
+        "    ,                        !- Use Flow Rate Fraction Schedule Name",
+        "    ,                        !- Cold Water Supply Temperature Schedule Name",
+        "    ,                        !- Use Side Inlet Node Name",
+        "    ,                        !- Use Side Outlet Node Name",
+        "    1,                       !- Use Side Effectiveness",
+        "    ,                        !- Source Side Inlet Node Name",
+        "    ,                        !- Source Side Outlet Node Name",
+        "    1,                       !- Source Side Effectiveness",
+        "    Autosize,                !- Use Side Design Flow Rate {m3/s}",
+        "    Autosize,                !- Source Side Design Flow Rate {m3/s}",
+        "    1.5;                     !- Indirect Water Heating Recovery Time {hr}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound = false;
+    //HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    //EXPECT_FALSE(ErrorsFound);
+
+    //InternalHeatGains::GetInternalHeatGainsInput();
+    //ErrorsFound = false;
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInputData(ErrorsFound));
+
+    int TankNum(1);
+    WaterThermalTanks::WaterThermalTankData &Tank = WaterThermalTanks::WaterThermalTank(TankNum);
+
+    DataGlobals::HourOfDay = 0;
+    DataGlobals::TimeStep = 1;
+    DataGlobals::TimeStepZone = 1.0 / 60.0; // one-minute system time step
+    DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
+
+    Tank.TankTemp = 2.0;
+    Tank.AmbientTemp = -40;
+    Tank.UseInletTemp = 3.0;
+    Tank.SetPointTemp = 3.0;
+    Tank.SetPointTemp2 = Tank.SetPointTemp;
+    Tank.TimeElapsed = 0.0;
+
+    // very low use mass flow rate
+    Tank.UseMassFlowRate = 0.00005;
+    // zero source mass flow rate
+    Tank.SourceMassFlowRate = 0.0;
+
+    // Calls CalcWaterThermalTankMixed
+    WaterThermalTanks::CalcWaterThermalTank(TankNum);
+
+    // expected tank avg temp less than starting value of 2 C
+    EXPECT_LT(Tank.TankTempAvg, 2.0);
+    // And the final tank temp too, which is the one triggering the warning
+    EXPECT_LT(Tank.TankTemp, 2.0);
+
+    std::string const error_string = delimited_string({
+      "   ** Warning ** CalcWaterThermalTankMixed: WaterHeater:Mixed = 'CHILLEDWATERTANK':  Temperature of tank < 2C indicates of possibility of freeze. Tank Temperature = 1.95 C.",
+      "   **   ~~~   **  Environment=, at Simulation time= 00:-1 - 00:00"
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+}
+
+TEST_F(EnergyPlusFixture, StratifiedTank_WarnPotentialFreeze)
+{
+    std::string const idf_objects = delimited_string({
+        "  Schedule:Constant, Water Heater Setpoint Temperature, ,12;",
+        "  Schedule:Constant, Tank Ambient Temperature, , -40;", // That's cold!
+
+        "WaterHeater:Stratified,",
+        "  Stratified ChilledWaterTank, !- Name",
+        "  ,                        !- End-Use Subcategory",
+        "  0.17,                    !- Tank Volume {m3}",
+        "  1.4,                     !- Tank Height {m}",
+        "  VerticalCylinder,        !- Tank Shape",
+        "  ,                        !- Tank Perimeter {m}",
+        "  82.2222,                 !- Maximum Temperature Limit {C}",
+        "  MasterSlave,             !- Heater Priority Control",
+        "  Water Heater Setpoint Temperature,  !- Heater 1 Setpoint Temperature Schedule Name",
+        "  2.0,                     !- Heater 1 Deadband Temperature Difference {deltaC}",
+        "  0,                       !- Heater 1 Capacity {W}",
+        "  1.0,                     !- Heater 1 Height {m}",
+        "  Water Heater Setpoint Temperature,  !- Heater 2 Setpoint Temperature Schedule Name",
+        "  5.0,                     !- Heater 2 Deadband Temperature Difference {deltaC}",
+        "  0,                       !- Heater 2 Capacity {W}",
+        "  0.0,                     !- Heater 2 Height {m}",
+        "  ELECTRICITY,             !- Heater Fuel Type",
+        "  1,                       !- Heater Thermal Efficiency",
+        "  ,                        !- Off Cycle Parasitic Fuel Consumption Rate {W}",
+        "  ELECTRICITY,             !- Off Cycle Parasitic Fuel Type",
+        "  ,                        !- Off Cycle Parasitic Heat Fraction to Tank",
+        "  ,                        !- Off Cycle Parasitic Height {m}",
+        "  ,                        !- On Cycle Parasitic Fuel Consumption Rate {W}",
+        "  ELECTRICITY,             !- On Cycle Parasitic Fuel Type",
+        "  ,                        !- On Cycle Parasitic Heat Fraction to Tank",
+        "  ,                        !- On Cycle Parasitic Height {m}",
+        "  SCHEDULE,                !- Ambient Temperature Indicator",
+        "  Tank Ambient Temperature,!- Ambient Temperature Schedule Name",
+        "  ,                        !- Ambient Temperature Zone Name",
+        "  ,                        !- Ambient Temperature Outdoor Air Node Name",
+        "  6,                       !- Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature {W/m2-K}",
+        "  1,                       !- Skin Loss Fraction to Zone",
+        "  6,                       !- Off Cycle Flue Loss Coefficient to Ambient Temperature {W/K}",
+        "  1,                       !- Off Cycle Flue Loss Fraction to Zone",
+        "  ,                        !- Peak Use Flow Rate {m3/s}",
+        "  ,                        !- Use Flow Rate Fraction Schedule Name",
+        "  ,                        !- Cold Water Supply Temperature Schedule Name",
+        "  ,                        !- Use Side Inlet Node Name",
+        "  ,                        !- Use Side Outlet Node Name",
+        "  ,                        !- Use Side Effectiveness",
+        "  1.0,                     !- Use Side Inlet Height {m}",
+        "  0.5,                     !- Use Side Outlet Height {m}",
+        "  ,                        !- Source Side Inlet Node Name",
+        "  ,                        !- Source Side Outlet Node Name",
+        "  ,                        !- Source Side Effectiveness",
+        "  ,                        !- Source Side Inlet Height {m}",
+        "  ,                        !- Source Side Outlet Height {m}",
+        "  FIXED,                   !- Inlet Mode",
+        "  ,                        !- Use Side Design Flow Rate {m3/s}",
+        "  ,                        !- Source Side Design Flow Rate {m3/s}",
+        "  ,                        !- Indirect Water Heating Recovery Time {hr}",
+        "  10,                      !- Number of Nodes",
+        "  0.1;                     !- Additional Destratification Conductivity {W/m-K}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound = false;
+    //HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    //EXPECT_FALSE(ErrorsFound);
+
+    //InternalHeatGains::GetInternalHeatGainsInput();
+    //ErrorsFound = false;
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInputData(ErrorsFound));
+
+    int TankNum(1);
+    WaterThermalTanks::WaterThermalTankData &Tank = WaterThermalTanks::WaterThermalTank(TankNum);
+
+    DataGlobals::HourOfDay = 0;
+    DataGlobals::TimeStep = 1;
+    DataGlobals::TimeStepZone = 1.0 / 60.0; // one-minute system time step
+    DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
+
+    Tank.TankTemp = 2.0;
+    for (auto &node : Tank.Node) {
+        node.Temp = 2.0;
+        node.SavedTemp = 2.0;
+    }
+
+    Tank.AmbientTemp = -40;
+    Tank.UseInletTemp = 3.0;
+    Tank.SetPointTemp = 3.0;
+    Tank.SetPointTemp2 = Tank.SetPointTemp;
+    Tank.TimeElapsed = 0.0;
+
+    // very low use mass flow rate
+    Tank.UseMassFlowRate = 0.00005;
+    // zero source mass flow rate
+    Tank.SourceMassFlowRate = 0.0;
+
+    // Calls CalcWaterThermalTankStratified
+    WaterThermalTanks::CalcWaterThermalTank(TankNum);
+
+    // expected tank avg temp less than starting value of 2 C
+    EXPECT_LT(Tank.TankTempAvg, 2.0);
+    // And the final tank temp too, which is the one triggering the warning
+    EXPECT_LT(Tank.TankTemp, 2.0);
+    // Might as well check the node temps too
+    for (int i = 0; i < Tank.Nodes; ++i) {
+        EXPECT_LT(Tank.Node[i].Temp, 2.0) << "Node i=" << i;
+    }
+
+    std::string const error_string = delimited_string({
+      "   ** Warning ** CalcWaterThermalTankStratified: WaterHeater:Stratified = 'STRATIFIED CHILLEDWATERTANK':  Temperature of tank < 2C indicates of possibility of freeze. Tank Temperature = 1.75 C.",
+      "   **   ~~~   **  Environment=, at Simulation time= 00:-1 - 00:00"
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
 }
