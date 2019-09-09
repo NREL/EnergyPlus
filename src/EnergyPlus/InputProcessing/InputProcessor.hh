@@ -276,4 +276,6 @@ private:
 extern std::unique_ptr<InputProcessor> inputProcessor;
 } // namespace EnergyPlus
 
+// This is a test for branch commit.
+
 #endif
