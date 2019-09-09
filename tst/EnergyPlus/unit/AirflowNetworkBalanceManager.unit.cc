@@ -52,9 +52,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <AirflowNetworkBalanceManager.hh>
-#include <AirflowNetwork/Solver.hpp>
 #include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Solver.hpp>
+#include <AirflowNetworkBalanceManager.hh>
 #include <DataSurfaces.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
@@ -2333,8 +2333,6 @@ TEST_F(EnergyPlusFixture, TestAFNPressureStat)
     EXPECT_NEAR(0.0, AirflowNetwork::AirflowNetworkLinkReport(20).FLOW, 0.0001);
     EXPECT_NEAR(0.0, AirflowNetwork::AirflowNetworkLinkReport(50).FLOW, 0.0001);
 
-    AirflowNetwork::AirflowNetworkExchangeData.deallocate();
-
     // Start a test for #6005
     AirflowNetwork::ANZT = 26.0;
     AirflowNetwork::MultizoneSurfaceData(2).HybridVentClose = true;
@@ -2348,7 +2346,37 @@ TEST_F(EnergyPlusFixture, TestAFNPressureStat)
     EXPECT_EQ(0.0, SurfaceWindow(5).VentingOpenFactorMultRep);
     EXPECT_EQ(0.0, SurfaceWindow(14).VentingOpenFactorMultRep);
 
-    Node.deallocate();
+    // Test for #7162
+    DataHeatBalFanSys::ZoneAirHumRat.allocate(4);
+    DataHeatBalFanSys::MAT.allocate(4);
+    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(NumOfZones);
+
+    DataHeatBalFanSys::MAT(1) = 23.0;
+    DataHeatBalFanSys::MAT(2) = 23.0;
+    DataHeatBalFanSys::MAT(3) = 23.0;
+    DataHeatBalFanSys::MAT(4) = 5.0;
+    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.0007;
+    DataHeatBalFanSys::ZoneAirHumRat(2) = 0.0011;
+    DataHeatBalFanSys::ZoneAirHumRat(3) = 0.0012;
+    DataHeatBalFanSys::ZoneAirHumRat(4) = 0.0008;
+    DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
+    DataZoneEquipment::ZoneEquipConfig.allocate(4);
+    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = false;
+    DataZoneEquipment::ZoneEquipConfig(2).IsControlled = false;
+    DataZoneEquipment::ZoneEquipConfig(3).IsControlled = false;
+    DataZoneEquipment::ZoneEquipConfig(4).IsControlled = false;
+    DataHVACGlobals::TimeStepSys = 0.1;
+
+    AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 = 0.1;
+    AirflowNetwork::AirflowNetworkLinkSimu(10).FLOW2 = 0.15;
+    AirflowNetwork::AirflowNetworkLinkSimu(13).FLOW2 = 0.1;
+
+    ReportAirflowNetwork();
+
+    EXPECT_NEAR(34.3673036, AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatGainW, 0.0001);
+    EXPECT_NEAR(36.7133377, AirflowNetwork::AirflowNetworkReportData(2).MultiZoneMixLatGainW, 0.0001);
+    EXPECT_NEAR(89.3450925, AirflowNetwork::AirflowNetworkReportData(3).MultiZoneInfiLatLossW, 0.0001);
+
 }
 TEST_F(EnergyPlusFixture, TestZoneVentingSchWithAdaptiveCtrl)
 {

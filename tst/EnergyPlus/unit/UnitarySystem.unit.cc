@@ -2165,6 +2165,11 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                   // expect no errors
 
+    // Verify UnitarySystem air flow rates are read in as AutoSized
+    EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, DataSizing::AutoSize);
+    EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, DataSizing::AutoSize);
+    EXPECT_EQ(thisSys->m_MaxNoCoolHeatAirVolFlow, DataSizing::AutoSize);
+
     OutputReportPredefined::SetPredefinedTables();
 
     // UnitarySystem used as zone equipment will not be modeled when FirstHAVCIteration is true, first time FirstHVACIteration = false will disable
@@ -2491,6 +2496,11 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
     thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                   // expect no errors
 
+    // Verify UnitarySystem air flow rates are read in as input
+    EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, 1.6);
+    EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, 1.6);
+    EXPECT_EQ(thisSys->m_MaxNoCoolHeatAirVolFlow, 0.8);
+
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "WATER COOLING COIL";
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_CoilWaterCooling;
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 10;
@@ -2575,15 +2585,15 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
 
     // check that CW coil air outlet node is at set point
     // TODO: FIXME: following is failing for some reason even after correcting nodes.
-    // EXPECT_NEAR( Node( coolingCoilAirOutletNodeIndex ).Temp, Node( coolingCoilAirOutletNodeIndex ).TempSetPoint, 0.001 );
+    EXPECT_NEAR(DataLoopNode::Node(coolingCoilAirOutletNodeIndex).Temp, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).TempSetPoint, 0.01);
     // CW air inlet node temp is greater than CW air outlet node temp
     // TODO: FIXME: following is failing for some reason even after correcting nodes.
-    // EXPECT_GT( Node( coolingCoilAirInletNodeIndex ).Temp, Node( coolingCoilAirOutletNodeIndex ).Temp );
+    EXPECT_GT(DataLoopNode::Node(coolingCoilAirInletNodeIndex).Temp, DataLoopNode::Node(coolingCoilAirOutletNodeIndex).Temp);
     // CW water inlet node flow is greater than 0
     // TODO: FIXME: following is failing for some reason even after correcting nodes.
     // EXPECT_GT( Node( coolingCoilWaterInletNodeIndex ).MassFlowRate, 0.0 );
     // CW water node flow is the same at inlet and outlet
-    EXPECT_EQ(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(11).MassFlowRate);
+    EXPECT_NEAR(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(11).MassFlowRate, 0.0001);
     // CW water outlet node temp is greater than CW inlet node temp
     // TODO: FIXME: following is failing for some reason even after correcting nodes.
     // EXPECT_GT( Node( 11 ).Temp, Node( coolingCoilWaterInletNodeIndex ).Temp );
@@ -2616,6 +2626,30 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
     EXPECT_GT(DataLoopNode::Node(heatingCoilAirOutletNodeIndex).Temp, DataLoopNode::Node(heatingCoilAirOutletNodeIndex).TempSetPoint);
     // expect supp heating coil outlet air temp to be greater than supp heating coil outlet air temp set point
     EXPECT_GT(DataLoopNode::Node(suppHeatingAirOutletNodeIndex).Temp, DataLoopNode::Node(suppHeatingAirOutletNodeIndex).TempSetPoint);
+
+    // verify dehumidify set points are not set
+    EXPECT_LT(DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRatMax, 0.0);
+    EXPECT_LT(DataLoopNode::Node(thisSys->AirOutNode).HumRatMax, 0.0);
+    EXPECT_GT(DataLoopNode::Node(thisSys->AirOutNode).HumRat, 0.009); // and air outlet HumRat > 0.009 without dehumidification control
+    EXPECT_LT(thisSys->m_CoolingPartLoadFrac, 1.0);
+    Real64 sensOnlyPartLoadFrac = thisSys->m_CoolingPartLoadFrac;
+    Real64 sensOnlyOutletAirHumRat = DataLoopNode::Node(thisSys->AirOutNode).HumRat;
+
+    // now test that the coil outlet node HumRatMax set point works for the cooling coil
+    thisSys->m_DehumidControlType_Num = UnitarySys::DehumCtrlType::CoolReheat;
+    thisSys->m_RunOnLatentLoad = true;
+    DataLoopNode::Node(thisSys->AirOutNode).HumRatMax = 0.008;
+    // COOLING mode
+    thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
+
+    // why doesn't water cooling coil decrease outlet air hum rat when PLR is increased?
+    EXPECT_GT(thisSys->m_CoolingPartLoadFrac, sensOnlyPartLoadFrac);
+    EXPECT_LE(DataLoopNode::Node(thisSys->AirOutNode).HumRat, sensOnlyOutletAirHumRat);
+
+    // reset system to original values
+    thisSys->m_DehumidControlType_Num = UnitarySys::DehumCtrlType::None;
+    thisSys->m_RunOnLatentLoad = false;
+    DataLoopNode::Node(thisSys->AirOutNode).HumRatMax = DataLoopNode::SensedNodeFlagValue;
 
     // HEATING mode
     // Unitary system AIR inlet node = 1
@@ -2924,6 +2958,16 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
     EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate, DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMax);
     EXPECT_LT(DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRate,
               DataLoopNode::Node(coolingCoilWaterInletNodeIndex).MassFlowRateMaxAvail);
+
+    // Case 4 - COOLING mode - dehumidification set point at air outlet instead of coil outlet
+    DataLoopNode::Node(coolingCoilAirOutletNodeIndex).HumRatMax = DataLoopNode::SensedNodeFlagValue;
+    DataLoopNode::Node(thisSys->AirOutNode).HumRatMax = 0.009;
+    Real64 partLoadRatio = thisSys->m_CoolingPartLoadFrac;
+
+    thisSys->simulate(thisSys->Name, FirstHVACIteration, AirLoopNum, CompIndex, HeatActive, CoolActive, ZoneOAUnitNum, OAUCoilOutTemp, ZoneEquipment);
+    // should get same answer as before
+    EXPECT_NEAR(thisSys->m_CoolingPartLoadFrac, partLoadRatio, 0.0000001);
+
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
