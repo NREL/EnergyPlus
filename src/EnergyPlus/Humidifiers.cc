@@ -1439,6 +1439,67 @@ namespace Humidifiers {
         AuxElecUseEnergy = AuxElecUseRate * TimeStepSys * SecInHour;
     }
 
+    int GetAirInletNodeNum(std::string const &HumidifierName,
+        bool &ErrorsFound
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given humidifier and returns the air inlet node number.
+        // If incorrect humidifier name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+                     // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichHumidifier;
+
+        // Obtains and Allocates heat exchanger related parameters from input file
+        if (GetInputFlag) {
+            GetHumidifierInput();
+            GetInputFlag = false;
+        }
+
+        WhichHumidifier = UtilityRoutines::FindItemInList(HumidifierName, Humidifier);
+        if (WhichHumidifier != 0) {
+            NodeNum = Humidifier(WhichHumidifier).AirInNode;
+        } else {
+            ShowSevereError("GetAirInletNodeNum: Could not find Humidifier = \"" + HumidifierName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
+    }
+
+    int GetAirOutletNodeNum(std::string const &HumidifierName,
+        bool &ErrorsFound
+    )
+    {
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given humidifier and returns the air outlet node number.
+        // If incorrect humidifier name is given, ErrorsFound is returned as true and node number as zero.
+
+        if (GetInputFlag) {
+            GetHumidifierInput();
+            GetInputFlag = false;
+        }
+
+        int WhichHumidifier = UtilityRoutines::FindItemInList(HumidifierName, Humidifier);
+        if (WhichHumidifier != 0) {
+            return Humidifier(WhichHumidifier).AirOutNode;
+        } else {
+            ShowSevereError("GetAirInletNodeNum: Could not find Humidifier = \"" + HumidifierName + "\"");
+            ErrorsFound = true;
+            return 0;
+        }
+    }
+
 } // namespace Humidifiers
 
 } // namespace EnergyPlus

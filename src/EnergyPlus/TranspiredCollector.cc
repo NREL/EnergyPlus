@@ -1557,6 +1557,81 @@ namespace TranspiredCollector {
         TsColl = UTSC(UTSCNum).Tcoll;
     }
 
+    int GetAirInletNodeNum(std::string const &UTSCName,
+        bool &ErrorsFound
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given UTSC and returns the air inlet node number.
+        // If incorrect UTSC name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichUTSC;
+
+        if (GetInputFlag) {
+            GetTranspiredCollectorInput();
+            GetInputFlag = false;
+        }
+
+        WhichUTSC = UtilityRoutines::FindItemInList(UTSCName, UTSC);
+        if (WhichUTSC != 0) {
+            NodeNum = UTSC(WhichUTSC).InletNode(1);
+        } else {
+            ShowSevereError("GetAirInletNodeNum: Could not find TranspiredCollector = \"" + UTSCName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
+    }
+
+    int GetAirOutletNodeNum(std::string const &UTSCName,
+        bool &ErrorsFound
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given UTSC and returns the air outlet node number.
+        // If incorrect UTSC name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+                     // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichUTSC;
+
+        if (GetInputFlag) {
+            GetTranspiredCollectorInput();
+            GetInputFlag = false;
+        }
+
+        WhichUTSC = UtilityRoutines::FindItemInList(UTSCName, UTSC);
+        if (WhichUTSC != 0) {
+            NodeNum = UTSC(WhichUTSC).OutletNode(1);
+        }
+        else {
+            ShowSevereError("GetAirOutletNodeNum: Could not find TranspiredCollector = \"" + UTSCName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
+    }
+
 } // namespace TranspiredCollector
 
 } // namespace EnergyPlus

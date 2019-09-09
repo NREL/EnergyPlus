@@ -208,6 +208,8 @@ namespace HeatBalanceManager {
     void CheckWarmupConvergence();
 
     void ReportWarmupConvergence();
+    
+    void UpdateWindowFaceTempsNonBSDFWin();
 
     //        End of Record Keeping subroutines for the HB Module
     // *****************************************************************************
@@ -234,6 +236,10 @@ namespace HeatBalanceManager {
 
     void CreateFCfactorConstructions(int &ConstrNum,   // Counter for Constructions
                                      bool &ErrorsFound // If errors found in input
+    );
+
+    void CreateAirBoundaryConstructions(int &ConstrNum,   // Counter for Constructions
+        bool &ErrorsFound // If errors found in input
     );
 
     void GetScheduledSurfaceGains(bool &ErrorsFound); // If errors found in input

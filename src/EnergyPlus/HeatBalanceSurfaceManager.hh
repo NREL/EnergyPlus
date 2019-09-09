@@ -112,7 +112,7 @@ namespace HeatBalanceSurfaceManager {
 
     void ComputeIntSWAbsorpFactors();
 
-    void ComputeDifSolExcZonesWIZWindows(int const NumberOfZones); // Number of zones
+    void ComputeDifSolExcZonesWIZWindows(int const NumberOfEnclosures); // Number of solar enclosures
 
     void InitEMSControlledSurfaceProperties();
 
@@ -140,6 +140,8 @@ namespace HeatBalanceSurfaceManager {
     // *****************************************************************************
 
     void ReportSurfaceHeatBalance();
+    
+    void ReportIntMovInsInsideSurfTemp();
 
     // End of Reporting subroutines for the HB Module
     // *****************************************************************************

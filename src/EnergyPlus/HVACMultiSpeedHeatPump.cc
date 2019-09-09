@@ -53,12 +53,12 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <AirflowNetwork/Elements.hpp>
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DXCoils.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
-#include <AirflowNetwork/Elements.hpp>
 #include <DataBranchNodeConnections.hh>
 #include <DataEnvironment.hh>
 #include <DataHVACGlobals.hh>
@@ -847,6 +847,11 @@ namespace HVACMultiSpeedHeatPump {
                     ErrorsFound = true;
                     LocalError = false;
                 }
+                MSHeatPump(MSHPNum).MinOATCompressorHeating = DXCoils::GetMinOATCompressorUsingIndex(MSHeatPump(MSHPNum).DXHeatCoilIndex, LocalError);
+                if ( LocalError ) {
+                    ShowContinueError("...for heating coil. Occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
+                    LocalError = false;
+                }
                 SetUpCompSets(CurrentModuleObject,
                               MSHeatPump(MSHPNum).Name,
                               "Coil:Heating:DX:MultiSpeed",
@@ -1034,13 +1039,12 @@ namespace HVACMultiSpeedHeatPump {
                 ErrorsFound = true;
             }
 
-            MSHeatPump(MSHPNum).MinOATCompressor = Numbers(1);
+            //MSHeatPump(MSHPNum).MinOATCompressor = Numbers(1); // deprecated, now uses coil MinOAT inputs
 
             if (UtilityRoutines::SameString(Alphas(12), "Coil:Cooling:DX:MultiSpeed")) {
                 MSHeatPump(MSHPNum).CoolCoilType = MultiSpeedCoolingCoil;
-                MSHeatPump(MSHPNum).CoolCoilNum = inputProcessor->getObjectItemNum("Coil:Cooling:DX:MultiSpeed", Alphas(13));
                 MSHeatPump(MSHPNum).DXCoolCoilName = Alphas(13);
-                if (MSHeatPump(MSHPNum).CoolCoilNum <= 0) {
+                if (inputProcessor->getObjectItemNum("Coil:Cooling:DX:MultiSpeed", Alphas(13)) <= 0) {
                     ShowSevereError("Configuration error in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ShowContinueError(cAlphaFields(13) + " \"" + Alphas(13) + "\" not found.");
                     ShowContinueError(cAlphaFields(12) + " must be Coil:Cooling:DX:MultiSpeed ");
@@ -1068,6 +1072,11 @@ namespace HVACMultiSpeedHeatPump {
                     ShowSevereError("The outlet node number of " + cAlphaFields(13) + " is not found \"" + Alphas(13) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ErrorsFound = true;
+                    LocalError = false;
+                }
+                MSHeatPump(MSHPNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(MSHeatPump(MSHPNum).DXCoolCoilIndex, LocalError);
+                if (LocalError) {
+                    ShowContinueError("...for cooling coil. Occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     LocalError = false;
                 }
             } else {
@@ -1422,6 +1431,11 @@ namespace HVACMultiSpeedHeatPump {
                 }
             }
 
+            if (DataGlobals::DoCoilDirectSolutions) {
+                int MaxNumber = std::max(MSHeatPump(MSHPNum).NumOfSpeedCooling, MSHeatPump(MSHPNum).NumOfSpeedHeating);
+                MSHeatPump(MSHPNum).FullOutput.allocate(MaxNumber);
+                DXCoils::DisableLatentDegradation(MSHeatPump(MSHPNum).DXCoolCoilIndex);
+            }
             // Generate a dynamic array for cooling
             if (MSHeatPump(MSHPNum).NumOfSpeedCooling > 0) {
                 MSHeatPump(MSHPNum).CoolMassFlowRate.allocate(MSHeatPump(MSHPNum).NumOfSpeedCooling);
@@ -2944,114 +2958,124 @@ namespace HVACMultiSpeedHeatPump {
             ErrorToler = 0.001; // Error tolerance for convergence from input deck
         }
 
-        // Calculate the part load fraction
-        if (((QZnReq > SmallLoad && QZnReq < FullOutput) || (QZnReq < (-1.0 * SmallLoad) && QZnReq > FullOutput)) &&
-            (!MSHeatPump(MSHeatPumpNum).Staged)) {
+        // Direct solution
+        if (DataGlobals::DoCoilDirectSolutions && !MSHeatPump(MSHeatPumpNum).Staged) {
+            Real64 TempOutput0 = 0.0;
+            MSHeatPump(MSHeatPumpNum).FullOutput = 0.0;
 
-            Par(1) = MSHeatPumpNum;
-            Par(2) = ZoneNum;
-            if (FirstHVACIteration) {
-                Par(3) = 1.0;
-            } else {
-                Par(3) = 0.0;
+            // heating
+            if (QZnReq > SmallLoad && QZnReq < FullOutput) {
+                CalcMSHeatPump(MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, 0.0, TempOutput0, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
+
+                for (int i = 1; i <= MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating; ++i) {
+                    if (i == 1) {
+                        CalcMSHeatPump(MSHeatPumpNum,
+                                       FirstHVACIteration,
+                                       CompOp,
+                                       i,
+                                       0.0,
+                                       1.0,
+                                       MSHeatPump(MSHeatPumpNum).FullOutput(i),
+                                       QZnReq,
+                                       OnOffAirFlowRatio,
+                                       SupHeaterLoad);
+                        if (QZnReq <= MSHeatPump(MSHeatPumpNum).FullOutput(i)) {
+                            SpeedNum = i;
+                            PartLoadFrac = (QZnReq - TempOutput0) / (MSHeatPump(MSHeatPumpNum).FullOutput(i) - TempOutput0);
+                            CalcMSHeatPump(MSHeatPumpNum,
+                                           FirstHVACIteration,
+                                           CompOp,
+                                           i,
+                                           0.0,
+                                           PartLoadFrac,
+                                           TempOutput,
+                                           QZnReq,
+                                           OnOffAirFlowRatio,
+                                           SupHeaterLoad);
+                            break;
+                        }
+                    } else {
+                        CalcMSHeatPump(MSHeatPumpNum,
+                                       FirstHVACIteration,
+                                       CompOp,
+                                       i,
+                                       1.0,
+                                       1.0,
+                                       MSHeatPump(MSHeatPumpNum).FullOutput(i),
+                                       QZnReq,
+                                       OnOffAirFlowRatio,
+                                       SupHeaterLoad);
+                        if (QZnReq <= MSHeatPump(MSHeatPumpNum).FullOutput(i)) {
+                            SpeedNum = i;
+                            PartLoadFrac = 1.0;
+                            SpeedRatio = (QZnReq - MSHeatPump(MSHeatPumpNum).FullOutput(i - 1)) /
+                                         (MSHeatPump(MSHeatPumpNum).FullOutput(i) - MSHeatPump(MSHeatPumpNum).FullOutput(i - 1));
+                            CalcMSHeatPump(
+                                MSHeatPumpNum, FirstHVACIteration, CompOp, i, SpeedRatio, 1.0, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
+                            break;
+                        }
+                    }
+                }
             }
-            Par(4) = OpMode;
-            Par(5) = QZnReq;
-            Par(6) = OnOffAirFlowRatio;
-            Par(7) = SupHeaterLoad;
-            Par(9) = CompOp;
-            // Check whether the low speed coil can meet the load or not
-            CalcMSHeatPump(MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, 1.0, LowOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
-            if ((QZnReq > 0.0 && QZnReq <= LowOutput) || (QZnReq < 0.0 && QZnReq >= LowOutput)) {
-                SpeedRatio = 0.0;
-                SpeedNum = 1;
-                SolveRoot(ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par);
-                if (SolFla == -1) {
-                    if (!WarmupFlag) {
-                        if (ErrCountCyc == 0) {
-                            ++ErrCountCyc;
-                            ShowWarningError("Iteration limit exceeded calculating DX unit cycling ratio, for unit=" +
-                                             MSHeatPump(MSHeatPumpNum).Name);
-                            ShowContinueErrorTimeStamp("Cycling ratio returned=" + RoundSigDigits(PartLoadFrac, 2));
-                        } else {
-                            ++ErrCountCyc;
-                            ShowRecurringWarningErrorAtEnd(
-                                MSHeatPump(MSHeatPumpNum).Name +
-                                    "\": Iteration limit warning exceeding calculating DX unit cycling ratio  continues...",
-                                MSHeatPump(MSHeatPumpNum).ErrIndexCyc,
-                                PartLoadFrac,
-                                PartLoadFrac);
-                        }
-                    }
-                } else if (SolFla == -2) {
-                    ShowFatalError("DX unit cycling ratio calculation failed: cycling limits exceeded, for unit=" +
-                                   MSHeatPump(MSHeatPumpNum).DXCoolCoilName);
-                }
-            } else {
-                // Check to see which speed to meet the load
-                PartLoadFrac = 1.0;
-                SpeedRatio = 1.0;
-                if (QZnReq < (-1.0 * SmallLoad)) { // Cooling
-                    for (i = 2; i <= MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling; ++i) {
+
+            // Coolling
+            if (QZnReq < (-1.0 * SmallLoad) && QZnReq > FullOutput) {
+                CalcMSHeatPump(MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, 0.0, TempOutput0, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
+                for (int i = 1; i <= MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling; ++i) {
+                    if (i == 1) {
                         CalcMSHeatPump(MSHeatPumpNum,
                                        FirstHVACIteration,
                                        CompOp,
                                        i,
-                                       SpeedRatio,
-                                       PartLoadFrac,
-                                       TempOutput,
+                                       0.0,
+                                       1.0,
+                                       MSHeatPump(MSHeatPumpNum).FullOutput(i),
                                        QZnReq,
                                        OnOffAirFlowRatio,
                                        SupHeaterLoad);
-                        if (QZnReq >= TempOutput) {
+                        if (QZnReq >= MSHeatPump(MSHeatPumpNum).FullOutput(i)) {
                             SpeedNum = i;
+                            PartLoadFrac = (QZnReq - TempOutput0) / (MSHeatPump(MSHeatPumpNum).FullOutput(i) - TempOutput0);
+                            CalcMSHeatPump(MSHeatPumpNum,
+                                           FirstHVACIteration,
+                                           CompOp,
+                                           i,
+                                           0.0,
+                                           PartLoadFrac,
+                                           TempOutput,
+                                           QZnReq,
+                                           OnOffAirFlowRatio,
+                                           SupHeaterLoad);
                             break;
                         }
-                    }
-                } else {
-                    for (i = 2; i <= MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating; ++i) {
+                    } else {
                         CalcMSHeatPump(MSHeatPumpNum,
                                        FirstHVACIteration,
                                        CompOp,
                                        i,
-                                       SpeedRatio,
-                                       PartLoadFrac,
-                                       TempOutput,
+                                       1.0,
+                                       1.0,
+                                       MSHeatPump(MSHeatPumpNum).FullOutput(i),
                                        QZnReq,
                                        OnOffAirFlowRatio,
                                        SupHeaterLoad);
-                        if (QZnReq <= TempOutput) {
+                        if (QZnReq >= MSHeatPump(MSHeatPumpNum).FullOutput(i)) {
                             SpeedNum = i;
+                            PartLoadFrac = 1.0;
+                            SpeedRatio = (QZnReq - MSHeatPump(MSHeatPumpNum).FullOutput(i - 1)) /
+                                         (MSHeatPump(MSHeatPumpNum).FullOutput(i) - MSHeatPump(MSHeatPumpNum).FullOutput(i - 1));
+                            CalcMSHeatPump(
+                                MSHeatPumpNum, FirstHVACIteration, CompOp, i, SpeedRatio, 1.0, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
                             break;
                         }
                     }
-                }
-                Par(8) = SpeedNum;
-                SolveRoot(ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par);
-                if (SolFla == -1) {
-                    if (!WarmupFlag) {
-                        if (ErrCountVar == 0) {
-                            ++ErrCountVar;
-                            ShowWarningError("Iteration limit exceeded calculating DX unit speed ratio, for unit=" + MSHeatPump(MSHeatPumpNum).Name);
-                            ShowContinueErrorTimeStamp("Speed ratio returned=[" + RoundSigDigits(SpeedRatio, 2) +
-                                                       "], Speed number =" + RoundSigDigits(SpeedNum));
-                        } else {
-                            ++ErrCountVar;
-                            ShowRecurringWarningErrorAtEnd(MSHeatPump(MSHeatPumpNum).Name +
-                                                               "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...",
-                                                           MSHeatPump(MSHeatPumpNum).ErrIndexVar,
-                                                           SpeedRatio,
-                                                           SpeedRatio);
-                        }
-                    }
-                } else if (SolFla == -2) {
-                    ShowFatalError("DX unit compressor speed calculation failed: speed limits exceeded, for unit=" +
-                                   MSHeatPump(MSHeatPumpNum).DXCoolCoilName);
                 }
             }
         } else {
-            // Staged thermostat performance
-            if (MSHeatPump(MSHeatPumpNum).StageNum != 0) {
+            // Calculate the part load fraction
+            if (((QZnReq > SmallLoad && QZnReq < FullOutput) || (QZnReq < (-1.0 * SmallLoad) && QZnReq > FullOutput)) &&
+                (!MSHeatPump(MSHeatPumpNum).Staged)) {
+
                 Par(1) = MSHeatPumpNum;
                 Par(2) = ZoneNum;
                 if (FirstHVACIteration) {
@@ -3064,79 +3088,186 @@ namespace HVACMultiSpeedHeatPump {
                 Par(6) = OnOffAirFlowRatio;
                 Par(7) = SupHeaterLoad;
                 Par(9) = CompOp;
-                SpeedNum = std::abs(MSHeatPump(MSHeatPumpNum).StageNum);
-                Par(8) = SpeedNum;
-                if (SpeedNum == 1) {
-                    CalcMSHeatPump(MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, 1.0, LowOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
+                // Check whether the low speed coil can meet the load or not
+                CalcMSHeatPump(MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, 1.0, LowOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
+                if ((QZnReq > 0.0 && QZnReq <= LowOutput) || (QZnReq < 0.0 && QZnReq >= LowOutput)) {
                     SpeedRatio = 0.0;
-                    if ((QZnReq > 0.0 && QZnReq <= LowOutput) || (QZnReq < 0.0 && QZnReq >= LowOutput)) {
-                        SolveRoot(ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par);
-                        if (SolFla == -1) {
-                            if (!WarmupFlag) {
-                                if (ErrCountCyc == 0) {
-                                    ++ErrCountCyc;
-                                    ShowWarningError("Iteration limit exceeded calculating DX unit cycling ratio, for unit=" +
-                                                     MSHeatPump(MSHeatPumpNum).Name);
-                                    ShowContinueErrorTimeStamp("Cycling ratio returned=" + RoundSigDigits(PartLoadFrac, 2));
-                                } else {
-                                    ++ErrCountCyc;
-                                    ShowRecurringWarningErrorAtEnd(
-                                        MSHeatPump(MSHeatPumpNum).Name +
-                                            "\": Iteration limit warning exceeding calculating DX unit cycling ratio  continues...",
-                                        MSHeatPump(MSHeatPumpNum).ErrIndexCyc,
-                                        PartLoadFrac,
-                                        PartLoadFrac);
-                                }
+                    SpeedNum = 1;
+                    SolveRoot(ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par);
+                    if (SolFla == -1) {
+                        if (!WarmupFlag) {
+                            if (ErrCountCyc == 0) {
+                                ++ErrCountCyc;
+                                ShowWarningError("Iteration limit exceeded calculating DX unit cycling ratio, for unit=" +
+                                                 MSHeatPump(MSHeatPumpNum).Name);
+                                ShowContinueErrorTimeStamp("Cycling ratio returned=" + RoundSigDigits(PartLoadFrac, 2));
+                            } else {
+                                ++ErrCountCyc;
+                                ShowRecurringWarningErrorAtEnd(
+                                    MSHeatPump(MSHeatPumpNum).Name +
+                                        "\": Iteration limit warning exceeding calculating DX unit cycling ratio  continues...",
+                                    MSHeatPump(MSHeatPumpNum).ErrIndexCyc,
+                                    PartLoadFrac,
+                                    PartLoadFrac);
                             }
-                        } else if (SolFla == -2) {
-                            ShowFatalError("DX unit cycling ratio calculation failed: cycling limits exceeded, for unit=" +
-                                           MSHeatPump(MSHeatPumpNum).DXCoolCoilName);
                         }
-                    } else {
-                        FullOutput = LowOutput;
-                        PartLoadFrac = 1.0;
+                    } else if (SolFla == -2) {
+                        ShowFatalError("DX unit cycling ratio calculation failed: cycling limits exceeded, for unit=" +
+                                       MSHeatPump(MSHeatPumpNum).DXCoolCoilName);
                     }
                 } else {
-                    if (MSHeatPump(MSHeatPumpNum).StageNum < 0) {
-                        SpeedNum = min(MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling, std::abs(MSHeatPump(MSHeatPumpNum).StageNum));
+                    // Check to see which speed to meet the load
+                    PartLoadFrac = 1.0;
+                    SpeedRatio = 1.0;
+                    if (QZnReq < (-1.0 * SmallLoad)) { // Cooling
+                        for (i = 2; i <= MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling; ++i) {
+                            CalcMSHeatPump(MSHeatPumpNum,
+                                           FirstHVACIteration,
+                                           CompOp,
+                                           i,
+                                           SpeedRatio,
+                                           PartLoadFrac,
+                                           TempOutput,
+                                           QZnReq,
+                                           OnOffAirFlowRatio,
+                                           SupHeaterLoad);
+                            if (QZnReq >= TempOutput) {
+                                SpeedNum = i;
+                                break;
+                            }
+                        }
                     } else {
-                        SpeedNum = min(MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating, std::abs(MSHeatPump(MSHeatPumpNum).StageNum));
+                        for (i = 2; i <= MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating; ++i) {
+                            CalcMSHeatPump(MSHeatPumpNum,
+                                           FirstHVACIteration,
+                                           CompOp,
+                                           i,
+                                           SpeedRatio,
+                                           PartLoadFrac,
+                                           TempOutput,
+                                           QZnReq,
+                                           OnOffAirFlowRatio,
+                                           SupHeaterLoad);
+                            if (QZnReq <= TempOutput) {
+                                SpeedNum = i;
+                                break;
+                            }
+                        }
                     }
-                    CalcMSHeatPump(
-                        MSHeatPumpNum, FirstHVACIteration, CompOp, SpeedNum, 0.0, 1.0, LowOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
-                    if ((QZnReq > 0.0 && QZnReq >= LowOutput) || (QZnReq < 0.0 && QZnReq <= LowOutput)) {
-                        CalcMSHeatPump(
-                            MSHeatPumpNum, FirstHVACIteration, CompOp, SpeedNum, 1.0, 1.0, FullOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
-                        if ((QZnReq > 0.0 && QZnReq <= FullOutput) || (QZnReq < 0.0 && QZnReq >= FullOutput)) {
-                            Par(8) = SpeedNum;
-                            SolveRoot(ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par);
+                    Par(8) = SpeedNum;
+                    SolveRoot(ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par);
+                    if (SolFla == -1) {
+                        if (!WarmupFlag) {
+                            if (ErrCountVar == 0) {
+                                ++ErrCountVar;
+                                ShowWarningError("Iteration limit exceeded calculating DX unit speed ratio, for unit=" +
+                                                 MSHeatPump(MSHeatPumpNum).Name);
+                                ShowContinueErrorTimeStamp("Speed ratio returned=[" + RoundSigDigits(SpeedRatio, 2) +
+                                                           "], Speed number =" + RoundSigDigits(SpeedNum));
+                            } else {
+                                ++ErrCountVar;
+                                ShowRecurringWarningErrorAtEnd(
+                                    MSHeatPump(MSHeatPumpNum).Name +
+                                        "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...",
+                                    MSHeatPump(MSHeatPumpNum).ErrIndexVar,
+                                    SpeedRatio,
+                                    SpeedRatio);
+                            }
+                        }
+                    } else if (SolFla == -2) {
+                        ShowFatalError("DX unit compressor speed calculation failed: speed limits exceeded, for unit=" +
+                                       MSHeatPump(MSHeatPumpNum).DXCoolCoilName);
+                    }
+                }
+            } else {
+                // Staged thermostat performance
+                if (MSHeatPump(MSHeatPumpNum).StageNum != 0) {
+                    Par(1) = MSHeatPumpNum;
+                    Par(2) = ZoneNum;
+                    if (FirstHVACIteration) {
+                        Par(3) = 1.0;
+                    } else {
+                        Par(3) = 0.0;
+                    }
+                    Par(4) = OpMode;
+                    Par(5) = QZnReq;
+                    Par(6) = OnOffAirFlowRatio;
+                    Par(7) = SupHeaterLoad;
+                    Par(9) = CompOp;
+                    SpeedNum = std::abs(MSHeatPump(MSHeatPumpNum).StageNum);
+                    Par(8) = SpeedNum;
+                    if (SpeedNum == 1) {
+                        CalcMSHeatPump(MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, 1.0, LowOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
+                        SpeedRatio = 0.0;
+                        if ((QZnReq > 0.0 && QZnReq <= LowOutput) || (QZnReq < 0.0 && QZnReq >= LowOutput)) {
+                            SolveRoot(ErrorToler, MaxIte, SolFla, PartLoadFrac, MSHPCyclingResidual, 0.0, 1.0, Par);
                             if (SolFla == -1) {
                                 if (!WarmupFlag) {
-                                    if (ErrCountVar == 0) {
-                                        ++ErrCountVar;
-                                        ShowWarningError("Iteration limit exceeded calculating DX unit speed ratio, for unit=" +
+                                    if (ErrCountCyc == 0) {
+                                        ++ErrCountCyc;
+                                        ShowWarningError("Iteration limit exceeded calculating DX unit cycling ratio, for unit=" +
                                                          MSHeatPump(MSHeatPumpNum).Name);
-                                        ShowContinueErrorTimeStamp("Speed ratio returned=[" + RoundSigDigits(SpeedRatio, 2) +
-                                                                   "], Speed number =" + RoundSigDigits(SpeedNum));
+                                        ShowContinueErrorTimeStamp("Cycling ratio returned=" + RoundSigDigits(PartLoadFrac, 2));
                                     } else {
-                                        ++ErrCountVar;
+                                        ++ErrCountCyc;
                                         ShowRecurringWarningErrorAtEnd(
                                             MSHeatPump(MSHeatPumpNum).Name +
-                                                "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...",
-                                            MSHeatPump(MSHeatPumpNum).ErrIndexVar,
-                                            SpeedRatio,
-                                            SpeedRatio);
+                                                "\": Iteration limit warning exceeding calculating DX unit cycling ratio  continues...",
+                                            MSHeatPump(MSHeatPumpNum).ErrIndexCyc,
+                                            PartLoadFrac,
+                                            PartLoadFrac);
                                     }
                                 }
                             } else if (SolFla == -2) {
-                                ShowFatalError("DX unit compressor speed calculation failed: speed limits exceeded, for unit=" +
+                                ShowFatalError("DX unit cycling ratio calculation failed: cycling limits exceeded, for unit=" +
                                                MSHeatPump(MSHeatPumpNum).DXCoolCoilName);
                             }
                         } else {
-                            SpeedRatio = 1.0;
+                            FullOutput = LowOutput;
+                            PartLoadFrac = 1.0;
                         }
-                    } else { // lowOutput provides a larger capacity than needed
-                        SpeedRatio = 0.0;
+                    } else {
+                        if (MSHeatPump(MSHeatPumpNum).StageNum < 0) {
+                            SpeedNum = min(MSHeatPump(MSHeatPumpNum).NumOfSpeedCooling, std::abs(MSHeatPump(MSHeatPumpNum).StageNum));
+                        } else {
+                            SpeedNum = min(MSHeatPump(MSHeatPumpNum).NumOfSpeedHeating, std::abs(MSHeatPump(MSHeatPumpNum).StageNum));
+                        }
+                        CalcMSHeatPump(
+                            MSHeatPumpNum, FirstHVACIteration, CompOp, SpeedNum, 0.0, 1.0, LowOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
+                        if ((QZnReq > 0.0 && QZnReq >= LowOutput) || (QZnReq < 0.0 && QZnReq <= LowOutput)) {
+                            CalcMSHeatPump(
+                                MSHeatPumpNum, FirstHVACIteration, CompOp, SpeedNum, 1.0, 1.0, FullOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad);
+                            if ((QZnReq > 0.0 && QZnReq <= FullOutput) || (QZnReq < 0.0 && QZnReq >= FullOutput)) {
+                                Par(8) = SpeedNum;
+                                SolveRoot(ErrorToler, MaxIte, SolFla, SpeedRatio, MSHPVarSpeedResidual, 0.0, 1.0, Par);
+                                if (SolFla == -1) {
+                                    if (!WarmupFlag) {
+                                        if (ErrCountVar == 0) {
+                                            ++ErrCountVar;
+                                            ShowWarningError("Iteration limit exceeded calculating DX unit speed ratio, for unit=" +
+                                                             MSHeatPump(MSHeatPumpNum).Name);
+                                            ShowContinueErrorTimeStamp("Speed ratio returned=[" + RoundSigDigits(SpeedRatio, 2) +
+                                                                       "], Speed number =" + RoundSigDigits(SpeedNum));
+                                        } else {
+                                            ++ErrCountVar;
+                                            ShowRecurringWarningErrorAtEnd(
+                                                MSHeatPump(MSHeatPumpNum).Name +
+                                                    "\": Iteration limit warning exceeding calculating DX unit speed ratio continues...",
+                                                MSHeatPump(MSHeatPumpNum).ErrIndexVar,
+                                                SpeedRatio,
+                                                SpeedRatio);
+                                        }
+                                    }
+                                } else if (SolFla == -2) {
+                                    ShowFatalError("DX unit compressor speed calculation failed: speed limits exceeded, for unit=" +
+                                                   MSHeatPump(MSHeatPumpNum).DXCoolCoilName);
+                                }
+                            } else {
+                                SpeedRatio = 1.0;
+                            }
+                        } else { // lowOutput provides a larger capacity than needed
+                            SpeedRatio = 0.0;
+                        }
                     }
                 }
             }
@@ -3282,7 +3413,7 @@ namespace HVACMultiSpeedHeatPump {
         if (MSHeatPump(MSHeatPumpNum).FanPlaceType == BlowThru) {
             SimulateFanComponents(MSHeatPump(MSHeatPumpNum).FanName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).FanNum, FanSpeedRatio);
             if (QZnReq < (-1.0 * SmallLoad)) {
-                if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressor) {
+                if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorCooling) {
                     SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
                                         SpeedRatio,
                                         PartLoadFrac,
@@ -3313,7 +3444,7 @@ namespace HVACMultiSpeedHeatPump {
             }
             if (MSHeatPump(MSHeatPumpNum).HeatCoilType == MultiSpeedHeatingCoil) {
                 if (QZnReq > SmallLoad) {
-                    if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressor) {
+                    if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorHeating) {
                         SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
                                             SpeedRatio,
                                             PartLoadFrac,
@@ -3365,7 +3496,7 @@ namespace HVACMultiSpeedHeatPump {
             // Call twice to ensure the fan outlet conditions are updated
             SimulateFanComponents(MSHeatPump(MSHeatPumpNum).FanName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).FanNum, FanSpeedRatio);
             if (QZnReq < (-1.0 * SmallLoad)) {
-                if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressor) {
+                if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorCooling) {
                     SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
                                         SpeedRatio,
                                         PartLoadFrac,
@@ -3396,7 +3527,7 @@ namespace HVACMultiSpeedHeatPump {
             }
             if (MSHeatPump(MSHeatPumpNum).HeatCoilType == MultiSpeedHeatingCoil) {
                 if (QZnReq > SmallLoad) {
-                    if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressor) {
+                    if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorHeating) {
                         SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
                                             SpeedRatio,
                                             PartLoadFrac,
@@ -3451,7 +3582,7 @@ namespace HVACMultiSpeedHeatPump {
             }
         } else { // otherwise simulate DX coils then fan then supplemental heater
             if (QZnReq < (-1.0 * SmallLoad)) {
-                if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressor) {
+                if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorCooling) {
                     SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXCoolCoilName,
                                         SpeedRatio,
                                         PartLoadFrac,
@@ -3482,7 +3613,7 @@ namespace HVACMultiSpeedHeatPump {
             }
             if (MSHeatPump(MSHeatPumpNum).HeatCoilType == MultiSpeedHeatingCoil) {
                 if (QZnReq > SmallLoad) {
-                    if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressor) {
+                    if (OutsideDryBulbTemp > MSHeatPump(MSHeatPumpNum).MinOATCompressorHeating) {
                         SimDXCoilMultiSpeed(MSHeatPump(MSHeatPumpNum).DXHeatCoilName,
                                             SpeedRatio,
                                             PartLoadFrac,

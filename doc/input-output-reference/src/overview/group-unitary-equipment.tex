@@ -1562,7 +1562,7 @@ This alpha field contains the identifying name given to the DX heating coil, and
 
 \paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation-000}
 
-This numeric field defines the outdoor air dry-bulb temperature below which the DX heating coil turns off.~ If this input field is left blank, the default value is -8 C. This temperature should match the minimum compressor operating temperature specified for the multispeed heat pump's DX heating coil. This field is only needed when Heating Coil Object Type above is \textbf{\hyperref[coilheatingdxmultispeed]{Coil:Heating:DX:MultiSpeed}}.
+\textbf{Deprecated field}. The Minimum Outdoor Dry-Bulb Temperature for Compressor Operation is now controlled by the \hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:MultiSpeed} and \hyperref[coilheatingdxmultispeed]{Coil:Heating:DX:MultiSpeed} (if used) coil objects.
 
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-4}
 
@@ -2829,7 +2829,7 @@ This output variable is the additional heating demand rate of the supplemental h
 
 \subsection{AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass}\label{airloophvacunitaryheatcoolvavchangeoverbypass}
 
-The changeover-bypass variable air volume (CBVAV) unitary system is a compound object made up of other components. Each CBVAV system consists of an outdoor air mixer, direct expansion (DX) cooling coil, heating coil, and a supply air fan as shown in the figures below. Zone thermostats and terminal units are required in each zone served by this system. The terminal units are specific to this system type and are either \hyperref[airterminalsingleductvavheatandcoolreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat} or \hyperref[airterminalsingleductvavheatandcoolnoreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat}. A zone humidistat and single zone max humidity set point manager may also be specified to help control high humidity levels. These individual components are described elsewhere in this document. The CBVAV unitary system object coordinates the operation of these components and is modeled as a type of air loop equipment (Ref. \hyperref[airloophvac]{AirLoopHVAC}).
+The changeover-bypass variable air volume (CBVAV) unitary system is a compound object made up of other components. Each CBVAV system consists of an outdoor air mixer, direct expansion (DX) cooling coil, heating coil, and a supply air fan as shown in the figures below. Zone thermostats and terminal units are required in each zone served by this system. The terminal units are specific to this system type and are either \hyperref[airterminalsingleductvavheatandcoolreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat} or \hyperref[airterminalsingleductvavheatandcoolnoreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat}. A zone humidistat and single zone max humidity set point manager may also be specified to help control high humidity levels. These individual components are described elsewhere in this document. The system may also be connected to an inlet node of either the \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer} or \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} to more accurately model the \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem}. The CBVAV unitary system object coordinates the operation of these components and is modeled as a type of air loop equipment (Ref. \hyperref[airloophvac]{AirLoopHVAC}).
 
 \begin{figure}[hbtp] % fig 123
 \centering
@@ -2841,6 +2841,12 @@ The changeover-bypass variable air volume (CBVAV) unitary system is a compound o
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image309.png}
 \caption{Schematic of a CBVAV unitary system (blow through fan placement) \protect \label{fig:schematic-of-a-cbvav-unitary-system-blow}}
+\end{figure}
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/ChangeoverBypassVAV-ReturnPlenumOrMixer.png}
+\caption{Schematic of a CBVAV unitary system used with outdoor air system \protect \label{fig:schematic-of-a-cbvav-unitary-system-used-with-outdoor-air-system}}
 \end{figure}
 
 Links to the CBVAV system's supply air fan, coils, and outdoor air mixer specifications are provided in the object's input syntax. Additional inputs include system and outdoor air flow rates during heating and cooling operation, the priority control mode, and dehumidification control type. A description of each input field for the CBVAV unitary system compound object is provided below.
@@ -2986,9 +2992,11 @@ This choice field defines the cooling or heating priority control mode for the u
   HeatingPriority
 \item
   ZonePriority
+\item
+  LoadPriority
 \end{itemize}
 
-If CoolingPriority is selected, the system operates to meet the cooling load if any zone served by this system (air loop) requires cooling. If no zones require cooling, then the system operates in heating mode if needed. If HeatingPriority is selected, the system operates to meet the heating load if any zone requires heating. If no zones require heating, then the system operates in cooling mode if needed. If ZonePriority is selected, the system operates based on the maximum number of zones requiring either heating or cooling. If the number of zones requiring cooling is greater than the number of zones requiring heating, then the system operates in cooling mode. If the number of zones requiring heating is greater than the number of zones requiring cooling, then the system operates in heating mode. If the number of zones requiring cooling equals the number of zones requiring heating, then the largest combined load (i.e., the sum of the cooling loads for zones requiring cooling compared to the sum of the heating loads for zones that require heating) sets the cooling or heating operating mode for the system during that simulation timestep.
+If CoolingPriority is selected, the system operates to meet the cooling load if any zone served by this system (air loop) requires cooling. If no zones require cooling, then the system operates in heating mode if needed. If HeatingPriority is selected, the system operates to meet the heating load if any zone requires heating. If no zones require heating, then the system operates in cooling mode if needed. If ZonePriority is selected, the system operates based on the maximum number of zones requiring either heating or cooling. If the number of zones requiring cooling is greater than the number of zones requiring heating, then the system operates in cooling mode. If the number of zones requiring heating is greater than the number of zones requiring cooling, then the system operates in heating mode. If the number of zones requiring cooling equals the number of zones requiring heating, then the largest combined load (i.e., the sum of the cooling loads for zones requiring cooling compared to the sum of the heating loads for zones that require heating) sets the cooling or heating operating mode for the system during that simulation timestep. If LoadPriority is selected, the system operates based on the largest combined load (i.e., the sum of the cooling loads for zones requiring cooling compared to the sum of the heating loads for zones that require heating). If the toal load for zones requiring cooling is greater than the toal load for zones requiring heating, then the system operates in cooling mode. Similar logic is used for heating mode selection. If the toal cooling load equals the toal heating load, then cooling or heating operation reverts to the total number of zones requiring cooling or heating (and if equal reverts to cooling mode if the cooling load is non-zero, otherwise, heating mode.
 
 \paragraph{Field: Minimum Outlet Air Temperature During Cooling Operation}\label{field-minimum-outlet-air-temperature-during-cooling-operation}
 
@@ -3021,6 +3029,15 @@ The default is \textbf{None}. For the other dehumidification control modes, the 
 
 objects. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate.
 
+\paragraph{Field: Plenum or Mixer Inlet Node Name}\label{field-bypass-duct-mixer-node-name}
+
+This alpha field defines the name of the HVAC system node where the bypass air enters the zone mixer or return plenum. This node name must be different from the system's \textbf{\hyperref[field-air-outlet-node-name-3-002]{Air Outlet Node Name}} and \textbf{\hyperref[field-bypass-duct-splitter-node-name]{Bypass Duct Splitter Node Name}}. This name should match the name of the inlet node in the \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer} or \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} associated with this system.
+
+\paragraph{Field: Minimum Runtime Before Operating Mode Change}\label{minimum-runtime-before-operating-mode-change}
+
+This numeric field defines the amount of time, in hours, the HVAC system operates before a mode change is allowed. The value entered must be greater than or equal to 0. The default value is 0.25 hours if this input is present and blank. If this field is not present the minimum runtime is 0 hours (i.e., immediate change over as needed).
+\medskip
+
 As shown in the example below, correct specification of the CBVAV unitary system requires specification of the following objects in addition to the AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass object:
 
 1)~~~outdoor air mixer (\hyperref[outdoorairmixer]{OutdoorAir:Mixer})
@@ -3033,7 +3050,9 @@ As shown in the example below, correct specification of the CBVAV unitary system
 
 5)~~~terminal unit for each zone being served by this system (\hyperref[airterminalsingleductvavheatandcoolreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat} or \hyperref[airterminalsingleductvavheatandcoolnoreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat})
 
-Note: The fan, heating coil, cooling coil, and outdoor air mixer must be connected in the air loop according to the configurations shown above (Figure~\ref{fig:schematic-of-a-cbvav-unitary-system-draw} and Figure~\ref{fig:schematic-of-a-cbvav-unitary-system-blow}).
+6)~~~When the Plenum or Mixer Inlet Node Name is specified, this node name must connect to either the \hyperref[airloophvaczonemixer]{AirLoopHVAC:ZoneMixer} or \hyperref[airloophvacreturnplenum]{AirLoopHVAC:ReturnPlenum} and the \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem} may then be used to control the outdoor air flow rates. When using the AirloopHVAC:OutdoorAirSystem it is recommended that the Cooling, Heating and No Load Outdoor Air Flow Rate inputs are set to 0, otherwise the amount of outdoor air is increased and the coils may not autosize properly.
+
+Note: The fan, heating coil, cooling coil, and outdoor air mixer must be connected in the air loop according to the configurations shown above (Figure~\ref{fig:schematic-of-a-cbvav-unitary-system-draw}, Figure~\ref{fig:schematic-of-a-cbvav-unitary-system-blow} or Figure~\ref{fig:schematic-of-a-cbvav-unitary-system-used-with-outdoor-air-system}).
 
 \begin{lstlisting}
 
@@ -3185,6 +3204,8 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
   HVAC,Average,Unitary System Bypass Air Mass Flow Rate {[}kg/s{]}
 \item
   HVAC,Average,Unitary System Air Outlet Setpoint Temperature {[}C{]}
+\item
+  HVAC,Average,Unitary System Operating Mode Index {[]}
 \end{itemize}
 
 \paragraph{Unitary System Total Heating Rate {[}W{]}}\label{unitary-system-total-heating-rate-w-2}
@@ -3258,3 +3279,7 @@ This output field is the mass flow rate of air, in kg/s, being bypassed from the
 \paragraph{Unitary System Air Outlet Setpoint Temperature {[}C{]}}\label{unitary-system-air-outlet-setpoint-temperature-c}
 
 This output field is the dry-bulb set point temperature in degrees Celsius. This set point temperature is calculated by the model based on the zone cooling/heating loads calculated by EnergyPlus, and the priority control mode and the dehumidification control type specified for this unitary system. The CBVAV system attempts to achieve the outlet air set point temperature to the extent possible.
+
+\paragraph{Unitary System Operating Mode Index {[]}}\label{unitary-system-operating-mode-index}
+
+This output field is the current operating mode, either cooling, heating or no cooling or heating.  A value of 0 represents no cooling or heating is required, a value of 1 represents cooling and a value of 2 represents heating. These specific values can be seen using the detailed time step reporting frequency. If longer reporting frequencies are used (e.g., timestep, hourly, etc.) then this output is averaged over the reporting interval and the result is dependent on the value selected for \hyperref[minimum-runtime-before-operating-mode-change]{Minimum Runtime Before Operating Mode Change}.

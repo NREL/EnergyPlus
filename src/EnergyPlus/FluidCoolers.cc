@@ -247,6 +247,9 @@ namespace FluidCoolers {
                                                                                                        DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
             SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = NumArray(1);
+            if (SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA == DataSizing::AutoSize) {
+                SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized = true;
+            }
             SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity = NumArray(2);
             SimpleFluidCooler(FluidCoolerNum).DesignEnteringWaterTemp = NumArray(3);
             SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirTemp = NumArray(4);
@@ -502,15 +505,16 @@ namespace FluidCoolers {
             }
             if (this->HighSpeedFluidCoolerUA != 0.0) {
                 if (this->HighSpeedFluidCoolerUA > 0.0) {
-                    ShowSevereError(cCurrentModuleObject + "= \"" + this->Name +
-                                    "\". Nominal fluid cooler capacity and design fluid cooler UA have been specified.");
+                    ShowWarningError(cCurrentModuleObject + "= \"" + this->Name +
+                                     "\". Nominal fluid cooler capacity and design fluid cooler UA have been specified.");
                 } else {
-                    ShowSevereError(cCurrentModuleObject + "= \"" + this->Name +
-                                    "\". Nominal fluid cooler capacity has been specified and design fluid cooler UA is being autosized.");
+                    ShowWarningError(cCurrentModuleObject + "= \"" + this->Name +
+                                     "\". Nominal fluid cooler capacity has been specified and design fluid cooler UA is being autosized.");
                 }
                 ShowContinueError(
                     "Design fluid cooler UA field must be left blank when nominal fluid cooler capacity performance input method is used.");
-                ErrorsFound = true;
+                ShowContinueError("Design fluid cooler UA value will be reset to zero and the simulation continuous.");
+                this->HighSpeedFluidCoolerUA = 0.0;
             }
         } else { // Fluid cooler performance input method is not specified as a valid "choice"
             ShowSevereError(cCurrentModuleObject + "= \"" + AlphArray(1) + "\", invalid " + cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
@@ -1826,6 +1830,7 @@ namespace FluidCoolers {
 
     void clear_state()
     {
+        NumSimpleFluidCoolers = 0;
         SimpleFluidCooler.clear();
         UniqueSimpleFluidCoolerNames.clear();
         GetFluidCoolerInputFlag = true;

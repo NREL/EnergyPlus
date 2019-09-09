@@ -72,6 +72,8 @@ class Validation;
 
 namespace EnergyPlus {
 
+void cleanEPJSON(nlohmann::json &epjson);
+
 class InputProcessor
 {
 public:
@@ -176,6 +178,8 @@ public:
     void preScanReportingVariables();
 
     void reportOrphanRecordObjects();
+
+    const json& getObjectInstances(std::string const &ObjType);
 
 private:
     struct ObjectInfo

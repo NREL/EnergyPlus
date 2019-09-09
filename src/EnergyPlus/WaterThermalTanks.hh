@@ -110,6 +110,7 @@ namespace WaterThermalTanks {
     extern int const COIL_DX_MULTIMODE;               // reclaim heating source is DX multimode coil
     extern int const CONDENSER_REFRIGERATION;         // reclaim heating source is detailed refrigeration system condenser
     extern int const COIL_DX_VARIABLE_COOLING;        // reclaim heating source is Variable Speed DX cooling coil
+    extern int const COIL_AIR_WATER_HEATPUMP_EQ;      // reclaim heating source is Water to air heat pump cooling coil
 
     extern int const UseSide;    // Indicates Use side of water heater
     extern int const SourceSide; // Indicates Source side of water heater
@@ -425,6 +426,7 @@ namespace WaterThermalTanks {
         int DesuperheaterNum;          // Index to desuperheating coil
         bool ShowSetPointWarning;      // Warn when set point is greater than max tank temp limit
         int MaxCycleErrorIndex;        // recurring error index
+        int FreezingErrorIndex;        // recurring error index for freeze conditions
         WaterHeaterSizingData Sizing;  // ancillary data for autosizing
 
         // Default Constructor
@@ -459,7 +461,7 @@ namespace WaterThermalTanks {
               HeaterEnergy(0.0), HeaterEnergy1(0.0), HeaterEnergy2(0.0), FuelEnergy(0.0), FuelEnergy1(0.0), FuelEnergy2(0.0), VentEnergy(0.0),
               OffCycParaFuelEnergy(0.0), OffCycParaEnergyToTank(0.0), OnCycParaFuelEnergy(0.0), OnCycParaEnergyToTank(0.0),
               NetHeatTransferEnergy(0.0), FirstRecoveryDone(false), FirstRecoveryFuel(0.0), HeatPumpNum(0), DesuperheaterNum(0),
-              ShowSetPointWarning(true), MaxCycleErrorIndex(0)
+              ShowSetPointWarning(true), MaxCycleErrorIndex(0), FreezingErrorIndex(0)
         {
         }
 
@@ -791,11 +793,16 @@ namespace WaterThermalTanks {
                                 Array1<Real64> const &Par //
     );
 
-    Real64 PLRResidualMixedTank(Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 PLRResidualWaterThermalTank(Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                 Array1<Real64> const &Par     // par(1) = HP set point temperature [C]
     );
 
     Real64 PLRResidualHPWH(Real64 const HPPartLoadRatio, Array1<Real64> const &Par);
+
+    bool SourceHeatNeed(WaterThermalTankData const WaterThermalTank,
+                        Real64 const OutletTemp,
+                        Real64 const DeadBandTemp,
+                        Real64 const SetPointTemp);
 
     Real64 PlantMassFlowRatesFunc(int const WaterThermalTankNum,
                                   int const InNodeNum,
