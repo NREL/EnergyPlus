@@ -7381,7 +7381,7 @@ namespace DXCoils {
                             if (DXCoil(DXCoilNum).MSRatedTotCap(Mode) > 0.0) {
                                 ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
                                                    DXCoil(DXCoilNum).Name,
-                                                   "Speed " + TrimSigDigits(Mode) + " User-Specified Total Cooling Capacity [W]",
+                                                   "User-Specified Speed " + TrimSigDigits(Mode) + " Total Cooling Capacity [W]",
                                                    DXCoil(DXCoilNum).MSRatedTotCap(Mode));
                             }
                         } else { // autosize or hard-sized with system sizing data
@@ -7482,7 +7482,7 @@ namespace DXCoils {
                             if (DXCoil(DXCoilNum).MSRatedTotCap(Mode) > 0.0) {
                                 ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
                                                    DXCoil(DXCoilNum).Name,
-                                                   "Speed " + TrimSigDigits(Mode) + " User-Specified Total Cooling Capacity [W]",
+                                                   "User-Specified Speed " + TrimSigDigits(Mode) + " Total Cooling Capacity [W]",
                                                    DXCoil(DXCoilNum).MSRatedTotCap(Mode));
                             }
                         } else { // autosize or hard-sized with system sizing data
@@ -7570,16 +7570,16 @@ namespace DXCoils {
                         DXCoil(DXCoilNum).MSRatedTotCap(Mode) = MSRatedTotCapDes;
                         ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
                                            DXCoil(DXCoilNum).Name,
-                                           "Speed " + TrimSigDigits(Mode) + " Design Size Rated Total Cooling Capacity [W]",
+                                           "Design Size Speed " + TrimSigDigits(Mode) + " Rated Total Cooling Capacity [W]",
                                            MSRatedTotCapDes);
                     } else {
                         if (DXCoil(DXCoilNum).MSRatedTotCap(Mode) > 0.0 && MSRatedTotCapDes > 0.0 && !HardSizeNoDesRun) {
                             MSRatedTotCapUser = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
                             ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
                                                DXCoil(DXCoilNum).Name,
-                                               "Speed " + TrimSigDigits(Mode) + " Design Size Rated Total Cooling Capacity [W]",
+                                               "Design Size Speed " + TrimSigDigits(Mode) + " Rated Total Cooling Capacity [W]",
                                                MSRatedTotCapDes,
-                                               "Speed " + TrimSigDigits(Mode) + " User-Specified Rated Total Cooling Capacity [W]",
+                                               "User-Specified Speed " + TrimSigDigits(Mode) + " Rated Total Cooling Capacity [W]",
                                                MSRatedTotCapUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(MSRatedTotCapDes - MSRatedTotCapUser) / MSRatedTotCapUser) > AutoVsHardSizingThreshold) {
@@ -7624,7 +7624,7 @@ namespace DXCoils {
                             if (DXCoil(DXCoilNum).MSRatedSHR(Mode) > 0.0) {
                                 ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
                                                    DXCoil(DXCoilNum).Name,
-                                                   "Speed " + TrimSigDigits(Mode) + " User-Specified Rated Sensible Heat Ratio",
+                                                   "User-Specified Speed " + TrimSigDigits(Mode) + " Rated Sensible Heat Ratio",
                                                    DXCoil(DXCoilNum).MSRatedSHR(Mode));
                                 // added for rated sensible cooling capacity estimate for html reporting, issue #7381
                                 DXCoil(DXCoilNum).RatedSHR(1) = DXCoil(DXCoilNum).MSRatedSHR(Mode);
@@ -7639,7 +7639,7 @@ namespace DXCoils {
                             if (DXCoil(DXCoilNum).MSRatedSHR(Mode) > 0.0) {
                                 ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
                                                    DXCoil(DXCoilNum).Name,
-                                                   "Speed " + TrimSigDigits(Mode) + " User-Specified Rated Sensible Heat Ratio",
+                                                   "User-Specified Speed " + TrimSigDigits(Mode) + " Rated Sensible Heat Ratio",
                                                    DXCoil(DXCoilNum).MSRatedSHR(Mode));
                                 // added for rated sensible cooling capacity estimate for html reporting, issue #7381
                                 DXCoil(DXCoilNum).RatedSHR(1) = DXCoil(DXCoilNum).MSRatedSHR(Mode);
@@ -7675,7 +7675,7 @@ namespace DXCoils {
                         DXCoil(DXCoilNum).MSRatedSHR(Mode) = MSRatedSHRDes;
                         ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
                                            DXCoil(DXCoilNum).Name,
-                                           "Speed " + TrimSigDigits(Mode) + " Design Size Rated Sensible Heat Ratio",
+                                           "Design Size Speed " + TrimSigDigits(Mode) + " Rated Sensible Heat Ratio",
                                            MSRatedSHRDes);
                         // added for rated sensible cooling capacity estimate for html reporting, issue #7381
                         DXCoil(DXCoilNum).RatedSHR(1) = MSRatedSHRDes;
@@ -7684,9 +7684,9 @@ namespace DXCoils {
                             MSRatedSHRUser = DXCoil(DXCoilNum).MSRatedSHR(Mode);
                             ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
                                                DXCoil(DXCoilNum).Name,
-                                               "Speed " + TrimSigDigits(Mode) + " Design Size Rated Sensible Heat Ratio",
+                                               "Design Size Speed " + TrimSigDigits(Mode) + " Rated Sensible Heat Ratio",
                                                MSRatedSHRDes,
-                                               "Speed " + TrimSigDigits(Mode) + " User-Specified Rated Sensible Heat Ratio",
+                                               "User-Specified Speed " + TrimSigDigits(Mode) + " Rated Sensible Heat Ratio",
                                                MSRatedSHRUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(MSRatedSHRDes - MSRatedSHRUser) / MSRatedSHRUser) > AutoVsHardSizingThreshold) {
@@ -7716,16 +7716,16 @@ namespace DXCoils {
                     DXCoil(DXCoilNum).MSEvapCondAirFlow(Mode) = MSEvapCondAirFlowDes;
                     ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
                                        DXCoil(DXCoilNum).Name,
-                                       "Speed " + TrimSigDigits(Mode) + " Design Size Evaporative Condenser Air Flow Rate [m3/s]",
+                                       "Design Size Speed " + TrimSigDigits(Mode) + " Evaporative Condenser Air Flow Rate [m3/s]",
                                        MSEvapCondAirFlowDes);
                 } else {
                     if (DXCoil(DXCoilNum).MSEvapCondAirFlow(Mode) > 0.0 && MSEvapCondAirFlowDes > 0.0 && !HardSizeNoDesRun) {
                         MSEvapCondAirFlowUser = DXCoil(DXCoilNum).MSEvapCondAirFlow(Mode);
                         ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
                                            DXCoil(DXCoilNum).Name,
-                                           "Speed " + TrimSigDigits(Mode) + " Design Size Evaporative Condenser Air Flow Rate [m3/s]",
+                                           "Design Size Speed " + TrimSigDigits(Mode) + " Evaporative Condenser Air Flow Rate [m3/s]",
                                            MSEvapCondAirFlowDes,
-                                           "Speed " + TrimSigDigits(Mode) + " User-Specified Evaporative Condenser Air Flow Rate [m3/s]",
+                                           "User-Specified Speed " + TrimSigDigits(Mode) + " Evaporative Condenser Air Flow Rate [m3/s]",
                                            MSEvapCondAirFlowUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(MSEvapCondAirFlowDes - MSEvapCondAirFlowUser) / MSEvapCondAirFlowUser) > AutoVsHardSizingThreshold) {
@@ -7768,16 +7768,16 @@ namespace DXCoils {
                     DXCoil(DXCoilNum).MSEvapCondPumpElecNomPower(Mode) = MSEvapCondPumpElecNomPowerDes;
                     ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
                                        DXCoil(DXCoilNum).Name,
-                                       "Speed " + TrimSigDigits(Mode) + " Design Size Rated Evaporative Condenser Pump Power Consumption [W]",
+                                       "Design Size Speed " + TrimSigDigits(Mode) + " Rated Evaporative Condenser Pump Power Consumption [W]",
                                        MSEvapCondPumpElecNomPowerDes);
                 } else {
                     if (DXCoil(DXCoilNum).MSEvapCondPumpElecNomPower(Mode) > 0.0 && MSEvapCondPumpElecNomPowerDes > 0.0 && !HardSizeNoDesRun) {
                         MSEvapCondPumpElecNomPowerUser = DXCoil(DXCoilNum).MSEvapCondPumpElecNomPower(Mode);
                         ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
                                            DXCoil(DXCoilNum).Name,
-                                           "Speed " + TrimSigDigits(Mode) + " Design Size Rated Evaporative Condenser Pump Power Consumption [W]",
+                                           "Design Size Speed " + TrimSigDigits(Mode) + " Rated Evaporative Condenser Pump Power Consumption [W]",
                                            MSEvapCondPumpElecNomPowerDes,
-                                           "Speed " + TrimSigDigits(Mode) + " User-Specified Rated Evaporative Condenser Pump Power Consumption [W]",
+                                           "User-Specified Speed " + TrimSigDigits(Mode) + " Rated Evaporative Condenser Pump Power Consumption [W]",
                                            MSEvapCondPumpElecNomPowerUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(MSEvapCondPumpElecNomPowerDes - MSEvapCondPumpElecNomPowerUser) / MSEvapCondPumpElecNomPowerUser) >
@@ -7873,16 +7873,16 @@ namespace DXCoils {
                         DXCoil(DXCoilNum).MSSecCoilAirFlow(Mode) = SecCoilAirFlowDes;
                         ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
                                            DXCoil(DXCoilNum).Name,
-                                           "Speed " + TrimSigDigits(Mode) + " Design Size Secondary Coil Air Flow Rate [m3/s]",
+                                           "Design Size Speed " + TrimSigDigits(Mode) + " Secondary Coil Air Flow Rate [m3/s]",
                                            SecCoilAirFlowDes);
                     } else {
                         if (DXCoil(DXCoilNum).MSSecCoilAirFlow(Mode) > 0.0 && SecCoilAirFlowDes > 0.0 && !HardSizeNoDesRun) {
                             SecCoilAirFlowUser = DXCoil(DXCoilNum).MSSecCoilAirFlow(Mode);
                             ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
                                                DXCoil(DXCoilNum).Name,
-                                               "Speed " + TrimSigDigits(Mode) + " Design Size Secondary Coil Air Flow Rate [m3/s]",
+                                               "Design Size Speed " + TrimSigDigits(Mode) + " Secondary Coil Air Flow Rate [m3/s]",
                                                SecCoilAirFlowDes,
-                                               "Speed " + TrimSigDigits(Mode) + " User-Specified Secondary Coil Air Flow Rate [m3/s]",
+                                               "User-Specified Speed " + TrimSigDigits(Mode) + " Secondary Coil Air Flow Rate [m3/s]",
                                                SecCoilAirFlowUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(SecCoilAirFlowDes - SecCoilAirFlowUser) / SecCoilAirFlowUser) > AutoVsHardSizingThreshold) {
