@@ -521,8 +521,8 @@
     ZONE 1,                  !- Zone Name
     180,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
+    6,                       !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
@@ -533,7 +533,8 @@
     Zn001:Wall001,           !- Building Surface Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
-    4,                       !- Starting X Coordinate {m}
+    10,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     3,                       !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
@@ -543,7 +544,8 @@
     HOLLOW WOOD DOOR,        !- Construction Name
     Zn001:Wall001,           !- Building Surface Name
     1,                       !- Multiplier
-    14,                      !- Starting X Coordinate {m}
+    20,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
@@ -586,8 +588,8 @@
     ZONE 1,                  !- Zone Name
     0,                       !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    20,                      !- Starting X Coordinate {m}
-    20,                      !- Starting Y Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    26,                      !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
@@ -598,8 +600,8 @@
     ZONE 1,                  !- Zone Name
     270,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    20,                      !- Starting Y Coordinate {m}
+    6,                       !- Starting X Coordinate {m}
+    26,                      !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
@@ -610,8 +612,8 @@
     ZONE 1,                  !- Zone Name
     90,                      !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    20,                      !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
@@ -622,8 +624,8 @@
     ZONE 1,                  !- Zone Name
     90,                      !- Azimuth Angle {deg}
     180,                     !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
+    6,                       !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     20;                      !- Width {m}
@@ -635,8 +637,8 @@
     Zn003:Flr001,            !- Outside Boundary Condition Object
     180,                     !- Azimuth Angle {deg}
     0,                       !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
+    6,                       !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     20;                      !- Width {m}
@@ -647,8 +649,8 @@
     ZONE 2,                  !- Zone Name
     180,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
@@ -659,7 +661,8 @@
     Zn002:Wall001,           !- Building Surface Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
-    4,                       !- Starting X Coordinate {m}
+    30,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     3,                       !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
@@ -679,7 +682,8 @@
     Zn002:Wall001,           !- Building Surface Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
-    10,                      !- Starting X Coordinate {m}
+    36,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     3,                       !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
@@ -690,8 +694,8 @@
     ZONE 2,                  !- Zone Name
     90,                      !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    20,                      !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
+    46,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
@@ -702,7 +706,8 @@
     Zn002:Wall002,           !- Building Surface Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
-    9,                       !- Starting X Coordinate {m}
+    35,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     3,                       !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
@@ -736,8 +741,8 @@
     ZONE 2,                  !- Zone Name
     0,                       !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    20,                      !- Starting X Coordinate {m}
-    20,                      !- Starting Y Coordinate {m}
+    46,                      !- Starting X Coordinate {m}
+    26,                      !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
@@ -748,8 +753,8 @@
     ZONE 2,                  !- Zone Name
     270,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    20,                      !- Starting Y Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    26,                      !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
@@ -760,8 +765,8 @@
     ZONE 2,                  !- Zone Name
     90,                      !- Azimuth Angle {deg}
     180,                     !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     20;                      !- Width {m}
@@ -773,8 +778,8 @@
     Zn004:Flr001,            !- Outside Boundary Condition Object
     180,                     !- Azimuth Angle {deg}
     0,                       !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     20;                      !- Width {m}
@@ -785,9 +790,9 @@
     ZONE 3,                  !- Zone Name
     180,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    6,                       !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    10                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
 
@@ -797,8 +802,9 @@
     Zn003:Wall001,           !- Building Surface Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
-    8,                       !- Starting X Coordinate {m}
-    3,                       !- Starting Z Coordinate {m}
+    14,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    13,                      !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
 
@@ -808,9 +814,9 @@
     ZONE 3,                  !- Zone Name
     0,                       !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    20,                      !- Starting X Coordinate {m}
-    20,                      !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    26,                      !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
 
@@ -820,9 +826,9 @@
     ZONE 3,                  !- Zone Name
     270,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    20,                      !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    6,                       !- Starting X Coordinate {m}
+    26,                      !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
 
@@ -833,9 +839,9 @@
     Zn004:Wall004,           !- Outside Boundary Condition Object
     90,                      !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    20,                      !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
 
@@ -845,8 +851,9 @@
     Zn003:Wall004,           !- Building Surface Name
     Zn004:Wall004:Win001,    !- Outside Boundary Condition Object
     1,                       !- Multiplier
-    4,                       !- Starting X Coordinate {m}
-    3,                       !- Starting Z Coordinate {m}
+    10,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    13,                      !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
 
@@ -857,9 +864,9 @@
     Zn001:Roof001,           !- Outside Boundary Condition Object
     90,                      !- Azimuth Angle {deg}
     180,                     !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    6,                       !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     20;                      !- Width {m}
 
@@ -869,9 +876,9 @@
     ZONE 3,                  !- Zone Name
     180,                     !- Azimuth Angle {deg}
     0,                       !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
-    10,                      !- Starting Z Coordinate {m}
+    6,                       !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    20,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     20;                      !- Width {m}
 
@@ -881,9 +888,9 @@
     ZONE 4,                  !- Zone Name
     180,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
 
@@ -893,8 +900,9 @@
     Zn004:Wall001,           !- Building Surface Name
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
-    8,                       !- Starting X Coordinate {m}
-    3,                       !- Starting Z Coordinate {m}
+    34,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    13,                      !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
 
@@ -904,9 +912,9 @@
     ZONE 4,                  !- Zone Name
     90,                      !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    20,                      !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    46,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
 
@@ -916,9 +924,9 @@
     ZONE 4,                  !- Zone Name
     0,                       !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    20,                      !- Starting X Coordinate {m}
-    20,                      !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    46,                      !- Starting X Coordinate {m}
+    26,                      !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
 
@@ -929,9 +937,9 @@
     Zn003:Wall004,           !- Outside Boundary Condition Object
     270,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    20,                      !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    26,                      !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
 
@@ -941,8 +949,9 @@
     Zn004:Wall004,           !- Building Surface Name
     Zn003:Wall004:Win001,    !- Outside Boundary Condition Object
     1,                       !- Multiplier
-    13,                      !- Starting X Coordinate {m}
-    3,                       !- Starting Z Coordinate {m}
+    39,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    13,                      !- Starting Z Coordinate {m}
     3,                       !- Length {m}
     5;                       !- Height {m}
 
@@ -953,9 +962,9 @@
     Zn002:Roof001,           !- Outside Boundary Condition Object
     90,                      !- Azimuth Angle {deg}
     180,                     !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     20;                      !- Width {m}
 
@@ -965,9 +974,9 @@
     ZONE 4,                  !- Zone Name
     180,                     !- Azimuth Angle {deg}
     0,                       !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
-    10,                      !- Starting Z Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    20,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     20;                      !- Width {m}
 
