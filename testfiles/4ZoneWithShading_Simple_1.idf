@@ -787,7 +787,7 @@
     90,                      !- Tilt Angle {deg}
     6,                       !- Starting X Coordinate {m}
     6,                       !- Starting Y Coordinate {m}
-    10                       !- Starting Z Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
 
