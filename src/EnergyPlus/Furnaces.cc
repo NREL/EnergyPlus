@@ -10198,7 +10198,7 @@ namespace Furnaces {
                              SupHeaterLoad);
 
         if (QLatReq < (-1.0 * SmallLoad)) { // dehumidification mode
-            if (QLatReq <= LatOutput || (QZnReq < -SmallLoad && QZnReq <= FullOutput || QZnReq > SmallLoad && QZnReq >= FullOutput)) {
+            if (QLatReq <= LatOutput || (QZnReq < -SmallLoad && QZnReq <= FullOutput) || (QZnReq > SmallLoad && QZnReq >= FullOutput)) {
                 PartLoadFrac = 1.0;
                 SpeedRatio = 1.0;
                 Furnace(FurnaceNum).CompPartLoadRatio = PartLoadFrac;
@@ -10226,7 +10226,7 @@ namespace Furnaces {
             ErrorToler = 0.001; // Error tolerance for convergence from input deck
         }
 
-        if (QZnReq < -SmallLoad && NoCompOutput - QZnReq > SmallLoad || QZnReq > SmallLoad && QZnReq - NoCompOutput > SmallLoad) {
+        if ((QZnReq < -SmallLoad && NoCompOutput - QZnReq > SmallLoad) || (QZnReq > SmallLoad && QZnReq - NoCompOutput > SmallLoad)) {
             if ((QZnReq > SmallLoad && QZnReq < FullOutput) || (QZnReq < (-1.0 * SmallLoad) && QZnReq > FullOutput)) {
 
                 Par(1) = FurnaceNum;
@@ -10518,14 +10518,12 @@ namespace Furnaces {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int OutletNode;           // MSHP air outlet node
         int InletNode;            // MSHP air inlet node
-        Real64 MinHumRat;         // Minimum humidity ratio for sensible capacity calculation (kg/kg)
         Real64 AirMassFlow;       // Air mass flow rate [kg/s]
         Real64 SavePartloadRatio; // part-load ratio
         Real64 SaveSpeedRatio;    // speed ratio
         Real64 QCoilActual;       // coil load actually delivered returned to calling component
         Real64 ErrorToler;        // supplemental heating coil convergence tollerance
         bool SuppHeatingCoilFlag; // whether to turn on the supplemental heater
-        Real64 MaxTemp;           // Maximum temperature for calculating latent load at a constant temperature
         Real64 HeatCoilLoad;      // REQUIRED HEAT COIL LOAD
 
         // FLOW
@@ -11052,30 +11050,6 @@ namespace Furnaces {
         SensibleLoadMet =
             AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(outNode.Temp, outNode.HumRat, zoneNode.Temp, zoneNode.HumRat); // sensible {W};
         LatentLoadMet = totalLoadMet - SensibleLoadMet;
-    //// Check delta T (outlet to space), if positive
-    //    // use space HumRat (next line), else outlet humrat (IF) so psyc routine gives good result
-    //    MinHumRat = Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat;
-    //    if (Node(OutletNode).Temp < Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp) MinHumRat = Node(OutletNode).HumRat;
-
-    //    // Calculate sensible load met (at constant humidity ratio)
-    //    SensibleLoadMet = AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, MinHumRat) -
-    //                                     PsyHFnTdbW(Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp, MinHumRat)) -
-    //                      Furnace(FurnaceNum).SenLoadLoss;
-    //    Furnace(FurnaceNum).SensibleLoadMet = SensibleLoadMet;
-
-    //    if (Furnace(FurnaceNum).Humidistat) {
-    //        MaxTemp = Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp;
-    //        // modified, why does switching between furnace outlet and control zone temp
-    //        // cause latent load to change when latent capacity is 0 ?
-    //        //    IF(Node(FurnaceOutletNode)%Temp .GT. Node(Furnace(FurnaceNum)%NodeNumOfControlledZone)%Temp ) &
-    //        //       MaxTemp = Node(FurnaceOutletNode)%Temp
-    //        //   Calculate latent load met (at constant temperature)
-    //        LatentLoadMet = AirMassFlow * (PsyHFnTdbW(MaxTemp, Node(OutletNode).HumRat) -
-    //                                       PsyHFnTdbW(MaxTemp, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat)) -
-    //                        Furnace(FurnaceNum).LatLoadLoss;
-    //    } else {
-    //        LatentLoadMet = 0.0;
-    //    }
         Furnace(FurnaceNum).LatentLoadMet = LatentLoadMet;
     }
 
