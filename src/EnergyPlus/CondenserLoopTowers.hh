@@ -93,18 +93,6 @@ namespace CondenserLoopTowers {
 
     extern int NumSimpleTowers; // Number of similar towers
 
-//    extern Real64 InletWaterTemp;    // CW temperature at tower inlet
-//    extern Real64 OutletWaterTemp;   // CW temperature at tower outlet
-//    extern int WaterInletNode;       // Node number at tower inlet
-//    extern int WaterOutletNode;      // Node number at tower outlet
-//    extern Real64 WaterMassFlowRate; // WaterMassFlowRate through tower
-//    extern Real64 Qactual;          // Tower heat transfer
-//    extern Real64 CTFanPower;       // Tower fan power used
-//    extern Real64 AirFlowRateRatio; // Ratio of air flow rate through VS cooling tower to design air flow rate
-//    extern Real64 BasinHeaterPower; // Basin heater power use (W)
-//    extern Real64 WaterUsage;       // Tower water usage (m3/s)
-//    extern Real64 FanCyclingRatio;  // cycling ratio of tower fan when min fan speed provide to much capacity
-
     extern bool GetInput; // When TRUE, calls subroutine to read input file
     extern Array1D_bool CheckEquipName;
 
@@ -255,6 +243,9 @@ namespace CondenserLoopTowers {
         Real64 TimeStepSysLast;    // last system time step (used to check for downshifting)
         Real64 CurrentEndTimeLast; // end time of time step for last simulation time step
 
+        Real64 __InletWaterTemp;    // CW temperature at tower inlet
+        Real64 __OutletWaterTemp;   // CW temperature at tower outlet
+
         // Default Constructor
         Towerspecs()
             : TowerType_Num(0), PerformanceInputMethod_Num(0), Available(true), ON(true), DesignWaterFlowRate(0.0),
@@ -284,7 +275,8 @@ namespace CondenserLoopTowers {
               VSMerkelAFRErrorFail(0), VSMerkelAFRErrorFailIndex(0), DesInletWaterTemp(0), DesOutletWaterTemp(0), DesInletAirDBTemp(0),
               DesInletAirWBTemp(0), DesApproach(0), DesRange(0), TowerInletCondsAutoSize(false), FaultyCondenserSWTFlag(false),
               FaultyCondenserSWTIndex(0), FaultyCondenserSWTOffset(0.0), FaultyTowerFoulingFlag(false), FaultyTowerFoulingIndex(0),
-              FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0)
+              FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0),
+              __InletWaterTemp(0.0), __OutletWaterTemp(0.0)
         {
         }
     };
