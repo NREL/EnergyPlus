@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_FILE_UTILS_HPP
-#define __VALIJSON_FILE_UTILS_HPP
 
 #include <fstream>
 #include <limits>
@@ -44,5 +42,3 @@ inline bool loadFile(const std::string &path, std::string &dest)
 
 }  // namespace utils
 }  // namespace valijson
-
-#endif

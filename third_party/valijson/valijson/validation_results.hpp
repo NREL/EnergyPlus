@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_VALIDATION_RESULTS_HPP
-#define __VALIJSON_VALIDATION_RESULTS_HPP
 
 #include <deque>
 #include <string>
@@ -122,5 +120,3 @@ private:
 };
 
 } // namespace valijson
-
-#endif // __VALIJSON_VALIDATION_RESULTS_HPP
