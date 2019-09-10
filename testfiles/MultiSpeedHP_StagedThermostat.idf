@@ -1,4 +1,4 @@
-! MultiSpeedHP_StagedThermostat.idf
+﻿! MultiSpeedHP_StagedThermostat.idf
 ! Basic file description:  Multispeed Heat pump with DX coils for cooling (w/ 10% outdoor air max.)
 !                          1 story building divided into 3 interior conditioned zones. Roof with no plenum.
 !                          No ground contact with floor. The staged thermostat is applied to the controlled
@@ -1709,7 +1709,7 @@
     Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     Outdoor Condenser Air Node,  !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    -8.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1
