@@ -190,20 +190,14 @@ namespace GroundHeatExchangers {
 
     Real64 Pipe::calcTransitTime(Real64 flowRate, Real64 temperature)
     {
-        // PURPOSE OF THIS SUBROUTINE:
         // Compute the fluid transit time
 
-        // USE STATEMENTS:
         using FluidProperties::GetDensityGlycol;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
+        static std::string const routineName("Pipe::calcTransitTime");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string const routineName("calcTransitTime");
-
-        Real64 cp =
-            FluidProperties::GetDensityGlycol(PlantLoop(this->loopNum).FluidName, temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
+        Real64 cp = FluidProperties::GetDensityGlycol(PlantLoop(this->loopNum).FluidName,
+                    temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
         Real64 vdot = flowRate / cp;
         return this->volFluid / vdot;
     }
@@ -220,7 +214,7 @@ namespace GroundHeatExchangers {
         }
 
         int idx = 0;
-        for (std::deque<Real64>::iterator it = this->inletTempTimes.begin(); it != this->inletTempTimes.end(); ++it) {
+        for (auto it = this->inletTempTimes.begin(); it != this->inletTempTimes.end(); ++it) {
             Real64 t_l = *it;
             if (t_l > time) {
                 int idx_h = idx;
@@ -229,9 +223,6 @@ namespace GroundHeatExchangers {
                 Real64 t_h = this->inletTempTimes[idx_h];
                 Real64 temp_l = this->inletTemps[idx_l];
                 Real64 temp_h = this->inletTemps[idx_h];
-
-
-                //
             }
             ++idx;
         }
@@ -243,7 +234,10 @@ namespace GroundHeatExchangers {
 
     Real64 Pipe::mdotToRe(Real64 flowRate, Real64 temperature)
     {
-        return 0;
+        static std::string const routineName("Pipe::calcTransitTime");
+        Real64 mu = FluidProperties::GetViscosityGlycol(PlantLoop(this->loopNum).FluidName,
+                                                      temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
+        return 4 * flowRate / (mu * Pi * this->innerDia);
     }
 
     Real64 Pipe::calcFrictionFactor(Real64 re)

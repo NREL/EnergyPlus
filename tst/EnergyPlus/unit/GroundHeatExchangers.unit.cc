@@ -76,7 +76,9 @@ using namespace EnergyPlus::GroundHeatExchangers;
 // using namespace EnergyPlus::ScheduleManager;
 // using namespace EnergyPlus::PlantManager;
 
-TEST_F(EnergyPlusFixture, GHE_BaseProps_init)
+class GHEFixture : public EnergyPlusFixture {};
+
+TEST_F(GHEFixture, InitBaseProps)
 {
     json j = {{"conductivity", 0.4}, {"density", 950}, {"specific-heat", 1900}};
 
@@ -88,7 +90,7 @@ TEST_F(EnergyPlusFixture, GHE_BaseProps_init)
     EXPECT_EQ(props.diffusivity, 0.4 / (950 * 1900));
 }
 
-TEST_F(EnergyPlusFixture, GHE_Pipe_init)
+TEST_F(GHEFixture, InitPipe)
 {
 
     DataPlant::PlantLoop.allocate(2);
@@ -139,7 +141,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_init)
     DataPlant::PlantLoop.deallocate();
 }
 
-TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
+TEST_F(GHEFixture, CalcTransitTimePipe)
 {
     DataPlant::PlantLoop.allocate(2);
     DataPlant::PlantLoop(1).PlantSizNum = 1;
@@ -162,7 +164,30 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
     EXPECT_NEAR(pipe.calcTransitTime(0.1, 20), 567.3, tol);
 }
 
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Interpolate)
+TEST_F(GHEFixture, mdotToRePipe)
+{
+    DataPlant::PlantLoop.allocate(2);
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(1).FluidIndex = 1;
+    DataPlant::PlantLoop(1).FluidName = "WATER";
+
+    json j = {{"conductivity", 0.4},
+              {"density", 950},
+              {"specific-heat", 1900},
+              {"outer-diameter", 0.0334},
+              {"inner-diameter", 0.0269},
+              {"length", 100},
+              {"initial-temperature", 10},
+              {"loop-num", 1}};
+
+    Pipe pipe(j);
+
+    Real64 tol = 0.1;
+
+    EXPECT_NEAR(pipe.mdotToRe(0.1, 20), 4725.7, tol);
+}
+
+// TEST_F(GHEFixture, GroundHeatExchangerTest_Interpolate)
 //{
 //
 //    // Initialization
@@ -199,7 +224,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_DOUBLE_EQ(2.5, thisGFunc);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_GetGFunc)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_Slinky_GetGFunc)
 //{
 //
 //    // Initialization
@@ -227,7 +252,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_EQ(2.5, thisGFunc);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_GetGFunc)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_GetGFunc)
 //{
 //
 //    // Initialization
@@ -264,7 +289,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_NEAR(2.5 + 0.6931, thisGFunc, 0.0001);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcHXResistance)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_Slinky_CalcHXResistance)
 //{
 //    // Initializations
 //    GLHESlinky thisGLHE;
@@ -298,7 +323,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_NEAR(0.07094, thisGLHE.calcHXResistance(), 0.0001);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcGroundHeatExchanger)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_Slinky_CalcGroundHeatExchanger)
 //{
 //
 //    // Initializations
@@ -329,7 +354,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_NEAR(18.91819, thisGLHE.myRespFactors->GFNC(28), 0.0001);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Properties_IDF_Check)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_Properties_IDF_Check)
 //{
 //    std::string const idf_objects = delimited_string(
 //        {"GroundHeatExchanger:Vertical:Properties,", "	GHE-1 Props,        !- Name", "	1,                  !- Depth of Top of Borehole {m}",
@@ -360,7 +385,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_EQ(0.04556, thisProp->bhUTubeDist);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Resp_Factors_IDF_Check)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_Resp_Factors_IDF_Check)
 //{
 //    std::string const idf_objects = delimited_string({"GroundHeatExchanger:Vertical:Properties,",
 //                                                      "	GHE-1 Props,        !- Name",
@@ -552,7 +577,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_EQ(12.778359, thisRF->GFNC(76));
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Vertical_Array_IDF_Check)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_Vertical_Array_IDF_Check)
 //{
 //    std::string const idf_objects = delimited_string({
 //        "GroundHeatExchanger:Vertical:Properties,",
@@ -590,7 +615,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_EQ(2, thisArray->numBHinYDirection);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Response_Factors_IDF_Check)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_Given_Response_Factors_IDF_Check)
 //{
 //    std::string const idf_objects = delimited_string({
 //        "Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
@@ -811,7 +836,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_EQ(thisGLHE.soil.k / thisGLHE.soil.rhoCp, thisGLHE.soil.diffusivity);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Array_IDF_Check)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_Given_Array_IDF_Check)
 //{
 //    std::string const idf_objects =
 //        delimited_string({"Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
@@ -881,7 +906,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_EQ(thisGLHE.soil.k / thisGLHE.soil.rhoCp, thisGLHE.soil.diffusivity);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Single_BHs_IDF_Check)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_Given_Single_BHs_IDF_Check)
 //{
 //    std::string const idf_objects =
 //        delimited_string({"Site:GroundTemperature:Undisturbed:KusudaAchenbach,",
@@ -970,7 +995,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_EQ(thisGLHE.soil.k / thisGLHE.soil.rhoCp, thisGLHE.soil.diffusivity);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
 //{
 //    using namespace DataSystemVariables;
 //
@@ -1323,7 +1348,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_NEAR(thisGLHE.interpGFunc(-3.963), 5.82, tolerance);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_conduction_resistance)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_calc_pipe_conduction_resistance)
 //{
 //    using namespace DataSystemVariables;
 //
@@ -1382,7 +1407,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_NEAR(thisGLHE.calcPipeConductionResistance(), 0.082204, tolerance);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_friction_factor)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_friction_factor)
 //{
 //    using namespace DataSystemVariables;
 //
@@ -1473,7 +1498,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), pow(0.79 * log(reynoldsNum) - 1.64, -2.0), tolerance);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_resistance)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_calc_pipe_convection_resistance)
 //{
 //    using namespace DataSystemVariables;
 //
@@ -1777,7 +1802,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_NEAR(thisGLHE.calcPipeConvectionResistance(), 0.135556, tolerance);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
 //{
 //    using namespace DataSystemVariables;
 //
@@ -2072,7 +2097,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_NEAR(thisGLHE.calcPipeResistance(), 0.082204 + 0.004453, tolerance);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1)
 //{
 //    using namespace DataSystemVariables;
 //
@@ -2370,7 +2395,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_NEAR(thisGLHE.calcBHGroutResistance(), 0.17701, tolerance);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2)
 //{
 //    using namespace DataSystemVariables;
 //
@@ -2668,7 +2693,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_NEAR(thisGLHE.calcBHGroutResistance(), 0.14724, tolerance);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3)
 //{
 //    using namespace DataSystemVariables;
 //
@@ -2966,7 +2991,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_NEAR(thisGLHE.calcBHGroutResistance(), 0.11038, tolerance);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_1)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_1)
 //{
 //    using namespace DataSystemVariables;
 //
@@ -3264,7 +3289,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_NEAR(thisGLHE.calcBHTotalInternalResistance(), 0.32365, tolerance);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_2)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_2)
 //{
 //    using namespace DataSystemVariables;
 //
@@ -3562,7 +3587,7 @@ TEST_F(EnergyPlusFixture, GHE_Pipe_calcTransitTime)
 //    EXPECT_NEAR(thisGLHE.calcBHTotalInternalResistance(), 0.16310, tolerance);
 //}
 //
-// TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_3)
+// TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_3)
 //{
 //    using namespace DataSystemVariables;
 //
