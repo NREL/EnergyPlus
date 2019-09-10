@@ -28,7 +28,7 @@ for root, dirs, files in os.walk(test_files_dir):
                             'tool': 'check_for_tabs_in_idfs',
                             'filename': os.path.join('testfiles', relative_path),
                             'file': os.path.join('testfiles', relative_path),
-                            'line': i,
+                            'line': i + 1,
                             'messagetype': 'error',
                             'message': 'Tab character found in IDF, use spaces for indentation'
                         }))
