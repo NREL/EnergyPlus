@@ -88,6 +88,16 @@ public:
 
     static std::unique_ptr<InputProcessor> factory();
 
+    template <typename T> struct EPVector : std::vector<T>
+    {
+        using std::vector<T>::vector;
+
+        T operator()(std::size_t n) const
+        {
+            return this->at(n - 1);
+        }
+    };
+    
     template <typename T> T *objectFactory(std::string const &objectName)
     {
         T *p = data->objectFactory<T>(objectName);
@@ -275,7 +285,5 @@ private:
 
 extern std::unique_ptr<InputProcessor> inputProcessor;
 } // namespace EnergyPlus
-
-// This is a test for branch commit.
 
 #endif
