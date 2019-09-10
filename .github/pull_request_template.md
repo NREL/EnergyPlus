@@ -16,6 +16,7 @@ Add to this list or remove from it as applicable.  This is a simple templated se
  - [ ] If any defect files are updated to a more recent version, upload new versions here or on DevSupport
  - [ ] If IDD requires transition, transition source, rules, ExpandObjects, and IDFs must be updated, and add IDDChange label
  - [ ] If structural output changes, add to output rules file and add OutputChange label
+ - [ ] If adding/removing any LaTeX docs or figures, update that document's CMakeLists file dependencies
 
 ### Reviewer
 This will not be exhaustively relevant to every PR.
