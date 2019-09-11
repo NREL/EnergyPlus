@@ -93,18 +93,6 @@ namespace CondenserLoopTowers {
 
     extern int NumSimpleTowers; // Number of similar towers
 
-//    extern Real64 InletWaterTemp;    // CW temperature at tower inlet
-//    extern Real64 OutletWaterTemp;   // CW temperature at tower outlet
-//    extern int WaterInletNode;       // Node number at tower inlet
-//    extern int WaterOutletNode;      // Node number at tower outlet
-//    extern Real64 WaterMassFlowRate; // WaterMassFlowRate through tower
-//    extern Real64 Qactual;          // Tower heat transfer
-//    extern Real64 CTFanPower;       // Tower fan power used
-//    extern Real64 AirFlowRateRatio; // Ratio of air flow rate through VS cooling tower to design air flow rate
-//    extern Real64 BasinHeaterPower; // Basin heater power use (W)
-//    extern Real64 WaterUsage;       // Tower water usage (m3/s)
-//    extern Real64 FanCyclingRatio;  // cycling ratio of tower fan when min fan speed provide to much capacity
-
     extern bool GetInput; // When TRUE, calls subroutine to read input file
     extern Array1D_bool CheckEquipName;
 

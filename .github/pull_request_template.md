@@ -21,6 +21,7 @@ Add to this list or remove from it as applicable.  This is a simple templated se
 ### Reviewer
 This will not be exhaustively relevant to every PR.
  - [ ] Perform a Code Review on GitHub
+ - [ ] If branch is behind develop, merge develop and build locally to check for side effects of the merge
  - [ ] If defect, verify by running develop branch and reproducing defect, then running PR and reproducing fix
  - [ ] If feature, test running new feature, try creative ways to break it
  - [ ] CI status: all green or justified
