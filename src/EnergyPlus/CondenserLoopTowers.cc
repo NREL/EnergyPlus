@@ -141,7 +141,6 @@ namespace CondenserLoopTowers {
     int NumSimpleTowers(0); // Number of similar towers
     bool GetInput(true);
 
-    Real64 __CTFanPower(0.0);       // Tower fan power used
     Real64 __AirFlowRateRatio(0.0); // Ratio of air flow rate through VS cooling tower to design air flow rate
 
     Array1D_bool CheckEquipName;
@@ -158,7 +157,6 @@ namespace CondenserLoopTowers {
     {
         NumSimpleTowers = 0;
         GetInput = true;
-        __CTFanPower = 0.0;
         __AirFlowRateRatio = 0.0;
         CheckEquipName.deallocate();
         SimpleTower.deallocate();
@@ -2369,7 +2367,6 @@ namespace CondenserLoopTowers {
         // PURPOSE OF THIS SUBROUTINE:
         // Initialize the simulation variables.
 
-        __CTFanPower = 0.0;       // Tower fan power used
         __AirFlowRateRatio = 0.0; // Ratio of air flow rate through VS cooling tower to design air flow rate
     }
 
@@ -4619,7 +4616,7 @@ namespace CondenserLoopTowers {
 
         // set inlet and outlet nodes
         SimpleTower(TowerNum).__Qactual = 0.0;
-        __CTFanPower = 0.0;
+        SimpleTower(TowerNum).__CTFanPower = 0.0;
         SimpleTower(TowerNum).__OutletWaterTemp = DataLoopNode::Node(SimpleTower(TowerNum).WaterInletNodeNum).Temp;
         LoopNum = SimpleTower(TowerNum).LoopNum;
         LoopSideNum = SimpleTower(TowerNum).LoopSideNum;
@@ -4728,7 +4725,7 @@ namespace CondenserLoopTowers {
             SimSimpleTower(TowerNum, WaterMassFlowRatePerCell, AirFlowRate, UAdesign, OutletWaterTempOFF);
 
             //   Assume Setpoint was met using free convection regime (pump ON and fan OFF)
-            __CTFanPower = 0.0;
+            SimpleTower(TowerNum).__CTFanPower = 0.0;
             SimpleTower(TowerNum).__OutletWaterTemp = OutletWaterTempOFF;
 
             if (OutletWaterTempOFF > TempSetPoint) {
@@ -4745,18 +4742,18 @@ namespace CondenserLoopTowers {
                     if (CapacityControl == CapacityControl_FanCycling || SimpleTower(TowerNum).__OutletWaterTemp <= OWTLowerLimit) {
                         //           Setpoint was met with pump ON and fan ON, calculate run-time fraction
                         FanModeFrac = (TempSetPoint - OutletWaterTempOFF) / (SimpleTower(TowerNum).__OutletWaterTemp - OutletWaterTempOFF);
-                        __CTFanPower = FanModeFrac * FanPowerOn;
+                        SimpleTower(TowerNum).__CTFanPower = FanModeFrac * FanPowerOn;
                         SimpleTower(TowerNum).__OutletWaterTemp = TempSetPoint;
                     } else {
                         // FluidBypass, fan runs at full speed for the entire time step
                         FanModeFrac = 1.0;
-                        __CTFanPower = FanPowerOn;
+                        SimpleTower(TowerNum).__CTFanPower = FanPowerOn;
                         BypassFlag = 1;
                     }
                 } else {
                     //         Setpoint was not met, cooling tower ran at full capacity
                     FanModeFrac = 1.0;
-                    __CTFanPower = FanPowerOn;
+                    SimpleTower(TowerNum).__CTFanPower = FanPowerOn;
                     // if possible increase the number of cells and do the calculations again with the new water mass flow rate per cell
                     if (NumCellOn < SimpleTower(TowerNum).NumCell && (SimpleTower(TowerNum).__WaterMassFlowRate / (NumCellOn + 1)) >= WaterMassFlowRatePerCellMin) {
                         ++NumCellOn;
@@ -4780,14 +4777,14 @@ namespace CondenserLoopTowers {
         if (BypassFlag == 1) {
             // Inlet water temperature lower than setpoint, assume 100% bypass, tower fan off
             if (SimpleTower(TowerNum).__InletWaterTemp <= TempSetPoint) {
-                __CTFanPower = 0.0;
+                SimpleTower(TowerNum).__CTFanPower = 0.0;
                 SimpleTower(TowerNum).BypassFraction = 1.0;
                 SimpleTower(TowerNum).__OutletWaterTemp = SimpleTower(TowerNum).__InletWaterTemp;
             } else {
                 if (std::abs(SimpleTower(TowerNum).__InletWaterTemp - SimpleTower(TowerNum).__OutletWaterTemp) <= 0.01) {
                     // Outlet temp is close enough to inlet temp, assume 100% bypass, tower fan off
                     SimpleTower(TowerNum).BypassFraction = 1.0;
-                    __CTFanPower = 0.0;
+                    SimpleTower(TowerNum).__CTFanPower = 0.0;
                 } else {
                     BypassFraction = (TempSetPoint - SimpleTower(TowerNum).__OutletWaterTemp) / (SimpleTower(TowerNum).__InletWaterTemp - SimpleTower(TowerNum).__OutletWaterTemp);
                     if (BypassFraction > 1.0 || BypassFraction < 0.0) {
@@ -4949,7 +4946,7 @@ namespace CondenserLoopTowers {
 
         // init
         SimpleTower(TowerNum).__Qactual = 0.0;
-        __CTFanPower = 0.0;
+        SimpleTower(TowerNum).__CTFanPower = 0.0;
         SimpleTower(TowerNum).__OutletWaterTemp = DataLoopNode::Node(SimpleTower(TowerNum).WaterInletNodeNum).Temp;
         LoopNum = SimpleTower(TowerNum).LoopNum;
         LoopSideNum = SimpleTower(TowerNum).LoopSideNum;
@@ -5053,7 +5050,7 @@ namespace CondenserLoopTowers {
             SimSimpleTower(TowerNum, WaterMassFlowRatePerCell, AirFlowRate, UAdesign, OutletWaterTempOFF);
 
             //     Setpoint was met using free convection regime (pump ON and fan OFF)
-            __CTFanPower = 0.0;
+            SimpleTower(TowerNum).__CTFanPower = 0.0;
             SimpleTower(TowerNum).__OutletWaterTemp = OutletWaterTempOFF;
             SpeedSel = 0;
 
@@ -5068,7 +5065,7 @@ namespace CondenserLoopTowers {
                 if (OutletWaterTemp1stStage <= TempSetPoint) {
                     //         Setpoint was met with pump ON and fan ON 1st stage, calculate fan mode fraction
                     FanModeFrac = (TempSetPoint - OutletWaterTempOFF) / (OutletWaterTemp1stStage - OutletWaterTempOFF);
-                    __CTFanPower = FanModeFrac * FanPowerLow;
+                    SimpleTower(TowerNum).__CTFanPower = FanModeFrac * FanPowerLow;
                     SimpleTower(TowerNum).__OutletWaterTemp = TempSetPoint;
                     SimpleTower(TowerNum).__Qactual *= FanModeFrac;
                     SpeedSel = 1;
@@ -5083,13 +5080,13 @@ namespace CondenserLoopTowers {
                     if ((OutletWaterTemp2ndStage <= TempSetPoint) && UAdesign > 0.0) {
                         //           Setpoint was met with pump ON and fan ON 2nd stage, calculate fan mode fraction
                         FanModeFrac = (TempSetPoint - OutletWaterTemp1stStage) / (OutletWaterTemp2ndStage - OutletWaterTemp1stStage);
-                        __CTFanPower = (FanModeFrac * FanPowerHigh) + (1.0 - FanModeFrac) * FanPowerLow;
+                        SimpleTower(TowerNum).__CTFanPower = (FanModeFrac * FanPowerHigh) + (1.0 - FanModeFrac) * FanPowerLow;
                         SimpleTower(TowerNum).__OutletWaterTemp = TempSetPoint;
                         SpeedSel = 2;
                     } else {
                         //           Setpoint was not met, cooling tower ran at full capacity
                         SimpleTower(TowerNum).__OutletWaterTemp = OutletWaterTemp2ndStage;
-                        __CTFanPower = FanPowerHigh;
+                        SimpleTower(TowerNum).__CTFanPower = FanPowerHigh;
                         SpeedSel = 2;
                         FanModeFrac = 1.0;
                         // if possible increase the number of cells and do the calculations again with the new water mass flow rate per cell
@@ -5169,7 +5166,7 @@ namespace CondenserLoopTowers {
                                                          DataPlant::PlantLoop(SimpleTower(TowerNum).LoopNum).FluidIndex,
                                         RoutineName);
         SimpleTower(TowerNum).__Qactual = 0.0;
-        __CTFanPower = 0.0;
+        SimpleTower(TowerNum).__CTFanPower = 0.0;
         SimpleTower(TowerNum).__OutletWaterTemp = DataLoopNode::Node(SimpleTower(TowerNum).WaterInletNodeNum).Temp;
         LoopNum = SimpleTower(TowerNum).LoopNum;
         LoopSideNum = SimpleTower(TowerNum).LoopSideNum;
@@ -5235,7 +5232,7 @@ namespace CondenserLoopTowers {
         if (std::abs(MyLoad) <= DataHVACGlobals::SmallLoad) {
             // tower doesn't need to do anything
             SimpleTower(TowerNum).__OutletWaterTemp = DataLoopNode::Node(SimpleTower(TowerNum).WaterInletNodeNum).Temp;
-            __CTFanPower = 0.0;
+            SimpleTower(TowerNum).__CTFanPower = 0.0;
             __AirFlowRateRatio = 0.0;
             SimpleTower(TowerNum).__Qactual = 0.0;
             CalcBasinHeaterPower(SimpleTower(TowerNum).BasinHeaterPowerFTempDiff,
@@ -5253,7 +5250,7 @@ namespace CondenserLoopTowers {
         SimSimpleTower(TowerNum, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAdesignPerCell, OutletWaterTempOFF);
 
         FreeConvQdot = SimpleTower(TowerNum).__WaterMassFlowRate * CpWater * (DataLoopNode::Node(SimpleTower(TowerNum).WaterInletNodeNum).Temp - OutletWaterTempOFF);
-        __CTFanPower = 0.0;
+        SimpleTower(TowerNum).__CTFanPower = 0.0;
 
         if (std::abs(MyLoad) <= FreeConvQdot) { // can meet load with free convection and fan off
 
@@ -5307,7 +5304,7 @@ namespace CondenserLoopTowers {
                                  SimpleTower(TowerNum).__BasinHeaterPower);
             // now calculate fan power
             FanPowerAdjustFac = CurveManager::CurveValue(SimpleTower(TowerNum).FanPowerfAirFlowCurve, __AirFlowRateRatio);
-            __CTFanPower = SimpleTower(TowerNum).HighSpeedFanPower * FanPowerAdjustFac * NumCellOn / SimpleTower(TowerNum).NumCell;
+            SimpleTower(TowerNum).__CTFanPower = SimpleTower(TowerNum).HighSpeedFanPower * FanPowerAdjustFac * NumCellOn / SimpleTower(TowerNum).NumCell;
 
             return;
         }
@@ -5328,7 +5325,7 @@ namespace CondenserLoopTowers {
                                  SimpleTower(TowerNum).__BasinHeaterPower);
             // now calculate fan power
             FanPowerAdjustFac = CurveManager::CurveValue(SimpleTower(TowerNum).FanPowerfAirFlowCurve, __AirFlowRateRatio);
-            __CTFanPower = SimpleTower(TowerNum).HighSpeedFanPower * FanPowerAdjustFac * NumCellOn / SimpleTower(TowerNum).NumCell;
+            SimpleTower(TowerNum).__CTFanPower = SimpleTower(TowerNum).HighSpeedFanPower * FanPowerAdjustFac * NumCellOn / SimpleTower(TowerNum).NumCell;
             return;
         }
 
@@ -5398,7 +5395,7 @@ namespace CondenserLoopTowers {
 
             // now calculate fan power
             FanPowerAdjustFac = CurveManager::CurveValue(SimpleTower(TowerNum).FanPowerfAirFlowCurve, __AirFlowRateRatio);
-            __CTFanPower = SimpleTower(TowerNum).HighSpeedFanPower * FanPowerAdjustFac * NumCellOn / SimpleTower(TowerNum).NumCell;
+            SimpleTower(TowerNum).__CTFanPower = SimpleTower(TowerNum).HighSpeedFanPower * FanPowerAdjustFac * NumCellOn / SimpleTower(TowerNum).NumCell;
         }
     }
 
@@ -5583,7 +5580,7 @@ namespace CondenserLoopTowers {
 
         // Initialize subroutine variables
         SimpleTower(TowerNum).__Qactual = 0.0;
-        __CTFanPower = 0.0;
+        SimpleTower(TowerNum).__CTFanPower = 0.0;
         SimpleTower(TowerNum).__OutletWaterTemp = DataLoopNode::Node(SimpleTower(TowerNum).WaterInletNodeNum).Temp;
 
         SimpleTower(TowerNum).__WaterUsage = 0.0;
@@ -5659,7 +5656,7 @@ namespace CondenserLoopTowers {
             if (OutletWaterTempON > TempSetPoint) {
                 SimpleTower(TowerNum).__FanCyclingRatio = 1.0;
                 __AirFlowRateRatio = 1.0;
-                __CTFanPower = SimpleTower(TowerNum).HighSpeedFanPower * NumCellOn / SimpleTower(TowerNum).NumCell;
+                SimpleTower(TowerNum).__CTFanPower = SimpleTower(TowerNum).HighSpeedFanPower * NumCellOn / SimpleTower(TowerNum).NumCell;
                 SimpleTower(TowerNum).__OutletWaterTemp = OutletWaterTempON;
                 // if possible increase the number of cells and do the calculations again with the new water mass flow rate per cell
                 if (NumCellOn < SimpleTower(TowerNum).NumCell && (SimpleTower(TowerNum).__WaterMassFlowRate / (NumCellOn + 1)) > WaterMassFlowRatePerCellMin) {
@@ -5680,7 +5677,7 @@ namespace CondenserLoopTowers {
             __AirFlowRateRatio = FreeConvectionCapFrac;
 
             // Assume setpoint was met using free convection regime (pump ON and fan OFF)
-            __CTFanPower = 0.0;
+            SimpleTower(TowerNum).__CTFanPower = 0.0;
             SimpleTower(TowerNum).__OutletWaterTemp = OutletWaterTempOFF;
 
             if (OutletWaterTempOFF > TempSetPoint) {
@@ -5692,14 +5689,14 @@ namespace CondenserLoopTowers {
                 if (OutletWaterTempMIN < TempSetPoint) {
                     //         if setpoint was exceeded, cycle the fan at minimum air flow to meet the setpoint temperature
                     if (SimpleTower(TowerNum).FanPowerfAirFlowCurve == 0) {
-                        __CTFanPower = pow_3(__AirFlowRateRatio) * SimpleTower(TowerNum).HighSpeedFanPower * NumCellOn / SimpleTower(TowerNum).NumCell;
+                        SimpleTower(TowerNum).__CTFanPower = pow_3(__AirFlowRateRatio) * SimpleTower(TowerNum).HighSpeedFanPower * NumCellOn / SimpleTower(TowerNum).NumCell;
                     } else {
                         FanCurveValue = CurveManager::CurveValue(SimpleTower(TowerNum).FanPowerfAirFlowCurve, __AirFlowRateRatio);
-                        __CTFanPower = max(0.0, (SimpleTower(TowerNum).HighSpeedFanPower * FanCurveValue)) * NumCellOn / SimpleTower(TowerNum).NumCell;
+                        SimpleTower(TowerNum).__CTFanPower = max(0.0, (SimpleTower(TowerNum).HighSpeedFanPower * FanCurveValue)) * NumCellOn / SimpleTower(TowerNum).NumCell;
                     }
                     //       fan is cycling ON and OFF at the minimum fan speed. Adjust fan power and air flow rate ratio according to cycling rate
                     SimpleTower(TowerNum).__FanCyclingRatio = ((OutletWaterTempOFF - TempSetPoint) / (OutletWaterTempOFF - OutletWaterTempMIN));
-                    __CTFanPower *= SimpleTower(TowerNum).__FanCyclingRatio;
+                    SimpleTower(TowerNum).__CTFanPower *= SimpleTower(TowerNum).__FanCyclingRatio;
                     SimpleTower(TowerNum).__OutletWaterTemp = TempSetPoint;
                     __AirFlowRateRatio =
                         (SimpleTower(TowerNum).__FanCyclingRatio * SimpleTower(TowerNum).MinimumVSAirFlowFrac) + ((1 - SimpleTower(TowerNum).__FanCyclingRatio) * FreeConvectionCapFrac);
@@ -5756,10 +5753,10 @@ namespace CondenserLoopTowers {
 
                     //         Use theoretical cubic for deterination of fan power if user has not specified a fan power ratio curve
                     if (SimpleTower(TowerNum).FanPowerfAirFlowCurve == 0) {
-                        __CTFanPower = pow_3(__AirFlowRateRatio) * SimpleTower(TowerNum).HighSpeedFanPower * NumCellOn / SimpleTower(TowerNum).NumCell;
+                        SimpleTower(TowerNum).__CTFanPower = pow_3(__AirFlowRateRatio) * SimpleTower(TowerNum).HighSpeedFanPower * NumCellOn / SimpleTower(TowerNum).NumCell;
                     } else {
                         FanCurveValue = CurveManager::CurveValue(SimpleTower(TowerNum).FanPowerfAirFlowCurve, __AirFlowRateRatio);
-                        __CTFanPower = max(0.0, (SimpleTower(TowerNum).HighSpeedFanPower * FanCurveValue)) * NumCellOn / SimpleTower(TowerNum).NumCell;
+                        SimpleTower(TowerNum).__CTFanPower = max(0.0, (SimpleTower(TowerNum).HighSpeedFanPower * FanCurveValue)) * NumCellOn / SimpleTower(TowerNum).NumCell;
                     }
                     //           outlet water temperature is calculated as the inlet air wet-bulb temperature plus tower approach temperature
                     SimpleTower(TowerNum).__OutletWaterTemp = Twb + Ta;
@@ -6795,8 +6792,8 @@ namespace CondenserLoopTowers {
             SimpleTowerReport(TowerNum).OutletWaterTemp = SimpleTower(TowerNum).__OutletWaterTemp;
             SimpleTowerReport(TowerNum).WaterMassFlowRate = SimpleTower(TowerNum).__WaterMassFlowRate;
             SimpleTowerReport(TowerNum).Qactual = SimpleTower(TowerNum).__Qactual;
-            SimpleTowerReport(TowerNum).FanPower = __CTFanPower;
-            SimpleTowerReport(TowerNum).FanEnergy = __CTFanPower * ReportingConstant;
+            SimpleTowerReport(TowerNum).FanPower = SimpleTower(TowerNum).__CTFanPower;
+            SimpleTowerReport(TowerNum).FanEnergy = SimpleTower(TowerNum).__CTFanPower * ReportingConstant;
             SimpleTowerReport(TowerNum).AirFlowRatio = __AirFlowRateRatio;
             SimpleTowerReport(TowerNum).WaterAmountUsed = SimpleTower(TowerNum).__WaterUsage * ReportingConstant;
             SimpleTowerReport(TowerNum).BasinHeaterPower = SimpleTower(TowerNum).__BasinHeaterPower;

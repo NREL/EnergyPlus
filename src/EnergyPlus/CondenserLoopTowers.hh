@@ -250,6 +250,7 @@ namespace CondenserLoopTowers {
         Real64 __FanCyclingRatio;  // cycling ratio of tower fan when min fan speed provide to much capacity
         Real64 __WaterMassFlowRate; // WaterMassFlowRate through tower
         Real64 __Qactual;          // Tower heat transfer
+        Real64 __CTFanPower;
 
         // Default Constructor
         Towerspecs()
@@ -282,7 +283,7 @@ namespace CondenserLoopTowers {
               FaultyCondenserSWTIndex(0), FaultyCondenserSWTOffset(0.0), FaultyTowerFoulingFlag(false), FaultyTowerFoulingIndex(0),
               FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0),
               __InletWaterTemp(0.0), __OutletWaterTemp(0.0), __BasinHeaterPower(0.0), __WaterUsage(0.0), __FanCyclingRatio(0.0),
-              __WaterMassFlowRate(0.0), __Qactual(0.0)
+              __WaterMassFlowRate(0.0), __Qactual(0.0), __CTFanPower(0.0)
         {
         }
     };
