@@ -78,6 +78,14 @@ using namespace EnergyPlus::GroundHeatExchangers;
 
 class GHEFixture : public EnergyPlusFixture {};
 
+TEST_F(GHEFixture, smoothingFunc)
+{
+    Real64 tol = 1E-3;
+    EXPECT_NEAR(smoothingFunc(-8, 0, 1), 0, tol);
+    EXPECT_NEAR(smoothingFunc(8, 0, 1), 1, tol);
+
+}
+
 TEST_F(GHEFixture, InitBaseProps)
 {
     json j = {{"conductivity", 0.4}, {"density", 950}, {"specific-heat", 1900}};
@@ -109,7 +117,7 @@ TEST_F(GHEFixture, InitPipe)
 
     Pipe pipe(j);
 
-    Real64 tol = 0.0001;
+    Real64 tol = 1E-4;
 
     // properties
     EXPECT_EQ(pipe.k, 0.4);
@@ -185,6 +193,104 @@ TEST_F(GHEFixture, mdotToRePipe)
     Real64 tol = 0.1;
 
     EXPECT_NEAR(pipe.mdotToRe(0.1, 20), 4725.7, tol);
+}
+
+TEST_F(GHEFixture, calcFrictionFactor)
+{
+    DataPlant::PlantLoop.allocate(2);
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(1).FluidIndex = 1;
+    DataPlant::PlantLoop(1).FluidName = "WATER";
+
+    json j = {{"conductivity", 0.4},
+              {"density", 950},
+              {"specific-heat", 1900},
+              {"outer-diameter", 0.0334},
+              {"inner-diameter", 0.0269},
+              {"length", 100},
+              {"initial-temperature", 10},
+              {"loop-num", 1}};
+
+    Pipe pipe(j);
+
+    Real64 tol = 1E-3;
+
+    // laminar tests
+    Real64 re = 100;
+    EXPECT_NEAR(pipe.calcFrictionFactor(100), 64 / re, tol);
+
+    re = 1000;
+    EXPECT_NEAR(pipe.calcFrictionFactor(re), 64.0 / re, tol);
+
+    re = 1400;
+    EXPECT_NEAR(pipe.calcFrictionFactor(re), 64.0 / re, tol);
+
+    // transitional tests
+    re = 2000;
+    EXPECT_NEAR(pipe.calcFrictionFactor(re), 0.034003503, tol);
+
+    re = 3000;
+    EXPECT_NEAR(pipe.calcFrictionFactor(re), 0.033446219, tol);
+
+    re = 4000;
+    EXPECT_NEAR(pipe.calcFrictionFactor(re), 0.03895358, tol);
+
+    // turbulent tests
+    re = 5000;
+    EXPECT_NEAR(pipe.calcFrictionFactor(re), std::pow(0.79 * std::log(re) - 1.64, -2.0), tol);
+
+    re = 15000;
+    EXPECT_NEAR(pipe.calcFrictionFactor(re), std::pow(0.79 * std::log(re) - 1.64, -2.0), tol);
+
+    re = 25000;
+    EXPECT_NEAR(pipe.calcFrictionFactor(re), std::pow(0.79 * std::log(re) - 1.64, -2.0), tol);
+}
+
+TEST_F(GHEFixture, calcConductionResistance)
+{
+    DataPlant::PlantLoop.allocate(2);
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(1).FluidIndex = 1;
+    DataPlant::PlantLoop(1).FluidName = "WATER";
+
+    json j = {{"conductivity", 0.4},
+              {"density", 950},
+              {"specific-heat", 1900},
+              {"outer-diameter", 0.0334},
+              {"inner-diameter", 0.0269},
+              {"length", 100},
+              {"initial-temperature", 10},
+              {"loop-num", 1}};
+
+    Pipe pipe(j);
+
+    Real64 tol = 1E-5;
+    EXPECT_NEAR(pipe.calcConductionResistance(), 0.0861146, tol);
+}
+
+TEST_F(GHEFixture, calcConvectionResistance)
+{
+    DataPlant::PlantLoop.allocate(2);
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(1).FluidIndex = 1;
+    DataPlant::PlantLoop(1).FluidName = "WATER";
+
+    json j = {{"conductivity", 0.4},
+              {"density", 950},
+              {"specific-heat", 1900},
+              {"outer-diameter", 0.0334},
+              {"inner-diameter", 0.0269},
+              {"length", 100},
+              {"initial-temperature", 10},
+              {"loop-num", 1}};
+
+    Pipe pipe(j);
+
+    Real64 temp = 20;
+    Real64 tol = 0.00001;
+    EXPECT_NEAR(pipe.calcConvectionResistance(0, temp), 0.13265, tol);
+    EXPECT_NEAR(pipe.calcConvectionResistance(0.07, temp), 0.02645, tol);
+    EXPECT_NEAR(pipe.calcConvectionResistance(2, temp), 0.00094, tol);
 }
 
 // TEST_F(GHEFixture, GroundHeatExchangerTest_Interpolate)

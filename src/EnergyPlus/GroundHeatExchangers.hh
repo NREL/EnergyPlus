@@ -132,11 +132,10 @@ namespace GroundHeatExchangers {
         Real64 volTotal = 0.0;      // Total pipe volume [m3]
         Real64 volFluid = 0.0;      // Fluid volume [m3]
         Real64 volPipeWall = 0.0;   // Pipe wall volume [m3]
-        Real64 f = 0.0;             // Friction factor [-]
+        Real64 friction = 0.0;      // Friction factor [-]
         Real64 resistPipe = 0.0;    // Total pipe resistance [K/(W/m)]
         Real64 resistConv = 0.0;    // Pipe convection resistance [K/(W/m)]
         int const numCells = 16;    // Number of pipe elements
-        Real64 re = 0.0;            // Reynolds number
         std::vector<Real64> cellTemps = {
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // Pipe temperature for each node
         std::deque<Real64> inletTemps = {0.0};                                               // Inlet temperature history [C]
@@ -195,15 +194,51 @@ namespace GroundHeatExchangers {
         Real64 plugFlowOutletTemp(Real64 time);
         void logInletTemps(Real64 inletTemp, Real64 time);
         Real64 mdotToRe(Real64 flowRate, Real64 temperature);
-        Real64 calcFrictionFactor(Real64 re);
-        Real64 calcCondResist();
-        Real64 calcConvResist(Real64 flowRate, Real64 temperature);
-        Real64 calcResist(Real64 flowRate, Real64 temperature);
-        Real64 laminarNu();
-        Real64 turbulentNu(Real64 re, Real64 temperature);
-        Real64 laminarFrictFact(Real64 re);
-        Real64 turbulentFrictFact(Real64 re);
+        Real64 calcFrictionFactor(Real64 Re);
+        Real64 calcConductionResistance();
+        Real64 calcConvectionResistance(Real64 flowRate, Real64 temperature);
+        Real64 calcResistance(Real64 flowRate, Real64 temperature);
+        Real64 turbulentNusselt(Real64 Re, Real64 temperature);
+
+        static Real64 laminarNusselt()
+        {
+            // laminar Nusselt number for smooth pipes
+            // mean(4.36, 3.66)
+
+            return 4.01;
+        }
+
+        static Real64 laminarFrictionFactor(Real64 Re)
+        {
+            // laminar friction factor
+            return 64 / Re;
+        }
+
+        static Real64 turbulentFrictionFactor(Real64 Re)
+        {
+            // turbulent friction factor
+
+            // Petukhov, B. S. (1970). Advances in Heat Transfer, volume 6, chapter Heat transfer and
+            // friction in turbulent pipe flow with variable physical properties, pages 503–564.
+            // Academic Press, Inc., New York, NY.
+
+            return std::pow(0.79 * std::log(Re) - 1.64, -2.0);
+        }
     };
+
+    static Real64 smoothingFunc(Real64 x, Real64 a, Real64 b)
+    {
+        //  Sigmoid smoothing function
+        //
+        //  https://en.wikipedia.org/wiki/Sigmoid_function
+        //
+        //  x: independent variable
+        //  param a: fitting parameter 1
+        //  param b: fitting parameter 2
+        //  return: float between 0-1
+
+        return 1 / (1 + std::exp(-(x - a) / b));
+    }
 
     // struct GLHEVertPropsStruct
     //{

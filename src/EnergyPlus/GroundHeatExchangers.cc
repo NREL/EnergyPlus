@@ -207,30 +207,30 @@ namespace GroundHeatExchangers {
         return 0;
     }
 
-    Real64 Pipe::plugFlowOutletTemp(Real64 time)
-    {
-        if (time < 0) {
-            return this->inletTemps[0];
-        }
+//    Real64 Pipe::plugFlowOutletTemp(Real64 time)
+//    {
+//        if (time < 0) {
+//            return this->inletTemps[0];
+//        }
+//
+//        int idx = 0;
+//        for (auto it = this->inletTempTimes.begin(); it != this->inletTempTimes.end(); ++it) {
+//            Real64 t_l = *it;
+//            if (t_l > time) {
+//                int idx_h = idx;
+//                int idx_l = idx - 1;
+//                t_l = this->inletTempTimes[idx_l];
+//                Real64 t_h = this->inletTempTimes[idx_h];
+//                Real64 temp_l = this->inletTemps[idx_l];
+//                Real64 temp_h = this->inletTemps[idx_h];
+//            }
+//            ++idx;
+//        }
+//    }
 
-        int idx = 0;
-        for (auto it = this->inletTempTimes.begin(); it != this->inletTempTimes.end(); ++it) {
-            Real64 t_l = *it;
-            if (t_l > time) {
-                int idx_h = idx;
-                int idx_l = idx - 1;
-                t_l = this->inletTempTimes[idx_l];
-                Real64 t_h = this->inletTempTimes[idx_h];
-                Real64 temp_l = this->inletTemps[idx_l];
-                Real64 temp_h = this->inletTemps[idx_h];
-            }
-            ++idx;
-        }
-    }
-
-    void Pipe::logInletTemps(Real64 inletTemp, Real64 time)
-    {
-    }
+//    void Pipe::logInletTemps(Real64 inletTemp, Real64 time)
+//    {
+//    }
 
     Real64 Pipe::mdotToRe(Real64 flowRate, Real64 temperature)
     {
@@ -240,43 +240,107 @@ namespace GroundHeatExchangers {
         return 4 * flowRate / (mu * Pi * this->innerDia);
     }
 
-    Real64 Pipe::calcFrictionFactor(Real64 re)
+    Real64 Pipe::calcFrictionFactor(Real64 Re)
     {
-        return 0;
+        Real64 lowRe = 1500;
+        Real64 highRe = 5000;
+
+        if (Re < lowRe) {
+            this->friction = laminarFrictionFactor(Re);
+        } else if (lowRe <= Re && Re < highRe) {
+            Real64 fLow = laminarFrictionFactor(Re);
+            Real64 fHigh = turbulentFrictionFactor(Re);
+            Real64 sigma = smoothingFunc(Re, 3000, 450);
+            this->friction = (1 - sigma) * fLow + sigma * fHigh;
+        } else
+            this->friction = turbulentFrictionFactor(Re);
+        return this->friction;
     }
 
-    Real64 Pipe::calcCondResist()
+    Real64 Pipe::calcConductionResistance()
     {
-        return 0;
+        // Calculates the thermal resistance of a pipe, in [K/(W/m)].
+
+        // Javed, S. and Spitler, J.D. 2017. 'Accuracy of borehole thermal resistance calculation methods
+        // for grouted single U-tube ground heat exchangers.' Applied Energy. 187: 790-806.
+
+        // @returns conduction resistance, K/(W/m)
+
+        return std::log(this->outDia / this->innerDia) / (2 * Pi * this->k);
     }
 
-    Real64 Pipe::calcConvResist(Real64 flowRate, Real64 temperature)
+    Real64 Pipe::turbulentNusselt(Real64 Re, Real64 temperature)
     {
-        return 0;
+        // turbulent Nusselt number
+
+        // Gnielinski, V. 1976. 'New equations for heat and mass transfer in turbulent pipe and channel flow.'
+        // International Chemical Engineering 16(1976), pp. 359-368.
+
+        static std::string const routineName("Pipe::turbulentNusselt");
+
+        Real64 f = this->calcFrictionFactor(Re);
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(PlantLoop(this->loopNum).FluidName,
+                                                           temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
+        Real64 mu = FluidProperties::GetViscosityGlycol(PlantLoop(this->loopNum).FluidName,
+                                                        temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
+        Real64 k = FluidProperties::GetConductivityGlycol(PlantLoop(this->loopNum).FluidName,
+                                                          temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
+
+        // Prandtl
+        Real64 Pr = Cp * mu / k;
+
+        return (f / 8) * (Re - 1000) * Pr / (1 + 12.7 * std::pow(f / 8, 0.5) * (std::pow(Pr, 2 / 3) - 1));
     }
 
-    Real64 Pipe::calcResist(Real64 flowRate, Real64 temperature)
+    Real64 Pipe::calcConvectionResistance(Real64 flowRate, Real64 temperature)
     {
-        return 0;
+
+        // Calculates the convection resistance using Gnielinski and Petukhov, in [k/(W/m)]
+
+        // Gnielinski, V. 1976. 'New equations for heat and mass transfer in turbulent pipe and channel flow.'
+        // International Chemical Engineering 16(1976), pp. 359-368.
+
+        // @param flow_rate: mass flow rate, kg/s
+        // @param temperature: temperature, C
+        // @returns convection resistance, K/(W/m)
+
+        static std::string const routineName("Pipe::calcConvectionResistance");
+
+        Real64 lowRe = 2000;
+        Real64 highRe = 4000;
+
+        Real64 Re = this->mdotToRe(flowRate, temperature);
+        Real64 Nu = 0;
+
+        if (Re < lowRe) {
+            Nu = laminarNusselt();
+        } else if (lowRe <= Re && Re < highRe) {
+            Real64 NuLow = laminarNusselt();
+            Real64 NuHigh = turbulentNusselt(Re, temperature);
+            Real64 sigma = smoothingFunc(Re, 3000, 150);
+            Nu = (1 - sigma) * NuLow + sigma * NuHigh;
+        } else
+            Nu = turbulentNusselt(Re, temperature);
+
+        Real64 k = FluidProperties::GetConductivityGlycol(PlantLoop(this->loopNum).FluidName,
+                                                          temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
+        this->resistConv = 1 / (Nu * Pi * k);
+        return this->resistConv;
     }
 
-    Real64 Pipe::laminarNu()
+    Real64 Pipe::calcResistance(Real64 flowRate, Real64 temperature)
     {
-        return 0;
-    }
+        // Calculates the combined conduction and convection pipe resistance
 
-    Real64 Pipe::turbulentNu(Real64 re, Real64 temperature)
-    {
-        return 0;
-    }
+        // Javed, S. and Spitler, J.D. 2017. 'Accuracy of borehole thermal resistance calculation methods
+        // for grouted single U-tube ground heat exchangers.' Applied Energy. 187: 790-806.
 
-    Real64 Pipe::laminarFrictFact(Real64 re)
-    {
-        return 0;
-    }
+        // Equation 3
 
-    Real64 Pipe::turbulentFrictFact(Real64 re)
-    {
+        // @param flowRate: mass flow rate, kg/s
+        // @param temperature: temperature, C
+
+        this->resistPipe = this->calcConvectionResistance(flowRate, temperature) + this->calcConductionResistance();
         return 0;
     }
 
