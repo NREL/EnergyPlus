@@ -7356,7 +7356,7 @@ namespace DXCoils {
                         SizingMethod = AutoCalculateSizing;
                         // Auto size low speed flow to fraction of the highest speed flow
                         DataConstantUsedForSizing = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( DXCoil( DXCoilNum ).NumOfSpeeds );
-                        if ( !HardSizeNoDesRun ) DataConstantUsedForSizing = MSRatedAirVolFlowRateDes;
+                        if ( !IsAutoSize && !HardSizeNoDesRun ) DataConstantUsedForSizing = MSRatedAirVolFlowRateDes;
                         DataFractionUsedForSizing = (float)Mode / DXCoil( DXCoilNum ).NumOfSpeeds;
                     }   
                     TempSize = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode );
@@ -7873,7 +7873,7 @@ namespace DXCoils {
                         SizingMethod = AutoCalculateSizing;
                         // Auto size low speed flow to fraction of the highest speed capacity
                         DataConstantUsedForSizing = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(DXCoil(DXCoilNum).NumOfSpeeds);
-                        if ( !HardSizeNoDesRun ) DataConstantUsedForSizing = MSRatedAirVolFlowRateDes;
+                        if (!IsAutoSize && !HardSizeNoDesRun ) DataConstantUsedForSizing = MSRatedAirVolFlowRateDes;
                         DataFractionUsedForSizing = (float)Mode / DXCoil(DXCoilNum).NumOfSpeeds;                        
                     }
                     TempSize = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode );
@@ -7962,7 +7962,6 @@ namespace DXCoils {
                         } else {
                             DataConstantUsedForSizing = DXCoil(DXCoilNum).RatedTotCap(1); // sized above
                         }
-                        //if ( !HardSizeNoDesRun ) DataConstantUsedForSizing = MSRatedTotCapDesAtMaxSpeed;
                     }
                     TempSize = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
