@@ -261,6 +261,31 @@ namespace CondenserLoopTowers {
         Real64 AirPress;   // Tower air barometric pressure
         Real64 AirHumRat;  // Tower air inlet humidity ratio (kg/kg)
 
+        // From ReportVars struct
+        Real64 InletWaterTemp;         // Tower inlet water temperature (C)
+        Real64 OutletWaterTemp;        // Tower outlet water temperature (C)
+        Real64 WaterMassFlowRate;      // Tower water mass flow rate (m3/s)
+        Real64 Qactual;                // Tower heat rejection rate (W)
+        Real64 FanPower;               // Tower fan power (W)
+        Real64 FanEnergy;              // Tower fan energy consumption (J)
+        Real64 AirFlowRatio;           // Air flow ratio through variable speed cooling tower
+        Real64 BasinHeaterPower;       // Basin heater power (W)
+        Real64 BasinHeaterConsumption; // Basin heater energy consumption (J)
+        Real64 WaterAmountUsed;        // Tower make up water usage (m3)
+        Real64 FanCyclingRatio;        // cycling ratio of tower fan when min fan speed provide too much capacity (for VFD)
+        Real64 EvaporationVdot;
+        Real64 EvaporationVol;
+        Real64 DriftVdot;
+        Real64 DriftVol;
+        Real64 BlowdownVdot;
+        Real64 BlowdownVol;
+        Real64 MakeUpVdot;
+        Real64 MakeUpVol;
+        Real64 TankSupplyVdot;
+        Real64 TankSupplyVol;
+        Real64 StarvedMakeUpVdot;
+        Real64 StarvedMakeUpVol;
+
         // Default Constructor
         Towerspecs()
             : TowerType_Num(0), PerformanceInputMethod_Num(0), Available(true), ON(true), DesignWaterFlowRate(0.0),
@@ -293,48 +318,10 @@ namespace CondenserLoopTowers {
               FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0),
               __InletWaterTemp(0.0), __OutletWaterTemp(0.0), __BasinHeaterPower(0.0), __WaterUsage(0.0), __FanCyclingRatio(0.0),
               __WaterMassFlowRate(0.0), __Qactual(0.0), __CTFanPower(0.0), __AirFlowRateRatio(0.0), WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0),
-              AirPress(0.0), AirHumRat(0.0)
-        {
-        }
-    };
-
-    struct ReportVars
-    {
-        // Members
-        Real64 InletWaterTemp;         // Tower inlet water temperature (C)
-        Real64 OutletWaterTemp;        // Tower outlet water temperature (C)
-        Real64 WaterMassFlowRate;      // Tower water mass flow rate (m3/s)
-        Real64 Qactual;                // Tower heat rejection rate (W)
-        Real64 FanPower;               // Tower fan power (W)
-        Real64 FanEnergy;              // Tower fan energy consumption (J)
-        Real64 AirFlowRatio;           // Air flow ratio through variable speed cooling tower
-        Real64 BasinHeaterPower;       // Basin heater power (W)
-        Real64 BasinHeaterConsumption; // Basin heater energy consumption (J)
-        Real64 WaterAmountUsed;        // Tower make up water usage (m3)
-        Real64 FanCyclingRatio;        // cycling ratio of tower fan when min fan speed provide too much capacity (for VFD)
-        Real64 EvaporationVdot;
-        Real64 EvaporationVol;
-        Real64 DriftVdot;
-        Real64 DriftVol;
-        Real64 BlowdownVdot;
-        Real64 BlowdownVol;
-        Real64 MakeUpVdot;
-        Real64 MakeUpVol;
-        Real64 TankSupplyVdot;
-        Real64 TankSupplyVol;
-        Real64 StarvedMakeUpVdot;
-        Real64 StarvedMakeUpVol;
-        Real64 BypassFraction; // Added for fluid bypass
-        int NumCellOn;         // for multi-cell tower
-        int SpeedSelected;     // Speed selected for the two speed tower
-
-        // Default Constructor
-        ReportVars()
-            : InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), AirFlowRatio(0.0),
+              AirPress(0.0), AirHumRat(0.0), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), AirFlowRatio(0.0),
               BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), WaterAmountUsed(0.0), FanCyclingRatio(0.0), EvaporationVdot(0.0),
               EvaporationVol(0.0), DriftVdot(0.0), DriftVol(0.0), BlowdownVdot(0.0), BlowdownVol(0.0), MakeUpVdot(0.0), MakeUpVol(0.0),
-              TankSupplyVdot(0.0), TankSupplyVol(0.0), StarvedMakeUpVdot(0.0), StarvedMakeUpVol(0.0), BypassFraction(0.0), NumCellOn(0),
-              SpeedSelected(0)
+              TankSupplyVdot(0.0), TankSupplyVol(0.0), StarvedMakeUpVdot(0.0), StarvedMakeUpVol(0.0)
         {
         }
     };
@@ -408,7 +395,6 @@ namespace CondenserLoopTowers {
 
     // Object Data
     extern Array1D<Towerspecs> SimpleTower;           // dimension to number of machines
-    extern Array1D<ReportVars> SimpleTowerReport;     // report variables
     extern Array1D<VSTowerData> VSTower;              // model coefficients and specific variables for VS tower
 
     // Functions
