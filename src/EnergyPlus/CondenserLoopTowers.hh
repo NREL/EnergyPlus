@@ -248,6 +248,10 @@ namespace CondenserLoopTowers {
         Real64 __BasinHeaterPower; // Basin heater power use (W)
         Real64 __WaterUsage;       // Tower water usage (m3/s)
         Real64 __FanCyclingRatio;  // cycling ratio of tower fan when min fan speed provide to much capacity
+        Real64 __WaterMassFlowRate;
+        Real64 __Qactual;
+        Real64 __CTFanPower;
+        Real64 __AirFlowRateRatio;
 
         // Default Constructor
         Towerspecs()
@@ -279,7 +283,8 @@ namespace CondenserLoopTowers {
               DesInletAirWBTemp(0), DesApproach(0), DesRange(0), TowerInletCondsAutoSize(false), FaultyCondenserSWTFlag(false),
               FaultyCondenserSWTIndex(0), FaultyCondenserSWTOffset(0.0), FaultyTowerFoulingFlag(false), FaultyTowerFoulingIndex(0),
               FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0),
-              __InletWaterTemp(0.0), __OutletWaterTemp(0.0), __BasinHeaterPower(0.0), __WaterUsage(0.0), __FanCyclingRatio(0.0)
+              __InletWaterTemp(0.0), __OutletWaterTemp(0.0), __BasinHeaterPower(0.0), __WaterUsage(0.0), __FanCyclingRatio(0.0),
+              __WaterMassFlowRate(0.0), __Qactual(0.0), __CTFanPower(0.0), __AirFlowRateRatio(0.0)
         {
         }
     };
@@ -430,8 +435,6 @@ namespace CondenserLoopTowers {
     );
 
     void GetTowerInput();
-
-    void InitSimVars();
 
     void InitTower(int TowerNum, // Number of the current cooling tower being simulated
                    bool RunFlag  // Indication of
