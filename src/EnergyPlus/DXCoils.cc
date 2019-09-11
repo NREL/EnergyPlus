@@ -7337,18 +7337,24 @@ namespace DXCoils {
                     DataIsDXCoil = false;
                     DataEMSOverrideON = false;
                     DataEMSOverride = 0.0;
+                    if ( !IsAutoSize && !HardSizeNoDesRun) {
+                        TempSize = AutoSize;
+                        bPRINT = false;
+                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
+                        MSRatedAirVolFlowRateDes = TempSize;
+                        bPRINT = true;
+                    } 
                 } else {
-                    //MSRatedAirVolFlowRateDes =
-                    //    DXCoil(DXCoilNum).MSRatedAirVolFlowRate(DXCoil(DXCoilNum).NumOfSpeeds) * Mode / DXCoil(DXCoilNum).NumOfSpeeds;
                     CompName = DXCoil(DXCoilNum).Name;
                     CompType = DXCoil(DXCoilNum).DXCoilType;
                     SizingMethod = CoolingAirflowSizing;
                     FieldNum = 10 + (Mode - 1) * 13;
                     SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
-                    if ( IsAutoSize ) {
+                    if ( IsAutoSize || !HardSizeNoDesRun) {
                         SizingMethod = AutoCalculateSizing;
                         // Auto size low speed flow to fraction of high speed capacity
                         DataConstantUsedForSizing = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( DXCoil( DXCoilNum ).NumOfSpeeds );
+                        if ( !HardSizeNoDesRun ) DataConstantUsedForSizing = MSRatedAirVolFlowRateDes;
                         DataFractionUsedForSizing = (float)Mode / DXCoil( DXCoilNum ).NumOfSpeeds;
                     }   
                     TempSize = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode );
@@ -7652,7 +7658,6 @@ namespace DXCoils {
                             CheckZoneSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
                         }
                     }
-                    // design SHR value is calculated for each speed instead of using the maximum speed design SHR value for all speeds
                     if (DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) >= SmallAirVolFlow && DXCoil(DXCoilNum).MSRatedTotCap(Mode) > 0.0) {
                         // For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
                         // minimum flow / capacity ratio = MinRatedVolFlowPerRatedTotCap = 0.00004027 [m3/s / W] = 300 [cfm/ton].
@@ -7845,17 +7850,25 @@ namespace DXCoils {
                     DataIsDXCoil = false;
                     DataEMSOverrideON = false;
                     DataEMSOverride = 0.0;
+                    if ( !IsAutoSize && !HardSizeNoDesRun) {
+                        TempSize = AutoSize;
+                        bPRINT = false;
+                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
+                        MSRatedAirVolFlowRateDes = TempSize;
+                        bPRINT = true;
+                    } 
                 } else {
                     CompName = DXCoil(DXCoilNum).Name;
                     CompType = DXCoil(DXCoilNum).DXCoilType;
                     SizingMethod = HeatingAirflowSizing;
                     FieldNum = 12 + (Mode - 1) * 5;
                     SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
-                    if ( IsAutoSize ) {
+                    if ( IsAutoSize || !HardSizeNoDesRun) {
                         SizingMethod = AutoCalculateSizing;
                         // Auto size low speed flow to fraction of high speed capacity
                         DataConstantUsedForSizing = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(DXCoil(DXCoilNum).NumOfSpeeds);
-                        DataFractionUsedForSizing = (float)Mode / DXCoil(DXCoilNum).NumOfSpeeds;
+                        if ( !HardSizeNoDesRun ) DataConstantUsedForSizing = MSRatedAirVolFlowRateDes;
+                        DataFractionUsedForSizing = (float)Mode / DXCoil(DXCoilNum).NumOfSpeeds;                        
                     }
                     TempSize = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode );
                     RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
