@@ -286,50 +286,7 @@ namespace CondenserLoopTowers {
         Real64 StarvedMakeUpVdot;
         Real64 StarvedMakeUpVol;
 
-        // Default Constructor
-        Towerspecs()
-            : TowerType_Num(0), PerformanceInputMethod_Num(0), Available(true), ON(true), DesignWaterFlowRate(0.0),
-              DesignWaterFlowRateWasAutoSized(false), DesignWaterFlowPerUnitNomCap(0.0), DesWaterMassFlowRate(0.0), DesWaterMassFlowRatePerCell(0.0),
-              HighSpeedAirFlowRate(0.0), HighSpeedAirFlowRateWasAutoSized(false), DesignAirFlowPerUnitNomCap(0.0),
-              DefaultedDesignAirFlowScalingFactor(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false),
-              DesignFanPowerPerUnitNomCap(0.0), HighSpeedTowerUA(0.0), HighSpeedTowerUAWasAutoSized(false), LowSpeedAirFlowRate(0.0),
-              LowSpeedAirFlowRateWasAutoSized(false), LowSpeedAirFlowRateSizingFactor(0.0), LowSpeedFanPower(0.0),
-              LowSpeedFanPowerWasAutoSized(false), LowSpeedFanPowerSizingFactor(0.0), LowSpeedTowerUA(0.0), LowSpeedTowerUAWasAutoSized(false),
-              LowSpeedTowerUASizingFactor(0.0), FreeConvAirFlowRate(0.0), FreeConvAirFlowRateWasAutoSized(false),
-              FreeConvAirFlowRateSizingFactor(0.0), FreeConvTowerUA(0.0), FreeConvTowerUAWasAutoSized(false), FreeConvTowerUASizingFactor(0.0),
-              DesignInletWB(0.0), DesignApproach(0.0), DesignRange(0.0), MinimumVSAirFlowFrac(0.0), CalibratedWaterFlowRate(0.0),
-              BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0), MakeupWaterDrift(0.0), FreeConvectionCapacityFraction(0.0),
-              TowerMassFlowRateMultiplier(0.0), HeatRejectCapNomCapSizingRatio(1.25), TowerNominalCapacity(0.0),
-              TowerNominalCapacityWasAutoSized(false), TowerLowSpeedNomCap(0.0), TowerLowSpeedNomCapWasAutoSized(false),
-              TowerLowSpeedNomCapSizingFactor(0.0), TowerFreeConvNomCap(0.0), TowerFreeConvNomCapWasAutoSized(false),
-              TowerFreeConvNomCapSizingFactor(0.0), SizFac(0.0), WaterInletNodeNum(0), WaterOutletNodeNum(0), OutdoorAirInletNodeNum(0),
-              TowerModelType(0), VSTower(0), FanPowerfAirFlowCurve(0), BlowDownSchedulePtr(0), BasinHeaterSchedulePtr(0), HighMassFlowErrorCount(0),
-              HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0), OutletWaterTempErrorIndex(0), SmallWaterMassFlowErrorCount(0),
-              SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0), WMFRLessThanMinAvailErrIndex(0), WMFRGreaterThanMaxAvailErrCount(0),
-              WMFRGreaterThanMaxAvailErrIndex(0), CoolingTowerAFRRFailedCount(0), CoolingTowerAFRRFailedIndex(0), SpeedSelected(0),
-              CapacityControl(0), BypassFraction(0.0), NumCell(0), CellCtrl_Num(0), NumCellOn(0), MinFracFlowRate(0.0), MaxFracFlowRate(0.0),
-              EvapLossMode(EvapLossByMoistTheory), UserEvapLossFactor(0.0), DriftLossFraction(0.0), BlowdownMode(BlowdownByConcentration),
-              ConcentrationRatio(0.0), SchedIDBlowdown(0), SuppliedByWaterSystem(false), WaterTankID(0), WaterTankDemandARRID(0), LoopNum(0),
-              LoopSideNum(0), BranchNum(0), CompNum(0), UAModFuncAirFlowRatioCurvePtr(0), UAModFuncWetBulbDiffCurvePtr(0),
-              UAModFuncWaterFlowRatioCurvePtr(0), SetpointIsOnOutlet(false), VSMerkelAFRErrorIter(0), VSMerkelAFRErrorIterIndex(0),
-              VSMerkelAFRErrorFail(0), VSMerkelAFRErrorFailIndex(0), DesInletWaterTemp(0), DesOutletWaterTemp(0), DesInletAirDBTemp(0),
-              DesInletAirWBTemp(0), DesApproach(0), DesRange(0), TowerInletCondsAutoSize(false), FaultyCondenserSWTFlag(false),
-              FaultyCondenserSWTIndex(0), FaultyCondenserSWTOffset(0.0), FaultyTowerFoulingFlag(false), FaultyTowerFoulingIndex(0),
-              FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0),
-              __InletWaterTemp(0.0), __OutletWaterTemp(0.0), __BasinHeaterPower(0.0), __WaterUsage(0.0), __FanCyclingRatio(0.0),
-              __WaterMassFlowRate(0.0), __Qactual(0.0), __CTFanPower(0.0), __AirFlowRateRatio(0.0), WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0),
-              AirPress(0.0), AirHumRat(0.0), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), AirFlowRatio(0.0),
-              BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), WaterAmountUsed(0.0), FanCyclingRatio(0.0), EvaporationVdot(0.0),
-              EvaporationVol(0.0), DriftVdot(0.0), DriftVol(0.0), BlowdownVdot(0.0), BlowdownVol(0.0), MakeUpVdot(0.0), MakeUpVol(0.0),
-              TankSupplyVdot(0.0), TankSupplyVol(0.0), StarvedMakeUpVdot(0.0), StarvedMakeUpVol(0.0)
-        {
-        }
-    };
-
-    struct VSTowerData
-    {
-        // Members
-        // variables specific to variable-speed towers
+        // From VSTower struct - for Variable speed towers only
         Array1D<Real64> Coeff;      // - model coefficients
         bool FoundModelCoeff;       // - TRUE if model is calibratable
         Real64 MinInletAirWBTemp;   // - model limit for min inlet air WB temp
@@ -383,8 +340,42 @@ namespace CondenserLoopTowers {
         Real64 LGLast;                 // value of LG when warning occurred (passed to Recurring Warn)
 
         // Default Constructor
-        VSTowerData()
-            : FoundModelCoeff(false), MinInletAirWBTemp(0.0), MaxInletAirWBTemp(0.0), MinRangeTemp(0.0), MaxRangeTemp(0.0), MinApproachTemp(0.0),
+        Towerspecs()
+            : TowerType_Num(0), PerformanceInputMethod_Num(0), Available(true), ON(true), DesignWaterFlowRate(0.0),
+              DesignWaterFlowRateWasAutoSized(false), DesignWaterFlowPerUnitNomCap(0.0), DesWaterMassFlowRate(0.0), DesWaterMassFlowRatePerCell(0.0),
+              HighSpeedAirFlowRate(0.0), HighSpeedAirFlowRateWasAutoSized(false), DesignAirFlowPerUnitNomCap(0.0),
+              DefaultedDesignAirFlowScalingFactor(false), HighSpeedFanPower(0.0), HighSpeedFanPowerWasAutoSized(false),
+              DesignFanPowerPerUnitNomCap(0.0), HighSpeedTowerUA(0.0), HighSpeedTowerUAWasAutoSized(false), LowSpeedAirFlowRate(0.0),
+              LowSpeedAirFlowRateWasAutoSized(false), LowSpeedAirFlowRateSizingFactor(0.0), LowSpeedFanPower(0.0),
+              LowSpeedFanPowerWasAutoSized(false), LowSpeedFanPowerSizingFactor(0.0), LowSpeedTowerUA(0.0), LowSpeedTowerUAWasAutoSized(false),
+              LowSpeedTowerUASizingFactor(0.0), FreeConvAirFlowRate(0.0), FreeConvAirFlowRateWasAutoSized(false),
+              FreeConvAirFlowRateSizingFactor(0.0), FreeConvTowerUA(0.0), FreeConvTowerUAWasAutoSized(false), FreeConvTowerUASizingFactor(0.0),
+              DesignInletWB(0.0), DesignApproach(0.0), DesignRange(0.0), MinimumVSAirFlowFrac(0.0), CalibratedWaterFlowRate(0.0),
+              BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0), MakeupWaterDrift(0.0), FreeConvectionCapacityFraction(0.0),
+              TowerMassFlowRateMultiplier(0.0), HeatRejectCapNomCapSizingRatio(1.25), TowerNominalCapacity(0.0),
+              TowerNominalCapacityWasAutoSized(false), TowerLowSpeedNomCap(0.0), TowerLowSpeedNomCapWasAutoSized(false),
+              TowerLowSpeedNomCapSizingFactor(0.0), TowerFreeConvNomCap(0.0), TowerFreeConvNomCapWasAutoSized(false),
+              TowerFreeConvNomCapSizingFactor(0.0), SizFac(0.0), WaterInletNodeNum(0), WaterOutletNodeNum(0), OutdoorAirInletNodeNum(0),
+              TowerModelType(0), VSTower(0), FanPowerfAirFlowCurve(0), BlowDownSchedulePtr(0), BasinHeaterSchedulePtr(0), HighMassFlowErrorCount(0),
+              HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0), OutletWaterTempErrorIndex(0), SmallWaterMassFlowErrorCount(0),
+              SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0), WMFRLessThanMinAvailErrIndex(0), WMFRGreaterThanMaxAvailErrCount(0),
+              WMFRGreaterThanMaxAvailErrIndex(0), CoolingTowerAFRRFailedCount(0), CoolingTowerAFRRFailedIndex(0), SpeedSelected(0),
+              CapacityControl(0), BypassFraction(0.0), NumCell(0), CellCtrl_Num(0), NumCellOn(0), MinFracFlowRate(0.0), MaxFracFlowRate(0.0),
+              EvapLossMode(EvapLossByMoistTheory), UserEvapLossFactor(0.0), DriftLossFraction(0.0), BlowdownMode(BlowdownByConcentration),
+              ConcentrationRatio(0.0), SchedIDBlowdown(0), SuppliedByWaterSystem(false), WaterTankID(0), WaterTankDemandARRID(0), LoopNum(0),
+              LoopSideNum(0), BranchNum(0), CompNum(0), UAModFuncAirFlowRatioCurvePtr(0), UAModFuncWetBulbDiffCurvePtr(0),
+              UAModFuncWaterFlowRatioCurvePtr(0), SetpointIsOnOutlet(false), VSMerkelAFRErrorIter(0), VSMerkelAFRErrorIterIndex(0),
+              VSMerkelAFRErrorFail(0), VSMerkelAFRErrorFailIndex(0), DesInletWaterTemp(0), DesOutletWaterTemp(0), DesInletAirDBTemp(0),
+              DesInletAirWBTemp(0), DesApproach(0), DesRange(0), TowerInletCondsAutoSize(false), FaultyCondenserSWTFlag(false),
+              FaultyCondenserSWTIndex(0), FaultyCondenserSWTOffset(0.0), FaultyTowerFoulingFlag(false), FaultyTowerFoulingIndex(0),
+              FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0),
+              __InletWaterTemp(0.0), __OutletWaterTemp(0.0), __BasinHeaterPower(0.0), __WaterUsage(0.0), __FanCyclingRatio(0.0),
+              __WaterMassFlowRate(0.0), __Qactual(0.0), __CTFanPower(0.0), __AirFlowRateRatio(0.0), WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0),
+              AirPress(0.0), AirHumRat(0.0), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), AirFlowRatio(0.0),
+              BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), WaterAmountUsed(0.0), FanCyclingRatio(0.0), EvaporationVdot(0.0),
+              EvaporationVol(0.0), DriftVdot(0.0), DriftVol(0.0), BlowdownVdot(0.0), BlowdownVol(0.0), MakeUpVdot(0.0), MakeUpVol(0.0),
+              TankSupplyVdot(0.0), TankSupplyVol(0.0), StarvedMakeUpVdot(0.0), StarvedMakeUpVol(0.0),
+              FoundModelCoeff(false), MinInletAirWBTemp(0.0), MaxInletAirWBTemp(0.0), MinRangeTemp(0.0), MaxRangeTemp(0.0), MinApproachTemp(0.0),
               MaxApproachTemp(0.0), MinWaterFlowRatio(0.0), MaxWaterFlowRatio(0.0), MaxLiquidToGasRatio(0.0), VSErrorCountFlowFrac(0),
               VSErrorCountWFRR(0), VSErrorCountIAWB(0), VSErrorCountTR(0), VSErrorCountTA(0), ErrIndexFlowFrac(0), ErrIndexWFRR(0), ErrIndexIAWB(0),
               ErrIndexTR(0), ErrIndexTA(0), ErrIndexLG(0), PrintTrMessage(false), PrintTwbMessage(false), PrintTaMessage(false),
@@ -395,7 +386,6 @@ namespace CondenserLoopTowers {
 
     // Object Data
     extern Array1D<Towerspecs> SimpleTower;           // dimension to number of machines
-    extern Array1D<VSTowerData> VSTower;              // model coefficients and specific variables for VS tower
 
     // Functions
     void clear_state();

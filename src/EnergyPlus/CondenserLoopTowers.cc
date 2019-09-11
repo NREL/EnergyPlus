@@ -145,7 +145,6 @@ namespace CondenserLoopTowers {
 
     // Object Data
     Array1D<Towerspecs> SimpleTower;           // dimension to number of machines
-    Array1D<VSTowerData> VSTower;              // model coefficients and specific variables for VS tower
     std::unordered_map<std::string, std::string> UniqueSimpleTowerNames;
 
     // Functions
@@ -156,7 +155,6 @@ namespace CondenserLoopTowers {
         CheckEquipName.deallocate();
         SimpleTower.deallocate();
         UniqueSimpleTowerNames.clear();
-        VSTower.deallocate();
     }
 
     void SimTowers(std::string const &TowerType,
@@ -382,7 +380,6 @@ namespace CondenserLoopTowers {
         CheckEquipName.dimension(NumSimpleTowers, true);
         // Allocate variable-speed tower structure with data specific to this type
         if (NumVariableSpeedTowers > 0) {
-            VSTower.allocate(NumVariableSpeedTowers);
             // Allow users to input model coefficients other than default
             NumVSCoolToolsModelCoeffs = inputProcessor->getNumObjectsFound("CoolingTowerPerformance:CoolTools");
             NumVSYorkCalcModelCoeffs = inputProcessor->getNumObjectsFound("CoolingTowerPerformance:YorkCalc");
@@ -1175,101 +1172,101 @@ namespace CondenserLoopTowers {
                 }
             }
 
-            VSTower(VariableSpeedTowerNumber).Coeff.allocate(35);
-            VSTower(VariableSpeedTowerNumber).Coeff = 0.0;
+            SimpleTower(VariableSpeedTowerNumber).Coeff.allocate(35);
+            SimpleTower(VariableSpeedTowerNumber).Coeff = 0.0;
 
             if (UtilityRoutines::SameString(AlphArray(4), "CoolToolsCrossFlow")) {
                 SimpleTower(TowerNum).TowerModelType = CoolToolsXFModel;
                 //     set cross-flow model coefficients
                 //       Outputs approach in C
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(1) = 0.52049709836241;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(2) = -10.617046395344;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(3) = 10.7292974722538;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(4) = -2.74988377158227;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(5) = 4.73629943913743;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(6) = -8.25759700874711;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(7) = 1.57640938114136;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(8) = 6.51119643791324;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(9) = 1.50433525206692;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(10) = -3.2888529287801;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(11) = 0.0257786145353773;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(12) = 0.182464289315254;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(13) = -0.0818947291400898;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(14) = -0.215010003996285;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(15) = 0.0186741309635284;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(16) = 0.0536824177590012;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(17) = -0.00270968955115031;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(18) = 0.00112277498589279;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(19) = -0.00127758497497718;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(20) = 0.0000760420796601607;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(21) = 1.43600088336017;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(22) = -0.5198695909109;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(23) = 0.117339576910507;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(24) = 1.50492810819924;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(25) = -0.135898905926974;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(26) = -0.152577581866506;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(27) = -0.0533843828114562;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(28) = 0.00493294869565511;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(29) = -0.00796260394174197;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(30) = 0.000222619828621544;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(31) = -0.0543952001568055;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(32) = 0.00474266879161693;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(33) = -0.0185854671815598;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(34) = 0.00115667701293848;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(35) = 0.000807370664460284;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(1) = 0.52049709836241;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(2) = -10.617046395344;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(3) = 10.7292974722538;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(4) = -2.74988377158227;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(5) = 4.73629943913743;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(6) = -8.25759700874711;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(7) = 1.57640938114136;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(8) = 6.51119643791324;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(9) = 1.50433525206692;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(10) = -3.2888529287801;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(11) = 0.0257786145353773;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(12) = 0.182464289315254;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(13) = -0.0818947291400898;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(14) = -0.215010003996285;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(15) = 0.0186741309635284;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(16) = 0.0536824177590012;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(17) = -0.00270968955115031;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(18) = 0.00112277498589279;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(19) = -0.00127758497497718;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(20) = 0.0000760420796601607;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(21) = 1.43600088336017;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(22) = -0.5198695909109;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(23) = 0.117339576910507;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(24) = 1.50492810819924;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(25) = -0.135898905926974;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(26) = -0.152577581866506;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(27) = -0.0533843828114562;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(28) = 0.00493294869565511;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(29) = -0.00796260394174197;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(30) = 0.000222619828621544;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(31) = -0.0543952001568055;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(32) = 0.00474266879161693;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(33) = -0.0185854671815598;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(34) = 0.00115667701293848;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(35) = 0.000807370664460284;
 
                 //       set minimum and maximum boundaries for CoolTools crossflow model input variables
-                VSTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp = -1.0;
-                VSTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp = 26.6667;
-                VSTower(SimpleTower(TowerNum).VSTower).MinRangeTemp = 1.1111;
-                VSTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp = 11.1111;
-                VSTower(SimpleTower(TowerNum).VSTower).MinApproachTemp = 1.1111;
-                VSTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp = 11.1111;
-                VSTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio = 0.75;
-                VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio = 1.25;
+                SimpleTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp = -1.0;
+                SimpleTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp = 26.6667;
+                SimpleTower(SimpleTower(TowerNum).VSTower).MinRangeTemp = 1.1111;
+                SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp = 11.1111;
+                SimpleTower(SimpleTower(TowerNum).VSTower).MinApproachTemp = 1.1111;
+                SimpleTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp = 11.1111;
+                SimpleTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio = 0.75;
+                SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio = 1.25;
 
             } else if (UtilityRoutines::SameString(AlphArray(4), "YorkCalc")) {
                 SimpleTower(TowerNum).TowerModelType = YorkCalcModel;
                 //     set counter-flow model coefficients
                 //       Outputs approach in C
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(1) = -0.359741205;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(2) = -0.055053608;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(3) = 0.0023850432;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(4) = 0.173926877;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(5) = -0.0248473764;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(6) = 0.00048430224;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(7) = -0.005589849456;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(8) = 0.0005770079712;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(9) = -0.00001342427256;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(10) = 2.84765801111111;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(11) = -0.121765149;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(12) = 0.0014599242;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(13) = 1.680428651;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(14) = -0.0166920786;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(15) = -0.0007190532;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(16) = -0.025485194448;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(17) = 0.0000487491696;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(18) = 0.00002719234152;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(19) = -0.0653766255555556;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(20) = -0.002278167;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(21) = 0.0002500254;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(22) = -0.0910565458;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(23) = 0.00318176316;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(24) = 0.000038621772;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(25) = -0.0034285382352;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(26) = 0.00000856589904;
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(27) = -0.000001516821552;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(1) = -0.359741205;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(2) = -0.055053608;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(3) = 0.0023850432;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(4) = 0.173926877;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(5) = -0.0248473764;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(6) = 0.00048430224;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(7) = -0.005589849456;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(8) = 0.0005770079712;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(9) = -0.00001342427256;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(10) = 2.84765801111111;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(11) = -0.121765149;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(12) = 0.0014599242;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(13) = 1.680428651;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(14) = -0.0166920786;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(15) = -0.0007190532;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(16) = -0.025485194448;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(17) = 0.0000487491696;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(18) = 0.00002719234152;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(19) = -0.0653766255555556;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(20) = -0.002278167;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(21) = 0.0002500254;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(22) = -0.0910565458;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(23) = 0.00318176316;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(24) = 0.000038621772;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(25) = -0.0034285382352;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(26) = 0.00000856589904;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(27) = -0.000001516821552;
 
                 //       set minimum and maximum boundaries for YorkCalc model input variables
-                VSTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp = -34.4;
-                VSTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp = 29.4444;
-                VSTower(SimpleTower(TowerNum).VSTower).MinRangeTemp = 1.1111;
-                VSTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp = 22.2222;
-                VSTower(SimpleTower(TowerNum).VSTower).MinApproachTemp = 1.1111;
-                VSTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp = 40.0;
-                VSTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio = 0.75;
-                VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio = 1.25;
-                VSTower(SimpleTower(TowerNum).VSTower).MaxLiquidToGasRatio = 8.0;
+                SimpleTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp = -34.4;
+                SimpleTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp = 29.4444;
+                SimpleTower(SimpleTower(TowerNum).VSTower).MinRangeTemp = 1.1111;
+                SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp = 22.2222;
+                SimpleTower(SimpleTower(TowerNum).VSTower).MinApproachTemp = 1.1111;
+                SimpleTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp = 40.0;
+                SimpleTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio = 0.75;
+                SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio = 1.25;
+                SimpleTower(SimpleTower(TowerNum).VSTower).MaxLiquidToGasRatio = 8.0;
 
             } else if (UtilityRoutines::SameString(AlphArray(4), "CoolToolsUserDefined")) {
                 SimpleTower(TowerNum).TowerModelType = CoolToolsUserDefined;
@@ -1278,7 +1275,7 @@ namespace CondenserLoopTowers {
                     inputProcessor->getObjectItem(
                         "CoolingTowerPerformance:CoolTools", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat);
                     if (!UtilityRoutines::SameString(AlphArray2(1), SimpleTower(TowerNum).ModelCoeffObjectName)) continue;
-                    VSTower(SimpleTower(TowerNum).VSTower).FoundModelCoeff = true;
+                    SimpleTower(SimpleTower(TowerNum).VSTower).FoundModelCoeff = true;
                     // verify the correct number of coefficients for the CoolTools model
                     if (NumNums2 != 43) {
                         ShowSevereError("CoolingTower:VariableSpeed \"" + SimpleTower(TowerNum).Name +
@@ -1287,22 +1284,22 @@ namespace CondenserLoopTowers {
                         ErrorsFound = true;
                     } else {
 
-                        VSTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp = NumArray2(1);
-                        VSTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp = NumArray2(2);
-                        VSTower(SimpleTower(TowerNum).VSTower).MinRangeTemp = NumArray2(3);
-                        VSTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp = NumArray2(4);
-                        VSTower(SimpleTower(TowerNum).VSTower).MinApproachTemp = NumArray2(5);
-                        VSTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp = NumArray2(6);
-                        VSTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio = NumArray2(7);
-                        VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio = NumArray2(8);
+                        SimpleTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp = NumArray2(1);
+                        SimpleTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp = NumArray2(2);
+                        SimpleTower(SimpleTower(TowerNum).VSTower).MinRangeTemp = NumArray2(3);
+                        SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp = NumArray2(4);
+                        SimpleTower(SimpleTower(TowerNum).VSTower).MinApproachTemp = NumArray2(5);
+                        SimpleTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp = NumArray2(6);
+                        SimpleTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio = NumArray2(7);
+                        SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio = NumArray2(8);
 
                         for (CoeffNum = 9; CoeffNum <= NumNums2; ++CoeffNum) {
-                            VSTower(SimpleTower(TowerNum).VSTower).Coeff(CoeffNum - 8) = NumArray2(CoeffNum);
+                            SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(CoeffNum - 8) = NumArray2(CoeffNum);
                         }
                     }
                     break;
                 }
-                if (!VSTower(SimpleTower(TowerNum).VSTower).FoundModelCoeff) {
+                if (!SimpleTower(SimpleTower(TowerNum).VSTower).FoundModelCoeff) {
                     ShowSevereError("CoolingTower:VariableSpeed \"" + SimpleTower(TowerNum).Name +
                                     "\". User defined name for variable speed cooling tower model coefficients object not found = " +
                                     SimpleTower(TowerNum).ModelCoeffObjectName);
@@ -1315,7 +1312,7 @@ namespace CondenserLoopTowers {
                     inputProcessor->getObjectItem(
                         "CoolingTowerPerformance:YorkCalc", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat);
                     if (!UtilityRoutines::SameString(AlphArray2(1), SimpleTower(TowerNum).ModelCoeffObjectName)) continue;
-                    VSTower(SimpleTower(TowerNum).VSTower).FoundModelCoeff = true;
+                    SimpleTower(SimpleTower(TowerNum).VSTower).FoundModelCoeff = true;
                     // verify the correct number of coefficients for the YorkCalc model
                     if (NumNums2 != 36) {
                         ShowSevereError("CoolingTower:VariableSpeed \"" + SimpleTower(TowerNum).Name +
@@ -1324,24 +1321,24 @@ namespace CondenserLoopTowers {
                         ErrorsFound = true;
                     } else {
 
-                        VSTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp = NumArray2(1);
-                        VSTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp = NumArray2(2);
-                        VSTower(SimpleTower(TowerNum).VSTower).MinRangeTemp = NumArray2(3);
-                        VSTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp = NumArray2(4);
-                        VSTower(SimpleTower(TowerNum).VSTower).MinApproachTemp = NumArray2(5);
-                        VSTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp = NumArray2(6);
-                        VSTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio = NumArray2(7);
-                        VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio = NumArray2(8);
-                        VSTower(SimpleTower(TowerNum).VSTower).MaxLiquidToGasRatio = NumArray2(9);
+                        SimpleTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp = NumArray2(1);
+                        SimpleTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp = NumArray2(2);
+                        SimpleTower(SimpleTower(TowerNum).VSTower).MinRangeTemp = NumArray2(3);
+                        SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp = NumArray2(4);
+                        SimpleTower(SimpleTower(TowerNum).VSTower).MinApproachTemp = NumArray2(5);
+                        SimpleTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp = NumArray2(6);
+                        SimpleTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio = NumArray2(7);
+                        SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio = NumArray2(8);
+                        SimpleTower(SimpleTower(TowerNum).VSTower).MaxLiquidToGasRatio = NumArray2(9);
 
                         for (CoeffNum = 10; CoeffNum <= NumNums2; ++CoeffNum) {
-                            VSTower(SimpleTower(TowerNum).VSTower).Coeff(CoeffNum - 9) = NumArray2(CoeffNum);
+                            SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(CoeffNum - 9) = NumArray2(CoeffNum);
                         }
                     }
                     break;
                 }
 
-                if (!VSTower(SimpleTower(TowerNum).VSTower).FoundModelCoeff) {
+                if (!SimpleTower(SimpleTower(TowerNum).VSTower).FoundModelCoeff) {
                     ShowSevereError(cCurrentModuleObject + " \"" + SimpleTower(TowerNum).Name +
                                     "\". User defined name for variable speed cooling tower model coefficients object not found = " +
                                     SimpleTower(TowerNum).ModelCoeffObjectName);
@@ -1353,67 +1350,67 @@ namespace CondenserLoopTowers {
                 ErrorsFound = true;
             }
 
-            SimpleTower(TowerNum).TowerMassFlowRateMultiplier = VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio;
+            SimpleTower(TowerNum).TowerMassFlowRateMultiplier = SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio;
 
             //   check user defined minimums to be greater than 0
-            if (VSTower(SimpleTower(TowerNum).VSTower).MinApproachTemp < 0.0) {
+            if (SimpleTower(SimpleTower(TowerNum).VSTower).MinApproachTemp < 0.0) {
                 ShowSevereError(cCurrentModuleObject + " \"" + SimpleTower(TowerNum).Name +
                                 "\". User defined minimum approach temperature must be > 0");
                 ErrorsFound = true;
             }
-            if (VSTower(SimpleTower(TowerNum).VSTower).MinRangeTemp < 0.0) {
+            if (SimpleTower(SimpleTower(TowerNum).VSTower).MinRangeTemp < 0.0) {
                 ShowSevereError(cCurrentModuleObject + " \"" + SimpleTower(TowerNum).Name + "\". User defined minimum range temperature must be > 0");
                 ErrorsFound = true;
             }
-            if (VSTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio < 0.0) {
+            if (SimpleTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio < 0.0) {
                 ShowSevereError(cCurrentModuleObject + " \"" + SimpleTower(TowerNum).Name +
                                 "\". User defined minimum water flow rate ratio must be > 0");
                 ErrorsFound = true;
             }
 
             //   check that the user defined maximums are greater than the minimums
-            if (VSTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp < VSTower(SimpleTower(TowerNum).VSTower).MinApproachTemp) {
+            if (SimpleTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp < SimpleTower(SimpleTower(TowerNum).VSTower).MinApproachTemp) {
                 ShowSevereError(cCurrentModuleObject + " \"" + SimpleTower(TowerNum).Name +
                                 "\". User defined maximum approach temperature must be > the minimum approach temperature");
                 ErrorsFound = true;
             }
-            if (VSTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp < VSTower(SimpleTower(TowerNum).VSTower).MinRangeTemp) {
+            if (SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp < SimpleTower(SimpleTower(TowerNum).VSTower).MinRangeTemp) {
                 ShowSevereError(cCurrentModuleObject + " \"" + SimpleTower(TowerNum).Name +
                                 "\". User defined maximum range temperature must be > the minimum range temperature");
                 ErrorsFound = true;
             }
-            if (VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio < VSTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio) {
+            if (SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio < SimpleTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio) {
                 ShowSevereError(cCurrentModuleObject + " \"" + SimpleTower(TowerNum).Name +
                                 "\". User defined maximum water flow rate ratio must be > the minimum water flow rate ratio");
                 ErrorsFound = true;
             }
 
             SimpleTower(TowerNum).DesignInletWB = NumArray(1);
-            if (NumArray(1) < VSTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp ||
-                NumArray(1) > VSTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp) {
+            if (NumArray(1) < SimpleTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp ||
+                NumArray(1) > SimpleTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp) {
                 ObjexxFCL::gio::write(OutputChar, OutputFormat) << SimpleTower(TowerNum).DesignInletWB;
-                ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp;
-                ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp;
+                ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << SimpleTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp;
+                ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << SimpleTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp;
                 ShowSevereError(cCurrentModuleObject.append(", \"").append(SimpleTower(TowerNum).Name).append("\" the design inlet air wet-bulb temperature of ").append(OutputChar).append(" must be within the model limits of ").append(OutputCharLo).append(" and ").append(OutputCharHi).append(" degrees C"));
                 ErrorsFound = true;
             }
 
             SimpleTower(TowerNum).DesignApproach = NumArray(2);
-            if (NumArray(2) < VSTower(SimpleTower(TowerNum).VSTower).MinApproachTemp ||
-                NumArray(2) > VSTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp) {
+            if (NumArray(2) < SimpleTower(SimpleTower(TowerNum).VSTower).MinApproachTemp ||
+                NumArray(2) > SimpleTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp) {
                 ObjexxFCL::gio::write(OutputChar, OutputFormat) << SimpleTower(TowerNum).DesignApproach;
-                ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MinApproachTemp;
-                ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp;
+                ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << SimpleTower(SimpleTower(TowerNum).VSTower).MinApproachTemp;
+                ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << SimpleTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp;
                 ShowSevereError(cCurrentModuleObject.append(", \"").append(SimpleTower(TowerNum).Name).append("\" the design approach temperature of ").append(OutputChar).append(" must be within the model limits of ").append(OutputCharLo).append(" and ").append(OutputCharHi).append(" degrees C"));
                 ErrorsFound = true;
             }
 
             SimpleTower(TowerNum).DesignRange = NumArray(3);
-            if (NumArray(3) < VSTower(SimpleTower(TowerNum).VSTower).MinRangeTemp ||
-                NumArray(3) > VSTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp) {
+            if (NumArray(3) < SimpleTower(SimpleTower(TowerNum).VSTower).MinRangeTemp ||
+                NumArray(3) > SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp) {
                 ObjexxFCL::gio::write(OutputChar, OutputFormat) << SimpleTower(TowerNum).DesignRange;
-                ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MinRangeTemp;
-                ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp;
+                ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << SimpleTower(SimpleTower(TowerNum).VSTower).MinRangeTemp;
+                ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp;
                 ShowSevereError(cCurrentModuleObject.append(", \"").append(SimpleTower(TowerNum).Name).append("\" the design range temperature of ").append(OutputChar).append(" must be within the model limits of ").append(OutputCharLo).append(" and ").append(OutputCharHi).append(" degrees C"));
                 ErrorsFound = true;
             }
@@ -3361,9 +3358,9 @@ namespace CondenserLoopTowers {
             MaxWaterFlowRateRatio = 0.5;
             Tapproach = 0.0;
             FlowRateRatioStep =
-                (VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio - VSTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio) / 10.0;
+                (SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio - SimpleTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio) / 10.0;
             ModelCalibrated = true;
-            ModelWaterFlowRatioMax = VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio * 4.0;
+            ModelWaterFlowRatioMax = SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio * 4.0;
             //   find a flow rate large enough to provide an approach temperature > than the user defined approach
             while (Tapproach < Ta && MaxWaterFlowRateRatio <= ModelWaterFlowRatioMax) {
                 WaterFlowRateRatio = MaxWaterFlowRateRatio;
@@ -3404,11 +3401,11 @@ namespace CondenserLoopTowers {
 
             SimpleTower(TowerNum).CalibratedWaterFlowRate = SimpleTower(TowerNum).DesignWaterFlowRate / WaterFlowRatio;
 
-            if (WaterFlowRatio < VSTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio ||
-                WaterFlowRatio > VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio) {
+            if (WaterFlowRatio < SimpleTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio ||
+                WaterFlowRatio > SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio) {
                 ObjexxFCL::gio::write(OutputChar2, OutputFormat2) << WaterFlowRatio;
-                ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio;
-                ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio;
+                ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << SimpleTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio;
+                ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio;
                 ShowWarningError("CoolingTower:VariableSpeed, \"" + SimpleTower(TowerNum).Name +
                                  "\" the calibrated water flow rate ratio is determined to be " + OutputChar2 +
                                  ". This is outside the valid range of " + OutputCharLo + " to " + OutputCharHi + '.');
@@ -5753,18 +5750,18 @@ namespace CondenserLoopTowers {
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
         if (CurrentEndTime > SimpleTower(TowerNum).CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= SimpleTower(TowerNum).TimeStepSysLast) {
-            if (VSTower(SimpleTower(TowerNum).VSTower).PrintLGMessage) {
-                ++VSTower(SimpleTower(TowerNum).VSTower).VSErrorCountFlowFrac;
+            if (SimpleTower(SimpleTower(TowerNum).VSTower).PrintLGMessage) {
+                ++SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountFlowFrac;
                 //       Show single warning and pass additional info to ShowRecurringWarningErrorAtEnd
-                if (VSTower(SimpleTower(TowerNum).VSTower).VSErrorCountFlowFrac < 2) {
-                    ShowWarningError(VSTower(SimpleTower(TowerNum).VSTower).LGBuffer1);
-                    ShowContinueError(VSTower(SimpleTower(TowerNum).VSTower).LGBuffer2);
+                if (SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountFlowFrac < 2) {
+                    ShowWarningError(SimpleTower(SimpleTower(TowerNum).VSTower).LGBuffer1);
+                    ShowContinueError(SimpleTower(SimpleTower(TowerNum).VSTower).LGBuffer2);
                 } else {
                     ShowRecurringWarningErrorAtEnd(SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
                                                        "\" - Liquid to gas ratio is out of range error continues...",
-                                                   VSTower(SimpleTower(TowerNum).VSTower).ErrIndexLG,
-                                                   VSTower(SimpleTower(TowerNum).VSTower).LGLast,
-                                                   VSTower(SimpleTower(TowerNum).VSTower).LGLast);
+                                                   SimpleTower(SimpleTower(TowerNum).VSTower).ErrIndexLG,
+                                                   SimpleTower(SimpleTower(TowerNum).VSTower).LGLast,
+                                                   SimpleTower(SimpleTower(TowerNum).VSTower).LGLast);
                 }
             }
         }
@@ -5775,23 +5772,23 @@ namespace CondenserLoopTowers {
 
         //   warn user on first occurrence if flow fraction is greater than maximum for the YorkCalc model, use recurring warning stats
         if (SimpleTower(TowerNum).TowerModelType == YorkCalcModel || SimpleTower(TowerNum).TowerModelType == YorkCalcUserDefined) {
-            VSTower(SimpleTower(TowerNum).VSTower).PrintLGMessage = false;
+            SimpleTower(SimpleTower(TowerNum).VSTower).PrintLGMessage = false;
             //      Do not report error message in free convection regime
             if (SimpleTower(TowerNum).__AirFlowRateRatio > SimpleTower(TowerNum).MinimumVSAirFlowFrac) {
                 FlowFraction = WaterFlowRateRatioCapped / SimpleTower(TowerNum).__AirFlowRateRatio;
                 //        Flow fractions greater than a MaxLiquidToGasRatio of 8 are not reliable using the YorkCalc model
-                if (FlowFraction > VSTower(SimpleTower(TowerNum).VSTower).MaxLiquidToGasRatio) {
+                if (FlowFraction > SimpleTower(SimpleTower(TowerNum).VSTower).MaxLiquidToGasRatio) {
                     //          Report warnings only during actual simulation
                     if (!DataGlobals::WarmupFlag) {
-                        VSTower(SimpleTower(TowerNum).VSTower).PrintLGMessage = true;
+                        SimpleTower(SimpleTower(TowerNum).VSTower).PrintLGMessage = true;
                         ObjexxFCL::gio::write(OutputChar, OutputFormat) << FlowFraction;
-                        ObjexxFCL::gio::write(OutputChar2, OutputFormat) << VSTower(SimpleTower(TowerNum).VSTower).MaxLiquidToGasRatio;
-                        VSTower(SimpleTower(TowerNum).VSTower).LGBuffer1 = SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
+                        ObjexxFCL::gio::write(OutputChar2, OutputFormat) << SimpleTower(SimpleTower(TowerNum).VSTower).MaxLiquidToGasRatio;
+                        SimpleTower(SimpleTower(TowerNum).VSTower).LGBuffer1 = SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
                                                                            "\" - Liquid to gas ratio (L/G) is out of range at " + OutputChar + '.';
-                        VSTower(SimpleTower(TowerNum).VSTower).LGBuffer2 = " ...Valid maximum ratio = " + OutputChar2 +
+                        SimpleTower(SimpleTower(TowerNum).VSTower).LGBuffer2 = " ...Valid maximum ratio = " + OutputChar2 +
                                                                            ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
                             General::CreateSysTimeIntervalString();
-                        VSTower(SimpleTower(TowerNum).VSTower).LGLast = FlowFraction;
+                        SimpleTower(SimpleTower(TowerNum).VSTower).LGLast = FlowFraction;
                     }
                 }
             }
@@ -5977,7 +5974,7 @@ namespace CondenserLoopTowers {
         Par(2) = WaterFlowRateRatio; // water flow rate ratio
         Par(3) = _AirFlowRateRatio;   // air flow rate ratio
         Par(4) = Twb;                // inlet air wet-bulb temperature [C]
-        General::SolveRoot(Acc, MaxIte, SolFla, Tr, SimpleTowerTrResidual, 0.001, VSTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp, Par);
+        General::SolveRoot(Acc, MaxIte, SolFla, Tr, SimpleTowerTrResidual, 0.001, SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp, Par);
 
         _OutletWaterTemp = SimpleTower(TowerNum).WaterTemp - Tr;
 
@@ -5998,8 +5995,8 @@ namespace CondenserLoopTowers {
                     assert(false);
                 }
             }
-            if (SimpleTower(TowerNum).WaterTemp > (TempSetPoint + VSTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp)) { // run flat out
-                _OutletWaterTemp = SimpleTower(TowerNum).WaterTemp - VSTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp;
+            if (SimpleTower(TowerNum).WaterTemp > (TempSetPoint + SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp)) { // run flat out
+                _OutletWaterTemp = SimpleTower(TowerNum).WaterTemp - SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp;
             }
         }
     }
@@ -6036,64 +6033,64 @@ namespace CondenserLoopTowers {
          if (SimpleTower(TowerNum).TowerModelType == YorkCalcModel || SimpleTower(TowerNum).TowerModelType == YorkCalcUserDefined) {
             Real64 PctAirFlow = AirFlowRatio;
             Real64 FlowFactor = PctWaterFlow / PctAirFlow;
-            Approach = VSTower(SimpleTower(TowerNum).VSTower).Coeff(1) + VSTower(SimpleTower(TowerNum).VSTower).Coeff(2) * Twb +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(3) * Twb * Twb + VSTower(SimpleTower(TowerNum).VSTower).Coeff(4) * Tr +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(5) * Twb * Tr + VSTower(SimpleTower(TowerNum).VSTower).Coeff(6) * Twb * Twb * Tr +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(7) * Tr * Tr + VSTower(SimpleTower(TowerNum).VSTower).Coeff(8) * Twb * Tr * Tr +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(9) * Twb * Twb * Tr * Tr +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(10) * FlowFactor +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(11) * Twb * FlowFactor +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(12) * Twb * Twb * FlowFactor +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(13) * Tr * FlowFactor +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(14) * Twb * Tr * FlowFactor +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(15) * Twb * Twb * Tr * FlowFactor +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(16) * Tr * Tr * FlowFactor +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(17) * Twb * Tr * Tr * FlowFactor +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(18) * Twb * Twb * Tr * Tr * FlowFactor +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(19) * FlowFactor * FlowFactor +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(20) * Twb * FlowFactor * FlowFactor +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(21) * Twb * Twb * FlowFactor * FlowFactor +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(22) * Tr * FlowFactor * FlowFactor +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(23) * Twb * Tr * FlowFactor * FlowFactor +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(24) * Twb * Twb * Tr * FlowFactor * FlowFactor +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(25) * Tr * Tr * FlowFactor * FlowFactor +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(26) * Twb * Tr * Tr * FlowFactor * FlowFactor +
-                       VSTower(SimpleTower(TowerNum).VSTower).Coeff(27) * Twb * Twb * Tr * Tr * FlowFactor * FlowFactor;
+            Approach = SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(1) + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(2) * Twb +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(3) * Twb * Twb + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(4) * Tr +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(5) * Twb * Tr + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(6) * Twb * Twb * Tr +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(7) * Tr * Tr + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(8) * Twb * Tr * Tr +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(9) * Twb * Twb * Tr * Tr +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(10) * FlowFactor +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(11) * Twb * FlowFactor +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(12) * Twb * Twb * FlowFactor +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(13) * Tr * FlowFactor +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(14) * Twb * Tr * FlowFactor +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(15) * Twb * Twb * Tr * FlowFactor +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(16) * Tr * Tr * FlowFactor +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(17) * Twb * Tr * Tr * FlowFactor +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(18) * Twb * Twb * Tr * Tr * FlowFactor +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(19) * FlowFactor * FlowFactor +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(20) * Twb * FlowFactor * FlowFactor +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(21) * Twb * Twb * FlowFactor * FlowFactor +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(22) * Tr * FlowFactor * FlowFactor +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(23) * Twb * Tr * FlowFactor * FlowFactor +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(24) * Twb * Twb * Tr * FlowFactor * FlowFactor +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(25) * Tr * Tr * FlowFactor * FlowFactor +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(26) * Twb * Tr * Tr * FlowFactor * FlowFactor +
+                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(27) * Twb * Twb * Tr * Tr * FlowFactor * FlowFactor;
 
         } else { // empirical model is CoolTools format
             //     the CoolTools model actually uses PctFanPower = AirFlowRatio^3 as an input to the model
             Real64 PctAirFlow = pow_3(AirFlowRatio);
             Approach =
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(1) + VSTower(SimpleTower(TowerNum).VSTower).Coeff(2) * PctAirFlow +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(3) * PctAirFlow * PctAirFlow +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(4) * PctAirFlow * PctAirFlow * PctAirFlow +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(5) * PctWaterFlow +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(6) * PctAirFlow * PctWaterFlow +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(7) * PctAirFlow * PctAirFlow * PctWaterFlow +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(8) * PctWaterFlow * PctWaterFlow +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(9) * PctAirFlow * PctWaterFlow * PctWaterFlow +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(10) * PctWaterFlow * PctWaterFlow * PctWaterFlow +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(11) * Twb + VSTower(SimpleTower(TowerNum).VSTower).Coeff(12) * PctAirFlow * Twb +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(13) * PctAirFlow * PctAirFlow * Twb +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(14) * PctWaterFlow * Twb +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(15) * PctAirFlow * PctWaterFlow * Twb +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(16) * PctWaterFlow * PctWaterFlow * Twb +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(17) * Twb * Twb +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(18) * PctAirFlow * Twb * Twb +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(19) * PctWaterFlow * Twb * Twb +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(20) * Twb * Twb * Twb + VSTower(SimpleTower(TowerNum).VSTower).Coeff(21) * Tr +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(22) * PctAirFlow * Tr +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(23) * PctAirFlow * PctAirFlow * Tr +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(24) * PctWaterFlow * Tr +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(25) * PctAirFlow * PctWaterFlow * Tr +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(26) * PctWaterFlow * PctWaterFlow * Tr +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(27) * Twb * Tr +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(28) * PctAirFlow * Twb * Tr +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(29) * PctWaterFlow * Twb * Tr +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(30) * Twb * Twb * Tr + VSTower(SimpleTower(TowerNum).VSTower).Coeff(31) * Tr * Tr +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(32) * PctAirFlow * Tr * Tr +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(33) * PctWaterFlow * Tr * Tr +
-                VSTower(SimpleTower(TowerNum).VSTower).Coeff(34) * Twb * Tr * Tr + VSTower(SimpleTower(TowerNum).VSTower).Coeff(35) * Tr * Tr * Tr;
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(1) + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(2) * PctAirFlow +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(3) * PctAirFlow * PctAirFlow +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(4) * PctAirFlow * PctAirFlow * PctAirFlow +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(5) * PctWaterFlow +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(6) * PctAirFlow * PctWaterFlow +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(7) * PctAirFlow * PctAirFlow * PctWaterFlow +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(8) * PctWaterFlow * PctWaterFlow +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(9) * PctAirFlow * PctWaterFlow * PctWaterFlow +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(10) * PctWaterFlow * PctWaterFlow * PctWaterFlow +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(11) * Twb + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(12) * PctAirFlow * Twb +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(13) * PctAirFlow * PctAirFlow * Twb +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(14) * PctWaterFlow * Twb +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(15) * PctAirFlow * PctWaterFlow * Twb +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(16) * PctWaterFlow * PctWaterFlow * Twb +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(17) * Twb * Twb +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(18) * PctAirFlow * Twb * Twb +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(19) * PctWaterFlow * Twb * Twb +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(20) * Twb * Twb * Twb + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(21) * Tr +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(22) * PctAirFlow * Tr +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(23) * PctAirFlow * PctAirFlow * Tr +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(24) * PctWaterFlow * Tr +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(25) * PctAirFlow * PctWaterFlow * Tr +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(26) * PctWaterFlow * PctWaterFlow * Tr +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(27) * Twb * Tr +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(28) * PctAirFlow * Twb * Tr +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(29) * PctWaterFlow * Twb * Tr +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(30) * Twb * Twb * Tr + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(31) * Tr * Tr +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(32) * PctAirFlow * Tr * Tr +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(33) * PctWaterFlow * Tr * Tr +
+                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(34) * Twb * Tr * Tr + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(35) * Tr * Tr * Tr;
         }
     }
 
@@ -6152,66 +6149,66 @@ namespace CondenserLoopTowers {
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
         if (CurrentEndTime > SimpleTower(TowerNum).CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= SimpleTower(TowerNum).TimeStepSysLast) {
-            if (VSTower(SimpleTower(TowerNum).VSTower).PrintTrMessage) {
-                ++VSTower(SimpleTower(TowerNum).VSTower).VSErrorCountTR;
-                if (VSTower(SimpleTower(TowerNum).VSTower).VSErrorCountTR < 2) {
-                    ShowWarningError(VSTower(SimpleTower(TowerNum).VSTower).TrBuffer1);
-                    ShowContinueError(VSTower(SimpleTower(TowerNum).VSTower).TrBuffer2);
-                    ShowContinueError(VSTower(SimpleTower(TowerNum).VSTower).TrBuffer3);
+            if (SimpleTower(SimpleTower(TowerNum).VSTower).PrintTrMessage) {
+                ++SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountTR;
+                if (SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountTR < 2) {
+                    ShowWarningError(SimpleTower(SimpleTower(TowerNum).VSTower).TrBuffer1);
+                    ShowContinueError(SimpleTower(SimpleTower(TowerNum).VSTower).TrBuffer2);
+                    ShowContinueError(SimpleTower(SimpleTower(TowerNum).VSTower).TrBuffer3);
                     ShowContinueError(" ...Range temperatures outside model boundaries may not adversely affect tower performance.");
                     ShowContinueError(" ...This is not an unexpected occurrence when simulating actual conditions.");
                 } else {
                     ShowRecurringWarningErrorAtEnd(SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
                                                        "\" - Tower range temperature is out of range error continues...",
-                                                   VSTower(SimpleTower(TowerNum).VSTower).ErrIndexTR,
-                                                   VSTower(SimpleTower(TowerNum).VSTower).TrLast,
-                                                   VSTower(SimpleTower(TowerNum).VSTower).TrLast);
+                                                   SimpleTower(SimpleTower(TowerNum).VSTower).ErrIndexTR,
+                                                   SimpleTower(SimpleTower(TowerNum).VSTower).TrLast,
+                                                   SimpleTower(SimpleTower(TowerNum).VSTower).TrLast);
                 }
             }
-            if (VSTower(SimpleTower(TowerNum).VSTower).PrintTwbMessage) {
-                ++VSTower(SimpleTower(TowerNum).VSTower).VSErrorCountIAWB;
-                if (VSTower(SimpleTower(TowerNum).VSTower).VSErrorCountIAWB < 6) {
-                    ShowWarningError(VSTower(SimpleTower(TowerNum).VSTower).TwbBuffer1);
-                    ShowContinueError(VSTower(SimpleTower(TowerNum).VSTower).TwbBuffer2);
-                    ShowContinueError(VSTower(SimpleTower(TowerNum).VSTower).TwbBuffer3);
+            if (SimpleTower(SimpleTower(TowerNum).VSTower).PrintTwbMessage) {
+                ++SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountIAWB;
+                if (SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountIAWB < 6) {
+                    ShowWarningError(SimpleTower(SimpleTower(TowerNum).VSTower).TwbBuffer1);
+                    ShowContinueError(SimpleTower(SimpleTower(TowerNum).VSTower).TwbBuffer2);
+                    ShowContinueError(SimpleTower(SimpleTower(TowerNum).VSTower).TwbBuffer3);
                     ShowContinueError(" ...Wet-bulb temperatures outside model boundaries may not adversely affect tower performance.");
                 } else {
                     ShowRecurringWarningErrorAtEnd(SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
                                                        "\" - Inlet air wet-bulb temperature is out of range error continues...",
-                                                   VSTower(SimpleTower(TowerNum).VSTower).ErrIndexIAWB,
-                                                   VSTower(SimpleTower(TowerNum).VSTower).TwbLast,
-                                                   VSTower(SimpleTower(TowerNum).VSTower).TwbLast);
+                                                   SimpleTower(SimpleTower(TowerNum).VSTower).ErrIndexIAWB,
+                                                   SimpleTower(SimpleTower(TowerNum).VSTower).TwbLast,
+                                                   SimpleTower(SimpleTower(TowerNum).VSTower).TwbLast);
                 }
             }
-            if (VSTower(SimpleTower(TowerNum).VSTower).PrintTaMessage) {
-                ++VSTower(SimpleTower(TowerNum).VSTower).VSErrorCountTA;
-                if (VSTower(SimpleTower(TowerNum).VSTower).VSErrorCountTA < 2) {
-                    ShowWarningError(VSTower(SimpleTower(TowerNum).VSTower).TaBuffer1);
-                    ShowContinueError(VSTower(SimpleTower(TowerNum).VSTower).TaBuffer2);
-                    ShowContinueError(VSTower(SimpleTower(TowerNum).VSTower).TaBuffer3);
+            if (SimpleTower(SimpleTower(TowerNum).VSTower).PrintTaMessage) {
+                ++SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountTA;
+                if (SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountTA < 2) {
+                    ShowWarningError(SimpleTower(SimpleTower(TowerNum).VSTower).TaBuffer1);
+                    ShowContinueError(SimpleTower(SimpleTower(TowerNum).VSTower).TaBuffer2);
+                    ShowContinueError(SimpleTower(SimpleTower(TowerNum).VSTower).TaBuffer3);
                     ShowContinueError(" ...Approach temperatures outside model boundaries may not adversely affect tower performance.");
                     ShowContinueError(" ...This is not an unexpected occurrence when simulating actual conditions.");
                 } else {
                     ShowRecurringWarningErrorAtEnd(SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
                                                        "\" - Tower approach temperature is out of range error continues...",
-                                                   VSTower(SimpleTower(TowerNum).VSTower).ErrIndexTA,
-                                                   VSTower(SimpleTower(TowerNum).VSTower).TaLast,
-                                                   VSTower(SimpleTower(TowerNum).VSTower).TaLast);
+                                                   SimpleTower(SimpleTower(TowerNum).VSTower).ErrIndexTA,
+                                                   SimpleTower(SimpleTower(TowerNum).VSTower).TaLast,
+                                                   SimpleTower(SimpleTower(TowerNum).VSTower).TaLast);
                 }
             }
-            if (VSTower(SimpleTower(TowerNum).VSTower).PrintWFRRMessage) {
-                ++VSTower(SimpleTower(TowerNum).VSTower).VSErrorCountWFRR;
-                if (VSTower(SimpleTower(TowerNum).VSTower).VSErrorCountWFRR < 6) {
-                    ShowWarningError(VSTower(SimpleTower(TowerNum).VSTower).WFRRBuffer1);
-                    ShowContinueError(VSTower(SimpleTower(TowerNum).VSTower).WFRRBuffer2);
-                    ShowContinueError(VSTower(SimpleTower(TowerNum).VSTower).WFRRBuffer3);
+            if (SimpleTower(SimpleTower(TowerNum).VSTower).PrintWFRRMessage) {
+                ++SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountWFRR;
+                if (SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountWFRR < 6) {
+                    ShowWarningError(SimpleTower(SimpleTower(TowerNum).VSTower).WFRRBuffer1);
+                    ShowContinueError(SimpleTower(SimpleTower(TowerNum).VSTower).WFRRBuffer2);
+                    ShowContinueError(SimpleTower(SimpleTower(TowerNum).VSTower).WFRRBuffer3);
                     ShowContinueError(" ...Water flow rate ratios outside model boundaries may not adversely affect tower performance.");
                 } else {
                     ShowRecurringWarningErrorAtEnd(SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
                                                        "\" - Water flow rate ratio is out of range error continues...",
-                                                   VSTower(SimpleTower(TowerNum).VSTower).ErrIndexWFRR,
-                                                   VSTower(SimpleTower(TowerNum).VSTower).WaterFlowRateRatioLast,
-                                                   VSTower(SimpleTower(TowerNum).VSTower).WaterFlowRateRatioLast);
+                                                   SimpleTower(SimpleTower(TowerNum).VSTower).ErrIndexWFRR,
+                                                   SimpleTower(SimpleTower(TowerNum).VSTower).WaterFlowRateRatioLast,
+                                                   SimpleTower(SimpleTower(TowerNum).VSTower).WaterFlowRateRatioLast);
                 }
             }
         }
@@ -6221,121 +6218,121 @@ namespace CondenserLoopTowers {
         SimpleTower(TowerNum).CurrentEndTimeLast = CurrentEndTime;
 
         //   check boundaries of independent variables and post warnings to individual buffers to print at end of time step
-        if (Twb < VSTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp || Twb > VSTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp) {
+        if (Twb < SimpleTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp || Twb > SimpleTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp) {
             OutputChar = General::RoundSigDigits(Twb, 2);
-            OutputCharLo = General::RoundSigDigits(VSTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp, 2);
-            OutputCharHi = General::RoundSigDigits(VSTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp, 2);
-            if (Twb < VSTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp) {
-                TwbCapped = VSTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp;
+            OutputCharLo = General::RoundSigDigits(SimpleTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp, 2);
+            OutputCharHi = General::RoundSigDigits(SimpleTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp, 2);
+            if (Twb < SimpleTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp) {
+                TwbCapped = SimpleTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp;
             }
-            if (Twb > VSTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp) {
-                TwbCapped = VSTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp;
+            if (Twb > SimpleTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp) {
+                TwbCapped = SimpleTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp;
             }
             if (!DataGlobals::WarmupFlag) {
-                VSTower(SimpleTower(TowerNum).VSTower).PrintTwbMessage = true;
-                VSTower(SimpleTower(TowerNum).VSTower).TwbBuffer1 = SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
+                SimpleTower(SimpleTower(TowerNum).VSTower).PrintTwbMessage = true;
+                SimpleTower(SimpleTower(TowerNum).VSTower).TwbBuffer1 = SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
                                                                     "\" - Inlet air wet-bulb temperature is outside model boundaries at " +
                                                                     OutputChar + '.';
-                VSTower(SimpleTower(TowerNum).VSTower).TwbBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
+                SimpleTower(SimpleTower(TowerNum).VSTower).TwbBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
                                                                     ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
                     General::CreateSysTimeIntervalString();
                 TrimValue = General::RoundSigDigits(TwbCapped, 6);
-                VSTower(SimpleTower(TowerNum).VSTower).TwbBuffer3 = " ...Inlet air wet-bulb temperature passed to the model = " + TrimValue;
-                VSTower(SimpleTower(TowerNum).VSTower).TwbLast = Twb;
+                SimpleTower(SimpleTower(TowerNum).VSTower).TwbBuffer3 = " ...Inlet air wet-bulb temperature passed to the model = " + TrimValue;
+                SimpleTower(SimpleTower(TowerNum).VSTower).TwbLast = Twb;
             } else {
-                VSTower(SimpleTower(TowerNum).VSTower).PrintTwbMessage = false;
+                SimpleTower(SimpleTower(TowerNum).VSTower).PrintTwbMessage = false;
             }
         } else {
-            VSTower(SimpleTower(TowerNum).VSTower).PrintTwbMessage = false;
+            SimpleTower(SimpleTower(TowerNum).VSTower).PrintTwbMessage = false;
         }
 
-        if (Tr < VSTower(SimpleTower(TowerNum).VSTower).MinRangeTemp || Tr > VSTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp) {
+        if (Tr < SimpleTower(SimpleTower(TowerNum).VSTower).MinRangeTemp || Tr > SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp) {
             OutputChar = General::RoundSigDigits(Tr, 2);
-            OutputCharLo = General::RoundSigDigits(VSTower(SimpleTower(TowerNum).VSTower).MinRangeTemp, 2);
-            OutputCharHi = General::RoundSigDigits(VSTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp, 2);
-            if (Tr < VSTower(SimpleTower(TowerNum).VSTower).MinRangeTemp) {
-                TrCapped = VSTower(SimpleTower(TowerNum).VSTower).MinRangeTemp;
+            OutputCharLo = General::RoundSigDigits(SimpleTower(SimpleTower(TowerNum).VSTower).MinRangeTemp, 2);
+            OutputCharHi = General::RoundSigDigits(SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp, 2);
+            if (Tr < SimpleTower(SimpleTower(TowerNum).VSTower).MinRangeTemp) {
+                TrCapped = SimpleTower(SimpleTower(TowerNum).VSTower).MinRangeTemp;
             }
-            if (Tr > VSTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp) {
-                TrCapped = VSTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp;
+            if (Tr > SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp) {
+                TrCapped = SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp;
             }
             if (!DataGlobals::WarmupFlag) {
-                VSTower(SimpleTower(TowerNum).VSTower).PrintTrMessage = true;
-                VSTower(SimpleTower(TowerNum).VSTower).TrBuffer1 = SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
+                SimpleTower(SimpleTower(TowerNum).VSTower).PrintTrMessage = true;
+                SimpleTower(SimpleTower(TowerNum).VSTower).TrBuffer1 = SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
                                                                    "\" - Tower range temperature is outside model boundaries at " + OutputChar + '.';
-                VSTower(SimpleTower(TowerNum).VSTower).TrBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
+                SimpleTower(SimpleTower(TowerNum).VSTower).TrBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
                                                                    ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
                     General::CreateSysTimeIntervalString();
                 TrimValue = General::RoundSigDigits(Tr, 5);
-                VSTower(SimpleTower(TowerNum).VSTower).TrBuffer3 = " ...Tower range temperature passed to the model = " + TrimValue;
-                VSTower(SimpleTower(TowerNum).VSTower).TrLast = Tr;
+                SimpleTower(SimpleTower(TowerNum).VSTower).TrBuffer3 = " ...Tower range temperature passed to the model = " + TrimValue;
+                SimpleTower(SimpleTower(TowerNum).VSTower).TrLast = Tr;
             } else {
-                VSTower(SimpleTower(TowerNum).VSTower).PrintTrMessage = false;
+                SimpleTower(SimpleTower(TowerNum).VSTower).PrintTrMessage = false;
             }
         } else {
-            VSTower(SimpleTower(TowerNum).VSTower).PrintTrMessage = false;
+            SimpleTower(SimpleTower(TowerNum).VSTower).PrintTrMessage = false;
         }
 
-        if (Ta < VSTower(SimpleTower(TowerNum).VSTower).MinApproachTemp || Ta > VSTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp) {
+        if (Ta < SimpleTower(SimpleTower(TowerNum).VSTower).MinApproachTemp || Ta > SimpleTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp) {
             OutputChar = General::RoundSigDigits(Ta, 2);
-            OutputCharLo = General::RoundSigDigits(VSTower(SimpleTower(TowerNum).VSTower).MinApproachTemp, 2);
-            OutputCharHi = General::RoundSigDigits(VSTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp, 2);
-            if (Ta < VSTower(SimpleTower(TowerNum).VSTower).MinApproachTemp) {
-                TaCapped = VSTower(SimpleTower(TowerNum).VSTower).MinApproachTemp;
+            OutputCharLo = General::RoundSigDigits(SimpleTower(SimpleTower(TowerNum).VSTower).MinApproachTemp, 2);
+            OutputCharHi = General::RoundSigDigits(SimpleTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp, 2);
+            if (Ta < SimpleTower(SimpleTower(TowerNum).VSTower).MinApproachTemp) {
+                TaCapped = SimpleTower(SimpleTower(TowerNum).VSTower).MinApproachTemp;
             }
-            if (Ta > VSTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp) {
-                TaCapped = VSTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp;
+            if (Ta > SimpleTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp) {
+                TaCapped = SimpleTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp;
             }
             if (!DataGlobals::WarmupFlag) {
-                VSTower(SimpleTower(TowerNum).VSTower).PrintTaMessage = true;
-                VSTower(SimpleTower(TowerNum).VSTower).TaBuffer1 = SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
+                SimpleTower(SimpleTower(TowerNum).VSTower).PrintTaMessage = true;
+                SimpleTower(SimpleTower(TowerNum).VSTower).TaBuffer1 = SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
                                                                    "\" - Tower approach temperature is outside model boundaries at " + OutputChar +
                                                                    '.';
-                VSTower(SimpleTower(TowerNum).VSTower).TaBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
+                SimpleTower(SimpleTower(TowerNum).VSTower).TaBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
                                                                    ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
                     General::CreateSysTimeIntervalString();
                 TrimValue = General::RoundSigDigits(Ta, 5);
-                VSTower(SimpleTower(TowerNum).VSTower).TaBuffer3 = " ...Tower approach temperature passed to the model = " + TrimValue;
-                VSTower(SimpleTower(TowerNum).VSTower).TaLast = Ta;
+                SimpleTower(SimpleTower(TowerNum).VSTower).TaBuffer3 = " ...Tower approach temperature passed to the model = " + TrimValue;
+                SimpleTower(SimpleTower(TowerNum).VSTower).TaLast = Ta;
             } else {
-                VSTower(SimpleTower(TowerNum).VSTower).PrintTaMessage = false;
+                SimpleTower(SimpleTower(TowerNum).VSTower).PrintTaMessage = false;
             }
         } else {
-            VSTower(SimpleTower(TowerNum).VSTower).PrintTaMessage = false;
+            SimpleTower(SimpleTower(TowerNum).VSTower).PrintTaMessage = false;
         }
 
         if (SimpleTower(TowerNum).TowerModelType == YorkCalcModel || SimpleTower(TowerNum).TowerModelType == YorkCalcUserDefined) {
             //     Water flow rate ratio warning not valid for YorkCalc model, print liquid to gas ratio
             //     warning instead (bottom of Subroutine VariableSpeedTower)
-            VSTower(SimpleTower(TowerNum).VSTower).PrintWFRRMessage = false;
+            SimpleTower(SimpleTower(TowerNum).VSTower).PrintWFRRMessage = false;
         } else {
-            if (WaterFlowRateRatio < VSTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio ||
-                WaterFlowRateRatio > VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio) {
+            if (WaterFlowRateRatio < SimpleTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio ||
+                WaterFlowRateRatio > SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio) {
                 OutputChar = General::RoundSigDigits(WaterFlowRateRatio, 2);
-                OutputCharLo = General::RoundSigDigits(VSTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio, 2);
-                OutputCharHi = General::RoundSigDigits(VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio, 2);
-                if (WaterFlowRateRatio < VSTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio) {
-                    WaterFlowRateRatioCapped = VSTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio;
+                OutputCharLo = General::RoundSigDigits(SimpleTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio, 2);
+                OutputCharHi = General::RoundSigDigits(SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio, 2);
+                if (WaterFlowRateRatio < SimpleTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio) {
+                    WaterFlowRateRatioCapped = SimpleTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio;
                 }
-                if (WaterFlowRateRatio > VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio) {
-                    WaterFlowRateRatioCapped = VSTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio;
+                if (WaterFlowRateRatio > SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio) {
+                    WaterFlowRateRatioCapped = SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio;
                 }
                 if (!DataGlobals::WarmupFlag) {
-                    VSTower(SimpleTower(TowerNum).VSTower).PrintWFRRMessage = true;
-                    VSTower(SimpleTower(TowerNum).VSTower).WFRRBuffer1 = SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
+                    SimpleTower(SimpleTower(TowerNum).VSTower).PrintWFRRMessage = true;
+                    SimpleTower(SimpleTower(TowerNum).VSTower).WFRRBuffer1 = SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
                                                                          "\" - Water flow rate ratio is outside model boundaries at " + OutputChar +
                                                                          '.';
-                    VSTower(SimpleTower(TowerNum).VSTower).WFRRBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
+                    SimpleTower(SimpleTower(TowerNum).VSTower).WFRRBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
                                                                          ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
                         General::CreateSysTimeIntervalString();
                     TrimValue = General::RoundSigDigits(WaterFlowRateRatioCapped, 5);
-                    VSTower(SimpleTower(TowerNum).VSTower).WFRRBuffer3 = " ...Water flow rate ratio passed to the model = " + TrimValue;
-                    VSTower(SimpleTower(TowerNum).VSTower).WaterFlowRateRatioLast = WaterFlowRateRatio;
+                    SimpleTower(SimpleTower(TowerNum).VSTower).WFRRBuffer3 = " ...Water flow rate ratio passed to the model = " + TrimValue;
+                    SimpleTower(SimpleTower(TowerNum).VSTower).WaterFlowRateRatioLast = WaterFlowRateRatio;
                 } else {
-                    VSTower(SimpleTower(TowerNum).VSTower).PrintWFRRMessage = false;
+                    SimpleTower(SimpleTower(TowerNum).VSTower).PrintWFRRMessage = false;
                 }
             } else {
-                VSTower(SimpleTower(TowerNum).VSTower).PrintWFRRMessage = false;
+                SimpleTower(SimpleTower(TowerNum).VSTower).PrintWFRRMessage = false;
             }
         }
     }
