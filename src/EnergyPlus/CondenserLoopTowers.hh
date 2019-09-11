@@ -243,6 +243,7 @@ namespace CondenserLoopTowers {
         Real64 TimeStepSysLast;    // last system time step (used to check for downshifting)
         Real64 CurrentEndTimeLast; // end time of time step for last simulation time step
 
+        // From module level variables
         Real64 __InletWaterTemp;    // CW temperature at tower inlet
         Real64 __OutletWaterTemp;   // CW temperature at tower outlet
         Real64 __BasinHeaterPower; // Basin heater power use (W)
@@ -252,6 +253,13 @@ namespace CondenserLoopTowers {
         Real64 __Qactual;          // Tower heat transfer
         Real64 __CTFanPower;
         Real64 __AirFlowRateRatio;
+
+        // From TowerInletConds struct
+        Real64 WaterTemp;  // Tower water inlet temperature (C)
+        Real64 AirTemp;    // Tower air inlet dry-bulb temperature (C)
+        Real64 AirWetBulb; // Tower air inlet wet-bulb temperature (C)
+        Real64 AirPress;   // Tower air barometric pressure
+        Real64 AirHumRat;  // Tower air inlet humidity ratio (kg/kg)
 
         // Default Constructor
         Towerspecs()
@@ -284,22 +292,8 @@ namespace CondenserLoopTowers {
               FaultyCondenserSWTIndex(0), FaultyCondenserSWTOffset(0.0), FaultyTowerFoulingFlag(false), FaultyTowerFoulingIndex(0),
               FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0),
               __InletWaterTemp(0.0), __OutletWaterTemp(0.0), __BasinHeaterPower(0.0), __WaterUsage(0.0), __FanCyclingRatio(0.0),
-              __WaterMassFlowRate(0.0), __Qactual(0.0), __CTFanPower(0.0), __AirFlowRateRatio(0.0)
-        {
-        }
-    };
-
-    struct TowerInletConds
-    {
-        // Members
-        Real64 WaterTemp;  // Tower water inlet temperature (C)
-        Real64 AirTemp;    // Tower air inlet dry-bulb temperature (C)
-        Real64 AirWetBulb; // Tower air inlet wet-bulb temperature (C)
-        Real64 AirPress;   // Tower air barometric pressure
-        Real64 AirHumRat;  // Tower air inlet humidity ratio (kg/kg)
-
-        // Default Constructor
-        TowerInletConds() : WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0), AirPress(0.0), AirHumRat(0.0)
+              __WaterMassFlowRate(0.0), __Qactual(0.0), __CTFanPower(0.0), __AirFlowRateRatio(0.0), WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0),
+              AirPress(0.0), AirHumRat(0.0)
         {
         }
     };
@@ -414,7 +408,6 @@ namespace CondenserLoopTowers {
 
     // Object Data
     extern Array1D<Towerspecs> SimpleTower;           // dimension to number of machines
-    extern Array1D<TowerInletConds> SimpleTowerInlet; // inlet conditions
     extern Array1D<ReportVars> SimpleTowerReport;     // report variables
     extern Array1D<VSTowerData> VSTower;              // model coefficients and specific variables for VS tower
 
