@@ -6811,7 +6811,7 @@ namespace CondenserLoopTowers {
             SimpleTowerReport(TowerNum).BypassFraction = SimpleTower(TowerNum).BypassFraction; // added for fluid bypass
             SimpleTowerReport(TowerNum).NumCellOn = SimpleTower(TowerNum).NumCellOn;
             SimpleTowerReport(TowerNum).SpeedSelected = SimpleTower(TowerNum).SpeedSelected;
-        }o
+        }
     }
 
 } // namespace CondenserLoopTowers
