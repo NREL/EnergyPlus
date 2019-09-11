@@ -217,9 +217,6 @@ namespace CondenserLoopTowers {
             }
         }
 
-        // INITIALIZE
-        InitSimVars();
-
         // CALCULATE
         {
             auto const SELECT_CASE_var(SimpleTower(TowerNum).TowerType_Num);
@@ -2343,22 +2340,6 @@ namespace CondenserLoopTowers {
         } // loop all towers
     }
 
-    void InitSimVars()
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR:          Dan Fisher
-        //       DATE WRITTEN:    October 1998
-        //       MODIFIED         Jan 2001, Richard Raustad
-        //       RE-ENGINEERED    na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Initialize the simulation variables.
-        for (auto & thisTower : SimpleTower) {
-            thisTower.__AirFlowRateRatio = 0.0;
-        }
-    }
-
     void InitTower(int const TowerNum,           // Number of the current cooling tower being simulated
                    bool const EP_UNUSED(RunFlag) // Indication of
     )
@@ -2485,6 +2466,7 @@ namespace CondenserLoopTowers {
         // Added for fluid bypass. 8/2008
         SimpleTower(TowerNum).BypassFraction = 0.0;
         SimpleTower(TowerNum).BasinHeaterPower = 0.0;
+        SimpleTower(TowerNum).__AirFlowRateRatio = 0.0;
     }
 
     void SizeTower(int const TowerNum)

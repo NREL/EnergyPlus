@@ -397,8 +397,6 @@ namespace CondenserLoopTowers {
 
     void GetTowerInput();
 
-    void InitSimVars();
-
     void InitTower(int TowerNum, // Number of the current cooling tower being simulated
                    bool RunFlag  // Indication of
     );
