@@ -244,8 +244,6 @@ namespace CondenserLoopTowers {
         Real64 CurrentEndTimeLast; // end time of time step for last simulation time step
 
         // From module level variables
-        Real64 __InletWaterTemp;    // CW temperature at tower inlet
-        Real64 __OutletWaterTemp;   // CW temperature at tower outlet
         Real64 __BasinHeaterPower; // Basin heater power use (W)
         Real64 __WaterUsage;       // Tower water usage (m3/s)
         Real64 __FanCyclingRatio;  // cycling ratio of tower fan when min fan speed provide to much capacity
@@ -367,7 +365,7 @@ namespace CondenserLoopTowers {
               DesInletAirWBTemp(0), DesApproach(0), DesRange(0), TowerInletCondsAutoSize(false), FaultyCondenserSWTFlag(false),
               FaultyCondenserSWTIndex(0), FaultyCondenserSWTOffset(0.0), FaultyTowerFoulingFlag(false), FaultyTowerFoulingIndex(0),
               FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0),
-              __InletWaterTemp(0.0), __OutletWaterTemp(0.0), __BasinHeaterPower(0.0), __WaterUsage(0.0), __FanCyclingRatio(0.0),
+              __BasinHeaterPower(0.0), __WaterUsage(0.0), __FanCyclingRatio(0.0),
               __WaterMassFlowRate(0.0), __AirFlowRateRatio(0.0), WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0),
               AirPress(0.0), AirHumRat(0.0), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), AirFlowRatio(0.0),
               BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), WaterAmountUsed(0.0), FanCyclingRatio(0.0), EvaporationVdot(0.0),
