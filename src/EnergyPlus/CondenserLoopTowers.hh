@@ -244,7 +244,6 @@ namespace CondenserLoopTowers {
         Real64 CurrentEndTimeLast; // end time of time step for last simulation time step
 
         // From module level variables
-        Real64 __WaterUsage;       // Tower water usage (m3/s)
         Real64 __AirFlowRateRatio;
 
         // From TowerInletConds struct
@@ -264,6 +263,7 @@ namespace CondenserLoopTowers {
         Real64 AirFlowRatio;           // Air flow ratio through variable speed cooling tower
         Real64 BasinHeaterPower;       // Basin heater power (W)
         Real64 BasinHeaterConsumption; // Basin heater energy consumption (J)
+        Real64 WaterUsage;             // Tower water usage (m3/s)
         Real64 WaterAmountUsed;        // Tower make up water usage (m3)
         Real64 FanCyclingRatio;        // cycling ratio of tower fan when min fan speed provide too much capacity (for VFD)
         Real64 EvaporationVdot;
@@ -362,9 +362,9 @@ namespace CondenserLoopTowers {
               DesInletAirWBTemp(0), DesApproach(0), DesRange(0), TowerInletCondsAutoSize(false), FaultyCondenserSWTFlag(false),
               FaultyCondenserSWTIndex(0), FaultyCondenserSWTOffset(0.0), FaultyTowerFoulingFlag(false), FaultyTowerFoulingIndex(0),
               FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0),
-              __WaterUsage(0.0), __AirFlowRateRatio(0.0), WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0),
+              __AirFlowRateRatio(0.0), WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0),
               AirPress(0.0), AirHumRat(0.0), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), AirFlowRatio(0.0),
-              BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), WaterAmountUsed(0.0), FanCyclingRatio(0.0), EvaporationVdot(0.0),
+              BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), WaterUsage(0.0), WaterAmountUsed(0.0), FanCyclingRatio(0.0), EvaporationVdot(0.0),
               EvaporationVol(0.0), DriftVdot(0.0), DriftVol(0.0), BlowdownVdot(0.0), BlowdownVol(0.0), MakeUpVdot(0.0), MakeUpVol(0.0),
               TankSupplyVdot(0.0), TankSupplyVol(0.0), StarvedMakeUpVdot(0.0), StarvedMakeUpVol(0.0),
               FoundModelCoeff(false), MinInletAirWBTemp(0.0), MaxInletAirWBTemp(0.0), MinRangeTemp(0.0), MaxRangeTemp(0.0), MinApproachTemp(0.0),

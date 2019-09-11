@@ -5553,7 +5553,7 @@ namespace CondenserLoopTowers {
         SimpleTower(TowerNum).FanPower = 0.0;
         SimpleTower(TowerNum).OutletWaterTemp = DataLoopNode::Node(SimpleTower(TowerNum).WaterInletNodeNum).Temp;
 
-        SimpleTower(TowerNum).__WaterUsage = 0.0;
+        SimpleTower(TowerNum).WaterUsage = 0.0;
         Twb = SimpleTower(TowerNum).AirWetBulb;
         TwbCapped = SimpleTower(TowerNum).AirWetBulb;
         LoopNum = SimpleTower(TowerNum).LoopNum;
@@ -6762,10 +6762,10 @@ namespace CondenserLoopTowers {
             SimpleTower(TowerNum).WaterMassFlowRate = SimpleTower(TowerNum).WaterMassFlowRate;
             SimpleTower(TowerNum).FanEnergy = SimpleTower(TowerNum).FanPower * ReportingConstant;
             SimpleTower(TowerNum).AirFlowRatio = SimpleTower(TowerNum).__AirFlowRateRatio; // TODO: Remove __ version
-            SimpleTower(TowerNum).WaterAmountUsed = SimpleTower(TowerNum).__WaterUsage * ReportingConstant;
-            SimpleTower(TowerNum).BasinHeaterPower = SimpleTower(TowerNum).BasinHeaterPower; // TODO: Remove __ version
+            SimpleTower(TowerNum).WaterAmountUsed = SimpleTower(TowerNum).WaterUsage * ReportingConstant;
+            SimpleTower(TowerNum).BasinHeaterPower = SimpleTower(TowerNum).BasinHeaterPower;
             SimpleTower(TowerNum).BasinHeaterConsumption = SimpleTower(TowerNum).BasinHeaterPower * ReportingConstant;
-            SimpleTower(TowerNum).FanCyclingRatio = SimpleTower(TowerNum).FanCyclingRatio; // TODO: Remove __ version
+            SimpleTower(TowerNum).FanCyclingRatio = SimpleTower(TowerNum).FanCyclingRatio;
             SimpleTower(TowerNum).BypassFraction = SimpleTower(TowerNum).BypassFraction; // added for fluid bypass
             SimpleTower(TowerNum).NumCellOn = SimpleTower(TowerNum).NumCellOn;
             SimpleTower(TowerNum).SpeedSelected = SimpleTower(TowerNum).SpeedSelected;
