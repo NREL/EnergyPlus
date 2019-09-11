@@ -125,11 +125,6 @@ namespace CondenserLoopTowers {
     int const PIM_NominalCapacity(1);
     int const PIM_UFactor(2);
 
-    int const CoolingTower_SingleSpeed(1);
-    int const CoolingTower_TwoSpeed(2);
-    int const CoolingTower_VariableSpeed(3);
-    int const CoolingTower_VariableSpeedMerkel(4);
-
     int const CapacityControl_FanCycling(1);
     int const CapacityControl_FluidBypass(2);
 
@@ -187,8 +182,6 @@ namespace CondenserLoopTowers {
         // then calls the appropriate subroutine to calculate tower performance,
         // update records (node info) and writes output report info.
 
-        int TowerNum;
-
         // GET INPUT
         if (GetInput) {
             GetTowerInput();
@@ -196,6 +189,7 @@ namespace CondenserLoopTowers {
         }
 
         // Find the correct CoolingTower
+        int TowerNum;
         if (CompIndex == 0) {
             TowerNum = UtilityRoutines::FindItemInList(TowerName, SimpleTower);
             if (TowerNum == 0) {
@@ -221,7 +215,7 @@ namespace CondenserLoopTowers {
         {
             auto const SELECT_CASE_var(SimpleTower(TowerNum).TowerType_Num);
 
-            if (SELECT_CASE_var == CoolingTower_SingleSpeed) {
+            if (SELECT_CASE_var == DataPlant::TypeOf_CoolingTower_SingleSpd) {
 
                 if (InitLoopEquip) {
                     InitTower(TowerNum, RunFlag);
@@ -240,7 +234,7 @@ namespace CondenserLoopTowers {
                 UpdateTowers(TowerNum);
                 ReportTowers(RunFlag, TowerNum);
 
-            } else if (SELECT_CASE_var == CoolingTower_TwoSpeed) {
+            } else if (SELECT_CASE_var == DataPlant::TypeOf_CoolingTower_TwoSpd) {
 
                 if (InitLoopEquip) {
                     InitTower(TowerNum, RunFlag);
@@ -259,7 +253,7 @@ namespace CondenserLoopTowers {
                 UpdateTowers(TowerNum);
                 ReportTowers(RunFlag, TowerNum);
 
-            } else if (SELECT_CASE_var == CoolingTower_VariableSpeedMerkel) {
+            } else if (SELECT_CASE_var == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {
 
                 if (InitLoopEquip) {
                     InitTower(TowerNum, RunFlag);
@@ -278,7 +272,7 @@ namespace CondenserLoopTowers {
                 UpdateTowers(TowerNum);
                 ReportTowers(RunFlag, TowerNum);
 
-            } else if (SELECT_CASE_var == CoolingTower_VariableSpeed) {
+            } else if (SELECT_CASE_var == DataPlant::TypeOf_CoolingTower_VarSpd) {
 
                 if (InitLoopEquip) {
                     InitTower(TowerNum, RunFlag);
@@ -400,7 +394,7 @@ namespace CondenserLoopTowers {
             GlobalNames::VerifyUniqueInterObjectName(UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             SimpleTower(TowerNum).Name = AlphArray(1);
             SimpleTower(TowerNum).TowerType = cCurrentModuleObject;
-            SimpleTower(TowerNum).TowerType_Num = CoolingTower_SingleSpeed;
+            SimpleTower(TowerNum).TowerType_Num = DataPlant::TypeOf_CoolingTower_SingleSpd;
             SimpleTower(TowerNum).TowerMassFlowRateMultiplier = 2.5;
             SimpleTower(TowerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(
                 AlphArray(2), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
@@ -750,7 +744,7 @@ namespace CondenserLoopTowers {
 
             SimpleTower(TowerNum).Name = AlphArray(1);
             SimpleTower(TowerNum).TowerType = cCurrentModuleObject;
-            SimpleTower(TowerNum).TowerType_Num = CoolingTower_TwoSpeed;
+            SimpleTower(TowerNum).TowerType_Num = DataPlant::TypeOf_CoolingTower_TwoSpd;
             SimpleTower(TowerNum).TowerMassFlowRateMultiplier = 2.5;
             SimpleTower(TowerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(
                 AlphArray(2), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
@@ -1136,7 +1130,7 @@ namespace CondenserLoopTowers {
             SimpleTower(TowerNum).VSTower = VariableSpeedTowerNumber;
             SimpleTower(TowerNum).Name = AlphArray(1);
             SimpleTower(TowerNum).TowerType = cCurrentModuleObject;
-            SimpleTower(TowerNum).TowerType_Num = CoolingTower_VariableSpeed;
+            SimpleTower(TowerNum).TowerType_Num = DataPlant::TypeOf_CoolingTower_VarSpd;
             SimpleTower(TowerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(
                 AlphArray(2), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
             SimpleTower(TowerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(
@@ -1619,7 +1613,7 @@ namespace CondenserLoopTowers {
             GlobalNames::VerifyUniqueInterObjectName(UniqueSimpleTowerNames, AlphArray(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
             SimpleTower(TowerNum).Name = AlphArray(1);
             SimpleTower(TowerNum).TowerType = cCurrentModuleObject;
-            SimpleTower(TowerNum).TowerType_Num = CoolingTower_VariableSpeedMerkel;
+            SimpleTower(TowerNum).TowerType_Num = DataPlant::TypeOf_CoolingTower_VarSpdMerkel;
             SimpleTower(TowerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(
                 AlphArray(2), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
             SimpleTower(TowerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(
@@ -2364,28 +2358,12 @@ namespace CondenserLoopTowers {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitTower");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int TypeOf_Num(0);
-        Real64 rho; // local density of fluid
-
         if (SimpleTower(TowerNum).oneTimeFlag) {
-
-            if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_SingleSpeed) {
-                TypeOf_Num = DataPlant::TypeOf_CoolingTower_SingleSpd;
-            } else if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_TwoSpeed) {
-                TypeOf_Num = DataPlant::TypeOf_CoolingTower_TwoSpd;
-            } else if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_VariableSpeed) {
-                TypeOf_Num = DataPlant::TypeOf_CoolingTower_VarSpd;
-            } else if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_VariableSpeedMerkel) {
-                TypeOf_Num = DataPlant::TypeOf_CoolingTower_VarSpdMerkel;
-            } else {
-                assert(false);
-            }
 
             // Locate the tower on the plant loops for later usage
             bool ErrorsFound = false;
             PlantUtilities::ScanPlantLoopsForObject(SimpleTower(TowerNum).Name,
-                                    TypeOf_Num,
+                                                    SimpleTower(TowerNum).TowerType_Num,
                                     SimpleTower(TowerNum).LoopNum,
                                     SimpleTower(TowerNum).LoopSideNum,
                                     SimpleTower(TowerNum).BranchNum,
@@ -2410,7 +2388,7 @@ namespace CondenserLoopTowers {
         // Begin environment initializations
         if (SimpleTower(TowerNum).envrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
-            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleTower(TowerNum).LoopNum).FluidName,
+            Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleTower(TowerNum).LoopNum).FluidName,
                                    DataGlobals::InitConvTemp,
                                                     DataPlant::PlantLoop(SimpleTower(TowerNum).LoopNum).FluidIndex,
                                    RoutineName);
@@ -2543,7 +2521,7 @@ namespace CondenserLoopTowers {
         // Find the appropriate Plant Sizing object
         PltSizCondNum = DataPlant::PlantLoop(SimpleTower(TowerNum).LoopNum).PlantSizNum;
 
-        if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_SingleSpeed || SimpleTower(TowerNum).TowerType_Num == CoolingTower_TwoSpeed) {
+        if (SimpleTower(TowerNum).TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd || SimpleTower(TowerNum).TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
             if (SimpleTower(TowerNum).TowerInletCondsAutoSize) {
                 if (PltSizCondNum > 0) {
                     // use plant sizing data
@@ -2731,8 +2709,8 @@ namespace CondenserLoopTowers {
                     }
                 }
             }
-            if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_SingleSpeed ||
-                SimpleTower(TowerNum).TowerType_Num == CoolingTower_VariableSpeed) {
+            if (SimpleTower(TowerNum).TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd ||
+                SimpleTower(TowerNum).TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     ReportSizingManager::ReportSizingOutput(SimpleTower(TowerNum).TowerType,
                                        SimpleTower(TowerNum).Name,
@@ -2745,7 +2723,7 @@ namespace CondenserLoopTowers {
                                        "Initial Fan Power at Design Air Flow Rate [W]",
                                        SimpleTower(TowerNum).HighSpeedFanPower);
                 }
-            } else if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_TwoSpeed) {
+            } else if (SimpleTower(TowerNum).TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     ReportSizingManager::ReportSizingOutput(SimpleTower(TowerNum).TowerType,
                                        SimpleTower(TowerNum).Name,
@@ -2766,8 +2744,8 @@ namespace CondenserLoopTowers {
             tmpHighSpeedAirFlowRate = tmpHighSpeedFanPower * 0.5 * (101325.0 / DataEnvironment::StdBaroPress) / 190.0;
             if (DataPlant::PlantFirstSizesOkayToFinalize) SimpleTower(TowerNum).HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
 
-            if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_SingleSpeed ||
-                SimpleTower(TowerNum).TowerType_Num == CoolingTower_VariableSpeed) {
+            if (SimpleTower(TowerNum).TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd ||
+                SimpleTower(TowerNum).TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     ReportSizingManager::ReportSizingOutput(SimpleTower(TowerNum).TowerType,
                                        SimpleTower(TowerNum).Name,
@@ -2780,7 +2758,7 @@ namespace CondenserLoopTowers {
                                        "Initial Design Air Flow Rate [m3/s]",
                                        SimpleTower(TowerNum).HighSpeedAirFlowRate);
                 }
-            } else if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_TwoSpeed) {
+            } else if (SimpleTower(TowerNum).TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     ReportSizingManager::ReportSizingOutput(SimpleTower(TowerNum).TowerType,
                                        SimpleTower(TowerNum).Name,
@@ -2855,7 +2833,7 @@ namespace CondenserLoopTowers {
                         SimpleTower(TowerNum).HighSpeedTowerUA = 0.0;
                     }
                 }
-                if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_SingleSpeed) {
+                if (SimpleTower(TowerNum).TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(SimpleTower(TowerNum).TowerType,
                                            SimpleTower(TowerNum).Name,
@@ -2868,7 +2846,7 @@ namespace CondenserLoopTowers {
                                            "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
                                            SimpleTower(TowerNum).HighSpeedTowerUA);
                     }
-                } else if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_TwoSpeed) {
+                } else if (SimpleTower(TowerNum).TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(SimpleTower(TowerNum).TowerType,
                                            SimpleTower(TowerNum).Name,
@@ -2959,7 +2937,7 @@ namespace CondenserLoopTowers {
                         SimpleTower(TowerNum).HighSpeedTowerUA = 0.0;
                     }
                 }
-                if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_SingleSpeed) {
+                if (SimpleTower(TowerNum).TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(SimpleTower(TowerNum).TowerType,
                                            SimpleTower(TowerNum).Name,
@@ -2972,7 +2950,7 @@ namespace CondenserLoopTowers {
                                            "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
                                            SimpleTower(TowerNum).HighSpeedTowerUA);
                     }
-                } else if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_TwoSpeed) {
+                } else if (SimpleTower(TowerNum).TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(SimpleTower(TowerNum).TowerType,
                                            SimpleTower(TowerNum).Name,
@@ -3031,7 +3009,7 @@ namespace CondenserLoopTowers {
                     SimpleTower(TowerNum).HighSpeedTowerUA = 0.0;
                 }
             }
-            if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_SingleSpeed) {
+            if (SimpleTower(TowerNum).TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     ReportSizingManager::ReportSizingOutput(SimpleTower(TowerNum).TowerType,
                                        SimpleTower(TowerNum).Name,
@@ -3044,7 +3022,7 @@ namespace CondenserLoopTowers {
                                        "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
                                        SimpleTower(TowerNum).HighSpeedTowerUA);
                 }
-            } else if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_TwoSpeed) {
+            } else if (SimpleTower(TowerNum).TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     ReportSizingManager::ReportSizingOutput(SimpleTower(TowerNum).TowerType,
                                        SimpleTower(TowerNum).Name,
@@ -3453,7 +3431,7 @@ namespace CondenserLoopTowers {
         // input error checking
         ErrorsFound = false;
         if (DataPlant::PlantFinalSizesOkayToReport) {
-            if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_SingleSpeed) {
+            if (SimpleTower(TowerNum).TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
                 if (SimpleTower(TowerNum).DesignWaterFlowRate > 0.0) {
                     if (SimpleTower(TowerNum).FreeConvAirFlowRate >= SimpleTower(TowerNum).HighSpeedAirFlowRate) {
                         ShowSevereError(cCoolingTower_SingleSpeed + " \"" + SimpleTower(TowerNum).Name +
@@ -3468,7 +3446,7 @@ namespace CondenserLoopTowers {
                 }
             }
 
-            if (SimpleTower(TowerNum).TowerType_Num == CoolingTower_TwoSpeed) {
+            if (SimpleTower(TowerNum).TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
                 if (SimpleTower(TowerNum).DesignWaterFlowRate > 0.0) {
                     if (SimpleTower(TowerNum).HighSpeedAirFlowRate <= SimpleTower(TowerNum).LowSpeedAirFlowRate) {
                         ShowSevereError(cCoolingTower_TwoSpeed + " \"" + SimpleTower(TowerNum).Name +
@@ -5282,7 +5260,7 @@ namespace CondenserLoopTowers {
         }
 
         if ((MinSpeedFanQdot < std::abs(MyLoad)) && (std::abs(MyLoad) < FullSpeedFanQdot)) {
-            // load can be refined by modulationg fan speed, call regulafalsi
+            // load can be refined by modulating fan speed, call regula-falsi
 
             Par(1) = double(TowerNum);
             Par(2) = MyLoad;

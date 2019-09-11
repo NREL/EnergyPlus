@@ -80,11 +80,6 @@ namespace CondenserLoopTowers {
     extern int const PIM_NominalCapacity;
     extern int const PIM_UFactor;
 
-    extern int const CoolingTower_SingleSpeed;
-    extern int const CoolingTower_TwoSpeed;
-    extern int const CoolingTower_VariableSpeed;
-    extern int const CoolingTower_VariableSpeedMerkel;
-
     extern int const CapacityControl_FanCycling;
     extern int const CapacityControl_FluidBypass;
 
