@@ -243,7 +243,8 @@ namespace CondenserLoopTowers {
         Real64 TimeStepSysLast;    // last system time step (used to check for downshifting)
         Real64 CurrentEndTimeLast; // end time of time step for last simulation time step
 
-        // From module level variables
+        // From module level variables, apparently the module AirFlowRateRatio was used slightly different from the struct's AirFlowRatio variable
+        //  so removing this caused diffs that I did not spend time investigating...they might be fine diffs, check some time later
         Real64 __AirFlowRateRatio;
 
         // From TowerInletConds struct
