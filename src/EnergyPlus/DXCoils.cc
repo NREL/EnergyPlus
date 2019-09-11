@@ -7652,26 +7652,29 @@ namespace DXCoils {
                             CheckZoneSizing( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name );
                         }
                     }
-                }
-                // design SHR value is calculated for each speed instead of using the maximum speed design SHR value for all speeds
-                if (DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) >= SmallAirVolFlow && DXCoil(DXCoilNum).MSRatedTotCap(Mode) > 0.0) {
-                    // For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
-                    // minimum flow / capacity ratio = MinRatedVolFlowPerRatedTotCap = 0.00004027 [m3/s / W] = 300 [cfm/ton].
-                    // The max SHR occurs at maximum flow / capacity ratio = MaxRatedVolFlowPerRatedTotCap = 0.00006041 [m3/s / W] = 450
-                    // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus rated
-                    // SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a regression
-                    // of flow/capacity ratio vs SHR for several actual coils.
-                    RatedVolFlowPerRatedTotCap = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) / DXCoil(DXCoilNum).MSRatedTotCap(Mode);
-                    if (RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap(DXCT)) {
-                        MSRatedSHRDes = 0.431 + 6086.0 * MaxRatedVolFlowPerRatedTotCap(DXCT);
-                    } else if (RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap(DXCT)) {
-                        MSRatedSHRDes = 0.431 + 6086.0 * MinRatedVolFlowPerRatedTotCap(DXCT);
+                    // design SHR value is calculated for each speed instead of using the maximum speed design SHR value for all speeds
+                    if (DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) >= SmallAirVolFlow && DXCoil(DXCoilNum).MSRatedTotCap(Mode) > 0.0) {
+                        // For autosizing the rated SHR, we set a minimum SHR of 0.676 and a maximum of 0.798. The min SHR occurs occurs at the
+                        // minimum flow / capacity ratio = MinRatedVolFlowPerRatedTotCap = 0.00004027 [m3/s / W] = 300 [cfm/ton].
+                        // The max SHR occurs at maximum flow / capacity ratio = MaxRatedVolFlowPerRatedTotCap = 0.00006041 [m3/s / W] = 450
+                        // [cfm/ton]. For flow / capacity ratios between the min and max we linearly interpolate between min and max SHR. Thus rated
+                        // SHR is a linear function of the rated flow / capacity ratio. This linear function (see below) is the result of a regression
+                        // of flow/capacity ratio vs SHR for several actual coils.
+                        RatedVolFlowPerRatedTotCap = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) / DXCoil(DXCoilNum).MSRatedTotCap(Mode);
+                        if (RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap(DXCT)) {
+                            MSRatedSHRDes = 0.431 + 6086.0 * MaxRatedVolFlowPerRatedTotCap(DXCT);
+                        } else if (RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap(DXCT)) {
+                            MSRatedSHRDes = 0.431 + 6086.0 * MinRatedVolFlowPerRatedTotCap(DXCT);
+                        } else {
+                            MSRatedSHRDes = 0.431 + 6086.0 * RatedVolFlowPerRatedTotCap;
+                        }
                     } else {
-                        MSRatedSHRDes = 0.431 + 6086.0 * RatedVolFlowPerRatedTotCap;
+                        MSRatedSHRDes = 1.0;
                     }
                 } else {
-                    MSRatedSHRDes = 1.0;
+                    MSRatedSHRDes = DXCoil( DXCoilNum ).MSRatedSHR( Mode + 1 );
                 }
+
                 if (IsAutoSize) {
                     DXCoil(DXCoilNum).MSRatedSHR(Mode) = MSRatedSHRDes;
                     ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
