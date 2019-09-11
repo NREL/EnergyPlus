@@ -2363,8 +2363,9 @@ namespace CondenserLoopTowers {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Initialize the simulation variables.
-
-
+        for (auto & thisTower : SimpleTower) {
+            thisTower.__AirFlowRateRatio = 0.0;
+        }
     }
 
     void InitTower(int const TowerNum,           // Number of the current cooling tower being simulated
