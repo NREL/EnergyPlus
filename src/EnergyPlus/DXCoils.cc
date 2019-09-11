@@ -6752,6 +6752,7 @@ namespace DXCoils {
         bool SizeSecDXCoil;                     // if true do sizing calculation for secondary coil
         Real64 SecCoilAirFlowDes;               // Design secondary DX coil air flow for reporting
         Real64 SecCoilAirFlowUser;              // Hard-sized secondary DX coil air flow for reporting
+        Real64 MSRatedTotCapDesAtMaxSpeed;      // Design multispeed rated total capacity at maximum speed 
 
         // Initiate all reporting variables
         if (SysSizingRunDone || ZoneSizingRunDone) {
@@ -6782,6 +6783,7 @@ namespace DXCoils {
         RatedTotCapUser = 0.0;
         RatedTotCap2Des = 0.0;
         RatedTotCap2User = 0.0;
+        MSRatedTotCapDesAtMaxSpeed = 0.0;
         RatedSHRDes = 0.0;
         RatedSHRUser = 0.0;
         RatedSHR2Des = 0.0;
@@ -7352,7 +7354,7 @@ namespace DXCoils {
                     SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
                     if ( IsAutoSize || !HardSizeNoDesRun) {
                         SizingMethod = AutoCalculateSizing;
-                        // Auto size low speed flow to fraction of high speed capacity
+                        // Auto size low speed flow to fraction of the highest speed flow
                         DataConstantUsedForSizing = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( DXCoil( DXCoilNum ).NumOfSpeeds );
                         if ( !HardSizeNoDesRun ) DataConstantUsedForSizing = MSRatedAirVolFlowRateDes;
                         DataFractionUsedForSizing = (float)Mode / DXCoil( DXCoilNum ).NumOfSpeeds;
@@ -7559,6 +7561,7 @@ namespace DXCoils {
                             }
                         }
                     }
+                    MSRatedTotCapDesAtMaxSpeed = MSRatedTotCapDes;
                 } else {
                     if ( CurSysNum > 0 ) {
                         if ( SizingDesRunThisAirSys ) HardSizeNoDesRun = false;
@@ -7574,7 +7577,7 @@ namespace DXCoils {
                     if ( HardSizeNoDesRun ) {
                         MSRatedTotCapDes = 0.0;
                     }  else {
-                        MSRatedTotCapDes = DXCoil(DXCoilNum).MSRatedTotCap(DXCoil(DXCoilNum).NumOfSpeeds) * (float)Mode / DXCoil(DXCoilNum).NumOfSpeeds;                        
+                        MSRatedTotCapDes = MSRatedTotCapDesAtMaxSpeed * (float)Mode / DXCoil( DXCoilNum ).NumOfSpeeds;
                     }
                 }
                 if ( IsAutoSize ) {
@@ -7677,6 +7680,9 @@ namespace DXCoils {
                         MSRatedSHRDes = 1.0;
                     }
                 } else {
+                    // design SHR value at the maxiumum speed calculated above was supposed to be used for all speeds
+                    // Now user specified SHR value is used when the SHR field is not autosized and design day run is
+                    // set to yes unless the code below is commented out
                     MSRatedSHRDes = DXCoil( DXCoilNum ).MSRatedSHR( Mode + 1 );
                 }
 
@@ -7865,7 +7871,7 @@ namespace DXCoils {
                     SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
                     if ( IsAutoSize || !HardSizeNoDesRun) {
                         SizingMethod = AutoCalculateSizing;
-                        // Auto size low speed flow to fraction of high speed capacity
+                        // Auto size low speed flow to fraction of the highest speed capacity
                         DataConstantUsedForSizing = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(DXCoil(DXCoilNum).NumOfSpeeds);
                         if ( !HardSizeNoDesRun ) DataConstantUsedForSizing = MSRatedAirVolFlowRateDes;
                         DataFractionUsedForSizing = (float)Mode / DXCoil(DXCoilNum).NumOfSpeeds;                        
@@ -7956,13 +7962,15 @@ namespace DXCoils {
                         } else {
                             DataConstantUsedForSizing = DXCoil(DXCoilNum).RatedTotCap(1); // sized above
                         }
+                        //if ( !HardSizeNoDesRun ) DataConstantUsedForSizing = MSRatedTotCapDesAtMaxSpeed;
                     }
                     TempSize = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedTotCapEMSOverrideValue(Mode);
                     RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).MSRatedTotCap(Mode) = TempSize;
-
+                    DataConstantUsedForSizing = 0.0;
+                    DataFractionUsedForSizing = 0.0;
                 } else {
 
                     PrintFlag = true;
@@ -7973,7 +7981,7 @@ namespace DXCoils {
                     SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [W]";
                     if (IsAutoSize || !HardSizeNoDesRun) {
                         SizingMethod = AutoCalculateSizing;
-                        // Auto size low speed capacity to fraction of high speed capacity
+                        // Auto size low speed capacity to fraction of highest speed capacity
                         DataConstantUsedForSizing = DXCoil(DXCoilNum).MSRatedTotCap(DXCoil(DXCoilNum).NumOfSpeeds);
                         DataFractionUsedForSizing = (float)Mode / DXCoil(DXCoilNum).NumOfSpeeds;
                     }
@@ -7982,6 +7990,8 @@ namespace DXCoils {
                     DataEMSOverride = DXCoil(DXCoilNum).RatedTotCapEMSOverrideValue(Mode);
                     RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).MSRatedTotCap(Mode) = TempSize;
+                    DataConstantUsedForSizing = 0.0;
+                    DataFractionUsedForSizing = 0.0;
                 }
 
                 PrintFlag = false;
