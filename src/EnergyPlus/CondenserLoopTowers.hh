@@ -458,19 +458,6 @@ namespace CondenserLoopTowers {
     // Functions
     void clear_state();
 
-    void SimTowers(std::string const &TowerType,
-                   std::string const &TowerName,
-                   int &CompIndex,
-                   bool &RunFlag,
-                   bool InitLoopEquip,
-                   Real64 &MyLoad,
-                   Real64 &MaxCap,
-                   Real64 &MinCap,
-                   Real64 &OptCap,
-                   bool GetSizingFactor, // TRUE when just the sizing factor is requested
-                   Real64 &SizingFactor        // sizing factor
-    );
-
     void GetTowerInput();
 
 } // namespace CondenserLoopTowers

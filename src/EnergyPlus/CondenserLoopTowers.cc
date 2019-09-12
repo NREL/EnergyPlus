@@ -176,7 +176,19 @@ namespace CondenserLoopTowers {
                                Real64 &CurLoad,
                                bool const RunFlag)
     {
-
+        this->InitTower();
+        if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
+            this->CalcSingleSpeedTower();
+        } else if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
+            this->CalcTwoSpeedTower();
+        } else if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {
+            this->CalcMerkelVariableSpeedTower(CurLoad);
+        } else if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpd) {
+            this->CalcVariableSpeedTower();
+        }
+        this->CalculateWaterUseage();
+        this->UpdateTowers();
+        this->ReportTowers(RunFlag);
     }
 
     void Towerspecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
@@ -194,152 +206,11 @@ namespace CondenserLoopTowers {
     void Towerspecs::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->InitTower();
-        this->SizeTower();
-    }
-
-    void SimTowers(std::string const &TowerType,
-                   std::string const &TowerName,
-                   int &CompIndex,
-                   bool &RunFlag,
-                   bool const InitLoopEquip,
-                   Real64 &MyLoad,
-                   Real64 &MaxCap,
-                   Real64 &MinCap,
-                   Real64 &OptCap,
-                   bool const GetSizingFactor, // TRUE when just the sizing factor is requested
-                   Real64 &SizingFactor        // sizing factor
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Don Shirey
-        //       DATE WRITTEN   Dec. 2000
-        //       MODIFIED       Fred Buhl, May 2002; Richard Raustad, FSEC, Feb 2005 (added VS tower)
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Main cooling tower driver subroutine.  Gets called from
-        // PlantLoopEquipments.
-
-        // METHODOLOGY EMPLOYED:
-        // After being called by PlantLoopEquipments, this subroutine
-        // calls GetTowerInput to get all cooling tower input info (one time only),
-        // then calls the appropriate subroutine to calculate tower performance,
-        // update records (node info) and writes output report info.
-
-        // GET INPUT
-        if (GetInput) {
-            GetTowerInput();
-            GetInput = false;
-        }
-
-        // Find the correct CoolingTower
-        int TowerNum;
-        if (CompIndex == 0) {
-            TowerNum = UtilityRoutines::FindItemInList(TowerName, SimpleTower);
-            if (TowerNum == 0) {
-                ShowFatalError("SimTowers: Unit not found=" + TowerName);
-            }
-            CompIndex = TowerNum;
+        if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {
+            this->SizeVSMerkelTower();
         } else {
-            TowerNum = CompIndex;
-            if (TowerNum > NumSimpleTowers || TowerNum < 1) {
-                ShowFatalError("SimTowers:  Invalid CompIndex passed=" + General::TrimSigDigits(TowerNum) +
-                               ", Number of Units=" + General::TrimSigDigits(NumSimpleTowers) + ", Entered Unit name=" + TowerName);
-            }
-            if (CheckEquipName(TowerNum)) {
-                if (TowerName != SimpleTower(TowerNum).Name) {
-                    ShowFatalError("SimTowers: Invalid CompIndex passed=" + General::TrimSigDigits(TowerNum) + ", Unit name=" + TowerName +
-                                   ", stored Unit Name for that index=" + SimpleTower(TowerNum).Name);
-                }
-                CheckEquipName(TowerNum) = false;
-            }
+            this->SizeTower();
         }
-
-        auto & thisTower = SimpleTower(TowerNum);
-        {
-            auto const SELECT_CASE_var(SimpleTower(TowerNum).TowerType_Num);
-
-            if (SELECT_CASE_var == DataPlant::TypeOf_CoolingTower_SingleSpd) {
-
-                if (InitLoopEquip) {
-                    thisTower.InitTower();
-                    thisTower.SizeTower();
-                    MinCap = 0.0;
-                    MaxCap = SimpleTower(TowerNum).TowerNominalCapacity * SimpleTower(TowerNum).HeatRejectCapNomCapSizingRatio;
-                    OptCap = SimpleTower(TowerNum).TowerNominalCapacity;
-                    if (GetSizingFactor) {
-                        SizingFactor = SimpleTower(TowerNum).SizFac;
-                    }
-                    return;
-                }
-                thisTower.InitTower();
-                thisTower.CalcSingleSpeedTower();
-                thisTower.CalculateWaterUseage();
-                thisTower.UpdateTowers();
-                thisTower.ReportTowers(RunFlag);
-
-            } else if (SELECT_CASE_var == DataPlant::TypeOf_CoolingTower_TwoSpd) {
-
-                if (InitLoopEquip) {
-                    thisTower.InitTower();
-                    thisTower.SizeTower();
-                    MinCap = 0.0;
-                    MaxCap = SimpleTower(TowerNum).TowerNominalCapacity * SimpleTower(TowerNum).HeatRejectCapNomCapSizingRatio;
-                    OptCap = SimpleTower(TowerNum).TowerNominalCapacity;
-                    if (GetSizingFactor) {
-                        SizingFactor = SimpleTower(TowerNum).SizFac;
-                    }
-                    return;
-                }
-                thisTower.InitTower();
-                thisTower.CalcTwoSpeedTower();
-                thisTower.CalculateWaterUseage();
-                thisTower.UpdateTowers();
-                thisTower.ReportTowers(RunFlag);
-
-            } else if (SELECT_CASE_var == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {
-
-                if (InitLoopEquip) {
-                    thisTower.InitTower();
-                    thisTower.SizeVSMerkelTower();
-                    MinCap = 0.0;
-                    MaxCap = SimpleTower(TowerNum).TowerNominalCapacity * SimpleTower(TowerNum).HeatRejectCapNomCapSizingRatio;
-                    OptCap = SimpleTower(TowerNum).TowerNominalCapacity;
-                    if (GetSizingFactor) {
-                        SizingFactor = SimpleTower(TowerNum).SizFac;
-                    }
-                    return;
-                }
-                thisTower.InitTower();
-                thisTower.CalcMerkelVariableSpeedTower(MyLoad);
-                thisTower.CalculateWaterUseage();
-                thisTower.UpdateTowers();
-                thisTower.ReportTowers(RunFlag);
-
-            } else if (SELECT_CASE_var == DataPlant::TypeOf_CoolingTower_VarSpd) {
-
-                if (InitLoopEquip) {
-                    thisTower.InitTower();
-                    thisTower.SizeTower();
-                    MinCap = 0.0;
-                    MaxCap = SimpleTower(TowerNum).TowerNominalCapacity * SimpleTower(TowerNum).HeatRejectCapNomCapSizingRatio;
-                    OptCap = SimpleTower(TowerNum).TowerNominalCapacity;
-                    if (GetSizingFactor) {
-                        SizingFactor = SimpleTower(TowerNum).SizFac;
-                    }
-                    return;
-                }
-                thisTower.InitTower();
-                thisTower.CalcVariableSpeedTower();
-                thisTower.CalculateWaterUseage();
-                thisTower.UpdateTowers();
-                thisTower.ReportTowers(RunFlag);
-
-            } else {
-                ShowFatalError("SimTowers: Invalid Tower Type Requested=" + TowerType);
-            }
-        } // TypeOfEquip
     }
 
     void GetTowerInput()
