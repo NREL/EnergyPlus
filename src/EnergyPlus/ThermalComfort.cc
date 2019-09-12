@@ -467,6 +467,12 @@ namespace ThermalComfort {
                                     "Zone",
                                     "State",
                                     People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort Pierce Model Standard Effective Temperature",
+                                    OutputProcessor::Unit::C,
+                                    ThermalComfortData(Loop).PierceSET,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
             }
 
             if (People(Loop).KSU) {
@@ -1071,7 +1077,7 @@ namespace ThermalComfort {
 
             CloCond = 1.0 / (CloUnit * 0.155);
 
-            // INITIALIZE THE POLLOWING VARIABLES
+            // INITIALIZE THE FOLLOWING VARIABLES
             if (AirVel < 0.137) AirVel = 0.137;
 
             Hc = 8.6 * std::pow(AirVel, 0.53);
@@ -1367,6 +1373,7 @@ namespace ThermalComfort {
 
             ThermalComfortData(PeopleNum).ThermalComfortMRT = RadTemp;
             ThermalComfortData(PeopleNum).ThermalComfortOpTemp = (RadTemp + AirTemp) / 2.0;
+            ThermalComfortData(PeopleNum).PierceSET = SET;
         }
     }
 

@@ -1393,6 +1393,16 @@ namespace WaterCoils {
                                 ShowContinueError("                                   Wair,out = " + RoundSigDigits(WOutNew, 6));
                                 WaterCoil(CoilNum).DesOutletAirHumRat = WOutNew;
                                 WaterCoil(CoilNum).DesOutletAirTemp = TOutNew;
+                                // update outlet air conditions used for sizing
+                                std::string CompType;                                              
+                                if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) {        
+                                    CompType = cAllCoilTypes(Coil_CoolingWaterDetailed);             
+                                } else {                                                           
+                                    CompType = cAllCoilTypes(Coil_CoolingWater);                         
+                                }                                                                          
+                                coilSelectionReportObj->setCoilLvgAirTemp(WaterCoil(CoilNum).Name, CompType, TOutNew); 
+                                coilSelectionReportObj->setCoilLvgAirHumRat(WaterCoil(CoilNum).Name, CompType, WOutNew); 
+                                // end update outlet air conditions used for sizing
                             }
                         }
                     }
@@ -1715,7 +1725,7 @@ namespace WaterCoils {
                                                                WaterCoil(CoilNum).RequestingAutoSize);
                         coilSelectionReportObj->setCoilWaterHeaterCapacityNodeNums(WaterCoil(CoilNum).Name,
                                                                                    "Coil:Heating:Water",
-                                                                                   WaterCoil(CoilNum).TotWaterHeatingCoilRate,
+                                                                                   WaterCoil(CoilNum).DesWaterHeatingCoilRate,
                                                                                    WaterCoil(CoilNum).RequestingAutoSize,
                                                                                    WaterCoil(CoilNum).WaterInletNodeNum,
                                                                                    WaterCoil(CoilNum).WaterOutletNodeNum,
@@ -3675,7 +3685,7 @@ namespace WaterCoils {
                     } // End if for dry coil
                 }
             }
-
+            
             // Report outlet variables at nodes
             WaterCoil(CoilNum).OutletAirTemp = OutletAirTemp;
             WaterCoil(CoilNum).OutletAirHumRat = OutletAirHumRat;
