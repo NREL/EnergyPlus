@@ -389,6 +389,10 @@ namespace CondenserLoopTowers {
 
         void CalcVariableSpeedTower();
 
+        Real64 SimpleTowerUAResidual(Real64 UA,          // UA of cooling tower
+                                     Array1<Real64> const &Par // par(1) = design tower load [W]
+        );
+
     };
 
     // Object Data
@@ -442,10 +446,6 @@ namespace CondenserLoopTowers {
                           Real64 &TrCapped,                // bounded value of range temperature (C)
                           Real64 &TaCapped,                // bounded value of approach temperature (C)
                           Real64 &WaterFlowRateRatioCapped // bounded value of water flow rate ratio
-    );
-
-    Real64 SimpleTowerUAResidual(Real64 UA,          // UA of cooling tower
-                                 Array1<Real64> const &Par // par(1) = design tower load [W]
     );
 
     Real64 SimpleTowerTrResidual(Real64 Trange,      // cooling tower range temperature [C]
