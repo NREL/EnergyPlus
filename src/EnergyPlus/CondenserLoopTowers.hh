@@ -64,7 +64,7 @@ namespace CondenserLoopTowers {
     extern int const BlowdownByConcentration;
     extern int const PIM_UFactor;
     extern int NumSimpleTowers; // Number of similar towers
-    extern bool GetInput; // When TRUE, calls subroutine to read input file
+    extern bool GetInput;       // When TRUE, calls subroutine to read input file
 
     struct CoolingTower : PlantComponent
     {
@@ -163,7 +163,7 @@ namespace CondenserLoopTowers {
         Real64 BypassFraction; // Fraction of fluid bypass as a ratio of total fluid flow
         //  through the tower sump
         // multi cell tower
-        int NumCell;          // Number of cells in the cooling tower
+        int NumCell; // Number of cells in the cooling tower
         int CellCtrl_Num;
         int NumCellOn;          // number of cells working
         Real64 MinFracFlowRate; // Minimal fraction of design flow/cell allowable
@@ -336,17 +336,16 @@ namespace CondenserLoopTowers {
               DesInletAirWBTemp(0), DesApproach(0), DesRange(0), TowerInletCondsAutoSize(false), FaultyCondenserSWTFlag(false),
               FaultyCondenserSWTIndex(0), FaultyCondenserSWTOffset(0.0), FaultyTowerFoulingFlag(false), FaultyTowerFoulingIndex(0),
               FaultyTowerFoulingFactor(1.0), envrnFlag(true), oneTimeFlag(true), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0),
-              __AirFlowRateRatio(0.0), WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0),
-              AirPress(0.0), AirHumRat(0.0), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), AirFlowRatio(0.0),
-              BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), WaterUsage(0.0), WaterAmountUsed(0.0), FanCyclingRatio(0.0), EvaporationVdot(0.0),
-              EvaporationVol(0.0), DriftVdot(0.0), DriftVol(0.0), BlowdownVdot(0.0), BlowdownVol(0.0), MakeUpVdot(0.0), MakeUpVol(0.0),
-              TankSupplyVdot(0.0), TankSupplyVol(0.0), StarvedMakeUpVdot(0.0), StarvedMakeUpVol(0.0),
-              FoundModelCoeff(false), MinInletAirWBTemp(0.0), MaxInletAirWBTemp(0.0), MinRangeTemp(0.0), MaxRangeTemp(0.0), MinApproachTemp(0.0),
-              MaxApproachTemp(0.0), MinWaterFlowRatio(0.0), MaxWaterFlowRatio(0.0), MaxLiquidToGasRatio(0.0), VSErrorCountFlowFrac(0),
-              VSErrorCountWFRR(0), VSErrorCountIAWB(0), VSErrorCountTR(0), VSErrorCountTA(0), ErrIndexFlowFrac(0), ErrIndexWFRR(0), ErrIndexIAWB(0),
-              ErrIndexTR(0), ErrIndexTA(0), ErrIndexLG(0), PrintTrMessage(false), PrintTwbMessage(false), PrintTaMessage(false),
-              PrintWFRRMessage(false), PrintLGMessage(false), TrLast(0.0), TwbLast(0.0), TaLast(0.0), WaterFlowRateRatioLast(0.0), LGLast(0.0),
-              thisTowerNum(0)
+              __AirFlowRateRatio(0.0), WaterTemp(0.0), AirTemp(0.0), AirWetBulb(0.0), AirPress(0.0), AirHumRat(0.0), InletWaterTemp(0.0),
+              OutletWaterTemp(0.0), WaterMassFlowRate(0.0), Qactual(0.0), FanPower(0.0), FanEnergy(0.0), AirFlowRatio(0.0), BasinHeaterPower(0.0),
+              BasinHeaterConsumption(0.0), WaterUsage(0.0), WaterAmountUsed(0.0), FanCyclingRatio(0.0), EvaporationVdot(0.0), EvaporationVol(0.0),
+              DriftVdot(0.0), DriftVol(0.0), BlowdownVdot(0.0), BlowdownVol(0.0), MakeUpVdot(0.0), MakeUpVol(0.0), TankSupplyVdot(0.0),
+              TankSupplyVol(0.0), StarvedMakeUpVdot(0.0), StarvedMakeUpVol(0.0), FoundModelCoeff(false), MinInletAirWBTemp(0.0),
+              MaxInletAirWBTemp(0.0), MinRangeTemp(0.0), MaxRangeTemp(0.0), MinApproachTemp(0.0), MaxApproachTemp(0.0), MinWaterFlowRatio(0.0),
+              MaxWaterFlowRatio(0.0), MaxLiquidToGasRatio(0.0), VSErrorCountFlowFrac(0), VSErrorCountWFRR(0), VSErrorCountIAWB(0), VSErrorCountTR(0),
+              VSErrorCountTA(0), ErrIndexFlowFrac(0), ErrIndexWFRR(0), ErrIndexIAWB(0), ErrIndexTR(0), ErrIndexTA(0), ErrIndexLG(0),
+              PrintTrMessage(false), PrintTwbMessage(false), PrintTaMessage(false), PrintWFRRMessage(false), PrintLGMessage(false), TrLast(0.0),
+              TwbLast(0.0), TaLast(0.0), WaterFlowRateRatioLast(0.0), LGLast(0.0), thisTowerNum(0)
         {
         }
 
@@ -377,54 +376,53 @@ namespace CondenserLoopTowers {
         Real64 calculateSimpleTowerOutletTemp(Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign);
 
         Real64 calculateVariableTowerOutletTemp(Real64 WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
-                              Real64 _AirFlowRateRatio,   // current air flow rate ratio
-                              Real64 Twb                // current inlet air wet-bulb temperature (C, capped if applicable)
+                                                Real64 _AirFlowRateRatio,  // current air flow rate ratio
+                                                Real64 Twb                 // current inlet air wet-bulb temperature (C, capped if applicable)
         );
 
         void calculateWaterUsage();
 
-        Real64 calculateVariableSpeedApproach(Real64 PctWaterFlow, // Water flow ratio of cooling tower
-                                 Real64 _AirFlowRatio, // Air flow ratio of cooling tower
-                                 Real64 Twb,          // Inlet air wet-bulb temperature [C]
-                                 Real64 Tr           // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
+        Real64 calculateVariableSpeedApproach(Real64 PctWaterFlow,  // Water flow ratio of cooling tower
+                                              Real64 _AirFlowRatio, // Air flow ratio of cooling tower
+                                              Real64 Twb,           // Inlet air wet-bulb temperature [C]
+                                              Real64 Tr             // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
         );
 
-        void checkModelBounds(Real64 Twb,                // current inlet air wet-bulb temperature (C)
-                              Real64 Tr,                 // requested range temperature for current time step (C)
-                              Real64 Ta,                 // requested approach temperature for current time step (C)
-                              Real64 WaterFlowRateRatio, // current water flow rate ratio at water inlet node
+        void checkModelBounds(Real64 Twb,                      // current inlet air wet-bulb temperature (C)
+                              Real64 Tr,                       // requested range temperature for current time step (C)
+                              Real64 Ta,                       // requested approach temperature for current time step (C)
+                              Real64 WaterFlowRateRatio,       // current water flow rate ratio at water inlet node
                               Real64 &TwbCapped,               // bounded value of inlet air wet-bulb temperature (C)
                               Real64 &TrCapped,                // bounded value of range temperature (C)
                               Real64 &TaCapped,                // bounded value of approach temperature (C)
                               Real64 &WaterFlowRateRatioCapped // bounded value of water flow rate ratio
         );
 
-
         void update();
 
         void report(bool RunFlag);
 
-        Real64 residualUA(Real64 UA,          // UA of cooling tower
-                                     Array1<Real64> const &Par // par(1) = design tower load [W]
+        Real64 residualUA(Real64 UA,                // UA of cooling tower
+                          Array1<Real64> const &Par // par(1) = design tower load [W]
         );
 
-        Real64 residualTa(Real64 FlowRatio,   // water or air flow ratio of cooling tower
+        Real64 residualTa(Real64 FlowRatio,         // water or air flow ratio of cooling tower
                           Array1<Real64> const &Par // par(1) = tower number
         );
 
-        Real64 residualTr(Real64 Trange,      // cooling tower range temperature [C]
-                                     Array1<Real64> const &Par // par(1) = tower number
+        Real64 residualTr(Real64 Trange,            // cooling tower range temperature [C]
+                          Array1<Real64> const &Par // par(1) = tower number
         );
 
         Real64 residualMerkelLoad(Real64 _AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
-                                Array1<Real64> const &Par      // par(1) = Tower number
+                                  Array1<Real64> const &Par // par(1) = Tower number
         );
 
         static PlantComponent *factory(std::string const &objectName);
     };
 
     // Object Data
-    extern Array1D<CoolingTower> towers;           // dimension to number of machines
+    extern Array1D<CoolingTower> towers; // dimension to number of machines
 
     // Functions
     void clear_state();

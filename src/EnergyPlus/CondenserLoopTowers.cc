@@ -137,7 +137,7 @@ namespace CondenserLoopTowers {
     bool GetInput(true);
 
     // Object Data
-    Array1D<CoolingTower> towers;           // dimension to number of machines
+    Array1D<CoolingTower> towers; // dimension to number of machines
     std::unordered_map<std::string, std::string> UniqueSimpleTowerNames;
 
     // Functions
@@ -169,9 +169,9 @@ namespace CondenserLoopTowers {
     }
 
     void CoolingTower::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
-                               bool const EP_UNUSED(FirstHVACIteration),
-                               Real64 &CurLoad,
-                               bool const RunFlag)
+                                bool const EP_UNUSED(FirstHVACIteration),
+                                Real64 &CurLoad,
+                                bool const RunFlag)
     {
         this->initialize();
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
@@ -236,32 +236,32 @@ namespace CondenserLoopTowers {
         static ObjexxFCL::gio::Fmt OutputFormat("(F5.2)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int TowerNum;                   // Tower number, reference counter for towers data array
-        int NumSingleSpeedTowers;       // Total number of single-speed cooling towers
-        int SingleSpeedTowerNumber;     // Specific single-speed tower of interest
-        int NumTwoSpeedTowers;          // Number of two-speed cooling towers
-        int TwoSpeedTowerNumber;        // Specific two-speed tower of interest
-        int NumVariableSpeedTowers;     // Number of variable-speed cooling towers
-        int VariableSpeedTowerNumber;   // Specific variable-speed tower of interest
-        int NumVSCoolToolsModelCoeffs = 0;  // Number of CoolTools VS cooling tower coefficient objects
-        int NumVSYorkCalcModelCoeffs = 0;   // Number of YorkCalc VS cooling tower coefficient objects
-        int NumVSMerkelTowers;          // Number of Merkel variable speed cooling towers
-        int MerkelVSTowerNum;           // specific merkel variable speed tower of interest
-        int VSModelCoeffNum;            // Specific variable-speed tower coefficient object of interest
-        int NumAlphas;                  // Number of elements in the alpha array
-        int NumNums;                    // Number of elements in the numeric array
-        int NumAlphas2;                 // Number of elements in the alpha2 array
-        int NumNums2;                   // Number of elements in the numeric2 array
-        int IOStat;                     // IO Status when calling get input subroutine
-        int CoeffNum;                   // Index for reading user defined VS tower coefficients
-        bool ErrorsFound(false); // Logical flag set .TRUE. if errors found while getting input data
-        std::string OutputChar;         // report variable for warning messages
-        std::string OutputCharLo;       // report variable for warning messages
-        std::string OutputCharHi;       // report variable for warning messages
-        Array1D<Real64> NumArray(33);   // Numeric input data array
-        Array1D<Real64> NumArray2(43);  // Numeric input data array for VS tower coefficients
-        Array1D_string AlphArray(16);   // Character string input data array
-        Array1D_string AlphArray2(1);   // Character string input data array for VS tower coefficients
+        int TowerNum;                      // Tower number, reference counter for towers data array
+        int NumSingleSpeedTowers;          // Total number of single-speed cooling towers
+        int SingleSpeedTowerNumber;        // Specific single-speed tower of interest
+        int NumTwoSpeedTowers;             // Number of two-speed cooling towers
+        int TwoSpeedTowerNumber;           // Specific two-speed tower of interest
+        int NumVariableSpeedTowers;        // Number of variable-speed cooling towers
+        int VariableSpeedTowerNumber;      // Specific variable-speed tower of interest
+        int NumVSCoolToolsModelCoeffs = 0; // Number of CoolTools VS cooling tower coefficient objects
+        int NumVSYorkCalcModelCoeffs = 0;  // Number of YorkCalc VS cooling tower coefficient objects
+        int NumVSMerkelTowers;             // Number of Merkel variable speed cooling towers
+        int MerkelVSTowerNum;              // specific merkel variable speed tower of interest
+        int VSModelCoeffNum;               // Specific variable-speed tower coefficient object of interest
+        int NumAlphas;                     // Number of elements in the alpha array
+        int NumNums;                       // Number of elements in the numeric array
+        int NumAlphas2;                    // Number of elements in the alpha2 array
+        int NumNums2;                      // Number of elements in the numeric2 array
+        int IOStat;                        // IO Status when calling get input subroutine
+        int CoeffNum;                      // Index for reading user defined VS tower coefficients
+        bool ErrorsFound(false);           // Logical flag set .TRUE. if errors found while getting input data
+        std::string OutputChar;            // report variable for warning messages
+        std::string OutputCharLo;          // report variable for warning messages
+        std::string OutputCharHi;          // report variable for warning messages
+        Array1D<Real64> NumArray(33);      // Numeric input data array
+        Array1D<Real64> NumArray2(43);     // Numeric input data array for VS tower coefficients
+        Array1D_string AlphArray(16);      // Character string input data array
+        Array1D_string AlphArray2(1);      // Character string input data array for VS tower coefficients
 
         // Get number of all cooling towers specified in the input data file (idf)
         NumSingleSpeedTowers = inputProcessor->getNumObjectsFound(cCoolingTower_SingleSpeed);
@@ -309,10 +309,22 @@ namespace CondenserLoopTowers {
             towers(TowerNum).TowerType = cCurrentModuleObject;
             towers(TowerNum).TowerType_Num = DataPlant::TypeOf_CoolingTower_SingleSpd;
             towers(TowerNum).TowerMassFlowRateMultiplier = 2.5;
-            towers(TowerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(
-                AlphArray(2), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
-            towers(TowerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(
-                AlphArray(3), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
+            towers(TowerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(2),
+                                                                                     ErrorsFound,
+                                                                                     cCurrentModuleObject,
+                                                                                     AlphArray(1),
+                                                                                     DataLoopNode::NodeType_Water,
+                                                                                     DataLoopNode::NodeConnectionType_Inlet,
+                                                                                     1,
+                                                                                     DataLoopNode::ObjectIsNotParent);
+            towers(TowerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(3),
+                                                                                      ErrorsFound,
+                                                                                      cCurrentModuleObject,
+                                                                                      AlphArray(1),
+                                                                                      DataLoopNode::NodeType_Water,
+                                                                                      DataLoopNode::NodeConnectionType_Outlet,
+                                                                                      1,
+                                                                                      DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
             towers(TowerNum).DesignWaterFlowRate = NumArray(1);
             if (towers(TowerNum).DesignWaterFlowRate == DataSizing::AutoSize) {
@@ -467,9 +479,9 @@ namespace CondenserLoopTowers {
                 towers(TowerNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
                 WaterManager::SetupTankDemandComponent(AlphArray(1),
-                                         cCurrentModuleObject,
-                                         AlphArray(9),
-                                         ErrorsFound,
+                                                       cCurrentModuleObject,
+                                                       AlphArray(9),
+                                                       ErrorsFound,
                                                        towers(TowerNum).WaterTankID,
                                                        towers(TowerNum).WaterTankDemandARRID);
                 towers(TowerNum).SuppliedByWaterSystem = true;
@@ -481,13 +493,13 @@ namespace CondenserLoopTowers {
                 towers(TowerNum).OutdoorAirInletNodeNum = 0;
             } else {
                 towers(TowerNum).OutdoorAirInletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(10),
-                                                                                 ErrorsFound,
-                                                                                 cCurrentModuleObject,
+                                                                                              ErrorsFound,
+                                                                                              cCurrentModuleObject,
                                                                                               towers(TowerNum).Name,
-                                                                                 DataLoopNode::NodeType_Air,
-                                                                                 DataLoopNode::NodeConnectionType_OutsideAirReference,
-                                                                                 1,
-                                                                                 DataLoopNode::ObjectIsNotParent);
+                                                                                              DataLoopNode::NodeType_Air,
+                                                                                              DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                                              1,
+                                                                                              DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(towers(TowerNum).OutdoorAirInletNodeNum)) {
                     ShowSevereError(cCurrentModuleObject + ", \"" + towers(TowerNum).Name +
                                     "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + AlphArray(10));
@@ -660,10 +672,22 @@ namespace CondenserLoopTowers {
             towers(TowerNum).TowerType = cCurrentModuleObject;
             towers(TowerNum).TowerType_Num = DataPlant::TypeOf_CoolingTower_TwoSpd;
             towers(TowerNum).TowerMassFlowRateMultiplier = 2.5;
-            towers(TowerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(
-                AlphArray(2), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
-            towers(TowerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(
-                AlphArray(3), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
+            towers(TowerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(2),
+                                                                                     ErrorsFound,
+                                                                                     cCurrentModuleObject,
+                                                                                     AlphArray(1),
+                                                                                     DataLoopNode::NodeType_Water,
+                                                                                     DataLoopNode::NodeConnectionType_Inlet,
+                                                                                     1,
+                                                                                     DataLoopNode::ObjectIsNotParent);
+            towers(TowerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(3),
+                                                                                      ErrorsFound,
+                                                                                      cCurrentModuleObject,
+                                                                                      AlphArray(1),
+                                                                                      DataLoopNode::NodeType_Water,
+                                                                                      DataLoopNode::NodeConnectionType_Outlet,
+                                                                                      1,
+                                                                                      DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
             if (NumAlphas >= 4) {
@@ -875,9 +899,9 @@ namespace CondenserLoopTowers {
                 towers(TowerNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
                 WaterManager::SetupTankDemandComponent(AlphArray(1),
-                                         cCurrentModuleObject,
-                                         AlphArray(9),
-                                         ErrorsFound,
+                                                       cCurrentModuleObject,
+                                                       AlphArray(9),
+                                                       ErrorsFound,
                                                        towers(TowerNum).WaterTankID,
                                                        towers(TowerNum).WaterTankDemandARRID);
                 towers(TowerNum).SuppliedByWaterSystem = true;
@@ -888,13 +912,13 @@ namespace CondenserLoopTowers {
                 towers(TowerNum).OutdoorAirInletNodeNum = 0;
             } else {
                 towers(TowerNum).OutdoorAirInletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(10),
-                                                                                 ErrorsFound,
-                                                                                 cCurrentModuleObject,
+                                                                                              ErrorsFound,
+                                                                                              cCurrentModuleObject,
                                                                                               towers(TowerNum).Name,
-                                                                                 DataLoopNode::NodeType_Air,
-                                                                                 DataLoopNode::NodeConnectionType_OutsideAirReference,
-                                                                                 1,
-                                                                                 DataLoopNode::ObjectIsNotParent);
+                                                                                              DataLoopNode::NodeType_Air,
+                                                                                              DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                                              1,
+                                                                                              DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(towers(TowerNum).OutdoorAirInletNodeNum)) {
                     ShowSevereError(cCurrentModuleObject + ", \"" + towers(TowerNum).Name +
                                     "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + AlphArray(10));
@@ -1046,17 +1070,29 @@ namespace CondenserLoopTowers {
             towers(TowerNum).thisTowerNum = TowerNum;
             towers(TowerNum).TowerType = cCurrentModuleObject;
             towers(TowerNum).TowerType_Num = DataPlant::TypeOf_CoolingTower_VarSpd;
-            towers(TowerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(
-                AlphArray(2), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
-            towers(TowerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(
-                AlphArray(3), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
+            towers(TowerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(2),
+                                                                                     ErrorsFound,
+                                                                                     cCurrentModuleObject,
+                                                                                     AlphArray(1),
+                                                                                     DataLoopNode::NodeType_Water,
+                                                                                     DataLoopNode::NodeConnectionType_Inlet,
+                                                                                     1,
+                                                                                     DataLoopNode::ObjectIsNotParent);
+            towers(TowerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(3),
+                                                                                      ErrorsFound,
+                                                                                      cCurrentModuleObject,
+                                                                                      AlphArray(1),
+                                                                                      DataLoopNode::NodeType_Water,
+                                                                                      DataLoopNode::NodeConnectionType_Outlet,
+                                                                                      1,
+                                                                                      DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
             if ((UtilityRoutines::SameString(AlphArray(4), "CoolToolsUserDefined") ||
                  UtilityRoutines::SameString(AlphArray(4), "YorkCalcUserDefined")) &&
                 lAlphaFieldBlanks(5)) {
-                ShowSevereError(cCurrentModuleObject + ", \"" + towers(TowerNum).Name + "\" a " + cAlphaFieldNames(5) +
-                                " must be specified when " + cAlphaFieldNames(4) + " is specified as CoolToolsUserDefined or YorkCalcUserDefined");
+                ShowSevereError(cCurrentModuleObject + ", \"" + towers(TowerNum).Name + "\" a " + cAlphaFieldNames(5) + " must be specified when " +
+                                cAlphaFieldNames(4) + " is specified as CoolToolsUserDefined or YorkCalcUserDefined");
                 ErrorsFound = true;
             } else if ((UtilityRoutines::SameString(AlphArray(4), "CoolToolsCrossFlow") || UtilityRoutines::SameString(AlphArray(4), "YorkCalc")) &&
                        !lAlphaFieldBlanks(5)) {
@@ -1260,8 +1296,7 @@ namespace CondenserLoopTowers {
 
             //   check user defined minimums to be greater than 0
             if (towers(towers(TowerNum).VSTower).MinApproachTemp < 0.0) {
-                ShowSevereError(cCurrentModuleObject + " \"" + towers(TowerNum).Name +
-                                "\". User defined minimum approach temperature must be > 0");
+                ShowSevereError(cCurrentModuleObject + " \"" + towers(TowerNum).Name + "\". User defined minimum approach temperature must be > 0");
                 ErrorsFound = true;
             }
             if (towers(towers(TowerNum).VSTower).MinRangeTemp < 0.0) {
@@ -1269,8 +1304,7 @@ namespace CondenserLoopTowers {
                 ErrorsFound = true;
             }
             if (towers(towers(TowerNum).VSTower).MinWaterFlowRatio < 0.0) {
-                ShowSevereError(cCurrentModuleObject + " \"" + towers(TowerNum).Name +
-                                "\". User defined minimum water flow rate ratio must be > 0");
+                ShowSevereError(cCurrentModuleObject + " \"" + towers(TowerNum).Name + "\". User defined minimum water flow rate ratio must be > 0");
                 ErrorsFound = true;
             }
 
@@ -1297,27 +1331,49 @@ namespace CondenserLoopTowers {
                 ObjexxFCL::gio::write(OutputChar, OutputFormat) << towers(TowerNum).DesignInletWB;
                 ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << towers(towers(TowerNum).VSTower).MinInletAirWBTemp;
                 ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << towers(towers(TowerNum).VSTower).MaxInletAirWBTemp;
-                ShowSevereError(cCurrentModuleObject.append(", \"").append(towers(TowerNum).Name).append("\" the design inlet air wet-bulb temperature of ").append(OutputChar).append(" must be within the model limits of ").append(OutputCharLo).append(" and ").append(OutputCharHi).append(" degrees C"));
+                ShowSevereError(cCurrentModuleObject.append(", \"")
+                                    .append(towers(TowerNum).Name)
+                                    .append("\" the design inlet air wet-bulb temperature of ")
+                                    .append(OutputChar)
+                                    .append(" must be within the model limits of ")
+                                    .append(OutputCharLo)
+                                    .append(" and ")
+                                    .append(OutputCharHi)
+                                    .append(" degrees C"));
                 ErrorsFound = true;
             }
 
             towers(TowerNum).DesignApproach = NumArray(2);
-            if (NumArray(2) < towers(towers(TowerNum).VSTower).MinApproachTemp ||
-                NumArray(2) > towers(towers(TowerNum).VSTower).MaxApproachTemp) {
+            if (NumArray(2) < towers(towers(TowerNum).VSTower).MinApproachTemp || NumArray(2) > towers(towers(TowerNum).VSTower).MaxApproachTemp) {
                 ObjexxFCL::gio::write(OutputChar, OutputFormat) << towers(TowerNum).DesignApproach;
                 ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << towers(towers(TowerNum).VSTower).MinApproachTemp;
                 ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << towers(towers(TowerNum).VSTower).MaxApproachTemp;
-                ShowSevereError(cCurrentModuleObject.append(", \"").append(towers(TowerNum).Name).append("\" the design approach temperature of ").append(OutputChar).append(" must be within the model limits of ").append(OutputCharLo).append(" and ").append(OutputCharHi).append(" degrees C"));
+                ShowSevereError(cCurrentModuleObject.append(", \"")
+                                    .append(towers(TowerNum).Name)
+                                    .append("\" the design approach temperature of ")
+                                    .append(OutputChar)
+                                    .append(" must be within the model limits of ")
+                                    .append(OutputCharLo)
+                                    .append(" and ")
+                                    .append(OutputCharHi)
+                                    .append(" degrees C"));
                 ErrorsFound = true;
             }
 
             towers(TowerNum).DesignRange = NumArray(3);
-            if (NumArray(3) < towers(towers(TowerNum).VSTower).MinRangeTemp ||
-                NumArray(3) > towers(towers(TowerNum).VSTower).MaxRangeTemp) {
+            if (NumArray(3) < towers(towers(TowerNum).VSTower).MinRangeTemp || NumArray(3) > towers(towers(TowerNum).VSTower).MaxRangeTemp) {
                 ObjexxFCL::gio::write(OutputChar, OutputFormat) << towers(TowerNum).DesignRange;
                 ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << towers(towers(TowerNum).VSTower).MinRangeTemp;
                 ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << towers(towers(TowerNum).VSTower).MaxRangeTemp;
-                ShowSevereError(cCurrentModuleObject.append(", \"").append(towers(TowerNum).Name).append("\" the design range temperature of ").append(OutputChar).append(" must be within the model limits of ").append(OutputCharLo).append(" and ").append(OutputCharHi).append(" degrees C"));
+                ShowSevereError(cCurrentModuleObject.append(", \"")
+                                    .append(towers(TowerNum).Name)
+                                    .append("\" the design range temperature of ")
+                                    .append(OutputChar)
+                                    .append(" must be within the model limits of ")
+                                    .append(OutputCharLo)
+                                    .append(" and ")
+                                    .append(OutputCharHi)
+                                    .append(" degrees C"));
                 ErrorsFound = true;
             }
 
@@ -1476,9 +1532,9 @@ namespace CondenserLoopTowers {
                 towers(TowerNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
                 WaterManager::SetupTankDemandComponent(AlphArray(1),
-                                         cCurrentModuleObject,
-                                         AlphArray(11),
-                                         ErrorsFound,
+                                                       cCurrentModuleObject,
+                                                       AlphArray(11),
+                                                       ErrorsFound,
                                                        towers(TowerNum).WaterTankID,
                                                        towers(TowerNum).WaterTankDemandARRID);
                 towers(TowerNum).SuppliedByWaterSystem = true;
@@ -1489,13 +1545,13 @@ namespace CondenserLoopTowers {
                 towers(TowerNum).OutdoorAirInletNodeNum = 0;
             } else {
                 towers(TowerNum).OutdoorAirInletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(12),
-                                                                                 ErrorsFound,
-                                                                                 cCurrentModuleObject,
+                                                                                              ErrorsFound,
+                                                                                              cCurrentModuleObject,
                                                                                               towers(TowerNum).Name,
-                                                                                 DataLoopNode::NodeType_Air,
-                                                                                 DataLoopNode::NodeConnectionType_OutsideAirReference,
-                                                                                 1,
-                                                                                 DataLoopNode::ObjectIsNotParent);
+                                                                                              DataLoopNode::NodeType_Air,
+                                                                                              DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                                              1,
+                                                                                              DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(towers(TowerNum).OutdoorAirInletNodeNum)) {
                     ShowSevereError(cCurrentModuleObject + ", \"" + towers(TowerNum).Name +
                                     "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + AlphArray(12));
@@ -1530,10 +1586,22 @@ namespace CondenserLoopTowers {
             towers(TowerNum).thisTowerNum = TowerNum;
             towers(TowerNum).TowerType = cCurrentModuleObject;
             towers(TowerNum).TowerType_Num = DataPlant::TypeOf_CoolingTower_VarSpdMerkel;
-            towers(TowerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(
-                AlphArray(2), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
-            towers(TowerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(
-                AlphArray(3), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
+            towers(TowerNum).WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(2),
+                                                                                     ErrorsFound,
+                                                                                     cCurrentModuleObject,
+                                                                                     AlphArray(1),
+                                                                                     DataLoopNode::NodeType_Water,
+                                                                                     DataLoopNode::NodeConnectionType_Inlet,
+                                                                                     1,
+                                                                                     DataLoopNode::ObjectIsNotParent);
+            towers(TowerNum).WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(3),
+                                                                                      ErrorsFound,
+                                                                                      cCurrentModuleObject,
+                                                                                      AlphArray(1),
+                                                                                      DataLoopNode::NodeType_Water,
+                                                                                      DataLoopNode::NodeConnectionType_Outlet,
+                                                                                      1,
+                                                                                      DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
             if (UtilityRoutines::SameString(AlphArray(4), "UFactorTimesAreaAndDesignWaterFlowRate")) {
@@ -1759,9 +1827,9 @@ namespace CondenserLoopTowers {
                 towers(TowerNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
                 WaterManager::SetupTankDemandComponent(AlphArray(1),
-                                         cCurrentModuleObject,
-                                         AlphArray(13),
-                                         ErrorsFound,
+                                                       cCurrentModuleObject,
+                                                       AlphArray(13),
+                                                       ErrorsFound,
                                                        towers(TowerNum).WaterTankID,
                                                        towers(TowerNum).WaterTankDemandARRID);
                 towers(TowerNum).SuppliedByWaterSystem = true;
@@ -1772,13 +1840,13 @@ namespace CondenserLoopTowers {
                 towers(TowerNum).OutdoorAirInletNodeNum = 0;
             } else {
                 towers(TowerNum).OutdoorAirInletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(14),
-                                                                                 ErrorsFound,
-                                                                                 cCurrentModuleObject,
+                                                                                              ErrorsFound,
+                                                                                              cCurrentModuleObject,
                                                                                               towers(TowerNum).Name,
-                                                                                 DataLoopNode::NodeType_Air,
-                                                                                 DataLoopNode::NodeConnectionType_OutsideAirReference,
-                                                                                 1,
-                                                                                 DataLoopNode::ObjectIsNotParent);
+                                                                                              DataLoopNode::NodeType_Air,
+                                                                                              DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                                              1,
+                                                                                              DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(towers(TowerNum).OutdoorAirInletNodeNum)) {
                     ShowSevereError(cCurrentModuleObject + ", \"" + towers(TowerNum).Name +
                                     "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + AlphArray(14));
@@ -1797,7 +1865,6 @@ namespace CondenserLoopTowers {
         if (ErrorsFound) {
             ShowFatalError("Errors found in getting cooling tower input.");
         }
-
     }
 
     void CoolingTower::initialize()
@@ -1828,25 +1895,15 @@ namespace CondenserLoopTowers {
 
             // Locate the tower on the plant loops for later usage
             bool ErrorsFound = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
-                                                    this->TowerType_Num,
-                                    this->LoopNum,
-                                    this->LoopSideNum,
-                                    this->BranchNum,
-                                    this->CompNum,
-                                    ErrorsFound,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
+            PlantUtilities::ScanPlantLoopsForObject(
+                this->Name, this->TowerType_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
             if (ErrorsFound) {
                 ShowFatalError("initialize: Program terminated due to previous condition(s).");
             }
 
             // check if setpoint on outlet node
             this->SetpointIsOnOutlet = !((DataLoopNode::Node(this->WaterOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
-                                                         (DataLoopNode::Node(this->WaterOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue));
+                                         (DataLoopNode::Node(this->WaterOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue));
 
             this->oneTimeFlag = false;
         }
@@ -1855,20 +1912,20 @@ namespace CondenserLoopTowers {
         if (this->envrnFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
             Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                   DataGlobals::InitConvTemp,
-                                                    DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                   RoutineName);
+                                                                 DataGlobals::InitConvTemp,
+                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                 RoutineName);
 
             this->DesWaterMassFlowRate = this->DesignWaterFlowRate * rho;
             this->DesWaterMassFlowRatePerCell = this->DesWaterMassFlowRate / this->NumCell;
             PlantUtilities::InitComponentNodes(0.0,
-                               this->DesWaterMassFlowRate,
-                               this->WaterInletNodeNum,
-                               this->WaterOutletNodeNum,
-                               this->LoopNum,
-                               this->LoopSideNum,
-                               this->BranchNum,
-                               this->CompNum);
+                                               this->DesWaterMassFlowRate,
+                                               this->WaterInletNodeNum,
+                                               this->WaterOutletNodeNum,
+                                               this->LoopNum,
+                                               this->LoopSideNum,
+                                               this->BranchNum,
+                                               this->CompNum);
 
             this->envrnFlag = false;
         }
@@ -1892,20 +1949,16 @@ namespace CondenserLoopTowers {
             this->AirWetBulb = DataEnvironment::OutWetBulbTemp;
         }
 
-        this->WaterMassFlowRate =
-            PlantUtilities::RegulateCondenserCompFlowReqOp(this->LoopNum,
-                                           this->LoopSideNum,
-                                           this->BranchNum,
-                                           this->CompNum,
-                                           this->DesWaterMassFlowRate * this->TowerMassFlowRateMultiplier);
+        this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(
+            this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesWaterMassFlowRate * this->TowerMassFlowRateMultiplier);
 
         PlantUtilities::SetComponentFlowRate(this->WaterMassFlowRate,
-                             this->WaterInletNodeNum,
-                             this->WaterOutletNodeNum,
-                             this->LoopNum,
-                             this->LoopSideNum,
-                             this->BranchNum,
-                             this->CompNum);
+                                             this->WaterInletNodeNum,
+                                             this->WaterOutletNodeNum,
+                                             this->LoopNum,
+                                             this->LoopSideNum,
+                                             this->BranchNum,
+                                             this->CompNum);
 
         // Added for fluid bypass. 8/2008
         this->BypassFraction = 0.0;
@@ -1917,36 +1970,12 @@ namespace CondenserLoopTowers {
     {
         // Set up output variables CurrentModuleObject='CoolingTower:SingleSpeed'
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
-            SetupOutputVariable("Cooling Tower Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                this->InletWaterTemp,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                this->OutletWaterTemp,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                this->WaterMassFlowRate,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                this->Qactual,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Power",
-                                OutputProcessor::Unit::W,
-                                this->FanPower,
-                                "System",
-                                "Average",
-                                this->Name);
+            SetupOutputVariable("Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, this->InletWaterTemp, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, this->OutletWaterTemp, "System", "Average", this->Name);
+            SetupOutputVariable(
+                "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
             SetupOutputVariable("Cooling Tower Fan Electric Energy",
                                 OutputProcessor::Unit::J,
                                 this->FanEnergy,
@@ -1959,31 +1988,13 @@ namespace CondenserLoopTowers {
                                 this->EndUseSubcategory,
                                 "Plant");
             // Added for fluid bypass
-            SetupOutputVariable("Cooling Tower Bypass Fraction",
-                                OutputProcessor::Unit::None,
-                                this->BypassFraction,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Operating Cells Count",
-                                OutputProcessor::Unit::None,
-                                this->NumCellOn,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Fan Cycling Ratio",
-                                OutputProcessor::Unit::None,
-                                this->FanCyclingRatio,
-                                "System",
-                                "Average",
-                                this->Name);
+            SetupOutputVariable("Cooling Tower Bypass Fraction", OutputProcessor::Unit::None, this->BypassFraction, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, this->NumCellOn, "System", "Average", this->Name);
+            SetupOutputVariable(
+                "Cooling Tower Fan Cycling Ratio", OutputProcessor::Unit::None, this->FanCyclingRatio, "System", "Average", this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
-                SetupOutputVariable("Cooling Tower Basin Heater Electric Power",
-                                    OutputProcessor::Unit::W,
-                                    this->BasinHeaterPower,
-                                    "System",
-                                    "Average",
-                                    this->Name);
+                SetupOutputVariable(
+                    "Cooling Tower Basin Heater Electric Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
                 SetupOutputVariable("Cooling Tower Basin Heater Electric Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
@@ -2000,36 +2011,12 @@ namespace CondenserLoopTowers {
 
         // CurrentModuleObject='CoolingTower:TwoSpeed'
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
-            SetupOutputVariable("Cooling Tower Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                this->InletWaterTemp,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                this->OutletWaterTemp,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                this->WaterMassFlowRate,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                this->Qactual,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Power",
-                                OutputProcessor::Unit::W,
-                                this->FanPower,
-                                "System",
-                                "Average",
-                                this->Name);
+            SetupOutputVariable("Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, this->InletWaterTemp, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, this->OutletWaterTemp, "System", "Average", this->Name);
+            SetupOutputVariable(
+                "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
             SetupOutputVariable("Cooling Tower Fan Electric Energy",
                                 OutputProcessor::Unit::J,
                                 this->FanEnergy,
@@ -2041,31 +2028,13 @@ namespace CondenserLoopTowers {
                                 "HeatRejection",
                                 this->EndUseSubcategory,
                                 "Plant");
-            SetupOutputVariable("Cooling Tower Fan Cycling Ratio",
-                                OutputProcessor::Unit::None,
-                                this->FanCyclingRatio,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Fan Speed Level",
-                                OutputProcessor::Unit::None,
-                                this->SpeedSelected,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Operating Cells Count",
-                                OutputProcessor::Unit::None,
-                                this->NumCellOn,
-                                "System",
-                                "Average",
-                                this->Name);
+            SetupOutputVariable(
+                "Cooling Tower Fan Cycling Ratio", OutputProcessor::Unit::None, this->FanCyclingRatio, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Fan Speed Level", OutputProcessor::Unit::None, this->SpeedSelected, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, this->NumCellOn, "System", "Average", this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
-                SetupOutputVariable("Cooling Tower Basin Heater Electric Power",
-                                    OutputProcessor::Unit::W,
-                                    this->BasinHeaterPower,
-                                    "System",
-                                    "Average",
-                                    this->Name);
+                SetupOutputVariable(
+                    "Cooling Tower Basin Heater Electric Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
                 SetupOutputVariable("Cooling Tower Basin Heater Electric Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
@@ -2082,36 +2051,12 @@ namespace CondenserLoopTowers {
 
         // CurrentModuleObject='CoolingTower:VariableSpeed'
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpd) {
-            SetupOutputVariable("Cooling Tower Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                this->InletWaterTemp,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                this->OutletWaterTemp,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                this->WaterMassFlowRate,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                this->Qactual,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Power",
-                                OutputProcessor::Unit::W,
-                                this->FanPower,
-                                "System",
-                                "Average",
-                                this->Name);
+            SetupOutputVariable("Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, this->InletWaterTemp, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, this->OutletWaterTemp, "System", "Average", this->Name);
+            SetupOutputVariable(
+                "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
             SetupOutputVariable("Cooling Tower Fan Electric Energy",
                                 OutputProcessor::Unit::J,
                                 this->FanEnergy,
@@ -2123,31 +2068,14 @@ namespace CondenserLoopTowers {
                                 "HeatRejection",
                                 this->EndUseSubcategory,
                                 "Plant");
-            SetupOutputVariable("Cooling Tower Air Flow Rate Ratio",
-                                OutputProcessor::Unit::None,
-                                this->AirFlowRatio,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Fan Part Load Ratio",
-                                OutputProcessor::Unit::None,
-                                this->FanCyclingRatio,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Operating Cells Count",
-                                OutputProcessor::Unit::None,
-                                this->NumCellOn,
-                                "System",
-                                "Average",
-                                this->Name);
+            SetupOutputVariable(
+                "Cooling Tower Air Flow Rate Ratio", OutputProcessor::Unit::None, this->AirFlowRatio, "System", "Average", this->Name);
+            SetupOutputVariable(
+                "Cooling Tower Fan Part Load Ratio", OutputProcessor::Unit::None, this->FanCyclingRatio, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, this->NumCellOn, "System", "Average", this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
-                SetupOutputVariable("Cooling Tower Basin Heater Electric Power",
-                                    OutputProcessor::Unit::W,
-                                    this->BasinHeaterPower,
-                                    "System",
-                                    "Average",
-                                    this->Name);
+                SetupOutputVariable(
+                    "Cooling Tower Basin Heater Electric Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
                 SetupOutputVariable("Cooling Tower Basin Heater Electric Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
@@ -2160,41 +2088,16 @@ namespace CondenserLoopTowers {
                                     "BasinHeater",
                                     "Plant");
             }
-
         }
 
         // CurrentModuleObject='CoolingTower:VariableSpeed:Merkel'
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {
-            SetupOutputVariable("Cooling Tower Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                this->InletWaterTemp,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                this->OutletWaterTemp,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                this->WaterMassFlowRate,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                this->Qactual,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Power",
-                                OutputProcessor::Unit::W,
-                                this->FanPower,
-                                "System",
-                                "Average",
-                                this->Name);
+            SetupOutputVariable("Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, this->InletWaterTemp, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, this->OutletWaterTemp, "System", "Average", this->Name);
+            SetupOutputVariable(
+                "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
             SetupOutputVariable("Cooling Tower Fan Electric Energy",
                                 OutputProcessor::Unit::J,
                                 this->FanEnergy,
@@ -2206,26 +2109,12 @@ namespace CondenserLoopTowers {
                                 "HeatRejection",
                                 this->EndUseSubcategory,
                                 "Plant");
-            SetupOutputVariable("Cooling Tower Fan Speed Ratio",
-                                OutputProcessor::Unit::None,
-                                this->AirFlowRatio,
-                                "System",
-                                "Average",
-                                this->Name);
+            SetupOutputVariable("Cooling Tower Fan Speed Ratio", OutputProcessor::Unit::None, this->AirFlowRatio, "System", "Average", this->Name);
 
-            SetupOutputVariable("Cooling Tower Operating Cells Count",
-                                OutputProcessor::Unit::None,
-                                this->NumCellOn,
-                                "System",
-                                "Average",
-                                this->Name);
+            SetupOutputVariable("Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, this->NumCellOn, "System", "Average", this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
-                SetupOutputVariable("Cooling Tower Basin Heater Electric Power",
-                                    OutputProcessor::Unit::W,
-                                    this->BasinHeaterPower,
-                                    "System",
-                                    "Average",
-                                    this->Name);
+                SetupOutputVariable(
+                    "Cooling Tower Basin Heater Electric Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
                 SetupOutputVariable("Cooling Tower Basin Heater Electric Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
@@ -2241,18 +2130,9 @@ namespace CondenserLoopTowers {
         }
         // setup common water reporting for all types of towers.
         if (this->SuppliedByWaterSystem) {
-            SetupOutputVariable("Cooling Tower Make Up Water Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
-                                this->MakeUpVdot,
-                                "System",
-                                "Average",
-                                this->Name);
-            SetupOutputVariable("Cooling Tower Make Up Water Volume",
-                                OutputProcessor::Unit::m3,
-                                this->MakeUpVol,
-                                "System",
-                                "Sum",
-                                this->Name);
+            SetupOutputVariable(
+                "Cooling Tower Make Up Water Volume Flow Rate", OutputProcessor::Unit::m3_s, this->MakeUpVdot, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Make Up Water Volume", OutputProcessor::Unit::m3, this->MakeUpVol, "System", "Sum", this->Name);
             SetupOutputVariable("Cooling Tower Storage Tank Water Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 this->TankSupplyVdot,
@@ -2276,12 +2156,8 @@ namespace CondenserLoopTowers {
                                 "System",
                                 "Average",
                                 this->Name);
-            SetupOutputVariable("Cooling Tower Starved Storage Tank Water Volume",
-                                OutputProcessor::Unit::m3,
-                                this->StarvedMakeUpVol,
-                                "System",
-                                "Sum",
-                                this->Name);
+            SetupOutputVariable(
+                "Cooling Tower Starved Storage Tank Water Volume", OutputProcessor::Unit::m3, this->StarvedMakeUpVol, "System", "Sum", this->Name);
             SetupOutputVariable("Cooling Tower Make Up Mains Water Volume",
                                 OutputProcessor::Unit::m3,
                                 this->StarvedMakeUpVol,
@@ -2294,12 +2170,8 @@ namespace CondenserLoopTowers {
                                 _,
                                 "Plant");
         } else { // tower water from mains and gets metered
-            SetupOutputVariable("Cooling Tower Make Up Water Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
-                                this->MakeUpVdot,
-                                "System",
-                                "Average",
-                                this->Name);
+            SetupOutputVariable(
+                "Cooling Tower Make Up Water Volume Flow Rate", OutputProcessor::Unit::m3_s, this->MakeUpVdot, "System", "Average", this->Name);
             SetupOutputVariable("Cooling Tower Make Up Water Volume",
                                 OutputProcessor::Unit::m3,
                                 this->MakeUpVol,
@@ -2324,44 +2196,17 @@ namespace CondenserLoopTowers {
                                 "Plant");
         }
 
-        SetupOutputVariable("Cooling Tower Water Evaporation Volume Flow Rate",
-                            OutputProcessor::Unit::m3_s,
-                            this->EvaporationVdot,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Cooling Tower Water Evaporation Volume",
-                            OutputProcessor::Unit::m3,
-                            this->EvaporationVol,
-                            "System",
-                            "Sum",
-                            this->Name);
-        SetupOutputVariable("Cooling Tower Water Drift Volume Flow Rate",
-                            OutputProcessor::Unit::m3_s,
-                            this->DriftVdot,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Cooling Tower Water Drift Volume",
-                            OutputProcessor::Unit::m3,
-                            this->DriftVol,
-                            "System",
-                            "Sum",
-                            this->Name);
-        SetupOutputVariable("Cooling Tower Water Blowdown Volume Flow Rate",
-                            OutputProcessor::Unit::m3_s,
-                            this->BlowdownVdot,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Cooling Tower Water Blowdown Volume",
-                            OutputProcessor::Unit::m3,
-                            this->BlowdownVol,
-                            "System",
-                            "Sum",
-                            this->Name);
+        SetupOutputVariable(
+            "Cooling Tower Water Evaporation Volume Flow Rate", OutputProcessor::Unit::m3_s, this->EvaporationVdot, "System", "Average", this->Name);
+        SetupOutputVariable("Cooling Tower Water Evaporation Volume", OutputProcessor::Unit::m3, this->EvaporationVol, "System", "Sum", this->Name);
+        SetupOutputVariable(
+            "Cooling Tower Water Drift Volume Flow Rate", OutputProcessor::Unit::m3_s, this->DriftVdot, "System", "Average", this->Name);
+        SetupOutputVariable("Cooling Tower Water Drift Volume", OutputProcessor::Unit::m3, this->DriftVol, "System", "Sum", this->Name);
+        SetupOutputVariable(
+            "Cooling Tower Water Blowdown Volume Flow Rate", OutputProcessor::Unit::m3_s, this->BlowdownVdot, "System", "Average", this->Name);
+        SetupOutputVariable("Cooling Tower Water Blowdown Volume", OutputProcessor::Unit::m3, this->BlowdownVol, "System", "Sum", this->Name);
     }
-    
+
     void CoolingTower::SizeTower()
     {
 
@@ -2388,16 +2233,16 @@ namespace CondenserLoopTowers {
         static std::string const RoutineName("SizeTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SolFla;                     // Flag of solver
-        Real64 DesTowerLoad(0.0);       // Design tower load [W]
-        Real64 UA0;                     // Lower bound for UA [W/C]
-        Real64 UA1;                     // Upper bound for UA [W/C]
-        Real64 UA;                      // Calculated UA value
-        Array1D<Real64> Par(6);         // Parameter array need for RegulaFalsi routine
-        std::string OutputChar;         // report variable for warning messages
-        std::string OutputChar2;        // report variable for warning messages
-        std::string OutputCharLo;       // report variable for warning messages
-        std::string OutputCharHi;       // report variable for warning messages
+        int SolFla;                       // Flag of solver
+        Real64 DesTowerLoad(0.0);         // Design tower load [W]
+        Real64 UA0;                       // Lower bound for UA [W/C]
+        Real64 UA1;                       // Upper bound for UA [W/C]
+        Real64 UA;                        // Calculated UA value
+        Array1D<Real64> Par(6);           // Parameter array need for RegulaFalsi routine
+        std::string OutputChar;           // report variable for warning messages
+        std::string OutputChar2;          // report variable for warning messages
+        std::string OutputCharLo;         // report variable for warning messages
+        std::string OutputCharHi;         // report variable for warning messages
         Real64 DesTowerInletWaterTemp;    // design tower inlet water temperature
         Real64 DesTowerExitWaterTemp;     // design tower exit water temperature
         Real64 DesTowerWaterDeltaT;       // design tower temperature range
@@ -2440,11 +2285,10 @@ namespace CondenserLoopTowers {
                                          ". Tower Design Range Temperature is different from the Design Loop Delta Temperature.");
                         ShowContinueError("Tower Design Range Temperature specified in tower = " + this->Name);
                         ShowContinueError("is inconsistent with Design Loop Delta Temperature specified in Sizing:Plant object = " +
-                                              DataSizing::PlantSizData(PltSizCondNum).PlantLoopName + ".");
-                        ShowContinueError("..The Design Range Temperature specified in tower is = " +
-                                              General::TrimSigDigits(this->DesRange, 2));
+                                          DataSizing::PlantSizData(PltSizCondNum).PlantLoopName + ".");
+                        ShowContinueError("..The Design Range Temperature specified in tower is = " + General::TrimSigDigits(this->DesRange, 2));
                         ShowContinueError("..The Design Loop Delta Temperature specified in plant sizing data is = " +
-                                              General::TrimSigDigits(DataSizing::PlantSizData(PltSizCondNum).DeltaT, 2));
+                                          General::TrimSigDigits(DataSizing::PlantSizData(PltSizCondNum).DeltaT, 2));
                     }
                     // check if the tower approach is different from plant sizing data
                     DesTowerApproachFromPlant = DataSizing::PlantSizData(PltSizCondNum).ExitTemp - this->DesInletAirWBTemp;
@@ -2452,13 +2296,12 @@ namespace CondenserLoopTowers {
                         ShowWarningError("Error when autosizing the UA for cooling tower = " + this->Name +
                                          ". Tower Design Approach Temperature is inconsistent with Approach from Plant Sizing Data.");
                         ShowContinueError("The Design Approach Temperature from inputs specified in Sizing:Plant object = " +
-                                              DataSizing::PlantSizData(PltSizCondNum).PlantLoopName);
-                        ShowContinueError("is inconsistent with Design Approach Temperature specified in tower = " + this->Name +
-                                          ".");
+                                          DataSizing::PlantSizData(PltSizCondNum).PlantLoopName);
+                        ShowContinueError("is inconsistent with Design Approach Temperature specified in tower = " + this->Name + ".");
                         ShowContinueError("..The Design Approach Temperature from inputs specified is = " +
-                                              General::TrimSigDigits(DesTowerApproachFromPlant, 2));
+                                          General::TrimSigDigits(DesTowerApproachFromPlant, 2));
                         ShowContinueError("..The Design Approach Temperature specified in tower is = " +
-                                              General::TrimSigDigits(this->DesApproach, 2));
+                                          General::TrimSigDigits(this->DesApproach, 2));
                     }
                 }
             }
@@ -2479,13 +2322,13 @@ namespace CondenserLoopTowers {
         if (this->PerformanceInputMethod_Num == PIM_UFactor && (!this->HighSpeedTowerUAWasAutoSized)) {
             if (PltSizCondNum > 0) {
                 Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                       DesTowerExitWaterTemp,
-                                                        DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                       RoutineName);
+                                                                     DesTowerExitWaterTemp,
+                                                                     DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                     RoutineName);
                 Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                           DesTowerExitWaterTemp,
-                                                            DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                           RoutineName);
+                                                                         DesTowerExitWaterTemp,
+                                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                         RoutineName);
                 DesTowerLoad = rho * Cp * this->DesignWaterFlowRate * DesTowerWaterDeltaT;
                 this->TowerNominalCapacity = DesTowerLoad / this->HeatRejectCapNomCapSizingRatio;
 
@@ -2493,14 +2336,10 @@ namespace CondenserLoopTowers {
                 Real64 AssumedDeltaT = DesTowerWaterDeltaT;
                 Real64 AssumedExitTemp = DesTowerExitWaterTemp;
 
-                Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                       AssumedExitTemp,
-                                                        DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                       RoutineName);
-                Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                           AssumedExitTemp,
-                                                            DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                           RoutineName);
+                Real64 const rho = FluidProperties::GetDensityGlycol(
+                    DataPlant::PlantLoop(this->LoopNum).FluidName, AssumedExitTemp, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+                Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(
+                    DataPlant::PlantLoop(this->LoopNum).FluidName, AssumedExitTemp, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
                 DesTowerLoad = rho * Cp * this->DesignWaterFlowRate * AssumedDeltaT;
                 this->TowerNominalCapacity = DesTowerLoad / this->HeatRejectCapNomCapSizingRatio;
@@ -2517,16 +2356,11 @@ namespace CondenserLoopTowers {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                 }
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Design Water Flow Rate [m3/s]",
-                                       this->DesignWaterFlowRate);
+                    ReportSizingManager::ReportSizingOutput(this->TowerType, this->Name, "Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Initial Design Water Flow Rate [m3/s]",
-                                       this->DesignWaterFlowRate);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Initial Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                 }
             } else {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
@@ -2542,29 +2376,27 @@ namespace CondenserLoopTowers {
             tmpDesignWaterFlowRate = this->DesignWaterFlowRate;
             if (UtilityRoutines::SameString(this->TowerType, "CoolingTower:SingleSpeed")) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Design Water Flow Rate based on tower nominal capacity [m3/s]",
-                                       this->DesignWaterFlowRate);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Design Water Flow Rate based on tower nominal capacity [m3/s]", this->DesignWaterFlowRate);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
                     ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Initial Design Water Flow Rate based on tower nominal capacity [m3/s]",
-                                       this->DesignWaterFlowRate);
+                                                            this->Name,
+                                                            "Initial Design Water Flow Rate based on tower nominal capacity [m3/s]",
+                                                            this->DesignWaterFlowRate);
                 }
             } else if (UtilityRoutines::SameString(this->TowerType, "CoolingTower:TwoSpeed")) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Design Water Flow Rate based on tower high-speed nominal capacity [m3/s]",
-                                       this->DesignWaterFlowRate);
+                                                            this->Name,
+                                                            "Design Water Flow Rate based on tower high-speed nominal capacity [m3/s]",
+                                                            this->DesignWaterFlowRate);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
                     ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Initial Design Water Flow Rate based on tower high-speed nominal capacity [m3/s]",
-                                       this->DesignWaterFlowRate);
+                                                            this->Name,
+                                                            "Initial Design Water Flow Rate based on tower high-speed nominal capacity [m3/s]",
+                                                            this->DesignWaterFlowRate);
                 }
             }
         }
@@ -2580,13 +2412,13 @@ namespace CondenserLoopTowers {
                 if (PltSizCondNum > 0) {
                     if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                         Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                               DataGlobals::InitConvTemp,
-                                                                DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                               RoutineName);
+                                                                             DataGlobals::InitConvTemp,
+                                                                             DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                             RoutineName);
                         Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                   DesTowerExitWaterTemp,
-                                                                    DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                                   RoutineName);
+                                                                                 DesTowerExitWaterTemp,
+                                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                                 RoutineName);
                         DesTowerLoad = rho * Cp * tmpDesignWaterFlowRate * DesTowerWaterDeltaT;
                         tmpHighSpeedFanPower = 0.0105 * DesTowerLoad;
                         if (DataPlant::PlantFirstSizesOkayToFinalize) this->HighSpeedFanPower = tmpHighSpeedFanPower;
@@ -2601,32 +2433,22 @@ namespace CondenserLoopTowers {
                     }
                 }
             }
-            if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd ||
-                this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpd) {
+            if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd || this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Fan Power at Design Air Flow Rate [W]",
-                                       this->HighSpeedFanPower);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Fan Power at Design Air Flow Rate [W]", this->HighSpeedFanPower);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Initial Fan Power at Design Air Flow Rate [W]",
-                                       this->HighSpeedFanPower);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Initial Fan Power at Design Air Flow Rate [W]", this->HighSpeedFanPower);
                 }
             } else if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Fan Power at High Fan Speed [W]",
-                                       this->HighSpeedFanPower);
+                    ReportSizingManager::ReportSizingOutput(this->TowerType, this->Name, "Fan Power at High Fan Speed [W]", this->HighSpeedFanPower);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Initial Fan Power at High Fan Speed [W]",
-                                       this->HighSpeedFanPower);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Initial Fan Power at High Fan Speed [W]", this->HighSpeedFanPower);
                 }
             }
         }
@@ -2636,32 +2458,22 @@ namespace CondenserLoopTowers {
             tmpHighSpeedAirFlowRate = tmpHighSpeedFanPower * 0.5 * (101325.0 / DataEnvironment::StdBaroPress) / 190.0;
             if (DataPlant::PlantFirstSizesOkayToFinalize) this->HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
 
-            if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd ||
-                this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpd) {
+            if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd || this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Design Air Flow Rate [m3/s]",
-                                       this->HighSpeedAirFlowRate);
+                    ReportSizingManager::ReportSizingOutput(this->TowerType, this->Name, "Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Initial Design Air Flow Rate [m3/s]",
-                                       this->HighSpeedAirFlowRate);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Initial Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                 }
             } else if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Air Flow Rate at High Fan Speed [m3/s]",
-                                       this->HighSpeedAirFlowRate);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Air Flow Rate at High Fan Speed [m3/s]", this->HighSpeedAirFlowRate);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Initial Air Flow Rate at High Fan Speed [m3/s]",
-                                       this->HighSpeedAirFlowRate);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Initial Air Flow Rate at High Fan Speed [m3/s]", this->HighSpeedAirFlowRate);
                 }
             }
         }
@@ -2670,28 +2482,28 @@ namespace CondenserLoopTowers {
             if (PltSizCondNum > 0) {
                 if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                     Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                           DataGlobals::InitConvTemp,
-                                                            DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                           RoutineName);
+                                                                         DataGlobals::InitConvTemp,
+                                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                         RoutineName);
                     Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                               DesTowerExitWaterTemp,
-                                                                DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                               RoutineName);
+                                                                             DesTowerExitWaterTemp,
+                                                                             DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                             RoutineName);
                     DesTowerLoad = rho * Cp * tmpDesignWaterFlowRate * DesTowerWaterDeltaT;
                     // This conditional statement is to trap when the user specified condenser/tower water design setpoint
                     //  temperature is less than design inlet air wet bulb temperature
                     if (DataSizing::PlantSizData(PltSizCondNum).ExitTemp <= this->DesInletAirWBTemp) {
                         ShowSevereError("Error when autosizing the UA value for cooling tower = " + this->Name +
-                                        ". Design Loop Exit Temperature must be greater than " +
-                                            General::TrimSigDigits(this->DesInletAirWBTemp, 2) + " C when autosizing the tower UA.");
-                        ShowContinueError(
-                            "The Design Loop Exit Temperature specified in Sizing:Plant object = " + DataSizing::PlantSizData(PltSizCondNum).PlantLoopName +
-                            " (" + General::TrimSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2) + " C)");
+                                        ". Design Loop Exit Temperature must be greater than " + General::TrimSigDigits(this->DesInletAirWBTemp, 2) +
+                                        " C when autosizing the tower UA.");
+                        ShowContinueError("The Design Loop Exit Temperature specified in Sizing:Plant object = " +
+                                          DataSizing::PlantSizData(PltSizCondNum).PlantLoopName + " (" +
+                                          General::TrimSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2) + " C)");
                         ShowContinueError("is less than or equal to the design inlet air wet-bulb temperature of " +
-                                              General::TrimSigDigits(this->DesInletAirWBTemp, 2) + " C.");
+                                          General::TrimSigDigits(this->DesInletAirWBTemp, 2) + " C.");
                         ShowContinueError(
                             "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > " +
-                                General::TrimSigDigits(this->DesInletAirWBTemp, 2) + " C if autosizing the cooling tower.");
+                            General::TrimSigDigits(this->DesInletAirWBTemp, 2) + " C if autosizing the cooling tower.");
                         ShowFatalError("Autosizing of cooling tower fails for tower = " + this->Name + '.');
                     }
 
@@ -2728,42 +2540,34 @@ namespace CondenserLoopTowers {
                 }
                 if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "U-Factor Times Area Value at Design Air Flow Rate [W/C]",
-                                           this->HighSpeedTowerUA);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "U-Factor Times Area Value at Design Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
-                                           this->HighSpeedTowerUA);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                     }
                 } else if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "U-Factor Times Area Value at High Fan Speed [W/C]",
-                                           this->HighSpeedTowerUA);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "U-Factor Times Area Value at High Fan Speed [W/C]", this->HighSpeedTowerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Initial U-Factor Times Area Value at High Fan Speed [W/C]",
-                                           this->HighSpeedTowerUA);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Initial U-Factor Times Area Value at High Fan Speed [W/C]", this->HighSpeedTowerUA);
                     }
                 }
             } else {
                 if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
 
                     Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                           DataGlobals::InitConvTemp,
-                                                            DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                           RoutineName);
+                                                                         DataGlobals::InitConvTemp,
+                                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                         RoutineName);
                     Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                               DesTowerExitWaterTemp,
-                                                                DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                               RoutineName);
+                                                                             DesTowerExitWaterTemp,
+                                                                             DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                             RoutineName);
                     DesTowerLoad = rho * Cp * tmpDesignWaterFlowRate * DesTowerWaterDeltaT;
                     // This conditional statement is to trap when the user specified condenser/tower water design setpoint
                     //  temperature is less than design inlet air wet bulb temperature
@@ -2776,27 +2580,27 @@ namespace CondenserLoopTowers {
                     // * If not, hardcoded above to 21C
                     if (DesTowerExitWaterTemp <= this->DesInletAirWBTemp) {
                         ShowSevereError("Error when autosizing the UA value for cooling tower = " + this->Name +
-                                        ". Design Tower Exit Temperature must be greater than " +
-                                            General::TrimSigDigits(this->DesInletAirWBTemp, 2) + " C when autosizing the tower UA.");
+                                        ". Design Tower Exit Temperature must be greater than " + General::TrimSigDigits(this->DesInletAirWBTemp, 2) +
+                                        " C when autosizing the tower UA.");
                         ShowContinueError("The User-specified Design Loop Exit Temperature=" + General::TrimSigDigits(DesTowerExitWaterTemp, 2));
                         ShowContinueError("is less than or equal to the design inlet air wet-bulb temperature of " +
-                                              General::TrimSigDigits(this->DesInletAirWBTemp, 2) + " C.");
+                                          General::TrimSigDigits(this->DesInletAirWBTemp, 2) + " C.");
 
                         if (this->TowerInletCondsAutoSize) {
                             ShowContinueError(
                                 "Because you did not specify the Design Approach Temperature, and you do not have a Sizing:Plant object, "
                                 "it was defaulted to " +
-                                    General::TrimSigDigits(DesTowerExitWaterTemp, 2) + " C.");
+                                General::TrimSigDigits(DesTowerExitWaterTemp, 2) + " C.");
                         } else {
                             // Should never get there...
-                            ShowContinueError("The Design Loop Exit Temperature is the sum of the design air inlet wet-bulb temperature= " +
-                                                  General::TrimSigDigits(this->DesInletAirWBTemp, 2) +
-                                              " C plus the cooling tower design approach temperature = " +
-                                                  General::TrimSigDigits(this->DesApproach, 2) + "C.");
+                            ShowContinueError(
+                                "The Design Loop Exit Temperature is the sum of the design air inlet wet-bulb temperature= " +
+                                General::TrimSigDigits(this->DesInletAirWBTemp, 2) +
+                                " C plus the cooling tower design approach temperature = " + General::TrimSigDigits(this->DesApproach, 2) + "C.");
                         }
                         ShowContinueError(
                             "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > " +
-                                General::TrimSigDigits(this->DesInletAirWBTemp, 2) + " C if autosizing the cooling tower.");
+                            General::TrimSigDigits(this->DesInletAirWBTemp, 2) + " C if autosizing the cooling tower.");
                         ShowFatalError("Autosizing of cooling tower fails for tower = " + this->Name + '.');
                     }
 
@@ -2833,29 +2637,21 @@ namespace CondenserLoopTowers {
                 }
                 if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "U-Factor Times Area Value at Design Air Flow Rate [W/C]",
-                                           this->HighSpeedTowerUA);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "U-Factor Times Area Value at Design Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
-                                           this->HighSpeedTowerUA);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                     }
                 } else if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "U-Factor Times Area Value at High Fan Speed [W/C]",
-                                           this->HighSpeedTowerUA);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "U-Factor Times Area Value at High Fan Speed [W/C]", this->HighSpeedTowerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Initial U-Factor Times Area Value at High Fan Speed [W/C]",
-                                           this->HighSpeedTowerUA);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Initial U-Factor Times Area Value at High Fan Speed [W/C]", this->HighSpeedTowerUA);
                     }
                 }
             }
@@ -2866,22 +2662,22 @@ namespace CondenserLoopTowers {
                 // nominal capacity doesn't include compressor heat; predefined factor was 1.25 W heat rejection per W of delivered cooling but now is
                 // a user input
                 Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                       29.44,
-                                                        DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                       RoutineName); // 85F design exiting water temp
+                                                                     29.44,
+                                                                     DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                     RoutineName); // 85F design exiting water temp
                 Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                           29.44,
-                                                            DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                           RoutineName); // 85F design exiting water temp
+                                                                         29.44,
+                                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                         RoutineName); // 85F design exiting water temp
 
                 DesTowerLoad = this->TowerNominalCapacity * this->HeatRejectCapNomCapSizingRatio;
                 Par(1) = DesTowerLoad;
                 Par(2) = double(this->thisTowerNum);
-                Par(3) = rho * tmpDesignWaterFlowRate;                                           // design water mass flow rate
-                Par(4) = tmpHighSpeedAirFlowRate;                                                // design air volume flow rate
-                Par(5) = Cp;                                                                     // 85F design exiting water temp
-                UA0 = 0.0001 * DesTowerLoad;                                                     // Assume deltaT = 10000K (limit)
-                UA1 = DesTowerLoad;                                                              // Assume deltaT = 1K
+                Par(3) = rho * tmpDesignWaterFlowRate;      // design water mass flow rate
+                Par(4) = tmpHighSpeedAirFlowRate;           // design air volume flow rate
+                Par(5) = Cp;                                // 85F design exiting water temp
+                UA0 = 0.0001 * DesTowerLoad;                // Assume deltaT = 10000K (limit)
+                UA1 = DesTowerLoad;                         // Assume deltaT = 1K
                 this->WaterTemp = this->DesInletWaterTemp;  // 35.0; // 95F design inlet water temperature
                 this->AirTemp = this->DesInletAirDBTemp;    // 95F design inlet air dry-bulb temp
                 this->AirWetBulb = this->DesInletAirWBTemp; // 78F design inlet air wet-bulb temp
@@ -2906,29 +2702,21 @@ namespace CondenserLoopTowers {
             }
             if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "U-Factor Times Area Value at Design Air Flow Rate [W/C]",
-                                       this->HighSpeedTowerUA);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "U-Factor Times Area Value at Design Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]",
-                                       this->HighSpeedTowerUA);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                 }
             } else if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "U-Factor Times Area Value at High Fan Speed [W/C]",
-                                       this->HighSpeedTowerUA);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "U-Factor Times Area Value at High Fan Speed [W/C]", this->HighSpeedTowerUA);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Initial U-Factor Times Area Value at High Fan Speed [W/C]",
-                                       this->HighSpeedTowerUA);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Initial U-Factor Times Area Value at High Fan Speed [W/C]", this->HighSpeedTowerUA);
                 }
             }
         }
@@ -2936,20 +2724,15 @@ namespace CondenserLoopTowers {
         if (this->LowSpeedAirFlowRateWasAutoSized) {
 
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                this->LowSpeedAirFlowRate =
-                    this->LowSpeedAirFlowRateSizingFactor * this->HighSpeedAirFlowRate;
+                this->LowSpeedAirFlowRate = this->LowSpeedAirFlowRateSizingFactor * this->HighSpeedAirFlowRate;
                 tmpLowSpeedAirFlowRate = this->LowSpeedAirFlowRate;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Low Fan Speed Air Flow Rate [m3/s]",
-                                       this->LowSpeedAirFlowRate);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Low Fan Speed Air Flow Rate [m3/s]", this->LowSpeedAirFlowRate);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Initial Low Fan Speed Air Flow Rate [m3/s]",
-                                       this->LowSpeedAirFlowRate);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Initial Low Fan Speed Air Flow Rate [m3/s]", this->LowSpeedAirFlowRate);
                 }
             } else {
                 tmpLowSpeedAirFlowRate = this->LowSpeedAirFlowRateSizingFactor * tmpHighSpeedAirFlowRate;
@@ -2960,16 +2743,11 @@ namespace CondenserLoopTowers {
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                 this->LowSpeedFanPower = this->LowSpeedFanPowerSizingFactor * this->HighSpeedFanPower;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Fan Power at Low Fan Speed [W]",
-                                       this->LowSpeedFanPower);
+                    ReportSizingManager::ReportSizingOutput(this->TowerType, this->Name, "Fan Power at Low Fan Speed [W]", this->LowSpeedFanPower);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Initial Fan Power at Low Fan Speed [W]",
-                                       this->LowSpeedFanPower);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Initial Fan Power at Low Fan Speed [W]", this->LowSpeedFanPower);
                 }
             }
         }
@@ -2977,80 +2755,65 @@ namespace CondenserLoopTowers {
         if (this->LowSpeedTowerUAWasAutoSized && DataPlant::PlantFirstSizesOkayToFinalize) {
             this->LowSpeedTowerUA = this->LowSpeedTowerUASizingFactor * this->HighSpeedTowerUA;
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                   this->Name,
-                                   "U-Factor Times Area Value at Low Fan Speed [W/K]",
-                                   this->LowSpeedTowerUA);
+                ReportSizingManager::ReportSizingOutput(
+                    this->TowerType, this->Name, "U-Factor Times Area Value at Low Fan Speed [W/K]", this->LowSpeedTowerUA);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                ReportSizingManager:: ReportSizingOutput(this->TowerType,
-                                   this->Name,
-                                   "Initial U-Factor Times Area Value at Low Fan Speed [W/K]",
-                                   this->LowSpeedTowerUA);
+                ReportSizingManager::ReportSizingOutput(
+                    this->TowerType, this->Name, "Initial U-Factor Times Area Value at Low Fan Speed [W/K]", this->LowSpeedTowerUA);
             }
         }
 
         if (this->PerformanceInputMethod_Num == PIM_NominalCapacity) {
             if (this->TowerLowSpeedNomCapWasAutoSized) {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                    this->TowerLowSpeedNomCap =
-                        this->TowerLowSpeedNomCapSizingFactor * this->TowerNominalCapacity;
+                    this->TowerLowSpeedNomCap = this->TowerLowSpeedNomCapSizingFactor * this->TowerNominalCapacity;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Low Speed Nominal Capacity [W]",
-                                           this->TowerLowSpeedNomCap);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Low Speed Nominal Capacity [W]", this->TowerLowSpeedNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Initial Low Speed Nominal Capacity [W]",
-                                           this->TowerLowSpeedNomCap);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Initial Low Speed Nominal Capacity [W]", this->TowerLowSpeedNomCap);
                     }
                 }
             }
             if (this->TowerFreeConvNomCapWasAutoSized) {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                    this->TowerFreeConvNomCap =
-                        this->TowerFreeConvNomCapSizingFactor * this->TowerNominalCapacity;
+                    this->TowerFreeConvNomCap = this->TowerFreeConvNomCapSizingFactor * this->TowerNominalCapacity;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Free Convection Nominal Capacity [W]",
-                                           this->TowerFreeConvNomCap);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Free Convection Nominal Capacity [W]", this->TowerFreeConvNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Initial Free Convection Nominal Capacity [W]",
-                                           this->TowerFreeConvNomCap);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Initial Free Convection Nominal Capacity [W]", this->TowerFreeConvNomCap);
                     }
                 }
             }
         }
 
-        if (this->PerformanceInputMethod_Num == PIM_NominalCapacity &&
-            UtilityRoutines::SameString(this->TowerType, "CoolingTower:TwoSpeed")) {
+        if (this->PerformanceInputMethod_Num == PIM_NominalCapacity && UtilityRoutines::SameString(this->TowerType, "CoolingTower:TwoSpeed")) {
             if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow && this->TowerLowSpeedNomCap > 0.0) {
 
                 // nominal capacity doesn't include compressor heat; predefined factor was 1.25 W heat rejection per W of evap cooling but now is a
                 // user input
                 Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                       29.44,
-                                                        DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                       RoutineName); // 85F design exiting water temp
+                                                                     29.44,
+                                                                     DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                     RoutineName); // 85F design exiting water temp
                 Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                           29.44,
-                                                            DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                           RoutineName); // 85F design exiting water temp
+                                                                         29.44,
+                                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                         RoutineName); // 85F design exiting water temp
                 DesTowerLoad = this->TowerLowSpeedNomCap * this->HeatRejectCapNomCapSizingRatio;
                 Par(1) = DesTowerLoad;
                 Par(2) = double(this->thisTowerNum);
-                Par(3) = rho * tmpDesignWaterFlowRate;                                           // design water mass flow rate
-                Par(4) = tmpLowSpeedAirFlowRate;                                                 // Air volume flow rate at low fan speed
-                Par(5) = Cp;                                                                     // 85F design exiting water temp
-                UA0 = 0.0001 * DesTowerLoad;                                                     // Assume deltaT = 10000K (limit)
-                UA1 = DesTowerLoad;                                                              // Assume deltaT = 1K
+                Par(3) = rho * tmpDesignWaterFlowRate;      // design water mass flow rate
+                Par(4) = tmpLowSpeedAirFlowRate;            // Air volume flow rate at low fan speed
+                Par(5) = Cp;                                // 85F design exiting water temp
+                UA0 = 0.0001 * DesTowerLoad;                // Assume deltaT = 10000K (limit)
+                UA1 = DesTowerLoad;                         // Assume deltaT = 1K
                 this->WaterTemp = this->DesInletWaterTemp;  // 35.0; // 95F design inlet water temperature
                 this->AirTemp = this->DesInletAirDBTemp;    // 35.0; // 95F design inlet air dry-bulb temp
                 this->AirWetBulb = this->DesInletAirWBTemp; // 25.6; // 78F design inlet air wet-bulb temp
@@ -3072,35 +2835,26 @@ namespace CondenserLoopTowers {
                 this->LowSpeedTowerUA = 0.0;
             }
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                   this->Name,
-                                   "Low Fan Speed U-Factor Times Area Value [W/K]",
-                                   this->LowSpeedTowerUA);
+                ReportSizingManager::ReportSizingOutput(
+                    this->TowerType, this->Name, "Low Fan Speed U-Factor Times Area Value [W/K]", this->LowSpeedTowerUA);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                   this->Name,
-                                   "Initial Low Fan Speed U-Factor Times Area Value [W/K]",
-                                   this->LowSpeedTowerUA);
+                ReportSizingManager::ReportSizingOutput(
+                    this->TowerType, this->Name, "Initial Low Fan Speed U-Factor Times Area Value [W/K]", this->LowSpeedTowerUA);
             }
         }
 
         if (this->FreeConvAirFlowRateWasAutoSized) {
             this->FreeConvAirFlowRate = this->FreeConvAirFlowRateSizingFactor * tmpHighSpeedAirFlowRate;
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                this->FreeConvAirFlowRate =
-                    this->FreeConvAirFlowRateSizingFactor * this->HighSpeedAirFlowRate;
+                this->FreeConvAirFlowRate = this->FreeConvAirFlowRateSizingFactor * this->HighSpeedAirFlowRate;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Free Convection Regime Air Flow Rate [m3/s]",
-                                       this->FreeConvAirFlowRate);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Free Convection Regime Air Flow Rate [m3/s]", this->FreeConvAirFlowRate);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Initial Free Convection Regime Air Flow Rate [m3/s]",
-                                       this->FreeConvAirFlowRate);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Initial Free Convection Regime Air Flow Rate [m3/s]", this->FreeConvAirFlowRate);
                 }
             }
         }
@@ -3109,16 +2863,12 @@ namespace CondenserLoopTowers {
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                 this->FreeConvTowerUA = this->FreeConvTowerUASizingFactor * this->HighSpeedTowerUA;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Free Convection U-Factor Times Area Value [W/K]",
-                                       this->FreeConvTowerUA);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Free Convection U-Factor Times Area Value [W/K]", this->FreeConvTowerUA);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Initial Free Convection U-Factor Times Area Value [W/K]",
-                                       this->FreeConvTowerUA);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Initial Free Convection U-Factor Times Area Value [W/K]", this->FreeConvTowerUA);
                 }
             }
         }
@@ -3128,21 +2878,21 @@ namespace CondenserLoopTowers {
                 // nominal capacity doesn't include compressor heat; predefined factor was 1.25 W heat rejection per W of evap cooling but now user
                 // input
                 Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                       29.44,
-                                                        DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                       RoutineName); // 85F design exiting water temp
+                                                                     29.44,
+                                                                     DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                     RoutineName); // 85F design exiting water temp
                 Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                           29.44,
-                                                            DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                           RoutineName); // 85F design exiting water temp
+                                                                         29.44,
+                                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                         RoutineName); // 85F design exiting water temp
                 DesTowerLoad = this->TowerFreeConvNomCap * this->HeatRejectCapNomCapSizingRatio;
                 Par(1) = DesTowerLoad;
                 Par(2) = double(this->thisTowerNum);
-                Par(3) = rho * this->DesignWaterFlowRate;                        // design water mass flow rate
-                Par(4) = this->FreeConvAirFlowRate;                              // free convection air volume flow rate
-                Par(5) = Cp;                                                                     // 85F design exiting water temp
-                UA0 = 0.0001 * DesTowerLoad;                                                     // Assume deltaT = 10000K (limit)
-                UA1 = DesTowerLoad;                                                              // Assume deltaT = 1K
+                Par(3) = rho * this->DesignWaterFlowRate;   // design water mass flow rate
+                Par(4) = this->FreeConvAirFlowRate;         // free convection air volume flow rate
+                Par(5) = Cp;                                // 85F design exiting water temp
+                UA0 = 0.0001 * DesTowerLoad;                // Assume deltaT = 10000K (limit)
+                UA1 = DesTowerLoad;                         // Assume deltaT = 1K
                 this->WaterTemp = this->DesInletWaterTemp;  // 35.0; // 95F design inlet water temperature
                 this->AirTemp = this->DesInletAirDBTemp;    // 35.0; // 95F design inlet air dry-bulb temp
                 this->AirWetBulb = this->DesInletAirWBTemp; // 25.6; // 78F design inlet air wet-bulb temp
@@ -3161,16 +2911,16 @@ namespace CondenserLoopTowers {
                     ShowContinueError("Tower load assumed to be " + General::TrimSigDigits(this->HeatRejectCapNomCapSizingRatio, 3) +
                                       " times free convection capacity of " + General::TrimSigDigits(this->TowerFreeConvNomCap, 0) + " W.");
 
-                    Real64 OutWaterTemp;              // outlet water temperature during sizing [C]
+                    Real64 OutWaterTemp; // outlet water temperature during sizing [C]
                     OutWaterTemp = this->calculateSimpleTowerOutletTemp(Par(3), Par(4), UA0);
-                    Real64 CoolingOutput = Par(5) * Par(3) * (this->WaterTemp - OutWaterTemp);             // tower capacity during sizing [W]
-                    ShowContinueError("Tower capacity at lower UA guess (" + General::TrimSigDigits(UA0, 4) + ") = " + General::TrimSigDigits(CoolingOutput, 0) +
-                                      " W.");
+                    Real64 CoolingOutput = Par(5) * Par(3) * (this->WaterTemp - OutWaterTemp); // tower capacity during sizing [W]
+                    ShowContinueError("Tower capacity at lower UA guess (" + General::TrimSigDigits(UA0, 4) +
+                                      ") = " + General::TrimSigDigits(CoolingOutput, 0) + " W.");
 
                     OutWaterTemp = this->calculateSimpleTowerOutletTemp(Par(3), Par(4), UA1);
                     CoolingOutput = Par(5) * Par(3) * (this->WaterTemp - OutWaterTemp);
-                    ShowContinueError("Tower capacity at upper UA guess (" + General::TrimSigDigits(UA1, 4) + ") = " + General::TrimSigDigits(CoolingOutput, 0) +
-                                      " W.");
+                    ShowContinueError("Tower capacity at upper UA guess (" + General::TrimSigDigits(UA1, 4) +
+                                      ") = " + General::TrimSigDigits(CoolingOutput, 0) + " W.");
 
                     if (CoolingOutput < DesTowerLoad) {
                         ShowContinueError("Free convection capacity should be less than tower capacity at upper UA guess.");
@@ -3184,16 +2934,12 @@ namespace CondenserLoopTowers {
                 this->FreeConvTowerUA = 0.0;
             }
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                   this->Name,
-                                   "U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]",
-                                   this->FreeConvTowerUA);
+                ReportSizingManager::ReportSizingOutput(
+                    this->TowerType, this->Name, "U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]", this->FreeConvTowerUA);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                   this->Name,
-                                   "Initial U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]",
-                                   this->FreeConvTowerUA);
+                ReportSizingManager::ReportSizingOutput(
+                    this->TowerType, this->Name, "Initial U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]", this->FreeConvTowerUA);
             }
         }
 
@@ -3201,18 +2947,17 @@ namespace CondenserLoopTowers {
         // yields an approach temperature that matches user input
         if (UtilityRoutines::SameString(this->TowerType, "CoolingTower:VariableSpeed")) {
 
-            Par(1) = this->thisTowerNum; // Index to cooling tower
-            Par(2) = 1.0;      // air flow rate ratio
-            Par(3) = this->DesignInletWB;      // inlet air wet-bulb temperature [C]
-            Par(4) = this->DesignRange;       // tower range temperature [C]
-            Par(5) = this->DesignApproach;       // design approach temperature [C]
-            Par(6) = 0.0;      // Calculation FLAG, 0.0 = calc water flow ratio, 1.0 calc air flow ratio
+            Par(1) = this->thisTowerNum;   // Index to cooling tower
+            Par(2) = 1.0;                  // air flow rate ratio
+            Par(3) = this->DesignInletWB;  // inlet air wet-bulb temperature [C]
+            Par(4) = this->DesignRange;    // tower range temperature [C]
+            Par(5) = this->DesignApproach; // design approach temperature [C]
+            Par(6) = 0.0;                  // Calculation FLAG, 0.0 = calc water flow ratio, 1.0 calc air flow ratio
 
             //   check range for water flow rate ratio (make sure RegulaFalsi converges)
-            Real64 MaxWaterFlowRateRatio = 0.5;   // maximum water flow rate ratio which yields desired approach temp
-            Real64 Tapproach = 0.0; // temporary tower approach temp variable [C]
-            Real64 const FlowRateRatioStep =
-                (towers(this->VSTower).MaxWaterFlowRatio - towers(this->VSTower).MinWaterFlowRatio) / 10.0;
+            Real64 MaxWaterFlowRateRatio = 0.5; // maximum water flow rate ratio which yields desired approach temp
+            Real64 Tapproach = 0.0;             // temporary tower approach temp variable [C]
+            Real64 const FlowRateRatioStep = (towers(this->VSTower).MaxWaterFlowRatio - towers(this->VSTower).MinWaterFlowRatio) / 10.0;
             bool ModelCalibrated = true;
             Real64 ModelWaterFlowRatioMax = towers(this->VSTower).MaxWaterFlowRatio * 4.0; // maximum water flow rate ratio used for model calibration
             //   find a flow rate large enough to provide an approach temperature > than the user defined approach
@@ -3231,7 +2976,7 @@ namespace CondenserLoopTowers {
                 }
             }
 
-            Real64 WaterFlowRatio(0.0);     // tower water flow rate ratio found during model calibration
+            Real64 WaterFlowRatio(0.0); // tower water flow rate ratio found during model calibration
             if (ModelCalibrated) {
                 auto f = std::bind(&CoolingTower::residualTa, this, std::placeholders::_1, std::placeholders::_2);
                 General::SolveRoot(Acc, MaxIte, SolFla, WaterFlowRatio, f, DataPrecisionGlobals::constant_pointfive, MaxWaterFlowRateRatio, Par);
@@ -3258,64 +3003,51 @@ namespace CondenserLoopTowers {
 
             this->CalibratedWaterFlowRate = this->DesignWaterFlowRate / WaterFlowRatio;
 
-            if (WaterFlowRatio < towers(this->VSTower).MinWaterFlowRatio ||
-                WaterFlowRatio > towers(this->VSTower).MaxWaterFlowRatio) {
+            if (WaterFlowRatio < towers(this->VSTower).MinWaterFlowRatio || WaterFlowRatio > towers(this->VSTower).MaxWaterFlowRatio) {
                 ObjexxFCL::gio::write(OutputChar2, OutputFormat2) << WaterFlowRatio;
                 ObjexxFCL::gio::write(OutputCharLo, OutputFormat) << towers(this->VSTower).MinWaterFlowRatio;
                 ObjexxFCL::gio::write(OutputCharHi, OutputFormat) << towers(this->VSTower).MaxWaterFlowRatio;
-                ShowWarningError("CoolingTower:VariableSpeed, \"" + this->Name +
-                                 "\" the calibrated water flow rate ratio is determined to be " + OutputChar2 +
-                                 ". This is outside the valid range of " + OutputCharLo + " to " + OutputCharHi + '.');
+                ShowWarningError("CoolingTower:VariableSpeed, \"" + this->Name + "\" the calibrated water flow rate ratio is determined to be " +
+                                 OutputChar2 + ". This is outside the valid range of " + OutputCharLo + " to " + OutputCharHi + '.');
             }
 
             Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                   (this->DesignInletWB + this->DesignApproach + this->DesignRange),
-                                                    DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                   RoutineName);
+                                                                 (this->DesignInletWB + this->DesignApproach + this->DesignRange),
+                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                 RoutineName);
             Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                       (this->DesignInletWB + this->DesignApproach + this->DesignRange),
-                                                        DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                       RoutineName);
+                                                                     (this->DesignInletWB + this->DesignApproach + this->DesignRange),
+                                                                     DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                     RoutineName);
 
             this->TowerNominalCapacity = ((rho * tmpDesignWaterFlowRate) * Cp * this->DesignRange);
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(
-                    this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
+                ReportSizingManager::ReportSizingOutput(this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                   this->Name,
-                                   "Initial Nominal Capacity [W]",
-                                   this->TowerNominalCapacity);
+                ReportSizingManager::ReportSizingOutput(this->TowerType, this->Name, "Initial Nominal Capacity [W]", this->TowerNominalCapacity);
             }
             this->FreeConvAirFlowRate = this->MinimumVSAirFlowFrac * this->HighSpeedAirFlowRate;
 
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                   this->Name,
-                                   "Air Flow Rate in free convection regime [m3/s]",
-                                   this->FreeConvAirFlowRate);
+                ReportSizingManager::ReportSizingOutput(
+                    this->TowerType, this->Name, "Air Flow Rate in free convection regime [m3/s]", this->FreeConvAirFlowRate);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                   this->Name,
-                                   "Initial Air Flow Rate in free convection regime [m3/s]",
-                                   this->FreeConvAirFlowRate);
+                ReportSizingManager::ReportSizingOutput(
+                    this->TowerType, this->Name, "Initial Air Flow Rate in free convection regime [m3/s]", this->FreeConvAirFlowRate);
             }
-            this->TowerFreeConvNomCap =
-                this->TowerNominalCapacity * this->FreeConvectionCapacityFraction;
+            this->TowerFreeConvNomCap = this->TowerNominalCapacity * this->FreeConvectionCapacityFraction;
 
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                   this->Name,
-                                   "Tower capacity in free convection regime at design conditions [W]",
-                                   this->TowerFreeConvNomCap);
+                ReportSizingManager::ReportSizingOutput(
+                    this->TowerType, this->Name, "Tower capacity in free convection regime at design conditions [W]", this->TowerFreeConvNomCap);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
                 ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                   this->Name,
-                                   "Initial Tower capacity in free convection regime at design conditions [W]",
-                                   this->TowerFreeConvNomCap);
+                                                        this->Name,
+                                                        "Initial Tower capacity in free convection regime at design conditions [W]",
+                                                        this->TowerFreeConvNomCap);
             }
         }
         if (DataPlant::PlantFinalSizesOkayToReport) {
@@ -3387,16 +3119,16 @@ namespace CondenserLoopTowers {
         static std::string const RoutineName("SizeTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SolFla;        // Flag of solver
+        int SolFla; // Flag of solver
         Real64 tmpHighSpeedFanPower;
 
-        Array1D<Real64> Par(6); // Parameter array need for RegulaFalsi routine
-        Real64 UA0;             // Lower bound for UA [W/C]
-        Real64 UA1;             // Upper bound for UA [W/C]
-        Real64 DesTowerLoad;    // Design tower load [W]
-        Real64 Cp(0);           // local specific heat for fluid
-        Real64 rho(0);          // local density for fluid
-        Real64 UA;              // Calculated UA value
+        Array1D<Real64> Par(6);           // Parameter array need for RegulaFalsi routine
+        Real64 UA0;                       // Lower bound for UA [W/C]
+        Real64 UA1;                       // Upper bound for UA [W/C]
+        Real64 DesTowerLoad;              // Design tower load [W]
+        Real64 Cp(0);                     // local specific heat for fluid
+        Real64 rho(0);                    // local density for fluid
+        Real64 UA;                        // Calculated UA value
         Real64 DesTowerInletWaterTemp;    // design tower inlet water temperature
         Real64 DesTowerExitWaterTemp;     // design tower exit water temperature
         Real64 DesTowerWaterDeltaT;       // design tower temperature range
@@ -3439,10 +3171,10 @@ namespace CondenserLoopTowers {
                                      ". Tower Design Range Temperature is different from the Design Loop Delta Temperature.");
                     ShowContinueError("Tower Design Range Temperature specified in tower = " + this->Name);
                     ShowContinueError("is inconsistent with Design Loop Delta Temperature specified in Sizing:Plant object = " +
-                                          DataSizing::PlantSizData(PltSizCondNum).PlantLoopName + ".");
+                                      DataSizing::PlantSizData(PltSizCondNum).PlantLoopName + ".");
                     ShowContinueError("..The Design Range Temperature specified in tower is = " + General::TrimSigDigits(this->DesRange, 2));
                     ShowContinueError("..The Design Loop Delta Temperature specified iin plant sizing data is = " +
-                                          General::TrimSigDigits(DataSizing::PlantSizData(PltSizCondNum).DeltaT, 2));
+                                      General::TrimSigDigits(DataSizing::PlantSizData(PltSizCondNum).DeltaT, 2));
                 }
                 // check if the tower approach is different from plant sizing data
                 DesTowerApproachFromPlant = DataSizing::PlantSizData(PltSizCondNum).ExitTemp - this->DesInletAirWBTemp;
@@ -3450,11 +3182,11 @@ namespace CondenserLoopTowers {
                     ShowWarningError("Error when autosizing the UA for cooling tower = " + this->Name +
                                      ". Tower Design Approach Temperature is inconsistent with Approach from Plant Sizing Data.");
                     ShowContinueError("The Design Approach Temperature from inputs specified in Sizing:Plant object = " +
-                                          DataSizing::PlantSizData(PltSizCondNum).PlantLoopName);
+                                      DataSizing::PlantSizData(PltSizCondNum).PlantLoopName);
                     ShowContinueError("is inconsistent with Design Approach Temperature specified in tower = " + this->Name + ".");
-                    ShowContinueError("..The Design Approach Temperature from inputs specified is = " + General::TrimSigDigits(DesTowerApproachFromPlant, 2));
-                    ShowContinueError("..The Design Approach Temperature specified in tower is = " +
-                                          General::TrimSigDigits(this->DesApproach, 2));
+                    ShowContinueError("..The Design Approach Temperature from inputs specified is = " +
+                                      General::TrimSigDigits(DesTowerApproachFromPlant, 2));
+                    ShowContinueError("..The Design Approach Temperature specified in tower is = " + General::TrimSigDigits(this->DesApproach, 2));
                 }
             }
         }
@@ -3464,29 +3196,29 @@ namespace CondenserLoopTowers {
             if (PltSizCondNum > 0) { // get nominal capacity from PlantSizData(PltSizCondNum)%DeltaT and PlantSizData(PltSizCondNum)%DesVolFlowRate
                 if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                     rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                           DesTowerExitWaterTemp,
+                                                            DesTowerExitWaterTemp,
                                                             DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                           RoutineName);
+                                                            RoutineName);
                     Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                               DesTowerExitWaterTemp,
+                                                                DesTowerExitWaterTemp,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                               RoutineName);
+                                                                RoutineName);
                     DesTowerLoad = rho * Cp * DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate * DesTowerWaterDeltaT * this->SizFac;
                     tmpNomTowerCap = DesTowerLoad / this->HeatRejectCapNomCapSizingRatio;
                 } else {
                     if (this->TowerNominalCapacityWasAutoSized) tmpNomTowerCap = 0.0;
                 }
-            } else {                                                  // PltSizCondNum = 0
+            } else {                                  // PltSizCondNum = 0
                 if (!this->TowerInletCondsAutoSize) { // can use design data entered into tower object
                     if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                         rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                               DesTowerExitWaterTemp,
+                                                                DesTowerExitWaterTemp,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                               RoutineName);
+                                                                RoutineName);
                         Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                   DesTowerExitWaterTemp,
+                                                                    DesTowerExitWaterTemp,
                                                                     DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                                   RoutineName);
+                                                                    RoutineName);
                         DesTowerLoad = rho * Cp * this->DesignWaterFlowRate * DesTowerWaterDeltaT * this->SizFac;
                         tmpNomTowerCap = DesTowerLoad / this->HeatRejectCapNomCapSizingRatio;
                     } else {
@@ -3503,14 +3235,11 @@ namespace CondenserLoopTowers {
                 if (this->TowerNominalCapacityWasAutoSized) {
                     this->TowerNominalCapacity = tmpNomTowerCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
-                            this->TowerType, this->Name, "Design Nominal Capacity [W]", tmpNomTowerCap);
+                        ReportSizingManager::ReportSizingOutput(this->TowerType, this->Name, "Design Nominal Capacity [W]", tmpNomTowerCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Initial Design Nominal Capacity [W]",
-                                           this->TowerNominalCapacity);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Initial Design Nominal Capacity [W]", this->TowerNominalCapacity);
                     }
                 } else { // Hard-sized with sizing data
                     if (this->TowerNominalCapacity > 0.0 && tmpNomTowerCap > 0.0) {
@@ -3518,11 +3247,11 @@ namespace CondenserLoopTowers {
                         NomCapUser = this->TowerNominalCapacity;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                               this->Name,
-                                               "Design Nominal Capacity [W]",
-                                               tmpNomTowerCap,
-                                               "User-Specified Nominal Capacity [W]",
-                                               NomCapUser);
+                                                                    this->Name,
+                                                                    "Design Nominal Capacity [W]",
+                                                                    tmpNomTowerCap,
+                                                                    "User-Specified Nominal Capacity [W]",
+                                                                    NomCapUser);
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomTowerCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
@@ -3544,16 +3273,12 @@ namespace CondenserLoopTowers {
                 if (this->TowerFreeConvNomCapWasAutoSized) {
                     this->TowerFreeConvNomCap = tmpTowerFreeConvNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Design Free Convection Nominal Capacity [W]",
-                                           this->TowerFreeConvNomCap);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Design Free Convection Nominal Capacity [W]", this->TowerFreeConvNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Initial Design Free Convection Nominal Capacity [W]",
-                                           this->TowerFreeConvNomCap);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Initial Design Free Convection Nominal Capacity [W]", this->TowerFreeConvNomCap);
                     }
                 } else { // Hard-sized with sizing data
                     if (this->TowerFreeConvNomCap > 0.0 && tmpTowerFreeConvNomCap > 0.0) {
@@ -3561,11 +3286,11 @@ namespace CondenserLoopTowers {
                         NomCapUser = this->TowerFreeConvNomCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                               this->Name,
-                                               "Design Free Convection Nominal Capacity [W]",
-                                               tmpTowerFreeConvNomCap,
-                                               "User-Specified Free Convection Nominal Capacity [W]",
-                                               NomCapUser);
+                                                                    this->Name,
+                                                                    "Design Free Convection Nominal Capacity [W]",
+                                                                    tmpTowerFreeConvNomCap,
+                                                                    "User-Specified Free Convection Nominal Capacity [W]",
+                                                                    NomCapUser);
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpTowerFreeConvNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
@@ -3590,16 +3315,12 @@ namespace CondenserLoopTowers {
 
                     this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Design Water Flow Rate [m3/s]",
-                                           this->DesignWaterFlowRate);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Initial Design Water Flow Rate [m3/s]",
-                                           this->DesignWaterFlowRate);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Initial Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                     }
 
                 } else { // Hard-sized with sizing data
@@ -3608,13 +3329,14 @@ namespace CondenserLoopTowers {
                         NomDesWaterFlowUser = this->DesignWaterFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                               this->Name,
-                                               "Design Water Flow Rate [m3/s]",
-                                               this->DesignWaterFlowRate,
-                                               "User-Specified Design Water Flow Rate [m3/s]",
-                                               NomDesWaterFlowUser);
+                                                                    this->Name,
+                                                                    "Design Water Flow Rate [m3/s]",
+                                                                    this->DesignWaterFlowRate,
+                                                                    "User-Specified Design Water Flow Rate [m3/s]",
+                                                                    NomDesWaterFlowUser);
                             if (DataGlobals::DisplayExtraWarnings) {
-                                if ((std::abs(tmpDesignWaterFlowRate - NomDesWaterFlowUser) / NomDesWaterFlowUser) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpDesignWaterFlowRate - NomDesWaterFlowUser) / NomDesWaterFlowUser) >
+                                    DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError("User-Specified Design Water Flow Rate of " + General::RoundSigDigits(NomDesWaterFlowUser, 2) +
                                                       " [m3/s]");
@@ -3641,29 +3363,26 @@ namespace CondenserLoopTowers {
                 if (this->HighSpeedAirFlowRateWasAutoSized) {
                     this->HighSpeedAirFlowRate = tmpDesignAirFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Design Air Flow Rate [m3/s]",
-                                           this->HighSpeedAirFlowRate);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Initial Design Air Flow Rate [m3/s]",
-                                           this->HighSpeedAirFlowRate);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Initial Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                     }
                 } else { // Hard-sized with sizing data
                     Real64 DesignAirFlowRateUser(0.0);
                     DesignAirFlowRateUser = this->HighSpeedAirFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Design Air Flow Rate [m3/s]",
-                                           tmpDesignAirFlowRate,
-                                           "User-Specified Design Air Flow Rate [m3/s]",
-                                           DesignAirFlowRateUser);
+                                                                this->Name,
+                                                                "Design Air Flow Rate [m3/s]",
+                                                                tmpDesignAirFlowRate,
+                                                                "User-Specified Design Air Flow Rate [m3/s]",
+                                                                DesignAirFlowRateUser);
                         if (DataGlobals::DisplayExtraWarnings) {
-                            if ((std::abs(tmpDesignAirFlowRate - DesignAirFlowRateUser) / DesignAirFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
+                            if ((std::abs(tmpDesignAirFlowRate - DesignAirFlowRateUser) / DesignAirFlowRateUser) >
+                                DataSizing::AutoVsHardSizingThreshold) {
                                 ShowMessage("SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError("User-Specified Design Air Flow Rate of " + General::RoundSigDigits(DesignAirFlowRateUser, 2) +
                                                   " [m3/s]");
@@ -3683,29 +3402,26 @@ namespace CondenserLoopTowers {
                 if (this->FreeConvAirFlowRateWasAutoSized) {
                     this->FreeConvAirFlowRate = tmpFreeConvAirFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Design Free Convection Regime Air Flow Rate [m3/s]",
-                                           this->FreeConvAirFlowRate);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Design Free Convection Regime Air Flow Rate [m3/s]", this->FreeConvAirFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Initial Design Free Convection Regime Air Flow Rate [m3/s]",
-                                           this->FreeConvAirFlowRate);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Initial Design Free Convection Regime Air Flow Rate [m3/s]", this->FreeConvAirFlowRate);
                     }
                 } else { // Hard-sized with sizing data
                     Real64 FreeConvAirFlowUser(0.0);
                     FreeConvAirFlowUser = this->FreeConvAirFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Design Free Convection Regime Air Flow Rate [m3/s]",
-                                           tmpFreeConvAirFlowRate,
-                                           "User-Specified Design Free Convection Regime Air Flow Rate [m3/s]",
-                                           FreeConvAirFlowUser);
+                                                                this->Name,
+                                                                "Design Free Convection Regime Air Flow Rate [m3/s]",
+                                                                tmpFreeConvAirFlowRate,
+                                                                "User-Specified Design Free Convection Regime Air Flow Rate [m3/s]",
+                                                                FreeConvAirFlowUser);
                         if (DataGlobals::DisplayExtraWarnings) {
-                            if ((std::abs(tmpFreeConvAirFlowRate - FreeConvAirFlowUser) / FreeConvAirFlowUser) > DataSizing::AutoVsHardSizingThreshold) {
+                            if ((std::abs(tmpFreeConvAirFlowRate - FreeConvAirFlowUser) / FreeConvAirFlowUser) >
+                                DataSizing::AutoVsHardSizingThreshold) {
                                 ShowMessage("SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError("User-Specified Design Free Convection Regime Air Flow Rate of " +
                                                   General::RoundSigDigits(FreeConvAirFlowUser, 2) + " [m3/s]");
@@ -3724,21 +3440,21 @@ namespace CondenserLoopTowers {
             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                 if (PltSizCondNum > 0) { // user has a plant sizing object
                     Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                               DesTowerExitWaterTemp,
+                                                                DesTowerExitWaterTemp,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                               RoutineName);
+                                                                RoutineName);
                     this->WaterTemp = DesTowerInletWaterTemp;
-                } else {                        // probably no plant sizing object
+                } else { // probably no plant sizing object
                     Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                               DataGlobals::InitConvTemp,
+                                                                DataGlobals::InitConvTemp,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                               RoutineName);
+                                                                RoutineName);
                     this->WaterTemp = DesTowerInletWaterTemp; // 35.0; // design condition
                 }
                 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                       DataGlobals::InitConvTemp,
+                                                        DataGlobals::InitConvTemp,
                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                       RoutineName);
+                                                        RoutineName);
 
                 // full speed fan tower UA
                 Par(1) = tmpNomTowerCap * this->HeatRejectCapNomCapSizingRatio;
@@ -3764,16 +3480,12 @@ namespace CondenserLoopTowers {
                 }
                 this->HighSpeedTowerUA = UA;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "U-Factor Times Area Value at Full Speed Air Flow Rate [W/C]",
-                                       this->HighSpeedTowerUA);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "U-Factor Times Area Value at Full Speed Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Initial U-Factor Times Area Value at Full Speed Air Flow Rate [W/C]",
-                                       this->HighSpeedTowerUA);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "Initial U-Factor Times Area Value at Full Speed Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                 }
                 // free convection tower UA
                 Par(1) = tmpTowerFreeConvNomCap * this->HeatRejectCapNomCapSizingRatio;
@@ -3800,16 +3512,14 @@ namespace CondenserLoopTowers {
                 }
                 this->FreeConvTowerUA = UA;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]",
-                                       this->FreeConvTowerUA);
+                    ReportSizingManager::ReportSizingOutput(
+                        this->TowerType, this->Name, "U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]", this->FreeConvTowerUA);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
                     ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Initial U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]",
-                                       this->FreeConvTowerUA);
+                                                            this->Name,
+                                                            "Initial U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]",
+                                                            this->FreeConvTowerUA);
                 }
             }
         } else if (this->PerformanceInputMethod_Num == PIM_UFactor) {
@@ -3823,16 +3533,12 @@ namespace CondenserLoopTowers {
                         if (DataPlant::PlantFirstSizesOkayToFinalize) {
                             this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                             if (DataPlant::PlantFinalSizesOkayToReport) {
-                                ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                                   this->Name,
-                                                   "Design Water Flow Rate [m3/s]",
-                                                   this->DesignWaterFlowRate);
+                                ReportSizingManager::ReportSizingOutput(
+                                    this->TowerType, this->Name, "Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                                   this->Name,
-                                                   "Initial Design Water Flow Rate [m3/s]",
-                                                   this->DesignWaterFlowRate);
+                                ReportSizingManager::ReportSizingOutput(
+                                    this->TowerType, this->Name, "Initial Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                             }
                         }
                     } else {
@@ -3845,16 +3551,12 @@ namespace CondenserLoopTowers {
                             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                                 this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                                       this->Name,
-                                                       "Design Water Flow Rate [m3/s]",
-                                                       this->DesignWaterFlowRate);
+                                    ReportSizingManager::ReportSizingOutput(
+                                        this->TowerType, this->Name, "Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                                 }
                                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                                       this->Name,
-                                                       "Initial Design Water Flow Rate [m3/s]",
-                                                       this->DesignWaterFlowRate);
+                                    ReportSizingManager::ReportSizingOutput(
+                                        this->TowerType, this->Name, "Initial Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                                 }
                             }
                         } else {
@@ -3875,28 +3577,24 @@ namespace CondenserLoopTowers {
                 if (PltSizCondNum > 0) {
                     if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                         rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                               DesTowerExitWaterTemp,
+                                                                DesTowerExitWaterTemp,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                               RoutineName);
+                                                                RoutineName);
                         Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                   DesTowerExitWaterTemp,
+                                                                    DesTowerExitWaterTemp,
                                                                     DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                                   RoutineName);
+                                                                    RoutineName);
                         DesTowerLoad = rho * Cp * DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate * DesTowerWaterDeltaT * this->SizFac;
                         tmpNomTowerCap = DesTowerLoad / this->HeatRejectCapNomCapSizingRatio;
                         if (DataPlant::PlantFirstSizesOkayToFinalize) {
                             this->TowerNominalCapacity = tmpNomTowerCap;
                             if (DataPlant::PlantFinalSizesOkayToReport) {
-                                ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                                   this->Name,
-                                                   "Nominal Capacity [W]",
-                                                   this->TowerNominalCapacity);
+                                ReportSizingManager::ReportSizingOutput(
+                                    this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                                   this->Name,
-                                                   "Initial Nominal Capacity [W]",
-                                                   this->TowerNominalCapacity);
+                                ReportSizingManager::ReportSizingOutput(
+                                    this->TowerType, this->Name, "Initial Nominal Capacity [W]", this->TowerNominalCapacity);
                             }
                         }
                     } else {
@@ -3904,16 +3602,12 @@ namespace CondenserLoopTowers {
                         if (DataPlant::PlantFirstSizesOkayToFinalize) {
                             this->TowerNominalCapacity = tmpNomTowerCap;
                             if (DataPlant::PlantFinalSizesOkayToReport) {
-                                ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                                   this->Name,
-                                                   "Nominal Capacity [W]",
-                                                   this->TowerNominalCapacity);
+                                ReportSizingManager::ReportSizingOutput(
+                                    this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
                             }
                             if (DataPlant::PlantFirstSizesOkayToReport) {
-                                ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                                   this->Name,
-                                                   "Initial Nominal Capacity [W]",
-                                                   this->TowerNominalCapacity);
+                                ReportSizingManager::ReportSizingOutput(
+                                    this->TowerType, this->Name, "Initial Nominal Capacity [W]", this->TowerNominalCapacity);
                             }
                         }
                     }
@@ -3921,28 +3615,24 @@ namespace CondenserLoopTowers {
                     if (!this->TowerInletCondsAutoSize) {
                         if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                             rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                   DesTowerExitWaterTemp,
+                                                                    DesTowerExitWaterTemp,
                                                                     DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                                   RoutineName);
+                                                                    RoutineName);
                             Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                       DesTowerExitWaterTemp,
+                                                                        DesTowerExitWaterTemp,
                                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                                       RoutineName);
+                                                                        RoutineName);
                             DesTowerLoad = rho * Cp * this->DesignWaterFlowRate * DesTowerWaterDeltaT * this->SizFac;
                             tmpNomTowerCap = DesTowerLoad / this->HeatRejectCapNomCapSizingRatio;
                             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                                 this->TowerNominalCapacity = tmpNomTowerCap;
                                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                                       this->Name,
-                                                       "Nominal Capacity [W]",
-                                                       this->TowerNominalCapacity);
+                                    ReportSizingManager::ReportSizingOutput(
+                                        this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
                                 }
                                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                                       this->Name,
-                                                       "Initial Nominal Capacity [W]",
-                                                       this->TowerNominalCapacity);
+                                    ReportSizingManager::ReportSizingOutput(
+                                        this->TowerType, this->Name, "Initial Nominal Capacity [W]", this->TowerNominalCapacity);
                                 }
                             }
                         } else {
@@ -3950,16 +3640,12 @@ namespace CondenserLoopTowers {
                             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                                 this->TowerNominalCapacity = tmpNomTowerCap;
                                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                                       this->Name,
-                                                       "Nominal Capacity [W]",
-                                                       this->TowerNominalCapacity);
+                                    ReportSizingManager::ReportSizingOutput(
+                                        this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
                                 }
                                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                                       this->Name,
-                                                       "Initial Nominal Capacity [W]",
-                                                       this->TowerNominalCapacity);
+                                    ReportSizingManager::ReportSizingOutput(
+                                        this->TowerType, this->Name, "Initial Nominal Capacity [W]", this->TowerNominalCapacity);
                                 }
                             }
                         }
@@ -3975,16 +3661,12 @@ namespace CondenserLoopTowers {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->TowerFreeConvNomCap = tmpTowerFreeConvNomCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                               this->Name,
-                                               "Free Convection Nominal Capacity [W]",
-                                               this->TowerFreeConvNomCap);
+                            ReportSizingManager::ReportSizingOutput(
+                                this->TowerType, this->Name, "Free Convection Nominal Capacity [W]", this->TowerFreeConvNomCap);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                               this->Name,
-                                               "Initial Free Convection Nominal Capacity [W]",
-                                               this->TowerFreeConvNomCap);
+                            ReportSizingManager::ReportSizingOutput(
+                                this->TowerType, this->Name, "Initial Free Convection Nominal Capacity [W]", this->TowerFreeConvNomCap);
                         }
                     }
                 }
@@ -3997,16 +3679,12 @@ namespace CondenserLoopTowers {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->HighSpeedAirFlowRate = tmpDesignAirFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                               this->Name,
-                                               "Design Air Flow Rate [m3/s]",
-                                               this->HighSpeedAirFlowRate);
+                            ReportSizingManager::ReportSizingOutput(
+                                this->TowerType, this->Name, "Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                               this->Name,
-                                               "Initial Design Air Flow Rate [m3/s]",
-                                               this->HighSpeedAirFlowRate);
+                            ReportSizingManager::ReportSizingOutput(
+                                this->TowerType, this->Name, "Initial Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                         }
                     }
                 }
@@ -4015,29 +3693,25 @@ namespace CondenserLoopTowers {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->FreeConvAirFlowRate = tmpFreeConvAirFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                               this->Name,
-                                               "Free Convection Regime Air Flow Rate [m3/s]",
-                                               this->FreeConvAirFlowRate);
+                            ReportSizingManager::ReportSizingOutput(
+                                this->TowerType, this->Name, "Free Convection Regime Air Flow Rate [m3/s]", this->FreeConvAirFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                               this->Name,
-                                               "Initial Free Convection Regime Air Flow Rate [m3/s]",
-                                               this->FreeConvAirFlowRate);
+                            ReportSizingManager::ReportSizingOutput(
+                                this->TowerType, this->Name, "Initial Free Convection Regime Air Flow Rate [m3/s]", this->FreeConvAirFlowRate);
                         }
                     }
                 }
                 // now calcuate UA values from nominal capacities and flow rates
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                           DataGlobals::InitConvTemp,
+                                                            DataGlobals::InitConvTemp,
                                                             DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                           RoutineName);
+                                                            RoutineName);
                     Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                               DesTowerExitWaterTemp,
+                                                                DesTowerExitWaterTemp,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                               RoutineName);
+                                                                RoutineName);
                     // full speed fan tower UA
                     Par(1) = tmpNomTowerCap * this->HeatRejectCapNomCapSizingRatio;
                     Par(2) = double(this->thisTowerNum);
@@ -4062,16 +3736,14 @@ namespace CondenserLoopTowers {
                     }
                     this->HighSpeedTowerUA = UA;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "U-Factor Times Area Value at Full Speed Air Flow Rate [W/C]",
-                                           this->HighSpeedTowerUA);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "U-Factor Times Area Value at Full Speed Air Flow Rate [W/C]", this->HighSpeedTowerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Initial U-Factor Times Area Value at Full Speed Air Flow Rate [W/C]",
-                                           this->HighSpeedTowerUA);
+                                                                this->Name,
+                                                                "Initial U-Factor Times Area Value at Full Speed Air Flow Rate [W/C]",
+                                                                this->HighSpeedTowerUA);
                     }
                     // free convection tower UA
                     Par(1) = tmpTowerFreeConvNomCap * this->HeatRejectCapNomCapSizingRatio;
@@ -4097,16 +3769,14 @@ namespace CondenserLoopTowers {
                     }
                     this->LowSpeedTowerUA = UA;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]",
-                                           this->FreeConvTowerUA);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]", this->FreeConvTowerUA);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
                         ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Initial U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]",
-                                           this->FreeConvTowerUA);
+                                                                this->Name,
+                                                                "Initial U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]",
+                                                                this->FreeConvTowerUA);
                     }
                 }
 
@@ -4114,19 +3784,18 @@ namespace CondenserLoopTowers {
 
                 if (this->FreeConvTowerUAWasAutoSized) { // determine from scalable sizing factor
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
-                        this->FreeConvTowerUA =
-                            this->HighSpeedTowerUA * this->FreeConvTowerUASizingFactor;
+                        this->FreeConvTowerUA = this->HighSpeedTowerUA * this->FreeConvTowerUASizingFactor;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                               this->Name,
-                                               "U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]",
-                                               this->FreeConvTowerUA);
+                                                                    this->Name,
+                                                                    "U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]",
+                                                                    this->FreeConvTowerUA);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
                             ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                               this->Name,
-                                               "Initial U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]",
-                                               this->FreeConvTowerUA);
+                                                                    this->Name,
+                                                                    "Initial U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]",
+                                                                    this->FreeConvTowerUA);
                         }
                     }
                 }
@@ -4137,28 +3806,24 @@ namespace CondenserLoopTowers {
                     if (PltSizCondNum > 0) {
                         if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                             rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                   DesTowerExitWaterTemp,
+                                                                    DesTowerExitWaterTemp,
                                                                     DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                                   RoutineName);
+                                                                    RoutineName);
                             Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                       DesTowerExitWaterTemp,
+                                                                        DesTowerExitWaterTemp,
                                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                                       RoutineName);
+                                                                        RoutineName);
                             DesTowerLoad = rho * Cp * DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate * DesTowerWaterDeltaT;
                             tmpNomTowerCap = DesTowerLoad / this->HeatRejectCapNomCapSizingRatio;
                             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                                 this->TowerNominalCapacity = tmpNomTowerCap;
                                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                                       this->Name,
-                                                       "Nominal Capacity [W]",
-                                                       this->TowerNominalCapacity);
+                                    ReportSizingManager::ReportSizingOutput(
+                                        this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
                                 }
                                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                                       this->Name,
-                                                       "Initial Nominal Capacity [W]",
-                                                       this->TowerNominalCapacity);
+                                    ReportSizingManager::ReportSizingOutput(
+                                        this->TowerType, this->Name, "Initial Nominal Capacity [W]", this->TowerNominalCapacity);
                                 }
                             }
                         } else {
@@ -4166,16 +3831,12 @@ namespace CondenserLoopTowers {
                             if (DataPlant::PlantFirstSizesOkayToFinalize) {
                                 this->TowerNominalCapacity = tmpNomTowerCap;
                                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                                       this->Name,
-                                                       "Nominal Capacity [W]",
-                                                       this->TowerNominalCapacity);
+                                    ReportSizingManager::ReportSizingOutput(
+                                        this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
                                 }
                                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                                       this->Name,
-                                                       "Initial Nominal Capacity [W]",
-                                                       this->TowerNominalCapacity);
+                                    ReportSizingManager::ReportSizingOutput(
+                                        this->TowerType, this->Name, "Initial Nominal Capacity [W]", this->TowerNominalCapacity);
                                 }
                             }
                         }
@@ -4196,53 +3857,43 @@ namespace CondenserLoopTowers {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->HighSpeedAirFlowRate = tmpDesignAirFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                               this->Name,
-                                               "Design Air Flow Rate [m3/s]",
-                                               this->HighSpeedAirFlowRate);
+                            ReportSizingManager::ReportSizingOutput(
+                                this->TowerType, this->Name, "Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                               this->Name,
-                                               "Initial Design Air Flow Rate [m3/s]",
-                                               this->HighSpeedAirFlowRate);
+                            ReportSizingManager::ReportSizingOutput(
+                                this->TowerType, this->Name, "Initial Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                         }
                     }
 
                 } else { // UA and Air flow rate given, so find Nominal Cap from running model
 
                     rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                           DesTowerExitWaterTemp,
+                                                            DesTowerExitWaterTemp,
                                                             DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                           RoutineName);
+                                                            RoutineName);
                     Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                               DesTowerExitWaterTemp,
+                                                                DesTowerExitWaterTemp,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                               RoutineName);
+                                                                RoutineName);
 
                     this->WaterTemp = DesTowerInletWaterTemp;
                     this->AirTemp = DesTowerInletAirDBTemp;    // 35.0;
                     this->AirWetBulb = DesTowerInletAirWBTemp; // 25.6;
                     this->AirPress = DataEnvironment::StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp, this->AirWetBulb, this->AirPress);
-                    OutWaterTemp = this->calculateSimpleTowerOutletTemp(rho * tmpDesignWaterFlowRate,
-                                   this->HighSpeedAirFlowRate,
-                                   this->HighSpeedTowerUA);
+                    OutWaterTemp =
+                        this->calculateSimpleTowerOutletTemp(rho * tmpDesignWaterFlowRate, this->HighSpeedAirFlowRate, this->HighSpeedTowerUA);
                     tmpNomTowerCap = Cp * rho * tmpDesignWaterFlowRate * (this->WaterTemp - OutWaterTemp);
                     tmpNomTowerCap /= this->HeatRejectCapNomCapSizingRatio;
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->TowerNominalCapacity = tmpNomTowerCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                               this->Name,
-                                               "Nominal Capacity [W]",
-                                               this->TowerNominalCapacity);
+                            ReportSizingManager::ReportSizingOutput(this->TowerType, this->Name, "Nominal Capacity [W]", this->TowerNominalCapacity);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                               this->Name,
-                                               "Initial Nominal Capacity [W]",
-                                               this->TowerNominalCapacity);
+                            ReportSizingManager::ReportSizingOutput(
+                                this->TowerType, this->Name, "Initial Nominal Capacity [W]", this->TowerNominalCapacity);
                         }
                     }
 
@@ -4253,16 +3904,12 @@ namespace CondenserLoopTowers {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) {
                         this->FreeConvAirFlowRate = tmpFreeConvAirFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                               this->Name,
-                                               "Free Convection Regime Air Flow Rate [m3/s]",
-                                               this->FreeConvAirFlowRate);
+                            ReportSizingManager::ReportSizingOutput(
+                                this->TowerType, this->Name, "Free Convection Regime Air Flow Rate [m3/s]", this->FreeConvAirFlowRate);
                         }
                         if (DataPlant::PlantFirstSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                               this->Name,
-                                               "Initial Free Convection Regime Air Flow Rate [m3/s]",
-                                               this->FreeConvAirFlowRate);
+                            ReportSizingManager::ReportSizingOutput(
+                                this->TowerType, this->Name, "Initial Free Convection Regime Air Flow Rate [m3/s]", this->FreeConvAirFlowRate);
                         }
                     }
                 }
@@ -4273,16 +3920,12 @@ namespace CondenserLoopTowers {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
                     this->TowerFreeConvNomCap = tmpTowerFreeConvNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Free Convection Nominal Capacity [W]",
-                                           this->TowerFreeConvNomCap);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Free Convection Nominal Capacity [W]", this->TowerFreeConvNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                           this->Name,
-                                           "Initial Free Convection Nominal Capacity [W]",
-                                           this->TowerFreeConvNomCap);
+                        ReportSizingManager::ReportSizingOutput(
+                            this->TowerType, this->Name, "Initial Free Convection Nominal Capacity [W]", this->TowerFreeConvNomCap);
                     }
                 }
             }
@@ -4294,27 +3937,24 @@ namespace CondenserLoopTowers {
 
                 this->HighSpeedFanPower = tmpHighSpeedFanPower;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(
-                        this->TowerType, this->Name, "Design Fan Power [W]", this->HighSpeedFanPower);
+                    ReportSizingManager::ReportSizingOutput(this->TowerType, this->Name, "Design Fan Power [W]", this->HighSpeedFanPower);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Initial Design Fan Power [W]",
-                                       this->HighSpeedFanPower);
+                    ReportSizingManager::ReportSizingOutput(this->TowerType, this->Name, "Initial Design Fan Power [W]", this->HighSpeedFanPower);
                 }
             } else { // Hard-sized with sizing data
                 Real64 HighSpeedFanPowerUser(0.0);
                 HighSpeedFanPowerUser = this->HighSpeedAirFlowRate;
                 if (DataPlant::PlantFinalSizesOkayToReport) {
                     ReportSizingManager::ReportSizingOutput(this->TowerType,
-                                       this->Name,
-                                       "Design Fan Power [W]",
-                                       tmpHighSpeedFanPower,
-                                       "User-Specified Design Fan Power [W]",
-                                       HighSpeedFanPowerUser);
+                                                            this->Name,
+                                                            "Design Fan Power [W]",
+                                                            tmpHighSpeedFanPower,
+                                                            "User-Specified Design Fan Power [W]",
+                                                            HighSpeedFanPowerUser);
                     if (DataGlobals::DisplayExtraWarnings) {
-                        if ((std::abs(tmpHighSpeedFanPower - HighSpeedFanPowerUser) / HighSpeedFanPowerUser) > DataSizing::AutoVsHardSizingThreshold) {
+                        if ((std::abs(tmpHighSpeedFanPower - HighSpeedFanPowerUser) / HighSpeedFanPowerUser) >
+                            DataSizing::AutoVsHardSizingThreshold) {
                             ShowMessage("SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                             ShowContinueError("User-Specified Design Fan Power of " + General::RoundSigDigits(HighSpeedFanPowerUser, 2) + " [W]");
                             ShowContinueError("differs from Design Fan Power of " + General::RoundSigDigits(tmpHighSpeedFanPower, 2) + " [W]");
@@ -4455,7 +4095,7 @@ namespace CondenserLoopTowers {
         }
 
         // Added for fluid bypass. First assume no fluid bypass
-        int BypassFlag = 0;  // Flag indicator for fluid bypass (0 - no bypass, 1 - bypass)
+        int BypassFlag = 0; // Flag indicator for fluid bypass (0 - no bypass, 1 - bypass)
         Real64 BypassFraction2 = 0.0;
         this->BypassFraction = 0.0;
 
@@ -4464,10 +4104,8 @@ namespace CondenserLoopTowers {
         int NumCellMax(0);
         Real64 WaterMassFlowRatePerCellMin = 0.0;
         if (this->DesWaterMassFlowRate > 0.0) {
-            WaterMassFlowRatePerCellMin =
-                this->DesWaterMassFlowRate * this->MinFracFlowRate / this->NumCell;
-            Real64 WaterMassFlowRatePerCellMax =
-                this->DesWaterMassFlowRate * this->MaxFracFlowRate / this->NumCell;
+            WaterMassFlowRatePerCellMin = this->DesWaterMassFlowRate * this->MinFracFlowRate / this->NumCell;
+            Real64 WaterMassFlowRatePerCellMax = this->DesWaterMassFlowRate * this->MaxFracFlowRate / this->NumCell;
 
             // round it up to the nearest integer
             NumCellMin = min(int((this->WaterMassFlowRate / WaterMassFlowRatePerCellMax) + 0.9999), this->NumCell);
@@ -4488,10 +4126,8 @@ namespace CondenserLoopTowers {
         // MassFlowTolerance is a parameter to indicate a no flow condition
         if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
             // for multiple cells, we assume that it's a common basin
-            CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
-                                 this->BasinHeaterSchedulePtr,
-                                 this->BasinHeaterSetPointTemp,
-                                 this->BasinHeaterPower);
+            CalcBasinHeaterPower(
+                this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             return;
         }
 
@@ -4586,16 +4222,19 @@ namespace CondenserLoopTowers {
                         while (NumIteration < MaxIteration) {
                             ++NumIteration;
                             // need to iterate for the new OutletWaterTemp while bypassing tower water
-                            this->OutletWaterTemp = this->calculateSimpleTowerOutletTemp(WaterMassFlowRatePerCell * (1.0 - _BypassFraction), AirFlowRate, UAdesign);
+                            this->OutletWaterTemp =
+                                this->calculateSimpleTowerOutletTemp(WaterMassFlowRatePerCell * (1.0 - _BypassFraction), AirFlowRate, UAdesign);
                             // Calc new BypassFraction based on the new OutletWaterTemp
                             if (std::abs(this->OutletWaterTemp - OWTLowerLimit) <= 0.01) {
                                 BypassFraction2 = _BypassFraction;
                                 break;
                             } else if (this->OutletWaterTemp < OWTLowerLimit) {
                                 // Set OutletWaterTemp = OWTLowerLimit, and use linear interpolation to calculate the bypassFraction
-                                BypassFraction2 = BypassFractionPrev - (BypassFractionPrev - _BypassFraction) * (OutletWaterTempPrev - OWTLowerLimit) /
+                                BypassFraction2 = BypassFractionPrev - (BypassFractionPrev - _BypassFraction) *
+                                                                           (OutletWaterTempPrev - OWTLowerLimit) /
                                                                            (OutletWaterTempPrev - this->OutletWaterTemp);
-                                this->OutletWaterTemp = this->calculateSimpleTowerOutletTemp(WaterMassFlowRatePerCell * (1.0 - BypassFraction2), AirFlowRate, UAdesign);
+                                this->OutletWaterTemp =
+                                    this->calculateSimpleTowerOutletTemp(WaterMassFlowRatePerCell * (1.0 - BypassFraction2), AirFlowRate, UAdesign);
                                 if (this->OutletWaterTemp < OWTLowerLimit) {
                                     // Use previous iteraction values
                                     BypassFraction2 = BypassFractionPrev;
@@ -4613,8 +4252,7 @@ namespace CondenserLoopTowers {
                             _BypassFraction = BypassFraction2;
                         }
                         if (NumIteration > MaxIteration) {
-                            ShowWarningError("Cooling tower fluid bypass iteration exceeds maximum limit of " + MaxItChar + " for " +
-                                             this->Name);
+                            ShowWarningError("Cooling tower fluid bypass iteration exceeds maximum limit of " + MaxItChar + " for " + this->Name);
                         }
                         this->BypassFraction = BypassFraction2;
                         // may not meet TempSetPoint due to limit of tower outlet temp to OWTLowerLimit
@@ -4628,9 +4266,9 @@ namespace CondenserLoopTowers {
         this->FanCyclingRatio = FanModeFrac;
         // Should this be water inlet node num?????
         Real64 const CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                         DataLoopNode::Node(this->WaterInletNodeNum).Temp,
-                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                        RoutineName);
+                                                                      DataLoopNode::Node(this->WaterInletNodeNum).Temp,
+                                                                      DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                      RoutineName);
 
         this->Qactual = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
         this->__AirFlowRateRatio = (AirFlowRate * this->NumCell) / this->HighSpeedAirFlowRate;
@@ -4758,13 +4396,11 @@ namespace CondenserLoopTowers {
         }
 
         // Do not RETURN here if flow rate is less than SmallMassFlow. Check basin heater and then RETURN.
-        if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) return;  // TODO: WTF
+        if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) return; // TODO: WTF
         // MassFlowTolerance is a parameter to indicate a no flow condition
         if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
-            CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
-                                 this->BasinHeaterSchedulePtr,
-                                 this->BasinHeaterSetPointTemp,
-                                 this->BasinHeaterPower);
+            CalcBasinHeaterPower(
+                this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             return;
         }
 
@@ -4775,10 +4411,8 @@ namespace CondenserLoopTowers {
         int NumCellMax(0);
         Real64 WaterMassFlowRatePerCell;
         if (this->DesWaterMassFlowRate > 0.0) {
-            WaterMassFlowRatePerCellMin =
-                this->DesWaterMassFlowRate * this->MinFracFlowRate / this->NumCell;
-            WaterMassFlowRatePerCellMax =
-                this->DesWaterMassFlowRate * this->MaxFracFlowRate / this->NumCell;
+            WaterMassFlowRatePerCellMin = this->DesWaterMassFlowRate * this->MinFracFlowRate / this->NumCell;
+            WaterMassFlowRatePerCellMax = this->DesWaterMassFlowRate * this->MaxFracFlowRate / this->NumCell;
 
             // round it up to the nearest integer
             NumCellMin = min(int((this->WaterMassFlowRate / WaterMassFlowRatePerCellMax) + 0.9999), this->NumCell);
@@ -4871,16 +4505,16 @@ namespace CondenserLoopTowers {
         this->SpeedSelected = SpeedSel;
 
         Real64 const CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                         DataLoopNode::Node(this->WaterInletNodeNum).Temp,
-                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                        RoutineName);
+                                                                      DataLoopNode::Node(this->WaterInletNodeNum).Temp,
+                                                                      DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                      RoutineName);
         this->Qactual = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
         this->__AirFlowRateRatio = (AirFlowRate * this->NumCell) / this->HighSpeedAirFlowRate;
     }
 
     void CoolingTower::calculateVariableSpeedTower()
     {
-    
+
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   Feb 2005
@@ -4889,10 +4523,10 @@ namespace CondenserLoopTowers {
         //                      Jun. 2016, R Zhang, Applied the condenser supply water temperature sensor fault model
         //                      Jul. 2016, R Zhang, Applied the cooling tower fouling fault model
         //       RE-ENGINEERED
-    
+
         // PURPOSE OF THIS SUBROUTINE:
         // To simulate the operation of a variable-speed fan cooling tower.
-    
+
         // METHODOLOGY EMPLOYED:
         // For each simulation time step, a desired range temperature (Twater,inlet-Twater,setpoint) and desired approach
         // temperature (Twater,setpoint-Tair,WB) is calculated which meets the outlet water temperature setpoint. This
@@ -4924,23 +4558,23 @@ namespace CondenserLoopTowers {
         // ASHRAE Transactions 2002, V. 108, Pt. 1.
         // York International Corporation, "YORKcalcTM Software, Chiller-Plant Energy-Estimating Program",
         // Form 160.00-SG2 (0502). 2002.
-    
+
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt OutputFormat("(F5.2)");
         static ObjexxFCL::gio::Fmt OutputFormat2("(F8.5)");
         int const MaxIte(500);    // Maximum number of iterations
         Real64 const Acc(0.0001); // Accuracy of result
         static std::string const RoutineName("calculateVariableSpeedTower");
-    
+
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SolFla(0);                            // Flag of solver
-        Array1D<Real64> Par(6);                // Parameter array for regula falsi solver
-        std::string OutputChar;                // character string used for warning messages
-        std::string OutputChar2;               // character string used for warning messages
-        std::string OutputChar3;               // character string used for warning messages
-        std::string OutputChar4;               // character string used for warning messages
-        std::string OutputChar5;               // character string used for warning messages
-    
+        int SolFla(0);           // Flag of solver
+        Array1D<Real64> Par(6);  // Parameter array for regula falsi solver
+        std::string OutputChar;  // character string used for warning messages
+        std::string OutputChar2; // character string used for warning messages
+        std::string OutputChar3; // character string used for warning messages
+        std::string OutputChar4; // character string used for warning messages
+        std::string OutputChar5; // character string used for warning messages
+
         // Added for multi-cell. Determine the number of cells operating
         Real64 WaterMassFlowRatePerCellMin = 0.0;
         Real64 WaterMassFlowRatePerCellMax;
@@ -4948,39 +4582,37 @@ namespace CondenserLoopTowers {
         int NumCellMax(0);
         Real64 WaterMassFlowRatePerCell;
         if (this->DesWaterMassFlowRate > 0.0) {
-            WaterMassFlowRatePerCellMin =
-                this->DesWaterMassFlowRate * this->MinFracFlowRate / this->NumCell;
-            WaterMassFlowRatePerCellMax =
-                this->DesWaterMassFlowRate * this->MaxFracFlowRate / this->NumCell;
-    
+            WaterMassFlowRatePerCellMin = this->DesWaterMassFlowRate * this->MinFracFlowRate / this->NumCell;
+            WaterMassFlowRatePerCellMax = this->DesWaterMassFlowRate * this->MaxFracFlowRate / this->NumCell;
+
             // round it up to the nearest integer
             NumCellMin = min(int((this->WaterMassFlowRate / WaterMassFlowRatePerCellMax) + 0.9999), this->NumCell);
             NumCellMax = min(int((this->WaterMassFlowRate / WaterMassFlowRatePerCellMin) + 0.9999), this->NumCell);
         }
-    
+
         // cap min at 1
         if (NumCellMin <= 0) NumCellMin = 1;
         if (NumCellMax <= 0) NumCellMax = 1;
-    
+
         if (this->CellCtrl_Num == CellCtrl_MinCell) {
             this->NumCellOn = NumCellMin;
         } else {
             this->NumCellOn = NumCellMax;
         }
-    
+
         WaterMassFlowRatePerCell = this->WaterMassFlowRate / this->NumCellOn;
-    
+
         // Initialize subroutine variables
         this->Qactual = 0.0;
         this->FanPower = 0.0;
         this->OutletWaterTemp = DataLoopNode::Node(this->WaterInletNodeNum).Temp;
-    
+
         this->WaterUsage = 0.0;
         Real64 Twb = this->AirWetBulb;
         Real64 TwbCapped = this->AirWetBulb;
-    
+
         // water temperature setpoint
-        Real64 TempSetPoint(0.0);              // Outlet water temperature setpoint (C)
+        Real64 TempSetPoint(0.0); // Outlet water temperature setpoint (C)
         {
             auto const SELECT_CASE_var(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
@@ -4991,38 +4623,36 @@ namespace CondenserLoopTowers {
                 assert(false);
             }
         }
-    
+
         // If there is a fault of condenser SWT Sensor (zrp_Jul2016)
         if (this->FaultyCondenserSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
             int FaultIndex = this->FaultyCondenserSWTIndex;
             Real64 TowerOutletTemp_ff = TempSetPoint;
-    
+
             // calculate the sensor offset using fault information
             this->FaultyCondenserSWTOffset = FaultsManager::FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct();
             // update the TempSetPoint
             TempSetPoint = TowerOutletTemp_ff - this->FaultyCondenserSWTOffset;
         }
-    
+
         Real64 Tr = DataLoopNode::Node(this->WaterInletNodeNum).Temp - TempSetPoint;
         Real64 Ta = TempSetPoint - this->AirWetBulb;
-    
+
         // Do not RETURN here if flow rate is less than MassFlowTolerance. Check basin heater and then RETURN.
-        if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) return;  // TODO: WTF
+        if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) return; // TODO: WTF
         // MassFlowTolerance is a parameter to indicate a no flow condition
         if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
-            CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
-                                 this->BasinHeaterSchedulePtr,
-                                 this->BasinHeaterSetPointTemp,
-                                 this->BasinHeaterPower);
+            CalcBasinHeaterPower(
+                this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             return;
         }
-    
+
         // loop to increment NumCell if we cannot meet the setpoint with the actual number of cells calculated above
         bool IncrNumCellFlag = true;
-        Real64 OutletWaterTempOFF; // Outlet water temperature with fan OFF (C)
-        Real64 OutletWaterTempON = 0.0; // Outlet water temperature with fan ON at maximum fan speed (C)
-        Real64 FreeConvectionCapFrac = 0.0;          // fraction of tower capacity in free convection
-        Real64 WaterFlowRateRatioCapped = 0.0;       // Water flow rate ratio passed to VS tower model
+        Real64 OutletWaterTempOFF;             // Outlet water temperature with fan OFF (C)
+        Real64 OutletWaterTempON = 0.0;        // Outlet water temperature with fan ON at maximum fan speed (C)
+        Real64 FreeConvectionCapFrac = 0.0;    // fraction of tower capacity in free convection
+        Real64 WaterFlowRateRatioCapped = 0.0; // Water flow rate ratio passed to VS tower model
         Real64 TrCapped;                       // range temp passed to VS tower model
         Real64 TaCapped;                       // approach temp passed to VS tower model
         while (IncrNumCellFlag) {
@@ -5032,23 +4662,22 @@ namespace CondenserLoopTowers {
                                                                           DataLoopNode::Node(this->WaterInletNodeNum).Temp,
                                                                           DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                                                           RoutineName);
-            Real64 const WaterFlowRateRatio =
-                WaterMassFlowRatePerCell / (WaterDensity * this->CalibratedWaterFlowRate / this->NumCell);
-    
+            Real64 const WaterFlowRateRatio = WaterMassFlowRatePerCell / (WaterDensity * this->CalibratedWaterFlowRate / this->NumCell);
+
             // check independent inputs with respect to model boundaries
             this->checkModelBounds(Twb, Tr, Ta, WaterFlowRateRatio, TwbCapped, TrCapped, TaCapped, WaterFlowRateRatioCapped);
-    
+
             //   determine the free convection capacity by finding the outlet temperature at full air flow and multiplying
             //   the tower's full capacity temperature difference by the percentage of tower capacity in free convection
             //   regime specified by the user
-    
+
             this->__AirFlowRateRatio = 1.0;
             OutletWaterTempOFF = DataLoopNode::Node(this->WaterInletNodeNum).Temp;
             OutletWaterTempON = DataLoopNode::Node(this->WaterInletNodeNum).Temp;
             this->OutletWaterTemp = OutletWaterTempOFF;
             FreeConvectionCapFrac = this->FreeConvectionCapacityFraction;
             OutletWaterTempON = this->calculateVariableTowerOutletTemp(WaterFlowRateRatioCapped, this->__AirFlowRateRatio, TwbCapped);
-    
+
             if (OutletWaterTempON > TempSetPoint) {
                 this->FanCyclingRatio = 1.0;
                 this->__AirFlowRateRatio = 1.0;
@@ -5062,27 +4691,28 @@ namespace CondenserLoopTowers {
                 }
             }
         }
-    
+
         // find the correct air ratio only if full flow is  too much
         if (OutletWaterTempON < TempSetPoint) {
             //   outlet water temperature is calculated in the free convection regime
-            OutletWaterTempOFF = DataLoopNode::Node(this->WaterInletNodeNum).Temp - FreeConvectionCapFrac * (DataLoopNode::Node(this->WaterInletNodeNum).Temp - OutletWaterTempON);
+            OutletWaterTempOFF = DataLoopNode::Node(this->WaterInletNodeNum).Temp -
+                                 FreeConvectionCapFrac * (DataLoopNode::Node(this->WaterInletNodeNum).Temp - OutletWaterTempON);
             //   fan is OFF
             this->FanCyclingRatio = 0.0;
             //   air flow ratio is assumed to be the fraction of tower capacity in the free convection regime (fan is OFF but air is flowing)
             this->__AirFlowRateRatio = FreeConvectionCapFrac;
-    
+
             // Assume setpoint was met using free convection regime (pump ON and fan OFF)
             this->FanPower = 0.0;
             this->OutletWaterTemp = OutletWaterTempOFF;
-    
+
             if (OutletWaterTempOFF > TempSetPoint) {
                 // Setpoint was not met, turn on cooling tower fan at minimum fan speed
-    
+
                 this->__AirFlowRateRatio = this->MinimumVSAirFlowFrac;
                 Real64 OutletWaterTempMIN; // Outlet water temperature with fan at minimum speed (C)
                 OutletWaterTempMIN = this->calculateVariableTowerOutletTemp(WaterFlowRateRatioCapped, this->__AirFlowRateRatio, TwbCapped);
-    
+
                 if (OutletWaterTempMIN < TempSetPoint) {
                     //         if setpoint was exceeded, cycle the fan at minimum air flow to meet the setpoint temperature
                     if (this->FanPowerfAirFlowCurve == 0) {
@@ -5104,10 +4734,10 @@ namespace CondenserLoopTowers {
                     this->FanCyclingRatio = 1.0;
 
                     this->OutletWaterTemp = this->calculateVariableTowerOutletTemp(WaterFlowRateRatioCapped, this->__AirFlowRateRatio, TwbCapped);
-    
+
                     // Setpoint was met with pump ON and fan ON at full flow
                     // Calculate the fraction of full air flow to exactly meet the setpoint temperature
-    
+
                     Par(1) = this->thisTowerNum; // Index to cooling tower
                     //         cap the water flow rate ratio and inlet air wet-bulb temperature to provide a stable output
                     Par(2) = WaterFlowRateRatioCapped; // water flow rate ratio
@@ -5120,8 +4750,7 @@ namespace CondenserLoopTowers {
                     General::SolveRoot(Acc, MaxIte, SolFla, this->__AirFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0, Par);
                     if (SolFla == -1) {
                         if (!DataGlobals::WarmupFlag)
-                            ShowWarningError("Cooling tower iteration limit exceeded when calculating air flow rate ratio for tower " +
-                                             this->Name);
+                            ShowWarningError("Cooling tower iteration limit exceeded when calculating air flow rate ratio for tower " + this->Name);
                         //           IF RegulaFalsi cannot find a solution then provide detailed output for debugging
                     } else if (SolFla == -2) {
                         if (!DataGlobals::WarmupFlag) {
@@ -5141,12 +4770,12 @@ namespace CondenserLoopTowers {
                                 ShowContinueError("...Consider modifying the design approach or design range temperature for this tower.");
                             } else {
                                 ShowRecurringWarningErrorAtEnd("CoolingTower:VariableSpeed \"" + this->Name +
-                                                               "\" - Cooling tower air flow rate ratio calculation failed error continues.",
+                                                                   "\" - Cooling tower air flow rate ratio calculation failed error continues.",
                                                                this->CoolingTowerAFRRFailedIndex);
                             }
                         }
                     }
-    
+
                     //         Use theoretical cubic for determination of fan power if user has not specified a fan power ratio curve
                     if (this->FanPowerfAirFlowCurve == 0) {
                         this->FanPower = pow_3(this->__AirFlowRateRatio) * this->HighSpeedFanPower * this->NumCellOn / this->NumCell;
@@ -5157,10 +4786,10 @@ namespace CondenserLoopTowers {
                     //           outlet water temperature is calculated as the inlet air wet-bulb temperature plus tower approach temperature
                     this->OutletWaterTemp = Twb + Ta;
                 } // IF(OutletWaterTempMIN .LT. TempSetPoint)THEN
-    
+
             } // IF(OutletWaterTempOFF .GT. TempSetPoint)THEN
         }     // IF(OutletWaterTempON .LT. TempSetPoint) ie if tower should not run at full capacity
-    
+
         Real64 const CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
                                                                       DataLoopNode::Node(this->WaterInletNodeNum).Temp,
                                                                       DataPlant::PlantLoop(this->LoopNum).FluidIndex,
@@ -5169,7 +4798,7 @@ namespace CondenserLoopTowers {
 
         //   calculate end time of current time step
         Real64 const CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
-    
+
         //   Print warning messages only when valid and only for the first occurrence. Let summary provide statistics.
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
@@ -5183,18 +4812,18 @@ namespace CondenserLoopTowers {
                     ShowContinueError(towers(this->VSTower).LGBuffer2);
                 } else {
                     ShowRecurringWarningErrorAtEnd(this->TowerType + " \"" + this->Name +
-                                                   "\" - Liquid to gas ratio is out of range error continues...",
+                                                       "\" - Liquid to gas ratio is out of range error continues...",
                                                    towers(this->VSTower).ErrIndexLG,
                                                    towers(this->VSTower).LGLast,
                                                    towers(this->VSTower).LGLast);
                 }
             }
         }
-    
+
         //   save last system time step and last end time of current time step (used to determine if warning is valid)
         this->TimeStepSysLast = DataHVACGlobals::TimeStepSys;
         this->CurrentEndTimeLast = CurrentEndTime;
-    
+
         //   warn user on first occurrence if flow fraction is greater than maximum for the YorkCalc model, use recurring warning stats
         if (this->TowerModelType == YorkCalcModel || this->TowerModelType == YorkCalcUserDefined) {
             towers(this->VSTower).PrintLGMessage = false;
@@ -5208,11 +4837,11 @@ namespace CondenserLoopTowers {
                         towers(this->VSTower).PrintLGMessage = true;
                         ObjexxFCL::gio::write(OutputChar, OutputFormat) << FlowFraction;
                         ObjexxFCL::gio::write(OutputChar2, OutputFormat) << towers(this->VSTower).MaxLiquidToGasRatio;
-                        towers(this->VSTower).LGBuffer1 = this->TowerType + " \"" + this->Name +
-                                                                               "\" - Liquid to gas ratio (L/G) is out of range at " + OutputChar + '.';
+                        towers(this->VSTower).LGBuffer1 =
+                            this->TowerType + " \"" + this->Name + "\" - Liquid to gas ratio (L/G) is out of range at " + OutputChar + '.';
                         towers(this->VSTower).LGBuffer2 = " ...Valid maximum ratio = " + OutputChar2 +
-                                                                               ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
-                                                                               General::CreateSysTimeIntervalString();
+                                                          ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " +
+                                                          DataEnvironment::CurMnDy + ' ' + General::CreateSysTimeIntervalString();
                         towers(this->VSTower).LGLast = FlowFraction;
                     }
                 }
@@ -5244,12 +4873,12 @@ namespace CondenserLoopTowers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D<Real64> Par(8); // Parameter array passed to solver
-        int SolFla(0);             // Flag of solver
+        int SolFla(0);          // Flag of solver
 
         Real64 const CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                         DataLoopNode::Node(this->WaterInletNodeNum).Temp,
-                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                        RoutineName);
+                                                                      DataLoopNode::Node(this->WaterInletNodeNum).Temp,
+                                                                      DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                      RoutineName);
         this->Qactual = 0.0;
         this->FanPower = 0.0;
         this->OutletWaterTemp = DataLoopNode::Node(this->WaterInletNodeNum).Temp;
@@ -5288,10 +4917,8 @@ namespace CondenserLoopTowers {
         Real64 UAdesignPerCell;
         Real64 AirFlowRatePerCell;
         if (this->DesWaterMassFlowRate > 0.0) {
-            WaterMassFlowRatePerCellMin =
-                this->DesWaterMassFlowRate * this->MinFracFlowRate / this->NumCell;
-            WaterMassFlowRatePerCellMax =
-                this->DesWaterMassFlowRate * this->MaxFracFlowRate / this->NumCell;
+            WaterMassFlowRatePerCellMin = this->DesWaterMassFlowRate * this->MinFracFlowRate / this->NumCell;
+            WaterMassFlowRatePerCellMax = this->DesWaterMassFlowRate * this->MaxFracFlowRate / this->NumCell;
 
             // round it up to the nearest integer
             NumCellMin = min(int((this->WaterMassFlowRate / WaterMassFlowRatePerCellMax) + 0.9999), this->NumCell);
@@ -5312,10 +4939,8 @@ namespace CondenserLoopTowers {
         // MassFlowTolerance is a parameter to indicate a no flow condition
         if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || (MyLoad > DataHVACGlobals::SmallLoad)) {
             // for multiple cells, we assume that it's a common bassin
-            CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
-                                 this->BasinHeaterSchedulePtr,
-                                 this->BasinHeaterSetPointTemp,
-                                 this->BasinHeaterPower);
+            CalcBasinHeaterPower(
+                this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             return;
         }
 
@@ -5325,10 +4950,8 @@ namespace CondenserLoopTowers {
             this->FanPower = 0.0;
             this->__AirFlowRateRatio = 0.0;
             this->Qactual = 0.0;
-            CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
-                                 this->BasinHeaterSchedulePtr,
-                                 this->BasinHeaterSetPointTemp,
-                                 this->BasinHeaterPower);
+            CalcBasinHeaterPower(
+                this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             return;
         }
 
@@ -5347,10 +4970,8 @@ namespace CondenserLoopTowers {
             this->OutletWaterTemp = OutletWaterTempOFF;
             this->__AirFlowRateRatio = 0.0;
             this->Qactual = FreeConvQdot;
-            CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
-                                 this->BasinHeaterSchedulePtr,
-                                 this->BasinHeaterSetPointTemp,
-                                 this->BasinHeaterPower);
+            CalcBasinHeaterPower(
+                this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
 
             return;
         }
@@ -5380,17 +5001,14 @@ namespace CondenserLoopTowers {
                     UAwaterflowAdjFac = CurveManager::CurveValue(this->UAModFuncWaterFlowRatioCurvePtr, WaterFlowRateRatio);
                     UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
                     this->OutletWaterTemp = this->calculateSimpleTowerOutletTemp(WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
-                    IncrNumCellFlag = (FullSpeedFanQdot + DataHVACGlobals::SmallLoad) < std::abs(MyLoad) &&
-                                      (this->NumCellOn < this->NumCell) &&
+                    IncrNumCellFlag = (FullSpeedFanQdot + DataHVACGlobals::SmallLoad) < std::abs(MyLoad) && (this->NumCellOn < this->NumCell) &&
                                       ((this->WaterMassFlowRate / (this->NumCellOn + 1)) >= WaterMassFlowRatePerCellMin);
                 }
                 FullSpeedFanQdot = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
             }
             this->Qactual = FullSpeedFanQdot;
-            CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
-                                 this->BasinHeaterSchedulePtr,
-                                 this->BasinHeaterSetPointTemp,
-                                 this->BasinHeaterPower);
+            CalcBasinHeaterPower(
+                this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             // now calculate fan power
             FanPowerAdjustFac = CurveManager::CurveValue(this->FanPowerfAirFlowCurve, this->__AirFlowRateRatio);
             this->FanPower = this->HighSpeedFanPower * FanPowerAdjustFac * this->NumCellOn / this->NumCell;
@@ -5408,10 +5026,8 @@ namespace CondenserLoopTowers {
 
         if (std::abs(MyLoad) <= MinSpeedFanQdot) { // min fan speed already exceeds load)
             this->Qactual = MinSpeedFanQdot;
-            CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
-                                 this->BasinHeaterSchedulePtr,
-                                 this->BasinHeaterSetPointTemp,
-                                 this->BasinHeaterPower);
+            CalcBasinHeaterPower(
+                this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             // now calculate fan power
             FanPowerAdjustFac = CurveManager::CurveValue(this->FanPowerfAirFlowCurve, this->__AirFlowRateRatio);
             this->FanPower = this->HighSpeedFanPower * FanPowerAdjustFac * this->NumCellOn / this->NumCell;
@@ -5440,7 +5056,7 @@ namespace CondenserLoopTowers {
                         ShowWarningError(cCoolingTower_VariableSpeedMerkel +
                                          " - Iteration limit exceeded calculating variable speed fan ratio for unit = " + this->Name);
                         ShowContinueError("Estimated air flow ratio  = " +
-                                              General::RoundSigDigits((std::abs(MyLoad) - MinSpeedFanQdot) / (FullSpeedFanQdot - MinSpeedFanQdot), 4));
+                                          General::RoundSigDigits((std::abs(MyLoad) - MinSpeedFanQdot) / (FullSpeedFanQdot - MinSpeedFanQdot), 4));
                         ShowContinueError("Calculated air flow ratio = " + General::RoundSigDigits(this->__AirFlowRateRatio, 4));
                         ShowContinueErrorTimeStamp("The calculated air flow ratio will be used and the simulation continues. Occurrence info:");
                     }
@@ -5478,10 +5094,8 @@ namespace CondenserLoopTowers {
 
             this->OutletWaterTemp = this->calculateSimpleTowerOutletTemp(WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
             this->Qactual = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
-            CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
-                                 this->BasinHeaterSchedulePtr,
-                                 this->BasinHeaterSetPointTemp,
-                                 this->BasinHeaterPower);
+            CalcBasinHeaterPower(
+                this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
 
             // now calculate fan power
             FanPowerAdjustFac = CurveManager::CurveValue(this->FanPowerfAirFlowCurve, this->__AirFlowRateRatio);
@@ -5490,7 +5104,7 @@ namespace CondenserLoopTowers {
     }
 
     Real64 CoolingTower::residualMerkelLoad(Real64 _AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
-                            Array1<Real64> const &Par      // par(1) = Tower number
+                                            Array1<Real64> const &Par // par(1) = Tower number
     )
     {
 
@@ -5513,13 +5127,13 @@ namespace CondenserLoopTowers {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
         int TowerNum = int(Par(1));
-        auto const & TargetLoad = Par(2);
-        auto const & WaterMassFlowRatePerCell = Par(3);
-        auto const & UAdesignPerCell = Par(4);
-        auto const & UAwetbulbAdjFac = Par(5);
-        auto const & UAwaterflowAdjFac = Par(6);
-        auto const & CpWater = Par(7);
-        auto const & TotalWaterMassFlowRate = Par(8);
+        auto const &TargetLoad = Par(2);
+        auto const &WaterMassFlowRatePerCell = Par(3);
+        auto const &UAdesignPerCell = Par(4);
+        auto const &UAwetbulbAdjFac = Par(5);
+        auto const &UAwaterflowAdjFac = Par(6);
+        auto const &CpWater = Par(7);
+        auto const &TotalWaterMassFlowRate = Par(8);
 
         Real64 const AirFlowRatePerCell = _AirFlowRateRatio * towers(TowerNum).HighSpeedAirFlowRate / towers(TowerNum).NumCell;
         Real64 const UAairflowAdjFac = CurveManager::CurveValue(towers(TowerNum).UAModFuncAirFlowRatioCurvePtr, _AirFlowRateRatio);
@@ -5555,28 +5169,28 @@ namespace CondenserLoopTowers {
         static std::string const RoutineName("calculateSimpleTowerOutletTemp");
 
         // initialize some local variables
-        Real64 _Qactual = 0.0;  // Actual heat transfer rate between tower water and air [W]
+        Real64 _Qactual = 0.0; // Actual heat transfer rate between tower water and air [W]
 
         // set local tower inlet and outlet temperature variables
         this->InletWaterTemp = this->WaterTemp;
         Real64 _OutletWaterTemp = this->InletWaterTemp;
-        Real64 InletAirTemp = this->AirTemp;  // Dry-bulb temperature of air entering the tower [C]
-        Real64 InletAirWetBulb = this->AirWetBulb;  // Wetbulb temp of entering moist air [C]
+        Real64 InletAirTemp = this->AirTemp;       // Dry-bulb temperature of air entering the tower [C]
+        Real64 InletAirWetBulb = this->AirWetBulb; // Wetbulb temp of entering moist air [C]
 
         if (UAdesign == 0.0) return _OutletWaterTemp;
 
         // set water and air properties
         Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(this->AirPress, InletAirTemp, this->AirHumRat); // Density of air [kg/m3]
-        Real64 AirMassFlowRate = AirFlowRate * AirDensity; // Mass flow rate of air [kg/s]
-        Real64 CpAir = Psychrometrics::PsyCpAirFnWTdb(this->AirHumRat, InletAirTemp); // Heat capacity of air [J/kg/K]
+        Real64 AirMassFlowRate = AirFlowRate * AirDensity;                                                    // Mass flow rate of air [kg/s]
+        Real64 CpAir = Psychrometrics::PsyCpAirFnWTdb(this->AirHumRat, InletAirTemp);                         // Heat capacity of air [J/kg/K]
         Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                                         this->WaterTemp,
-                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                        RoutineName); // Heat capacity of water [J/kg/K]
+                                                                this->WaterTemp,
+                                                                DataPlant::PlantLoop(this->LoopNum).FluidIndex,
+                                                                RoutineName);                           // Heat capacity of water [J/kg/K]
         Real64 InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(this->AirWetBulb, 1.0, this->AirPress); // Enthalpy of entering moist air [J/kg]
 
         // initialize exiting wet bulb temperature before iterating on final solution
-        Real64 OutletAirWetBulb = InletAirWetBulb + 6.0;  // Wetbulb temp of exiting moist air [C]
+        Real64 OutletAirWetBulb = InletAirWetBulb + 6.0; // Wetbulb temp of exiting moist air [C]
 
         // Calculate mass flow rates
         if (_WaterMassFlowRate <= 0.0) {
@@ -5587,26 +5201,28 @@ namespace CondenserLoopTowers {
         Real64 MdotCpWater = _WaterMassFlowRate * CpWater; // Water mass flow rate times the heat capacity [W/K]
 
         int Iter = 0;
-        Real64 OutletAirEnthalpy;    // Enthalpy of exiting moist air [J/kg]
-        Real64 WetBulbError = 1.0;  // Calculated error for exiting wet-bulb temperature between iterations [delta K/K]
-        Real64 DeltaTwb = 1.0;  // Absolute value of difference between inlet and outlet air wet-bulb temp [C]
-        Real64 OutletAirWetBulbLast; // temporary Wetbulb temp of exiting moist air [C]
+        Real64 OutletAirEnthalpy;               // Enthalpy of exiting moist air [J/kg]
+        Real64 WetBulbError = 1.0;              // Calculated error for exiting wet-bulb temperature between iterations [delta K/K]
+        Real64 DeltaTwb = 1.0;                  // Absolute value of difference between inlet and outlet air wet-bulb temp [C]
+        Real64 OutletAirWetBulbLast;            // temporary Wetbulb temp of exiting moist air [C]
         int const IterMax(50);                  // Maximum number of iterations allowed
         Real64 const WetBulbTolerance(0.00001); // Maximum error for exiting wet-bulb temperature between iterations [delta K/K]
-        Real64 const DeltaTwbTolerance(0.001); // Maximum error (tolerance) in DeltaTwb for iteration convergence [C]
+        Real64 const DeltaTwbTolerance(0.001);  // Maximum error (tolerance) in DeltaTwb for iteration convergence [C]
         while ((WetBulbError > WetBulbTolerance) && (Iter <= IterMax) && (DeltaTwb > DeltaTwbTolerance)) {
             ++Iter;
             //        OutletAirEnthalpy = PsyHFnTdbRhPb(OutletAirWetBulb,1.0,OutBaroPress)
             OutletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(OutletAirWetBulb, 1.0, this->AirPress);
             // calculate the airside specific heat and capacity
-            Real64 const CpAirside = (OutletAirEnthalpy - InletAirEnthalpy) / (OutletAirWetBulb - InletAirWetBulb); // Delta enthalpy of the tower air divides by delta air wet-bulb temp [J/kg/K]
+            Real64 const CpAirside =
+                (OutletAirEnthalpy - InletAirEnthalpy) /
+                (OutletAirWetBulb - InletAirWetBulb);               // Delta enthalpy of the tower air divides by delta air wet-bulb temp [J/kg/K]
             Real64 const AirCapacity = AirMassFlowRate * CpAirside; // MdotCp of air through the tower
             // calculate the minimum to maximum capacity ratios of airside and waterside
-            Real64 const CapacityRatioMin = min(AirCapacity, MdotCpWater); // Minimum capacity of airside and waterside
-            Real64 const CapacityRatioMax = max(AirCapacity, MdotCpWater); // Maximum capacity of airside and waterside
+            Real64 const CapacityRatioMin = min(AirCapacity, MdotCpWater);    // Minimum capacity of airside and waterside
+            Real64 const CapacityRatioMax = max(AirCapacity, MdotCpWater);    // Maximum capacity of airside and waterside
             Real64 const CapacityRatio = CapacityRatioMin / CapacityRatioMax; // Ratio of minimum to maximum capacity
             // Calculate heat transfer coefficient and number of transfer units (NTU)
-            Real64 const UAactual = UAdesign * CpAirside / CpAir; // UA value at actual conditions [W/C]
+            Real64 const UAactual = UAdesign * CpAirside / CpAir;        // UA value at actual conditions [W/C]
             Real64 const NumTransferUnits = UAactual / CapacityRatioMin; // Number of transfer Units [NTU]
             // calculate heat exchanger effectiveness
             Real64 effectiveness; // Effectiveness of the heat exchanger [-]
@@ -5642,8 +5258,8 @@ namespace CondenserLoopTowers {
     }
 
     Real64 CoolingTower::calculateVariableTowerOutletTemp(Real64 const WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
-                          Real64 const _AirFlowRateRatio,   // current air flow rate ratio
-                          Real64 const Twb                // current inlet air wet-bulb temperature (C, capped if applicable)
+                                                          Real64 const _AirFlowRateRatio,  // current air flow rate ratio
+                                                          Real64 const Twb // current inlet air wet-bulb temperature (C, capped if applicable)
     )
     {
 
@@ -5673,15 +5289,15 @@ namespace CondenserLoopTowers {
         Real64 const Acc(0.0001); // Accuracy of result
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SolFla;               // Flag of solver
-        Array1D<Real64> Par(4);   // Parameter array for regula falsi solver
+        int SolFla;             // Flag of solver
+        Array1D<Real64> Par(4); // Parameter array for regula falsi solver
 
         //   determine tower outlet water temperature
-        Par(1) = this->thisTowerNum;           // Index to cooling tower
+        Par(1) = this->thisTowerNum; // Index to cooling tower
         Par(2) = WaterFlowRateRatio; // water flow rate ratio
-        Par(3) = _AirFlowRateRatio;   // air flow rate ratio
+        Par(3) = _AirFlowRateRatio;  // air flow rate ratio
         Par(4) = Twb;                // inlet air wet-bulb temperature [C]
-        Real64 Tr;                // range temperature which results in an energy balance
+        Real64 Tr;                   // range temperature which results in an energy balance
         auto f = std::bind(&CoolingTower::residualTr, this, std::placeholders::_1, std::placeholders::_2);
         General::SolveRoot(Acc, MaxIte, SolFla, Tr, f, 0.001, towers(this->VSTower).MaxRangeTemp, Par);
 
@@ -5693,7 +5309,7 @@ namespace CondenserLoopTowers {
                 "Design inlet air wet-bulb or approach temperature must be modified to achieve an acceptable range at the minimum air flow rate");
             ShowContinueError("Cooling tower simulation failed to converge for tower " + this->Name);
             //    if SolFla = -2, Tr is returned as minimum value (0.001) and outlet temp = inlet temp - 0.001
-        } else if (SolFla == -2) { // decide if should run at max flow
+        } else if (SolFla == -2) {    // decide if should run at max flow
             Real64 TempSetPoint(0.0); // local temporary for loop setpoint
             {
                 auto const SELECT_CASE_var(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
@@ -5712,10 +5328,10 @@ namespace CondenserLoopTowers {
         return _OutletWaterTemp;
     }
 
-    Real64 CoolingTower::calculateVariableSpeedApproach(Real64 const PctWaterFlow, // Water flow ratio of cooling tower
-                             Real64 const _AirFlowRatio, // Air flow ratio of cooling tower
-                             Real64 const Twb,          // Inlet air wet-bulb temperature [C]
-                             Real64 const Tr           // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
+    Real64 CoolingTower::calculateVariableSpeedApproach(Real64 const PctWaterFlow,  // Water flow ratio of cooling tower
+                                                        Real64 const _AirFlowRatio, // Air flow ratio of cooling tower
+                                                        Real64 const Twb,           // Inlet air wet-bulb temperature [C]
+                                                        Real64 const Tr // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
     )
     {
         // FUNCTION INFORMATION:
@@ -5740,10 +5356,10 @@ namespace CondenserLoopTowers {
         // Form 160.00-SG2 (0502). 2002.
 
         Real64 approach;
-         if (this->TowerModelType == YorkCalcModel || this->TowerModelType == YorkCalcUserDefined) {
+        if (this->TowerModelType == YorkCalcModel || this->TowerModelType == YorkCalcUserDefined) {
             Real64 PctAirFlow = _AirFlowRatio;
             Real64 FlowFactor = PctWaterFlow / PctAirFlow;
-             approach = towers(this->VSTower).Coeff(1) + towers(this->VSTower).Coeff(2) * Twb + towers(this->VSTower).Coeff(3) * Twb * Twb +
+            approach = towers(this->VSTower).Coeff(1) + towers(this->VSTower).Coeff(2) * Twb + towers(this->VSTower).Coeff(3) * Twb * Twb +
                        towers(this->VSTower).Coeff(4) * Tr + towers(this->VSTower).Coeff(5) * Twb * Tr +
                        towers(this->VSTower).Coeff(6) * Twb * Twb * Tr + towers(this->VSTower).Coeff(7) * Tr * Tr +
                        towers(this->VSTower).Coeff(8) * Twb * Tr * Tr + towers(this->VSTower).Coeff(9) * Twb * Twb * Tr * Tr +
@@ -5764,7 +5380,7 @@ namespace CondenserLoopTowers {
         } else { // empirical model is CoolTools format
             //     the CoolTools model actually uses PctFanPower = AirFlowRatio^3 as an input to the model
             Real64 PctAirFlow = pow_3(_AirFlowRatio);
-             approach = towers(this->VSTower).Coeff(1) + towers(this->VSTower).Coeff(2) * PctAirFlow +
+            approach = towers(this->VSTower).Coeff(1) + towers(this->VSTower).Coeff(2) * PctAirFlow +
                        towers(this->VSTower).Coeff(3) * PctAirFlow * PctAirFlow +
                        towers(this->VSTower).Coeff(4) * PctAirFlow * PctAirFlow * PctAirFlow + towers(this->VSTower).Coeff(5) * PctWaterFlow +
                        towers(this->VSTower).Coeff(6) * PctAirFlow * PctWaterFlow +
@@ -5785,17 +5401,17 @@ namespace CondenserLoopTowers {
                        towers(this->VSTower).Coeff(32) * PctAirFlow * Tr * Tr + towers(this->VSTower).Coeff(33) * PctWaterFlow * Tr * Tr +
                        towers(this->VSTower).Coeff(34) * Twb * Tr * Tr + towers(this->VSTower).Coeff(35) * Tr * Tr * Tr;
         }
-         return approach;
+        return approach;
     }
 
-    void CoolingTower::checkModelBounds(Real64 Twb,                // current inlet air wet-bulb temperature (C)
-                                      Real64 Tr,                 // requested range temperature for current time step (C)
-                                      Real64 Ta,                 // requested approach temperature for current time step (C)
-                                      Real64 WaterFlowRateRatio, // current water flow rate ratio at water inlet node
-                          Real64 &TwbCapped,               // bounded value of inlet air wet-bulb temperature (C)
-                          Real64 &TrCapped,                // bounded value of range temperature (C)
-                          Real64 &TaCapped,                // bounded value of approach temperature (C)
-                          Real64 &WaterFlowRateRatioCapped // bounded value of water flow rate ratio
+    void CoolingTower::checkModelBounds(Real64 Twb,                      // current inlet air wet-bulb temperature (C)
+                                        Real64 Tr,                       // requested range temperature for current time step (C)
+                                        Real64 Ta,                       // requested approach temperature for current time step (C)
+                                        Real64 WaterFlowRateRatio,       // current water flow rate ratio at water inlet node
+                                        Real64 &TwbCapped,               // bounded value of inlet air wet-bulb temperature (C)
+                                        Real64 &TrCapped,                // bounded value of range temperature (C)
+                                        Real64 &TaCapped,                // bounded value of approach temperature (C)
+                                        Real64 &WaterFlowRateRatioCapped // bounded value of water flow rate ratio
     )
     {
 
@@ -5821,11 +5437,11 @@ namespace CondenserLoopTowers {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string OutputChar;         // character string for warning messages
-        std::string OutputCharLo;       // character string for warning messages
-        std::string OutputCharHi;       // character string for warning messages
-        std::string TrimValue;          // character string for warning messages
-        Real64 CurrentEndTime(0.0);     // end time of time step for current simulation time step
+        std::string OutputChar;     // character string for warning messages
+        std::string OutputCharLo;   // character string for warning messages
+        std::string OutputCharHi;   // character string for warning messages
+        std::string TrimValue;      // character string for warning messages
+        Real64 CurrentEndTime(0.0); // end time of time step for current simulation time step
         // current end time is compared with last to see if time step changed
 
         //   initialize capped variables in case independent variables are in bounds
@@ -5923,12 +5539,11 @@ namespace CondenserLoopTowers {
             }
             if (!DataGlobals::WarmupFlag) {
                 towers(this->VSTower).PrintTwbMessage = true;
-                towers(this->VSTower).TwbBuffer1 = this->TowerType + " \"" + this->Name +
-                                                                    "\" - Inlet air wet-bulb temperature is outside model boundaries at " +
-                                                                    OutputChar + '.';
+                towers(this->VSTower).TwbBuffer1 =
+                    this->TowerType + " \"" + this->Name + "\" - Inlet air wet-bulb temperature is outside model boundaries at " + OutputChar + '.';
                 towers(this->VSTower).TwbBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
-                                                                    ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
-                    General::CreateSysTimeIntervalString();
+                                                   ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
+                                                   General::CreateSysTimeIntervalString();
                 TrimValue = General::RoundSigDigits(TwbCapped, 6);
                 towers(this->VSTower).TwbBuffer3 = " ...Inlet air wet-bulb temperature passed to the model = " + TrimValue;
                 towers(this->VSTower).TwbLast = Twb;
@@ -5951,11 +5566,11 @@ namespace CondenserLoopTowers {
             }
             if (!DataGlobals::WarmupFlag) {
                 towers(this->VSTower).PrintTrMessage = true;
-                towers(this->VSTower).TrBuffer1 = this->TowerType + " \"" + this->Name +
-                                                                   "\" - Tower range temperature is outside model boundaries at " + OutputChar + '.';
+                towers(this->VSTower).TrBuffer1 =
+                    this->TowerType + " \"" + this->Name + "\" - Tower range temperature is outside model boundaries at " + OutputChar + '.';
                 towers(this->VSTower).TrBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
-                                                                   ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
-                    General::CreateSysTimeIntervalString();
+                                                  ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
+                                                  General::CreateSysTimeIntervalString();
                 TrimValue = General::RoundSigDigits(Tr, 5);
                 towers(this->VSTower).TrBuffer3 = " ...Tower range temperature passed to the model = " + TrimValue;
                 towers(this->VSTower).TrLast = Tr;
@@ -5978,12 +5593,11 @@ namespace CondenserLoopTowers {
             }
             if (!DataGlobals::WarmupFlag) {
                 towers(this->VSTower).PrintTaMessage = true;
-                towers(this->VSTower).TaBuffer1 = this->TowerType + " \"" + this->Name +
-                                                                   "\" - Tower approach temperature is outside model boundaries at " + OutputChar +
-                                                                   '.';
+                towers(this->VSTower).TaBuffer1 =
+                    this->TowerType + " \"" + this->Name + "\" - Tower approach temperature is outside model boundaries at " + OutputChar + '.';
                 towers(this->VSTower).TaBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
-                                                                   ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
-                    General::CreateSysTimeIntervalString();
+                                                  ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
+                                                  General::CreateSysTimeIntervalString();
                 TrimValue = General::RoundSigDigits(Ta, 5);
                 towers(this->VSTower).TaBuffer3 = " ...Tower approach temperature passed to the model = " + TrimValue;
                 towers(this->VSTower).TaLast = Ta;
@@ -5999,8 +5613,7 @@ namespace CondenserLoopTowers {
             //     warning instead (bottom of Subroutine VariableSpeedTower)
             towers(this->VSTower).PrintWFRRMessage = false;
         } else {
-            if (WaterFlowRateRatio < towers(this->VSTower).MinWaterFlowRatio ||
-                WaterFlowRateRatio > towers(this->VSTower).MaxWaterFlowRatio) {
+            if (WaterFlowRateRatio < towers(this->VSTower).MinWaterFlowRatio || WaterFlowRateRatio > towers(this->VSTower).MaxWaterFlowRatio) {
                 OutputChar = General::RoundSigDigits(WaterFlowRateRatio, 2);
                 OutputCharLo = General::RoundSigDigits(towers(this->VSTower).MinWaterFlowRatio, 2);
                 OutputCharHi = General::RoundSigDigits(towers(this->VSTower).MaxWaterFlowRatio, 2);
@@ -6012,12 +5625,11 @@ namespace CondenserLoopTowers {
                 }
                 if (!DataGlobals::WarmupFlag) {
                     towers(this->VSTower).PrintWFRRMessage = true;
-                    towers(this->VSTower).WFRRBuffer1 = this->TowerType + " \"" + this->Name +
-                                                                         "\" - Water flow rate ratio is outside model boundaries at " + OutputChar +
-                                                                         '.';
+                    towers(this->VSTower).WFRRBuffer1 =
+                        this->TowerType + " \"" + this->Name + "\" - Water flow rate ratio is outside model boundaries at " + OutputChar + '.';
                     towers(this->VSTower).WFRRBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
-                                                                         ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
-                        General::CreateSysTimeIntervalString();
+                                                        ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy +
+                                                        ' ' + General::CreateSysTimeIntervalString();
                     TrimValue = General::RoundSigDigits(WaterFlowRateRatioCapped, 5);
                     towers(this->VSTower).WFRRBuffer3 = " ...Water flow rate ratio passed to the model = " + TrimValue;
                     towers(this->VSTower).WaterFlowRateRatioLast = WaterFlowRateRatio;
@@ -6030,8 +5642,8 @@ namespace CondenserLoopTowers {
         }
     }
 
-    Real64 CoolingTower::residualUA(Real64 UA,          // UA of cooling tower
-                                 Array1<Real64> const &Par // par(1) = design tower load [W]
+    Real64 CoolingTower::residualUA(Real64 UA,                // UA of cooling tower
+                                    Array1<Real64> const &Par // par(1) = design tower load [W]
     )
     {
         // FUNCTION INFORMATION:
@@ -6059,8 +5671,8 @@ namespace CondenserLoopTowers {
         return (Par(1) - CoolingOutput) / Par(1);
     }
 
-    Real64 CoolingTower::residualTr(Real64 Trange,      // cooling tower range temperature [C]
-                                 Array1<Real64> const &Par // par(1) = tower number
+    Real64 CoolingTower::residualTr(Real64 Trange,            // cooling tower range temperature [C]
+                                    Array1<Real64> const &Par // par(1) = tower number
     )
     {
         // FUNCTION INFORMATION:
@@ -6082,9 +5694,9 @@ namespace CondenserLoopTowers {
         // par(3) = air flow ratio
         // par(4) = inlet air wet-bulb temperature [C]
 
-        Real64 WaterFlowRateRatio = Par(2);  // ratio of water flow rate to design water flow rate
-        Real64 _AirFlowRateRatio = Par(3); // ratio of water flow rate to design water flow rate
-        Real64 InletAirWB = Par(4); // inlet air wet-bulb temperature [C]
+        Real64 WaterFlowRateRatio = Par(2); // ratio of water flow rate to design water flow rate
+        Real64 _AirFlowRateRatio = Par(3);  // ratio of water flow rate to design water flow rate
+        Real64 InletAirWB = Par(4);         // inlet air wet-bulb temperature [C]
 
         // call model to determine approach temperature given other independent variables (range temp is being varied to find balance)
         Real64 Tapproach = this->calculateVariableSpeedApproach(WaterFlowRateRatio, _AirFlowRateRatio, InletAirWB, Trange);
@@ -6092,8 +5704,8 @@ namespace CondenserLoopTowers {
         return (InletAirWB + Tapproach + Trange) - DataLoopNode::Node(this->WaterInletNodeNum).Temp;
     }
 
-    Real64 CoolingTower::residualTa(Real64 FlowRatio,   // water or air flow ratio of cooling tower
-                                       Array1<Real64> const &Par // par(1) = tower number
+    Real64 CoolingTower::residualTa(Real64 FlowRatio,         // water or air flow ratio of cooling tower
+                                    Array1<Real64> const &Par // par(1) = tower number
     )
     {
         // FUNCTION INFORMATION:
@@ -6117,7 +5729,7 @@ namespace CondenserLoopTowers {
         // par(5) = desired approach [C]
         // par(6) = 0.0 to calculate water flow rate ratio, 1.0 for air
 
-        Real64 _AirFlowRateRatio; // ratio of water flow rate to design water flow rate
+        Real64 _AirFlowRateRatio;  // ratio of water flow rate to design water flow rate
         Real64 WaterFlowRateRatio; // ratio of water flow rate to design water flow rate
         if (Par(6) == 0.0) {
             _AirFlowRateRatio = Par(2);
@@ -6126,8 +5738,8 @@ namespace CondenserLoopTowers {
             _AirFlowRateRatio = FlowRatio;
             WaterFlowRateRatio = Par(2);
         }
-        Real64 InletAirWB = Par(3); // inlet air wet-bulb temperature [C]
-        Real64 Trange = Par(4); // tower range temperature [C]
+        Real64 InletAirWB = Par(3);       // inlet air wet-bulb temperature [C]
+        Real64 Trange = Par(4);           // tower range temperature [C]
         Real64 TapproachDesired = Par(5); // desired tower approach temperature [C]
         // call model to determine tower approach temperature given other independent variables
         Real64 TapproachActual = this->calculateVariableSpeedApproach(WaterFlowRateRatio, _AirFlowRateRatio, InletAirWB, Trange);
@@ -6160,10 +5772,8 @@ namespace CondenserLoopTowers {
         // Set water and air properties
         if (this->EvapLossMode == EvapLossByMoistTheory) {
 
-            Real64 const AirDensity =
-                Psychrometrics::PsyRhoAirFnPbTdbW(this->AirPress, this->AirTemp, this->AirHumRat);
-            Real64 const AirMassFlowRate = this->__AirFlowRateRatio * this->HighSpeedAirFlowRate * AirDensity * this->NumCellOn /
-                              this->NumCell;
+            Real64 const AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(this->AirPress, this->AirTemp, this->AirHumRat);
+            Real64 const AirMassFlowRate = this->__AirFlowRateRatio * this->HighSpeedAirFlowRate * AirDensity * this->NumCellOn / this->NumCell;
             Real64 const InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(this->AirWetBulb, 1.0, this->AirPress);
 
             if (AirMassFlowRate > 0.0) {
@@ -6181,10 +5791,8 @@ namespace CondenserLoopTowers {
                 Real64 const TairAvg = (this->AirTemp + OutletAirTSat) / 2.0;
 
                 // Amount of water evaporated, get density water at air temp or 4 C if too cold
-                Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                       max(TairAvg, 4.0),
-                                                        DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                       RoutineName);
+                Real64 const rho = FluidProperties::GetDensityGlycol(
+                    DataPlant::PlantLoop(this->LoopNum).FluidName, max(TairAvg, 4.0), DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
                 EvapVdot = (AirMassFlowRate * (OutSpecificHumRat - InSpecificHumRat)) / rho; // [m3/s]
                 if (EvapVdot < 0.0) EvapVdot = 0.0;
@@ -6193,10 +5801,8 @@ namespace CondenserLoopTowers {
             }
 
         } else if (this->EvapLossMode == EvapLossByUserFactor) {
-            Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
-                                   AverageWaterTemp,
-                                                    DataPlant::PlantLoop(this->LoopNum).FluidIndex,
-                                   RoutineName);
+            Real64 const rho = FluidProperties::GetDensityGlycol(
+                DataPlant::PlantLoop(this->LoopNum).FluidName, AverageWaterTemp, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
 
             EvapVdot = this->UserEvapLossFactor * (this->InletWaterTemp - this->OutletWaterTemp) * (this->WaterMassFlowRate / rho);
             if (EvapVdot < 0.0) EvapVdot = 0.0;
@@ -6205,8 +5811,7 @@ namespace CondenserLoopTowers {
         }
 
         //   amount of water lost due to drift
-        Real64 DriftVdot = this->DesignWaterFlowRate * this->NumCellOn / this->NumCell *
-                    this->DriftLossFraction * this->__AirFlowRateRatio;
+        Real64 DriftVdot = this->DesignWaterFlowRate * this->NumCellOn / this->NumCell * this->DriftLossFraction * this->__AirFlowRateRatio;
 
         Real64 BlowDownVdot(0.0);
         if (this->BlowdownMode == BlowdownBySchedule) {
@@ -6244,8 +5849,8 @@ namespace CondenserLoopTowers {
             // set demand request
             DataWater::WaterStorage(this->WaterTankID).VdotRequestDemand(this->WaterTankDemandARRID) = MakeUpVdot;
 
-            Real64 const AvailTankVdot = DataWater::WaterStorage(this->WaterTankID)
-                                .VdotAvailDemand(this->WaterTankDemandARRID); // check what tank can currently provide
+            Real64 const AvailTankVdot =
+                DataWater::WaterStorage(this->WaterTankID).VdotAvailDemand(this->WaterTankDemandARRID); // check what tank can currently provide
 
             TankSupplyVdot = MakeUpVdot;      // init
             if (AvailTankVdot < MakeUpVdot) { // calculate starved flow
@@ -6301,7 +5906,8 @@ namespace CondenserLoopTowers {
             if (this->HighMassFlowErrorCount < 2) {
                 ShowWarningError(this->TowerType + " \"" + this->Name + "\"");
                 ShowContinueError(" Condenser Loop Mass Flow Rate is much greater than the towers design mass flow rate.");
-                ShowContinueError(" Condenser Loop Mass Flow Rate = " + General::TrimSigDigits(DataLoopNode::Node(this->WaterOutletNodeNum).MassFlowRate, 6));
+                ShowContinueError(" Condenser Loop Mass Flow Rate = " +
+                                  General::TrimSigDigits(DataLoopNode::Node(this->WaterOutletNodeNum).MassFlowRate, 6));
                 ShowContinueError(" Tower Design Mass Flow Rate   = " + General::TrimSigDigits(this->DesWaterMassFlowRate, 6));
                 ShowContinueErrorTimeStamp("");
             } else {
