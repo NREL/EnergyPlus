@@ -375,6 +375,13 @@ namespace CondenserLoopTowers {
         {
         }
 
+
+        void SimVariableTower(Real64 WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
+                              Real64 _AirFlowRateRatio,   // current air flow rate ratio
+                              Real64 Twb,                // current inlet air wet-bulb temperature (C, capped if applicable)
+                              Real64 &_OutletWaterTemp   // calculated tower outlet water temperature (C)
+        );
+
         void InitTower();
 
         void SizeTower();
@@ -391,6 +398,18 @@ namespace CondenserLoopTowers {
 
         Real64 SimpleTowerUAResidual(Real64 UA,          // UA of cooling tower
                                      Array1<Real64> const &Par // par(1) = design tower load [W]
+        );
+
+        Real64 SimpleTowerTrResidual(Real64 Trange,      // cooling tower range temperature [C]
+                                     Array1<Real64> const &Par // par(1) = tower number
+        );
+
+        Real64 VSMerkelResidual(Real64 _AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
+                                Array1<Real64> const &Par      // par(1) = Tower number
+        );
+
+        Real64 SimpleTowerApproachResidual(Real64 FlowRatio,   // water or air flow ratio of cooling tower
+                                           Array1<Real64> const &Par // par(1) = tower number
         );
 
     };
@@ -416,18 +435,7 @@ namespace CondenserLoopTowers {
 
     void GetTowerInput();
 
-    Real64 VSMerkelResidual(Real64 _AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
-                            Array1<Real64> const &Par      // par(1) = Tower number
-    );
-
     void SimSimpleTower(int TowerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
-
-    void SimVariableTower(int TowerNum,              // variable speed tower index
-                          Real64 WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
-                          Real64 _AirFlowRateRatio,   // current air flow rate ratio
-                          Real64 Twb,                // current inlet air wet-bulb temperature (C, capped if applicable)
-                          Real64 &_OutletWaterTemp   // calculated tower outlet water temperature (C)
-    );
 
     void CalcVSTowerApproach(int TowerNum,        // Index to cooling tower
                              Real64 PctWaterFlow, // Water flow ratio of cooling tower
@@ -446,14 +454,6 @@ namespace CondenserLoopTowers {
                           Real64 &TrCapped,                // bounded value of range temperature (C)
                           Real64 &TaCapped,                // bounded value of approach temperature (C)
                           Real64 &WaterFlowRateRatioCapped // bounded value of water flow rate ratio
-    );
-
-    Real64 SimpleTowerTrResidual(Real64 Trange,      // cooling tower range temperature [C]
-                                 Array1<Real64> const &Par // par(1) = tower number
-    );
-
-    Real64 SimpleTowerApproachResidual(Real64 FlowRatio,   // water or air flow ratio of cooling tower
-                                       Array1<Real64> const &Par // par(1) = tower number
     );
 
     void CalculateWaterUseage(int TowerNum);

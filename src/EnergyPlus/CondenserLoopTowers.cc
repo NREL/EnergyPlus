@@ -3320,7 +3320,8 @@ namespace CondenserLoopTowers {
 
             Real64 WaterFlowRatio(0.0);     // tower water flow rate ratio found during model calibration
             if (ModelCalibrated) {
-                General::SolveRoot(Acc, MaxIte, SolFla, WaterFlowRatio, SimpleTowerApproachResidual, DataPrecisionGlobals::constant_pointfive, MaxWaterFlowRateRatio, Par);
+                auto f = std::bind(&Towerspecs::SimpleTowerApproachResidual, this, std::placeholders::_1, std::placeholders::_2);
+                General::SolveRoot(Acc, MaxIte, SolFla, WaterFlowRatio, f, DataPrecisionGlobals::constant_pointfive, MaxWaterFlowRateRatio, Par);
                 if (SolFla == -1) {
                     ShowSevereError("Iteration limit exceeded in calculating tower water flow ratio during calibration");
                     ShowContinueError("Inlet air wet-bulb, range, and/or approach temperature does not allow calibration of water flow rate ratio "
@@ -5136,7 +5137,7 @@ namespace CondenserLoopTowers {
             this->OutletWaterTemp = OutletWaterTempOFF;
             FreeConvectionCapFrac = this->FreeConvectionCapacityFraction;
     
-            SimVariableTower(this->thisTowerNum, WaterFlowRateRatioCapped, this->__AirFlowRateRatio, TwbCapped, OutletWaterTempON);
+            this->SimVariableTower(WaterFlowRateRatioCapped, this->__AirFlowRateRatio, TwbCapped, OutletWaterTempON);
     
             if (OutletWaterTempON > TempSetPoint) {
                 this->FanCyclingRatio = 1.0;
@@ -5170,7 +5171,7 @@ namespace CondenserLoopTowers {
     
                 this->__AirFlowRateRatio = this->MinimumVSAirFlowFrac;
                 Real64 OutletWaterTempMIN; // Outlet water temperature with fan at minimum speed (C)
-                SimVariableTower(this->thisTowerNum, WaterFlowRateRatioCapped, this->__AirFlowRateRatio, TwbCapped, OutletWaterTempMIN);
+                this->SimVariableTower(WaterFlowRateRatioCapped, this->__AirFlowRateRatio, TwbCapped, OutletWaterTempMIN);
     
                 if (OutletWaterTempMIN < TempSetPoint) {
                     //         if setpoint was exceeded, cycle the fan at minimum air flow to meet the setpoint temperature
@@ -5192,7 +5193,7 @@ namespace CondenserLoopTowers {
                     //         fan will not cycle and runs the entire time step
                     this->FanCyclingRatio = 1.0;
     
-                    SimVariableTower(this->thisTowerNum, WaterFlowRateRatioCapped, this->__AirFlowRateRatio, TwbCapped, this->OutletWaterTemp);
+                    this->SimVariableTower(WaterFlowRateRatioCapped, this->__AirFlowRateRatio, TwbCapped, this->OutletWaterTemp);
     
                     // Setpoint was met with pump ON and fan ON at full flow
                     // Calculate the fraction of full air flow to exactly meet the setpoint temperature
@@ -5205,9 +5206,8 @@ namespace CondenserLoopTowers {
                     Par(4) = Tr;  // Tower range temperature [C]
                     Par(5) = Ta;  // desired approach temperature [C]
                     Par(6) = 1.0; // calculate the air flow rate ratio required for a balance
-    
-                    General::SolveRoot(
-                        Acc, MaxIte, SolFla, this->__AirFlowRateRatio, SimpleTowerApproachResidual, this->MinimumVSAirFlowFrac, 1.0, Par);
+                    auto f = std::bind(&Towerspecs::SimpleTowerApproachResidual, this, std::placeholders::_1, std::placeholders::_2);
+                    General::SolveRoot(Acc, MaxIte, SolFla, this->__AirFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0, Par);
                     if (SolFla == -1) {
                         if (!DataGlobals::WarmupFlag)
                             ShowWarningError("Cooling tower iteration limit exceeded when calculating air flow rate ratio for tower " +
@@ -5520,7 +5520,8 @@ namespace CondenserLoopTowers {
             Par(7) = CpWater;
             Par(8) = this->WaterMassFlowRate;
 
-            General::SolveRoot(Acc, MaxIte, SolFla, this->__AirFlowRateRatio, VSMerkelResidual, this->MinimumVSAirFlowFrac, 1.0, Par);
+            auto f = std::bind(&Towerspecs::VSMerkelResidual, this, std::placeholders::_1, std::placeholders::_2);
+            General::SolveRoot(Acc, MaxIte, SolFla, this->__AirFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0, Par);
 
             if (SolFla == -1) {
                 if (!DataGlobals::WarmupFlag) {
@@ -5578,7 +5579,7 @@ namespace CondenserLoopTowers {
         }
     }
 
-    Real64 VSMerkelResidual(Real64 const _AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
+    Real64 Towerspecs::VSMerkelResidual(Real64 const _AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
                             Array1<Real64> const &Par      // par(1) = Tower number
     )
     {
@@ -5729,8 +5730,7 @@ namespace CondenserLoopTowers {
         }
     }
 
-    void SimVariableTower(int const TowerNum,              // variable speed tower index
-                          Real64 const WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
+    void Towerspecs::SimVariableTower(Real64 const WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
                           Real64 const _AirFlowRateRatio,   // current air flow rate ratio
                           Real64 const Twb,                // current inlet air wet-bulb temperature (C, capped if applicable)
                           Real64 &_OutletWaterTemp         // calculated tower outlet water temperature (C)
@@ -5767,35 +5767,36 @@ namespace CondenserLoopTowers {
         Array1D<Real64> Par(4);   // Parameter array for regula falsi solver
 
         //   determine tower outlet water temperature
-        Par(1) = TowerNum;           // Index to cooling tower
+        Par(1) = this->thisTowerNum;           // Index to cooling tower
         Par(2) = WaterFlowRateRatio; // water flow rate ratio
         Par(3) = _AirFlowRateRatio;   // air flow rate ratio
         Par(4) = Twb;                // inlet air wet-bulb temperature [C]
         Real64 Tr;                // range temperature which results in an energy balance
-        General::SolveRoot(Acc, MaxIte, SolFla, Tr, SimpleTowerTrResidual, 0.001, SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp, Par);
+        auto f = std::bind(&Towerspecs::SimpleTowerTrResidual, this, std::placeholders::_1, std::placeholders::_2);
+        General::SolveRoot(Acc, MaxIte, SolFla, Tr, f, 0.001, SimpleTower(this->VSTower).MaxRangeTemp, Par);
 
-        _OutletWaterTemp = SimpleTower(TowerNum).WaterTemp - Tr;
+        _OutletWaterTemp = this->WaterTemp - Tr;
 
         if (SolFla == -1) {
             ShowSevereError("Iteration limit exceeded in calculating tower nominal capacity at minimum air flow ratio");
             ShowContinueError(
                 "Design inlet air wet-bulb or approach temperature must be modified to achieve an acceptable range at the minimum air flow rate");
-            ShowContinueError("Cooling tower simulation failed to converge for tower " + SimpleTower(TowerNum).Name);
+            ShowContinueError("Cooling tower simulation failed to converge for tower " + this->Name);
             //    if SolFla = -2, Tr is returned as minimum value (0.001) and outlet temp = inlet temp - 0.001
         } else if (SolFla == -2) { // decide if should run at max flow
             Real64 TempSetPoint(0.0); // local temporary for loop setpoint
             {
-                auto const SELECT_CASE_var(DataPlant::PlantLoop(SimpleTower(TowerNum).LoopNum).LoopDemandCalcScheme);
+                auto const SELECT_CASE_var(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
                 if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
-                    TempSetPoint = DataPlant::PlantLoop(SimpleTower(TowerNum).LoopNum).LoopSide(SimpleTower(TowerNum).LoopSideNum).TempSetPoint;
+                    TempSetPoint = DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPoint;
                 } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
-                    TempSetPoint = DataPlant::PlantLoop(SimpleTower(TowerNum).LoopNum).LoopSide(SimpleTower(TowerNum).LoopSideNum).TempSetPointHi;
+                    TempSetPoint = DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).TempSetPointHi;
                 } else {
                     assert(false);
                 }
             }
-            if (SimpleTower(TowerNum).WaterTemp > (TempSetPoint + SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp)) { // run flat out
-                _OutletWaterTemp = SimpleTower(TowerNum).WaterTemp - SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp;
+            if (this->WaterTemp > (TempSetPoint + SimpleTower(this->VSTower).MaxRangeTemp)) { // run flat out
+                _OutletWaterTemp = this->WaterTemp - SimpleTower(this->VSTower).MaxRangeTemp;
             }
         }
     }
@@ -6167,7 +6168,7 @@ namespace CondenserLoopTowers {
         return (Par(1) - CoolingOutput) / Par(1);
     }
 
-    Real64 SimpleTowerTrResidual(Real64 const Trange,      // cooling tower range temperature [C]
+    Real64 Towerspecs::SimpleTowerTrResidual(Real64 const Trange,      // cooling tower range temperature [C]
                                  Array1<Real64> const &Par // par(1) = tower number
     )
     {
@@ -6202,7 +6203,7 @@ namespace CondenserLoopTowers {
         return (InletAirWB + Tapproach + Trange) - DataLoopNode::Node(SimpleTower(TowerIndex).WaterInletNodeNum).Temp;
     }
 
-    Real64 SimpleTowerApproachResidual(Real64 const FlowRatio,   // water or air flow ratio of cooling tower
+    Real64 Towerspecs::SimpleTowerApproachResidual(Real64 const FlowRatio,   // water or air flow ratio of cooling tower
                                        Array1<Real64> const &Par // par(1) = tower number
     )
     {
