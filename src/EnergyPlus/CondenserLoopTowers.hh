@@ -60,39 +60,13 @@ namespace EnergyPlus {
 
 namespace CondenserLoopTowers {
 
-    // MODULE PARAMETER DEFINITIONS
-    // Empirical Model Type
-    extern int const CoolToolsXFModel;
-    extern int const CoolToolsUserDefined;
-    extern int const YorkCalcModel;
-    extern int const YorkCalcUserDefined;
-
-    extern int const EvapLossByUserFactor;
     extern int const EvapLossByMoistTheory;
-
     extern int const BlowdownByConcentration;
-    extern int const BlowdownBySchedule;
-
-    extern std::string const cCoolingTower_SingleSpeed;
-    extern std::string const cCoolingTower_TwoSpeed;
-    extern std::string const cCoolingTower_VariableSpeed;
-    extern std::string const cCoolingTower_VariableSpeedMerkel;
-
-    extern int const PIM_NominalCapacity;
     extern int const PIM_UFactor;
-
-    extern int const CapacityControl_FanCycling;
-    extern int const CapacityControl_FluidBypass;
-
-    extern int const CellCtrl_MinCell;
-    extern int const CellCtrl_MaxCell;
-
     extern int NumSimpleTowers; // Number of similar towers
-
     extern bool GetInput; // When TRUE, calls subroutine to read input file
-    extern Array1D_bool CheckEquipName;
 
-    struct Towerspecs : PlantComponent
+    struct CoolingTower : PlantComponent
     {
         // Members
         std::string Name;      // User identifier
@@ -333,7 +307,7 @@ namespace CondenserLoopTowers {
         int thisTowerNum; // regula falsi residual functions are static and so they need to get an index passed from a member function
 
         // Default Constructor
-        Towerspecs()
+        CoolingTower()
             : TowerType_Num(0), PerformanceInputMethod_Num(0), Available(true), ON(true), DesignWaterFlowRate(0.0),
               DesignWaterFlowRateWasAutoSized(false), DesignWaterFlowPerUnitNomCap(0.0), DesWaterMassFlowRate(0.0), DesWaterMassFlowRatePerCell(0.0),
               HighSpeedAirFlowRate(0.0), HighSpeedAirFlowRateWasAutoSized(false), DesignAirFlowPerUnitNomCap(0.0),
@@ -384,7 +358,7 @@ namespace CondenserLoopTowers {
 
         void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-        void InitTower();
+        void initialize();
 
         void setupOutputVariables();
 
@@ -392,13 +366,13 @@ namespace CondenserLoopTowers {
 
         void SizeVSMerkelTower();
 
-        void CalcSingleSpeedTower();
+        void calculateSingleSpeedTower();
 
-        void CalcTwoSpeedTower();
+        void calculateTwoSpeedTower();
 
-        void CalcMerkelVariableSpeedTower(Real64 &MyLoad);
+        void calculateMerkelVariableSpeedTower(Real64 &MyLoad);
 
-        void CalcVariableSpeedTower();
+        void calculateVariableSpeedTower();
 
         Real64 calculateSimpleTowerOutletTemp(Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign);
 
@@ -407,17 +381,15 @@ namespace CondenserLoopTowers {
                               Real64 Twb                // current inlet air wet-bulb temperature (C, capped if applicable)
         );
 
-        void CalculateWaterUseage();
+        void calculateWaterUsage();
 
-        void CalcVSTowerApproach(Real64 PctWaterFlow, // Water flow ratio of cooling tower
+        Real64 calculateVariableSpeedApproach(Real64 PctWaterFlow, // Water flow ratio of cooling tower
                                  Real64 _AirFlowRatio, // Air flow ratio of cooling tower
                                  Real64 Twb,          // Inlet air wet-bulb temperature [C]
-                                 Real64 Tr,           // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
-                                 Real64 &Approach           // Calculated approach temperature [C]
+                                 Real64 Tr           // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
         );
 
-
-        void CheckModelBounds(Real64 Twb,                // current inlet air wet-bulb temperature (C)
+        void checkModelBounds(Real64 Twb,                // current inlet air wet-bulb temperature (C)
                               Real64 Tr,                 // requested range temperature for current time step (C)
                               Real64 Ta,                 // requested approach temperature for current time step (C)
                               Real64 WaterFlowRateRatio, // current water flow rate ratio at water inlet node
@@ -428,31 +400,31 @@ namespace CondenserLoopTowers {
         );
 
 
-        void UpdateTowers();
+        void update();
 
-        void ReportTowers(bool RunFlag);
+        void report(bool RunFlag);
 
-        Real64 SimpleTowerUAResidual(Real64 UA,          // UA of cooling tower
+        Real64 residualUA(Real64 UA,          // UA of cooling tower
                                      Array1<Real64> const &Par // par(1) = design tower load [W]
         );
 
-        Real64 SimpleTowerTrResidual(Real64 Trange,      // cooling tower range temperature [C]
+        Real64 residualTa(Real64 FlowRatio,   // water or air flow ratio of cooling tower
+                          Array1<Real64> const &Par // par(1) = tower number
+        );
+
+        Real64 residualTr(Real64 Trange,      // cooling tower range temperature [C]
                                      Array1<Real64> const &Par // par(1) = tower number
         );
 
-        Real64 VSMerkelResidual(Real64 _AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
+        Real64 residualMerkelLoad(Real64 _AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
                                 Array1<Real64> const &Par      // par(1) = Tower number
-        );
-
-        Real64 SimpleTowerApproachResidual(Real64 FlowRatio,   // water or air flow ratio of cooling tower
-                                           Array1<Real64> const &Par // par(1) = tower number
         );
 
         static PlantComponent *factory(std::string const &objectName);
     };
 
     // Object Data
-    extern Array1D<Towerspecs> SimpleTower;           // dimension to number of machines
+    extern Array1D<CoolingTower> towers;           // dimension to number of machines
 
     // Functions
     void clear_state();
