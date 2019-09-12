@@ -262,7 +262,9 @@ namespace HVACUnitaryBypassVAV {
         int plenumIndex;                         // index to AirloopHVAC:ReturnPlenum
         int mixerIndex;                          // index to AirloopHVAC:ZoneMixer
         Real64 changeOverTimer;                  // timer to avoid rapid change of operating modes (e.g., cooling to heating)
-        Real64 minModeChangeTime;                   // time limit before mode change is allowed (hr)
+        Real64 minModeChangeTime;                // time limit before mode change is allowed (hr)
+        int OutNodeSPMIndex;                     // set point manager index if exists on outlet node
+        bool modeChanged;                        // identifies operating mode changed this time step
 
         // Default Constructor
         CBVAVData()
@@ -290,7 +292,7 @@ namespace HVACUnitaryBypassVAV {
             MMDXIterationExceededIndex(0), MMDXIterationFailed(0), MMDXIterationFailedIndex(0), DMDXIterationExceeded(0),
             DMDXIterationExceededIndex(0), DMDXIterationFailed(0), DMDXIterationFailedIndex(0), CRDXIterationExceeded(0),
             CRDXIterationExceededIndex(0), CRDXIterationFailed(0), CRDXIterationFailedIndex(0), FirstPass(true), plenumIndex(0), mixerIndex(0),
-            changeOverTimer(-1.0), minModeChangeTime(-1.0)
+            changeOverTimer(-1.0), minModeChangeTime(-1.0), OutNodeSPMIndex(0), modeChanged(false)
         {
         }
     };
