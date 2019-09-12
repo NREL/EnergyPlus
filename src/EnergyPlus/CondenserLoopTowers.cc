@@ -230,9 +230,9 @@ namespace CondenserLoopTowers {
                 }
                 thisTower.InitTower();
                 thisTower.CalcSingleSpeedTower();
-                CalculateWaterUseage(TowerNum);
-                UpdateTowers(TowerNum);
-                ReportTowers(RunFlag, TowerNum);
+                thisTower.CalculateWaterUseage();
+                thisTower.UpdateTowers();
+                thisTower.ReportTowers(RunFlag);
 
             } else if (SELECT_CASE_var == DataPlant::TypeOf_CoolingTower_TwoSpd) {
 
@@ -249,9 +249,9 @@ namespace CondenserLoopTowers {
                 }
                 thisTower.InitTower();
                 thisTower.CalcTwoSpeedTower();
-                CalculateWaterUseage(TowerNum);
-                UpdateTowers(TowerNum);
-                ReportTowers(RunFlag, TowerNum);
+                thisTower.CalculateWaterUseage();
+                thisTower.UpdateTowers();
+                thisTower.ReportTowers(RunFlag);
 
             } else if (SELECT_CASE_var == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {
 
@@ -268,9 +268,9 @@ namespace CondenserLoopTowers {
                 }
                 thisTower.InitTower();
                 thisTower.CalcMerkelVariableSpeedTower(MyLoad);
-                CalculateWaterUseage(TowerNum);
-                UpdateTowers(TowerNum);
-                ReportTowers(RunFlag, TowerNum);
+                thisTower.CalculateWaterUseage();
+                thisTower.UpdateTowers();
+                thisTower.ReportTowers(RunFlag);
 
             } else if (SELECT_CASE_var == DataPlant::TypeOf_CoolingTower_VarSpd) {
 
@@ -287,9 +287,9 @@ namespace CondenserLoopTowers {
                 }
                 thisTower.InitTower();
                 thisTower.CalcVariableSpeedTower();
-                CalculateWaterUseage(TowerNum);
-                UpdateTowers(TowerNum);
-                ReportTowers(RunFlag, TowerNum);
+                thisTower.CalculateWaterUseage();
+                thisTower.UpdateTowers();
+                thisTower.ReportTowers(RunFlag);
 
             } else {
                 ShowFatalError("SimTowers: Invalid Tower Type Requested=" + TowerType);
@@ -3249,12 +3249,12 @@ namespace CondenserLoopTowers {
                                       " times free convection capacity of " + General::TrimSigDigits(this->TowerFreeConvNomCap, 0) + " W.");
 
                     Real64 OutWaterTemp;              // outlet water temperature during sizing [C]
-                    SimSimpleTower(this->thisTowerNum, Par(3), Par(4), UA0, OutWaterTemp);
+                    this->SimSimpleTower(Par(3), Par(4), UA0, OutWaterTemp);
                     Real64 CoolingOutput = Par(5) * Par(3) * (this->WaterTemp - OutWaterTemp);             // tower capacity during sizing [W]
                     ShowContinueError("Tower capacity at lower UA guess (" + General::TrimSigDigits(UA0, 4) + ") = " + General::TrimSigDigits(CoolingOutput, 0) +
                                       " W.");
 
-                    SimSimpleTower(this->thisTowerNum, Par(3), Par(4), UA1, OutWaterTemp);
+                    this->SimSimpleTower(Par(3), Par(4), UA1, OutWaterTemp);
                     CoolingOutput = Par(5) * Par(3) * (this->WaterTemp - OutWaterTemp);
                     ShowContinueError("Tower capacity at upper UA guess (" + General::TrimSigDigits(UA1, 4) + ") = " + General::TrimSigDigits(CoolingOutput, 0) +
                                       " W.");
@@ -3306,7 +3306,7 @@ namespace CondenserLoopTowers {
             Real64 WaterFlowRateRatio(0.0); // tower water flow rate ratio
             while (Tapproach < this->DesignApproach && MaxWaterFlowRateRatio <= ModelWaterFlowRatioMax) {
                 WaterFlowRateRatio = MaxWaterFlowRateRatio;
-                CalcVSTowerApproach(this->thisTowerNum, WaterFlowRateRatio, 1.0, this->DesignInletWB, this->DesignRange, Tapproach);
+                this->CalcVSTowerApproach(WaterFlowRateRatio, 1.0, this->DesignInletWB, this->DesignRange, Tapproach);
                 if (Tapproach < this->DesignApproach) {
                     MaxWaterFlowRateRatio += FlowRateRatioStep;
                 }
@@ -4312,8 +4312,7 @@ namespace CondenserLoopTowers {
                     this->AirWetBulb = DesTowerInletAirWBTemp; // 25.6;
                     this->AirPress = DataEnvironment::StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(this->AirTemp, this->AirWetBulb, this->AirPress);
-                    SimSimpleTower(this->thisTowerNum,
-                                   rho * tmpDesignWaterFlowRate,
+                    this->SimSimpleTower(rho * tmpDesignWaterFlowRate,
                                    this->HighSpeedAirFlowRate,
                                    this->HighSpeedTowerUA,
                                    OutWaterTemp);
@@ -4356,7 +4355,7 @@ namespace CondenserLoopTowers {
                     }
                 }
 
-                SimSimpleTower(this->thisTowerNum, rho * tmpDesignWaterFlowRate, tmpFreeConvAirFlowRate, this->FreeConvTowerUA, OutWaterTemp);
+                this->SimSimpleTower(rho * tmpDesignWaterFlowRate, tmpFreeConvAirFlowRate, this->FreeConvTowerUA, OutWaterTemp);
                 tmpTowerFreeConvNomCap = Cp * rho * tmpDesignWaterFlowRate * (this->WaterTemp - OutWaterTemp);
                 tmpTowerFreeConvNomCap /= this->HeatRejectCapNomCapSizingRatio;
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
@@ -4600,7 +4599,7 @@ namespace CondenserLoopTowers {
             this->OutletWaterTemp = OutletWaterTempOFF;
             FanModeFrac = 0.0;
 
-            SimSimpleTower(this->thisTowerNum, WaterMassFlowRatePerCell, AirFlowRate, UAdesign, OutletWaterTempOFF);
+            this->SimSimpleTower(WaterMassFlowRatePerCell, AirFlowRate, UAdesign, OutletWaterTempOFF);
 
             //   Assume Setpoint was met using free convection regime (pump ON and fan OFF)
             this->FanPower = 0.0;
@@ -4614,7 +4613,7 @@ namespace CondenserLoopTowers {
                 // The fan power is for all cells operating
                 Real64 const FanPowerOn = this->HighSpeedFanPower * this->NumCellOn / this->NumCell;
 
-                SimSimpleTower(this->thisTowerNum, WaterMassFlowRatePerCell, AirFlowRate, UAdesign, this->OutletWaterTemp);
+                this->SimSimpleTower(WaterMassFlowRatePerCell, AirFlowRate, UAdesign, this->OutletWaterTemp);
 
                 if (this->OutletWaterTemp <= TempSetPoint) {
                     if (this->CapacityControl == CapacityControl_FanCycling || this->OutletWaterTemp <= OWTLowerLimit) {
@@ -4675,7 +4674,7 @@ namespace CondenserLoopTowers {
                         while (NumIteration < MaxIteration) {
                             ++NumIteration;
                             // need to iterate for the new OutletWaterTemp while bypassing tower water
-                            SimSimpleTower(this->thisTowerNum, WaterMassFlowRatePerCell * (1.0 - _BypassFraction), AirFlowRate, UAdesign, this->OutletWaterTemp);
+                            this->SimSimpleTower(WaterMassFlowRatePerCell * (1.0 - _BypassFraction), AirFlowRate, UAdesign, this->OutletWaterTemp);
                             // Calc new BypassFraction based on the new OutletWaterTemp
                             if (std::abs(this->OutletWaterTemp - OWTLowerLimit) <= 0.01) {
                                 BypassFraction2 = _BypassFraction;
@@ -4684,7 +4683,7 @@ namespace CondenserLoopTowers {
                                 // Set OutletWaterTemp = OWTLowerLimit, and use linear interpolation to calculate the bypassFraction
                                 BypassFraction2 = BypassFractionPrev - (BypassFractionPrev - _BypassFraction) * (OutletWaterTempPrev - OWTLowerLimit) /
                                                                            (OutletWaterTempPrev - this->OutletWaterTemp);
-                                SimSimpleTower(this->thisTowerNum, WaterMassFlowRatePerCell * (1.0 - BypassFraction2), AirFlowRate, UAdesign, this->OutletWaterTemp);
+                                this->SimSimpleTower(WaterMassFlowRatePerCell * (1.0 - BypassFraction2), AirFlowRate, UAdesign, this->OutletWaterTemp);
                                 if (this->OutletWaterTemp < OWTLowerLimit) {
                                     // Use previous iteraction values
                                     BypassFraction2 = BypassFractionPrev;
@@ -4903,7 +4902,7 @@ namespace CondenserLoopTowers {
             Real64 OutletWaterTemp2ndStage = this->OutletWaterTemp;
             FanModeFrac = 0.0;
 
-            SimSimpleTower(this->thisTowerNum, WaterMassFlowRatePerCell, AirFlowRate, UAdesign, OutletWaterTempOFF);
+            this->SimSimpleTower(WaterMassFlowRatePerCell, AirFlowRate, UAdesign, OutletWaterTempOFF);
 
             //     Setpoint was met using free convection regime (pump ON and fan OFF)
             this->FanPower = 0.0;
@@ -4915,7 +4914,7 @@ namespace CondenserLoopTowers {
                 AirFlowRate = this->LowSpeedAirFlowRate / this->NumCell;
                 Real64 const FanPowerLow = this->LowSpeedFanPower * this->NumCellOn / this->NumCell;
 
-                SimSimpleTower(this->thisTowerNum, WaterMassFlowRatePerCell, AirFlowRate, UAdesign, OutletWaterTemp1stStage);
+                this->SimSimpleTower(WaterMassFlowRatePerCell, AirFlowRate, UAdesign, OutletWaterTemp1stStage);
 
                 if (OutletWaterTemp1stStage <= TempSetPoint) {
                     //         Setpoint was met with pump ON and fan ON 1st stage, calculate fan mode fraction
@@ -4930,7 +4929,7 @@ namespace CondenserLoopTowers {
                     AirFlowRate = this->HighSpeedAirFlowRate / this->NumCell;
                     Real64 const FanPowerHigh = this->HighSpeedFanPower * this->NumCellOn / this->NumCell;
 
-                    SimSimpleTower(this->thisTowerNum, WaterMassFlowRatePerCell, AirFlowRate, UAdesign, OutletWaterTemp2ndStage);
+                    this->SimSimpleTower(WaterMassFlowRatePerCell, AirFlowRate, UAdesign, OutletWaterTemp2ndStage);
 
                     if ((OutletWaterTemp2ndStage <= TempSetPoint) && UAdesign > 0.0) {
                         //           Setpoint was met with pump ON and fan ON 2nd stage, calculate fan mode fraction
@@ -5125,7 +5124,7 @@ namespace CondenserLoopTowers {
                 WaterMassFlowRatePerCell / (WaterDensity * this->CalibratedWaterFlowRate / this->NumCell);
     
             // check independent inputs with respect to model boundaries
-            CheckModelBounds(this->thisTowerNum, Twb, Tr, Ta, WaterFlowRateRatio, TwbCapped, TrCapped, TaCapped, WaterFlowRateRatioCapped);
+            this->CheckModelBounds(Twb, Tr, Ta, WaterFlowRateRatio, TwbCapped, TrCapped, TaCapped, WaterFlowRateRatioCapped);
     
             //   determine the free convection capacity by finding the outlet temperature at full air flow and multiplying
             //   the tower's full capacity temperature difference by the percentage of tower capacity in free convection
@@ -5427,7 +5426,7 @@ namespace CondenserLoopTowers {
         AirFlowRatePerCell = this->FreeConvAirFlowRate / this->NumCell;
         Real64 OutletWaterTempOFF = DataLoopNode::Node(this->WaterInletNodeNum).Temp;
         this->WaterMassFlowRate = DataLoopNode::Node(this->WaterInletNodeNum).MassFlowRate;
-        SimSimpleTower(this->thisTowerNum, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAdesignPerCell, OutletWaterTempOFF);
+        this->SimSimpleTower(WaterMassFlowRatePerCell, AirFlowRatePerCell, UAdesignPerCell, OutletWaterTempOFF);
 
         Real64 FreeConvQdot = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(this->WaterInletNodeNum).Temp - OutletWaterTempOFF);
         this->FanPower = 0.0;
@@ -5454,7 +5453,7 @@ namespace CondenserLoopTowers {
         Real64 UAairflowAdjFac = CurveManager::CurveValue(this->UAModFuncAirFlowRatioCurvePtr, this->__AirFlowRateRatio);
         Real64 UAwaterflowAdjFac = CurveManager::CurveValue(this->UAModFuncWaterFlowRatioCurvePtr, WaterFlowRateRatio);
         Real64 UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
-        SimSimpleTower(this->thisTowerNum, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell, this->OutletWaterTemp);
+        this->SimSimpleTower(WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell, this->OutletWaterTemp);
         Real64 FullSpeedFanQdot = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
         Real64 FanPowerAdjustFac = 0.0;
         if (FullSpeedFanQdot <= std::abs(MyLoad)) { // full speed is what we want.
@@ -5469,7 +5468,7 @@ namespace CondenserLoopTowers {
                     WaterFlowRateRatio = WaterMassFlowRatePerCell / this->DesWaterMassFlowRatePerCell;
                     UAwaterflowAdjFac = CurveManager::CurveValue(this->UAModFuncWaterFlowRatioCurvePtr, WaterFlowRateRatio);
                     UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
-                    SimSimpleTower(this->thisTowerNum, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell, this->OutletWaterTemp);
+                    this->SimSimpleTower(WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell, this->OutletWaterTemp);
                     IncrNumCellFlag = (FullSpeedFanQdot + DataHVACGlobals::SmallLoad) < std::abs(MyLoad) &&
                                       (this->NumCellOn < this->NumCell) &&
                                       ((this->WaterMassFlowRate / (this->NumCellOn + 1)) >= WaterMassFlowRatePerCellMin);
@@ -5493,7 +5492,7 @@ namespace CondenserLoopTowers {
         AirFlowRatePerCell = this->__AirFlowRateRatio * this->HighSpeedAirFlowRate / this->NumCell;
         UAairflowAdjFac = CurveManager::CurveValue(this->UAModFuncAirFlowRatioCurvePtr, this->__AirFlowRateRatio);
         UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
-        SimSimpleTower(this->thisTowerNum, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell, this->OutletWaterTemp);
+        this->SimSimpleTower(WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell, this->OutletWaterTemp);
         Real64 MinSpeedFanQdot = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
 
         if (std::abs(MyLoad) <= MinSpeedFanQdot) { // min fan speed already exceeds load)
@@ -5566,7 +5565,7 @@ namespace CondenserLoopTowers {
             UAairflowAdjFac = CurveManager::CurveValue(this->UAModFuncAirFlowRatioCurvePtr, this->__AirFlowRateRatio);
             UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
 
-            SimSimpleTower(this->thisTowerNum, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell, this->OutletWaterTemp);
+            this->SimSimpleTower(WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell, this->OutletWaterTemp);
             this->Qactual = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
             CalcBasinHeaterPower(this->BasinHeaterPowerFTempDiff,
                                  this->BasinHeaterSchedulePtr,
@@ -5616,13 +5615,13 @@ namespace CondenserLoopTowers {
         Real64 const UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
 
         Real64 OutletWaterTempTrial;
-        SimSimpleTower(TowerNum, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell, OutletWaterTempTrial);
+        this->SimSimpleTower(WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell, OutletWaterTempTrial);
 
         Real64 const Qdot = TotalWaterMassFlowRate * CpWater * (DataLoopNode::Node(SimpleTower(TowerNum).WaterInletNodeNum).Temp - OutletWaterTempTrial);
         return std::abs(TargetLoad) - Qdot;
     }
 
-    void SimSimpleTower(int const TowerNum, Real64 const _WaterMassFlowRate, Real64 const AirFlowRate, Real64 const UAdesign, Real64 &_OutletWaterTemp)
+    void Towerspecs::SimSimpleTower(Real64 const _WaterMassFlowRate, Real64 const AirFlowRate, Real64 const UAdesign, Real64 &_OutletWaterTemp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5648,29 +5647,29 @@ namespace CondenserLoopTowers {
         Real64 _Qactual = 0.0;  // Actual heat transfer rate between tower water and air [W]
 
         // set local tower inlet and outlet temperature variables
-        SimpleTower(TowerNum).InletWaterTemp = SimpleTower(TowerNum).WaterTemp;
-        _OutletWaterTemp = SimpleTower(TowerNum).InletWaterTemp;
-        Real64 InletAirTemp = SimpleTower(TowerNum).AirTemp;  // Dry-bulb temperature of air entering the tower [C]
-        Real64 InletAirWetBulb = SimpleTower(TowerNum).AirWetBulb;  // Wetbulb temp of entering moist air [C]
+        this->InletWaterTemp = this->WaterTemp;
+        _OutletWaterTemp = this->InletWaterTemp;
+        Real64 InletAirTemp = this->AirTemp;  // Dry-bulb temperature of air entering the tower [C]
+        Real64 InletAirWetBulb = this->AirWetBulb;  // Wetbulb temp of entering moist air [C]
 
         if (UAdesign == 0.0) return;
 
         // set water and air properties
-        Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(SimpleTower(TowerNum).AirPress, InletAirTemp, SimpleTower(TowerNum).AirHumRat); // Density of air [kg/m3]
+        Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(this->AirPress, InletAirTemp, this->AirHumRat); // Density of air [kg/m3]
         Real64 AirMassFlowRate = AirFlowRate * AirDensity; // Mass flow rate of air [kg/s]
-        Real64 CpAir = Psychrometrics::PsyCpAirFnWTdb(SimpleTower(TowerNum).AirHumRat, InletAirTemp); // Heat capacity of air [J/kg/K]
-        Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(SimpleTower(TowerNum).LoopNum).FluidName,
-                                                         SimpleTower(TowerNum).WaterTemp,
-                                                         DataPlant::PlantLoop(SimpleTower(TowerNum).LoopNum).FluidIndex,
+        Real64 CpAir = Psychrometrics::PsyCpAirFnWTdb(this->AirHumRat, InletAirTemp); // Heat capacity of air [J/kg/K]
+        Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
+                                                         this->WaterTemp,
+                                                         DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                         RoutineName); // Heat capacity of water [J/kg/K]
-        Real64 InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(SimpleTower(TowerNum).AirWetBulb, 1.0, SimpleTower(TowerNum).AirPress); // Enthalpy of entering moist air [J/kg]
+        Real64 InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(this->AirWetBulb, 1.0, this->AirPress); // Enthalpy of entering moist air [J/kg]
 
         // initialize exiting wet bulb temperature before iterating on final solution
         Real64 OutletAirWetBulb = InletAirWetBulb + 6.0;  // Wetbulb temp of exiting moist air [C]
 
         // Calculate mass flow rates
         if (_WaterMassFlowRate <= 0.0) {
-            _OutletWaterTemp = SimpleTower(TowerNum).InletWaterTemp;
+            _OutletWaterTemp = this->InletWaterTemp;
             return;
         }
 
@@ -5687,7 +5686,7 @@ namespace CondenserLoopTowers {
         while ((WetBulbError > WetBulbTolerance) && (Iter <= IterMax) && (DeltaTwb > DeltaTwbTolerance)) {
             ++Iter;
             //        OutletAirEnthalpy = PsyHFnTdbRhPb(OutletAirWetBulb,1.0,OutBaroPress)
-            OutletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(OutletAirWetBulb, 1.0, SimpleTower(TowerNum).AirPress);
+            OutletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(OutletAirWetBulb, 1.0, this->AirPress);
             // calculate the airside specific heat and capacity
             Real64 const CpAirside = (OutletAirEnthalpy - InletAirEnthalpy) / (OutletAirWetBulb - InletAirWetBulb); // Delta enthalpy of the tower air divides by delta air wet-bulb temp [J/kg/K]
             Real64 const AirCapacity = AirMassFlowRate * CpAirside; // MdotCp of air through the tower
@@ -5712,7 +5711,7 @@ namespace CondenserLoopTowers {
                 effectiveness = NumTransferUnits / (1.0 + NumTransferUnits);
             }
             // calculate water to air heat transfer and store last exiting WB temp of air
-            _Qactual = effectiveness * CapacityRatioMin * (SimpleTower(TowerNum).InletWaterTemp - InletAirWetBulb);
+            _Qactual = effectiveness * CapacityRatioMin * (this->InletWaterTemp - InletAirWetBulb);
             OutletAirWetBulbLast = OutletAirWetBulb;
             // calculate new exiting wet bulb temperature of airstream
             OutletAirWetBulb = InletAirWetBulb + _Qactual / AirCapacity;
@@ -5724,9 +5723,9 @@ namespace CondenserLoopTowers {
         }
 
         if (_Qactual >= 0.0) {
-            _OutletWaterTemp = SimpleTower(TowerNum).InletWaterTemp - _Qactual / MdotCpWater;
+            _OutletWaterTemp = this->InletWaterTemp - _Qactual / MdotCpWater;
         } else {
-            _OutletWaterTemp = SimpleTower(TowerNum).InletWaterTemp;
+            _OutletWaterTemp = this->InletWaterTemp;
         }
     }
 
@@ -5801,9 +5800,8 @@ namespace CondenserLoopTowers {
         }
     }
 
-    void CalcVSTowerApproach(int const TowerNum,        // Index to cooling tower
-                             Real64 const PctWaterFlow, // Water flow ratio of cooling tower
-                             Real64 const AirFlowRatio, // Air flow ratio of cooling tower
+    void Towerspecs::CalcVSTowerApproach(Real64 const PctWaterFlow, // Water flow ratio of cooling tower
+                             Real64 const _AirFlowRatio, // Air flow ratio of cooling tower
                              Real64 const Twb,          // Inlet air wet-bulb temperature [C]
                              Real64 const Tr,           // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
                              Real64 &Approach           // Calculated approach temperature [C]
@@ -5830,72 +5828,71 @@ namespace CondenserLoopTowers {
         // York International Corporation, "YORKcalcTM Software, Chiller-Plant Energy-Estimating Program",
         // Form 160.00-SG2 (0502). 2002.
 
-         if (SimpleTower(TowerNum).TowerModelType == YorkCalcModel || SimpleTower(TowerNum).TowerModelType == YorkCalcUserDefined) {
-            Real64 PctAirFlow = AirFlowRatio;
+         if (this->TowerModelType == YorkCalcModel || this->TowerModelType == YorkCalcUserDefined) {
+            Real64 PctAirFlow = _AirFlowRatio;
             Real64 FlowFactor = PctWaterFlow / PctAirFlow;
-            Approach = SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(1) + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(2) * Twb +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(3) * Twb * Twb + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(4) * Tr +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(5) * Twb * Tr + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(6) * Twb * Twb * Tr +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(7) * Tr * Tr + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(8) * Twb * Tr * Tr +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(9) * Twb * Twb * Tr * Tr +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(10) * FlowFactor +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(11) * Twb * FlowFactor +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(12) * Twb * Twb * FlowFactor +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(13) * Tr * FlowFactor +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(14) * Twb * Tr * FlowFactor +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(15) * Twb * Twb * Tr * FlowFactor +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(16) * Tr * Tr * FlowFactor +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(17) * Twb * Tr * Tr * FlowFactor +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(18) * Twb * Twb * Tr * Tr * FlowFactor +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(19) * FlowFactor * FlowFactor +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(20) * Twb * FlowFactor * FlowFactor +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(21) * Twb * Twb * FlowFactor * FlowFactor +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(22) * Tr * FlowFactor * FlowFactor +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(23) * Twb * Tr * FlowFactor * FlowFactor +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(24) * Twb * Twb * Tr * FlowFactor * FlowFactor +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(25) * Tr * Tr * FlowFactor * FlowFactor +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(26) * Twb * Tr * Tr * FlowFactor * FlowFactor +
-                       SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(27) * Twb * Twb * Tr * Tr * FlowFactor * FlowFactor;
+            Approach = SimpleTower(this->VSTower).Coeff(1) + SimpleTower(this->VSTower).Coeff(2) * Twb +
+                       SimpleTower(this->VSTower).Coeff(3) * Twb * Twb + SimpleTower(this->VSTower).Coeff(4) * Tr +
+                       SimpleTower(this->VSTower).Coeff(5) * Twb * Tr + SimpleTower(this->VSTower).Coeff(6) * Twb * Twb * Tr +
+                       SimpleTower(this->VSTower).Coeff(7) * Tr * Tr + SimpleTower(this->VSTower).Coeff(8) * Twb * Tr * Tr +
+                       SimpleTower(this->VSTower).Coeff(9) * Twb * Twb * Tr * Tr +
+                       SimpleTower(this->VSTower).Coeff(10) * FlowFactor +
+                       SimpleTower(this->VSTower).Coeff(11) * Twb * FlowFactor +
+                       SimpleTower(this->VSTower).Coeff(12) * Twb * Twb * FlowFactor +
+                       SimpleTower(this->VSTower).Coeff(13) * Tr * FlowFactor +
+                       SimpleTower(this->VSTower).Coeff(14) * Twb * Tr * FlowFactor +
+                       SimpleTower(this->VSTower).Coeff(15) * Twb * Twb * Tr * FlowFactor +
+                       SimpleTower(this->VSTower).Coeff(16) * Tr * Tr * FlowFactor +
+                       SimpleTower(this->VSTower).Coeff(17) * Twb * Tr * Tr * FlowFactor +
+                       SimpleTower(this->VSTower).Coeff(18) * Twb * Twb * Tr * Tr * FlowFactor +
+                       SimpleTower(this->VSTower).Coeff(19) * FlowFactor * FlowFactor +
+                       SimpleTower(this->VSTower).Coeff(20) * Twb * FlowFactor * FlowFactor +
+                       SimpleTower(this->VSTower).Coeff(21) * Twb * Twb * FlowFactor * FlowFactor +
+                       SimpleTower(this->VSTower).Coeff(22) * Tr * FlowFactor * FlowFactor +
+                       SimpleTower(this->VSTower).Coeff(23) * Twb * Tr * FlowFactor * FlowFactor +
+                       SimpleTower(this->VSTower).Coeff(24) * Twb * Twb * Tr * FlowFactor * FlowFactor +
+                       SimpleTower(this->VSTower).Coeff(25) * Tr * Tr * FlowFactor * FlowFactor +
+                       SimpleTower(this->VSTower).Coeff(26) * Twb * Tr * Tr * FlowFactor * FlowFactor +
+                       SimpleTower(this->VSTower).Coeff(27) * Twb * Twb * Tr * Tr * FlowFactor * FlowFactor;
 
         } else { // empirical model is CoolTools format
             //     the CoolTools model actually uses PctFanPower = AirFlowRatio^3 as an input to the model
-            Real64 PctAirFlow = pow_3(AirFlowRatio);
+            Real64 PctAirFlow = pow_3(_AirFlowRatio);
             Approach =
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(1) + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(2) * PctAirFlow +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(3) * PctAirFlow * PctAirFlow +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(4) * PctAirFlow * PctAirFlow * PctAirFlow +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(5) * PctWaterFlow +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(6) * PctAirFlow * PctWaterFlow +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(7) * PctAirFlow * PctAirFlow * PctWaterFlow +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(8) * PctWaterFlow * PctWaterFlow +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(9) * PctAirFlow * PctWaterFlow * PctWaterFlow +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(10) * PctWaterFlow * PctWaterFlow * PctWaterFlow +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(11) * Twb + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(12) * PctAirFlow * Twb +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(13) * PctAirFlow * PctAirFlow * Twb +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(14) * PctWaterFlow * Twb +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(15) * PctAirFlow * PctWaterFlow * Twb +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(16) * PctWaterFlow * PctWaterFlow * Twb +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(17) * Twb * Twb +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(18) * PctAirFlow * Twb * Twb +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(19) * PctWaterFlow * Twb * Twb +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(20) * Twb * Twb * Twb + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(21) * Tr +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(22) * PctAirFlow * Tr +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(23) * PctAirFlow * PctAirFlow * Tr +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(24) * PctWaterFlow * Tr +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(25) * PctAirFlow * PctWaterFlow * Tr +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(26) * PctWaterFlow * PctWaterFlow * Tr +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(27) * Twb * Tr +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(28) * PctAirFlow * Twb * Tr +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(29) * PctWaterFlow * Twb * Tr +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(30) * Twb * Twb * Tr + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(31) * Tr * Tr +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(32) * PctAirFlow * Tr * Tr +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(33) * PctWaterFlow * Tr * Tr +
-                SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(34) * Twb * Tr * Tr + SimpleTower(SimpleTower(TowerNum).VSTower).Coeff(35) * Tr * Tr * Tr;
+                SimpleTower(this->VSTower).Coeff(1) + SimpleTower(this->VSTower).Coeff(2) * PctAirFlow +
+                SimpleTower(this->VSTower).Coeff(3) * PctAirFlow * PctAirFlow +
+                SimpleTower(this->VSTower).Coeff(4) * PctAirFlow * PctAirFlow * PctAirFlow +
+                SimpleTower(this->VSTower).Coeff(5) * PctWaterFlow +
+                SimpleTower(this->VSTower).Coeff(6) * PctAirFlow * PctWaterFlow +
+                SimpleTower(this->VSTower).Coeff(7) * PctAirFlow * PctAirFlow * PctWaterFlow +
+                SimpleTower(this->VSTower).Coeff(8) * PctWaterFlow * PctWaterFlow +
+                SimpleTower(this->VSTower).Coeff(9) * PctAirFlow * PctWaterFlow * PctWaterFlow +
+                SimpleTower(this->VSTower).Coeff(10) * PctWaterFlow * PctWaterFlow * PctWaterFlow +
+                SimpleTower(this->VSTower).Coeff(11) * Twb + SimpleTower(this->VSTower).Coeff(12) * PctAirFlow * Twb +
+                SimpleTower(this->VSTower).Coeff(13) * PctAirFlow * PctAirFlow * Twb +
+                SimpleTower(this->VSTower).Coeff(14) * PctWaterFlow * Twb +
+                SimpleTower(this->VSTower).Coeff(15) * PctAirFlow * PctWaterFlow * Twb +
+                SimpleTower(this->VSTower).Coeff(16) * PctWaterFlow * PctWaterFlow * Twb +
+                SimpleTower(this->VSTower).Coeff(17) * Twb * Twb +
+                SimpleTower(this->VSTower).Coeff(18) * PctAirFlow * Twb * Twb +
+                SimpleTower(this->VSTower).Coeff(19) * PctWaterFlow * Twb * Twb +
+                SimpleTower(this->VSTower).Coeff(20) * Twb * Twb * Twb + SimpleTower(this->VSTower).Coeff(21) * Tr +
+                SimpleTower(this->VSTower).Coeff(22) * PctAirFlow * Tr +
+                SimpleTower(this->VSTower).Coeff(23) * PctAirFlow * PctAirFlow * Tr +
+                SimpleTower(this->VSTower).Coeff(24) * PctWaterFlow * Tr +
+                SimpleTower(this->VSTower).Coeff(25) * PctAirFlow * PctWaterFlow * Tr +
+                SimpleTower(this->VSTower).Coeff(26) * PctWaterFlow * PctWaterFlow * Tr +
+                SimpleTower(this->VSTower).Coeff(27) * Twb * Tr +
+                SimpleTower(this->VSTower).Coeff(28) * PctAirFlow * Twb * Tr +
+                SimpleTower(this->VSTower).Coeff(29) * PctWaterFlow * Twb * Tr +
+                SimpleTower(this->VSTower).Coeff(30) * Twb * Twb * Tr + SimpleTower(this->VSTower).Coeff(31) * Tr * Tr +
+                SimpleTower(this->VSTower).Coeff(32) * PctAirFlow * Tr * Tr +
+                SimpleTower(this->VSTower).Coeff(33) * PctWaterFlow * Tr * Tr +
+                SimpleTower(this->VSTower).Coeff(34) * Twb * Tr * Tr + SimpleTower(this->VSTower).Coeff(35) * Tr * Tr * Tr;
         }
     }
 
-    void CheckModelBounds(int const TowerNum,              // index to tower
-                          Real64 const Twb,                // current inlet air wet-bulb temperature (C)
+    void Towerspecs::CheckModelBounds(Real64 const Twb,                // current inlet air wet-bulb temperature (C)
                           Real64 const Tr,                 // requested range temperature for current time step (C)
                           Real64 const Ta,                 // requested approach temperature for current time step (C)
                           Real64 const WaterFlowRateRatio, // current water flow rate ratio at water inlet node
@@ -5948,191 +5945,191 @@ namespace CondenserLoopTowers {
         //   Wait for next time step to print warnings. If simulation iterates, print out
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
-        if (CurrentEndTime > SimpleTower(TowerNum).CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= SimpleTower(TowerNum).TimeStepSysLast) {
-            if (SimpleTower(SimpleTower(TowerNum).VSTower).PrintTrMessage) {
-                ++SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountTR;
-                if (SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountTR < 2) {
-                    ShowWarningError(SimpleTower(SimpleTower(TowerNum).VSTower).TrBuffer1);
-                    ShowContinueError(SimpleTower(SimpleTower(TowerNum).VSTower).TrBuffer2);
-                    ShowContinueError(SimpleTower(SimpleTower(TowerNum).VSTower).TrBuffer3);
+        if (CurrentEndTime > this->CurrentEndTimeLast && DataHVACGlobals::TimeStepSys >= this->TimeStepSysLast) {
+            if (SimpleTower(this->VSTower).PrintTrMessage) {
+                ++SimpleTower(this->VSTower).VSErrorCountTR;
+                if (SimpleTower(this->VSTower).VSErrorCountTR < 2) {
+                    ShowWarningError(SimpleTower(this->VSTower).TrBuffer1);
+                    ShowContinueError(SimpleTower(this->VSTower).TrBuffer2);
+                    ShowContinueError(SimpleTower(this->VSTower).TrBuffer3);
                     ShowContinueError(" ...Range temperatures outside model boundaries may not adversely affect tower performance.");
                     ShowContinueError(" ...This is not an unexpected occurrence when simulating actual conditions.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
+                    ShowRecurringWarningErrorAtEnd(this->TowerType + " \"" + this->Name +
                                                        "\" - Tower range temperature is out of range error continues...",
-                                                   SimpleTower(SimpleTower(TowerNum).VSTower).ErrIndexTR,
-                                                   SimpleTower(SimpleTower(TowerNum).VSTower).TrLast,
-                                                   SimpleTower(SimpleTower(TowerNum).VSTower).TrLast);
+                                                   SimpleTower(this->VSTower).ErrIndexTR,
+                                                   SimpleTower(this->VSTower).TrLast,
+                                                   SimpleTower(this->VSTower).TrLast);
                 }
             }
-            if (SimpleTower(SimpleTower(TowerNum).VSTower).PrintTwbMessage) {
-                ++SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountIAWB;
-                if (SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountIAWB < 6) {
-                    ShowWarningError(SimpleTower(SimpleTower(TowerNum).VSTower).TwbBuffer1);
-                    ShowContinueError(SimpleTower(SimpleTower(TowerNum).VSTower).TwbBuffer2);
-                    ShowContinueError(SimpleTower(SimpleTower(TowerNum).VSTower).TwbBuffer3);
+            if (SimpleTower(this->VSTower).PrintTwbMessage) {
+                ++SimpleTower(this->VSTower).VSErrorCountIAWB;
+                if (SimpleTower(this->VSTower).VSErrorCountIAWB < 6) {
+                    ShowWarningError(SimpleTower(this->VSTower).TwbBuffer1);
+                    ShowContinueError(SimpleTower(this->VSTower).TwbBuffer2);
+                    ShowContinueError(SimpleTower(this->VSTower).TwbBuffer3);
                     ShowContinueError(" ...Wet-bulb temperatures outside model boundaries may not adversely affect tower performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
+                    ShowRecurringWarningErrorAtEnd(this->TowerType + " \"" + this->Name +
                                                        "\" - Inlet air wet-bulb temperature is out of range error continues...",
-                                                   SimpleTower(SimpleTower(TowerNum).VSTower).ErrIndexIAWB,
-                                                   SimpleTower(SimpleTower(TowerNum).VSTower).TwbLast,
-                                                   SimpleTower(SimpleTower(TowerNum).VSTower).TwbLast);
+                                                   SimpleTower(this->VSTower).ErrIndexIAWB,
+                                                   SimpleTower(this->VSTower).TwbLast,
+                                                   SimpleTower(this->VSTower).TwbLast);
                 }
             }
-            if (SimpleTower(SimpleTower(TowerNum).VSTower).PrintTaMessage) {
-                ++SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountTA;
-                if (SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountTA < 2) {
-                    ShowWarningError(SimpleTower(SimpleTower(TowerNum).VSTower).TaBuffer1);
-                    ShowContinueError(SimpleTower(SimpleTower(TowerNum).VSTower).TaBuffer2);
-                    ShowContinueError(SimpleTower(SimpleTower(TowerNum).VSTower).TaBuffer3);
+            if (SimpleTower(this->VSTower).PrintTaMessage) {
+                ++SimpleTower(this->VSTower).VSErrorCountTA;
+                if (SimpleTower(this->VSTower).VSErrorCountTA < 2) {
+                    ShowWarningError(SimpleTower(this->VSTower).TaBuffer1);
+                    ShowContinueError(SimpleTower(this->VSTower).TaBuffer2);
+                    ShowContinueError(SimpleTower(this->VSTower).TaBuffer3);
                     ShowContinueError(" ...Approach temperatures outside model boundaries may not adversely affect tower performance.");
                     ShowContinueError(" ...This is not an unexpected occurrence when simulating actual conditions.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
+                    ShowRecurringWarningErrorAtEnd(this->TowerType + " \"" + this->Name +
                                                        "\" - Tower approach temperature is out of range error continues...",
-                                                   SimpleTower(SimpleTower(TowerNum).VSTower).ErrIndexTA,
-                                                   SimpleTower(SimpleTower(TowerNum).VSTower).TaLast,
-                                                   SimpleTower(SimpleTower(TowerNum).VSTower).TaLast);
+                                                   SimpleTower(this->VSTower).ErrIndexTA,
+                                                   SimpleTower(this->VSTower).TaLast,
+                                                   SimpleTower(this->VSTower).TaLast);
                 }
             }
-            if (SimpleTower(SimpleTower(TowerNum).VSTower).PrintWFRRMessage) {
-                ++SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountWFRR;
-                if (SimpleTower(SimpleTower(TowerNum).VSTower).VSErrorCountWFRR < 6) {
-                    ShowWarningError(SimpleTower(SimpleTower(TowerNum).VSTower).WFRRBuffer1);
-                    ShowContinueError(SimpleTower(SimpleTower(TowerNum).VSTower).WFRRBuffer2);
-                    ShowContinueError(SimpleTower(SimpleTower(TowerNum).VSTower).WFRRBuffer3);
+            if (SimpleTower(this->VSTower).PrintWFRRMessage) {
+                ++SimpleTower(this->VSTower).VSErrorCountWFRR;
+                if (SimpleTower(this->VSTower).VSErrorCountWFRR < 6) {
+                    ShowWarningError(SimpleTower(this->VSTower).WFRRBuffer1);
+                    ShowContinueError(SimpleTower(this->VSTower).WFRRBuffer2);
+                    ShowContinueError(SimpleTower(this->VSTower).WFRRBuffer3);
                     ShowContinueError(" ...Water flow rate ratios outside model boundaries may not adversely affect tower performance.");
                 } else {
-                    ShowRecurringWarningErrorAtEnd(SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
+                    ShowRecurringWarningErrorAtEnd(this->TowerType + " \"" + this->Name +
                                                        "\" - Water flow rate ratio is out of range error continues...",
-                                                   SimpleTower(SimpleTower(TowerNum).VSTower).ErrIndexWFRR,
-                                                   SimpleTower(SimpleTower(TowerNum).VSTower).WaterFlowRateRatioLast,
-                                                   SimpleTower(SimpleTower(TowerNum).VSTower).WaterFlowRateRatioLast);
+                                                   SimpleTower(this->VSTower).ErrIndexWFRR,
+                                                   SimpleTower(this->VSTower).WaterFlowRateRatioLast,
+                                                   SimpleTower(this->VSTower).WaterFlowRateRatioLast);
                 }
             }
         }
 
         //   save last system time step and last end time of current time step (used to determine if warning is valid)
-        SimpleTower(TowerNum).TimeStepSysLast = DataHVACGlobals::TimeStepSys;
-        SimpleTower(TowerNum).CurrentEndTimeLast = CurrentEndTime;
+        this->TimeStepSysLast = DataHVACGlobals::TimeStepSys;
+        this->CurrentEndTimeLast = CurrentEndTime;
 
         //   check boundaries of independent variables and post warnings to individual buffers to print at end of time step
-        if (Twb < SimpleTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp || Twb > SimpleTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp) {
+        if (Twb < SimpleTower(this->VSTower).MinInletAirWBTemp || Twb > SimpleTower(this->VSTower).MaxInletAirWBTemp) {
             OutputChar = General::RoundSigDigits(Twb, 2);
-            OutputCharLo = General::RoundSigDigits(SimpleTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp, 2);
-            OutputCharHi = General::RoundSigDigits(SimpleTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp, 2);
-            if (Twb < SimpleTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp) {
-                TwbCapped = SimpleTower(SimpleTower(TowerNum).VSTower).MinInletAirWBTemp;
+            OutputCharLo = General::RoundSigDigits(SimpleTower(this->VSTower).MinInletAirWBTemp, 2);
+            OutputCharHi = General::RoundSigDigits(SimpleTower(this->VSTower).MaxInletAirWBTemp, 2);
+            if (Twb < SimpleTower(this->VSTower).MinInletAirWBTemp) {
+                TwbCapped = SimpleTower(this->VSTower).MinInletAirWBTemp;
             }
-            if (Twb > SimpleTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp) {
-                TwbCapped = SimpleTower(SimpleTower(TowerNum).VSTower).MaxInletAirWBTemp;
+            if (Twb > SimpleTower(this->VSTower).MaxInletAirWBTemp) {
+                TwbCapped = SimpleTower(this->VSTower).MaxInletAirWBTemp;
             }
             if (!DataGlobals::WarmupFlag) {
-                SimpleTower(SimpleTower(TowerNum).VSTower).PrintTwbMessage = true;
-                SimpleTower(SimpleTower(TowerNum).VSTower).TwbBuffer1 = SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
+                SimpleTower(this->VSTower).PrintTwbMessage = true;
+                SimpleTower(this->VSTower).TwbBuffer1 = this->TowerType + " \"" + this->Name +
                                                                     "\" - Inlet air wet-bulb temperature is outside model boundaries at " +
                                                                     OutputChar + '.';
-                SimpleTower(SimpleTower(TowerNum).VSTower).TwbBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
+                SimpleTower(this->VSTower).TwbBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
                                                                     ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
                     General::CreateSysTimeIntervalString();
                 TrimValue = General::RoundSigDigits(TwbCapped, 6);
-                SimpleTower(SimpleTower(TowerNum).VSTower).TwbBuffer3 = " ...Inlet air wet-bulb temperature passed to the model = " + TrimValue;
-                SimpleTower(SimpleTower(TowerNum).VSTower).TwbLast = Twb;
+                SimpleTower(this->VSTower).TwbBuffer3 = " ...Inlet air wet-bulb temperature passed to the model = " + TrimValue;
+                SimpleTower(this->VSTower).TwbLast = Twb;
             } else {
-                SimpleTower(SimpleTower(TowerNum).VSTower).PrintTwbMessage = false;
+                SimpleTower(this->VSTower).PrintTwbMessage = false;
             }
         } else {
-            SimpleTower(SimpleTower(TowerNum).VSTower).PrintTwbMessage = false;
+            SimpleTower(this->VSTower).PrintTwbMessage = false;
         }
 
-        if (Tr < SimpleTower(SimpleTower(TowerNum).VSTower).MinRangeTemp || Tr > SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp) {
+        if (Tr < SimpleTower(this->VSTower).MinRangeTemp || Tr > SimpleTower(this->VSTower).MaxRangeTemp) {
             OutputChar = General::RoundSigDigits(Tr, 2);
-            OutputCharLo = General::RoundSigDigits(SimpleTower(SimpleTower(TowerNum).VSTower).MinRangeTemp, 2);
-            OutputCharHi = General::RoundSigDigits(SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp, 2);
-            if (Tr < SimpleTower(SimpleTower(TowerNum).VSTower).MinRangeTemp) {
-                TrCapped = SimpleTower(SimpleTower(TowerNum).VSTower).MinRangeTemp;
+            OutputCharLo = General::RoundSigDigits(SimpleTower(this->VSTower).MinRangeTemp, 2);
+            OutputCharHi = General::RoundSigDigits(SimpleTower(this->VSTower).MaxRangeTemp, 2);
+            if (Tr < SimpleTower(this->VSTower).MinRangeTemp) {
+                TrCapped = SimpleTower(this->VSTower).MinRangeTemp;
             }
-            if (Tr > SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp) {
-                TrCapped = SimpleTower(SimpleTower(TowerNum).VSTower).MaxRangeTemp;
+            if (Tr > SimpleTower(this->VSTower).MaxRangeTemp) {
+                TrCapped = SimpleTower(this->VSTower).MaxRangeTemp;
             }
             if (!DataGlobals::WarmupFlag) {
-                SimpleTower(SimpleTower(TowerNum).VSTower).PrintTrMessage = true;
-                SimpleTower(SimpleTower(TowerNum).VSTower).TrBuffer1 = SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
+                SimpleTower(this->VSTower).PrintTrMessage = true;
+                SimpleTower(this->VSTower).TrBuffer1 = this->TowerType + " \"" + this->Name +
                                                                    "\" - Tower range temperature is outside model boundaries at " + OutputChar + '.';
-                SimpleTower(SimpleTower(TowerNum).VSTower).TrBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
+                SimpleTower(this->VSTower).TrBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
                                                                    ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
                     General::CreateSysTimeIntervalString();
                 TrimValue = General::RoundSigDigits(Tr, 5);
-                SimpleTower(SimpleTower(TowerNum).VSTower).TrBuffer3 = " ...Tower range temperature passed to the model = " + TrimValue;
-                SimpleTower(SimpleTower(TowerNum).VSTower).TrLast = Tr;
+                SimpleTower(this->VSTower).TrBuffer3 = " ...Tower range temperature passed to the model = " + TrimValue;
+                SimpleTower(this->VSTower).TrLast = Tr;
             } else {
-                SimpleTower(SimpleTower(TowerNum).VSTower).PrintTrMessage = false;
+                SimpleTower(this->VSTower).PrintTrMessage = false;
             }
         } else {
-            SimpleTower(SimpleTower(TowerNum).VSTower).PrintTrMessage = false;
+            SimpleTower(this->VSTower).PrintTrMessage = false;
         }
 
-        if (Ta < SimpleTower(SimpleTower(TowerNum).VSTower).MinApproachTemp || Ta > SimpleTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp) {
+        if (Ta < SimpleTower(this->VSTower).MinApproachTemp || Ta > SimpleTower(this->VSTower).MaxApproachTemp) {
             OutputChar = General::RoundSigDigits(Ta, 2);
-            OutputCharLo = General::RoundSigDigits(SimpleTower(SimpleTower(TowerNum).VSTower).MinApproachTemp, 2);
-            OutputCharHi = General::RoundSigDigits(SimpleTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp, 2);
-            if (Ta < SimpleTower(SimpleTower(TowerNum).VSTower).MinApproachTemp) {
-                TaCapped = SimpleTower(SimpleTower(TowerNum).VSTower).MinApproachTemp;
+            OutputCharLo = General::RoundSigDigits(SimpleTower(this->VSTower).MinApproachTemp, 2);
+            OutputCharHi = General::RoundSigDigits(SimpleTower(this->VSTower).MaxApproachTemp, 2);
+            if (Ta < SimpleTower(this->VSTower).MinApproachTemp) {
+                TaCapped = SimpleTower(this->VSTower).MinApproachTemp;
             }
-            if (Ta > SimpleTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp) {
-                TaCapped = SimpleTower(SimpleTower(TowerNum).VSTower).MaxApproachTemp;
+            if (Ta > SimpleTower(this->VSTower).MaxApproachTemp) {
+                TaCapped = SimpleTower(this->VSTower).MaxApproachTemp;
             }
             if (!DataGlobals::WarmupFlag) {
-                SimpleTower(SimpleTower(TowerNum).VSTower).PrintTaMessage = true;
-                SimpleTower(SimpleTower(TowerNum).VSTower).TaBuffer1 = SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
+                SimpleTower(this->VSTower).PrintTaMessage = true;
+                SimpleTower(this->VSTower).TaBuffer1 = this->TowerType + " \"" + this->Name +
                                                                    "\" - Tower approach temperature is outside model boundaries at " + OutputChar +
                                                                    '.';
-                SimpleTower(SimpleTower(TowerNum).VSTower).TaBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
+                SimpleTower(this->VSTower).TaBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
                                                                    ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
                     General::CreateSysTimeIntervalString();
                 TrimValue = General::RoundSigDigits(Ta, 5);
-                SimpleTower(SimpleTower(TowerNum).VSTower).TaBuffer3 = " ...Tower approach temperature passed to the model = " + TrimValue;
-                SimpleTower(SimpleTower(TowerNum).VSTower).TaLast = Ta;
+                SimpleTower(this->VSTower).TaBuffer3 = " ...Tower approach temperature passed to the model = " + TrimValue;
+                SimpleTower(this->VSTower).TaLast = Ta;
             } else {
-                SimpleTower(SimpleTower(TowerNum).VSTower).PrintTaMessage = false;
+                SimpleTower(this->VSTower).PrintTaMessage = false;
             }
         } else {
-            SimpleTower(SimpleTower(TowerNum).VSTower).PrintTaMessage = false;
+            SimpleTower(this->VSTower).PrintTaMessage = false;
         }
 
-        if (SimpleTower(TowerNum).TowerModelType == YorkCalcModel || SimpleTower(TowerNum).TowerModelType == YorkCalcUserDefined) {
+        if (this->TowerModelType == YorkCalcModel || this->TowerModelType == YorkCalcUserDefined) {
             //     Water flow rate ratio warning not valid for YorkCalc model, print liquid to gas ratio
             //     warning instead (bottom of Subroutine VariableSpeedTower)
-            SimpleTower(SimpleTower(TowerNum).VSTower).PrintWFRRMessage = false;
+            SimpleTower(this->VSTower).PrintWFRRMessage = false;
         } else {
-            if (WaterFlowRateRatio < SimpleTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio ||
-                WaterFlowRateRatio > SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio) {
+            if (WaterFlowRateRatio < SimpleTower(this->VSTower).MinWaterFlowRatio ||
+                WaterFlowRateRatio > SimpleTower(this->VSTower).MaxWaterFlowRatio) {
                 OutputChar = General::RoundSigDigits(WaterFlowRateRatio, 2);
-                OutputCharLo = General::RoundSigDigits(SimpleTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio, 2);
-                OutputCharHi = General::RoundSigDigits(SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio, 2);
-                if (WaterFlowRateRatio < SimpleTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio) {
-                    WaterFlowRateRatioCapped = SimpleTower(SimpleTower(TowerNum).VSTower).MinWaterFlowRatio;
+                OutputCharLo = General::RoundSigDigits(SimpleTower(this->VSTower).MinWaterFlowRatio, 2);
+                OutputCharHi = General::RoundSigDigits(SimpleTower(this->VSTower).MaxWaterFlowRatio, 2);
+                if (WaterFlowRateRatio < SimpleTower(this->VSTower).MinWaterFlowRatio) {
+                    WaterFlowRateRatioCapped = SimpleTower(this->VSTower).MinWaterFlowRatio;
                 }
-                if (WaterFlowRateRatio > SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio) {
-                    WaterFlowRateRatioCapped = SimpleTower(SimpleTower(TowerNum).VSTower).MaxWaterFlowRatio;
+                if (WaterFlowRateRatio > SimpleTower(this->VSTower).MaxWaterFlowRatio) {
+                    WaterFlowRateRatioCapped = SimpleTower(this->VSTower).MaxWaterFlowRatio;
                 }
                 if (!DataGlobals::WarmupFlag) {
-                    SimpleTower(SimpleTower(TowerNum).VSTower).PrintWFRRMessage = true;
-                    SimpleTower(SimpleTower(TowerNum).VSTower).WFRRBuffer1 = SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
+                    SimpleTower(this->VSTower).PrintWFRRMessage = true;
+                    SimpleTower(this->VSTower).WFRRBuffer1 = this->TowerType + " \"" + this->Name +
                                                                          "\" - Water flow rate ratio is outside model boundaries at " + OutputChar +
                                                                          '.';
-                    SimpleTower(SimpleTower(TowerNum).VSTower).WFRRBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
+                    SimpleTower(this->VSTower).WFRRBuffer2 = " ...Valid range = " + OutputCharLo + " to " + OutputCharHi +
                                                                          ". Occurrence info = " + DataEnvironment::EnvironmentName + ", " + DataEnvironment::CurMnDy + ' ' +
                         General::CreateSysTimeIntervalString();
                     TrimValue = General::RoundSigDigits(WaterFlowRateRatioCapped, 5);
-                    SimpleTower(SimpleTower(TowerNum).VSTower).WFRRBuffer3 = " ...Water flow rate ratio passed to the model = " + TrimValue;
-                    SimpleTower(SimpleTower(TowerNum).VSTower).WaterFlowRateRatioLast = WaterFlowRateRatio;
+                    SimpleTower(this->VSTower).WFRRBuffer3 = " ...Water flow rate ratio passed to the model = " + TrimValue;
+                    SimpleTower(this->VSTower).WaterFlowRateRatioLast = WaterFlowRateRatio;
                 } else {
-                    SimpleTower(SimpleTower(TowerNum).VSTower).PrintWFRRMessage = false;
+                    SimpleTower(this->VSTower).PrintWFRRMessage = false;
                 }
             } else {
-                SimpleTower(SimpleTower(TowerNum).VSTower).PrintWFRRMessage = false;
+                SimpleTower(this->VSTower).PrintWFRRMessage = false;
             }
         }
     }
@@ -6163,7 +6160,7 @@ namespace CondenserLoopTowers {
 
         int TowerIndex = int(Par(2));
         Real64 OutWaterTemp;  // outlet water temperature [C]
-        SimSimpleTower(TowerIndex, Par(3), Par(4), UA, OutWaterTemp);
+        this->SimSimpleTower(Par(3), Par(4), UA, OutWaterTemp);
         Real64 CoolingOutput = Par(5) * Par(3) * (SimpleTower(TowerIndex).WaterTemp - OutWaterTemp); // tower cooling output [W]
         return (Par(1) - CoolingOutput) / Par(1);
     }
@@ -6198,7 +6195,7 @@ namespace CondenserLoopTowers {
         Real64 Tapproach = 0.0; // tower approach temperature [C]
 
         // call model to determine approach temperature given other independent variables (range temp is being varied to find balance)
-        CalcVSTowerApproach(TowerIndex, WaterFlowRateRatio, _AirFlowRateRatio, InletAirWB, Trange, Tapproach);
+        this->CalcVSTowerApproach(WaterFlowRateRatio, _AirFlowRateRatio, InletAirWB, Trange, Tapproach);
         // calculate residual based on a balance where Twb + Ta + Tr = Node(WaterInletNode)%Temp
         return (InletAirWB + Tapproach + Trange) - DataLoopNode::Node(SimpleTower(TowerIndex).WaterInletNodeNum).Temp;
     }
@@ -6228,7 +6225,6 @@ namespace CondenserLoopTowers {
         // par(5) = desired approach [C]
         // par(6) = 0.0 to calculate water flow rate ratio, 1.0 for air
 
-        int TowerIndex = int(Par(1));
         Real64 _AirFlowRateRatio; // ratio of water flow rate to design water flow rate
         Real64 WaterFlowRateRatio; // ratio of water flow rate to design water flow rate
         if (Par(6) == 0.0) {
@@ -6244,11 +6240,11 @@ namespace CondenserLoopTowers {
         Real64 TapproachActual = 0.0; // actual tower approach temperature [C]
 
         // call model to determine tower approach temperature given other independent variables
-        CalcVSTowerApproach(TowerIndex, WaterFlowRateRatio, _AirFlowRateRatio, InletAirWB, Trange, TapproachActual);
+        this->CalcVSTowerApproach(WaterFlowRateRatio, _AirFlowRateRatio, InletAirWB, Trange, TapproachActual);
         return TapproachDesired - TapproachActual;
     }
 
-    void CalculateWaterUseage(int const TowerNum)
+    void Towerspecs::CalculateWaterUseage()
     {
 
         // SUBROUTINE INFORMATION:
@@ -6269,35 +6265,35 @@ namespace CondenserLoopTowers {
         static std::string const RoutineName("CalculateWaterUseage");
 
         Real64 EvapVdot(0.0);
-        Real64 AverageWaterTemp = (SimpleTower(TowerNum).InletWaterTemp + SimpleTower(TowerNum).OutletWaterTemp) / 2.0;
+        Real64 AverageWaterTemp = (this->InletWaterTemp + this->OutletWaterTemp) / 2.0;
 
         // Set water and air properties
-        if (SimpleTower(TowerNum).EvapLossMode == EvapLossByMoistTheory) {
+        if (this->EvapLossMode == EvapLossByMoistTheory) {
 
             Real64 const AirDensity =
-                Psychrometrics::PsyRhoAirFnPbTdbW(SimpleTower(TowerNum).AirPress, SimpleTower(TowerNum).AirTemp, SimpleTower(TowerNum).AirHumRat);
-            Real64 const AirMassFlowRate = SimpleTower(TowerNum).__AirFlowRateRatio * SimpleTower(TowerNum).HighSpeedAirFlowRate * AirDensity * SimpleTower(TowerNum).NumCellOn /
-                              SimpleTower(TowerNum).NumCell;
-            Real64 const InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(SimpleTower(TowerNum).AirWetBulb, 1.0, SimpleTower(TowerNum).AirPress);
+                Psychrometrics::PsyRhoAirFnPbTdbW(this->AirPress, this->AirTemp, this->AirHumRat);
+            Real64 const AirMassFlowRate = this->__AirFlowRateRatio * this->HighSpeedAirFlowRate * AirDensity * this->NumCellOn /
+                              this->NumCell;
+            Real64 const InletAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(this->AirWetBulb, 1.0, this->AirPress);
 
             if (AirMassFlowRate > 0.0) {
                 // Calculate outlet air conditions for determining water usage
 
-                Real64 const OutletAirEnthalpy = InletAirEnthalpy + SimpleTower(TowerNum).Qactual / AirMassFlowRate;
-                Real64 const OutletAirTSat = Psychrometrics::PsyTsatFnHPb(OutletAirEnthalpy, SimpleTower(TowerNum).AirPress);
+                Real64 const OutletAirEnthalpy = InletAirEnthalpy + this->Qactual / AirMassFlowRate;
+                Real64 const OutletAirTSat = Psychrometrics::PsyTsatFnHPb(OutletAirEnthalpy, this->AirPress);
                 Real64 const OutletAirHumRatSat = Psychrometrics::PsyWFnTdbH(OutletAirTSat, OutletAirEnthalpy);
 
                 // calculate specific humidity ratios (HUMRAT to mass of moist air not dry air)
-                Real64 const InSpecificHumRat = SimpleTower(TowerNum).AirHumRat / (1 + SimpleTower(TowerNum).AirHumRat);
+                Real64 const InSpecificHumRat = this->AirHumRat / (1 + this->AirHumRat);
                 Real64 const OutSpecificHumRat = OutletAirHumRatSat / (1 + OutletAirHumRatSat);
 
                 // calculate average air temp for density call
-                Real64 const TairAvg = (SimpleTower(TowerNum).AirTemp + OutletAirTSat) / 2.0;
+                Real64 const TairAvg = (this->AirTemp + OutletAirTSat) / 2.0;
 
                 // Amount of water evaporated, get density water at air temp or 4 C if too cold
-                Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleTower(TowerNum).LoopNum).FluidName,
+                Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
                                        max(TairAvg, 4.0),
-                                                        DataPlant::PlantLoop(SimpleTower(TowerNum).LoopNum).FluidIndex,
+                                                        DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                        RoutineName);
 
                 EvapVdot = (AirMassFlowRate * (OutSpecificHumRat - InSpecificHumRat)) / rho; // [m3/s]
@@ -6306,33 +6302,33 @@ namespace CondenserLoopTowers {
                 EvapVdot = 0.0;
             }
 
-        } else if (SimpleTower(TowerNum).EvapLossMode == EvapLossByUserFactor) {
-            Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(SimpleTower(TowerNum).LoopNum).FluidName,
+        } else if (this->EvapLossMode == EvapLossByUserFactor) {
+            Real64 const rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
                                    AverageWaterTemp,
-                                                    DataPlant::PlantLoop(SimpleTower(TowerNum).LoopNum).FluidIndex,
+                                                    DataPlant::PlantLoop(this->LoopNum).FluidIndex,
                                    RoutineName);
 
-            EvapVdot = SimpleTower(TowerNum).UserEvapLossFactor * (SimpleTower(TowerNum).InletWaterTemp - SimpleTower(TowerNum).OutletWaterTemp) * (SimpleTower(TowerNum).WaterMassFlowRate / rho);
+            EvapVdot = this->UserEvapLossFactor * (this->InletWaterTemp - this->OutletWaterTemp) * (this->WaterMassFlowRate / rho);
             if (EvapVdot < 0.0) EvapVdot = 0.0;
         } else {
             // should never come here
         }
 
         //   amount of water lost due to drift
-        Real64 DriftVdot = SimpleTower(TowerNum).DesignWaterFlowRate * SimpleTower(TowerNum).NumCellOn / SimpleTower(TowerNum).NumCell *
-                    SimpleTower(TowerNum).DriftLossFraction * SimpleTower(TowerNum).__AirFlowRateRatio;
+        Real64 DriftVdot = this->DesignWaterFlowRate * this->NumCellOn / this->NumCell *
+                    this->DriftLossFraction * this->__AirFlowRateRatio;
 
         Real64 BlowDownVdot(0.0);
-        if (SimpleTower(TowerNum).BlowdownMode == BlowdownBySchedule) {
+        if (this->BlowdownMode == BlowdownBySchedule) {
             // Amount of water lost due to blow down (purging contaminants from tower basin)
-            if (SimpleTower(TowerNum).SchedIDBlowdown > 0) {
-                BlowDownVdot = ScheduleManager::GetCurrentScheduleValue(SimpleTower(TowerNum).SchedIDBlowdown);
+            if (this->SchedIDBlowdown > 0) {
+                BlowDownVdot = ScheduleManager::GetCurrentScheduleValue(this->SchedIDBlowdown);
             } else {
                 BlowDownVdot = 0.0;
             }
-        } else if (SimpleTower(TowerNum).BlowdownMode == BlowdownByConcentration) {
-            if (SimpleTower(TowerNum).ConcentrationRatio > 2.0) { // protect divide by zero
-                BlowDownVdot = EvapVdot / (SimpleTower(TowerNum).ConcentrationRatio - 1) - DriftVdot;
+        } else if (this->BlowdownMode == BlowdownByConcentration) {
+            if (this->ConcentrationRatio > 2.0) { // protect divide by zero
+                BlowDownVdot = EvapVdot / (this->ConcentrationRatio - 1) - DriftVdot;
             } else {
                 BlowDownVdot = EvapVdot - DriftVdot;
             }
@@ -6342,10 +6338,10 @@ namespace CondenserLoopTowers {
         }
 
         // Added for fluid bypass
-        if (SimpleTower(TowerNum).CapacityControl == CapacityControl_FluidBypass) {
-            if (SimpleTower(TowerNum).EvapLossMode == EvapLossByUserFactor) EvapVdot *= (1 - SimpleTower(TowerNum).BypassFraction);
-            DriftVdot *= (1 - SimpleTower(TowerNum).BypassFraction);
-            BlowDownVdot *= (1 - SimpleTower(TowerNum).BypassFraction);
+        if (this->CapacityControl == CapacityControl_FluidBypass) {
+            if (this->EvapLossMode == EvapLossByUserFactor) EvapVdot *= (1 - this->BypassFraction);
+            DriftVdot *= (1 - this->BypassFraction);
+            BlowDownVdot *= (1 - this->BypassFraction);
         }
 
         Real64 const MakeUpVdot = EvapVdot + DriftVdot + BlowDownVdot;
@@ -6353,13 +6349,13 @@ namespace CondenserLoopTowers {
         // set demand request in Water Storage if needed
         Real64 StarvedVdot = 0.0;
         Real64 TankSupplyVdot = 0.0;
-        if (SimpleTower(TowerNum).SuppliedByWaterSystem) {
+        if (this->SuppliedByWaterSystem) {
 
             // set demand request
-            DataWater::WaterStorage(SimpleTower(TowerNum).WaterTankID).VdotRequestDemand(SimpleTower(TowerNum).WaterTankDemandARRID) = MakeUpVdot;
+            DataWater::WaterStorage(this->WaterTankID).VdotRequestDemand(this->WaterTankDemandARRID) = MakeUpVdot;
 
-            Real64 const AvailTankVdot = DataWater::WaterStorage(SimpleTower(TowerNum).WaterTankID)
-                                .VdotAvailDemand(SimpleTower(TowerNum).WaterTankDemandARRID); // check what tank can currently provide
+            Real64 const AvailTankVdot = DataWater::WaterStorage(this->WaterTankID)
+                                .VdotAvailDemand(this->WaterTankDemandARRID); // check what tank can currently provide
 
             TankSupplyVdot = MakeUpVdot;      // init
             if (AvailTankVdot < MakeUpVdot) { // calculate starved flow
@@ -6371,21 +6367,21 @@ namespace CondenserLoopTowers {
 
         //   total water usage
         // update report variables
-        SimpleTower(TowerNum).EvaporationVdot = EvapVdot;
-        SimpleTower(TowerNum).EvaporationVol = EvapVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-        SimpleTower(TowerNum).DriftVdot = DriftVdot;
-        SimpleTower(TowerNum).DriftVol = DriftVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-        SimpleTower(TowerNum).BlowdownVdot = BlowDownVdot;
-        SimpleTower(TowerNum).BlowdownVol = BlowDownVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-        SimpleTower(TowerNum).MakeUpVdot = MakeUpVdot;
-        SimpleTower(TowerNum).MakeUpVol = MakeUpVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-        SimpleTower(TowerNum).TankSupplyVdot = TankSupplyVdot;
-        SimpleTower(TowerNum).TankSupplyVol = TankSupplyVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
-        SimpleTower(TowerNum).StarvedMakeUpVdot = StarvedVdot;
-        SimpleTower(TowerNum).StarvedMakeUpVol = StarvedVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        this->EvaporationVdot = EvapVdot;
+        this->EvaporationVol = EvapVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        this->DriftVdot = DriftVdot;
+        this->DriftVol = DriftVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        this->BlowdownVdot = BlowDownVdot;
+        this->BlowdownVol = BlowDownVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        this->MakeUpVdot = MakeUpVdot;
+        this->MakeUpVol = MakeUpVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        this->TankSupplyVdot = TankSupplyVdot;
+        this->TankSupplyVol = TankSupplyVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
+        this->StarvedMakeUpVdot = StarvedVdot;
+        this->StarvedMakeUpVol = StarvedVdot * (DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour);
     }
 
-    void UpdateTowers(int const TowerNum)
+    void Towerspecs::UpdateTowers()
     {
 
         // SUBROUTINE INFORMATION:
@@ -6405,70 +6401,70 @@ namespace CondenserLoopTowers {
         std::string CharLowOutletTemp;
 
         // set node information
-        DataLoopNode::Node(SimpleTower(TowerNum).WaterOutletNodeNum).Temp = SimpleTower(TowerNum).OutletWaterTemp;
+        DataLoopNode::Node(this->WaterOutletNodeNum).Temp = this->OutletWaterTemp;
 
-        if (DataPlant::PlantLoop(SimpleTower(TowerNum).LoopNum).LoopSide(SimpleTower(TowerNum).LoopSideNum).FlowLock == 0 || DataGlobals::WarmupFlag) return;
+        if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0 || DataGlobals::WarmupFlag) return;
 
         // Check flow rate through tower and compare to design flow rate, show warning if greater than Design * Mulitplier
-        if (DataLoopNode::Node(SimpleTower(TowerNum).WaterOutletNodeNum).MassFlowRate > SimpleTower(TowerNum).DesWaterMassFlowRate * SimpleTower(TowerNum).TowerMassFlowRateMultiplier) {
-            ++SimpleTower(TowerNum).HighMassFlowErrorCount;
-            if (SimpleTower(TowerNum).HighMassFlowErrorCount < 2) {
-                ShowWarningError(SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name + "\"");
+        if (DataLoopNode::Node(this->WaterOutletNodeNum).MassFlowRate > this->DesWaterMassFlowRate * this->TowerMassFlowRateMultiplier) {
+            ++this->HighMassFlowErrorCount;
+            if (this->HighMassFlowErrorCount < 2) {
+                ShowWarningError(this->TowerType + " \"" + this->Name + "\"");
                 ShowContinueError(" Condenser Loop Mass Flow Rate is much greater than the towers design mass flow rate.");
-                ShowContinueError(" Condenser Loop Mass Flow Rate = " + General::TrimSigDigits(DataLoopNode::Node(SimpleTower(TowerNum).WaterOutletNodeNum).MassFlowRate, 6));
-                ShowContinueError(" Tower Design Mass Flow Rate   = " + General::TrimSigDigits(SimpleTower(TowerNum).DesWaterMassFlowRate, 6));
+                ShowContinueError(" Condenser Loop Mass Flow Rate = " + General::TrimSigDigits(DataLoopNode::Node(this->WaterOutletNodeNum).MassFlowRate, 6));
+                ShowContinueError(" Tower Design Mass Flow Rate   = " + General::TrimSigDigits(this->DesWaterMassFlowRate, 6));
                 ShowContinueErrorTimeStamp("");
             } else {
                 ShowRecurringWarningErrorAtEnd(
-                    SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
+                    this->TowerType + " \"" + this->Name +
                         "\"  Condenser Loop Mass Flow Rate is much greater than the towers design mass flow rate error continues...",
-                    SimpleTower(TowerNum).HighMassFlowErrorIndex,
-                    DataLoopNode::Node(SimpleTower(TowerNum).WaterOutletNodeNum).MassFlowRate,
-                    DataLoopNode::Node(SimpleTower(TowerNum).WaterOutletNodeNum).MassFlowRate);
+                    this->HighMassFlowErrorIndex,
+                    DataLoopNode::Node(this->WaterOutletNodeNum).MassFlowRate,
+                    DataLoopNode::Node(this->WaterOutletNodeNum).MassFlowRate);
             }
         }
 
         // Check if OutletWaterTemp is below the minimum condenser loop temp and warn user
-        Real64 const LoopMinTemp = DataPlant::PlantLoop(SimpleTower(TowerNum).LoopNum).MinTemp;
-        if (SimpleTower(TowerNum).OutletWaterTemp < LoopMinTemp && SimpleTower(TowerNum).WaterMassFlowRate > 0.0) {
-            ++SimpleTower(TowerNum).OutletWaterTempErrorCount;
+        Real64 const LoopMinTemp = DataPlant::PlantLoop(this->LoopNum).MinTemp;
+        if (this->OutletWaterTemp < LoopMinTemp && this->WaterMassFlowRate > 0.0) {
+            ++this->OutletWaterTempErrorCount;
             ObjexxFCL::gio::write(CharLowOutletTemp, LowTempFmt) << LoopMinTemp;
-            ObjexxFCL::gio::write(CharErrOut, LowTempFmt) << SimpleTower(TowerNum).OutletWaterTemp;
+            ObjexxFCL::gio::write(CharErrOut, LowTempFmt) << this->OutletWaterTemp;
             strip(CharErrOut);
-            if (SimpleTower(TowerNum).OutletWaterTempErrorCount < 2) {
-                ShowWarningError(SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name + "\"");
+            if (this->OutletWaterTempErrorCount < 2) {
+                ShowWarningError(this->TowerType + " \"" + this->Name + "\"");
                 ShowContinueError("Cooling tower water outlet temperature (" + CharErrOut +
                                   " C) is below the specified minimum condenser loop temp of " + stripped(CharLowOutletTemp) + " C");
                 ShowContinueErrorTimeStamp("");
             } else {
                 ShowRecurringWarningErrorAtEnd(
-                    SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
+                    this->TowerType + " \"" + this->Name +
                         "\" Cooling tower water outlet temperature is below the specified minimum condenser loop temp error continues...",
-                    SimpleTower(TowerNum).OutletWaterTempErrorIndex,
-                    SimpleTower(TowerNum).OutletWaterTemp,
-                    SimpleTower(TowerNum).OutletWaterTemp);
+                    this->OutletWaterTempErrorIndex,
+                    this->OutletWaterTemp,
+                    this->OutletWaterTemp);
             }
         }
 
         // Check if water mass flow rate is small (e.g. no flow) and warn user
-        if (SimpleTower(TowerNum).WaterMassFlowRate > 0.0 && SimpleTower(TowerNum).WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
-            ++SimpleTower(TowerNum).SmallWaterMassFlowErrorCount;
-            if (SimpleTower(TowerNum).SmallWaterMassFlowErrorCount < 2) {
-                ShowWarningError(SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name + "\"");
+        if (this->WaterMassFlowRate > 0.0 && this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
+            ++this->SmallWaterMassFlowErrorCount;
+            if (this->SmallWaterMassFlowErrorCount < 2) {
+                ShowWarningError(this->TowerType + " \"" + this->Name + "\"");
                 ShowContinueError("Cooling tower water mass flow rate near zero.");
                 ShowContinueErrorTimeStamp("");
-                ShowContinueError("Actual Mass flow = " + General::TrimSigDigits(SimpleTower(TowerNum).WaterMassFlowRate, 2));
+                ShowContinueError("Actual Mass flow = " + General::TrimSigDigits(this->WaterMassFlowRate, 2));
             } else {
-                ShowRecurringWarningErrorAtEnd(SimpleTower(TowerNum).TowerType + " \"" + SimpleTower(TowerNum).Name +
+                ShowRecurringWarningErrorAtEnd(this->TowerType + " \"" + this->Name +
                                                    "\"  Cooling tower water mass flow rate near zero error continues...",
-                                               SimpleTower(TowerNum).SmallWaterMassFlowErrorIndex,
-                                               SimpleTower(TowerNum).WaterMassFlowRate,
-                                               SimpleTower(TowerNum).WaterMassFlowRate);
+                                               this->SmallWaterMassFlowErrorIndex,
+                                               this->WaterMassFlowRate,
+                                               this->WaterMassFlowRate);
             }
         }
     }
 
-    void ReportTowers(bool const RunFlag, int const TowerNum)
+    void Towerspecs::ReportTowers(bool const RunFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6483,26 +6479,24 @@ namespace CondenserLoopTowers {
         Real64 const ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
         if (!RunFlag) {
-            SimpleTower(TowerNum).InletWaterTemp = DataLoopNode::Node(SimpleTower(TowerNum).WaterInletNodeNum).Temp;
-            SimpleTower(TowerNum).OutletWaterTemp = DataLoopNode::Node(SimpleTower(TowerNum).WaterInletNodeNum).Temp;
-            SimpleTower(TowerNum).WaterMassFlowRate = SimpleTower(TowerNum).WaterMassFlowRate;
-            SimpleTower(TowerNum).Qactual = 0.0;
-            SimpleTower(TowerNum).FanPower = 0.0;
-            SimpleTower(TowerNum).FanEnergy = 0.0;
-            SimpleTower(TowerNum).AirFlowRatio = 0.0;
-            SimpleTower(TowerNum).WaterAmountUsed = 0.0;
-            SimpleTower(TowerNum).BasinHeaterPower = SimpleTower(TowerNum).BasinHeaterPower;
-            SimpleTower(TowerNum).BasinHeaterConsumption = SimpleTower(TowerNum).BasinHeaterPower * ReportingConstant;
-            SimpleTower(TowerNum).FanCyclingRatio = 0.0;
-            SimpleTower(TowerNum).BypassFraction = 0.0; // added for fluid bypass
-            SimpleTower(TowerNum).NumCellOn = 0;
-            SimpleTower(TowerNum).SpeedSelected = 0;
+            this->InletWaterTemp = DataLoopNode::Node(this->WaterInletNodeNum).Temp;
+            this->OutletWaterTemp = DataLoopNode::Node(this->WaterInletNodeNum).Temp;
+            this->Qactual = 0.0;
+            this->FanPower = 0.0;
+            this->FanEnergy = 0.0;
+            this->AirFlowRatio = 0.0;
+            this->WaterAmountUsed = 0.0;
+            this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
+            this->FanCyclingRatio = 0.0;
+            this->BypassFraction = 0.0; // added for fluid bypass
+            this->NumCellOn = 0;
+            this->SpeedSelected = 0;
         } else {
-            SimpleTower(TowerNum).InletWaterTemp = DataLoopNode::Node(SimpleTower(TowerNum).WaterInletNodeNum).Temp;
-            SimpleTower(TowerNum).FanEnergy = SimpleTower(TowerNum).FanPower * ReportingConstant;
-            SimpleTower(TowerNum).AirFlowRatio = SimpleTower(TowerNum).__AirFlowRateRatio; // TODO: Remove __ version
-            SimpleTower(TowerNum).WaterAmountUsed = SimpleTower(TowerNum).WaterUsage * ReportingConstant;
-            SimpleTower(TowerNum).BasinHeaterConsumption = SimpleTower(TowerNum).BasinHeaterPower * ReportingConstant;
+            this->InletWaterTemp = DataLoopNode::Node(this->WaterInletNodeNum).Temp;
+            this->FanEnergy = this->FanPower * ReportingConstant;
+            this->AirFlowRatio = this->__AirFlowRateRatio; // TODO: Remove __ version
+            this->WaterAmountUsed = this->WaterUsage * ReportingConstant;
+            this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
         }
     }
 

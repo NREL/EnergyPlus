@@ -511,8 +511,8 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     CondenserLoopTowers::SimpleTower(1).InitTower();
     Real64 MyLoad = 0.0;
     CondenserLoopTowers::SimpleTower(1).CalcMerkelVariableSpeedTower(MyLoad);
-    CondenserLoopTowers::UpdateTowers(1);
-    CondenserLoopTowers::ReportTowers(true, 1);
+    CondenserLoopTowers::SimpleTower(1).UpdateTowers();
+    CondenserLoopTowers::SimpleTower(1).ReportTowers(true);
 
     // test that tower is really not cooling with no load so temp in and out is the same issue #4927
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(9).Temp, DataLoopNode::Node(10).Temp);
@@ -902,8 +902,8 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     CondenserLoopTowers::SimpleTower(1).SizeTower();
     CondenserLoopTowers::SimpleTower(1).InitTower();
     CondenserLoopTowers::SimpleTower(1).CalcSingleSpeedTower();
-    CondenserLoopTowers::UpdateTowers(1);
-    CondenserLoopTowers::ReportTowers(true, 1);
+    CondenserLoopTowers::SimpleTower(1).UpdateTowers();
+    CondenserLoopTowers::SimpleTower(1).ReportTowers(true);
 
     // test that tower outlet temperature = set point temperature
     int inletNodeIndex = 0;
