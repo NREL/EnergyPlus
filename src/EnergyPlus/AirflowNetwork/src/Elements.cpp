@@ -52,6 +52,7 @@
 #include "DataHVACGlobals.hh"
 #include "DataLoopNode.hh"
 #include "DataSurfaces.hh"
+#include "InputProcessing/InputProcessor.hh"
 
 namespace EnergyPlus {
 
@@ -186,7 +187,7 @@ namespace AirflowNetwork {
     Real64 ReliefMassFlowRate(0.0);     // OA Mixer relief node flow rate used in PressureStat
 
     // Object Data
-    Array1D<AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
+    EPVector<AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
     Array1D<AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
     Array1D<AirflowNetworkExchangeProp> AirflowNetworkExchangeData;
     Array1D<AirflowNetworkExchangeProp> AirflowNetworkMultiExchangeData;

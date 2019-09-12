@@ -50,9 +50,9 @@
 
 // C++ Headers
 #include <map>
+#include <set>
 #include <string>
 #include <unordered_map>
-#include <set>
 #include <vector>
 
 // ObjexxFCL Headers
@@ -74,6 +74,29 @@ namespace EnergyPlus {
 
 void cleanEPJSON(nlohmann::json &epjson);
 
+template <typename T> struct EPVector : std::vector<T>
+{
+    using std::vector<T>::vector;
+
+    T operator()(std::size_t n) const
+    {
+        return this->at(n - 1);
+    }
+
+    void allocate(int size)
+    {
+        this->reserve(size);
+    }
+
+    // EPVector<T> & deallocate()
+    void deallocate()
+    {
+        return;
+        // EPVector<T>().swap(this);
+        // return *this;
+    }
+};
+
 class InputProcessor
 {
 public:
@@ -88,16 +111,6 @@ public:
 
     static std::unique_ptr<InputProcessor> factory();
 
-    template <typename T> struct EPVector : std::vector<T>
-    {
-        using std::vector<T>::vector;
-
-        T operator()(std::size_t n) const
-        {
-            return this->at(n - 1);
-        }
-    };
-    
     template <typename T> T *objectFactory(std::string const &objectName)
     {
         T *p = data->objectFactory<T>(objectName);
@@ -189,7 +202,7 @@ public:
 
     void reportOrphanRecordObjects();
 
-    const json& getObjectInstances(std::string const &ObjType);
+    const json &getObjectInstances(std::string const &ObjType);
 
 private:
     struct ObjectInfo
@@ -204,10 +217,10 @@ private:
         {
         }
 
-        bool operator<(const ObjectInfo& rhs) const
+        bool operator<(const ObjectInfo &rhs) const
         {
             int cmp = this->objectType.compare(rhs.objectType);
-            if(cmp == 0) {
+            if (cmp == 0) {
                 return this->objectName < rhs.objectName;
             }
             return cmp < 0;
@@ -273,9 +286,11 @@ private:
     std::unique_ptr<Validation> validation;
     std::unique_ptr<DataStorage> data;
     json schema;
-    public:
+
+public:
     json epJSON;
-    private:
+
+private:
     UnorderedObjectTypeMap caseInsensitiveObjectMap;
     UnorderedObjectCacheMap objectCacheMap;
     UnusedObjectSet unusedInputs;

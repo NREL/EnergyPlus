@@ -50,6 +50,7 @@
 
 #include "AirflowNetwork/Solver.hpp"
 #include "AirflowNetwork/Properties.hpp"
+#include "InputProcessing/InputProcessor.hh"
 
 namespace EnergyPlus {
 
@@ -1292,7 +1293,7 @@ namespace AirflowNetwork {
     };
 
     // Object Data
-    extern Array1D<AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
+    extern EPVector<AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
     extern Array1D<AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
     extern Array1D<AirflowNetworkExchangeProp> AirflowNetworkExchangeData;
     extern Array1D<AirflowNetworkExchangeProp> AirflowNetworkMultiExchangeData;
