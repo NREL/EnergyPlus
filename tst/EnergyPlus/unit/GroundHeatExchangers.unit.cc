@@ -287,11 +287,119 @@ TEST_F(GHEFixture, calcConvectionResistance)
     Pipe pipe(j);
 
     Real64 temp = 20;
-    Real64 tol = 0.00001;
+    Real64 tol = 1E-5;
     EXPECT_NEAR(pipe.calcConvectionResistance(0, temp), 0.13265, tol);
     EXPECT_NEAR(pipe.calcConvectionResistance(0.07, temp), 0.02645, tol);
     EXPECT_NEAR(pipe.calcConvectionResistance(2, temp), 0.00094, tol);
 }
+
+TEST_F(GHEFixture, laminarNusselt)
+{
+    DataPlant::PlantLoop.allocate(2);
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(1).FluidIndex = 1;
+    DataPlant::PlantLoop(1).FluidName = "WATER";
+
+    json j = {{"conductivity", 0.4},
+              {"density", 950},
+              {"specific-heat", 1900},
+              {"outer-diameter", 0.0334},
+              {"inner-diameter", 0.0269},
+              {"length", 100},
+              {"initial-temperature", 10},
+              {"loop-num", 1}};
+
+    Pipe pipe(j);
+
+    Real64 tol = 1E-2;
+    EXPECT_NEAR(pipe.laminarNusselt(), 4.01, tol);
+}
+
+TEST_F(GHEFixture, turbulentNusselt)
+{
+    DataPlant::PlantLoop.allocate(2);
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(1).FluidIndex = 1;
+    DataPlant::PlantLoop(1).FluidName = "WATER";
+
+    json j = {{"conductivity", 0.4},
+              {"density", 950},
+              {"specific-heat", 1900},
+              {"outer-diameter", 0.0334},
+              {"inner-diameter", 0.0269},
+              {"length", 100},
+              {"initial-temperature", 10},
+              {"loop-num", 1}};
+
+    Pipe pipe(j);
+
+    Real64 temp = 20;
+    Real64 tol = 1E-2;
+    EXPECT_NEAR(pipe.turbulentNusselt(3000, temp), 18.39, tol);
+    EXPECT_NEAR(pipe.turbulentNusselt(10000, temp), 79.48, tol);
+}
+
+TEST_F(GHEFixture, calcResistance)
+{
+    DataPlant::PlantLoop.allocate(2);
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(1).FluidIndex = 1;
+    DataPlant::PlantLoop(1).FluidName = "WATER";
+
+    json j = {{"conductivity", 0.4},
+              {"density", 950},
+              {"specific-heat", 1900},
+              {"outer-diameter", 0.0334},
+              {"inner-diameter", 0.0269},
+              {"length", 100},
+              {"initial-temperature", 10},
+              {"loop-num", 1}};
+
+    Pipe pipe(j);
+
+    Real64 temp = 20;
+    Real64 tol = 1E-5;
+
+    EXPECT_NEAR(pipe.calcResistance(0, temp), 0.218766, tol);
+    EXPECT_NEAR(pipe.calcResistance(0.07, temp), 0.11256, tol);
+    EXPECT_NEAR(pipe.calcResistance(2, temp), 0.08704, tol);
+}
+
+TEST_F(GHEFixture, logInletTemps)
+{
+    DataPlant::PlantLoop.allocate(2);
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(1).FluidIndex = 1;
+    DataPlant::PlantLoop(1).FluidName = "WATER";
+
+    json j = {{"conductivity", 0.4},
+              {"density", 950},
+              {"specific-heat", 1900},
+              {"outer-diameter", 0.0334},
+              {"inner-diameter", 0.0269},
+              {"length", 100},
+              {"initial-temperature", 10},
+              {"loop-num", 1}};
+
+    Pipe pipe(j);
+
+    EXPECT_EQ(pipe.inletTemps.size(), 1u);
+    EXPECT_EQ(pipe.inletTempTimes.size(), 1u);
+
+    pipe.logInletTemps(25, 100);
+
+    EXPECT_EQ(pipe.inletTemps.size(), 2u);
+    EXPECT_EQ(pipe.inletTempTimes.size(), 2u);
+
+    Real64 tol = 1E-8;
+    EXPECT_NEAR(pipe.inletTemps[0], 10, tol);
+    EXPECT_NEAR(pipe.inletTempTimes[0], 0.0, tol);
+
+    EXPECT_NEAR(pipe.inletTemps[1], 25, tol);
+    EXPECT_NEAR(pipe.inletTempTimes[1], 100, tol);
+}
+
+
 
 // TEST_F(GHEFixture, GroundHeatExchangerTest_Interpolate)
 //{
@@ -407,7 +515,7 @@ TEST_F(GHEFixture, calcConvectionResistance)
 //    PlantLoop(thisGLHE.loopNum).FluidIndex = 1;
 //
 //    thisGLHE.inletTemp = 5.0;
-//    thisGLHE.massFlowRate = 0.01;
+//    thisGLHE.massFlowRate = 1E-2;
 //    thisGLHE.numTrenches = 1;
 //    thisGLHE.pipe.outDia = 0.02667;
 //    thisGLHE.pipe.thickness = 0.004;
@@ -1416,42 +1524,42 @@ TEST_F(GHEFixture, calcConvectionResistance)
 //
 //    thisGLHE.calcGFunctions();
 //
-//    Real64 const tolerance = 0.1;
+//    Real64 const tol = 0.1;
 //
 //    // Test g-function values from GLHEPro
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-11.939864), 0.37, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-11.802269), 0.48, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-11.664675), 0.59, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-11.52708), 0.69, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-11.389486), 0.79, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-11.251891), 0.89, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-11.114296), 0.99, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-10.976702), 1.09, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-10.839107), 1.18, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-10.701513), 1.27, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-10.563918), 1.36, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-10.426324), 1.44, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-10.288729), 1.53, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-10.151135), 1.61, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-10.01354), 1.69, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-9.875946), 1.77, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-9.738351), 1.85, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-9.600756), 1.93, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-9.463162), 2.00, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-9.325567), 2.08, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-9.187973), 2.15, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-9.050378), 2.23, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-8.912784), 2.30, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-8.775189), 2.37, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-8.637595), 2.45, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-8.5), 2.53, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-7.8), 2.87, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-7.2), 3.17, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-6.5), 3.52, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-5.9), 3.85, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-5.2), 4.37, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-4.5), 5.11, tolerance);
-//    EXPECT_NEAR(thisGLHE.interpGFunc(-3.963), 5.82, tolerance);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-11.939864), 0.37, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-11.802269), 0.48, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-11.664675), 0.59, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-11.52708), 0.69, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-11.389486), 0.79, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-11.251891), 0.89, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-11.114296), 0.99, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-10.976702), 1.09, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-10.839107), 1.18, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-10.701513), 1.27, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-10.563918), 1.36, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-10.426324), 1.44, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-10.288729), 1.53, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-10.151135), 1.61, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-11E-2354), 1.69, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-9.875946), 1.77, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-9.738351), 1.85, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-9.600756), 1.93, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-9.463162), 2.00, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-9.325567), 2.08, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-9.187973), 2.15, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-9.050378), 2.23, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-8.912784), 2.30, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-8.775189), 2.37, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-8.637595), 2.45, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-8.5), 2.53, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-7.8), 2.87, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-7.2), 3.17, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-6.5), 3.52, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-5.9), 3.85, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-5.2), 4.37, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-4.5), 5.11, tol);
+//    EXPECT_NEAR(thisGLHE.interpGFunc(-3.963), 5.82, tol);
 //}
 //
 // TEST_F(GHEFixture, GroundHeatExchangerTest_System_calc_pipe_conduction_resistance)
@@ -1508,9 +1616,9 @@ TEST_F(GHEFixture, calcConvectionResistance)
 //
 //    auto &thisGLHE(verticalGLHE[0]);
 //
-//    Real64 const tolerance = 0.00001;
+//    Real64 const tol = 1E-5;
 //
-//    EXPECT_NEAR(thisGLHE.calcPipeConductionResistance(), 0.082204, tolerance);
+//    EXPECT_NEAR(thisGLHE.calcPipeConductionResistance(), 0.082204, tol);
 //}
 //
 // TEST_F(GHEFixture, GroundHeatExchangerTest_System_friction_factor)
@@ -1571,37 +1679,37 @@ TEST_F(GHEFixture, calcConvectionResistance)
 //
 //    Real64 reynoldsNum = 0;
 //
-//    Real64 const tolerance = 0.000001;
+//    Real64 const tol = 0.000001;
 //
 //    // laminar tests
 //    reynoldsNum = 100;
-//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), 64.0 / reynoldsNum, tolerance);
+//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), 64.0 / reynoldsNum, tol);
 //
 //    reynoldsNum = 1000;
-//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), 64.0 / reynoldsNum, tolerance);
+//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), 64.0 / reynoldsNum, tol);
 //
 //    reynoldsNum = 1400;
-//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), 64.0 / reynoldsNum, tolerance);
+//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), 64.0 / reynoldsNum, tol);
 //
 //    // transitional tests
 //    reynoldsNum = 2000;
-//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), 0.034003503, tolerance);
+//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), 0.034003503, tol);
 //
 //    reynoldsNum = 3000;
-//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), 0.033446219, tolerance);
+//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), 0.033446219, tol);
 //
 //    reynoldsNum = 4000;
-//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), 0.03895358, tolerance);
+//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), 0.03895358, tol);
 //
 //    // turbulent tests
 //    reynoldsNum = 5000;
-//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), pow(0.79 * log(reynoldsNum) - 1.64, -2.0), tolerance);
+//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), pow(0.79 * log(reynoldsNum) - 1.64, -2.0), tol);
 //
 //    reynoldsNum = 15000;
-//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), pow(0.79 * log(reynoldsNum) - 1.64, -2.0), tolerance);
+//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), pow(0.79 * log(reynoldsNum) - 1.64, -2.0), tol);
 //
 //    reynoldsNum = 25000;
-//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), pow(0.79 * log(reynoldsNum) - 1.64, -2.0), tolerance);
+//    EXPECT_NEAR(thisGLHE.frictionFactor(reynoldsNum), pow(0.79 * log(reynoldsNum) - 1.64, -2.0), tol);
 //}
 //
 // TEST_F(GHEFixture, GroundHeatExchangerTest_System_calc_pipe_convection_resistance)
@@ -1894,18 +2002,18 @@ TEST_F(GHEFixture, calcConvectionResistance)
 //    Real64 rho = 999.380058; // Density at 13 C using CoolProp
 //    thisGLHE.massFlowRate = thisGLHE.designFlow * rho;
 //
-//    Real64 const tolerance = 0.00001;
+//    Real64 const tol = 1E-5;
 //
 //    // Turbulent
-//    EXPECT_NEAR(thisGLHE.calcPipeConvectionResistance(), 0.004453, tolerance);
+//    EXPECT_NEAR(thisGLHE.calcPipeConvectionResistance(), 0.004453, tol);
 //
 //    // Transitional
 //    thisGLHE.massFlowRate = thisGLHE.designFlow * rho / 4;
-//    EXPECT_NEAR(thisGLHE.calcPipeConvectionResistance(), 0.019185, tolerance);
+//    EXPECT_NEAR(thisGLHE.calcPipeConvectionResistance(), 1E-29185, tol);
 //
 //    // Laminar
 //    thisGLHE.massFlowRate = thisGLHE.designFlow * rho / 10;
-//    EXPECT_NEAR(thisGLHE.calcPipeConvectionResistance(), 0.135556, tolerance);
+//    EXPECT_NEAR(thisGLHE.calcPipeConvectionResistance(), 0.135556, tol);
 //}
 //
 // TEST_F(GHEFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
@@ -2198,9 +2306,9 @@ TEST_F(GHEFixture, calcConvectionResistance)
 //    Real64 rho = 999.380058; // Density at 13 C using CoolProp
 //    thisGLHE.massFlowRate = thisGLHE.designFlow * rho;
 //
-//    Real64 const tolerance = 0.00001;
+//    Real64 const tol = 1E-5;
 //
-//    EXPECT_NEAR(thisGLHE.calcPipeResistance(), 0.082204 + 0.004453, tolerance);
+//    EXPECT_NEAR(thisGLHE.calcPipeResistance(), 0.082204 + 0.004453, tol);
 //}
 //
 // TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1)
@@ -2491,14 +2599,14 @@ TEST_F(GHEFixture, calcConvectionResistance)
 //    Node(thisGLHE.inletNodeNum).Temp = 20.0;
 //    thisGLHE.massFlowRate = 1;
 //
-//    Real64 const tolerance = 0.00001;
+//    Real64 const tol = 1E-5;
 //
 //    // Flow rate and pipe thickness picked to fix pipe resistance at 0.05
-//    EXPECT_NEAR(thisGLHE.theta_1, 0.33333, tolerance);
-//    EXPECT_NEAR(thisGLHE.theta_2, 3.0, tolerance);
-//    EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tolerance);
-//    EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tolerance);
-//    EXPECT_NEAR(thisGLHE.calcBHGroutResistance(), 0.17701, tolerance);
+//    EXPECT_NEAR(thisGLHE.theta_1, 0.33333, tol);
+//    EXPECT_NEAR(thisGLHE.theta_2, 3.0, tol);
+//    EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tol);
+//    EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tol);
+//    EXPECT_NEAR(thisGLHE.calcBHGroutResistance(), 0.17701, tol);
 //}
 //
 // TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2)
@@ -2789,14 +2897,14 @@ TEST_F(GHEFixture, calcConvectionResistance)
 //    Node(thisGLHE.inletNodeNum).Temp = 20.0;
 //    thisGLHE.massFlowRate = 1;
 //
-//    Real64 const tolerance = 0.00001;
+//    Real64 const tol = 1E-5;
 //
 //    // Flow rate and pipe thickness picked to fix pipe resistance at 0.05
-//    EXPECT_NEAR(thisGLHE.theta_1, 0.44444, tolerance);
-//    EXPECT_NEAR(thisGLHE.theta_2, 3.0, tolerance);
-//    EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tolerance);
-//    EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tolerance);
-//    EXPECT_NEAR(thisGLHE.calcBHGroutResistance(), 0.14724, tolerance);
+//    EXPECT_NEAR(thisGLHE.theta_1, 0.44444, tol);
+//    EXPECT_NEAR(thisGLHE.theta_2, 3.0, tol);
+//    EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tol);
+//    EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tol);
+//    EXPECT_NEAR(thisGLHE.calcBHGroutResistance(), 0.14724, tol);
 //}
 //
 // TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3)
@@ -3087,14 +3195,14 @@ TEST_F(GHEFixture, calcConvectionResistance)
 //    Node(thisGLHE.inletNodeNum).Temp = 20.0;
 //    thisGLHE.massFlowRate = 1;
 //
-//    Real64 const tolerance = 0.00001;
+//    Real64 const tol = 1E-5;
 //
 //    // Flow rate and pipe thickness picked to fix pipe resistance at 0.05
-//    EXPECT_NEAR(thisGLHE.theta_1, 0.37037, tolerance);
-//    EXPECT_NEAR(thisGLHE.theta_2, 9.0, tolerance);
-//    EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tolerance);
-//    EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tolerance);
-//    EXPECT_NEAR(thisGLHE.calcBHGroutResistance(), 0.11038, tolerance);
+//    EXPECT_NEAR(thisGLHE.theta_1, 0.37037, tol);
+//    EXPECT_NEAR(thisGLHE.theta_2, 9.0, tol);
+//    EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tol);
+//    EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tol);
+//    EXPECT_NEAR(thisGLHE.calcBHGroutResistance(), 0.11038, tol);
 //}
 //
 // TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_1)
@@ -3385,14 +3493,14 @@ TEST_F(GHEFixture, calcConvectionResistance)
 //    Node(thisGLHE.inletNodeNum).Temp = 20.0;
 //    thisGLHE.massFlowRate = 1;
 //
-//    Real64 const tolerance = 0.00001;
+//    Real64 const tol = 1E-5;
 //
 //    // Flow rate and pipe thickness picked to fix pipe resistance at 0.05
-//    EXPECT_NEAR(thisGLHE.theta_1, 0.33333, tolerance);
-//    EXPECT_NEAR(thisGLHE.theta_2, 3.0, tolerance);
-//    EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tolerance);
-//    EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tolerance);
-//    EXPECT_NEAR(thisGLHE.calcBHTotalInternalResistance(), 0.32365, tolerance);
+//    EXPECT_NEAR(thisGLHE.theta_1, 0.33333, tol);
+//    EXPECT_NEAR(thisGLHE.theta_2, 3.0, tol);
+//    EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tol);
+//    EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tol);
+//    EXPECT_NEAR(thisGLHE.calcBHTotalInternalResistance(), 0.32365, tol);
 //}
 //
 // TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_2)
@@ -3683,14 +3791,14 @@ TEST_F(GHEFixture, calcConvectionResistance)
 //    Node(thisGLHE.inletNodeNum).Temp = 20.0;
 //    thisGLHE.massFlowRate = 1;
 //
-//    Real64 const tolerance = 0.00001;
+//    Real64 const tol = 1E-5;
 //
 //    // Flow rate and pipe thickness picked to fix pipe resistance at 0.05
-//    EXPECT_NEAR(thisGLHE.theta_1, 0.166667, tolerance);
-//    EXPECT_NEAR(thisGLHE.theta_2, 6.0, tolerance);
-//    EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tolerance);
-//    EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tolerance);
-//    EXPECT_NEAR(thisGLHE.calcBHTotalInternalResistance(), 0.16310, tolerance);
+//    EXPECT_NEAR(thisGLHE.theta_1, 0.166667, tol);
+//    EXPECT_NEAR(thisGLHE.theta_2, 6.0, tol);
+//    EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tol);
+//    EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tol);
+//    EXPECT_NEAR(thisGLHE.calcBHTotalInternalResistance(), 0.16310, tol);
 //}
 //
 // TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_3)
@@ -3981,12 +4089,12 @@ TEST_F(GHEFixture, calcConvectionResistance)
 //    Node(thisGLHE.inletNodeNum).Temp = 20.0;
 //    thisGLHE.massFlowRate = 1;
 //
-//    Real64 const tolerance = 0.00001;
+//    Real64 const tol = 1E-5;
 //
 //    // Flow rate and pipe thickness picked to fix pipe resistance at 0.05
-//    EXPECT_NEAR(thisGLHE.theta_1, 0.37037, tolerance);
-//    EXPECT_NEAR(thisGLHE.theta_2, 9.0, tolerance);
-//    EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tolerance);
-//    EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tolerance);
-//    EXPECT_NEAR(thisGLHE.calcBHTotalInternalResistance(), 0.31582, tolerance);
+//    EXPECT_NEAR(thisGLHE.theta_1, 0.37037, tol);
+//    EXPECT_NEAR(thisGLHE.theta_2, 9.0, tol);
+//    EXPECT_NEAR(thisGLHE.theta_3, 1 / (2 * thisGLHE.theta_1 * thisGLHE.theta_2), tol);
+//    EXPECT_NEAR(thisGLHE.sigma, (thisGLHE.grout.k - thisGLHE.soil.k) / (thisGLHE.grout.k + thisGLHE.soil.k), tol);
+//    EXPECT_NEAR(thisGLHE.calcBHTotalInternalResistance(), 0.31582, tol);
 //}

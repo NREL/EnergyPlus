@@ -228,9 +228,11 @@ namespace GroundHeatExchangers {
 //        }
 //    }
 
-//    void Pipe::logInletTemps(Real64 inletTemp, Real64 time)
-//    {
-//    }
+    void Pipe::logInletTemps(Real64 inletTemp, Real64 time)
+    {
+        this->inletTemps.push_back(inletTemp);
+        this->inletTempTimes.push_back(time);
+    }
 
     Real64 Pipe::mdotToRe(Real64 flowRate, Real64 temperature)
     {
@@ -289,7 +291,7 @@ namespace GroundHeatExchangers {
         // Prandtl
         Real64 Pr = Cp * mu / k;
 
-        return (f / 8) * (Re - 1000) * Pr / (1 + 12.7 * std::pow(f / 8, 0.5) * (std::pow(Pr, 2 / 3) - 1));
+        return (f / 8) * (Re - 1000) * Pr / (1 + 12.7 * std::pow(f / 8, 0.5) * (std::pow(Pr, 2.0 / 3.0) - 1));
     }
 
     Real64 Pipe::calcConvectionResistance(Real64 flowRate, Real64 temperature)
@@ -341,7 +343,7 @@ namespace GroundHeatExchangers {
         // @param temperature: temperature, C
 
         this->resistPipe = this->calcConvectionResistance(flowRate, temperature) + this->calcConductionResistance();
-        return 0;
+        return this->resistPipe;
     }
 
     //
