@@ -384,14 +384,6 @@ namespace CondenserLoopTowers {
 
         void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-        void SimSimpleTower(Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
-
-        void SimVariableTower(Real64 WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
-                              Real64 _AirFlowRateRatio,   // current air flow rate ratio
-                              Real64 Twb,                // current inlet air wet-bulb temperature (C, capped if applicable)
-                              Real64 &_OutletWaterTemp   // calculated tower outlet water temperature (C)
-        );
-
         void InitTower();
 
         void setupOutputVariables();
@@ -407,6 +399,13 @@ namespace CondenserLoopTowers {
         void CalcMerkelVariableSpeedTower(Real64 &MyLoad);
 
         void CalcVariableSpeedTower();
+
+        Real64 calculateSimpleTowerOutletTemp(Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign);
+
+        Real64 calculateVariableTowerOutletTemp(Real64 WaterFlowRateRatio, // current water flow rate ratio (capped if applicable)
+                              Real64 _AirFlowRateRatio,   // current air flow rate ratio
+                              Real64 Twb                // current inlet air wet-bulb temperature (C, capped if applicable)
+        );
 
         void CalculateWaterUseage();
 
