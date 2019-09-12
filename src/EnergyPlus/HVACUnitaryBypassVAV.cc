@@ -1817,12 +1817,20 @@ namespace HVACUnitaryBypassVAV {
                 DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate = CompOnMassFlow;
                 DataLoopNode::Node(CBVAV(CBVAVNum).MixerOutsideAirNode).MassFlowRate = OACompOnMassFlow;
                 DataLoopNode::Node(CBVAV(CBVAVNum).MixerReliefAirNode).MassFlowRate = OACompOnMassFlow;
+                BypassDuctFlowFraction = 0.0;
                 PartLoadFrac = 0.0;
             } else {
                 if (CBVAV(CBVAVNum).HeatCoolMode != 0) {
                     PartLoadFrac = 1.0;
                 } else {
                     PartLoadFrac = 0.0;
+                }
+                if (CBVAV(CBVAVNum).OpMode == DataHVACGlobals::CycFanCycCoil) {
+                    BypassDuctFlowFraction = 0.0;
+                } else {
+                    if (CBVAV(CBVAVNum).PlenumMixerInletAirNode == 0) {
+                        BypassDuctFlowFraction = max(0.0, 1.0 - (DataLoopNode::Node(CBVAV(CBVAVNum).AirInNode).MassFlowRate / CompOnMassFlow));
+                    }
                 }
             }
         } else {
