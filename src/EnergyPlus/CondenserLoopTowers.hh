@@ -328,6 +328,9 @@ namespace CondenserLoopTowers {
         Real64 WaterFlowRateRatioLast; // value of WFRR when warning occurred (passed to Recurring Warn)
         Real64 LGLast;                 // value of LG when warning occurred (passed to Recurring Warn)
 
+        // Hopefully temporary members
+        int thisTowerNum; // regula falsi residual functions are static and so they need to get an index passed from a member function
+
         // Default Constructor
         Towerspecs()
             : TowerType_Num(0), PerformanceInputMethod_Num(0), Available(true), ON(true), DesignWaterFlowRate(0.0),
@@ -367,9 +370,25 @@ namespace CondenserLoopTowers {
               MaxApproachTemp(0.0), MinWaterFlowRatio(0.0), MaxWaterFlowRatio(0.0), MaxLiquidToGasRatio(0.0), VSErrorCountFlowFrac(0),
               VSErrorCountWFRR(0), VSErrorCountIAWB(0), VSErrorCountTR(0), VSErrorCountTA(0), ErrIndexFlowFrac(0), ErrIndexWFRR(0), ErrIndexIAWB(0),
               ErrIndexTR(0), ErrIndexTA(0), ErrIndexLG(0), PrintTrMessage(false), PrintTwbMessage(false), PrintTaMessage(false),
-              PrintWFRRMessage(false), PrintLGMessage(false), TrLast(0.0), TwbLast(0.0), TaLast(0.0), WaterFlowRateRatioLast(0.0), LGLast(0.0)
+              PrintWFRRMessage(false), PrintLGMessage(false), TrLast(0.0), TwbLast(0.0), TaLast(0.0), WaterFlowRateRatioLast(0.0), LGLast(0.0),
+              thisTowerNum(0)
         {
         }
+
+        void InitTower();
+
+        void SizeTower();
+
+        void SizeVSMerkelTower();
+
+        void CalcSingleSpeedTower();
+
+        void CalcTwoSpeedTower();
+
+        void CalcMerkelVariableSpeedTower(Real64 &MyLoad);
+
+        void CalcVariableSpeedTower();
+
     };
 
     // Object Data
@@ -393,25 +412,9 @@ namespace CondenserLoopTowers {
 
     void GetTowerInput();
 
-    void InitTower(int TowerNum, // Number of the current cooling tower being simulated
-                   bool RunFlag  // Indication of
-    );
-
-    void SizeTower(int TowerNum);
-
-    void SizeVSMerkelTower(int TowerNum);
-
-    void CalcSingleSpeedTower(int &TowerNum);
-
-    void CalcTwoSpeedTower(int &TowerNum);
-
-    void CalcMerkelVariableSpeedTower(int TowerNum, Real64 &MyLoad);
-
     Real64 VSMerkelResidual(Real64 _AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
                             Array1<Real64> const &Par      // par(1) = Tower number
     );
-
-    void CalcVariableSpeedTower(int TowerNum);
 
     void SimSimpleTower(int TowerNum, Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
 

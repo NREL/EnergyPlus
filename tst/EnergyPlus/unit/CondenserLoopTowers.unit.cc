@@ -506,11 +506,11 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     SimulationManager::SetupSimulation(ErrorsFound);
     CondenserLoopTowers::GetTowerInput();
 
-    CondenserLoopTowers::InitTower(1, false);
-    CondenserLoopTowers::SizeVSMerkelTower(1);
-    CondenserLoopTowers::InitTower(1, true);
+    CondenserLoopTowers::SimpleTower(1).InitTower();
+    CondenserLoopTowers::SimpleTower(1).SizeVSMerkelTower();
+    CondenserLoopTowers::SimpleTower(1).InitTower();
     Real64 MyLoad = 0.0;
-    CondenserLoopTowers::CalcMerkelVariableSpeedTower(1, MyLoad);
+    CondenserLoopTowers::SimpleTower(1).CalcMerkelVariableSpeedTower(MyLoad);
     CondenserLoopTowers::UpdateTowers(1);
     CondenserLoopTowers::ReportTowers(true, 1);
 
@@ -898,11 +898,10 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     SimulationManager::SetupSimulation(ErrorsFound);
     CondenserLoopTowers::GetTowerInput();
 
-    CondenserLoopTowers::InitTower(1, false);
-    CondenserLoopTowers::SizeTower(1);
-    CondenserLoopTowers::InitTower(1, true);
-    int towerNum = 1;
-    CondenserLoopTowers::CalcSingleSpeedTower(towerNum);
+    CondenserLoopTowers::SimpleTower(1).InitTower();
+    CondenserLoopTowers::SimpleTower(1).SizeTower();
+    CondenserLoopTowers::SimpleTower(1).InitTower();
+    CondenserLoopTowers::SimpleTower(1).CalcSingleSpeedTower();
     CondenserLoopTowers::UpdateTowers(1);
     CondenserLoopTowers::ReportTowers(true, 1);
 
@@ -1331,7 +1330,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     CondenserLoopTowers::GetTowerInput();
 
     // sized using user inputs in cooling tower instead of plant sizing object
-    CondenserLoopTowers::SizeTower(1);
+    CondenserLoopTowers::SimpleTower(1).SizeTower();
 
     // input not needed for sizing
     EXPECT_FALSE(CondenserLoopTowers::SimpleTower(1).HighSpeedTowerUAWasAutoSized);
@@ -1746,7 +1745,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     CondenserLoopTowers::GetTowerInput();
 
     // sized using user inputs in cooling tower instead of plant sizing object
-    CondenserLoopTowers::SizeTower(1);
+    CondenserLoopTowers::SimpleTower(1).SizeTower();
 
     // input not needed for sizing (NOT WasAutoSized)
     EXPECT_FALSE(CondenserLoopTowers::SimpleTower(1).HighSpeedTowerUAWasAutoSized);
@@ -2230,7 +2229,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
     CondenserLoopTowers::GetTowerInput();
 
     // sized using user inputs in cooling tower instead of plant sizing object
-    CondenserLoopTowers::SizeVSMerkelTower(1);
+    CondenserLoopTowers::SimpleTower(1).SizeVSMerkelTower();
 
     // input not needed for sizing (NOT WasAutoSized)
     EXPECT_FALSE(CondenserLoopTowers::SimpleTower(1).HighSpeedTowerUAWasAutoSized);
@@ -2663,7 +2662,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     EXPECT_DOUBLE_EQ(CondenserLoopTowers::SimpleTower(1).TowerNominalCapacity, 100000.0);
 
     // autosized other input fields of cooling tower
-    CondenserLoopTowers::SizeTower(1);
+    CondenserLoopTowers::SimpleTower(1).SizeTower();
     // size low speed nominal capacity
     LowSpeedCoolTowerNomCap =
         CondenserLoopTowers::SimpleTower(1).TowerNominalCapacity * CondenserLoopTowers::SimpleTower(1).TowerLowSpeedNomCapSizingFactor;
@@ -3061,7 +3060,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
 
 
     // autosized other input fields of cooling tower. Tt throws, so we catch that so we can compare the error
-    ASSERT_THROW(CondenserLoopTowers::SizeTower(1), std::runtime_error);
+    ASSERT_THROW(CondenserLoopTowers::SimpleTower(1).SizeTower(), std::runtime_error);
 
     std::string const error_string = delimited_string({
 
@@ -3464,13 +3463,13 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     // get inputs of cooling tower object
     CondenserLoopTowers::GetTowerInput();
 
-    CondenserLoopTowers::InitTower(1, false);
+    CondenserLoopTowers::SimpleTower(1).InitTower();
 
     // Fake a flow
     CondenserLoopTowers::SimpleTower(1).DesignWaterFlowRate = 1000.0;
 
     // autosized other input fields of cooling tower. Tt throws, so we catch that so we can compare the error
-    ASSERT_THROW(CondenserLoopTowers::SizeTower(1), std::runtime_error);
+    ASSERT_THROW(CondenserLoopTowers::SimpleTower(1).SizeTower(), std::runtime_error);
 
     std::string const error_string = delimited_string({
 
