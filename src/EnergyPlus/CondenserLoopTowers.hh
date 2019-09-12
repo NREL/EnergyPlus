@@ -386,6 +386,8 @@ namespace CondenserLoopTowers {
 
         void InitTower();
 
+        void setupOutputVariables();
+
         void SizeTower();
 
         void SizeVSMerkelTower();

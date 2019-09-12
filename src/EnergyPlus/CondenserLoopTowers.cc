@@ -1886,456 +1886,6 @@ namespace CondenserLoopTowers {
             ShowFatalError("Errors found in getting cooling tower input.");
         }
 
-        // Set up output variables CurrentModuleObject='CoolingTower:SingleSpeed'
-        for (TowerNum = 1; TowerNum <= NumSingleSpeedTowers; ++TowerNum) {
-            SetupOutputVariable("Cooling Tower Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                SimpleTower(TowerNum).InletWaterTemp,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                SimpleTower(TowerNum).OutletWaterTemp,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                SimpleTower(TowerNum).WaterMassFlowRate,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                SimpleTower(TowerNum).Qactual,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Power",
-                                OutputProcessor::Unit::W,
-                                SimpleTower(TowerNum).FanPower,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Energy",
-                                OutputProcessor::Unit::J,
-                                SimpleTower(TowerNum).FanEnergy,
-                                "System",
-                                "Sum",
-                                SimpleTower(TowerNum).Name,
-                                _,
-                                "Electric",
-                                "HeatRejection",
-                                SimpleTower(TowerNum).EndUseSubcategory,
-                                "Plant");
-            // Added for fluid bypass
-            SetupOutputVariable("Cooling Tower Bypass Fraction",
-                                OutputProcessor::Unit::None,
-                                SimpleTower(TowerNum).BypassFraction,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Operating Cells Count",
-                                OutputProcessor::Unit::None,
-                                SimpleTower(TowerNum).NumCellOn,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Cycling Ratio",
-                                OutputProcessor::Unit::None,
-                                SimpleTower(TowerNum).FanCyclingRatio,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            if (SimpleTower(TowerNum).BasinHeaterPowerFTempDiff > 0.0) {
-                SetupOutputVariable("Cooling Tower Basin Heater Electric Power",
-                                    OutputProcessor::Unit::W,
-                                    SimpleTower(TowerNum).BasinHeaterPower,
-                                    "System",
-                                    "Average",
-                                    SimpleTower(TowerNum).Name);
-                SetupOutputVariable("Cooling Tower Basin Heater Electric Energy",
-                                    OutputProcessor::Unit::J,
-                                    SimpleTower(TowerNum).BasinHeaterConsumption,
-                                    "System",
-                                    "Sum",
-                                    SimpleTower(TowerNum).Name,
-                                    _,
-                                    "Electric",
-                                    "HeatRejection",
-                                    "BasinHeater",
-                                    "Plant");
-            }
-        }
-
-        // CurrentModuleObject='CoolingTower:TwoSpeed'
-        for (TowerNum = NumSingleSpeedTowers + 1; TowerNum <= NumSingleSpeedTowers + NumTwoSpeedTowers; ++TowerNum) {
-            SetupOutputVariable("Cooling Tower Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                SimpleTower(TowerNum).InletWaterTemp,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                SimpleTower(TowerNum).OutletWaterTemp,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                SimpleTower(TowerNum).WaterMassFlowRate,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                SimpleTower(TowerNum).Qactual,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Power",
-                                OutputProcessor::Unit::W,
-                                SimpleTower(TowerNum).FanPower,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Energy",
-                                OutputProcessor::Unit::J,
-                                SimpleTower(TowerNum).FanEnergy,
-                                "System",
-                                "Sum",
-                                SimpleTower(TowerNum).Name,
-                                _,
-                                "Electric",
-                                "HeatRejection",
-                                SimpleTower(TowerNum).EndUseSubcategory,
-                                "Plant");
-            SetupOutputVariable("Cooling Tower Fan Cycling Ratio",
-                                OutputProcessor::Unit::None,
-                                SimpleTower(TowerNum).FanCyclingRatio,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Speed Level",
-                                OutputProcessor::Unit::None,
-                                SimpleTower(TowerNum).SpeedSelected,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Operating Cells Count",
-                                OutputProcessor::Unit::None,
-                                SimpleTower(TowerNum).NumCellOn,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            if (SimpleTower(TowerNum).BasinHeaterPowerFTempDiff > 0.0) {
-                SetupOutputVariable("Cooling Tower Basin Heater Electric Power",
-                                    OutputProcessor::Unit::W,
-                                    SimpleTower(TowerNum).BasinHeaterPower,
-                                    "System",
-                                    "Average",
-                                    SimpleTower(TowerNum).Name);
-                SetupOutputVariable("Cooling Tower Basin Heater Electric Energy",
-                                    OutputProcessor::Unit::J,
-                                    SimpleTower(TowerNum).BasinHeaterConsumption,
-                                    "System",
-                                    "Sum",
-                                    SimpleTower(TowerNum).Name,
-                                    _,
-                                    "Electric",
-                                    "HeatRejection",
-                                    "BasinHeater",
-                                    "Plant");
-            }
-        }
-
-        // CurrentModuleObject='CoolingTower:VariableSpeed'
-        for (TowerNum = NumSingleSpeedTowers + NumTwoSpeedTowers + 1; TowerNum <= NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers;
-             ++TowerNum) {
-            SetupOutputVariable("Cooling Tower Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                SimpleTower(TowerNum).InletWaterTemp,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                SimpleTower(TowerNum).OutletWaterTemp,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                SimpleTower(TowerNum).WaterMassFlowRate,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                SimpleTower(TowerNum).Qactual,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Power",
-                                OutputProcessor::Unit::W,
-                                SimpleTower(TowerNum).FanPower,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Energy",
-                                OutputProcessor::Unit::J,
-                                SimpleTower(TowerNum).FanEnergy,
-                                "System",
-                                "Sum",
-                                SimpleTower(TowerNum).Name,
-                                _,
-                                "Electric",
-                                "HeatRejection",
-                                SimpleTower(TowerNum).EndUseSubcategory,
-                                "Plant");
-            SetupOutputVariable("Cooling Tower Air Flow Rate Ratio",
-                                OutputProcessor::Unit::None,
-                                SimpleTower(TowerNum).AirFlowRatio,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Part Load Ratio",
-                                OutputProcessor::Unit::None,
-                                SimpleTower(TowerNum).FanCyclingRatio,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Operating Cells Count",
-                                OutputProcessor::Unit::None,
-                                SimpleTower(TowerNum).NumCellOn,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            if (SimpleTower(TowerNum).BasinHeaterPowerFTempDiff > 0.0) {
-                SetupOutputVariable("Cooling Tower Basin Heater Electric Power",
-                                    OutputProcessor::Unit::W,
-                                    SimpleTower(TowerNum).BasinHeaterPower,
-                                    "System",
-                                    "Average",
-                                    SimpleTower(TowerNum).Name);
-                SetupOutputVariable("Cooling Tower Basin Heater Electric Energy",
-                                    OutputProcessor::Unit::J,
-                                    SimpleTower(TowerNum).BasinHeaterConsumption,
-                                    "System",
-                                    "Sum",
-                                    SimpleTower(TowerNum).Name,
-                                    _,
-                                    "Electric",
-                                    "HeatRejection",
-                                    "BasinHeater",
-                                    "Plant");
-            }
-
-        }
-
-        // CurrentModuleObject='CoolingTower:VariableSpeed:Merkel'
-        for (TowerNum = NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + 1;
-             TowerNum <= NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + NumVSMerkelTowers;
-             ++TowerNum) {
-            SetupOutputVariable("Cooling Tower Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                SimpleTower(TowerNum).InletWaterTemp,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                SimpleTower(TowerNum).OutletWaterTemp,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                SimpleTower(TowerNum).WaterMassFlowRate,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
-                                SimpleTower(TowerNum).Qactual,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Power",
-                                OutputProcessor::Unit::W,
-                                SimpleTower(TowerNum).FanPower,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Energy",
-                                OutputProcessor::Unit::J,
-                                SimpleTower(TowerNum).FanEnergy,
-                                "System",
-                                "Sum",
-                                SimpleTower(TowerNum).Name,
-                                _,
-                                "Electric",
-                                "HeatRejection",
-                                SimpleTower(TowerNum).EndUseSubcategory,
-                                "Plant");
-            SetupOutputVariable("Cooling Tower Fan Speed Ratio",
-                                OutputProcessor::Unit::None,
-                                SimpleTower(TowerNum).AirFlowRatio,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-
-            SetupOutputVariable("Cooling Tower Operating Cells Count",
-                                OutputProcessor::Unit::None,
-                                SimpleTower(TowerNum).NumCellOn,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            if (SimpleTower(TowerNum).BasinHeaterPowerFTempDiff > 0.0) {
-                SetupOutputVariable("Cooling Tower Basin Heater Electric Power",
-                                    OutputProcessor::Unit::W,
-                                    SimpleTower(TowerNum).BasinHeaterPower,
-                                    "System",
-                                    "Average",
-                                    SimpleTower(TowerNum).Name);
-                SetupOutputVariable("Cooling Tower Basin Heater Electric Energy",
-                                    OutputProcessor::Unit::J,
-                                    SimpleTower(TowerNum).BasinHeaterConsumption,
-                                    "System",
-                                    "Sum",
-                                    SimpleTower(TowerNum).Name,
-                                    _,
-                                    "Electric",
-                                    "HeatRejection",
-                                    "BasinHeater",
-                                    "Plant");
-            }
-        }
-        // setup common water reporting for all types of towers.
-        for (TowerNum = 1; TowerNum <= NumSingleSpeedTowers + NumTwoSpeedTowers + NumVariableSpeedTowers + NumVSMerkelTowers; ++TowerNum) {
-            if (SimpleTower(TowerNum).SuppliedByWaterSystem) {
-                SetupOutputVariable("Cooling Tower Make Up Water Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    SimpleTower(TowerNum).MakeUpVdot,
-                                    "System",
-                                    "Average",
-                                    SimpleTower(TowerNum).Name);
-                SetupOutputVariable("Cooling Tower Make Up Water Volume",
-                                    OutputProcessor::Unit::m3,
-                                    SimpleTower(TowerNum).MakeUpVol,
-                                    "System",
-                                    "Sum",
-                                    SimpleTower(TowerNum).Name);
-                SetupOutputVariable("Cooling Tower Storage Tank Water Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    SimpleTower(TowerNum).TankSupplyVdot,
-                                    "System",
-                                    "Average",
-                                    SimpleTower(TowerNum).Name);
-                SetupOutputVariable("Cooling Tower Storage Tank Water Volume",
-                                    OutputProcessor::Unit::m3,
-                                    SimpleTower(TowerNum).TankSupplyVol,
-                                    "System",
-                                    "Sum",
-                                    SimpleTower(TowerNum).Name,
-                                    _,
-                                    "Water",
-                                    "HeatRejection",
-                                    _,
-                                    "Plant");
-                SetupOutputVariable("Cooling Tower Starved Storage Tank Water Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    SimpleTower(TowerNum).StarvedMakeUpVdot,
-                                    "System",
-                                    "Average",
-                                    SimpleTower(TowerNum).Name);
-                SetupOutputVariable("Cooling Tower Starved Storage Tank Water Volume",
-                                    OutputProcessor::Unit::m3,
-                                    SimpleTower(TowerNum).StarvedMakeUpVol,
-                                    "System",
-                                    "Sum",
-                                    SimpleTower(TowerNum).Name);
-                SetupOutputVariable("Cooling Tower Make Up Mains Water Volume",
-                                    OutputProcessor::Unit::m3,
-                                    SimpleTower(TowerNum).StarvedMakeUpVol,
-                                    "System",
-                                    "Sum",
-                                    SimpleTower(TowerNum).Name,
-                                    _,
-                                    "MainsWater",
-                                    "HeatRejection",
-                                    _,
-                                    "Plant");
-            } else { // tower water from mains and gets metered
-                SetupOutputVariable("Cooling Tower Make Up Water Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
-                                    SimpleTower(TowerNum).MakeUpVdot,
-                                    "System",
-                                    "Average",
-                                    SimpleTower(TowerNum).Name);
-                SetupOutputVariable("Cooling Tower Make Up Water Volume",
-                                    OutputProcessor::Unit::m3,
-                                    SimpleTower(TowerNum).MakeUpVol,
-                                    "System",
-                                    "Sum",
-                                    SimpleTower(TowerNum).Name,
-                                    _,
-                                    "Water",
-                                    "HeatRejection",
-                                    _,
-                                    "Plant");
-                SetupOutputVariable("Cooling Tower Make Up Mains Water Volume",
-                                    OutputProcessor::Unit::m3,
-                                    SimpleTower(TowerNum).MakeUpVol,
-                                    "System",
-                                    "Sum",
-                                    SimpleTower(TowerNum).Name,
-                                    _,
-                                    "MainsWater",
-                                    "HeatRejection",
-                                    _,
-                                    "Plant");
-            }
-
-            SetupOutputVariable("Cooling Tower Water Evaporation Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
-                                SimpleTower(TowerNum).EvaporationVdot,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Water Evaporation Volume",
-                                OutputProcessor::Unit::m3,
-                                SimpleTower(TowerNum).EvaporationVol,
-                                "System",
-                                "Sum",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Water Drift Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
-                                SimpleTower(TowerNum).DriftVdot,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Water Drift Volume",
-                                OutputProcessor::Unit::m3,
-                                SimpleTower(TowerNum).DriftVol,
-                                "System",
-                                "Sum",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Water Blowdown Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
-                                SimpleTower(TowerNum).BlowdownVdot,
-                                "System",
-                                "Average",
-                                SimpleTower(TowerNum).Name);
-            SetupOutputVariable("Cooling Tower Water Blowdown Volume",
-                                OutputProcessor::Unit::m3,
-                                SimpleTower(TowerNum).BlowdownVol,
-                                "System",
-                                "Sum",
-                                SimpleTower(TowerNum).Name);
-        } // loop all towers
     }
 
     void Towerspecs::InitTower()
@@ -2361,6 +1911,8 @@ namespace CondenserLoopTowers {
         static std::string const RoutineName("InitTower");
 
         if (this->oneTimeFlag) {
+
+            this->setupOutputVariables();
 
             // Locate the tower on the plant loops for later usage
             bool ErrorsFound = false;
@@ -2449,6 +2001,455 @@ namespace CondenserLoopTowers {
         this->__AirFlowRateRatio = 0.0;
     }
 
+    void Towerspecs::setupOutputVariables()
+    {
+        // Set up output variables CurrentModuleObject='CoolingTower:SingleSpeed'
+        if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
+            SetupOutputVariable("Cooling Tower Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->InletWaterTemp,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->OutletWaterTemp,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->WaterMassFlowRate,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                this->Qactual,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electric Power",
+                                OutputProcessor::Unit::W,
+                                this->FanPower,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electric Energy",
+                                OutputProcessor::Unit::J,
+                                this->FanEnergy,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "Electric",
+                                "HeatRejection",
+                                this->EndUseSubcategory,
+                                "Plant");
+            // Added for fluid bypass
+            SetupOutputVariable("Cooling Tower Bypass Fraction",
+                                OutputProcessor::Unit::None,
+                                this->BypassFraction,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Operating Cells Count",
+                                OutputProcessor::Unit::None,
+                                this->NumCellOn,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Fan Cycling Ratio",
+                                OutputProcessor::Unit::None,
+                                this->FanCyclingRatio,
+                                "System",
+                                "Average",
+                                this->Name);
+            if (this->BasinHeaterPowerFTempDiff > 0.0) {
+                SetupOutputVariable("Cooling Tower Basin Heater Electric Power",
+                                    OutputProcessor::Unit::W,
+                                    this->BasinHeaterPower,
+                                    "System",
+                                    "Average",
+                                    this->Name);
+                SetupOutputVariable("Cooling Tower Basin Heater Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    this->BasinHeaterConsumption,
+                                    "System",
+                                    "Sum",
+                                    this->Name,
+                                    _,
+                                    "Electric",
+                                    "HeatRejection",
+                                    "BasinHeater",
+                                    "Plant");
+            }
+        }
+
+        // CurrentModuleObject='CoolingTower:TwoSpeed'
+        if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
+            SetupOutputVariable("Cooling Tower Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->InletWaterTemp,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->OutletWaterTemp,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->WaterMassFlowRate,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                this->Qactual,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electric Power",
+                                OutputProcessor::Unit::W,
+                                this->FanPower,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electric Energy",
+                                OutputProcessor::Unit::J,
+                                this->FanEnergy,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "Electric",
+                                "HeatRejection",
+                                this->EndUseSubcategory,
+                                "Plant");
+            SetupOutputVariable("Cooling Tower Fan Cycling Ratio",
+                                OutputProcessor::Unit::None,
+                                this->FanCyclingRatio,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Fan Speed Level",
+                                OutputProcessor::Unit::None,
+                                this->SpeedSelected,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Operating Cells Count",
+                                OutputProcessor::Unit::None,
+                                this->NumCellOn,
+                                "System",
+                                "Average",
+                                this->Name);
+            if (this->BasinHeaterPowerFTempDiff > 0.0) {
+                SetupOutputVariable("Cooling Tower Basin Heater Electric Power",
+                                    OutputProcessor::Unit::W,
+                                    this->BasinHeaterPower,
+                                    "System",
+                                    "Average",
+                                    this->Name);
+                SetupOutputVariable("Cooling Tower Basin Heater Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    this->BasinHeaterConsumption,
+                                    "System",
+                                    "Sum",
+                                    this->Name,
+                                    _,
+                                    "Electric",
+                                    "HeatRejection",
+                                    "BasinHeater",
+                                    "Plant");
+            }
+        }
+
+        // CurrentModuleObject='CoolingTower:VariableSpeed'
+        if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpd) {
+            SetupOutputVariable("Cooling Tower Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->InletWaterTemp,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->OutletWaterTemp,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->WaterMassFlowRate,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                this->Qactual,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electric Power",
+                                OutputProcessor::Unit::W,
+                                this->FanPower,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electric Energy",
+                                OutputProcessor::Unit::J,
+                                this->FanEnergy,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "Electric",
+                                "HeatRejection",
+                                this->EndUseSubcategory,
+                                "Plant");
+            SetupOutputVariable("Cooling Tower Air Flow Rate Ratio",
+                                OutputProcessor::Unit::None,
+                                this->AirFlowRatio,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Fan Part Load Ratio",
+                                OutputProcessor::Unit::None,
+                                this->FanCyclingRatio,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Operating Cells Count",
+                                OutputProcessor::Unit::None,
+                                this->NumCellOn,
+                                "System",
+                                "Average",
+                                this->Name);
+            if (this->BasinHeaterPowerFTempDiff > 0.0) {
+                SetupOutputVariable("Cooling Tower Basin Heater Electric Power",
+                                    OutputProcessor::Unit::W,
+                                    this->BasinHeaterPower,
+                                    "System",
+                                    "Average",
+                                    this->Name);
+                SetupOutputVariable("Cooling Tower Basin Heater Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    this->BasinHeaterConsumption,
+                                    "System",
+                                    "Sum",
+                                    this->Name,
+                                    _,
+                                    "Electric",
+                                    "HeatRejection",
+                                    "BasinHeater",
+                                    "Plant");
+            }
+
+        }
+
+        // CurrentModuleObject='CoolingTower:VariableSpeed:Merkel'
+        if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {
+            SetupOutputVariable("Cooling Tower Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->InletWaterTemp,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->OutletWaterTemp,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->WaterMassFlowRate,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Heat Transfer Rate",
+                                OutputProcessor::Unit::W,
+                                this->Qactual,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electric Power",
+                                OutputProcessor::Unit::W,
+                                this->FanPower,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electric Energy",
+                                OutputProcessor::Unit::J,
+                                this->FanEnergy,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "Electric",
+                                "HeatRejection",
+                                this->EndUseSubcategory,
+                                "Plant");
+            SetupOutputVariable("Cooling Tower Fan Speed Ratio",
+                                OutputProcessor::Unit::None,
+                                this->AirFlowRatio,
+                                "System",
+                                "Average",
+                                this->Name);
+
+            SetupOutputVariable("Cooling Tower Operating Cells Count",
+                                OutputProcessor::Unit::None,
+                                this->NumCellOn,
+                                "System",
+                                "Average",
+                                this->Name);
+            if (this->BasinHeaterPowerFTempDiff > 0.0) {
+                SetupOutputVariable("Cooling Tower Basin Heater Electric Power",
+                                    OutputProcessor::Unit::W,
+                                    this->BasinHeaterPower,
+                                    "System",
+                                    "Average",
+                                    this->Name);
+                SetupOutputVariable("Cooling Tower Basin Heater Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    this->BasinHeaterConsumption,
+                                    "System",
+                                    "Sum",
+                                    this->Name,
+                                    _,
+                                    "Electric",
+                                    "HeatRejection",
+                                    "BasinHeater",
+                                    "Plant");
+            }
+        }
+        // setup common water reporting for all types of towers.
+        if (this->SuppliedByWaterSystem) {
+            SetupOutputVariable("Cooling Tower Make Up Water Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                this->MakeUpVdot,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Make Up Water Volume",
+                                OutputProcessor::Unit::m3,
+                                this->MakeUpVol,
+                                "System",
+                                "Sum",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Storage Tank Water Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                this->TankSupplyVdot,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Storage Tank Water Volume",
+                                OutputProcessor::Unit::m3,
+                                this->TankSupplyVol,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "Water",
+                                "HeatRejection",
+                                _,
+                                "Plant");
+            SetupOutputVariable("Cooling Tower Starved Storage Tank Water Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                this->StarvedMakeUpVdot,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Starved Storage Tank Water Volume",
+                                OutputProcessor::Unit::m3,
+                                this->StarvedMakeUpVol,
+                                "System",
+                                "Sum",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Make Up Mains Water Volume",
+                                OutputProcessor::Unit::m3,
+                                this->StarvedMakeUpVol,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "MainsWater",
+                                "HeatRejection",
+                                _,
+                                "Plant");
+        } else { // tower water from mains and gets metered
+            SetupOutputVariable("Cooling Tower Make Up Water Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                this->MakeUpVdot,
+                                "System",
+                                "Average",
+                                this->Name);
+            SetupOutputVariable("Cooling Tower Make Up Water Volume",
+                                OutputProcessor::Unit::m3,
+                                this->MakeUpVol,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "Water",
+                                "HeatRejection",
+                                _,
+                                "Plant");
+            SetupOutputVariable("Cooling Tower Make Up Mains Water Volume",
+                                OutputProcessor::Unit::m3,
+                                this->MakeUpVol,
+                                "System",
+                                "Sum",
+                                this->Name,
+                                _,
+                                "MainsWater",
+                                "HeatRejection",
+                                _,
+                                "Plant");
+        }
+
+        SetupOutputVariable("Cooling Tower Water Evaporation Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            this->EvaporationVdot,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Cooling Tower Water Evaporation Volume",
+                            OutputProcessor::Unit::m3,
+                            this->EvaporationVol,
+                            "System",
+                            "Sum",
+                            this->Name);
+        SetupOutputVariable("Cooling Tower Water Drift Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            this->DriftVdot,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Cooling Tower Water Drift Volume",
+                            OutputProcessor::Unit::m3,
+                            this->DriftVol,
+                            "System",
+                            "Sum",
+                            this->Name);
+        SetupOutputVariable("Cooling Tower Water Blowdown Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            this->BlowdownVdot,
+                            "System",
+                            "Average",
+                            this->Name);
+        SetupOutputVariable("Cooling Tower Water Blowdown Volume",
+                            OutputProcessor::Unit::m3,
+                            this->BlowdownVol,
+                            "System",
+                            "Sum",
+                            this->Name);
+    }
+    
     void Towerspecs::SizeTower()
     {
 
