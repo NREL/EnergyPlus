@@ -5707,13 +5707,22 @@ namespace HeatBalanceSurfaceManager {
             }
 
             // fill in reporting values for outside face
-            QdotConvOutRep(SurfNum) = -Surface(SurfNum).Area * HcExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
+            if (IsRain) {
+                QdotConvOutRep(SurfNum) = -Surface(SurfNum).Area * HcExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutWetBulbTemp);
+            } else {
+                QdotConvOutRep(SurfNum) = -Surface(SurfNum).Area * HcExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
+            }
 
             if (Surface(SurfNum).OSCMPtr > 0) { // Optr is set above in this case, use OSCM boundary data
                 QdotConvOutRepPerArea(SurfNum) = -OSCM(OPtr).HConv * (TH(1, 1, SurfNum) - OSCM(OPtr).TConv);
             } else {
-                QdotConvOutRepPerArea(SurfNum) = -HcExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
+                if (IsRain) {
+                    QdotConvOutRepPerArea(SurfNum) = -HcExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutWetBulbTemp);
+                } else {
+                    QdotConvOutRepPerArea(SurfNum) = -HcExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
+                }
             }
+
             QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * TimeStepZoneSec;
         } // ...end of DO loop over all surface (actually heat transfer surfaces)
     }
