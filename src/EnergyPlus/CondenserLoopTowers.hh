@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -91,7 +92,7 @@ namespace CondenserLoopTowers {
     extern bool GetInput; // When TRUE, calls subroutine to read input file
     extern Array1D_bool CheckEquipName;
 
-    struct Towerspecs
+    struct Towerspecs : PlantComponent
     {
         // Members
         std::string Name;      // User identifier
@@ -375,6 +376,13 @@ namespace CondenserLoopTowers {
         {
         }
 
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+        void getSizingFactor(Real64 &SizFac) override;
+
+        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
         void SimSimpleTower(Real64 _WaterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &_OutletWaterTemp);
 
@@ -441,6 +449,7 @@ namespace CondenserLoopTowers {
                                            Array1<Real64> const &Par // par(1) = tower number
         );
 
+        static PlantComponent *factory(std::string const &objectName);
     };
 
     // Object Data

@@ -152,6 +152,51 @@ namespace CondenserLoopTowers {
         UniqueSimpleTowerNames.clear();
     }
 
+    PlantComponent *Towerspecs::factory(std::string const &objectName)
+    {
+        // Process the input data for towers if it hasn't been done already
+        if (GetInput) {
+            GetTowerInput();
+            GetInput = false;
+        }
+        // Now look for this particular tower in the list
+        for (auto &tower : SimpleTower) {
+            if (tower.Name == objectName) {
+                return &tower;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("CoolingTowerFactory: Error getting inputs for tower named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    void Towerspecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+                               bool const EP_UNUSED(FirstHVACIteration),
+                               Real64 &CurLoad,
+                               bool const RunFlag)
+    {
+
+    }
+
+    void Towerspecs::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    {
+        MinLoad = 0.0;
+        MaxLoad = this->TowerNominalCapacity * this->HeatRejectCapNomCapSizingRatio;
+        OptLoad = this->TowerNominalCapacity;
+    }
+
+    void Towerspecs::getSizingFactor(Real64 &SizFactor)
+    {
+        SizFactor = this->SizFac;
+    }
+
+    void Towerspecs::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    {
+        this->InitTower();
+        this->SizeTower();
+    }
+
     void SimTowers(std::string const &TowerType,
                    std::string const &TowerName,
                    int &CompIndex,
