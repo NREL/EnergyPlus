@@ -1855,7 +1855,7 @@ namespace HVACUnitaryBypassVAV {
             return;
         }
 
-        SetAverageAirFlow(CBVAVNum, OnOffAirFlowRatio, FirstHVACIteration);
+        SetAverageAirFlow(CBVAVNum, OnOffAirFlowRatio);
 
         if (FirstHVACIteration) CBVAV(CBVAVNum).OutletTempSetPoint = CalcSetPointTempTarget(CBVAVNum);
 
@@ -3774,8 +3774,7 @@ namespace HVACUnitaryBypassVAV {
     }
 
     void SetAverageAirFlow(int const CBVAVNum,           // Index to CBVAV system
-                           Real64 &OnOffAirFlowRatio,    // Ratio of compressor ON airflow to average airflow over timestep
-                           bool const FirstHVACIteration // Flag denoting the first pass on the air loop simulation
+                           Real64 &OnOffAirFlowRatio    // Ratio of compressor ON airflow to average airflow over timestep
     )
     {
 
