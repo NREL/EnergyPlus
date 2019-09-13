@@ -1087,32 +1087,32 @@ namespace FaultsManager {
                     CondenserLoopTowers::GetInput = false;
                 }
                 // Check the tower name and tower type
-                int TowerNum = UtilityRoutines::FindItemInList(FaultsTowerFouling(jFault_TowerFouling).TowerName, CondenserLoopTowers::SimpleTower);
+                int TowerNum = UtilityRoutines::FindItemInList(FaultsTowerFouling(jFault_TowerFouling).TowerName, CondenserLoopTowers::towers);
                 if (TowerNum <= 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
                                     "\" not found.");
                     ErrorsFound = true;
                 } else {
                     // Link the tower with the fault model
-                    CondenserLoopTowers::SimpleTower(TowerNum).FaultyTowerFoulingFlag = true;
-                    CondenserLoopTowers::SimpleTower(TowerNum).FaultyTowerFoulingIndex = jFault_TowerFouling;
+                    CondenserLoopTowers::towers(TowerNum).FaultyTowerFoulingFlag = true;
+                    CondenserLoopTowers::towers(TowerNum).FaultyTowerFoulingIndex = jFault_TowerFouling;
 
                     // Check the faulty tower type
-                    if (!UtilityRoutines::SameString(CondenserLoopTowers::SimpleTower(TowerNum).TowerType,
+                    if (!UtilityRoutines::SameString(CondenserLoopTowers::towers(TowerNum).TowerType,
                                                      FaultsTowerFouling(jFault_TowerFouling).TowerType)) {
                         ShowWarningError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" +
                                          cAlphaArgs(4) + "\" not match the type of " + cAlphaFieldNames(5) +
                                          ". Tower type in the fault model is updated. ");
-                        FaultsTowerFouling(jFault_TowerFouling).TowerType = CondenserLoopTowers::SimpleTower(TowerNum).TowerType;
+                        FaultsTowerFouling(jFault_TowerFouling).TowerType = CondenserLoopTowers::towers(TowerNum).TowerType;
                     }
 
                     // Check the tower model
                     // Performance Input Method should be UFactorTimesAreaAndDesignWaterFlowRate to apply the fault model
-                    if (CondenserLoopTowers::SimpleTower(TowerNum).PerformanceInputMethod_Num != CondenserLoopTowers::PIM_UFactor) {
+                    if (CondenserLoopTowers::towers(TowerNum).PerformanceInputMethod_Num != CondenserLoopTowers::PIM_UFactor) {
                         ShowWarningError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                          cAlphaFieldNames(5) + ". Tower Performance Input Method is not UFactorTimesAreaAndDesignWaterFlowRate. " +
                                          "The tower fouling fault model will not be applied to the tower. ");
-                        CondenserLoopTowers::SimpleTower(TowerNum).FaultyTowerFoulingFlag = false;
+                        CondenserLoopTowers::towers(TowerNum).FaultyTowerFoulingFlag = false;
                     }
                 }
             }
@@ -1192,22 +1192,22 @@ namespace FaultsManager {
                 }
                 // Check the tower name and tower type
                 int TowerNum =
-                    UtilityRoutines::FindItemInList(FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerName, CondenserLoopTowers::SimpleTower);
+                    UtilityRoutines::FindItemInList(FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerName, CondenserLoopTowers::towers);
                 if (TowerNum <= 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5) +
                                     "\" not found.");
                     ErrorsFound = true;
                 } else {
                     // Link the tower with the fault model
-                    CondenserLoopTowers::SimpleTower(TowerNum).FaultyCondenserSWTFlag = true;
-                    CondenserLoopTowers::SimpleTower(TowerNum).FaultyCondenserSWTIndex = jFault_CondenserSWT;
+                    CondenserLoopTowers::towers(TowerNum).FaultyCondenserSWTFlag = true;
+                    CondenserLoopTowers::towers(TowerNum).FaultyCondenserSWTIndex = jFault_CondenserSWT;
 
                     // Check the faulty tower type
-                    if (!UtilityRoutines::SameString(CondenserLoopTowers::SimpleTower(TowerNum).TowerType,
+                    if (!UtilityRoutines::SameString(CondenserLoopTowers::towers(TowerNum).TowerType,
                                                      FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerType)) {
                         ShowWarningError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(4) + " = \"" +
                                          cAlphaArgs(4) + "\" not match the type of " + cAlphaFieldNames(5) + ". Tower type is updated. ");
-                        FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerType = CondenserLoopTowers::SimpleTower(TowerNum).TowerType;
+                        FaultsCondenserSWTSensor(jFault_CondenserSWT).TowerType = CondenserLoopTowers::towers(TowerNum).TowerType;
                     }
                 }
             }
