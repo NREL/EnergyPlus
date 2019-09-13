@@ -610,7 +610,7 @@ bool Regexp::ParseState::DoLeftParen(const StringPiece& name) {
   Regexp* re = new Regexp(kLeftParen, flags_);
   re->cap_ = ++ncap_;
   if (name.data() != NULL)
-    re->name_ = new string(name);
+    re->name_ = new std::string(name);
   return PushRegexp(re);
 }
 
@@ -801,7 +801,7 @@ void Regexp::RemoveLeadingString(Regexp* re, int n) {
   // limit on the size of a concatenation, so we should never
   // see more than two here.
   Regexp* stk[4];
-  int d = 0;
+  size_t d = 0;
   while (re->op() == kRegexpConcat) {
     if (d < arraysize(stk))
       stk[d++] = re;
@@ -832,8 +832,8 @@ void Regexp::RemoveLeadingString(Regexp* re, int n) {
   }
 
   // If re is now empty, concatenations might simplify too.
-  while (d-- > 0) {
-    re = stk[d];
+  while (d > 0) {
+    re = stk[--d];
     Regexp** sub = re->sub();
     if (sub[0]->op() == kRegexpEmptyMatch) {
       sub[0]->Decref();
@@ -1447,7 +1447,7 @@ static int UnHex(int c) {
 // Sets *rp to the named character.
 static bool ParseEscape(StringPiece* s, Rune* rp,
                         RegexpStatus* status, int rune_max) {
-  const char* begin = s->begin();
+  const char* begin = s->data();
   if (s->size() < 1 || (*s)[0] != '\\') {
     // Should not happen - caller always checks.
     status->set_code(kRegexpInternalError);
@@ -1590,7 +1590,7 @@ BadEscape:
   // Unrecognized escape sequence.
   status->set_code(kRegexpBadEscape);
   status->set_error_arg(
-      StringPiece(begin, static_cast<size_t>(s->begin() - begin)));
+      StringPiece(begin, static_cast<size_t>(s->data() - begin)));
   return false;
 }
 
@@ -1710,7 +1710,7 @@ const UGroup* MaybeParsePerlCCEscape(StringPiece* s, Regexp::ParseFlags parse_fl
     return NULL;
   // Could use StringPieceToRune, but there aren't
   // any non-ASCII Perl group names.
-  StringPiece name(s->begin(), 2);
+  StringPiece name(s->data(), 2);
   const UGroup *g = LookupPerlGroup(name);
   if (g == NULL)
     return NULL;
@@ -1750,8 +1750,8 @@ ParseStatus ParseUnicodeGroup(StringPiece* s, Regexp::ParseFlags parse_flags,
     return kParseError;
   if (c != '{') {
     // Name is the bit of string we just skipped over for c.
-    const char* p = seq.begin() + 2;
-    name = StringPiece(p, static_cast<size_t>(s->begin() - p));
+    const char* p = seq.data() + 2;
+    name = StringPiece(p, static_cast<size_t>(s->data() - p));
   } else {
     // Name is in braces. Look for closing }
     size_t end = s->find('}', 0);
@@ -1762,14 +1762,14 @@ ParseStatus ParseUnicodeGroup(StringPiece* s, Regexp::ParseFlags parse_flags,
       status->set_error_arg(seq);
       return kParseError;
     }
-    name = StringPiece(s->begin(), end);  // without '}'
+    name = StringPiece(s->data(), end);  // without '}'
     s->remove_prefix(end + 1);  // with '}'
     if (!IsValidUTF8(name, status))
       return kParseError;
   }
 
   // Chop seq where s now begins.
-  seq = StringPiece(seq.begin(), static_cast<size_t>(s->begin() - seq.begin()));
+  seq = StringPiece(seq.data(), static_cast<size_t>(s->data() - seq.data()));
 
   if (name.size() > 0 && name[0] == '^') {
     sign = -sign;
@@ -1790,7 +1790,7 @@ ParseStatus ParseUnicodeGroup(StringPiece* s, Regexp::ParseFlags parse_flags,
   // Look up the group in the ICU Unicode data. Because ICU provides full
   // Unicode properties support, this could be more than a lookup by name.
   ::icu::UnicodeString ustr = ::icu::UnicodeString::fromUTF8(
-      string("\\p{") + string(name) + string("}"));
+      std::string("\\p{") + std::string(name) + std::string("}"));
   UErrorCode uerr = U_ZERO_ERROR;
   ::icu::UnicodeSet uset(ustr, uerr);
   if (U_FAILURE(uerr)) {
@@ -2074,8 +2074,8 @@ bool Regexp::ParseState::ParsePerlFlags(StringPiece* s) {
     }
 
     // t is "P<name>...", t[end] == '>'
-    StringPiece capture(t.begin()-2, end+3);  // "(?P<name>"
-    StringPiece name(t.begin()+2, end-2);     // "name"
+    StringPiece capture(t.data()-2, end+3);  // "(?P<name>"
+    StringPiece name(t.data()+2, end-2);     // "name"
     if (!IsValidUTF8(name, status_))
       return false;
     if (!IsValidCaptureName(name)) {
@@ -2089,7 +2089,8 @@ bool Regexp::ParseState::ParsePerlFlags(StringPiece* s) {
       return false;
     }
 
-    s->remove_prefix(static_cast<size_t>(capture.end() - s->begin()));
+    s->remove_prefix(
+        static_cast<size_t>(capture.data() + capture.size() - s->data()));
     return true;
   }
 
@@ -2173,7 +2174,7 @@ bool Regexp::ParseState::ParsePerlFlags(StringPiece* s) {
 BadPerlOp:
   status_->set_code(kRegexpBadPerlOp);
   status_->set_error_arg(
-      StringPiece(s->begin(), static_cast<size_t>(t.begin() - s->begin())));
+      StringPiece(s->data(), static_cast<size_t>(t.data() - s->data())));
   return false;
 }
 
@@ -2181,7 +2182,7 @@ BadPerlOp:
 // into UTF8 encoding in string.
 // Can't use EncodingUtils::EncodeLatin1AsUTF8 because it is
 // deprecated and because it rejects code points 0x80-0x9F.
-void ConvertLatin1ToUTF8(const StringPiece& latin1, string* utf) {
+void ConvertLatin1ToUTF8(const StringPiece& latin1, std::string* utf) {
   char buf[UTFmax];
 
   utf->clear();
@@ -2208,7 +2209,7 @@ Regexp* Regexp::Parse(const StringPiece& s, ParseFlags global_flags,
 
   // Convert regexp to UTF-8 (easier on the rest of the parser).
   if (global_flags & Latin1) {
-    string* tmp = new string;
+    std::string* tmp = new std::string;
     ConvertLatin1ToUTF8(t, tmp);
     status->set_tmp(tmp);
     t = *tmp;
@@ -2321,8 +2322,8 @@ Regexp* Regexp::Parse(const StringPiece& s, ParseFlags global_flags,
             // (and a++ means something else entirely, which we don't support!)
             status->set_code(kRegexpRepeatOp);
             status->set_error_arg(StringPiece(
-                lastunary.begin(),
-                static_cast<size_t>(t.begin() - lastunary.begin())));
+                lastunary.data(),
+                static_cast<size_t>(t.data() - lastunary.data())));
             return NULL;
           }
         }
@@ -2354,8 +2355,8 @@ Regexp* Regexp::Parse(const StringPiece& s, ParseFlags global_flags,
             // Not allowed to stack repetition operators.
             status->set_code(kRegexpRepeatOp);
             status->set_error_arg(StringPiece(
-                lastunary.begin(),
-                static_cast<size_t>(t.begin() - lastunary.begin())));
+                lastunary.data(),
+                static_cast<size_t>(t.data() - lastunary.data())));
             return NULL;
           }
         }
