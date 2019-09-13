@@ -86,7 +86,8 @@ class Prog {
     int cap()       { DCHECK_EQ(opcode(), kInstCapture); return cap_; }
     int lo()        { DCHECK_EQ(opcode(), kInstByteRange); return lo_; }
     int hi()        { DCHECK_EQ(opcode(), kInstByteRange); return hi_; }
-    int foldcase()  { DCHECK_EQ(opcode(), kInstByteRange); return foldcase_; }
+    int foldcase()  { DCHECK_EQ(opcode(), kInstByteRange); return hint_foldcase_&1; }
+    int hint()      { DCHECK_EQ(opcode(), kInstByteRange); return hint_foldcase_>>1; }
     int match_id()  { DCHECK_EQ(opcode(), kInstMatch); return match_id_; }
     EmptyOp empty() { DCHECK_EQ(opcode(), kInstEmptyWidth); return empty_; }
 
@@ -100,13 +101,13 @@ class Prog {
     // Does this inst (an kInstByteRange) match c?
     inline bool Matches(int c) {
       DCHECK_EQ(opcode(), kInstByteRange);
-      if (foldcase_ && 'A' <= c && c <= 'Z')
+      if (foldcase() && 'A' <= c && c <= 'Z')
         c += 'a' - 'A';
       return lo_ <= c && c <= hi_;
     }
 
     // Returns string representation for debugging.
-    string Dump();
+    std::string Dump();
 
     // Maximum instruction id.
     // (Must fit in out_opcode_. PatchList/last steal another bit.)
@@ -129,25 +130,31 @@ class Prog {
       out_opcode_ = (out<<4) | (last()<<3) | opcode;
     }
 
-    uint32_t out_opcode_;   // 28 bits: out, 1 bit: last, 3 (low) bits: opcode
-    union {                 // additional instruction arguments:
-      uint32_t out1_;       // opcode == kInstAlt
-                            //   alternate next instruction
+    uint32_t out_opcode_;  // 28 bits: out, 1 bit: last, 3 (low) bits: opcode
+    union {                // additional instruction arguments:
+      uint32_t out1_;      // opcode == kInstAlt
+                           //   alternate next instruction
 
-      int32_t cap_;         // opcode == kInstCapture
-                            //   Index of capture register (holds text
-                            //   position recorded by capturing parentheses).
-                            //   For \n (the submatch for the nth parentheses),
-                            //   the left parenthesis captures into register 2*n
-                            //   and the right one captures into register 2*n+1.
+      int32_t cap_;        // opcode == kInstCapture
+                           //   Index of capture register (holds text
+                           //   position recorded by capturing parentheses).
+                           //   For \n (the submatch for the nth parentheses),
+                           //   the left parenthesis captures into register 2*n
+                           //   and the right one captures into register 2*n+1.
 
-      int32_t match_id_;    // opcode == kInstMatch
-                            //   Match ID to identify this match (for re2::Set).
+      int32_t match_id_;   // opcode == kInstMatch
+                           //   Match ID to identify this match (for re2::Set).
 
-      struct {              // opcode == kInstByteRange
-        uint8_t lo_;        //   byte range is lo_-hi_ inclusive
-        uint8_t hi_;        //
-        uint8_t foldcase_;  //   convert A-Z to a-z before checking range.
+      struct {             // opcode == kInstByteRange
+        uint8_t lo_;       //   byte range is lo_-hi_ inclusive
+        uint8_t hi_;       //
+        uint16_t hint_foldcase_;  // 15 bits: hint, 1 (low) bit: foldcase
+                           //   hint to execution engines: the delta to the
+                           //   next instruction (in the current list) worth
+                           //   exploring iff this instruction matched; 0
+                           //   means there are no remaining possibilities,
+                           //   which is most likely for character classes.
+                           //   foldcase: A-Z -> a-z before checking range.
       };
 
       EmptyOp empty_;       // opcode == kInstEmptyWidth
@@ -199,6 +206,7 @@ class Prog {
   void set_reversed(bool reversed) { reversed_ = reversed; }
   int list_count() { return list_count_; }
   int inst_count(InstOp op) { return inst_count_[op]; }
+  uint16_t* list_heads() { return list_heads_.data(); }
   void set_dfa_mem(int64_t dfa_mem) { dfa_mem_ = dfa_mem; }
   int64_t dfa_mem() { return dfa_mem_; }
   int flags() { return flags_; }
@@ -214,9 +222,9 @@ class Prog {
   int first_byte();
 
   // Returns string representation of program for debugging.
-  string Dump();
-  string DumpUnanchored();
-  string DumpByteMap();
+  std::string Dump();
+  std::string DumpUnanchored();
+  std::string DumpByteMap();
 
   // Returns the set of kEmpty flags that are in effect at
   // position p within context.
@@ -305,7 +313,8 @@ class Prog {
                      StringPiece* match, int nmatch);
 
   // Bit-state backtracking.  Fast on small cases but uses memory
-  // proportional to the product of the program size and the text size.
+  // proportional to the product of the list count and the text size.
+  bool CanBitState() { return list_heads_.data() != NULL; }
   bool SearchBitState(const StringPiece& text, const StringPiece& context,
                       Anchor anchor, MatchKind kind,
                       StringPiece* match, int nmatch);
@@ -337,7 +346,7 @@ class Prog {
   // do not compile down to infinite repetitions.
   //
   // Returns true on success, false on error.
-  bool PossibleMatchRange(string* min, string* max, int maxlen);
+  bool PossibleMatchRange(std::string* min, std::string* max, int maxlen);
 
   // EXPERIMENTAL! SUBJECT TO CHANGE!
   // Outputs the program fanout into the given sparse array.
@@ -374,6 +383,9 @@ class Prog {
                 std::vector<Inst>* flat,
                 SparseSet* reachable, std::vector<int>* stk);
 
+  // Computes hints for ByteRange instructions in [begin, end).
+  void ComputeHints(std::vector<Inst>* flat, int begin, int end);
+
  private:
   friend class Compiler;
 
@@ -393,10 +405,12 @@ class Prog {
   int first_byte_;          // required first byte for match, or -1 if none
   int flags_;               // regexp parse flags
 
-  int list_count_;            // count of lists (see above)
-  int inst_count_[kNumInst];  // count of instructions by opcode
+  int list_count_;                 // count of lists (see above)
+  int inst_count_[kNumInst];       // count of instructions by opcode
+  PODArray<uint16_t> list_heads_;  // sparse array enumerating list heads
+                                   // not populated if size_ is overly large
 
-  PODArray<Inst> inst_;     // pointer to instruction array
+  PODArray<Inst> inst_;              // pointer to instruction array
   PODArray<uint8_t> onepass_nodes_;  // data for OnePass nodes
 
   int64_t dfa_mem_;         // Maximum memory for DFAs.
