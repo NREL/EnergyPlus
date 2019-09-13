@@ -2358,19 +2358,19 @@ This equipment is metered on the Interior Equipment end-use category for Electri
 
 \paragraph{Field: Supply Temperature Difference}\label{field-supply-temperature-difference}
 
-The difference of the IT inlet temperature from the AHU supply air temperature. Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
+The difference of the IT inlet temperature from the AHU supply air temperature ($\delta T_{supply} = T_{in}-T_{supply}$). Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 \paragraph{Field: Supply Temperature Difference Schedule}\label{field-supply-temperature-difference-schedule}
 
-The difference schedule of the IT inlet temperature from the AHU supply air temperature. Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
+The difference schedule of the IT inlet temperature from the AHU supply air temperature ($\delta T_{supply} = T_{in}-T_{supply}$). Either Supply Temperature Difference or Supply Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 \paragraph{Field: Return Temperature Difference}\label{field-return-temperature-difference}
 
-The difference of the actual AHU return air temperature to the IT equipment outlet temperature. Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
+The difference of the actual AHU return air temperature to the IT equipment outlet temperature ($\delta T_{return} = T_{return}-T_{out}$). Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 \paragraph{Field: Return Temperature Difference Schedule}\label{field-return-temperature-difference-schedule}
 
-The difference schedule of the actual AHU return air temperature to the IT equipment outlet temperature. Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
+The difference schedule of the actual AHU return air temperature to the IT equipment outlet temperature ($\delta T_{return} = T_{return}-T_{out}$). Either Return Temperature Difference or Return Temperature Difference Schedule is required if Air Flow Calculation Method is set to \textbf{FlowControlWithApproachTemperatures}. This field is ignored when Air Flow Calculation Method is \textbf{FlowFromSystem}.
 
 An IDF example:
 

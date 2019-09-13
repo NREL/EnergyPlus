@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_UTILS_RAPIDJSON_UTILS_HPP
-#define __VALIJSON_UTILS_RAPIDJSON_UTILS_HPP
 
 #include <iostream>
 
@@ -35,5 +33,3 @@ inline bool loadDocument(const std::string &path, rapidjson::GenericDocument<Enc
 
 }  // namespace utils
 }  // namespace valijson
-
-#endif
