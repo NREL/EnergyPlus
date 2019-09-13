@@ -5,10 +5,10 @@
 // Tested by search_test.cc, exhaustive_test.cc, tester.cc
 
 // Prog::SearchBitState is a regular expression search with submatch
-// tracking for small regular expressions and texts.  Like
-// testing/backtrack.cc, it allocates a bit vector with (length of
-// text) * (length of prog) bits, to make sure it never explores the
-// same (character position, instruction) state multiple times.  This
+// tracking for small regular expressions and texts.  Similarly to
+// testing/backtrack.cc, it allocates a bitmap with (count of
+// lists) * (length of prog) bits to make sure it never explores the
+// same (instruction list, character position) multiple times.  This
 // limits the search to run in time linear in the length of the text.
 //
 // Unlike testing/backtrack.cc, SearchBitState is not recursive
@@ -64,7 +64,7 @@ class BitState {
 
   // Search state
   static const int VisitedBits = 32;
-  PODArray<uint32_t> visited_;  // bitmap: (Inst*, char*) pairs visited
+  PODArray<uint32_t> visited_;  // bitmap: (list ID, char*) pairs visited
   PODArray<const char*> cap_;   // capture registers
   PODArray<Job> job_;           // stack of text positions to explore
   int njob_;                    // stack size
@@ -80,12 +80,13 @@ BitState::BitState(Prog* prog)
     njob_(0) {
 }
 
-// Should the search visit the pair ip, p?
+// Given id, which *must* be a list head, we can look up its list ID.
+// Then the question is: Should the search visit the (list ID, p) pair?
 // If so, remember that it was visited so that the next time,
 // we don't repeat the visit.
 bool BitState::ShouldVisit(int id, const char* p) {
-  int n = id * static_cast<int>(text_.size()+1) +
-          static_cast<int>(p-text_.begin());
+  int n = prog_->list_heads()[id] * static_cast<int>(text_.size()+1) +
+          static_cast<int>(p-text_.data());
   if (visited_[n/VisitedBits] & (1 << (n & (VisitedBits-1))))
     return false;
   visited_[n/VisitedBits] |= 1 << (n & (VisitedBits-1));
@@ -113,18 +114,13 @@ void BitState::Push(int id, const char* p) {
 
   // If id < 0, it's undoing a Capture,
   // so we mustn't interfere with that.
-  if (id >= 0) {
-    if (!ShouldVisit(id, p))
+  if (id >= 0 && njob_ > 0) {
+    Job* top = &job_[njob_-1];
+    if (id == top->id &&
+        p == top->p + top->rle + 1 &&
+        top->rle < std::numeric_limits<int>::max()) {
+      ++top->rle;
       return;
-
-    if (njob_ > 0) {
-      Job* top = &job_[njob_-1];
-      if (id == top->id &&
-          p == top->p + top->rle + 1 &&
-          top->rle < std::numeric_limits<int>::max()) {
-        ++top->rle;
-        return;
-      }
     }
   }
 
@@ -138,9 +134,12 @@ void BitState::Push(int id, const char* p) {
 // Return whether it succeeded.
 bool BitState::TrySearch(int id0, const char* p0) {
   bool matched = false;
-  const char* end = text_.end();
+  const char* end = text_.data() + text_.size();
   njob_ = 0;
-  Push(id0, p0);
+  // Push() no longer checks ShouldVisit(),
+  // so we must perform the check ourselves.
+  if (ShouldVisit(id0, p0))
+    Push(id0, p0);
   while (njob_ > 0) {
     // Pop job off stack.
     --njob_;
@@ -153,6 +152,7 @@ bool BitState::TrySearch(int id0, const char* p0) {
       cap_[prog_->inst(-id)->cap()] = p;
       continue;
     }
+
     if (rle > 0) {
       p += rle;
       // Revivify job on stack.
@@ -160,24 +160,8 @@ bool BitState::TrySearch(int id0, const char* p0) {
       ++njob_;
     }
 
-    // Optimization: rather than push and pop,
-    // code that is going to Push and continue
-    // the loop simply updates (ip, p) and jumps
-    // to CheckAndLoop.  We have to do the
-    // ShouldVisit check that Push would have,
-    // but we avoid the stack manipulation.
-    if (0) {
-    Next:
-      if (prog_->inst(id)->last())
-        continue;
-      id++;
-
-    CheckAndLoop:
-      if (!ShouldVisit(id, p))
-        continue;
-    }
-
-    // Visit ip, p.
+  Loop:
+    // Visit id, p.
     Prog::Inst* ip = prog_->inst(id);
     switch (ip->opcode()) {
       default:
@@ -185,21 +169,21 @@ bool BitState::TrySearch(int id0, const char* p0) {
         return false;
 
       case kInstFail:
-        continue;
+        break;
 
       case kInstAltMatch:
         if (ip->greedy(prog_)) {
           // out1 is the Match instruction.
           id = ip->out1();
           p = end;
-          goto CheckAndLoop;
+          goto Loop;
         }
         if (longest_) {
           // ip must be non-greedy...
           // out is the Match instruction.
           id = ip->out();
           p = end;
-          goto CheckAndLoop;
+          goto Loop;
         }
         goto Next;
 
@@ -210,8 +194,8 @@ bool BitState::TrySearch(int id0, const char* p0) {
         if (!ip->Matches(c))
           goto Next;
 
-        if (!ip->last())
-          Push(id+1, p);  // try the next when we're done
+        if (ip->hint() != 0)
+          Push(id+ip->hint(), p);  // try the next when we're done
         id = ip->out();
         p++;
         goto CheckAndLoop;
@@ -243,7 +227,14 @@ bool BitState::TrySearch(int id0, const char* p0) {
         if (!ip->last())
           Push(id+1, p);  // try the next when we're done
         id = ip->out();
-        goto CheckAndLoop;
+
+      CheckAndLoop:
+        // Sanity check: id is the head of its list, which must
+        // be the case if id-1 is the last of *its* list. :)
+        DCHECK(id == 0 || prog_->inst(id-1)->last());
+        if (ShouldVisit(id, p))
+          goto Loop;
+        break;
 
       case kInstMatch: {
         if (endmatch_ && p != end)
@@ -260,7 +251,7 @@ bool BitState::TrySearch(int id0, const char* p0) {
         matched = true;
         cap_[1] = p;
         if (submatch_[0].data() == NULL ||
-            (longest_ && p > submatch_[0].end())) {
+            (longest_ && p > submatch_[0].data() + submatch_[0].size())) {
           for (int i = 0; i < nsubmatch_; i++)
             submatch_[i] =
                 StringPiece(cap_[2 * i],
@@ -276,7 +267,14 @@ bool BitState::TrySearch(int id0, const char* p0) {
           return true;
 
         // Otherwise, continue on in hope of a longer match.
-        goto Next;
+        // Note the absence of the ShouldVisit() check here
+        // due to execution remaining in the same list.
+      Next:
+        if (!ip->last()) {
+          id++;
+          goto Loop;
+        }
+        break;
       }
     }
   }
@@ -290,7 +288,7 @@ bool BitState::Search(const StringPiece& text, const StringPiece& context,
   // Search parameters.
   text_ = text;
   context_ = context;
-  if (context_.begin() == NULL)
+  if (context_.data() == NULL)
     context_ = text;
   if (prog_->anchor_start() && context_.begin() != text.begin())
     return false;
@@ -305,7 +303,7 @@ bool BitState::Search(const StringPiece& text, const StringPiece& context,
     submatch_[i] = StringPiece();
 
   // Allocate scratch space.
-  int nvisited = prog_->size() * static_cast<int>(text.size()+1);
+  int nvisited = prog_->list_count() * static_cast<int>(text.size()+1);
   nvisited = (nvisited + VisitedBits-1) / VisitedBits;
   visited_ = PODArray<uint32_t>(nvisited);
   memset(visited_.data(), 0, nvisited*sizeof visited_[0]);
@@ -321,8 +319,8 @@ bool BitState::Search(const StringPiece& text, const StringPiece& context,
 
   // Anchored search must start at text.begin().
   if (anchored_) {
-    cap_[0] = text.begin();
-    return TrySearch(prog_->start(), text.begin());
+    cap_[0] = text.data();
+    return TrySearch(prog_->start(), text.data());
   }
 
   // Unanchored search, starting from each possible text position.
@@ -331,13 +329,14 @@ bool BitState::Search(const StringPiece& text, const StringPiece& context,
   // This looks like it's quadratic in the size of the text,
   // but we are not clearing visited_ between calls to TrySearch,
   // so no work is duplicated and it ends up still being linear.
-  for (const char* p = text.begin(); p <= text.end(); p++) {
+  for (const char* p = text.data(); p <= text.data() + text.size(); p++) {
     // Try to use memchr to find the first byte quickly.
     int fb = prog_->first_byte();
-    if (fb >= 0 && p < text.end() && (p[0] & 0xFF) != fb) {
-      p = reinterpret_cast<const char*>(memchr(p, fb, text.end() - p));
+    if (fb >= 0 && p < text.data() + text.size() && (p[0] & 0xFF) != fb) {
+      p = reinterpret_cast<const char*>(
+          memchr(p, fb, text.data() + text.size() - p));
       if (p == NULL)
-        p = text.end();
+        p = text.data() + text.size();
     }
 
     cap_[0] = p;
