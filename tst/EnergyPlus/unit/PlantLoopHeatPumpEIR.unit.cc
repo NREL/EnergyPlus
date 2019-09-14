@@ -2400,11 +2400,11 @@ TEST_F(EIRPLHPFixture, ClearState) {
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
-    EXPECT_EQ(eir_plhp.size(), 1);
+    EXPECT_EQ(eir_plhp.size(), 1u);
 
     // test that vector is cleared
     EIRPlantLoopHeatPump::clear_state();
-    EXPECT_EQ(eir_plhp.size(), 0);
+    EXPECT_EQ(eir_plhp.size(), 0u);
 }
 
 TEST_F(EIRPLHPFixture, Initialization2_AirSource) {
