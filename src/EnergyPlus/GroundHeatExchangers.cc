@@ -1,18 +1,18 @@
-//// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
-//// The Regents of the University of California, through Lawrence Berkeley National Laboratory
-//// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
-//// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
-//// contributors. All rights reserved.
-////
-//// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
-//// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
-//// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
-//// worldwide license in the Software to reproduce, distribute copies to the public, prepare
-//// derivative works, and perform publicly and display publicly, and to permit others to do so.
-////
-//// Redistribution and use in source and binary forms, with or without modification, are permitted
-//// provided that the following conditions are met:
-////
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
 // (1) Redistributions of source code must retain the above copyright notice, this list of
 //     conditions and the following disclaimer.
 //
@@ -44,6 +44,7 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
+
 //
 //// C++ Headers
 //#include <cmath>
@@ -202,7 +203,7 @@ namespace GroundHeatExchangers {
         return this->volFluid / vdot;
     }
 
-    Real64 Pipe::simulate(Real64 time, Real64 timeStep, Real64 flowRate, Real64 temperature)
+    Real64 Pipe::simulate(Real64 EP_UNUSED(time), Real64 EP_UNUSED(timeStep), Real64 EP_UNUSED(flowRate), Real64 EP_UNUSED(temperature))
     {
         return 0;
     }
