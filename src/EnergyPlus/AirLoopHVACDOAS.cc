@@ -1122,15 +1122,15 @@ namespace AirLoopHVACDOAS {
         Real64 OldTemp;
         for (std::size_t loop = 0; loop < airloopDOAS.size(); ++loop) {
             maxDiff = 0.0;
-            Diff = abs(airloopDOAS[loop].m_CompPointerAirLoopSplitter->InletTemp -
-                       DataLoopNode::Node(airloopDOAS[loop].m_CompPointerAirLoopSplitter->OutletNodeNum[0]).Temp);
+            Diff = std::abs(airloopDOAS[loop].m_CompPointerAirLoopSplitter->InletTemp -
+                            DataLoopNode::Node(airloopDOAS[loop].m_CompPointerAirLoopSplitter->OutletNodeNum[0]).Temp);
             if (Diff > maxDiff) {
                 maxDiff = Diff;
             }
             if (airloopDOAS[loop].m_HeatExchangerFlag) {
                 OldTemp = airloopDOAS[loop].m_CompPointerAirLoopMixer->OutletTemp;
                 airloopDOAS[loop].m_CompPointerAirLoopMixer->CalcAirLoopMixer();
-                Diff = abs(OldTemp - airloopDOAS[loop].m_CompPointerAirLoopMixer->OutletTemp);
+                Diff = std::abs(OldTemp - airloopDOAS[loop].m_CompPointerAirLoopMixer->OutletTemp);
                 if (Diff > maxDiff) {
                     maxDiff = Diff;
                 }
