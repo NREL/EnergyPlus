@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_INTERNAL_JSON_POINTER_HPP
-#define __VALIJSON_INTERNAL_JSON_POINTER_HPP
 
 #include <algorithm>
 #include <cerrno>
@@ -253,5 +251,3 @@ inline AdapterType resolveJsonPointer(
 } // namespace json_pointer
 } // namespace internal
 } // namespace valijson
-
-#endif

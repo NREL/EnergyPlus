@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_UTILS_PROPERTY_TREE_UTILS_HPP
-#define __VALIJSON_UTILS_PROPERTY_TREE_UTILS_HPP
 
 #include <iostream>
 #include <sstream>
@@ -36,5 +34,3 @@ inline bool loadDocument(const std::string &path, boost::property_tree::ptree &d
 
 }  // namespace utils
 }  // namespace valijson
-
-#endif
