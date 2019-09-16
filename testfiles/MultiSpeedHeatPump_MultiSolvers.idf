@@ -1,4 +1,4 @@
-﻿! MultiSpeedHeatPump_MultiSolvers.idf
+! MultiSpeedHeatPump_MultiSolvers.idf
 ! Basic file description:  Multispeed Heat pump with DX coils for cooling (w/ 10% outdoor air max.)
 !                          1 story building divided into 3 interior conditioned zones. Roof with no plenum.
 !                          No ground contact with floor.

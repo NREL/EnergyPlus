@@ -3754,9 +3754,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     MixedAir::OAController(1).RelTotalLossRate = 1.0;
     MixedAir::OAController(2).RelTotalLossRate = 1.0;
     CondenserLoopTowers::NumSimpleTowers = 1;
-    CondenserLoopTowers::SimpleTowerReport.allocate(1);
-    CondenserLoopTowers::SimpleTowerReport(1).Qactual = 1.0;
-    CondenserLoopTowers::SimpleTowerReport(1).FanEnergy = 50.0;
+    CondenserLoopTowers::towers.allocate(1);
+    CondenserLoopTowers::towers(1).Qactual = 1.0;
+    CondenserLoopTowers::towers(1).FanEnergy = 50.0;
 
     Real64 TimeStepSysSec = DataHVACGlobals::TimeStepSys * SecInHour;
     Real64 reliefEnergy = 2.0 * TimeStepSysSec;

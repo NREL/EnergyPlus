@@ -1,5 +1,4 @@
-#ifndef __VALIJSON_CUSTOM_ALLOCATOR_HPP
-#define __VALIJSON_CUSTOM_ALLOCATOR_HPP
+#pragma once
 
 namespace valijson {
 namespace internal {
@@ -106,5 +105,3 @@ public:
 
 } // end namespace internal
 } // end namespace valijson
-
-#endif
