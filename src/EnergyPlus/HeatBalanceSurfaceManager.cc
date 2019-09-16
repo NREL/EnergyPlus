@@ -5713,7 +5713,7 @@ namespace HeatBalanceSurfaceManager {
             if (Surface(SurfNum).OSCMPtr > 0) { // Optr is set above in this case, use OSCM boundary data
                 QdotConvOutRepPerArea(SurfNum) = -OSCM(OPtr).HConv * (TH(1, 1, SurfNum) - OSCM(OPtr).TConv);
             } else {
-                QdotConvOutRepPerArea(SurfNum) = GetQdotConvOutRep(SurfNum) / Surface(SurfNum).Area;
+                QdotConvOutRepPerArea(SurfNum) = QdotConvOutRep(SurfNum) / Surface(SurfNum).Area;
             }
 
             QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * TimeStepZoneSec;
