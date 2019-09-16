@@ -5707,11 +5707,8 @@ namespace HeatBalanceSurfaceManager {
             }
 
             // fill in reporting values for outside face
-            if (IsRain) {
-                QdotConvOutRep(SurfNum) = -Surface(SurfNum).Area * HcExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutWetBulbTemp);
-            } else {
-                QdotConvOutRep(SurfNum) = -Surface(SurfNum).Area * HcExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
-            }
+            
+            QdotConvOutRep(SurfNum) = getMyQdotConvOutRep(SurfNum);
 
             if (Surface(SurfNum).OSCMPtr > 0) { // Optr is set above in this case, use OSCM boundary data
                 QdotConvOutRepPerArea(SurfNum) = -OSCM(OPtr).HConv * (TH(1, 1, SurfNum) - OSCM(OPtr).TConv);
