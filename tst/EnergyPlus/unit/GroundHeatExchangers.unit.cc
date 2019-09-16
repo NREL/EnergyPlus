@@ -399,7 +399,32 @@ TEST_F(GHEFixture, logInletTemps)
     EXPECT_NEAR(pipe.inletTempTimes[1], 100, tol);
 }
 
+TEST_F(GHEFixture, plugFlowOutletTemp) {
+    DataPlant::PlantLoop.allocate(2);
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(1).FluidIndex = 1;
+    DataPlant::PlantLoop(1).FluidName = "WATER";
 
+    json j = {{"conductivity", 0.4},
+              {"density", 950},
+              {"specific-heat", 1900},
+              {"outer-diameter", 0.0334},
+              {"inner-diameter", 0.0269},
+              {"length", 100},
+              {"initial-temperature", 10},
+              {"loop-num", 1}};
+
+    Pipe pipe(j);
+    Real64 tol = 1E-4;
+
+    EXPECT_NEAR(pipe.plugFlowOutletTemp(0), 10.0, tol);
+
+    pipe.logInletTemps(50, 50);
+    pipe.logInletTemps(100, 100);
+    pipe.logInletTemps(150, 150);
+
+    EXPECT_NEAR(pipe.plugFlowOutletTemp(75), 75.0, tol);
+}
 
 // TEST_F(GHEFixture, GroundHeatExchangerTest_Interpolate)
 //{

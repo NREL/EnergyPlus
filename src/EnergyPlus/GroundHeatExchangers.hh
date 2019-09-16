@@ -179,6 +179,8 @@ namespace GroundHeatExchangers {
             Real64 initTemp = j["initial-temperature"];
             std::replace(this->cellTemps.begin(), this->cellTemps.end(), 0.0, initTemp);
             std::replace(this->inletTemps.begin(), this->inletTemps.end(), 0.0, initTemp);
+
+            const int numPipeCells = 16;
         }
 
         // default constructor
@@ -210,6 +212,9 @@ namespace GroundHeatExchangers {
         static Real64 laminarFrictionFactor(Real64 Re)
         {
             // laminar friction factor
+
+            // @param Re: Reynolds number
+
             return 64 / Re;
         }
 
@@ -221,6 +226,8 @@ namespace GroundHeatExchangers {
             // friction in turbulent pipe flow with variable physical properties, pages 503–564.
             // Academic Press, Inc., New York, NY.
 
+            // @param Re: Reynolds number
+
             return std::pow(0.79 * std::log(Re) - 1.64, -2.0);
         }
     };
@@ -231,12 +238,26 @@ namespace GroundHeatExchangers {
         //
         //  https://en.wikipedia.org/wiki/Sigmoid_function
         //
-        //  x: independent variable
-        //  param a: fitting parameter 1
-        //  param b: fitting parameter 2
-        //  return: float between 0-1
+        //  @param x: independent variable
+        //  @param a: fitting parameter 1
+        //  @param b: fitting parameter 2
+        //  @return float between 0-1
 
         return 1 / (1 + std::exp(-(x - a) / b));
+    }
+
+    static Real64 linInterp(Real64 x, Real64 x_l, Real64 x_h, Real64 y_l, Real64 y_h)
+    {
+        //  Simple linear interpolation
+        //
+        //  @param x: independent input variable
+        //  @param x_l: low independent interval bound
+        //  @param x_h: high independent interval bound
+        //  @param y_l: low dependent interval bound
+        //  @param y_h: high dependent interval bound
+        //  @return interpolated value
+
+        return (x - x_l) / (x_h - x_l) * (y_h - y_l) + y_l;
     }
 
     // struct GLHEVertPropsStruct

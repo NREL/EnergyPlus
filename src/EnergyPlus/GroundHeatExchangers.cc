@@ -188,9 +188,33 @@ namespace GroundHeatExchangers {
         // singleBoreholesVector.clear();
     }
 
+    Real64 Pipe::simulate(Real64 time, Real64 timeStep, Real64 flowRate, Real64 temperature)
+    {
+        //  Simulate the temperature response of an adiabatic pipe with internal fluid mixing.
+
+        //  Rees, S.J. 2015. 'An extended two-dimensional borehole heat exchanger model for
+        //  simulation of short and medium timescale thermal response.' Renewable Energy. 83: 518-526.
+
+        //  Skoglund, T, and P. Dejmek. 2007. 'A dynamic object-oriented model for efficient
+        //  fsimulation of fluid dispersion in turbulent flow with varying fluid properties.'
+        //  Chem. Eng. Sci.. 62: 2168-2178.
+
+        //  Bischoff, K.B., and O. Levenspiel. 1962. 'Fluid dispersion--generalization and comparision
+        //  of mathematical models--II; Comparison of models.' Chem. Eng. Sci.. 17: 257-264.
+
+        //
+
+
+        return 0;
+    }
+
     Real64 Pipe::calcTransitTime(Real64 flowRate, Real64 temperature)
     {
         // Compute the fluid transit time
+
+        // @param flowRate: mass flow rate, kg/s
+        // @param temperature: temperature, C
+        // @returns pipe transit time
 
         using FluidProperties::GetDensityGlycol;
 
@@ -202,36 +226,46 @@ namespace GroundHeatExchangers {
         return this->volFluid / vdot;
     }
 
-    Real64 Pipe::simulate(Real64 time, Real64 timeStep, Real64 flowRate, Real64 temperature)
+    Real64 Pipe::plugFlowOutletTemp(Real64 time)
     {
-        return 0;
-    }
+        // tracks the plug flow outlet temperature
 
-//    Real64 Pipe::plugFlowOutletTemp(Real64 time)
-//    {
-//        if (time < 0) {
-//            return this->inletTemps[0];
-//        }
-//
-//        int idx = 0;
-//        for (auto it = this->inletTempTimes.begin(); it != this->inletTempTimes.end(); ++it) {
-//            Real64 t_l = *it;
-//            if (t_l > time) {
-//                int idx_h = idx;
-//                int idx_l = idx - 1;
-//                t_l = this->inletTempTimes[idx_l];
-//                Real64 t_h = this->inletTempTimes[idx_h];
-//                Real64 temp_l = this->inletTemps[idx_l];
-//                Real64 temp_h = this->inletTemps[idx_h];
-//            }
-//            ++idx;
-//        }
-//    }
+        // @param time: simulation time
+        // @returns temperature, C
+
+        if (time <= 0) {
+            return this->inletTemps[0];
+        }
+
+        int idx = 0;
+        for (auto it = this->inletTempTimes.begin(); it != this->inletTempTimes.end(); ++it) {
+            Real64 t_l = *it;
+            if (t_l > time) {
+                int idx_h = idx;
+                int idx_l = idx - 1;
+                t_l = this->inletTempTimes[idx_l];
+                Real64 t_h = this->inletTempTimes[idx_h];
+                Real64 temp_l = this->inletTemps[idx_l];
+                Real64 temp_h = this->inletTemps[idx_h];
+
+                // eliminate old history
+                std::vector<int> x(idx_l);
+                std::iota(std::begin(x), std::end(x), 0);
+
+                for (auto it_in = this->inletTempTimes.begin(); it_in != this->inletTempTimes.end(); ++it_in) {
+                    this->inletTemps.pop_front();
+                    this->inletTempTimes.pop_front();
+                }
+                return linInterp(time, t_l, t_h, temp_l, temp_h);
+            }
+            ++idx;
+        }
+    }
 
     void Pipe::logInletTemps(Real64 inletTemp, Real64 time)
     {
-        this->inletTemps.push_back(inletTemp);
-        this->inletTempTimes.push_back(time);
+        this->inletTemps.emplace_back(inletTemp);
+        this->inletTempTimes.emplace_back(time);
     }
 
     Real64 Pipe::mdotToRe(Real64 flowRate, Real64 temperature)
@@ -244,6 +278,11 @@ namespace GroundHeatExchangers {
 
     Real64 Pipe::calcFrictionFactor(Real64 Re)
     {
+        // smooth pipe friction factor
+
+        // @param Re: Reynolds number
+        // @returns friction factor
+
         Real64 lowRe = 1500;
         Real64 highRe = 5000;
 
@@ -278,6 +317,10 @@ namespace GroundHeatExchangers {
         // Gnielinski, V. 1976. 'New equations for heat and mass transfer in turbulent pipe and channel flow.'
         // International Chemical Engineering 16(1976), pp. 359-368.
 
+        // @param Re: Reynolds number
+        // @param temperature: temperature, C
+        // @returns Nusselt number
+
         static std::string const routineName("Pipe::turbulentNusselt");
 
         Real64 f = this->calcFrictionFactor(Re);
@@ -296,7 +339,6 @@ namespace GroundHeatExchangers {
 
     Real64 Pipe::calcConvectionResistance(Real64 flowRate, Real64 temperature)
     {
-
         // Calculates the convection resistance using Gnielinski and Petukhov, in [k/(W/m)]
 
         // Gnielinski, V. 1976. 'New equations for heat and mass transfer in turbulent pipe and channel flow.'
@@ -341,6 +383,7 @@ namespace GroundHeatExchangers {
 
         // @param flowRate: mass flow rate, kg/s
         // @param temperature: temperature, C
+        // @returns pipe resistance, K/(W/m)
 
         this->resistPipe = this->calcConvectionResistance(flowRate, temperature) + this->calcConductionResistance();
         return this->resistPipe;
