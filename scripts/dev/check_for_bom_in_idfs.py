@@ -31,5 +31,5 @@ for root, dirs, files in os.walk(test_files_dir):
                             'file': os.path.join('testfiles', relative_path),
                             'line': i + 1,
                             'messagetype': 'error',
-                            'message': 'Byte-Order-Mark sequence found in IDF, check editor'
+                            'message': 'Byte-Order-Mark sequence detected in IDF, check editor'
                         }))
