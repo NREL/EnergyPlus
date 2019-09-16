@@ -78,12 +78,19 @@ using namespace EnergyPlus::GroundHeatExchangers;
 
 class GHEFixture : public EnergyPlusFixture {};
 
+TEST_F(GHEFixture, linInterp)
+{
+    Real64 tol = 1E-6;
+    EXPECT_NEAR(linInterp(0.25, 0, 1, 0, 1), 0.25, tol);
+    EXPECT_NEAR(linInterp(0.50, 0, 1, 0, 1), 0.50, tol);
+    EXPECT_NEAR(linInterp(0.75, 0, 1, 0, 1), 0.75, tol);
+}
+
 TEST_F(GHEFixture, smoothingFunc)
 {
     Real64 tol = 1E-3;
     EXPECT_NEAR(smoothingFunc(-8, 0, 1), 0, tol);
     EXPECT_NEAR(smoothingFunc(8, 0, 1), 1, tol);
-
 }
 
 TEST_F(GHEFixture, InitBaseProps)

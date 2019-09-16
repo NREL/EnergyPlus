@@ -230,6 +230,11 @@ namespace GroundHeatExchangers {
 
     Real64 Pipe::plugFlowOutletTemp(Real64 time)
     {
+        // computes the plug-flow outlet temperature
+
+        // @param time: simulation time, s
+        // @returns outlet temperature for respective time, C
+
         int idx = 0;
         for (auto it = this->inletTempTimes.begin(); it != this->inletTempTimes.end(); ++it) {
             Real64 t_l = *it;
@@ -263,6 +268,13 @@ namespace GroundHeatExchangers {
 
     Real64 Pipe::mdotToRe(Real64 flowRate, Real64 temperature)
     {
+        // convert mass flow rate to Reynolds number
+
+        // @param flowRate: mass flow rate, kg/s
+        // @param temperature: temperature, C
+
+        // @returns Reynolds number
+
         static std::string const routineName("Pipe::calcTransitTime");
         Real64 mu = FluidProperties::GetViscosityGlycol(PlantLoop(this->loopNum).FluidName,
                                                       temperature, PlantLoop(this->loopNum).FluidIndex, routineName);

@@ -179,8 +179,6 @@ namespace GroundHeatExchangers {
             Real64 initTemp = j["initial-temperature"];
             std::replace(this->cellTemps.begin(), this->cellTemps.end(), 0.0, initTemp);
             std::replace(this->inletTemps.begin(), this->inletTemps.end(), 0.0, initTemp);
-
-            const int numPipeCells = 16;
         }
 
         // default constructor
