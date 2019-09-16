@@ -2571,6 +2571,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_OutsideSurfHeatBalanceWhenRa
     DataEnvironment::IsRain = false;
     DataHeatBalSurface::HcExtSurf(1) = 5.65361106051348;
     Real64 ExpectedQconv2 = -58.197 * 5.65361106051348 * (6.71793958923051 - 7.2);
+
     EXPECT_EQ(ExpectedQconv2, GetQdotConvOutRep(1));
 }
 
