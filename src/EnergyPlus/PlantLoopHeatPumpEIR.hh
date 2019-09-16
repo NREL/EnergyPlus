@@ -162,7 +162,7 @@ namespace EnergyPlus {
 
             void resetReportingVariables();
 
-            static PlantComponent *factory(int plhp_type_of_num, std::string eir_plhp_name);
+            static PlantComponent *factory(int hp_type_of_num, std::string hp_name);
 
             static void pairUpCompanionCoils();
 
@@ -177,7 +177,7 @@ namespace EnergyPlus {
             static Real64 subtract(Real64 const a, Real64 const b) {return a - b;}
         };
 
-        extern std::vector<EIRPlantLoopHeatPump> eir_plhp;
+        extern std::vector<EIRPlantLoopHeatPump> heatPumps;
     } // namespace EIRPlantLoopHeatPumps
 } // namespace EnergyPlus
 

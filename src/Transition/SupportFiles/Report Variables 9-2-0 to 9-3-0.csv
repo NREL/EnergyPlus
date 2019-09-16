@@ -1,0 +1,15 @@
+9.1.0,9.2.0,Transition notes
+0,0,These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.
+old variable name,new variable name,-- add variable names (before this line) and leave off units -- <DELETE> to delete
+Water to Water Heat Pump Load Side Heat Transfer Rate,Plant Loop EIR Heat Pump Load Side Heat Transfer Rate,
+Water to Water Heat Pump Load Side Heat Transfer Energy,Plant Loop EIR Heat Pump Load Side Heat Transfer Energy,
+Water to Water Heat Pump Source Side Heat Transfer Rate,Plant Loop EIR Heat Pump Source Side Heat Transfer Rate,
+Water to Water Heat Pump Source Side Heat Transfer Energy,Plant Loop EIR Heat Pump Source Side Heat Transfer Energy,
+Water to Water Heat Pump Load Side Inlet Temperature,Plant Loop EIR Heat Pump Load Side Inlet Temperature,
+Water to Water Heat Pump Load Side Outlet Temperature,Plant Loop EIR Heat Pump Load Side Outlet Temperature,
+Water to Water Heat Pump Source Side Inlet Temperature,Plant Loop EIR Heat Pump Source Side Inlet Temperature,
+Water to Water Heat Pump Source Side Outlet Temperature,Plant Loop EIR Heat Pump Source Side Outlet Temperature,
+Water to Water Heat Pump Electric Power,Plant Loop EIR Heat Pump Electric Power,
+Water to Water Heat Pump Electric Energy,Plant Loop EIR Heat Pump Electric Energy,
+Water to Water Heat Pump Load Side Mass Flow Rate,Plant Loop EIR Heat Pump Load Side Mass Flow Rate,
+Water to Water Heat Pump Source Side Mass Flow Rate,Plant Loop EIR Heat Pump Source Side Mass Flow Rate,

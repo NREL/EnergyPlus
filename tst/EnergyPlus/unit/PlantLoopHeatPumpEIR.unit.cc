@@ -118,11 +118,11 @@ TEST_F(EIRPLHPFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(2u, eir_plhp.size());
+    EXPECT_EQ(2u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisHeatingPLHP = &eir_plhp[1];
-    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisHeatingPLHP = &heatPumps[1];
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
@@ -160,9 +160,9 @@ TEST_F(EIRPLHPFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource) {
 }
 
 TEST_F(EIRPLHPFixture, PairingCompanionCoils) {
-    eir_plhp.resize(2);
-    EIRPlantLoopHeatPump *coil1 = &eir_plhp[0];
-    EIRPlantLoopHeatPump *coil2 = &eir_plhp[1];
+    heatPumps.resize(2);
+    EIRPlantLoopHeatPump *coil1 = &heatPumps[0];
+    EIRPlantLoopHeatPump *coil2 = &heatPumps[1];
 
     {
         // a successful try
@@ -241,10 +241,10 @@ TEST_F(EIRPLHPFixture, HeatingConstructionFullObjectsNoCompanion) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_plhp.size());
+    EXPECT_EQ(1u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisHeatingPLHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisHeatingPLHP = &heatPumps[0];
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
@@ -299,10 +299,10 @@ TEST_F(EIRPLHPFixture, CoolingConstructionFullObjectsNoCompanion) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_plhp.size());
+    EXPECT_EQ(1u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
@@ -357,10 +357,10 @@ TEST_F(EIRPLHPFixture, CoolingConstructionFullObjectWithDefaults) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_plhp.size());
+    EXPECT_EQ(1u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
@@ -403,10 +403,10 @@ TEST_F(EIRPLHPFixture, CoolingConstructionFullyAutoSized_WaterSource) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_plhp.size());
+    EXPECT_EQ(1u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
@@ -511,10 +511,10 @@ TEST_F(EIRPLHPFixture, Initialization) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_plhp.size());
+    EXPECT_EQ(1u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
 
     // do a bit of extra wiring up to the plant
     PLHPPlantLoadSideComp.Name = thisCoolingPLHP->name;
@@ -599,7 +599,7 @@ TEST_F(EIRPLHPFixture, Initialization) {
 
 }
 
-TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion) {
+TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSource) {
     std::string const idf_objects =
             delimited_string(
                     {
@@ -649,11 +649,11 @@ TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(2u, eir_plhp.size());
+    EXPECT_EQ(2u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
-    EIRPlantLoopHeatPump *thisHeatingPLHP = &eir_plhp[1];
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
+    EIRPlantLoopHeatPump *thisHeatingPLHP = &heatPumps[1];
 
     // validate that we have the right ones
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
@@ -840,11 +840,11 @@ TEST_F(EIRPLHPFixture, TestSizing_FullyHardsizedHeatingWithCompanion) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(2u, eir_plhp.size());
+    EXPECT_EQ(2u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
-    EIRPlantLoopHeatPump *thisHeatingPLHP = &eir_plhp[1];
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
+    EIRPlantLoopHeatPump *thisHeatingPLHP = &heatPumps[1];
 
     // validate that we have the right ones
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
@@ -982,11 +982,11 @@ TEST_F(EIRPLHPFixture, TestSizing_WithCompanionNoPlantSizing) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(2u, eir_plhp.size());
+    EXPECT_EQ(2u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
-    EIRPlantLoopHeatPump *thisHeatingPLHP = &eir_plhp[1];
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
+    EIRPlantLoopHeatPump *thisHeatingPLHP = &heatPumps[1];
 
     // validate that we have the right ones
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
@@ -1099,10 +1099,10 @@ TEST_F(EIRPLHPFixture, TestSizing_NoCompanionNoPlantSizingError) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_plhp.size());
+    EXPECT_EQ(1u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisHeatingPLHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisHeatingPLHP = &heatPumps[0];
 
     // validate that we have the right ones
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
@@ -1193,10 +1193,10 @@ TEST_F(EIRPLHPFixture, TestSizing_NoCompanionNoPlantSizingHardSized) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_plhp.size());
+    EXPECT_EQ(1u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisHeatingPLHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisHeatingPLHP = &heatPumps[0];
 
     // validate that we have the right ones
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
@@ -1303,10 +1303,10 @@ TEST_F(EIRPLHPFixture, CoolingOutletSetpointWorker) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_plhp.size());
+    EXPECT_EQ(1u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
 
     // do a little setup here
     thisCoolingPLHP->loadSideLocation.loopNum = 1;
@@ -1413,10 +1413,10 @@ TEST_F(EIRPLHPFixture, Initialization2_WaterSource) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_plhp.size());
+    EXPECT_EQ(1u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
 
     // do a bit of extra wiring up to the plant
     PLHPPlantLoadSideComp.Name = thisCoolingPLHP->name;
@@ -1614,8 +1614,8 @@ TEST_F(EIRPLHPFixture, OnInitLoopEquipTopologyErrorCases) {
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
-    EXPECT_EQ(1u, eir_plhp.size());
-    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
+    EXPECT_EQ(1u, heatPumps.size());
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
 
     // init the plant component data with the name we have now from the factory call
     PLHPPlantSupplySideComp.Name = thisCoolingPLHP->name;
@@ -1732,10 +1732,10 @@ TEST_F(EIRPLHPFixture, CoolingSimulate_WaterSource) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_plhp.size());
+    EXPECT_EQ(1u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
 
     // do a bit of extra wiring up to the plant
     PLHPPlantLoadSideComp.Name = thisCoolingPLHP->name;
@@ -1872,10 +1872,10 @@ TEST_F(EIRPLHPFixture, HeatingSimulate_WaterSource) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_plhp.size());
+    EXPECT_EQ(1u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisHeatingPLHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisHeatingPLHP = &heatPumps[0];
 
     // do a bit of extra wiring up to the plant
     PLHPPlantLoadSideComp.Name = thisHeatingPLHP->name;
@@ -1946,11 +1946,11 @@ TEST_F(EIRPLHPFixture, HeatingSimulate_WaterSource) {
 }
 
 TEST_F(EIRPLHPFixture, TestConcurrentOperationChecking) {
-    eir_plhp.resize(4);
-    EIRPlantLoopHeatPump *coil1 = &eir_plhp[0];
-    EIRPlantLoopHeatPump *coil2 = &eir_plhp[1];
-    EIRPlantLoopHeatPump *coil3 = &eir_plhp[2];
-    EIRPlantLoopHeatPump *coil4 = &eir_plhp[3];
+    heatPumps.resize(4);
+    EIRPlantLoopHeatPump *coil1 = &heatPumps[0];
+    EIRPlantLoopHeatPump *coil2 = &heatPumps[1];
+    EIRPlantLoopHeatPump *coil3 = &heatPumps[2];
+    EIRPlantLoopHeatPump *coil4 = &heatPumps[3];
 
     // pair up the last two
     coil3->companionHeatPumpCoil = coil4;
@@ -2023,11 +2023,11 @@ TEST_F(EIRPLHPFixture, ConstructionFullObjectsHeatingAndCooling_AirSource) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(2u, eir_plhp.size());
+    EXPECT_EQ(2u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisHeatingPLHP = &eir_plhp[1];
-    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisHeatingPLHP = &heatPumps[1];
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
@@ -2115,10 +2115,10 @@ TEST_F(EIRPLHPFixture, CoolingSimulate_AirSource) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_plhp.size());
+    EXPECT_EQ(1u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
 
     // do a bit of extra wiring up to the plant
     PLHPPlantLoadSideComp.Name = thisCoolingPLHP->name;
@@ -2239,10 +2239,10 @@ TEST_F(EIRPLHPFixture, HeatingSimulate_AirSource) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_plhp.size());
+    EXPECT_EQ(1u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisHeatingPLHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisHeatingPLHP = &heatPumps[0];
 
     // do a bit of extra wiring up to the plant
     PLHPPlantLoadSideComp.Name = thisHeatingPLHP->name;
@@ -2344,10 +2344,10 @@ TEST_F(EIRPLHPFixture, CoolingConstructionFullyAutoSized_AirSource) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_plhp.size());
+    EXPECT_EQ(1u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
@@ -2400,11 +2400,11 @@ TEST_F(EIRPLHPFixture, ClearState) {
 
     // call the factory with a valid name to trigger reading inputs
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
-    EXPECT_EQ(eir_plhp.size(), 1u);
+    EXPECT_EQ(heatPumps.size(), 1u);
 
     // test that vector is cleared
     EIRPlantLoopHeatPump::clear_state();
-    EXPECT_EQ(eir_plhp.size(), 0u);
+    EXPECT_EQ(heatPumps.size(), 0u);
 }
 
 TEST_F(EIRPLHPFixture, Initialization2_AirSource) {
@@ -2456,10 +2456,10 @@ TEST_F(EIRPLHPFixture, Initialization2_AirSource) {
     EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
 
     // verify the size of the vector and the processed condition
-    EXPECT_EQ(1u, eir_plhp.size());
+    EXPECT_EQ(1u, heatPumps.size());
 
     // for now we know the order is maintained, so get each heat pump object
-    EIRPlantLoopHeatPump *thisCoolingPLHP = &eir_plhp[0];
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
 
     // do a bit of extra wiring up to the plant
     PLHPPlantLoadSideComp.Name = thisCoolingPLHP->name;
@@ -2579,6 +2579,306 @@ TEST_F(EIRPLHPFixture, Initialization2_AirSource) {
             0.1
     );
 
+}
+
+TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSource) {
+    std::string const idf_objects =
+            delimited_string(
+                    {
+                            "HeatPump:PlantLoop:EIR:Cooling,",
+                            "  hp cooling side,",
+                            "  node 1,",
+                            "  node 2,",
+                            "  AirSource,",
+                            "  node 3,",
+                            "  node 4,",
+                            "  hp heating side,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  1.0,",
+                            "  1,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "HeatPump:PlantLoop:EIR:Heating,",
+                            "  hp heating side,",
+                            "  node 5,",
+                            "  node 6,",
+                            "  AirSource,",
+                            "  node 7,",
+                            "  node 8,",
+                            "  hp cooling side,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  Autosize,",
+                            "  1.0,",
+                            "  1,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "Curve:Linear,",
+                            "  dummyCurve,",
+                            "  1,",
+                            "  0,",
+                            "  1,",
+                            "  1;"
+                    }
+            );
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(2u, heatPumps.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
+    EIRPlantLoopHeatPump *thisHeatingPLHP = &heatPumps[1];
+
+    // validate that we have the right ones
+    EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
+    EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
+
+    // We'll set up two plant loops: a load and a source loop
+    DataPlant::TotNumLoops = 1;
+    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
+    DataPlant::PlantLoop(1).LoopSide.allocate(2);
+    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
+
+    Real64 const plantSizingLoadVolFlow = 0.01;
+    Real64 const plantSizingLoadDeltaT = 1.0;
+
+    Real64 const plantSizingSrcDeltaT = 10.0;
+
+    Real64 const COP = 1;
+
+    DataSizing::PlantSizData.allocate(2);
+    DataSizing::PlantSizData(1).DesVolFlowRate = 0.01;
+    DataSizing::PlantSizData(1).DeltaT = 1.0;
+    DataSizing::PlantSizData(2).DesVolFlowRate = 0.03;
+    DataSizing::PlantSizData(2).DeltaT = 1.0;
+
+    auto &loop1supplyComponent1 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    auto &loop1supplyComponent2 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
+
+    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop1supplyComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+
+    loop1supplyComponent1.Name = thisHeatingPLHP->name;
+    loop1supplyComponent2.Name = thisCoolingPLHP->name;
+
+    loop1supplyComponent1.NodeNumIn = thisHeatingPLHP->loadSideNodes.inlet;
+    loop1supplyComponent2.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
+
+    // the init call expects a "from" calling point
+    PlantLocation myCoolingLoadLocation = PlantLocation(1, 2, 1, 1);
+    PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 2);
+
+    // set a couple global flags
+    DataGlobals::BeginEnvrnFlag = true;
+
+    // initialize so the components can find themselves on the plant
+    thisCoolingPLHP->onInitLoopEquip(myCoolingLoadLocation);
+    thisHeatingPLHP->onInitLoopEquip(myHeatingLoadLocation);
+
+    DataPlant::PlantFinalSizesOkayToReport = true;
+    DataPlant::PlantFirstSizesOkayToReport = true;
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
+
+    // assign the plant sizing data
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+
+    Real64 expectedLoadCp = 4197.93;
+    Real64 expectedLoadRho = 999.898;
+    Real64 expectedSourceCp = 1004.0;
+    Real64 expectedSourceRho = 1.2;
+    Real64 expectedLoadFlow = plantSizingLoadVolFlow;
+    Real64 expectedCapacity = expectedLoadRho * expectedLoadFlow * expectedLoadCp * plantSizingLoadDeltaT;
+    Real64 expectedSourceLoad = expectedCapacity * (1 + 1 / COP);
+    Real64 expectedSourceFlow = expectedSourceLoad / (expectedSourceCp * expectedSourceRho * plantSizingSrcDeltaT);
+    thisCoolingPLHP->sizeLoadSide();
+    thisCoolingPLHP->sizeSrcSideASHP();
+    EXPECT_NEAR(expectedLoadFlow, thisCoolingPLHP->loadSideDesignVolFlowRate, 0.0001);
+    EXPECT_NEAR(expectedSourceFlow, thisCoolingPLHP->sourceSideDesignVolFlowRate, 0.1);
+    EXPECT_NEAR(expectedCapacity, thisCoolingPLHP->referenceCapacity, 0.0001);
+
+    // with a sizing run complete, we can also go ahead and get the design capacities...
+    // they should be nonzero for the load side of things
+    Real64 tmpMin = -1.0, tmpMax = -1.0, tmpOpt = -1.0;
+    thisCoolingPLHP->getDesignCapacities(myCoolingLoadLocation, tmpMax, tmpMin, tmpOpt);
+    EXPECT_NEAR(0.0, tmpMin, 0.001);
+    EXPECT_NEAR(expectedCapacity, tmpMax, 0.001);
+    EXPECT_NEAR(expectedCapacity, tmpOpt, 0.001);
+
+    // we can reset things and do a few more corner cases here
+
+    // lets just try it again but with the plant sizing data set to zero flow, it should try to use the companion
+    // but the companion isn't sized yet, so it should get zero conditions
+    thisCoolingPLHP->loadSideDesignVolFlowRate = DataSizing::AutoSize;
+    thisCoolingPLHP->sourceSideDesignVolFlowRate = DataSizing::AutoSize;
+    thisCoolingPLHP->referenceCapacity = DataSizing::AutoSize;
+    DataSizing::PlantSizData(1).DesVolFlowRate = 0.0;
+    thisCoolingPLHP->sizeLoadSide();
+    thisCoolingPLHP->sizeSrcSideASHP();
+    EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideDesignVolFlowRate, 0.0001);
+    EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideDesignVolFlowRate, 0.0001);
+    EXPECT_NEAR(0.0, thisCoolingPLHP->referenceCapacity, 0.0001);
+
+    // but now let's try to size the heating coil, which will try to use the cooling coil's sized data
+    thisCoolingPLHP->loadSideDesignVolFlowRate = expectedLoadFlow;
+    thisCoolingPLHP->sourceSideDesignVolFlowRate = expectedSourceFlow;
+    thisCoolingPLHP->referenceCapacity = expectedCapacity;
+    expectedLoadCp = 4185;
+    expectedLoadRho = 983.2;
+    expectedCapacity = expectedLoadRho * expectedLoadFlow * expectedLoadCp * plantSizingLoadDeltaT;
+    expectedSourceLoad = expectedCapacity * (1 + 1 / COP);
+    expectedSourceFlow = expectedSourceLoad / (expectedSourceCp * expectedSourceRho * plantSizingSrcDeltaT);
+    thisHeatingPLHP->sizeLoadSide();
+    thisHeatingPLHP->sizeSrcSideASHP();
+    EXPECT_NEAR(expectedLoadFlow, thisHeatingPLHP->loadSideDesignVolFlowRate, 0.0001);
+    EXPECT_NEAR(expectedSourceFlow, thisHeatingPLHP->sourceSideDesignVolFlowRate, 0.1);
+    EXPECT_NEAR(expectedCapacity, thisHeatingPLHP->referenceCapacity, 0.0001);
+}
+
+TEST_F(EIRPLHPFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_AirSource) {
+    std::string const idf_objects =
+            delimited_string(
+                    {
+                            "HeatPump:PlantLoop:EIR:Cooling,",
+                            "  hp cooling side,",
+                            "  node 1,",
+                            "  node 2,",
+                            "  AirSource,",
+                            "  node 3,",
+                            "  node 4,",
+                            "  hp heating side,",
+                            "  Autosize,",
+                            "  2.0,",
+                            "  Autosize,",
+                            "  1.0,",
+                            "  1,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "HeatPump:PlantLoop:EIR:Heating,",
+                            "  hp heating side,",
+                            "  node 5,",
+                            "  node 6,",
+                            "  AirSource,",
+                            "  node 7,",
+                            "  node 8,",
+                            "  hp cooling side,",
+                            "  Autosize,",
+                            "  2.0,",
+                            "  Autosize,",
+                            "  1.0,",
+                            "  1,",
+                            "  dummyCurve,",
+                            "  dummyCurve,",
+                            "  dummyCurve;",
+                            "Curve:Linear,",
+                            "  dummyCurve,",
+                            "  1,",
+                            "  0,",
+                            "  1,",
+                            "  1;"
+                    }
+            );
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(2u, heatPumps.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
+    EIRPlantLoopHeatPump *thisHeatingPLHP = &heatPumps[1];
+
+    // validate that we have the right ones
+    EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
+    EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
+
+    // We'll set up two plant loops: a load and a source loop
+    DataPlant::TotNumLoops = 1;
+    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
+    DataPlant::PlantLoop(1).LoopSide.allocate(2);
+    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
+
+    Real64 const plantSizingLoadVolFlow = 0.01;
+    Real64 const plantSizingLoadDeltaT = 1.0;
+
+    DataSizing::PlantSizData.allocate(2);
+    DataSizing::PlantSizData(1).DesVolFlowRate = 0.01;
+    DataSizing::PlantSizData(1).DeltaT = 1.0;
+    DataSizing::PlantSizData(2).DesVolFlowRate = 0.03;
+    DataSizing::PlantSizData(2).DeltaT = 1.0;
+
+    auto &loop1supplyComponent1 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    auto &loop1supplyComponent2 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
+
+    loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    loop1supplyComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+
+    loop1supplyComponent1.Name = thisHeatingPLHP->name;
+    loop1supplyComponent2.Name = thisCoolingPLHP->name;
+
+    loop1supplyComponent1.NodeNumIn = thisHeatingPLHP->loadSideNodes.inlet;
+    loop1supplyComponent2.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
+
+    // the init call expects a "from" calling point
+    PlantLocation myCoolingLoadLocation = PlantLocation(1, 2, 1, 1);
+    PlantLocation myHeatingLoadLocation = PlantLocation(1, 2, 1, 2);
+
+    // set a couple global flags
+    DataGlobals::BeginEnvrnFlag = true;
+
+    // initialize so the components can find themselves on the plant
+    thisCoolingPLHP->onInitLoopEquip(myCoolingLoadLocation);
+    thisHeatingPLHP->onInitLoopEquip(myHeatingLoadLocation);
+
+    DataPlant::PlantFinalSizesOkayToReport = true;
+    DataPlant::PlantFirstSizesOkayToReport = true;
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
+
+    // assign the plant sizing data
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+
+    Real64 expectedLoadCp = 4197.93;
+    Real64 expectedLoadRho = 999.898;
+    Real64 expectedLoadFlow = plantSizingLoadVolFlow;
+    Real64 expectedCapacity = expectedLoadRho * expectedLoadFlow * expectedLoadCp * plantSizingLoadDeltaT;
+    Real64 expectedSourceFlow = 2.0;
+    thisCoolingPLHP->sizeLoadSide();
+    thisCoolingPLHP->sizeSrcSideASHP();
+    EXPECT_NEAR(expectedLoadFlow, thisCoolingPLHP->loadSideDesignVolFlowRate, 0.0001);
+    EXPECT_NEAR(expectedSourceFlow, thisCoolingPLHP->sourceSideDesignVolFlowRate, 0.1);
+    EXPECT_NEAR(expectedCapacity, thisCoolingPLHP->referenceCapacity, 0.0001);
+
+    // with a sizing run complete, we can also go ahead and get the design capacities...
+    // they should be nonzero for the load side of things
+    Real64 tmpMin = -1.0, tmpMax = -1.0, tmpOpt = -1.0;
+    thisCoolingPLHP->getDesignCapacities(myCoolingLoadLocation, tmpMax, tmpMin, tmpOpt);
+    EXPECT_NEAR(0.0, tmpMin, 0.001);
+    EXPECT_NEAR(expectedCapacity, tmpMax, 0.001);
+    EXPECT_NEAR(expectedCapacity, tmpOpt, 0.001);
 }
 
 #pragma clang diagnostic pop

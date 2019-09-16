@@ -75,12 +75,12 @@ namespace EnergyPlus {
     namespace EIRPlantLoopHeatPumps {
 
         bool getInputsPLHP(true);
-        std::vector<EIRPlantLoopHeatPump> eir_plhp;
-        std::string static const __EQUIP__ = "EIRPlantLoopHeatPump"; // NOLINT(cert-err58-cpp)
+        std::vector<EIRPlantLoopHeatPump> heatPumps;
+        std::string static const __EQUIP__ = "EIRPlantLoopHeatPump "; // NOLINT(cert-err58-cpp)
 
         void EIRPlantLoopHeatPump::clear_state() {
             getInputsPLHP = true;
-            eir_plhp.clear();
+            heatPumps.clear();
         }
 
         void EIRPlantLoopHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
@@ -949,14 +949,15 @@ namespace EnergyPlus {
                 tmpSourceVolFlow = this->sourceSideDesignVolFlowRate;
             } else if (!this->sourceSideDesignVolFlowRateWasAutoSized && this->sourceSideDesignVolFlowRate == 0) {
                 // user gave a flow rate of 0
-                // error out
-                errorsFound = true;
-                ShowSevereError("Invalid condenser flow rate for EIR PLHP (name="
-                + this->name + "; entered value: " + std::to_string(this->sourceSideDesignVolFlowRate));
+                // protected by the input processor to be >0.0
+                // fatal out just in case
+                errorsFound = true;  // LCOV_EXCL_LINE
+                ShowSevereError("Invalid condenser flow rate for EIR PLHP (name="  // LCOV_EXCL_LINE
+                + this->name + "; entered value: " + std::to_string(this->sourceSideDesignVolFlowRate));  // LCOV_EXCL_LINE
             } else {
                 // can't imagine how it would ever get to this point
                 // just assume it's the same as the load side if we don't have any sizing information
-                tmpSourceVolFlow = tmpLoadVolFlow;
+                tmpSourceVolFlow = tmpLoadVolFlow;  // LCOV_EXCL_LINE
             }
 
             this->sourceSideDesignVolFlowRate = tmpSourceVolFlow;
@@ -966,30 +967,30 @@ namespace EnergyPlus {
             }
         }
 
-        PlantComponent *EIRPlantLoopHeatPump::factory(int plhp_type_of_num, std::string eir_plhp_name) {
+        PlantComponent *EIRPlantLoopHeatPump::factory(int hp_type_of_num, std::string hp_name) {
             if (getInputsPLHP) {
                 EIRPlantLoopHeatPump::processInputForEIRPLHP();
                 EIRPlantLoopHeatPump::pairUpCompanionCoils();
                 getInputsPLHP = false;
             }
 
-            for (auto &plhp : eir_plhp) {
-                if (plhp.name == UtilityRoutines::MakeUPPERCase(eir_plhp_name) && plhp.plantTypeOfNum == plhp_type_of_num) {
+            for (auto &plhp : heatPumps) {
+                if (plhp.name == UtilityRoutines::MakeUPPERCase(hp_name) && plhp.plantTypeOfNum == hp_type_of_num) {
                     return &plhp;
                 }
             }
 
-            ShowFatalError("EIR_PLHP factory: Error getting inputs for PLHP named: " + eir_plhp_name);
+            ShowFatalError("EIR Plant Loop Heat Pump factory: Error getting inputs for PLHP named: " + hp_name);
             return nullptr;  // LCOV_EXCL_LINE
         }
 
         void EIRPlantLoopHeatPump::pairUpCompanionCoils() {
-            for (auto &thisHP : eir_plhp) {
+            for (auto &thisHP : heatPumps) {
                 if (!thisHP.companionCoilName.empty()) {
                     auto thisCoilName = UtilityRoutines::MakeUPPERCase(thisHP.name);
                     auto &thisCoilType = thisHP.plantTypeOfNum;
                     auto targetCompanionName = UtilityRoutines::MakeUPPERCase(thisHP.companionCoilName);
-                    for (auto &potentialCompanionCoil : eir_plhp) {
+                    for (auto &potentialCompanionCoil : heatPumps) {
                         auto &potentialCompanionType = potentialCompanionCoil.plantTypeOfNum;
                         auto potentialCompanionName = UtilityRoutines::MakeUPPERCase(potentialCompanionCoil.name);
                         if (potentialCompanionName == thisCoilName) {
@@ -1258,7 +1259,7 @@ namespace EnergyPlus {
                         thisPLHP.calcSourceOutletTemp = classToInput.calcSourceOutletTemp;
 
                         if (!errorsFound) {
-                            eir_plhp.push_back(thisPLHP);
+                            heatPumps.push_back(thisPLHP);
                         }
                     }
                 }
@@ -1280,7 +1281,7 @@ namespace EnergyPlus {
             //  companion index values as I warn against their partner, so then I would have to add the values to the
             //  vector each pass, and check then each loop.  This seemed really bulky and inefficient, so I chose to
             //  leave a tight loop here of just reporting for each coil if it and the companion are running.
-            for (auto &thisPLHP : eir_plhp) {
+            for (auto &thisPLHP : heatPumps) {
                 if (!thisPLHP.companionHeatPumpCoil) {
                     continue;
                 }
