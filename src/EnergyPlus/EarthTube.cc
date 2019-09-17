@@ -105,8 +105,8 @@ namespace EarthTube {
     int const ExhaustEarthTube(2);
 
     // Object Data
-    Array1D<EarthTubeData> EarthTubeSys;
-    Array1D<EarthTubeZoneReportVars> ZnRptET;
+    EPVector<EarthTubeData> EarthTubeSys;
+    EPVector<EarthTubeZoneReportVars> ZnRptET;
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -533,7 +533,7 @@ namespace EarthTube {
         Real64 AirMassFlowRate;      // Actual Mass Flow Rate of Air inside Pipe
         Real64 AirSpecHeat;          // Specific Heat of Air
         Real64 AirDensity;           // Density of Air
-        static Array1D<Real64> EVF;  // DESIGN EARTHTUBE FLOW RATE (M**3/SEC)
+        static EPVector<Real64> EVF;  // DESIGN EARTHTUBE FLOW RATE (M**3/SEC)
 
         // Allocate the EVF array
         if (!allocated(EVF)) EVF.allocate(NumOfZones);

@@ -230,8 +230,8 @@ namespace WaterUse {
     };
 
     // Object Data
-    extern Array1D<WaterEquipmentType> WaterEquipment;
-    extern Array1D<WaterConnectionsType> WaterConnections;
+    extern EPVector<WaterEquipmentType> WaterEquipment;
+    extern EPVector<WaterConnectionsType> WaterConnections;
 
     // Functions
 

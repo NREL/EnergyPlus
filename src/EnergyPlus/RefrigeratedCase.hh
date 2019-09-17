@@ -193,10 +193,10 @@ namespace RefrigeratedCase {
     extern Real64 const FanHalfSpeedRatio; // = 1/(2**2.5) for power step for two speed fan
     extern Real64 const CapFac60Percent;   // = 60%, load served by half power 2-speed fan
 
-    extern Array1D<Real64> const EuropeanWetCoilFactor;
-    extern Array1D<Real64> const EuropeanAirInletTemp;
-    extern Array1D<Real64> const EuropeanEvapTemp;
-    extern Array1D<Real64> const EuropeanDT1;
+    extern EPVector<Real64> const EuropeanWetCoilFactor;
+    extern EPVector<Real64> const EuropeanAirInletTemp;
+    extern EPVector<Real64> const EuropeanEvapTemp;
+    extern EPVector<Real64> const EuropeanDT1;
 
     // DERIVED TYPE DEFINITIONS:
 
@@ -643,7 +643,7 @@ namespace RefrigeratedCase {
         //   and used thereafter
         int SuctionPipeActualZoneNum;    // ID number for zone where suction pipes gain heat
         int SuctionPipeZoneNodeNum;      // ID number for zone node where suction pipes gain heat
-        Array1D<Real64> MechSCLoad;      // Mechanical subcooler load on system from other systems(W)
+        EPVector<Real64> MechSCLoad;      // Mechanical subcooler load on system from other systems(W)
         Real64 AverageCompressorCOP;     // Average COP for compressers on this system (W)
         Real64 CpSatLiqCond;             // Spec Heat of sat liquid at condensing pressure  (J/kg-C)
         Real64 CpSatVapEvap;             // Spec Heat of saturated vapor exiting evaporator (J/kg-C)
@@ -1385,14 +1385,14 @@ namespace RefrigeratedCase {
         Real64 Temperature;           // Rated temperature [C]
         Real64 TEvapDesign;           // Design evaporator temperature (or brine inlet T) [C]
         Real64 TotalFanPower;         // Sum of coil and circ fan power  [W]
-        Array1D<Real64> AreaGlassDr;
-        Array1D<Real64> UValueGlassDr;
-        Array1D<Real64> HeightGlassDr;
-        Array1D<Real64> AreaStockDr;
-        Array1D<Real64> UValueStockDr;
-        Array1D<Real64> HeightStockDr;
-        Array1D<Real64> SurfaceArea;
-        Array1D<Real64> UValue;
+        EPVector<Real64> AreaGlassDr;
+        EPVector<Real64> UValueGlassDr;
+        EPVector<Real64> HeightGlassDr;
+        EPVector<Real64> AreaStockDr;
+        EPVector<Real64> UValueStockDr;
+        EPVector<Real64> HeightStockDr;
+        EPVector<Real64> SurfaceArea;
+        EPVector<Real64> UValue;
         // Report Variables
         Real64 ElecHeaterPower;         // Walk In heater rate (W)
         Real64 ElecHeaterConsumption;   // Walk In heater energy (J)
@@ -1411,13 +1411,13 @@ namespace RefrigeratedCase {
         Real64 TotLatCoolingEnergy;             // Walk In latent cooling energy (J)
         Real64 TotSensCoolingEnergyRate;        // Walk In sensible cooling rate (W)
         Real64 TotSensCoolingEnergy;            // Walk In sensible cooling energy (J)
-        Array1D<Real64> LatZoneCreditRate;      // Amount of latent energy provided to zone(W)
-        Array1D<Real64> LatZoneCredit;          // Amount of latent energy provided to zone(J)
-        Array1D<Real64> SensZoneCreditRate;     // Amount of sensible heat gain to zone, pos and neg (W)
-        Array1D<Real64> SensZoneCreditCoolRate; // Amount of sensible cooling provided to the zone (W)
-        Array1D<Real64> SensZoneCreditCool;     // Amount of sensible cooling provided to the zone (J)
-        Array1D<Real64> SensZoneCreditHeatRate; // Amount of sensible heat provided to the zone (W)
-        Array1D<Real64> SensZoneCreditHeat;     // Amount of sensible heat provided to the zone (J)
+        EPVector<Real64> LatZoneCreditRate;      // Amount of latent energy provided to zone(W)
+        EPVector<Real64> LatZoneCredit;          // Amount of latent energy provided to zone(J)
+        EPVector<Real64> SensZoneCreditRate;     // Amount of sensible heat gain to zone, pos and neg (W)
+        EPVector<Real64> SensZoneCreditCoolRate; // Amount of sensible cooling provided to the zone (W)
+        EPVector<Real64> SensZoneCreditCool;     // Amount of sensible cooling provided to the zone (J)
+        EPVector<Real64> SensZoneCreditHeatRate; // Amount of sensible heat provided to the zone (W)
+        EPVector<Real64> SensZoneCreditHeat;     // Amount of sensible heat provided to the zone (J)
 
         // Default Constructor
         WalkInData()
@@ -1701,24 +1701,24 @@ namespace RefrigeratedCase {
     };
 
     // Object Data
-    extern Array1D<RefrigCaseData> RefrigCase;
-    extern Array1D<RefrigRackData> RefrigRack;
-    extern Array1D<CaseRAFractionData> CaseRAFraction;
-    extern Array1D<RefrigSystemData> System;
-    extern Array1D<TransRefrigSystemData> TransSystem;
-    extern Array1D<RefrigCondenserData> Condenser;
-    extern Array1D<RefrigCompressorData> Compressor;
-    extern Array1D<RefrigGasCoolerData> GasCooler;
-    extern Array1D<SubcoolerData> Subcooler;
-    extern Array1D<CaseAndWalkInListDef> CaseAndWalkInList;
-    extern Array1D<CompressorListDef> CompressorLists;
-    extern Array1D<SecondaryLoopData> Secondary;
-    extern Array1D<TransferLoadListDef> TransferLoadList;
-    extern Array1D<WalkInData> WalkIn;
-    extern Array1D<WarehouseCoilData> WarehouseCoil;
-    extern Array1D<AirChillerSetData> AirChillerSet;
-    extern Array1D<CoilCreditData> CoilSysCredit;
-    extern Array1D<CaseWIZoneReportData> CaseWIZoneReport;
+    extern EPVector<RefrigCaseData> RefrigCase;
+    extern EPVector<RefrigRackData> RefrigRack;
+    extern EPVector<CaseRAFractionData> CaseRAFraction;
+    extern EPVector<RefrigSystemData> System;
+    extern EPVector<TransRefrigSystemData> TransSystem;
+    extern EPVector<RefrigCondenserData> Condenser;
+    extern EPVector<RefrigCompressorData> Compressor;
+    extern EPVector<RefrigGasCoolerData> GasCooler;
+    extern EPVector<SubcoolerData> Subcooler;
+    extern EPVector<CaseAndWalkInListDef> CaseAndWalkInList;
+    extern EPVector<CompressorListDef> CompressorLists;
+    extern EPVector<SecondaryLoopData> Secondary;
+    extern EPVector<TransferLoadListDef> TransferLoadList;
+    extern EPVector<WalkInData> WalkIn;
+    extern EPVector<WarehouseCoilData> WarehouseCoil;
+    extern EPVector<AirChillerSetData> AirChillerSet;
+    extern EPVector<CoilCreditData> CoilSysCredit;
+    extern EPVector<CaseWIZoneReportData> CaseWIZoneReport;
 
     // Functions
 

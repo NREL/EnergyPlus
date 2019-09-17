@@ -72,7 +72,7 @@ namespace DataPlant {
         Real64 PumpSizFac;
         bool EMSCtrlOverrideOn;      // if true, EMS is calling to override branch operation avail
         Real64 EMSCtrlOverrideValue; // value set by EMS system for branch override controls
-        Array1D<CompData> Comp;      // Component type list
+        EPVector<CompData> Comp;      // Component type list
         bool HasPressureComponents;
         Real64 PressureDrop;
         int PressureCurveType;  // Either none, pressure curve, or generic curve

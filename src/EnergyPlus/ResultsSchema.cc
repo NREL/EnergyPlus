@@ -673,7 +673,7 @@ namespace ResultsFramework {
 
         Array1D_string alphas(5);
         int numAlphas;
-        Array1D<Real64> numbers(2);
+        EPVector<Real64> numbers(2);
         int numNumbers;
         int status;
         inputProcessor->getObjectItem("Output:JSON", 1, alphas, numAlphas, numbers, numNumbers, status);
@@ -732,7 +732,7 @@ namespace ResultsFramework {
     }
 
     void ResultsSchema::initializeRTSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
-                                               const Array1D<RealVariableType> &RVariableTypes,
+                                               const EPVector<RealVariableType> &RVariableTypes,
                                                const int NumOfRVariable,
                                                const OutputProcessor::TimeStepType timeStepType)
     {
@@ -819,7 +819,7 @@ namespace ResultsFramework {
     }
 
     void ResultsSchema::initializeITSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
-                                               const Array1D<IntegerVariableType> &IVariableTypes,
+                                               const EPVector<IntegerVariableType> &IVariableTypes,
                                                const int NumOfIVariable,
                                                const OutputProcessor::TimeStepType timeStepType)
     {
@@ -907,7 +907,7 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsSchema::initializeMeters(const Array1D<OutputProcessor::MeterType> &EnergyMeters,
+    void ResultsSchema::initializeMeters(const EPVector<OutputProcessor::MeterType> &EnergyMeters,
                                          const OutputProcessor::ReportingFrequency reportFrequency)
     {
         switch (reportFrequency) {

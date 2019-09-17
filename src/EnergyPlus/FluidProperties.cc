@@ -154,11 +154,11 @@ namespace FluidProperties {
     // ACCESSIBLE SPECIFICATIONS OF MODULE SUBROUTINES OR FUNCTONS:
 
     // Object Data
-    Array1D<FluidPropsRefrigerantData> RefrigData;
-    Array1D<FluidPropsRefrigErrors> RefrigErrorTracking;
-    Array1D<FluidPropsGlycolRawData> GlyRawData;
-    Array1D<FluidPropsGlycolData> GlycolData;
-    Array1D<FluidPropsGlycolErrors> GlycolErrorTracking;
+    EPVector<FluidPropsRefrigerantData> RefrigData;
+    EPVector<FluidPropsRefrigErrors> RefrigErrorTracking;
+    EPVector<FluidPropsGlycolRawData> GlyRawData;
+    EPVector<FluidPropsGlycolData> GlycolData;
+    EPVector<FluidPropsGlycolErrors> GlycolErrorTracking;
 
     // Data Initializer Forward Declarations
     // See GetFluidPropertiesData "SUBROUTINE LOCAL DATA" for actual data.
@@ -184,21 +184,21 @@ namespace FluidProperties {
         GlycolErrorTracking.deallocate();
     }
 
-    void DefaultEthGlyCpData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
+    void DefaultEthGlyCpData_initializer(Array2D<Real64> &, EPVector<Real64> const &);
 
-    void DefaultEthGlyViscData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
+    void DefaultEthGlyViscData_initializer(Array2D<Real64> &, EPVector<Real64> const &);
 
-    void DefaultEthGlyRhoData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
+    void DefaultEthGlyRhoData_initializer(Array2D<Real64> &, EPVector<Real64> const &);
 
-    void DefaultEthGlyCondData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
+    void DefaultEthGlyCondData_initializer(Array2D<Real64> &, EPVector<Real64> const &);
 
-    void DefaultPropGlyCpData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
+    void DefaultPropGlyCpData_initializer(Array2D<Real64> &, EPVector<Real64> const &);
 
-    void DefaultPropGlyViscData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
+    void DefaultPropGlyViscData_initializer(Array2D<Real64> &, EPVector<Real64> const &);
 
-    void DefaultPropGlyRhoData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
+    void DefaultPropGlyRhoData_initializer(Array2D<Real64> &, EPVector<Real64> const &);
 
-    void DefaultPropGlyCondData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
+    void DefaultPropGlyCondData_initializer(Array2D<Real64> &, EPVector<Real64> const &);
 
     void DefaultSteamSuperheatedEnthalpyData_initializer(Array2D<Real64> &);
 
@@ -258,7 +258,7 @@ namespace FluidProperties {
         Array1D_string cNumericFieldNames; // field names for numeric fields
         int Loop;                          // DO loop counter (various uses)
         int NumAlphas;                     // States which alpha value to read from a "Number" line
-        Array1D<Real64> Numbers;           // brings in data from IP
+        EPVector<Real64> Numbers;           // brings in data from IP
         Array1D_bool lAlphaFieldBlanks;    // logical for blank alpha fields
         Array1D_bool lNumericFieldBlanks;  // logical for blank numeric fields
         int NumNumbers;                    // States which number value to read from a "Numbers" line
@@ -298,31 +298,31 @@ namespace FluidProperties {
 
         // For default "glycol" fluids of Water, Ethylene Glycol, and Propylene Glycol
 
-        static Array1D<Real64> const
+        static EPVector<Real64> const
             DefaultGlycolTemps(DefaultNumGlyTemps, {-35.0, -30.0, -25.0, -20.0, -15.0, -10.0, -5.0,  0.0,   5.0,  10.0, 15.0, 20.0,
                                                     25.0,  30.0,  35.0,  40.0,  45.0,  50.0,  55.0,  60.0,  65.0, 70.0, 75.0, 80.0,
                                                     85.0,  90.0,  95.0,  100.0, 105.0, 110.0, 115.0, 120.0, 125.0}); // 33 total temperature points
 
-        static Array1D<Real64> const DefaultGlycolConcs(DefaultNumGlyConcs,
+        static EPVector<Real64> const DefaultGlycolConcs(DefaultNumGlyConcs,
                                                         {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9}); // 10 total concentration points
 
-        static Array1D<Real64> const DefaultWaterCpData(DefaultNumGlyTemps, {0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    4217.0, 4198.0,
+        static EPVector<Real64> const DefaultWaterCpData(DefaultNumGlyTemps, {0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    4217.0, 4198.0,
                                                                              4191.0, 4185.0, 4181.0, 4179.0, 4180.0, 4180.0, 4180.0, 4180.0, 4181.0,
                                                                              4183.0, 4185.0, 4188.0, 4192.0, 4196.0, 4200.0, 4203.0, 4208.0, 4213.0,
                                                                              4218.0, 4223.0, 4228.0, 4233.0, 4238.0, 4243.0}); // in J/kg-K
 
-        static Array1D<Real64> const DefaultWaterViscData(
+        static EPVector<Real64> const DefaultWaterViscData(
             DefaultNumGlyTemps,
             {0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3,    1.7912e-3, 1.5183e-3, 1.306e-3,  1.1376e-3,
              1.0016e-3, 0.8901e-3, 0.7974e-3, 0.7193e-3, 0.653e-3,  0.5961e-3, 0.5468e-3, 0.504e-3,  0.4664e-3, 0.4332e-3, 0.4039e-3,
              0.3777e-3, 0.3543e-3, 0.3333e-3, 0.3144e-3, 0.2973e-3, 0.2817e-3, 0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3,    0.0e-3}); // in Pa-s
 
-        static Array1D<Real64> const DefaultWaterRhoData(DefaultNumGlyTemps,
+        static EPVector<Real64> const DefaultWaterRhoData(DefaultNumGlyTemps,
                                                          {0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   999.8, 999.9, 999.7, 999.1,
                                                           998.2, 997.0, 995.6, 994.0, 992.2, 990.2, 988.0, 985.7, 983.2, 980.5, 977.7,
                                                           974.8, 971.8, 968.6, 965.3, 961.9, 958.3, 0.0,   0.0,   0.0,   0.0,   0.0}); // in kg/m3
 
-        static Array1D<Real64> const DefaultWaterCondData(DefaultNumGlyTemps, {0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.561,  0.5705,
+        static EPVector<Real64> const DefaultWaterCondData(DefaultNumGlyTemps, {0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.561,  0.5705,
                                                                                0.58,   0.5893, 0.5984, 0.6072, 0.6155, 0.6233, 0.6306, 0.6373, 0.6436,
                                                                                0.6492, 0.6543, 0.659,  0.6631, 0.6668, 0.67,   0.6728, 0.6753, 0.6773,
                                                                                0.6791, 0.0,    0.0,    0.0,    0.0,    0.0}); // in W/mK
@@ -360,7 +360,7 @@ namespace FluidProperties {
             DefaultNumGlyTemps, DefaultNumGlyConcs, std::bind(DefaultPropGlyCondData_initializer, _1, DefaultWaterCondData));
 
         // Steam Refrigerant Data
-        static Array1D<Real64> const DefaultSteamTemps(
+        static EPVector<Real64> const DefaultSteamTemps(
             DefaultNumSteamTemps,
             {1.00e-002, 1.0,   5.0,   10.0,  15.0,  20.0,  25.0,  30.0,  35.0,  40.0,  45.0,  50.0,  55.0,  60.0,  65.0,  70.0,  72.0,  74.0,  76.0,
              78.0,      80.0,  82.0,  84.0,  86.0,  88.0,  90.0,  92.0,  94.0,  96.0,  98.0,  99.0,  100.0, 101.0, 102.0, 103.0, 104.0, 105.0, 106.0,
@@ -369,7 +369,7 @@ namespace FluidProperties {
              160.0,     162.0, 164.0, 166.0, 168.0, 170.0, 172.0, 174.0, 176.0, 178.0, 180.0, 185.0, 190.0, 195.0, 200.0, 205.0, 210.0, 215.0, 220.0,
              225.0,     230.0, 240.0, 250.0, 260.0, 270.0, 280.0, 290.0, 300.0, 310.0, 320.0, 330.0, 340.0, 350.0, 360.0, 370.0});
 
-        static Array1D<Real64> const DefaultSteamPressData(
+        static EPVector<Real64> const DefaultSteamPressData(
             DefaultNumSteamTemps,
             {611.7,      657.1,      872.6,     1228.0,    1706.0,    2339.0,    3170.0,    4247.0,    5629.0,    7385.0,     9595.0,     12350.0,
              15760.0,    19950.0,    25040.0,   31200.0,   34000.0,   37010.0,   40240.0,   43700.0,   47410.0,   51390.0,    55640.0,    60170.0,
@@ -382,7 +382,7 @@ namespace FluidProperties {
              2797000.0,  3347000.0,  3976000.0, 4692000.0, 5503000.0, 6417000.0, 7442000.0, 8588000.0, 9865000.0, 11280000.0, 12860000.0, 14600000.0,
              16530000.0, 18670000.0, 21040000.0});
 
-        static Array1D<Real64> const DefaultSteamEnthalpyFluidData(
+        static EPVector<Real64> const DefaultSteamEnthalpyFluidData(
             DefaultNumSteamTemps,
             {0.59,      4177.0,    21020.0,   42020.0,   62980.0,   83910.0,   104800.0,  125700.0,  146600.0,  167500.0,  188400.0,  209300.0,
              230300.0,  251200.0,  272100.0,  293100.0,  301400.0,  309800.0,  318200.0,  326600.0,  335000.0,  343400.0,  351800.0,  360200.0,
@@ -395,7 +395,7 @@ namespace FluidProperties {
              990200.0,  1038000.0, 1086000.0, 1135000.0, 1185000.0, 1237000.0, 1290000.0, 1345000.0, 1402000.0, 1462000.0, 1526000.0, 1595000.0,
              1671000.0, 1762000.0, 1891000.0});
 
-        static Array1D<Real64> const DefaultSteamEnthalpyGasFluidData(
+        static EPVector<Real64> const DefaultSteamEnthalpyGasFluidData(
             DefaultNumSteamTemps,
             {2501000.0, 2503000.0, 2510000.0, 2519000.0, 2528000.0, 2537000.0, 2547000.0, 2556000.0, 2565000.0, 2574000.0, 2582000.0, 2591000.0,
              2600000.0, 2609000.0, 2618000.0, 2626000.0, 2630000.0, 2633000.0, 2636000.0, 2640000.0, 2643000.0, 2646000.0, 2650000.0, 2653000.0,
@@ -408,7 +408,7 @@ namespace FluidProperties {
              2803000.0, 2803000.0, 2801000.0, 2797000.0, 2790000.0, 2780000.0, 2767000.0, 2750000.0, 2728000.0, 2701000.0, 2666000.0, 2622000.0,
              2564000.0, 2481000.0, 2335000.0});
 
-        static Array1D<Real64> const DefaultSteamCpFluidData(
+        static EPVector<Real64> const DefaultSteamCpFluidData(
             DefaultNumSteamTemps,
             {4220.0, 4217.0, 4205.0, 4196.0, 4189.0, 4184.0, 4182.0, 4180.0, 4180.0, 4180.0, 4180.0, 4182.0, 4183.0,  4185.0,  4187.0, 4190.0,
              4191.0, 4193.0, 4194.0, 4195.0, 4197.0, 4198.0, 4200.0, 4202.0, 4203.0, 4205.0, 4207.0, 4209.0, 4211.0,  4213.0,  4215.0, 4216.0,
@@ -418,7 +418,7 @@ namespace FluidProperties {
              4361.0, 4368.0, 4375.0, 4382.0, 4390.0, 4397.0, 4405.0, 4425.0, 4447.0, 4471.0, 4496.0, 4523.0, 4551.0,  4582.0,  4615.0, 4650.0,
              4688.0, 4772.0, 4870.0, 4986.0, 5123.0, 5289.0, 5493.0, 5750.0, 6085.0, 6537.0, 7186.0, 8208.0, 10120.0, 15000.0, 45160.0});
 
-        static Array1D<Real64> const DefaultSteamCpGasFluidData(
+        static EPVector<Real64> const DefaultSteamCpGasFluidData(
             DefaultNumSteamTemps,
             {1884.0, 1885.0, 1889.0, 1895.0, 1900.0, 1906.0, 1912.0, 1918.0, 1925.0, 1931.0, 1939.0, 1947.0,  1955.0,  1965.0,  1975.0, 1986.0,
              1991.0, 1996.0, 2001.0, 2006.0, 2012.0, 2018.0, 2024.0, 2030.0, 2036.0, 2043.0, 2050.0, 2057.0,  2064.0,  2072.0,  2076.0, 2080.0,
@@ -428,7 +428,7 @@ namespace FluidProperties {
              2572.0, 2594.0, 2617.0, 2640.0, 2664.0, 2688.0, 2713.0, 2777.0, 2844.0, 2915.0, 2990.0, 3068.0,  3150.0,  3237.0,  3329.0, 3426.0,
              3528.0, 3754.0, 4011.0, 4308.0, 4656.0, 5073.0, 5582.0, 6220.0, 7045.0, 8159.0, 9753.0, 12240.0, 16690.0, 27360.0, 96600.0});
 
-        static Array1D<Real64> const DefaultSteamDensityFluidData(
+        static EPVector<Real64> const DefaultSteamDensityFluidData(
             DefaultNumSteamTemps,
             {999.8, 999.9, 999.9, 999.7, 999.1, 998.2, 997.0, 995.6, 994.0, 992.2, 990.2, 988.0, 985.7, 983.2, 980.5, 977.7, 976.6, 975.4, 974.2,
              973.0, 971.8, 970.5, 969.2, 967.9, 966.6, 965.3, 963.9, 962.6, 961.2, 959.8, 959.1, 958.3, 957.6, 956.9, 956.2, 955.4, 954.7, 954.0,
@@ -437,7 +437,7 @@ namespace FluidProperties {
              907.4, 905.5, 903.5, 901.5, 899.5, 897.5, 895.4, 893.3, 891.2, 889.1, 887.0, 881.6, 876.1, 870.4, 864.7, 858.8, 852.7, 846.5, 840.2,
              833.7, 827.1, 813.4, 798.9, 783.6, 767.5, 750.3, 731.9, 712.1, 690.7, 667.1, 640.8, 610.7, 574.7, 527.6, 451.4});
 
-        static Array1D<Real64> const DefaultSteamDensityGasFluidData(
+        static EPVector<Real64> const DefaultSteamDensityGasFluidData(
             DefaultNumSteamTemps,
             {4.86e-003, 5.20e-003, 6.80e-003, 9.41e-003, 1.28e-002, 1.73e-002, 2.31e-002, 3.04e-002, 3.97e-002, 5.12e-002, 6.56e-002, 8.32e-002,
              0.10,      0.13,      0.16,      0.20,      0.22,      0.23,      0.25,      0.27,      0.29,      0.32,      0.34,      0.37,
@@ -450,7 +450,7 @@ namespace FluidProperties {
              13.99,     16.75,     19.97,     23.71,     28.07,     33.16,     39.13,     46.17,     54.54,     64.64,     77.05,     92.76,
              113.60,    143.90,    201.80});
 
-        static Array1D<Real64> const DefaultSteamSuperheatedTemps(
+        static EPVector<Real64> const DefaultSteamSuperheatedTemps(
             DefaultNumSteamSuperheatedTemps,
             {1.00e-002, 1.0,   5.0,   10.0,  15.0,  20.0,  25.0,  30.0,  35.0,  40.0,  45.0,  50.0,  55.0,  60.0,  65.0,  70.0,  72.0,
              74.0,      76.0,  78.0,  80.0,  82.0,  84.0,  86.0,  88.0,  90.0,  92.0,  94.0,  96.0,  98.0,  99.0,  100.0, 101.0, 102.0,
@@ -460,7 +460,7 @@ namespace FluidProperties {
              178.0,     180.0, 185.0, 190.0, 195.0, 200.0, 205.0, 210.0, 215.0, 220.0, 225.0, 230.0, 240.0, 250.0, 260.0, 270.0, 280.0,
              290.0,     300.0, 310.0, 320.0, 330.0, 340.0, 350.0, 360.0, 370.0, 400.0, 450.0, 500.0});
 
-        static Array1D<Real64> const DefaultSteamSuperheatedPressData(
+        static EPVector<Real64> const DefaultSteamSuperheatedPressData(
             DefaultNumSteamSuperheatedTemps,
             {611.70,     657.10,     872.60,     1228.0,    1706.0,    2339.0,    3170.0,     4247.0,     5629.0,     7385.0,     9595.0,
              12350.0,    15760.0,    19950.0,    25040.0,   31200.0,   34000.0,   37010.0,    40240.0,    43700.0,    47410.0,    51390.0,
@@ -483,7 +483,7 @@ namespace FluidProperties {
             // Members
             std::string Name;      // Name of the temperature list
             int NumOfTemps;        // Number of temperatures in a particular arry
-            Array1D<Real64> Temps; // Temperature values (degrees C)
+            EPVector<Real64> Temps; // Temperature values (degrees C)
 
             // Default Constructor
             FluidTempData() : NumOfTemps(0)
@@ -516,9 +516,9 @@ namespace FluidProperties {
         };
 
         // Object Data
-        Array1D<FluidTempData> FluidTemps;
-        Array1D<PressureSequence> PressurePtr;
-        Array1D<FluidData> FluidNames;
+        EPVector<FluidTempData> FluidTemps;
+        EPVector<PressureSequence> PressurePtr;
+        EPVector<FluidData> FluidNames;
 
         // FLOW:
         MaxAlphas = 0;
@@ -2337,7 +2337,7 @@ namespace FluidProperties {
     // would be shorter and more obvious, but would lose the flow of the original code.
     // Each function initializes the array of the same name in `GetFluidPropertiesData`.
 
-    void DefaultEthGlyCpData_initializer(Array2D<Real64> &DefaultEthGlyCpData, Array1D<Real64> const &DefaultWaterCpData)
+    void DefaultEthGlyCpData_initializer(Array2D<Real64> &DefaultEthGlyCpData, EPVector<Real64> const &DefaultWaterCpData)
     {
         DefaultEthGlyCpData(_, 2) = {0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    3937.0, 3946.0, 3954.0, 3963.0,
                                      3972.0, 3981.0, 3989.0, 3998.0, 4007.0, 4015.0, 4024.0, 4033.0, 4042.0, 4050.0, 4059.0,
@@ -2371,7 +2371,7 @@ namespace FluidProperties {
         DefaultEthGlyCpData(_, 1) = DefaultWaterCpData;
     }
 
-    void DefaultEthGlyViscData_initializer(Array2D<Real64> &DefaultEthGlyViscData, Array1D<Real64> const &DefaultWaterViscData)
+    void DefaultEthGlyViscData_initializer(Array2D<Real64> &DefaultEthGlyViscData, EPVector<Real64> const &DefaultWaterViscData)
     {
         DefaultEthGlyViscData(_, 1) = 0.0; // Initialize before division below
         DefaultEthGlyViscData(_, 2) = {0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 2.08, 1.79, 1.56, 1.37, 1.21, 1.08, 0.97, 0.88, 0.80, 0.73,
@@ -2407,7 +2407,7 @@ namespace FluidProperties {
         DefaultEthGlyViscData(_, 1) = DefaultWaterViscData;
     }
 
-    void DefaultEthGlyRhoData_initializer(Array2D<Real64> &DefaultEthGlyRhoData, Array1D<Real64> const &DefaultWaterRhoData)
+    void DefaultEthGlyRhoData_initializer(Array2D<Real64> &DefaultEthGlyRhoData, EPVector<Real64> const &DefaultWaterRhoData)
     {
         DefaultEthGlyRhoData(_, 2) = {0.00,    0.00,    0.00,    0.00,    0.00,    0.00,    0.00,    1018.73, 1017.57, 1016.28, 1014.87,
                                       1013.34, 1011.69, 1009.92, 1008.02, 1006.01, 1003.87, 1001.61, 999.23,  996.72,  994.10,  991.35,
@@ -2441,7 +2441,7 @@ namespace FluidProperties {
         DefaultEthGlyRhoData(_, 1) = DefaultWaterRhoData;
     }
 
-    void DefaultEthGlyCondData_initializer(Array2D<Real64> &DefaultEthGlyCondData, Array1D<Real64> const &DefaultWaterCondData)
+    void DefaultEthGlyCondData_initializer(Array2D<Real64> &DefaultEthGlyCondData, EPVector<Real64> const &DefaultWaterCondData)
     {
         DefaultEthGlyCondData(_, 2) = {0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.511, 0.520, 0.528, 0.537,
                                        0.545, 0.552, 0.559, 0.566, 0.572, 0.577, 0.583, 0.588, 0.592, 0.596, 0.600,
@@ -2475,7 +2475,7 @@ namespace FluidProperties {
         DefaultEthGlyCondData(_, 1) = DefaultWaterCondData;
     }
 
-    void DefaultPropGlyCpData_initializer(Array2D<Real64> &DefaultPropGlyCpData, Array1D<Real64> const &DefaultWaterCpData)
+    void DefaultPropGlyCpData_initializer(Array2D<Real64> &DefaultPropGlyCpData, EPVector<Real64> const &DefaultWaterCpData)
     {
         DefaultPropGlyCpData(_, 2) = {0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    4042.0, 4050.0, 4058.0, 4067.0,
                                       4075.0, 4083.0, 4091.0, 4099.0, 4107.0, 4115.0, 4123.0, 4131.0, 4139.0, 4147.0, 4155.0,
@@ -2509,7 +2509,7 @@ namespace FluidProperties {
         DefaultPropGlyCpData(_, 1) = DefaultWaterCpData;
     }
 
-    void DefaultPropGlyViscData_initializer(Array2D<Real64> &DefaultPropGlyViscData, Array1D<Real64> const &DefaultWaterViscData)
+    void DefaultPropGlyViscData_initializer(Array2D<Real64> &DefaultPropGlyViscData, EPVector<Real64> const &DefaultWaterViscData)
     {
         DefaultPropGlyViscData(_, 1) = 0.0; // Initialize before division below
         DefaultPropGlyViscData(_, 2) = {0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 2.68, 2.23, 1.89, 1.63, 1.42, 1.25, 1.11, 0.99, 0.89, 0.81,
@@ -2546,7 +2546,7 @@ namespace FluidProperties {
         DefaultPropGlyViscData(_, 1) = DefaultWaterViscData;
     }
 
-    void DefaultPropGlyRhoData_initializer(Array2D<Real64> &DefaultPropGlyRhoData, Array1D<Real64> const &DefaultWaterRhoData)
+    void DefaultPropGlyRhoData_initializer(Array2D<Real64> &DefaultPropGlyRhoData, EPVector<Real64> const &DefaultWaterRhoData)
     {
         DefaultPropGlyRhoData(_, 2) = {0.00,    0.00,    0.00,    0.00,    0.00,    0.00,   0.00,   1013.85, 1012.61, 1011.24, 1009.75,
                                        1008.13, 1006.40, 1004.54, 1002.56, 1000.46, 998.23, 995.88, 993.41,  990.82,  988.11,  985.27,
@@ -2580,7 +2580,7 @@ namespace FluidProperties {
         DefaultPropGlyRhoData(_, 1) = DefaultWaterRhoData;
     }
 
-    void DefaultPropGlyCondData_initializer(Array2D<Real64> &DefaultPropGlyCondData, Array1D<Real64> const &DefaultWaterCondData)
+    void DefaultPropGlyCondData_initializer(Array2D<Real64> &DefaultPropGlyCondData, EPVector<Real64> const &DefaultWaterCondData)
     {
         DefaultPropGlyCondData(_, 2) = {0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.510, 0.518, 0.527, 0.535,
                                         0.543, 0.550, 0.557, 0.563, 0.569, 0.575, 0.580, 0.585, 0.589, 0.593, 0.596,
@@ -7697,7 +7697,7 @@ namespace FluidProperties {
 
         // Perform iterations to obtain the temperature level
         {
-            Array1D<Real64> Par(6);       // Parameters passed to RegulaFalsi
+            EPVector<Real64> Par(6);       // Parameters passed to RegulaFalsi
             Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
             int const MaxIte(500);        // maximum number of iterations
             int SolFla;                   // Flag of RegulaFalsi solver
@@ -8952,7 +8952,7 @@ namespace FluidProperties {
     //*****************************************************************************
 
     int FindArrayIndex(Real64 const Value,           // Value to be placed/found within the array of values
-                       Array1D<Real64> const &Array, // Array of values in ascending order
+                       EPVector<Real64> const &Array, // Array of values in ascending order
                        int const LowBound,           // Valid values lower bound (set by calling program)
                        int const UpperBound          // Valid values upper bound (set by calling program)
     )
@@ -9006,7 +9006,7 @@ namespace FluidProperties {
     }
 
     int FindArrayIndex(Real64 const Value,          // Value to be placed/found within the array of values
-                       Array1D<Real64> const &Array // Array of values in ascending order
+                       EPVector<Real64> const &Array // Array of values in ascending order
     )
     {
         // FUNCTION INFORMATION:
@@ -9055,9 +9055,9 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetInterpolatedSatProp(Real64 const Temperature,         // Saturation Temp.
-                                  Array1D<Real64> const &PropTemps, // Array of temperature at which props are available
-                                  Array1D<Real64> const &LiqProp,   // Array of saturated liquid properties
-                                  Array1D<Real64> const &VapProp,   // Array of saturatedvapour properties
+                                  EPVector<Real64> const &PropTemps, // Array of temperature at which props are available
+                                  EPVector<Real64> const &LiqProp,   // Array of saturated liquid properties
+                                  EPVector<Real64> const &VapProp,   // Array of saturatedvapour properties
                                   Real64 const Quality,             // Quality
                                   std::string const &CalledFrom,    // routine this function was called from (error messages)
                                   int const LowBound,               // Valid values lower bound (set by calling program)

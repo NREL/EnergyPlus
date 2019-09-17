@@ -144,10 +144,10 @@ namespace PlantCentralGSHP {
     // SUBROUTINE SPECIFICATIONS FOR MODULE ChillerElectricEIR
 
     // Object Data
-    Array1D<WrapperSpecs> Wrapper;
-    Array1D<WrapperReportVars> WrapperReport;
-    Array1D<ChillerHeaterSpecs> ChillerHeater;
-    Array1D<CHReportVars> ChillerHeaterReport;
+    EPVector<WrapperSpecs> Wrapper;
+    EPVector<WrapperReportVars> WrapperReport;
+    EPVector<ChillerHeaterSpecs> ChillerHeater;
+    EPVector<CHReportVars> ChillerHeaterReport;
 
 
     // MODULE SUBROUTINES:
@@ -1258,7 +1258,7 @@ namespace PlantCentralGSHP {
         int NumNums;                       // Number of elements in the numeric array
         int IOStat;                        // IO Status when calling get input subroutine
         Real64 CurveVal;                   // Used to verify EIR-FT and CAP-FT curves
-        Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
+        EPVector<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
         Real64 CurveValTmp;                // Used to evaluate PLFFPLR curve objects
 
         // Formats

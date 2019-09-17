@@ -67,7 +67,7 @@ class SiteShallowGroundTemps : public BaseGroundTempsModel
 {
 public:
     int timeOfSimInMonths;
-    Array1D<Real64> surfaceGroundTemps;
+    EPVector<Real64> surfaceGroundTemps;
 
     // Default Constructor
     SiteShallowGroundTemps() : timeOfSimInMonths(0), surfaceGroundTemps(12, 13.0)

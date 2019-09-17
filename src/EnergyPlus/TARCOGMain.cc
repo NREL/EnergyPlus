@@ -630,16 +630,16 @@ namespace TARCOGMain {
         Real64 trminTemp;
         Real64 hinTemp;
         Real64 houtTemp;
-        static Array1D<Real64> sconTemp(maxlay);
-        static Array1D<Real64> thickTemp(maxlay);
+        static EPVector<Real64> sconTemp(maxlay);
+        static EPVector<Real64> thickTemp(maxlay);
 
         // REAL(r64), dimension(maxlay) ::  sol ! Vector of Absorbed solar energy for each layer [W/m2] = dir*asol
 
         // Internaly used
         static bool converged(false); // used for convergence check in case of deflection calculations
-        static Array1D<Real64> told(maxlay2);
-        static Array1D<Real64> CurGap(MaxGap);
-        static Array1D<Real64> GapDefMean(MaxGap);
+        static EPVector<Real64> told(maxlay2);
+        static EPVector<Real64> CurGap(MaxGap);
+        static EPVector<Real64> GapDefMean(MaxGap);
         Real64 dtmax;
         int i;
         int counter;

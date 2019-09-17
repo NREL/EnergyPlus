@@ -230,7 +230,7 @@ namespace WaterToAirHeatPumpSimple {
     };
 
     // Object Data
-    extern Array1D<SimpleWatertoAirHPConditions> SimpleWatertoAirHP;
+    extern EPVector<SimpleWatertoAirHPConditions> SimpleWatertoAirHP;
 
     // Functions
     void clear_state();

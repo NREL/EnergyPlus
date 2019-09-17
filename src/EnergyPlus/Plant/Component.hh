@@ -81,7 +81,7 @@ namespace DataPlant {
         int NumOpSchemes;      // number of schemes held in the pointer array
         int CurCompLevelOpNum; // pointer to the OpScheme array defined next
         // PlantLoop()%LoopSide()%Branch()%Comp()%OpScheme(curOpSchemePtr)
-        Array1D<OpSchemePtrData> OpScheme; // Pointers to component on lists
+        EPVector<OpSchemePtrData> OpScheme; // Pointers to component on lists
         Real64 EquipDemand;                // Component load request based on inlet temp and outlet SP
         bool EMSLoadOverrideOn;            // EMS is calling to override load dispatched to component
         Real64 EMSLoadOverrideValue;       // EMS value to use for load when overridden [W] always positive.

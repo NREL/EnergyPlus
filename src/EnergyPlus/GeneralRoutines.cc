@@ -1071,12 +1071,12 @@ void CalcPassiveExteriorBaffleGap(Array1S_int const SurfPtrARR, // Array of inde
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // following arrays are used to temporarily hold results from multiple underlying surfaces
-    Array1D<Real64> HSkyARR;
-    Array1D<Real64> HGroundARR;
-    Array1D<Real64> HAirARR;
-    Array1D<Real64> HPlenARR;
-    Array1D<Real64> HExtARR;
-    Array1D<Real64> LocalWindArr;
+    EPVector<Real64> HSkyARR;
+    EPVector<Real64> HGroundARR;
+    EPVector<Real64> HAirARR;
+    EPVector<Real64> HPlenARR;
+    EPVector<Real64> HExtARR;
+    EPVector<Real64> LocalWindArr;
 
     // local working variables
     Real64 RhoAir;                       // density of air

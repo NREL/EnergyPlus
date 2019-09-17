@@ -230,18 +230,18 @@ namespace FaultsManager {
     // SUBROUTINE SPECIFICATIONS:
 
     // Object Data
-    Array1D<FaultPropertiesEconomizer> FaultsEconomizer;
-    Array1D<FaultPropertiesFoulingCoil> FouledCoils;
-    Array1D<FaultPropertiesThermostat> FaultsThermostatOffset;
-    Array1D<FaultPropertiesHumidistat> FaultsHumidistatOffset;
-    Array1D<FaultPropertiesAirFilter> FaultsFouledAirFilters;
-    Array1D<FaultPropertiesChillerSWT> FaultsChillerSWTSensor;
-    Array1D<FaultPropertiesCondenserSWT> FaultsCondenserSWTSensor;
-    Array1D<FaultPropertiesTowerFouling> FaultsTowerFouling;
-    Array1D<FaultPropertiesCoilSAT> FaultsCoilSATSensor;
-    Array1D<FaultPropertiesBoilerFouling> FaultsBoilerFouling;
-    Array1D<FaultPropertiesChillerFouling> FaultsChillerFouling;
-    Array1D<FaultPropertiesEvapCoolerFouling> FaultsEvapCoolerFouling;
+    EPVector<FaultPropertiesEconomizer> FaultsEconomizer;
+    EPVector<FaultPropertiesFoulingCoil> FouledCoils;
+    EPVector<FaultPropertiesThermostat> FaultsThermostatOffset;
+    EPVector<FaultPropertiesHumidistat> FaultsHumidistatOffset;
+    EPVector<FaultPropertiesAirFilter> FaultsFouledAirFilters;
+    EPVector<FaultPropertiesChillerSWT> FaultsChillerSWTSensor;
+    EPVector<FaultPropertiesCondenserSWT> FaultsCondenserSWTSensor;
+    EPVector<FaultPropertiesTowerFouling> FaultsTowerFouling;
+    EPVector<FaultPropertiesCoilSAT> FaultsCoilSATSensor;
+    EPVector<FaultPropertiesBoilerFouling> FaultsBoilerFouling;
+    EPVector<FaultPropertiesChillerFouling> FaultsChillerFouling;
+    EPVector<FaultPropertiesEvapCoolerFouling> FaultsEvapCoolerFouling;
 
     // Functions
 
@@ -301,7 +301,7 @@ namespace FaultsManager {
         Array1D_bool lNumericFieldBlanks(10, false);
         Array1D_string cAlphaFieldNames(10);
         Array1D_string cNumericFieldNames(10);
-        Array1D<Real64> rNumericArgs(10); // Numeric input items for object
+        EPVector<Real64> rNumericArgs(10); // Numeric input items for object
         std::string cFaultCurrentObject;
 
         if (RunFaultMgrOnceFlag) return;

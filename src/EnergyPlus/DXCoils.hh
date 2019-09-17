@@ -126,17 +126,17 @@ namespace DXCoils {
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Array1D<Real64> DXCoilOutletTemp;           // DX coil outlet dry bulb temperature [C]
-    extern Array1D<Real64> DXCoilOutletHumRat;         // DX coil outlet humidity ratio [kgWater/kgDryAir]
-    extern Array1D<Real64> DXCoilPartLoadRatio;        // DX coil part-load ratio
+    extern EPVector<Real64> DXCoilOutletTemp;           // DX coil outlet dry bulb temperature [C]
+    extern EPVector<Real64> DXCoilOutletHumRat;         // DX coil outlet humidity ratio [kgWater/kgDryAir]
+    extern EPVector<Real64> DXCoilPartLoadRatio;        // DX coil part-load ratio
     extern Array1D_int DXCoilFanOpMode;                // supply air fan operating mode
-    extern Array1D<Real64> DXCoilFullLoadOutAirTemp;   // DX coil full load outlet dry bulb temperature [C]
-    extern Array1D<Real64> DXCoilFullLoadOutAirHumRat; // DX coil full load outlet humidity ratio [kgWater/kgDryAir]
-    extern Array1D<Real64> DXCoilTotalCooling;         // DX cooling coil total cooling output [W]
-    extern Array1D<Real64> DXCoilTotalHeating;         // DX heating coil total heating output [W]
-    extern Array1D<Real64> DXCoilCoolInletAirWBTemp;   // DX cooling coil inlet air wet-bulb temp [C]
-    extern Array1D<Real64> DXCoilHeatInletAirDBTemp;   // DX heating coil inlet air dry-bulb temp [C]
-    extern Array1D<Real64> DXCoilHeatInletAirWBTemp;   // DX heating coil inlet air wet-bulb temp [C]
+    extern EPVector<Real64> DXCoilFullLoadOutAirTemp;   // DX coil full load outlet dry bulb temperature [C]
+    extern EPVector<Real64> DXCoilFullLoadOutAirHumRat; // DX coil full load outlet humidity ratio [kgWater/kgDryAir]
+    extern EPVector<Real64> DXCoilTotalCooling;         // DX cooling coil total cooling output [W]
+    extern EPVector<Real64> DXCoilTotalHeating;         // DX heating coil total heating output [W]
+    extern EPVector<Real64> DXCoilCoolInletAirWBTemp;   // DX cooling coil inlet air wet-bulb temp [C]
+    extern EPVector<Real64> DXCoilHeatInletAirDBTemp;   // DX heating coil inlet air dry-bulb temp [C]
+    extern EPVector<Real64> DXCoilHeatInletAirWBTemp;   // DX heating coil inlet air wet-bulb temp [C]
 
     extern int CurDXCoilNum;
 
@@ -186,24 +186,24 @@ namespace DXCoils {
         int SchedPtr;           // Pointer to the correct schedule
         //          RatedCoolCap, RatedSHR and RatedCOP do not include the thermal or electrical
         //          effects due to the supply air fan
-        Array1D<Real64> RatedTotCap;                 // Gross total cooling capacity at rated conditions [watts]
+        EPVector<Real64> RatedTotCap;                 // Gross total cooling capacity at rated conditions [watts]
         Real64 HeatSizeRatio;                        // heat pump heating to cooling sizing ratio when autosized
         Array1D_bool RatedTotCapEMSOverrideOn;       // if true, then EMS is calling to override rated total capacity
-        Array1D<Real64> RatedTotCapEMSOverrideValue; // value to use for EMS override
-        Array1D<Real64> RatedSHR;                    // Sensible heat ratio (sens cap/total cap) at rated conditions
+        EPVector<Real64> RatedTotCapEMSOverrideValue; // value to use for EMS override
+        EPVector<Real64> RatedSHR;                    // Sensible heat ratio (sens cap/total cap) at rated conditions
         Array1D_bool RatedSHREMSOverrideOn;          // if true, then EMS is calling to override Sensible heat ratio
-        Array1D<Real64> RatedSHREMSOverrideValue;    // value to use for EMS override forSensible heat ratio
-        Array1D<Real64> RatedCOP;                    // Coefficient of performance at rated conditions
-        Array1D<Real64> RatedAirVolFlowRate;         // Air volume flow rate through coil at rated conditions [m3/s]
+        EPVector<Real64> RatedSHREMSOverrideValue;    // value to use for EMS override forSensible heat ratio
+        EPVector<Real64> RatedCOP;                    // Coefficient of performance at rated conditions
+        EPVector<Real64> RatedAirVolFlowRate;         // Air volume flow rate through coil at rated conditions [m3/s]
         // This is adjusted for bypassed air if any (see BypassedFlowFrac)
         Array1D_bool RatedAirVolFlowRateEMSOverrideON;       // if true, then EMS is calling to override Air volume flow rate
-        Array1D<Real64> RatedAirVolFlowRateEMSOverrideValue; // value to use for EMS override Air volume flow rate
-        Array1D<Real64> FanPowerPerEvapAirFlowRate;          // Fan Power Per Air volume flow rate through the
+        EPVector<Real64> RatedAirVolFlowRateEMSOverrideValue; // value to use for EMS override Air volume flow rate
+        EPVector<Real64> FanPowerPerEvapAirFlowRate;          // Fan Power Per Air volume flow rate through the
         // Evaporator coil at rated conditions [W/(m3/s)]
-        Array1D<Real64> RatedAirMassFlowRate; // Air mass flow rate through coil at rated conditions [kg/s]
+        EPVector<Real64> RatedAirMassFlowRate; // Air mass flow rate through coil at rated conditions [kg/s]
         // This is adjusted for bypassed air if any (see BypassedFlowFrac)
-        Array1D<Real64> BypassedFlowFrac; // Fraction of air flow bypassed around coil
-        Array1D<Real64> RatedCBF;         // rated coil bypass factor, determined using RatedTotCap and RatedSHR
+        EPVector<Real64> BypassedFlowFrac; // Fraction of air flow bypassed around coil
+        EPVector<Real64> RatedCBF;         // rated coil bypass factor, determined using RatedTotCap and RatedSHR
         int AirInNode;                    // Air inlet node number
         int AirOutNode;                   // Air outlet node number
         Array1D_int CCapFTemp;            // index of total cooling capacity modifier curve
@@ -259,7 +259,7 @@ namespace DXCoils {
         std::string SupplyFanName; // name of fan associated with this dx coil
         std::string CoilSystemName;
         // end of multi-speed compressor variables
-        Array1D<Real64> RatedEIR; // rated energy input ratio (inverse of COP)
+        EPVector<Real64> RatedEIR; // rated energy input ratio (inverse of COP)
         Real64 InletAirMassFlowRate;
         Real64 InletAirMassFlowRateMax;
         Real64 InletAirTemp;
@@ -309,23 +309,23 @@ namespace DXCoils {
         bool OATempCompressorOnOffBlank;
         // end of variables used in heat pump heating coils only
         // start of variables for DX cooling coil latent degradation model
-        Array1D<Real64> Twet_Rated; // Nominal time for condensate to begin leaving the coil's
+        EPVector<Real64> Twet_Rated; // Nominal time for condensate to begin leaving the coil's
         // condensate drain line (sec)
-        Array1D<Real64> Gamma_Rated; // Initial moisture evaporation rate divided by steady-state
+        EPVector<Real64> Gamma_Rated; // Initial moisture evaporation rate divided by steady-state
         // AC latent capacity (dimensionless)
-        Array1D<Real64> MaxONOFFCyclesperHour;      // Maximum ON/OFF cycles per hour for the compressor (cycles/hour)
-        Array1D<Real64> LatentCapacityTimeConstant; // Time constant for latent capacity to reach steady state
+        EPVector<Real64> MaxONOFFCyclesperHour;      // Maximum ON/OFF cycles per hour for the compressor (cycles/hour)
+        EPVector<Real64> LatentCapacityTimeConstant; // Time constant for latent capacity to reach steady state
         // after startup (sec)
         // end of variables for DX cooling coil latent degradation model
         Array1D_int CondenserType; // Type of condenser for DX cooling coil: AIR COOLED or EVAP COOLED
         // start of variables for DX cooling coil evaporative condenser option
         bool ReportEvapCondVars;        // true if any performance mode includes an evap condenser
-        Array1D<Real64> EvapCondEffect; // effectiveness of the evaporatively cooled condenser
+        EPVector<Real64> EvapCondEffect; // effectiveness of the evaporatively cooled condenser
         // [high speed for multi-speed unit] (-)
         Real64 CondInletTemp;            // Evap condenser inlet temperature [C], report variable
-        Array1D<Real64> EvapCondAirFlow; // Air flow rate through the evap condenser at high speed,
+        EPVector<Real64> EvapCondAirFlow; // Air flow rate through the evap condenser at high speed,
         // for water use calcs [m3/s]
-        Array1D<Real64> EvapCondPumpElecNomPower; // Nominal power input to the evap condenser water circulation pump
+        EPVector<Real64> EvapCondPumpElecNomPower; // Nominal power input to the evap condenser water circulation pump
         // at high speed [W]
         Real64 EvapCondPumpElecPower; // Average power consumed by the evap condenser water circulation pump over
         // the time step [W]
@@ -418,30 +418,30 @@ namespace DXCoils {
         bool PLRImpact;                             // Part load fraction applied to Speed Number > 1
         bool LatentImpact;                          // Latent degradation applied to Speed Number > 1
         Array1D_int MSErrIndex;                     // index flag for num speeds/recurring messages
-        Array1D<Real64> MSRatedTotCap;              // Rated cooling capacity for MS heat pump [W]
-        Array1D<Real64> MSRatedSHR;                 // Rated SHR for MS heat pump [dimensionless]
-        Array1D<Real64> MSRatedCOP;                 // Rated COP for MS heat pump [dimensionless]
-        Array1D<Real64> MSRatedAirVolFlowRate;      // Air volume flow rate through unit at rated conditions [m3/s]
-        Array1D<Real64> MSRatedAirMassFlowRate;     // Air mass flow rate through unit at rated conditions [m3/s]
-        Array1D<Real64> MSRatedCBF;                 // rated coil bypass factor
+        EPVector<Real64> MSRatedTotCap;              // Rated cooling capacity for MS heat pump [W]
+        EPVector<Real64> MSRatedSHR;                 // Rated SHR for MS heat pump [dimensionless]
+        EPVector<Real64> MSRatedCOP;                 // Rated COP for MS heat pump [dimensionless]
+        EPVector<Real64> MSRatedAirVolFlowRate;      // Air volume flow rate through unit at rated conditions [m3/s]
+        EPVector<Real64> MSRatedAirMassFlowRate;     // Air mass flow rate through unit at rated conditions [m3/s]
+        EPVector<Real64> MSRatedCBF;                 // rated coil bypass factor
         Array1D_int MSCCapFTemp;                    // index of total cooling capacity modifier curve
         Array1D_int MSCCapFFlow;                    // index of total cooling capacity modifier curve
         Array1D_int MSEIRFTemp;                     // index of energy input ratio modifier curve as a function of temperature
         Array1D_int MSEIRFFlow;                     // index of energy input ratio modifier curve as a function of flow fraction
         Array1D_int MSPLFFPLR;                      // index of part load factor as a function of part load ratio
         Array1D_int MSWasteHeat;                    // index of waste heat as a function of temperature
-        Array1D<Real64> MSWasteHeatFrac;            // Waste heat fraction
-        Array1D<Real64> MSEvapCondEffect;           // effectiveness of the evaporatively cooled condenser
-        Array1D<Real64> MSEvapCondAirFlow;          // Air flow rate through the evap condenser for water use calcs [m3/s]
-        Array1D<Real64> MSEvapCondPumpElecNomPower; // Nominal power input to the evap condenser
+        EPVector<Real64> MSWasteHeatFrac;            // Waste heat fraction
+        EPVector<Real64> MSEvapCondEffect;           // effectiveness of the evaporatively cooled condenser
+        EPVector<Real64> MSEvapCondAirFlow;          // Air flow rate through the evap condenser for water use calcs [m3/s]
+        EPVector<Real64> MSEvapCondPumpElecNomPower; // Nominal power input to the evap condenser
         // water circulation pump
-        Array1D<Real64> MSTwet_Rated; // Nominal time for condensate to begin leaving the coil's
+        EPVector<Real64> MSTwet_Rated; // Nominal time for condensate to begin leaving the coil's
         // condensate drain line (sec)
-        Array1D<Real64> MSGamma_Rated; // Initial moisture evaporation rate divided by steady-state
+        EPVector<Real64> MSGamma_Rated; // Initial moisture evaporation rate divided by steady-state
         // AC latent capacity (dimensionless)
-        Array1D<Real64> MSMaxONOFFCyclesperHour;      // Maximum ON/OFF cycles per hour for the compressor (cycles/hour)
-        Array1D<Real64> MSLatentCapacityTimeConstant; // Time constant for latent capacity to reach steady state
-        Array1D<Real64> MSFanPowerPerEvapAirFlowRate;
+        EPVector<Real64> MSMaxONOFFCyclesperHour;      // Maximum ON/OFF cycles per hour for the compressor (cycles/hour)
+        EPVector<Real64> MSLatentCapacityTimeConstant; // Time constant for latent capacity to reach steady state
+        EPVector<Real64> MSFanPowerPerEvapAirFlowRate;
         Real64 FuelUsed;         // Energy used, in addition to electricity [W]
         Real64 FuelConsumed;     // Energy consumed, in addition to electricity [J]
         Real64 MSFuelWasteHeat;  // Total waste heat [J]
@@ -482,9 +482,9 @@ namespace DXCoils {
         Real64 CompressorPartLoadRatio;                // compressor part load ratio of the primary DX coil
         Array1D_int MSSecCoilSHRFT;                    // index to the multi speed secondary coil sensible heat ratio temperature modifier curve
         Array1D_int MSSecCoilSHRFF;                    //  index to the multi speed secondary coil sensible heat ratio flow fraction modifier curve
-        Array1D<Real64> MSSecCoilAirFlow;              // multispeed secondary coil air flow rate
-        Array1D<Real64> MSSecCoilAirFlowScalingFactor; // multispeed secondary coil air flow rate autosize scaling factor
-        Array1D<Real64> MSSecCoilRatedSHR;             // multispeed secondary coil nominal or rated sensible heat ratio
+        EPVector<Real64> MSSecCoilAirFlow;              // multispeed secondary coil air flow rate
+        EPVector<Real64> MSSecCoilAirFlowScalingFactor; // multispeed secondary coil air flow rate autosize scaling factor
+        EPVector<Real64> MSSecCoilRatedSHR;             // multispeed secondary coil nominal or rated sensible heat ratio
         int MSSpeedNumLS;                              // current low speed number of multspeed HP
         int MSSpeedNumHS;                              // current high speed number of multspeed HP
         Real64 MSSpeedRatio;                           // current speed ratio of multspeed HP
@@ -575,7 +575,7 @@ namespace DXCoils {
     struct PerfModeData
     {
         // Members
-        Array1D<std::string> FieldNames;
+        EPVector<std::string> FieldNames;
 
         // Default Constructor
         PerfModeData() : FieldNames()
@@ -586,7 +586,7 @@ namespace DXCoils {
     struct DXCoilNumericFieldData
     {
         // Members
-        Array1D<PerfModeData> PerfMode; // Coil Performance object type
+        EPVector<PerfModeData> PerfMode; // Coil Performance object type
 
         // Default Constructor
         DXCoilNumericFieldData() : PerfMode(0)
@@ -595,8 +595,8 @@ namespace DXCoils {
     };
 
     // Object Data
-    extern Array1D<DXCoilData> DXCoil;
-    extern Array1D<DXCoilNumericFieldData> DXCoilNumericFields;
+    extern EPVector<DXCoilData> DXCoil;
+    extern EPVector<DXCoilNumericFieldData> DXCoilNumericFields;
 
     // Functions
 

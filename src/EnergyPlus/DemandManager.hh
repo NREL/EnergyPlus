@@ -115,7 +115,7 @@ namespace DemandManager {
         Real64 BillingPeriod;     // Current billing period value
         int PeakSchedule;         // Schedule index for billing month periods
         int AveragingWindow;      // Number of timesteps for averaging demand window
-        Array1D<Real64> History;  // Demand window history
+        EPVector<Real64> History;  // Demand window history
         int ManagerPriority;      // Indicator for priority (SEQUENTIAL, OPTIMAL, ALL)
         int NumOfManager;         // Number of DEMAND MANAGERs
         Array1D_int Manager;      // Indexes for DEMAND MANAGERs
@@ -176,8 +176,8 @@ namespace DemandManager {
     };
 
     // Object Data
-    extern Array1D<DemandManagerListData> DemandManagerList;
-    extern Array1D<DemandManagerData> DemandMgr;
+    extern EPVector<DemandManagerListData> DemandManagerList;
+    extern EPVector<DemandManagerData> DemandMgr;
 
     // Functions
 

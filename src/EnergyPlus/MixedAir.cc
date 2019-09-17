@@ -302,10 +302,10 @@ namespace MixedAir {
     // Utility routines for the module
 
     // Object Data
-    Array1D<ControllerListProps> ControllerLists;
-    Array1D<OAControllerProps> OAController;
-    Array1D<OAMixerProps> OAMixer;
-    Array1D<VentilationMechanicalProps> VentilationMechanical;
+    EPVector<ControllerListProps> ControllerLists;
+    EPVector<OAControllerProps> OAController;
+    EPVector<OAMixerProps> OAMixer;
+    EPVector<VentilationMechanicalProps> VentilationMechanical;
     std::unordered_set<std::string> ControllerListUniqueNames;
     std::unordered_map<std::string, std::string> OAControllerUniqueNames;
 
@@ -958,7 +958,7 @@ namespace MixedAir {
         int NumNums;   // Number of real numbers returned by GetObjectItem
         int NumAlphas; // Number of alphanumerics returned by GetObjectItem
         int IOStat;
-        Array1D<Real64> NumArray;
+        EPVector<Real64> NumArray;
         Array1D_string AlphArray;
         int OASysNum;
         int CompNum;
@@ -1343,7 +1343,7 @@ namespace MixedAir {
         int VentMechNum;     // Number of VENTILATION:MECHANICAL objects
         int groupNum;        // Index to group in extensible VENTILATION:MECHANICAL object
         int IOStat;          // Status of GetObjectItem call
-        Array1D<Real64> NumArray;
+        EPVector<Real64> NumArray;
         Array1D_string AlphArray;
         std::string CurrentModuleObject; // Object type for getting and messages
         Array1D_string cAlphaFields;     // Alpha field names
@@ -2135,7 +2135,7 @@ namespace MixedAir {
         int NumArg;    // Number of arguments from GetObjectDefMaxArgs call
         int OutAirNum;
         int IOStat;
-        Array1D<Real64> NumArray;        // array that holds numeric input values
+        EPVector<Real64> NumArray;        // array that holds numeric input values
         Array1D_string AlphArray;        // array that holds alpha input values
         std::string CurrentModuleObject; // Object type for getting and messages
         Array1D_string cAlphaFields;     // Alpha field names
@@ -4443,7 +4443,7 @@ namespace MixedAir {
         Real64 EconomizerAirFlowScheduleValue; // value of economizer operation schedule (push-button type control schedule)
         Real64 MaximumOAFracBySetPoint;        // The maximum OA fraction due to freezing cooling coil check
         Real64 OutAirSignal;                   // Used to set OA mass flow rate
-        static Array1D<Real64> Par(6);         // Par(1) = mixed air node number //Tuned Made static
+        static EPVector<Real64> Par(6);         // Par(1) = mixed air node number //Tuned Made static
                                                // Par(2) = return air node number
                                                // Par(3) = outside air node number
                                                // Par(4) = mixed air mass flow rate

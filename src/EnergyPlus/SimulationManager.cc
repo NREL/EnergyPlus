@@ -724,7 +724,7 @@ namespace SimulationManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string Alphas(6);
-        Array1D<Real64> Number(4);
+        EPVector<Real64> Number(4);
         int NumAlpha;
         int NumNumber;
         int IOStat;
@@ -2818,9 +2818,9 @@ namespace SimulationManager {
         int NumVariables;
         Array1D_int VarIndexes;
         Array1D_int VarIDs;
-        Array1D<OutputProcessor::TimeStepType> IndexTypes;
+        EPVector<OutputProcessor::TimeStepType> IndexTypes;
         Array1D_int VarTypes;
-        Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
+        EPVector<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
         Array1D_string VarNames;
         Array1D_int ResourceTypes;
         Array1D_string EndUses;

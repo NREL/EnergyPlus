@@ -148,10 +148,10 @@ namespace MundtSimMgr {
     };
 
     // Object Data
-    extern Array1D<DefineZoneData> ZoneData;            // zone data
+    extern EPVector<DefineZoneData> ZoneData;            // zone data
     extern Array2D<DefineLinearModelNode> LineNode;     // air nodes
     extern Array2D<DefineSurfaceSettings> MundtAirSurf; // surfaces
-    extern Array1D<DefineSurfaceSettings> FloorSurf;    // floor
+    extern EPVector<DefineSurfaceSettings> FloorSurf;    // floor
 
     // Functions
 

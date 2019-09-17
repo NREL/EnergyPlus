@@ -94,10 +94,10 @@ namespace SingleDuct {
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Array1D<Real64> MassFlow1; // previous value of the terminal unit mass flow rate
-    extern Array1D<Real64> MassFlow2; // previous value of the previous value of the mass flow rate
-    extern Array1D<Real64> MassFlow3;
-    extern Array1D<Real64> MassFlowDiff;
+    extern EPVector<Real64> MassFlow1; // previous value of the terminal unit mass flow rate
+    extern EPVector<Real64> MassFlow2; // previous value of the previous value of the mass flow rate
+    extern EPVector<Real64> MassFlow3;
+    extern EPVector<Real64> MassFlowDiff;
     extern bool GetInputFlag;   // Flag set to make sure you get input once
     extern bool GetATMixerFlag; // Flag set to make sure you get input once
     extern int NumConstVolSys;
@@ -305,10 +305,10 @@ namespace SingleDuct {
     };
 
     // Object Data
-    extern Array1D<SysDesignParams> Sys;
-    extern Array1D<SysFlowConditions> SysInlet;
-    extern Array1D<SysFlowConditions> SysOutlet;
-    extern Array1D<AirTerminalMixerData> SysATMixer;
+    extern EPVector<SysDesignParams> Sys;
+    extern EPVector<SysFlowConditions> SysInlet;
+    extern EPVector<SysFlowConditions> SysOutlet;
+    extern EPVector<AirTerminalMixerData> SysATMixer;
 
     // Functions
     void clear_state();

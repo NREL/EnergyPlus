@@ -78,7 +78,7 @@ template <typename T> struct EPVector : std::vector<T>
 {
     using std::vector<T>::vector;
 
-    T operator()(std::size_t n) const
+    T & operator()(std::size_t n)
     {
         return this->at(n - 1);
     }

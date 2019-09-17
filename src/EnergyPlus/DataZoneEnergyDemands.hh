@@ -86,9 +86,9 @@ namespace DataZoneEnergyDemands {
         Real64 UnadjRemainingOutputReqToHeatSP; // Remaining unadjusted load required to meet heating setpoint (>0 is a heating load)
         Real64 UnadjRemainingOutputReqToCoolSP; // Remaining unadjusted load required to meet cooling setpoint (<0 is a cooling load)
         int NumZoneEquipment;              // count of zone equipment for this zone, from ZoneHVAC:EquipmentList
-        Array1D<Real64> SequencedOutputRequired;
-        Array1D<Real64> SequencedOutputRequiredToHeatingSP; // load required to meet heating setpoint by sequence
-        Array1D<Real64> SequencedOutputRequiredToCoolingSP; // load required to meet cooling setpoint by sequence
+        EPVector<Real64> SequencedOutputRequired;
+        EPVector<Real64> SequencedOutputRequiredToHeatingSP; // load required to meet heating setpoint by sequence
+        EPVector<Real64> SequencedOutputRequiredToCoolingSP; // load required to meet cooling setpoint by sequence
         Real64 SupplyAirAdjustFactor;                       // supply air adjustment factor due to the cap of
         // zone maximum outdoor air fraction
         int StageNum; // The stage number when staged thermostate is used:
@@ -119,9 +119,9 @@ namespace DataZoneEnergyDemands {
         Real64 UnadjRemainingOutputReqToDehumidSP; // Remaining unadjusted load required to meet dehumidifying setpoint
         // (<0 is a dehumidify load)
         int NumZoneEquipment; // count of zone equipment for this zone, from ZoneHVAC:EquipmentList
-        Array1D<Real64> SequencedOutputRequired;
-        Array1D<Real64> SequencedOutputRequiredToHumidSP;   // load required to meet humidify setpoint by sequence
-        Array1D<Real64> SequencedOutputRequiredToDehumidSP; // load required to meet dehumidify setpoint by sequenc
+        EPVector<Real64> SequencedOutputRequired;
+        EPVector<Real64> SequencedOutputRequiredToHumidSP;   // load required to meet humidify setpoint by sequence
+        EPVector<Real64> SequencedOutputRequiredToDehumidSP; // load required to meet dehumidify setpoint by sequenc
 
         // Default Constructor
         ZoneSystemMoistureDemand()
@@ -132,8 +132,8 @@ namespace DataZoneEnergyDemands {
     };
 
     // Object Data
-    extern Array1D<ZoneSystemDemandData> ZoneSysEnergyDemand;
-    extern Array1D<ZoneSystemMoistureDemand> ZoneSysMoistureDemand;
+    extern EPVector<ZoneSystemDemandData> ZoneSysEnergyDemand;
+    extern EPVector<ZoneSystemMoistureDemand> ZoneSysMoistureDemand;
 
     void clear_state();
 

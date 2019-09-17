@@ -192,9 +192,9 @@ namespace EnergyPlus {
             int numGFuncPairs;                                             // Number of g-function pairs
             Real64 gRefRatio;                                              // Reference ratio of g-function set
             Real64 maxSimYears;                                            // Maximum length of simulation in years
-            Array1D<Real64> time;                                          // response time in seconds
-            Array1D<Real64> LNTTS;                                         // natural log of Non Dimensional Time Ln(t/ts)
-            Array1D<Real64> GFNC;                                          // G-function ( Non Dimensional temperature response factors)
+            EPVector<Real64> time;                                          // response time in seconds
+            EPVector<Real64> LNTTS;                                         // natural log of Non Dimensional Time Ln(t/ts)
+            EPVector<Real64> GFNC;                                          // G-function ( Non Dimensional temperature response factors)
             std::shared_ptr<GLHEVertPropsStruct> props;                    // Properties
             std::vector<std::shared_ptr<GLHEVertSingleStruct>> myBorholes; // Boreholes used by this response factors object
 
@@ -224,9 +224,9 @@ namespace EnergyPlus {
             Real64 designFlow;            // Design volumetric flow rate			[m3/s]
             Real64 designMassFlow;        // Design mass flow rate				[kg/s]
             Real64 tempGround;            // The far field temperature of the ground   [degC]
-            Array1D<Real64> QnMonthlyAgg; // Monthly aggregated normalized heat extraction/rejection rate [W/m]
-            Array1D<Real64> QnHr;         // Hourly aggregated normalized heat extraction/rejection rate [W/m]
-            Array1D<Real64> QnSubHr; // Contains the sub-hourly heat extraction/rejection rate normalized by the total active length of bore holes  [W/m]
+            EPVector<Real64> QnMonthlyAgg; // Monthly aggregated normalized heat extraction/rejection rate [W/m]
+            EPVector<Real64> QnHr;         // Hourly aggregated normalized heat extraction/rejection rate [W/m]
+            EPVector<Real64> QnSubHr; // Contains the sub-hourly heat extraction/rejection rate normalized by the total active length of bore holes  [W/m]
             int prevHour;
             int AGG;               // Minimum Hourly History required
             int SubAGG;            // Minimum sub-hourly History
@@ -393,8 +393,8 @@ namespace EnergyPlus {
             int monthOfMinSurfTemp;
             Real64 maxSimYears;
             Real64 minSurfTemp;
-            Array1D<Real64> X0;
-            Array1D<Real64> Y0;
+            EPVector<Real64> X0;
+            EPVector<Real64> Y0;
             Real64 Z0;
 
             GLHESlinky()

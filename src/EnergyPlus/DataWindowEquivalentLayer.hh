@@ -234,8 +234,8 @@ namespace DataWindowEquivalentLayer {
         // Members
         std::string Name;         // ID (Fenestration Name)
         int NL;                   // number of layers
-        Array1D<CFSLAYER> L;      // layer array, L(1) is outside layer
-        Array1D<CFSGAP> G;        // gap array, G(1) is outside-most, betw L(1) and L(2)
+        EPVector<CFSLAYER> L;      // layer array, L(1) is outside layer
+        EPVector<CFSGAP> G;        // gap array, G(1) is outside-most, betw L(1) and L(2)
         bool ISControlled;        // CFS is not controlled, or has no controlled VB layer
         int VBLayerPtr;           // Venetian blind layer pointer
         int WEQLSolverErrorIndex; // recurring error index
@@ -251,9 +251,9 @@ namespace DataWindowEquivalentLayer {
                                // Solar transmittance, BEAM-BEAM, back | Solar reflectance, BEAM-DIFFUSE, front | Solar reflectance, BEAM-DIFFUSE,
                                // back | Solar transmittance, BEAM-DIFFUSE, front | Solar transmittance, BEAM-DIFFUSE, back | Solar reflectance,
                                // DIFFUSE-DIFFUSE, front | Solar reflectance, DIFFUSE-DIFFUSE, back | Solar transmittance, DIFFUSE-DIFFUSE
-    extern Array1D<CFSLAYER> CFSLayers;
-    extern Array1D<CFSTY> CFS;
-    extern Array1D<CFSGAP> CFSGaps;
+    extern EPVector<CFSLAYER> CFSLayers;
+    extern EPVector<CFSTY> CFS;
+    extern EPVector<CFSGAP> CFSGaps;
 
 } // namespace DataWindowEquivalentLayer
 

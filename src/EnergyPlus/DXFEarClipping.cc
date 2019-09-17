@@ -185,7 +185,7 @@ namespace DXFEarClipping {
 
     int Triangulate(int const nsides, // number of sides to polygon
                     Array1A<Vector> polygon,
-                    Array1D<dTriangle> &outtriangles,
+                    EPVector<dTriangle> &outtriangles,
                     Real64 const surfazimuth,    // surface azimuth angle (outward facing normal)
                     Real64 const surftilt,       // surface tilt angle
                     std::string const &surfname, // surface name (for error messages)
@@ -242,16 +242,16 @@ namespace DXFEarClipping {
         bool errFlag;
         Array1D_int ears(nsides);
         Array1D_int r_angles(nsides);
-        Array1D<Real64> rangles(nsides);
+        EPVector<Real64> rangles(nsides);
         Array1D_int c_vertices(nsides);
         Array2D_int earvert(nsides, 3);
         Array1D_bool removed(nsides);
         // unused  type(Vector_2d), dimension(3) :: testtri
         // unused  type(Vector_2d) :: point
         Array1D_int earverts(3);
-        Array1D<Real64> xvt(nsides);
-        Array1D<Real64> yvt(nsides);
-        Array1D<Real64> zvt(nsides);
+        EPVector<Real64> xvt(nsides);
+        EPVector<Real64> yvt(nsides);
+        EPVector<Real64> zvt(nsides);
 
         //'General Variables
         int i;
@@ -274,8 +274,8 @@ namespace DXFEarClipping {
         static int errcount(0);
 
         // Object Data
-        Array1D<Vector_2d> vertex(nsides);
-        Array1D<dTriangle> Triangle(nsides);
+        EPVector<Vector_2d> vertex(nsides);
+        EPVector<dTriangle> Triangle(nsides);
 
         errFlag = false;
         //  vertex=polygon
@@ -598,7 +598,7 @@ namespace DXFEarClipping {
 
         // Object Data
         Vector_2d point;               // structure for point
-        Array1D<Vector_2d> testtri(3); // structure for triangle
+        EPVector<Vector_2d> testtri(3); // structure for triangle
 
         // initialize, always recalculate
         ears = 0;

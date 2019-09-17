@@ -138,7 +138,7 @@ namespace TranspiredCollector {
     // SUBROUTINE SPECIFICATIONS FOR MODULE TranspiredCollector:
 
     // Object Data
-    Array1D<UTSCDataStruct> UTSC;
+    EPVector<UTSCDataStruct> UTSC;
 
     // Functions
     void clear_state()
@@ -281,7 +281,7 @@ namespace TranspiredCollector {
         Array1D_string Alphas; // Alpha items for extensible
         // Solar Collectors:Unglazed Transpired object
         int Item;                       // Item to be "gotten"
-        Array1D<Real64> Numbers(11);    // Numeric items for object
+        EPVector<Real64> Numbers(11);    // Numeric items for object
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
         int MaxNumAlphas;               // argumenet for call to GetObjectDefMaxArgs
@@ -302,7 +302,7 @@ namespace TranspiredCollector {
         Array1D_string AlphasSplit; // Alpha items for extensible
         // Solar Collectors:Unglazed Transpired object
         int ItemSplit;                        // Item to be "gotten"
-        Array1D<Real64> NumbersSplit(1);      // Numeric items for object
+        EPVector<Real64> NumbersSplit(1);      // Numeric items for object
         int NumAlphasSplit;                   // Number of Alphas for each GetObjectItem call
         int NumNumbersSplit;                  // Number of Numbers for each GetObjectItem call
         int MaxNumAlphasSplit;                // argumenet for call to GetObjectDefMaxArgs
@@ -923,11 +923,11 @@ namespace TranspiredCollector {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
         // following arrays are used to temporarily hold results from multiple underlying surfaces
-        Array1D<Real64> HSkyARR;
-        Array1D<Real64> HGroundARR;
-        Array1D<Real64> HAirARR;
-        Array1D<Real64> HPlenARR;
-        Array1D<Real64> LocalWindArr;
+        EPVector<Real64> HSkyARR;
+        EPVector<Real64> HGroundARR;
+        EPVector<Real64> HAirARR;
+        EPVector<Real64> HPlenARR;
+        EPVector<Real64> LocalWindArr;
         //  REAL(r64), ALLOCATABLE, DIMENSION(:) :: IscARR
         //  REAL(r64), ALLOCATABLE, DIMENSION(:) :: TsoARR
 

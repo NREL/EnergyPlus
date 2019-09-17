@@ -175,7 +175,7 @@ namespace HVACUnitaryBypassVAV {
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
     // Object Data
-    Array1D<CBVAVData> CBVAV;
+    EPVector<CBVAVData> CBVAV;
 
     // Functions
 
@@ -394,7 +394,7 @@ namespace HVACUnitaryBypassVAV {
         bool DXCoilErrFlag;                 // used in warning messages
 
         Array1D_string Alphas(20, "");
-        Array1D<Real64> Numbers(9, 0.0);
+        EPVector<Real64> Numbers(9, 0.0);
         Array1D_string cAlphaFields(20, "");
         Array1D_string cNumericFields(9, "");
         Array1D_bool lAlphaBlanks(20, true);
@@ -2136,7 +2136,7 @@ namespace HVACUnitaryBypassVAV {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MinHumRat;       // Minimum humidity ratio for sensible capacity calculation (kg/kg)
-        Array1D<Real64> Par(6); // RegulaFalsi parameters
+        EPVector<Real64> Par(6); // RegulaFalsi parameters
         int SolFla;             // Flag of RegulaFalsi solver
         Real64 QHeater;         // Load to be met by heater [W]
         Real64 QHeaterActual;   // actual heating load met [W]
@@ -3906,7 +3906,7 @@ namespace HVACUnitaryBypassVAV {
         Real64 MinWaterFlow;    // minimum water mass flow rate
         Real64 MaxHotWaterFlow; // maximum hot water mass flow rate, kg/s
         Real64 HotWaterMdot;    // actual hot water mass flow rate
-        Array1D<Real64> Par(3);
+        EPVector<Real64> Par(3);
         int SolFlag; // error flag
 
         Real64 QCoilActual = 0.0; // actual heating load met

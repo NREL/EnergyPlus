@@ -183,14 +183,14 @@ namespace SurfaceGroundHeatExchanger {
     bool GetInputFlag(true);
 
     // time keeping variables used for keeping track of average flux over each time step
-    Array1D<Real64> QRadSysSrcAvg;      // Average source over the time step
-    Array1D<Real64> LastSysTimeElapsed; // record of system time
-    Array1D<Real64> LastTimeStepSys;    // previous time step size
+    EPVector<Real64> QRadSysSrcAvg;      // Average source over the time step
+    EPVector<Real64> LastSysTimeElapsed; // record of system time
+    EPVector<Real64> LastTimeStepSys;    // previous time step size
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE PlantSurfaceGroundHeatExchangers
 
     // Object Data
-    Array1D<SurfaceGroundHeatExchangerData> SurfaceGHE;
+    EPVector<SurfaceGroundHeatExchangerData> SurfaceGHE;
 
     PlantComponent *SurfaceGroundHeatExchangerData::factory(int const EP_UNUSED(objectType), std::string const objectName)
     {
@@ -1265,9 +1265,9 @@ namespace SurfaceGroundHeatExchanger {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
         int const NumOfPropDivisions(13);  // intervals in property correlation
-        static Array1D<Real64> const Temps(
+        static EPVector<Real64> const Temps(
             NumOfPropDivisions, {1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85}); // Temperature, in C
-        static Array1D<Real64> const Mu(NumOfPropDivisions,
+        static EPVector<Real64> const Mu(NumOfPropDivisions,
                                         {0.001652,
                                          0.001422,
                                          0.001225,
@@ -1281,9 +1281,9 @@ namespace SurfaceGroundHeatExchanger {
                                          0.000528,
                                          0.000489,
                                          0.000453}); // Viscosity, in Ns/m2
-        static Array1D<Real64> const Conductivity(
+        static EPVector<Real64> const Conductivity(
             NumOfPropDivisions, {0.574, 0.582, 0.590, 0.598, 0.606, 0.613, 0.620, 0.628, 0.634, 0.640, 0.645, 0.650, 0.656}); // Conductivity, in W/mK
-        static Array1D<Real64> const Pr(
+        static EPVector<Real64> const Pr(
             NumOfPropDivisions, {12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88}); // Prandtl number (dimensionless)
         int const WaterIndex(1);
         static std::string const RoutineName("SurfaceGroundHeatExchanger:CalcHXEffectTerm");

@@ -242,10 +242,10 @@ namespace AirflowNetworkBalanceManager {
     }
 
     // Report variables
-    Array1D<Real64> PZ;
+    EPVector<Real64> PZ;
     // Inverse matrix
-    Array1D<Real64> MA;
-    Array1D<Real64> MV;
+    EPVector<Real64> MA;
+    EPVector<Real64> MV;
     Array1D_int IVEC;
     Array1D_int SplitterNodeNumbers;
 
@@ -278,7 +278,7 @@ namespace AirflowNetworkBalanceManager {
     int NumOfExtNodes(0);
     int AirflowNetworkNumOfExtSurfaces(0);
     Real64 IncAng(0.0);                     // Wind incidence angle relative to facade normal (deg)
-    Array1D<Real64> FacadeAng(5);           // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
+    EPVector<Real64> FacadeAng(5);           // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
     int WindDirNum;                         // Wind direction number
     Real64 WindAng;                         // Wind direction angle (degrees clockwise from North)
     int SupplyFanInletNode(0);              // Supply air fan inlet node number
@@ -298,18 +298,18 @@ namespace AirflowNetworkBalanceManager {
     int NumOfOAFans(0);              // number of OutdoorAir fans
     int NumOfReliefFans(0);          // number of OutdoorAir relief fans
 
-    Array1D<Real64> LoopPartLoadRatio;
-    Array1D<Real64> LoopOnOffFanRunTimeFraction;
-    Array1D<bool> LoopOnOffFlag;
+    EPVector<Real64> LoopPartLoadRatio;
+    EPVector<Real64> LoopOnOffFanRunTimeFraction;
+    EPVector<bool> LoopOnOffFlag;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE AirflowNetworkBalanceManager:
     // Name Public routines, optionally name Private routines within this module
 
     // Object Data
-    Array1D<AirflowNetworkReportVars> AirflowNetworkZnRpt;
+    EPVector<AirflowNetworkReportVars> AirflowNetworkZnRpt;
     std::unordered_map<std::string, std::string> UniqueAirflowNetworkSurfaceName;
 
-    Array1D<OccupantVentilationControlProp> OccupantVentilationControl;
+    EPVector<OccupantVentilationControlProp> OccupantVentilationControl;
 
     // Functions
 
@@ -349,7 +349,7 @@ namespace AirflowNetworkBalanceManager {
         NumOfExtNodes = 0;
         AirflowNetworkNumOfExtSurfaces = 0;
         IncAng = 0.0;
-        FacadeAng = Array1D<Real64>(5);
+        FacadeAng = EPVector<Real64>(5);
         WindDirNum = 0; // added default value
         WindAng = 0;    // added default value
         SupplyFanInletNode = 0;
@@ -1631,7 +1631,7 @@ namespace AirflowNetworkBalanceManager {
         Array1D_string Alphas;         // Alpha input items for object
         Array1D_string cAlphaFields;   // Alpha field names
         Array1D_string cNumericFields; // Numeric field names
-        Array1D<Real64> Numbers;       // Numeric input items for object
+        EPVector<Real64> Numbers;       // Numeric input items for object
         Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);         // Maximum number of numeric input fields
@@ -5789,7 +5789,7 @@ namespace AirflowNetworkBalanceManager {
         Real64 LocalWindDir;
         Real64 LocalHumRat;
         Real64 LocalDryBulb;
-        Array1D<Real64> Par; // Pressure setpoint
+        EPVector<Real64> Par; // Pressure setpoint
         Real64 const ErrorToler(0.00001);
         int const MaxIte(20);
         int SolFla;
@@ -8216,8 +8216,8 @@ namespace AirflowNetworkBalanceManager {
         int FanNum;
         Real64 RepOnOffFanRunTimeFraction;
         bool static onetime = false;
-        static Array1D<bool> onceZoneFlag;
-        static Array1D<bool> onceSurfFlag;
+        static EPVector<bool> onceZoneFlag;
+        static EPVector<bool> onceSurfFlag;
 
         if (SimulateAirflowNetwork < AirflowNetworkControlMultizone) return;
 
@@ -10738,12 +10738,12 @@ namespace AirflowNetworkBalanceManager {
         Real64 ZoneAng1;
         Real64 ZoneAng2;
         Real64 ZoneAngDiff;
-        Array1D<Real64> ZoneAng;           // Azimuth angle of the exterior wall of the zone
-        Array1D<Real64> PiFormula;         // Formula for the mean pressure difference
-        Array1D<Real64> SigmaFormula;      // Formula for the fluctuating pressure difference
-        Array1D<Real64> Sprime;            // The dimensionless ratio of the window separation to the building width
-        Array1D<Real64> CPV1;              // Wind pressure coefficient for the first opening in the zone
-        Array1D<Real64> CPV2;              // Wind pressure coefficient for the second opening in the zone
+        EPVector<Real64> ZoneAng;           // Azimuth angle of the exterior wall of the zone
+        EPVector<Real64> PiFormula;         // Formula for the mean pressure difference
+        EPVector<Real64> SigmaFormula;      // Formula for the fluctuating pressure difference
+        EPVector<Real64> Sprime;            // The dimensionless ratio of the window separation to the building width
+        EPVector<Real64> CPV1;              // Wind pressure coefficient for the first opening in the zone
+        EPVector<Real64> CPV2;              // Wind pressure coefficient for the second opening in the zone
         static int AFNNumOfExtOpenings(0); // Total number of external openings in the model
         static int OpenNuminZone(0);       // Counts which opening this is in the zone, 1 or 2
         std::string Name;                  // External node name
@@ -10777,7 +10777,7 @@ namespace AirflowNetworkBalanceManager {
         };
 
         // Object Data
-        Array1D<AFNExtSurfacesProp> AFNExtSurfaces; // Surface numbers of all exterior openings
+        EPVector<AFNExtSurfacesProp> AFNExtSurfaces; // Surface numbers of all exterior openings
 
         // Count the total number of exterior simple and detailed openings and the number in each zone
         // Verify that each zone with "ADVANCED" single sided wind pressure coefficients has exactly two openings.

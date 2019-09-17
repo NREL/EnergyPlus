@@ -221,7 +221,7 @@ namespace FuelCellElectricGenerator {
         int NumNums;                   // Number of elements in the numeric array
         int IOStat;                    // IO Status when calling get input subroutine
         Array1D_string AlphArray(25);  // character string data
-        Array1D<Real64> NumArray(200); // numeric data TODO deal with allocatable for extensible
+        EPVector<Real64> NumArray(200); // numeric data TODO deal with allocatable for extensible
         Array1D_bool lAlphaBlanks(25);
         static bool ErrorsFound(false); // error flag
         int NumFuelCellPMs;             // number of power subsystems in input file
@@ -1466,7 +1466,7 @@ namespace FuelCellElectricGenerator {
         Real64 Acc;             // accuracy control for SolveRoot
         int MaxIter;            // iteration control for SolveRoot
         int SolverFlag;         // feed back flag from SolveRoot
-        Array1D<Real64> Par(3); // parameters passed in to SolveRoot
+        EPVector<Real64> Par(3); // parameters passed in to SolveRoot
         // Par(1) = generator number index in structure
         // Par(2) = targeted enthalpy (W)
         // Par(3) = molar flow rate of product gases (kmol/s)

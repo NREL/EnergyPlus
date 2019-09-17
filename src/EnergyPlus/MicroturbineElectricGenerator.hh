@@ -246,8 +246,8 @@ namespace MicroturbineElectricGenerator {
     };
 
     // Object Data
-    extern Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
-    extern Array1D<ReportVars> MTGeneratorReport;
+    extern EPVector<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
+    extern EPVector<ReportVars> MTGeneratorReport;
 
     // Functions
 

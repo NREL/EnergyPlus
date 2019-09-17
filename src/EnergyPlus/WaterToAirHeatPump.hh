@@ -187,7 +187,7 @@ namespace WaterToAirHeatPump {
     };
 
     // Object Data
-    extern Array1D<WatertoAirHPEquipConditions> WatertoAirHP;
+    extern EPVector<WatertoAirHPEquipConditions> WatertoAirHP;
 
     // Functions
 

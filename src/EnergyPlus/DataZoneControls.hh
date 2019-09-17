@@ -78,8 +78,8 @@ namespace DataZoneControls {
     extern bool AnyOpTempControl;                 // flag set true if any zones have op temp control
     extern bool AnyZoneTempAndHumidityControl;    // flag set true if any zones have over cool control
     extern Array1D_bool StageZoneLogic;           // Logical array, A zone with staged thermostat = .TRUE.
-    extern Array1D<Real64> OccRoomTSetPointHeat;  // occupied heating set point for optimum start period
-    extern Array1D<Real64> OccRoomTSetPointCool;  // occupied cooling set point for optimum start period
+    extern EPVector<Real64> OccRoomTSetPointHeat;  // occupied heating set point for optimum start period
+    extern EPVector<Real64> OccRoomTSetPointCool;  // occupied cooling set point for optimum start period
     extern bool GetZoneAirStatsInputFlag;         // True when need to get input
 
     // Types
@@ -252,8 +252,8 @@ namespace DataZoneControls {
         int NumOfCoolStages;              // Number of cooling stages
         Real64 HeatThroRange;             // Heating throttling tempeature range
         Real64 CoolThroRange;             // Cooling throttling tempeature range
-        Array1D<Real64> HeatTOffset;      // Heating temperature offset
-        Array1D<Real64> CoolTOffset;      // Cooling temperature offset
+        EPVector<Real64> HeatTOffset;      // Heating temperature offset
+        EPVector<Real64> CoolTOffset;      // Cooling temperature offset
         Real64 HeatSetPoint;              // Heating throttling tempeature range
         Real64 CoolSetPoint;              // Cooling throttling tempeature range
         int StageErrCount;                // Staged setpoint erro count
@@ -287,13 +287,13 @@ namespace DataZoneControls {
     };
 
     // Object Data
-    extern Array1D<ZoneHumidityControls> HumidityControlZone;
-    extern Array1D<ZoneTempControls> TempControlledZone;
-    extern Array1D<ZoneComfortControls> ComfortControlledZone;
-    extern Array1D<TStatObject> TStatObjects;
-    extern Array1D<TStatObject> ComfortTStatObjects;
-    extern Array1D<TStatObject> StagedTStatObjects;
-    extern Array1D<ZoneStagedControls> StageControlledZone;
+    extern EPVector<ZoneHumidityControls> HumidityControlZone;
+    extern EPVector<ZoneTempControls> TempControlledZone;
+    extern EPVector<ZoneComfortControls> ComfortControlledZone;
+    extern EPVector<TStatObject> TStatObjects;
+    extern EPVector<TStatObject> ComfortTStatObjects;
+    extern EPVector<TStatObject> StagedTStatObjects;
+    extern EPVector<ZoneStagedControls> StageControlledZone;
 
 } // namespace DataZoneControls
 

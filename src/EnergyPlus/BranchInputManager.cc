@@ -145,11 +145,11 @@ namespace BranchInputManager {
     // PUBLIC  MyPlantSizingIndex
 
     // Object Data
-    Array1D<BranchListData> BranchList;    // Branch List data for each Branch List
-    Array1D<BranchData> Branch;            // Branch Data for each Branch
-    Array1D<ConnectorData> ConnectorLists; // Connector List data for each Connector List
-    Array1D<SplitterData> Splitters;       // Splitter Data for each Splitter
-    Array1D<MixerData> Mixers;             // Mixer Data for each Mixer
+    EPVector<BranchListData> BranchList;    // Branch List data for each Branch List
+    EPVector<BranchData> Branch;            // Branch Data for each Branch
+    EPVector<ConnectorData> ConnectorLists; // Connector List data for each Connector List
+    EPVector<SplitterData> Splitters;       // Splitter Data for each Splitter
+    EPVector<MixerData> Mixers;             // Mixer Data for each Mixer
 
     // Functions
     void clear_state()
@@ -378,7 +378,7 @@ namespace BranchInputManager {
         int MinCompsAllowed;
 
         // Object Data
-        static Array1D<ComponentData> BComponents; // Component data to be returned
+        static EPVector<ComponentData> BComponents; // Component data to be returned
 
         // NumComps now defined on input
 
@@ -893,7 +893,7 @@ namespace BranchInputManager {
 
         // Object Data
         ConnectorData Connectoid;           // Connector Data
-        Array1D<ComponentData> BComponents; // Branch Component Data
+        EPVector<ComponentData> BComponents; // Branch Component Data
 
         if (GetMixerInputFlag) {
             GetMixerInput();
@@ -1053,7 +1053,7 @@ namespace BranchInputManager {
 
         // Object Data
         ConnectorData Connectoid;           // Connector Data
-        Array1D<ComponentData> BComponents; // Branch Component Data
+        EPVector<ComponentData> BComponents; // Branch Component Data
 
         if (GetSplitterInputFlag) {
             GetSplitterInput();
@@ -1355,7 +1355,7 @@ namespace BranchInputManager {
         Array1D_string Alphas;   // Used to retrieve names from IDF
         Array1D_int NodeNums;    // Possible Array of Node Numbers (only 1 allowed)
         int NumNumbers;          // Used to retrieve numbers from IDF
-        Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
+        EPVector<Real64> Numbers; // Used to retrieve numbers from IDF
         Array1D_string cAlphaFields;
         Array1D_string cNumericFields;
         Array1D_bool lNumericBlanks;
@@ -1626,7 +1626,7 @@ namespace BranchInputManager {
         int NumAlphas;         // Used to retrieve Branch list from IDF
         Array1D_string Alphas; // Used to retrieve names from IDF
         int NumNumbers;
-        Array1D<Real64> Numbers; // Not used in this object
+        EPVector<Real64> Numbers; // Not used in this object
         Array1D_string cAlphaFields;
         Array1D_string cNumericFields;
         Array1D_bool lNumericBlanks;
@@ -1779,7 +1779,7 @@ namespace BranchInputManager {
         int NumAlphas;           // Used to retrieve names from IDF
         Array1D_string Alphas;   // Used to retrieve names from IDF
         int NumNumbers;          // Used to retrieve numbers from IDF
-        Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
+        EPVector<Real64> Numbers; // Used to retrieve numbers from IDF
         Array1D_string cAlphaFields;
         Array1D_string cNumericFields;
         Array1D_bool lNumericBlanks;
@@ -2042,7 +2042,7 @@ namespace BranchInputManager {
         int NumAlphas;           // Used to retrieve names from IDF
         Array1D_string Alphas;   // Used to retrieve names from IDF
         int NumNumbers;          // Used to retrieve numbers from IDF
-        Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
+        EPVector<Real64> Numbers; // Used to retrieve numbers from IDF
         Array1D_string cAlphaFields;
         Array1D_string cNumericFields;
         Array1D_bool lNumericBlanks;
@@ -2287,7 +2287,7 @@ namespace BranchInputManager {
         int NumAlphas;           // Used to retrieve names from IDF
         Array1D_string Alphas;   // Used to retrieve names from IDF
         int NumNumbers;          // Used to retrieve numbers from IDF
-        Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
+        EPVector<Real64> Numbers; // Used to retrieve numbers from IDF
         Array1D_string cAlphaFields;
         Array1D_string cNumericFields;
         Array1D_bool lNumericBlanks;
@@ -2520,7 +2520,7 @@ namespace BranchInputManager {
         int NumParams;
         Array1D_string Alphas;
         int NumAlphas;
-        Array1D<Real64> Numbers;
+        EPVector<Real64> Numbers;
         int NumNumbers;
         int IOStat;
 
@@ -2600,7 +2600,7 @@ namespace BranchInputManager {
         int NumParams;
         Array1D_string Alphas;
         int NumAlphas;
-        Array1D<Real64> Numbers;
+        EPVector<Real64> Numbers;
         int NumNumbers;
         int IOStat;
 
@@ -2680,7 +2680,7 @@ namespace BranchInputManager {
         int NumParams;
         Array1D_string Alphas;
         int NumAlphas;
-        Array1D<Real64> Numbers;
+        EPVector<Real64> Numbers;
         int NumNumbers;
         int IOStat;
 
@@ -2959,7 +2959,7 @@ namespace BranchInputManager {
         };
 
         // Object Data
-        Array1D<BranchUniqueNodes> BranchNodes;
+        EPVector<BranchUniqueNodes> BranchNodes;
 
         // Formats
         static ObjexxFCL::gio::Fmt Format_700("('! <#Branch Lists>,<Number of Branch Lists>')");

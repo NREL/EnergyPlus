@@ -906,7 +906,7 @@ namespace HeatBalanceSurfaceManager {
         Array1D_int numExtSurfaces(20);
         int frameDivNum;
         bool isExterior;
-        Array1D<Real64> computedNetArea; // holds the gross wall area minus the window and door areas
+        EPVector<Real64> computedNetArea; // holds the gross wall area minus the window and door areas
 
         // the following variables are for the CalcNominalWindowCond call but only SHGCSummer is needed
         Real64 nomCond;
@@ -2247,9 +2247,9 @@ namespace HeatBalanceSurfaceManager {
         int TotGlassLay;                                // Number of glass layers
         int TotSolidLay;                                // Number of solid layers in fenestration system (glass + shading)
         int CurrentState;                               // Current state for Complex Fenestration
-        static Array1D<Real64> AbsDiffWin(CFSMAXNL);    // Diffuse solar absorptance of glass layers //Tuned Made static
-        static Array1D<Real64> AbsDiffWinGnd(CFSMAXNL); // Ground diffuse solar absorptance of glass layers //Tuned Made static
-        static Array1D<Real64> AbsDiffWinSky(CFSMAXNL); // Sky diffuse solar absorptance of glass layers //Tuned Made static
+        static EPVector<Real64> AbsDiffWin(CFSMAXNL);    // Diffuse solar absorptance of glass layers //Tuned Made static
+        static EPVector<Real64> AbsDiffWinGnd(CFSMAXNL); // Ground diffuse solar absorptance of glass layers //Tuned Made static
+        static EPVector<Real64> AbsDiffWinSky(CFSMAXNL); // Sky diffuse solar absorptance of glass layers //Tuned Made static
         int Lay;                                        // Layer number
         Real64 DividerAbs;                              // Window divider solar absorptance
         Real64 DividerRefl;                             // Window divider solar reflectance
@@ -4490,14 +4490,14 @@ namespace HeatBalanceSurfaceManager {
         int SideNum;     // DO loop counter for surfaces sides (inside, outside)
         int SurfNum;     // Surface number DO loop counter
 
-        static Array1D<Real64> QExt1;    // Heat flux at the exterior surface during first time step/series
-        static Array1D<Real64> QInt1;    // Heat flux at the interior surface during first time step/series
-        static Array1D<Real64> TempInt1; // Temperature of interior surface during first time step/series
-        static Array1D<Real64> TempExt1; // Temperature of exterior surface during first time step/series
-        static Array1D<Real64> Qsrc1;    // Heat source/sink (during first time step/series)
-        static Array1D<Real64> Tsrc1;    // Temperature at source/sink (during first time step/series)
-        static Array1D<Real64> Tuser1;   // Temperature at the user specified location (during first time step/series)
-        static Array1D<Real64> SumTime;  // Amount of time that has elapsed from start of master history to
+        static EPVector<Real64> QExt1;    // Heat flux at the exterior surface during first time step/series
+        static EPVector<Real64> QInt1;    // Heat flux at the interior surface during first time step/series
+        static EPVector<Real64> TempInt1; // Temperature of interior surface during first time step/series
+        static EPVector<Real64> TempExt1; // Temperature of exterior surface during first time step/series
+        static EPVector<Real64> Qsrc1;    // Heat source/sink (during first time step/series)
+        static EPVector<Real64> Tsrc1;    // Temperature at source/sink (during first time step/series)
+        static EPVector<Real64> Tuser1;   // Temperature at the user specified location (during first time step/series)
+        static EPVector<Real64> SumTime;  // Amount of time that has elapsed from start of master history to
         // the current time step
 
         // FLOW:
@@ -4812,9 +4812,9 @@ namespace HeatBalanceSurfaceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Real64 SumAET;                    // Intermediate calculational variable (area*emissivity*T) sum
-        static Array1D<Real64> SurfaceAE; // Product of area and emissivity for each surface
+        static EPVector<Real64> SurfaceAE; // Product of area and emissivity for each surface
         int SurfNum;                      // Surface number
-        static Array1D<Real64> ZoneAESum; // Sum of area times emissivity for all zone surfaces
+        static EPVector<Real64> ZoneAESum; // Sum of area times emissivity for all zone surfaces
         int ZoneNum;                      // Zone number
 
         // FLOW:
@@ -5838,7 +5838,7 @@ namespace HeatBalanceSurfaceManager {
         Real64 HMovInsul;  // "Convection" coefficient of movable insulation
         Real64 MaxDelTemp; // Maximum change in surface temperature for any
         //  opaque surface from one iteration to the next
-        static Array1D<Real64> TempInsOld; // Holds previous iteration's value for convergence check
+        static EPVector<Real64> TempInsOld; // Holds previous iteration's value for convergence check
         Real64 TempSurfOutTmp;             // Local Temporary Surface temperature for the outside surface face
         Real64 TempSurfInSat;              // Local temporary surface dew point temperature
 
@@ -5854,7 +5854,7 @@ namespace HeatBalanceSurfaceManager {
         Real64 MassFlowRate;
         Real64 NodeTemp;
         Real64 CpAir;
-        static Array1D<Real64> RefAirTemp; // reference air temperatures
+        static EPVector<Real64> RefAirTemp; // reference air temperatures
         static bool MyEnvrnFlag(true);
         static int InsideSurfErrCount(0);
         Real64 Wsurf;         // Moisture ratio for HAMT

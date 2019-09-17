@@ -375,7 +375,7 @@ namespace CondenserLoopTowers {
     {
         // Members
         // variables specific to variable-speed towers
-        Array1D<Real64> Coeff;      // - model coefficients
+        EPVector<Real64> Coeff;      // - model coefficients
         bool FoundModelCoeff;       // - TRUE if model is calibratable
         Real64 MinInletAirWBTemp;   // - model limit for min inlet air WB temp
         Real64 MaxInletAirWBTemp;   // - model limit for max inlet air WB temp
@@ -440,10 +440,10 @@ namespace CondenserLoopTowers {
     };
 
     // Object Data
-    extern Array1D<Towerspecs> SimpleTower;           // dimension to number of machines
-    extern Array1D<TowerInletConds> SimpleTowerInlet; // inlet conditions
-    extern Array1D<ReportVars> SimpleTowerReport;     // report variables
-    extern Array1D<VSTowerData> VSTower;              // model coefficients and specific variables for VS tower
+    extern EPVector<Towerspecs> SimpleTower;           // dimension to number of machines
+    extern EPVector<TowerInletConds> SimpleTowerInlet; // inlet conditions
+    extern EPVector<ReportVars> SimpleTowerReport;     // report variables
+    extern EPVector<VSTowerData> VSTower;              // model coefficients and specific variables for VS tower
 
     // Functions
     void clear_state();

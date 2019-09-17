@@ -252,7 +252,7 @@ namespace Furnaces {
     // Reporting routines for module
 
     // Object Data
-    Array1D<FurnaceEquipConditions> Furnace;
+    EPVector<FurnaceEquipConditions> Furnace;
     std::unordered_map<std::string, std::string> UniqueFurnaceNames;
 
     // Utility routines for module
@@ -909,7 +909,7 @@ namespace Furnaces {
         int NumNumbers;                // Total number of numeric fields in object
         int MaxNumbers;                // Maximum number of numeric fields in all objects
         int IOStatus;                  // Function call status
-        Array1D<Real64> Numbers;       // Numeric data
+        EPVector<Real64> Numbers;       // Numeric data
         Array1D_string Alphas;         // Alpha data
         Array1D_string cAlphaFields;   // Alpha field names
         Array1D_string cNumericFields; // Numeric field names
@@ -6691,7 +6691,7 @@ namespace Furnaces {
         Real64 TempLatentOutput;    // Temporary Latent output of AC at increasing PLR (W)
         //                                           ! (Temp variables are used to find min PLR for positive latent removal)
         static bool HumControl(false); // Logical flag signaling when dehumidification is required
-        Array1D<Real64> Par(10);       // parameters passed to RegulaFalsi function
+        EPVector<Real64> Par(10);       // parameters passed to RegulaFalsi function
         int SolFlag;                   // return flag from RegulaFalsi
         Real64 TempMinPLR;             // Temporary min latent PLR when hum control is required and iter is exceeded
         Real64 TempMinPLR2;            // Temporary min latent PLR when cyc fan hum control is required and iter is exceeded
@@ -7980,7 +7980,7 @@ namespace Furnaces {
         Real64 CoolErrorToler;           // convergence tolerance used in cooling mode
         Real64 HeatErrorToler;           // convergence tolerance used in heating mode
         int SolFlag;                     // flag returned from iteration routine to denote problems
-        Array1D<Real64> Par(9);          // parameters passed to iteration routine
+        EPVector<Real64> Par(9);          // parameters passed to iteration routine
 
         // Set local variables
         Dummy = 0.0;
@@ -9534,7 +9534,7 @@ namespace Furnaces {
         Real64 MinWaterFlow;    // coil minimum hot water mass flow rate, kg/s
         Real64 MaxHotWaterFlow; // coil maximum hot water mass flow rate, kg/s
         Real64 HotWaterMdot;    // actual hot water mass flow rate
-        Array1D<Real64> Par(4);
+        EPVector<Real64> Par(4);
         int SolFlag;
         static std::string HeatingCoilName; // name of heating coil
         static std::string HeatingCoilType; // type of heating coil
@@ -10120,7 +10120,7 @@ namespace Furnaces {
         Real64 LatOutput;          // latent capacity output
         Real64 ErrorToler;         // error tolerance
         int SolFla;                // Flag of RegulaFalsi solver
-        Array1D<Real64> Par(10);   // Parameters passed to RegulaFalsi
+        EPVector<Real64> Par(10);   // Parameters passed to RegulaFalsi
         Real64 CpAir;              // air specific heat
         Real64 QCoilActual;        // coil load actually delivered returned to calling component
         int i;                     // Speed index

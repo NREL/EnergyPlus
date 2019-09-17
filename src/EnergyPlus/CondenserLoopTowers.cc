@@ -200,10 +200,10 @@ namespace CondenserLoopTowers {
     // Update routines to check convergence and update nodes
 
     // Object Data
-    Array1D<Towerspecs> SimpleTower;           // dimension to number of machines
-    Array1D<TowerInletConds> SimpleTowerInlet; // inlet conditions
-    Array1D<ReportVars> SimpleTowerReport;     // report variables
-    Array1D<VSTowerData> VSTower;              // model coefficients and specific variables for VS tower
+    EPVector<Towerspecs> SimpleTower;           // dimension to number of machines
+    EPVector<TowerInletConds> SimpleTowerInlet; // inlet conditions
+    EPVector<ReportVars> SimpleTowerReport;     // report variables
+    EPVector<VSTowerData> VSTower;              // model coefficients and specific variables for VS tower
     std::unordered_map<std::string, std::string> UniqueSimpleTowerNames;
 
     // MODULE SUBROUTINES:
@@ -449,8 +449,8 @@ namespace CondenserLoopTowers {
         std::string OutputChar;         // report variable for warning messages
         std::string OutputCharLo;       // report variable for warning messages
         std::string OutputCharHi;       // report variable for warning messages
-        Array1D<Real64> NumArray(33);   // Numeric input data array
-        Array1D<Real64> NumArray2(43);  // Numeric input data array for VS tower coefficients
+        EPVector<Real64> NumArray(33);   // Numeric input data array
+        EPVector<Real64> NumArray2(43);  // Numeric input data array for VS tower coefficients
         Array1D_string AlphArray(16);   // Character string input data array
         Array1D_string AlphArray2(1);   // Character string input data array for VS tower coefficients
 
@@ -2936,7 +2936,7 @@ namespace CondenserLoopTowers {
         Real64 Tapproach;               // temporary tower approach temp variable [C]
         Real64 ModelWaterFlowRatioMax;  // maximum water flow rate ratio used for model calibration
         Real64 FlowRateRatioStep;       // flow rate ratio to determine maximum water flow rate ratio during calibration
-        Array1D<Real64> Par(6);         // Parameter array need for RegulaFalsi routine
+        EPVector<Real64> Par(6);         // Parameter array need for RegulaFalsi routine
         bool ModelCalibrated;           // TRUE if water flow rate ratio is with the specified range
         std::string OutputChar;         // report variable for warning messages
         std::string OutputChar2;        // report variable for warning messages
@@ -3992,7 +3992,7 @@ namespace CondenserLoopTowers {
         Real64 tmpHighSpeedFanPower;
         Real64 tmpFreeConvAirFlowRate;
 
-        Array1D<Real64> Par(6); // Parameter array need for RegulaFalsi routine
+        EPVector<Real64> Par(6); // Parameter array need for RegulaFalsi routine
         Real64 UA0;             // Lower bound for UA [W/C]
         Real64 UA1;             // Upper bound for UA [W/C]
         Real64 DesTowerLoad;    // Design tower load [W]
@@ -5654,7 +5654,7 @@ namespace CondenserLoopTowers {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D<Real64> Par(8); // Parameter array passed to solver
+        EPVector<Real64> Par(8); // Parameter array passed to solver
         int SolFla;             // Flag of solver
         Real64 CpWater;
         int LoopNum;
@@ -6120,7 +6120,7 @@ namespace CondenserLoopTowers {
         Real64 AirMassFlowRate;                // Mass flow rate of air [kg/s]
         Real64 InletAirEnthalpy;               // Enthalpy of entering moist air [J/kg]
         int SolFla;                            // Flag of solver
-        Array1D<Real64> Par(6);                // Parameter array for regula falsi solver
+        EPVector<Real64> Par(6);                // Parameter array for regula falsi solver
         Real64 Twb;                            // inlet air wet-bulb temperature
         Real64 TwbCapped;                      // inlet air wet-bulb temp passed to VS tower model
         Real64 Tr;                             // range temperature
@@ -6630,7 +6630,7 @@ namespace CondenserLoopTowers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SolFla;               // Flag of solver
-        Array1D<Real64> Par(4);   // Parameter array for regula falsi solver
+        EPVector<Real64> Par(4);   // Parameter array for regula falsi solver
         Real64 Tr;                // range temperature which results in an energy balance
         Real64 TempSetPoint(0.0); // local temporary for loop setpoint
 

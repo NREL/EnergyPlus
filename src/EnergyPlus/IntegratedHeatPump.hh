@@ -234,7 +234,7 @@ namespace IntegratedHeatPump {
     };
 
     // Object Data
-    extern Array1D<IntegratedHeatPumpData> IntegratedHeatPumps;
+    extern EPVector<IntegratedHeatPumpData> IntegratedHeatPumps;
 
     // Functions
     void clear_state();

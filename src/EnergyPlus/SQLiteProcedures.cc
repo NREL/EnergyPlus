@@ -93,7 +93,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase()
         if (numberOfSQLiteObjects == 1) {
             Array1D_string alphas(5);
             int numAlphas;
-            Array1D<Real64> numbers(2);
+            EPVector<Real64> numbers(2);
             int numNumbers;
             int status;
 

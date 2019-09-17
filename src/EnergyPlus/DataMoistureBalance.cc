@@ -89,27 +89,27 @@ namespace DataMoistureBalance {
     Array2D<Real64> DiffC;  // Thermal Diffusivity in combined potential formulation (CPF)
     // for each equation
     Array2D<Real64> mtinc; // # of Moisture transfer function time increment for each equation
-    Array1D<Real64> S1;    // Thermal Diffusivity in combined potential formulation (CPF)
+    EPVector<Real64> S1;    // Thermal Diffusivity in combined potential formulation (CPF)
     // for each equation
-    Array1D<Real64> R2; // Thermal Diffusivity in combined potential formulation (CPF)
+    EPVector<Real64> R2; // Thermal Diffusivity in combined potential formulation (CPF)
     // for each equation
-    Array1D<Real64> TempOutsideAirFD; // Temperature outside air for the FD surface
+    EPVector<Real64> TempOutsideAirFD; // Temperature outside air for the FD surface
 
     Array2D_int mhstry; // # of FD History terms for each equation
     Array1D_int CMTF;   // Type of material layer
     Array2D_int Nmrf;   // # of Moisture Response Factors for CPF Solution
 
     // variables used for MTF moisture implementation
-    Array1D<Real64> RhoVaporAirOut; // Vapor Density outside surface
-    Array1D<Real64> RhoVaporAirIn;  // Vapor Density inside surface
-    Array1D<Real64> HConvExtFD;     // thermal convection coefficient outside surface
-    Array1D<Real64> HMassConvExtFD; // mass convection coefficient outside surface
-    Array1D<Real64> HConvInFD;      // thermal convection coefficient inside surface
-    Array1D<Real64> HMassConvInFD;  // mass convection coefficient inside surface
-    Array1D<Real64> RhoVaporSurfIn; // Vapor Density inside surface
-    Array1D<Real64> HSkyFD;         // Sky Convection Coefficient
-    Array1D<Real64> HGrndFD;        // Ground Convection Coefficient
-    Array1D<Real64> HAirFD;         // Air Convection Coefficient
+    EPVector<Real64> RhoVaporAirOut; // Vapor Density outside surface
+    EPVector<Real64> RhoVaporAirIn;  // Vapor Density inside surface
+    EPVector<Real64> HConvExtFD;     // thermal convection coefficient outside surface
+    EPVector<Real64> HMassConvExtFD; // mass convection coefficient outside surface
+    EPVector<Real64> HConvInFD;      // thermal convection coefficient inside surface
+    EPVector<Real64> HMassConvInFD;  // mass convection coefficient inside surface
+    EPVector<Real64> RhoVaporSurfIn; // Vapor Density inside surface
+    EPVector<Real64> HSkyFD;         // Sky Convection Coefficient
+    EPVector<Real64> HGrndFD;        // Ground Convection Coefficient
+    EPVector<Real64> HAirFD;         // Air Convection Coefficient
 
     void clear_state()
     {

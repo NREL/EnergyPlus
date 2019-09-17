@@ -115,7 +115,7 @@ namespace CoolTower {
     // Subroutine Specifications for the Heat Balance Module
 
     // Object Data
-    Array1D<CoolTowerParams> CoolTowerSys;
+    EPVector<CoolTowerParams> CoolTowerSys;
 
     // Functions
 
@@ -225,7 +225,7 @@ namespace CoolTower {
         Array1D_string cAlphaArgs;     // Alpha input items for object
         Array1D_string cAlphaFields;   // Alpha field names
         Array1D_string cNumericFields; // Numeric field names
-        Array1D<Real64> rNumericArgs;  // Numeric input items for object
+        EPVector<Real64> rNumericArgs;  // Numeric input items for object
         Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
 

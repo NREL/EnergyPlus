@@ -104,7 +104,7 @@ namespace DataDefineEquip {
     int NumAirDistUnits(0);
 
     // Object Data
-    Array1D<ZoneAirEquip> AirDistUnit; // Used to specify zone related
+    EPVector<ZoneAirEquip> AirDistUnit; // Used to specify zone related
 
     // Clears the global data in DataDefineEquip.
     // Needed for unit tests, should not be normally called.

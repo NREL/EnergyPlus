@@ -267,12 +267,12 @@ namespace Furnaces {
         Real64 IdleMassFlowRate;             // idle air flow rate
         Real64 FanVolFlow;                   // fan volumetric flow rate
         bool CheckFanFlow;                   // Supply airflow check
-        Array1D<Real64> HeatVolumeFlowRate;  // Supply air volume flow rate during heating operation
-        Array1D<Real64> HeatMassFlowRate;    // Supply air mass flow rate during heating operation
-        Array1D<Real64> CoolVolumeFlowRate;  // Supply air volume flow rate during cooling operation
-        Array1D<Real64> CoolMassFlowRate;    // Supply air mass flow rate during cooling operation
-        Array1D<Real64> MSHeatingSpeedRatio; // Fan speed ratio in heating mode
-        Array1D<Real64> MSCoolingSpeedRatio; // Fan speed ratio in cooling mode
+        EPVector<Real64> HeatVolumeFlowRate;  // Supply air volume flow rate during heating operation
+        EPVector<Real64> HeatMassFlowRate;    // Supply air mass flow rate during heating operation
+        EPVector<Real64> CoolVolumeFlowRate;  // Supply air volume flow rate during cooling operation
+        EPVector<Real64> CoolMassFlowRate;    // Supply air mass flow rate during cooling operation
+        EPVector<Real64> MSHeatingSpeedRatio; // Fan speed ratio in heating mode
+        EPVector<Real64> MSCoolingSpeedRatio; // Fan speed ratio in cooling mode
         bool bIsIHP;
         int CompSpeedNum;
         Real64 CompSpeedRatio;
@@ -282,7 +282,7 @@ namespace Furnaces {
         int WaterCyclingMode; // Heat Pump Coil water flow mode; See definitions in DataHVACGlobals,
         // 1=water cycling, 2=water constant, 3=water constant on demand (old mode)
         int iterationCounter;       // track time step iterations
-        Array1D<int> iterationMode; // keep track of previous iteration mode (i.e., cooling or heating)
+        EPVector<int> iterationMode; // keep track of previous iteration mode (i.e., cooling or heating)
         bool FirstPass;             // used to determine when first call is made
 
         // Default Constructor
@@ -321,7 +321,7 @@ namespace Furnaces {
     };
 
     // Object Data
-    extern Array1D<FurnaceEquipConditions> Furnace;
+    extern EPVector<FurnaceEquipConditions> Furnace;
 
     // Functions
 

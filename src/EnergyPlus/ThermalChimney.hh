@@ -91,9 +91,9 @@ namespace ThermalChimney {
         int TotZoneToDistrib;
         Array1D_int ZonePtr;
         Array1D_string ZoneName;
-        Array1D<Real64> DistanceThermChimInlet;
-        Array1D<Real64> RatioThermChimAirFlow;
-        Array1D<Real64> EachAirInletCrossArea;
+        EPVector<Real64> DistanceThermChimInlet;
+        EPVector<Real64> RatioThermChimAirFlow;
+        EPVector<Real64> EachAirInletCrossArea;
 
         // Default Constructor
         ThermalChimneyData() : RealZonePtr(0), SchedPtr(0), AbsorberWallWidth(0.0), AirOutletCrossArea(0.0), DischargeCoeff(0.0), TotZoneToDistrib(0)
@@ -130,9 +130,9 @@ namespace ThermalChimney {
     };
 
     // Object Data
-    extern Array1D<ThermalChimneyData> ThermalChimneySys;
-    extern Array1D<ThermChimZnReportVars> ZnRptThermChim;
-    extern Array1D<ThermChimReportVars> ThermalChimneyReport;
+    extern EPVector<ThermalChimneyData> ThermalChimneySys;
+    extern EPVector<ThermChimZnReportVars> ZnRptThermChim;
+    extern EPVector<ThermChimReportVars> ThermalChimneyReport;
 
     // Functions
 

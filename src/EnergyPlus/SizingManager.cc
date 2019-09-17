@@ -2106,7 +2106,7 @@ namespace SizingManager {
         Array1D_string Alphas;           // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D<Real64> Numbers;         // Numeric input items for object
+        EPVector<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
@@ -2372,7 +2372,7 @@ namespace SizingManager {
         Array1D_string Alphas;           // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D<Real64> Numbers;         // Numeric input items for object
+        EPVector<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
@@ -2641,8 +2641,8 @@ namespace SizingManager {
         };
 
         // Object Data
-        Array1D<ZoneListData> ZoneListNames;
-        Array1D<GlobalMiscObject> SizingZoneObjects;
+        EPVector<ZoneListData> ZoneListNames;
+        EPVector<GlobalMiscObject> SizingZoneObjects;
 
         cCurrentModuleObject = "Sizing:Zone";
         NumSizingZoneStatements = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -3183,7 +3183,7 @@ namespace SizingManager {
         }
     }
 
-    void GetZoneAndZoneListNames(bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames)
+    void GetZoneAndZoneListNames(bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, EPVector<ZoneListData> &ZoneListNames)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4234,7 +4234,7 @@ namespace SizingManager {
         Array1D_string Alphas;           // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D<Real64> Numbers;         // Numeric input items for object
+        EPVector<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 

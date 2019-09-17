@@ -90,8 +90,8 @@ namespace SurfaceGeometry {
     extern Real64 SinBldgRelNorth;          // Sine of the building rotation (relative north)   (includes appendix G rotation)
     extern Real64 CosBldgRotAppGonly;       // Cosine of the building rotation for appendix G only(relative north)
     extern Real64 SinBldgRotAppGonly;       // Sine of the building rotation for appendix G only (relative north)
-    extern Array1D<Real64> CosZoneRelNorth; // Cosine of the zone rotation (relative north)
-    extern Array1D<Real64> SinZoneRelNorth; // Sine of the zone rotation (relative north)
+    extern EPVector<Real64> CosZoneRelNorth; // Cosine of the zone rotation (relative north)
+    extern EPVector<Real64> SinZoneRelNorth; // Sine of the zone rotation (relative north)
 
     extern bool NoGroundTempObjWarning; // This will cause a warning to be issued if surfaces with "Ground"
     // outside environment are used but no ground temperature object was input.
@@ -105,7 +105,7 @@ namespace SurfaceGeometry {
     // SUBROUTINE SPECIFICATIONS FOR MODULE SurfaceGeometry
 
     // Object Data
-    extern Array1D<SurfaceData> SurfaceTmp; // Allocated/Deallocated during input processing
+    extern EPVector<SurfaceData> SurfaceTmp; // Allocated/Deallocated during input processing
     extern HeatBalanceKivaManager::KivaManager kivaManager;
 
     // Functions

@@ -198,29 +198,29 @@ namespace HeatBalanceManager {
 
     // Real Variables for the Heat Balance Simulation
     // Variables used to determine warmup convergence
-    Array1D<Real64> MaxCoolLoadPrevDay; // Max cooling load from the previous day
-    Array1D<Real64> MaxCoolLoadZone;    // Maximum zone cooling load from the current day
-    Array1D<Real64> MaxHeatLoadPrevDay; // Max heating load from the previous day
-    Array1D<Real64> MaxHeatLoadZone;    // Maximum zone heating load from the current day
-    Array1D<Real64> MaxTempPrevDay;     // Max temperature from the previous day
-    Array1D<Real64> MaxTempZone;        // Maximum zone temperature from the current day
-    Array1D<Real64> MinTempPrevDay;     // Min temperature from the previous day
-    Array1D<Real64> MinTempZone;        // Minimum zone temperature from the current day
+    EPVector<Real64> MaxCoolLoadPrevDay; // Max cooling load from the previous day
+    EPVector<Real64> MaxCoolLoadZone;    // Maximum zone cooling load from the current day
+    EPVector<Real64> MaxHeatLoadPrevDay; // Max heating load from the previous day
+    EPVector<Real64> MaxHeatLoadZone;    // Maximum zone heating load from the current day
+    EPVector<Real64> MaxTempPrevDay;     // Max temperature from the previous day
+    EPVector<Real64> MaxTempZone;        // Maximum zone temperature from the current day
+    EPVector<Real64> MinTempPrevDay;     // Min temperature from the previous day
+    EPVector<Real64> MinTempZone;        // Minimum zone temperature from the current day
 
     // Variables used to report difference in temperature and load from the last two warmup days
-    Array1D<Real64> WarmupTempDiff;     // Temperature difference between the last two warmup days
-    Array1D<Real64> WarmupLoadDiff;     // Zone load differences between the last two warmup days
-    Array1D<Real64> TempZoneSecPrevDay; // Zone air temperature from the second last warmup day
-    Array1D<Real64> LoadZoneSecPrevDay; // Zone load from the second last warmup day
-    Array1D<Real64> TempZonePrevDay;    // Zone air temperature from the previous day
-    Array1D<Real64> LoadZonePrevDay;    // Zone load from the previuos day
-    Array1D<Real64> TempZone;           // Zone air temperature from the current warmup day
-    Array1D<Real64> LoadZone;           // Zone load from the current warmup day
+    EPVector<Real64> WarmupTempDiff;     // Temperature difference between the last two warmup days
+    EPVector<Real64> WarmupLoadDiff;     // Zone load differences between the last two warmup days
+    EPVector<Real64> TempZoneSecPrevDay; // Zone air temperature from the second last warmup day
+    EPVector<Real64> LoadZoneSecPrevDay; // Zone load from the second last warmup day
+    EPVector<Real64> TempZonePrevDay;    // Zone air temperature from the previous day
+    EPVector<Real64> LoadZonePrevDay;    // Zone load from the previuos day
+    EPVector<Real64> TempZone;           // Zone air temperature from the current warmup day
+    EPVector<Real64> LoadZone;           // Zone load from the current warmup day
 
     Array2D<Real64> TempZoneRpt;       // Zone air temperature to report (average over all warmup days)
-    Array1D<Real64> TempZoneRptStdDev; // Zone air temperature to report (std dev over all warmup days)
+    EPVector<Real64> TempZoneRptStdDev; // Zone air temperature to report (std dev over all warmup days)
     Array2D<Real64> LoadZoneRpt;       // Zone load to report (average over all warmup days)
-    Array1D<Real64> LoadZoneRptStdDev; // Zone load to report (std dev over all warmup days)
+    EPVector<Real64> LoadZoneRptStdDev; // Zone load to report (std dev over all warmup days)
     Array2D<Real64> MaxLoadZoneRpt;    // Maximum zone load for reporting calcs
     int CountWarmupDayPoints;          // Count of warmup timesteps (to achieve warmup)
 
@@ -238,7 +238,7 @@ namespace HeatBalanceManager {
     // Reporting routines for module
 
     // Object Data
-    Array1D<WarmupConvergence> WarmupConvergenceValues;
+    EPVector<WarmupConvergence> WarmupConvergenceValues;
     std::unordered_map<std::string, std::string> UniqueMaterialNames;
     std::unordered_map<std::string, std::string> UniqueConstructNames;
 
@@ -694,7 +694,7 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string AlphaName(4);
-        Array1D<Real64> BuildingNumbers(5);
+        EPVector<Real64> BuildingNumbers(5);
         int NumAlpha;
         int NumNumber;
         int IOStat;
@@ -1413,7 +1413,7 @@ namespace HeatBalanceManager {
         int NumNums;                 // Number of elements in the numeric array
         int IOStat;                  // IO Status when calling get input subroutine
         Array1D_string AlphArray(1); // Character string data
-        Array1D<Real64> NumArray(3); // Numeric data
+        EPVector<Real64> NumArray(3); // Numeric data
 
         // Formats
         static ObjexxFCL::gio::Fmt Format_720("('Environment:Site Atmospheric Variation',3(',',A))");
@@ -1516,7 +1516,7 @@ namespace HeatBalanceManager {
         int MaterNum;                      // Counter to keep track of the material number
         int MaterialNumAlpha;              // Number of material alpha names being passed
         int MaterialNumProp;               // Number of material properties being passed
-        Array1D<Real64> MaterialProps(27); // Temporary array to transfer material properties
+        EPVector<Real64> MaterialProps(27); // Temporary array to transfer material properties
         int RegMat;                        // Regular Materials -- full property definition
         int RegRMat;                       // Regular Materials -- R only property definition
         int AirMat;                        // Air space materials in opaque constructions
@@ -3949,7 +3949,7 @@ namespace HeatBalanceManager {
         Array1D_string SpecDataNames(1); // Spectral data alpha names
         int SpecDataNumAlpha;            // Number of spectral data alpha names being passed
         int SpecDataNumProp;             // Number of spectral data properties being passed
-        Array1D<Real64> SpecDataProps;   // Temporary array to transfer spectal data properties
+        EPVector<Real64> SpecDataProps;   // Temporary array to transfer spectal data properties
         int Loop;
         int LamNum; // Wavelength number
         int TotLam; // Total wavelengths
@@ -4164,7 +4164,7 @@ namespace HeatBalanceManager {
         int DummyNumProp;                                          // dummy variable for properties being passed
         int IOStat;                                                // IO Status when calling get input subroutine
         Array1D_string ConstructAlphas({0, MaxLayersInConstruct}); // Construction Alpha names defined
-        Array1D<Real64> DummyProps(4);                             // Temporary array to transfer construction properties
+        EPVector<Real64> DummyProps(4);                             // Temporary array to transfer construction properties
         int Loop;
         int TotRegConstructs; // Number of "regular" constructions (no embedded sources or sinks and
 
@@ -6082,7 +6082,7 @@ namespace HeatBalanceManager {
         int FrameDividerNum;                   // Counter to keep track of the frame/divider number
         int FrameDividerNumAlpha;              // Number of frame/divider alpha names being passed
         int FrameDividerNumProp;               // Number of frame/divider properties being passed
-        Array1D<Real64> FrameDividerProps(23); // Temporary array to transfer frame/divider properties
+        EPVector<Real64> FrameDividerProps(23); // Temporary array to transfer frame/divider properties
         int Loop;
 
         CurrentModuleObject = "WindowProperty:FrameAndDivider";
@@ -6263,26 +6263,26 @@ namespace HeatBalanceManager {
         int MatNum;
         int FrDivNum;                 // FrameDivider number
         bool exists;                  // True if Window5 data file exists
-        Array1D<Real64> WinHeight(2); // Height, width for glazing system (m)
-        Array1D<Real64> WinWidth(2);
-        Array1D<Real64> UValCenter(2);      // Center of glass U-value (W/m2-K) for glazing system
-        Array1D<Real64> SCCenter(2);        // Center of glass shading coefficient for glazing system
-        Array1D<Real64> SHGCCenter(2);      // Center of glass solar heat gain coefficient for glazing system
-        Array1D<Real64> TVisCenter(2);      // Center of glass visible transmittance for glazing system
-        Array1D<Real64> Tsol(11);           // Solar transmittance vs incidence angle; diffuse trans.
+        EPVector<Real64> WinHeight(2); // Height, width for glazing system (m)
+        EPVector<Real64> WinWidth(2);
+        EPVector<Real64> UValCenter(2);      // Center of glass U-value (W/m2-K) for glazing system
+        EPVector<Real64> SCCenter(2);        // Center of glass shading coefficient for glazing system
+        EPVector<Real64> SHGCCenter(2);      // Center of glass solar heat gain coefficient for glazing system
+        EPVector<Real64> TVisCenter(2);      // Center of glass visible transmittance for glazing system
+        EPVector<Real64> Tsol(11);           // Solar transmittance vs incidence angle; diffuse trans.
         Array2D<Real64> AbsSol(11, 5);      // Solar absorptance vs inc. angle in each glass layer
-        Array1D<Real64> Rfsol(11);          // Front solar reflectance vs inc. angle
-        Array1D<Real64> Rbsol(11);          // Back solar reflectance vs inc. angle
-        Array1D<Real64> Tvis(11);           // Visible transmittance vs inc. angle
-        Array1D<Real64> Rfvis(11);          // Front visible reflectance vs inc. angle
-        Array1D<Real64> Rbvis(11);          // Back visible reflectance vs inc. angle
-        Array1D<Real64> CosPhiIndepVar(10); // Cosine of incidence angle from 0 to 90 deg in 10 deg increments
+        EPVector<Real64> Rfsol(11);          // Front solar reflectance vs inc. angle
+        EPVector<Real64> Rbsol(11);          // Back solar reflectance vs inc. angle
+        EPVector<Real64> Tvis(11);           // Visible transmittance vs inc. angle
+        EPVector<Real64> Rfvis(11);          // Front visible reflectance vs inc. angle
+        EPVector<Real64> Rbvis(11);          // Back visible reflectance vs inc. angle
+        EPVector<Real64> CosPhiIndepVar(10); // Cosine of incidence angle from 0 to 90 deg in 10 deg increments
         int IPhi;                           // Incidence angle counter
         Real64 Phi;                         // Incidence angle (deg)
-        Array1D<Real64> CosPhi(10);         // Cosine of incidence angle
-        Array1D<Real64> tsolFit(10);        // Fitted solar transmittance vs incidence angle
-        Array1D<Real64> tvisFit(10);        // Fitted visible transmittance vs incidence angle
-        Array1D<Real64> rfsolFit(10);       // Fitted solar front reflectance vs incidence angle
+        EPVector<Real64> CosPhi(10);         // Cosine of incidence angle
+        EPVector<Real64> tsolFit(10);        // Fitted solar transmittance vs incidence angle
+        EPVector<Real64> tvisFit(10);        // Fitted visible transmittance vs incidence angle
+        EPVector<Real64> rfsolFit(10);       // Fitted solar front reflectance vs incidence angle
         Array2D<Real64> solabsFit(5, 10);   // Fitted solar absorptance vs incidence angle for each glass layer
         Array1D_string DividerType(2);      // Divider type: DividedLite or Suspended
         Real64 FrameWidth;
@@ -6296,14 +6296,14 @@ namespace HeatBalanceManager {
         Real64 FrameEmis;
         Array1D_int HorDividers(2);  // For divider: number horizontal for each glazing system
         Array1D_int VertDividers(2); // For divider: number vertical for each glazing system
-        Array1D<Real64> DividerWidth(2);
-        Array1D<Real64> DividerProjectionOut(2);
-        Array1D<Real64> DividerProjectionIn(2);
-        Array1D<Real64> DividerConductance(2);
-        Array1D<Real64> DivEdgeToCenterGlCondRatio(2);
-        Array1D<Real64> DividerSolAbsorp(2);
-        Array1D<Real64> DividerVisAbsorp(2);
-        Array1D<Real64> DividerEmis(2);
+        EPVector<Real64> DividerWidth(2);
+        EPVector<Real64> DividerProjectionOut(2);
+        EPVector<Real64> DividerProjectionIn(2);
+        EPVector<Real64> DividerConductance(2);
+        EPVector<Real64> DivEdgeToCenterGlCondRatio(2);
+        EPVector<Real64> DividerSolAbsorp(2);
+        EPVector<Real64> DividerVisAbsorp(2);
+        EPVector<Real64> DividerEmis(2);
         std::string::size_type endcol;
 
         // Object Data
@@ -7313,7 +7313,7 @@ namespace HeatBalanceManager {
         int DummyNumProp;                  // dummy variable for properties being passed
         int IOStat;                        // IO Status when calling get input subroutine
         Array1D_string ConstructAlphas(1); // Construction Alpha names defined
-        Array1D<Real64> DummyProps(4);     // Temporary array to transfer construction properties
+        EPVector<Real64> DummyProps(4);     // Temporary array to transfer construction properties
         int Loop;
 
         int TotFfactorConstructs; // Number of slabs-on-grade or underground floor constructions defined with F factors
@@ -8233,7 +8233,7 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string MaterialNames(5);   // Number of Material Alpha names defined
-        Array1D<Real64> MaterialProps(27); // Temporary array to transfer material properties
+        EPVector<Real64> MaterialProps(27); // Temporary array to transfer material properties
         int Loop;
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
@@ -8644,7 +8644,7 @@ namespace HeatBalanceManager {
         Array1D_bool locNumericFieldBlanks;
         Array1D_bool locAlphaFieldBlanks;
         Array1D_string locAlphaArgs;
-        Array1D<Real64> locNumericArgs;
+        EPVector<Real64> locNumericArgs;
         std::string locCurrentModuleObject;
 
         // Reading WindowThermalModel:Params

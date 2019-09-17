@@ -114,7 +114,7 @@ namespace PlantComponentTemperatureSources {
     };
 
     // Object Data
-    extern Array1D<WaterSourceSpecs> WaterSource; // dimension to number of machines
+    extern EPVector<WaterSourceSpecs> WaterSource; // dimension to number of machines
 
     // Functions
 

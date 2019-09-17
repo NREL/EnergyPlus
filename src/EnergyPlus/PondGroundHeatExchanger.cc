@@ -156,7 +156,7 @@ namespace PondGroundHeatExchanger {
     // SUBROUTINE SPECIFICATIONS FOR MODULE PlantPondGroundHeatExchangers
 
     // Object Data
-    Array1D<PondGroundHeatExchangerData> PondGHE;
+    EPVector<PondGroundHeatExchangerData> PondGHE;
 
     void PondGroundHeatExchangerData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
                                                bool const FirstHVACIteration,

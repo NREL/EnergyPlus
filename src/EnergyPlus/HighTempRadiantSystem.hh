@@ -87,13 +87,13 @@ namespace HighTempRadiantSystem {
     // MODULE VARIABLE DECLARATIONS:
     // Standard, run-of-the-mill variables...
     extern int NumOfHighTempRadSys;              // Number of hydronic low tempererature radiant systems
-    extern Array1D<Real64> QHTRadSource;         // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> QHTRadSrcAvg;         // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+    extern EPVector<Real64> QHTRadSource;         // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> QHTRadSrcAvg;         // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
     // Record keeping variables used to calculate QHTRadSrcAvg locally
-    extern Array1D<Real64> LastQHTRadSrc;      // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastQHTRadSrc;      // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     extern Array1D_bool MySizeFlag;
     extern Array1D_bool CheckEquipName;
 
@@ -126,7 +126,7 @@ namespace HighTempRadiantSystem {
         int TotSurfToDistrib;              // Total number of surfaces the heater sends radiation to
         Array1D_string SurfaceName;        // Surface name in the list of surfaces heater sends radiation to
         Array1D_int SurfacePtr;            // Surface number in the list of surfaces heater sends radiation to
-        Array1D<Real64> FracDistribToSurf; // Fraction of fraction radiant incident on the surface
+        EPVector<Real64> FracDistribToSurf; // Fraction of fraction radiant incident on the surface
         // Other parameters
         // Report data
         Real64 ElecPower;     // system electric consumption in Watts
@@ -161,8 +161,8 @@ namespace HighTempRadiantSystem {
     };
 
     // Object Data
-    extern Array1D<HighTempRadiantSystemData> HighTempRadSys;
-    extern Array1D<HighTempRadSysNumericFieldData> HighTempRadSysNumericFields;
+    extern EPVector<HighTempRadiantSystemData> HighTempRadSys;
+    extern EPVector<HighTempRadSysNumericFieldData> HighTempRadSysNumericFields;
 
     // Functions
     void clear_state();

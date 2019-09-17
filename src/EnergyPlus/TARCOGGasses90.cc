@@ -122,15 +122,15 @@ namespace TARCOGGasses90 {
         // Locals
 
         static Real64 const two_sqrt_2(2.0 * std::sqrt(2.0));
-        static Array1D<Real64> fvis(maxgas);
-        static Array1D<Real64> fcon(maxgas);
-        static Array1D<Real64> fdens(maxgas);
-        static Array1D<Real64> fcp(maxgas);
-        static Array1D<Real64> kprime(maxgas);
-        static Array1D<Real64> kdblprm(maxgas);
-        static Array1D<Real64> mukpdwn(maxgas);
-        static Array1D<Real64> kpdown(maxgas);
-        static Array1D<Real64> kdpdown(maxgas);
+        static EPVector<Real64> fvis(maxgas);
+        static EPVector<Real64> fcon(maxgas);
+        static EPVector<Real64> fdens(maxgas);
+        static EPVector<Real64> fcp(maxgas);
+        static EPVector<Real64> kprime(maxgas);
+        static EPVector<Real64> kdblprm(maxgas);
+        static EPVector<Real64> mukpdwn(maxgas);
+        static EPVector<Real64> kpdown(maxgas);
+        static EPVector<Real64> kdpdown(maxgas);
         Real64 molmix;
         Real64 cpmixm;
         Real64 phimup;

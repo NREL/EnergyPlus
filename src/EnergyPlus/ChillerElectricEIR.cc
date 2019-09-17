@@ -174,8 +174,8 @@ namespace ChillerElectricEIR {
     // PUBLIC     SimEIRChillerHeatRecovery
 
     // Object Data
-    Array1D<ElectricEIRChillerSpecs> ElectricEIRChiller; // Dimension to number of machines
-    Array1D<ReportEIRVars> ElectricEIRChillerReport;
+    EPVector<ElectricEIRChillerSpecs> ElectricEIRChiller; // Dimension to number of machines
+    EPVector<ReportEIRVars> ElectricEIRChillerReport;
 
     // MODULE SUBROUTINES:
 
@@ -376,7 +376,7 @@ namespace ChillerElectricEIR {
         Real64 CurveVal;                   // Used to verify EIR-FT and CAP-FT curves equal 1 at reference conditions
         static bool FoundNegValue(false);  // Used to evaluate PLFFPLR curve objects
         static int CurveCheck(0);          // Used to evaluate PLFFPLR curve objects
-        Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
+        EPVector<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
         Real64 CurveValTmp;                // Used to evaluate PLFFPLR curve objects
         std::string StringVar;             // Used for EIRFPLR warning messages
         int CurveValPtr;                   // Index to EIRFPLR curve output

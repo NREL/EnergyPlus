@@ -390,18 +390,18 @@ namespace FaultsManager {
     };
 
     // Object Data
-    extern Array1D<FaultPropertiesEconomizer> FaultsEconomizer;
-    extern Array1D<FaultPropertiesFoulingCoil> FouledCoils;
-    extern Array1D<FaultPropertiesThermostat> FaultsThermostatOffset;
-    extern Array1D<FaultPropertiesHumidistat> FaultsHumidistatOffset;
-    extern Array1D<FaultPropertiesAirFilter> FaultsFouledAirFilters;
-    extern Array1D<FaultPropertiesChillerSWT> FaultsChillerSWTSensor;
-    extern Array1D<FaultPropertiesCondenserSWT> FaultsCondenserSWTSensor;
-    extern Array1D<FaultPropertiesTowerFouling> FaultsTowerFouling;
-    extern Array1D<FaultPropertiesCoilSAT> FaultsCoilSATSensor;
-    extern Array1D<FaultPropertiesBoilerFouling> FaultsBoilerFouling;
-    extern Array1D<FaultPropertiesChillerFouling> FaultsChillerFouling;
-    extern Array1D<FaultPropertiesEvapCoolerFouling> FaultsEvapCoolerFouling;
+    extern EPVector<FaultPropertiesEconomizer> FaultsEconomizer;
+    extern EPVector<FaultPropertiesFoulingCoil> FouledCoils;
+    extern EPVector<FaultPropertiesThermostat> FaultsThermostatOffset;
+    extern EPVector<FaultPropertiesHumidistat> FaultsHumidistatOffset;
+    extern EPVector<FaultPropertiesAirFilter> FaultsFouledAirFilters;
+    extern EPVector<FaultPropertiesChillerSWT> FaultsChillerSWTSensor;
+    extern EPVector<FaultPropertiesCondenserSWT> FaultsCondenserSWTSensor;
+    extern EPVector<FaultPropertiesTowerFouling> FaultsTowerFouling;
+    extern EPVector<FaultPropertiesCoilSAT> FaultsCoilSATSensor;
+    extern EPVector<FaultPropertiesBoilerFouling> FaultsBoilerFouling;
+    extern EPVector<FaultPropertiesChillerFouling> FaultsChillerFouling;
+    extern EPVector<FaultPropertiesEvapCoolerFouling> FaultsEvapCoolerFouling;
 
     // Functions
 

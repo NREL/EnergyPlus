@@ -152,7 +152,7 @@ namespace OutputProcessor {
     extern int NumVarMeterArrays; // Current number of Arrays pointing to meters
 
     extern int NumEnergyMeters;        // Current number of Energy Meters
-    extern Array1D<Real64> MeterValue; // This holds the current timestep value for each meter.
+    extern EPVector<Real64> MeterValue; // This holds the current timestep value for each meter.
 
     extern int TimeStepStampReportNbr;          // TimeStep and Hourly Report number
     extern std::string TimeStepStampReportChr;  // TimeStep and Hourly Report number (character -- for printing)
@@ -567,15 +567,15 @@ namespace OutputProcessor {
 
     // Object Data
     extern std::map<TimeStepType, TimeSteps> TimeValue;      // Pointers to the actual TimeStep variables
-    extern Array1D<RealVariableType> RVariableTypes;         // Variable Types structure (use NumOfRVariables to traverse)
-    extern Array1D<IntegerVariableType> IVariableTypes;      // Variable Types structure (use NumOfIVariables to traverse)
-    extern Array1D<VariableTypeForDDOutput> DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
+    extern EPVector<RealVariableType> RVariableTypes;         // Variable Types structure (use NumOfRVariables to traverse)
+    extern EPVector<IntegerVariableType> IVariableTypes;      // Variable Types structure (use NumOfIVariables to traverse)
+    extern EPVector<VariableTypeForDDOutput> DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
     extern Reference<RealVariables> RVariable;
     extern Reference<IntegerVariables> IVariable;
-    extern Array1D<ReqReportVariables> ReqRepVars;
-    extern Array1D<MeterArrayType> VarMeterArrays;
-    extern Array1D<MeterType> EnergyMeters;
-    extern Array1D<EndUseCategoryType> EndUseCategory;
+    extern EPVector<ReqReportVariables> ReqRepVars;
+    extern EPVector<MeterArrayType> VarMeterArrays;
+    extern EPVector<MeterType> EnergyMeters;
+    extern EPVector<EndUseCategoryType> EndUseCategory;
 
     // Functions
 

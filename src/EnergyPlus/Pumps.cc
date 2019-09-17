@@ -168,9 +168,9 @@ namespace Pumps {
     // SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 
     // Object Data
-    Array1D<PumpSpecs> PumpEquip;
+    EPVector<PumpSpecs> PumpEquip;
     std::unordered_map<std::string, std::string> PumpUniqueNames;
-    Array1D<ReportVars> PumpEquipReport;
+    EPVector<ReportVars> PumpEquipReport;
 
     //*************************************************************************!
 

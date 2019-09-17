@@ -109,7 +109,7 @@ namespace FluidCoolers {
     int NumSimpleFluidCoolers(0); // Number of similar fluid coolers
 
     // Object Data
-    Array1D<FluidCoolerspecs> SimpleFluidCooler; // dimension to number of machines
+    EPVector<FluidCoolerspecs> SimpleFluidCooler; // dimension to number of machines
     std::unordered_map<std::string, std::string> UniqueSimpleFluidCoolerNames;
 
     PlantComponent *FluidCoolerspecs::factory(int objectType, std::string objectName)
@@ -184,7 +184,7 @@ namespace FluidCoolers {
         int NumNums;                  // Number of elements in the numeric array
         int IOStat;                   // IO Status when calling get input subroutine
         bool ErrorsFound(false);      // Logical flag set .TRUE. if errors found while getting input data
-        Array1D<Real64> NumArray(16); // Numeric input data array
+        EPVector<Real64> NumArray(16); // Numeric input data array
         Array1D_string AlphArray(5);  // Character string input data array
 
         // Get number of all Fluid Coolers specified in the input data file (idf)
@@ -426,9 +426,9 @@ namespace FluidCoolers {
     }
 
     bool FluidCoolerspecs::validateSingleSpeedInputs(std::string const &cCurrentModuleObject,
-                                                     Array1D<std::string> const &AlphArray,
-                                                     Array1D<std::string> const &cNumericFieldNames,
-                                                     Array1D<std::string> const &cAlphaFieldNames)
+                                                     EPVector<std::string> const &AlphArray,
+                                                     EPVector<std::string> const &cNumericFieldNames,
+                                                     EPVector<std::string> const &cAlphaFieldNames)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR:          Chandan Sharma
@@ -525,9 +525,9 @@ namespace FluidCoolers {
     }
 
     bool FluidCoolerspecs::validateTwoSpeedInputs(std::string const &cCurrentModuleObject,
-                                                  Array1D<std::string> const &AlphArray,
-                                                  Array1D<std::string> const &cNumericFieldNames,
-                                                  Array1D<std::string> const &cAlphaFieldNames)
+                                                  EPVector<std::string> const &AlphArray,
+                                                  EPVector<std::string> const &cNumericFieldNames,
+                                                  EPVector<std::string> const &cAlphaFieldNames)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR:          Chandan Sharma
@@ -801,7 +801,7 @@ namespace FluidCoolers {
         Real64 UA;                      // Calculated UA value
         Real64 OutWaterTempAtUA0;       // Water outlet temperature at UA0
         Real64 OutWaterTempAtUA1;       // Water outlet temperature at UA1
-        Array1D<Real64> Par(5);         // Parameter array need for RegulaFalsi routine
+        EPVector<Real64> Par(5);         // Parameter array need for RegulaFalsi routine
         std::string equipName;
         Real64 Cp;                            // local specific heat for fluid
         Real64 rho;                           // local density for fluid

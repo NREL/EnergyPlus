@@ -416,7 +416,7 @@ namespace DataRuntimeLanguage {
         int NumLines;                         // count of lines in Erl program or subroutine
         Array1D_string Line;                  // string array holding lines of Erl code (for processing)
         int NumInstructions;                  // count of program instructions in stack
-        Array1D<InstructionType> Instruction; // structure array of program instructions
+        EPVector<InstructionType> Instruction; // structure array of program instructions
         int NumErrors;                        // count of errors during stack parsing
         Array1D_string Error;                 // array of error messages from stack parsing
 
@@ -431,7 +431,7 @@ namespace DataRuntimeLanguage {
         // Members
         int Operator;                  // indicates the type of operator or function 1..64
         int NumOperands;               // count of operands in expression
-        Array1D<ErlValueType> Operand; // holds Erl values for operands in expression
+        EPVector<ErlValueType> Operand; // holds Erl values for operands in expression
 
         // Default Constructor
         ErlExpressionType() : Operator(0), NumOperands(0)
@@ -459,9 +459,9 @@ namespace DataRuntimeLanguage {
         std::string Name;
         int ErlVariablePointer;       // the Erl variable being logged in trend
         int LogDepth;                 // number of timesteps back
-        Array1D<Real64> TrendValARR;  // the main storage of trend data
-        Array1D<Real64> tempTrendARR; // temporary holder during push
-        Array1D<Real64> TimeARR;      // hours back in time for trend points
+        EPVector<Real64> TrendValARR;  // the main storage of trend data
+        EPVector<Real64> tempTrendARR; // temporary holder during push
+        EPVector<Real64> TimeARR;      // hours back in time for trend points
 
         // Default Constructor
         TrendVariableType() : ErlVariablePointer(0), LogDepth(0)
@@ -470,17 +470,17 @@ namespace DataRuntimeLanguage {
     };
 
     // Object Data
-    extern Array1D<ErlVariableType> ErlVariable;                        // holds Erl variables in a structure array
-    extern Array1D<ErlStackType> ErlStack;                              // holds Erl programs in separate "stacks"
-    extern Array1D<ErlExpressionType> ErlExpression;                    // holds Erl expressions in structure array
-    extern Array1D<OperatorType> PossibleOperators;                     // hard library of available operators and functions
-    extern Array1D<TrendVariableType> TrendVariable;                    // holds Erl trend varialbes in a structure array
-    extern Array1D<OutputVarSensorType> Sensor;                         // EMS:SENSOR objects used (from output variables)
-    extern Array1D<EMSActuatorAvailableType> EMSActuatorAvailable;      // actuators that could be used
-    extern Array1D<ActuatorUsedType> EMSActuatorUsed;                   // actuators that are used
-    extern Array1D<InternalVarsAvailableType> EMSInternalVarsAvailable; // internal data that could be used
-    extern Array1D<InternalVarsUsedType> EMSInternalVarsUsed;           // internal data that are used
-    extern Array1D<EMSProgramCallManagementType> EMSProgramCallManager; // program calling managers
+    extern EPVector<ErlVariableType> ErlVariable;                        // holds Erl variables in a structure array
+    extern EPVector<ErlStackType> ErlStack;                              // holds Erl programs in separate "stacks"
+    extern EPVector<ErlExpressionType> ErlExpression;                    // holds Erl expressions in structure array
+    extern EPVector<OperatorType> PossibleOperators;                     // hard library of available operators and functions
+    extern EPVector<TrendVariableType> TrendVariable;                    // holds Erl trend varialbes in a structure array
+    extern EPVector<OutputVarSensorType> Sensor;                         // EMS:SENSOR objects used (from output variables)
+    extern EPVector<EMSActuatorAvailableType> EMSActuatorAvailable;      // actuators that could be used
+    extern EPVector<ActuatorUsedType> EMSActuatorUsed;                   // actuators that are used
+    extern EPVector<InternalVarsAvailableType> EMSInternalVarsAvailable; // internal data that could be used
+    extern EPVector<InternalVarsUsedType> EMSInternalVarsUsed;           // internal data that are used
+    extern EPVector<EMSProgramCallManagementType> EMSProgramCallManager; // program calling managers
     extern ErlValueType Null;                                           // special "null" Erl variable value instance
     extern ErlValueType False;                                          // special "false" Erl variable value instance
     extern ErlValueType True;                                           // special "True" Erl variable value instance, gets reset

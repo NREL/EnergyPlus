@@ -124,8 +124,8 @@ namespace FluidProperties {
         Real64 PsHighPresValue;      // High Pressure Value for Ps (max in tables)
         int PsLowPresIndex;          // Low Pressure Min Index for Ps (>0.0)
         int PsHighPresIndex;         // High Pressure Max Index for Ps (>0.0)
-        Array1D<Real64> PsTemps;     // Temperatures for saturation pressures
-        Array1D<Real64> PsValues;    // Saturation pressures at PsTemps
+        EPVector<Real64> PsTemps;     // Temperatures for saturation pressures
+        EPVector<Real64> PsValues;    // Saturation pressures at PsTemps
         int NumHPoints;              // Number of enthalpy points
         Real64 HfLowTempValue;       // Low Temperature Value for Hf (>0.0)
         Real64 HfHighTempValue;      // High Temperature Value for Hf (max in tables)
@@ -135,9 +135,9 @@ namespace FluidProperties {
         Real64 HfgHighTempValue;     // High Temperature Value for Hfg (max in tables)
         int HfgLowTempIndex;         // Low Temperature Min Index for Hfg (>0.0)
         int HfgHighTempIndex;        // High Temperature Max Index for Hfg (>0.0)
-        Array1D<Real64> HTemps;      // Temperatures for enthalpy points
-        Array1D<Real64> HfValues;    // Enthalpy of saturated fluid at HTemps
-        Array1D<Real64> HfgValues;   // Enthalpy of saturated fluid/gas at HTemps
+        EPVector<Real64> HTemps;      // Temperatures for enthalpy points
+        EPVector<Real64> HfValues;    // Enthalpy of saturated fluid at HTemps
+        EPVector<Real64> HfgValues;   // Enthalpy of saturated fluid/gas at HTemps
         int NumCpPoints;             // Number of specific heat of fluid points
         Real64 CpfLowTempValue;      // Low Temperature Value for Cpf (>0.0)
         Real64 CpfHighTempValue;     // High Temperature Value for Cpf (max in tables)
@@ -147,9 +147,9 @@ namespace FluidProperties {
         Real64 CpfgHighTempValue;    // High Temperature Value for Cpfg (max in tables)
         int CpfgLowTempIndex;        // Low Temperature Min Index for Cpfg (>0.0)
         int CpfgHighTempIndex;       // High Temperature Max Index for Cpfg (>0.0)
-        Array1D<Real64> CpTemps;     // Temperatures for specific heat points
-        Array1D<Real64> CpfValues;   // Specific heat of saturated fluid at CpTemps
-        Array1D<Real64> CpfgValues;  // Specific heat of saturated fluid/gas at CpTemps
+        EPVector<Real64> CpTemps;     // Temperatures for specific heat points
+        EPVector<Real64> CpfValues;   // Specific heat of saturated fluid at CpTemps
+        EPVector<Real64> CpfgValues;  // Specific heat of saturated fluid/gas at CpTemps
         int NumRhoPoints;            // Number of density of fluid points
         Real64 RhofLowTempValue;     // Low Temperature Value for Rhof (>0.0)
         Real64 RhofHighTempValue;    // High Temperature Value for Rhof (max in tables)
@@ -159,13 +159,13 @@ namespace FluidProperties {
         Real64 RhofgHighTempValue;   // High Temperature Value for Rhofg (max in tables)
         int RhofgLowTempIndex;       // Low Temperature Min Index for Rhofg (>0.0)
         int RhofgHighTempIndex;      // High Temperature Max Index for Rhofg (>0.0)
-        Array1D<Real64> RhoTemps;    // Temperatures for density of fluid points
-        Array1D<Real64> RhofValues;  // Density of saturated fluid at RhoTemps
-        Array1D<Real64> RhofgValues; // Density of saturated fluid/gas at RhoTemps
+        EPVector<Real64> RhoTemps;    // Temperatures for density of fluid points
+        EPVector<Real64> RhofValues;  // Density of saturated fluid at RhoTemps
+        EPVector<Real64> RhofgValues; // Density of saturated fluid/gas at RhoTemps
         int NumSuperTempPts;         // Number of temperature points for superheated enthalpy
         int NumSuperPressPts;        // Number of pressure points for superheated enthalpy
-        Array1D<Real64> SHTemps;     // Temperatures for superheated gas
-        Array1D<Real64> SHPress;     // Pressures for superheated gas
+        EPVector<Real64> SHTemps;     // Temperatures for superheated gas
+        EPVector<Real64> SHPress;     // Pressures for superheated gas
         Array2D<Real64> HshValues;   // Enthalpy of superheated gas at HshTemps, HshPress
         Array2D<Real64> RhoshValues; // Density of superheated gas at HshTemps, HshPress
 
@@ -189,26 +189,26 @@ namespace FluidProperties {
         bool CpDataPresent;         // Flag set when specific heat data is available
         int NumCpTempPts;           // Number of temperature points for specific heat
         int NumCpConcPts;           // Number of concentration points for specific heat
-        Array1D<Real64> CpTemps;    // Temperatures for specific heat of glycol
-        Array1D<Real64> CpConcs;    // Concentration for specific heat of glycol
+        EPVector<Real64> CpTemps;    // Temperatures for specific heat of glycol
+        EPVector<Real64> CpConcs;    // Concentration for specific heat of glycol
         Array2D<Real64> CpValues;   // Specific heat data values
         bool RhoDataPresent;        // Flag set when density data is available
         int NumRhoTempPts;          // Number of temperature points for density
         int NumRhoConcPts;          // Number of concentration points for density
-        Array1D<Real64> RhoTemps;   // Temperatures for density of glycol
-        Array1D<Real64> RhoConcs;   // Concentration for density of glycol
+        EPVector<Real64> RhoTemps;   // Temperatures for density of glycol
+        EPVector<Real64> RhoConcs;   // Concentration for density of glycol
         Array2D<Real64> RhoValues;  // Density data values
         bool CondDataPresent;       // Flag set when conductivity data is available
         int NumCondTempPts;         // Number of temperature points for conductivity
         int NumCondConcPts;         // Number of concentration points for conductivity
-        Array1D<Real64> CondTemps;  // Temperatures for conductivity of glycol
-        Array1D<Real64> CondConcs;  // Concentration for conductivity of glycol
+        EPVector<Real64> CondTemps;  // Temperatures for conductivity of glycol
+        EPVector<Real64> CondConcs;  // Concentration for conductivity of glycol
         Array2D<Real64> CondValues; // conductivity values
         bool ViscDataPresent;       // Flag set when viscosity data is available
         int NumViscTempPts;         // Number of temperature points for viscosity
         int NumViscConcPts;         // Number of concentration points for viscosity
-        Array1D<Real64> ViscTemps;  // Temperatures for viscosity of glycol
-        Array1D<Real64> ViscConcs;  // Concentration for viscosity of glycol
+        EPVector<Real64> ViscTemps;  // Temperatures for viscosity of glycol
+        EPVector<Real64> ViscConcs;  // Concentration for viscosity of glycol
         Array2D<Real64> ViscValues; // viscosity values
 
         // Default Constructor
@@ -234,32 +234,32 @@ namespace FluidProperties {
         int CpLowTempIndex;         // Low Temperature Min Index for Cp (>0.0)
         int CpHighTempIndex;        // High Temperature Max Index for Cp (>0.0)
         int NumCpTempPts;           // Number of temperature points for specific heat
-        Array1D<Real64> CpTemps;    // Temperatures for specific heat of glycol
-        Array1D<Real64> CpValues;   // Specific heat data values (J/kg-K)
+        EPVector<Real64> CpTemps;    // Temperatures for specific heat of glycol
+        EPVector<Real64> CpValues;   // Specific heat data values (J/kg-K)
         bool RhoDataPresent;        // Flag set when density data is available
         int NumRhoTempPts;          // Number of temperature points for density
         Real64 RhoLowTempValue;     // Low Temperature Value for Rho (>0.0)
         Real64 RhoHighTempValue;    // High Temperature Value for Rho (max in tables)
         int RhoLowTempIndex;        // Low Temperature Min Index for Rho (>0.0)
         int RhoHighTempIndex;       // High Temperature Max Index for Rho (>0.0)
-        Array1D<Real64> RhoTemps;   // Temperatures for density of glycol
-        Array1D<Real64> RhoValues;  // Density data values (kg/m3)
+        EPVector<Real64> RhoTemps;   // Temperatures for density of glycol
+        EPVector<Real64> RhoValues;  // Density data values (kg/m3)
         bool CondDataPresent;       // Flag set when conductivity data is available
         int NumCondTempPts;         // Number of temperature points for conductivity
         Real64 CondLowTempValue;    // Low Temperature Value for Cond (>0.0)
         Real64 CondHighTempValue;   // High Temperature Value for Cond (max in tables)
         int CondLowTempIndex;       // Low Temperature Min Index for Cond (>0.0)
         int CondHighTempIndex;      // High Temperature Max Index for Cond (>0.0)
-        Array1D<Real64> CondTemps;  // Temperatures for conductivity of glycol
-        Array1D<Real64> CondValues; // conductivity values (W/m-K)
+        EPVector<Real64> CondTemps;  // Temperatures for conductivity of glycol
+        EPVector<Real64> CondValues; // conductivity values (W/m-K)
         bool ViscDataPresent;       // Flag set when viscosity data is available
         int NumViscTempPts;         // Number of temperature points for viscosity
         Real64 ViscLowTempValue;    // Low Temperature Value for Visc (>0.0)
         Real64 ViscHighTempValue;   // High Temperature Value for Visc (max in tables)
         int ViscLowTempIndex;       // Low Temperature Min Index for Visc (>0.0)
         int ViscHighTempIndex;      // High Temperature Max Index for Visc (>0.0)
-        Array1D<Real64> ViscTemps;  // Temperatures for viscosity of glycol
-        Array1D<Real64> ViscValues; // viscosity values (mPa-s)
+        EPVector<Real64> ViscTemps;  // Temperatures for viscosity of glycol
+        EPVector<Real64> ViscValues; // viscosity values (mPa-s)
 
         // Default Constructor
         FluidPropsGlycolData()
@@ -345,11 +345,11 @@ namespace FluidProperties {
     };
 
     // Object Data
-    extern Array1D<FluidPropsRefrigerantData> RefrigData;
-    extern Array1D<FluidPropsRefrigErrors> RefrigErrorTracking;
-    extern Array1D<FluidPropsGlycolRawData> GlyRawData;
-    extern Array1D<FluidPropsGlycolData> GlycolData;
-    extern Array1D<FluidPropsGlycolErrors> GlycolErrorTracking;
+    extern EPVector<FluidPropsRefrigerantData> RefrigData;
+    extern EPVector<FluidPropsRefrigErrors> RefrigErrorTracking;
+    extern EPVector<FluidPropsGlycolRawData> GlyRawData;
+    extern EPVector<FluidPropsGlycolData> GlycolData;
+    extern EPVector<FluidPropsGlycolErrors> GlycolErrorTracking;
 
     // Functions
 
@@ -599,21 +599,21 @@ namespace FluidProperties {
     //*****************************************************************************
 
     int FindArrayIndex(Real64 Value,           // Value to be placed/found within the array of values
-                       Array1D<Real64> const &Array, // Array of values in ascending order
+                       EPVector<Real64> const &Array, // Array of values in ascending order
                        int LowBound,           // Valid values lower bound (set by calling program)
                        int UpperBound          // Valid values upper bound (set by calling program)
     );
 
     int FindArrayIndex(Real64 Value,          // Value to be placed/found within the array of values
-                       Array1D<Real64> const &Array // Array of values in ascending order
+                       EPVector<Real64> const &Array // Array of values in ascending order
     );
 
     //*****************************************************************************
 
     Real64 GetInterpolatedSatProp(Real64 Temperature,         // Saturation Temp.
-                                  Array1D<Real64> const &PropTemps, // Array of temperature at which props are available
-                                  Array1D<Real64> const &LiqProp,   // Array of saturated liquid properties
-                                  Array1D<Real64> const &VapProp,   // Array of saturatedvapour properties
+                                  EPVector<Real64> const &PropTemps, // Array of temperature at which props are available
+                                  EPVector<Real64> const &LiqProp,   // Array of saturated liquid properties
+                                  EPVector<Real64> const &VapProp,   // Array of saturatedvapour properties
                                   Real64 Quality,             // Quality
                                   std::string const &CalledFrom,    // routine this function was called from (error messages)
                                   int LowBound,               // Valid values lower bound (set by calling program)

@@ -84,15 +84,15 @@ namespace HeatBalanceHAMTManager {
     extern Array1D_int Intcell;
     extern Array1D_int IntConcell;
 
-    extern Array1D<Real64> watertot;
-    extern Array1D<Real64> surfrh;
-    extern Array1D<Real64> surfextrh;
-    extern Array1D<Real64> surftemp;
-    extern Array1D<Real64> surfexttemp;
-    extern Array1D<Real64> surfvp;
+    extern EPVector<Real64> watertot;
+    extern EPVector<Real64> surfrh;
+    extern EPVector<Real64> surfextrh;
+    extern EPVector<Real64> surftemp;
+    extern EPVector<Real64> surfexttemp;
+    extern EPVector<Real64> surfvp;
 
-    extern Array1D<Real64> extvtc;   // External Surface vapor transfer coefficient
-    extern Array1D<Real64> intvtc;   // Internal Surface Vapor Transfer Coefficient
+    extern EPVector<Real64> extvtc;   // External Surface vapor transfer coefficient
+    extern EPVector<Real64> intvtc;   // Internal Surface Vapor Transfer Coefficient
     extern Array1D_bool extvtcflag;  // External Surface vapor transfer coefficient flag
     extern Array1D_bool intvtcflag;  // Internal Surface Vapor Transfer Coefficient flag
     extern Array1D_bool MyEnvrnFlag; // Flag to reset surface properties.
@@ -135,10 +135,10 @@ namespace HeatBalanceHAMTManager {
         Real64 rhp;              // cell relative humidity (percent - reporting)
         Real64 dwdphi;           // Moisture storage capacity
         Real64 dw;               // Liquid transport Coefficient
-        Array1D<Real64> origin;  // Cell origin. The geometric centre of the cell.
-        Array1D<Real64> length;  // Cell lengths
-        Array1D<Real64> overlap; // Area of overlap
-        Array1D<Real64> dist;    // distance between cell origins
+        EPVector<Real64> origin;  // Cell origin. The geometric centre of the cell.
+        EPVector<Real64> length;  // Cell lengths
+        EPVector<Real64> overlap; // Area of overlap
+        EPVector<Real64> dist;    // distance between cell origins
         Array1D_int adjs;
         Array1D_int adjsl;
 
@@ -152,7 +152,7 @@ namespace HeatBalanceHAMTManager {
     };
 
     // Object Data
-    extern Array1D<subcell> cells;
+    extern EPVector<subcell> cells;
 
     // Functions
 

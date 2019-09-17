@@ -371,24 +371,24 @@ void DXFOut(std::string &PolygonAction,
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static Array1D<Real64> StemX(4, -10.0);
-    static Array1D<Real64> StemY(4, {3.0, 3.0, 0.0, 0.0});
-    static Array1D<Real64> StemZ(4, {0.1, 0.0, 0.0, 0.1});
-    static Array1D<Real64> Head1X(4, {-10.0, -10.0, -10.5, -10.5});
-    static Array1D<Real64> Head1Y(4, {3.0, 3.0, 2.133975, 2.133975});
-    static Array1D<Real64> Head1Z(4, {0.1, 0.0, 0.0, 0.1});
-    static Array1D<Real64> Head2X(4, {-10.0, -10.0, -9.5, -9.5});
-    static Array1D<Real64> Head2Y(4, {3.0, 3.0, 2.133975, 2.133975});
-    static Array1D<Real64> Head2Z(4, {0.1, 0.0, 0.0, 0.1});
-    static Array1D<Real64> NSide1X(4, -10.5);
-    static Array1D<Real64> NSide1Y(4, {4.5, 4.5, 3.5, 3.5});
-    static Array1D<Real64> NSide1Z(4, {0.1, 0.0, 0.0, 0.1});
-    static Array1D<Real64> NSide2X(4, {-10.5, -10.5, -9.5, -9.5});
-    static Array1D<Real64> NSide2Y(4, {4.5, 4.5, 3.5, 3.5});
-    static Array1D<Real64> NSide2Z(4, {0.1, 0.0, 0.0, 0.1});
-    static Array1D<Real64> NSide3X(4, -9.5);
-    static Array1D<Real64> NSide3Y(4, {4.5, 4.5, 3.5, 3.5});
-    static Array1D<Real64> NSide3Z(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> StemX(4, -10.0);
+    static EPVector<Real64> StemY(4, {3.0, 3.0, 0.0, 0.0});
+    static EPVector<Real64> StemZ(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> Head1X(4, {-10.0, -10.0, -10.5, -10.5});
+    static EPVector<Real64> Head1Y(4, {3.0, 3.0, 2.133975, 2.133975});
+    static EPVector<Real64> Head1Z(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> Head2X(4, {-10.0, -10.0, -9.5, -9.5});
+    static EPVector<Real64> Head2Y(4, {3.0, 3.0, 2.133975, 2.133975});
+    static EPVector<Real64> Head2Z(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> NSide1X(4, -10.5);
+    static EPVector<Real64> NSide1Y(4, {4.5, 4.5, 3.5, 3.5});
+    static EPVector<Real64> NSide1Z(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> NSide2X(4, {-10.5, -10.5, -9.5, -9.5});
+    static EPVector<Real64> NSide2Y(4, {4.5, 4.5, 3.5, 3.5});
+    static EPVector<Real64> NSide2Z(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> NSide3X(4, -9.5);
+    static EPVector<Real64> NSide3Y(4, {4.5, 4.5, 3.5, 3.5});
+    static EPVector<Real64> NSide3Z(4, {0.1, 0.0, 0.0, 0.1});
     //  integer, dimension(7) :: colorno=(/3,4,5,6,2,8,9/)
     int unit;       // Unit number on which to write file
     int surf;       // Loop variable for surfaces
@@ -417,7 +417,7 @@ void DXFOut(std::string &PolygonAction,
     int mapnum;
 
     // Object Data
-    Array1D<dTriangle> mytriangles;
+    EPVector<dTriangle> mytriangles;
 
     // Formats
     static ObjexxFCL::gio::Fmt Format_702("('  0',/,'SECTION',/,'  2',/,'ENTITIES')");
@@ -924,24 +924,24 @@ void DXFOutLines(std::string const &ColorScheme)
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static Array1D<Real64> StemX(4, -10.0);
-    static Array1D<Real64> StemY(4, {3.0, 3.0, 0.0, 0.0});
-    static Array1D<Real64> StemZ(4, {0.1, 0.0, 0.0, 0.1});
-    static Array1D<Real64> Head1X(4, {-10.0, -10.0, -10.5, -10.5});
-    static Array1D<Real64> Head1Y(4, {3.0, 3.0, 2.133975, 2.133975});
-    static Array1D<Real64> Head1Z(4, {0.1, 0.0, 0.0, 0.1});
-    static Array1D<Real64> Head2X(4, {-10.0, -10.0, -9.5, -9.5});
-    static Array1D<Real64> Head2Y(4, {3.0, 3.0, 2.133975, 2.133975});
-    static Array1D<Real64> Head2Z(4, {0.1, 0.0, 0.0, 0.1});
-    static Array1D<Real64> NSide1X(4, -10.5);
-    static Array1D<Real64> NSide1Y(4, {4.5, 4.5, 3.5, 3.5});
-    static Array1D<Real64> NSide1Z(4, {0.1, 0.0, 0.0, 0.1});
-    static Array1D<Real64> NSide2X(4, {-10.5, -10.5, -9.5, -9.5});
-    static Array1D<Real64> NSide2Y(4, {4.5, 4.5, 3.5, 3.5});
-    static Array1D<Real64> NSide2Z(4, {0.1, 0.0, 0.0, 0.1});
-    static Array1D<Real64> NSide3X(4, -9.5);
-    static Array1D<Real64> NSide3Y(4, {4.5, 4.5, 3.5, 3.5});
-    static Array1D<Real64> NSide3Z(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> StemX(4, -10.0);
+    static EPVector<Real64> StemY(4, {3.0, 3.0, 0.0, 0.0});
+    static EPVector<Real64> StemZ(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> Head1X(4, {-10.0, -10.0, -10.5, -10.5});
+    static EPVector<Real64> Head1Y(4, {3.0, 3.0, 2.133975, 2.133975});
+    static EPVector<Real64> Head1Z(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> Head2X(4, {-10.0, -10.0, -9.5, -9.5});
+    static EPVector<Real64> Head2Y(4, {3.0, 3.0, 2.133975, 2.133975});
+    static EPVector<Real64> Head2Z(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> NSide1X(4, -10.5);
+    static EPVector<Real64> NSide1Y(4, {4.5, 4.5, 3.5, 3.5});
+    static EPVector<Real64> NSide1Z(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> NSide2X(4, {-10.5, -10.5, -9.5, -9.5});
+    static EPVector<Real64> NSide2Y(4, {4.5, 4.5, 3.5, 3.5});
+    static EPVector<Real64> NSide2Z(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> NSide3X(4, -9.5);
+    static EPVector<Real64> NSide3Y(4, {4.5, 4.5, 3.5, 3.5});
+    static EPVector<Real64> NSide3Z(4, {0.1, 0.0, 0.0, 0.1});
     //  integer, dimension(7) :: colorno=(/3,4,5,6,2,8,9/)
     int unit;       // Unit number on which to write file
     int surf;       // Loop variable for surfaces
@@ -1368,24 +1368,24 @@ void DXFOutWireFrame(std::string const &ColorScheme)
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static Array1D<Real64> StemX(4, -10.0);
-    static Array1D<Real64> StemY(4, {3.0, 3.0, 0.0, 0.0});
-    static Array1D<Real64> StemZ(4, {0.1, 0.0, 0.0, 0.1});
-    static Array1D<Real64> Head1X(4, {-10.0, -10.0, -10.5, -10.5});
-    static Array1D<Real64> Head1Y(4, {3.0, 3.0, 2.133975, 2.133975});
-    static Array1D<Real64> Head1Z(4, {0.1, 0.0, 0.0, 0.1});
-    static Array1D<Real64> Head2X(4, {-10.0, -10.0, -9.5, -9.5});
-    static Array1D<Real64> Head2Y(4, {3.0, 3.0, 2.133975, 2.133975});
-    static Array1D<Real64> Head2Z(4, {0.1, 0.0, 0.0, 0.1});
-    static Array1D<Real64> NSide1X(4, -10.5);
-    static Array1D<Real64> NSide1Y(4, {4.5, 4.5, 3.5, 3.5});
-    static Array1D<Real64> NSide1Z(4, {0.1, 0.0, 0.0, 0.1});
-    static Array1D<Real64> NSide2X(4, {-10.5, -10.5, -9.5, -9.5});
-    static Array1D<Real64> NSide2Y(4, {4.5, 4.5, 3.5, 3.5});
-    static Array1D<Real64> NSide2Z(4, {0.1, 0.0, 0.0, 0.1});
-    static Array1D<Real64> NSide3X(4, -9.5);
-    static Array1D<Real64> NSide3Y(4, {4.5, 4.5, 3.5, 3.5});
-    static Array1D<Real64> NSide3Z(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> StemX(4, -10.0);
+    static EPVector<Real64> StemY(4, {3.0, 3.0, 0.0, 0.0});
+    static EPVector<Real64> StemZ(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> Head1X(4, {-10.0, -10.0, -10.5, -10.5});
+    static EPVector<Real64> Head1Y(4, {3.0, 3.0, 2.133975, 2.133975});
+    static EPVector<Real64> Head1Z(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> Head2X(4, {-10.0, -10.0, -9.5, -9.5});
+    static EPVector<Real64> Head2Y(4, {3.0, 3.0, 2.133975, 2.133975});
+    static EPVector<Real64> Head2Z(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> NSide1X(4, -10.5);
+    static EPVector<Real64> NSide1Y(4, {4.5, 4.5, 3.5, 3.5});
+    static EPVector<Real64> NSide1Z(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> NSide2X(4, {-10.5, -10.5, -9.5, -9.5});
+    static EPVector<Real64> NSide2Y(4, {4.5, 4.5, 3.5, 3.5});
+    static EPVector<Real64> NSide2Z(4, {0.1, 0.0, 0.0, 0.1});
+    static EPVector<Real64> NSide3X(4, -9.5);
+    static EPVector<Real64> NSide3Y(4, {4.5, 4.5, 3.5, 3.5});
+    static EPVector<Real64> NSide3Z(4, {0.1, 0.0, 0.0, 0.1});
     //  integer, dimension(7) :: colorno=(/3,4,5,6,2,8,9/)
     int unit;       // Unit number on which to write file
     int surf;       // Loop variable for surfaces
@@ -2412,7 +2412,7 @@ void VRMLOut(std::string &PolygonAction, std::string &ColorScheme)
     int write_stat;
 
     // Object Data
-    Array1D<dTriangle> mytriangles;
+    EPVector<dTriangle> mytriangles;
 
     // Formats
     static ObjexxFCL::gio::Fmt Format_702("('#VRML V2.0 utf8')");

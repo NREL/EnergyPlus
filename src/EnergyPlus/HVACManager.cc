@@ -194,7 +194,7 @@ namespace HVACManager {
 
     // Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
     // Array1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
-    // Array1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
+    // EPVector< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -2408,8 +2408,8 @@ namespace HVACManager {
         Real64 H2OHtOfVap;                 // Heat of vaporization of air
         Real64 TotalLoad;                  // Total loss or gain
         int MixNum;                        // Counter for MIXING and Cross Mixing statements
-        static Array1D<Real64> MixSenLoad; // Mixing sensible loss or gain
-        static Array1D<Real64> MixLatLoad; // Mixing latent loss or gain
+        static EPVector<Real64> MixSenLoad; // Mixing sensible loss or gain
+        static EPVector<Real64> MixLatLoad; // Mixing latent loss or gain
         int j;                             // Index in a do-loop
         int VentZoneNum;                   // Number of ventilation object per zone
         Real64 VentZoneMassflow;           // Total mass flow rate per zone
@@ -3064,7 +3064,7 @@ namespace HVACManager {
         int ZoneNum;
         int NodeIndex;
         int NodeNum;
-        Array1D<Real64> tmpRealARR(ConvergLogStackDepth);
+        EPVector<Real64> tmpRealARR(ConvergLogStackDepth);
 
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
 

@@ -184,10 +184,10 @@ namespace Fans {
     // Utility routines for module
 
     // Object Data
-    Array1D<FanEquipConditions> Fan;
+    EPVector<FanEquipConditions> Fan;
     std::unordered_map<std::string, std::string> UniqueFanNames;
-    Array1D<NightVentPerfData> NightVentPerf;
-    Array1D<FanNumericFieldData> FanNumericFields;
+    EPVector<NightVentPerfData> NightVentPerf;
+    EPVector<FanNumericFieldData> FanNumericFields;
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -338,7 +338,7 @@ namespace Fans {
         Array1D_bool lNumericFieldBlanks;
         Array1D_bool lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
+        EPVector<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         int NumParams;
         int MaxAlphas;

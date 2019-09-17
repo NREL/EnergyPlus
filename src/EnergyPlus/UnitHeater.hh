@@ -168,8 +168,8 @@ namespace UnitHeater {
     };
 
     // Object Data
-    extern Array1D<UnitHeaterData> UnitHeat;
-    extern Array1D<UnitHeatNumericFieldData> UnitHeatNumericFields;
+    extern EPVector<UnitHeaterData> UnitHeat;
+    extern EPVector<UnitHeatNumericFieldData> UnitHeatNumericFields;
 
     // Functions
 

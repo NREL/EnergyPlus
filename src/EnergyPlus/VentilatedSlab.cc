@@ -181,15 +181,15 @@ namespace VentilatedSlab {
     int NumOfVentSlabs(0);                // Number of ventilated slab in the input file
     Real64 OAMassFlowRate(0.0);           // Outside air mass flow rate for the ventilated slab
     Array1D_double QRadSysSrcAvg;         // Average source over the time step for a particular radiant surfaceD
-    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+    EPVector<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
     int MaxCloNumOfSurfaces(0);           // Used to set allocate size in CalcClo routine
     Real64 QZnReq(0.0);                   // heating or cooling needed by system [watts]
 
     // Record keeping variables used to calculate QRadSysSrcAvg locally
 
     Array1D_double LastQRadSysSrc;      // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    EPVector<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    EPVector<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     Array1D_bool CheckEquipName;
 
     // Autosizing variables
@@ -199,8 +199,8 @@ namespace VentilatedSlab {
     // PRIVATE UpdateVentilatedSlabValAvg
 
     // Object Data
-    Array1D<VentilatedSlabData> VentSlab;
-    Array1D<VentSlabNumericFieldData> VentSlabNumericFields;
+    EPVector<VentilatedSlabData> VentSlab;
+    EPVector<VentSlabNumericFieldData> VentSlabNumericFields;
 
     // Functions
 
@@ -361,7 +361,7 @@ namespace VentilatedSlab {
         Array1D_string cAlphaArgs;     // Alpha input items for object
         Array1D_string cAlphaFields;   // Alpha field names
         Array1D_string cNumericFields; // Numeric field names
-        Array1D<Real64> rNumericArgs;  // Numeric input items for object
+        EPVector<Real64> rNumericArgs;  // Numeric input items for object
         Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
         bool SteamMessageNeeded;
@@ -3544,7 +3544,7 @@ namespace VentilatedSlab {
         // unused0309  REAL(r64):: CoreNumber
         static Real64 Ckj; // Coefficients for individual surfaces within a radiant system
         static Real64 Cmj;
-        static Array1D<Real64> AirTempOut; // Array of outlet air temperatures for each surface in the radiant system
+        static EPVector<Real64> AirTempOut; // Array of outlet air temperatures for each surface in the radiant system
         int FanOutletNode;                 // unit air outlet node
         int OAInletNode;                   // unit air outlet node
         int MixoutNode;                    // unit air outlet node
@@ -4448,9 +4448,9 @@ namespace VentilatedSlab {
         Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
         int const NumOfPropDivisions(13);
         Real64 const MaxExpPower(50.0); // Maximum power after which EXP argument would be zero for DP variables
-        static Array1D<Real64> const Temps(
+        static EPVector<Real64> const Temps(
             NumOfPropDivisions, {1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85}); // Temperature, in C
-        static Array1D<Real64> const Mu(NumOfPropDivisions,
+        static EPVector<Real64> const Mu(NumOfPropDivisions,
                                         {0.0000088,
                                          0.0000176,
                                          0.00001781,
@@ -4464,10 +4464,10 @@ namespace VentilatedSlab {
                                          0.0000195,
                                          0.00001971,
                                          0.00001992}); // Viscosity, in Ns/m2
-        static Array1D<Real64> const Conductivity(
+        static EPVector<Real64> const Conductivity(
             NumOfPropDivisions,
             {0.01275, 0.0255, 0.0258, 0.0261, 0.0264, 0.0267, 0.02705, 0.0274, 0.02775, 0.0281, 0.0284, 0.0287, 0.01435}); // Conductivity, in W/mK
-        static Array1D<Real64> const Pr(NumOfPropDivisions, 0.69); // Prandtl number (dimensionless)
+        static EPVector<Real64> const Pr(NumOfPropDivisions, 0.69); // Prandtl number (dimensionless)
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

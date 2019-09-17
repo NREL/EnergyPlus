@@ -170,7 +170,7 @@ namespace RuntimeLanguageProcessor {
     };
 
     // Object Data
-    extern Array1D<RuntimeReportVarType> RuntimeReportVar;
+    extern EPVector<RuntimeReportVarType> RuntimeReportVar;
 
     // Functions
     void clear_state();

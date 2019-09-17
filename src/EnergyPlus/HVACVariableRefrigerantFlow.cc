@@ -239,21 +239,21 @@ namespace HVACVariableRefrigerantFlow {
     Array1D_bool MyZoneEqFlag;              // used to set up zone equipment availability managers
     Array1D_int NumCoolingLoads;            // number of TU's requesting cooling
     Array1D_int NumHeatingLoads;            // number of TU's requesting heating
-    Array1D<Real64> MaxCoolingCapacity;     // maximum capacity of any terminal unit
-    Array1D<Real64> MaxHeatingCapacity;     // maximum capacity of any terminal unit
-    Array1D<Real64> CoolCombinationRatio;   // ratio of terminal unit capacity to VRF condenser capacity
-    Array1D<Real64> HeatCombinationRatio;   // ratio of terminal unit capacity to VRF condenser capacity
-    Array1D<Real64> MaxDeltaT;              // maximum zone temperature difference from setpoint
-    Array1D<Real64> MinDeltaT;              // minimum zone temperature difference from setpoint
-    Array1D<Real64> SumCoolingLoads;        // sum of cooling loads
-    Array1D<Real64> SumHeatingLoads;        // sum of heating loads
+    EPVector<Real64> MaxCoolingCapacity;     // maximum capacity of any terminal unit
+    EPVector<Real64> MaxHeatingCapacity;     // maximum capacity of any terminal unit
+    EPVector<Real64> CoolCombinationRatio;   // ratio of terminal unit capacity to VRF condenser capacity
+    EPVector<Real64> HeatCombinationRatio;   // ratio of terminal unit capacity to VRF condenser capacity
+    EPVector<Real64> MaxDeltaT;              // maximum zone temperature difference from setpoint
+    EPVector<Real64> MinDeltaT;              // minimum zone temperature difference from setpoint
+    EPVector<Real64> SumCoolingLoads;        // sum of cooling loads
+    EPVector<Real64> SumHeatingLoads;        // sum of heating loads
 
     // Object Data
-    Array1D<VRFCondenserEquipment> VRF; // AirConditioner:VariableRefrigerantFlow object
+    EPVector<VRFCondenserEquipment> VRF; // AirConditioner:VariableRefrigerantFlow object
     std::unordered_map<std::string, std::string> VrfUniqueNames;
-    Array1D<VRFTerminalUnitEquipment> VRFTU;           // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
-    Array1D<TerminalUnitListData> TerminalUnitList;    // zoneTerminalUnitList object
-    Array1D<VRFTUNumericFieldData> VRFTUNumericFields; // holds VRF TU numeric input fields character field name
+    EPVector<VRFTerminalUnitEquipment> VRFTU;           // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
+    EPVector<TerminalUnitListData> TerminalUnitList;    // zoneTerminalUnitList object
+    EPVector<VRFTUNumericFieldData> VRFTUNumericFields; // holds VRF TU numeric input fields character field name
 
     // Utility routines for module
     // na
@@ -1460,7 +1460,7 @@ namespace HVACVariableRefrigerantFlow {
         Array1D_bool lNumericFieldBlanks;
         Array1D_bool lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
+        EPVector<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         int NumParams;
         int MaxAlphas;
@@ -7634,7 +7634,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 TempOutput;      // unit output when iteration limit exceeded [W]
         Real64 NoCompOutput;    // output when no active compressor [W]
         int SolFla;             // Flag of RegulaFalsi solver
-        Array1D<Real64> Par(6); // Parameters passed to RegulaFalsi
+        EPVector<Real64> Par(6); // Parameters passed to RegulaFalsi
         std::string IterNum;    // Max number of iterations for warning message
         Real64 TempMinPLR;      // min PLR used in Regula Falsi call
         Real64 TempMaxPLR;      // max PLR used in Regula Falsi call
@@ -8983,8 +8983,8 @@ namespace HVACVariableRefrigerantFlow {
         int MinOutputIndex;                          // index to TU with lowest load
         Real64 MinOutput;                            // used when finding TU "max" capacity limit
         Real64 RemainingCapacity;                    // decrement capacity counter to find limiting TU capacity [W]
-        Array1D<Real64> Temp(NumTUInList, CapArray); // temporary array for processing terminal units
-        Array1D<Real64> Temp2(NumTUInList, Temp);    // temporary array for processing terminal units
+        EPVector<Real64> Temp(NumTUInList, CapArray); // temporary array for processing terminal units
+        EPVector<Real64> Temp2(NumTUInList, Temp);    // temporary array for processing terminal units
 
         RemainingCapacity = TotalCapacity;
 
@@ -9130,8 +9130,8 @@ namespace HVACVariableRefrigerantFlow {
         //       by the user.
 
         // Followings for FluidTCtrl Only
-        Array1D<Real64> EvapTemp;
-        Array1D<Real64> CondTemp;
+        EPVector<Real64> EvapTemp;
+        EPVector<Real64> CondTemp;
         Real64 IUMinEvapTemp;
         Real64 IUMaxCondTemp;
 
@@ -9500,9 +9500,9 @@ namespace HVACVariableRefrigerantFlow {
         Real64 Tsuction;       // VRF compressor suction refrigerant temperature [C]
         Real64 Tolerance;      // Tolerance for condensing temperature calculation [C]
         Real64 Tfs;            // Temperature of the air at the coil surface [C]
-        Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
-        Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
-        Array1D<Real64> Par(3);                // Array for the parameters [-]
+        EPVector<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
+        EPVector<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
+        EPVector<Real64> Par(3);                // Array for the parameters [-]
 
         // FLOW
 
@@ -10706,7 +10706,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 TempOutput;      // unit output when iteration limit exceeded [W]
         Real64 NoCompOutput;    // output when no active compressor [W]
         int SolFla;             // Flag of RegulaFalsi solver
-        Array1D<Real64> Par(6); // Parameters passed to RegulaFalsi
+        EPVector<Real64> Par(6); // Parameters passed to RegulaFalsi
         std::string IterNum;    // Max number of iterations for warning message
         Real64 TempMinPLR;      // min PLR used in Regula Falsi call
         Real64 TempMaxPLR;      // max PLR used in Regula Falsi call
@@ -11151,7 +11151,7 @@ namespace HVACVariableRefrigerantFlow {
         //  na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Array1D<Real64> Par(7);      // Parameters passed to RegulaFalsi
+        EPVector<Real64> Par(7);      // Parameters passed to RegulaFalsi
         int const Mode(1);           // Performance mode for MultiMode DX coil. Always 1 for other coil types
         int const MaxIte(500);       // maximum number of iterations
         int DXCoilNum;               // index to DX Coil
@@ -12118,8 +12118,8 @@ namespace HVACVariableRefrigerantFlow {
         Real64 RefPHigh;                       // High Pressure Value for Ps (max in tables) [Pa]
         Real64 SH_Comp;                        // Temperature between compressor inlet temperature and evaporative temperature Te' [C]
         Real64 T_comp_in;                      // Refrigerant temperature at compressor inlet (after piping loss) [C]
-        Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
-        Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
+        EPVector<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
+        EPVector<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -12281,8 +12281,8 @@ namespace HVACVariableRefrigerantFlow {
         Real64 RefPHigh;                       // High Pressure Value for Ps (max in tables) [Pa]
         Real64 SH_Comp;                        // Temperature between compressor inlet temperature and evaporative temperature Te' [C]
         Real64 T_comp_in;                      // Refrigerant temperature at compressor inlet (after piping loss) [C]
-        Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
-        Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
+        EPVector<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
+        EPVector<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -12448,9 +12448,9 @@ namespace HVACVariableRefrigerantFlow {
         Real64 T_discharge_new;                // Condensing temperature, for temporary use in iterations [C]
         Real64 Tfs;                            // Temperature of the air at the coil surface [C]]
         Real64 Tolerance(0.05);                // Tolerance for condensing temperature calculation [C}
-        Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
-        Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
-        Array1D<Real64> Par(3);                // Array for the parameters [-]
+        EPVector<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
+        EPVector<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
+        EPVector<Real64> Par(3);                // Array for the parameters [-]
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -12791,9 +12791,9 @@ namespace HVACVariableRefrigerantFlow {
         Real64 RefPLow;                        // Low Pressure Value for Ps (>0.0) [Pa]
         Real64 RefPHigh;                       // High Pressure Value for Ps (max in tables) [Pa]
         Real64 Tolerance(0.05);                // Tolerance for condensing temperature calculation [C}
-        Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
-        Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
-        Array1D<Real64> Par(3);                // Array for the parameters [-]
+        EPVector<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
+        EPVector<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
+        EPVector<Real64> Par(3);                // Array for the parameters [-]
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -12980,7 +12980,7 @@ namespace HVACVariableRefrigerantFlow {
         using General::SolveRoot;
         using General::TrimSigDigits;
 
-        Array1D<Real64> Par(7);     // Parameters passed to RegulaFalsi
+        EPVector<Real64> Par(7);     // Parameters passed to RegulaFalsi
         int const FlagCondMode(0);  // Flag for running as condenser [-]
         int const FlagEvapMode(1);  // Flag for running as evaporator [-]
         Real64 const ErrorTol(0.1); // tolerance for RegulaFalsi iterations

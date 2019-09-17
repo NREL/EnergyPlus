@@ -132,7 +132,7 @@ namespace HVACDXHeatPumpSystem {
     };
 
     // Object Data
-    extern Array1D<DXHeatPumpSystemStruct> DXHeatPumpSystem;
+    extern EPVector<DXHeatPumpSystemStruct> DXHeatPumpSystem;
 
     // Functions
 

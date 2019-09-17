@@ -90,7 +90,7 @@ namespace DataPlant {
         bool MixerExists;        // Logical Flag indication mixer exists in the half loop
         int TotalPumps;          // total number of pumps on the half loop
         bool BranchPumpsExist;   // logical flag indication branch pumps exist on half loop
-        Array1D<LoopSidePumpInformation> Pumps;
+        EPVector<LoopSidePumpInformation> Pumps;
         Real64 TotalPumpHeat; // [W] total heat addition by the pumps to place in "tank"
         bool BypassExists;
         bool InletNodeSetPt;
@@ -101,8 +101,8 @@ namespace DataPlant {
         // is less than max available flow at inlet
         int FlowLock;                         // DSU
         int TotalConnected;                   // total number of other loops connected to this loop side
-        Array1D<ConnectedLoopData> Connected; // DSU Other loops connected to this Loop side
-        Array1D<BranchData> Branch;           // Branch data
+        EPVector<ConnectedLoopData> Connected; // DSU Other loops connected to this Loop side
+        EPVector<BranchData> Branch;           // Branch data
         SplitterData Splitter;       // Data for splitter on branch (if any)
         MixerData Mixer;             // Data for splitter on branch (if any)
         bool HasPressureComponents;
@@ -125,7 +125,7 @@ namespace DataPlant {
         Real64 flowRequestNeedAndTurnOn;
         Real64 flowRequestFinal;
         bool hasConstSpeedBranchPumps;
-        Array1D<Real64> noLoadConstantSpeedBranchFlowRateSteps;
+        EPVector<Real64> noLoadConstantSpeedBranchFlowRateSteps;
 
         // Default Constructor
         HalfLoopData()

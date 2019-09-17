@@ -393,7 +393,7 @@ namespace HeatBalanceAirManager {
         Array1D_bool lNumericFieldBlanks;
         Array1D_bool lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
+        EPVector<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
 
         int i;
@@ -412,9 +412,9 @@ namespace HeatBalanceAirManager {
         int Item1;
         bool errFlag;
         int ZLItem;
-        Array1D<Real64> TotInfilVentFlow;
-        Array1D<Real64> TotMixingFlow;
-        Array1D<Real64> ZoneMixingNum;
+        EPVector<Real64> TotInfilVentFlow;
+        EPVector<Real64> TotMixingFlow;
+        EPVector<Real64> ZoneMixingNum;
         int ConnectTest;
         int ConnectionNumber;
         int NumbNum;

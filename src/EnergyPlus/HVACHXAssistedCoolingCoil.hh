@@ -72,8 +72,8 @@ namespace HVACHXAssistedCoolingCoil {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int TotalNumHXAssistedCoils;                // The total number of HXAssistedCoolingCoil compound objects
-    extern Array1D<Real64> HXAssistedCoilOutletTemp;   // Outlet temperature from this compound object
-    extern Array1D<Real64> HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
+    extern EPVector<Real64> HXAssistedCoilOutletTemp;   // Outlet temperature from this compound object
+    extern EPVector<Real64> HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
     // PUBLIC so others can access this information
     extern bool GetCoilsInputFlag; // Flag to allow input data to be retrieved from idf on first call to this subroutine
     extern Array1D_bool CheckEquipName;
@@ -136,7 +136,7 @@ namespace HVACHXAssistedCoolingCoil {
     };
 
     // Object Data
-    extern Array1D<HXAssistedCoilParameters> HXAssistedCoil;
+    extern EPVector<HXAssistedCoilParameters> HXAssistedCoil;
 
     // Functions
 

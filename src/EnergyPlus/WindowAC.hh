@@ -172,8 +172,8 @@ namespace WindowAC {
     };
 
     // Object Data
-    extern Array1D<WindACData> WindAC;
-    extern Array1D<WindACNumericFieldData> WindACNumericFields; // holds window AC numeric input fields character field name
+    extern EPVector<WindACData> WindAC;
+    extern EPVector<WindACNumericFieldData> WindACNumericFields; // holds window AC numeric input fields character field name
 
     // Functions
 

@@ -217,7 +217,7 @@ namespace PVWatts {
         Array1D_bool lNumericFieldBlanks;
         Array1D_bool lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
+        EPVector<Real64> rNumericArgs;
         const int maxAlphas = 6;  // from idd
         const int maxNumeric = 5; // from idd
         cAlphaFieldNames.allocate(maxAlphas);

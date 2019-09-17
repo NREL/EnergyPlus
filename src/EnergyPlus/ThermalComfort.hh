@@ -164,9 +164,9 @@ namespace ThermalComfort {
     extern Real64 TotalAnyZoneNotMetHeatingOccupied;
     extern Real64 TotalAnyZoneNotMetCoolingOccupied;
     extern Real64 TotalAnyZoneNotMetOccupied;
-    extern Array1D<Real64> ZoneOccHrs;
+    extern EPVector<Real64> ZoneOccHrs;
     extern bool useEpwData;
-    extern Array1D<Real64> DailyAveOutTemp;
+    extern EPVector<Real64> DailyAveOutTemp;
 
     extern Real64 runningAverageASH;
 
@@ -260,7 +260,7 @@ namespace ThermalComfort {
     struct AngleFactorData
     {
         // Members
-        Array1D<Real64> AngleFactor; // Angle factor of each surface
+        EPVector<Real64> AngleFactor; // Angle factor of each surface
         std::string Name;            // Angle factor list name
         Array1D_string SurfaceName;  // Names of the Surfces
         Array1D_int SurfacePtr;      // ALLOCATABLE to the names of the Surfces
@@ -275,10 +275,10 @@ namespace ThermalComfort {
     };
 
     // Object Data
-    extern Array1D<ThermalComfortInASH55Type> ThermalComfortInASH55;
-    extern Array1D<ThermalComfortSetPointType> ThermalComfortSetPoint;
-    extern Array1D<ThermalComfortDataType> ThermalComfortData;
-    extern Array1D<AngleFactorData> AngleFactorList; // Angle Factor List data for each Angle Factor List
+    extern EPVector<ThermalComfortInASH55Type> ThermalComfortInASH55;
+    extern EPVector<ThermalComfortSetPointType> ThermalComfortSetPoint;
+    extern EPVector<ThermalComfortDataType> ThermalComfortData;
+    extern EPVector<AngleFactorData> AngleFactorList; // Angle Factor List data for each Angle Factor List
 
     // Functions
 

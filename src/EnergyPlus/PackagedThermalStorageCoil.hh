@@ -414,7 +414,7 @@ namespace PackagedThermalStorageCoil {
     };
 
     // Object Data
-    extern Array1D<PackagedTESCoolingCoilStruct> TESCoil;
+    extern EPVector<PackagedTESCoolingCoilStruct> TESCoil;
 
     // Functions
 

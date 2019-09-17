@@ -137,8 +137,8 @@ namespace ChillerExhaustAbsorption {
     Array1D_bool CheckEquipName;
 
     // Object Data
-    Array1D<ExhaustAbsorberSpecs> ExhaustAbsorber; // dimension to number of machines
-    Array1D<ReportVars> ExhaustAbsorberReport;
+    EPVector<ExhaustAbsorberSpecs> ExhaustAbsorber; // dimension to number of machines
+    EPVector<ReportVars> ExhaustAbsorberReport;
 
     // Functions
     namespace {

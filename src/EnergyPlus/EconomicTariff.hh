@@ -279,7 +279,7 @@ namespace EconomicTariff {
         int tariffIndx;         // index of the tariff name in the tariff array
         int kindOfObj;          // enumerated list for the kind of economics object
         int index;              // pointer to item in specific array
-        Array1D<Real64> values; // values
+        EPVector<Real64> values; // values
         // the following items are not part of the object description
         bool isArgument; // flag if the variable is ever used as an argument (value needed)
         bool isAssigned; // flag if the variable is ever assigned to
@@ -400,11 +400,11 @@ namespace EconomicTariff {
         Real64 collectTime;
         Real64 collectEnergy;
         // arryas for holding real time pricing gathered values
-        Array1D<Real64> RTPcost;
-        Array1D<Real64> RTPaboveBaseCost;
-        Array1D<Real64> RTPbelowBaseCost;
-        Array1D<Real64> RTPaboveBaseEnergy;
-        Array1D<Real64> RTPbelowBaseEnergy;
+        EPVector<Real64> RTPcost;
+        EPVector<Real64> RTPaboveBaseCost;
+        EPVector<Real64> RTPbelowBaseCost;
+        EPVector<Real64> RTPaboveBaseEnergy;
+        EPVector<Real64> RTPbelowBaseEnergy;
         Array1D_int seasonForMonth;
         // overall qualification of the rate
         bool isQualified;
@@ -486,9 +486,9 @@ namespace EconomicTariff {
         Real64 blkSzMultVal;        // block size multiplier value
         int blkSzMultPt;            // block size variable in the variable array (0 is flag for no variable)
         int numBlk;                 // number of blocks used
-        Array1D<Real64> blkSzVal;   // array of block size values
+        EPVector<Real64> blkSzVal;   // array of block size values
         Array1D_int blkSzPt;        // block size variables index to the variable array (0 is no variable)
-        Array1D<Real64> blkCostVal; // array of block cost values
+        EPVector<Real64> blkCostVal; // array of block cost values
         Array1D_int blkCostPt;      // block cost variables index to the variable array (0 is no variable)
 
         // Default Constructor
@@ -539,7 +539,7 @@ namespace EconomicTariff {
     {
         // Members
         int varPt;              // pointer to item in specific array
-        Array1D<Real64> values; // values
+        EPVector<Real64> values; // values
 
         // Default Constructor
         StackType() : varPt(0), values(MaxNumMonths, 0.0)
@@ -548,14 +548,14 @@ namespace EconomicTariff {
     };
 
     // Object Data
-    extern Array1D<EconVarType> econVar;
-    extern Array1D<TariffType> tariff;
-    extern Array1D<QualifyType> qualify;
-    extern Array1D<ChargeSimpleType> chargeSimple;
-    extern Array1D<ChargeBlockType> chargeBlock;
-    extern Array1D<RatchetType> ratchet;
-    extern Array1D<ComputationType> computation;
-    extern Array1D<StackType> stack;
+    extern EPVector<EconVarType> econVar;
+    extern EPVector<TariffType> tariff;
+    extern EPVector<QualifyType> qualify;
+    extern EPVector<ChargeSimpleType> chargeSimple;
+    extern EPVector<ChargeBlockType> chargeBlock;
+    extern EPVector<RatchetType> ratchet;
+    extern EPVector<ComputationType> computation;
+    extern EPVector<StackType> stack;
 
     // Functions
 

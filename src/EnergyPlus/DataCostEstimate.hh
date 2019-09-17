@@ -173,7 +173,7 @@ namespace DataCostEstimate {
     };
 
     // Object Data
-    extern Array1D<CostLineItemStruct> CostLineItem;
+    extern EPVector<CostLineItemStruct> CostLineItem;
     extern CostAdjustmentStruct CurntBldg;  // holds total from line item cost calculations | holds user-defined constant cost model | holds
                                             // user-defined fraction for design fees | holds user-defined fraction for contractor fees | holds
                                             // user-defined fraction for contingencies | holds user-defined fraction for bonding costs | holds
@@ -184,7 +184,7 @@ namespace DataCostEstimate {
                                             // user-defined fraction for contingencies | holds user-defined fraction for bonding costs | holds
                                             // user-defined fraction for commissioning costs | holds user-defined multiplier to account for regional
                                             // diffs | the Grand Total of all line items plus all other costs
-    extern Array1D<monetaryUnitType> monetaryUnit;
+    extern EPVector<monetaryUnitType> monetaryUnit;
 
 } // namespace DataCostEstimate
 

@@ -145,7 +145,7 @@ namespace WaterToAirHeatPump {
     // Utility routines
 
     // Object Data
-    Array1D<WatertoAirHPEquipConditions> WatertoAirHP;
+    EPVector<WatertoAirHPEquipConditions> WatertoAirHP;
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -283,7 +283,7 @@ namespace WaterToAirHeatPump {
         Array1D_string AlphArray;        // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D<Real64> NumArray;        // Numeric input items for object
+        EPVector<Real64> NumArray;        // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
@@ -1241,7 +1241,7 @@ namespace WaterToAirHeatPump {
         Real64 QLatActual;      // Qlatent at actual operating conditions
         Real64 SHRss;           // Sensible heat ratio at steady state
         Real64 SHReff;          // Effective sensible heat ratio at part-load condition
-        Array1D<Real64> Par(4); // Parameter array passed to RegulaFalsi function
+        EPVector<Real64> Par(4); // Parameter array passed to RegulaFalsi function
         int SolFlag;            // Solution flag returned from RegulaFalsi function
         static bool firstTime(true);
         static Real64 LoadSideInletDBTemp_Init;  // rated conditions
@@ -1890,7 +1890,7 @@ namespace WaterToAirHeatPump {
         Real64 CompSuctionSatTemp; // Temperature of Saturated Refrigerant at Compressor Suction Pressure [C]
         bool StillSimulatingFlag;  // Final Simulation Flag
         bool Converged;            // Overall convergence Flag
-        Array1D<Real64> Par(4);    // Parameter array passed to RegulaFalsi function
+        EPVector<Real64> Par(4);    // Parameter array passed to RegulaFalsi function
         int SolFlag;               // Solution flag returned from RegulaFalsi function
         Real64 LoadResidual;       // loop convergence criteria
         Real64 SourceResidual;     // loop convergence criteria

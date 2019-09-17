@@ -118,8 +118,8 @@ namespace BaseboardElectric {
     };
 
     // Object Data
-    extern Array1D<BaseboardParams> Baseboard;
-    extern Array1D<BaseboardNumericFieldData> BaseboardNumericFields;
+    extern EPVector<BaseboardParams> Baseboard;
+    extern EPVector<BaseboardNumericFieldData> BaseboardNumericFields;
 
     // Functions
 

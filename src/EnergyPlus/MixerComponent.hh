@@ -92,13 +92,13 @@ namespace MixerComponent {
         bool InitFlag;
         int NumInletNodes;
         Array1D_int InletNode;
-        Array1D<Real64> InletMassFlowRate;
-        Array1D<Real64> InletMassFlowRateMaxAvail;
-        Array1D<Real64> InletMassFlowRateMinAvail;
-        Array1D<Real64> InletTemp;
-        Array1D<Real64> InletHumRat;
-        Array1D<Real64> InletEnthalpy;
-        Array1D<Real64> InletPressure;
+        EPVector<Real64> InletMassFlowRate;
+        EPVector<Real64> InletMassFlowRateMaxAvail;
+        EPVector<Real64> InletMassFlowRateMinAvail;
+        EPVector<Real64> InletTemp;
+        EPVector<Real64> InletHumRat;
+        EPVector<Real64> InletEnthalpy;
+        EPVector<Real64> InletPressure;
 
         // Default Constructor
         MixerConditions()
@@ -109,7 +109,7 @@ namespace MixerComponent {
     };
 
     // Object Data
-    extern Array1D<MixerConditions> MixerCond;
+    extern EPVector<MixerConditions> MixerCond;
 
     // Functions
 

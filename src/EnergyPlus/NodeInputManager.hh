@@ -106,7 +106,7 @@ namespace NodeInputManager {
     };
 
     // Object Data
-    extern Array1D<NodeListDef> NodeLists; // Node Lists
+    extern EPVector<NodeListDef> NodeLists; // Node Lists
 
     // Functions
 

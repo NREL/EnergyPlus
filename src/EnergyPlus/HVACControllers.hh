@@ -176,7 +176,7 @@ namespace HVACControllers {
         // Array of solution trackers. Saved at last call to SimAirLoop() in ManageControllers(iControllerOpEnd)
         // The first tracker is used to track the solution when FirstHVACIteration is TRUE.
         // The second tracker is used to track the solution at FirstHVACIteration is FALSE.
-        Array1D<SolutionTrackerType> SolutionTrackers;
+        EPVector<SolutionTrackerType> SolutionTrackers;
         // --------------------
         // Operational limits at min/max avail values for actuated variable and the corresponding sensed values
         // --------------------
@@ -276,7 +276,7 @@ namespace HVACControllers {
         int MaxSimAirLoopComponents;                  // Maximum number of times the SimAirLoopComponents() routine has been invoked
         int TotIterations;                            // Total number of iterations required to solve the controllers on this air loop
         int MaxIterations;                            // Maximum number of iterations required to solve the controllers on this air loop
-        Array1D<ControllerStatsType> ControllerStats; // Array of statistics for each controller
+        EPVector<ControllerStatsType> ControllerStats; // Array of statistics for each controller
         // on this air loop
 
         // Default Constructor
@@ -288,9 +288,9 @@ namespace HVACControllers {
     };
 
     // Object Data
-    extern Array1D<ControllerPropsType> ControllerProps;
-    extern Array1D<RootFinderDataType> RootFinders;
-    extern Array1D<AirLoopStatsType> AirLoopStats; // Statistics array to analyze computational profile for
+    extern EPVector<ControllerPropsType> ControllerProps;
+    extern EPVector<RootFinderDataType> RootFinders;
+    extern EPVector<AirLoopStatsType> AirLoopStats; // Statistics array to analyze computational profile for
 
     // Functions
 

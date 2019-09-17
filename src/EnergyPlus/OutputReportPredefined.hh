@@ -961,12 +961,12 @@ namespace OutputReportPredefined {
     };
 
     // Object Data
-    extern Array1D<reportNameType> reportName;
-    extern Array1D<SubTableType> subTable;
-    extern Array1D<ColumnTagType> columnTag;
-    extern Array1D<TableEntryType> tableEntry;
-    extern Array1D<CompSizeTableEntryType> CompSizeTableEntry;
-    extern Array1D<ShadowRelateType> ShadowRelate;
+    extern EPVector<reportNameType> reportName;
+    extern EPVector<SubTableType> subTable;
+    extern EPVector<ColumnTagType> columnTag;
+    extern EPVector<TableEntryType> tableEntry;
+    extern EPVector<CompSizeTableEntryType> CompSizeTableEntry;
+    extern EPVector<ShadowRelateType> ShadowRelate;
 
     // Functions
     void clear_state();

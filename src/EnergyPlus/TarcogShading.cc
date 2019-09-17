@@ -181,8 +181,8 @@ namespace TarcogShading {
         Real64 hc;
         Real64 hc1;
         Real64 hc2;
-        static Array1D<Real64> frct1(maxgas);
-        static Array1D<Real64> frct2(maxgas);
+        static EPVector<Real64> frct1(maxgas);
+        static EPVector<Real64> frct2(maxgas);
         Real64 speed;
         Real64 Tav;
         Real64 Tgap;
@@ -1076,11 +1076,11 @@ namespace TarcogShading {
                                     Array1A<Real64> const Al,       // Left side openning area [m2]
                                     Array1A<Real64> const Ar,       // Right side openning area [m2]
                                     Array1A<Real64> const Ah,       // Front side openning area [m2]
-                                    Array1D<Real64> &Atop_eff,      // Output - Effective top openning area [m2]
-                                    Array1D<Real64> &Abot_eff,      // Output - Effective bottom openning area [m2]
-                                    Array1D<Real64> &Al_eff,        // Output - Effective left side openning area [m2]
-                                    Array1D<Real64> &Ar_eff,        // Output - Effective right side openning area [m2]
-                                    Array1D<Real64> &Ah_eff,        // Output - Effective front side openning area [m2]
+                                    EPVector<Real64> &Atop_eff,      // Output - Effective top openning area [m2]
+                                    EPVector<Real64> &Abot_eff,      // Output - Effective bottom openning area [m2]
+                                    EPVector<Real64> &Al_eff,        // Output - Effective left side openning area [m2]
+                                    EPVector<Real64> &Ar_eff,        // Output - Effective right side openning area [m2]
+                                    EPVector<Real64> &Ah_eff,        // Output - Effective front side openning area [m2]
                                     Array1A_int const LayerType,    // Layer type
                                     Array1A<Real64> const SlatAngle // Venetian layer slat angle [deg]
     )

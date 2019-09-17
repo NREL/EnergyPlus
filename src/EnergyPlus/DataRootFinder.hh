@@ -161,7 +161,7 @@ namespace DataRootFinder {
         PointType UpperPoint;       // Point { XUpper, F(XUpper) } so that XRoot <= YUpper
         PointType CurrentPoint;     // Last evaluated point { X, F(X) }
         int NumHistory;             // Number of points stored in History
-        Array1D<PointType> History; // Vector containing last 3 best iterates
+        EPVector<PointType> History; // Vector containing last 3 best iterates
 
         // Default Constructor
         RootFinderDataType()

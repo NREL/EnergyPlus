@@ -168,7 +168,7 @@ namespace HeatPumpWaterToWaterHEATING {
     };
 
     // Object Data
-    extern Array1D<GshpPeHeatingSpecs> GSHP; // dimension to number of machines
+    extern EPVector<GshpPeHeatingSpecs> GSHP; // dimension to number of machines
 
     void GetGshpInput();
 

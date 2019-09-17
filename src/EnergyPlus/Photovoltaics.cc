@@ -320,9 +320,9 @@ namespace Photovoltaics {
         int dupPtr;
 
         // Object Data
-        Array1D<SimplePVParamsStruct> tmpSimpleModuleParams;       // temporary, for processing input data
-        Array1D<TRNSYSPVModuleParamsStruct> tmpTNRSYSModuleParams; // temporary, for processing input data
-        Array1D<SNLModuleParamsStuct> tmpSNLModuleParams;          // temporary, for processing input data
+        EPVector<SimplePVParamsStruct> tmpSimpleModuleParams;       // temporary, for processing input data
+        EPVector<TRNSYSPVModuleParamsStruct> tmpTNRSYSModuleParams; // temporary, for processing input data
+        EPVector<SNLModuleParamsStuct> tmpSNLModuleParams;          // temporary, for processing input data
 
         // count how many photovoltaic arrays of different types are in the .idf
         NumPVs = inputProcessor->getNumObjectsFound(cPVGeneratorObjectName);

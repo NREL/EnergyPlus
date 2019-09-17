@@ -230,7 +230,7 @@ namespace OutputProcessor {
     int NumVarMeterArrays(0); // Current number of Arrays pointing to meters
 
     int NumEnergyMeters(0);     // Current number of Energy Meters
-    Array1D<Real64> MeterValue; // This holds the current timestep value for each meter.
+    EPVector<Real64> MeterValue; // This holds the current timestep value for each meter.
 
     int TimeStepStampReportNbr;             // TimeStep and Hourly Report number
     std::string TimeStepStampReportChr;     // TimeStep and Hourly Report number (character -- for printing)
@@ -280,15 +280,15 @@ namespace OutputProcessor {
 
     // Pointers to the actual TimeStep variables
     std::map<TimeStepType, TimeSteps> TimeValue;
-    Array1D<RealVariableType> RVariableTypes;         // Variable Types structure (use NumOfRVariables to traverse)
-    Array1D<IntegerVariableType> IVariableTypes;      // Variable Types structure (use NumOfIVariables to traverse)
-    Array1D<VariableTypeForDDOutput> DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
+    EPVector<RealVariableType> RVariableTypes;         // Variable Types structure (use NumOfRVariables to traverse)
+    EPVector<IntegerVariableType> IVariableTypes;      // Variable Types structure (use NumOfIVariables to traverse)
+    EPVector<VariableTypeForDDOutput> DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
     Reference<RealVariables> RVariable;
     Reference<IntegerVariables> IVariable;
-    Array1D<ReqReportVariables> ReqRepVars;
-    Array1D<MeterArrayType> VarMeterArrays;
-    Array1D<MeterType> EnergyMeters;
-    Array1D<EndUseCategoryType> EndUseCategory;
+    EPVector<ReqReportVariables> ReqRepVars;
+    EPVector<MeterArrayType> VarMeterArrays;
+    EPVector<MeterType> EnergyMeters;
+    EPVector<EndUseCategoryType> EndUseCategory;
     std::unordered_map<std::string, std::string> UniqueMeterNames;
 
     // Routines tagged on the end of this module:
@@ -865,7 +865,7 @@ namespace OutputProcessor {
         Array1D_string cAlphaArgs(4);
         Array1D_string cAlphaFieldNames(4);
         Array1D_bool lAlphaFieldBlanks(4);
-        Array1D<Real64> rNumericArgs(1);
+        EPVector<Real64> rNumericArgs(1);
         Array1D_string cNumericFieldNames(1);
         Array1D_bool lNumericFieldBlanks(1);
 
@@ -6895,7 +6895,7 @@ void UpdateMeterReporting()
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Loop;
     Array1D_string Alphas(2);
-    Array1D<Real64> Numbers(1);
+    EPVector<Real64> Numbers(1);
     int NumAlpha;
     int NumNumbers;
     int IOStat;

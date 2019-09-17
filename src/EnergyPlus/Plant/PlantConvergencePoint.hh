@@ -56,8 +56,8 @@ namespace DataPlant {
     struct PlantConvergencePoint
     {
         // Members
-        Array1D<Real64> MassFlowRateHistory;
-        Array1D<Real64> TemperatureHistory;
+        EPVector<Real64> MassFlowRateHistory;
+        EPVector<Real64> TemperatureHistory;
 
         // Default Constructor
         PlantConvergencePoint() : MassFlowRateHistory(NumConvergenceHistoryTerms), TemperatureHistory(NumConvergenceHistoryTerms)

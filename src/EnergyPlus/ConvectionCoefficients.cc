@@ -131,7 +131,7 @@ namespace ConvectionCoefficients {
     Real64 const FourFifths(4.0 / 5.0); // 4/5 in highest precision
 
     // Coefficients that modify the convection coeff based on surface roughness
-    Array1D<Real64> const RoughnessMultiplier(6, {2.17, 1.67, 1.52, 1.13, 1.11, 1.0});
+    EPVector<Real64> const RoughnessMultiplier(6, {2.17, 1.67, 1.52, 1.13, 1.11, 1.0});
 
     // parameters for identifying more specific hc model equations, inside face
     int const HcInt_UserValue(200);
@@ -239,8 +239,8 @@ namespace ConvectionCoefficients {
     // Object Data
     InsideFaceAdaptiveConvAlgoStruct InsideFaceAdaptiveConvectionAlgo; // stores rules for Hc model equations
     OutsideFaceAdpativeConvAlgoStruct OutsideFaceAdaptiveConvectionAlgo;
-    Array1D<HcInsideFaceUserCurveStruct> HcInsideUserCurve;
-    Array1D<HcOutsideFaceUserCurveStruct> HcOutsideUserCurve;
+    EPVector<HcInsideFaceUserCurveStruct> HcInsideUserCurve;
+    EPVector<HcOutsideFaceUserCurveStruct> HcOutsideUserCurve;
     RoofGeoCharactisticsStruct RoofGeo;
 
     // Functions
@@ -1152,7 +1152,7 @@ namespace ConvectionCoefficients {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string Alphas(9);
-        Array1D<Real64> Numbers(2);
+        EPVector<Real64> Numbers(2);
         int NumAlphas;
         int NumNumbers;
         int Loop;
@@ -3780,9 +3780,9 @@ namespace ConvectionCoefficients {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static Array1D<Real64> const D(6, {11.58, 12.49, 10.79, 8.23, 10.22, 8.23});
-        static Array1D<Real64> const E(6, {5.894, 4.065, 4.192, 4.00, 3.100, 3.33});
-        static Array1D<Real64> const F(6, {0.0, 0.028, 0.0, -0.057, 0.0, -0.036});
+        static EPVector<Real64> const D(6, {11.58, 12.49, 10.79, 8.23, 10.22, 8.23});
+        static EPVector<Real64> const E(6, {5.894, 4.065, 4.192, 4.00, 3.100, 3.33});
+        static EPVector<Real64> const F(6, {0.0, 0.028, 0.0, -0.057, 0.0, -0.036});
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -4896,8 +4896,8 @@ namespace ConvectionCoefficients {
         Real64 thisAzimuth;
         Real64 thisArea;
         int thisZone;
-        Array1D<Real64> RoofBoundZvals(8);
-        Array1D<Real64> TestDist(4);
+        EPVector<Real64> RoofBoundZvals(8);
+        EPVector<Real64> TestDist(4);
         //  TYPE(Vector), DIMENSION(4) :: BoundSurf
         Real64 surfacearea;
         Real64 BoundTilt;
@@ -10028,7 +10028,7 @@ namespace ConvectionCoefficients {
         Real64 Rex; // Reynolds number
         Real64 x;   // distance to roof edge toward wind direction
         Real64 eta;
-        Array1D<Real64> RfARR(6);
+        EPVector<Real64> RfARR(6);
         Real64 BetaFilm;
 
         // find x, don't know x. avoid time consuming geometry algorithm

@@ -403,7 +403,7 @@ namespace SimAirServingZones {
 
         // SUBROUTINE LOCAL VARIABLE DEFINITIONS
         int NumNumbers;                // number of numbers returned by GetObjectItem
-        Array1D<Real64> Numbers;       // numbers (REAL(r64)s) returned by GetObjectItem
+        EPVector<Real64> Numbers;       // numbers (REAL(r64)s) returned by GetObjectItem
         Array1D_string cNumericFields; // Numeric field names
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
         int NumAlphas;                 // number of strings returned by GetObjectItem
@@ -486,7 +486,7 @@ namespace SimAirServingZones {
         };
 
         // Object Data
-        Array1D<AirUniqueNodes> TestUniqueNodes;
+        EPVector<AirUniqueNodes> TestUniqueNodes;
 
         inputProcessor->getObjectDefMaxArgs("AirLoopHVAC", NumParams, MaxAlphas, MaxNumbers);
         inputProcessor->getObjectDefMaxArgs("ConnectorList", NumParams, NumAlphas, NumNumbers);
@@ -5327,8 +5327,8 @@ namespace SimAirServingZones {
         Real64 RetTempRise;                 // difference between zone return temperature and zone temperature [delta K]
         Real64 SysCoolingEv;                // System level ventilation effectiveness for cooling mode
         Real64 SysHeatingEv;                // System level ventilation effectiveness for heating mode
-        static Array1D<Real64> EvBySysCool; // saved value of SysCoolingEv used in 62.1 tabular report
-        static Array1D<Real64> EvBySysHeat; // saved value of SysHeatingEv used in 62.1 tabular report
+        static EPVector<Real64> EvBySysCool; // saved value of SysCoolingEv used in 62.1 tabular report
+        static EPVector<Real64> EvBySysHeat; // saved value of SysHeatingEv used in 62.1 tabular report
         static Real64 Ep(1.0);              // zone primary air fraction
         static Real64 Er(0.0);              // zone secondary recirculation fraction
         static Real64 Fa(1.0);              // temporary variable used in multi-path VRP calc

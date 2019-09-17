@@ -199,14 +199,14 @@ namespace PlantChillers {
     // Const COP
 
     // Object Data
-    Array1D<ElectricChillerSpecs> ElectricChiller; // dimension to number of machines
-    Array1D<ElectricReportVars> ElectricChillerReport;
-    Array1D<EngineDrivenChillerSpecs> EngineDrivenChiller; // dimension to number of machines
-    Array1D<EngineDrivenReportVars> EngineDrivenChillerReport;
-    Array1D<GTChillerSpecs> GTChiller; // dimension to number of machines
-    Array1D<GasTurbineReportVars> GTChillerReport;
-    Array1D<ConstCOPChillerSpecs> ConstCOPChiller; // dimension to number of machines
-    Array1D<ConstCOPReportVars> ConstCOPChillerReport;
+    EPVector<ElectricChillerSpecs> ElectricChiller; // dimension to number of machines
+    EPVector<ElectricReportVars> ElectricChillerReport;
+    EPVector<EngineDrivenChillerSpecs> EngineDrivenChiller; // dimension to number of machines
+    EPVector<EngineDrivenReportVars> EngineDrivenChillerReport;
+    EPVector<GTChillerSpecs> GTChiller; // dimension to number of machines
+    EPVector<GasTurbineReportVars> GTChillerReport;
+    EPVector<ConstCOPChillerSpecs> ConstCOPChiller; // dimension to number of machines
+    EPVector<ConstCOPReportVars> ConstCOPChillerReport;
 
     // MODULE SUBROUTINES:
 

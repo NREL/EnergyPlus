@@ -78,8 +78,8 @@ namespace DataZoneEnergyDemands {
     // in a zone is simulated
 
     // Object Data
-    Array1D<ZoneSystemDemandData> ZoneSysEnergyDemand;
-    Array1D<ZoneSystemMoistureDemand> ZoneSysMoistureDemand;
+    EPVector<ZoneSystemDemandData> ZoneSysEnergyDemand;
+    EPVector<ZoneSystemMoistureDemand> ZoneSysMoistureDemand;
 
     void clear_state()
     {

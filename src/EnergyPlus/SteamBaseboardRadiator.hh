@@ -71,15 +71,15 @@ namespace SteamBaseboardRadiator {
     extern int NumSteamBaseboards;
     extern int SteamIndex;
 
-    extern Array1D<Real64> QBBSteamRadSource;    // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> QBBSteamRadSrcAvg;    // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone
+    extern EPVector<Real64> QBBSteamRadSource;    // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> QBBSteamRadSrcAvg;    // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone
     // with no source
 
     // Record keeping variables used to calculate QBBRadSrcAvg locally
-    extern Array1D<Real64> LastQBBSteamRadSrc; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastQBBSteamRadSrc; // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     extern Array1D_bool MySizeFlag;
     extern Array1D_bool CheckEquipName;
     extern Array1D_bool SetLoopIndexFlag; // get loop number flag
@@ -120,7 +120,7 @@ namespace SteamBaseboardRadiator {
         Real64 FracRadiant;          // User defined fraction for radiant heat addition
         Real64 FracConvect;          // Fraction for convective heat addition
         Real64 FracDistribPerson;    // Fraction for radiant heat incident on people
-        Array1D<Real64> FracDistribToSurf;
+        EPVector<Real64> FracDistribToSurf;
         Real64 TotPower;   // Convective system impact rate that the heater actually meets [W]
         Real64 Power;      // Maximum heating rate [W]
         Real64 ConvPower;  // Convective heating rate [W]
@@ -166,8 +166,8 @@ namespace SteamBaseboardRadiator {
     };
 
     // Object Data
-    extern Array1D<SteamBaseboardParams> SteamBaseboard;
-    extern Array1D<SteamBaseboardNumericFieldData> SteamBaseboardNumericFields;
+    extern EPVector<SteamBaseboardParams> SteamBaseboard;
+    extern EPVector<SteamBaseboardNumericFieldData> SteamBaseboardNumericFields;
 
     // Functions
 

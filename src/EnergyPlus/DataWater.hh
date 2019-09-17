@@ -146,13 +146,13 @@ namespace DataWater {
         Real64 LastTimeStepVolume;
         Real64 LastTimeStepTemp; // previous temperature of tank water
         int NumWaterSupplies;
-        Array1D<Real64> VdotAvailSupply; // Each supply component has its own term
-        Array1D<Real64> TwaterSupply;    // Each supply component has its own term
+        EPVector<Real64> VdotAvailSupply; // Each supply component has its own term
+        EPVector<Real64> TwaterSupply;    // Each supply component has its own term
         Array1D_string SupplyCompNames;
         Array1D_string SupplyCompTypes;
         int NumWaterDemands;
-        Array1D<Real64> VdotRequestDemand; // each demand componennt has a slot
-        Array1D<Real64> VdotAvailDemand;   // each demand componennt has a slot
+        EPVector<Real64> VdotRequestDemand; // each demand componennt has a slot
+        EPVector<Real64> VdotAvailDemand;   // each demand componennt has a slot
         Array1D_string DemandCompNames;
         Array1D_string DemandCompTypes;
         Real64 VdotFromTank;
@@ -284,9 +284,9 @@ namespace DataWater {
         RainFall; // type of rainfall modeling | design annual rain | rain sched id | nominal annual rain | current rate | current amount
     extern IrrigationDataStruct
         Irrigation; // type of irrigation modeling | Irrigation schedule id | scheduled amount | actual amount | irrigation threshold
-    extern Array1D<StorageTankDataStruct> WaterStorage;
-    extern Array1D<RainfallCollectorDataStruct> RainCollector;
-    extern Array1D<GroundwaterWellDataStruct> GroundwaterWell;
+    extern EPVector<StorageTankDataStruct> WaterStorage;
+    extern EPVector<RainfallCollectorDataStruct> RainCollector;
+    extern EPVector<GroundwaterWellDataStruct> GroundwaterWell;
 
 } // namespace DataWater
 

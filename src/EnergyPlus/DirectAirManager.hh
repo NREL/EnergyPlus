@@ -119,7 +119,7 @@ namespace DirectAirManager {
     };
 
     // Object Data
-    extern Array1D<DirectAirProps> DirectAir;
+    extern EPVector<DirectAirProps> DirectAir;
 
     // Functions
 

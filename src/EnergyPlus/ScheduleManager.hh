@@ -180,10 +180,10 @@ namespace ScheduleManager {
     };
 
     // Object Data
-    extern Array1D<ScheduleTypeData> ScheduleType; // Allowed Schedule Types
-    extern Array1D<DayScheduleData> DaySchedule;   // Day Schedule Storage
-    extern Array1D<WeekScheduleData> WeekSchedule; // Week Schedule Storage
-    extern Array1D<ScheduleData> Schedule;         // Schedule Storage
+    extern EPVector<ScheduleTypeData> ScheduleType; // Allowed Schedule Types
+    extern EPVector<DayScheduleData> DaySchedule;   // Day Schedule Storage
+    extern EPVector<WeekScheduleData> WeekSchedule; // Week Schedule Storage
+    extern EPVector<ScheduleData> Schedule;         // Schedule Storage
 
     // Functions
 

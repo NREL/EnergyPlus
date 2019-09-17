@@ -130,7 +130,7 @@ namespace HVACDXHeatPumpSystem {
     // Update routine to check convergence and update nodes
 
     // Object Data
-    Array1D<DXHeatPumpSystemStruct> DXHeatPumpSystem;
+    EPVector<DXHeatPumpSystemStruct> DXHeatPumpSystem;
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -323,7 +323,7 @@ namespace HVACDXHeatPumpSystem {
         Array1D_string Alphas;           // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D<Real64> Numbers;         // Numeric input items for object
+        EPVector<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
@@ -625,7 +625,7 @@ namespace HVACDXHeatPumpSystem {
         Real64 OutletTempDXCoil; // Actual outlet temperature of the DX cooling coil
 
         int SolFla;             // Flag of solver
-        Array1D<Real64> Par(5); // Parameter array passed to solver
+        EPVector<Real64> Par(5); // Parameter array passed to solver
         bool SensibleLoad;      // True if there is a sensible cooling load on this system
         int FanOpMode;          // Supply air fan operating mode
         // added variables to call variable speed DX coils

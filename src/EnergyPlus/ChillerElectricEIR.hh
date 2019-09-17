@@ -274,8 +274,8 @@ namespace ChillerElectricEIR {
     };
 
     // Object Data
-    extern Array1D<ElectricEIRChillerSpecs> ElectricEIRChiller; // Dimension to number of machines
-    extern Array1D<ReportEIRVars> ElectricEIRChillerReport;
+    extern EPVector<ElectricEIRChillerSpecs> ElectricEIRChiller; // Dimension to number of machines
+    extern EPVector<ReportEIRVars> ElectricEIRChillerReport;
 
     // Functions
     void clear_state();

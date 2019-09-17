@@ -191,7 +191,7 @@ namespace PlantHeatExchangerFluidToFluid {
     };
 
     // Object Data
-    extern Array1D<HeatExchangerStruct> FluidHX;
+    extern EPVector<HeatExchangerStruct> FluidHX;
 
     // Functions
 

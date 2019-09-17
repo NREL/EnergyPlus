@@ -106,7 +106,7 @@ namespace ICEngineElectricGenerator {
         int ExhaustTempCurve;             // Curve Index for Exhaust Gas Temp to Fuel Energy Input Coeffs Poly Fit
         int ErrExhaustTempIndex;          // error index for temp curve
         Real64 UA;                        // (UACDC) exhaust gas Heat Exchanger UA to Capacity
-        Array1D<Real64> UACoef;           // Heat Exchanger UA Coeffs Poly Fit
+        EPVector<Real64> UACoef;           // Heat Exchanger UA Coeffs Poly Fit
         Real64 MaxExhaustperPowerOutput;  // MAX EXHAUST FLOW PER W DSL POWER OUTPUT COEFF
         Real64 DesignMinExitGasTemp;      // Steam Saturation Temperature
         Real64 FuelHeatingValue;          // Heating Value of Fuel in kJ/kg
@@ -186,8 +186,8 @@ namespace ICEngineElectricGenerator {
     };
 
     // Object Data
-    extern Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
-    extern Array1D<ReportVars> ICEngineGeneratorReport;
+    extern EPVector<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
+    extern EPVector<ReportVars> ICEngineGeneratorReport;
 
     // Functions
 

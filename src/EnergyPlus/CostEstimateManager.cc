@@ -591,7 +591,7 @@ namespace CostEstimateManager {
         std::string ThisConstructStr;
 
         Array1D_bool uniqueSurfMask;
-        Array1D<Real64> SurfMultipleARR;
+        EPVector<Real64> SurfMultipleARR;
         int surf;     // do-loop counter for checking for surfaces for uniqueness
         int thisCoil; // index of named coil in its derived type
         bool WildcardObjNames;

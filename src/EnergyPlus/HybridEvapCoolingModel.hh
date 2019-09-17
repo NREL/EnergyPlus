@@ -140,7 +140,7 @@ namespace HybridEvapCoolingModel {
         bool ValidPointer(int curve_pointer);
         bool ValidateArrays(Array1D_string Alphas,
                             Array1D_string cAlphaFields,
-                            Array1D<Real64> Numbers,
+                            EPVector<Real64> Numbers,
                             Array1D_string cNumericFields,
                             std::string cCurrentModuleObject);
         bool ParseMode(int ModeCounter,
@@ -148,9 +148,9 @@ namespace HybridEvapCoolingModel {
                        Real64 correction,
                        Array1D_string Alphas,
                        Array1D_string cAlphaFields,
-                       Array1D<Real64> Numbers,
+                       EPVector<Real64> Numbers,
                        Array1D_string cNumericFields,
-                       Array1D<bool> lAlphaBlanks,
+                       EPVector<bool> lAlphaBlanks,
                        std::string cCurrentModuleObject);
         void InitializeCurve(int curveType, int CurveID);
         Real64 CalculateCurveVal(Real64 X_1, Real64 X_2, Real64 X_3, Real64 X_4, Real64 X_5, Real64 X_6, int curve_ID);
@@ -373,9 +373,9 @@ namespace HybridEvapCoolingModel {
                                             Real64 LatentRoomORZone);
         bool ParseMode(Array1D_string Alphas,
                        Array1D_string cAlphaFields,
-                       Array1D<Real64> Numbers,
+                       EPVector<Real64> Numbers,
                        Array1D_string cNumericFields,
-                       Array1D<bool> lAlphaBlanks,
+                       EPVector<bool> lAlphaBlanks,
                        std::string cCurrentModuleObject);
         void
         doStep(Real64 RequestedLoad, Real64 ZoneHeatingLoad, Real64 OutputRequiredToHumidify, Real64 OutputRequiredToDehumidify, Real64 DesignMinVR);

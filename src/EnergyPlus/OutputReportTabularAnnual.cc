@@ -98,7 +98,7 @@ namespace OutputReportTabularAnnual {
         int numAlphas;            // Number of elements in the alpha array
         int numNums;              // Number of elements in the numeric array
         Array1D_string alphArray; // character string data
-        Array1D<Real64> numArray; // numeric data
+        EPVector<Real64> numArray; // numeric data
         int IOStat;               // IO Status when calling get input subroutine
         // static bool ErrorsFound( false );
         int objCount(0);

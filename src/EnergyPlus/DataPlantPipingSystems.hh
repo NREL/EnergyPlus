@@ -233,7 +233,7 @@ namespace DataPlantPipingSystems {
     struct CartesianPipeCellInformation // Specialized cell information only used by cells which contain pipes
     {
         // Members
-        Array1D<RadialCellInformation> Soil;
+        EPVector<RadialCellInformation> Soil;
         RadialCellInformation Insulation;
         RadialCellInformation Pipe;
         FluidCellInformation Fluid;
@@ -362,7 +362,7 @@ namespace DataPlantPipingSystems {
         Real64 Min;
         Real64 Max;
         int RegionType; // From Enum: RegionType
-        Array1D<Real64> CellWidths;
+        EPVector<Real64> CellWidths;
 
         // Default Constructor
         GridRegion()
@@ -467,7 +467,7 @@ namespace DataPlantPipingSystems {
         Point3DReal Centroid;
         int CellType; // From Enum: CellType
         int PipeIndex;
-        Array1D<DirectionNeighbor_Dictionary> NeighborInformation;
+        EPVector<DirectionNeighbor_Dictionary> NeighborInformation;
         CartesianPipeCellInformation PipeCellData;
 
         // Default Constructor
@@ -580,7 +580,7 @@ namespace DataPlantPipingSystems {
     struct ReportingInformation
     {
         // Members
-        Array1D<DirectionReal_Dictionary> SurfaceHeatTransfer;
+        EPVector<DirectionReal_Dictionary> SurfaceHeatTransfer;
         Real64 TotalBoundaryHeatTransfer;
         Real64 EnergyStoredInCells;
         Real64 AverageSurfaceTemperature;
@@ -603,9 +603,9 @@ namespace DataPlantPipingSystems {
     struct MeshPartitions
     {
         // Members
-        Array1D<MeshPartition> X;
-        Array1D<MeshPartition> Y;
-        Array1D<MeshPartition> Z;
+        EPVector<MeshPartition> X;
+        EPVector<MeshPartition> Y;
+        EPVector<MeshPartition> Z;
 
         // Default Constructor
         MeshPartitions()
@@ -705,7 +705,7 @@ namespace DataPlantPipingSystems {
         BaseThermalPropertySet PipeProperties;
         BaseThermalPropertySet InsulationProperties;
         // A list of 3d cell indices that span the entire length of this pipe circuit (useful for reporting)
-        Array1D<Point3DInteger> ListOfCircuitPoints;
+        EPVector<Point3DInteger> ListOfCircuitPoints;
         // Flags
         bool CheckEquipName;
         bool NeedToFindOnPlantLoop;
@@ -805,7 +805,7 @@ namespace DataPlantPipingSystems {
         ReportingInformation Reporting;
         bool HasBasement;
         // Zone coupled variables
-        Array1D<ZoneCoupledSurfaceData> ZoneCoupledSurfaces;
+        EPVector<ZoneCoupledSurfaceData> ZoneCoupledSurfaces;
         int ZoneCoupledOSCMIndex;
         Real64 PerimeterOffset;
         bool SlabInGradeFlag;
@@ -870,9 +870,9 @@ namespace DataPlantPipingSystems {
     };
 
     // Object Data
-    extern Array1D<FullDomainStructureInfo> PipingSystemDomains;
-    extern Array1D<PipeCircuitInfo> PipingSystemCircuits;
-    extern Array1D<PipeSegmentInfo> PipingSystemSegments;
+    extern EPVector<FullDomainStructureInfo> PipingSystemDomains;
+    extern EPVector<PipeCircuitInfo> PipingSystemCircuits;
+    extern EPVector<PipeSegmentInfo> PipingSystemSegments;
 
     //*********************************************************************************************!
 

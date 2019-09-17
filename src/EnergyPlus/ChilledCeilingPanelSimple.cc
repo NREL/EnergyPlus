@@ -121,14 +121,14 @@ namespace CoolingPanelSimple {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumCoolingPanels(0);
-    Array1D<Real64> CoolingPanelSource;   // Need to keep the last value in case we are still iterating
-    Array1D<Real64> CoolingPanelSrcAvg;   // Need to keep the last value in case we are still iterating
-    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+    EPVector<Real64> CoolingPanelSource;   // Need to keep the last value in case we are still iterating
+    EPVector<Real64> CoolingPanelSrcAvg;   // Need to keep the last value in case we are still iterating
+    EPVector<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
 
     // Record keeping variables used to calculate CoolingPanelSrcAvg locally
-    Array1D<Real64> LastCoolingPanelSrc; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastSysTimeElapsed;  // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastTimeStepSys;     // Need to keep the last value in case we are still iterating
+    EPVector<Real64> LastCoolingPanelSrc; // Need to keep the last value in case we are still iterating
+    EPVector<Real64> LastSysTimeElapsed;  // Need to keep the last value in case we are still iterating
+    EPVector<Real64> LastTimeStepSys;     // Need to keep the last value in case we are still iterating
     Array1D_bool CheckEquipName;
     Array1D_bool SetLoopIndexFlag; // get loop number flag
 
@@ -141,8 +141,8 @@ namespace CoolingPanelSimple {
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE Simple Chilled Ceiling Panel
     // Object Data
-    Array1D<CoolingPanelParams> CoolingPanel;
-    Array1D<CoolingPanelSysNumericFieldData> CoolingPanelSysNumericFields;
+    EPVector<CoolingPanelParams> CoolingPanel;
+    EPVector<CoolingPanelSysNumericFieldData> CoolingPanelSysNumericFields;
 
     // Functions
 

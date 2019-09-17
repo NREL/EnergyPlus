@@ -279,7 +279,7 @@ namespace ZoneAirLoopEquipmentManager {
         int NumNums;
         int IOStat;
         static Array1D_string AlphArray(5);      // Tuned Made static
-        static Array1D<Real64> NumArray(2);      // Tuned Made static
+        static EPVector<Real64> NumArray(2);      // Tuned Made static
         static bool ErrorsFound(false);          // If errors detected in input
         bool IsNotOK;                            // Flag to verify name
         static Array1D_string cAlphaFields(5);   // Alpha field names //Tuned Made static

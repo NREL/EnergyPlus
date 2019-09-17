@@ -257,8 +257,8 @@ namespace SystemAvailabilityManager {
         bool FirstTimeATGFlag;
         bool OverNightStartFlag; // Flag to indicate the optimum start starts before mid night.
         bool OSReportVarFlag;
-        Array1D<Real64> AdaTempGradTrdHeat; // Heating temp gradient for previous days
-        Array1D<Real64> AdaTempGradTrdCool; // Cooling temp gradient for previous days
+        EPVector<Real64> AdaTempGradTrdHeat; // Heating temp gradient for previous days
+        EPVector<Real64> AdaTempGradTrdCool; // Cooling temp gradient for previous days
         Real64 AdaTempGradHeat;
         Real64 AdaTempGradCool;
         Real64 ATGUpdateTime1;
@@ -434,21 +434,21 @@ namespace SystemAvailabilityManager {
     };
 
     // Object Data
-    extern Array1D<DefineSchedSysAvailManager> SchedSysAvailMgrData;
-    extern Array1D<DefineSchedOnSysAvailManager> SchedOnSysAvailMgrData;
-    extern Array1D<DefineSchedOffSysAvailManager> SchedOffSysAvailMgrData;
-    extern Array1D<DefineNightCycSysAvailManager> NCycSysAvailMgrData;
-    extern Array1D<DefineDiffTSysAvailManager> DiffTSysAvailMgrData;
-    extern Array1D<DefineHiLoSysAvailManager> HiTurnOffSysAvailMgrData;
-    extern Array1D<DefineHiLoSysAvailManager> HiTurnOnSysAvailMgrData;
-    extern Array1D<DefineHiLoSysAvailManager> LoTurnOffSysAvailMgrData;
-    extern Array1D<DefineHiLoSysAvailManager> LoTurnOnSysAvailMgrData;
-    extern Array1D<DefineNightVentSysAvailManager> NVentSysAvailMgrData;
-    extern Array1D<DefineHybridVentSysAvailManager> HybridVentSysAvailMgrData;
-    extern Array1D<SysAvailManagerList> SysAvailMgrListData;
-    extern Array1D<DefineOptStartSysAvailManager> OptStartSysAvailMgrData;
-    extern Array1D<DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffCooling;
-    extern Array1D<DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffHeating;
+    extern EPVector<DefineSchedSysAvailManager> SchedSysAvailMgrData;
+    extern EPVector<DefineSchedOnSysAvailManager> SchedOnSysAvailMgrData;
+    extern EPVector<DefineSchedOffSysAvailManager> SchedOffSysAvailMgrData;
+    extern EPVector<DefineNightCycSysAvailManager> NCycSysAvailMgrData;
+    extern EPVector<DefineDiffTSysAvailManager> DiffTSysAvailMgrData;
+    extern EPVector<DefineHiLoSysAvailManager> HiTurnOffSysAvailMgrData;
+    extern EPVector<DefineHiLoSysAvailManager> HiTurnOnSysAvailMgrData;
+    extern EPVector<DefineHiLoSysAvailManager> LoTurnOffSysAvailMgrData;
+    extern EPVector<DefineHiLoSysAvailManager> LoTurnOnSysAvailMgrData;
+    extern EPVector<DefineNightVentSysAvailManager> NVentSysAvailMgrData;
+    extern EPVector<DefineHybridVentSysAvailManager> HybridVentSysAvailMgrData;
+    extern EPVector<SysAvailManagerList> SysAvailMgrListData;
+    extern EPVector<DefineOptStartSysAvailManager> OptStartSysAvailMgrData;
+    extern EPVector<DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffCooling;
+    extern EPVector<DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffHeating;
 
     // Functions
     void clear_state();

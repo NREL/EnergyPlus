@@ -143,15 +143,15 @@ namespace SteamBaseboardRadiator {
     int NumSteamBaseboards(0);
     int SteamIndex(0);
 
-    Array1D<Real64> QBBSteamRadSource;    // Need to keep the last value in case we are still iterating
-    Array1D<Real64> QBBSteamRadSrcAvg;    // Need to keep the last value in case we are still iterating
-    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone
+    EPVector<Real64> QBBSteamRadSource;    // Need to keep the last value in case we are still iterating
+    EPVector<Real64> QBBSteamRadSrcAvg;    // Need to keep the last value in case we are still iterating
+    EPVector<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone
     // with no source
 
     // Record keeping variables used to calculate QBBRadSrcAvg locally
-    Array1D<Real64> LastQBBSteamRadSrc; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    EPVector<Real64> LastQBBSteamRadSrc; // Need to keep the last value in case we are still iterating
+    EPVector<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    EPVector<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
     Array1D_bool SetLoopIndexFlag; // get loop number flag
@@ -159,8 +159,8 @@ namespace SteamBaseboardRadiator {
     // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
     // Object Data
-    Array1D<SteamBaseboardParams> SteamBaseboard;
-    Array1D<SteamBaseboardNumericFieldData> SteamBaseboardNumericFields;
+    EPVector<SteamBaseboardParams> SteamBaseboard;
+    EPVector<SteamBaseboardNumericFieldData> SteamBaseboardNumericFields;
 
     // Functions
 

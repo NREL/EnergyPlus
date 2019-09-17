@@ -175,7 +175,7 @@ namespace ThermalEN673Calc {
 
         /// Gaps:
 
-        Array1D<Real64> rs(maxlay3);
+        EPVector<Real64> rs(maxlay3);
         Real64 rtot;
         Real64 sft;
 
@@ -289,7 +289,7 @@ namespace ThermalEN673Calc {
         Real64 Tm;
         Real64 diff;
         Real64 Rg;
-        Array1D<Real64> dT(maxlay1);
+        EPVector<Real64> dT(maxlay1);
         int i;
         int j;
         int iter;
@@ -298,7 +298,7 @@ namespace ThermalEN673Calc {
         Real64 con;
         Real64 cp;
         Real64 pr;
-        Array1D<Real64> Gr(maxlay);
+        EPVector<Real64> Gr(maxlay);
         Real64 A;
         Real64 n;
         Real64 hrin;
@@ -307,7 +307,7 @@ namespace ThermalEN673Calc {
 
         Real64 const eps(1.0e-4); // set iteration accuracy
 
-        Array1D<Real64> frctg(maxgas);
+        EPVector<Real64> frctg(maxgas);
         Array1D_int ipropg(maxgas);
 
         // jel..hrin is 4.4 for standard clear glass:

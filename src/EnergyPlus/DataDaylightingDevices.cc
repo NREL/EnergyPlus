@@ -94,8 +94,8 @@ namespace DataDaylightingDevices {
     int NumOfShelf(0);    // Number of daylighting shelves in the input file
 
     // Object Data
-    Array1D<TDDPipeData> TDDPipe;
-    Array1D<ShelfData> Shelf;
+    EPVector<TDDPipeData> TDDPipe;
+    EPVector<ShelfData> Shelf;
 
 } // namespace DataDaylightingDevices
 

@@ -153,7 +153,7 @@ namespace HVACSingleDuctInduc {
     // SUBROUTINE SPECIFICATIONS FOR MODULE HVACSingleDuctInduc:
 
     // Object Data
-    Array1D<IndUnitData> IndUnit;
+    EPVector<IndUnitData> IndUnit;
 
     void clear_state()
     {
@@ -294,7 +294,7 @@ namespace HVACSingleDuctInduc {
         Array1D_string Alphas;           // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D<Real64> Numbers;         // Numeric input items for object
+        EPVector<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int NumAlphas(0);         // Number of Alphas for each GetObjectItem call
@@ -1138,7 +1138,7 @@ namespace HVACSingleDuctInduc {
         Real64 PriAirMassFlow;   // primary air mass flow rate [kg/s]
         Real64 SecAirMassFlow;   // secondary air mass flow rate [kg/s]
         Real64 InducRat;         // Induction Ratio
-        Array1D<Real64> Par(7);
+        EPVector<Real64> Par(7);
         int SolFlag;
         Real64 ErrTolerance;
         int HWOutletNode;

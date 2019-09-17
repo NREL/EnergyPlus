@@ -206,10 +206,10 @@ namespace IceThermalStorage {
     // General routine
 
     // Object Data
-    Array1D<IceStorageSpecs> IceStorage;        // dimension to number of machines
-    Array1D<ReportVars> IceStorageReport;       // dimension to number of machines
-    Array1D<DetailedIceStorageData> DetIceStor; // Derived type for detailed ice storage model
-    Array1D<IceStorageMapping> IceStorageTypeMap;
+    EPVector<IceStorageSpecs> IceStorage;        // dimension to number of machines
+    EPVector<ReportVars> IceStorageReport;       // dimension to number of machines
+    EPVector<DetailedIceStorageData> DetIceStor; // Derived type for detailed ice storage model
+    EPVector<IceStorageMapping> IceStorageTypeMap;
 
     //*************************************************************************
 

@@ -82,7 +82,7 @@ namespace DataPlant {
         Real64 Capacity;
         Real64 Efficiency;
         int OpMode;
-        Array1D<MeterData> MeteredVar; // Index of energy output report data
+        EPVector<MeterData> MeteredVar; // Index of energy output report data
         int AirSysToPlantPtr;          // 0=No plant connection, >0 = index to AirSysToPlant array
 
         // Default Constructor
@@ -128,8 +128,8 @@ namespace DataPlant {
         Real64 PeakPlantSupplyOtherEff;
         int AirSysToPlantPtr; // 0=No plant connection, >0 = index to AirSysToPlant array
         Real64 LoopLoadFrac;
-        Array1D<MeterData> MeteredVar;           // Index of energy output report data
-        Array1D<SubSubcomponentData> SubSubComp; // Component list
+        EPVector<MeterData> MeteredVar;           // Index of energy output report data
+        EPVector<SubSubcomponentData> SubSubComp; // Component list
 
         // Default Constructor
         SubcomponentData()

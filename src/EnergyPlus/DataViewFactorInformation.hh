@@ -72,15 +72,15 @@ namespace DataViewFactorInformation {
         int NumOfSurfaces;                  // Number of surfaces in the enclosure
         Array2D<Real64> F;                  // View Factors
         Array2D<Real64> ScriptF;            // Hottel's Script F //Tuned Transposed
-        Array1D<Real64> Area;               // Surface area
-        Array1D<Real64> Emissivity;         // Surface emissivity
-        Array1D<Real64> Azimuth;            // Azimuth angle of the surface (in degrees)
-        Array1D<Real64> Tilt;               // Tilt angle of the surface (in degrees)
+        EPVector<Real64> Area;               // Surface area
+        EPVector<Real64> Emissivity;         // Surface emissivity
+        EPVector<Real64> Azimuth;            // Azimuth angle of the surface (in degrees)
+        EPVector<Real64> Tilt;               // Tilt angle of the surface (in degrees)
         Array1D_int SurfacePtr;             // Surface ALLOCATABLE (to Surface derived type)
         Real64 FloorArea;                   // Floor area of zone(s) in radiant enclosure
         Real64 ExtWindowArea;               // Exterior window area
         Real64 TotalSurfArea;               // Total surface area
-        Array1D<Real64> SolAbsorptance;     // Surface solar absorptance
+        EPVector<Real64> SolAbsorptance;     // Surface solar absorptance
 
         // Default Constructor
         ZoneViewFactorInformation() : NumOfSurfaces(0), FloorArea(0.0), ExtWindowArea(0.0), TotalSurfArea(0.0)
@@ -88,8 +88,8 @@ namespace DataViewFactorInformation {
         }
     };
 
-    extern Array1D<ZoneViewFactorInformation> ZoneRadiantInfo;
-    extern Array1D<ZoneViewFactorInformation> ZoneSolarInfo;
+    extern EPVector<ZoneViewFactorInformation> ZoneRadiantInfo;
+    extern EPVector<ZoneViewFactorInformation> ZoneSolarInfo;
 
     void clear_state();
 

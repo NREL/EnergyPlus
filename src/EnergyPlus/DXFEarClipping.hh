@@ -82,7 +82,7 @@ namespace DXFEarClipping {
 
     int Triangulate(int const nsides, // number of sides to polygon
                     Array1A<Vector> polygon,
-                    Array1D<dTriangle> &outtriangles,
+                    EPVector<dTriangle> &outtriangles,
                     Real64 const surfazimuth,    // surface azimuth angle (outward facing normal)
                     Real64 const surftilt,       // surface tilt angle
                     std::string const &surfname, // surface name (for error messages)

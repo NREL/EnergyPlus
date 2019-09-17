@@ -290,8 +290,8 @@ namespace FanCoilUnits {
     };
 
     // Object Data
-    extern Array1D<FanCoilData> FanCoil;
-    extern Array1D<FanCoilNumericFieldData> FanCoilNumericFields;
+    extern EPVector<FanCoilData> FanCoil;
+    extern EPVector<FanCoilNumericFieldData> FanCoilNumericFields;
 
     // Functions
 

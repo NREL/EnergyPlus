@@ -296,7 +296,7 @@ namespace HVACUnitaryBypassVAV {
     };
 
     // Object Data
-    extern Array1D<CBVAVData> CBVAV;
+    extern EPVector<CBVAVData> CBVAV;
     extern bool GetInputFlag; // Flag set to make sure you get input once
 
     // Functions

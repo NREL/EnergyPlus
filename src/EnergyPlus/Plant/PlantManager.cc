@@ -316,7 +316,7 @@ namespace EnergyPlus {
             int PlantLoopNum;
             int CondLoopNum;
             Array1D_string Alpha(18); // dimension to num of alpha fields in input
-            Array1D<Real64> Num(30);  // dimension to num of numeric data fields in input
+            EPVector<Real64> Num(30);  // dimension to num of numeric data fields in input
             static bool ErrorsFound(false);
             std::string LoadingScheme;
             bool ErrFound;

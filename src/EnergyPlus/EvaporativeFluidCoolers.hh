@@ -284,9 +284,9 @@ namespace EvaporativeFluidCoolers {
     };
 
     // Object Data
-    extern Array1D<EvapFluidCoolerspecs> SimpleEvapFluidCooler;           // dimension to number of machines
-    extern Array1D<EvapFluidCoolerInletConds> SimpleEvapFluidCoolerInlet; // inlet conditions
-    extern Array1D<ReportVars> SimpleEvapFluidCoolerReport;               // report variables
+    extern EPVector<EvapFluidCoolerspecs> SimpleEvapFluidCooler;           // dimension to number of machines
+    extern EPVector<EvapFluidCoolerInletConds> SimpleEvapFluidCoolerInlet; // inlet conditions
+    extern EPVector<ReportVars> SimpleEvapFluidCoolerReport;               // report variables
 
     // Functions
 

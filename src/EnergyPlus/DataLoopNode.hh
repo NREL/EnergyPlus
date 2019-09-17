@@ -293,10 +293,10 @@ namespace DataLoopNode {
     };
 
     // Object Data
-    extern Array1D<NodeData> Node; // dim to num nodes in SimHVAC
+    extern EPVector<NodeData> Node; // dim to num nodes in SimHVAC
     extern NodeData DefaultNodeValues;
-    extern Array1D<MoreNodeData> MoreNodeInfo;
-    extern Array1D<MarkedNodeData> MarkedNode;
+    extern EPVector<MoreNodeData> MoreNodeInfo;
+    extern EPVector<MarkedNodeData> MarkedNode;
 
     // Clears the global data in DataLoopNode.
     // Needed for unit tests, should not be normally called.

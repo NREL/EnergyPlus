@@ -133,8 +133,8 @@ namespace WindowComplexManager {
     };
 
     // Object Data
-    extern Array1D<BasisStruct> BasisList;
-    extern Array1D<WindowIndex> WindowList;
+    extern EPVector<BasisStruct> BasisList;
+    extern EPVector<WindowIndex> WindowList;
     extern Array2D<WindowStateIndex> WindowStateList;
 
     // Functions

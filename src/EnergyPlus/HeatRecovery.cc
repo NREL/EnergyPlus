@@ -188,11 +188,11 @@ namespace HeatRecovery {
     // External function calls
 
     // Object Data
-    Array1D<HeatExchCond> ExchCond;
+    EPVector<HeatExchCond> ExchCond;
     std::unordered_map<std::string, std::string> HeatExchangerUniqueNames;
-    Array1D<BalancedDesDehumPerfData> BalDesDehumPerfData;
-    Array1D<HeatExchCondNumericFieldData> HeatExchCondNumericFields;
-    Array1D<HeatExchCondNumericFieldData> BalDesDehumPerfNumericFields;
+    EPVector<BalancedDesDehumPerfData> BalDesDehumPerfData;
+    EPVector<HeatExchCondNumericFieldData> HeatExchCondNumericFields;
+    EPVector<HeatExchCondNumericFieldData> BalDesDehumPerfNumericFields;
 
     // Functions
 
@@ -3494,7 +3494,7 @@ namespace HeatRecovery {
         int SolFla;               // Flag of solver
         static Real64 NTU0(0.0);  // lower bound for NTU
         static Real64 NTU1(50.0); // upper bound for NTU
-        Array1D<Real64> Par(2);
+        EPVector<Real64> Par(2);
 
         Par(1) = Eps;
         Par(2) = Z;

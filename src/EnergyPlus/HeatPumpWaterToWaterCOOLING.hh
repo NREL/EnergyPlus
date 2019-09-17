@@ -170,7 +170,7 @@ namespace HeatPumpWaterToWaterCOOLING {
     };
 
     // Object Data
-    extern Array1D<GshpPeCoolingSpecs> GSHP; // dimension to number of machines
+    extern EPVector<GshpPeCoolingSpecs> GSHP; // dimension to number of machines
 
     void clear_state();
 

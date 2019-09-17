@@ -154,8 +154,8 @@ namespace ChillerAbsorption {
     // SUBROUTINE SPECIFICATIONS FOR MODULE:
 
     // Object Data
-    Array1D<BLASTAbsorberSpecs> BLASTAbsorber; // dimension to number of machines
-    Array1D<ReportVars> BLASTAbsorberReport;
+    EPVector<BLASTAbsorberSpecs> BLASTAbsorber; // dimension to number of machines
+    EPVector<ReportVars> BLASTAbsorberReport;
 
     // MODULE SUBROUTINES:
 
@@ -1648,8 +1648,8 @@ namespace ChillerAbsorption {
         static std::string const RoutineName("CalcBLASTAbsorberModel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D<Real64> SteamLoadFactor(3);    // coefficients to poly curve fit
-        Array1D<Real64> ElectricLoadFactor(3); // coefficients to poly curve fit
+        EPVector<Real64> SteamLoadFactor(3);    // coefficients to poly curve fit
+        EPVector<Real64> ElectricLoadFactor(3); // coefficients to poly curve fit
         Real64 MinPartLoadRat;                 // min allowed operating frac full load
         Real64 MaxPartLoadRat;                 // max allowed operating frac full load
         Real64 TempCondIn;                     // C - (BLAST ADJTC(1)The design secondary loop fluid

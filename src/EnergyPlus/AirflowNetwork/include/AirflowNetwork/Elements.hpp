@@ -157,10 +157,10 @@ namespace AirflowNetwork {
     extern int AirflowNetworkNumOfZones;    // The number of zones for multizone calculation
 
     extern bool RollBackFlag;                         // Roll back flag when system time step down shifting
-    extern Array1D<Real64> ANZT;                      // Local zone air temperature for roll back use
-    extern Array1D<Real64> ANZW;                      // Local zone air humidity ratio for roll back use
-    extern Array1D<Real64> ANCO;                      // Local zone air CO2 for roll back use
-    extern Array1D<Real64> ANGC;                      // Local zone air generic contaminant for roll back use
+    extern EPVector<Real64> ANZT;                      // Local zone air temperature for roll back use
+    extern EPVector<Real64> ANZW;                      // Local zone air humidity ratio for roll back use
+    extern EPVector<Real64> ANCO;                      // Local zone air CO2 for roll back use
+    extern EPVector<Real64> ANGC;                      // Local zone air generic contaminant for roll back use
     extern int AirflowNetworkNumOfExhFan;             // Number of zone exhaust fans
     extern Array1D_bool AirflowNetworkZoneExhaustFan; // Logical to use zone exhaust fans
     extern bool AirflowNetworkFanActivated;           // Supply fan activation flag
@@ -595,7 +595,7 @@ namespace AirflowNetwork {
     struct DeltaCpProp
     {
         // Members
-        Array1D<Real64> WindDir; // Wind direction
+        EPVector<Real64> WindDir; // Wind direction
 
         // Default Constructor
         DeltaCpProp()
@@ -821,7 +821,7 @@ namespace AirflowNetwork {
         Real64 Pshut;          // Shutoff pressure at Q=0
         Real64 TranRat;        // Flow coefficient at laminar/turbulent transition
         int n;                 // Number of ranges for fan performance curve
-        Array1D<Real64> Coeff; // Coefficients of fan performance curve.
+        EPVector<Real64> Coeff; // Coefficients of fan performance curve.
         // Each range has a min flow rate and 4 coefficients
 
         // Default Constructor
@@ -1282,7 +1282,7 @@ namespace AirflowNetwork {
         std::string LinkageName;
         Real64 DuctExposureFraction;
         Real64 DuctEmittance;
-        Array1D<LinkageSurfaceProp> LinkageSurfaceData;
+        EPVector<LinkageSurfaceProp> LinkageSurfaceData;
         int ObjectNum;
         Real64 QRad;
         Real64 QConv;
@@ -1294,12 +1294,12 @@ namespace AirflowNetwork {
 
     // Object Data
     extern EPVector<AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
-    extern Array1D<AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
-    extern Array1D<AirflowNetworkExchangeProp> AirflowNetworkExchangeData;
-    extern Array1D<AirflowNetworkExchangeProp> AirflowNetworkMultiExchangeData;
-    extern Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport;
-    extern Array1D<AirflowNetworkNodeReportData> AirflowNetworkNodeReport;
-    extern Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport1;
+    extern EPVector<AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
+    extern EPVector<AirflowNetworkExchangeProp> AirflowNetworkExchangeData;
+    extern EPVector<AirflowNetworkExchangeProp> AirflowNetworkMultiExchangeData;
+    extern EPVector<AirflowNetworkLinkReportData> AirflowNetworkLinkReport;
+    extern EPVector<AirflowNetworkNodeReportData> AirflowNetworkNodeReport;
+    extern EPVector<AirflowNetworkLinkReportData> AirflowNetworkLinkReport1;
     extern AirflowNetworkSimuProp
         AirflowNetworkSimu; // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr
                             // field | CP Array name at WPCCntr = "INPUT" | Building type | Height Selection | Maximum number of iteration |
@@ -1309,39 +1309,39 @@ namespace AirflowNetwork {
                             // error count during HVAC system operation | Exterior large opening error index during HVAC system operation | Large
                             // opening error count at Open factor > 1.0 | Large opening error error index at Open factor > 1.0 | Initialization flag
                             // type
-    extern Array1D<AirflowNetworkNodeProp> AirflowNetworkNodeData;
-    extern Array1D<AirflowNetworkCompProp> AirflowNetworkCompData;
-    extern Array1D<AirflowNetworkLinkageProp> AirflowNetworkLinkageData;
-    extern Array1D<MultizoneZoneProp> MultizoneZoneData;
-    extern Array1D<MultizoneSurfaceProp> MultizoneSurfaceData;
-    extern Array1D<DetailedOpening> MultizoneCompDetOpeningData;
-    extern Array1D<SimpleOpening> MultizoneCompSimpleOpeningData;
-    extern Array1D<HorizontalOpening> MultizoneCompHorOpeningData;
-    // extern Array1D<ReferenceConditions> MultizoneSurfaceStdConditionsCrackData;
-    extern Array1D<SurfaceCrack> MultizoneSurfaceCrackData;
-    extern Array1D<EffectiveLeakageArea> MultizoneSurfaceELAData;
-    extern Array1D<MultizoneExternalNodeProp> MultizoneExternalNodeData;
-    extern Array1D<DeltaCpProp> DeltaCp;
-    extern Array1D<DeltaCpProp> EPDeltaCP;
-    extern Array1D<ZoneExhaustFan> MultizoneCompExhaustFanData;
-    extern Array1D<IntraZoneNodeProp> IntraZoneNodeData;       // Intra zone data set
-    extern Array1D<IntraZoneLinkageProp> IntraZoneLinkageData; // Intra zone linkage adat set
-    extern Array1D<DisSysNodeProp> DisSysNodeData;
-    extern Array1D<DuctLeak> DisSysCompLeakData;
-    extern Array1D<EffectiveLeakageRatio> DisSysCompELRData;
-    extern Array1D<Duct> DisSysCompDuctData;
-    extern Array1D<Damper> DisSysCompDamperData;
-    extern Array1D<ConstantVolumeFan> DisSysCompCVFData;
-    extern Array1D<DetailedFan> DisSysCompDetFanData;
-    extern Array1D<DisSysCompCoilProp> DisSysCompCoilData;
-    extern Array1D<DisSysCompHXProp> DisSysCompHXData;
-    extern Array1D<DisSysCompTermUnitProp> DisSysCompTermUnitData;
-    extern Array1D<ConstantPressureDrop> DisSysCompCPDData;
-    extern Array1D<AiflowNetworkReportProp> AirflowNetworkReportData;
-    extern Array1D<PressureControllerProp> PressureControllerData;
-    extern Array1D<OutdoorAirFan> DisSysCompOutdoorAirData;
-    extern Array1D<ReliefFlow> DisSysCompReliefAirData;
-    extern Array1D<AirflowNetworkLinkageViewFactorProp> AirflowNetworkLinkageViewFactorData;
+    extern EPVector<AirflowNetworkNodeProp> AirflowNetworkNodeData;
+    extern EPVector<AirflowNetworkCompProp> AirflowNetworkCompData;
+    extern EPVector<AirflowNetworkLinkageProp> AirflowNetworkLinkageData;
+    extern EPVector<MultizoneZoneProp> MultizoneZoneData;
+    extern EPVector<MultizoneSurfaceProp> MultizoneSurfaceData;
+    extern EPVector<DetailedOpening> MultizoneCompDetOpeningData;
+    extern EPVector<SimpleOpening> MultizoneCompSimpleOpeningData;
+    extern EPVector<HorizontalOpening> MultizoneCompHorOpeningData;
+    // extern EPVector<ReferenceConditions> MultizoneSurfaceStdConditionsCrackData;
+    extern EPVector<SurfaceCrack> MultizoneSurfaceCrackData;
+    extern EPVector<EffectiveLeakageArea> MultizoneSurfaceELAData;
+    extern EPVector<MultizoneExternalNodeProp> MultizoneExternalNodeData;
+    extern EPVector<DeltaCpProp> DeltaCp;
+    extern EPVector<DeltaCpProp> EPDeltaCP;
+    extern EPVector<ZoneExhaustFan> MultizoneCompExhaustFanData;
+    extern EPVector<IntraZoneNodeProp> IntraZoneNodeData;       // Intra zone data set
+    extern EPVector<IntraZoneLinkageProp> IntraZoneLinkageData; // Intra zone linkage adat set
+    extern EPVector<DisSysNodeProp> DisSysNodeData;
+    extern EPVector<DuctLeak> DisSysCompLeakData;
+    extern EPVector<EffectiveLeakageRatio> DisSysCompELRData;
+    extern EPVector<Duct> DisSysCompDuctData;
+    extern EPVector<Damper> DisSysCompDamperData;
+    extern EPVector<ConstantVolumeFan> DisSysCompCVFData;
+    extern EPVector<DetailedFan> DisSysCompDetFanData;
+    extern EPVector<DisSysCompCoilProp> DisSysCompCoilData;
+    extern EPVector<DisSysCompHXProp> DisSysCompHXData;
+    extern EPVector<DisSysCompTermUnitProp> DisSysCompTermUnitData;
+    extern EPVector<ConstantPressureDrop> DisSysCompCPDData;
+    extern EPVector<AiflowNetworkReportProp> AirflowNetworkReportData;
+    extern EPVector<PressureControllerProp> PressureControllerData;
+    extern EPVector<OutdoorAirFan> DisSysCompOutdoorAirData;
+    extern EPVector<ReliefFlow> DisSysCompReliefAirData;
+    extern EPVector<AirflowNetworkLinkageViewFactorProp> AirflowNetworkLinkageViewFactorData;
 
     void clear_state();
 

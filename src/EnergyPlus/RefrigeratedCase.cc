@@ -357,10 +357,10 @@ namespace RefrigeratedCase {
     Real64 const FanHalfSpeedRatio(0.1768); // = 1/(2**2.5) for power step for two speed fan
     Real64 const CapFac60Percent(0.60);     // = 60%, load served by half power 2-speed fan
 
-    Array1D<Real64> const EuropeanWetCoilFactor(5, {1.35, 1.15, 1.05, 1.01, 1.0});
-    Array1D<Real64> const EuropeanAirInletTemp(5, {10.0, 0.0, -18.0, -25.0, -34.0});
-    Array1D<Real64> const EuropeanEvapTemp(5, {0.0, -8.0, -25.0, -31.0, -40.0});
-    Array1D<Real64> const EuropeanDT1(5, {10.0, 8.0, 7.0, 7.0, 6.0});
+    EPVector<Real64> const EuropeanWetCoilFactor(5, {1.35, 1.15, 1.05, 1.01, 1.0});
+    EPVector<Real64> const EuropeanAirInletTemp(5, {10.0, 0.0, -18.0, -25.0, -34.0});
+    EPVector<Real64> const EuropeanEvapTemp(5, {0.0, -8.0, -25.0, -31.0, -40.0});
+    EPVector<Real64> const EuropeanDT1(5, {10.0, 8.0, 7.0, 7.0, 6.0});
 
     // DERIVED TYPE DEFINITIONS:
 
@@ -467,25 +467,25 @@ namespace RefrigeratedCase {
     // SUBROUTINE SPECIFICATIONS FOR MODULE RefrigeratedCase:
 
     // Object Data
-    Array1D<RefrigCaseData> RefrigCase;
-    Array1D<RefrigRackData> RefrigRack;
-    Array1D<CaseRAFractionData> CaseRAFraction;
-    Array1D<RefrigSystemData> System;
-    Array1D<TransRefrigSystemData> TransSystem;
-    Array1D<RefrigCondenserData> Condenser;
+    EPVector<RefrigCaseData> RefrigCase;
+    EPVector<RefrigRackData> RefrigRack;
+    EPVector<CaseRAFractionData> CaseRAFraction;
+    EPVector<RefrigSystemData> System;
+    EPVector<TransRefrigSystemData> TransSystem;
+    EPVector<RefrigCondenserData> Condenser;
     std::unordered_map<std::string, std::string> UniqueCondenserNames;
-    Array1D<RefrigCompressorData> Compressor;
-    Array1D<RefrigGasCoolerData> GasCooler;
-    Array1D<SubcoolerData> Subcooler;
-    Array1D<CaseAndWalkInListDef> CaseAndWalkInList;
-    Array1D<CompressorListDef> CompressorLists;
-    Array1D<SecondaryLoopData> Secondary;
-    Array1D<TransferLoadListDef> TransferLoadList;
-    Array1D<WalkInData> WalkIn;
-    Array1D<WarehouseCoilData> WarehouseCoil;
-    Array1D<AirChillerSetData> AirChillerSet;
-    Array1D<CoilCreditData> CoilSysCredit;
-    Array1D<CaseWIZoneReportData> CaseWIZoneReport;
+    EPVector<RefrigCompressorData> Compressor;
+    EPVector<RefrigGasCoolerData> GasCooler;
+    EPVector<SubcoolerData> Subcooler;
+    EPVector<CaseAndWalkInListDef> CaseAndWalkInList;
+    EPVector<CompressorListDef> CompressorLists;
+    EPVector<SecondaryLoopData> Secondary;
+    EPVector<TransferLoadListDef> TransferLoadList;
+    EPVector<WalkInData> WalkIn;
+    EPVector<WarehouseCoilData> WarehouseCoil;
+    EPVector<AirChillerSetData> AirChillerSet;
+    EPVector<CoilCreditData> CoilSysCredit;
+    EPVector<CaseWIZoneReportData> CaseWIZoneReport;
 
     // Functions
 
@@ -842,7 +842,7 @@ namespace RefrigeratedCase {
         static Real64 TBrineAverage(0.0);         // Rated average of inlet and outlet temps, used for property look up, C
         static Real64 TempRAFraction(0.0);        // Temporary sum of Return Air fraction per zone for reporting
         static Real64 TestDelta(0.0);             // Used to compare secondary loop rated capacity to calculated capacity, fraction
-        Array1D<Real64> Numbers;                  // Numeric items for object
+        EPVector<Real64> Numbers;                  // Numeric items for object
         Array2D<Real64> DayValues;                // Array of schedule values
 
         NumSimulationCascadeCondensers = inputProcessor->getNumObjectsFound("Refrigeration:Condenser:Cascade");

@@ -173,8 +173,8 @@ namespace WindowAC {
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
     // Object Data
-    Array1D<WindACData> WindAC;
-    Array1D<WindACNumericFieldData> WindACNumericFields; // holds window AC numeric input fields character field name
+    EPVector<WindACData> WindAC;
+    EPVector<WindACNumericFieldData> WindACNumericFields; // holds window AC numeric input fields character field name
 
     // Functions
 
@@ -366,7 +366,7 @@ namespace WindowAC {
         Array1D_string Alphas;           // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D<Real64> Numbers;         // Numeric input items for object
+        EPVector<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a

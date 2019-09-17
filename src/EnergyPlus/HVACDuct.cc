@@ -112,7 +112,7 @@ namespace HVACDuct {
     // <name Public routines, optionally name Private routines within this module>
 
     // Object Data
-    Array1D<DuctData> Duct;
+    EPVector<DuctData> Duct;
 
     // Functions
 

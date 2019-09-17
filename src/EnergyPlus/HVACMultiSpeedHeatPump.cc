@@ -213,8 +213,8 @@ namespace HVACMultiSpeedHeatPump {
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
     // Object Data
-    Array1D<MSHeatPumpData> MSHeatPump;
-    Array1D<MSHeatPumpReportData> MSHeatPumpReport;
+    EPVector<MSHeatPumpData> MSHeatPump;
+    EPVector<MSHeatPumpReportData> MSHeatPumpReport;
 
     // Functions
 
@@ -602,7 +602,7 @@ namespace HVACMultiSpeedHeatPump {
         Array1D_string Alphas;            // Alpha input items for object
         Array1D_string cAlphaFields;      // Alpha field names
         Array1D_string cNumericFields;    // Numeric field names
-        Array1D<Real64> Numbers;          // Numeric input items for object
+        EPVector<Real64> Numbers;          // Numeric input items for object
         Array1D_bool lAlphaBlanks;        // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;      // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);            // Maximum number of numeric input fields
@@ -2871,7 +2871,7 @@ namespace HVACMultiSpeedHeatPump {
         Real64 NoCompOutput;       // output when no active compressor [W]
         Real64 ErrorToler;         // error tolerance
         int SolFla;                // Flag of RegulaFalsi solver
-        Array1D<Real64> Par(9);    // Parameters passed to RegulaFalsi
+        EPVector<Real64> Par(9);    // Parameters passed to RegulaFalsi
         Real64 CpAir;              // air specific heat
         Real64 OutsideDryBulbTemp; // Outside air temperature at external node height
         Real64 QCoilActual;        // coil load actually delivered returned to calling component
@@ -4210,7 +4210,7 @@ namespace HVACMultiSpeedHeatPump {
         Real64 MinWaterFlow;    // coil minimum hot water mass flow rate, kg/s
         Real64 MaxHotWaterFlow; // coil maximum hot water mass flow rate, kg/s
         Real64 HotWaterMdot;    // actual hot water mass flow rate
-        Array1D<Real64> Par(3);
+        EPVector<Real64> Par(3);
         int SolFlag;
 
         static std::string HeatCoilName;

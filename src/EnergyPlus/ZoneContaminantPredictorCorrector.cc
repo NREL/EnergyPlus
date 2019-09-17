@@ -263,7 +263,7 @@ namespace ZoneContaminantPredictorCorrector {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string AlphaName;
-        Array1D<Real64> IHGNumbers;
+        EPVector<Real64> IHGNumbers;
         Real64 SchMin;
         Real64 SchMax;
         int NumAlpha;

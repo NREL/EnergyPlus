@@ -114,7 +114,7 @@ namespace DataBranchAirLoopPlant {
     };
 
     // Object Data
-    extern Array1D<PlantPressureCurveData> PressureCurve;
+    extern EPVector<PlantPressureCurveData> PressureCurve;
 
     void clear_state();
 

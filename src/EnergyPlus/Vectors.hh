@@ -88,7 +88,7 @@ namespace Vectors {
 
     void VecRound(Vector &vec, Real64 const roundto);
 
-    void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf, // Surface Definition
+    void DetermineAzimuthAndTilt(EPVector<Vector> const &Surf, // Surface Definition
                                  int const NSides,            // Number of sides to surface
                                  Real64 &Azimuth,             // Outward Normal Azimuth Angle
                                  Real64 &Tilt,                // Tilt angle of surface
@@ -108,9 +108,9 @@ namespace Vectors {
                     PlaneEq const &pleq // Equation of the plane
     );
 
-    void CreateNewellAreaVector(Array1D<Vector> const &VList, int const NSides, Vector &OutNewellAreaVector);
+    void CreateNewellAreaVector(EPVector<Vector> const &VList, int const NSides, Vector &OutNewellAreaVector);
 
-    void CreateNewellSurfaceNormalVector(Array1D<Vector> const &VList, int const NSides, Vector &OutNewellSurfaceNormalVector);
+    void CreateNewellSurfaceNormalVector(EPVector<Vector> const &VList, int const NSides, Vector &OutNewellSurfaceNormalVector);
 
     void CompareTwoVectors(Vector const &vector1, // standard vector
                            Vector const &vector2, // standard vector

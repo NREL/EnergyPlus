@@ -299,9 +299,9 @@ namespace PurchasedAirManager {
     };
 
     // Object Data
-    extern Array1D<ZonePurchasedAir> PurchAir;                      // Used to specify purchased air parameters
-    extern Array1D<PurchAirNumericFieldData> PurchAirNumericFields; // Used to save the indices of scalable sizing object for zone HVAC
-    extern Array1D<PurchAirPlenumArrayData> PurchAirPlenumArrays;   // Used to save the indices of scalable sizing object for zone HVAC
+    extern EPVector<ZonePurchasedAir> PurchAir;                      // Used to specify purchased air parameters
+    extern EPVector<PurchAirNumericFieldData> PurchAirNumericFields; // Used to save the indices of scalable sizing object for zone HVAC
+    extern EPVector<PurchAirPlenumArrayData> PurchAirPlenumArrays;   // Used to save the indices of scalable sizing object for zone HVAC
 
     // Functions
 

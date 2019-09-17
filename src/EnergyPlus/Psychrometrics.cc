@@ -207,16 +207,16 @@ namespace Psychrometrics {
     bool ReportErrors(true);
     Array1D_int iPsyErrIndex(NumPsychMonitors, 0); // Number of times error occurred
 #ifdef EP_psych_stats
-    Array1D<Int64> NumTimesCalled(NumPsychMonitors, 0);
+    EPVector<Int64> NumTimesCalled(NumPsychMonitors, 0);
     Array1D_int NumIterations(NumPsychMonitors, 0);
 #endif
 
     // Object Data
 #ifdef EP_cache_PsyTwbFnTdbWPb
-    Array1D<cached_twb_t> cached_Twb; // DIMENSION(0:twbcache_size)
+    EPVector<cached_twb_t> cached_Twb; // DIMENSION(0:twbcache_size)
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
-    Array1D<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
+    EPVector<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
 #endif
 
     // Subroutine Specifications for the Module
@@ -229,7 +229,7 @@ namespace Psychrometrics {
         ReportErrors = true;
         iPsyErrIndex = Array1D_int(NumPsychMonitors, 0);
 #ifdef EP_psych_stats
-        NumTimesCalled = Array1D<Int64>(NumPsychMonitors, 0);
+        NumTimesCalled = EPVector<Int64>(NumPsychMonitors, 0);
         NumIterations = Array1D_int(NumPsychMonitors, 0);
 #endif
 #ifdef EP_cache_PsyTwbFnTdbWPb

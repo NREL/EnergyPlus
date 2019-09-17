@@ -119,7 +119,7 @@ namespace HVACInterfaceManager {
     // SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
 
     // Object Data
-    Array1D<CommonPipeData> PlantCommonPipe;
+    EPVector<CommonPipeData> PlantCommonPipe;
 
     // MODULE SUBROUTINES:
 
@@ -149,7 +149,7 @@ namespace HVACInterfaceManager {
         using namespace DataConvergParams;
         using DataContaminantBalance::Contaminant;
 
-        static Array1D<Real64> TmpRealARR(ConvergLogStackDepth); // Tuned Made static
+        static EPVector<Real64> TmpRealARR(ConvergLogStackDepth); // Tuned Made static
         Real64 DeltaEnergy;
 
         if ((CalledFrom == CalledFromAirSystemDemandSide) && (OutletNode == 0)) {

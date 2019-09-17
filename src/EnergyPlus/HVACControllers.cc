@@ -251,9 +251,9 @@ namespace HVACControllers {
     // Misc routines
 
     // Object Data
-    Array1D<ControllerPropsType> ControllerProps;
-    Array1D<RootFinderDataType> RootFinders;
-    Array1D<AirLoopStatsType> AirLoopStats; // Statistics array to analyze computational profile for
+    EPVector<ControllerPropsType> ControllerProps;
+    EPVector<RootFinderDataType> RootFinders;
+    EPVector<AirLoopStatsType> AirLoopStats; // Statistics array to analyze computational profile for
 
     namespace {
         bool InitControllerOneTimeFlag(true);
@@ -579,7 +579,7 @@ namespace HVACControllers {
         int IOStat;
         int AirLoopNum;            // DO index for each air loop
         bool ActuatorNodeNotFound; // true if no water coil inlet node match for actuator node
-        Array1D<Real64> NumArray;
+        EPVector<Real64> NumArray;
         Array1D_string AlphArray;
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names

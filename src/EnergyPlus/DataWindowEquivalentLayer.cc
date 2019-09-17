@@ -105,9 +105,9 @@ namespace DataWindowEquivalentLayer {
                         // transmittance, BEAM-BEAM, back | Solar reflectance, BEAM-DIFFUSE, front | Solar reflectance, BEAM-DIFFUSE, back | Solar
                         // transmittance, BEAM-DIFFUSE, front | Solar transmittance, BEAM-DIFFUSE, back | Solar reflectance, DIFFUSE-DIFFUSE, front |
                         // Solar reflectance, DIFFUSE-DIFFUSE, back | Solar transmittance, DIFFUSE-DIFFUSE
-    Array1D<CFSLAYER> CFSLayers;
-    Array1D<CFSTY> CFS;
-    Array1D<CFSGAP> CFSGaps;
+    EPVector<CFSLAYER> CFSLayers;
+    EPVector<CFSTY> CFS;
+    EPVector<CFSGAP> CFSGaps;
 
 } // namespace DataWindowEquivalentLayer
 

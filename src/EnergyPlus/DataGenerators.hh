@@ -197,7 +197,7 @@ namespace DataGenerators {
         Real64 NdotFuel;           // molar fuel use rate.  (kmol/sec)
         Real64 TotFuelInEnthalphy; // Enthalpy of fuel coming into FCPM (watts)
         Real64 NdotProdGas;        // (kmol/sec)
-        Array1D<Real64> ConstitMolalFract;
+        EPVector<Real64> ConstitMolalFract;
         Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 TprodGasLeavingFCPM;
         Real64 NdotAir;           // molar air use rate    (kmol/sec)
@@ -247,7 +247,7 @@ namespace DataGenerators {
         int ConstituentMode; // how are air data input
         int NumConstituents;
         Array1D_string ConstitName;
-        Array1D<Real64> ConstitMolalFract;
+        EPVector<Real64> ConstitMolalFract;
         // Calculated values and input from elsewhere
         Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 O2fraction;
@@ -353,7 +353,7 @@ namespace DataGenerators {
         int NumConstituents;
         Real64 TauxMix;
         Real64 NdotAuxMix;
-        Array1D<Real64> ConstitMolalFract;
+        EPVector<Real64> ConstitMolalFract;
         Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 QskinLoss;     // Heat lost to room
         Real64 QairIntake;    // heat into intake air
@@ -406,7 +406,7 @@ namespace DataGenerators {
         Real64 WaterInletTemp;
         Real64 WaterVaporFractExh; // water vapor fraction in exhaust gas stream.
         Real64 CondensateRate;     // water condensation rate.
-        Array1D<Real64> ConstitMolalFract;
+        EPVector<Real64> ConstitMolalFract;
         Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 NdotHXleaving;
         Real64 WaterOutletTemp;
@@ -433,8 +433,8 @@ namespace DataGenerators {
         Real64 NominalVoltage;
         Real64 LowVoltsDischarged; // not used
         int NumTablePairs;
-        Array1D<Real64> DischargeCurrent; // amps
-        Array1D<Real64> DischargeTime;    // hours
+        EPVector<Real64> DischargeCurrent; // amps
+        EPVector<Real64> DischargeTime;    // hours
         // calculated variables
         Real64 k;    // parameter in Manwell McGowan model
         Real64 c;    // parameter in Manwell McGowan model
@@ -649,7 +649,7 @@ namespace DataGenerators {
         Real64 CompPowerLossFactor;
         int NumConstituents; // number of constituents in fue supply
         Array1D_string ConstitName;
-        Array1D<Real64> ConstitMolalFract;
+        EPVector<Real64> ConstitMolalFract;
         // calculated data (except some for generic liquid)
         Array1D_int GasLibID;        // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 LHV;                  // lower heating value of gaseous fuel (kJ/mol)
@@ -957,12 +957,12 @@ namespace DataGenerators {
     };
 
     // Object Data
-    extern Array1D<FCDataStruct> FuelCell; // dimension to number of machines
-    extern Array1D<GasPropertyDataStruct> GasPhaseThermoChemistryData;
-    extern Array1D<GeneratorFuelSupplyDataStruct> FuelSupply; // fuel supply (reused across various)
-    extern Array1D<MicroCHPDataStruct> MicroCHP;
-    extern Array1D<MicroCHPParamsNonNormalized> MicroCHPParamInput; // Used during get input then put into nested
-    extern Array1D<GeneratorDynamicsManagerStruct> GeneratorDynamics;
+    extern EPVector<FCDataStruct> FuelCell; // dimension to number of machines
+    extern EPVector<GasPropertyDataStruct> GasPhaseThermoChemistryData;
+    extern EPVector<GeneratorFuelSupplyDataStruct> FuelSupply; // fuel supply (reused across various)
+    extern EPVector<MicroCHPDataStruct> MicroCHP;
+    extern EPVector<MicroCHPParamsNonNormalized> MicroCHPParamInput; // Used during get input then put into nested
+    extern EPVector<GeneratorDynamicsManagerStruct> GeneratorDynamics;
 
     void clear_state();
 

@@ -220,8 +220,8 @@ namespace WaterCoils {
     // Other routines
 
     // Object Data
-    Array1D<WaterCoilEquipConditions> WaterCoil;
-    Array1D<WaterCoilNumericFieldData> WaterCoilNumericFields;
+    EPVector<WaterCoilEquipConditions> WaterCoil;
+    EPVector<WaterCoilNumericFieldData> WaterCoilNumericFields;
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -381,7 +381,7 @@ namespace WaterCoils {
         Array1D_string AlphArray;        // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D<Real64> NumArray;        // Numeric input items for object
+        EPVector<Real64> NumArray;        // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);           // Maximum number of numeric input fields
@@ -1041,8 +1041,8 @@ namespace WaterCoils {
         int WaterInletNode;
         int WaterOutletNode;
 
-        static Array1D<Real64> DesCpAir;        // CpAir at Design Inlet Air Temp
-        static Array1D<Real64> DesUARangeCheck; // Value for range check based on Design Inlet Air Humidity Ratio
+        static EPVector<Real64> DesCpAir;        // CpAir at Design Inlet Air Temp
+        static EPVector<Real64> DesUARangeCheck; // Value for range check based on Design Inlet Air Humidity Ratio
         /////////// hoisted into namespace InitWaterCoilOneTimeFlag
         // static bool MyOneTimeFlag( true );
         /////////////////////////
@@ -1050,7 +1050,7 @@ namespace WaterCoils {
         static Array1D_bool MyCoilReportFlag;
         static Array1D_bool PlantLoopScanFlag;
 
-        static Array1D<Real64> CoefSeries(5); // Tuned Changed to static: High call count: Set before use
+        static EPVector<Real64> CoefSeries(5); // Tuned Changed to static: High call count: Set before use
         Real64 FinDiamVar;
         Real64 TubeToFinDiamRatio;
 
@@ -1059,7 +1059,7 @@ namespace WaterCoils {
         Real64 UA0;      // lower bound for UA
         Real64 UA1;      // upper bound for UA
         Real64 UA;
-        static Array1D<Real64> Par(4); // Tuned Changed to static: High call count: Set before use
+        static EPVector<Real64> Par(4); // Tuned Changed to static: High call count: Set before use
 
         static bool NoSatCurveIntersect(false); // TRUE if failed to find appatatus dew-point
         static bool BelowInletWaterTemp(false); // TRUE if apparatus dew-point below design inlet water temperature
@@ -4994,7 +4994,7 @@ namespace WaterCoils {
         Real64 G1;
         Real64 GJ;
         Real64 HJ;
-        Array1D<Real64> T(12);
+        EPVector<Real64> T(12);
         Real64 X2J;
 
         KBessFunc = 0.0;
@@ -6169,7 +6169,7 @@ namespace WaterCoils {
         Real64 T0;                // lower bound for Tprov [C]
         Real64 T1;                // upper bound for Tprov [C]
         static Real64 Tprov(0.0); // provisional value of drybulb temperature [C]
-        Array1D<Real64> Par(3);   // Par(1) = desired enthaply H [J/kg]
+        EPVector<Real64> Par(3);   // Par(1) = desired enthaply H [J/kg]
         // Par(2) = desired relative humidity (0.0 - 1.0)
         // Par(3) = barometric pressure [N/m2 (Pascals)]
 

@@ -222,8 +222,8 @@ namespace ChillerIndirectAbsorption {
     };
 
     // Object Data
-    extern Array1D<IndirectAbsorberSpecs> IndirectAbsorber; // dimension to number of machines
-    extern Array1D<ReportVars> IndirectAbsorberReport;
+    extern EPVector<IndirectAbsorberSpecs> IndirectAbsorber; // dimension to number of machines
+    extern EPVector<ReportVars> IndirectAbsorberReport;
 
     // Functions
 

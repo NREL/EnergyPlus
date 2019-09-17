@@ -192,7 +192,7 @@ namespace OutdoorAirUnit {
     // PUBLIC GetOutAirCoilOutletTemp
 
     // Object Data
-    Array1D<OAUnitData> OutAirUnit;
+    EPVector<OAUnitData> OutAirUnit;
     std::unordered_set<std::string> SupplyFanUniqueNames;
     std::unordered_set<std::string> ExhaustFanUniqueNames;
     std::unordered_set<std::string> ComponentListUniqueNames;
@@ -381,7 +381,7 @@ namespace OutdoorAirUnit {
         Array1D_string cNumericFields;   // Numeric field names
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        Array1D<Real64> NumArray;
+        EPVector<Real64> NumArray;
         Array1D_string AlphArray;
         static bool errFlag(false);
 

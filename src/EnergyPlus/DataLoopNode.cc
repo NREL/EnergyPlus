@@ -145,7 +145,7 @@ namespace DataLoopNode {
     Array1D_string NodeID;
 
     // Object Data
-    Array1D<NodeData> Node; // dim to num nodes in SimHVAC
+    EPVector<NodeData> Node; // dim to num nodes in SimHVAC
     NodeData DefaultNodeValues(0,
                                0,
                                0.0,
@@ -202,8 +202,8 @@ namespace DataLoopNode {
                                        // | EMSOverrideOutAirDryBulb | EMSValueForOutAirDryBulb {C} | OutAirWetBulb {C} | EMSOverrideOutAirWetBulb |
                                        // EMSValueForOutAirWetBulb {C} | CO2 {ppm} | CO2 setpoint {ppm} | Generic contaminant {ppm} | Generic
                                        // contaminant setpoint {ppm} | Set to true when node has SPM which follows wetbulb
-    Array1D<MoreNodeData> MoreNodeInfo;
-    Array1D<MarkedNodeData> MarkedNode;
+    EPVector<MoreNodeData> MoreNodeInfo;
+    EPVector<MarkedNodeData> MarkedNode;
 
     // Clears the global data in DataLoopNode.
     // Needed for unit tests, should not be normally called.

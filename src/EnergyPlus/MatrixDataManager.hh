@@ -104,7 +104,7 @@ namespace MatrixDataManager {
     };
 
     // Object Data
-    extern Array1D<MatrixDataStruct> MatData;
+    extern EPVector<MatrixDataStruct> MatData;
 
     // Functions
 

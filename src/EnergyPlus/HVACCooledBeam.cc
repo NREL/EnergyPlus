@@ -146,7 +146,7 @@ namespace HVACCooledBeam {
     // SUBROUTINE SPECIFICATIONS FOR MODULE HVACCooledBeam:
 
     // Object Data
-    Array1D<CoolBeamData> CoolBeam;
+    EPVector<CoolBeamData> CoolBeam;
 
     // Functions
 
@@ -256,7 +256,7 @@ namespace HVACCooledBeam {
         Array1D_string Alphas;           // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D<Real64> Numbers;         // Numeric input items for object
+        EPVector<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int NumAlphas(0);         // Number of Alphas for each GetObjectItem call
@@ -969,7 +969,7 @@ namespace HVACCooledBeam {
         int ControlNode;                     // the water inlet node
         int InAirNode;                       // the air inlet node
         bool UnitOn;                         // TRUE if unit is on
-        Array1D<Real64> Par(5);
+        EPVector<Real64> Par(5);
         int SolFlag;
         Real64 ErrTolerance;
 

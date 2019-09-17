@@ -212,7 +212,7 @@ namespace HVACDXSystem {
     };
 
     // Object Data
-    extern Array1D<DXCoolingConditions> DXCoolingSystem;
+    extern EPVector<DXCoolingConditions> DXCoolingSystem;
 
     // Functions
 

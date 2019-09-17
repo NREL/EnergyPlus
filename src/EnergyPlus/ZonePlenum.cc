@@ -124,8 +124,8 @@ namespace ZonePlenum {
     // SUBROUTINE SPECIFICATIONS FOR MODULE ZONEPLENUM
 
     // Object Data
-    Array1D<ZoneReturnPlenumConditions> ZoneRetPlenCond;
-    Array1D<ZoneSupplyPlenumConditions> ZoneSupPlenCond;
+    EPVector<ZoneReturnPlenumConditions> ZoneRetPlenCond;
+    EPVector<ZoneSupplyPlenumConditions> ZoneSupPlenCond;
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -336,7 +336,7 @@ namespace ZonePlenum {
         int MaxAlphas;
         int NodeNum;
         int IOStat;
-        Array1D<Real64> NumArray;        // Numeric input items for object
+        EPVector<Real64> NumArray;        // Numeric input items for object
         std::string CurrentModuleObject; // for ease in getting objects
         Array1D_string AlphArray;        // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names

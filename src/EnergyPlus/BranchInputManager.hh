@@ -155,7 +155,7 @@ namespace BranchInputManager {
         int PressureCurveIndex;           // Integer index of pressure curve
         int FluidType;                    // Fluid type (see DataLoopNode)
         int NumOfComponents;              // Number of Components on this Branch
-        Array1D<ComponentData> Component; // Component definitions for each component
+        EPVector<ComponentData> Component; // Component definitions for each component
 
         // Default Constructor
         BranchData() : PressureCurveType(0), PressureCurveIndex(0), FluidType(NodeType_Unknown), NumOfComponents(0)
@@ -192,11 +192,11 @@ namespace BranchInputManager {
     };
 
     // Object Data
-    extern Array1D<BranchListData> BranchList;    // Branch List data for each Branch List
-    extern Array1D<BranchData> Branch;            // Branch Data for each Branch
-    extern Array1D<ConnectorData> ConnectorLists; // Connector List data for each Connector List
-    extern Array1D<SplitterData> Splitters;       // Splitter Data for each Splitter
-    extern Array1D<MixerData> Mixers;             // Mixer Data for each Mixer
+    extern EPVector<BranchListData> BranchList;    // Branch List data for each Branch List
+    extern EPVector<BranchData> Branch;            // Branch Data for each Branch
+    extern EPVector<ConnectorData> ConnectorLists; // Connector List data for each Connector List
+    extern EPVector<SplitterData> Splitters;       // Splitter Data for each Splitter
+    extern EPVector<MixerData> Mixers;             // Mixer Data for each Mixer
 
     // Functions
     void clear_state();

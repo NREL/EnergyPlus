@@ -191,7 +191,7 @@ namespace ZoneEquipmentManager {
         bool FirstPassZoneEquipFlag(true); // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
     }                                      // namespace
 
-    Array1D<Real64> AvgData; // scratch array for storing averaged data
+    EPVector<Real64> AvgData; // scratch array for storing averaged data
     int NumOfTimeStepInDay;  // number of zone time steps in a day
     bool GetZoneEquipmentInputFlag(true);
     bool SizeZoneEquipmentOneTimeFlag(true);
@@ -199,7 +199,7 @@ namespace ZoneEquipmentManager {
     // SUBROUTINE SPECIFICATIONS FOR MODULE ZoneEquipmentManager
 
     // Object Data
-    Array1D<SimulationOrder> PrioritySimOrder;
+    EPVector<SimulationOrder> PrioritySimOrder;
 
     // Functions
     void clear_state()

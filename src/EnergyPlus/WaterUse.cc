@@ -111,8 +111,8 @@ namespace WaterUse {
     Array1D_bool CheckPlantLoop;
 
     // Object Data
-    Array1D<WaterEquipmentType> WaterEquipment;
-    Array1D<WaterConnectionsType> WaterConnections;
+    EPVector<WaterEquipmentType> WaterEquipment;
+    EPVector<WaterConnectionsType> WaterConnections;
 
     void clear_state()
     {

@@ -327,37 +327,37 @@ namespace SetPointManager {
     // SUBROUTINE SPECIFICATIONS FOR MODULE SetPointManager
 
     // Object Data
-    Array1D<DataSetPointManager> AllSetPtMgr;                                    // Array for all Setpoint Manager data(warnings)
-    Array1D<DefineScheduledSetPointManager> SchSetPtMgr;                         // Array for Scheduled Setpoint Manager data
-    Array1D<DefineSchedDualSetPointManager> DualSchSetPtMgr;                     // Dual Scheduled Setpoint Manager data
-    Array1D<DefineOutsideAirSetPointManager> OutAirSetPtMgr;                     // Array for Outside Air Setpoint Manager data
-    Array1D<DefineSZReheatSetPointManager> SingZoneRhSetPtMgr;                   // Array for SZRH Set Pt Mgr
-    Array1D<DefineSZHeatingSetPointManager> SingZoneHtSetPtMgr;                  // Array for SZ Heating Set Pt Mgr
-    Array1D<DefineSZCoolingSetPointManager> SingZoneClSetPtMgr;                  // Array for SZ Cooling Set Pt Mgr
-    Array1D<DefineSZMinHumSetPointManager> SZMinHumSetPtMgr;                     // Array for SZ Min Hum Set Pt Mgr
-    Array1D<DefineSZMaxHumSetPointManager> SZMaxHumSetPtMgr;                     // Array for SZ Max Hum Set Pt Mgr
-    Array1D<DefineMixedAirSetPointManager> MixedAirSetPtMgr;                     // Array for Mixed Air Set Pt Mgr
-    Array1D<DefineOAPretreatSetPointManager> OAPretreatSetPtMgr;                 // Array for OA Pretreat Set Pt Mgr
-    Array1D<DefineWarmestSetPointManager> WarmestSetPtMgr;                       // Array for Warmest Set Pt Mgr
-    Array1D<DefineColdestSetPointManager> ColdestSetPtMgr;                       // Array for Coldest Set Pt Mgr
-    Array1D<DefWarmestSetPtManagerTempFlow> WarmestSetPtMgrTempFlow;             // Array for Warmest Set Pt Mgr
-    Array1D<DefRABFlowSetPointManager> RABFlowSetPtMgr;                          // Array for return air bypass
-    Array1D<DefMultiZoneAverageCoolingSetPointManager> MZAverageCoolingSetPtMgr; // Array for MultiZone
-    Array1D<DefMultiZoneAverageHeatingSetPointManager> MZAverageHeatingSetPtMgr; // Array for MultiZone
-    Array1D<DefMultiZoneAverageMinHumSetPointManager> MZAverageMinHumSetPtMgr;   // Array for MultiZone
-    Array1D<DefMultiZoneAverageMaxHumSetPointManager> MZAverageMaxHumSetPtMgr;   // Array for MultiZone
-    Array1D<DefMultiZoneMinHumSetPointManager> MZMinHumSetPtMgr;                 // Multizone min humidity rat Set Pt Mgr
-    Array1D<DefMultiZoneMaxHumSetPointManager> MZMaxHumSetPtMgr;                 // Multizone max humidity rat Set Pt Mgr
-    Array1D<DefineFollowOATempSetPointManager> FollowOATempSetPtMgr;             // Array for Follow Outdoor Air
-    Array1D<DefineFollowSysNodeTempSetPointManager> FollowSysNodeTempSetPtMgr;   // Array for Follow System
-    Array1D<DefineGroundTempSetPointManager> GroundTempSetPtMgr;                 // Array for Ground Temp Setpoint
-    Array1D<DefineCondEntSetPointManager> CondEntSetPtMgr;                       // Condenser Entering Water Set Pt Mgr
-    Array1D<DefineIdealCondEntSetPointManager> IdealCondEntSetPtMgr;             // Ideal Condenser Entering Set Pt Mgr
-    Array1D<DefineSZOneStageCoolinggSetPointManager> SZOneStageCoolingSetPtMgr;  // single zone 1 stage cool
-    Array1D<DefineSZOneStageHeatingSetPointManager> SZOneStageHeatingSetPtMgr;   // single zone 1 stage heat
-    Array1D<DefineReturnWaterChWSetPointManager> ReturnWaterResetChWSetPtMgr;    // return water reset
-    Array1D<DefineReturnWaterHWSetPointManager> ReturnWaterResetHWSetPtMgr;      // hot-water return water reset
-    Array1D<DefineScheduledTESSetPointManager> SchTESSetPtMgr;                   // Array for TES Scheduled Setpoint Manager data
+    EPVector<DataSetPointManager> AllSetPtMgr;                                    // Array for all Setpoint Manager data(warnings)
+    EPVector<DefineScheduledSetPointManager> SchSetPtMgr;                         // Array for Scheduled Setpoint Manager data
+    EPVector<DefineSchedDualSetPointManager> DualSchSetPtMgr;                     // Dual Scheduled Setpoint Manager data
+    EPVector<DefineOutsideAirSetPointManager> OutAirSetPtMgr;                     // Array for Outside Air Setpoint Manager data
+    EPVector<DefineSZReheatSetPointManager> SingZoneRhSetPtMgr;                   // Array for SZRH Set Pt Mgr
+    EPVector<DefineSZHeatingSetPointManager> SingZoneHtSetPtMgr;                  // Array for SZ Heating Set Pt Mgr
+    EPVector<DefineSZCoolingSetPointManager> SingZoneClSetPtMgr;                  // Array for SZ Cooling Set Pt Mgr
+    EPVector<DefineSZMinHumSetPointManager> SZMinHumSetPtMgr;                     // Array for SZ Min Hum Set Pt Mgr
+    EPVector<DefineSZMaxHumSetPointManager> SZMaxHumSetPtMgr;                     // Array for SZ Max Hum Set Pt Mgr
+    EPVector<DefineMixedAirSetPointManager> MixedAirSetPtMgr;                     // Array for Mixed Air Set Pt Mgr
+    EPVector<DefineOAPretreatSetPointManager> OAPretreatSetPtMgr;                 // Array for OA Pretreat Set Pt Mgr
+    EPVector<DefineWarmestSetPointManager> WarmestSetPtMgr;                       // Array for Warmest Set Pt Mgr
+    EPVector<DefineColdestSetPointManager> ColdestSetPtMgr;                       // Array for Coldest Set Pt Mgr
+    EPVector<DefWarmestSetPtManagerTempFlow> WarmestSetPtMgrTempFlow;             // Array for Warmest Set Pt Mgr
+    EPVector<DefRABFlowSetPointManager> RABFlowSetPtMgr;                          // Array for return air bypass
+    EPVector<DefMultiZoneAverageCoolingSetPointManager> MZAverageCoolingSetPtMgr; // Array for MultiZone
+    EPVector<DefMultiZoneAverageHeatingSetPointManager> MZAverageHeatingSetPtMgr; // Array for MultiZone
+    EPVector<DefMultiZoneAverageMinHumSetPointManager> MZAverageMinHumSetPtMgr;   // Array for MultiZone
+    EPVector<DefMultiZoneAverageMaxHumSetPointManager> MZAverageMaxHumSetPtMgr;   // Array for MultiZone
+    EPVector<DefMultiZoneMinHumSetPointManager> MZMinHumSetPtMgr;                 // Multizone min humidity rat Set Pt Mgr
+    EPVector<DefMultiZoneMaxHumSetPointManager> MZMaxHumSetPtMgr;                 // Multizone max humidity rat Set Pt Mgr
+    EPVector<DefineFollowOATempSetPointManager> FollowOATempSetPtMgr;             // Array for Follow Outdoor Air
+    EPVector<DefineFollowSysNodeTempSetPointManager> FollowSysNodeTempSetPtMgr;   // Array for Follow System
+    EPVector<DefineGroundTempSetPointManager> GroundTempSetPtMgr;                 // Array for Ground Temp Setpoint
+    EPVector<DefineCondEntSetPointManager> CondEntSetPtMgr;                       // Condenser Entering Water Set Pt Mgr
+    EPVector<DefineIdealCondEntSetPointManager> IdealCondEntSetPtMgr;             // Ideal Condenser Entering Set Pt Mgr
+    EPVector<DefineSZOneStageCoolinggSetPointManager> SZOneStageCoolingSetPtMgr;  // single zone 1 stage cool
+    EPVector<DefineSZOneStageHeatingSetPointManager> SZOneStageHeatingSetPtMgr;   // single zone 1 stage heat
+    EPVector<DefineReturnWaterChWSetPointManager> ReturnWaterResetChWSetPtMgr;    // return water reset
+    EPVector<DefineReturnWaterHWSetPointManager> ReturnWaterResetHWSetPtMgr;      // hot-water return water reset
+    EPVector<DefineScheduledTESSetPointManager> SchTESSetPtMgr;                   // Array for TES Scheduled Setpoint Manager data
 
     // Functions
 
@@ -585,7 +585,7 @@ namespace SetPointManager {
         Array1D_bool lNumericFieldBlanks;
         Array1D_bool lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
+        EPVector<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         static int MaxNumAlphas(0);  // argument for call to GetObjectDefMaxArgs
         static int MaxNumNumbers(0); // argument for call to GetObjectDefMaxArgs
@@ -7760,8 +7760,8 @@ namespace SetPointManager {
 
         Array1D_int VarIndexes;                     // Variable Numbers
         Array1D_int VarTypes;                       // Variable Types (1=integer, 2=real, 3=meter)
-        Array1D<OutputProcessor::TimeStepType> IndexTypes;                     // Variable Index Types (1=Zone,2=HVAC)
-        Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
+        EPVector<OutputProcessor::TimeStepType> IndexTypes;                     // Variable Index Types (1=Zone,2=HVAC)
+        EPVector<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
         Array1D_int ResourceTypes;                  // ResourceTypes for each variable
         Array1D_string EndUses;                     // EndUses for each variable
         Array1D_string Groups;                      // Groups for each variable

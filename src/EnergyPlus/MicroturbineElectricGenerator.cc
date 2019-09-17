@@ -116,8 +116,8 @@ namespace MicroturbineElectricGenerator {
     Array1D_bool CheckEquipName;
 
     // Object Data
-    Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
-    Array1D<ReportVars> MTGeneratorReport;
+    EPVector<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
+    EPVector<ReportVars> MTGeneratorReport;
 
     void SimMTGenerator(int const EP_UNUSED(GeneratorType), // Type of generator !unused1208
                         std::string const &GeneratorName,   // User-specified name of generator
@@ -275,7 +275,7 @@ namespace MicroturbineElectricGenerator {
         static Real64 Var1Min(0.0);      // Minimum value for variable 1, value obtained from a curve object
         static Real64 Var1Max(0.0);      // Maximum value for variable 1, value obtained from a curve object
 
-        Array1D<Real64> NumArray(19); // Numeric data array
+        EPVector<Real64> NumArray(19); // Numeric data array
 
         Array1D_string AlphArray(20); // Character string data array
         std::string FuelType;         // Type of fuel used for generator

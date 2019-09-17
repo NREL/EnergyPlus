@@ -151,7 +151,7 @@ namespace DataDefineEquip {
     };
 
     // Object Data
-    extern Array1D<ZoneAirEquip> AirDistUnit; // Used to specify zone related
+    extern EPVector<ZoneAirEquip> AirDistUnit; // Used to specify zone related
 
     // Clears the global data in DataDefineEquip.
     // Needed for unit tests, should not be normally called.

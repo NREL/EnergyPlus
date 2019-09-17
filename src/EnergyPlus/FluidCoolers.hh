@@ -178,14 +178,14 @@ namespace FluidCoolers {
         void report(bool RunFlag);
 
         bool validateSingleSpeedInputs(std::string const &cCurrentModuleObject,
-                                       Array1D<std::string> const &AlphArray,
-                                       Array1D<std::string> const &cNumericFieldNames,
-                                       Array1D<std::string> const &cAlphaFieldNames);
+                                       EPVector<std::string> const &AlphArray,
+                                       EPVector<std::string> const &cNumericFieldNames,
+                                       EPVector<std::string> const &cAlphaFieldNames);
 
         bool validateTwoSpeedInputs(std::string const &cCurrentModuleObject,
-                                    Array1D<std::string> const &AlphArray,
-                                    Array1D<std::string> const &cNumericFieldNames,
-                                    Array1D<std::string> const &cAlphaFieldNames);
+                                    EPVector<std::string> const &AlphArray,
+                                    EPVector<std::string> const &cNumericFieldNames,
+                                    EPVector<std::string> const &cAlphaFieldNames);
 
         void calcSingleSpeed();
 
@@ -203,7 +203,7 @@ namespace FluidCoolers {
         static PlantComponent *factory(int typeOf, std::string objectName);
     };
 
-    extern Array1D<FluidCoolerspecs> SimpleFluidCooler; // dimension to number of machines
+    extern EPVector<FluidCoolerspecs> SimpleFluidCooler; // dimension to number of machines
 
     void GetFluidCoolerInput();
 

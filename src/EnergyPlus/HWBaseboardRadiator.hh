@@ -70,14 +70,14 @@ namespace HWBaseboardRadiator {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumHWBaseboards;
-    extern Array1D<Real64> QBBRadSource;         // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> QBBRadSrcAvg;         // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+    extern EPVector<Real64> QBBRadSource;         // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> QBBRadSrcAvg;         // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
 
     // Record keeping variables used to calculate QBBRadSrcAvg locally
-    extern Array1D<Real64> LastQBBRadSrc;      // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastQBBRadSrc;      // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     extern Array1D_bool MySizeFlag;
     extern Array1D_bool CheckEquipName;
     extern Array1D_bool SetLoopIndexFlag; // get loop number flag
@@ -125,7 +125,7 @@ namespace HWBaseboardRadiator {
         Real64 FracRadiant;
         Real64 FracConvect;
         Real64 FracDistribPerson;
-        Array1D<Real64> FracDistribToSurf;
+        EPVector<Real64> FracDistribToSurf;
         Real64 TotPower;
         Real64 Power;
         Real64 ConvPower;
@@ -171,8 +171,8 @@ namespace HWBaseboardRadiator {
     };
 
     // Object Data
-    extern Array1D<HWBaseboardParams> HWBaseboard;
-    extern Array1D<HWBaseboardNumericFieldData> HWBaseboardNumericFields;
+    extern EPVector<HWBaseboardParams> HWBaseboard;
+    extern EPVector<HWBaseboardNumericFieldData> HWBaseboardNumericFields;
 
     // Functions
 

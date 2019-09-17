@@ -116,7 +116,7 @@ namespace HVACInterfaceManager {
     };
 
     // Object Data
-    extern Array1D<CommonPipeData> PlantCommonPipe;
+    extern EPVector<CommonPipeData> PlantCommonPipe;
 
     // Functions
 

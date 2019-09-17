@@ -233,28 +233,28 @@ namespace SystemAvailabilityManager {
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool InitSysAvailManagers_MyOneTimeFlag(true);
         bool CalcNCycSysAvailMgr_OneTimeFlag(true);
-        Array1D<Real64> OptStart_AdaTempGradTrdHeat; // Heating temp gradient for previous days - used in CalcOptStartSysAvailMgr
-        Array1D<Real64> OptStart_AdaTempGradTrdCool; // Cooling temp gradient for previous days - used in CalcOptStartSysAvailMgr
+        EPVector<Real64> OptStart_AdaTempGradTrdHeat; // Heating temp gradient for previous days - used in CalcOptStartSysAvailMgr
+        EPVector<Real64> OptStart_AdaTempGradTrdCool; // Cooling temp gradient for previous days - used in CalcOptStartSysAvailMgr
     }                                                // namespace
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
     // Object Data
-    Array1D<DefineSchedSysAvailManager> SchedSysAvailMgrData;
-    Array1D<DefineSchedOnSysAvailManager> SchedOnSysAvailMgrData;
-    Array1D<DefineSchedOffSysAvailManager> SchedOffSysAvailMgrData;
-    Array1D<DefineNightCycSysAvailManager> NCycSysAvailMgrData;
-    Array1D<DefineDiffTSysAvailManager> DiffTSysAvailMgrData;
-    Array1D<DefineHiLoSysAvailManager> HiTurnOffSysAvailMgrData;
-    Array1D<DefineHiLoSysAvailManager> HiTurnOnSysAvailMgrData;
-    Array1D<DefineHiLoSysAvailManager> LoTurnOffSysAvailMgrData;
-    Array1D<DefineHiLoSysAvailManager> LoTurnOnSysAvailMgrData;
-    Array1D<DefineNightVentSysAvailManager> NVentSysAvailMgrData;
-    Array1D<DefineHybridVentSysAvailManager> HybridVentSysAvailMgrData;
-    Array1D<SysAvailManagerList> SysAvailMgrListData;
-    Array1D<DefineOptStartSysAvailManager> OptStartSysAvailMgrData;
-    Array1D<DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffCooling;
-    Array1D<DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffHeating;
+    EPVector<DefineSchedSysAvailManager> SchedSysAvailMgrData;
+    EPVector<DefineSchedOnSysAvailManager> SchedOnSysAvailMgrData;
+    EPVector<DefineSchedOffSysAvailManager> SchedOffSysAvailMgrData;
+    EPVector<DefineNightCycSysAvailManager> NCycSysAvailMgrData;
+    EPVector<DefineDiffTSysAvailManager> DiffTSysAvailMgrData;
+    EPVector<DefineHiLoSysAvailManager> HiTurnOffSysAvailMgrData;
+    EPVector<DefineHiLoSysAvailManager> HiTurnOnSysAvailMgrData;
+    EPVector<DefineHiLoSysAvailManager> LoTurnOffSysAvailMgrData;
+    EPVector<DefineHiLoSysAvailManager> LoTurnOnSysAvailMgrData;
+    EPVector<DefineNightVentSysAvailManager> NVentSysAvailMgrData;
+    EPVector<DefineHybridVentSysAvailManager> HybridVentSysAvailMgrData;
+    EPVector<SysAvailManagerList> SysAvailMgrListData;
+    EPVector<DefineOptStartSysAvailManager> OptStartSysAvailMgrData;
+    EPVector<DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffCooling;
+    EPVector<DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffHeating;
 
     // Functions
     void clear_state()
@@ -518,7 +518,7 @@ namespace SystemAvailabilityManager {
         Array1D_bool lNumericFieldBlanks;
         Array1D_bool lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
+        EPVector<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
@@ -1425,7 +1425,7 @@ namespace SystemAvailabilityManager {
         Array1D_bool lNumericFieldBlanks;
         Array1D_bool lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
+        EPVector<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         int NumAlphas;
         int NumNumbers;

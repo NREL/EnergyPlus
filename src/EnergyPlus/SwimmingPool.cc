@@ -129,17 +129,17 @@ namespace SwimmingPool {
     int NumSwimmingPools(0); // Number of swimming pools
     Array1D_bool CheckEquipName;
     Array1D_int SurfaceToPoolIndex;
-    Array1D<Real64> QPoolSrcAvg;          // Average source over the time step for a particular radiant surface
-    Array1D<Real64> HeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
-    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+    EPVector<Real64> QPoolSrcAvg;          // Average source over the time step for a particular radiant surface
+    EPVector<Real64> HeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
+    EPVector<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
     // Record keeping variables used to calculate QRadSysSrcAvg locally
-    Array1D<Real64> LastQPoolSrc;       // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    EPVector<Real64> LastQPoolSrc;       // Need to keep the last value in case we are still iterating
+    EPVector<Real64> LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
+    EPVector<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    EPVector<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
 
     // Object Data
-    Array1D<SwimmingPoolData> Pool;
+    EPVector<SwimmingPoolData> Pool;
 
     // Functions
 
@@ -249,7 +249,7 @@ namespace SwimmingPool {
         int Item;                        // Item to be "gotten"
         int MaxAlphas;                   // Maximum number of alphas for these input keywords
         int MaxNumbers;                  // Maximum number of numbers for these input keywords
-        Array1D<Real64> Numbers;         // Numeric items for object
+        EPVector<Real64> Numbers;         // Numeric items for object
         int NumAlphas;                   // Number of Alphas for each GetObjectItem call
         int NumArgs;                     // Unused variable that is part of a subroutine call
         int NumNumbers;                  // Number of Numbers for each GetObjectItem call

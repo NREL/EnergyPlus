@@ -441,108 +441,108 @@ namespace DataHeatBalance {
     extern int NumRefrigSystems;     // Total number of detailed refrigeration systems in input
     extern int NumRefrigCondensers;  // Total number of detailed refrigeration condensers in input
     extern int NumRefrigChillerSets; // Total number of refrigerated warehouse coils in input
-    extern Array1D<Real64> SNLoadHeatEnergy;
-    extern Array1D<Real64> SNLoadCoolEnergy;
-    extern Array1D<Real64> SNLoadHeatRate;
-    extern Array1D<Real64> SNLoadCoolRate;
-    extern Array1D<Real64> SNLoadPredictedRate;
-    extern Array1D<Real64> SNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
-    extern Array1D<Real64> SNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)
-    extern Array1D<Real64> MoisturePredictedRate;
+    extern EPVector<Real64> SNLoadHeatEnergy;
+    extern EPVector<Real64> SNLoadCoolEnergy;
+    extern EPVector<Real64> SNLoadHeatRate;
+    extern EPVector<Real64> SNLoadCoolRate;
+    extern EPVector<Real64> SNLoadPredictedRate;
+    extern EPVector<Real64> SNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
+    extern EPVector<Real64> SNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)
+    extern EPVector<Real64> MoisturePredictedRate;
 
-    extern Array1D<Real64> ListSNLoadHeatEnergy;
-    extern Array1D<Real64> ListSNLoadCoolEnergy;
-    extern Array1D<Real64> ListSNLoadHeatRate;
-    extern Array1D<Real64> ListSNLoadCoolRate;
+    extern EPVector<Real64> ListSNLoadHeatEnergy;
+    extern EPVector<Real64> ListSNLoadCoolEnergy;
+    extern EPVector<Real64> ListSNLoadHeatRate;
+    extern EPVector<Real64> ListSNLoadCoolRate;
 
-    extern Array1D<Real64> GroupSNLoadHeatEnergy;
-    extern Array1D<Real64> GroupSNLoadCoolEnergy;
-    extern Array1D<Real64> GroupSNLoadHeatRate;
-    extern Array1D<Real64> GroupSNLoadCoolRate;
+    extern EPVector<Real64> GroupSNLoadHeatEnergy;
+    extern EPVector<Real64> GroupSNLoadCoolEnergy;
+    extern EPVector<Real64> GroupSNLoadHeatRate;
+    extern EPVector<Real64> GroupSNLoadCoolRate;
 
-    extern Array1D<Real64> MRT;            // MEAN RADIANT TEMPERATURE (C)
-    extern Array1D<Real64> SUMAI;          // 1 over the Sum of zone areas or 1/SumA
-    extern Array1D<Real64> ZoneTransSolar; // Exterior beam plus diffuse solar entering zone;
+    extern EPVector<Real64> MRT;            // MEAN RADIANT TEMPERATURE (C)
+    extern EPVector<Real64> SUMAI;          // 1 over the Sum of zone areas or 1/SumA
+    extern EPVector<Real64> ZoneTransSolar; // Exterior beam plus diffuse solar entering zone;
     //   sum of WinTransSolar for exterior windows in zone (W)
-    extern Array1D<Real64> ZoneWinHeatGain; // Heat gain to zone from all exterior windows (includes
+    extern EPVector<Real64> ZoneWinHeatGain; // Heat gain to zone from all exterior windows (includes
     //   ZoneTransSolar); sum of WinHeatGain for exterior
     //   windows in zone (W)
-    extern Array1D<Real64> ZoneWinHeatGainRep;     // = ZoneWinHeatGain when ZoneWinHeatGain >= 0
-    extern Array1D<Real64> ZoneWinHeatLossRep;     // = -ZoneWinHeatGain when ZoneWinHeatGain < 0
-    extern Array1D<Real64> ZoneBmSolFrExtWinsRep;  // Beam solar into zone from exterior windows [W]
-    extern Array1D<Real64> ZoneBmSolFrIntWinsRep;  // Beam solar into zone from interior windows [W]
-    extern Array1D<Real64> InitialZoneDifSolReflW; // Initial diffuse solar in zone from ext and int windows
+    extern EPVector<Real64> ZoneWinHeatGainRep;     // = ZoneWinHeatGain when ZoneWinHeatGain >= 0
+    extern EPVector<Real64> ZoneWinHeatLossRep;     // = -ZoneWinHeatGain when ZoneWinHeatGain < 0
+    extern EPVector<Real64> ZoneBmSolFrExtWinsRep;  // Beam solar into zone from exterior windows [W]
+    extern EPVector<Real64> ZoneBmSolFrIntWinsRep;  // Beam solar into zone from interior windows [W]
+    extern EPVector<Real64> InitialZoneDifSolReflW; // Initial diffuse solar in zone from ext and int windows
     // reflected from interior surfaces [W]
-    extern Array1D<Real64> ZoneDifSolFrExtWinsRep;         // Diffuse solar into zone from exterior windows [W]
-    extern Array1D<Real64> ZoneDifSolFrIntWinsRep;         // Diffuse solar into zone from interior windows [W]
-    extern Array1D<Real64> ZoneOpaqSurfInsFaceCond;        // Zone inside face opaque surface conduction (W)
-    extern Array1D<Real64> ZoneOpaqSurfInsFaceCondGainRep; // = Zone inside face opaque surface conduction when >= 0
-    extern Array1D<Real64> ZoneOpaqSurfInsFaceCondLossRep; // = -Zone inside face opaque surface conduction when < 0
-    extern Array1D<Real64> ZoneOpaqSurfExtFaceCond;        // Zone outside face opaque surface conduction (W)
-    extern Array1D<Real64> ZoneOpaqSurfExtFaceCondGainRep; // = Zone outside face opaque surface conduction when >= 0
-    extern Array1D<Real64> ZoneOpaqSurfExtFaceCondLossRep; // = -Zone outside face opaque surface conduction when < 0
-    extern Array1D<Real64> QRadThermInAbs;                 // Thermal radiation absorbed on inside surfaces
+    extern EPVector<Real64> ZoneDifSolFrExtWinsRep;         // Diffuse solar into zone from exterior windows [W]
+    extern EPVector<Real64> ZoneDifSolFrIntWinsRep;         // Diffuse solar into zone from interior windows [W]
+    extern EPVector<Real64> ZoneOpaqSurfInsFaceCond;        // Zone inside face opaque surface conduction (W)
+    extern EPVector<Real64> ZoneOpaqSurfInsFaceCondGainRep; // = Zone inside face opaque surface conduction when >= 0
+    extern EPVector<Real64> ZoneOpaqSurfInsFaceCondLossRep; // = -Zone inside face opaque surface conduction when < 0
+    extern EPVector<Real64> ZoneOpaqSurfExtFaceCond;        // Zone outside face opaque surface conduction (W)
+    extern EPVector<Real64> ZoneOpaqSurfExtFaceCondGainRep; // = Zone outside face opaque surface conduction when >= 0
+    extern EPVector<Real64> ZoneOpaqSurfExtFaceCondLossRep; // = -Zone outside face opaque surface conduction when < 0
+    extern EPVector<Real64> QRadThermInAbs;                 // Thermal radiation absorbed on inside surfaces
     extern Array2D<Real64> QRadSWwinAbs;                   // Short wave radiation absorbed in window glass layers
     extern Array2D<Real64> InitialDifSolwinAbs;            // Initial diffuse solar absorbed in window glass layers
     // from inside(W/m2)
-    extern Array1D<Real64> QRadSWOutIncident;           // Exterior beam plus diffuse solar incident on surface (W/m2)
-    extern Array1D<Real64> QRadSWOutIncidentBeam;       // Exterior beam solar incident on surface (W/m2)
-    extern Array1D<Real64> BmIncInsSurfIntensRep;       // Beam sol irrad from ext wins on inside of surface (W/m2)
-    extern Array1D<Real64> BmIncInsSurfAmountRep;       // Beam sol amount from ext wins incident on inside of surface (W)
-    extern Array1D<Real64> IntBmIncInsSurfIntensRep;    // Beam sol irrad from int wins on inside of surface (W/m2)
-    extern Array1D<Real64> IntBmIncInsSurfAmountRep;    // Beam sol amount from int wins incident on inside of surface (W)
-    extern Array1D<Real64> QRadSWOutIncidentSkyDiffuse; // Exterior sky diffuse solar incident on surface (W/m2)
-    extern Array1D<Real64> QRadSWOutIncidentGndDiffuse; // Exterior ground diffuse solar incident on surface (W/m2)
-    extern Array1D<Real64> QRadSWOutIncBmToDiffReflGnd; // Exterior diffuse solar incident from beam to diffuse
+    extern EPVector<Real64> QRadSWOutIncident;           // Exterior beam plus diffuse solar incident on surface (W/m2)
+    extern EPVector<Real64> QRadSWOutIncidentBeam;       // Exterior beam solar incident on surface (W/m2)
+    extern EPVector<Real64> BmIncInsSurfIntensRep;       // Beam sol irrad from ext wins on inside of surface (W/m2)
+    extern EPVector<Real64> BmIncInsSurfAmountRep;       // Beam sol amount from ext wins incident on inside of surface (W)
+    extern EPVector<Real64> IntBmIncInsSurfIntensRep;    // Beam sol irrad from int wins on inside of surface (W/m2)
+    extern EPVector<Real64> IntBmIncInsSurfAmountRep;    // Beam sol amount from int wins incident on inside of surface (W)
+    extern EPVector<Real64> QRadSWOutIncidentSkyDiffuse; // Exterior sky diffuse solar incident on surface (W/m2)
+    extern EPVector<Real64> QRadSWOutIncidentGndDiffuse; // Exterior ground diffuse solar incident on surface (W/m2)
+    extern EPVector<Real64> QRadSWOutIncBmToDiffReflGnd; // Exterior diffuse solar incident from beam to diffuse
     // reflection from ground (W/m2)
-    extern Array1D<Real64> QRadSWOutIncSkyDiffReflGnd; // Exterior diffuse solar incident from sky diffuse
+    extern EPVector<Real64> QRadSWOutIncSkyDiffReflGnd; // Exterior diffuse solar incident from sky diffuse
     // reflection from ground (W/m2)
-    extern Array1D<Real64> QRadSWOutIncBmToBmReflObs; // Exterior beam solar incident from beam-to-beam
+    extern EPVector<Real64> QRadSWOutIncBmToBmReflObs; // Exterior beam solar incident from beam-to-beam
     // reflection from obstructions (W/m2)
-    extern Array1D<Real64> QRadSWOutIncBmToDiffReflObs; // Exterior diffuse solar incident from beam-to-diffuse
+    extern EPVector<Real64> QRadSWOutIncBmToDiffReflObs; // Exterior diffuse solar incident from beam-to-diffuse
     // reflection from obstructions (W/m2)
-    extern Array1D<Real64> QRadSWOutIncSkyDiffReflObs; // Exterior diffuse solar incident from sky diffuse
+    extern EPVector<Real64> QRadSWOutIncSkyDiffReflObs; // Exterior diffuse solar incident from sky diffuse
     // reflection from obstructions (W/m2)
-    extern Array1D<Real64> CosIncidenceAngle; // Cosine of beam solar incidence angle (for reporting)
+    extern EPVector<Real64> CosIncidenceAngle; // Cosine of beam solar incidence angle (for reporting)
     extern Array1D_int BSDFBeamDirectionRep;  // BSDF beam direction number for given complex fenestration state (for reporting) []
-    extern Array1D<Real64> BSDFBeamThetaRep;  // BSDF beam Theta angle (for reporting) [rad]
-    extern Array1D<Real64> BSDFBeamPhiRep;    // BSDF beam Phi angle (for reporting) [rad]
+    extern EPVector<Real64> BSDFBeamThetaRep;  // BSDF beam Theta angle (for reporting) [rad]
+    extern EPVector<Real64> BSDFBeamPhiRep;    // BSDF beam Phi angle (for reporting) [rad]
 
-    extern Array1D<Real64> QRadSWwinAbsTot;   // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
+    extern EPVector<Real64> QRadSWwinAbsTot;   // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
     extern Array2D<Real64> QRadSWwinAbsLayer; // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
 
     extern Array2D<Real64> FenLaySurfTempFront;            // Front surface temperatures of fenestration layers
     extern Array2D<Real64> FenLaySurfTempBack;             // Back surface temperatures of fenestration layers
-    extern Array1D<Real64> ZoneTransSolarEnergy;           // Energy of ZoneTransSolar [J]
-    extern Array1D<Real64> ZoneWinHeatGainRepEnergy;       // Energy of ZoneWinHeatGainRep [J]
-    extern Array1D<Real64> ZoneWinHeatLossRepEnergy;       // Energy of ZoneWinHeatLossRep [J]
-    extern Array1D<Real64> ZoneBmSolFrExtWinsRepEnergy;    // Energy of ZoneBmSolFrExtWinsRep [J]
-    extern Array1D<Real64> ZoneBmSolFrIntWinsRepEnergy;    // Energy of ZoneBmSolFrIntWinsRep [J]
-    extern Array1D<Real64> ZoneDifSolFrExtWinsRepEnergy;   // Energy of ZoneDifSolFrExtWinsRep [J]
-    extern Array1D<Real64> ZoneDifSolFrIntWinsRepEnergy;   // Energy of ZoneDifSolFrIntWinsRep [J]
-    extern Array1D<Real64> ZnOpqSurfInsFaceCondGnRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
-    extern Array1D<Real64> ZnOpqSurfInsFaceCondLsRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
-    extern Array1D<Real64> ZnOpqSurfExtFaceCondGnRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
-    extern Array1D<Real64> ZnOpqSurfExtFaceCondLsRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
-    extern Array1D<Real64> BmIncInsSurfAmountRepEnergy;    // energy of BmIncInsSurfAmountRep [J]
-    extern Array1D<Real64> IntBmIncInsSurfAmountRepEnergy; // energy of IntBmIncInsSurfAmountRep [J]
-    extern Array1D<Real64> QRadSWwinAbsTotEnergy;          // Energy of QRadSWwinAbsTot [J]
-    extern Array1D<Real64> SWwinAbsTotalReport;            // Report - Total interior/exterior shortwave
+    extern EPVector<Real64> ZoneTransSolarEnergy;           // Energy of ZoneTransSolar [J]
+    extern EPVector<Real64> ZoneWinHeatGainRepEnergy;       // Energy of ZoneWinHeatGainRep [J]
+    extern EPVector<Real64> ZoneWinHeatLossRepEnergy;       // Energy of ZoneWinHeatLossRep [J]
+    extern EPVector<Real64> ZoneBmSolFrExtWinsRepEnergy;    // Energy of ZoneBmSolFrExtWinsRep [J]
+    extern EPVector<Real64> ZoneBmSolFrIntWinsRepEnergy;    // Energy of ZoneBmSolFrIntWinsRep [J]
+    extern EPVector<Real64> ZoneDifSolFrExtWinsRepEnergy;   // Energy of ZoneDifSolFrExtWinsRep [J]
+    extern EPVector<Real64> ZoneDifSolFrIntWinsRepEnergy;   // Energy of ZoneDifSolFrIntWinsRep [J]
+    extern EPVector<Real64> ZnOpqSurfInsFaceCondGnRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
+    extern EPVector<Real64> ZnOpqSurfInsFaceCondLsRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
+    extern EPVector<Real64> ZnOpqSurfExtFaceCondGnRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
+    extern EPVector<Real64> ZnOpqSurfExtFaceCondLsRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
+    extern EPVector<Real64> BmIncInsSurfAmountRepEnergy;    // energy of BmIncInsSurfAmountRep [J]
+    extern EPVector<Real64> IntBmIncInsSurfAmountRepEnergy; // energy of IntBmIncInsSurfAmountRep [J]
+    extern EPVector<Real64> QRadSWwinAbsTotEnergy;          // Energy of QRadSWwinAbsTot [J]
+    extern EPVector<Real64> SWwinAbsTotalReport;            // Report - Total interior/exterior shortwave
     // absorbed in all glass layers of window (W)
-    extern Array1D<Real64> InitialDifSolInAbsReport; // Report - Initial transmitted diffuse solar
+    extern EPVector<Real64> InitialDifSolInAbsReport; // Report - Initial transmitted diffuse solar
     // absorbed on inside of surface (W)
-    extern Array1D<Real64> InitialDifSolInTransReport; // Report - Initial transmitted diffuse solar
+    extern EPVector<Real64> InitialDifSolInTransReport; // Report - Initial transmitted diffuse solar
     // transmitted out through inside of window surface (W)
-    extern Array1D<Real64> SWInAbsTotalReport; // Report - Total interior/exterior shortwave
+    extern EPVector<Real64> SWInAbsTotalReport; // Report - Total interior/exterior shortwave
     // absorbed on inside of surface (W)
-    extern Array1D<Real64> SWOutAbsTotalReport; // Report - Total exterior shortwave/solar
+    extern EPVector<Real64> SWOutAbsTotalReport; // Report - Total exterior shortwave/solar
     // absorbed on outside of surface (W)
-    extern Array1D<Real64> SWOutAbsEnergyReport; // Report - Total exterior shortwave/solar
+    extern EPVector<Real64> SWOutAbsEnergyReport; // Report - Total exterior shortwave/solar
     // absorbed on outside of surface (j)
 
-    extern Array1D<Real64> NominalR;                       // Nominal R value of each material -- used in matching interzone surfaces
-    extern Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
-    extern Array1D<Real64> NominalU;                       // Nominal U value for each construction -- used in matching interzone surfaces
+    extern EPVector<Real64> NominalR;                       // Nominal R value of each material -- used in matching interzone surfaces
+    extern EPVector<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
+    extern EPVector<Real64> NominalU;                       // Nominal U value for each construction -- used in matching interzone surfaces
 
     // removed variables (these were all arrays):
     // REAL(r64), ALLOCATABLE, :: DifIncInsSurfIntensRep    !Diffuse sol irradiance from ext wins on inside of surface (W/m2)
@@ -555,37 +555,37 @@ namespace DataHeatBalance {
     // Variables moved from HeatBalanceSurfaceManager and SolarShading
     // to avoid conflict with their use in WindowManager
 
-    extern Array1D<Real64> TempEffBulkAir; // air temperature adjacent to the surface used for
+    extern EPVector<Real64> TempEffBulkAir; // air temperature adjacent to the surface used for
     // inside surface heat balances
-    extern Array1D<Real64> HConvIn;      // INSIDE CONVECTION COEFFICIENT
-    extern Array1D<Real64> AnisoSkyMult; // Multiplier on exterior-surface sky view factor to
+    extern EPVector<Real64> HConvIn;      // INSIDE CONVECTION COEFFICIENT
+    extern EPVector<Real64> AnisoSkyMult; // Multiplier on exterior-surface sky view factor to
     // account for anisotropy of sky radiance; = 1.0 for
     // for isotropic sky
 
     // Moved from SolarShading to avoid conflicts in DaylightingDevices
-    extern Array1D<Real64> DifShdgRatioIsoSky;     // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
+    extern EPVector<Real64> DifShdgRatioIsoSky;     // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
     extern Array3D<Real64> DifShdgRatioIsoSkyHRTS; // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
-    extern Array1D<Real64> curDifShdgRatioIsoSky;  // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
-    extern Array1D<Real64> DifShdgRatioHoriz;      // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
+    extern EPVector<Real64> curDifShdgRatioIsoSky;  // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
+    extern EPVector<Real64> DifShdgRatioHoriz;      // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
     extern Array3D<Real64> DifShdgRatioHorizHRTS;  // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
-    extern Array1D<Real64> WithShdgIsoSky;         // Diffuse solar irradiance from sky on surface, with shading
-    extern Array1D<Real64> WoShdgIsoSky;           // Diffuse solar from sky on surface, without shading
-    extern Array1D<Real64> WithShdgHoriz;          // Diffuse solar irradiance from horizon portion of sky on surface,
+    extern EPVector<Real64> WithShdgIsoSky;         // Diffuse solar irradiance from sky on surface, with shading
+    extern EPVector<Real64> WoShdgIsoSky;           // Diffuse solar from sky on surface, without shading
+    extern EPVector<Real64> WithShdgHoriz;          // Diffuse solar irradiance from horizon portion of sky on surface,
     // with shading
-    extern Array1D<Real64> WoShdgHoriz; // Diffuse solar irradiance from horizon portion of sky on surface,
+    extern EPVector<Real64> WoShdgHoriz; // Diffuse solar irradiance from horizon portion of sky on surface,
     // without shading
-    extern Array1D<Real64> MultIsoSky;        // Contribution to eff sky view factor from isotropic sky
-    extern Array1D<Real64> MultCircumSolar;   // Contribution to eff sky view factor from circumsolar brightening
-    extern Array1D<Real64> MultHorizonZenith; // Contribution to eff sky view factor from horizon or zenith brightening
+    extern EPVector<Real64> MultIsoSky;        // Contribution to eff sky view factor from isotropic sky
+    extern EPVector<Real64> MultCircumSolar;   // Contribution to eff sky view factor from circumsolar brightening
+    extern EPVector<Real64> MultHorizonZenith; // Contribution to eff sky view factor from horizon or zenith brightening
 
-    extern Array1D<Real64> QS; // Zone short-wave flux density; used to calculate short-wave
+    extern EPVector<Real64> QS; // Zone short-wave flux density; used to calculate short-wave
     //     radiation absorbed on inside surfaces of zone
-    extern Array1D<Real64> QSLights; // Like QS, but Lights short-wave only.
+    extern EPVector<Real64> QSLights; // Like QS, but Lights short-wave only.
 
-    extern Array1D<Real64> QSDifSol;                // Like QS, but diffuse solar short-wave only.
-    extern Array1D<Real64> ITABSF;                  // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
-    extern Array1D<Real64> TMULT;                   // TMULT  - MULTIPLIER TO COMPUTE 'ITABSF'
-    extern Array1D<Real64> QL;                      // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
+    extern EPVector<Real64> QSDifSol;                // Like QS, but diffuse solar short-wave only.
+    extern EPVector<Real64> ITABSF;                  // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
+    extern EPVector<Real64> TMULT;                   // TMULT  - MULTIPLIER TO COMPUTE 'ITABSF'
+    extern EPVector<Real64> QL;                      // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
     extern Array2D<Real64> SunlitFracHR;            // Hourly fraction of heat transfer surface that is sunlit
     extern Array2D<Real64> CosIncAngHR;             // Hourly cosine of beam radiation incidence angle on surface
     extern Array3D<Real64> SunlitFrac;              // TimeStep fraction of heat transfer surface that is sunlit
@@ -606,9 +606,9 @@ namespace DataHeatBalance {
     extern Array2D<Real64> const GasCoeffsCp; // Gas specific heat coefficients for gases in a mixture
 
     //                       Air       Argon     Krypton   Xenon
-    extern Array1D<Real64> const GasWght; // Gas molecular weights for gases in a mixture
+    extern EPVector<Real64> const GasWght; // Gas molecular weights for gases in a mixture
 
-    extern Array1D<Real64> const GasSpecificHeatRatio; // Gas specific heat ratios.  Used for gasses in low pressure
+    extern EPVector<Real64> const GasSpecificHeatRatio; // Gas specific heat ratios.  Used for gasses in low pressure
 
     extern Real64 ZeroPointerVal;
 
@@ -653,9 +653,9 @@ namespace DataHeatBalance {
         Array2D<Real64> GasCon;           // Gas conductance coefficients for up to 5 gases in a mixture
         Array2D<Real64> GasVis;           // Gas viscosity coefficients for up to 5 gases in a mixture
         Array2D<Real64> GasCp;            // Gas specific-heat coefficients for up to 5 gases in a mixture
-        Array1D<Real64> GasWght;          // Gas molecular weight for up to 5 gases in a mixture
-        Array1D<Real64> GasSpecHeatRatio; // Gas specific heat ratio (used for low pressure calculations)
-        Array1D<Real64> GasFract;         // Gas fractions for up to 5 gases in a mixture
+        EPVector<Real64> GasWght;          // Gas molecular weight for up to 5 gases in a mixture
+        EPVector<Real64> GasSpecHeatRatio; // Gas specific heat ratio (used for low pressure calculations)
+        EPVector<Real64> GasFract;         // Gas fractions for up to 5 gases in a mixture
         // Radiation parameters
         Real64 AbsorpSolar;              // Layer solar absorptance
         Real64 AbsorpSolarInput;         // Layer solar absorptance input by user
@@ -736,20 +736,20 @@ namespace DataHeatBalance {
         Real64 RStomata;              // Minimum stomatal resistance DJS
         // HAMT
         int niso;                 // Number of data points
-        Array1D<Real64> isodata;  // isotherm values
-        Array1D<Real64> isorh;    // isotherm RH values
+        EPVector<Real64> isodata;  // isotherm values
+        EPVector<Real64> isorh;    // isotherm RH values
         int nsuc;                 // Number of data points
-        Array1D<Real64> sucdata;  // suction values
-        Array1D<Real64> sucwater; // suction water values
+        EPVector<Real64> sucdata;  // suction values
+        EPVector<Real64> sucwater; // suction water values
         int nred;                 // Number of data points
-        Array1D<Real64> reddata;  // redistribution values
-        Array1D<Real64> redwater; // redistribution water values
+        EPVector<Real64> reddata;  // redistribution values
+        EPVector<Real64> redwater; // redistribution water values
         int nmu;                  // Number of data points
-        Array1D<Real64> mudata;   // mu values
-        Array1D<Real64> murh;     // mu rh values
+        EPVector<Real64> mudata;   // mu values
+        EPVector<Real64> murh;     // mu rh values
         int ntc;                  // Number of data points
-        Array1D<Real64> tcdata;   // thermal conductivity values
-        Array1D<Real64> tcwater;  // thermal conductivity water values
+        EPVector<Real64> tcdata;   // thermal conductivity values
+        EPVector<Real64> tcwater;  // thermal conductivity water values
         Real64 itemp;             // initial Temperature
         Real64 irh;               // Initial RH
         Real64 iwater;            // Initial water content kg/kg
@@ -852,7 +852,7 @@ namespace DataHeatBalance {
         std::string Name;         // Name
         int NumGlzMat;            // Number of TC glazing materials
         Array1D_int LayerPoint;   // Layer pointer
-        Array1D<Real64> SpecTemp; // Temperature corresponding to the specified TC glazing optical data
+        EPVector<Real64> SpecTemp; // Temperature corresponding to the specified TC glazing optical data
         Array1D_string LayerName; // Name of the referenced WindowMaterial:Glazing object
 
         // Default Constructor
@@ -886,30 +886,30 @@ namespace DataHeatBalance {
         int W5FrameDivider; // FrameDivider number for window construction from Window5 data file;
         //  zero is construction not from Window5 file or Window5 construction has no frame.
         // Conductive properties for the construction
-        Array1D<Real64> CTFCross;     // Cross or Y terms of the CTF equation
-        Array1D<Real64> CTFFlux;      // Flux history terms of the CTF equation
-        Array1D<Real64> CTFInside;    // Inside or Z terms of the CTF equation
-        Array1D<Real64> CTFOutside;   // Outside or X terms of the CTF equation
-        Array1D<Real64> CTFSourceIn;  // Heat source/sink inside terms of CTF equation
-        Array1D<Real64> CTFSourceOut; // Heat source/sink outside terms of CTF equation
+        EPVector<Real64> CTFCross;     // Cross or Y terms of the CTF equation
+        EPVector<Real64> CTFFlux;      // Flux history terms of the CTF equation
+        EPVector<Real64> CTFInside;    // Inside or Z terms of the CTF equation
+        EPVector<Real64> CTFOutside;   // Outside or X terms of the CTF equation
+        EPVector<Real64> CTFSourceIn;  // Heat source/sink inside terms of CTF equation
+        EPVector<Real64> CTFSourceOut; // Heat source/sink outside terms of CTF equation
         Real64 CTFTimeStep;           // Time increment for stable simulation of construct (could be greater than TimeStep)
         // The next three series of terms are used to calculate the temperature at the location of a source/sink
         // in the QTF formulation.  This calculation is necessary to allow the proper simulation of a
         // radiant system.
-        Array1D<Real64> CTFTSourceOut; // Outside terms of the CTF equation for interior temp
+        EPVector<Real64> CTFTSourceOut; // Outside terms of the CTF equation for interior temp
         // calc@source location
-        Array1D<Real64> CTFTSourceIn; // Inside terms of the CTF equation for interior temp
+        EPVector<Real64> CTFTSourceIn; // Inside terms of the CTF equation for interior temp
         // calc@source location
-        Array1D<Real64> CTFTSourceQ; // Source/sink terms of the CTF equation for interior temp
+        EPVector<Real64> CTFTSourceQ; // Source/sink terms of the CTF equation for interior temp
         // calc@source location
         // The next three series of terms are used to calculate the temperature at a location specified by the user.
         // This location must be between two layers and is intended to allow the user to evaluate whether or not
         // condensation is a possibility between material layers.
-        Array1D<Real64> CTFTUserOut; // Outside terms of the CTF equation for interior temp
+        EPVector<Real64> CTFTUserOut; // Outside terms of the CTF equation for interior temp
         // calc@user location
-        Array1D<Real64> CTFTUserIn; // Inside terms of the CTF equation for interior temp
+        EPVector<Real64> CTFTUserIn; // Inside terms of the CTF equation for interior temp
         // calc@user location
-        Array1D<Real64> CTFTUserSource; // Source/sink terms of the CTF equation for interior temp
+        EPVector<Real64> CTFTUserSource; // Source/sink terms of the CTF equation for interior temp
         // calc@user location
         int NumHistories; // CTFTimeStep/TimeStepZone or the number of temp/flux history series
         // for the construction
@@ -927,7 +927,7 @@ namespace DataHeatBalance {
         Real64 AbsDiffIn;  // Inner absorptance coefficient for diffuse radiation
         Real64 AbsDiffOut; // Outer absorptance coefficient for diffuse radiation
         // Variables for window constructions
-        Array1D<Real64> AbsDiff; // Diffuse solar absorptance for each glass layer,
+        EPVector<Real64> AbsDiff; // Diffuse solar absorptance for each glass layer,
         // bare glass or shade on
         Array2D<Real64> BlAbsDiff; // Diffuse solar absorptance for each glass layer vs.
         // slat angle, blind on
@@ -935,42 +935,42 @@ namespace DataHeatBalance {
         // vs. slat angle, blind on
         Array2D<Real64> BlAbsDiffSky; // Diffuse sky solar absorptance for each glass layer
         // vs. slat angle, blind on
-        Array1D<Real64> AbsDiffBack;   // Diffuse back solar absorptance for each glass layer
+        EPVector<Real64> AbsDiffBack;   // Diffuse back solar absorptance for each glass layer
         Array2D<Real64> BlAbsDiffBack; // Diffuse back solar absorptance for each glass layer,
         //  vs. slat angle, blind on
         Real64 AbsDiffShade;              // Diffuse solar absorptance for shade
-        Array1D<Real64> AbsDiffBlind;     // Diffuse solar absorptance for blind, vs. slat angle
-        Array1D<Real64> AbsDiffBlindGnd;  // Diffuse ground solar absorptance for blind, vs. slat angle
-        Array1D<Real64> AbsDiffBlindSky;  // Diffuse sky solar absorptance for blind, vs. slat angle
+        EPVector<Real64> AbsDiffBlind;     // Diffuse solar absorptance for blind, vs. slat angle
+        EPVector<Real64> AbsDiffBlindGnd;  // Diffuse ground solar absorptance for blind, vs. slat angle
+        EPVector<Real64> AbsDiffBlindSky;  // Diffuse sky solar absorptance for blind, vs. slat angle
         Real64 AbsDiffBackShade;          // Diffuse back solar absorptance for shade
-        Array1D<Real64> AbsDiffBackBlind; // Diffuse back solar absorptance for blind, vs. slat angle
+        EPVector<Real64> AbsDiffBackBlind; // Diffuse back solar absorptance for blind, vs. slat angle
         Real64 ShadeAbsorpThermal;        // Diffuse back thermal absorptance of shade
         Array2D<Real64> AbsBeamCoef;      // Coefficients of incidence-angle polynomial for solar
         // absorptance for each solid glazing layer
         Array2D<Real64> AbsBeamBackCoef;  // As for AbsBeamCoef but for back-incident solar
-        Array1D<Real64> AbsBeamShadeCoef; // Coefficients of incidence-angle polynomial for solar
+        EPVector<Real64> AbsBeamShadeCoef; // Coefficients of incidence-angle polynomial for solar
         // absorptance of shade
         Real64 TransDiff;                      // Diffuse solar transmittance, bare glass or shade on
-        Array1D<Real64> BlTransDiff;           // Diffuse solar transmittance, blind present, vs. slat angle
-        Array1D<Real64> BlTransDiffGnd;        // Ground diffuse solar transmittance, blind present, vs. slat angle
-        Array1D<Real64> BlTransDiffSky;        // Sky diffuse solar transmittance, blind present, vs. slat angle
+        EPVector<Real64> BlTransDiff;           // Diffuse solar transmittance, blind present, vs. slat angle
+        EPVector<Real64> BlTransDiffGnd;        // Ground diffuse solar transmittance, blind present, vs. slat angle
+        EPVector<Real64> BlTransDiffSky;        // Sky diffuse solar transmittance, blind present, vs. slat angle
         Real64 TransDiffVis;                   // Diffuse visible transmittance, bare glass or shade on
-        Array1D<Real64> BlTransDiffVis;        // Diffuse visible transmittance, blind present, vs. slat angle
+        EPVector<Real64> BlTransDiffVis;        // Diffuse visible transmittance, blind present, vs. slat angle
         Real64 ReflectSolDiffBack;             // Diffuse back solar reflectance, bare glass or shade on
-        Array1D<Real64> BlReflectSolDiffBack;  // Diffuse back solar reflectance, blind present, vs. slat angle
+        EPVector<Real64> BlReflectSolDiffBack;  // Diffuse back solar reflectance, blind present, vs. slat angle
         Real64 ReflectSolDiffFront;            // Diffuse front solar reflectance, bare glass or shade on
-        Array1D<Real64> BlReflectSolDiffFront; // Diffuse front solar reflectance, blind present, vs. slat angle
+        EPVector<Real64> BlReflectSolDiffFront; // Diffuse front solar reflectance, blind present, vs. slat angle
         Real64 ReflectVisDiffBack;             // Diffuse back visible reflectance, bare glass or shade on
-        Array1D<Real64> BlReflectVisDiffBack;  // Diffuse back visible reflectance, blind present, vs. slat angle
+        EPVector<Real64> BlReflectVisDiffBack;  // Diffuse back visible reflectance, blind present, vs. slat angle
         Real64 ReflectVisDiffFront;            // Diffuse front visible reflectance, bare glass or shade on
-        Array1D<Real64> BlReflectVisDiffFront; // Diffuse front visible reflectance, blind present, vs. slat angle
-        Array1D<Real64> TransSolBeamCoef;      // Coeffs of incidence-angle polynomial for beam sol trans,
+        EPVector<Real64> BlReflectVisDiffFront; // Diffuse front visible reflectance, blind present, vs. slat angle
+        EPVector<Real64> TransSolBeamCoef;      // Coeffs of incidence-angle polynomial for beam sol trans,
         // bare glass or shade on
-        Array1D<Real64> TransVisBeamCoef; // Coeffs of incidence-angle polynomial for beam vis trans,
+        EPVector<Real64> TransVisBeamCoef; // Coeffs of incidence-angle polynomial for beam vis trans,
         // bare glass or shade on
-        Array1D<Real64> ReflSolBeamFrontCoef; // Coeffs of incidence-angle polynomial for beam sol front refl,
+        EPVector<Real64> ReflSolBeamFrontCoef; // Coeffs of incidence-angle polynomial for beam sol front refl,
         // bare glass or shade on
-        Array1D<Real64> ReflSolBeamBackCoef; // Like ReflSolBeamFrontCoef, but for back-incident beam solar
+        EPVector<Real64> ReflSolBeamBackCoef; // Like ReflSolBeamFrontCoef, but for back-incident beam solar
         Array2D<Real64> tBareSolCoef;        // Isolated glass solar transmittance coeffs of inc. angle polynomial
         Array2D<Real64> tBareVisCoef;        // Isolated glass visible transmittance coeffs of inc. angle polynomial
         Array2D<Real64> rfBareSolCoef;       // Isolated glass front solar reflectance coeffs of inc. angle polynomial
@@ -979,14 +979,14 @@ namespace DataHeatBalance {
         Array2D<Real64> rbBareVisCoef;       // Isolated glass back visible reflectance coeffs of inc. angle polynomial
         Array2D<Real64> afBareSolCoef;       // Isolated glass front solar absorptance coeffs of inc. angle polynomial
         Array2D<Real64> abBareSolCoef;       // Isolated glass back solar absorptance coeffs of inc. angle polynomial
-        Array1D<Real64> tBareSolDiff;        // Isolated glass diffuse solar transmittance
-        Array1D<Real64> tBareVisDiff;        // Isolated glass diffuse visible transmittance
-        Array1D<Real64> rfBareSolDiff;       // Isolated glass diffuse solar front reflectance
-        Array1D<Real64> rfBareVisDiff;       // Isolated glass diffuse visible front reflectance
-        Array1D<Real64> rbBareSolDiff;       // Isolated glass diffuse solar back reflectance
-        Array1D<Real64> rbBareVisDiff;       // Isolated glass diffuse visible back reflectance
-        Array1D<Real64> afBareSolDiff;       // Isolated glass diffuse solar front absorptance
-        Array1D<Real64> abBareSolDiff;       // Isolated glass diffuse solar back absorptance
+        EPVector<Real64> tBareSolDiff;        // Isolated glass diffuse solar transmittance
+        EPVector<Real64> tBareVisDiff;        // Isolated glass diffuse visible transmittance
+        EPVector<Real64> rfBareSolDiff;       // Isolated glass diffuse solar front reflectance
+        EPVector<Real64> rfBareVisDiff;       // Isolated glass diffuse visible front reflectance
+        EPVector<Real64> rbBareSolDiff;       // Isolated glass diffuse solar back reflectance
+        EPVector<Real64> rbBareVisDiff;       // Isolated glass diffuse visible back reflectance
+        EPVector<Real64> afBareSolDiff;       // Isolated glass diffuse solar front absorptance
+        EPVector<Real64> abBareSolDiff;       // Isolated glass diffuse solar back absorptance
         bool FromWindow5DataFile;            // True if this is a window construction extracted from the Window5 data file
         Real64 W5FileMullionWidth;           // Width of mullion for construction from Window5 data file (m)
         int W5FileMullionOrientation;        // Orientation of mullion, if present, for Window5 data file construction,
@@ -1024,8 +1024,8 @@ namespace DataHeatBalance {
         // EquivalentLayer Window
         bool WindowTypeEQL;              // True for equivalent layer window, false otherwise
         int EQLConsPtr;                  // Pointer to equivalent Layer window construction
-        Array1D<Real64> AbsDiffFrontEQL; // Diffuse layer system front absorptance for EQL window
-        Array1D<Real64> AbsDiffBackEQL;  // Diffuse layer system back absorptance for EQL window
+        EPVector<Real64> AbsDiffFrontEQL; // Diffuse layer system front absorptance for EQL window
+        EPVector<Real64> AbsDiffBackEQL;  // Diffuse layer system back absorptance for EQL window
         Real64 TransDiffFrontEQL;        // Diffuse system front transmittance for EQL window
         Real64 TransDiffBackEQL;         // Diffuse system back transmittance for EQL window
         // Air boundary
@@ -1082,10 +1082,10 @@ namespace DataHeatBalance {
         // Members
         std::string Name;           // Name of spectral data set
         int NumOfWavelengths;       // Number of wavelengths in the data set
-        Array1D<Real64> WaveLength; // Wavelength (microns)
-        Array1D<Real64> Trans;      // Transmittance at normal incidence
-        Array1D<Real64> ReflFront;  // Front reflectance at normal incidence
-        Array1D<Real64> ReflBack;   // Back reflectance at normal incidence
+        EPVector<Real64> WaveLength; // Wavelength (microns)
+        EPVector<Real64> Trans;      // Transmittance at normal incidence
+        EPVector<Real64> ReflFront;  // Front reflectance at normal incidence
+        EPVector<Real64> ReflBack;   // Back reflectance at normal incidence
 
         // Default Constructor
         SpectralDataProperties() : NumOfWavelengths(0)
@@ -1777,12 +1777,12 @@ namespace DataHeatBalance {
         bool RefDoorMixFlag;           // Refrigeration door mixing within zone
         Real64 EMSimpleMixingFlowRate; // Value EMS is directing to use for override
         Array1D_bool EMSRefDoorMixingOn;
-        Array1D<Real64> EMSRefDoorFlowRate;
-        Array1D<Real64> VolRefDoorFlowRate;
+        EPVector<Real64> EMSRefDoorFlowRate;
+        EPVector<Real64> VolRefDoorFlowRate;
         Array1D_int OpenSchedPtr;            // Schedule for Refrigeration door open fraction
-        Array1D<Real64> DoorHeight;          // Door height for refrigeration door, m
-        Array1D<Real64> DoorArea;            // Door area for refrigeration door, m2
-        Array1D<Real64> Protection;          // Refrigeration door protection factor, dimensionless
+        EPVector<Real64> DoorHeight;          // Door height for refrigeration door, m
+        EPVector<Real64> DoorArea;            // Door area for refrigeration door, m2
+        EPVector<Real64> Protection;          // Refrigeration door protection factor, dimensionless
         Array1D_int MateZonePtr;             // Zone connected by refrigeration door (MateZone > ZonePtr)
         Array1D_string DoorMixingObjectName; // Used in one error statement and eio
         Array1D_string DoorProtTypeName;     // Used in eio
@@ -1833,7 +1833,7 @@ namespace DataHeatBalance {
         int IncludeInfilToZoneMassBal;         // not self-balanced, include infiltration in zone air mass balance
         Array1D_int ZoneMixingSourcesPtr;      // source zones pointer
         Array1D_int ZoneMixingReceivingPtr;    // receiving zones pointer
-        Array1D<Real64> ZoneMixingReceivingFr; // receiving zones fraction
+        EPVector<Real64> ZoneMixingReceivingFr; // receiving zones fraction
                                                // Note, this type dimensioned by number of zones
 
         // Default Constructor
@@ -1915,7 +1915,7 @@ namespace DataHeatBalance {
         Real64 QBBRAD;  // ENERGY RADIATED FROM BASEBOARD HEATING
         int NumberOfDevices;
         int MaxNumberOfDevices;
-        Array1D<GenericComponentZoneIntGainStruct> Device;
+        EPVector<GenericComponentZoneIntGainStruct> Device;
 
         // Default Constructor
         ZoneSimData()
@@ -1989,28 +1989,28 @@ namespace DataHeatBalance {
         // vs. profile angle, slat angle
         Array2D<Real64> SolBackBeamDiffRefl; // Blind solar back beam-diffuse reflectance
         // vs. profile angle, slat angle
-        Array1D<Real64> SolFrontDiffDiffTrans; // Blind solar front diffuse-diffuse transmittance
+        EPVector<Real64> SolFrontDiffDiffTrans; // Blind solar front diffuse-diffuse transmittance
         // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffTransGnd; // Blind ground solar front diffuse-diffuse transmittance
+        EPVector<Real64> SolFrontDiffDiffTransGnd; // Blind ground solar front diffuse-diffuse transmittance
         // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffTransSky; // Blind sky solar front diffuse-diffuse transmittance
+        EPVector<Real64> SolFrontDiffDiffTransSky; // Blind sky solar front diffuse-diffuse transmittance
         // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffRefl; // Blind solar front diffuse-diffuse reflectance
+        EPVector<Real64> SolFrontDiffDiffRefl; // Blind solar front diffuse-diffuse reflectance
         // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffReflGnd; // Blind ground solar front diffuse-diffuse reflectance
+        EPVector<Real64> SolFrontDiffDiffReflGnd; // Blind ground solar front diffuse-diffuse reflectance
         // vs. slat angle
-        Array1D<Real64> SolFrontDiffDiffReflSky; // Blind sky solar front diffuse-diffuse reflectance
+        EPVector<Real64> SolFrontDiffDiffReflSky; // Blind sky solar front diffuse-diffuse reflectance
         // vs. slat angle
-        Array1D<Real64> SolBackDiffDiffTrans; // Blind solar back diffuse-diffuse transmittance
+        EPVector<Real64> SolBackDiffDiffTrans; // Blind solar back diffuse-diffuse transmittance
         // vs. slat angle
-        Array1D<Real64> SolBackDiffDiffRefl; // Blind solar back diffuse-diffuse reflectance
+        EPVector<Real64> SolBackDiffDiffRefl; // Blind solar back diffuse-diffuse reflectance
         // vs. slat angle
         Array2D<Real64> SolFrontBeamAbs;    // Blind solar front beam absorptance vs. slat angle
         Array2D<Real64> SolBackBeamAbs;     // Blind solar back beam absorptance vs. slat angle
-        Array1D<Real64> SolFrontDiffAbs;    // Blind solar front diffuse absorptance vs. slat angle
-        Array1D<Real64> SolFrontDiffAbsGnd; // Blind ground solar front diffuse absorptance vs. slat angle
-        Array1D<Real64> SolFrontDiffAbsSky; // Blind sky solar front diffuse absorptance vs. slat angle
-        Array1D<Real64> SolBackDiffAbs;     // Blind solar back diffuse absorptance vs. slat angle
+        EPVector<Real64> SolFrontDiffAbs;    // Blind solar front diffuse absorptance vs. slat angle
+        EPVector<Real64> SolFrontDiffAbsGnd; // Blind ground solar front diffuse absorptance vs. slat angle
+        EPVector<Real64> SolFrontDiffAbsSky; // Blind sky solar front diffuse absorptance vs. slat angle
+        EPVector<Real64> SolBackDiffAbs;     // Blind solar back diffuse absorptance vs. slat angle
         // Blind visible properties
         Array2D<Real64> VisFrontBeamBeamTrans; // Blind visible front beam-beam transmittance
         // vs. profile angle, slat angle
@@ -2028,19 +2028,19 @@ namespace DataHeatBalance {
         // vs. profile angle, slat angle
         Array2D<Real64> VisBackBeamDiffRefl; // Blind visible back beam-diffuse reflectance
         // vs. profile angle, slat angle
-        Array1D<Real64> VisFrontDiffDiffTrans; // Blind visible front diffuse-diffuse transmittance
+        EPVector<Real64> VisFrontDiffDiffTrans; // Blind visible front diffuse-diffuse transmittance
         // vs. slat angle
-        Array1D<Real64> VisFrontDiffDiffRefl; // Blind visible front diffuse-diffuse reflectance
+        EPVector<Real64> VisFrontDiffDiffRefl; // Blind visible front diffuse-diffuse reflectance
         // vs. slat angle
-        Array1D<Real64> VisBackDiffDiffTrans; // Blind visible back diffuse-diffuse transmittance
+        EPVector<Real64> VisBackDiffDiffTrans; // Blind visible back diffuse-diffuse transmittance
         // vs. slat angle
-        Array1D<Real64> VisBackDiffDiffRefl; // Blind visible back diffuse-diffuse reflectance
+        EPVector<Real64> VisBackDiffDiffRefl; // Blind visible back diffuse-diffuse reflectance
         // vs. slat angle
         // Long-wave (IR) blind properties
-        Array1D<Real64> IRFrontTrans; // Blind IR front transmittance vs. slat angle
-        Array1D<Real64> IRFrontEmiss; // Blind IR front emissivity vs. slat angle
-        Array1D<Real64> IRBackTrans;  // Blind IR back transmittance vs. slat angle
-        Array1D<Real64> IRBackEmiss;  // Blind IR back emissivity vs. slat angle
+        EPVector<Real64> IRFrontTrans; // Blind IR front transmittance vs. slat angle
+        EPVector<Real64> IRFrontEmiss; // Blind IR front emissivity vs. slat angle
+        EPVector<Real64> IRBackTrans;  // Blind IR back transmittance vs. slat angle
+        EPVector<Real64> IRBackEmiss;  // Blind IR back emissivity vs. slat angle
 
         // Default Constructor
         WindowBlindProperties()
@@ -2124,10 +2124,10 @@ namespace DataHeatBalance {
     struct ZoneCatEUseData
     {
         // Members
-        Array1D<Real64> EEConvected; // Category (0 to 25) Energy Convected from Electric Equipment
-        Array1D<Real64> EERadiated;  // Category (0 to 25) Energy Radiated from Electric Equipment
-        Array1D<Real64> EELost;      // Category (0 to 25) Energy from Electric Equipment (lost)
-        Array1D<Real64> EELatent;    // Category (0 to 25) Latent Energy from Electric Equipment
+        EPVector<Real64> EEConvected; // Category (0 to 25) Energy Convected from Electric Equipment
+        EPVector<Real64> EERadiated;  // Category (0 to 25) Energy Radiated from Electric Equipment
+        EPVector<Real64> EELost;      // Category (0 to 25) Energy from Electric Equipment (lost)
+        EPVector<Real64> EELatent;    // Category (0 to 25) Latent Energy from Electric Equipment
 
         // Default Constructor
         ZoneCatEUseData() : EEConvected({0, 25}, 0.0), EERadiated({0, 25}, 0.0), EELost({0, 25}, 0.0), EELatent({0, 25}, 0.0)
@@ -2205,7 +2205,7 @@ namespace DataHeatBalance {
     {
         // Customized Members
         Real64 WaterHeatingDesuperheaterReclaimedHeatTotal;    // total reclaimed heat by water heating desuperheater coils
-        Array1D<Real64> WaterHeatingDesuperheaterReclaimedHeat; // heat reclaimed by water heating desuperheater coils
+        EPVector<Real64> WaterHeatingDesuperheaterReclaimedHeat; // heat reclaimed by water heating desuperheater coils
 
         // Default Constructor
         HeatReclaimHPCoilData() : WaterHeatingDesuperheaterReclaimedHeatTotal(0.0)
@@ -2612,60 +2612,60 @@ namespace DataHeatBalance {
     };
 
     // Object Data
-    extern Array1D<ZonePreDefRepType> ZonePreDefRep;
+    extern EPVector<ZonePreDefRepType> ZonePreDefRep;
     extern ZonePreDefRepType BuildingPreDefRep; // Autodesk:Note Removed explicit constructor that was missing some entries
-    extern Array1D<ZoneSimData> ZoneIntGain;
-    extern Array1D<MaterialProperties> Material;
-    extern Array1D<GapSupportPillar> SupportPillar;
-    extern Array1D<GapDeflectionState> DeflectionState;
-    extern Array1D<ConstructionData> Construct;
-    extern Array1D<SpectralDataProperties> SpectralData;
-    extern Array1D<ZoneData> Zone;
-    extern Array1D<ZoneListData> ZoneList;
-    extern Array1D<ZoneGroupData> ZoneGroup;
-    extern Array1D<ZoneListData> ShadingZoneGroup;
-    extern Array1D<PeopleData> People;
-    extern Array1D<LightsData> Lights;
-    extern Array1D<ZoneEquipData> ZoneElectric;
-    extern Array1D<ZoneEquipData> ZoneGas;
-    extern Array1D<ZoneEquipData> ZoneOtherEq;
-    extern Array1D<ZoneEquipData> ZoneHWEq;
-    extern Array1D<ZoneEquipData> ZoneSteamEq;
-    extern Array1D<ITEquipData> ZoneITEq;
-    extern Array1D<BBHeatData> ZoneBBHeat;
-    extern Array1D<InfiltrationData> Infiltration;
-    extern Array1D<VentilationData> Ventilation;
-    extern Array1D<ZoneAirBalanceData> ZoneAirBalance;
-    extern Array1D<MixingData> Mixing;
-    extern Array1D<MixingData> CrossMixing;
-    extern Array1D<MixingData> RefDoorMixing;
-    extern Array1D<WindowBlindProperties> Blind;
-    extern Array1D<WindowComplexShade> ComplexShade;
-    extern Array1D<WindowThermalModelParams> WindowThermalModel;
-    extern Array1D<SurfaceScreenProperties> SurfaceScreens;
-    extern Array1D<ScreenTransData> ScreenTrans;
-    extern Array1D<ZoneCatEUseData> ZoneIntEEuse;
-    extern Array1D<RefrigCaseCreditData> RefrigCaseCredit;
-    extern Array1D<HeatReclaimRefrigeratedRackData> HeatReclaimRefrigeratedRack;
-    extern Array1D<HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
-    extern Array1D<HeatReclaimDXCoilData> HeatReclaimDXCoil;
-    extern Array1D<HeatReclaimDXCoilData> HeatReclaimVS_DXCoil;
-    extern Array1D<HeatReclaimHPCoilData> HeatReclaimSimple_WAHPCoil;
-    extern Array1D<AirReportVars> ZnAirRpt;
-    extern Array1D<TCGlazingsType> TCGlazings;
-    extern Array1D<ZoneEquipData> ZoneCO2Gen;
-    extern Array1D<GlobalInternalGainMiscObject> PeopleObjects;
-    extern Array1D<GlobalInternalGainMiscObject> LightsObjects;
-    extern Array1D<GlobalInternalGainMiscObject> ZoneElectricObjects;
-    extern Array1D<GlobalInternalGainMiscObject> ZoneGasObjects;
-    extern Array1D<GlobalInternalGainMiscObject> HotWaterEqObjects;
-    extern Array1D<GlobalInternalGainMiscObject> SteamEqObjects;
-    extern Array1D<GlobalInternalGainMiscObject> OtherEqObjects;
-    extern Array1D<GlobalInternalGainMiscObject> InfiltrationObjects;
-    extern Array1D<GlobalInternalGainMiscObject> VentilationObjects;
-    extern Array1D<ZoneReportVars> ZnRpt;
-    extern Array1D<ZoneMassConservationData> MassConservation;
-    extern Array1D<ZoneLocalEnvironmentData> ZoneLocalEnvironment;
+    extern EPVector<ZoneSimData> ZoneIntGain;
+    extern EPVector<MaterialProperties> Material;
+    extern EPVector<GapSupportPillar> SupportPillar;
+    extern EPVector<GapDeflectionState> DeflectionState;
+    extern EPVector<ConstructionData> Construct;
+    extern EPVector<SpectralDataProperties> SpectralData;
+    extern EPVector<ZoneData> Zone;
+    extern EPVector<ZoneListData> ZoneList;
+    extern EPVector<ZoneGroupData> ZoneGroup;
+    extern EPVector<ZoneListData> ShadingZoneGroup;
+    extern EPVector<PeopleData> People;
+    extern EPVector<LightsData> Lights;
+    extern EPVector<ZoneEquipData> ZoneElectric;
+    extern EPVector<ZoneEquipData> ZoneGas;
+    extern EPVector<ZoneEquipData> ZoneOtherEq;
+    extern EPVector<ZoneEquipData> ZoneHWEq;
+    extern EPVector<ZoneEquipData> ZoneSteamEq;
+    extern EPVector<ITEquipData> ZoneITEq;
+    extern EPVector<BBHeatData> ZoneBBHeat;
+    extern EPVector<InfiltrationData> Infiltration;
+    extern EPVector<VentilationData> Ventilation;
+    extern EPVector<ZoneAirBalanceData> ZoneAirBalance;
+    extern EPVector<MixingData> Mixing;
+    extern EPVector<MixingData> CrossMixing;
+    extern EPVector<MixingData> RefDoorMixing;
+    extern EPVector<WindowBlindProperties> Blind;
+    extern EPVector<WindowComplexShade> ComplexShade;
+    extern EPVector<WindowThermalModelParams> WindowThermalModel;
+    extern EPVector<SurfaceScreenProperties> SurfaceScreens;
+    extern EPVector<ScreenTransData> ScreenTrans;
+    extern EPVector<ZoneCatEUseData> ZoneIntEEuse;
+    extern EPVector<RefrigCaseCreditData> RefrigCaseCredit;
+    extern EPVector<HeatReclaimRefrigeratedRackData> HeatReclaimRefrigeratedRack;
+    extern EPVector<HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
+    extern EPVector<HeatReclaimDXCoilData> HeatReclaimDXCoil;
+    extern EPVector<HeatReclaimDXCoilData> HeatReclaimVS_DXCoil;
+    extern EPVector<HeatReclaimHPCoilData> HeatReclaimSimple_WAHPCoil;
+    extern EPVector<AirReportVars> ZnAirRpt;
+    extern EPVector<TCGlazingsType> TCGlazings;
+    extern EPVector<ZoneEquipData> ZoneCO2Gen;
+    extern EPVector<GlobalInternalGainMiscObject> PeopleObjects;
+    extern EPVector<GlobalInternalGainMiscObject> LightsObjects;
+    extern EPVector<GlobalInternalGainMiscObject> ZoneElectricObjects;
+    extern EPVector<GlobalInternalGainMiscObject> ZoneGasObjects;
+    extern EPVector<GlobalInternalGainMiscObject> HotWaterEqObjects;
+    extern EPVector<GlobalInternalGainMiscObject> SteamEqObjects;
+    extern EPVector<GlobalInternalGainMiscObject> OtherEqObjects;
+    extern EPVector<GlobalInternalGainMiscObject> InfiltrationObjects;
+    extern EPVector<GlobalInternalGainMiscObject> VentilationObjects;
+    extern EPVector<ZoneReportVars> ZnRpt;
+    extern EPVector<ZoneMassConservationData> MassConservation;
+    extern EPVector<ZoneLocalEnvironmentData> ZoneLocalEnvironment;
     extern ZoneAirMassFlowConservation ZoneAirMassFlow;
 
     // Functions

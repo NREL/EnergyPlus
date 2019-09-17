@@ -240,17 +240,17 @@ namespace ThermalComfort {
     Real64 TotalAnyZoneNotMetHeatingOccupied(0.0);
     Real64 TotalAnyZoneNotMetCoolingOccupied(0.0);
     Real64 TotalAnyZoneNotMetOccupied(0.0);
-    Array1D<Real64> ZoneOccHrs;
+    EPVector<Real64> ZoneOccHrs;
     bool useEpwData(false);
-    Array1D<Real64> DailyAveOutTemp(30, 0.0);
+    EPVector<Real64> DailyAveOutTemp(30, 0.0);
 
     // Subroutine Specifications for the Thermal Comfort module
 
     // Object Data
-    Array1D<ThermalComfortInASH55Type> ThermalComfortInASH55;
-    Array1D<ThermalComfortSetPointType> ThermalComfortSetPoint;
-    Array1D<ThermalComfortDataType> ThermalComfortData;
-    Array1D<AngleFactorData> AngleFactorList; // Angle Factor List data for each Angle Factor List
+    EPVector<ThermalComfortInASH55Type> ThermalComfortInASH55;
+    EPVector<ThermalComfortSetPointType> ThermalComfortSetPoint;
+    EPVector<ThermalComfortDataType> ThermalComfortData;
+    EPVector<AngleFactorData> AngleFactorList; // Angle Factor List data for each Angle Factor List
 
     Real64 runningAverageASH(0.0);
 
@@ -1400,9 +1400,9 @@ namespace ThermalComfort {
         Real64 const CloEmiss(0.8); // Clothing Emissivity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D<Real64> Coeff(2);      // Coefficients used in Range-Kutta's Method
-        static Array1D<Real64> Temp(2);       // Temperature
-        static Array1D<Real64> TempChange(2); // Change of temperature
+        static EPVector<Real64> Coeff(2);      // Coefficients used in Range-Kutta's Method
+        static EPVector<Real64> Temp(2);       // Temperature
+        static EPVector<Real64> TempChange(2); // Change of temperature
         Real64 BodyWt;                        // Weight of body, kg
         Real64 DayNum;                        // Number of days of acclimation
         int NumDay;                           // Loop counter for DayNum
@@ -1790,7 +1790,7 @@ namespace ThermalComfort {
         int J;
         Real64 B;
         Real64 H2;
-        static Array1D<Real64> const A(2, {0.29289321881345, 1.70710678118654});
+        static EPVector<Real64> const A(2, {0.29289321881345, 1.70710678118654});
 
         H2 = 0.5 * H;
 
@@ -2029,8 +2029,8 @@ namespace ThermalComfort {
         int SurfNum2;                     // surface number used in "for" loop
         int ZoneNum2;                     // zone number index
         Real64 SumAET;                    // Intermediate calculational variable (area*emissivity*T) sum
-        static Array1D<Real64> SurfaceAE; // Product of area and emissivity for each surface
-        static Array1D<Real64> ZoneAESum; // Sum of area times emissivity for all zone surfaces
+        static EPVector<Real64> SurfaceAE; // Product of area and emissivity for each surface
+        static EPVector<Real64> ZoneAESum; // Sum of area times emissivity for all zone surfaces
         static bool FirstTimeError;       // Only report the error message one time
 
         // Initialize ZoneAESum for all zones and SurfaceAE for all surfaces at the start of the simulation
@@ -2615,7 +2615,7 @@ namespace ThermalComfort {
         std::string epwLine;
         static Real64 avgDryBulbASH(0.0);
         Real64 dryBulb;
-        static Array1D<Real64> monthlyTemp(12, 0.0);
+        static EPVector<Real64> monthlyTemp(12, 0.0);
         Real64 tComf;
         Real64 numOccupants;
         int statFile;
@@ -2916,7 +2916,7 @@ namespace ThermalComfort {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Real64 const alpha(0.8);
-        static Array1D<Real64> const alpha_pow({pow_6(alpha), pow_5(alpha), pow_4(alpha), pow_3(alpha), pow_2(alpha), alpha, 1.0}); // alpha^(7-i)
+        static EPVector<Real64> const alpha_pow({pow_6(alpha), pow_5(alpha), pow_4(alpha), pow_3(alpha), pow_2(alpha), alpha, 1.0}); // alpha^(7-i)
         static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

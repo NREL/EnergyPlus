@@ -143,8 +143,8 @@ namespace BaseboardRadiator {
         }
     };
     // Object Data
-    extern Array1D<BaseboardParams> Baseboard;
-    extern Array1D<BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
+    extern EPVector<BaseboardParams> Baseboard;
+    extern EPVector<BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
 
     // Functions
 

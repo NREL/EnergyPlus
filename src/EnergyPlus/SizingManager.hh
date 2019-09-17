@@ -125,7 +125,7 @@ namespace SizingManager {
     void GetZoneSizingInput();
 
     void
-    GetZoneAndZoneListNames(bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames);
+    GetZoneAndZoneListNames(bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, EPVector<ZoneListData> &ZoneListNames);
 
     void GetSystemSizingInput();
 

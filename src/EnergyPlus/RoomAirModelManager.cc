@@ -2820,7 +2820,7 @@ namespace RoomAirModelManager {
         int MaxAlphas = 0;       // Maximum number of alpha input fields
         int TotalArgs = 0;       // Total number of alpha and numeric arguments(max) for a
         Array1D_string Alphas;   // Alpha input items for object
-        Array1D<Real64> Numbers; // Numeric input items for object
+        EPVector<Real64> Numbers; // Numeric input items for object
         bool errorfound;
 
         NumAlphas = 1;

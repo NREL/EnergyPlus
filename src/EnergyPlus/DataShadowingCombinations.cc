@@ -85,7 +85,7 @@ namespace DataShadowingCombinations {
     // MODULE VARIABLE DECLARATIONS:
 
     // Object Data
-    Array1D<ShadowingCombinations> ShadowComb;
+    EPVector<ShadowingCombinations> ShadowComb;
 
 } // namespace DataShadowingCombinations
 

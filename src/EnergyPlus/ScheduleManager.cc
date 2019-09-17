@@ -183,12 +183,12 @@ namespace ScheduleManager {
     // Derived Types Variables
 
     // Object Data
-    Array1D<ScheduleTypeData> ScheduleType; // Allowed Schedule Types
-    Array1D<DayScheduleData> DaySchedule;   // Day Schedule Storage
+    EPVector<ScheduleTypeData> ScheduleType; // Allowed Schedule Types
+    EPVector<DayScheduleData> DaySchedule;   // Day Schedule Storage
     std::unordered_map<std::string, std::string> UniqueDayScheduleNames;
-    Array1D<WeekScheduleData> WeekSchedule; // Week Schedule Storage
+    EPVector<WeekScheduleData> WeekSchedule; // Week Schedule Storage
     std::unordered_map<std::string, std::string> UniqueWeekScheduleNames;
-    Array1D<ScheduleData> Schedule; // Schedule Storage
+    EPVector<ScheduleData> Schedule; // Schedule Storage
     std::unordered_map<std::string, std::string> UniqueScheduleNames;
 
     static ObjexxFCL::gio::Fmt fmtLD("*");
@@ -263,7 +263,7 @@ namespace ScheduleManager {
         Array1D_string Alphas;
         Array1D_string cAlphaFields;
         Array1D_string cNumericFields;
-        Array1D<Real64> Numbers;
+        EPVector<Real64> Numbers;
         Array1D_bool lAlphaBlanks;
         Array1D_bool lNumericBlanks;
         int NumAlphas;
@@ -336,9 +336,9 @@ namespace ScheduleManager {
         int kdy;
         bool FileExists;
         // for SCHEDULE:FILE
-        Array1D<Real64> hourlyFileValues;
+        EPVector<Real64> hourlyFileValues;
         std::map<std::string, int> CSVAllColumnNames;
-        std::map<int, Array1D<Real64>> CSVAllColumnNameAndValues;
+        std::map<int, EPVector<Real64>> CSVAllColumnNameAndValues;
         int SchdFile;
         int colCnt;
         int rowCnt;
@@ -645,7 +645,7 @@ namespace ScheduleManager {
                             }
                             if (!errFlag) {
                                 NumCSVAllColumnsSchedules++;
-                                Array1D<Real64> timestepColumnValues;
+                                EPVector<Real64> timestepColumnValues;
                                 timestepColumnValues.allocate(rowLimitCount);
                                 // {column header: column number - 1}
                                 CSVAllColumnNames[subString] = colCnt - 1;
@@ -1997,7 +1997,7 @@ namespace ScheduleManager {
         }
 
         std::string curName;
-        Array1D<Real64> timestepColumnValues;
+        EPVector<Real64> timestepColumnValues;
         for (auto &NameValue : CSVAllColumnNames) {
             curName = NameValue.first + "_shading";
             timestepColumnValues = CSVAllColumnNameAndValues[NameValue.second];

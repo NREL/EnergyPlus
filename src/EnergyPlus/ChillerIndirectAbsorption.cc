@@ -150,8 +150,8 @@ namespace ChillerIndirectAbsorption {
     // SUBROUTINE SPECIFICATIONS FOR MODULE:
 
     // Object Data
-    Array1D<IndirectAbsorberSpecs> IndirectAbsorber; // dimension to number of machines
-    Array1D<ReportVars> IndirectAbsorberReport;
+    EPVector<IndirectAbsorberSpecs> IndirectAbsorber; // dimension to number of machines
+    EPVector<ReportVars> IndirectAbsorberReport;
 
     // MODULE SUBROUTINES:
 

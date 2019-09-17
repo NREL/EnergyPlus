@@ -124,7 +124,7 @@ namespace HybridModel {
     };
 
     // Object Data
-    extern Array1D<HybridModelProperties> HybridModelZone;
+    extern EPVector<HybridModelProperties> HybridModelZone;
 
     // Functions
 

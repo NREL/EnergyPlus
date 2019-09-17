@@ -236,17 +236,17 @@ namespace DataRuntimeLanguage {
     Array2D_bool EMSConstructActuatorIsOkay;
 
     // Object Data
-    Array1D<ErlVariableType> ErlVariable;                        // holds Erl variables in a structure array
-    Array1D<ErlStackType> ErlStack;                              // holds Erl programs in separate "stacks"
-    Array1D<ErlExpressionType> ErlExpression;                    // holds Erl expressions in structure array
-    Array1D<OperatorType> PossibleOperators;                     // hard library of available operators and functions
-    Array1D<TrendVariableType> TrendVariable;                    // holds Erl trend varialbes in a structure array
-    Array1D<OutputVarSensorType> Sensor;                         // EMS:SENSOR objects used (from output variables)
-    Array1D<EMSActuatorAvailableType> EMSActuatorAvailable;      // actuators that could be used
-    Array1D<ActuatorUsedType> EMSActuatorUsed;                   // actuators that are used
-    Array1D<InternalVarsAvailableType> EMSInternalVarsAvailable; // internal data that could be used
-    Array1D<InternalVarsUsedType> EMSInternalVarsUsed;           // internal data that are used
-    Array1D<EMSProgramCallManagementType> EMSProgramCallManager; // program calling managers
+    EPVector<ErlVariableType> ErlVariable;                        // holds Erl variables in a structure array
+    EPVector<ErlStackType> ErlStack;                              // holds Erl programs in separate "stacks"
+    EPVector<ErlExpressionType> ErlExpression;                    // holds Erl expressions in structure array
+    EPVector<OperatorType> PossibleOperators;                     // hard library of available operators and functions
+    EPVector<TrendVariableType> TrendVariable;                    // holds Erl trend varialbes in a structure array
+    EPVector<OutputVarSensorType> Sensor;                         // EMS:SENSOR objects used (from output variables)
+    EPVector<EMSActuatorAvailableType> EMSActuatorAvailable;      // actuators that could be used
+    EPVector<ActuatorUsedType> EMSActuatorUsed;                   // actuators that are used
+    EPVector<InternalVarsAvailableType> EMSInternalVarsAvailable; // internal data that could be used
+    EPVector<InternalVarsUsedType> EMSInternalVarsUsed;           // internal data that are used
+    EPVector<EMSProgramCallManagementType> EMSProgramCallManager; // program calling managers
     ErlValueType Null(0, 0.0, "", 0, 0, false, 0, "", true);     // special "null" Erl variable value instance
     ErlValueType False(0, 0.0, "", 0, 0, false, 0, "", true);    // special "false" Erl variable value instance
     ErlValueType True(0, 0.0, "", 0, 0, false, 0, "", true);     // special "True" Erl variable value instance, gets reset

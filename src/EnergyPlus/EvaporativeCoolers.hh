@@ -327,9 +327,9 @@ namespace EvaporativeCoolers {
     };
 
     // Object Data
-    extern Array1D<EvapConditions> EvapCond;
-    extern Array1D<ZoneEvapCoolerUnitStruct> ZoneEvapUnit;
-    extern Array1D<ZoneEvapCoolerUnitFieldData> ZoneEvapCoolerUnitFields;
+    extern EPVector<EvapConditions> EvapCond;
+    extern EPVector<ZoneEvapCoolerUnitStruct> ZoneEvapUnit;
+    extern EPVector<ZoneEvapCoolerUnitFieldData> ZoneEvapCoolerUnitFields;
 
     // Functions
 

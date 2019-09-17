@@ -274,7 +274,7 @@ namespace OutputReportTabular {
     std::ofstream fix_stream;                                                                                                    // Fixed table stream
     std::ofstream htm_stream;                                                                                                    // HTML table stream
     std::ofstream xml_stream;                                                                                                    // XML table stream
-    Array1D<std::ofstream *> TabularOutputFile(maxNumStyles, {&csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream}); // Table stream array
+    EPVector<std::ofstream *> TabularOutputFile(maxNumStyles, {&csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream}); // Table stream array
     Array1D_string del(maxNumStyles);        // the delimiter to use
     Array1D_int TableStyle(maxNumStyles, 0); // see list of parameters
 
@@ -306,7 +306,7 @@ namespace OutputReportTabular {
     Array1D_int meterNumTotalsSource(numSourceTypes, 0);
     Array1D_bool fuelfactorsused(numSourceTypes, false);
     Array1D_bool ffUsed(numResourceTypes, false);
-    Array1D<Real64> SourceFactors(numResourceTypes, 0.0);
+    EPVector<Real64> SourceFactors(numResourceTypes, 0.0);
     Array1D_bool ffSchedUsed(numResourceTypes, false);
     Array1D_int ffSchedIndex(numResourceTypes, 0);
     Array2D_int meterNumEndUseBEPS(numResourceTypes, NumEndUses, 0);
@@ -316,17 +316,17 @@ namespace OutputReportTabular {
     Array1D_string sourceTypeNames(numSourceTypes);
     Array1D_string endUseNames(NumEndUses);
     // arrays that hold the actual values for the year
-    Array1D<Real64> gatherTotalsBEPS(numResourceTypes, 0.0);
-    Array1D<Real64> gatherTotalsBySourceBEPS(numResourceTypes, 0.0);
-    Array1D<Real64> gatherTotalsSource(numSourceTypes, 0.0);
-    Array1D<Real64> gatherTotalsBySource(numSourceTypes, 0.0);
+    EPVector<Real64> gatherTotalsBEPS(numResourceTypes, 0.0);
+    EPVector<Real64> gatherTotalsBySourceBEPS(numResourceTypes, 0.0);
+    EPVector<Real64> gatherTotalsSource(numSourceTypes, 0.0);
+    EPVector<Real64> gatherTotalsBySource(numSourceTypes, 0.0);
     Array2D<Real64> gatherEndUseBEPS(numResourceTypes, NumEndUses, 0.0);
     Array2D<Real64> gatherEndUseBySourceBEPS(numResourceTypes, NumEndUses, 0.0);
     Array3D<Real64> gatherEndUseSubBEPS;
     Array1D_bool needOtherRowLEED45(NumEndUses);
 
     // arrays the hold the demand values
-    Array1D<Real64> gatherDemandTotal(numResourceTypes, 0.0);
+    EPVector<Real64> gatherDemandTotal(numResourceTypes, 0.0);
     Array2D<Real64> gatherDemandEndUse(numResourceTypes, NumEndUses, 0.0);
     Array2D<Real64> gatherDemandIndEndUse(numResourceTypes, NumEndUses, 0.0);
     Array3D<Real64> gatherDemandEndUseSub;
@@ -520,19 +520,19 @@ namespace OutputReportTabular {
     // PRIVATE      DateToStr
 
     // Object Data
-    Array1D<OutputTableBinnedType> OutputTableBinned;
+    EPVector<OutputTableBinnedType> OutputTableBinned;
     Array2D<BinResultsType> BinResults;      // table number, number of intervals
-    Array1D<BinResultsType> BinResultsBelow; // time below the lowest defined bin
-    Array1D<BinResultsType> BinResultsAbove; // time above the highest defined bin
-    Array1D<BinObjVarIDType> BinObjVarID;
-    Array1D<BinStatisticsType> BinStatistics;
-    Array1D<NamedMonthlyType> namedMonthly; // for predefined monthly report titles
-    Array1D<MonthlyFieldSetInputType> MonthlyFieldSetInput;
-    Array1D<MonthlyInputType> MonthlyInput;
-    Array1D<MonthlyTablesType> MonthlyTables;
-    Array1D<MonthlyColumnsType> MonthlyColumns;
-    Array1D<TOCEntriesType> TOCEntries;
-    Array1D<UnitConvType> UnitConv;
+    EPVector<BinResultsType> BinResultsBelow; // time below the lowest defined bin
+    EPVector<BinResultsType> BinResultsAbove; // time above the highest defined bin
+    EPVector<BinObjVarIDType> BinObjVarID;
+    EPVector<BinStatisticsType> BinStatistics;
+    EPVector<NamedMonthlyType> namedMonthly; // for predefined monthly report titles
+    EPVector<MonthlyFieldSetInputType> MonthlyFieldSetInput;
+    EPVector<MonthlyInputType> MonthlyInput;
+    EPVector<MonthlyTablesType> MonthlyTables;
+    EPVector<MonthlyColumnsType> MonthlyColumns;
+    EPVector<TOCEntriesType> TOCEntries;
+    EPVector<UnitConvType> UnitConv;
 
     static ObjexxFCL::gio::Fmt fmtLD("*");
     static ObjexxFCL::gio::Fmt fmtA("(A)");
@@ -569,7 +569,7 @@ namespace OutputReportTabular {
         WriteTabularFiles = false;
         unitsStyle = 0;
         numStyles = 0;
-        TabularOutputFile = Array1D<std::ofstream *>(maxNumStyles, {&csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream});
+        TabularOutputFile = EPVector<std::ofstream *>(maxNumStyles, {&csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream});
         del = Array1D_string(maxNumStyles);
         TableStyle = Array1D_int(maxNumStyles, 0);
         timeInYear = 0.0;
@@ -594,7 +594,7 @@ namespace OutputReportTabular {
         meterNumTotalsSource = Array1D_int(numSourceTypes, 0);
         fuelfactorsused = Array1D_bool(numSourceTypes, false);
         ffUsed = Array1D_bool(numResourceTypes, false);
-        SourceFactors = Array1D<Real64>(numResourceTypes, 0.0);
+        SourceFactors = EPVector<Real64>(numResourceTypes, 0.0);
         ffSchedUsed = Array1D_bool(numResourceTypes, false);
         ffSchedIndex = Array1D_int(numResourceTypes, 0);
         meterNumEndUseBEPS = Array2D_int(numResourceTypes, NumEndUses, 0);
@@ -602,14 +602,14 @@ namespace OutputReportTabular {
         //		resourceTypeNames.deallocate();
         //		sourceTypeNames.deallocate();
         //		endUseNames.deallocate();
-        gatherTotalsBEPS = Array1D<Real64>(numResourceTypes, 0.0);
-        gatherTotalsBySourceBEPS = Array1D<Real64>(numResourceTypes, 0.0);
-        gatherTotalsSource = Array1D<Real64>(numSourceTypes, 0.0);
-        gatherTotalsBySource = Array1D<Real64>(numSourceTypes, 0.0);
+        gatherTotalsBEPS = EPVector<Real64>(numResourceTypes, 0.0);
+        gatherTotalsBySourceBEPS = EPVector<Real64>(numResourceTypes, 0.0);
+        gatherTotalsSource = EPVector<Real64>(numSourceTypes, 0.0);
+        gatherTotalsBySource = EPVector<Real64>(numSourceTypes, 0.0);
         gatherEndUseBEPS = Array2D<Real64>(numResourceTypes, NumEndUses, 0.0);
         gatherEndUseBySourceBEPS = Array2D<Real64>(numResourceTypes, NumEndUses, 0.0);
         gatherEndUseSubBEPS.deallocate();
-        gatherDemandTotal = Array1D<Real64>(numResourceTypes, 0.0);
+        gatherDemandTotal = EPVector<Real64>(numResourceTypes, 0.0);
         gatherDemandEndUse = Array2D<Real64>(numResourceTypes, NumEndUses, 0.0);
         gatherDemandEndUseSub.deallocate();
         gatherDemandIndEndUseSub.deallocate();
@@ -854,7 +854,7 @@ namespace OutputReportTabular {
         int NumAlphas;            // Number of elements in the alpha array
         int NumNums;              // Number of elements in the numeric array
         Array1D_string AlphArray; // character string data
-        Array1D<Real64> NumArray; // numeric data
+        EPVector<Real64> NumArray; // numeric data
         int IOStat;               // IO Status when calling get input subroutine
         static bool ErrorsFound(false);
 
@@ -1565,7 +1565,7 @@ namespace OutputReportTabular {
         int NumAlphas;            // Number of elements in the alpha array
         int NumNums;              // Number of elements in the numeric array
         Array1D_string AlphArray; // character string data
-        Array1D<Real64> NumArray; // numeric data
+        EPVector<Real64> NumArray; // numeric data
         int IOStat;               // IO Status when calling get input subroutine
         int iTable;
         int firstReport;
@@ -1784,7 +1784,7 @@ namespace OutputReportTabular {
         int NumAlphas;            // Number of elements in the alpha array
         int NumNums;              // Number of elements in the numeric array
         Array1D_string AlphArray; // character string data
-        Array1D<Real64> NumArray; // numeric data
+        EPVector<Real64> NumArray; // numeric data
         int IOStat;               // IO Status when calling get input subroutine
 
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
@@ -1973,7 +1973,7 @@ namespace OutputReportTabular {
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
         Array1D_string AlphArray;
-        Array1D<Real64> NumArray;
+        EPVector<Real64> NumArray;
         int IOStat; // IO Status when calling get input subroutine
         int iReport;
         std::string meterName;
@@ -2428,7 +2428,7 @@ namespace OutputReportTabular {
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
         Array1D_string AlphArray;
-        Array1D<Real64> NumArray;
+        EPVector<Real64> NumArray;
         int IOStat; // IO Status when calling get input subroutine
         int iReport;
         bool isFound;
@@ -4100,7 +4100,7 @@ namespace OutputReportTabular {
         // profiling showed that they were slow.
 
         static Array1D_int MonthlyColumnsTypeOfVar;
-        static Array1D<OutputProcessor::TimeStepType> MonthlyColumnsStepType;
+        static EPVector<OutputProcessor::TimeStepType> MonthlyColumnsStepType;
         static Array1D_int MonthlyColumnsAggType;
         static Array1D_int MonthlyColumnsVarNum;
         static Array1D_int MonthlyTablesNumColumns;
@@ -5171,10 +5171,10 @@ namespace OutputReportTabular {
         static Real64 eqpSens(0.0);
         static Real64 total(0.0);
         // the following arrays store the radiant total for each timestep
-        static Array1D<Real64> radiantHeat;
-        static Array1D<Real64> radiantCool;
-        static Array1D<Real64> ATUHeat;
-        static Array1D<Real64> ATUCool;
+        static EPVector<Real64> radiantHeat;
+        static EPVector<Real64> radiantCool;
+        static EPVector<Real64> ATUHeat;
+        static EPVector<Real64> ATUCool;
         static int timestepTimeStamp(0);
         static Real64 bldgHtPk(0.0);
         static Real64 bldgClPk(0.0);
@@ -7605,7 +7605,7 @@ namespace OutputReportTabular {
         // all arrays are in the format: (row, columnm)
         Array2D<Real64> useVal(6, 15);
         Array2D<Real64> normalVal(6, 4);
-        Array1D<Real64> collapsedTotal(6);
+        EPVector<Real64> collapsedTotal(6);
         Array2D<Real64> collapsedEndUse(6, NumEndUses);
         Array3D<Real64> collapsedEndUseSub(MaxNumSubcategories, NumEndUses, 6);
         Array2D<Real64> endUseSubOther(6, NumEndUses);
@@ -9146,7 +9146,7 @@ namespace OutputReportTabular {
 
         // all arrays are in the format: (row, columnm)
         Array2D<Real64> useVal(6, 15);
-        Array1D<Real64> collapsedTotal(6);
+        EPVector<Real64> collapsedTotal(6);
         Array2D<Real64> collapsedEndUse(6, NumEndUses);
         Array3D<Real64> collapsedEndUseSub(MaxNumSubcategories, NumEndUses, 6);
         int iResource;
@@ -9462,7 +9462,7 @@ namespace OutputReportTabular {
 
         // all arrays are in the format: (row, columnm)
         Array2D<Real64> useVal(6, 15);
-        Array1D<Real64> collapsedTotal(6);
+        EPVector<Real64> collapsedTotal(6);
         Array2D<Real64> collapsedEndUse(6, NumEndUses);
         Array2D<Real64> collapsedIndEndUse(6, NumEndUses);
         Array1D_int collapsedTimeStep(6);
@@ -10366,15 +10366,15 @@ namespace OutputReportTabular {
         static std::string Wm2_unitName;
 
         // zone summary total
-        static Array1D<Real64> zstArea(4);
-        static Array1D<Real64> zstVolume(4);
-        static Array1D<Real64> zstWallArea(4);
-        static Array1D<Real64> zstUndWallArea(4);
-        static Array1D<Real64> zstWindowArea(4);
-        static Array1D<Real64> zstOpeningArea(4);
-        static Array1D<Real64> zstLight(4);
-        static Array1D<Real64> zstPeople(4);
-        static Array1D<Real64> zstPlug(4);
+        static EPVector<Real64> zstArea(4);
+        static EPVector<Real64> zstVolume(4);
+        static EPVector<Real64> zstWallArea(4);
+        static EPVector<Real64> zstUndWallArea(4);
+        static EPVector<Real64> zstWindowArea(4);
+        static EPVector<Real64> zstOpeningArea(4);
+        static EPVector<Real64> zstLight(4);
+        static EPVector<Real64> zstPeople(4);
+        static EPVector<Real64> zstPlug(4);
 
         zstArea = 0.0;
         zstVolume = 0.0;
@@ -10393,11 +10393,11 @@ namespace OutputReportTabular {
         Real64 TotalWindowArea;
         Real64 TotalAboveGroundWallArea;
 
-        Array1D<Real64> zoneOpeningArea;
+        EPVector<Real64> zoneOpeningArea;
         zoneOpeningArea.allocate(NumOfZones);
         zoneOpeningArea = 0.0;
 
-        Array1D<Real64> zoneGlassArea;
+        EPVector<Real64> zoneGlassArea;
         zoneGlassArea.allocate(NumOfZones);
         zoneGlassArea = 0.0;
 
@@ -12594,18 +12594,18 @@ namespace OutputReportTabular {
 
         // Delayed components are moved into this function so that we can calculate them one zone at a time
         // with Array1D
-        Array1D<Real64> peopleDelaySeqHeat;
-        Array1D<Real64> peopleDelaySeqCool;
-        Array1D<Real64> lightDelaySeqHeat;
-        Array1D<Real64> lightDelaySeqCool;
-        Array1D<Real64> equipDelaySeqHeat;
-        Array1D<Real64> equipDelaySeqCool;
-        Array1D<Real64> hvacLossDelaySeqHeat;
-        Array1D<Real64> hvacLossDelaySeqCool;
-        Array1D<Real64> powerGenDelaySeqHeat;
-        Array1D<Real64> powerGenDelaySeqCool;
-        Array1D<Real64> feneSolarDelaySeqHeat;
-        Array1D<Real64> feneSolarDelaySeqCool;
+        EPVector<Real64> peopleDelaySeqHeat;
+        EPVector<Real64> peopleDelaySeqCool;
+        EPVector<Real64> lightDelaySeqHeat;
+        EPVector<Real64> lightDelaySeqCool;
+        EPVector<Real64> equipDelaySeqHeat;
+        EPVector<Real64> equipDelaySeqCool;
+        EPVector<Real64> hvacLossDelaySeqHeat;
+        EPVector<Real64> hvacLossDelaySeqCool;
+        EPVector<Real64> powerGenDelaySeqHeat;
+        EPVector<Real64> powerGenDelaySeqCool;
+        EPVector<Real64> feneSolarDelaySeqHeat;
+        EPVector<Real64> feneSolarDelaySeqCool;
         Array2D<Real64> surfDelaySeqHeat;
         Array2D<Real64> surfDelaySeqCool;
 
@@ -12638,18 +12638,18 @@ namespace OutputReportTabular {
         surfDelaySeqCool.allocate(NumOfTimeStepInHour * 24, TotSurfaces);
         surfDelaySeqCool = 0.0;
 
-        Array1D<CompLoadTablesType> ZoneHeatCompLoadTables; // for zone level component load summary output tables
-        Array1D<CompLoadTablesType> ZoneCoolCompLoadTables;
+        EPVector<CompLoadTablesType> ZoneHeatCompLoadTables; // for zone level component load summary output tables
+        EPVector<CompLoadTablesType> ZoneCoolCompLoadTables;
 
-        Array1D<CompLoadTablesType> AirLoopHeatCompLoadTables; // for airloop level component load summary output tables
-        Array1D<CompLoadTablesType> AirLoopCoolCompLoadTables;
-        Array1D<CompLoadTablesType> AirLoopZonesHeatCompLoadTables; // zone results used for airloop report - never directly output
-        Array1D<CompLoadTablesType> AirLoopZonesCoolCompLoadTables;
+        EPVector<CompLoadTablesType> AirLoopHeatCompLoadTables; // for airloop level component load summary output tables
+        EPVector<CompLoadTablesType> AirLoopCoolCompLoadTables;
+        EPVector<CompLoadTablesType> AirLoopZonesHeatCompLoadTables; // zone results used for airloop report - never directly output
+        EPVector<CompLoadTablesType> AirLoopZonesCoolCompLoadTables;
 
         CompLoadTablesType FacilityHeatCompLoadTables; // for facility level component load summary output tables
         CompLoadTablesType FacilityCoolCompLoadTables;
-        Array1D<CompLoadTablesType> FacilityZonesHeatCompLoadTables; // zone results used for facility report - never directly output
-        Array1D<CompLoadTablesType> FacilityZonesCoolCompLoadTables;
+        EPVector<CompLoadTablesType> FacilityZonesHeatCompLoadTables; // zone results used for facility report - never directly output
+        EPVector<CompLoadTablesType> FacilityZonesCoolCompLoadTables;
 
         CompLoadTablesType curCompLoadTable; // active component load table
 
@@ -12732,7 +12732,7 @@ namespace OutputReportTabular {
         }
 
         // get the zone areas needed later
-        Array1D<ZompComponentAreasType> ZoneComponentAreas;
+        EPVector<ZompComponentAreasType> ZoneComponentAreas;
         ZoneComponentAreas.allocate(NumOfZones);
         GetZoneComponentAreas(ZoneComponentAreas);
 
@@ -13139,12 +13139,12 @@ namespace OutputReportTabular {
     void GetDelaySequences(int const &desDaySelected,
                            bool const &isCooling,
                            int const &zoneIndex,
-                           Array1D<Real64> &peopleDelaySeq,
-                           Array1D<Real64> &equipDelaySeq,
-                           Array1D<Real64> &hvacLossDelaySeq,
-                           Array1D<Real64> &powerGenDelaySeq,
-                           Array1D<Real64> &lightDelaySeq,
-                           Array1D<Real64> &feneSolarDelaySeq,
+                           EPVector<Real64> &peopleDelaySeq,
+                           EPVector<Real64> &equipDelaySeq,
+                           EPVector<Real64> &hvacLossDelaySeq,
+                           EPVector<Real64> &powerGenDelaySeq,
+                           EPVector<Real64> &lightDelaySeq,
+                           EPVector<Real64> &feneSolarDelaySeq,
                            Array3D<Real64> &feneCondInstantSeq,
                            Array2D<Real64> &surfDelaySeq)
     {
@@ -13158,11 +13158,11 @@ namespace OutputReportTabular {
         // static bool initAdjFenDone(false); moved to anonymous namespace for unit testing
         static Array3D_bool adjFenDone;
 
-        Array1D<Real64> peopleRadIntoSurf;
-        Array1D<Real64> equipRadIntoSurf;
-        Array1D<Real64> hvacLossRadIntoSurf;
-        Array1D<Real64> powerGenRadIntoSurf;
-        Array1D<Real64> lightLWRadIntoSurf;
+        EPVector<Real64> peopleRadIntoSurf;
+        EPVector<Real64> equipRadIntoSurf;
+        EPVector<Real64> hvacLossRadIntoSurf;
+        EPVector<Real64> powerGenRadIntoSurf;
+        EPVector<Real64> lightLWRadIntoSurf;
 
         if (!initAdjFenDone) {
             adjFenDone.allocate(TotDesDays + TotRunDesPersDays, NumOfTimeStepInHour * 24, NumOfZones);
@@ -13282,7 +13282,7 @@ namespace OutputReportTabular {
     {
         using DataSizing::NumTimeStepsInAvg;
         using General::MovingAvg;
-        Array1D<Real64> AvgData; // sequence data after averaging
+        EPVector<Real64> AvgData; // sequence data after averaging
         AvgData.allocate(numTimeSteps);
         AvgData = 0.;
         MovingAvg(dataSeq * 1.0, numTimeSteps, NumTimeStepsInAvg, AvgData);
@@ -13295,12 +13295,12 @@ namespace OutputReportTabular {
                                         int const &desDaySelected,
                                         int const &timeOfMax,
                                         int const &zoneIndex,
-                                        Array1D<Real64> const &peopleDelaySeq,
-                                        Array1D<Real64> const &equipDelaySeq,
-                                        Array1D<Real64> const &hvacLossDelaySeq,
-                                        Array1D<Real64> const &powerGenDelaySeq,
-                                        Array1D<Real64> const &lightDelaySeq,
-                                        Array1D<Real64> const &feneSolarDelaySeq,
+                                        EPVector<Real64> const &peopleDelaySeq,
+                                        EPVector<Real64> const &equipDelaySeq,
+                                        EPVector<Real64> const &hvacLossDelaySeq,
+                                        EPVector<Real64> const &powerGenDelaySeq,
+                                        EPVector<Real64> const &lightDelaySeq,
+                                        EPVector<Real64> const &feneSolarDelaySeq,
                                         Array3D<Real64> const &feneCondInstantSeq,
                                         Array2D<Real64> const &surfDelaySeq)
     {
@@ -13324,9 +13324,9 @@ namespace OutputReportTabular {
         using DataSurfaces::TotSurfaces;
         using General::MovingAvg;
 
-        Array1D<Real64> seqData;     // raw data sequence that has not been averaged yet
-        Array1D<Real64> AvgData;     // sequence data after averaging
-        Array1D<Real64> delayOpaque; // hold values for report for delayed opaque
+        EPVector<Real64> seqData;     // raw data sequence that has not been averaged yet
+        EPVector<Real64> AvgData;     // sequence data after averaging
+        EPVector<Real64> delayOpaque; // hold values for report for delayed opaque
         int curExtBoundCond;
         Real64 singleSurfDelay;
 
@@ -13683,7 +13683,7 @@ namespace OutputReportTabular {
     }
 
     // gather the areas used in the load component tabels
-    void GetZoneComponentAreas(Array1D<ZompComponentAreasType> &areas)
+    void GetZoneComponentAreas(EPVector<ZompComponentAreasType> &areas)
     {
         using namespace DataSurfaces;
 
@@ -13729,7 +13729,7 @@ namespace OutputReportTabular {
     }
 
     // adds the area column for the load component tables
-    void AddAreaColumnForZone(int const &zoneNum, Array1D<ZompComponentAreasType> const &compAreas, CompLoadTablesType &compLoad)
+    void AddAreaColumnForZone(int const &zoneNum, EPVector<ZompComponentAreasType> const &compAreas, CompLoadTablesType &compLoad)
     {
         compLoad.cells(cArea, rPeople) = compAreas(zoneNum).floor;
         compLoad.cellUsed(cArea, rPeople) = true;
@@ -15630,7 +15630,7 @@ namespace OutputReportTabular {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static Array1D<ObjexxFCL::gio::Fmt> formDigits({0, 9},
+        static EPVector<ObjexxFCL::gio::Fmt> formDigits({0, 9},
                                             {"(F12.0)",
                                              "(F12.1)",
                                              "(F12.2)",
@@ -15643,7 +15643,7 @@ namespace OutputReportTabular {
                                              "(F12.9)"}); // formDigits(0) | formDigits(1) | formDigits(2) | formDigits(3) |
                                                           // formDigits(4) | formDigits(5) | formDigits(6) | formDigits(7) |
                                                           // formDigits(8) | formDigits(9)
-        static Array1D<Real64> const maxvalDigits({0, 9},
+        static EPVector<Real64> const maxvalDigits({0, 9},
                                                   {9999999999.0,
                                                    999999999.0,
                                                    99999999.0,

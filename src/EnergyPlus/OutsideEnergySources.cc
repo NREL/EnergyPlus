@@ -103,7 +103,7 @@ namespace OutsideEnergySources {
         bool SimOutsideEnergyGetInputFlag(true);
     } // namespace
     // Object Data
-    Array1D<OutsideEnergySourceSpecs> EnergySource;
+    EPVector<OutsideEnergySourceSpecs> EnergySource;
     std::unordered_map<std::string, std::string> EnergySourceUniqueNames;
 
     // Functions

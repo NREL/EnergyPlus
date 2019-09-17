@@ -109,7 +109,7 @@ namespace SolarReflectionManager {
     // SUBROUTINE SPECIFICATIONS FOR MODULE ExteriorSolarReflectionManager
 
     // Object Data
-    Array1D<SolReflRecSurfData> SolReflRecSurf;
+    EPVector<SolReflRecSurfData> SolReflRecSurf;
 
     // MODULE SUBROUTINES:
 
@@ -667,10 +667,10 @@ namespace SolarReflectionManager {
         static int HitPtSurfNum(0);         // Surface number of hit point: -1 = ground,
         // 0 = sky or obstruction with receiving point below ground level,
         // >0 = obstruction with receiving point above ground level
-        Array1D<Real64> ReflBmToDiffSolObs(MaxRecPts); // Irradiance at a receiving point for
+        EPVector<Real64> ReflBmToDiffSolObs(MaxRecPts); // Irradiance at a receiving point for
         // beam solar diffusely reflected from obstructions, divided by
         // beam normal irradiance
-        Array1D<Real64> ReflBmToDiffSolGnd(MaxRecPts); // Irradiance at a receiving point for
+        EPVector<Real64> ReflBmToDiffSolGnd(MaxRecPts); // Irradiance at a receiving point for
         // beam solar diffusely reflected from the ground, divided by
         // beam normal irradiance
         static int RayNum(0);                      // Ray number
@@ -946,7 +946,7 @@ namespace SolarReflectionManager {
         static Vector3<Real64> SunVecMir(0.0);         // Unit vector to sun mirrored by a reflecting surface
         static Vector3<Real64> RecPt(0.0);             // Receiving point (m)
         static Vector3<Real64> HitPtRefl(0.0);         // Hit point on a reflecting surface (m)
-        Array1D<Real64> ReflBmToDiffSolObs(MaxRecPts); // Irradiance at a receiving point for
+        EPVector<Real64> ReflBmToDiffSolObs(MaxRecPts); // Irradiance at a receiving point for
         // beam solar diffusely reflected from obstructions, divided by
         // beam normal irradiance
         // unused  INTEGER           :: RayNum               =0   ! Ray number
@@ -955,7 +955,7 @@ namespace SolarReflectionManager {
         static Vector3<Real64> HitPtObs(0.0);        // Hit point on obstruction (m)
         bool hitObsRefl;                             // True iff obstruction hit between rec. pt. and reflection point
         static Vector3<Real64> ReflNorm(0.0);        // Unit normal to reflecting surface
-        Array1D<Real64> ReflBmToBmSolObs(MaxRecPts); // Irradiance at a receiving point for
+        EPVector<Real64> ReflBmToBmSolObs(MaxRecPts); // Irradiance at a receiving point for
         // beam solar specularly reflected from obstructions, divided by
         // beam normal irradiance
         Real64 ReflDistanceSq;                            // Distance squared from receiving point to hit point on a reflecting surface (m)
@@ -965,7 +965,7 @@ namespace SolarReflectionManager {
         static Real64 CosIncAngRefl(0.0);                 // Cosine of incidence angle of beam on reflecting surface
         static Real64 CosIncAngRec(0.0);                  // Angle of incidence of reflected beam on receiving surface
         static Real64 ReflFac(0.0);                       // Contribution to specular reflection factor
-        Array1D<Real64> ReflFacTimesCosIncSum(MaxRecPts); // Sum of ReflFac times CosIncAngRefl
+        EPVector<Real64> ReflFacTimesCosIncSum(MaxRecPts); // Sum of ReflFac times CosIncAngRefl
         static Real64 CosIncWeighted(0.0);                // Cosine of incidence angle on receiving surf weighted by reflection factor
 
         ReflBmToDiffSolObs = 0.0;
@@ -1133,10 +1133,10 @@ namespace SolarReflectionManager {
         // >0 = obstruction with receiving point above ground level
         static int HitPtSurfNumX(0); // For a shading surface, HitPtSurfNum for original surface,
         // HitPitSurfNum + 1 for mirror surface
-        Array1D<Real64> ReflSkySolObs(MaxRecPts); // Irradiance at a receiving point for sky diffuse solar
+        EPVector<Real64> ReflSkySolObs(MaxRecPts); // Irradiance at a receiving point for sky diffuse solar
         // reflected from obstructions, divided by unobstructed
         // sky diffuse horizontal irradiance
-        Array1D<Real64> ReflSkySolGnd(MaxRecPts); // Irradiance at a receiving point for sky diffuse solar
+        EPVector<Real64> ReflSkySolGnd(MaxRecPts); // Irradiance at a receiving point for sky diffuse solar
         // reflected from ground, divided by unobstructed
         // sky diffuse horizontal irradiance
         static int RayNum(0);                  // Ray number

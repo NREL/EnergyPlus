@@ -104,7 +104,7 @@ namespace SZVAVModel {
         int SolFlag(0);            // return flag from RegulaFalsi for sensible load
         std::string MessagePrefix; // label for warning reporting
 
-        Array1D<Real64> Par(18); // parameters passed to RegulaFalsi function
+        EPVector<Real64> Par(18); // parameters passed to RegulaFalsi function
         Real64 lowBoundaryLoad(0.0);
         Real64 highBoundaryLoad(0.0);
         Real64 minHumRat(0.0);
@@ -524,7 +524,7 @@ namespace SZVAVModel {
         int SolFlag(0);            // return flag from RegulaFalsi for sensible load
         std::string MessagePrefix; // label for warning reporting
 
-        Array1D<Real64> Par(17); // parameters passed to RegulaFalsi function
+        EPVector<Real64> Par(17); // parameters passed to RegulaFalsi function
         Real64 lowBoundaryLoad(0.0);
         Real64 highBoundaryLoad(0.0);
         Real64 minHumRat(0.0);

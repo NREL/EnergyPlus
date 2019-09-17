@@ -294,7 +294,7 @@ namespace Vectors {
         vec.z = nint64(vec.z * roundto) / roundto;
     }
 
-    void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf, // Surface Definition
+    void DetermineAzimuthAndTilt(EPVector<Vector> const &Surf, // Surface Definition
                                  int const EP_UNUSED(NSides), // Number of sides to surface
                                  Real64 &Azimuth,             // Outward Normal Azimuth Angle
                                  Real64 &Tilt,                // Tilt angle of surface
@@ -520,7 +520,7 @@ namespace Vectors {
         return PtDist;
     }
 
-    void CreateNewellAreaVector(Array1D<Vector> const &VList, int const NSides, Vector &OutNewellAreaVector)
+    void CreateNewellAreaVector(EPVector<Vector> const &VList, int const NSides, Vector &OutNewellAreaVector)
     {
 
         // SUBROUTINE INFORMATION:
@@ -577,7 +577,7 @@ namespace Vectors {
         OutNewellAreaVector /= 2.0;
     }
 
-    void CreateNewellSurfaceNormalVector(Array1D<Vector> const &VList, int const NSides, Vector &OutNewellSurfaceNormalVector)
+    void CreateNewellSurfaceNormalVector(EPVector<Vector> const &VList, int const NSides, Vector &OutNewellSurfaceNormalVector)
     {
 
         // SUBROUTINE INFORMATION:

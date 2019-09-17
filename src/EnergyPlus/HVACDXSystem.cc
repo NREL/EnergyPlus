@@ -160,7 +160,7 @@ namespace HVACDXSystem {
     // Update routine to check convergence and update nodes
 
     // Object Data
-    Array1D<DXCoolingConditions> DXCoolingSystem;
+    EPVector<DXCoolingConditions> DXCoolingSystem;
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -406,7 +406,7 @@ namespace HVACDXSystem {
         Array1D_string Alphas;           // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D<Real64> Numbers;         // Numeric input items for object
+        EPVector<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
@@ -1055,7 +1055,7 @@ namespace HVACDXSystem {
         Real64 OutletHumRatHS;         // Actual outlet humrat of the variable speed DX cooling coil at high speed
         Real64 OutletHumRatDXCoil;     // Actual outlet humidity ratio of the DX cooling coil
         int SolFla;                    // Flag of solver
-        Array1D<Real64> Par(5);        // Parameter array passed to solver
+        EPVector<Real64> Par(5);        // Parameter array passed to solver
         bool SensibleLoad;             // True if there is a sensible cooling load on this system
         bool LatentLoad;               // True if there is a latent   cooling load on this system
         int DehumidMode;               // Dehumidification mode (0=normal, 1=enhanced)

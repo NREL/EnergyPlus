@@ -132,7 +132,7 @@ namespace PlantLoadProfile {
     };
 
     // Object Data
-    extern Array1D<PlantProfileData> PlantProfile;
+    extern EPVector<PlantProfileData> PlantProfile;
 
     // This could be static inside the class
     void GetPlantProfileInput();

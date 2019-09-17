@@ -444,7 +444,7 @@ namespace UnitarySystems {
                 inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
                 int IOStatus = 0;
                 Array1D_string Alphas(NumAlphas);
-                Array1D<Real64> Numbers(NumNumbers, 0.0);
+                EPVector<Real64> Numbers(NumNumbers, 0.0);
                 Array1D_bool lNumericBlanks(NumNumbers, true);
                 Array1D_bool lAlphaBlanks(NumAlphas, true);
                 Array1D_string cAlphaFields(NumAlphas);

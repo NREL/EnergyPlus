@@ -96,7 +96,7 @@ namespace HybridModel {
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // Object Data
-    Array1D<HybridModelProperties> HybridModelZone;
+    EPVector<HybridModelProperties> HybridModelZone;
 
     // Functions
 
@@ -117,7 +117,7 @@ namespace HybridModel {
         Array1D_string cAlphaArgs(16);   // Alpha input items for object
         Array1D_string cAlphaFieldNames(16);
         Array1D_string cNumericFieldNames(16);
-        Array1D<Real64> rNumericArgs(4); // Numeric input items for object
+        EPVector<Real64> rNumericArgs(4); // Numeric input items for object
         int HybridModelStartMonth(0);    // Hybrid model start month
         int HybridModelStartDate(0);     // Hybrid model start date of month
         int HybridModelEndMonth(0);      // Hybrid model end month

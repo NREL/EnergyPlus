@@ -294,14 +294,14 @@ namespace EconomicTariff {
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
     // Object Data
-    Array1D<EconVarType> econVar;
-    Array1D<TariffType> tariff;
-    Array1D<QualifyType> qualify;
-    Array1D<ChargeSimpleType> chargeSimple;
-    Array1D<ChargeBlockType> chargeBlock;
-    Array1D<RatchetType> ratchet;
-    Array1D<ComputationType> computation;
-    Array1D<StackType> stack;
+    EPVector<EconVarType> econVar;
+    EPVector<TariffType> tariff;
+    EPVector<QualifyType> qualify;
+    EPVector<ChargeSimpleType> chargeSimple;
+    EPVector<ChargeBlockType> chargeBlock;
+    EPVector<RatchetType> ratchet;
+    EPVector<ComputationType> computation;
+    EPVector<StackType> stack;
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -2881,13 +2881,13 @@ namespace EconomicTariff {
         using OutputReportTabular::WriteTabularFiles;
 
         // values used in specific operations
-        Array1D<Real64> a(MaxNumMonths);
+        EPVector<Real64> a(MaxNumMonths);
         int aPt;
-        Array1D<Real64> b(MaxNumMonths);
+        EPVector<Real64> b(MaxNumMonths);
         int bPt;
-        Array1D<Real64> c(MaxNumMonths);
+        EPVector<Real64> c(MaxNumMonths);
         int cPt;
-        Array1D<Real64> d(MaxNumMonths);
+        EPVector<Real64> d(MaxNumMonths);
 
         int iTariff;
         int jStep;
@@ -3264,7 +3264,7 @@ namespace EconomicTariff {
 
         monthlyArray.dim(MaxNumMonths);
 
-        Array1D<Real64> curMonthlyArray(MaxNumMonths);
+        EPVector<Real64> curMonthlyArray(MaxNumMonths);
         int const sizeIncrement(50);
 
         curMonthlyArray = monthlyArray;
@@ -3354,10 +3354,10 @@ namespace EconomicTariff {
 
         int curTariff;
         int indexInChg;
-        Array1D<Real64> sourceVals(MaxNumMonths);
-        Array1D<Real64> costPer(MaxNumMonths);
-        Array1D<Real64> resultChg(MaxNumMonths);
-        Array1D<Real64> seasonMask(MaxNumMonths);
+        EPVector<Real64> sourceVals(MaxNumMonths);
+        EPVector<Real64> costPer(MaxNumMonths);
+        EPVector<Real64> resultChg(MaxNumMonths);
+        EPVector<Real64> seasonMask(MaxNumMonths);
 
         curTariff = econVar(usingVariable).tariffIndx;
         indexInChg = econVar(usingVariable).index;
@@ -3413,14 +3413,14 @@ namespace EconomicTariff {
         int indexInChg;
         int iBlk;
         int jMonth;
-        Array1D<Real64> sourceVals(MaxNumMonths);
-        Array1D<Real64> blkSzMult(MaxNumMonths);
-        Array1D<Real64> remainVals(MaxNumMonths);
-        Array1D<Real64> resultChg(MaxNumMonths);
-        Array1D<Real64> amountForBlk(MaxNumMonths);
-        Array1D<Real64> curBlkSz(MaxNumMonths);
-        Array1D<Real64> curBlkCost(MaxNumMonths);
-        Array1D<Real64> seasonMask(MaxNumMonths);
+        EPVector<Real64> sourceVals(MaxNumMonths);
+        EPVector<Real64> blkSzMult(MaxNumMonths);
+        EPVector<Real64> remainVals(MaxNumMonths);
+        EPVector<Real64> resultChg(MaxNumMonths);
+        EPVector<Real64> amountForBlk(MaxNumMonths);
+        EPVector<Real64> curBlkSz(MaxNumMonths);
+        EPVector<Real64> curBlkCost(MaxNumMonths);
+        EPVector<Real64> seasonMask(MaxNumMonths);
         bool flagAllZero;
 
         curTariff = econVar(usingVariable).tariffIndx;
@@ -3523,19 +3523,19 @@ namespace EconomicTariff {
 
         int curTariff;
         int indexInChg;
-        Array1D<Real64> baselineVals(MaxNumMonths);
-        Array1D<Real64> adjustmentVals(MaxNumMonths);
-        Array1D<Real64> multiplierVals(MaxNumMonths);
-        Array1D<Real64> offsetVals(MaxNumMonths);
-        Array1D<Real64> seasonFromMask(MaxNumMonths);
-        Array1D<Real64> seasonToMask(MaxNumMonths);
+        EPVector<Real64> baselineVals(MaxNumMonths);
+        EPVector<Real64> adjustmentVals(MaxNumMonths);
+        EPVector<Real64> multiplierVals(MaxNumMonths);
+        EPVector<Real64> offsetVals(MaxNumMonths);
+        EPVector<Real64> seasonFromMask(MaxNumMonths);
+        EPVector<Real64> seasonToMask(MaxNumMonths);
         bool isMonthly(false);
-        Array1D<Real64> adjSeasonal(MaxNumMonths);
-        Array1D<Real64> adjPeak(MaxNumMonths);
-        Array1D<Real64> maxAdjBase(MaxNumMonths);
+        EPVector<Real64> adjSeasonal(MaxNumMonths);
+        EPVector<Real64> adjPeak(MaxNumMonths);
+        EPVector<Real64> maxAdjBase(MaxNumMonths);
         Real64 maximumVal;
         int iMonth;
-        Array1D<Real64> finalResult(MaxNumMonths);
+        EPVector<Real64> finalResult(MaxNumMonths);
 
         curTariff = econVar(usingVariable).tariffIndx;
         indexInChg = econVar(usingVariable).index;
@@ -3650,10 +3650,10 @@ namespace EconomicTariff {
 
         int curTariff;
         int indexInQual;
-        Array1D<Real64> sourceVals(MaxNumMonths);
-        Array1D<Real64> thresholdVals(MaxNumMonths);
+        EPVector<Real64> sourceVals(MaxNumMonths);
+        EPVector<Real64> thresholdVals(MaxNumMonths);
         Array1D_int monthsQualify(MaxNumMonths);
-        Array1D<Real64> seasonMask(MaxNumMonths);
+        EPVector<Real64> seasonMask(MaxNumMonths);
         bool curIsMaximum;
         bool curIsConsecutive;
         int curNumberOfMonths;
@@ -3858,7 +3858,7 @@ namespace EconomicTariff {
         int iTariff;
         int jPeriod;
         int kMonth;
-        Array1D<Real64> monthVal(MaxNumMonths);
+        EPVector<Real64> monthVal(MaxNumMonths);
         Real64 bigNumber(0.0); // Autodesk Value not used but suppresses warning about HUGE_() call
 
         bigNumber = HUGE_(bigNumber);

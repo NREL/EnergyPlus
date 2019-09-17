@@ -188,7 +188,7 @@ namespace OutputReportTabular {
     extern std::ofstream fix_stream;                   // Fixed table stream
     extern std::ofstream htm_stream;                   // HTML table stream
     extern std::ofstream xml_stream;                   // XML table stream
-    extern Array1D<std::ofstream *> TabularOutputFile; // Table stream array
+    extern EPVector<std::ofstream *> TabularOutputFile; // Table stream array
     extern Array1D_string del;                         // the delimiter to use
     extern Array1D_int TableStyle;                     // see list of parameters
 
@@ -220,7 +220,7 @@ namespace OutputReportTabular {
     extern Array1D_int meterNumTotalsSource;
     extern Array1D_bool fuelfactorsused;
     extern Array1D_bool ffUsed;
-    extern Array1D<Real64> SourceFactors;
+    extern EPVector<Real64> SourceFactors;
     extern Array1D_bool ffSchedUsed;
     extern Array1D_int ffSchedIndex;
     extern Array2D_int meterNumEndUseBEPS;
@@ -230,15 +230,15 @@ namespace OutputReportTabular {
     extern Array1D_string sourceTypeNames;
     extern Array1D_string endUseNames;
     // arrays that hold the actual values for the year
-    extern Array1D<Real64> gatherTotalsBEPS;
-    extern Array1D<Real64> gatherTotalsBySourceBEPS;
-    extern Array1D<Real64> gatherTotalsSource;
-    extern Array1D<Real64> gatherTotalsBySource;
+    extern EPVector<Real64> gatherTotalsBEPS;
+    extern EPVector<Real64> gatherTotalsBySourceBEPS;
+    extern EPVector<Real64> gatherTotalsSource;
+    extern EPVector<Real64> gatherTotalsBySource;
     extern Array2D<Real64> gatherEndUseBEPS;
     extern Array2D<Real64> gatherEndUseBySourceBEPS;
     extern Array3D<Real64> gatherEndUseSubBEPS;
     // arrays the hold the demand values
-    extern Array1D<Real64> gatherDemandTotal;
+    extern EPVector<Real64> gatherDemandTotal;
     extern Array2D<Real64> gatherDemandEndUse;
     extern Array2D<Real64> gatherDemandIndEndUse;
     extern Array3D<Real64> gatherDemandEndUseSub;
@@ -425,8 +425,8 @@ namespace OutputReportTabular {
     struct BinResultsType
     {
         // Members
-        Array1D<Real64> mnth; // monthly bins
-        Array1D<Real64> hrly; // hourly bins
+        EPVector<Real64> mnth; // monthly bins
+        EPVector<Real64> hrly; // hourly bins
 
         // Default Constructor
         BinResultsType() : mnth(12, 0.0), hrly(24, 0.0)
@@ -536,8 +536,8 @@ namespace OutputReportTabular {
         OutputProcessor::TimeStepType stepType;                      // Variable time step is Zone=1 or HVAC=2
         OutputProcessor::Unit units;       // the units string, may be blank
         int aggType;                       // index to the type of aggregation (see list of parameters)
-        Array1D<Real64> reslt;             // monthly results
-        Array1D<Real64> duration;          // the time during which results are summed for use in averages
+        EPVector<Real64> reslt;             // monthly results
+        EPVector<Real64> duration;          // the time during which results are summed for use in averages
         Array1D_int timeStamp;             // encoded timestamp of max or min
         Real64 aggForStep;                 // holds the aggregation for the HVAC time steps when smaller than
         // the zone timestep
@@ -652,19 +652,19 @@ namespace OutputReportTabular {
     };
 
     // Object Data
-    extern Array1D<OutputTableBinnedType> OutputTableBinned;
+    extern EPVector<OutputTableBinnedType> OutputTableBinned;
     extern Array2D<BinResultsType> BinResults;      // table number, number of intervals
-    extern Array1D<BinResultsType> BinResultsBelow; // time below the lowest defined bin
-    extern Array1D<BinResultsType> BinResultsAbove; // time above the highest defined bin
-    extern Array1D<BinObjVarIDType> BinObjVarID;
-    extern Array1D<BinStatisticsType> BinStatistics;
-    extern Array1D<NamedMonthlyType> namedMonthly; // for predefined monthly report titles
-    extern Array1D<MonthlyFieldSetInputType> MonthlyFieldSetInput;
-    extern Array1D<MonthlyInputType> MonthlyInput;
-    extern Array1D<MonthlyTablesType> MonthlyTables;
-    extern Array1D<MonthlyColumnsType> MonthlyColumns;
-    extern Array1D<TOCEntriesType> TOCEntries;
-    extern Array1D<UnitConvType> UnitConv;
+    extern EPVector<BinResultsType> BinResultsBelow; // time below the lowest defined bin
+    extern EPVector<BinResultsType> BinResultsAbove; // time above the highest defined bin
+    extern EPVector<BinObjVarIDType> BinObjVarID;
+    extern EPVector<BinStatisticsType> BinStatistics;
+    extern EPVector<NamedMonthlyType> namedMonthly; // for predefined monthly report titles
+    extern EPVector<MonthlyFieldSetInputType> MonthlyFieldSetInput;
+    extern EPVector<MonthlyInputType> MonthlyInput;
+    extern EPVector<MonthlyTablesType> MonthlyTables;
+    extern EPVector<MonthlyColumnsType> MonthlyColumns;
+    extern EPVector<TOCEntriesType> TOCEntries;
+    extern EPVector<UnitConvType> UnitConv;
 
     // Functions
     void clear_state();
@@ -814,12 +814,12 @@ namespace OutputReportTabular {
     void GetDelaySequences(int const &desDaySelected,
                            bool const &isCooling,
                            int const &zoneIndex,
-                           Array1D<Real64> &peopleDelaySeq,
-                           Array1D<Real64> &equipDelaySeq,
-                           Array1D<Real64> &hvacLossDelaySeq,
-                           Array1D<Real64> &powerGenDelaySeq,
-                           Array1D<Real64> &lightDelaySeq,
-                           Array1D<Real64> &feneSolarDelaySeq,
+                           EPVector<Real64> &peopleDelaySeq,
+                           EPVector<Real64> &equipDelaySeq,
+                           EPVector<Real64> &hvacLossDelaySeq,
+                           EPVector<Real64> &powerGenDelaySeq,
+                           EPVector<Real64> &lightDelaySeq,
+                           EPVector<Real64> &feneSolarDelaySeq,
                            Array3D<Real64> &feneCondInstantSeq,
                            Array2D<Real64> &surfDelaySeq);
 
@@ -830,12 +830,12 @@ namespace OutputReportTabular {
                                         int const &desDaySelected,
                                         int const &timeOfMax,
                                         int const &zoneIndex,
-                                        Array1D<Real64> const &peopleDelaySeq,
-                                        Array1D<Real64> const &equipDelaySeq,
-                                        Array1D<Real64> const &hvacLossDelaySeq,
-                                        Array1D<Real64> const &powerGenDelaySeq,
-                                        Array1D<Real64> const &lightDelaySeq,
-                                        Array1D<Real64> const &feneSolarDelaySeq,
+                                        EPVector<Real64> const &peopleDelaySeq,
+                                        EPVector<Real64> const &equipDelaySeq,
+                                        EPVector<Real64> const &hvacLossDelaySeq,
+                                        EPVector<Real64> const &powerGenDelaySeq,
+                                        EPVector<Real64> const &lightDelaySeq,
+                                        EPVector<Real64> const &feneSolarDelaySeq,
                                         Array3D<Real64> const &feneCondInstantSeqLoc,
                                         Array2D<Real64> const &surfDelaySeq);
 
@@ -844,9 +844,9 @@ namespace OutputReportTabular {
 
     void ComputeEngineeringChecks(CompLoadTablesType &compLoad);
 
-    void GetZoneComponentAreas(Array1D<ZompComponentAreasType> &areas);
+    void GetZoneComponentAreas(EPVector<ZompComponentAreasType> &areas);
 
-    void AddAreaColumnForZone(int const &zoneNum, Array1D<ZompComponentAreasType> const &compAreas, CompLoadTablesType &compLoadTotal);
+    void AddAreaColumnForZone(int const &zoneNum, EPVector<ZompComponentAreasType> const &compAreas, CompLoadTablesType &compLoadTotal);
 
     void CombineLoadCompResults(CompLoadTablesType &compLoadTotal, CompLoadTablesType const &compLoadPartial, Real64 const &multiplier);
 

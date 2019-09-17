@@ -202,15 +202,15 @@ namespace EconomicLifeCycleCost {
     int numResourcesUsed;
 
     // present value factors
-    Array1D<Real64> SPV;
+    EPVector<Real64> SPV;
     Array2D<Real64> energySPV; // yearly equivalent to FEMP UPV* values
 
     // arrays related to computing after tax cashflow and present value
-    Array1D<Real64> DepreciatedCapital;
-    Array1D<Real64> TaxableIncome;
-    Array1D<Real64> Taxes;
-    Array1D<Real64> AfterTaxCashFlow;
-    Array1D<Real64> AfterTaxPresentValue;
+    EPVector<Real64> DepreciatedCapital;
+    EPVector<Real64> TaxableIncome;
+    EPVector<Real64> Taxes;
+    EPVector<Real64> AfterTaxCashFlow;
+    EPVector<Real64> AfterTaxPresentValue;
 
     Array1D_string const
         MonthNames(12, {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"});
@@ -218,11 +218,11 @@ namespace EconomicLifeCycleCost {
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
     // Object Data
-    Array1D<RecurringCostsType> RecurringCosts;
-    Array1D<NonrecurringCostType> NonrecurringCost;
-    Array1D<UsePriceEscalationType> UsePriceEscalation;
-    Array1D<UseAdjustmentType> UseAdjustment;
-    Array1D<CashFlowType> CashFlow;
+    EPVector<RecurringCostsType> RecurringCosts;
+    EPVector<NonrecurringCostType> NonrecurringCost;
+    EPVector<UsePriceEscalationType> UsePriceEscalation;
+    EPVector<UseAdjustmentType> UseAdjustment;
+    EPVector<CashFlowType> CashFlow;
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -359,7 +359,7 @@ namespace EconomicLifeCycleCost {
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
         Array1D_string AlphaArray;       // character string data
-        Array1D<Real64> NumArray;        // numeric data
+        EPVector<Real64> NumArray;        // numeric data
         int IOStat;                      // IO Status when calling get input subroutine
         std::string CurrentModuleObject; // for ease in renaming.
         int NumObj;                      // count of objects
@@ -610,7 +610,7 @@ namespace EconomicLifeCycleCost {
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
         Array1D_string AlphaArray;       // character string data
-        Array1D<Real64> NumArray;        // numeric data
+        EPVector<Real64> NumArray;        // numeric data
         int IOStat;                      // IO Status when calling get input subroutine
         std::string CurrentModuleObject; // for ease in renaming.
 
@@ -790,7 +790,7 @@ namespace EconomicLifeCycleCost {
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
         Array1D_string AlphaArray;       // character string data
-        Array1D<Real64> NumArray;        // numeric data
+        EPVector<Real64> NumArray;        // numeric data
         int IOStat;                      // IO Status when calling get input subroutine
         std::string CurrentModuleObject; // for ease in renaming.
         int numComponentCostLineItems;   // number of ComponentCost:LineItem objects
@@ -918,7 +918,7 @@ namespace EconomicLifeCycleCost {
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
         Array1D_string AlphaArray;       // character string data
-        Array1D<Real64> NumArray;        // numeric data
+        EPVector<Real64> NumArray;        // numeric data
         int IOStat;                      // IO Status when calling get input subroutine
         std::string CurrentModuleObject; // for ease in renaming.
 
@@ -1052,7 +1052,7 @@ namespace EconomicLifeCycleCost {
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
         Array1D_string AlphaArray;       // character string data
-        Array1D<Real64> NumArray;        // numeric data
+        EPVector<Real64> NumArray;        // numeric data
         int IOStat;                      // IO Status when calling get input subroutine
         std::string CurrentModuleObject; // for ease in renaming.
         int numFldsToUse;
@@ -1249,14 +1249,14 @@ namespace EconomicLifeCycleCost {
         int firstMonth;
         int monthsBaseToService;
         Array2D<Real64> resourceCosts;
-        Array1D<Real64> curResourceCosts(12);
+        EPVector<Real64> curResourceCosts(12);
         Array1D_bool resourceCostNotZero;
-        Array1D<Real64> resourceCostAnnual;
+        EPVector<Real64> resourceCostAnnual;
         Real64 annualCost;
         int cashFlowCounter;
         int found;
         int curCategory;
-        Array1D<Real64> monthlyInflationFactor;
+        EPVector<Real64> monthlyInflationFactor;
         Real64 inflationPerMonth;
         int iLoop;
 
@@ -1691,7 +1691,7 @@ namespace EconomicLifeCycleCost {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D<Real64> DepreciationPercent(SizeDepr); // values expressed as percent 5% is 5.0 (based on tables)
+        EPVector<Real64> DepreciationPercent(SizeDepr); // values expressed as percent 5% is 5.0 (based on tables)
         Real64 curCapital;
         int curDepYear;
         int iYear;

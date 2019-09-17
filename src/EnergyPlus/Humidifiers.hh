@@ -175,7 +175,7 @@ namespace Humidifiers {
     };
 
     // Object Data
-    extern Array1D<HumidifierData> Humidifier;
+    extern EPVector<HumidifierData> Humidifier;
 
     // Functions
 

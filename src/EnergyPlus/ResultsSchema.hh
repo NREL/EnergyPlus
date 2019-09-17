@@ -288,14 +288,14 @@ namespace ResultsFramework {
         bool MsgPackEnabled() const;
 
         void initializeRTSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
-                                    const Array1D<OutputProcessor::RealVariableType> &RVariableTypes,
+                                    const EPVector<OutputProcessor::RealVariableType> &RVariableTypes,
                                     const int NumOfRVariable,
                                     const OutputProcessor::TimeStepType timeStepType = OutputProcessor::TimeStepType::TimeStepZone);
         void initializeITSDataFrame(const OutputProcessor::ReportingFrequency reportFrequency,
-                                    const Array1D<OutputProcessor::IntegerVariableType> &IVariableTypes,
+                                    const EPVector<OutputProcessor::IntegerVariableType> &IVariableTypes,
                                     const int NumOfIVariable,
                                     const OutputProcessor::TimeStepType timeStepType = OutputProcessor::TimeStepType::TimeStepZone);
-        void initializeMeters(const Array1D<OutputProcessor::MeterType> &EnergyMeters, const OutputProcessor::ReportingFrequency reportFrequency);
+        void initializeMeters(const EPVector<OutputProcessor::MeterType> &EnergyMeters, const OutputProcessor::ReportingFrequency reportFrequency);
 
         DataFrame RIDetailedZoneTSData = DataFrame("Detailed-Zone");
         DataFrame RIDetailedHVACTSData = DataFrame("Detailed-HVAC");

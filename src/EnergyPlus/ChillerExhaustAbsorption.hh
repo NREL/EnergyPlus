@@ -230,8 +230,8 @@ namespace ChillerExhaustAbsorption {
     };
 
     // Object Data
-    extern Array1D<ExhaustAbsorberSpecs> ExhaustAbsorber; // dimension to number of machines
-    extern Array1D<ReportVars> ExhaustAbsorberReport;
+    extern EPVector<ExhaustAbsorberSpecs> ExhaustAbsorber; // dimension to number of machines
+    extern EPVector<ReportVars> ExhaustAbsorberReport;
 
     // Functions
 

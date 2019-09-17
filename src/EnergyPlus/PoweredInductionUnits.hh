@@ -164,7 +164,7 @@ namespace PoweredInductionUnits {
     };
 
     // Object Data
-    extern Array1D<PowIndUnitData> PIU;
+    extern EPVector<PowIndUnitData> PIU;
 
     // Functions
 

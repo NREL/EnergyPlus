@@ -121,7 +121,7 @@ namespace DataBSDFWindow {
     Array2D<Real64> BSDFTempMtrx;        // Temporary matrix for holding axisymmetric input
 
     // Object Data
-    Array1D<BSDFWindowGeomDescr> ComplexWind; // Window geometry structure: set in CalcPerSolarBeam/SolarShading
+    EPVector<BSDFWindowGeomDescr> ComplexWind; // Window geometry structure: set in CalcPerSolarBeam/SolarShading
 
 } // namespace DataBSDFWindow
 

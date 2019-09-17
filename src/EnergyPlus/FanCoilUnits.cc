@@ -199,8 +199,8 @@ namespace FanCoilUnits {
     // look up functions for node numbers
 
     // Object Data
-    Array1D<FanCoilData> FanCoil;
-    Array1D<FanCoilNumericFieldData> FanCoilNumericFields;
+    EPVector<FanCoilData> FanCoil;
+    EPVector<FanCoilNumericFieldData> FanCoilNumericFields;
 
     // Functions
 
@@ -357,7 +357,7 @@ namespace FanCoilUnits {
         Array1D_string Alphas;                 // Alpha input items for object
         Array1D_string cAlphaFields;           // Alpha field names
         Array1D_string cNumericFields;         // Numeric field names
-        Array1D<Real64> Numbers;               // Numeric input items for object
+        EPVector<Real64> Numbers;               // Numeric input items for object
         Array1D_bool lAlphaBlanks;             // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;           // Logical array, numeric field input BLANK = .TRUE.
         static int TotalArgs(0);               // Total number of alpha and numeric arguments (max) for a
@@ -2210,7 +2210,7 @@ namespace FanCoilUnits {
         // Real64 Low_mdot;
         Real64 QSensUnitOutNoATM;     // unit output not including air added by supply side air terminal mixer
         int SolFlag;                  // return flag from RegulaFalsi for sensible load
-        Array1D<Real64> Par(10);      // parameters passed to RegulaFalsi function
+        EPVector<Real64> Par(10);      // parameters passed to RegulaFalsi function
         Real64 ElectricHeaterControl; // 1 or 0, enables or disables heating coil
         Real64 OAVolumeFlowRate;      // OA volume flow rate based on design specifications object [m3/s]
         Real64 OAMassFlow;            // OA mass flow rate based on design specifications object [kg/s]

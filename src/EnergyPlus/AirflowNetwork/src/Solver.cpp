@@ -113,45 +113,45 @@ namespace AirflowNetwork {
     static std::string const BlankString;
 
     // Common block AFEDAT
-    Array1D<Real64> AFECTL;
-    Array1D<Real64> AFLOW2;
-    Array1D<Real64> AFLOW;
-    Array1D<Real64> PS;
-    Array1D<Real64> PW;
+    EPVector<Real64> AFECTL;
+    EPVector<Real64> AFLOW2;
+    EPVector<Real64> AFLOW;
+    EPVector<Real64> PS;
+    EPVector<Real64> PW;
 
     // Common block CONTRL
     Real64 PB(0.0);
     int LIST(0);
 
     // Common block ZONL
-    // Array1D<Real64> RHOZ;
-    // Array1D<Real64> SQRTDZ;
-    // Array1D<Real64> VISCZ;
-    Array1D<Real64> SUMAF;
-    // Array1D<Real64> TZ; // Temperature [C]
-    // Array1D<Real64> WZ; // Humidity ratio [kg/kg]
-    Array1D<Real64> PZ; // Pressure [Pa]
+    // EPVector<Real64> RHOZ;
+    // EPVector<Real64> SQRTDZ;
+    // EPVector<Real64> VISCZ;
+    EPVector<Real64> SUMAF;
+    // EPVector<Real64> TZ; // Temperature [C]
+    // EPVector<Real64> WZ; // Humidity ratio [kg/kg]
+    EPVector<Real64> PZ; // Pressure [Pa]
 
     // Other array variables
     Array1D_int ID;
     Array1D_int IK;
-    Array1D<Real64> AD;
-    Array1D<Real64> AU;
+    EPVector<Real64> AD;
+    EPVector<Real64> AU;
 
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
     Array1D_int newIK;     // noel
-    Array1D<Real64> newAU; // noel
+    EPVector<Real64> newAU; // noel
 #endif
 
     // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
-    Array1D<Real64> SUMF;
+    EPVector<Real64> SUMF;
     int Unit11(0);
     int Unit21(0);
 
     // Large opening variables
-    Array1D<Real64> DpProf;   // Differential pressure profile for Large Openings [Pa]
-    Array1D<Real64> RhoProfF; // Density profile in FROM zone [kg/m3]
-    Array1D<Real64> RhoProfT; // Density profile in TO zone [kg/m3]
+    EPVector<Real64> DpProf;   // Differential pressure profile for Large Openings [Pa]
+    EPVector<Real64> RhoProfF; // Density profile in FROM zone [kg/m3]
+    EPVector<Real64> RhoProfT; // Density profile in TO zone [kg/m3]
     Array2D<Real64> DpL;      // Array of stack pressures in link
 
     // Functions
@@ -679,14 +679,14 @@ namespace AirflowNetwork {
         bool LFLAG;
         int CONVG;
         int ACCEL;
-        Array1D<Real64> PCF(NetworkNumOfNodes);
-        Array1D<Real64> CEF(NetworkNumOfNodes);
+        EPVector<Real64> PCF(NetworkNumOfNodes);
+        EPVector<Real64> CEF(NetworkNumOfNodes);
         Real64 C;
         Real64 SSUMF;
         Real64 SSUMAF;
         Real64 ACC0;
         Real64 ACC1;
-        Array1D<Real64> CCF(NetworkNumOfNodes);
+        EPVector<Real64> CCF(NetworkNumOfNodes);
 
         // Formats
         static ObjexxFCL::gio::Fmt Format_901("(A5,I3,2E14.6,0P,F8.4,F24.14)");
@@ -883,7 +883,7 @@ namespace AirflowNetwork {
         int thisIK;
         bool allZero; // noel
 #endif
-        Array1D<Real64> X(4);
+        EPVector<Real64> X(4);
         Real64 DP;
         std::array<Real64, 2> F{{0.0, 0.0}};
         std::array<Real64, 2> DF{{0.0, 0.0}};
@@ -2224,7 +2224,7 @@ namespace AirflowNetwork {
         Real64 fma21;                         // massflow in direction "to-from" [kg/s]
         Real64 dp1fma12;                      // derivative d fma12 / d Dp [kg/s/Pa]
         Real64 dp1fma21;                      // derivative d fma21 / d Dp [kg/s/Pa]
-        Array1D<Real64> DpProfNew(NrInt + 2); // Differential pressure profile for Large Openings, taking into account fixed
+        EPVector<Real64> DpProfNew(NrInt + 2); // Differential pressure profile for Large Openings, taking into account fixed
         // pressures and actual zone pressures at reference height
         Real64 Fact;   // Actual opening factor
         Real64 DifLim; // Limit for the pressure difference where laminarization takes place [Pa]
@@ -2243,7 +2243,7 @@ namespace AirflowNetwork {
         Real64 fmasum;
         Real64 dfmasum;
         Real64 Prefact;
-        Array1D<Real64> EvalHghts(NrInt + 2);
+        EPVector<Real64> EvalHghts(NrInt + 2);
         Real64 h2;
         Real64 h4;
         Real64 alpha;
@@ -2742,15 +2742,15 @@ namespace AirflowNetwork {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D<Real64> zF(2); // Startheights of layers in FROM-, TO-zone
-        Array1D<Real64> zT(2);
-        Array1D<Real64> zStF(2); // Startheights of layers within the LO, starting with the actual startheight of the LO.
-        Array1D<Real64> zStT(2);
+        EPVector<Real64> zF(2); // Startheights of layers in FROM-, TO-zone
+        EPVector<Real64> zT(2);
+        EPVector<Real64> zStF(2); // Startheights of layers within the LO, starting with the actual startheight of the LO.
+        EPVector<Real64> zStT(2);
         // The values in the arrays DpF, DpT, BetaF, BetaT, RhoStF, RhoStT are calculated at these heights.
         Real64 hghtsFR;
         Real64 hghtsTR;
-        Array1D<Real64> hghtsF(NrInt + 2); // Heights of evaluation points for pressure and density profiles
-        Array1D<Real64> hghtsT(NrInt + 2);
+        EPVector<Real64> hghtsF(NrInt + 2); // Heights of evaluation points for pressure and density profiles
+        EPVector<Real64> hghtsT(NrInt + 2);
         Real64 Interval; // Distance between two evaluation points
         Real64 delzF;    // Interval between actual evaluation point and startheight of actual layer in FROM-, TO-zone
         Real64 delzT;
@@ -2918,21 +2918,21 @@ namespace AirflowNetwork {
         Real64 Xhl1; // Humidity in From and To zone at link level [kg/kg]
         Real64 Xhl2;
         //      REAL(r64) Xhout ! outside humidity [kg/kg]
-        Array1D<Real64> Hfl(NumOfLinksMultiZone); // Own height factor for large (slanted) openings
+        EPVector<Real64> Hfl(NumOfLinksMultiZone); // Own height factor for large (slanted) openings
         int Nl;                                   // number of links
 
-        Array1D<Real64> DpF(2);
+        EPVector<Real64> DpF(2);
         Real64 DpP;
-        Array1D<Real64> DpT(2);
+        EPVector<Real64> DpT(2);
         Real64 H;
-        Array1D<Real64> RhoStF(2);
-        Array1D<Real64> RhoStT(2);
+        EPVector<Real64> RhoStF(2);
+        EPVector<Real64> RhoStT(2);
         Real64 RhoDrDummi;
-        Array1D<Real64> BetaStF(2);
-        Array1D<Real64> BetaStT(2);
+        EPVector<Real64> BetaStF(2);
+        EPVector<Real64> BetaStT(2);
         Real64 T;
         Real64 X;
-        Array1D<Real64> HSt(2);
+        EPVector<Real64> HSt(2);
         Real64 TzFrom;
         Real64 XhzFrom;
         Real64 TzTo;
@@ -2942,7 +2942,7 @@ namespace AirflowNetwork {
         Real64 Pref;
         Real64 PzFrom;
         Real64 PzTo;
-        Array1D<Real64> RhoLd(2);
+        EPVector<Real64> RhoLd(2);
         Real64 RhoStd;
         int From;
         int To;

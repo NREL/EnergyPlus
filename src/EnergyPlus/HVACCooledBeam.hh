@@ -152,7 +152,7 @@ namespace HVACCooledBeam {
     };
 
     // Object Data
-    extern Array1D<CoolBeamData> CoolBeam;
+    extern EPVector<CoolBeamData> CoolBeam;
 
     // Functions
 

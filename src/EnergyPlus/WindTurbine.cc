@@ -128,7 +128,7 @@ namespace WindTurbine {
     // Subroutine Specifications for the Heat Balance Module
 
     // Object Data
-    Array1D<WindTurbineParams> WindTurbineSys;
+    EPVector<WindTurbineParams> WindTurbineSys;
 
     // Functions
 
@@ -269,7 +269,7 @@ namespace WindTurbine {
         Array1D_string cAlphaArgs;     // Alpha input items for object
         Array1D_string cAlphaFields;   // Alpha field names
         Array1D_string cNumericFields; // Numeric field names
-        Array1D<Real64> rNumericArgs;  // Numeric input items for object
+        EPVector<Real64> rNumericArgs;  // Numeric input items for object
         Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
 
@@ -712,7 +712,7 @@ namespace WindTurbine {
         bool fileExists;              // true if Stat file exists
         bool warningShown;            // true if the <365 warning has already been shown
         std::string lineIn;
-        Array1D<Real64> MonthWS(12);
+        EPVector<Real64> MonthWS(12);
         static Real64 AnnualTMYWS(0.0); // Annual average wind speed in stat file
         Real64 LocalTMYWS;              // Annual average wind speed at the rotor height
 

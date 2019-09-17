@@ -208,9 +208,9 @@ namespace PackagedTerminalHeatPump {
     // modules for variable speed heat pump
 
     // Object Data
-    Array1D<PTUnitData> PTUnit;
+    EPVector<PTUnitData> PTUnit;
     std::unordered_map<std::string, std::string> PTUnitUniqueNames;
-    Array1D<PTUnitNumericFieldData> PTUnitUNumericFields; // holds VRF TU numeric input fields character field name
+    EPVector<PTUnitNumericFieldData> PTUnitUNumericFields; // holds VRF TU numeric input fields character field name
 
     // Functions
     void clear_state()
@@ -599,7 +599,7 @@ namespace PackagedTerminalHeatPump {
         int PTUnitIndex;             // loop index
         int PTUnitNum;               // current packaged terminal unit number
         Array1D_string Alphas;       // Alpha items for object
-        Array1D<Real64> Numbers;     // Numeric items for object
+        EPVector<Real64> Numbers;     // Numeric items for object
         Array1D_int OANodeNums(4);   // Node numbers of OA mixer (OA, EA, RA, MA)
         int FanInletNodeNum;         // Fan inlet node number
         int FanOutletNodeNum;        // Fan outlet node number
@@ -5472,7 +5472,7 @@ namespace PackagedTerminalHeatPump {
         Real64 NoCompOutput;           // output when no active compressor [W]
         Real64 ErrorToler;             // error tolerance
         int SolFla;                    // Flag of RegulaFalsi solver
-        static Array1D<Real64> Par(8); // Parameters passed to RegulaFalsi
+        static EPVector<Real64> Par(8); // Parameters passed to RegulaFalsi
         std::string IterNum;           // Max number of iterations for warning message
         Real64 CpAir;                  // air specific heat
         Real64 OutsideDryBulbTemp;     // Outside air temperature at external node height
@@ -5786,7 +5786,7 @@ namespace PackagedTerminalHeatPump {
         Real64 mdot;               // local temporary for mass flow rate
         Real64 MaxHotWaterFlow;    // coil maximum hot water mass flow rate, kg/s
         Real64 HotWaterMdot;       // actual hot water mass flow rate
-        static Array1D<Real64> Par(3);
+        static EPVector<Real64> Par(3);
         int SolFlag;
         static int ATMixOutNode(0); // outlet node of ATM Mixer
 
@@ -7302,7 +7302,7 @@ namespace PackagedTerminalHeatPump {
         Real64 LatOutput;               // latent capacity output
         Real64 ErrorToler;              // error tolerance
         int SolFla;                     // Flag of RegulaFalsi solver
-        static Array1D<Real64> Par(11); // Parameters passed to RegulaFalsi
+        static EPVector<Real64> Par(11); // Parameters passed to RegulaFalsi
         Real64 CpAir;                   // air specific heat
         int i;                          // Speed index
         static int ErrCountCyc(0);      // Counter used to minimize the occurrence of output warnings
@@ -7974,7 +7974,7 @@ namespace PackagedTerminalHeatPump {
         Real64 mdot;               // local temporary for mass flow rate
         Real64 MaxHotWaterFlow;    // coil maximum hot water mass flow rate, kg/s
         Real64 HotWaterMdot;       // actual hot water mass flow rate
-        static Array1D<Real64> Par(3);
+        static EPVector<Real64> Par(3);
         int SolFlag;
         static int ATMixOutNode(0); // outlet node of ATM Mixer
 

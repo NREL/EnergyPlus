@@ -128,7 +128,7 @@ namespace TARCOGDeflection {
         // OUTPUT
 
         // Localy used
-        Array1D<Real64> DCoeff(maxlay);
+        EPVector<Real64> DCoeff(maxlay);
         int i;
 
         i = 0;
@@ -200,11 +200,11 @@ namespace TARCOGDeflection {
         static Real64 const Pi_6(pow_6(Pi));
 
         // localy used
-        Array1D<Real64> DPressure(maxlay); // delta pressure at each glazing layer
-        Array1D<Real64> Vini(MaxGap);
-        Array1D<Real64> Vgap(MaxGap);
-        Array1D<Real64> Pgap(MaxGap);
-        Array1D<Real64> Tgap(MaxGap);
+        EPVector<Real64> DPressure(maxlay); // delta pressure at each glazing layer
+        EPVector<Real64> Vini(MaxGap);
+        EPVector<Real64> Vgap(MaxGap);
+        EPVector<Real64> Pgap(MaxGap);
+        EPVector<Real64> Tgap(MaxGap);
         Real64 MaxLDSum;
         Real64 MeanLDSum;
         Real64 Ratio;

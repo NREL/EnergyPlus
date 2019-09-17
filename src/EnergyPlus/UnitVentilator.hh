@@ -247,8 +247,8 @@ namespace UnitVentilator {
     };
 
     // Object Data
-    extern Array1D<UnitVentilatorData> UnitVent;
-    extern Array1D<UnitVentNumericFieldData> UnitVentNumericFields;
+    extern EPVector<UnitVentilatorData> UnitVent;
+    extern EPVector<UnitVentNumericFieldData> UnitVentNumericFields;
 
     // Functions
 

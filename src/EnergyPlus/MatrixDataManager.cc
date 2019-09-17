@@ -112,7 +112,7 @@ namespace MatrixDataManager {
     // PUBLIC GetMatrixName
 
     // Object Data
-    Array1D<MatrixDataStruct> MatData;
+    EPVector<MatrixDataStruct> MatData;
 
     // Functions
 

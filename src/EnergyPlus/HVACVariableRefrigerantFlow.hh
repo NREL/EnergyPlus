@@ -148,19 +148,19 @@ namespace HVACVariableRefrigerantFlow {
     extern Array1D_bool CoolingLoad;             // defines a cooling load on VRFTerminalUnits
     extern Array1D_bool LastModeHeating;         // defines last mode was heating mode
     extern Array1D_bool LastModeCooling;         // defines last mode was cooling mode
-    extern Array1D<Real64> MaxCoolingCapacity;   // maximum capacity of any terminal unit
-    extern Array1D<Real64> MaxHeatingCapacity;   // maximum capacity of any terminal unit
-    extern Array1D<Real64> CoolCombinationRatio; // ratio of terminal unit capacity to VRF condenser capacity
-    extern Array1D<Real64> HeatCombinationRatio; // ratio of terminal unit capacity to VRF condenser capacity
+    extern EPVector<Real64> MaxCoolingCapacity;   // maximum capacity of any terminal unit
+    extern EPVector<Real64> MaxHeatingCapacity;   // maximum capacity of any terminal unit
+    extern EPVector<Real64> CoolCombinationRatio; // ratio of terminal unit capacity to VRF condenser capacity
+    extern EPVector<Real64> HeatCombinationRatio; // ratio of terminal unit capacity to VRF condenser capacity
     extern Real64 LoopDXCoolCoilRTF;             // holds value of DX cooling coil RTF
     extern Real64 LoopDXHeatCoilRTF;             // holds value of DX heating coil RTF
     extern Real64 CondenserWaterMassFlowRate;    // VRF water-cooled condenser mass flow rate (kg/s)
     extern Array1D_int NumCoolingLoads;          // number of TU's requesting cooling
     extern Array1D_int NumHeatingLoads;          // number of TU's requesting heating
-    extern Array1D<Real64> MaxDeltaT;            // maximum zone temperature difference from setpoint
-    extern Array1D<Real64> MinDeltaT;            // minimum zone temperature difference from setpoint
-    extern Array1D<Real64> SumCoolingLoads;      // sum of cooling loads
-    extern Array1D<Real64> SumHeatingLoads;      // sum of heating loads
+    extern EPVector<Real64> MaxDeltaT;            // maximum zone temperature difference from setpoint
+    extern EPVector<Real64> MinDeltaT;            // minimum zone temperature difference from setpoint
+    extern EPVector<Real64> SumCoolingLoads;      // sum of cooling loads
+    extern EPVector<Real64> SumHeatingLoads;      // sum of heating loads
 
     // Subroutine Specifications for the Module
     struct VRFCondenserEquipment
@@ -337,7 +337,7 @@ namespace HVACVariableRefrigerantFlow {
         int CoolCapFTErrorIndex; // warning message index
                                  // The following are for the Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
         int AlgorithmIUCtrl;     // VRF indoor unit contrl algorithm, 1-High sensible, 2-Te/Tc constant
-        Array1D<Real64> CompressorSpeed;  // compressor speed array [rps]
+        EPVector<Real64> CompressorSpeed;  // compressor speed array [rps]
         Real64 CondensingTemp;            // VRV system outdoor unit condensing temperature [C]
         Real64 CondTempFixed;             // Inddor unit condensing temperature, fixed, for AlgorithmIUCtrl is 2-Te/Tc constant [C]
         Real64 CoffEvapCap;               // Evaporative Capacity Correction Factor
@@ -600,8 +600,8 @@ namespace HVACVariableRefrigerantFlow {
         Array1D_int ZoneTUPtr;                // index to VRF Terminal Unit
         Array1D_string ZoneTUName;            // Name of the VRF Terminal Unit
         Array1D_bool IsSimulated;             // TRUE if TU has been simulated
-        Array1D<Real64> TotalCoolLoad;        // Total zone cooling coil load met by TU
-        Array1D<Real64> TotalHeatLoad;        // Total zone heating coil load met by TU
+        EPVector<Real64> TotalCoolLoad;        // Total zone cooling coil load met by TU
+        EPVector<Real64> TotalHeatLoad;        // Total zone heating coil load met by TU
         Array1D_bool CoolingCoilPresent;      // FALSE if coil not present
         Array1D_bool HeatingCoilPresent;      // FALSE if coil not present
         Array1D_bool SuppHeatingCoilPresent;  // FALSE if supplemental heating coil not present
@@ -835,10 +835,10 @@ namespace HVACVariableRefrigerantFlow {
     };
 
     // Object Data
-    extern Array1D<VRFCondenserEquipment> VRF;                // AirConditioner:VariableRefrigerantFlow object
-    extern Array1D<VRFTerminalUnitEquipment> VRFTU;           // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
-    extern Array1D<TerminalUnitListData> TerminalUnitList;    // zoneTerminalUnitList object
-    extern Array1D<VRFTUNumericFieldData> VRFTUNumericFields; // holds VRF TU numeric input fields character field name
+    extern EPVector<VRFCondenserEquipment> VRF;                // AirConditioner:VariableRefrigerantFlow object
+    extern EPVector<VRFTerminalUnitEquipment> VRFTU;           // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
+    extern EPVector<TerminalUnitListData> TerminalUnitList;    // zoneTerminalUnitList object
+    extern EPVector<VRFTUNumericFieldData> VRFTUNumericFields; // holds VRF TU numeric input fields character field name
 
     // Functions
 

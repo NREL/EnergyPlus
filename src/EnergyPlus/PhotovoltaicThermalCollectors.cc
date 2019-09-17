@@ -157,7 +157,7 @@ namespace PhotovoltaicThermalCollectors {
     // PUBLIC  GetPVTCellTemp
 
     // Object Data
-    Array1D<PVTCollectorStruct> PVT;
+    EPVector<PVTCollectorStruct> PVT;
 
     // Functions
 
@@ -273,7 +273,7 @@ namespace PhotovoltaicThermalCollectors {
         int ThisParamObj;
 
         // Object Data
-        Array1D<SimplePVTModelStruct> tmpSimplePVTperf;
+        EPVector<SimplePVTModelStruct> tmpSimplePVTperf;
 
         // first load the performance object info into temporary structure
         cCurrentModuleObject = "SolarCollectorPerformance:PhotovoltaicThermal:Simple";

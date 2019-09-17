@@ -112,7 +112,7 @@ namespace PlantValves {
     void GetPlantValvesInput();
 
     // Object Data
-    extern Array1D<TemperValveData> TemperValve; // dimension to No. of TemperingValve objects
+    extern EPVector<TemperValveData> TemperValve; // dimension to No. of TemperingValve objects
 
 } // namespace PlantValves
 

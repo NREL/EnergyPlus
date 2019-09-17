@@ -182,7 +182,7 @@ namespace PondGroundHeatExchanger {
     };
 
     // Object Data
-    extern Array1D<PondGroundHeatExchangerData> PondGHE;
+    extern EPVector<PondGroundHeatExchangerData> PondGHE;
 
     void GetPondGroundHeatExchanger();
 

@@ -195,7 +195,7 @@ namespace DesiccantDehumidifiers {
     // Name Public routines, optionally name Private routines within this module
 
     // Object Data
-    Array1D<DesiccantDehumidifierData> DesicDehum;
+    EPVector<DesiccantDehumidifierData> DesicDehum;
     std::unordered_map<std::string, std::string> UniqueDesicDehumNames;
 
     // Functions
@@ -358,7 +358,7 @@ namespace DesiccantDehumidifiers {
         Array1D_string Alphas;                 // Alpha input items for object
         Array1D_string cAlphaFields;           // Alpha field names
         Array1D_string cNumericFields;         // Numeric field names
-        Array1D<Real64> Numbers;               // Numeric input items for object
+        EPVector<Real64> Numbers;               // Numeric input items for object
         Array1D_bool lAlphaBlanks;             // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;           // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);                 // Maximum number of numeric input fields
@@ -3260,7 +3260,7 @@ namespace DesiccantDehumidifiers {
         // unused  REAL(r64)      :: PartLoadFraction  ! heating or cooling part load fraction
         Real64 MaxHotWaterFlow; // maximum hot water mass flow rate, kg/s
         Real64 HotWaterMdot;    // actual hot water mass flow rate
-        Array1D<Real64> Par(3);
+        EPVector<Real64> Par(3);
         int SolFlag;
 
         RegenCoilActual = 0.0;

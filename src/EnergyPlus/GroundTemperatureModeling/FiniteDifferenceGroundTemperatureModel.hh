@@ -115,7 +115,7 @@ public:
         Real64 conductionArea = 1.0; // Assumes 1 m2
     };
 
-    Array1D<instanceOfCellData> cellArray;
+    EPVector<instanceOfCellData> cellArray;
 
     struct instanceOfWeatherData
     {
@@ -126,7 +126,7 @@ public:
         Real64 airDensity;
     };
 
-    Array1D<instanceOfWeatherData> weatherDataArray;
+    EPVector<instanceOfWeatherData> weatherDataArray;
 
     static std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGTMFactory(int objectType, std::string objectName);
 
@@ -168,7 +168,7 @@ public:
 
     Array2D<Real64> groundTemps;
 
-    Array1D<Real64> cellDepths;
+    EPVector<Real64> cellDepths;
 
     enum surfaceTypes
     {

@@ -330,7 +330,7 @@ namespace TARCOGCommon {
 
         // Locals
         static int const NMAX(500);
-        static Array1D<Real64> vv(NMAX);
+        static EPVector<Real64> vv(NMAX);
 
         Real64 const TINY(1.0e-20);
 

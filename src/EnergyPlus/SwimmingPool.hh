@@ -68,15 +68,15 @@ namespace SwimmingPool {
     // MODULE VARIABLE DECLARATIONS:
     // Standard, run-of-the-mill variables...
     extern int NumSwimmingPools;                 // Number of swimming pools
-    extern Array1D<int> SurfaceToPoolIndex;      // Average source over the time step for a particular radiant surface
-    extern Array1D<Real64> QPoolSrcAvg;          // Average source over the time step for a particular pool
-    extern Array1D<Real64> HeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
-    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+    extern EPVector<int> SurfaceToPoolIndex;      // Average source over the time step for a particular radiant surface
+    extern EPVector<Real64> QPoolSrcAvg;          // Average source over the time step for a particular pool
+    extern EPVector<Real64> HeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
+    extern EPVector<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
     // Record keeping variables used to calculate QPoolSrcAvg locally
-    extern Array1D<Real64> LastQPoolSrc;       // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastQPoolSrc;       // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
 
     // Types
 
@@ -167,7 +167,7 @@ namespace SwimmingPool {
     };
 
     // Object Data
-    extern Array1D<SwimmingPoolData> Pool;
+    extern EPVector<SwimmingPoolData> Pool;
 
     // Functions
 

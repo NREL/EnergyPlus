@@ -70,13 +70,13 @@ namespace ElectricBaseboardRadiator {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumElecBaseboards;
-    extern Array1D<Real64> QBBElecRadSource;     // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> QBBElecRadSrcAvg;     // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+    extern EPVector<Real64> QBBElecRadSource;     // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> QBBElecRadSrcAvg;     // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
     // Record keeping variables used to calculate QBBRadSrcAvg locally
-    extern Array1D<Real64> LastQBBElecRadSrc;  // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastQBBElecRadSrc;  // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     extern Array1D_bool MySizeFlag;
     extern Array1D_bool CheckEquipName;
     // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
@@ -112,7 +112,7 @@ namespace ElectricBaseboardRadiator {
         Real64 Energy;
         Real64 ConvEnergy;
         Real64 RadEnergy;
-        Array1D<Real64> FracDistribToSurf;
+        EPVector<Real64> FracDistribToSurf;
         int HeatingCapMethod;         // - Method for electric baseboard heating capacity scalable sizing calculation
         Real64 ScaledHeatingCapacity; // - electric baseboard scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
 
@@ -138,8 +138,8 @@ namespace ElectricBaseboardRadiator {
     };
 
     // Object Data
-    extern Array1D<ElecBaseboardParams> ElecBaseboard;
-    extern Array1D<ElecBaseboardNumericFieldData> ElecBaseboardNumericFields;
+    extern EPVector<ElecBaseboardParams> ElecBaseboard;
+    extern EPVector<ElecBaseboardNumericFieldData> ElecBaseboardNumericFields;
 
     // Functions
 

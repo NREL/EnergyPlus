@@ -126,8 +126,8 @@ namespace ExteriorEnergyUse {
     // Name Public routines, optionally name Private routines within this module
 
     // Object Data
-    Array1D<ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
-    Array1D<ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
+    EPVector<ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
+    EPVector<ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
     std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
 
     // Functions

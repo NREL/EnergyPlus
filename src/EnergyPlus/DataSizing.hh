@@ -306,8 +306,8 @@ namespace DataSizing {
     extern Real64 SuppHeatCap;                        // the heating capacity of the supplemental heater in a unitary system
     extern Real64 GlobalHeatSizingFactor;             // the global heating sizing ratio
     extern Real64 GlobalCoolSizingFactor;             // the global cooling sizing ratio
-    extern Array1D<Real64> ZoneSizThermSetPtHi;       // highest zone thermostat setpoint during zone sizing calcs
-    extern Array1D<Real64> ZoneSizThermSetPtLo;       // lowest zone thermostat setpoint during zone sizing calcs
+    extern EPVector<Real64> ZoneSizThermSetPtHi;       // highest zone thermostat setpoint during zone sizing calcs
+    extern EPVector<Real64> ZoneSizThermSetPtLo;       // lowest zone thermostat setpoint during zone sizing calcs
     extern Array1D_string CoolPeakDateHrMin;          // date:hr:min of cooling peak
     extern Array1D_string HeatPeakDateHrMin;          // date:hr:min of heating peak
     extern char SizingFileColSep;                     // Character to separate columns in sizing outputs
@@ -523,28 +523,28 @@ namespace DataSizing {
         //  DesCoolMinAirFlowPerArea
         Real64 DesHeatMaxAirFlow2; // design heating maximum air flow rate [m3/s] derived from
         //  DesHeatMaxAirFlowPerArea
-        Array1D<Real64> HeatFlowSeq;        // daily sequence of zone heating air mass flow rate (zone time step) [kg/s]
-        Array1D<Real64> HeatFlowSeqNoOA;    // daily sequence of zone heating air mass flow rate (zone time step) without MinOA limit [kg/s]
-        Array1D<Real64> CoolFlowSeq;        // daily sequence of zone cooling air mass flow rate (zone time step) [kg/s]
-        Array1D<Real64> CoolFlowSeqNoOA;    // daily sequence of zone cooling air mass flow rate (zone time step) without MinOA limit [kg/s]
-        Array1D<Real64> HeatLoadSeq;        // daily sequence of zone heating load (zone time step)
-        Array1D<Real64> CoolLoadSeq;        // daily sequence of zone cooling load (zone time step)
-        Array1D<Real64> HeatZoneTempSeq;    // daily sequence of zone temperatures (heating, zone time step)
-        Array1D<Real64> HeatOutTempSeq;     // daily sequence of outdoor temperatures (heating, zone time step)
-        Array1D<Real64> HeatZoneRetTempSeq; // daily sequence of zone return temperatures (heating,
+        EPVector<Real64> HeatFlowSeq;        // daily sequence of zone heating air mass flow rate (zone time step) [kg/s]
+        EPVector<Real64> HeatFlowSeqNoOA;    // daily sequence of zone heating air mass flow rate (zone time step) without MinOA limit [kg/s]
+        EPVector<Real64> CoolFlowSeq;        // daily sequence of zone cooling air mass flow rate (zone time step) [kg/s]
+        EPVector<Real64> CoolFlowSeqNoOA;    // daily sequence of zone cooling air mass flow rate (zone time step) without MinOA limit [kg/s]
+        EPVector<Real64> HeatLoadSeq;        // daily sequence of zone heating load (zone time step)
+        EPVector<Real64> CoolLoadSeq;        // daily sequence of zone cooling load (zone time step)
+        EPVector<Real64> HeatZoneTempSeq;    // daily sequence of zone temperatures (heating, zone time step)
+        EPVector<Real64> HeatOutTempSeq;     // daily sequence of outdoor temperatures (heating, zone time step)
+        EPVector<Real64> HeatZoneRetTempSeq; // daily sequence of zone return temperatures (heating,
         //  zone time step)
-        Array1D<Real64> HeatTstatTempSeq;   // daily sequence of zone thermostat temperatures (heating, zone time step)
-        Array1D<Real64> DesHeatSetPtSeq;    // daily sequence of indoor set point temperatures (zone time step)
-        Array1D<Real64> CoolZoneTempSeq;    // daily sequence of zone temperatures (cooling, zone time step)
-        Array1D<Real64> CoolOutTempSeq;     // daily sequence of outdoor temperatures (cooling, zone time step)
-        Array1D<Real64> CoolZoneRetTempSeq; // daily sequence of zone return temperatures (cooling,
+        EPVector<Real64> HeatTstatTempSeq;   // daily sequence of zone thermostat temperatures (heating, zone time step)
+        EPVector<Real64> DesHeatSetPtSeq;    // daily sequence of indoor set point temperatures (zone time step)
+        EPVector<Real64> CoolZoneTempSeq;    // daily sequence of zone temperatures (cooling, zone time step)
+        EPVector<Real64> CoolOutTempSeq;     // daily sequence of outdoor temperatures (cooling, zone time step)
+        EPVector<Real64> CoolZoneRetTempSeq; // daily sequence of zone return temperatures (cooling,
         //  zone time step)
-        Array1D<Real64> CoolTstatTempSeq;  // daily sequence of zone thermostat temperatures (cooling, zone time step)
-        Array1D<Real64> DesCoolSetPtSeq;   // daily sequence of indoor set point temperatures (zone time step)
-        Array1D<Real64> HeatZoneHumRatSeq; // daily sequence of zone humidity ratios (heating, zone time step)
-        Array1D<Real64> CoolZoneHumRatSeq; // daily sequence of zone humidity ratios (cooling, zone time step)
-        Array1D<Real64> HeatOutHumRatSeq;  // daily sequence of outdoor humidity ratios (heating, zone time step)
-        Array1D<Real64> CoolOutHumRatSeq;  // daily sequence of outdoor humidity ratios (cooling, zone time step)
+        EPVector<Real64> CoolTstatTempSeq;  // daily sequence of zone thermostat temperatures (cooling, zone time step)
+        EPVector<Real64> DesCoolSetPtSeq;   // daily sequence of indoor set point temperatures (zone time step)
+        EPVector<Real64> HeatZoneHumRatSeq; // daily sequence of zone humidity ratios (heating, zone time step)
+        EPVector<Real64> CoolZoneHumRatSeq; // daily sequence of zone humidity ratios (cooling, zone time step)
+        EPVector<Real64> HeatOutHumRatSeq;  // daily sequence of outdoor humidity ratios (heating, zone time step)
+        EPVector<Real64> CoolOutHumRatSeq;  // daily sequence of outdoor humidity ratios (cooling, zone time step)
         Real64 ZoneADEffCooling;           // the zone air distribution effectiveness in cooling mode
         Real64 ZoneADEffHeating;           // the zone air distribution effectiveness in heating mode
         Real64 ZoneSecondaryRecirculation; // the zone secondary air recirculation fraction
@@ -571,14 +571,14 @@ namespace DataSizing {
         Real64 DOASSupTemp;     // current DOAS supply air temperature [C]
         Real64 DOASSupHumRat;   // current DOAS supply air humidity ratio [kg H2O / kg dry air]
         Real64 DOASTotCoolLoad; // current total cooling load imposed by DOAS supply air [W]
-        Array1D<Real64> DOASHeatLoadSeq;    // daily sequence of zone DOAS heating load (zone time step) [W]
-        Array1D<Real64> DOASCoolLoadSeq;    // daily sequence of zone DOAS cooling load (zone time step) [W]
-        Array1D<Real64> DOASHeatAddSeq;     // daily sequence of zone DOAS heat addition rate (zone time step) [W]
-        Array1D<Real64> DOASLatAddSeq;      // daily sequence of zone DOAS latent heat addition rate (zone time step) [W]
-        Array1D<Real64> DOASSupMassFlowSeq; // daily sequence of zone DOAS supply mass flow rate (zone time step) [Kg/s]
-        Array1D<Real64> DOASSupTempSeq;     // daily sequence of zone DOAS supply temperature (zone time step) [C]
-        Array1D<Real64> DOASSupHumRatSeq;   // daily sequence of zone DOAS supply humidity ratio (zone time step) [kg H2O / kg dry air]
-        Array1D<Real64> DOASTotCoolLoadSeq; // daily sequence of zone DOAS total cooling load (zone time step) [W]
+        EPVector<Real64> DOASHeatLoadSeq;    // daily sequence of zone DOAS heating load (zone time step) [W]
+        EPVector<Real64> DOASCoolLoadSeq;    // daily sequence of zone DOAS cooling load (zone time step) [W]
+        EPVector<Real64> DOASHeatAddSeq;     // daily sequence of zone DOAS heat addition rate (zone time step) [W]
+        EPVector<Real64> DOASLatAddSeq;      // daily sequence of zone DOAS latent heat addition rate (zone time step) [W]
+        EPVector<Real64> DOASSupMassFlowSeq; // daily sequence of zone DOAS supply mass flow rate (zone time step) [Kg/s]
+        EPVector<Real64> DOASSupTempSeq;     // daily sequence of zone DOAS supply temperature (zone time step) [C]
+        EPVector<Real64> DOASSupHumRatSeq;   // daily sequence of zone DOAS supply humidity ratio (zone time step) [kg H2O / kg dry air]
+        EPVector<Real64> DOASTotCoolLoadSeq; // daily sequence of zone DOAS total cooling load (zone time step) [W]
 
         // Default Constructor
         ZoneSizingData()
@@ -891,42 +891,42 @@ namespace DataSizing {
         Real64 HeatOutTemp;                    // design outside air temperature for heating [C]
         Real64 HeatOutHumRat;                  // design outside air hum ratio for Heating [kg water/kg dry air]
         Real64 DesCoolVolFlowMin;              // design minimum system cooling flow rate [m3/s]
-        Array1D<Real64> HeatFlowSeq;           // daily sequence of system heating air mass flow rate
+        EPVector<Real64> HeatFlowSeq;           // daily sequence of system heating air mass flow rate
         //  (zone time step)
-        Array1D<Real64> SumZoneHeatLoadSeq; // daily sequence of zones summed heating load [W]
+        EPVector<Real64> SumZoneHeatLoadSeq; // daily sequence of zones summed heating load [W]
         //  (zone time step)
-        Array1D<Real64> CoolFlowSeq; // daily sequence of system cooling air mass flow rate
+        EPVector<Real64> CoolFlowSeq; // daily sequence of system cooling air mass flow rate
         //  (zone time step)
-        Array1D<Real64> SumZoneCoolLoadSeq; // daily sequence of zones summed cooling load [W]
+        EPVector<Real64> SumZoneCoolLoadSeq; // daily sequence of zones summed cooling load [W]
         //  (zone time step)
-        Array1D<Real64> CoolZoneAvgTempSeq; // daily sequence of zones flow weighted average temperature [C]
+        EPVector<Real64> CoolZoneAvgTempSeq; // daily sequence of zones flow weighted average temperature [C]
         //  (zone time step)
-        Array1D<Real64> HeatZoneAvgTempSeq; // daily sequence of zones flow weighted average temperature [C]
+        EPVector<Real64> HeatZoneAvgTempSeq; // daily sequence of zones flow weighted average temperature [C]
         //  (zone time step)
-        Array1D<Real64> SensCoolCapSeq; // daily sequence of system sensible cooling capacity
+        EPVector<Real64> SensCoolCapSeq; // daily sequence of system sensible cooling capacity
         //  (zone time step)
-        Array1D<Real64> TotCoolCapSeq; // daily sequence of system total cooling capacity
+        EPVector<Real64> TotCoolCapSeq; // daily sequence of system total cooling capacity
         //  (zone time step)
-        Array1D<Real64> HeatCapSeq;        // daily sequence of system heating capacity [zone time step]
-        Array1D<Real64> PreheatCapSeq;     // daily sequence of system preheat capacity [zone time step]
-        Array1D<Real64> SysCoolRetTempSeq; // daily sequence of system cooling return temperatures [C]
+        EPVector<Real64> HeatCapSeq;        // daily sequence of system heating capacity [zone time step]
+        EPVector<Real64> PreheatCapSeq;     // daily sequence of system preheat capacity [zone time step]
+        EPVector<Real64> SysCoolRetTempSeq; // daily sequence of system cooling return temperatures [C]
         //  [zone time step]
-        Array1D<Real64> SysCoolRetHumRatSeq; // daily sequence of system cooling return humidity ratios
+        EPVector<Real64> SysCoolRetHumRatSeq; // daily sequence of system cooling return humidity ratios
         //  [kg water/kg dry air] [zone time step]
-        Array1D<Real64> SysHeatRetTempSeq; // daily sequence of system heating return temperatures [C]
+        EPVector<Real64> SysHeatRetTempSeq; // daily sequence of system heating return temperatures [C]
         //   [zone time step]
-        Array1D<Real64> SysHeatRetHumRatSeq; // daily sequence of system heating return humidity ratios
+        EPVector<Real64> SysHeatRetHumRatSeq; // daily sequence of system heating return humidity ratios
         //  [kg water/kg dry air] [zone time step]
-        Array1D<Real64> SysCoolOutTempSeq; // daily sequence of system cooling outside temperatures [C]
+        EPVector<Real64> SysCoolOutTempSeq; // daily sequence of system cooling outside temperatures [C]
         //  [zone time step]
-        Array1D<Real64> SysCoolOutHumRatSeq; // daily sequence of system cooling outside humidity ratios
+        EPVector<Real64> SysCoolOutHumRatSeq; // daily sequence of system cooling outside humidity ratios
         //  [kg water/kg dry air] [zone time step]
-        Array1D<Real64> SysHeatOutTempSeq; // daily sequence of system heating outside temperatures [C]
+        EPVector<Real64> SysHeatOutTempSeq; // daily sequence of system heating outside temperatures [C]
         //  [zone time step]
-        Array1D<Real64> SysHeatOutHumRatSeq; // daily sequence of system heating outside humidity ratios
+        EPVector<Real64> SysHeatOutHumRatSeq; // daily sequence of system heating outside humidity ratios
         //   [kg water/kg dry air] [zone time step]
-        Array1D<Real64> SysDOASHeatAddSeq; // daily sequence of heat addition rate from DOAS supply air [W]
-        Array1D<Real64> SysDOASLatAddSeq;  // daily sequence of latent heat addition rate from DOAS supply air [W]
+        EPVector<Real64> SysDOASHeatAddSeq; // daily sequence of heat addition rate from DOAS supply air [W]
+        EPVector<Real64> SysDOASLatAddSeq;  // daily sequence of latent heat addition rate from DOAS supply air [W]
         int SystemOAMethod;                // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP
         Real64 MaxZoneOAFraction;          // maximum value of min OA for zones served by system
         Real64 SysUncOA;                   // uncorrected system outdoor air flow based on zone people and zone area
@@ -1010,10 +1010,10 @@ namespace DataSizing {
         std::string cCoolFlowPeakDDDate;   // date string of design day causing cooling air flow peak
         int HeatPeakDD;                    // design day containing the heating peak
         std::string cHeatPeakDDDate;       // date string of design day causing heating peak
-        Array1D<int> TimeStepAtSensCoolPk; // time step of the sensible cooling peak
-        Array1D<int> TimeStepAtTotCoolPk;  // time step of the total cooling peak
-        Array1D<int> TimeStepAtCoolFlowPk; // time step of the cooling air flow peak
-        Array1D<int> TimeStepAtHeatPk;     // time step of the heating peak
+        EPVector<int> TimeStepAtSensCoolPk; // time step of the sensible cooling peak
+        EPVector<int> TimeStepAtTotCoolPk;  // time step of the total cooling peak
+        EPVector<int> TimeStepAtCoolFlowPk; // time step of the cooling air flow peak
+        EPVector<int> TimeStepAtHeatPk;     // time step of the heating peak
 
         // Default Constructor
         SysSizPeakDDNumData() : SensCoolPeakDD(0), TotCoolPeakDD(0), CoolFlowPeakDD(0), HeatPeakDD(0)
@@ -1051,18 +1051,18 @@ namespace DataSizing {
         int CoolDDNum;                    // design day index of design day causing heating peak
         int HeatDDNum;                    // design day index of design day causing heating peak
         int TimeStepNumAtCoolMax;         // time step number (in day) at cooling peak
-        Array1D<Real64> DOASHeatAddSeq;   // daily sequence of zone DOAS heat addition rate (zone time step) [W]
-        Array1D<Real64> DOASLatAddSeq;    // daily sequence of zone DOAS latent heat addition rate (zone time step) [W]
-        Array1D<Real64> CoolOutHumRatSeq; // daily sequence of outdoor humidity ratios (cooling, zone time step)
-        Array1D<Real64> CoolOutTempSeq;   // daily sequence of outdoor temperatures (cooling, zone time step)
-        Array1D<Real64> CoolZoneTempSeq;  // daily sequence of zone temperatures (cooling, zone time step)
-        Array1D<Real64> CoolLoadSeq;      // daily sequence of cooling load (cooling, zone time step)
+        EPVector<Real64> DOASHeatAddSeq;   // daily sequence of zone DOAS heat addition rate (zone time step) [W]
+        EPVector<Real64> DOASLatAddSeq;    // daily sequence of zone DOAS latent heat addition rate (zone time step) [W]
+        EPVector<Real64> CoolOutHumRatSeq; // daily sequence of outdoor humidity ratios (cooling, zone time step)
+        EPVector<Real64> CoolOutTempSeq;   // daily sequence of outdoor temperatures (cooling, zone time step)
+        EPVector<Real64> CoolZoneTempSeq;  // daily sequence of zone temperatures (cooling, zone time step)
+        EPVector<Real64> CoolLoadSeq;      // daily sequence of cooling load (cooling, zone time step)
         Real64 DesCoolLoad;               // zone design cooling load [W]
         int TimeStepNumAtHeatMax;         // time step number (in day) at Heating peak
-        Array1D<Real64> HeatOutHumRatSeq; // daily sequence of outdoor humidity ratios (heating, zone time step)
-        Array1D<Real64> HeatOutTempSeq;   // daily sequence of outdoor temperatures (heating, zone time step)
-        Array1D<Real64> HeatZoneTempSeq;  // daily sequence of zone temperatures (heating, zone time step)
-        Array1D<Real64> HeatLoadSeq;      // daily sequence of heating load (cooling, zone time step)
+        EPVector<Real64> HeatOutHumRatSeq; // daily sequence of outdoor humidity ratios (heating, zone time step)
+        EPVector<Real64> HeatOutTempSeq;   // daily sequence of outdoor temperatures (heating, zone time step)
+        EPVector<Real64> HeatZoneTempSeq;  // daily sequence of zone temperatures (heating, zone time step)
+        EPVector<Real64> HeatLoadSeq;      // daily sequence of heating load (cooling, zone time step)
         Real64 DesHeatLoad;               // zone design heating load [W]
 
         // Default Constructor
@@ -1075,9 +1075,9 @@ namespace DataSizing {
     {
         // Members
         std::string DateString; // date of design day weather values
-        Array1D<Real64> Temp;   // design day temperatures at the major time step
-        Array1D<Real64> HumRat; // design day humidity ratios at the major time step
-        Array1D<Real64> Press;  // design day braometric pressure at the major time step
+        EPVector<Real64> Temp;   // design day temperatures at the major time step
+        EPVector<Real64> HumRat; // design day humidity ratios at the major time step
+        EPVector<Real64> Press;  // design day braometric pressure at the major time step
 
         // Default Constructor
         DesDayWeathData()
@@ -1152,78 +1152,78 @@ namespace DataSizing {
     };
 
     // Object Data
-    extern Array1D<OARequirementsData> OARequirements;
-    extern Array1D<ZoneAirDistributionData> ZoneAirDistribution;
-    extern Array1D<ZoneSizingInputData> ZoneSizingInput;             // Input data for zone sizing
+    extern EPVector<OARequirementsData> OARequirements;
+    extern EPVector<ZoneAirDistributionData> ZoneAirDistribution;
+    extern EPVector<ZoneSizingInputData> ZoneSizingInput;             // Input data for zone sizing
     extern Array2D<ZoneSizingData> ZoneSizing;                       // Data for zone sizing (all data, all design)
-    extern Array1D<ZoneSizingData> FinalZoneSizing;                  // Final data for zone sizing including effects
+    extern EPVector<ZoneSizingData> FinalZoneSizing;                  // Final data for zone sizing including effects
     extern Array2D<ZoneSizingData> CalcZoneSizing;                   // Data for zone sizing (all data)
-    extern Array1D<ZoneSizingData> CalcFinalZoneSizing;              // Final data for zone sizing (calculated only)
-    extern Array1D<ZoneSizingData> TermUnitFinalZoneSizing;          // Final data for sizing terminal units
-    extern Array1D<SystemSizingInputData> SysSizInput;               // Input data array for system sizing object
+    extern EPVector<ZoneSizingData> CalcFinalZoneSizing;              // Final data for zone sizing (calculated only)
+    extern EPVector<ZoneSizingData> TermUnitFinalZoneSizing;          // Final data for sizing terminal units
+    extern EPVector<SystemSizingInputData> SysSizInput;               // Input data array for system sizing object
     extern Array2D<SystemSizingData> SysSizing;                      // Data array for system sizing (all data)
-    extern Array1D<SystemSizingData> FinalSysSizing;                 // Data array for system sizing (max heat/cool)
-    extern Array1D<SystemSizingData> CalcSysSizing;                  // Data array for system sizing (max heat/cool)
-    extern Array1D<TermUnitSizingData> TermUnitSizing;               // Data added in sizing routines
-    extern Array1D<ZoneEqSizingData> ZoneEqSizing;                   // Data added in zone eq component sizing routines
-    extern Array1D<ZoneEqSizingData> UnitarySysEqSizing;             // Data added in unitary system sizing routines
-    extern Array1D<ZoneEqSizingData> OASysEqSizing;                  // Data added in unitary system sizing routines
-    extern Array1D<PlantSizingData> PlantSizData;                    // Input data array for plant sizing
-    extern Array1D<DesDayWeathData> DesDayWeath;                     // design day weather saved at major time step
-    extern Array1D<CompDesWaterFlowData> CompDesWaterFlow;           // array to store components' design water flow
-    extern Array1D<SysSizPeakDDNumData> SysSizPeakDDNum;             // data array for peak des day indices
-    extern Array1D<ZoneHVACSizingData> ZoneHVACSizing;               // Input data for zone HVAC sizing
-    extern Array1D<AirTerminalSizingSpecData> AirTerminalSizingSpec; // Input data for air terminal sizing
+    extern EPVector<SystemSizingData> FinalSysSizing;                 // Data array for system sizing (max heat/cool)
+    extern EPVector<SystemSizingData> CalcSysSizing;                  // Data array for system sizing (max heat/cool)
+    extern EPVector<TermUnitSizingData> TermUnitSizing;               // Data added in sizing routines
+    extern EPVector<ZoneEqSizingData> ZoneEqSizing;                   // Data added in zone eq component sizing routines
+    extern EPVector<ZoneEqSizingData> UnitarySysEqSizing;             // Data added in unitary system sizing routines
+    extern EPVector<ZoneEqSizingData> OASysEqSizing;                  // Data added in unitary system sizing routines
+    extern EPVector<PlantSizingData> PlantSizData;                    // Input data array for plant sizing
+    extern EPVector<DesDayWeathData> DesDayWeath;                     // design day weather saved at major time step
+    extern EPVector<CompDesWaterFlowData> CompDesWaterFlow;           // array to store components' design water flow
+    extern EPVector<SysSizPeakDDNumData> SysSizPeakDDNum;             // data array for peak des day indices
+    extern EPVector<ZoneHVACSizingData> ZoneHVACSizing;               // Input data for zone HVAC sizing
+    extern EPVector<AirTerminalSizingSpecData> AirTerminalSizingSpec; // Input data for air terminal sizing
     // used only for Facility Load Component Summary
-    extern Array1D<FacilitySizingData> CalcFacilitySizing; // Data for facility sizing
+    extern EPVector<FacilitySizingData> CalcFacilitySizing; // Data for facility sizing
     extern FacilitySizingData CalcFinalFacilitySizing;     // Final data for facility sizing
-    extern Array1D<Real64> VbzByZone;                      // saved value of ZoneOAUnc which is Vbz used in 62.1 tabular report
-    extern Array1D<Real64> VdzClgByZone;    // saved value of cooling based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level
+    extern EPVector<Real64> VbzByZone;                      // saved value of ZoneOAUnc which is Vbz used in 62.1 tabular report
+    extern EPVector<Real64> VdzClgByZone;    // saved value of cooling based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level
                                             // Vps) Vdz includes secondary flows and primary flows
-    extern Array1D<Real64> VdzMinClgByZone; // minimum discarge flow for cooling, Vdz includes secondary and primary flows for dual path
-    extern Array1D<Real64> VdzHtgByZone;    // saved value of heating based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level
+    extern EPVector<Real64> VdzMinClgByZone; // minimum discarge flow for cooling, Vdz includes secondary and primary flows for dual path
+    extern EPVector<Real64> VdzHtgByZone;    // saved value of heating based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level
                                             // Vps) Vdz includes secondary flows and primary flows
-    extern Array1D<Real64> VdzMinHtgByZone; // minimum discharge flow for heating, Vdz includes secondary and primary flows for dual path
-    extern Array1D<Real64> ZdzClgByZone;    // minimum discharge outdoor-air fraction for cooling
-    extern Array1D<Real64> ZdzHtgByZone;    // minimum discharge outdoor-air fraction for heating
-    extern Array1D<Real64> VpzClgByZone;    // saved value of cooling based ZonePA which is Vpz used in 62.1 tabular report
-    extern Array1D<Real64> VpzMinClgByZone; // saved value of minimum cooling based ZonePA which is VpzClg-min used in 62.1 tabular report
-    extern Array1D<Real64> VpzHtgByZone;    // saved value of heating based ZonePA which is Vpz used in 62.1 tabular report
-    extern Array1D<Real64> VpzMinHtgByZone; // saved value of minimum heating based ZonePA which is VpzHtg-min used in 62.1 tabular report
-    extern Array1D<Real64> VpzClgSumBySys;  // sum of saved value of cooling based ZonePA which is Vpz-sum used in 62.1 tabular report
-    extern Array1D<Real64> VpzHtgSumBySys;  // sum of saved value of heating based ZonePA which is Vpz-sum used in 62.1 tabular report
-    extern Array1D<Real64> PzSumBySys;      // sum of design people for system, Pz_sum
-    extern Array1D<Real64> PsBySys;         // sum of peak concurrent people by system, Ps
-    extern Array1D<Real64> DBySys;          // Population Diversity by system
-    extern Array1D<Real64> SumRpxPzBySys;   // Sum of per person OA times number of people by system, No D yet
-    extern Array1D<Real64> SumRaxAzBySys;   // sum of per area OA time zone area by system, does not get altered by D
-    extern Array1D<std::string> PeakPsOccurrenceDateTimeStringBySys;    // string describing date and time when Ps peak occurs
-    extern Array1D<std::string> PeakPsOccurrenceEnvironmentStringBySys; // string describing Environment when Ps peak occurs
+    extern EPVector<Real64> VdzMinHtgByZone; // minimum discharge flow for heating, Vdz includes secondary and primary flows for dual path
+    extern EPVector<Real64> ZdzClgByZone;    // minimum discharge outdoor-air fraction for cooling
+    extern EPVector<Real64> ZdzHtgByZone;    // minimum discharge outdoor-air fraction for heating
+    extern EPVector<Real64> VpzClgByZone;    // saved value of cooling based ZonePA which is Vpz used in 62.1 tabular report
+    extern EPVector<Real64> VpzMinClgByZone; // saved value of minimum cooling based ZonePA which is VpzClg-min used in 62.1 tabular report
+    extern EPVector<Real64> VpzHtgByZone;    // saved value of heating based ZonePA which is Vpz used in 62.1 tabular report
+    extern EPVector<Real64> VpzMinHtgByZone; // saved value of minimum heating based ZonePA which is VpzHtg-min used in 62.1 tabular report
+    extern EPVector<Real64> VpzClgSumBySys;  // sum of saved value of cooling based ZonePA which is Vpz-sum used in 62.1 tabular report
+    extern EPVector<Real64> VpzHtgSumBySys;  // sum of saved value of heating based ZonePA which is Vpz-sum used in 62.1 tabular report
+    extern EPVector<Real64> PzSumBySys;      // sum of design people for system, Pz_sum
+    extern EPVector<Real64> PsBySys;         // sum of peak concurrent people by system, Ps
+    extern EPVector<Real64> DBySys;          // Population Diversity by system
+    extern EPVector<Real64> SumRpxPzBySys;   // Sum of per person OA times number of people by system, No D yet
+    extern EPVector<Real64> SumRaxAzBySys;   // sum of per area OA time zone area by system, does not get altered by D
+    extern EPVector<std::string> PeakPsOccurrenceDateTimeStringBySys;    // string describing date and time when Ps peak occurs
+    extern EPVector<std::string> PeakPsOccurrenceEnvironmentStringBySys; // string describing Environment when Ps peak occurs
 
-    extern Array1D<Real64> VouBySys; // uncorrected system outdoor air requirement, for std 62.1 VRP
+    extern EPVector<Real64> VouBySys; // uncorrected system outdoor air requirement, for std 62.1 VRP
 
-    extern Array1D<Real64> VpsClgBySys;       // System primary airflow Vps, for cooling for std 62.1 VRP
-    extern Array1D<Real64> VpsHtgBySys;       // system primary airflow Vps, for heating for std 62.1 VRP
-    extern Array1D<Real64> FaByZoneHeat;      // saved value of Fa used in 62.1 tabular report
-    extern Array1D<Real64> FbByZoneCool;      // saved value of Fb used in 62.1 tabular report
-    extern Array1D<Real64> FbByZoneHeat;      // saved value of Fb used in 62.1 tabular report
-    extern Array1D<Real64> FcByZoneCool;      // saved value of Fc used in 62.1 tabular report
-    extern Array1D<Real64> FcByZoneHeat;      // saved value of Fc used in 62.1 tabular report
-    extern Array1D<Real64> XsBySysCool;       // saved value of Xs used in 62.1 tabular report
-    extern Array1D<Real64> XsBySysHeat;       // saved value of Xs used in 62.1 tabular report
-    extern Array1D<Real64> EvzByZoneCool;     // saved value of Evz (zone vent effy) used in 62.1 tabular report
-    extern Array1D<Real64> EvzByZoneHeat;     // saved value of Evz (zone vent effy) used in 62.1 tabular report
-    extern Array1D<Real64> EvzByZoneCoolPrev; // saved value of Evz (zone vent effy) used in 62.1 tabular report
-    extern Array1D<Real64> EvzByZoneHeatPrev; // saved value of Evz (zone vent effy) used in 62.1 tabular report
-    extern Array1D<Real64> VotClgBySys;       // saved value of cooling ventilation required at primary AHU, used in 62.1 tabular report
-    extern Array1D<Real64> VotHtgBySys;       // saved value of heating ventilation required at primary AHU, used in 62.1 tabular report
-    extern Array1D<Real64> VozSumClgBySys;    // saved value of cooling ventilation required at clg zones
-    extern Array1D<Real64> VozSumHtgBySys;    // saved value of heating ventilation required at htg zones
-    extern Array1D<Real64> TotCoolCapTemp;    // scratch variable used for calulating peak load [W]
-    extern Array1D<Real64> EvzMinBySysHeat;   // saved value of EvzMin used in 62.1 tabular report
-    extern Array1D<Real64> EvzMinBySysCool;   // saved value of EvzMin used in 62.1 tabular report
-    extern Array1D<Real64> FaByZoneCool;      // triggers allocation in UpdateSysSizing
-    extern Array1D<Real64> SensCoolCapTemp;   // triggers allocation in UpdateSysSizing
+    extern EPVector<Real64> VpsClgBySys;       // System primary airflow Vps, for cooling for std 62.1 VRP
+    extern EPVector<Real64> VpsHtgBySys;       // system primary airflow Vps, for heating for std 62.1 VRP
+    extern EPVector<Real64> FaByZoneHeat;      // saved value of Fa used in 62.1 tabular report
+    extern EPVector<Real64> FbByZoneCool;      // saved value of Fb used in 62.1 tabular report
+    extern EPVector<Real64> FbByZoneHeat;      // saved value of Fb used in 62.1 tabular report
+    extern EPVector<Real64> FcByZoneCool;      // saved value of Fc used in 62.1 tabular report
+    extern EPVector<Real64> FcByZoneHeat;      // saved value of Fc used in 62.1 tabular report
+    extern EPVector<Real64> XsBySysCool;       // saved value of Xs used in 62.1 tabular report
+    extern EPVector<Real64> XsBySysHeat;       // saved value of Xs used in 62.1 tabular report
+    extern EPVector<Real64> EvzByZoneCool;     // saved value of Evz (zone vent effy) used in 62.1 tabular report
+    extern EPVector<Real64> EvzByZoneHeat;     // saved value of Evz (zone vent effy) used in 62.1 tabular report
+    extern EPVector<Real64> EvzByZoneCoolPrev; // saved value of Evz (zone vent effy) used in 62.1 tabular report
+    extern EPVector<Real64> EvzByZoneHeatPrev; // saved value of Evz (zone vent effy) used in 62.1 tabular report
+    extern EPVector<Real64> VotClgBySys;       // saved value of cooling ventilation required at primary AHU, used in 62.1 tabular report
+    extern EPVector<Real64> VotHtgBySys;       // saved value of heating ventilation required at primary AHU, used in 62.1 tabular report
+    extern EPVector<Real64> VozSumClgBySys;    // saved value of cooling ventilation required at clg zones
+    extern EPVector<Real64> VozSumHtgBySys;    // saved value of heating ventilation required at htg zones
+    extern EPVector<Real64> TotCoolCapTemp;    // scratch variable used for calulating peak load [W]
+    extern EPVector<Real64> EvzMinBySysHeat;   // saved value of EvzMin used in 62.1 tabular report
+    extern EPVector<Real64> EvzMinBySysCool;   // saved value of EvzMin used in 62.1 tabular report
+    extern EPVector<Real64> FaByZoneCool;      // triggers allocation in UpdateSysSizing
+    extern EPVector<Real64> SensCoolCapTemp;   // triggers allocation in UpdateSysSizing
 
     // Clears the global data in DataSizing.
     // Needed for unit tests, should not be normally called.

@@ -163,100 +163,100 @@ namespace DataRoomAirModel {
     int TotNumOfAirNodes(0);
     int TotNumOfRoomAFNNodes(0);
     Array1D_int TotNumOfZoneAirNodes;
-    Array1D<Real64> ConvectiveFloorSplit;
-    Array1D<Real64> InfiltratFloorSplit;
+    EPVector<Real64> ConvectiveFloorSplit;
+    EPVector<Real64> InfiltratFloorSplit;
     // UCSD
-    Array1D<Real64> DVHcIn;
+    EPVector<Real64> DVHcIn;
     int TotUCSDDV(0);             // Total number of UCSDDV zones
     Array1D_bool IsZoneDV;        // Is the air model for the zone UCSDDV?
-    Array1D<Real64> ZTOC;         // Temperature of occupied (lower) zone
-    Array1D<Real64> AvgTempGrad;  // vertical Average Temperature Gradient in the room
-    Array1D<Real64> ZTMX;         // Temperature of the mixing(upper) layer
-    Array1D<Real64> MaxTempGrad;  // maximum Average Temperature Gradient in the room
-    Array1D<Real64> HVACAirTemp;  // HVAC system temperature (DEG C)
-    Array1D<Real64> HVACMassFlow; // HVAC system mass flow rate (KG/S)
-    Array1D<Real64> ZTFloor;
-    Array1D<Real64> HeightTransition;
-    Array1D<Real64> FracMinFlow;
+    EPVector<Real64> ZTOC;         // Temperature of occupied (lower) zone
+    EPVector<Real64> AvgTempGrad;  // vertical Average Temperature Gradient in the room
+    EPVector<Real64> ZTMX;         // Temperature of the mixing(upper) layer
+    EPVector<Real64> MaxTempGrad;  // maximum Average Temperature Gradient in the room
+    EPVector<Real64> HVACAirTemp;  // HVAC system temperature (DEG C)
+    EPVector<Real64> HVACMassFlow; // HVAC system mass flow rate (KG/S)
+    EPVector<Real64> ZTFloor;
+    EPVector<Real64> HeightTransition;
+    EPVector<Real64> FracMinFlow;
     Array1D_int ZoneDVMixedFlag;
-    Array1D<Real64> ZoneDVMixedFlagRep;
+    EPVector<Real64> ZoneDVMixedFlagRep;
     Array1D_bool ZoneAirSystemON;
-    Array1D<Real64> TCMF; // comfort temperature
-    Array1D<Real64> ZoneCeilingHeight;
-    Array1D<Real64> MATFloor;    // [C] floor level mean air temp
-    Array1D<Real64> XMATFloor;   // [C] floor level mean air temp at t minus 1 zone time step
-    Array1D<Real64> XM2TFloor;   // [C] floor level mean air temp at t minus 2 zone time step
-    Array1D<Real64> XM3TFloor;   // [C] floor level mean air temp at t minus 3 zone time step
-    Array1D<Real64> XM4TFloor;   // [C] floor level mean air temp at t minus 4 zone time step
-    Array1D<Real64> DSXMATFloor; // [C] floor level mean air temp at t minus 1 system time step
-    Array1D<Real64> DSXM2TFloor; // [C] floor level mean air temp at t minus 2 system time step
-    Array1D<Real64> DSXM3TFloor; // [C] floor level mean air temp at t minus 3 system time step
-    Array1D<Real64> DSXM4TFloor; // [C] floor level mean air temp at t minus 4 system time step
-    Array1D<Real64> MATOC;       // [C] occupied mean air temp
-    Array1D<Real64> XMATOC;      // [C] occupied mean air temp at t minus 1 zone time step
-    Array1D<Real64> XM2TOC;      // [C] occupied mean air temp at t minus 2 zone time step
-    Array1D<Real64> XM3TOC;      // [C] occupied mean air temp at t minus 3 zone time step
-    Array1D<Real64> XM4TOC;      // [C] occupied mean air temp at t minus 4 zone time step
-    Array1D<Real64> DSXMATOC;    // [C] occupied mean air temp at t minus 1 system time step
-    Array1D<Real64> DSXM2TOC;    // [C] occupied mean air temp at t minus 2 system time step
-    Array1D<Real64> DSXM3TOC;    // [C] occupied mean air temp at t minus 3 system time step
-    Array1D<Real64> DSXM4TOC;    // [C] occupied mean air temp at t minus 4 system time step
-    Array1D<Real64> MATMX;       // [C] mixed (upper) mean air temp
-    Array1D<Real64> XMATMX;      // [C] mixed (upper) mean air temp at t minus 1 zone time step
-    Array1D<Real64> XM2TMX;      // [C] mixed (upper) mean air temp at t minus 2 zone time step
-    Array1D<Real64> XM3TMX;      // [C] mixed (upper) mean air temp at t minus 3 zone time step
-    Array1D<Real64> XM4TMX;      // [C] mixed (upper) mean air temp at t minus 4 zone time step
-    Array1D<Real64> DSXMATMX;    // [C] mixed  mean air temp at t minus 1 system time step
-    Array1D<Real64> DSXM2TMX;    // [C] mixed  mean air temp at t minus 2 system time step
-    Array1D<Real64> DSXM3TMX;    // [C] mixed  mean air temp at t minus 3 system time step
-    Array1D<Real64> DSXM4TMX;    // [C] mixed  mean air temp at t minus 4 system time step
-    Array1D<Real64> ZTM1Floor;   // [C] difference equation's Floor air temp at t minus 1
-    Array1D<Real64> ZTM2Floor;   // [C] difference equation's Floor air temp at t minus 2
-    Array1D<Real64> ZTM3Floor;   // [C] difference equation's Floor air temp at t minus 3
-    Array1D<Real64> ZTM1OC;      // [C] difference equation's Occupied air temp at t minus 1
-    Array1D<Real64> ZTM2OC;      // [C] difference equation's Occupied air temp at t minus 2
-    Array1D<Real64> ZTM3OC;      // [C] difference equation's Occupied air temp at t minus 3
-    Array1D<Real64> ZTM1MX;      // [C] difference equation's Mixed  air temp at t minus 1
-    Array1D<Real64> ZTM2MX;      // [C] difference equation's Mixed  air temp at t minus 1
-    Array1D<Real64> ZTM3MX;      // [C] difference equation's Mixed  air temp at t minus 1
-    Array1D<Real64> AIRRATFloor;
-    Array1D<Real64> AIRRATOC;
-    Array1D<Real64> AIRRATMX;
+    EPVector<Real64> TCMF; // comfort temperature
+    EPVector<Real64> ZoneCeilingHeight;
+    EPVector<Real64> MATFloor;    // [C] floor level mean air temp
+    EPVector<Real64> XMATFloor;   // [C] floor level mean air temp at t minus 1 zone time step
+    EPVector<Real64> XM2TFloor;   // [C] floor level mean air temp at t minus 2 zone time step
+    EPVector<Real64> XM3TFloor;   // [C] floor level mean air temp at t minus 3 zone time step
+    EPVector<Real64> XM4TFloor;   // [C] floor level mean air temp at t minus 4 zone time step
+    EPVector<Real64> DSXMATFloor; // [C] floor level mean air temp at t minus 1 system time step
+    EPVector<Real64> DSXM2TFloor; // [C] floor level mean air temp at t minus 2 system time step
+    EPVector<Real64> DSXM3TFloor; // [C] floor level mean air temp at t minus 3 system time step
+    EPVector<Real64> DSXM4TFloor; // [C] floor level mean air temp at t minus 4 system time step
+    EPVector<Real64> MATOC;       // [C] occupied mean air temp
+    EPVector<Real64> XMATOC;      // [C] occupied mean air temp at t minus 1 zone time step
+    EPVector<Real64> XM2TOC;      // [C] occupied mean air temp at t minus 2 zone time step
+    EPVector<Real64> XM3TOC;      // [C] occupied mean air temp at t minus 3 zone time step
+    EPVector<Real64> XM4TOC;      // [C] occupied mean air temp at t minus 4 zone time step
+    EPVector<Real64> DSXMATOC;    // [C] occupied mean air temp at t minus 1 system time step
+    EPVector<Real64> DSXM2TOC;    // [C] occupied mean air temp at t minus 2 system time step
+    EPVector<Real64> DSXM3TOC;    // [C] occupied mean air temp at t minus 3 system time step
+    EPVector<Real64> DSXM4TOC;    // [C] occupied mean air temp at t minus 4 system time step
+    EPVector<Real64> MATMX;       // [C] mixed (upper) mean air temp
+    EPVector<Real64> XMATMX;      // [C] mixed (upper) mean air temp at t minus 1 zone time step
+    EPVector<Real64> XM2TMX;      // [C] mixed (upper) mean air temp at t minus 2 zone time step
+    EPVector<Real64> XM3TMX;      // [C] mixed (upper) mean air temp at t minus 3 zone time step
+    EPVector<Real64> XM4TMX;      // [C] mixed (upper) mean air temp at t minus 4 zone time step
+    EPVector<Real64> DSXMATMX;    // [C] mixed  mean air temp at t minus 1 system time step
+    EPVector<Real64> DSXM2TMX;    // [C] mixed  mean air temp at t minus 2 system time step
+    EPVector<Real64> DSXM3TMX;    // [C] mixed  mean air temp at t minus 3 system time step
+    EPVector<Real64> DSXM4TMX;    // [C] mixed  mean air temp at t minus 4 system time step
+    EPVector<Real64> ZTM1Floor;   // [C] difference equation's Floor air temp at t minus 1
+    EPVector<Real64> ZTM2Floor;   // [C] difference equation's Floor air temp at t minus 2
+    EPVector<Real64> ZTM3Floor;   // [C] difference equation's Floor air temp at t minus 3
+    EPVector<Real64> ZTM1OC;      // [C] difference equation's Occupied air temp at t minus 1
+    EPVector<Real64> ZTM2OC;      // [C] difference equation's Occupied air temp at t minus 2
+    EPVector<Real64> ZTM3OC;      // [C] difference equation's Occupied air temp at t minus 3
+    EPVector<Real64> ZTM1MX;      // [C] difference equation's Mixed  air temp at t minus 1
+    EPVector<Real64> ZTM2MX;      // [C] difference equation's Mixed  air temp at t minus 1
+    EPVector<Real64> ZTM3MX;      // [C] difference equation's Mixed  air temp at t minus 1
+    EPVector<Real64> AIRRATFloor;
+    EPVector<Real64> AIRRATOC;
+    EPVector<Real64> AIRRATMX;
     // Euler and Exact solution algorithms
-    Array1D<Real64> Zone1Floor;  // [C] difference equation's Floor air temp at previous dt
-    Array1D<Real64> ZoneMXFloor; // [C] difference equation's Floor air temp at t minus 1
-    Array1D<Real64> ZoneM2Floor; // [C] difference equation's Floor air temp at t minus 2
-    Array1D<Real64> Zone1OC;     // [C] difference equation's Occupied air temp at previous dt
-    Array1D<Real64> ZoneMXOC;    // [C] difference equation's Occupied air temp at t minus 1
-    Array1D<Real64> ZoneM2OC;    // [C] difference equation's Occupied air temp at t minus 2
-    Array1D<Real64> Zone1MX;     // [C] difference equation's Mixed  air temp at previous dt
-    Array1D<Real64> ZoneMXMX;    // [C] difference equation's Mixed  air temp at t minus 1
-    Array1D<Real64> ZoneM2MX;    // [C] difference equation's Mixed  air temp at t minus 2
+    EPVector<Real64> Zone1Floor;  // [C] difference equation's Floor air temp at previous dt
+    EPVector<Real64> ZoneMXFloor; // [C] difference equation's Floor air temp at t minus 1
+    EPVector<Real64> ZoneM2Floor; // [C] difference equation's Floor air temp at t minus 2
+    EPVector<Real64> Zone1OC;     // [C] difference equation's Occupied air temp at previous dt
+    EPVector<Real64> ZoneMXOC;    // [C] difference equation's Occupied air temp at t minus 1
+    EPVector<Real64> ZoneM2OC;    // [C] difference equation's Occupied air temp at t minus 2
+    EPVector<Real64> Zone1MX;     // [C] difference equation's Mixed  air temp at previous dt
+    EPVector<Real64> ZoneMXMX;    // [C] difference equation's Mixed  air temp at t minus 1
+    EPVector<Real64> ZoneM2MX;    // [C] difference equation's Mixed  air temp at t minus 2
     // UCSD-CV
-    Array1D<Real64> CVHcIn;
+    EPVector<Real64> CVHcIn;
     int TotUCSDCV(0);                // Total number of UCSDDV zones
     Array1D_bool IsZoneCV;           // Is the air model for the zone UCSDDV?
-    Array1D<Real64> ZoneCVisMixing;  // Zone set to CV is actually using a mixing model
-    Array1D<Real64> ZTJET;           // Jet Temperatures
-    Array1D<Real64> ZTREC;           // Recirculation Temperatures
-    Array1D<Real64> RoomOutflowTemp; // Temperature of air flowing out of the room
-    Array1D<Real64> JetRecAreaRatio;
-    Array1D<Real64> Urec;           // Recirculation region average velocity
-    Array1D<Real64> Ujet;           // Jet region average velocity
-    Array1D<Real64> Qrec;           // Recirculation zone total flow rate
-    Array1D<Real64> Qtot;           // Total volumetric inflow rate through all active aperatures [m3/s]
-    Array1D<Real64> RecInflowRatio; // Ratio of the recirculation volumetric flow rate to the total inflow flow rate []
-    Array1D<Real64> Uhc;
-    Array1D<Real64> Ain;                     // Inflow aperture area
-    Array1D<Real64> Droom;                   // CV Zone average length
-    Array1D<Real64> Dstar;                   // CV Zone average length, wind direction corrected
-    Array1D<Real64> Tin;                     // Inflow air temperature
-    Array1D<Real64> TotArea;                 // Sum of the areas of all apertures in the zone
+    EPVector<Real64> ZoneCVisMixing;  // Zone set to CV is actually using a mixing model
+    EPVector<Real64> ZTJET;           // Jet Temperatures
+    EPVector<Real64> ZTREC;           // Recirculation Temperatures
+    EPVector<Real64> RoomOutflowTemp; // Temperature of air flowing out of the room
+    EPVector<Real64> JetRecAreaRatio;
+    EPVector<Real64> Urec;           // Recirculation region average velocity
+    EPVector<Real64> Ujet;           // Jet region average velocity
+    EPVector<Real64> Qrec;           // Recirculation zone total flow rate
+    EPVector<Real64> Qtot;           // Total volumetric inflow rate through all active aperatures [m3/s]
+    EPVector<Real64> RecInflowRatio; // Ratio of the recirculation volumetric flow rate to the total inflow flow rate []
+    EPVector<Real64> Uhc;
+    EPVector<Real64> Ain;                     // Inflow aperture area
+    EPVector<Real64> Droom;                   // CV Zone average length
+    EPVector<Real64> Dstar;                   // CV Zone average length, wind direction corrected
+    EPVector<Real64> Tin;                     // Inflow air temperature
+    EPVector<Real64> TotArea;                 // Sum of the areas of all apertures in the zone
     Array2D_int AirflowNetworkSurfaceUCSDCV; // table for AirflowNetwork surfaces organization
     int CVNumAirflowNetworkSurfaces(0);      // total number of AirFlowNetwork surfaces.
     // Interzone surfaces counts twice.
-    Array1D<Real64> Rfr;          // Ration between inflow and recirculation air flows
-    Array1D<Real64> ZoneCVhasREC; // Airflow pattern is C(0), CR(1)
+    EPVector<Real64> Rfr;          // Ration between inflow and recirculation air flows
+    EPVector<Real64> ZoneCVhasREC; // Airflow pattern is C(0), CR(1)
     bool UCSDModelUsed(false);
     bool MundtModelUsed(false);
     // UCSD-UF
@@ -264,13 +264,13 @@ namespace DataRoomAirModel {
     int TotUCSDUE(0);      // total number of UCSDUE zones
     Array1D_bool IsZoneUI; // controls program flow, for interior or exterior UFAD model
     Array1D_int ZoneUFPtr;
-    Array1D<Real64> UFHcIn;
+    EPVector<Real64> UFHcIn;
     Array1D_int ZoneUFMixedFlag;
-    Array1D<Real64> ZoneUFMixedFlagRep;
-    Array1D<Real64> ZoneUFGamma;
-    Array1D<Real64> ZoneUFPowInPlumes;            // [W]
-    Array1D<Real64> ZoneUFPowInPlumesfromWindows; // [W]
-    Array1D<Real64> Phi;                          // dimensionless measure of occupied subzone temperature
+    EPVector<Real64> ZoneUFMixedFlagRep;
+    EPVector<Real64> ZoneUFGamma;
+    EPVector<Real64> ZoneUFPowInPlumes;            // [W]
+    EPVector<Real64> ZoneUFPowInPlumesfromWindows; // [W]
+    EPVector<Real64> Phi;                          // dimensionless measure of occupied subzone temperature
 
     // END UCSD
 
@@ -290,17 +290,17 @@ namespace DataRoomAirModel {
     int NumOfRoomAirflowNetControl(0); // count of RoomAirSettings:AirflowNetwork
 
     // Object Data
-    Array1D<AirModelData> AirModel;
-    Array1D<AirNodeData> AirNode;
-    Array1D<DVData> ZoneUCSDDV; // UCSD
-    Array1D<CVData> ZoneUCSDCV;
-    Array1D<UFIData> ZoneUCSDUI;
-    Array1D<UFEData> ZoneUCSDUE;
+    EPVector<AirModelData> AirModel;
+    EPVector<AirNodeData> AirNode;
+    EPVector<DVData> ZoneUCSDDV; // UCSD
+    EPVector<CVData> ZoneUCSDCV;
+    EPVector<UFIData> ZoneUCSDUI;
+    EPVector<UFEData> ZoneUCSDUE;
     Array2D<CVFlow> CVJetRecFlows;                                          // Jet and recirculation zone flows and properties
-    Array1D<CVDVParameters> SurfParametersCVDV;                             // Surface parameters
-    Array1D<TemperaturePatternStruct> RoomAirPattern;                       // user defined patterns ,various types
-    Array1D<AirPatternInfobyZoneStruct> AirPatternZoneInfo;                 // added zone information for user defined patterns
-    Array1D<RoomAirflowNetworkInfoByZoneStruct> RoomAirflowNetworkZoneInfo; // added zone info
+    EPVector<CVDVParameters> SurfParametersCVDV;                             // Surface parameters
+    EPVector<TemperaturePatternStruct> RoomAirPattern;                       // user defined patterns ,various types
+    EPVector<AirPatternInfobyZoneStruct> AirPatternZoneInfo;                 // added zone information for user defined patterns
+    EPVector<RoomAirflowNetworkInfoByZoneStruct> RoomAirflowNetworkZoneInfo; // added zone info
 
     void clear_state()
     {

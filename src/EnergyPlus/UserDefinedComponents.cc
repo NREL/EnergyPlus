@@ -133,10 +133,10 @@ namespace UserDefinedComponents {
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
     // Object Data
-    Array1D<UserPlantComponentStruct> UserPlantComp;
-    Array1D<UserCoilComponentStruct> UserCoil;
-    Array1D<UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
-    Array1D<UserAirTerminalComponentStruct> UserAirTerminal;
+    EPVector<UserPlantComponentStruct> UserPlantComp;
+    EPVector<UserCoilComponentStruct> UserCoil;
+    EPVector<UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
+    EPVector<UserAirTerminalComponentStruct> UserAirTerminal;
 
     // Functions
 
@@ -602,7 +602,7 @@ namespace UserDefinedComponents {
         Array1D_bool lNumericFieldBlanks;
         Array1D_bool lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
+        EPVector<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         int CompLoop;
         int ConnectionLoop;

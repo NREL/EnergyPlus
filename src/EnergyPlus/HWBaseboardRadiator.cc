@@ -140,14 +140,14 @@ namespace HWBaseboardRadiator {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumHWBaseboards(0);
-    Array1D<Real64> QBBRadSource;         // Need to keep the last value in case we are still iterating
-    Array1D<Real64> QBBRadSrcAvg;         // Need to keep the last value in case we are still iterating
-    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+    EPVector<Real64> QBBRadSource;         // Need to keep the last value in case we are still iterating
+    EPVector<Real64> QBBRadSrcAvg;         // Need to keep the last value in case we are still iterating
+    EPVector<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
 
     // Record keeping variables used to calculate QBBRadSrcAvg locally
-    Array1D<Real64> LastQBBRadSrc;      // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    EPVector<Real64> LastQBBRadSrc;      // Need to keep the last value in case we are still iterating
+    EPVector<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    EPVector<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
     Array1D_bool SetLoopIndexFlag; // get loop number flag
@@ -155,8 +155,8 @@ namespace HWBaseboardRadiator {
     // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
     // Object Data
-    Array1D<HWBaseboardParams> HWBaseboard;
-    Array1D<HWBaseboardNumericFieldData> HWBaseboardNumericFields;
+    EPVector<HWBaseboardParams> HWBaseboard;
+    EPVector<HWBaseboardNumericFieldData> HWBaseboardNumericFields;
 
     // Functions
 

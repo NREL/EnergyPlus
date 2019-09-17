@@ -221,8 +221,8 @@ namespace ChillerGasAbsorption {
     };
 
     // Object Data
-    extern Array1D<GasAbsorberSpecs> GasAbsorber; // dimension to number of machines
-    extern Array1D<ReportVars> GasAbsorberReport;
+    extern EPVector<GasAbsorberSpecs> GasAbsorber; // dimension to number of machines
+    extern EPVector<ReportVars> GasAbsorberReport;
 
     // Functions
 

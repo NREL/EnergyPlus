@@ -75,7 +75,7 @@ namespace DataPlant {
         int OpSchemePtr; // DSU points to OpScheme on plant loop:
         // PlantLoop(LoopNum)%OpScheme(Optschemeptr)...
         int NumEquipLists;                   // DSU ALLOCATABLE to the schedule (for valid schedules)
-        Array1D<EquipListPtrData> EquipList; // DSU Component  list
+        EPVector<EquipListPtrData> EquipList; // DSU Component  list
 
         // Default Constructor
         OpSchemePtrData() : OpSchemePtr(0), NumEquipLists(0)
@@ -116,7 +116,7 @@ namespace DataPlant {
         Real64 RangeUpperLimit;          // for range based controls
         Real64 RangeLowerLimit;          // for range based controls
         int NumComps;                    // ALLOCATABLE to the schedule (for valid schedules)
-        Array1D<EquipListCompData> Comp; // Component type list
+        EPVector<EquipListCompData> Comp; // Component type list
 
         // Default Constructor
         EquipOpList() : RangeUpperLimit(0.0), RangeLowerLimit(0.0), NumComps(0)
@@ -135,7 +135,7 @@ namespace DataPlant {
         bool Available;                 // TRUE = designated component or operation scheme available
         int NumEquipLists;              // number of equipment lists
         int CurListPtr;                 // points to the current equipment list
-        Array1D<EquipOpList> EquipList; // Component type list
+        EPVector<EquipOpList> EquipList; // Component type list
         int EquipListNumForLastStage;   // points to the equipment list with the highest upper limit
         std::string ReferenceNodeName;  // DELTA CTRL ONLY--for calculation of delta Temp
         int ReferenceNodeNumber;        // DELTA CTRL ONLY--for calculation of delta Temp

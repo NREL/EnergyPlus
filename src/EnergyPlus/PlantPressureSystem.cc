@@ -500,8 +500,8 @@ namespace PlantPressureSystem {
         Real64 BranchPressureDrop;
         Real64 LoopSidePressureDrop;
         Real64 LoopPressureDrop;
-        Array1D<Real64> ParallelBranchPressureDrops;
-        Array1D<Real64> ParallelBranchInletPressures;
+        EPVector<Real64> ParallelBranchPressureDrops;
+        EPVector<Real64> ParallelBranchInletPressures;
         int ParallelBranchCounter;
         Real64 SplitterInletPressure;
         Real64 MixerPressure;
@@ -895,7 +895,7 @@ namespace PlantPressureSystem {
         bool Converged;
         static int ZeroKWarningCounter(0);
         static int MaxIterWarningCounter(0);
-        Array1D<Real64> MassFlowIterativeHistory(3);
+        EPVector<Real64> MassFlowIterativeHistory(3);
         Real64 MdotDeltaLatest;
         Real64 MdotDeltaPrevious;
         Real64 DampingFactor;

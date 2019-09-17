@@ -65,8 +65,8 @@ namespace DataViewFactorInformation {
     int NumOfRadiantEnclosures(0); // Number of radiant enclosures
     int NumOfSolarEnclosures(0);   // Number of solar enclosures
 
-    Array1D<ZoneViewFactorInformation> ZoneRadiantInfo;
-    Array1D<ZoneViewFactorInformation> ZoneSolarInfo;
+    EPVector<ZoneViewFactorInformation> ZoneRadiantInfo;
+    EPVector<ZoneViewFactorInformation> ZoneSolarInfo;
 
     void clear_state()
     {

@@ -507,7 +507,7 @@ namespace DataPlant {
     int const GenEquipTypes_PlantComponent(22);
     int const GenEquipTypes_CentralHeatPumpSystem(23);
 
-    Array1D<Real64> const ConvergenceHistoryARR(DataPlant::NumConvergenceHistoryTerms, {0.0, -1.0, -2.0, -3.0, -4.0});
+    EPVector<Real64> const ConvergenceHistoryARR(DataPlant::NumConvergenceHistoryTerms, {0.0, -1.0, -2.0, -3.0, -4.0});
     Real64 const sum_ConvergenceHistoryARR(sum(ConvergenceHistoryARR));
     Real64 const square_sum_ConvergenceHistoryARR(pow_2(sum_ConvergenceHistoryARR));
     Real64 const sum_square_ConvergenceHistoryARR(sum(pow(ConvergenceHistoryARR, 2)));
@@ -533,14 +533,14 @@ namespace DataPlant {
     int PlantManageHalfLoopCalls(0); // tracks number of half loop calls
 
     // Object Data
-    Array1D<PlantLoopData> PlantLoop;
-    Array1D<PlantAvailMgrData> PlantAvailMgr;
-    Array1D<ReportVars> PlantReport;
-    Array1D<ReportLoopData> VentRepPlantSupplySide;
-    Array1D<ReportLoopData> VentRepPlantDemandSide;
-    Array1D<ReportLoopData> VentRepCondSupplySide;
-    Array1D<ReportLoopData> VentRepCondDemandSide;
-    Array1D<PlantCallingOrderInfoStruct> PlantCallingOrderInfo;
+    EPVector<PlantLoopData> PlantLoop;
+    EPVector<PlantAvailMgrData> PlantAvailMgr;
+    EPVector<ReportVars> PlantReport;
+    EPVector<ReportLoopData> VentRepPlantSupplySide;
+    EPVector<ReportLoopData> VentRepPlantDemandSide;
+    EPVector<ReportLoopData> VentRepCondSupplySide;
+    EPVector<ReportLoopData> VentRepCondDemandSide;
+    EPVector<PlantCallingOrderInfoStruct> PlantCallingOrderInfo;
 
     // Clears the global data in DataPlant.
     // Needed for unit tests, should not be normally called.

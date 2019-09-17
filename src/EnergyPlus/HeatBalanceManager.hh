@@ -70,29 +70,29 @@ namespace HeatBalanceManager {
 
     // Real Variables for the Heat Balance Simulation
     // Variables used to determine warmup convergence
-    extern Array1D<Real64> MaxCoolLoadPrevDay; // Max cooling load from the previous day
-    extern Array1D<Real64> MaxCoolLoadZone;    // Maximum zone cooling load from the current day
-    extern Array1D<Real64> MaxHeatLoadPrevDay; // Max heating load from the previous day
-    extern Array1D<Real64> MaxHeatLoadZone;    // Maximum zone heating load from the current day
-    extern Array1D<Real64> MaxTempPrevDay;     // Max temperature from the previous day
-    extern Array1D<Real64> MaxTempZone;        // Maximum zone temperature from the current day
-    extern Array1D<Real64> MinTempPrevDay;     // Min temperature from the previous day
-    extern Array1D<Real64> MinTempZone;        // Minimum zone temperature from the current day
+    extern EPVector<Real64> MaxCoolLoadPrevDay; // Max cooling load from the previous day
+    extern EPVector<Real64> MaxCoolLoadZone;    // Maximum zone cooling load from the current day
+    extern EPVector<Real64> MaxHeatLoadPrevDay; // Max heating load from the previous day
+    extern EPVector<Real64> MaxHeatLoadZone;    // Maximum zone heating load from the current day
+    extern EPVector<Real64> MaxTempPrevDay;     // Max temperature from the previous day
+    extern EPVector<Real64> MaxTempZone;        // Maximum zone temperature from the current day
+    extern EPVector<Real64> MinTempPrevDay;     // Min temperature from the previous day
+    extern EPVector<Real64> MinTempZone;        // Minimum zone temperature from the current day
 
     // Variables used to report difference in temperature and load from the last two warmup days
-    extern Array1D<Real64> WarmupTempDiff;     // Temperature difference between the last two warmup days
-    extern Array1D<Real64> WarmupLoadDiff;     // Zone load differences between the last two warmup days
-    extern Array1D<Real64> TempZoneSecPrevDay; // Zone air temperature from the second last warmup day
-    extern Array1D<Real64> LoadZoneSecPrevDay; // Zone load from the second last warmup day
-    extern Array1D<Real64> TempZonePrevDay;    // Zone air temperature from the previous day
-    extern Array1D<Real64> LoadZonePrevDay;    // Zone load from the previuos day
-    extern Array1D<Real64> TempZone;           // Zone air temperature from the current warmup day
-    extern Array1D<Real64> LoadZone;           // Zone load from the current warmup day
+    extern EPVector<Real64> WarmupTempDiff;     // Temperature difference between the last two warmup days
+    extern EPVector<Real64> WarmupLoadDiff;     // Zone load differences between the last two warmup days
+    extern EPVector<Real64> TempZoneSecPrevDay; // Zone air temperature from the second last warmup day
+    extern EPVector<Real64> LoadZoneSecPrevDay; // Zone load from the second last warmup day
+    extern EPVector<Real64> TempZonePrevDay;    // Zone air temperature from the previous day
+    extern EPVector<Real64> LoadZonePrevDay;    // Zone load from the previuos day
+    extern EPVector<Real64> TempZone;           // Zone air temperature from the current warmup day
+    extern EPVector<Real64> LoadZone;           // Zone load from the current warmup day
 
     extern Array2D<Real64> TempZoneRpt;       // Zone air temperature to report (average over all warmup days)
-    extern Array1D<Real64> TempZoneRptStdDev; // Zone air temperature to report (std dev over all warmup days)
+    extern EPVector<Real64> TempZoneRptStdDev; // Zone air temperature to report (std dev over all warmup days)
     extern Array2D<Real64> LoadZoneRpt;       // Zone load to report (average over all warmup days)
-    extern Array1D<Real64> LoadZoneRptStdDev; // Zone load to report (std dev over all warmup days)
+    extern EPVector<Real64> LoadZoneRptStdDev; // Zone load to report (std dev over all warmup days)
     extern Array2D<Real64> MaxLoadZoneRpt;    // Maximum zone load for reporting calcs
     extern int CountWarmupDayPoints;          // Count of warmup timesteps (to achieve warmup)
 
@@ -132,7 +132,7 @@ namespace HeatBalanceManager {
     };
 
     // Object Data
-    extern Array1D<WarmupConvergence> WarmupConvergenceValues;
+    extern EPVector<WarmupConvergence> WarmupConvergenceValues;
 
     // Functions
 

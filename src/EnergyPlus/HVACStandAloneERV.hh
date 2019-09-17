@@ -169,7 +169,7 @@ namespace HVACStandAloneERV {
     };
 
     // Object Data
-    extern Array1D<StandAloneERVData> StandAloneERV;
+    extern EPVector<StandAloneERVData> StandAloneERV;
 
     // Functions
 

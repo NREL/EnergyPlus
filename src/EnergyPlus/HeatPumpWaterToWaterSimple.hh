@@ -219,7 +219,7 @@ namespace HeatPumpWaterToWaterSimple {
     };
 
     // Object Data
-    extern Array1D<GshpSpecs> GSHP;
+    extern EPVector<GshpSpecs> GSHP;
 
 } // namespace HeatPumpWaterToWaterSimple
 

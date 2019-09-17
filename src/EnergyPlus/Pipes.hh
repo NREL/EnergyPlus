@@ -114,7 +114,7 @@ namespace Pipes {
     };
 
     // Object Data
-    extern Array1D<LocalPipeData> LocalPipe; // dimension to number of pipes
+    extern EPVector<LocalPipeData> LocalPipe; // dimension to number of pipes
 
     // Functions
     void clear_state();

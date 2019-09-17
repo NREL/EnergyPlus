@@ -120,7 +120,7 @@ namespace DataVectorTypes {
     //		// Array Assignment
     //		inline
     //		Vector &
-    //		operator =( Array1D< Real64 > const & a )
+    //		operator =( EPVector< Real64 > const & a )
     //		{
     //			assert( ( a.l() == 1 ) && ( a.u() == 3 ) );
     //			x = a( 1 );
@@ -244,9 +244,9 @@ namespace DataVectorTypes {
     //
     //		// Array Conversion
     //		inline
-    //		operator Array1D< Real64 >() const
+    //		operator EPVector< Real64 >() const
     //		{
-    //			return Array1D< Real64 >( 3, { x, y, z } );
+    //			return EPVector< Real64 >( 3, { x, y, z } );
     //		}
     //
     //		// Length
@@ -497,10 +497,10 @@ namespace DataVectorTypes {
     //
     //		// Array Generator
     //		inline
-    //		Array1D< Real64 >
+    //		EPVector< Real64 >
     //		Array() const
     //		{
-    //			return Array1D< Real64 >( 3, { x, y, z } );
+    //			return EPVector< Real64 >( 3, { x, y, z } );
     //		}
     //
     //		// Vector3 Generator
@@ -514,7 +514,7 @@ namespace DataVectorTypes {
     //		// Assign to an Array
     //		inline
     //		void
-    //		assign_to( Array1D< Real64 > & a ) const
+    //		assign_to( EPVector< Real64 > & a ) const
     //		{
     //			a.dimension( 3 );
     //			a( 1 ) = x;
@@ -564,7 +564,7 @@ namespace DataVectorTypes {
         // Members
         int NSides;  // Number of Sides for this Face
         int SurfNum; // ALLOCATABLE to actual surface number
-        Array1D<Vector> FacePoints;
+        EPVector<Vector> FacePoints;
         Vector NewellAreaVector;
 
         // Default Constructor
@@ -577,7 +577,7 @@ namespace DataVectorTypes {
     {
         // Members
         int NumSurfaceFaces;
-        Array1D<Face> SurfaceFace;
+        EPVector<Face> SurfaceFace;
 
         // Default Constructor
         Polyhedron() : NumSurfaceFaces(0)

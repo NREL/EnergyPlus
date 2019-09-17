@@ -148,10 +148,10 @@ namespace DataBranchNodeConnections {
     };
 
     // Object Data
-    extern Array1D<ComponentListData> CompSets;
-    extern Array1D<ParentListData> ParentNodeList;
-    extern Array1D<NodeConnectionDef> NodeConnections;
-    extern Array1D<EqNodeConnectionDef> AirTerminalNodeConnections;
+    extern EPVector<ComponentListData> CompSets;
+    extern EPVector<ParentListData> ParentNodeList;
+    extern EPVector<NodeConnectionDef> NodeConnections;
+    extern EPVector<EqNodeConnectionDef> AirTerminalNodeConnections;
     extern Array1D_bool NonConnectedNodes;
 
     // Clears the global data in DataBranchNodeConnections.

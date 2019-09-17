@@ -160,12 +160,12 @@ namespace PipeHeatTransfer {
         Real64 InsulationResistance;   // Insulation thermal resistance [m2.K/W]
         Real64 CurrentSimTime;         // Current simulation time [hr]
         Real64 PreviousSimTime;        // simulation time the report data was last updated
-        Array1D<Real64> TentativeFluidTemp;
-        Array1D<Real64> FluidTemp; // arrays for fluid and pipe temperatures at each node
-        Array1D<Real64> PreviousFluidTemp;
-        Array1D<Real64> TentativePipeTemp;
-        Array1D<Real64> PipeTemp;
-        Array1D<Real64> PreviousPipeTemp;
+        EPVector<Real64> TentativeFluidTemp;
+        EPVector<Real64> FluidTemp; // arrays for fluid and pipe temperatures at each node
+        EPVector<Real64> PreviousFluidTemp;
+        EPVector<Real64> TentativePipeTemp;
+        EPVector<Real64> PipeTemp;
+        EPVector<Real64> PreviousPipeTemp;
         int NumDepthNodes;            // number of soil grid points in the depth direction
         int PipeNodeDepth;            // soil depth grid point where pipe is located
         int PipeNodeWidth;            // soil width grid point where pipe is located
@@ -278,7 +278,7 @@ namespace PipeHeatTransfer {
     };
 
     // Object Data
-    extern Array1D<PipeHTData> PipeHT;
+    extern EPVector<PipeHTData> PipeHT;
 
     void GetPipesHeatTransfer();
 

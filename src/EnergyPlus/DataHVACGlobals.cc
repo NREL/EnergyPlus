@@ -377,11 +377,11 @@ namespace DataHVACGlobals {
     Real64 const MaxCoolVolFlowPerRatedTotCap2(0.00004026);  // m3/s per watt = 300 cfm/ton
     Real64 const MinOperVolFlowPerRatedTotCap2(0.00001342);  // m3/s per watt = 100 cfm/ton
 
-    Array1D<Real64> MaxRatedVolFlowPerRatedTotCap(2, {MaxRatedVolFlowPerRatedTotCap1, MaxRatedVolFlowPerRatedTotCap2});
-    Array1D<Real64> MinRatedVolFlowPerRatedTotCap(2, {MinRatedVolFlowPerRatedTotCap1, MinRatedVolFlowPerRatedTotCap2});
-    Array1D<Real64> MaxHeatVolFlowPerRatedTotCap(2, {MaxHeatVolFlowPerRatedTotCap1, MaxHeatVolFlowPerRatedTotCap2});
-    Array1D<Real64> MaxCoolVolFlowPerRatedTotCap(2, {MaxCoolVolFlowPerRatedTotCap1, MaxCoolVolFlowPerRatedTotCap2});
-    Array1D<Real64> MinOperVolFlowPerRatedTotCap(2, {MinOperVolFlowPerRatedTotCap1, MinOperVolFlowPerRatedTotCap2});
+    EPVector<Real64> MaxRatedVolFlowPerRatedTotCap(2, {MaxRatedVolFlowPerRatedTotCap1, MaxRatedVolFlowPerRatedTotCap2});
+    EPVector<Real64> MinRatedVolFlowPerRatedTotCap(2, {MinRatedVolFlowPerRatedTotCap1, MinRatedVolFlowPerRatedTotCap2});
+    EPVector<Real64> MaxHeatVolFlowPerRatedTotCap(2, {MaxHeatVolFlowPerRatedTotCap1, MaxHeatVolFlowPerRatedTotCap2});
+    EPVector<Real64> MaxCoolVolFlowPerRatedTotCap(2, {MaxCoolVolFlowPerRatedTotCap1, MaxCoolVolFlowPerRatedTotCap2});
+    EPVector<Real64> MinOperVolFlowPerRatedTotCap(2, {MinOperVolFlowPerRatedTotCap1, MinOperVolFlowPerRatedTotCap2});
 
     // dx coil type (DXCT)
     int const RegularDXCoil(1); // Regular DX coils or mixed air dx coils
@@ -486,7 +486,7 @@ namespace DataHVACGlobals {
     Array1D_int HybridVentSysAvailActualZoneNum;    // Actual zone num in hybrid vent availability manager
     Array1D_int HybridVentSysAvailANCtrlStatus;     // AN control status in hybrid vent availability manager
     Array1D_int HybridVentSysAvailMaster;           // Master object name: Ventilation for simple; Zone name for AN
-    Array1D<Real64> HybridVentSysAvailWindModifier; // Wind modifier for AirflowNetwork
+    EPVector<Real64> HybridVentSysAvailWindModifier; // Wind modifier for AirflowNetwork
     // For multispeed heat pump only
     Real64 MSHPMassFlowRateLow(0.0);       // Mass flow rate at low speed
     Real64 MSHPMassFlowRateHigh(0.0);      // Mass flow rate at high speed
@@ -627,9 +627,9 @@ namespace DataHVACGlobals {
     int const ZoneEquipTypeOf_AirLoopHVACReturnAir(38);
 
     // Object Data
-    Array1D<ZoneCompTypeData> ZoneComp;
+    EPVector<ZoneCompTypeData> ZoneComp;
     OptStartDataType OptStartData; // For optimum start
-    Array1D<ComponentSetPtData> CompSetPtEquip;
+    EPVector<ComponentSetPtData> CompSetPtEquip;
     HVACSystemRootFindingAlgorithm HVACSystemRootFinding;
 
     // Clears the global data in DataHVACGlobals.

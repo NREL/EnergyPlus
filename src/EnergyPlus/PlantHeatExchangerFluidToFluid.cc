@@ -144,7 +144,7 @@ namespace PlantHeatExchangerFluidToFluid {
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
     // Object Data
-    Array1D<HeatExchangerStruct> FluidHX;
+    EPVector<HeatExchangerStruct> FluidHX;
 
     // Functions
 
@@ -278,7 +278,7 @@ namespace PlantHeatExchangerFluidToFluid {
         Array1D_bool lNumericFieldBlanks;
         Array1D_bool lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
+        EPVector<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         int CompLoop;
         bool NodeEMSSetPointMissing;
@@ -2277,7 +2277,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SolFla;             // Flag of solver
-        Array1D<Real64> Par(2); // Parameter array passed to solver
+        EPVector<Real64> Par(2); // Parameter array passed to solver
 
         Real64 LeavingTempMinFlow;
         Real64 LeavingTempFullFlow;

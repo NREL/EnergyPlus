@@ -175,12 +175,12 @@ namespace HVACMultiSpeedHeatPump {
         Real64 IdleSpeedRatio;              // Fan speed ratio in idle mode
         int NumOfSpeedCooling;              // The number of speeds for cooling
         int NumOfSpeedHeating;              // The number of speeds for heating
-        Array1D<Real64> HeatVolumeFlowRate; // Supply air volume flow rate during heating operation
-        Array1D<Real64> HeatMassFlowRate;   // Supply air mass flow rate during heating operation
-        Array1D<Real64> CoolVolumeFlowRate; // Supply air volume flow rate during cooling operation
-        Array1D<Real64> CoolMassFlowRate;   // Supply air mass flow rate during cooling operation
-        Array1D<Real64> HeatingSpeedRatio;  // Fan speed ratio in heating mode
-        Array1D<Real64> CoolingSpeedRatio;  // Fan speed ratio in cooling mode
+        EPVector<Real64> HeatVolumeFlowRate; // Supply air volume flow rate during heating operation
+        EPVector<Real64> HeatMassFlowRate;   // Supply air mass flow rate during heating operation
+        EPVector<Real64> CoolVolumeFlowRate; // Supply air volume flow rate during cooling operation
+        EPVector<Real64> CoolMassFlowRate;   // Supply air mass flow rate during cooling operation
+        EPVector<Real64> HeatingSpeedRatio;  // Fan speed ratio in heating mode
+        EPVector<Real64> CoolingSpeedRatio;  // Fan speed ratio in cooling mode
         bool CheckFanFlow;                  // Supply airflow check
         int LastMode;                       // MSHP operation mode
         int HeatCoolMode;                   // System operating mode (0 = floating, 1 = cooling, 2 = heating)
@@ -241,7 +241,7 @@ namespace HVACMultiSpeedHeatPump {
         int HeatCountAvail;            // Counter used to minimize the occurrence of output warnings
         int HeatIndexAvail;            // Index used to minimize the occurrence of output warnings
         bool FirstPass;                // used to determine when first call is made
-        Array1D<Real64> FullOutput;    // Full output for different speed
+        EPVector<Real64> FullOutput;    // Full output for different speed
         Real64 MinOATCompressorCooling; // min OAT from multispeed cooling coil object
         Real64 MinOATCompressorHeating; // min OAT from multispeed heating coil object
 
@@ -289,8 +289,8 @@ namespace HVACMultiSpeedHeatPump {
     };
 
     // Object Data
-    extern Array1D<MSHeatPumpData> MSHeatPump;
-    extern Array1D<MSHeatPumpReportData> MSHeatPumpReport;
+    extern EPVector<MSHeatPumpData> MSHeatPump;
+    extern EPVector<MSHeatPumpReportData> MSHeatPumpReport;
 
     // Functions
 

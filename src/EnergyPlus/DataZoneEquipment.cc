@@ -177,20 +177,20 @@ namespace DataZoneEquipment {
 
     Array1D_bool CrossMixingReportFlag;
     Array1D_bool MixingReportFlag;
-    Array1D<Real64> VentMCP;
-    Array1D<Real64> ZMAT;
-    Array1D<Real64> ZHumRat;
+    EPVector<Real64> VentMCP;
+    EPVector<Real64> ZMAT;
+    EPVector<Real64> ZHumRat;
 
     // Utility routines for module
 
     // Object Data
-    Array1D<EquipConfiguration> ZoneEquipConfig;
+    EPVector<EquipConfiguration> ZoneEquipConfig;
     std::unordered_set<std::string> UniqueZoneEquipListNames;
-    Array1D<EquipList> ZoneEquipList;
-    Array1D<ControlList> HeatingControlList;
-    Array1D<ControlList> CoolingControlList;
-    Array1D<SupplyAir> SupplyAirPath;
-    Array1D<ReturnAir> ReturnAirPath;
+    EPVector<EquipList> ZoneEquipList;
+    EPVector<ControlList> HeatingControlList;
+    EPVector<ControlList> CoolingControlList;
+    EPVector<SupplyAir> SupplyAirPath;
+    EPVector<ReturnAir> ReturnAirPath;
 
     // Functions
     // Clears the global data in DataZoneEquipment.
@@ -307,7 +307,7 @@ namespace DataZoneEquipment {
         std::string ReturnNodeListName;
         std::string ReturnFlowBasisNodeListName;
         Array1D_string AlphArray;
-        Array1D<Real64> NumArray;
+        EPVector<Real64> NumArray;
         int MaxAlphas;
         int MaxNums;
         int NumParams;
@@ -347,7 +347,7 @@ namespace DataZoneEquipment {
         };
 
         // Object Data
-        Array1D<EquipListAudit> ZoneEquipListAcct;
+        EPVector<EquipListAudit> ZoneEquipListAcct;
 
         ExhaustNodeListName = "";
         InletNodeListName = "";

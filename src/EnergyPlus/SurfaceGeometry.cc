@@ -154,9 +154,9 @@ namespace SurfaceGeometry {
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool ProcessSurfaceVerticesOneTimeFlag(true);
         int checkSubSurfAzTiltNormErrCount(0);
-        Array1D<Real64> Xpsv;
-        Array1D<Real64> Ypsv;
-        Array1D<Real64> Zpsv;
+        EPVector<Real64> Xpsv;
+        EPVector<Real64> Ypsv;
+        EPVector<Real64> Zpsv;
 
         bool GetSurfaceDataOneTimeFlag(false);
         std::unordered_map<std::string, std::string> UniqueSurfaceNames;
@@ -167,8 +167,8 @@ namespace SurfaceGeometry {
     Real64 SinBldgRelNorth(0.0);     // Sine of the building rotation (relative north)   (includes appendix G rotation)
     Real64 CosBldgRotAppGonly(0.0);  // Cosine of the building rotation for appendix G only(relative north)
     Real64 SinBldgRotAppGonly(0.0);  // Sine of the building rotation for appendix G only (relative north)
-    Array1D<Real64> CosZoneRelNorth; // Cosine of the zone rotation (relative north)
-    Array1D<Real64> SinZoneRelNorth; // Sine of the zone rotation (relative north)
+    EPVector<Real64> CosZoneRelNorth; // Cosine of the zone rotation (relative north)
+    EPVector<Real64> SinZoneRelNorth; // Sine of the zone rotation (relative north)
 
     bool NoGroundTempObjWarning(true); // This will cause a warning to be issued if surfaces with "Ground"
     // outside environment are used but no ground temperature object was input.
@@ -183,7 +183,7 @@ namespace SurfaceGeometry {
     // SUBROUTINE SPECIFICATIONS FOR MODULE SurfaceGeometry
 
     // Object Data
-    Array1D<SurfaceData> SurfaceTmp; // Allocated/Deallocated during input processing
+    EPVector<SurfaceData> SurfaceTmp; // Allocated/Deallocated during input processing
     HeatBalanceKivaManager::KivaManager kivaManager;
     ExposedFoundationPerimeter exposedFoundationPerimeter;
 
@@ -259,7 +259,7 @@ namespace SurfaceGeometry {
         std::string String3;
         int Count; // To count wall surfaces for ceiling height calculation
         Array1D_bool ZoneCeilingHeightEntered;
-        Array1D<Real64> ZoneCeilingArea;
+        EPVector<Real64> ZoneCeilingArea;
         static int ErrCount(0);
         Real64 NominalUwithConvCoeffs;
         std::string cNominalU;
@@ -2215,7 +2215,7 @@ namespace SurfaceGeometry {
         int NumStmt;
         Array1D_string GAlphas(5);
         int NAlphas;
-        Array1D<Real64> GNum(1);
+        EPVector<Real64> GNum(1);
         int NNum;
         int IOStat;
         bool OK;
@@ -3617,8 +3617,8 @@ namespace SurfaceGeometry {
         Real64 SinSurfAzimuth;
         Real64 CosSurfTilt;
         Real64 SinSurfTilt;
-        Array1D<Real64> XX(4);
-        Array1D<Real64> YY(4);
+        EPVector<Real64> XX(4);
+        EPVector<Real64> YY(4);
         Real64 Xb;
         Real64 Yb;
         Real64 Perimeter;
@@ -4872,8 +4872,8 @@ namespace SurfaceGeometry {
         Real64 BaseSinSurfAzimuth;
         Real64 BaseCosSurfTilt;
         Real64 BaseSinSurfTilt;
-        Array1D<Real64> XX(4);
-        Array1D<Real64> YY(4);
+        EPVector<Real64> XX(4);
+        EPVector<Real64> YY(4);
         Real64 Perimeter;
         int n;
         int Vrt;
@@ -7608,7 +7608,7 @@ namespace SurfaceGeometry {
         std::string TiltString;
 
         // Object Data
-        Array1D<Vector> Vertices(NSides); // Vertices, in specified order
+        EPVector<Vector> Vertices(NSides); // Vertices, in specified order
 
         for (n = 1; n <= NSides; ++n) {
             Vertices(n) = SurfaceTmp(SurfNum).Vertex(n);
@@ -10656,9 +10656,9 @@ namespace SurfaceGeometry {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //////////// hoisted into namespace
         // static bool OneTimeFlag( true ); // now ProcessSurfaceVerticesOneTimeFlag
-        // static Array1D< Real64 > X; // now Xpsv (to avoid conflicts with CheckConvexity)
-        // static Array1D< Real64 > Y; // now Ypsv
-        // static Array1D< Real64 > Z; // now Zpsv
+        // static EPVector< Real64 > X; // now Xpsv (to avoid conflicts with CheckConvexity)
+        // static EPVector< Real64 > Y; // now Ypsv
+        // static EPVector< Real64 > Z; // now Zpsv
         ////////////////////////////////////////////////
 
         // LOCAL VARIABLES
@@ -11684,7 +11684,7 @@ namespace SurfaceGeometry {
         struct rectangularwindow
         {
             // Members
-            Array1D<Vector> Vertex;
+            EPVector<Vector> Vertex;
 
             // Default Constructor
             rectangularwindow() : Vertex(4)
@@ -11846,7 +11846,7 @@ namespace SurfaceGeometry {
         struct rectangularwindow
         {
             // Members
-            Array1D<Vector> Vertex;
+            EPVector<Vector> Vertex;
 
             // Default Constructor
             rectangularwindow() : Vertex(4)
@@ -12261,7 +12261,7 @@ namespace SurfaceGeometry {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string cAlphas(1);
-        Array1D<Real64> rNumerics(2);
+        EPVector<Real64> rNumerics(2);
         int NAlphas;
         int NNum;
         int IOStat;
@@ -12384,8 +12384,8 @@ namespace SurfaceGeometry {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // Object Data
-        static Array1D<Vector> Triangle1(3); // working struct for a 3-sided surface
-        static Array1D<Vector> Triangle2(3); // working struct for a 3-sided surface
+        static EPVector<Vector> Triangle1(3); // working struct for a 3-sided surface
+        static EPVector<Vector> Triangle2(3); // working struct for a 3-sided surface
         static Vector const zero_vector(0.0);
         Vector centroid;
 
@@ -12934,11 +12934,11 @@ namespace SurfaceGeometry {
         Real64 V2len;             // Edge vector length
         bool SignFlag;            // Direction of edge turn : true is right, false is left
         bool PrevSignFlag(false); // Container for the sign of the previous iteration's edge turn
-        static Array1D<Real64> X; // containers for x,y,z vertices of the surface
-        static Array1D<Real64> Y;
-        static Array1D<Real64> Z;
-        static Array1D<Real64> A; // containers for convexity test
-        static Array1D<Real64> B;
+        static EPVector<Real64> X; // containers for x,y,z vertices of the surface
+        static EPVector<Real64> Y;
+        static EPVector<Real64> Z;
+        static EPVector<Real64> A; // containers for convexity test
+        static EPVector<Real64> B;
         static Array1D_int SurfCollinearVerts; // Array containing indices of collinear vertices
         static int VertSize;                   // size of X,Y,Z,A,B arrays
         Real64 cosarg;
@@ -13121,7 +13121,7 @@ namespace SurfaceGeometry {
                 }
             }
             // remove duplicated points and resize Vertex
-            Array1D<Vector> OldVertex;
+            EPVector<Vector> OldVertex;
             OldVertex.allocate(NSides);
             OldVertex = SurfaceTmp(SurfNum).Vertex;
             SurfaceTmp(SurfNum).Vertex.deallocate();

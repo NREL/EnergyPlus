@@ -143,14 +143,14 @@ namespace DualDuct {
     bool GetDualDuctInputFlag(true); // Flag set to make sure you get input once
 
     // Object Data
-    Array1D<DamperDesignParams> Damper;
+    EPVector<DamperDesignParams> Damper;
     std::unordered_map<std::string, std::string> UniqueDamperNames;
-    Array1D<DamperFlowConditions> DamperInlet;
-    Array1D<DamperFlowConditions> DamperHotAirInlet;
-    Array1D<DamperFlowConditions> DamperColdAirInlet;
-    Array1D<DamperFlowConditions> DamperOutlet;
-    Array1D<DamperFlowConditions> DamperOAInlet;        // VAV:OutdoorAir Outdoor Air Inlet
-    Array1D<DamperFlowConditions> DamperRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
+    EPVector<DamperFlowConditions> DamperInlet;
+    EPVector<DamperFlowConditions> DamperHotAirInlet;
+    EPVector<DamperFlowConditions> DamperColdAirInlet;
+    EPVector<DamperFlowConditions> DamperOutlet;
+    EPVector<DamperFlowConditions> DamperOAInlet;        // VAV:OutdoorAir Outdoor Air Inlet
+    EPVector<DamperFlowConditions> DamperRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
 
     void SimulateDualDuct(std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
     {
@@ -274,7 +274,7 @@ namespace DualDuct {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        static Array1D<Real64> NumArray(2, 0.0);
+        static EPVector<Real64> NumArray(2, 0.0);
         static Array1D_string AlphArray(7);
         static Array1D_string cAlphaFields(7);       // Alpha field names
         static Array1D_string cNumericFields(2);     // Numeric field names
@@ -2262,7 +2262,7 @@ namespace DualDuct {
         static Array1D_string DamperNamesARR;
         int DamperIndex;                 // Loop index to Damper that you are currently loading input into
         std::string CurrentModuleObject; // for ease in getting objects
-        static Array1D<Real64> NumArray(2, 0.0);
+        static EPVector<Real64> NumArray(2, 0.0);
         static Array1D_string AlphArray(7);
         static Array1D_string cAlphaFields(7);       // Alpha field names
         static Array1D_string cNumericFields(2);     // Numeric field names

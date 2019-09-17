@@ -137,8 +137,8 @@ namespace DataDaylighting {
         // in absolute coordinate system (m)
         // Points 1 and 2 are the control reference points
         Array1D_bool DaylRefPtInBounds; // True when coordinates are in bounds of zone coordinates
-        Array1D<Real64> FracZoneDaylit; // =0.0  ! Fraction of zone controlled by each reference point
-        Array1D<Real64> IllumSetPoint;  // =0.0  ! Illuminance setpoint at each reference point (lux)
+        EPVector<Real64> FracZoneDaylit; // =0.0  ! Fraction of zone controlled by each reference point
+        EPVector<Real64> IllumSetPoint;  // =0.0  ! Illuminance setpoint at each reference point (lux)
         int LightControlType;           // Lighting control type (same for all reference points)
         // (1=continuous, 2=stepped, 3=continuous/off)
         int glareRefPtNumber;                      // from field: Glare Calculation Daylighting Reference Point Name
@@ -151,17 +151,17 @@ namespace DataDaylighting {
         int TotalExtWindows;                       // Total number of exterior windows in the zone
         Real64 AveVisDiffReflect;                  // Area-weighted average inside surface visible reflectance of zone
         Real64 DElightGriddingResolution;          // Field: Delight Gridding Resolution
-        Array1D<Real64> RefPtPowerReductionFactor; // =1.0  ! Electric power reduction factor at reference points
+        EPVector<Real64> RefPtPowerReductionFactor; // =1.0  ! Electric power reduction factor at reference points
         // due to daylighting
         Real64 ZonePowerReductionFactor;   // Electric power reduction factor for entire zone due to daylighting
-        Array1D<Real64> DaylIllumAtRefPt;  // =0.0 ! Daylight illuminance at reference points (lux)
-        Array1D<Real64> GlareIndexAtRefPt; // =0.0 ! Glare index at reference points
+        EPVector<Real64> DaylIllumAtRefPt;  // =0.0 ! Daylight illuminance at reference points (lux)
+        EPVector<Real64> GlareIndexAtRefPt; // =0.0 ! Glare index at reference points
         Array1D_int AdjIntWinZoneNums;     // List of zone numbers of adjacent zones that have exterior windows and
         // share one or more interior windows with target zone
         int NumOfIntWinAdjZones; // Number of adjacent zones that have exterior windows and share one or
         // more interior windows with target zone
         int NumOfIntWinAdjZoneExtWins; // number of exterior windows associated with zone via interior windows
-        Array1D<IntWinAdjZoneExtWinStruct>
+        EPVector<IntWinAdjZoneExtWinStruct>
             IntWinAdjZoneExtWin;          // nested structure | info about exterior window associated with zone via interior window
         int NumOfDayltgExtWins;           // Number of associated exterior windows providing daylight to this zone
         Array1D_int DayltgExtWinSurfNums; // List of surface numbers of zone's exterior windows or
@@ -175,7 +175,7 @@ namespace DataDaylighting {
         Real64 FloorVisRefl;          // Area-weighted visible reflectance of floor of a daylit zone
         Real64 InterReflIllFrIntWins; // Inter-reflected illuminance due to beam and diffuse solar passing
         //  through a zone's interior windows (lux)
-        Array1D<Real64> BacLum;                  // =0.0 ! Background luminance at each reference point (cd/m2)
+        EPVector<Real64> BacLum;                  // =0.0 ! Background luminance at each reference point (cd/m2)
         Array2D<Real64> SolidAngAtRefPt;         // (MaxRefPoints,50)
         Array2D<Real64> SolidAngAtRefPtWtd;      // (MaxRefPoints,50)
         Array3D<Real64> IllumFromWinAtRefPt;     // (MaxRefPoints,2,50)
@@ -205,9 +205,9 @@ namespace DataDaylighting {
         Array4D<Real64> DaylBackFacSun;
         Array4D<Real64> DaylBackFacSunDisk;
         // Time exceeding maximum allowable discomfort glare index at reference points (hours)
-        Array1D<Real64> TimeExceedingGlareIndexSPAtRefPt;
+        EPVector<Real64> TimeExceedingGlareIndexSPAtRefPt;
         // Time exceeding daylight illuminance setpoint at reference points (hours)
-        Array1D<Real64> TimeExceedingDaylightIlluminanceSPAtRefPt;
+        EPVector<Real64> TimeExceedingDaylightIlluminanceSPAtRefPt;
         // True if at least one adjacent zone, sharing one or more interior windows, has daylighting control
         bool AdjZoneHasDayltgCtrl;
         int MapCount;          // Number of maps assigned to Zone
@@ -258,11 +258,11 @@ namespace DataDaylighting {
         // in absolute coordinate system (m)
         // Points 1 and 2 are the control reference points
         Array1D_bool MapRefPtInBounds;     // True when coordinates are in bounds of zone coordinates
-        Array1D<Real64> DaylIllumAtMapPt;  // Daylight illuminance at illuminance map points (lux)
-        Array1D<Real64> GlareIndexAtMapPt; // Glare index at illuminance map points
+        EPVector<Real64> DaylIllumAtMapPt;  // Daylight illuminance at illuminance map points (lux)
+        EPVector<Real64> GlareIndexAtMapPt; // Glare index at illuminance map points
         // following Hr - report avg hr
-        Array1D<Real64> DaylIllumAtMapPtHr;      // Daylight illuminance at illuminance map points (lux)
-        Array1D<Real64> GlareIndexAtMapPtHr;     // Glare index at illuminance map points
+        EPVector<Real64> DaylIllumAtMapPtHr;      // Daylight illuminance at illuminance map points (lux)
+        EPVector<Real64> GlareIndexAtMapPtHr;     // Glare index at illuminance map points
         Array2D<Real64> SolidAngAtMapPt;         // (MaxRefPoints,50)
         Array2D<Real64> SolidAngAtMapPtWtd;      // (MaxRefPoints,50)
         Array3D<Real64> IllumFromWinAtMapPt;     // (MaxRefPoints,2,50)
@@ -322,11 +322,11 @@ namespace DataDaylighting {
     extern int TotDElightCFS; // number of Daylighting:DELight:ComplexFenestration
 
     // Object Data
-    extern Array1D<ZoneDaylightCalc> ZoneDaylight;
-    extern Array1D<IllumMapData> IllumMap;
-    extern Array1D<MapCalcData> IllumMapCalc;
-    extern Array1D<RefPointData> DaylRefPt;
-    extern Array1D<DElightComplexFeneData> DElightComplexFene;
+    extern EPVector<ZoneDaylightCalc> ZoneDaylight;
+    extern EPVector<IllumMapData> IllumMap;
+    extern EPVector<MapCalcData> IllumMapCalc;
+    extern EPVector<RefPointData> DaylRefPt;
+    extern EPVector<DElightComplexFeneData> DElightComplexFene;
 
 } // namespace DataDaylighting
 

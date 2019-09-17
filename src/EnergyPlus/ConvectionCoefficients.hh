@@ -77,7 +77,7 @@ namespace ConvectionCoefficients {
     extern Real64 const FourFifths; // 4/5 in highest precision
 
     // Coefficients that modify the convection coeff based on surface roughness
-    extern Array1D<Real64> const RoughnessMultiplier;
+    extern EPVector<Real64> const RoughnessMultiplier;
 
     // parameters for identifying more specific hc model equations, inside face
     extern int const HcInt_UserValue;
@@ -421,7 +421,7 @@ namespace ConvectionCoefficients {
         BoundingBoxVertStruct XuYuZd; // 6 hi x, hi y, low z
         BoundingBoxVertStruct XuYdZu; // 7 hi x, low y, hi z
         BoundingBoxVertStruct XuYuZu; // 8 hi x, hi y, hi z
-        Array1D<Vector> BoundSurf;    // long edge of roof group bounding surface
+        EPVector<Vector> BoundSurf;    // long edge of roof group bounding surface
         Real64 Area;
         Real64 Perimeter;
         Real64 Height;
@@ -435,8 +435,8 @@ namespace ConvectionCoefficients {
     // Object Data
     extern InsideFaceAdaptiveConvAlgoStruct InsideFaceAdaptiveConvectionAlgo; // stores rules for Hc model equations
     extern OutsideFaceAdpativeConvAlgoStruct OutsideFaceAdaptiveConvectionAlgo;
-    extern Array1D<HcInsideFaceUserCurveStruct> HcInsideUserCurve;
-    extern Array1D<HcOutsideFaceUserCurveStruct> HcOutsideUserCurve;
+    extern EPVector<HcInsideFaceUserCurveStruct> HcInsideUserCurve;
+    extern EPVector<HcOutsideFaceUserCurveStruct> HcOutsideUserCurve;
     extern RoofGeoCharactisticsStruct RoofGeo;
 
     // Functions

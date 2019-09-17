@@ -510,10 +510,10 @@ namespace HeatRecovery {
     };
 
     // Object Data
-    extern Array1D<HeatExchCond> ExchCond;
-    extern Array1D<BalancedDesDehumPerfData> BalDesDehumPerfData;
-    extern Array1D<HeatExchCondNumericFieldData> HeatExchCondNumericFields;
-    extern Array1D<HeatExchCondNumericFieldData> BalDesDehumPerfNumericFields;
+    extern EPVector<HeatExchCond> ExchCond;
+    extern EPVector<BalancedDesDehumPerfData> BalDesDehumPerfData;
+    extern EPVector<HeatExchCondNumericFieldData> HeatExchCondNumericFields;
+    extern EPVector<HeatExchCondNumericFieldData> BalDesDehumPerfNumericFields;
 
     // Functions
 

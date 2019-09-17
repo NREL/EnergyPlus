@@ -278,7 +278,7 @@ namespace DataPlant {
     extern int const GenEquipTypes_PlantComponent;
     extern int const GenEquipTypes_CentralHeatPumpSystem;
 
-    extern Array1D<Real64> const ConvergenceHistoryARR;
+    extern EPVector<Real64> const ConvergenceHistoryARR;
     extern Real64 const sum_ConvergenceHistoryARR;
     extern Real64 const square_sum_ConvergenceHistoryARR;
     extern Real64 const sum_square_ConvergenceHistoryARR;
@@ -305,14 +305,14 @@ namespace DataPlant {
     extern int PlantManageHalfLoopCalls; // tracks number of half loop calls
 
     // Object Data
-    extern Array1D<PlantLoopData> PlantLoop;
-    extern Array1D<PlantAvailMgrData> PlantAvailMgr;
-    extern Array1D<ReportVars> PlantReport;
-    extern Array1D<ReportLoopData> VentRepPlantSupplySide;
-    extern Array1D<ReportLoopData> VentRepPlantDemandSide;
-    extern Array1D<ReportLoopData> VentRepCondSupplySide;
-    extern Array1D<ReportLoopData> VentRepCondDemandSide;
-    extern Array1D<PlantCallingOrderInfoStruct> PlantCallingOrderInfo;
+    extern EPVector<PlantLoopData> PlantLoop;
+    extern EPVector<PlantAvailMgrData> PlantAvailMgr;
+    extern EPVector<ReportVars> PlantReport;
+    extern EPVector<ReportLoopData> VentRepPlantSupplySide;
+    extern EPVector<ReportLoopData> VentRepPlantDemandSide;
+    extern EPVector<ReportLoopData> VentRepCondSupplySide;
+    extern EPVector<ReportLoopData> VentRepCondDemandSide;
+    extern EPVector<PlantCallingOrderInfoStruct> PlantCallingOrderInfo;
 
     // Clears the global data in DataPlant.
     // Needed for unit tests, should not be normally called.

@@ -183,7 +183,7 @@ namespace PhotovoltaicThermalCollectors {
     };
 
     // Object Data
-    extern Array1D<PVTCollectorStruct> PVT;
+    extern EPVector<PVTCollectorStruct> PVT;
 
     // Functions
 

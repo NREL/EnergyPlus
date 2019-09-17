@@ -330,10 +330,10 @@ namespace MixedAir {
         Real64 TotZoneOAACH;                    // Total outdoor air flow rate for all zones Air Changes per hour (m3/s/m3)
         int SystemOAMethod;                     // System Outdoor Air Method - SOAM_ZoneSum, SOAM_VRP
         Real64 ZoneMaxOAFraction;               // Zone maximum outdoor air fraction
-        Array1D<Real64> ZoneOAAreaRate;         // Mechanical ventilation rate (m3/s/m2) for each zone
-        Array1D<Real64> ZoneOAPeopleRate;       // Mechanical ventilation rate (m3/s/person) for each zone
-        Array1D<Real64> ZoneOAFlowRate;         // OA Flow Rate (m3/s/zone) for each zone
-        Array1D<Real64> ZoneOAACHRate;          // OA ACH (m3/s/volume) for each zone
+        EPVector<Real64> ZoneOAAreaRate;         // Mechanical ventilation rate (m3/s/m2) for each zone
+        EPVector<Real64> ZoneOAPeopleRate;       // Mechanical ventilation rate (m3/s/person) for each zone
+        EPVector<Real64> ZoneOAFlowRate;         // OA Flow Rate (m3/s/zone) for each zone
+        EPVector<Real64> ZoneOAACHRate;          // OA ACH (m3/s/volume) for each zone
         Array1D_int VentMechZone;               // Zones requiring mechanical ventilation
         Array1D_string VentMechZoneName;        // name of mech vent zone
         Array1D_int ZoneDesignSpecOAObjIndex;   // index of the design specification outdoor air object for each zone
@@ -345,15 +345,15 @@ namespace MixedAir {
         int CO2GainErrorIndex;       // Index for recurring error message when CO2 generation from people is zero for SOAM_ProportionalControlSchOcc
         int OAMaxMinLimitErrorCount; // Counter when max OA < min OA for SOAM_ProportionalControlDesOARate
         int OAMaxMinLimitErrorIndex; // Index for max OA < min OA recurring error message for SOAM_ProportionalControlDesOARate
-        Array1D<Real64> ZoneADEffCooling;           // Zone air distribution effectiveness in cooling mode for each zone
-        Array1D<Real64> ZoneADEffHeating;           // Zone air distribution effectiveness in heating mode for each zone
+        EPVector<Real64> ZoneADEffCooling;           // Zone air distribution effectiveness in cooling mode for each zone
+        EPVector<Real64> ZoneADEffHeating;           // Zone air distribution effectiveness in heating mode for each zone
         Array1D_int ZoneADEffSchPtr;                // Pointer to the zone air distribution effectiveness schedule for each zone
         Array1D_int ZoneDesignSpecADObjIndex;       // index of the design specification zone air distribution object for each zone
         Array1D_string ZoneDesignSpecADObjName;     // name of the design specification zone air distribution object for each zone
-        Array1D<Real64> ZoneSecondaryRecirculation; // zone air secondary recirculation ratio for each zone
+        EPVector<Real64> ZoneSecondaryRecirculation; // zone air secondary recirculation ratio for each zone
         Array1D_int ZoneOAFlowMethod;               // OA flow method for each zone
         Array1D_int ZoneOASchPtr;               // Index to the outdoor air schedule for each zone (from DesignSpecification:OutdoorAir or default)
-        Array1D<Real64> OAPropCtlMinRateSchPtr; // Outdoor design OA flow rate schedule from DesignSpecification:OutdoorAir
+        EPVector<Real64> OAPropCtlMinRateSchPtr; // Outdoor design OA flow rate schedule from DesignSpecification:OutdoorAir
 
         // Default Constructor
         VentilationMechanicalProps()
@@ -409,10 +409,10 @@ namespace MixedAir {
     };
 
     // Object Data
-    extern Array1D<ControllerListProps> ControllerLists;
-    extern Array1D<OAControllerProps> OAController;
-    extern Array1D<OAMixerProps> OAMixer;
-    extern Array1D<VentilationMechanicalProps> VentilationMechanical;
+    extern EPVector<ControllerListProps> ControllerLists;
+    extern EPVector<OAControllerProps> OAController;
+    extern EPVector<OAMixerProps> OAMixer;
+    extern EPVector<VentilationMechanicalProps> VentilationMechanical;
 
     // Functions
 

@@ -178,13 +178,13 @@ namespace DualDuct {
     };
 
     // Object Data
-    extern Array1D<DamperDesignParams> Damper;
-    extern Array1D<DamperFlowConditions> DamperInlet;
-    extern Array1D<DamperFlowConditions> DamperHotAirInlet;
-    extern Array1D<DamperFlowConditions> DamperColdAirInlet;
-    extern Array1D<DamperFlowConditions> DamperOutlet;
-    extern Array1D<DamperFlowConditions> DamperOAInlet;        // VAV:OutdoorAir Outdoor Air Inlet
-    extern Array1D<DamperFlowConditions> DamperRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
+    extern EPVector<DamperDesignParams> Damper;
+    extern EPVector<DamperFlowConditions> DamperInlet;
+    extern EPVector<DamperFlowConditions> DamperHotAirInlet;
+    extern EPVector<DamperFlowConditions> DamperColdAirInlet;
+    extern EPVector<DamperFlowConditions> DamperOutlet;
+    extern EPVector<DamperFlowConditions> DamperOAInlet;        // VAV:OutdoorAir Outdoor Air Inlet
+    extern EPVector<DamperFlowConditions> DamperRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
 
     // Functions
 

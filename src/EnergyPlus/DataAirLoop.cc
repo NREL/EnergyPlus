@@ -90,14 +90,14 @@ namespace DataAirLoop {
     bool AirLoopInputsFilled(false);       // Set to TRUE after first pass through air loop
 
     // Object Data
-    Array1D<AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
-    Array1D<AirLoopOutsideAirConnectData> AirToOANodeInfo;
-    Array1D<DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
-    Array1D<AirLooptoZoneData> AirLoopZoneInfo;
-    Array1D<AirLoopControlData> AirLoopControlInfo;
-    Array1D<AirLoopFlowData> AirLoopFlow;
-    Array1D<OutsideAirSysProps> OutsideAirSys;
-    Array1D<AirLoopAFNData> AirLoopAFNInfo;
+    EPVector<AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
+    EPVector<AirLoopOutsideAirConnectData> AirToOANodeInfo;
+    EPVector<DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
+    EPVector<AirLooptoZoneData> AirLoopZoneInfo;
+    EPVector<AirLoopControlData> AirLoopControlInfo;
+    EPVector<AirLoopFlowData> AirLoopFlow;
+    EPVector<OutsideAirSysProps> OutsideAirSys;
+    EPVector<AirLoopAFNData> AirLoopAFNInfo;
 
     // Clears the global data in DataAirLoop.
     // Needed for unit tests, should not be normally called.

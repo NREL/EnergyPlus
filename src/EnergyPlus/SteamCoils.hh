@@ -179,7 +179,7 @@ namespace SteamCoils {
     };
 
     // Object Data
-    extern Array1D<SteamCoilEquipConditions> SteamCoil;
+    extern EPVector<SteamCoilEquipConditions> SteamCoil;
 
     // Functions
 

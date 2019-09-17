@@ -130,10 +130,10 @@ namespace ConductionTransferFunctionCalc {
     Array2D<Real64> AInv; // Inverse of AMat
     Array2D<Real64> AMat; // "A" matrix from Seem's dissertation
     // (constant coefficients of linear system)
-    Array1D<Real64> BMat(3); // "B" matrix of state space method (non-zero elements)
-    Array1D<Real64> CMat(2); // "C" matrix of state space method (non-zero elements)
-    Array1D<Real64> DMat(2); // "D" matrix of state space method (non-zero elements)
-    Array1D<Real64> e;       // Coefficients for the surface flux history term
+    EPVector<Real64> BMat(3); // "B" matrix of state space method (non-zero elements)
+    EPVector<Real64> CMat(2); // "C" matrix of state space method (non-zero elements)
+    EPVector<Real64> DMat(2); // "D" matrix of state space method (non-zero elements)
+    EPVector<Real64> e;       // Coefficients for the surface flux history term
     Array2D<Real64> Gamma1;  // Intermediate calculation array corresponding to a term
     // in Seem's dissertation
     Array2D<Real64> Gamma2; // Intermediate calculation array corresponding to a term
@@ -267,13 +267,13 @@ namespace ConductionTransferFunctionCalc {
         Real64 cnd;                               // Total thermal conductance (1/Rtot) of the bldg element
         int Constr;                               // Loop counter
         int ConstrNum;                            // Loop counter (construct number)
-        Array1D<Real64> cp(MaxLayersInConstruct); // Specific heat of a material layer
+        EPVector<Real64> cp(MaxLayersInConstruct); // Specific heat of a material layer
         bool CTFConvrg;                           // Set after CTFs are calculated, based on whether there are too
         // many CTF terms
         int CurrentLayer;                         // Pointer to material number in Material derived type (current layer)
-        Array1D<Real64> dl(MaxLayersInConstruct); // Thickness of a material layer
+        EPVector<Real64> dl(MaxLayersInConstruct); // Thickness of a material layer
         Real64 dtn;                               // Intermediate calculation of the time step
-        Array1D<Real64> dx(MaxLayersInConstruct); // Distance between nodes in a particular material layer
+        EPVector<Real64> dx(MaxLayersInConstruct); // Distance between nodes in a particular material layer
         Real64 dxn;                               // Intermediate calculation of nodal spacing
         Real64 dxtmp;                             // Intermediate calculation variable ( = 1/dx/cap)
         Real64 dyn;                               // Nodal spacing in the direction perpendicular to the main direction
@@ -286,7 +286,7 @@ namespace ConductionTransferFunctionCalc {
         int Layer1;                     // Loop counter
         int LayersInConstruct;          // Array containing the number of layers for each construct
         // Different from TotLayers because shades are not include in local var
-        Array1D<Real64> lr(MaxLayersInConstruct); // R value of a material layer
+        EPVector<Real64> lr(MaxLayersInConstruct); // R value of a material layer
         int Node;                                 // Loop counter
         int Node2;                                // Node number (modification of Node and NodeInRow)
         int NodeInLayer;                          // Loop counter
@@ -299,8 +299,8 @@ namespace ConductionTransferFunctionCalc {
         Array1D_bool ResLayer(MaxLayersInConstruct); // Set true if the layer must be handled as a resistive
         bool RevConst;                               // Set true if one construct is the reverse of another (CTFs already
         // available)
-        Array1D<Real64> rho(MaxLayersInConstruct); // Density of a material layer
-        Array1D<Real64> rk(MaxLayersInConstruct);  // Thermal conductivity of a material layer
+        EPVector<Real64> rho(MaxLayersInConstruct); // Density of a material layer
+        EPVector<Real64> rk(MaxLayersInConstruct);  // Thermal conductivity of a material layer
         Real64 rs;                                 // Total thermal resistance of the building element
         Real64 SumXi;                              // Summation of all of the Xi terms (inside CTFs) for a construction
         Real64 SumYi;                              // Summation of all of the Xi terms (cross CTFs) for a construction

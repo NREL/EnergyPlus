@@ -128,7 +128,7 @@ namespace HeatPumpWaterToWaterSimple {
     }                            // namespace
 
     // Object Data
-    Array1D<GshpSpecs> GSHP;
+    EPVector<GshpSpecs> GSHP;
     std::unordered_map<std::string, std::string> HeatPumpWaterUniqueNames;
 
     void GshpSpecs::clear_state()

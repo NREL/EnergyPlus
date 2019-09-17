@@ -62,7 +62,7 @@ namespace DataPlant {
         Real64 DemandNotDispatched; // Plant Loop Demand that was not distributed [W]
         Real64 UnmetDemand;         // Plant Loop Unmet Demand [W]
         // Loop side data
-        Array1D<LoopSideReportVars> LoopSide;
+        EPVector<LoopSideReportVars> LoopSide;
         Real64 BypassFrac;            // Debug Variable
         Real64 InletNodeFlowrate;     // Debug Variable
         Real64 InletNodeTemperature;  // Debug Variable

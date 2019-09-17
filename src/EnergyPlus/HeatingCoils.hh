@@ -157,9 +157,9 @@ namespace HeatingCoils {
         //                                                            COIL:DX:MultiMode:CoolingEmpirical   = 4
         //                                                            Refrigeration:Condenser              = 5
         int NumOfStages;                     // Number of speeds
-        Array1D<Real64> MSNominalCapacity;   // Nominal Capacity MS AC Furnace [W]
-        Array1D<Real64> MSEfficiency;        // Efficiency for MS AC Furnace [dimensionless]
-        Array1D<Real64> MSParasiticElecLoad; // Parasitic elec load MS AC Furnace (gas only) [W]
+        EPVector<Real64> MSNominalCapacity;   // Nominal Capacity MS AC Furnace [W]
+        EPVector<Real64> MSEfficiency;        // Efficiency for MS AC Furnace [dimensionless]
+        EPVector<Real64> MSParasiticElecLoad; // Parasitic elec load MS AC Furnace (gas only) [W]
         bool DesiccantRegenerationCoil;      // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
         int DesiccantDehumNum;               // index to desiccant dehumidifier object
         bool FaultyCoilSATFlag;              // True if the coil has SAT sensor fault
@@ -192,8 +192,8 @@ namespace HeatingCoils {
     };
 
     // Object Data
-    extern Array1D<HeatingCoilEquipConditions> HeatingCoil;
-    extern Array1D<HeatingCoilNumericFieldData> HeatingCoilNumericFields;
+    extern EPVector<HeatingCoilEquipConditions> HeatingCoil;
+    extern EPVector<HeatingCoilNumericFieldData> HeatingCoilNumericFields;
 
     // Functions
 

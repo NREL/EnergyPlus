@@ -207,7 +207,7 @@ namespace OutdoorAirUnit {
         Real64 CompOutSetTemp; // component outlet setpoint temperature
         int AvailStatus;
         std::string AvailManagerListName; // Name of an availability manager list object
-        Array1D<OAEquipList> OAEquip;
+        EPVector<OAEquipList> OAEquip;
         // Report data
         Real64 TotCoolingRate;    // Rate of total cooling delivered to the zone [W]
         Real64 TotCoolingEnergy;  // Total cooling energy delivered by the OAU supply air to the zone [J]
@@ -241,7 +241,7 @@ namespace OutdoorAirUnit {
     };
 
     // Object Data
-    extern Array1D<OAUnitData> OutAirUnit;
+    extern EPVector<OAUnitData> OutAirUnit;
 
     // Functions
 

@@ -382,7 +382,7 @@ namespace HVACFan {
         Array1D_string alphaArgs;
         Array1D_string alphaFieldNames;
         Array1D_bool isAlphaFieldBlank;
-        Array1D<Real64> numericArgs;
+        EPVector<Real64> numericArgs;
         Array1D_string numericFieldNames;
         Array1D_bool isNumericFieldBlank;
         int objectNum = inputProcessor->getObjectItemNum(locCurrentModuleObject, objectName);

@@ -135,14 +135,14 @@ namespace ZoneTempPredictorCorrector {
     // Number of zone with onoff thermostat
     extern int NumOnOffCtrZone;
 
-    extern Array1D<Real64> ZoneSetPointLast;
-    extern Array1D<Real64> TempIndZnLd;
-    extern Array1D<Real64> TempDepZnLd;
-    extern Array1D<Real64> ZoneAirRelHum; // Zone relative humidity in percent
+    extern EPVector<Real64> ZoneSetPointLast;
+    extern EPVector<Real64> TempIndZnLd;
+    extern EPVector<Real64> TempDepZnLd;
+    extern EPVector<Real64> ZoneAirRelHum; // Zone relative humidity in percent
 
     // Zone temperature history - used only for oscillation test
     extern Array2D<Real64> ZoneTempHist;
-    extern Array1D<Real64> ZoneTempOscillate;
+    extern EPVector<Real64> ZoneTempOscillate;
     extern Real64 AnyZoneTempOscillate;
 
     // SUBROUTINE SPECIFICATIONS:
@@ -187,13 +187,13 @@ namespace ZoneTempPredictorCorrector {
     {
         // Members
         bool initialized;
-        Array1D<Real64> ThermalComfortAdaptiveASH55_Upper_90;
-        Array1D<Real64> ThermalComfortAdaptiveASH55_Upper_80;
-        Array1D<Real64> ThermalComfortAdaptiveASH55_Central;
-        Array1D<Real64> ThermalComfortAdaptiveCEN15251_Upper_I;
-        Array1D<Real64> ThermalComfortAdaptiveCEN15251_Upper_II;
-        Array1D<Real64> ThermalComfortAdaptiveCEN15251_Upper_III;
-        Array1D<Real64> ThermalComfortAdaptiveCEN15251_Central;
+        EPVector<Real64> ThermalComfortAdaptiveASH55_Upper_90;
+        EPVector<Real64> ThermalComfortAdaptiveASH55_Upper_80;
+        EPVector<Real64> ThermalComfortAdaptiveASH55_Central;
+        EPVector<Real64> ThermalComfortAdaptiveCEN15251_Upper_I;
+        EPVector<Real64> ThermalComfortAdaptiveCEN15251_Upper_II;
+        EPVector<Real64> ThermalComfortAdaptiveCEN15251_Upper_III;
+        EPVector<Real64> ThermalComfortAdaptiveCEN15251_Central;
 
         // Default Constructor
         AdaptiveComfortDailySetPointSchedule() : initialized(false)
@@ -202,16 +202,16 @@ namespace ZoneTempPredictorCorrector {
     };
 
     // Object Data
-    extern Array1D<ZoneTempControlType> SetPointSingleHeating;
-    extern Array1D<ZoneTempControlType> SetPointSingleCooling;
-    extern Array1D<ZoneTempControlType> SetPointSingleHeatCool;
-    extern Array1D<ZoneTempControlType> SetPointDualHeatCool;
-    extern Array1D<ZoneComfortFangerControlType> SetPointSingleHeatingFanger;
-    extern Array1D<ZoneComfortFangerControlType> SetPointSingleCoolingFanger;
-    extern Array1D<ZoneComfortFangerControlType> SetPointSingleHeatCoolFanger;
-    extern Array1D<ZoneComfortFangerControlType> SetPointDualHeatCoolFanger;
+    extern EPVector<ZoneTempControlType> SetPointSingleHeating;
+    extern EPVector<ZoneTempControlType> SetPointSingleCooling;
+    extern EPVector<ZoneTempControlType> SetPointSingleHeatCool;
+    extern EPVector<ZoneTempControlType> SetPointDualHeatCool;
+    extern EPVector<ZoneComfortFangerControlType> SetPointSingleHeatingFanger;
+    extern EPVector<ZoneComfortFangerControlType> SetPointSingleCoolingFanger;
+    extern EPVector<ZoneComfortFangerControlType> SetPointSingleHeatCoolFanger;
+    extern EPVector<ZoneComfortFangerControlType> SetPointDualHeatCoolFanger;
     extern AdaptiveComfortDailySetPointSchedule AdapComfortDailySetPointSchedule;
-    extern Array1D<Real64> AdapComfortSetPointSummerDesDay;
+    extern EPVector<Real64> AdapComfortSetPointSummerDesDay;
 
     // Functions
     void clear_state();
@@ -234,9 +234,9 @@ namespace ZoneTempPredictorCorrector {
 
     void CalcZoneAirTempSetPoints();
 
-    void CalculateMonthlyRunningAverageDryBulb(Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN);
+    void CalculateMonthlyRunningAverageDryBulb(EPVector<Real64> &runningAverageASH, EPVector<Real64> &runningAverageCEN);
 
-    void CalculateAdaptiveComfortSetPointSchl(Array1D<Real64> const &runningAverageASH, Array1D<Real64> const &runningAverageCEN);
+    void CalculateAdaptiveComfortSetPointSchl(EPVector<Real64> const &runningAverageASH, EPVector<Real64> const &runningAverageCEN);
 
     void CalcPredictedSystemLoad(int const ZoneNum, Real64 RAFNFrac);
 

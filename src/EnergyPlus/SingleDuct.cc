@@ -172,10 +172,10 @@ namespace SingleDuct {
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-    Array1D<Real64> MassFlow1; // previous value of the terminal unit mass flow rate
-    Array1D<Real64> MassFlow2; // previous value of the previous value of the mass flow rate
-    Array1D<Real64> MassFlow3;
-    Array1D<Real64> MassFlowDiff;
+    EPVector<Real64> MassFlow1; // previous value of the terminal unit mass flow rate
+    EPVector<Real64> MassFlow2; // previous value of the previous value of the mass flow rate
+    EPVector<Real64> MassFlow3;
+    EPVector<Real64> MassFlowDiff;
     bool GetInputFlag(true);   // Flag set to make sure you get input once
     bool GetATMixerFlag(true); // Flag set to make sure you get input once
     int NumConstVolSys(0);
@@ -199,12 +199,12 @@ namespace SingleDuct {
     // Reporting routines for module
 
     // Object Data
-    Array1D<SysDesignParams> Sys;
+    EPVector<SysDesignParams> Sys;
     std::unordered_map<std::string, std::string> SysUniqueNames;
-    Array1D<SysFlowConditions> SysInlet;
-    Array1D<SysFlowConditions> SysOutlet;
-    Array1D<AirTerminalMixerData> SysATMixer;
-    // Array1D< AirTerminalSingleDuctConstantVolumeNoReheat > SingleDuctConstantVolumeNoReheat;
+    EPVector<SysFlowConditions> SysInlet;
+    EPVector<SysFlowConditions> SysOutlet;
+    EPVector<AirTerminalMixerData> SysATMixer;
+    // EPVector< AirTerminalSingleDuctConstantVolumeNoReheat > SingleDuctConstantVolumeNoReheat;
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -389,7 +389,7 @@ namespace SingleDuct {
         Array1D_string Alphas;           // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D<Real64> Numbers;         // Numeric input items for object
+        EPVector<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);           // Maximum number of numeric input fields
@@ -4147,7 +4147,7 @@ namespace SingleDuct {
         Real64 UnitFlowToler;   // flow rate tolerance
         Real64 QDelivered;
         Real64 FracDelivered;
-        Array1D<Real64> Par(11);
+        EPVector<Real64> Par(11);
         int SolFlag;
         Real64 ErrTolerance;
         Real64 MaxSteamCap; // steam coil capacity at full load

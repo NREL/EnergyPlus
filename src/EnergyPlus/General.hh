@@ -350,7 +350,7 @@ namespace General {
     void ScanForReports(
         std::string const &reportName, bool &DoReport, Optional_string_const ReportKey = _, Optional_string Option1 = _, Optional_string Option2 = _);
 
-    inline void ReallocateRealArray(Array1D<Real64> &Array,
+    inline void ReallocateRealArray(EPVector<Real64> &Array,
                                     int &ArrayMax,     // Current and resultant dimension for Array
                                     int const ArrayInc // increment for redimension
     )

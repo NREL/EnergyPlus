@@ -342,7 +342,7 @@ namespace DataPhotovoltaics {
     };
 
     // Object Data
-    extern Array1D<PVArrayStruct> PVarray;
+    extern EPVector<PVArrayStruct> PVarray;
 
     void clear_state();
 

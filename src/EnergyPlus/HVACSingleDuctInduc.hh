@@ -153,7 +153,7 @@ namespace HVACSingleDuctInduc {
     };
 
     // Object Data
-    extern Array1D<IndUnitData> IndUnit;
+    extern EPVector<IndUnitData> IndUnit;
 
     // Functions
 

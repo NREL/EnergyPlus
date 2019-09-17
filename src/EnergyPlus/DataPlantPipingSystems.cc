@@ -156,9 +156,9 @@ namespace DataPlantPipingSystems {
     // MODULE VARIABLE DECLARATIONS:
 
     // Object Data
-    Array1D<FullDomainStructureInfo> PipingSystemDomains;
-    Array1D<PipeCircuitInfo> PipingSystemCircuits;
-    Array1D<PipeSegmentInfo> PipingSystemSegments;
+    EPVector<FullDomainStructureInfo> PipingSystemDomains;
+    EPVector<PipeCircuitInfo> PipingSystemCircuits;
+    EPVector<PipeSegmentInfo> PipingSystemSegments;
 
     //*********************************************************************************************!
 

@@ -81,38 +81,33 @@ namespace AirflowNetwork {
         int const NrInt; // Number of intervals for a large opening
 
         // Common block AFEDAT
-        Array1D<Real64> AFECTL;
-        Array1D<Real64> AFLOW2;
-        Array1D<Real64> AFLOW;
-        Array1D<Real64> PS;
-        Array1D<Real64> PW;
+        EPVector<Real64> AFECTL;
+        EPVector<Real64> AFLOW2;
+        EPVector<Real64> AFLOW;
+        EPVector<Real64> PS;
+        EPVector<Real64> PW;
 
         // Common block CONTRL
         Real64 PB;
         int LIST;
 
         // Common block ZONL
-        // extern Array1D<Real64> RHOZ;
-        // extern Array1D<Real64> SQRTDZ;
-        // extern Array1D<Real64> VISCZ;
-        Array1D<Real64> SUMAF;
-        // extern Array1D<Real64> TZ; // Temperature [C]
-        // extern Array1D<Real64> WZ; // Humidity ratio [kg/kg]
-        Array1D<Real64> PZ; // Pressure [Pa]
+        EPVector<Real64> SUMAF;
+        EPVector<Real64> PZ; // Pressure [Pa]
 
         // Other array variables
         Array1D_int ID;
         Array1D_int IK;
-        Array1D<Real64> AD;
-        Array1D<Real64> AU;
+        EPVector<Real64> AD;
+        EPVector<Real64> AU;
 
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
         Array1D_int newIK;     // noel
-        Array1D<Real64> newAU; // noel
+        EPVector<Real64> newAU; // noel
 #endif
 
         // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
-        Array1D<Real64> SUMF;
+        EPVector<Real64> SUMF;
     };
 
     extern std::vector<AirProperties> properties;
@@ -124,45 +119,40 @@ namespace AirflowNetwork {
     extern int const NrInt; // Number of intervals for a large opening
 
     // Common block AFEDAT
-    extern Array1D<Real64> AFECTL;
-    extern Array1D<Real64> AFLOW2;
-    extern Array1D<Real64> AFLOW;
-    extern Array1D<Real64> PS;
-    extern Array1D<Real64> PW;
+    extern EPVector<Real64> AFECTL;
+    extern EPVector<Real64> AFLOW2;
+    extern EPVector<Real64> AFLOW;
+    extern EPVector<Real64> PS;
+    extern EPVector<Real64> PW;
 
     // Common block CONTRL
     extern Real64 PB;
     extern int LIST;
 
     // Common block ZONL
-    // extern Array1D<Real64> RHOZ;
-    // extern Array1D<Real64> SQRTDZ;
-    // extern Array1D<Real64> VISCZ;
-    extern Array1D<Real64> SUMAF;
-    // extern Array1D<Real64> TZ; // Temperature [C]
-    // extern Array1D<Real64> WZ; // Humidity ratio [kg/kg]
-    extern Array1D<Real64> PZ; // Pressure [Pa]
+    extern EPVector<Real64> SUMAF;
+    extern EPVector<Real64> PZ; // Pressure [Pa]
 
     // Other array variables
     extern Array1D_int ID;
     extern Array1D_int IK;
-    extern Array1D<Real64> AD;
-    extern Array1D<Real64> AU;
+    extern EPVector<Real64> AD;
+    extern EPVector<Real64> AU;
 
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
     extern Array1D_int newIK;     // noel
-    extern Array1D<Real64> newAU; // noel
+    extern EPVector<Real64> newAU; // noel
 #endif
 
     // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
-    extern Array1D<Real64> SUMF;
+    extern EPVector<Real64> SUMF;
     extern int Unit11;
     extern int Unit21;
 
     // Large opening variables
-    extern Array1D<Real64> DpProf;   // Differential pressure profile for Large Openings [Pa]
-    extern Array1D<Real64> RhoProfF; // Density profile in FROM zone [kg/m3]
-    extern Array1D<Real64> RhoProfT; // Density profile in TO zone [kg/m3]
+    extern EPVector<Real64> DpProf;   // Differential pressure profile for Large Openings [Pa]
+    extern EPVector<Real64> RhoProfF; // Density profile in FROM zone [kg/m3]
+    extern EPVector<Real64> RhoProfT; // Density profile in TO zone [kg/m3]
     extern Array2D<Real64> DpL;      // Array of stack pressures in link
 
     // Functions

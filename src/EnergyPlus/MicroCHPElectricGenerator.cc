@@ -248,7 +248,7 @@ namespace MicroCHPElectricGenerator {
         int NumNums;                    // Number of elements in the numeric array
         int IOStat;                     // IO Status when calling get input subroutine
         Array1D_string AlphArray(25);   // character string data
-        Array1D<Real64> NumArray(200);  // numeric data TODO deal with allocatable for extensible
+        EPVector<Real64> NumArray(200);  // numeric data TODO deal with allocatable for extensible
         static bool ErrorsFound(false); // error flag
         //  INTEGER       :: thisMicroCHP  !temporary index
         //  INTEGER       :: otherMicroCHP !loop counter and temporary indexer

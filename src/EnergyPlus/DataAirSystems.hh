@@ -118,8 +118,8 @@ namespace DataAirSystems {
         Real64 PlantSupplyOtherEff;
         Real64 PeakPlantSupplyOtherEff;
         int AirSysToPlantPtr;              // =0 No plant loop connection, >0 index to AirSysToPlant array
-        Array1D<MeterData> MeteredVar;     // Index of energy output report data
-        Array1D<SubcomponentData> SubComp; // Component list
+        EPVector<MeterData> MeteredVar;     // Index of energy output report data
+        EPVector<SubcomponentData> SubComp; // Component list
 
         // Default Constructor
         AirLoopCompData()
@@ -143,7 +143,7 @@ namespace DataAirSystems {
         int NodeNumIn;                 // Branch inlet node number
         int NodeNumOut;                // Branch outlet node number
         int DuctType;                  // 1=main, 2=cooling, 3=heating, 4=other
-        Array1D<AirLoopCompData> Comp; // Component list--high level components
+        EPVector<AirLoopCompData> Comp; // Component list--high level components
         //  TYPE(ExpandedCompData), &
         //           ALLOCATABLE, DIMENSION(:) :: MegaComp              ! Component list
         //  This list would include children, grandchildren, etc.
@@ -220,7 +220,7 @@ namespace DataAirSystems {
         Array1D_bool CanBeLockedOutByEcono; // true if controller inactive
         // when the economizer is active
         int NumBranches;                   // number of branches making up this system
-        Array1D<AirLoopBranchData> Branch; // data for each branch
+        EPVector<AirLoopBranchData> Branch; // data for each branch
         AirLoopSplitterData Splitter;      // Data for splitter (if any)
         AirLoopMixerData Mixer;            // Data for mixer (if any)
         Array1D_bool ControlConverged;     // Convergence Parameter for controllers
@@ -411,14 +411,14 @@ namespace DataAirSystems {
     };
 
     // Object Data
-    extern Array1D<DefinePrimaryAirSystem> PrimaryAirSystem;
-    extern Array1D<ConnectionPoint> DemandSideConnect;               // Connections between loops
-    extern Array1D<ConnectZoneComp> ZoneCompToPlant;                 // Connections between loops
-    extern Array1D<ConnectZoneSubComp> ZoneSubCompToPlant;           // Connections between loops
-    extern Array1D<ConnectZoneSubSubComp> ZoneSubSubCompToPlant;     // Connections between loops
-    extern Array1D<ConnectAirSysComp> AirSysCompToPlant;             // Connections between loops
-    extern Array1D<ConnectAirSysSubComp> AirSysSubCompToPlant;       // Connections between loops
-    extern Array1D<ConnectAirSysSubSubComp> AirSysSubSubCompToPlant; // Connections between loops
+    extern EPVector<DefinePrimaryAirSystem> PrimaryAirSystem;
+    extern EPVector<ConnectionPoint> DemandSideConnect;               // Connections between loops
+    extern EPVector<ConnectZoneComp> ZoneCompToPlant;                 // Connections between loops
+    extern EPVector<ConnectZoneSubComp> ZoneSubCompToPlant;           // Connections between loops
+    extern EPVector<ConnectZoneSubSubComp> ZoneSubSubCompToPlant;     // Connections between loops
+    extern EPVector<ConnectAirSysComp> AirSysCompToPlant;             // Connections between loops
+    extern EPVector<ConnectAirSysSubComp> AirSysSubCompToPlant;       // Connections between loops
+    extern EPVector<ConnectAirSysSubSubComp> AirSysSubSubCompToPlant; // Connections between loops
 
     // Functions
     void clear_state();

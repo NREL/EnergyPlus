@@ -114,7 +114,7 @@ namespace PlantUtilities {
         };
 
         // Object Data
-        Array1D<CriteriaData> CriteriaChecks; // stores criteria information
+        EPVector<CriteriaData> CriteriaChecks; // stores criteria information
     }                                         // namespace
     // MODULE VARIABLE DECLARATIONS:
     // na
@@ -1523,7 +1523,7 @@ namespace PlantUtilities {
         }
 
         // store copy of prior structure
-        Array1D<PlantCallingOrderInfoStruct> TempPlantCallingOrderInfo(PlantCallingOrderInfo);
+        EPVector<PlantCallingOrderInfoStruct> TempPlantCallingOrderInfo(PlantCallingOrderInfo);
 
         RecordToMoveInPlantCallingOrderInfo = PlantCallingOrderInfo(OldIndex);
 

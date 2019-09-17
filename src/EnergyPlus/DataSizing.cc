@@ -305,8 +305,8 @@ namespace DataSizing {
     Real64 GlobalCoolSizingFactor(0.0);             // the global cooling sizing ratio
     Real64 SuppHeatCap(0.0);                        // the heating capacity of the supplemental heater in a unitary system
     Real64 UnitaryHeatCap(0.0);                     // the heating capacity of a unitary system
-    Array1D<Real64> ZoneSizThermSetPtHi;            // highest zone thermostat setpoint during zone sizing calcs
-    Array1D<Real64> ZoneSizThermSetPtLo;            // lowest zone thermostat setpoint during zone sizing calcs
+    EPVector<Real64> ZoneSizThermSetPtHi;            // highest zone thermostat setpoint during zone sizing calcs
+    EPVector<Real64> ZoneSizThermSetPtLo;            // lowest zone thermostat setpoint during zone sizing calcs
     Array1D_string CoolPeakDateHrMin;               // date:hr:min of cooling peak
     Array1D_string HeatPeakDateHrMin;               // date:hr:min of heating peak
     char SizingFileColSep;                          // Character to separate columns in sizing outputs
@@ -321,74 +321,74 @@ namespace DataSizing {
     zoneFanPlacement DataFanPlacement(zoneFanPlacement::zoneFanPlaceNotSet); // identifies location of fan wrt coil
 
     // Object Data
-    Array1D<OARequirementsData> OARequirements;
-    Array1D<ZoneAirDistributionData> ZoneAirDistribution;
-    Array1D<ZoneSizingInputData> ZoneSizingInput;             // Input data for zone sizing
+    EPVector<OARequirementsData> OARequirements;
+    EPVector<ZoneAirDistributionData> ZoneAirDistribution;
+    EPVector<ZoneSizingInputData> ZoneSizingInput;             // Input data for zone sizing
     Array2D<ZoneSizingData> ZoneSizing;                       // Data for zone sizing (all data, all design)
-    Array1D<ZoneSizingData> FinalZoneSizing;                  // Final data for zone sizing including effects
+    EPVector<ZoneSizingData> FinalZoneSizing;                  // Final data for zone sizing including effects
     Array2D<ZoneSizingData> CalcZoneSizing;                   // Data for zone sizing (all data)
-    Array1D<ZoneSizingData> CalcFinalZoneSizing;              // Final data for zone sizing (calculated only)
-    Array1D<ZoneSizingData> TermUnitFinalZoneSizing;          // Final data for sizing terminal units (indexed per terminal unit)
-    Array1D<SystemSizingInputData> SysSizInput;               // Input data array for system sizing object
+    EPVector<ZoneSizingData> CalcFinalZoneSizing;              // Final data for zone sizing (calculated only)
+    EPVector<ZoneSizingData> TermUnitFinalZoneSizing;          // Final data for sizing terminal units (indexed per terminal unit)
+    EPVector<SystemSizingInputData> SysSizInput;               // Input data array for system sizing object
     Array2D<SystemSizingData> SysSizing;                      // Data array for system sizing (all data)
-    Array1D<SystemSizingData> FinalSysSizing;                 // Data array for system sizing (max heat/cool)
-    Array1D<SystemSizingData> CalcSysSizing;                  // Data array for system sizing (max heat/cool)
-    Array1D<SysSizPeakDDNumData> SysSizPeakDDNum;             // data array for peak des day indices
-    Array1D<TermUnitSizingData> TermUnitSizing;               // Data added in sizing routines (indexed per terminal unit)
-    Array1D<ZoneEqSizingData> ZoneEqSizing;                   // Data added in zone eq component sizing routines
-    Array1D<ZoneEqSizingData> UnitarySysEqSizing;             // Data added in unitary system sizing routines
-    Array1D<ZoneEqSizingData> OASysEqSizing;                  // Data added in unitary system sizing routines
-    Array1D<PlantSizingData> PlantSizData;                    // Input data array for plant sizing
-    Array1D<DesDayWeathData> DesDayWeath;                     // design day weather saved at major time step
-    Array1D<CompDesWaterFlowData> CompDesWaterFlow;           // array to store components' design water flow
-    Array1D<ZoneHVACSizingData> ZoneHVACSizing;               // Input data for zone HVAC sizing
-    Array1D<AirTerminalSizingSpecData> AirTerminalSizingSpec; // Input data for zone HVAC sizing
+    EPVector<SystemSizingData> FinalSysSizing;                 // Data array for system sizing (max heat/cool)
+    EPVector<SystemSizingData> CalcSysSizing;                  // Data array for system sizing (max heat/cool)
+    EPVector<SysSizPeakDDNumData> SysSizPeakDDNum;             // data array for peak des day indices
+    EPVector<TermUnitSizingData> TermUnitSizing;               // Data added in sizing routines (indexed per terminal unit)
+    EPVector<ZoneEqSizingData> ZoneEqSizing;                   // Data added in zone eq component sizing routines
+    EPVector<ZoneEqSizingData> UnitarySysEqSizing;             // Data added in unitary system sizing routines
+    EPVector<ZoneEqSizingData> OASysEqSizing;                  // Data added in unitary system sizing routines
+    EPVector<PlantSizingData> PlantSizData;                    // Input data array for plant sizing
+    EPVector<DesDayWeathData> DesDayWeath;                     // design day weather saved at major time step
+    EPVector<CompDesWaterFlowData> CompDesWaterFlow;           // array to store components' design water flow
+    EPVector<ZoneHVACSizingData> ZoneHVACSizing;               // Input data for zone HVAC sizing
+    EPVector<AirTerminalSizingSpecData> AirTerminalSizingSpec; // Input data for zone HVAC sizing
     // used only for Facility Load Component Summary
-    Array1D<FacilitySizingData> CalcFacilitySizing; // Data for zone sizing
+    EPVector<FacilitySizingData> CalcFacilitySizing; // Data for zone sizing
     FacilitySizingData CalcFinalFacilitySizing;     // Final data for zone sizing
-    Array1D<Real64> VbzByZone;                      // saved value of ZoneOAUnc which is Vbz used in 62.1 tabular report
-    Array1D<Real64> VdzClgByZone;    // saved value of cooling based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
-    Array1D<Real64> VdzMinClgByZone; // minimum discarge flow for cooling, Vdz includes secondary and primary flows for dual path
-    Array1D<Real64> VdzHtgByZone;    // saved value of heating based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
-    Array1D<Real64> VdzMinHtgByZone; // minimum discharge flow for heating, Vdz includes secondary and primary flows for dual path
-    Array1D<Real64> ZdzClgByZone;    // minimum discharge outdoor-air fraction for cooling
-    Array1D<Real64> ZdzHtgByZone;    // minimum discharge outdoor-air fraction for heating
-    Array1D<Real64> VpzClgByZone;    // saved value of cooling based ZonePA which is Vpz used in 62.1 tabular report
-    Array1D<Real64> VpzMinClgByZone; // saved value of minimum cooling based ZonePA which is VpzClg-min used in 62.1 tabular report
-    Array1D<Real64> VpzHtgByZone;    // saved value of heating based ZonePA which is Vpz used in 62.1 tabular report
-    Array1D<Real64> VpzMinHtgByZone; // saved value of minimum heating based ZonePA which is VpzHtg-min used in 62.1 tabular report
-    Array1D<Real64> VpzClgSumBySys;  // sum of saved value of cooling based ZonePA which is Vpz-sum used in 62.1 tabular report
-    Array1D<Real64> VpzHtgSumBySys;  // sum of saved value of heating based ZonePA which is Vpz-sum used in 62.1 tabular report
-    Array1D<Real64> PzSumBySys;      // sum of design people for system, Pz_sum
-    Array1D<Real64> PsBySys;         // sum of peak concurrent people by system, Ps
-    Array1D<Real64> DBySys;          // Population Diversity by system
-    Array1D<Real64> SumRpxPzBySys;   // Sum of per person OA times number of people by system, No D yet
-    Array1D<Real64> SumRaxAzBySys;   // sum of per area OA time zone area by system, does not get altered by D
-    Array1D<std::string> PeakPsOccurrenceDateTimeStringBySys;    // string describing when Ps peak occurs
-    Array1D<std::string> PeakPsOccurrenceEnvironmentStringBySys; // string describing Environment when Ps peak occurs
-    Array1D<Real64> VouBySys;                                    // uncorrected system outdoor air requirement, for std 62.1 VRP
-    Array1D<Real64> VpsClgBySys;                                 // System primary airflow Vps, for cooling for std 62.1 VRP
-    Array1D<Real64> VpsHtgBySys;                                 // system primary airflow Vps, for heating for std 62.1 VRP
-    Array1D<Real64> FaByZoneHeat;                                // saved value of Fa used in 62.1 tabular report
-    Array1D<Real64> FbByZoneCool;                                // saved value of Fb used in 62.1 tabular report
-    Array1D<Real64> FbByZoneHeat;                                // saved value of Fb used in 62.1 tabular report
-    Array1D<Real64> FcByZoneCool;                                // saved value of Fc used in 62.1 tabular report
-    Array1D<Real64> FcByZoneHeat;                                // saved value of Fc used in 62.1 tabular report
-    Array1D<Real64> XsBySysCool;                                 // saved value of Xs used in 62.1 tabular report
-    Array1D<Real64> XsBySysHeat;                                 // saved value of Xs used in 62.1 tabular report
-    Array1D<Real64> EvzByZoneCool;                               // saved value of Evz (zone vent effy) used in 62.1 tabular report
-    Array1D<Real64> EvzByZoneHeat;                               // saved value of Evz (zone vent effy) used in 62.1 tabular report
-    Array1D<Real64> EvzByZoneCoolPrev;                           // saved value of Evz (zone vent effy) used in 62.1 tabular report
-    Array1D<Real64> EvzByZoneHeatPrev;                           // saved value of Evz (zone vent effy) used in 62.1 tabular report
-    Array1D<Real64> VotClgBySys;     // saved value of cooling ventilation required at primary AHU, used in 62.1 tabular report
-    Array1D<Real64> VotHtgBySys;     // saved value of heating ventilation required at primary AHU, used in 62.1 tabular report
-    Array1D<Real64> VozSumClgBySys;  // saved value of cooling ventilation required at clg zones
-    Array1D<Real64> VozSumHtgBySys;  // saved value of cooling ventilation required at htg zones
-    Array1D<Real64> TotCoolCapTemp;  // scratch variable used for calulating peak load [W]
-    Array1D<Real64> EvzMinBySysHeat; // saved value of EvzMin used in 62.1 tabular report
-    Array1D<Real64> EvzMinBySysCool; // saved value of EvzMin used in 62.1 tabular report
-    Array1D<Real64> FaByZoneCool;    // triggers allocation in UpdateSysSizing
-    Array1D<Real64> SensCoolCapTemp; // triggers allocation in UpdateSysSizing
+    EPVector<Real64> VbzByZone;                      // saved value of ZoneOAUnc which is Vbz used in 62.1 tabular report
+    EPVector<Real64> VdzClgByZone;    // saved value of cooling based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
+    EPVector<Real64> VdzMinClgByZone; // minimum discarge flow for cooling, Vdz includes secondary and primary flows for dual path
+    EPVector<Real64> VdzHtgByZone;    // saved value of heating based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
+    EPVector<Real64> VdzMinHtgByZone; // minimum discharge flow for heating, Vdz includes secondary and primary flows for dual path
+    EPVector<Real64> ZdzClgByZone;    // minimum discharge outdoor-air fraction for cooling
+    EPVector<Real64> ZdzHtgByZone;    // minimum discharge outdoor-air fraction for heating
+    EPVector<Real64> VpzClgByZone;    // saved value of cooling based ZonePA which is Vpz used in 62.1 tabular report
+    EPVector<Real64> VpzMinClgByZone; // saved value of minimum cooling based ZonePA which is VpzClg-min used in 62.1 tabular report
+    EPVector<Real64> VpzHtgByZone;    // saved value of heating based ZonePA which is Vpz used in 62.1 tabular report
+    EPVector<Real64> VpzMinHtgByZone; // saved value of minimum heating based ZonePA which is VpzHtg-min used in 62.1 tabular report
+    EPVector<Real64> VpzClgSumBySys;  // sum of saved value of cooling based ZonePA which is Vpz-sum used in 62.1 tabular report
+    EPVector<Real64> VpzHtgSumBySys;  // sum of saved value of heating based ZonePA which is Vpz-sum used in 62.1 tabular report
+    EPVector<Real64> PzSumBySys;      // sum of design people for system, Pz_sum
+    EPVector<Real64> PsBySys;         // sum of peak concurrent people by system, Ps
+    EPVector<Real64> DBySys;          // Population Diversity by system
+    EPVector<Real64> SumRpxPzBySys;   // Sum of per person OA times number of people by system, No D yet
+    EPVector<Real64> SumRaxAzBySys;   // sum of per area OA time zone area by system, does not get altered by D
+    EPVector<std::string> PeakPsOccurrenceDateTimeStringBySys;    // string describing when Ps peak occurs
+    EPVector<std::string> PeakPsOccurrenceEnvironmentStringBySys; // string describing Environment when Ps peak occurs
+    EPVector<Real64> VouBySys;                                    // uncorrected system outdoor air requirement, for std 62.1 VRP
+    EPVector<Real64> VpsClgBySys;                                 // System primary airflow Vps, for cooling for std 62.1 VRP
+    EPVector<Real64> VpsHtgBySys;                                 // system primary airflow Vps, for heating for std 62.1 VRP
+    EPVector<Real64> FaByZoneHeat;                                // saved value of Fa used in 62.1 tabular report
+    EPVector<Real64> FbByZoneCool;                                // saved value of Fb used in 62.1 tabular report
+    EPVector<Real64> FbByZoneHeat;                                // saved value of Fb used in 62.1 tabular report
+    EPVector<Real64> FcByZoneCool;                                // saved value of Fc used in 62.1 tabular report
+    EPVector<Real64> FcByZoneHeat;                                // saved value of Fc used in 62.1 tabular report
+    EPVector<Real64> XsBySysCool;                                 // saved value of Xs used in 62.1 tabular report
+    EPVector<Real64> XsBySysHeat;                                 // saved value of Xs used in 62.1 tabular report
+    EPVector<Real64> EvzByZoneCool;                               // saved value of Evz (zone vent effy) used in 62.1 tabular report
+    EPVector<Real64> EvzByZoneHeat;                               // saved value of Evz (zone vent effy) used in 62.1 tabular report
+    EPVector<Real64> EvzByZoneCoolPrev;                           // saved value of Evz (zone vent effy) used in 62.1 tabular report
+    EPVector<Real64> EvzByZoneHeatPrev;                           // saved value of Evz (zone vent effy) used in 62.1 tabular report
+    EPVector<Real64> VotClgBySys;     // saved value of cooling ventilation required at primary AHU, used in 62.1 tabular report
+    EPVector<Real64> VotHtgBySys;     // saved value of heating ventilation required at primary AHU, used in 62.1 tabular report
+    EPVector<Real64> VozSumClgBySys;  // saved value of cooling ventilation required at clg zones
+    EPVector<Real64> VozSumHtgBySys;  // saved value of cooling ventilation required at htg zones
+    EPVector<Real64> TotCoolCapTemp;  // scratch variable used for calulating peak load [W]
+    EPVector<Real64> EvzMinBySysHeat; // saved value of EvzMin used in 62.1 tabular report
+    EPVector<Real64> EvzMinBySysCool; // saved value of EvzMin used in 62.1 tabular report
+    EPVector<Real64> FaByZoneCool;    // triggers allocation in UpdateSysSizing
+    EPVector<Real64> SensCoolCapTemp; // triggers allocation in UpdateSysSizing
 
     // Clears the global data in DataSizing.
     // Needed for unit tests, should not be normally called.

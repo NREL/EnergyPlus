@@ -124,7 +124,7 @@ namespace NodeInputManager {
     Array1D_bool NodeWetBulbRepReq;
 
     // Object Data
-    Array1D<NodeListDef> NodeLists; // Node Lists
+    EPVector<NodeListDef> NodeLists; // Node Lists
     namespace {
         bool CalcMoreNodeInfoMyOneTimeFlag(true); // one time flag
         Array1D_int GetOnlySingleNodeNodeNums;
@@ -609,7 +609,7 @@ namespace NodeInputManager {
         int NCount;     // Actual number of node lists
         bool flagError; // true when error node list name should be output
         Array1D_string cAlphas;
-        Array1D<Real64> rNumbers;
+        EPVector<Real64> rNumbers;
 
         bool localErrorsFound(false);
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NCount, NumAlphas, NumNumbers);

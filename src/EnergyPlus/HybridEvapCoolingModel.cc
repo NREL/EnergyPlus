@@ -414,7 +414,7 @@ namespace HybridEvapCoolingModel {
     }
     bool CMode::ValidateArrays(Array1D_string Alphas,
                                Array1D_string EP_UNUSED(cAlphaFields),
-                               Array1D<Real64> Numbers,
+                               EPVector<Real64> Numbers,
                                Array1D_string EP_UNUSED(cNumericFields),
                                std::string EP_UNUSED(cCurrentModuleObject))
     {
@@ -453,9 +453,9 @@ namespace HybridEvapCoolingModel {
 
     bool Model::ParseMode(Array1D_string Alphas,
                           Array1D_string cAlphaFields,
-                          Array1D<Real64> Numbers,
+                          EPVector<Real64> Numbers,
                           Array1D_string cNumericFields,
-                          Array1D<bool> lAlphaBlanks,
+                          EPVector<bool> lAlphaBlanks,
                           std::string cCurrentModuleObject)
     {
         CMode newMode;
@@ -513,9 +513,9 @@ namespace HybridEvapCoolingModel {
                           Real64 scaledCorrection,
                           Array1D_string Alphas,
                           Array1D_string cAlphaFields,
-                          Array1D<Real64> Numbers,
+                          EPVector<Real64> Numbers,
                           Array1D_string cNumericFields,
-                          Array1D<bool> lAlphaBlanks,
+                          EPVector<bool> lAlphaBlanks,
                           std::string cCurrentModuleObject)
     {
         // SUBROUTINE INFORMATION:

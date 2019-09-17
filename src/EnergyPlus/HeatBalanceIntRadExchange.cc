@@ -202,7 +202,7 @@ namespace HeatBalanceIntRadExchange {
 
         // variables added as part of strategy to reduce calculation time - Glazer 2011-04-22
         Real64 RecSurfTempInKTo4th; // Receiving surface temperature in K to 4th power
-        static Array1D<Real64> SendSurfaceTempInKto4thPrecalc;
+        static EPVector<Real64> SendSurfaceTempInKto4thPrecalc;
 
         // FLOW:
 
@@ -1370,7 +1370,7 @@ namespace HeatBalanceIntRadExchange {
 
         int i; // DO loop counters for surfaces in the zone
         int j;
-        Array1D<Real64> ZoneArea; // Sum of the area of all zone surfaces seen
+        EPVector<Real64> ZoneArea; // Sum of the area of all zone surfaces seen
 
         // FLOW:
         // Calculate the sum of the areas seen by all zone surfaces
@@ -1564,7 +1564,7 @@ namespace HeatBalanceIntRadExchange {
                 // Correct this by finding the largest row summation and dividing all of the elements in the F matrix by
                 // this max summation.  This will provide a cap on radiation so that no row has a sum greater than unity
                 // and will still maintain reciprocity.
-                Array1D<Real64> sumFixedF;
+                EPVector<Real64> sumFixedF;
                 Real64 MaxFixedFRowSum;
                 sumFixedF.allocate(N);
                 sumFixedF = 0.0;
@@ -1596,7 +1596,7 @@ namespace HeatBalanceIntRadExchange {
         } //  N <= 3 Case
 
         //  Regular fix cases
-        Array1D<Real64> RowCoefficient(N);
+        EPVector<Real64> RowCoefficient(N);
         Converged = false;
         while (!Converged) {
             ++NumIterations;
@@ -1743,7 +1743,7 @@ namespace HeatBalanceIntRadExchange {
         }
 
         // Load Cmatrix with (AF - EMISS/REFLECTANCE) matrix
-        Array1D<Real64> Excite(N); // Excitation vector = A*EMISS/REFLECTANCE
+        EPVector<Real64> Excite(N); // Excitation vector = A*EMISS/REFLECTANCE
         l = 0u;
         for (int i = 1; i <= N; ++i, l += N + 1) {
             Real64 EMISS_i(EMISS(i));

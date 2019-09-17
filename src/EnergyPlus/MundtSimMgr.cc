@@ -139,10 +139,10 @@ namespace MundtSimMgr {
     // Routines for actual calculations in Mundt model
 
     // Object Data
-    Array1D<DefineZoneData> ZoneData;            // zone data
+    EPVector<DefineZoneData> ZoneData;            // zone data
     Array2D<DefineLinearModelNode> LineNode;     // air nodes
     Array2D<DefineSurfaceSettings> MundtAirSurf; // surfaces
-    Array1D<DefineSurfaceSettings> FloorSurf;    // floor
+    EPVector<DefineSurfaceSettings> FloorSurf;    // floor
 
     // MODULE SUBROUTINES:
 

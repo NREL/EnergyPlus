@@ -162,7 +162,7 @@ namespace DataEnvironment {
     Real64 WaterMainsTemp;                    // Current water mains temperature
     int Year;                                 // Current calendar year of the simulation from the weather file
     int YearTomorrow;                         // Tomorrow's calendar year of the simulation
-    Array1D<Real64> SOLCOS(3);                // Solar direction cosines at current time step
+    EPVector<Real64> SOLCOS(3);                // Solar direction cosines at current time step
     Real64 CloudFraction;                     // Fraction of sky covered by clouds
     Real64 HISKF;                             // Exterior horizontal illuminance from sky (lux).
     Real64 HISUNF;                            // Exterior horizontal beam illuminance (lux)

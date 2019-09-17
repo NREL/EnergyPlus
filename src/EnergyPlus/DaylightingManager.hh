@@ -75,16 +75,16 @@ namespace DaylightingManager {
     // MODULE VARIABLE DECLARATIONS:
     extern int TotWindowsWithDayl;    // Total number of exterior windows in all daylit zones
     extern int OutputFileDFS;         // Unit number for daylight factors
-    extern Array1D<Real64> DaylIllum; // Daylight illuminance at reference points (lux)
+    extern EPVector<Real64> DaylIllum; // Daylight illuminance at reference points (lux)
     extern int maxNumRefPtInAnyZone;  // The most number of reference points that any single zone has
     extern Real64 PHSUN;              // Solar altitude (radians)
     extern Real64 SPHSUN;             // Sine of solar altitude
     extern Real64 CPHSUN;             // Cosine of solar altitude
     extern Real64 THSUN;              // Solar azimuth (rad) in Absolute Coordinate System (azimuth=0 along east)
-    extern Array1D<Real64> PHSUNHR;   // Hourly values of PHSUN
-    extern Array1D<Real64> SPHSUNHR;  // Hourly values of the sine of PHSUN
-    extern Array1D<Real64> CPHSUNHR;  // Hourly values of the cosine of PHSUN
-    extern Array1D<Real64> THSUNHR;   // Hourly values of THSUN
+    extern EPVector<Real64> PHSUNHR;   // Hourly values of PHSUN
+    extern EPVector<Real64> SPHSUNHR;  // Hourly values of the sine of PHSUN
+    extern EPVector<Real64> CPHSUNHR;  // Hourly values of the cosine of PHSUN
+    extern EPVector<Real64> THSUNHR;   // Hourly values of THSUN
 
     // In the following I,J,K arrays:
     // I = 1 for clear sky, 2 for clear turbid, 3 for intermediate, 4 for overcast;
@@ -100,7 +100,7 @@ namespace DaylightingManager {
     extern Array2D<Real64> WLUMSUdisk; // Sun-related window luminance, due to view of solar disk
 
     extern Array2D<Real64> GILSK; // Horizontal illuminance from sky, by sky type, for each hour of the day
-    extern Array1D<Real64> GILSU; // Horizontal illuminance from sun for each hour of the day
+    extern EPVector<Real64> GILSU; // Horizontal illuminance from sun for each hour of the day
 
     extern Array3D<Real64> EDIRSK;     // Sky-related component of direct illuminance
     extern Array2D<Real64> EDIRSU;     // Sun-related component of direct illuminance (excluding beam solar at ref pt)

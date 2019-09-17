@@ -161,15 +161,15 @@ namespace HeatBalanceHAMTManager {
     Array1D_int Intcell;
     Array1D_int IntConcell;
 
-    Array1D<Real64> watertot;
-    Array1D<Real64> surfrh;
-    Array1D<Real64> surfextrh;
-    Array1D<Real64> surftemp;
-    Array1D<Real64> surfexttemp;
-    Array1D<Real64> surfvp;
+    EPVector<Real64> watertot;
+    EPVector<Real64> surfrh;
+    EPVector<Real64> surfextrh;
+    EPVector<Real64> surftemp;
+    EPVector<Real64> surfexttemp;
+    EPVector<Real64> surfvp;
 
-    Array1D<Real64> extvtc;   // External Surface vapor transfer coefficient
-    Array1D<Real64> intvtc;   // Internal Surface Vapor Transfer Coefficient
+    EPVector<Real64> extvtc;   // External Surface vapor transfer coefficient
+    EPVector<Real64> intvtc;   // Internal Surface Vapor Transfer Coefficient
     Array1D_bool extvtcflag;  // External Surface vapor transfer coefficient flag
     Array1D_bool intvtcflag;  // Internal Surface Vapor Transfer Coefficient flag
     Array1D_bool MyEnvrnFlag; // Flag to reset surface properties.
@@ -184,7 +184,7 @@ namespace HeatBalanceHAMTManager {
     // SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceHAMTManager:
 
     // Object Data
-    Array1D<subcell> cells;
+    EPVector<subcell> cells;
 
     // Functions
 
@@ -265,7 +265,7 @@ namespace HeatBalanceHAMTManager {
         Array1D_bool lAlphaBlanks;
         Array1D_bool lNumericBlanks;
 
-        Array1D<Real64> NumArray;
+        EPVector<Real64> NumArray;
 
         Real64 dumrh;
         Real64 dumdata;

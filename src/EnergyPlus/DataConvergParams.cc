@@ -111,7 +111,7 @@ namespace DataConvergParams {
     // plant pumps can be shut down
 
     int const ConvergLogStackDepth(10);
-    Array1D<Real64> const ConvergLogStackARR(ConvergLogStackDepth, {0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0, -9.0});
+    EPVector<Real64> const ConvergLogStackARR(ConvergLogStackDepth, {0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0, -9.0});
     Real64 const sum_ConvergLogStackARR(sum(ConvergLogStackARR));
     Real64 const square_sum_ConvergLogStackARR(pow_2(sum_ConvergLogStackARR));
     Real64 const sum_square_ConvergLogStackARR(sum(pow(ConvergLogStackARR, 2)));
@@ -137,9 +137,9 @@ namespace DataConvergParams {
     int MinPlantSubIterations(2); // Iteration Min for Plant Simulation sub iterations
 
     // Object Data
-    Array1D<HVACZoneInletConvergenceStruct> ZoneInletConvergence;
-    Array1D<HVACAirLoopIterationConvergenceStruct> AirLoopConvergence;
-    Array1D<PlantIterationConvergenceStruct> PlantConvergence;
+    EPVector<HVACZoneInletConvergenceStruct> ZoneInletConvergence;
+    EPVector<HVACAirLoopIterationConvergenceStruct> AirLoopConvergence;
+    EPVector<PlantIterationConvergenceStruct> PlantConvergence;
 
     void clear_state()
     {

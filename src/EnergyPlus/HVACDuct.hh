@@ -91,7 +91,7 @@ namespace HVACDuct {
     };
 
     // Object Data
-    extern Array1D<DuctData> Duct;
+    extern EPVector<DuctData> Duct;
 
     // Functions
 

@@ -329,9 +329,9 @@ namespace PlantCentralGSHP {
         Real64 WrapperCoolingLoad;        // Cooling demand for the central heat pump system
         Real64 WrapperHeatingLoad;        // Heating demand for the central heat pump system
         Real64 AncilliaryPower;           // Wrapper Ancilliary Power
-        Array1D<WrapperComponentSpecs> WrapperComp;
-        Array1D<ChillerHeaterSpecs> ChillerHeater; // Dimension to number of machines
-        Array1D<CHReportVars> ChillerHeaterReport; // Dimension to number of machines
+        EPVector<WrapperComponentSpecs> WrapperComp;
+        EPVector<ChillerHeaterSpecs> ChillerHeater; // Dimension to number of machines
+        EPVector<CHReportVars> ChillerHeaterReport; // Dimension to number of machines
         bool CoolSetPointErrDone;                  // true if setpoint warning issued
         bool HeatSetPointErrDone;                  // true if setpoint warning issued
         bool CoolSetPointSetToLoop;                // True if the setpoint is missing at the outlet node
@@ -420,10 +420,10 @@ namespace PlantCentralGSHP {
     };
 
     // Object Data
-    extern Array1D<WrapperSpecs> Wrapper;
-    extern Array1D<ChillerHeaterSpecs> ChillerHeater;
-    extern Array1D<CHReportVars> ChillerHeaterReport;
-    extern Array1D<WrapperReportVars> WrapperReport;
+    extern EPVector<WrapperSpecs> Wrapper;
+    extern EPVector<ChillerHeaterSpecs> ChillerHeater;
+    extern EPVector<CHReportVars> ChillerHeaterReport;
+    extern EPVector<WrapperReportVars> WrapperReport;
 
     // Functions
 

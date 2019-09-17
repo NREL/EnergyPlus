@@ -175,8 +175,8 @@ namespace UnitVentilator {
     // PRIVATE UpdateUnitVentilator
 
     // Object Data
-    Array1D<UnitVentilatorData> UnitVent;
-    Array1D<UnitVentNumericFieldData> UnitVentNumericFields;
+    EPVector<UnitVentilatorData> UnitVent;
+    EPVector<UnitVentNumericFieldData> UnitVentNumericFields;
 
     // Functions
 
@@ -334,7 +334,7 @@ namespace UnitVentilator {
         Real64 FanVolFlow;              // volumetric flow rate of fan
         std::string CurrentModuleObject;
         Array1D_string Alphas;         // Alpha items for object
-        Array1D<Real64> Numbers;       // Numeric items for object
+        EPVector<Real64> Numbers;       // Numeric items for object
         Array1D_string cAlphaFields;   // Alpha field names
         Array1D_string cNumericFields; // Numeric field names
         Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
@@ -2583,7 +2583,7 @@ namespace UnitVentilator {
         Real64 SpecHumOut;   // Specific humidity ratio of outlet air (kg moisture / kg moist air)
         Real64 SpecHumIn;    // Specific humidity ratio of inlet air (kg moisture / kg moist air)
         Real64 mdot;
-        Array1D<Real64> Par(3); // parameters passed to RegulaFalsi function
+        EPVector<Real64> Par(3); // parameters passed to RegulaFalsi function
         int OpMode;             // operatin gmode of the fan
         Real64 PartLoadFrac;    // part load ratio of the unit ventilator
         Real64 NoOutput;        // no load output of the unit ventilator

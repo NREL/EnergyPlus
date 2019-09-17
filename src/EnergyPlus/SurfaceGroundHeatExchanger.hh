@@ -124,9 +124,9 @@ namespace SurfaceGroundHeatExchanger {
     extern bool GetInputFlag;
 
     // time keeping variables used for keeping track of average flux over each time step
-    extern Array1D<Real64> QRadSysSrcAvg;      // Average source over the time step
-    extern Array1D<Real64> LastSysTimeElapsed; // record of system time
-    extern Array1D<Real64> LastTimeStepSys;    // previous time step size
+    extern EPVector<Real64> QRadSysSrcAvg;      // Average source over the time step
+    extern EPVector<Real64> LastSysTimeElapsed; // record of system time
+    extern EPVector<Real64> LastTimeStepSys;    // previous time step size
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE PlantSurfaceGroundHeatExchangers
 
@@ -181,23 +181,23 @@ namespace SurfaceGroundHeatExchanger {
         // conventional CTF terms
         int NumCTFTerms; // number of terms for surface
         // could be allocated rather than hard dimensioning.
-        Array1D<Real64> CTFin;    // surf flux in ctf - X
-        Array1D<Real64> CTFout;   // surf flux in ctf - Z
-        Array1D<Real64> CTFcross; // surf flux in ctf - Y
-        Array1D<Real64> CTFflux;  // surf flux in ctf - F
+        EPVector<Real64> CTFin;    // surf flux in ctf - X
+        EPVector<Real64> CTFout;   // surf flux in ctf - Z
+        EPVector<Real64> CTFcross; // surf flux in ctf - Y
+        EPVector<Real64> CTFflux;  // surf flux in ctf - F
         // QTF coefficients
-        Array1D<Real64> CTFSourceIn;   // surf flux in ctf - Wi
-        Array1D<Real64> CTFSourceOut;  // surf flux out ctf - Wo
-        Array1D<Real64> CTFTSourceOut; // surf flux in qtf - x
-        Array1D<Real64> CTFTSourceIn;  // surf flux in qtf - y
-        Array1D<Real64> CTFTSourceQ;   // surf flux in qtf - f
+        EPVector<Real64> CTFSourceIn;   // surf flux in ctf - Wi
+        EPVector<Real64> CTFSourceOut;  // surf flux out ctf - Wo
+        EPVector<Real64> CTFTSourceOut; // surf flux in qtf - x
+        EPVector<Real64> CTFTSourceIn;  // surf flux in qtf - y
+        EPVector<Real64> CTFTSourceQ;   // surf flux in qtf - f
         // History data
-        Array1D<Real64> TbtmHistory;
-        Array1D<Real64> TtopHistory;
-        Array1D<Real64> TsrcHistory;
-        Array1D<Real64> QbtmHistory;
-        Array1D<Real64> QtopHistory;
-        Array1D<Real64> QsrcHistory;
+        EPVector<Real64> TbtmHistory;
+        EPVector<Real64> TtopHistory;
+        EPVector<Real64> TsrcHistory;
+        EPVector<Real64> QbtmHistory;
+        EPVector<Real64> QtopHistory;
+        EPVector<Real64> QsrcHistory;
         Real64 QSrc;
         Real64 QSrcAvg;
         Real64 LastQSrc;
@@ -326,7 +326,7 @@ namespace SurfaceGroundHeatExchanger {
     };
 
     // Object Data
-    extern Array1D<SurfaceGroundHeatExchangerData> SurfaceGHE;
+    extern EPVector<SurfaceGroundHeatExchangerData> SurfaceGHE;
 
     void GetSurfaceGroundHeatExchanger();
 

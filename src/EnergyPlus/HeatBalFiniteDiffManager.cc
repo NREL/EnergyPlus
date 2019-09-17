@@ -169,11 +169,11 @@ namespace HeatBalFiniteDiffManager {
     Real64 const RhovInitValue(0.0115); // Initialization value for Rhov
     Real64 const EnthInitValue(100.0);  // Initialization value for Enthalpy
 
-    Array1D<Real64> SigmaR; // Total Resistance of construction layers
-    Array1D<Real64> SigmaC; // Total Capacitance of construction layers
+    EPVector<Real64> SigmaR; // Total Resistance of construction layers
+    EPVector<Real64> SigmaC; // Total Capacitance of construction layers
 
-    Array1D<Real64> QHeatInFlux;  // HeatFlux on Surface for reporting
-    Array1D<Real64> QHeatOutFlux; // HeatFlux on Surface for reporting
+    EPVector<Real64> QHeatInFlux;  // HeatFlux on Surface for reporting
+    EPVector<Real64> QHeatOutFlux; // HeatFlux on Surface for reporting
 
     int CondFDSchemeType(FullyImplicitFirstOrder); // solution scheme for CondFD - default
     Real64 SpaceDescritConstant(3.0);              // spatial descritization constant,
@@ -185,9 +185,9 @@ namespace HeatBalFiniteDiffManager {
     int WarmupSurfTemp(0);
 
     // Object Data
-    Array1D<ConstructionDataFD> ConstructFD;
-    Array1D<SurfaceDataFD> SurfaceFD;
-    Array1D<MaterialDataFD> MaterialFD;
+    EPVector<ConstructionDataFD> ConstructFD;
+    EPVector<SurfaceDataFD> SurfaceFD;
+    EPVector<MaterialDataFD> MaterialFD;
 
     void clear_state()
     {
@@ -261,7 +261,7 @@ namespace HeatBalFiniteDiffManager {
         int MaterNum;                       // Counter to keep track of the material number
         int MaterialNumAlpha;               // Number of material alpha names being passed
         int MaterialNumProp;                // Number of material properties being passed
-        Array1D<Real64> MaterialProps(40);  // Temporary array to transfer material properties
+        EPVector<Real64> MaterialProps(40);  // Temporary array to transfer material properties
         static bool ErrorsFound(false);     // If errors detected in input
         //  INTEGER :: CondFDMat                ! Number of variable property CondFD materials in input
         int Loop;

@@ -267,7 +267,7 @@ namespace InternalHeatGains {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string AlphaName;
-        Array1D<Real64> IHGNumbers;
+        EPVector<Real64> IHGNumbers;
         int IOStat;
         int Loop;
         bool MustInpSch;
@@ -5659,7 +5659,7 @@ namespace InternalHeatGains {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D<Real64> const C(
+        static EPVector<Real64> const C(
             9, {6.4611027, 0.946892, 0.0000255737, 7.139322, -0.0627909, 0.0000589271, -0.198550, 0.000940018, -0.00000149532});
         static ZoneCatEUseData const zeroZoneCatEUse; // For initialization
 
@@ -6140,12 +6140,12 @@ namespace InternalHeatGains {
         // SUBROUTINE PARAMETER DEFINITIONS:
         // Operating Limits for environmental class: None, A1, A2, A3, A4, B, C
         // From ASHRAE 2011 Thermal Guidelines environmental classes for Air-Cooled ITE
-        static Array1D<Real64> const DBMin(7, {-99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0});           // Minimum dry-bulb temperature [C]
-        static Array1D<Real64> const DBMax(7, {99.0, 32.0, 35.0, 40.0, 45.0, 35.0, 40.0});        // Maximum dry-bulb temperature [C]
-        static Array1D<Real64> const DPMax(7, {99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0});        // Maximum dewpoint temperature [C]
-        static Array1D<Real64> const DPMin(7, {-99.0, -99.0, -99.0, -12.0, -12.0, -99.0, -99.0}); // Minimum dewpoint temperature [C]
-        static Array1D<Real64> const RHMin(7, {0.0, 20.0, 20.0, 8.0, 8.0, 8.0, 8.0});             // Minimum relative humidity [%]
-        static Array1D<Real64> const RHMax(7, {99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0});        // Minimum relative humidity [%]
+        static EPVector<Real64> const DBMin(7, {-99.0, 15.0, 10.0, 5.0, 5.0, 5.0, 5.0});           // Minimum dry-bulb temperature [C]
+        static EPVector<Real64> const DBMax(7, {99.0, 32.0, 35.0, 40.0, 45.0, 35.0, 40.0});        // Maximum dry-bulb temperature [C]
+        static EPVector<Real64> const DPMax(7, {99.0, 17.0, 21.0, 24.0, 24.0, 28.0, 28.0});        // Maximum dewpoint temperature [C]
+        static EPVector<Real64> const DPMin(7, {-99.0, -99.0, -99.0, -12.0, -12.0, -99.0, -99.0}); // Minimum dewpoint temperature [C]
+        static EPVector<Real64> const RHMin(7, {0.0, 20.0, 20.0, 8.0, 8.0, 8.0, 8.0});             // Minimum relative humidity [%]
+        static EPVector<Real64> const RHMax(7, {99.0, 80.0, 80.0, 85.0, 90.0, 80.0, 80.0});        // Minimum relative humidity [%]
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -6183,8 +6183,8 @@ namespace InternalHeatGains {
         Real64 UPSPartLoadRatio;                          // UPS part load ratio (current total power input / design total power input)
         Real64 UPSHeatGain;                               // UPS convective heat gain to zone [W]
         int EnvClass;                                     // Index for environmental class (None=0, A1=1, A2=2, A3=3, A4=4, B=5, C=6)
-        Array1D<Real64> ZoneSumTinMinusTSup(NumOfZones);  // Numerator for zone-level sensible heat index (SHI)
-        Array1D<Real64> ZoneSumToutMinusTSup(NumOfZones); // Denominator for zone-level sensible heat index (SHI)
+        EPVector<Real64> ZoneSumTinMinusTSup(NumOfZones);  // Numerator for zone-level sensible heat index (SHI)
+        EPVector<Real64> ZoneSumToutMinusTSup(NumOfZones); // Denominator for zone-level sensible heat index (SHI)
 
         std::map<int, std::vector<int>> ZoneITEMap;
 

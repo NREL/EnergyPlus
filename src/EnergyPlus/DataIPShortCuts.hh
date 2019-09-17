@@ -77,7 +77,7 @@ namespace DataIPShortCuts {
     extern Array1D_bool lNumericFieldBlanks;
     extern Array1D_bool lAlphaFieldBlanks;
     extern Array1D_string cAlphaArgs;
-    extern Array1D<Real64> rNumericArgs;
+    extern EPVector<Real64> rNumericArgs;
     extern std::string cCurrentModuleObject;
 
     // Clears the global data in DataIPShortCuts.

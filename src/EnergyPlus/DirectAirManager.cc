@@ -136,7 +136,7 @@ namespace DirectAirManager {
     // SUBROUTINE SPECIFICATIONS FOR MODULE AirLoopSplitter
 
     // Object Data
-    Array1D<DirectAirProps> DirectAir;
+    EPVector<DirectAirProps> DirectAir;
 
     void clear_state()
     {

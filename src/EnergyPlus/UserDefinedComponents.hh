@@ -195,7 +195,7 @@ namespace UserDefinedComponents {
         std::string Name;                    // user identifier
         int ErlSimProgramMngr;               // EMS:ProgramManager to always run when this model is called
         int NumPlantConnections;             // count of how many plant loop connections there are
-        Array1D<PlantConnectionStruct> Loop; // collect data for each plant loop connection
+        EPVector<PlantConnectionStruct> Loop; // collect data for each plant loop connection
         AirConnectionStruct Air;
         WaterUseTankConnectionStruct Water;
         ZoneInternalGainsStruct Zone;
@@ -214,7 +214,7 @@ namespace UserDefinedComponents {
         int ErlInitProgramMngr; // EMS:ProgramManager to  run when this model is initialized and setup
         int NumAirConnections;  // count of how many air connectiosn there are
         bool PlantIsConnected;
-        Array1D<AirConnectionStruct> Air;
+        EPVector<AirConnectionStruct> Air;
         PlantConnectionStruct Loop;
         WaterUseTankConnectionStruct Water;
         ZoneInternalGainsStruct Zone;
@@ -234,7 +234,7 @@ namespace UserDefinedComponents {
         AirConnectionStruct ZoneAir;
         AirConnectionStruct SourceAir;
         int NumPlantConnections;             // count of how many plant loop (demand) connections there are
-        Array1D<PlantConnectionStruct> Loop; // collect data for each plant loop connection
+        EPVector<PlantConnectionStruct> Loop; // collect data for each plant loop connection
         WaterUseTankConnectionStruct Water;
         ZoneInternalGainsStruct Zone;         // for skin losses
         Real64 RemainingOutputToHeatingSP;    // sensible load remaining for device, to heating setpoint [W]
@@ -261,7 +261,7 @@ namespace UserDefinedComponents {
         AirConnectionStruct AirLoop;
         AirConnectionStruct SourceAir;
         int NumPlantConnections;             // count of how many plant loop (demand) connections there are
-        Array1D<PlantConnectionStruct> Loop; // collect data for each plant loop connection
+        EPVector<PlantConnectionStruct> Loop; // collect data for each plant loop connection
         WaterUseTankConnectionStruct Water;
         ZoneInternalGainsStruct Zone;         // for skin losses
         Real64 RemainingOutputToHeatingSP;    // sensible load remaining for device, to heating setpoint [W]
@@ -278,10 +278,10 @@ namespace UserDefinedComponents {
     };
 
     // Object Data
-    extern Array1D<UserPlantComponentStruct> UserPlantComp;
-    extern Array1D<UserCoilComponentStruct> UserCoil;
-    extern Array1D<UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
-    extern Array1D<UserAirTerminalComponentStruct> UserAirTerminal;
+    extern EPVector<UserPlantComponentStruct> UserPlantComp;
+    extern EPVector<UserCoilComponentStruct> UserCoil;
+    extern EPVector<UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
+    extern EPVector<UserAirTerminalComponentStruct> UserAirTerminal;
 
     // Functions
 

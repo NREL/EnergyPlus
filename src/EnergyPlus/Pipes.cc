@@ -113,7 +113,7 @@ namespace Pipes {
     // SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
 
     // Object Data
-    Array1D<LocalPipeData> LocalPipe; // dimension to number of pipes
+    EPVector<LocalPipeData> LocalPipe; // dimension to number of pipes
     std::unordered_map<std::string, std::string> LocalPipeUniqueNames;
 
     // Functions

@@ -158,15 +158,15 @@ namespace EconomicLifeCycleCost {
     extern int numResourcesUsed;
 
     // present value factors
-    extern Array1D<Real64> SPV;
+    extern EPVector<Real64> SPV;
     extern Array2D<Real64> energySPV; // yearly equivalent to FEMP UPV* values
 
     // arrays related to computing after tax cashflow and present value
-    extern Array1D<Real64> DepreciatedCapital;
-    extern Array1D<Real64> TaxableIncome;
-    extern Array1D<Real64> Taxes;
-    extern Array1D<Real64> AfterTaxCashFlow;
-    extern Array1D<Real64> AfterTaxPresentValue;
+    extern EPVector<Real64> DepreciatedCapital;
+    extern EPVector<Real64> TaxableIncome;
+    extern EPVector<Real64> Taxes;
+    extern EPVector<Real64> AfterTaxCashFlow;
+    extern EPVector<Real64> AfterTaxPresentValue;
 
     extern Array1D_string const MonthNames;
 
@@ -224,7 +224,7 @@ namespace EconomicLifeCycleCost {
         int resource;               // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
         int escalationStartYear;    // Escalation Start Year 1900-2100
         int escalationStartMonth;   // Escalation Start Month 1 to 12
-        Array1D<Real64> Escalation; // Escalation by year, first year is baseDateYear
+        EPVector<Real64> Escalation; // Escalation by year, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
@@ -238,7 +238,7 @@ namespace EconomicLifeCycleCost {
         // Members
         std::string name;           // Name
         int resource;               // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
-        Array1D<Real64> Adjustment; // Adjustment by year, first year is baseDateYear
+        EPVector<Real64> Adjustment; // Adjustment by year, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
@@ -254,13 +254,13 @@ namespace EconomicLifeCycleCost {
         int SourceKind;           // 1=recurring, 2=nonrecurring, 3=resource
         int Resource;             // resource like electricity or natural gas (uses definitions from DataGlobalConstants)
         int Category;             // uses "costCat" constants above
-        Array1D<Real64> mnAmount; // cashflow dollar amount by month, first year is baseDateYear
+        EPVector<Real64> mnAmount; // cashflow dollar amount by month, first year is baseDateYear
         // last year is baseDateYear + lengthStudyYears - 1
-        Array1D<Real64> yrAmount;  // cashflow dollar amount by year, first year is baseDateYear
+        EPVector<Real64> yrAmount;  // cashflow dollar amount by year, first year is baseDateYear
         int pvKind;                // kind of present value 1=energy, 2=non-energy,3=not computed but summed
         Real64 presentValue;       // total present value for cashflow
         Real64 orginalCost;        // original cost from recurring, non-recurring or energy cost
-        Array1D<Real64> yrPresVal; // present value by year, first year is baseDateYear
+        EPVector<Real64> yrPresVal; // present value by year, first year is baseDateYear
 
         // Default Constructor
         CashFlowType() : pvKind(0)
@@ -269,11 +269,11 @@ namespace EconomicLifeCycleCost {
     };
 
     // Object Data
-    extern Array1D<RecurringCostsType> RecurringCosts;
-    extern Array1D<NonrecurringCostType> NonrecurringCost;
-    extern Array1D<UsePriceEscalationType> UsePriceEscalation;
-    extern Array1D<UseAdjustmentType> UseAdjustment;
-    extern Array1D<CashFlowType> CashFlow;
+    extern EPVector<RecurringCostsType> RecurringCosts;
+    extern EPVector<NonrecurringCostType> NonrecurringCost;
+    extern EPVector<UsePriceEscalationType> UsePriceEscalation;
+    extern EPVector<UseAdjustmentType> UseAdjustment;
+    extern EPVector<CashFlowType> CashFlow;
 
     // Functions
 

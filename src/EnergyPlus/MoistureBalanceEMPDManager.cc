@@ -125,7 +125,7 @@ namespace MoistureBalanceEMPDManager {
 
     // Data
     // MODULE VARIABLE and Function DECLARATIONs
-    Array1D<EMPDReportVarsData> EMPDReportVars; // Array of structs that hold the empd report vars data, one for each surface.
+    EPVector<EMPDReportVarsData> EMPDReportVars; // Array of structs that hold the empd report vars data, one for each surface.
     bool InitEnvrnFlag(true);
 
     // SUBROUTINE SPECIFICATION FOR MODULE MoistureBalanceEMPDManager
@@ -191,7 +191,7 @@ namespace MoistureBalanceEMPDManager {
         int MaterNum;                     // Counter to keep track of the material number
         int MaterialNumAlpha;             // Number of material alpha names being passed
         int MaterialNumProp;              // Number of material properties being passed
-        Array1D<Real64> MaterialProps(9); // Temporary array to transfer material properties
+        EPVector<Real64> MaterialProps(9); // Temporary array to transfer material properties
         static bool ErrorsFound(false);   // If errors detected in input
 
         int EMPDMat; // EMPD Moisture Material additional properties for each base material

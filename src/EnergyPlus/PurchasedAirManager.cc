@@ -182,10 +182,10 @@ namespace PurchasedAirManager {
     // SUBROUTINE SPECIFICATIONS FOR MODULE PurchasedAir:
 
     // Object Data
-    Array1D<ZonePurchasedAir> PurchAir;                        // Used to specify purchased air parameters
-    Array1D<PurchAirNumericFieldData> PurchAirNumericFields;   // Used to save the indices of scalable sizing object for zone HVAC
-    Array1D<PurchAirPlenumArrayData> PurchAirPlenumArrays;     // Used to save the indices of scalable sizing object for zone HVAC
-    Array1D<PurchAirPlenumArrayData> TempPurchAirPlenumArrays; // Used to save the indices of scalable sizing object for zone HVAC
+    EPVector<ZonePurchasedAir> PurchAir;                        // Used to specify purchased air parameters
+    EPVector<PurchAirNumericFieldData> PurchAirNumericFields;   // Used to save the indices of scalable sizing object for zone HVAC
+    EPVector<PurchAirPlenumArrayData> PurchAirPlenumArrays;     // Used to save the indices of scalable sizing object for zone HVAC
+    EPVector<PurchAirPlenumArrayData> TempPurchAirPlenumArrays; // Used to save the indices of scalable sizing object for zone HVAC
 
     // Functions
 

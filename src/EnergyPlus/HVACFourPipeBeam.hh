@@ -216,7 +216,7 @@ namespace FourPipeBeam {
     }; // HVACFourPipeBeam
 
     ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
-    extern Array1D<std::shared_ptr<HVACFourPipeBeam>> FourPipeBeams; // dimension to number of machines
+    extern EPVector<std::shared_ptr<HVACFourPipeBeam>> FourPipeBeams; // dimension to number of machines
 
 } // namespace FourPipeBeam
 

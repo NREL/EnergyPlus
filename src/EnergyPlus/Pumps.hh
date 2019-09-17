@@ -185,7 +185,7 @@ namespace Pumps {
         Real64 FracMotorLossToFluid;                 // ?????
         Real64 Energy;                               // Energy consumed
         Real64 Power;                                // Power used
-        Array1D<Real64> PartLoadCoef;                // Pump Curve Coefficients
+        EPVector<Real64> PartLoadCoef;                // Pump Curve Coefficients
         int PressureCurve_Index;                     // Pointer to a pump coefficient curve
         Real64 PumpMassFlowRateMaxRPM;               // Mass flow rate calculated from maximum rpm
         Real64 PumpMassFlowRateMinRPM;               // Mass flow rate calculated from minimum rpm
@@ -246,8 +246,8 @@ namespace Pumps {
     };
 
     // Object Data
-    extern Array1D<PumpSpecs> PumpEquip;
-    extern Array1D<ReportVars> PumpEquipReport;
+    extern EPVector<PumpSpecs> PumpEquip;
+    extern EPVector<ReportVars> PumpEquipReport;
 
     // Functions
     void clear_state();

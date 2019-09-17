@@ -74,10 +74,10 @@ namespace HeatBalFiniteDiffManager {
     extern Real64 const EnthInitValue; // Initialization value for Enthalpy
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Array1D<Real64> SigmaR;       // Total Resistance of construction layers
-    extern Array1D<Real64> SigmaC;       // Total Capacitance of construction layers
-    extern Array1D<Real64> QHeatInFlux;  // HeatFlux on Surface for reporting
-    extern Array1D<Real64> QHeatOutFlux; // HeatFlux on Surface for reporting
+    extern EPVector<Real64> SigmaR;       // Total Resistance of construction layers
+    extern EPVector<Real64> SigmaC;       // Total Capacitance of construction layers
+    extern EPVector<Real64> QHeatInFlux;  // HeatFlux on Surface for reporting
+    extern EPVector<Real64> QHeatOutFlux; // HeatFlux on Surface for reporting
     extern int CondFDSchemeType;         // solution scheme for CondFD - default
     extern Real64 SpaceDescritConstant;  // spatial descritization constant,
     extern Real64 MinTempLimit;          // lower limit check, degree C
@@ -91,12 +91,12 @@ namespace HeatBalFiniteDiffManager {
     {
         // Members
         Array1D_string Name; // Name of construction
-        Array1D<Real64> DelX;
-        Array1D<Real64> TempStability;
-        Array1D<Real64> MoistStability;
+        EPVector<Real64> DelX;
+        EPVector<Real64> TempStability;
+        EPVector<Real64> MoistStability;
         Array1D_int NodeNumPoint;
-        Array1D<Real64> Thickness;
-        Array1D<Real64> NodeXlocation; // sized to TotNode, contains X distance in m from outside face
+        EPVector<Real64> Thickness;
+        EPVector<Real64> NodeXlocation; // sized to TotNode, contains X distance in m from outside face
         int TotNodes;
         int DeltaTime;
 
@@ -109,26 +109,26 @@ namespace HeatBalFiniteDiffManager {
     struct SurfaceDataFD
     {
         // Members
-        Array1D<Real64> T;
-        Array1D<Real64> TOld;
-        Array1D<Real64> TT;
-        Array1D<Real64> Rhov;
-        Array1D<Real64> RhovOld;
-        Array1D<Real64> RhoT;
-        Array1D<Real64> TD;
-        Array1D<Real64> TDT;
-        Array1D<Real64> TDTLast;
-        Array1D<Real64> TDOld;
-        Array1D<Real64> TDreport; // Node temperatures for reporting [C]
-        Array1D<Real64> RH;
-        Array1D<Real64> RHreport;
-        Array1D<Real64> EnthOld; // Current node enthalpy
-        Array1D<Real64> EnthNew; // Node enthalpy at new time
-        Array1D<Real64> EnthLast;
-        Array1D<Real64> QDreport;        // Node heat flux for reporting [W/m2] postive is flow towards inside face of surface
-        Array1D<Real64> CpDelXRhoS1;     // Current outer half-node Cp * DelX * RhoS / Delt
-        Array1D<Real64> CpDelXRhoS2;     // Current inner half-node Cp * DelX * RhoS / Delt
-        Array1D<Real64> TDpriortimestep; // Node temperatures from previous timestep
+        EPVector<Real64> T;
+        EPVector<Real64> TOld;
+        EPVector<Real64> TT;
+        EPVector<Real64> Rhov;
+        EPVector<Real64> RhovOld;
+        EPVector<Real64> RhoT;
+        EPVector<Real64> TD;
+        EPVector<Real64> TDT;
+        EPVector<Real64> TDTLast;
+        EPVector<Real64> TDOld;
+        EPVector<Real64> TDreport; // Node temperatures for reporting [C]
+        EPVector<Real64> RH;
+        EPVector<Real64> RHreport;
+        EPVector<Real64> EnthOld; // Current node enthalpy
+        EPVector<Real64> EnthNew; // Node enthalpy at new time
+        EPVector<Real64> EnthLast;
+        EPVector<Real64> QDreport;        // Node heat flux for reporting [W/m2] postive is flow towards inside face of surface
+        EPVector<Real64> CpDelXRhoS1;     // Current outer half-node Cp * DelX * RhoS / Delt
+        EPVector<Real64> CpDelXRhoS2;     // Current inner half-node Cp * DelX * RhoS / Delt
+        EPVector<Real64> TDpriortimestep; // Node temperatures from previous timestep
         int SourceNodeNum;               // Node number for internal source layer (zero if no source)
         Real64 QSource;                  // Internal source flux [W/m2]
         int GSloopCounter;               // count of inner loop iterations
@@ -136,10 +136,10 @@ namespace HeatBalFiniteDiffManager {
         Real64 MaxNodeDelTemp;           // largest change in node temps after calc
         Real64 EnthalpyM;                // Melting enthalpy at a particular temperature
         Real64 EnthalpyF;                // Freezing enthalpy at a particular temperature
-        Array1D<int> PhaseChangeState;
-        Array1D<int> PhaseChangeStateOld;
-        Array1D<int> PhaseChangeStateOldOld;
-        Array1D<Real64> PhaseChangeTemperatureReverse;
+        EPVector<int> PhaseChangeState;
+        EPVector<int> PhaseChangeStateOld;
+        EPVector<int> PhaseChangeStateOldOld;
+        EPVector<Real64> PhaseChangeTemperatureReverse;
 
         // Default Constructor
         SurfaceDataFD()
@@ -179,9 +179,9 @@ namespace HeatBalFiniteDiffManager {
 
     // Object Data
 
-    extern Array1D<ConstructionDataFD> ConstructFD;
-    extern Array1D<SurfaceDataFD> SurfaceFD;
-    extern Array1D<MaterialDataFD> MaterialFD;
+    extern EPVector<ConstructionDataFD> ConstructFD;
+    extern EPVector<SurfaceDataFD> SurfaceFD;
+    extern EPVector<MaterialDataFD> MaterialFD;
 
     // Functions
 

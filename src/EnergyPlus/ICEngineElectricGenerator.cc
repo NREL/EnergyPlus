@@ -109,8 +109,8 @@ namespace ICEngineElectricGenerator {
     Array1D_bool CheckEquipName;
 
     // Object Data
-    Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
-    Array1D<ReportVars> ICEngineGeneratorReport;
+    EPVector<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
+    EPVector<ReportVars> ICEngineGeneratorReport;
 
     void SimICEngineGenerator(int const EP_UNUSED(GeneratorType), // type of Generator
                               std::string const &GeneratorName,   // user specified name of Generator
@@ -301,7 +301,7 @@ namespace ICEngineElectricGenerator {
         int NumNums;                    // Number of elements in the numeric array
         int IOStat;                     // IO Status when calling get input subroutine
         Array1D_string AlphArray(10);   // character string data
-        Array1D<Real64> NumArray(11);   // numeric data
+        EPVector<Real64> NumArray(11);   // numeric data
         static bool ErrorsFound(false); // error flag
         Real64 xValue;                  // test curve limits
 

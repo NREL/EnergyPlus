@@ -162,8 +162,8 @@ namespace UnitHeater {
     // SUBROUTINE SPECIFICATIONS FOR MODULE UnitHeater
 
     // Object Data
-    Array1D<UnitHeaterData> UnitHeat;
-    Array1D<UnitHeatNumericFieldData> UnitHeatNumericFields;
+    EPVector<UnitHeaterData> UnitHeat;
+    EPVector<UnitHeatNumericFieldData> UnitHeatNumericFields;
 
     // Functions
 
@@ -308,7 +308,7 @@ namespace UnitHeater {
         Real64 FanVolFlow;                                            // Fan volumetric flow rate
         std::string CurrentModuleObject;
         Array1D_string Alphas;         // Alpha items for object
-        Array1D<Real64> Numbers;       // Numeric items for object
+        EPVector<Real64> Numbers;       // Numeric items for object
         Array1D_string cAlphaFields;   // Alpha field names
         Array1D_string cNumericFields; // Numeric field names
         Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
@@ -1432,7 +1432,7 @@ namespace UnitHeater {
         Real64 SpecHumOut;      // Specific humidity ratio of outlet air (kg moisture / kg moist air)
         Real64 SpecHumIn;       // Specific humidity ratio of inlet air (kg moisture / kg moist air)
         Real64 mdot;            // local temporary for fluid mass flow rate
-        Array1D<Real64> Par(3); // parameters passed to RegulaFalsi function
+        EPVector<Real64> Par(3); // parameters passed to RegulaFalsi function
         int OpMode;
         Real64 PartLoadFrac;
         Real64 NoOutput;

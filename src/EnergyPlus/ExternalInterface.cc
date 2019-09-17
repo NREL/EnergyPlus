@@ -156,10 +156,10 @@ namespace ExternalInterface {
     // SUBROUTINE SPECIFICATIONS FOR MODULE ExternalInterface:
 
     // Object Data
-    Array1D<FMUType> FMU; // Variable Types structure
+    EPVector<FMUType> FMU; // Variable Types structure
     std::unordered_map<std::string, std::string> UniqueFMUInputVarNames;
-    Array1D<FMUType> FMUTemp;                            // Variable Types structure
-    Array1D<checkFMUInstanceNameType> checkInstanceName; // Variable Types structure for checking instance names
+    EPVector<FMUType> FMUTemp;                            // Variable Types structure
+    EPVector<checkFMUInstanceNameType> checkInstanceName; // Variable Types structure for checking instance names
 
     // Functions
 
@@ -2275,8 +2275,8 @@ namespace ExternalInterface {
         Real64 curSimTim; // current simulation time
         Real64 preSimTim; // previous time step's simulation time
 
-        Array1D<Real64> dblValWri(nDblMax);
-        Array1D<Real64> dblValRea(nDblMax);
+        EPVector<Real64> dblValWri(nDblMax);
+        EPVector<Real64> dblValRea(nDblMax);
         std::string retValCha;
         bool continueSimulation; // Flag, true if simulation should continue
         static bool firstCall(true);

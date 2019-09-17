@@ -101,8 +101,8 @@ namespace DataSurfaceLists {
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaceLists
 
     // Object Data
-    Array1D<SurfaceListData> SurfList;
-    Array1D<SlabListData> SlabList;
+    EPVector<SurfaceListData> SurfList;
+    EPVector<SlabListData> SlabList;
 
     // Functions
 
@@ -145,7 +145,7 @@ namespace DataSurfaceLists {
         int MaxAlphas;                 // Maximum number of alphas for these input keywords
         int MaxNumbers;                // Maximum number of numbers for these input keywords
         int NameConflict;              // Used to see if a surface name matches the name of a surface list (not allowed)
-        Array1D<Real64> Numbers;       // Numeric items for object
+        EPVector<Real64> Numbers;       // Numeric items for object
         int NumAlphas;                 // Number of Alphas for each GetObjectItem call
         int NumArgs;                   // Unused variable that is part of a subroutine call
         int NumNumbers;                // Number of Numbers for each GetObjectItem call

@@ -107,12 +107,12 @@ namespace LowTempRadiantSystem {
     extern bool VarOffCond;               // Set to true when in cooling for constant flow system + variable off condensation predicted
     extern bool FirstTimeInit;            // Set to true initially and set to false once the first pass is made through the initialization routine
     extern Real64 LoopReqTemp;            // Temperature required at the inlet of the pump (from the loop) to meet control logic
-    extern Array1D<Real64> QRadSysSrcAvg; // Average source over the time step for a particular radiant surface
-    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+    extern EPVector<Real64> QRadSysSrcAvg; // Average source over the time step for a particular radiant surface
+    extern EPVector<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
     // Record keeping variables used to calculate QRadSysSrcAvg locally
-    extern Array1D<Real64> LastQRadSysSrc;     // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastQRadSysSrc;     // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     // Autosizing variables
     extern Array1D_bool MySizeFlagHydr;
     extern Array1D_bool MySizeFlagCFlo;
@@ -136,8 +136,8 @@ namespace LowTempRadiantSystem {
         int NumOfSurfaces;               // Number of surfaces included in this radiant system (coordinated control)
         Array1D_int SurfacePtr;          // Pointer to the surface(s) in the Surface derived type
         Array1D_string SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
-        Array1D<Real64> SurfaceFlowFrac; // Fraction of flow/pipe length for a particular surface
-        Array1D<Real64> NumCircuits;     // Number of fluid circuits in the surface
+        EPVector<Real64> SurfaceFlowFrac; // Fraction of flow/pipe length for a particular surface
+        EPVector<Real64> NumCircuits;     // Number of fluid circuits in the surface
         Real64 TotalSurfaceArea;         // Total surface area for all surfaces that are part of this radiant system
         Real64 TubeDiameter;             // tube diameter for embedded tubing
         Real64 TubeLength;               // tube length embedded in radiant surface
@@ -224,8 +224,8 @@ namespace LowTempRadiantSystem {
         int NumOfSurfaces;               // Number of surfaces included in this radiant system (coordinated control)
         Array1D_int SurfacePtr;          // Pointer to the surface(s) in the Surface derived type
         Array1D_string SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
-        Array1D<Real64> SurfaceFlowFrac; // Fraction of flow/pipe length for a particular surface
-        Array1D<Real64> NumCircuits;     // Number of fluid circuits in the surface
+        EPVector<Real64> SurfaceFlowFrac; // Fraction of flow/pipe length for a particular surface
+        EPVector<Real64> NumCircuits;     // Number of fluid circuits in the surface
         Real64 TotalSurfaceArea;         // Total surface area for all surfaces that are part of this radiant system
         Real64 TubeDiameter;             // tube diameter for embedded tubing
         Real64 TubeLength;               // tube length embedded in radiant surface
@@ -341,7 +341,7 @@ namespace LowTempRadiantSystem {
         int NumOfSurfaces;                // Number of surfaces included in this radiant system (coordinated control)
         Array1D_int SurfacePtr;           // Pointer to the surface(s) in the Surface derived type
         Array1D_string SurfaceName;       // Name of surfaces that are the radiant system (can be one or more)
-        Array1D<Real64> SurfacePowerFrac; // Fraction of total power input to surface
+        EPVector<Real64> SurfacePowerFrac; // Fraction of total power input to surface
         Real64 TotalSurfaceArea;          // Total surface area for all surfaces that are part of this radiant system
         Real64 MaxElecPower;              // Maximum electric power that can be supplied to surface, Watts
         int ControlType;                  // Control type for the system (MAT, MRT, Op temp, ODB, OWB)
@@ -404,12 +404,12 @@ namespace LowTempRadiantSystem {
     };
 
     // Object Data
-    extern Array1D<HydronicRadiantSystemData> HydrRadSys;
-    extern Array1D<ConstantFlowRadiantSystemData> CFloRadSys;
-    extern Array1D<ElectricRadiantSystemData> ElecRadSys;
-    extern Array1D<RadSysTypeData> RadSysTypes;
-    extern Array1D<ElecRadSysNumericFieldData> ElecRadSysNumericFields;
-    extern Array1D<HydronicRadiantSysNumericFieldData> HydronicRadiantSysNumericFields;
+    extern EPVector<HydronicRadiantSystemData> HydrRadSys;
+    extern EPVector<ConstantFlowRadiantSystemData> CFloRadSys;
+    extern EPVector<ElectricRadiantSystemData> ElecRadSys;
+    extern EPVector<RadSysTypeData> RadSysTypes;
+    extern EPVector<ElecRadSysNumericFieldData> ElecRadSysNumericFields;
+    extern EPVector<HydronicRadiantSysNumericFieldData> HydronicRadiantSysNumericFields;
 
     // Functions
 

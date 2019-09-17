@@ -83,12 +83,12 @@ namespace DataUCSDSharedData {
     extern Array1D_int PosZ_Door;
     extern Array1D_int PosZ_Internal;
     // Convection coeficients for the various surfaces
-    extern Array1D<Real64> HCeiling;
-    extern Array1D<Real64> HWall;
-    extern Array1D<Real64> HFloor;
-    extern Array1D<Real64> HInternal;
-    extern Array1D<Real64> HWindow;
-    extern Array1D<Real64> HDoor;
+    extern EPVector<Real64> HCeiling;
+    extern EPVector<Real64> HWall;
+    extern EPVector<Real64> HFloor;
+    extern EPVector<Real64> HInternal;
+    extern EPVector<Real64> HWindow;
+    extern EPVector<Real64> HDoor;
 
     void clear_state();
 

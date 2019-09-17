@@ -124,8 +124,8 @@ namespace ChillerGasAbsorption {
 
     Array1D_bool CheckEquipName;
 
-    Array1D<GasAbsorberSpecs> GasAbsorber; // dimension to number of machines
-    Array1D<ReportVars> GasAbsorberReport;
+    EPVector<GasAbsorberSpecs> GasAbsorber; // dimension to number of machines
+    EPVector<ReportVars> GasAbsorberReport;
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace

@@ -167,7 +167,7 @@ namespace TranspiredCollector {
     };
 
     // Object Data
-    extern Array1D<UTSCDataStruct> UTSC;
+    extern EPVector<UTSCDataStruct> UTSC;
 
     // Functions
     void clear_state();

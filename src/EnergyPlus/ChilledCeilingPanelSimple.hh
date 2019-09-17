@@ -82,14 +82,14 @@ namespace CoolingPanelSimple {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumCoolingPanels;
-    extern Array1D<Real64> CoolingPanelSource;   // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> CoolingPanelSrcAvg;   // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+    extern EPVector<Real64> CoolingPanelSource;   // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> CoolingPanelSrcAvg;   // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
 
     // Record keeping variables used to calculate CoolingPanelSrcAvg locally
-    extern Array1D<Real64> LastCoolingPanelSrc; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastSysTimeElapsed;  // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastTimeStepSys;     // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastCoolingPanelSrc; // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastSysTimeElapsed;  // Need to keep the last value in case we are still iterating
+    extern EPVector<Real64> LastTimeStepSys;     // Need to keep the last value in case we are still iterating
     extern Array1D_bool CheckEquipName;
     extern Array1D_bool SetLoopIndexFlag; // get loop number flag
 
@@ -141,7 +141,7 @@ namespace CoolingPanelSimple {
         Real64 FracRadiant;
         Real64 FracConvect;
         Real64 FracDistribPerson;
-        Array1D<Real64> FracDistribToSurf;
+        EPVector<Real64> FracDistribToSurf;
         Real64 TotPower;
         Real64 Power;
         Real64 ConvPower;
@@ -192,8 +192,8 @@ namespace CoolingPanelSimple {
     };
 
     // Object Data
-    extern Array1D<CoolingPanelParams> CoolingPanel;
-    extern Array1D<CoolingPanelSysNumericFieldData> CoolingPanelSysNumericFields;
+    extern EPVector<CoolingPanelParams> CoolingPanel;
+    extern EPVector<CoolingPanelSysNumericFieldData> CoolingPanelSysNumericFields;
 
     // Functions
 

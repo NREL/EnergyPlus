@@ -113,7 +113,7 @@ namespace OutsideEnergySources {
     };
 
     // Object Data
-    extern Array1D<OutsideEnergySourceSpecs> EnergySource;
+    extern EPVector<OutsideEnergySourceSpecs> EnergySource;
 
     // Functions
     void clear_state();

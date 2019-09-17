@@ -301,14 +301,14 @@ namespace DataAirLoop {
     };
 
     // Object Data
-    extern Array1D<AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
-    extern Array1D<AirLoopOutsideAirConnectData> AirToOANodeInfo;
-    extern Array1D<DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
-    extern Array1D<AirLooptoZoneData> AirLoopZoneInfo;
-    extern Array1D<AirLoopControlData> AirLoopControlInfo;
-    extern Array1D<AirLoopFlowData> AirLoopFlow;
-    extern Array1D<OutsideAirSysProps> OutsideAirSys;
-    extern Array1D<AirLoopAFNData> AirLoopAFNInfo;
+    extern EPVector<AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
+    extern EPVector<AirLoopOutsideAirConnectData> AirToOANodeInfo;
+    extern EPVector<DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
+    extern EPVector<AirLooptoZoneData> AirLoopZoneInfo;
+    extern EPVector<AirLoopControlData> AirLoopControlInfo;
+    extern EPVector<AirLoopFlowData> AirLoopFlow;
+    extern EPVector<OutsideAirSysProps> OutsideAirSys;
+    extern EPVector<AirLoopAFNData> AirLoopAFNInfo;
 
     // Clears the global data in DataAirLoop.
     // Needed for unit tests, should not be normally called.

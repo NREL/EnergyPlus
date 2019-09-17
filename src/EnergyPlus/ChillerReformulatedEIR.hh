@@ -296,8 +296,8 @@ namespace ChillerReformulatedEIR {
     };
 
     // Object Data
-    extern Array1D<ReformulatedEIRChillerSpecs> ElecReformEIRChiller; // dimension to number of machines
-    extern Array1D<ReportVars> ElecReformEIRChillerReport;
+    extern EPVector<ReformulatedEIRChillerSpecs> ElecReformEIRChiller; // dimension to number of machines
+    extern EPVector<ReportVars> ElecReformEIRChillerReport;
 
     // Functions
 

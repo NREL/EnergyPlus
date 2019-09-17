@@ -262,11 +262,11 @@ namespace DataHVACGlobals {
     extern Real64 const MaxCoolVolFlowPerRatedTotCap2;  // m3/s per watt = 300 cfm/ton
     extern Real64 const MinOperVolFlowPerRatedTotCap2;  // m3/s per watt = 100 cfm/ton
 
-    extern Array1D<Real64> MaxRatedVolFlowPerRatedTotCap;
-    extern Array1D<Real64> MinRatedVolFlowPerRatedTotCap;
-    extern Array1D<Real64> MaxHeatVolFlowPerRatedTotCap;
-    extern Array1D<Real64> MaxCoolVolFlowPerRatedTotCap;
-    extern Array1D<Real64> MinOperVolFlowPerRatedTotCap;
+    extern EPVector<Real64> MaxRatedVolFlowPerRatedTotCap;
+    extern EPVector<Real64> MinRatedVolFlowPerRatedTotCap;
+    extern EPVector<Real64> MaxHeatVolFlowPerRatedTotCap;
+    extern EPVector<Real64> MaxCoolVolFlowPerRatedTotCap;
+    extern EPVector<Real64> MinOperVolFlowPerRatedTotCap;
 
     // dx coil type (DXCT)
     extern int const RegularDXCoil; // Regular DX coils or mixed air dx coils
@@ -368,7 +368,7 @@ namespace DataHVACGlobals {
     extern Array1D_int HybridVentSysAvailActualZoneNum;    // Actual zone num in hybrid vent availability manager
     extern Array1D_int HybridVentSysAvailANCtrlStatus;     // AN control status in hybrid vent availability manager
     extern Array1D_int HybridVentSysAvailMaster;           // Master object name: Ventilation for simple; Zone name for AN
-    extern Array1D<Real64> HybridVentSysAvailWindModifier; // Wind modifier for AirflowNetwork
+    extern EPVector<Real64> HybridVentSysAvailWindModifier; // Wind modifier for AirflowNetwork
     // For multispeed heat pump only
     extern Real64 MSHPMassFlowRateLow;     // Mass flow rate at low speed
     extern Real64 MSHPMassFlowRateHigh;    // Mass flow rate at high speed
@@ -475,7 +475,7 @@ namespace DataHVACGlobals {
     struct ZoneCompTypeData
     {
         // Members
-        Array1D<DefineZoneCompAvailMgrs> ZoneCompAvailMgrs;
+        EPVector<DefineZoneCompAvailMgrs> ZoneCompAvailMgrs;
         int TotalNumComp; // total number of components of a zone equip type
 
         // Default Constructor
@@ -488,7 +488,7 @@ namespace DataHVACGlobals {
     {
         // Members
         Array1D_int ActualZoneNum;
-        Array1D<Real64> OccStartTime;
+        EPVector<Real64> OccStartTime;
         Array1D_bool OptStartFlag;
 
         // Default Constructor
@@ -510,9 +510,9 @@ namespace DataHVACGlobals {
     };
 
     // Object Data
-    extern Array1D<ZoneCompTypeData> ZoneComp;
+    extern EPVector<ZoneCompTypeData> ZoneComp;
     extern OptStartDataType OptStartData; // For optimum start
-    extern Array1D<ComponentSetPtData> CompSetPtEquip;
+    extern EPVector<ComponentSetPtData> CompSetPtEquip;
     extern HVACSystemRootFindingAlgorithm HVACSystemRootFinding;
 
     // Clears the global data in DataHVACGlobals.

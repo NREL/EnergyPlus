@@ -171,8 +171,8 @@ namespace ChillerReformulatedEIR {
     // SUBROUTINE SPECIFICATIONS FOR MODULE ChillerReformulatedEIR
 
     // Object Data
-    Array1D<ReformulatedEIRChillerSpecs> ElecReformEIRChiller; // dimension to number of machines
-    Array1D<ReportVars> ElecReformEIRChillerReport;
+    EPVector<ReformulatedEIRChillerSpecs> ElecReformEIRChiller; // dimension to number of machines
+    EPVector<ReportVars> ElecReformEIRChillerReport;
 
     // MODULE SUBROUTINES:
 
@@ -1249,8 +1249,8 @@ namespace ChillerReformulatedEIR {
         Real64 CondTemp;                   // Used to verify EIRFPLR curve is > than 0 at reference conditions
         static bool FoundNegValue(false);  // Used to evaluate EIRFPLR curve objects
         static int CurveCheck(0);          // Used to evaluate EIRFPLR curve objects
-        Array1D<Real64> CurveValArray(11); // Used to evaluate EIRFPLR curve objects
-        Array1D<Real64> CondTempArray(11); // Used to evaluate EIRFPLR curve objects
+        EPVector<Real64> CurveValArray(11); // Used to evaluate EIRFPLR curve objects
+        EPVector<Real64> CondTempArray(11); // Used to evaluate EIRFPLR curve objects
         Real64 CurveValTmp;                // Used to evaluate EIRFPLR curve objects
         Real64 Density;                    // Density of condenser water used in warning messages
         Real64 SpecificHeat;               // Specific heat of condenser water used in warning messages
@@ -1823,7 +1823,7 @@ namespace ChillerReformulatedEIR {
         Real64 EIRFPLRTmax;      // Maximum condenser leaving temperature allowed by EIRFPLR curve [C]
         Real64 Tmin(-99);        // Minimum condenser leaving temperature allowed by curve objects [C]
         Real64 Tmax(-99);        // Maximum condenser leaving temperature allowed by curve objects [C]
-        Array1D<Real64> Par(6);  // Pass parameters for RegulaFalsi solver
+        EPVector<Real64> Par(6);  // Pass parameters for RegulaFalsi solver
         Real64 FalsiCondOutTemp; // RegulaFalsi condenser outlet temperature result [C]
         int SolFla;              // Feedback flag from SolveRoot
         Real64 CondTempMin;      // Condenser outlet temperature when using Tmin as input to CalcReformEIRChillerModel [C]

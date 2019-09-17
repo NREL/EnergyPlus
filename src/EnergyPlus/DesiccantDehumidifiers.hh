@@ -238,7 +238,7 @@ namespace DesiccantDehumidifiers {
     };
 
     // Object Data
-    extern Array1D<DesiccantDehumidifierData> DesicDehum;
+    extern EPVector<DesiccantDehumidifierData> DesicDehum;
 
     // Functions
 

@@ -142,12 +142,12 @@ namespace WindowManager {
     int const numt3(81);              // Number of wavelength values in the photopic response
 
     //               Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
-    Array1D<Real64> const AirProps(8, {1.29, -0.4e-2, 2.41e-2, 7.6e-5, 1.73e-5, 1.0e-7, 0.72, 1.8e-3});
+    EPVector<Real64> const AirProps(8, {1.29, -0.4e-2, 2.41e-2, 7.6e-5, 1.73e-5, 1.0e-7, 0.72, 1.8e-3});
     // Air mass 1.5 terrestrial solar global spectral irradiance (W/m2-micron)
     // on a 37 degree tilted surface; corresponds
     // to wavelengths (microns) in following data block (ISO 9845-1 and ASTM E 892;
     // derived from Optics5 data file ISO-9845GlobalNorm.std, 10-14-99)
-    Array1D<Real64> wle(nume, {0.3000, 0.3050, 0.3100, 0.3150, 0.3200, 0.3250, 0.3300, 0.3350, 0.3400, 0.3450, 0.3500, 0.3600, 0.3700, 0.3800,
+    EPVector<Real64> wle(nume, {0.3000, 0.3050, 0.3100, 0.3150, 0.3200, 0.3250, 0.3300, 0.3350, 0.3400, 0.3450, 0.3500, 0.3600, 0.3700, 0.3800,
                                0.3900, 0.4000, 0.4100, 0.4200, 0.4300, 0.4400, 0.4500, 0.4600, 0.4700, 0.4800, 0.4900, 0.5000, 0.5100, 0.5200,
                                0.5300, 0.5400, 0.5500, 0.5700, 0.5900, 0.6100, 0.6300, 0.6500, 0.6700, 0.6900, 0.7100, 0.7180, 0.7244, 0.7400,
                                0.7525, 0.7575, 0.7625, 0.7675, 0.7800, 0.8000, 0.8160, 0.8237, 0.8315, 0.8400, 0.8600, 0.8800, 0.9050, 0.9150,
@@ -156,7 +156,7 @@ namespace WindowManager {
                                1.5780, 1.5920, 1.6100, 1.6300, 1.6460, 1.6780, 1.7400, 1.8000, 1.8600, 1.9200, 1.9600, 1.9850, 2.0050, 2.0350,
                                2.0650, 2.1000, 2.1480, 2.1980, 2.2700, 2.3600, 2.4500, 2.4940, 2.5370}); // Solar spectrum wavelength values (microns)
 
-    Array1D<Real64> e(nume, {0.0,    9.5,    42.3,   107.8,  181.0,  246.0,  395.3,  390.1,  435.3,  438.9,  483.7,  520.3,  666.2,  712.5,
+    EPVector<Real64> e(nume, {0.0,    9.5,    42.3,   107.8,  181.0,  246.0,  395.3,  390.1,  435.3,  438.9,  483.7,  520.3,  666.2,  712.5,
                              720.7,  1013.1, 1158.2, 1184.0, 1071.9, 1302.0, 1526.0, 1599.6, 1581.0, 1628.3, 1539.2, 1548.7, 1586.5, 1484.9,
                              1572.4, 1550.7, 1561.5, 1501.5, 1395.5, 1485.3, 1434.1, 1419.9, 1392.3, 1130.0, 1316.7, 1010.3, 1043.2, 1211.2,
                              1193.9, 1175.5, 643.1,  1030.7, 1131.1, 1081.6, 849.2,  785.0,  916.4,  959.9,  978.9,  933.2,  748.5,  667.5,
@@ -169,7 +169,7 @@ namespace WindowManager {
     // (CIE 1931 observer; ISO/CIE 10527, CIE Standard Calorimetric Observers;
     // derived from Optics5 data file "CIE 1931 Color Match from E308.txt", which is
     // the same as WINDOW4 file Cie31t.dat)
-    Array1D<Real64>
+    EPVector<Real64>
         wlt3(numt3,
              {0.380, 0.385, 0.390, 0.395, 0.400, 0.405, 0.410, 0.415, 0.420, 0.425, 0.430, 0.435, 0.440, 0.445, 0.450, 0.455, 0.460,
               0.465, 0.470, 0.475, 0.480, 0.485, 0.490, 0.495, 0.500, 0.505, 0.510, 0.515, 0.520, 0.525, 0.530, 0.535, 0.540, 0.545,
@@ -177,7 +177,7 @@ namespace WindowManager {
               0.635, 0.640, 0.645, 0.650, 0.655, 0.660, 0.665, 0.670, 0.675, 0.680, 0.685, 0.690, 0.695, 0.700, 0.705, 0.710, 0.715,
               0.720, 0.725, 0.730, 0.735, 0.740, 0.745, 0.750, 0.755, 0.760, 0.765, 0.770, 0.775, 0.780}); // Wavelength values for photopic response
 
-    Array1D<Real64> y30(numt3, {0.0000, 0.0001, 0.0001, 0.0002, 0.0004, 0.0006, 0.0012, 0.0022, 0.0040, 0.0073, 0.0116, 0.0168, 0.0230, 0.0298,
+    EPVector<Real64> y30(numt3, {0.0000, 0.0001, 0.0001, 0.0002, 0.0004, 0.0006, 0.0012, 0.0022, 0.0040, 0.0073, 0.0116, 0.0168, 0.0230, 0.0298,
                                 0.0380, 0.0480, 0.0600, 0.0739, 0.0910, 0.1126, 0.1390, 0.1693, 0.2080, 0.2586, 0.3230, 0.4073, 0.5030, 0.6082,
                                 0.7100, 0.7932, 0.8620, 0.9149, 0.9540, 0.9803, 0.9950, 1.0000, 0.9950, 0.9786, 0.9520, 0.9154, 0.8700, 0.8163,
                                 0.7570, 0.6949, 0.6310, 0.5668, 0.5030, 0.4412, 0.3810, 0.3210, 0.2650, 0.2170, 0.1750, 0.1382, 0.1070, 0.0816,
@@ -207,38 +207,38 @@ namespace WindowManager {
     Array2D<Real64> gwght(5, 5, 0.0);   // Gas molecular weights for each gap
     Array2D<Real64> gfract(5, 5, 0.0);  // Gas fractions for each gap
     Array1D_int gnmix(5, 0);            // Number of gases in gap
-    Array1D<Real64> gap(5, 0.0);        // Gap width (m)
-    Array1D<Real64> thick(5, 0.0);      // Glass layer thickness (m)
-    Array1D<Real64> scon(5, 0.0);       // Glass layer conductance--conductivity/thickness (W/m2-K)
-    Array1D<Real64> tir(10, 0.0);       // Front and back IR transmittance for each glass layer
-    Array1D<Real64> emis(10, 0.0);      // Front and back IR emissivity for each glass layer
-    Array1D<Real64> rir(10, 0.0);       // Front and back IR reflectance for each glass layer
+    EPVector<Real64> gap(5, 0.0);        // Gap width (m)
+    EPVector<Real64> thick(5, 0.0);      // Glass layer thickness (m)
+    EPVector<Real64> scon(5, 0.0);       // Glass layer conductance--conductivity/thickness (W/m2-K)
+    EPVector<Real64> tir(10, 0.0);       // Front and back IR transmittance for each glass layer
+    EPVector<Real64> emis(10, 0.0);      // Front and back IR emissivity for each glass layer
+    EPVector<Real64> rir(10, 0.0);       // Front and back IR reflectance for each glass layer
     //  (program calculates from tir and emis)
-    Array1D<Real64> AbsRadGlassFace(10, 0.0); // Solar radiation and IR radiation from internal
+    EPVector<Real64> AbsRadGlassFace(10, 0.0); // Solar radiation and IR radiation from internal
     //  gains absorbed by glass face
-    Array1D<Real64> thetas(10, 0.0);     // Glass surface temperatures (K)
-    Array1D<Real64> thetasPrev(10, 0.0); // Previous-iteration glass surface temperatures (K)
-    Array1D<Real64> fvec(10, 0.0);       // Glass face heat balance function
+    EPVector<Real64> thetas(10, 0.0);     // Glass surface temperatures (K)
+    EPVector<Real64> thetasPrev(10, 0.0); // Previous-iteration glass surface temperatures (K)
+    EPVector<Real64> fvec(10, 0.0);       // Glass face heat balance function
     Array2D<Real64> fjac(10, 10, 0.0);   // Glass face heat balance Jacobian
-    Array1D<Real64> dtheta(5, 0.0);      // Glass layer temperature difference factor [K]
+    EPVector<Real64> dtheta(5, 0.0);      // Glass layer temperature difference factor [K]
     Array2D<Real64> zir(10, 10, 0.0);    // IR transfer matrix
     Array2D<Real64> ziri(10, 10, 0.0);   // Inverse of IR transfer matrix
     Array2D<Real64> ddeldt(10, 10, 0.0); // Matrix of derivatives of residuals wrt temperature
     Array2D<Real64> dtddel(10, 10, 0.0); // Inverse of matrix of derivatives of
     //   residuals wrt temperature
-    Array1D<Real64> qf(10, 0.0);     // IR heat flux at each face [W/m2]
-    Array1D<Real64> hf(10, 0.0);     // Component of convective flux at each face
+    EPVector<Real64> qf(10, 0.0);     // IR heat flux at each face [W/m2]
+    EPVector<Real64> hf(10, 0.0);     // Component of convective flux at each face
     Array2D<Real64> der(5, 10, 0.0); // Derivative of IR sources wrt surface temperature
     Array2D<Real64> dhf(5, 10, 0.0); // Derivative of heat flux wrt surface temperature
-    Array1D<Real64> sour(10, 0.0);   // IR source term at each face [W/m2]
-    Array1D<Real64> delta(5, 0.0);   // Residual at each glass layer [W/m2]
-    Array1D<Real64> hcgap(5, 0.0);   // Convective gap conductance
-    Array1D<Real64> hrgap(5, 0.0);   // Radiative gap conductance
-    Array1D<Real64> rgap(6, 0.0);    // Convective plus radiative gap resistance
+    EPVector<Real64> sour(10, 0.0);   // IR source term at each face [W/m2]
+    EPVector<Real64> delta(5, 0.0);   // Residual at each glass layer [W/m2]
+    EPVector<Real64> hcgap(5, 0.0);   // Convective gap conductance
+    EPVector<Real64> hrgap(5, 0.0);   // Radiative gap conductance
+    EPVector<Real64> rgap(6, 0.0);    // Convective plus radiative gap resistance
     //   (inverse of hcgap + hrgap)
-    Array1D<Real64> rs(6, 0.0); // Outside film convective resistance, gap resistances,
+    EPVector<Real64> rs(6, 0.0); // Outside film convective resistance, gap resistances,
     //   inside air film convective resistance
-    Array1D<Real64> arhs(6, 0.0);
+    EPVector<Real64> arhs(6, 0.0);
     Real64 A23P; // Intermediate variables in glass face
     Real64 A32P;
     Real64 A45P;
@@ -264,28 +264,28 @@ namespace WindowManager {
     Array2D<Real64> rbadjPhi(5, MaxSpectralDataElements, 0.0); // back reflectance at angle of incidence
 
     Array1D_int numpt(5, 0);             // Number of spectral data wavelengths for each layer; =2 if no spectra data for a layer
-    Array1D<Real64> stPhi(nume, 0.0);    // Glazing system transmittance at angle of incidence for each wavelength in wle
-    Array1D<Real64> srfPhi(nume, 0.0);   // Glazing system front reflectance at angle of incidence for each wavelength in wle
-    Array1D<Real64> srbPhi(nume, 0.0);   // Glazing system back reflectance at angle of incidence for each wavelenth in wle
+    EPVector<Real64> stPhi(nume, 0.0);    // Glazing system transmittance at angle of incidence for each wavelength in wle
+    EPVector<Real64> srfPhi(nume, 0.0);   // Glazing system front reflectance at angle of incidence for each wavelength in wle
+    EPVector<Real64> srbPhi(nume, 0.0);   // Glazing system back reflectance at angle of incidence for each wavelenth in wle
     Array2D<Real64> saPhi(5, nume, 0.0); // For each layer, glazing system absorptance at angle of incidence
     // for each wavelenth in wle
     Array2D<Real64> top(5, 5, 0.0);                                // Transmittance matrix for subr. op
     Array2D<Real64> rfop(5, 5, 0.0);                               // Front reflectance matrix for subr. op
     Array2D<Real64> rbop(5, 5, 0.0);                               // Back transmittance matrix for subr. op
-    Array1D<Real64> DepVarCurveFit(MaxNumOfIncidentAngles, 0.0);   // Values of dependent variable corresponding to IndepVarCurveFit values
-    Array1D<Real64> CoeffsCurveFit(6, 0.0);                        // Polynomial coefficients from curve fit
-    Array1D<Real64> tsolPhi(MaxNumOfIncidentAngles, 0.0);          // Glazing system solar transmittance for each angle of incidence
-    Array1D<Real64> rfsolPhi(MaxNumOfIncidentAngles, 0.0);         // Glazing system solar front reflectance for each angle of incidence
-    Array1D<Real64> rbsolPhi(MaxNumOfIncidentAngles, 0.0);         // Glazing system solar back reflectance for each angle of incidence
+    EPVector<Real64> DepVarCurveFit(MaxNumOfIncidentAngles, 0.0);   // Values of dependent variable corresponding to IndepVarCurveFit values
+    EPVector<Real64> CoeffsCurveFit(6, 0.0);                        // Polynomial coefficients from curve fit
+    EPVector<Real64> tsolPhi(MaxNumOfIncidentAngles, 0.0);          // Glazing system solar transmittance for each angle of incidence
+    EPVector<Real64> rfsolPhi(MaxNumOfIncidentAngles, 0.0);         // Glazing system solar front reflectance for each angle of incidence
+    EPVector<Real64> rbsolPhi(MaxNumOfIncidentAngles, 0.0);         // Glazing system solar back reflectance for each angle of incidence
     Array2D<Real64> solabsPhi(5, MaxNumOfIncidentAngles, 0.0);     // Glazing system solar absorptance for each angle of incidence
     Array2D<Real64> solabsBackPhi(5, MaxNumOfIncidentAngles, 0.0); // Glazing system back solar absorptance for each angle of incidence
-    Array1D<Real64> solabsShadePhi(MaxNumOfIncidentAngles, 0.0);   // Glazing system interior shade solar absorptance for each angle of incidence
-    Array1D<Real64> tvisPhi(MaxNumOfIncidentAngles, 0.0);          // Glazing system visible transmittance for each angle of incidence
-    Array1D<Real64> rfvisPhi(MaxNumOfIncidentAngles, 0.0);         // Glazing system visible front reflectance for each angle of incidence
-    Array1D<Real64> rbvisPhi(MaxNumOfIncidentAngles, 0.0);         // Glazing system visible back reflectance for each angle of incidence
-    Array1D<Real64> CosPhiIndepVar(MaxNumOfIncidentAngles, 0.0);   // Cos of incidence angles at 10-deg increments for curve fits
+    EPVector<Real64> solabsShadePhi(MaxNumOfIncidentAngles, 0.0);   // Glazing system interior shade solar absorptance for each angle of incidence
+    EPVector<Real64> tvisPhi(MaxNumOfIncidentAngles, 0.0);          // Glazing system visible transmittance for each angle of incidence
+    EPVector<Real64> rfvisPhi(MaxNumOfIncidentAngles, 0.0);         // Glazing system visible front reflectance for each angle of incidence
+    EPVector<Real64> rbvisPhi(MaxNumOfIncidentAngles, 0.0);         // Glazing system visible back reflectance for each angle of incidence
+    EPVector<Real64> CosPhiIndepVar(MaxNumOfIncidentAngles, 0.0);   // Cos of incidence angles at 10-deg increments for curve fits
 
-    Array1D<int> LayerNum(5, 0); // Glass layer number
+    EPVector<int> LayerNum(5, 0); // Glass layer number
 
     std::unique_ptr<CWindowModel> inExtWindowModel;       // Information about windows model (interior or exterior)
     std::unique_ptr<CWindowOpticalModel> winOpticalModel; // Information about windows optical model (Simplified or BSDF)
@@ -300,7 +300,7 @@ namespace WindowManager {
 
     void clear_state()
     {
-        wle = Array1D<Real64>(nume, {0.3000, 0.3050, 0.3100, 0.3150, 0.3200, 0.3250, 0.3300, 0.3350, 0.3400, 0.3450, 0.3500, 0.3600, 0.3700, 0.3800,
+        wle = EPVector<Real64>(nume, {0.3000, 0.3050, 0.3100, 0.3150, 0.3200, 0.3250, 0.3300, 0.3350, 0.3400, 0.3450, 0.3500, 0.3600, 0.3700, 0.3800,
                                      0.3900, 0.4000, 0.4100, 0.4200, 0.4300, 0.4400, 0.4500, 0.4600, 0.4700, 0.4800, 0.4900, 0.5000, 0.5100, 0.5200,
                                      0.5300, 0.5400, 0.5500, 0.5700, 0.5900, 0.6100, 0.6300, 0.6500, 0.6700, 0.6900, 0.7100, 0.7180, 0.7244, 0.7400,
                                      0.7525, 0.7575, 0.7625, 0.7675, 0.7800, 0.8000, 0.8160, 0.8237, 0.8315, 0.8400, 0.8600, 0.8800, 0.9050, 0.9150,
@@ -308,7 +308,7 @@ namespace WindowManager {
                                      1.1800, 1.2000, 1.2350, 1.2900, 1.3200, 1.3500, 1.3950, 1.4425, 1.4625, 1.4770, 1.4970, 1.5200, 1.5390, 1.5580,
                                      1.5780, 1.5920, 1.6100, 1.6300, 1.6460, 1.6780, 1.7400, 1.8000, 1.8600, 1.9200, 1.9600, 1.9850, 2.0050, 2.0350,
                                      2.0650, 2.1000, 2.1480, 2.1980, 2.2700, 2.3600, 2.4500, 2.4940, 2.5370});
-        e = Array1D<Real64>(nume, {0.0,    9.5,    42.3,   107.8,  181.0,  246.0,  395.3,  390.1,  435.3,  438.9,  483.7,  520.3,  666.2,  712.5,
+        e = EPVector<Real64>(nume, {0.0,    9.5,    42.3,   107.8,  181.0,  246.0,  395.3,  390.1,  435.3,  438.9,  483.7,  520.3,  666.2,  712.5,
                                    720.7,  1013.1, 1158.2, 1184.0, 1071.9, 1302.0, 1526.0, 1599.6, 1581.0, 1628.3, 1539.2, 1548.7, 1586.5, 1484.9,
                                    1572.4, 1550.7, 1561.5, 1501.5, 1395.5, 1485.3, 1434.1, 1419.9, 1392.3, 1130.0, 1316.7, 1010.3, 1043.2, 1211.2,
                                    1193.9, 1175.5, 643.1,  1030.7, 1131.1, 1081.6, 849.2,  785.0,  916.4,  959.9,  978.9,  933.2,  748.5,  667.5,
@@ -316,13 +316,13 @@ namespace WindowManager {
                                    460.0,  423.6,  480.5,  413.1,  250.2,  32.5,   1.6,    55.7,   105.1,  105.5,  182.1,  262.2,  274.2,  275.0,
                                    244.6,  247.4,  228.7,  244.5,  234.8,  220.5,  171.5,  30.7,   2.0,    1.2,    21.2,   91.1,   26.8,   99.5,
                                    60.4,   89.1,   82.2,   71.5,   70.2,   62.0,   21.2,   18.5,   3.2});
-        wlt3 = Array1D<Real64>(numt3,
+        wlt3 = EPVector<Real64>(numt3,
                                {0.380, 0.385, 0.390, 0.395, 0.400, 0.405, 0.410, 0.415, 0.420, 0.425, 0.430, 0.435, 0.440, 0.445, 0.450, 0.455, 0.460,
                                 0.465, 0.470, 0.475, 0.480, 0.485, 0.490, 0.495, 0.500, 0.505, 0.510, 0.515, 0.520, 0.525, 0.530, 0.535, 0.540, 0.545,
                                 0.550, 0.555, 0.560, 0.565, 0.570, 0.575, 0.580, 0.585, 0.590, 0.595, 0.600, 0.605, 0.610, 0.615, 0.620, 0.625, 0.630,
                                 0.635, 0.640, 0.645, 0.650, 0.655, 0.660, 0.665, 0.670, 0.675, 0.680, 0.685, 0.690, 0.695, 0.700, 0.705, 0.710, 0.715,
                                 0.720, 0.725, 0.730, 0.735, 0.740, 0.745, 0.750, 0.755, 0.760, 0.765, 0.770, 0.775, 0.780});
-        y30 = Array1D<Real64>(numt3, {0.0000, 0.0001, 0.0001, 0.0002, 0.0004, 0.0006, 0.0012, 0.0022, 0.0040, 0.0073, 0.0116, 0.0168, 0.0230, 0.0298,
+        y30 = EPVector<Real64>(numt3, {0.0000, 0.0001, 0.0001, 0.0002, 0.0004, 0.0006, 0.0012, 0.0022, 0.0040, 0.0073, 0.0116, 0.0168, 0.0230, 0.0298,
                                       0.0380, 0.0480, 0.0600, 0.0739, 0.0910, 0.1126, 0.1390, 0.1693, 0.2080, 0.2586, 0.3230, 0.4073, 0.5030, 0.6082,
                                       0.7100, 0.7932, 0.8620, 0.9149, 0.9540, 0.9803, 0.9950, 1.0000, 0.9950, 0.9786, 0.9520, 0.9154, 0.8700, 0.8163,
                                       0.7570, 0.6949, 0.6310, 0.5668, 0.5030, 0.4412, 0.3810, 0.3210, 0.2650, 0.2170, 0.1750, 0.1382, 0.1070, 0.0816,
@@ -347,33 +347,33 @@ namespace WindowManager {
         gwght = Array2D<Real64>(5, 5, 0.0);
         gfract = Array2D<Real64>(5, 5, 0.0);
         gnmix = Array1D_int(5, 0);
-        gap = Array1D<Real64>(5, 0.0);
-        thick = Array1D<Real64>(5, 0.0);
-        scon = Array1D<Real64>(5, 0.0);
-        tir = Array1D<Real64>(10, 0.0);
-        emis = Array1D<Real64>(10, 0.0);
-        rir = Array1D<Real64>(10, 0.0);
-        AbsRadGlassFace = Array1D<Real64>(10, 0.0);
-        thetas = Array1D<Real64>(10, 0.0);
-        thetasPrev = Array1D<Real64>(10, 0.0);
-        fvec = Array1D<Real64>(10, 0.0);
+        gap = EPVector<Real64>(5, 0.0);
+        thick = EPVector<Real64>(5, 0.0);
+        scon = EPVector<Real64>(5, 0.0);
+        tir = EPVector<Real64>(10, 0.0);
+        emis = EPVector<Real64>(10, 0.0);
+        rir = EPVector<Real64>(10, 0.0);
+        AbsRadGlassFace = EPVector<Real64>(10, 0.0);
+        thetas = EPVector<Real64>(10, 0.0);
+        thetasPrev = EPVector<Real64>(10, 0.0);
+        fvec = EPVector<Real64>(10, 0.0);
         fjac = Array2D<Real64>(10, 10, 0.0);
-        dtheta = Array1D<Real64>(5, 0.0);
+        dtheta = EPVector<Real64>(5, 0.0);
         zir = Array2D<Real64>(10, 10, 0.0);
         ziri = Array2D<Real64>(10, 10, 0.0);
         ddeldt = Array2D<Real64>(10, 10, 0.0);
         dtddel = Array2D<Real64>(10, 10, 0.0);
-        qf = Array1D<Real64>(10, 0.0);
-        hf = Array1D<Real64>(10, 0.0);
+        qf = EPVector<Real64>(10, 0.0);
+        hf = EPVector<Real64>(10, 0.0);
         der = Array2D<Real64>(5, 10, 0.0);
         dhf = Array2D<Real64>(5, 10, 0.0);
-        sour = Array1D<Real64>(10, 0.0);
-        delta = Array1D<Real64>(5, 0.0);
-        hcgap = Array1D<Real64>(5, 0.0);
-        hrgap = Array1D<Real64>(5, 0.0);
-        rgap = Array1D<Real64>(6, 0.0);
-        rs = Array1D<Real64>(6, 0.0);
-        arhs = Array1D<Real64>(6, 0.0);
+        sour = EPVector<Real64>(10, 0.0);
+        delta = EPVector<Real64>(5, 0.0);
+        hcgap = EPVector<Real64>(5, 0.0);
+        hrgap = EPVector<Real64>(5, 0.0);
+        rgap = EPVector<Real64>(6, 0.0);
+        rs = EPVector<Real64>(6, 0.0);
+        arhs = EPVector<Real64>(6, 0.0);
         A23P = 0.0;
         A32P = 0.0;
         A45P = 0.0;
@@ -394,25 +394,25 @@ namespace WindowManager {
         rfadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
         rbadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
         numpt = Array1D_int(5, 0);
-        stPhi = Array1D<Real64>(nume, 0.0);
-        srfPhi = Array1D<Real64>(nume, 0.0);
-        srbPhi = Array1D<Real64>(nume, 0.0);
+        stPhi = EPVector<Real64>(nume, 0.0);
+        srfPhi = EPVector<Real64>(nume, 0.0);
+        srbPhi = EPVector<Real64>(nume, 0.0);
         saPhi = Array2D<Real64>(5, nume, 0.0);
         top = Array2D<Real64>(5, 5, 0.0);
         rfop = Array2D<Real64>(5, 5, 0.0);
         rbop = Array2D<Real64>(5, 5, 0.0);
-        DepVarCurveFit = Array1D<Real64>(10, 0.0);
-        CoeffsCurveFit = Array1D<Real64>(6, 0.0);
-        tsolPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-        rfsolPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-        rbsolPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
+        DepVarCurveFit = EPVector<Real64>(10, 0.0);
+        CoeffsCurveFit = EPVector<Real64>(6, 0.0);
+        tsolPhi = EPVector<Real64>(MaxNumOfIncidentAngles, 0.0);
+        rfsolPhi = EPVector<Real64>(MaxNumOfIncidentAngles, 0.0);
+        rbsolPhi = EPVector<Real64>(MaxNumOfIncidentAngles, 0.0);
         solabsPhi = Array2D<Real64>(5, MaxNumOfIncidentAngles, 0.0);
         solabsBackPhi = Array2D<Real64>(5, MaxNumOfIncidentAngles, 0.0);
-        solabsShadePhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-        tvisPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-        rfvisPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-        rbvisPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
-        CosPhiIndepVar = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
+        solabsShadePhi = EPVector<Real64>(MaxNumOfIncidentAngles, 0.0);
+        tvisPhi = EPVector<Real64>(MaxNumOfIncidentAngles, 0.0);
+        rfvisPhi = EPVector<Real64>(MaxNumOfIncidentAngles, 0.0);
+        rbvisPhi = EPVector<Real64>(MaxNumOfIncidentAngles, 0.0);
+        CosPhiIndepVar = EPVector<Real64>(MaxNumOfIncidentAngles, 0.0);
         CWindowConstructionsSimplified::clearState();
     }
 
@@ -506,13 +506,13 @@ namespace WindowManager {
         bool ShadeOn;                  // True if IntShade, ExtShade or BGShade is true
         int BlNum;                     // Blind number
         int ScNum;                     // Screen number
-        Array1D<Real64> sabsPhi(nume); // Glazing system absorptance for a glass layer
+        EPVector<Real64> sabsPhi(nume); // Glazing system absorptance for a glass layer
         //  and angle of incidence, for each wavelength
         //   glass layer for an angle of incidence, for each wavelength
-        Array1D<Real64> solabsDiff(5);                          // Glazing system layer solar absorptance for each glass layer
-        Array1D<Real64> solabsPhiLay(MaxNumOfIncidentAngles);   // Glazing system solar absorptance for a layer at each incidence angle
-        Array1D<Real64> tsolPhiFit(MaxNumOfIncidentAngles);     // Glazing system solar transmittance from fit at each incidence angle
-        Array1D<Real64> tvisPhiFit(MaxNumOfIncidentAngles);     // Glazing system visible transmittance from fit at each incidence angle
+        EPVector<Real64> solabsDiff(5);                          // Glazing system layer solar absorptance for each glass layer
+        EPVector<Real64> solabsPhiLay(MaxNumOfIncidentAngles);   // Glazing system solar absorptance for a layer at each incidence angle
+        EPVector<Real64> tsolPhiFit(MaxNumOfIncidentAngles);     // Glazing system solar transmittance from fit at each incidence angle
+        EPVector<Real64> tvisPhiFit(MaxNumOfIncidentAngles);     // Glazing system visible transmittance from fit at each incidence angle
         Array2D<Real64> tBareSolPhi(5, MaxNumOfIncidentAngles); // Isolated glass solar transmittance for each incidence angle
         Real64 t1;                                              // = tBareSolPhi(,1)(,2)
         Real64 t2;
@@ -608,11 +608,11 @@ namespace WindowManager {
         bool StormWinConst;     // True if a construction with a storm window
         bool Triangle;          // True if window is triangular
         bool Rectangle;         // True if window is rectangular
-        Array1D<Real64> W1(3);  // Window vertices (m)
-        Array1D<Real64> W2(3);
-        Array1D<Real64> W3(3);
-        Array1D<Real64> W21(3); // W1-W2, W3-W2, resp. (m)
-        Array1D<Real64> W23(3);
+        EPVector<Real64> W1(3);  // Window vertices (m)
+        EPVector<Real64> W2(3);
+        EPVector<Real64> W3(3);
+        EPVector<Real64> W21(3); // W1-W2, W3-W2, resp. (m)
+        EPVector<Real64> W23(3);
         static bool lSimpleGlazingSystem(false); // true if using simple glazing system block model
         static Real64 SimpleGlazingSHGC(0.0);    // value of SHGC for simple glazing system block model
         static Real64 SimpleGlazingU(0.0);       // value of U-factor for simple glazing system block model
@@ -625,14 +625,14 @@ namespace WindowManager {
         static Real64 tmpReflectVisBeamBack(0.0);
 
         // Debug
-        static Array1D<Real64> DbgTheta(11, {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 82.5, 89.5});
-        static Array1D<Real64> DbgTSol(11, 0.0);
-        static Array1D<Real64> DbgRbSol(11, 0.0);
-        static Array1D<Real64> DbgTVis(11, 0.0);
+        static EPVector<Real64> DbgTheta(11, {0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 82.5, 89.5});
+        static EPVector<Real64> DbgTSol(11, 0.0);
+        static EPVector<Real64> DbgRbSol(11, 0.0);
+        static EPVector<Real64> DbgTVis(11, 0.0);
         static Array2D<Real64> DbgFtAbs(5, 11, 0.0);
         static Array2D<Real64> DbgBkAbs(5, 11, 0.0);
-        static Array1D<Real64> DbgFTAbsDiff(5, 0.0);
-        static Array1D<Real64> DbgBkAbsDiff(5, 0.0);
+        static EPVector<Real64> DbgFTAbsDiff(5, 0.0);
+        static EPVector<Real64> DbgBkAbsDiff(5, 0.0);
 
         // EndDebug
 
@@ -2059,7 +2059,7 @@ namespace WindowManager {
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        Array1D<Real64> sabsPhi(5); // System solar absorptance in each glass layer for
+        EPVector<Real64> sabsPhi(5); // System solar absorptance in each glass layer for
         //   particular angle of incidence
         int in; // Glass layer counter
         int i;
@@ -2534,7 +2534,7 @@ namespace WindowManager {
         Real64 locTCSpecTemp;         // The temperature corresponding to the specified optical properties of the TC layer
         Real64 locTCLayerTemp;        // TC layer temperature at each time step. C
         static bool locTCFlag(false); // True if this surface is a TC window
-        static Array1D<Real64> deltaTemp(100, 0.0);
+        static EPVector<Real64> deltaTemp(100, 0.0);
         int i;
         static Array1D_int iMinDT(1, 0);
         static Array1D_int IDConst(100, 0);
@@ -3116,7 +3116,7 @@ namespace WindowManager {
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        Array1D<Real64> hgap(5); // Gap gas conductance
+        EPVector<Real64> hgap(5); // Gap gas conductance
         Real64 gr;               // Gap gas Grashof number
         Real64 con;              // Gap gas conductivity
         Real64 pr;               // Gap gas Prandtl number
@@ -3296,20 +3296,20 @@ namespace WindowManager {
 
         int ZoneNum;                    // Zone number corresponding to SurfNum
         int i;                          // Counter
-        static Array1D<Real64> hgap(5); // Gap gas conductance (W/m2-K) //Tuned Made static
+        static EPVector<Real64> hgap(5); // Gap gas conductance (W/m2-K) //Tuned Made static
         Real64 gr;                      // Grashof number of gas in a gap
         Real64 con;                     // Gap gas conductivity
         Real64 pr;                      // Gap gas Prandtl number
         Real64 nu;                      // Gap gas Nusselt number
-        static Array1D<Real64> hr(10);  // Radiative conductance (W/m2-K) //Tuned Made static
+        static EPVector<Real64> hr(10);  // Radiative conductance (W/m2-K) //Tuned Made static
         Real64 d;                       // +1 if number of row interchanges is even,
         // -1 if odd (in LU decomposition)
         static Array1D_int indx(10);          // Vector of row permutations in LU decomposition //Tuned Made static
         static Array2D<Real64> Aface(10, 10); // Coefficient in equation Aface*thetas = Bface //Tuned Made static
-        static Array1D<Real64> Bface(10);     // Coefficient in equation Aface*thetas = Bface //Tuned Made static
+        static EPVector<Real64> Bface(10);     // Coefficient in equation Aface*thetas = Bface //Tuned Made static
 
         int iter;                          // Iteration number
-        static Array1D<Real64> hrprev(10); // Value of hr from previous iteration //Tuned Made static
+        static EPVector<Real64> hrprev(10); // Value of hr from previous iteration //Tuned Made static
         Real64 errtemp;                    // Absolute value of sum of face temperature differences
         //   between iterations, divided by number of faces
         Real64 VGap;                         // Air velocity in gap between glass and shade/blind (m/s)
@@ -3320,12 +3320,12 @@ namespace WindowManager {
         Real64 TGapOutlet;                   // Temperature of air leaving gap between glass and shade/blind (K)
         Real64 TAirflowGapOutlet;            // Temperature of air leaving airflow gap between glass panes (K)
         Real64 TAirflowGapOutletC;           // Temperature of air leaving airflow gap between glass panes (C)
-        static Array1D<Real64> TGapNewBG(2); // For between-glass shade/blind, average gas temp in gaps on either //Tuned Made static
+        static EPVector<Real64> TGapNewBG(2); // For between-glass shade/blind, average gas temp in gaps on either //Tuned Made static
         //  side of shade/blind (K)
         Real64 hcv;                      // Convection coefficient from gap glass or shade/blind to gap air (W/m2-K)
         Real64 hcvAirflowGap;            // Convection coefficient from airflow gap glass to airflow gap air (W/m2-K)
         Real64 hcvPrev;                  // Value of hcv from previous iteration
-        static Array1D<Real64> hcvBG(2); // For between-glass shade/blind, convection coefficient from gap glass or //Tuned Made static
+        static EPVector<Real64> hcvBG(2); // For between-glass shade/blind, convection coefficient from gap glass or //Tuned Made static
         //  shade/blind to gap gas on either side of shade/blind (W/m2-K)
         Real64 ConvHeatFlowNatural; // Convective heat flow from gap between glass and interior shade or blind (W)
         Real64 ConvHeatFlowForced;  // Convective heat flow from forced airflow gap (W)
@@ -3344,7 +3344,7 @@ namespace WindowManager {
         int ShadeFlag;  // Shading flag
         // Real64 ShadeAbsFac1; // Fractions for apportioning absorbed radiation to shade/blind faces
         // Real64 ShadeAbsFac2;
-        static Array1D<Real64> AbsRadShadeFace(2); // Solar radiation, short-wave radiation from lights, and long-wave //Tuned Made static
+        static EPVector<Real64> AbsRadShadeFace(2); // Solar radiation, short-wave radiation from lights, and long-wave //Tuned Made static
         //  radiation from lights and zone equipment absorbed by faces of shade/blind (W/m2)
         Real64 ShadeArea;          // shade/blind area (m2)
         Real64 CondHeatGainGlass;  // Conduction through inner glass layer, outside to inside (W)
@@ -3359,7 +3359,7 @@ namespace WindowManager {
         int ConstrNum;        // Construction number, bare and with shading device
         int ConstrNumSh;
         Real64 TransDiff;                 // Diffuse shortwave transmittance
-        static Array1D<Real64> RhoIR(10); // Face IR reflectance //Tuned Made static
+        static EPVector<Real64> RhoIR(10); // Face IR reflectance //Tuned Made static
         Real64 FacRhoIR25;                // Intermediate variable
         Real64 FacRhoIR63;                // Intermediate variable
         Real64 RhoIRfp;                   // Intermediate variable
@@ -4281,15 +4281,15 @@ namespace WindowManager {
         int MatNumSh;    // Material number of shade/blind layer
         int nglassfaces; // Number of glass faces in contruction
         // In the following, "gaps" refer to the gaps on either side of the shade/blind
-        Array1D<Real64> TGlassFace(2); // Temperature of glass surfaces facing gaps (K)
-        Array1D<Real64> TShadeFace(2); // Temperature of shade surfaces facing gaps (K)
-        Array1D<Real64> hGapStill(2);  // Still-air conduction/convection coeffs for the gaps (W/m2-K)
-        Array1D<Real64> TGapOld(2);    // Previous-iteration average gas temp in gaps (K)
+        EPVector<Real64> TGlassFace(2); // Temperature of glass surfaces facing gaps (K)
+        EPVector<Real64> TShadeFace(2); // Temperature of shade surfaces facing gaps (K)
+        EPVector<Real64> hGapStill(2);  // Still-air conduction/convection coeffs for the gaps (W/m2-K)
+        EPVector<Real64> TGapOld(2);    // Previous-iteration average gas temp in gaps (K)
         Real64 GapHeight;              // Vertical length of glass-shade/blind gap (m)
         Real64 GapDepth;               // Distance from shade/blind to glass; assumed same for both gaps (m)
-        Array1D<Real64> RhoGas(2);     // Density of gap gas at a temperature of TGapOld (kg/m3)
+        EPVector<Real64> RhoGas(2);     // Density of gap gas at a temperature of TGapOld (kg/m3)
         Real64 RhoTRef;                // Density of gap gas at reference temp = KelvinConvK (kg/m3)
-        Array1D<Real64> ViscGas(2);    // Viscosity of gap gas at a temperature of TGapOld (kg/m3)
+        EPVector<Real64> ViscGas(2);    // Viscosity of gap gas at a temperature of TGapOld (kg/m3)
         Real64 RhoGasZero;             // Gas density at KelvinConvK
         Real64 ViscGasZero;            // Gas viscosity at KelvinConvK (not used)
         Real64 AGap;                   // Cross sectional area of gaps (m2); for vertical window, this
@@ -4309,9 +4309,9 @@ namespace WindowManager {
         Real64 AVGap;                     // Coeff. of VGap**2 term in pressure balance equation
         Real64 BVGap;                     // Coeff. of VGap term in pressure balance equation
         Real64 CVGap;                     // VGap-independent term in pressure balance equation
-        Array1D<Real64> GapHeightChar(2); // Characteristic height of the gap gas temperature profile (m)
-        Array1D<Real64> EpsChar(2);       // EXP(-GapHeight/GapHeightChar(IGap))
-        Array1D<Real64> TAve(2);          // Average of TGlass and TShade for the gaps (K)
+        EPVector<Real64> GapHeightChar(2); // Characteristic height of the gap gas temperature profile (m)
+        EPVector<Real64> EpsChar(2);       // EXP(-GapHeight/GapHeightChar(IGap))
+        EPVector<Real64> TAve(2);          // Average of TGlass and TShade for the gaps (K)
         Real64 con;                       // Gap gas conductivity and derivative
         Real64 gr;                        // Gap gas Grashof number
         Real64 pr;                        // Gap gas Prandtl number
@@ -4599,20 +4599,20 @@ namespace WindowManager {
         int ConstrNumSh; // Shaded construction number
         int MatNumSh;    // Material number of shade/blind layer
         // In the following, "gaps" refer to the gaps on either side of the shade/blind
-        Array1D<Real64> TGlassFace(2); // Temperature of glass surfaces facing gaps (K)
-        Array1D<Real64> TShadeFace(2); // Temperature of shade surfaces facing gaps (K)
-        Array1D<Real64> hGapStill(2);  // Still-air conduction/convection coeffs for the gaps (W/m2-K)
-        Array1D<Real64> TGapOld(2);    // Previous-iteration average gas temp in gaps (K)
+        EPVector<Real64> TGlassFace(2); // Temperature of glass surfaces facing gaps (K)
+        EPVector<Real64> TShadeFace(2); // Temperature of shade surfaces facing gaps (K)
+        EPVector<Real64> hGapStill(2);  // Still-air conduction/convection coeffs for the gaps (W/m2-K)
+        EPVector<Real64> TGapOld(2);    // Previous-iteration average gas temp in gaps (K)
         Real64 GapHeight;              // Vertical length of glass-shade/blind gap (m)
         Real64 GapDepth;               // Distance from shade/blind to glass; assumed same for both gaps (m)
-        Array1D<Real64> RhoAir(2);     // Density of gap air (kg/m3)
+        EPVector<Real64> RhoAir(2);     // Density of gap air (kg/m3)
         Real64 AGap;                   // Cross sectional area of each gap (m2); for vertical window, this
         //   is in horizontal plane normal to window.
         Real64 TGapInlet;                 // Gap inlet air temperature (K)
-        Array1D<Real64> TGapOutlet(2);    // Gap outlet air temperature (K)
-        Array1D<Real64> QConvGap(2);      // Convective heat flow from each gap (W)
-        Array1D<Real64> GapHeightChar(2); // Characteristic height of the gap air temperature profile (m)
-        Array1D<Real64> TAve(2);          // Average of TGlass and TShade for the gaps (K)
+        EPVector<Real64> TGapOutlet(2);    // Gap outlet air temperature (K)
+        EPVector<Real64> QConvGap(2);      // Convective heat flow from each gap (W)
+        EPVector<Real64> GapHeightChar(2); // Characteristic height of the gap air temperature profile (m)
+        EPVector<Real64> TAve(2);          // Average of TGlass and TShade for the gaps (K)
         Real64 con;                       // Gap air conductivity and derivative
         Real64 gr;                        // Gap air Grashof number
         Real64 pr;                        // Gap air Prandtl number
@@ -4735,7 +4735,7 @@ namespace WindowManager {
         int k;
         int imax; // Temporary variable
         //   as output: decomposed matrix
-        static Array1D<Real64> vv(10); // Stores the implicit scaling of each row //Tuned Made static
+        static EPVector<Real64> vv(10); // Stores the implicit scaling of each row //Tuned Made static
         Real64 aamax;                  // Absolute value of largest element of matrix
         Real64 dum;                    // Temporary variable
         Real64 sum;                    // Sum of products of matrix elements
@@ -4917,14 +4917,14 @@ namespace WindowManager {
         int j;
         int NMix;                           // Number of gases in a mixture
         Real64 molmix;                      // Molecular weight of mixture
-        static Array1D<Real64> kprime(10);  // Monotonic thermal conductivity
-        static Array1D<Real64> kdblprm(10); // Conductivity term accounting for additional energy moved by
+        static EPVector<Real64> kprime(10);  // Monotonic thermal conductivity
+        static EPVector<Real64> kdblprm(10); // Conductivity term accounting for additional energy moved by
         //  the diffusional transport of internal energy in polyatomic gases.
         Real64 kpmix; // Monotonic thermal conductivity of mixture
         Real64 kdpmix;
-        static Array1D<Real64> mukpdwn(10); // Denominator term
-        static Array1D<Real64> kpdown(10);  // Denominator terms
-        static Array1D<Real64> kdpdown(10);
+        static EPVector<Real64> mukpdwn(10); // Denominator term
+        static EPVector<Real64> kpdown(10);  // Denominator terms
+        static EPVector<Real64> kdpdown(10);
         Real64 kmix;                      // For accumulating conductance of gas mixture
         Real64 mumix;                     // For accumulating viscosity of gas mixture
         Real64 visc(0.0);                 // Dynamic viscosity of mixture at tmean (g/m-s)
@@ -4937,11 +4937,11 @@ namespace WindowManager {
         Real64 psiterm;                   // Factor
         Real64 phikup;                    // Numerator factor
         Real64 rhomix;                    // Density of gas mixture (kg/m3)
-        static Array1D<Real64> frct(10);  // Fraction of each gas in a mixture
-        static Array1D<Real64> fvis(10);  // Viscosity of each gas in a mixture (g/m-s)
-        static Array1D<Real64> fcon(10);  // Conductance of each gas in a mixture (W/m2-K)
-        static Array1D<Real64> fdens(10); // Density of each gas in a mixture (kg/m3)
-        static Array1D<Real64> fcp(10);   // Specific heat of each gas in a mixture (J/m3-K)
+        static EPVector<Real64> frct(10);  // Fraction of each gas in a mixture
+        static EPVector<Real64> fvis(10);  // Viscosity of each gas in a mixture (g/m-s)
+        static EPVector<Real64> fcon(10);  // Conductance of each gas in a mixture (W/m2-K)
+        static EPVector<Real64> fdens(10); // Density of each gas in a mixture (kg/m3)
+        static EPVector<Real64> fcp(10);   // Specific heat of each gas in a mixture (J/m3-K)
 
         NMix = gnmix(IGap); // Autodesk:Logic Either assert NMix>0 or handle NMix<=0 in logic so that con and locals guar. initialized before use
 
@@ -5083,14 +5083,14 @@ namespace WindowManager {
         int j;
         int NMix;                    // Number of gases in a mixture
         Real64 molmix;               // Molecular weight of mixture
-        Array1D<Real64> mukpdwn(10); // Denominator term
+        EPVector<Real64> mukpdwn(10); // Denominator term
         Real64 mumix;                // For accumulating viscosity of gas mixture
         Real64 phimup;               // Numerator factor
         Real64 downer;               // Denominator factor
         Real64 rhomix;               // Density of gas mixture (kg/m3)
-        Array1D<Real64> frct(10);    // Fraction of each gas in a mixture
-        Array1D<Real64> fvis(10);    // Viscosity of each gas in a mixture (g/m-s)
-        Array1D<Real64> fdens(10);   // Density of each gas in a mixture (kg/m3)
+        EPVector<Real64> frct(10);    // Fraction of each gas in a mixture
+        EPVector<Real64> fvis(10);    // Viscosity of each gas in a mixture (g/m-s)
+        EPVector<Real64> fdens(10);   // Density of each gas in a mixture (kg/m3)
 
         NMix = gnmix(IGap);
 
@@ -5188,7 +5188,7 @@ namespace WindowManager {
 
         int i;                             // Face counter
         int ShadeFlag;                     // Shading flag
-        static Array1D<Real64> rguess(11); // Combined radiative/convective resistance (m2-K/W) of //Tuned Made static
+        static EPVector<Real64> rguess(11); // Combined radiative/convective resistance (m2-K/W) of //Tuned Made static
         // inside or outside air film, or gap
         Real64 restot; // Total window resistance including outside
         //   and inside air films (m2-K/W)
@@ -6083,7 +6083,7 @@ namespace WindowManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Array2D<Real64> A(6, 6);  // Least squares derivative matrix
-        Array1D<Real64> B(6);     // Least squares derivative vector
+        EPVector<Real64> B(6);     // Least squares derivative vector
         Array2D<Real64> D(6, 16); // Powers of independent variable
         Real64 ACON;              // Intermediate variables
         Real64 SUM;
@@ -6204,7 +6204,7 @@ namespace WindowManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array2D<Real64> A(6, 6);  // Least squares derivative matrix
-        Array1D<Real64> B(6);     // Least squares derivative vector
+        EPVector<Real64> B(6);     // Least squares derivative vector
         Array2D<Real64> D(6, 16); // Powers of independent variable
         Real64 ACON;              // Intermediate variables
         Real64 SUM;
@@ -6787,15 +6787,15 @@ namespace WindowManager {
         Real64 rOut; // Combined radiative and conductive outside and inside film
         Real64 rIn;
         //   resistance [m2-K/W]
-        Array1D<Real64> hgap(5);        // Conductive gap conductance [W/m2-K]
-        Array1D<Real64> hGapTot(5);     // Combined radiative and conductive gap conductance [W/m2-K]
+        EPVector<Real64> hgap(5);        // Conductive gap conductance [W/m2-K]
+        EPVector<Real64> hGapTot(5);     // Combined radiative and conductive gap conductance [W/m2-K]
         Real64 Rbare;                   // Nominal center-of-glass resistance without air films [m2-K/W]
         int ShadeFlag;                  // Shading flag
         Real64 ShadeRes;                // Thermal resistance of shade
         int MatOutside;                 // Material number of outside layer of construction
         int MatInside;                  // Material number of inside layer of construction
         int MatShade;                   // Material number of shade layer
-        Array1D<Real64> AbsBeamNorm(5); // Beam absorptance at normal incidence for each glass layer
+        EPVector<Real64> AbsBeamNorm(5); // Beam absorptance at normal incidence for each glass layer
         Real64 AbsBeamShadeNorm;        // Shade solar absorptance at normal incidence
         int ConstrNum1;                 // Construction counter
         int ConstrNumBare;              // Construction without shading device
@@ -7261,14 +7261,14 @@ namespace WindowManager {
         Real64 con;                 // Gap gas conductivity
         Real64 pr;                  // Gap gas Prandtl number
         Real64 nu;                  // Gap gas Nusselt number
-        Array1D<Real64> hr(10);     // Radiative conductance (W/m2-K)
-        Array1D<Real64> hrprev(10); // Value of hr from previous iteration
+        EPVector<Real64> hr(10);     // Radiative conductance (W/m2-K)
+        EPVector<Real64> hrprev(10); // Value of hr from previous iteration
         Real64 hcinprev;            // Value of hcin from previous iteration
         Real64 d;                   // +1 if number of row interchanges is even,
         // -1 if odd (in LU decomposition)
         Array1D_int indx(10);          // Vector of row permutations in LU decomposition
         Array2D<Real64> Aface(10, 10); // Coefficient in equation Aface*thetas = Bface
-        Array1D<Real64> Bface(10);     // Coefficient in equation Aface*thetas = Bface
+        EPVector<Real64> Bface(10);     // Coefficient in equation Aface*thetas = Bface
         int iter;                      // Iteration number
         Real64 errtemp;                // Absolute value of sum of face temperature differences
         //   between iterations, divided by number of faces
@@ -7528,7 +7528,7 @@ namespace WindowManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;                      // Face counter
-        Array1D<Real64> rguess(11); // Combined radiative/convective resistance (m2-K/W) of
+        EPVector<Real64> rguess(11); // Combined radiative/convective resistance (m2-K/W) of
         // inside or outside air film, or gap
         Real64 restot; // Total window resistance including outside
         //   and inside air films (m2-K/W)
@@ -8022,10 +8022,10 @@ namespace WindowManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        Array1D<Real64> bld_pr(15);     // Slat properties
-        Array1D<Real64> st_lay(16);     // Solar-optical blind/glazing system properties
+        EPVector<Real64> bld_pr(15);     // Slat properties
+        EPVector<Real64> st_lay(16);     // Solar-optical blind/glazing system properties
         Real64 sun_el;                  // Solar profile angle (radians)
-        Array1D<Real64> sun_el_deg(37); // Solar profile angle (deg) corresponding to sun_el values
+        EPVector<Real64> sun_el_deg(37); // Solar profile angle (deg) corresponding to sun_el values
         Real64 bld_el;                  // Slat angle (elevation of slat normal vector in plane
         //  perpendicular to window and containing the slat normal vector) (radians)
         int ISolVis;  // 1 = do solar and IR calculation; 2 = do visible calculation
@@ -8515,17 +8515,17 @@ namespace WindowManager {
         Real64 phib;                     // Elevation of slat normal vector (radians)
         Real64 phis;                     // Source elevation (radians)
         Real64 delphis;                  // Angle increment for integration over source distribution (radians)
-        Array1D<Real64> fEdgeSource(10); // Slat edge correction factor vs source elevation
-        Array1D<Real64> fEdgeA(2);       // Average slat edge correction factor for upper and lower quadrants
+        EPVector<Real64> fEdgeSource(10); // Slat edge correction factor vs source elevation
+        EPVector<Real64> fEdgeA(2);       // Average slat edge correction factor for upper and lower quadrants
         //  seen by window blind
         Real64 gamma; // phib - phis
         int Iphis;    // Source elevation counter
         int IUpDown;  // =1 for source in upper quadrant, =2 for source in lower quadrant
         Real64 fEdge; // Slat edge correction factor
         Real64 fEdge1;
-        Array1D<Real64> j(6);       // Slat section radiosity vector
-        Array1D<Real64> G(6);       // Slat section irradiance vector
-        Array1D<Real64> Q(6);       // Slat section radiance vector
+        EPVector<Real64> j(6);       // Slat section radiosity vector
+        EPVector<Real64> G(6);       // Slat section irradiance vector
+        EPVector<Real64> Q(6);       // Slat section radiance vector
         Array2D<Real64> F(6, 6);    // View factor array
         Array2D<Real64> X(4, 4);    // Exchange matrix
         Array2D<Real64> Xinv(4, 4); // Inverse of exchange matrix
@@ -8886,9 +8886,9 @@ namespace WindowManager {
         Real64 phib;                // Elevation angle of normal vector to front of slat (0 to pi radians)
         Real64 phis;                // Elevation angle of source vector; same as "profile angle" (-pi/2 to pi/2 radians)
         Real64 gamma;               // phib - phis (radians)
-        Array1D<Real64> j(6);       // Slat surface section radiosity vector
-        Array1D<Real64> G(6);       // Slat surface section irradiance vector
-        Array1D<Real64> Q(6);       // Slat surface section source vector
+        EPVector<Real64> j(6);       // Slat surface section radiosity vector
+        EPVector<Real64> G(6);       // Slat surface section irradiance vector
+        EPVector<Real64> Q(6);       // Slat surface section source vector
         Array2D<Real64> F(6, 6);    // View factor array
         Array2D<Real64> X(4, 4);    // X*J = Q
         Array2D<Real64> Xinv(4, 4); // J = Xinv*Q
@@ -9047,7 +9047,7 @@ namespace WindowManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D<Real64> L(6); // Length of slat sections: L1 = L2 = h; L3, L5 = length
+        EPVector<Real64> L(6); // Length of slat sections: L1 = L2 = h; L3, L5 = length
         Real64 L3;
         Real64 L5;
         //  of upper slat sections; L4, L6 = length of lower slat
@@ -9212,7 +9212,7 @@ namespace WindowManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D<Real64> VV(100);
+        EPVector<Real64> VV(100);
         Real64 sum;
         Real64 aamax;
         Real64 dum;
@@ -9398,7 +9398,7 @@ namespace WindowManager {
         int NumArgs;
         int IOStatus;
         Array1D_string cAlphaArgs;    // Alpha input items for object
-        Array1D<Real64> rNumericArgs; // Numeric input items for object
+        EPVector<Real64> rNumericArgs; // Numeric input items for object
 
         static bool RunMeOnceFlag(false); // This subroutine only needs to be run once
         std::string cCurrentModuleObject;

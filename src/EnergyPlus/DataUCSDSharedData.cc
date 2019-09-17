@@ -104,12 +104,12 @@ namespace DataUCSDSharedData {
     Array1D_int PosZ_Door;
     Array1D_int PosZ_Internal;
     // Convection coeficients for the various surfaces
-    Array1D<Real64> HCeiling;
-    Array1D<Real64> HWall;
-    Array1D<Real64> HFloor;
-    Array1D<Real64> HInternal;
-    Array1D<Real64> HWindow;
-    Array1D<Real64> HDoor;
+    EPVector<Real64> HCeiling;
+    EPVector<Real64> HWall;
+    EPVector<Real64> HFloor;
+    EPVector<Real64> HInternal;
+    EPVector<Real64> HWindow;
+    EPVector<Real64> HDoor;
 
     // Clears the global data in DataAirLoop.
     // Needed for unit tests, should not be normally called.

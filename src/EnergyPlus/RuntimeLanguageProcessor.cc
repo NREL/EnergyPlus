@@ -172,7 +172,7 @@ namespace RuntimeLanguageProcessor {
     // SUBROUTINE SPECIFICATIONS:
 
     // Object Data
-    Array1D<RuntimeReportVarType> RuntimeReportVar;
+    EPVector<RuntimeReportVarType> RuntimeReportVar;
     std::unordered_map<std::string, std::string> ErlStackUniqueNames;
     std::unordered_map<std::string, std::string> RuntimeReportVarUniqueNames;
 
@@ -1162,7 +1162,7 @@ namespace RuntimeLanguageProcessor {
         bool LastED; // last character in a numeric was an E or D
 
         // Object Data
-        static Array1D<TokenType> Token;
+        static EPVector<TokenType> Token;
 
         // FLOW:
         CountDoLooping = 0;
@@ -1786,8 +1786,8 @@ namespace RuntimeLanguageProcessor {
         int ParenthWhileCounter; // used to trap for unbalanced parentheses
 
         // Object Data
-        Array1D<TokenType> Token(TokenIN);
-        Array1D<TokenType> SubTokenList;
+        EPVector<TokenType> Token(TokenIN);
+        EPVector<TokenType> SubTokenList;
 
         // FLOW:
         ExpressionNum = 0;
@@ -2087,7 +2087,7 @@ namespace RuntimeLanguageProcessor {
         Real64 TestValue;       // local temporary
 
         // Object Data
-        Array1D<ErlValueType> Operand;
+        EPVector<ErlValueType> Operand;
 
         static std::string const EMSBuiltInFunction("EMS Built-In Function");
 
@@ -2760,7 +2760,7 @@ namespace RuntimeLanguageProcessor {
         Array1D_bool lNumericFieldBlanks;
         Array1D_bool lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
+        EPVector<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         int ConstructNum;
         bool errFlag;

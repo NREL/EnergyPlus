@@ -108,7 +108,7 @@ namespace PlantComponentTemperatureSources {
     bool GetInput(true); // then TRUE, calls subroutine to read input file.
 
     // Object Data
-    Array1D<WaterSourceSpecs> WaterSource; // dimension to number of machines
+    EPVector<WaterSourceSpecs> WaterSource; // dimension to number of machines
 
     void SimWaterSource(std::string const &SourceName,            // user-specified name for this component
                         int const EP_UNUSED(EquipFlowCtrl),       // Flow control mode for the equipment

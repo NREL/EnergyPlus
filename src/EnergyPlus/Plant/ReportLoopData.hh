@@ -68,7 +68,7 @@ namespace DataPlant {
         int TotalBranches; // Total number of branches on the loop
         Real64 LoopVentLoad;
         Real64 VentLoadFrac;
-        Array1D<ReportBranchData> Branch; // Branch data
+        EPVector<ReportBranchData> Branch; // Branch data
 
         // Default Constructor
         ReportLoopData()

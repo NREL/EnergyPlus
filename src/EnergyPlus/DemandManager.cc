@@ -136,8 +136,8 @@ namespace DemandManager {
     // SUBROUTINE SPECIFICATIONS:
 
     // Object Data
-    Array1D<DemandManagerListData> DemandManagerList;
-    Array1D<DemandManagerData> DemandMgr;
+    EPVector<DemandManagerListData> DemandManagerList;
+    EPVector<DemandManagerData> DemandMgr;
     std::unordered_map<std::string, std::string> UniqueDemandMgrNames;
 
     // MODULE SUBROUTINES:
@@ -417,7 +417,7 @@ namespace DemandManager {
         int NumNums;              // Number of elements in the numeric array
         int IOStat;               // IO Status when calling get input subroutine
         Array1D_string AlphArray; // Character string data
-        Array1D<Real64> NumArray; // Numeric data
+        EPVector<Real64> NumArray; // Numeric data
         std::string Units;        // String for meter units
         static bool ErrorsFound(false);
         std::string CurrentModuleObject; // for ease in renaming.
@@ -689,7 +689,7 @@ namespace DemandManager {
         int NumParams;            // Number of arguments total in an ObjectDef
         int IOStat;               // IO Status when calling get input subroutine
         Array1D_string AlphArray; // Character string data
-        Array1D<Real64> NumArray; // Numeric data
+        EPVector<Real64> NumArray; // Numeric data
         static bool ErrorsFound(false);
         std::string CurrentModuleObject; // for ease in renaming.
         int Item;

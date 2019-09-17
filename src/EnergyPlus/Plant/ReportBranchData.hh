@@ -60,7 +60,7 @@ namespace DataPlant {
         int TotalComponents;          // Total number of components on the branch
         int NodeNumIn;                // Branch inlet node number
         int NodeNumOut;               // Branch outlet node number
-        Array1D<ReportCompData> Comp; // Component type list
+        EPVector<ReportCompData> Comp; // Component type list
 
         // Default Constructor
         ReportBranchData() : TotalComponents(0), NodeNumIn(0), NodeNumOut(0)

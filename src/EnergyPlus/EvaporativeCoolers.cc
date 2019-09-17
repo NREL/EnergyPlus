@@ -183,10 +183,10 @@ namespace EvaporativeCoolers {
     // zone unit routines
 
     // Object Data
-    Array1D<EvapConditions> EvapCond;
+    EPVector<EvapConditions> EvapCond;
     std::unordered_map<std::string, std::string> UniqueEvapCondNames;
-    Array1D<ZoneEvapCoolerUnitStruct> ZoneEvapUnit;
-    Array1D<ZoneEvapCoolerUnitFieldData> ZoneEvapCoolerUnitFields;
+    EPVector<ZoneEvapCoolerUnitStruct> ZoneEvapUnit;
+    EPVector<ZoneEvapCoolerUnitFieldData> ZoneEvapCoolerUnitFields;
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -2508,7 +2508,7 @@ namespace EvaporativeCoolers {
         Real64 EvapCoolerTotalElectricPowerDry; // evaporative cooler current total electric power drawn
         Real64 EvapCoolerTotalElectricPowerWet; // evaporative cooler current total electric power drawn
         int SolFla;                             // Flag of solver
-        Array1D<Real64> Par(6);                 // Parameter array passed to solver
+        EPVector<Real64> Par(6);                 // Parameter array passed to solver
         Real64 QHXLatent;                       // evaporative cooler latent heat transfer rate
         Real64 hfg;                             // latent heat of vaporization of water at the secondary air inlet condition
 
@@ -3660,7 +3660,7 @@ namespace EvaporativeCoolers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string CurrentModuleObject; // Object type for getting and error messages
         Array1D_string Alphas;           // Alpha items for object
-        Array1D<Real64> Numbers;         // Numeric items for object
+        EPVector<Real64> Numbers;         // Numeric items for object
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
@@ -4632,7 +4632,7 @@ namespace EvaporativeCoolers {
         int const MaxIte(50);          // maximum number of iterations
         Real64 const Tol(0.01);        // error tolerance
         int SolFla;                    // Flag of root solver
-        Array1D<Real64> Par(2);        // Parameters passed to root solver
+        EPVector<Real64> Par(2);        // Parameters passed to root solver
         Real64 PartLoadRatio;          // cooling part load ratio
         Real64 FullFlowSensibleOutput; // full flow sensible cooling output
         Real64 FullFlowLatentOutput;   // full flow sensible cooling output
@@ -4744,7 +4744,7 @@ namespace EvaporativeCoolers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MinHumRat;
-        Array1D<Real64> Par(5); // Parameters passed to RegulaFalsi
+        EPVector<Real64> Par(5); // Parameters passed to RegulaFalsi
         Real64 FanSpeedRatio;
         static Real64 ErrorToler(0.001); // error tolerance
         int SolFla;                      // Flag of RegulaFalsi solver

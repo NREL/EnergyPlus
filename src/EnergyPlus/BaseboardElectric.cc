@@ -110,8 +110,8 @@ namespace BaseboardElectric {
     // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
     // Object Data
-    Array1D<BaseboardParams> Baseboard;
-    Array1D<BaseboardNumericFieldData> BaseboardNumericFields;
+    EPVector<BaseboardParams> Baseboard;
+    EPVector<BaseboardNumericFieldData> BaseboardNumericFields;
 
     // Functions
 

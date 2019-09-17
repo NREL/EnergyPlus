@@ -119,8 +119,8 @@ namespace HVACHXAssistedCoolingCoil {
 
     // MODULE VARIABLE DECLARATIONS:
     int TotalNumHXAssistedCoils(0);             // The total number of HXAssistedCoolingCoil compound objects
-    Array1D<Real64> HXAssistedCoilOutletTemp;   // Outlet temperature from this compound object
-    Array1D<Real64> HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
+    EPVector<Real64> HXAssistedCoilOutletTemp;   // Outlet temperature from this compound object
+    EPVector<Real64> HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
     // PUBLIC so others can access this information
     bool GetCoilsInputFlag(true); // Flag to allow input data to be retrieved from idf on first call to this subroutine
     Array1D_bool CheckEquipName;
@@ -146,7 +146,7 @@ namespace HVACHXAssistedCoolingCoil {
     // Utility routines for module
 
     // Object Data
-    Array1D<HXAssistedCoilParameters> HXAssistedCoil;
+    EPVector<HXAssistedCoilParameters> HXAssistedCoil;
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -326,7 +326,7 @@ namespace HVACHXAssistedCoolingCoil {
         Array1D_string AlphArray;         // Alpha input items for object
         Array1D_string cAlphaFields;      // Alpha field names
         Array1D_string cNumericFields;    // Numeric field names
-        Array1D<Real64> NumArray;         // Numeric input items for object
+        EPVector<Real64> NumArray;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;        // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;      // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);            // Maximum number of numeric input fields

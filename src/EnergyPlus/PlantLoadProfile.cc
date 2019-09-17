@@ -101,7 +101,7 @@ namespace PlantLoadProfile {
     int NumOfPlantProfile;
 
     // Object Data
-    Array1D<PlantProfileData> PlantProfile;
+    EPVector<PlantProfileData> PlantProfile;
 
     PlantComponent *PlantProfileData::factory(std::string objectName)
     {

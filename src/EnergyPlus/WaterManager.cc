@@ -257,7 +257,7 @@ namespace WaterManager {
         Array1D_bool lNumericFieldBlanks;
         Array1D_bool lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
+        EPVector<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
         static Real64 tmpMax(0.0);
         static Real64 tmpMin(0.0);

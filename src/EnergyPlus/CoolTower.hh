@@ -141,7 +141,7 @@ namespace CoolTower {
     };
 
     // Object Data
-    extern Array1D<CoolTowerParams> CoolTowerSys;
+    extern EPVector<CoolTowerParams> CoolTowerSys;
 
     // Functions
 

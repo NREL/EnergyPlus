@@ -158,8 +158,8 @@ namespace EarthTube {
     };
 
     // Object Data
-    extern Array1D<EarthTubeData> EarthTubeSys;
-    extern Array1D<EarthTubeZoneReportVars> ZnRptET;
+    extern EPVector<EarthTubeData> EarthTubeSys;
+    extern EPVector<EarthTubeZoneReportVars> ZnRptET;
 
     // Functions
     void clear_state();

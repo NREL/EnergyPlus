@@ -260,10 +260,10 @@ namespace WaterThermalTanks {
     // SUBROUTINE SPECIFICATIONS:
 
     // Object Data
-    Array1D<WaterThermalTankData> WaterThermalTank;
+    EPVector<WaterThermalTankData> WaterThermalTank;
     std::unordered_map<std::string, std::string> UniqueWaterThermalTankNames;
-    Array1D<HeatPumpWaterHeaterData> HPWaterHeater;
-    Array1D<WaterHeaterDesuperheaterData> WaterHeaterDesuperheater;
+    EPVector<HeatPumpWaterHeaterData> HPWaterHeater;
+    EPVector<WaterHeaterDesuperheaterData> WaterHeaterDesuperheater;
 
     static ObjexxFCL::gio::Fmt fmtLD("*");
 
@@ -1105,9 +1105,9 @@ namespace WaterThermalTanks {
         };
 
         // Object Data
-        Array1D<WaterHeaterSaveNodes> HPWHSaveNodeNames; // temporary for HPWH node names used in later checks
-        Array1D<WaterHeaterSaveNodes> WHSaveNodeNames;   // temporary for WH node names used in later checks
-        Array1D<WaterHeaterSaveNodes> CoilSaveNodeNames; // temporary for coil node names used in later checks
+        EPVector<WaterHeaterSaveNodes> HPWHSaveNodeNames; // temporary for HPWH node names used in later checks
+        EPVector<WaterHeaterSaveNodes> WHSaveNodeNames;   // temporary for WH node names used in later checks
+        EPVector<WaterHeaterSaveNodes> CoilSaveNodeNames; // temporary for coil node names used in later checks
 
         // Formats
         static ObjexxFCL::gio::Fmt Format_720("('! <Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},Standard Rated Recovery Efficiency, "
@@ -8767,7 +8767,7 @@ namespace WaterThermalTanks {
         int DesuperheaterNum;       // Index to desuperheater
         int SolFla;                 // Flag of RegulaFalsi solver
         int SourceID;               // Waste Heat Source ID number
-        Array1D<Real64> Par(5);     // Parameters passed to RegulaFalsi
+        EPVector<Real64> Par(5);     // Parameters passed to RegulaFalsi
         static Real64 MinTemp(0.0); // used for error messages, C
         std::string IterNum;        // Max number of iterations for warning message
 
@@ -9300,8 +9300,8 @@ namespace WaterThermalTanks {
         int OutletAirSplitterNode;   // HP outlet air splitter node number
         int DXCoilAirInletNode;      // Inlet air node number of DX coil
         int SolFla(0);               // Flag of RegulaFalsi solver
-        Array1D<Real64> Par(5);      // Parameters passed to RegulaFalsi
-        Array1D<Real64> ParVS(10);   // Parameters passed to RegulaFalsi, for variable-speed HPWH
+        EPVector<Real64> Par(5);      // Parameters passed to RegulaFalsi
+        EPVector<Real64> ParVS(10);   // Parameters passed to RegulaFalsi, for variable-speed HPWH
         Real64 HPMinTemp;            // used for error messages, C
         std::string HPMinTempChar;   // used for error messages
         std::string IterNum;         // Max number of iterations for warning message

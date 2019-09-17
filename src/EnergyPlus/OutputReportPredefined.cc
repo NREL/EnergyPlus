@@ -887,12 +887,12 @@ namespace OutputReportPredefined {
     Real64 TotalTimeNotSimpleASH55EitherForABUPS(0.0);
 
     // Object Data
-    Array1D<reportNameType> reportName;
-    Array1D<SubTableType> subTable;
-    Array1D<ColumnTagType> columnTag;
-    Array1D<TableEntryType> tableEntry;
-    Array1D<CompSizeTableEntryType> CompSizeTableEntry;
-    Array1D<ShadowRelateType> ShadowRelate;
+    EPVector<reportNameType> reportName;
+    EPVector<SubTableType> subTable;
+    EPVector<ColumnTagType> columnTag;
+    EPVector<TableEntryType> tableEntry;
+    EPVector<CompSizeTableEntryType> CompSizeTableEntry;
+    EPVector<ShadowRelateType> ShadowRelate;
 
     // Functions
     void clear_state()

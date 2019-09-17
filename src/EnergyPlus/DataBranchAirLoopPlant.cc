@@ -105,7 +105,7 @@ namespace DataBranchAirLoopPlant {
     int NumPressureCurves(0);
 
     // Object Data
-    Array1D<PlantPressureCurveData> PressureCurve;
+    EPVector<PlantPressureCurveData> PressureCurve;
 
     void clear_state()
     {

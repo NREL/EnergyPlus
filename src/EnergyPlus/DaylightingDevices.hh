@@ -64,7 +64,7 @@ namespace DaylightingDevices {
     // MODULE VARIABLE TYPE DECLARATIONS: na
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Array1D<Real64> COSAngle; // List of cosines of incident angle
+    extern EPVector<Real64> COSAngle; // List of cosines of incident angle
 
     // SUBROUTINE SPECIFICATIONS:
 

@@ -182,7 +182,7 @@ namespace WaterToAirHeatPumpSimple {
     // Utility routines
 
     // Object Data
-    Array1D<SimpleWatertoAirHPConditions> SimpleWatertoAirHP;
+    EPVector<SimpleWatertoAirHPConditions> SimpleWatertoAirHP;
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -357,7 +357,7 @@ namespace WaterToAirHeatPumpSimple {
         Array1D_string AlphArray;        // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D<Real64> NumArray;        // Numeric input items for object
+        EPVector<Real64> NumArray;        // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 

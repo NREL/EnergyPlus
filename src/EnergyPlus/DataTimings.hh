@@ -128,7 +128,7 @@ namespace DataTimings {
     };
 
     // Object Data
-    extern Array1D<timings> Timing;
+    extern EPVector<timings> Timing;
 
     // Functions
 

@@ -61,6 +61,7 @@
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
 #include <UtilityRoutines.hh>
+#include "InputProcessing/InputProcessor.hh"
 
 namespace EnergyPlus {
 
@@ -137,7 +138,7 @@ namespace Psychrometrics {
     extern bool ReportErrors;
     extern Array1D_int iPsyErrIndex; // Number of times error occurred
 #ifdef EP_psych_stats
-    extern Array1D<Int64> NumTimesCalled;
+    extern EPVector<Int64> NumTimesCalled;
     extern Array1D_int NumIterations;
 #endif
 
@@ -177,10 +178,10 @@ namespace Psychrometrics {
 
     // Object Data
 #ifdef EP_cache_PsyTwbFnTdbWPb
-    extern Array1D<cached_twb_t> cached_Twb; // DIMENSION(0:twbcache_size)
+    extern EPVector<cached_twb_t> cached_Twb; // DIMENSION(0:twbcache_size)
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
-    extern Array1D<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
+    extern EPVector<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
 #endif
 
     // Subroutine Specifications for the Module

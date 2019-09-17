@@ -96,25 +96,25 @@ namespace ZonePlenum {
         Real64 OutletMassFlowRateMinAvail; // [kg/Sec]
         int NumInducedNodes;
         Array1D_int InducedNode;
-        Array1D<Real64> InducedMassFlowRate;
-        Array1D<Real64> InducedMassFlowRateMaxAvail;
-        Array1D<Real64> InducedMassFlowRateMinAvail;
-        Array1D<Real64> InducedTemp;
-        Array1D<Real64> InducedHumRat;
-        Array1D<Real64> InducedEnthalpy;
-        Array1D<Real64> InducedPressure;
-        Array1D<Real64> InducedCO2;
-        Array1D<Real64> InducedGenContam;
+        EPVector<Real64> InducedMassFlowRate;
+        EPVector<Real64> InducedMassFlowRateMaxAvail;
+        EPVector<Real64> InducedMassFlowRateMinAvail;
+        EPVector<Real64> InducedTemp;
+        EPVector<Real64> InducedHumRat;
+        EPVector<Real64> InducedEnthalpy;
+        EPVector<Real64> InducedPressure;
+        EPVector<Real64> InducedCO2;
+        EPVector<Real64> InducedGenContam;
         bool InitFlag;
         int NumInletNodes;
         Array1D_int InletNode;
-        Array1D<Real64> InletMassFlowRate;
-        Array1D<Real64> InletMassFlowRateMaxAvail;
-        Array1D<Real64> InletMassFlowRateMinAvail;
-        Array1D<Real64> InletTemp;
-        Array1D<Real64> InletHumRat;
-        Array1D<Real64> InletEnthalpy;
-        Array1D<Real64> InletPressure;
+        EPVector<Real64> InletMassFlowRate;
+        EPVector<Real64> InletMassFlowRateMaxAvail;
+        EPVector<Real64> InletMassFlowRateMinAvail;
+        EPVector<Real64> InletTemp;
+        EPVector<Real64> InletHumRat;
+        EPVector<Real64> InletEnthalpy;
+        EPVector<Real64> InletPressure;
         Array1D_int ADUIndex;  // index to AirDistUnit leaking to this plenum
         int NumADUs;           // number of ADU's that can leak to this plenum
         Array1D_int ZoneEqNum; // list of zone equip config indices for this plenum
@@ -150,13 +150,13 @@ namespace ZonePlenum {
         bool InitFlag;
         int NumOutletNodes;
         Array1D_int OutletNode;
-        Array1D<Real64> OutletMassFlowRate;
-        Array1D<Real64> OutletMassFlowRateMaxAvail;
-        Array1D<Real64> OutletMassFlowRateMinAvail;
-        Array1D<Real64> OutletTemp;
-        Array1D<Real64> OutletHumRat;
-        Array1D<Real64> OutletEnthalpy;
-        Array1D<Real64> OutletPressure;
+        EPVector<Real64> OutletMassFlowRate;
+        EPVector<Real64> OutletMassFlowRateMaxAvail;
+        EPVector<Real64> OutletMassFlowRateMinAvail;
+        EPVector<Real64> OutletTemp;
+        EPVector<Real64> OutletHumRat;
+        EPVector<Real64> OutletEnthalpy;
+        EPVector<Real64> OutletPressure;
 
         // Default Constructor
         ZoneSupplyPlenumConditions()
@@ -168,8 +168,8 @@ namespace ZonePlenum {
     };
 
     // Object Data
-    extern Array1D<ZoneReturnPlenumConditions> ZoneRetPlenCond;
-    extern Array1D<ZoneSupplyPlenumConditions> ZoneSupPlenCond;
+    extern EPVector<ZoneReturnPlenumConditions> ZoneRetPlenCond;
+    extern EPVector<ZoneSupplyPlenumConditions> ZoneSupPlenCond;
 
     // Functions
 

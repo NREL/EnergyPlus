@@ -285,10 +285,10 @@ namespace IceThermalStorage {
     };
 
     // Object Data
-    extern Array1D<IceStorageSpecs> IceStorage;        // dimension to number of machines
-    extern Array1D<ReportVars> IceStorageReport;       // dimension to number of machines
-    extern Array1D<DetailedIceStorageData> DetIceStor; // Derived type for detailed ice storage model
-    extern Array1D<IceStorageMapping> IceStorageTypeMap;
+    extern EPVector<IceStorageSpecs> IceStorage;        // dimension to number of machines
+    extern EPVector<ReportVars> IceStorageReport;       // dimension to number of machines
+    extern EPVector<DetailedIceStorageData> DetIceStor; // Derived type for detailed ice storage model
+    extern EPVector<IceStorageMapping> IceStorageTypeMap;
 
     // Functions
 

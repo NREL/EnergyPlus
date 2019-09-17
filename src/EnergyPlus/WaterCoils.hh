@@ -199,7 +199,7 @@ namespace WaterCoils {
         Real64 CoilEffectiveInsideDiam;
         Real64 GeometryCoef1;
         Real64 GeometryCoef2;
-        Array1D<Real64> DryFinEfficncyCoef;
+        EPVector<Real64> DryFinEfficncyCoef;
         Real64 SatEnthlCurveConstCoef;
         Real64 SatEnthlCurveSlope;
         Real64 EnthVsTempCurveAppxSlope;
@@ -309,8 +309,8 @@ namespace WaterCoils {
     };
 
     // Object Data
-    extern Array1D<WaterCoilEquipConditions> WaterCoil;
-    extern Array1D<WaterCoilNumericFieldData> WaterCoilNumericFields;
+    extern EPVector<WaterCoilEquipConditions> WaterCoil;
+    extern EPVector<WaterCoilNumericFieldData> WaterCoilNumericFields;
 
     // Functions
     void clear_state();

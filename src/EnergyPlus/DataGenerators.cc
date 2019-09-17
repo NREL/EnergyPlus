@@ -156,12 +156,12 @@ namespace DataGenerators {
     int NumGensWDynamics(0);  // number of dynamics controls for generators
 
     // Object Data
-    Array1D<FCDataStruct> FuelCell; // dimension to number of machines
-    Array1D<GasPropertyDataStruct> GasPhaseThermoChemistryData;
-    Array1D<GeneratorFuelSupplyDataStruct> FuelSupply; // fuel supply (reused across various)
-    Array1D<MicroCHPDataStruct> MicroCHP;
-    Array1D<MicroCHPParamsNonNormalized> MicroCHPParamInput; // Used during get input then put into nested
-    Array1D<GeneratorDynamicsManagerStruct> GeneratorDynamics;
+    EPVector<FCDataStruct> FuelCell; // dimension to number of machines
+    EPVector<GasPropertyDataStruct> GasPhaseThermoChemistryData;
+    EPVector<GeneratorFuelSupplyDataStruct> FuelSupply; // fuel supply (reused across various)
+    EPVector<MicroCHPDataStruct> MicroCHP;
+    EPVector<MicroCHPParamsNonNormalized> MicroCHPParamInput; // Used during get input then put into nested
+    EPVector<GeneratorDynamicsManagerStruct> GeneratorDynamics;
 
     void clear_state()
     {

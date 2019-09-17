@@ -139,9 +139,9 @@ namespace DataZoneEquipment {
     // moved from HVACManager.hh to avoid circular call, B Nigusse, 05/14
     extern Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
     extern Array1D_bool MixingReportFlag;      // TRUE when Mixing is active based on controls
-    extern Array1D<Real64> VentMCP;            // product of mass rate and Cp for each Venitlation object
-    extern Array1D<Real64> ZMAT;               // Zone air temperature for zone air mixing
-    extern Array1D<Real64> ZHumRat;            // Zone air humidity ratio zone air mixing
+    extern EPVector<Real64> VentMCP;            // product of mass rate and Cp for each Venitlation object
+    extern EPVector<Real64> ZMAT;               // Zone air temperature for zone air mixing
+    extern EPVector<Real64> ZHumRat;            // Zone air humidity ratio zone air mixing
     // Utility routines for module
 
     // Types
@@ -186,7 +186,7 @@ namespace DataZoneEquipment {
         int InletNodeNum;
         int OutletNodeNum;
         int NumMeteredVars;
-        Array1D<EquipMeterData> MeteredVar; // Index of energy output report data
+        EPVector<EquipMeterData> MeteredVar; // Index of energy output report data
         int EnergyTransComp;                // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
         int ZoneEqToPlantPtr;               // 0=No plant loop connection, >=0 index to ZoneEqToPlant array
         int OpMode;
@@ -227,8 +227,8 @@ namespace DataZoneEquipment {
         int InletNodeNum;
         int OutletNodeNum;
         int NumMeteredVars;
-        Array1D<EquipMeterData> MeteredVar;           // Index of energy output report data
-        Array1D<SubSubEquipmentData> SubSubEquipData; // Component list
+        EPVector<EquipMeterData> MeteredVar;           // Index of energy output report data
+        EPVector<SubSubEquipmentData> SubSubEquipData; // Component list
         int EnergyTransComp;                          // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
         int ZoneEqToPlantPtr;                         // 0=No plant loop connection, >0 index to ZoneEqToPlant array
         int OpMode;
@@ -269,7 +269,7 @@ namespace DataZoneEquipment {
         int TermUnitSizingIndex; // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
         int SupplyAirPathIndex;
         Real64 NetBranchCoilDemand;
-        Array1D<SubSubEquipmentData> Coil;
+        EPVector<SubSubEquipmentData> Coil;
 
         // Default Constructor
         AirIn()
@@ -322,8 +322,8 @@ namespace DataZoneEquipment {
         // or the cold/hot side of AIR DISTRIBUTION
         // UNIT object.  That is both AirDistUnitHeat and AirDistUnitCool are required to describe a dual
         // duct AIR DISTRIBUTION object in the ZoneEquipList.
-        Array1D<AirIn> AirDistUnitHeat; // dimensioned to number of zone inlet nodes
-        Array1D<AirIn> AirDistUnitCool; // dimensioned to number of zone inlet nodes.
+        EPVector<AirIn> AirDistUnitHeat; // dimensioned to number of zone inlet nodes
+        EPVector<AirIn> AirDistUnitCool; // dimensioned to number of zone inlet nodes.
         bool InFloorActiveElement;      // Convection adapation, true if zone has in-floor HVAC
         bool InWallActiveElement;       // Convection adapation, true if zone has in-wall HVAC
         bool InCeilingActiveElement;    // Convection adapation,
@@ -356,8 +356,8 @@ namespace DataZoneEquipment {
         Array1D_int InletNodeNums;
         Array1D_int OutletNodeNums;
         int NumMeteredVars;
-        Array1D<EquipMeterData> MeteredVar;     // Index of energy output report data
-        Array1D<SubEquipmentData> SubEquipData; // Component list
+        EPVector<EquipMeterData> MeteredVar;     // Index of energy output report data
+        EPVector<SubEquipmentData> SubEquipData; // Component list
         int EnergyTransComp;                    // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
         int ZoneEqToPlantPtr;                   // 0=No plant loop connection, >0 index to ZoneEqToPlant array
         Real64 TotPlantSupplyElec;
@@ -403,7 +403,7 @@ namespace DataZoneEquipment {
         Array1D_int SequentialHeatingFractionSchedPtr;
         Array1D_int CoolingCapacity;      // Current cooling capacity (negative) [W]
         Array1D_int HeatingCapacity;      // Current heating capacity (positive) [W]
-        Array1D<EquipmentData> EquipData; // Index of energy output report data
+        EPVector<EquipmentData> EquipData; // Index of energy output report data
 
         // Default Constructor
         EquipList() : LoadDistScheme(DataZoneEquipment::LoadDist::SequentialLoading), NumOfEquipTypes(0), NumAvailHeatEquip(0), NumAvailCoolEquip(0)
@@ -476,12 +476,12 @@ namespace DataZoneEquipment {
     };
 
     // Object Data
-    extern Array1D<EquipConfiguration> ZoneEquipConfig;
-    extern Array1D<EquipList> ZoneEquipList;
-    extern Array1D<ControlList> HeatingControlList;
-    extern Array1D<ControlList> CoolingControlList;
-    extern Array1D<SupplyAir> SupplyAirPath;
-    extern Array1D<ReturnAir> ReturnAirPath;
+    extern EPVector<EquipConfiguration> ZoneEquipConfig;
+    extern EPVector<EquipList> ZoneEquipList;
+    extern EPVector<ControlList> HeatingControlList;
+    extern EPVector<ControlList> CoolingControlList;
+    extern EPVector<SupplyAir> SupplyAirPath;
+    extern EPVector<ReturnAir> ReturnAirPath;
 
     // Functions
     // Clears the global data in DataZoneEquipment.

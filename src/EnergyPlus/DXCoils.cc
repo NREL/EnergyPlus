@@ -203,17 +203,17 @@ namespace DXCoils {
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-    Array1D<Real64> DXCoilOutletTemp;           // DX coil outlet dry bulb temperature [C]
-    Array1D<Real64> DXCoilOutletHumRat;         // DX coil outlet humidity ratio [kgWater/kgDryAir]
-    Array1D<Real64> DXCoilPartLoadRatio;        // DX coil part-load ratio
+    EPVector<Real64> DXCoilOutletTemp;           // DX coil outlet dry bulb temperature [C]
+    EPVector<Real64> DXCoilOutletHumRat;         // DX coil outlet humidity ratio [kgWater/kgDryAir]
+    EPVector<Real64> DXCoilPartLoadRatio;        // DX coil part-load ratio
     Array1D_int DXCoilFanOpMode;                // supply air fan operating mode
-    Array1D<Real64> DXCoilFullLoadOutAirTemp;   // DX coil full load outlet dry bulb temperature [C]
-    Array1D<Real64> DXCoilFullLoadOutAirHumRat; // DX coil full load outlet humidity ratio [kgWater/kgDryAir]
-    Array1D<Real64> DXCoilTotalCooling;         // DX cooling coil total cooling output [W]
-    Array1D<Real64> DXCoilTotalHeating;         // DX heating coil total heating output [W]
-    Array1D<Real64> DXCoilCoolInletAirWBTemp;   // DX cooling coil inlet air wet-bulb temp [C]
-    Array1D<Real64> DXCoilHeatInletAirDBTemp;   // DX heating coil inlet air dry-bulb temp [C]
-    Array1D<Real64> DXCoilHeatInletAirWBTemp;   // DX heating coil inlet air wet-bulb temp [C]
+    EPVector<Real64> DXCoilFullLoadOutAirTemp;   // DX coil full load outlet dry bulb temperature [C]
+    EPVector<Real64> DXCoilFullLoadOutAirHumRat; // DX coil full load outlet humidity ratio [kgWater/kgDryAir]
+    EPVector<Real64> DXCoilTotalCooling;         // DX cooling coil total cooling output [W]
+    EPVector<Real64> DXCoilTotalHeating;         // DX heating coil total heating output [W]
+    EPVector<Real64> DXCoilCoolInletAirWBTemp;   // DX cooling coil inlet air wet-bulb temp [C]
+    EPVector<Real64> DXCoilHeatInletAirDBTemp;   // DX heating coil inlet air dry-bulb temp [C]
+    EPVector<Real64> DXCoilHeatInletAirWBTemp;   // DX heating coil inlet air wet-bulb temp [C]
 
     int CurDXCoilNum(0);
 
@@ -252,8 +252,8 @@ namespace DXCoils {
     // External function calls
 
     // Object Data
-    Array1D<DXCoilData> DXCoil;
-    Array1D<DXCoilNumericFieldData> DXCoilNumericFields;
+    EPVector<DXCoilData> DXCoil;
+    EPVector<DXCoilNumericFieldData> DXCoilNumericFields;
 
     // bool CrankcaseHeaterReportVarFlag( true ); // One time flag used to report crankcase heater power for non-HP coils
     namespace {
@@ -894,7 +894,7 @@ namespace DXCoils {
         int NumAlphas;                   // Number of alphas in input
         int NumNumbers;                  // Number of numeric items in input
         Array1D_string Alphas2;          // Alpha input items for object
-        Array1D<Real64> Numbers2;        // Numeric input items for object
+        EPVector<Real64> Numbers2;        // Numeric input items for object
         Array1D_string cAlphaFields2;    // Alpha field names
         Array1D_string cNumericFields2;  // Numeric field names
         Array1D_bool lAlphaBlanks2;      // Logical array, alpha field input BLANK = .TRUE.
@@ -919,7 +919,7 @@ namespace DXCoils {
         Array1D_string Alphas;           // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D<Real64> Numbers;         // Numeric input items for object
+        EPVector<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNumbers(0);        // Maximum number of numeric input fields
@@ -13635,8 +13635,8 @@ namespace DXCoils {
         Real64 const CoolingCoilInletAirWetBulbTempRated(19.4); // 19.44C (67F)
         Real64 const CoolingCoilInletAirDryBulbTempRated(26.7);
         Real64 const OutdoorUnitInletAirDryBulbTempRated(35.0); // 35.00C (95F)
-        static Array1D<Real64> const OutdoorUnitInletAirDryBulbTempPLTestPoint(3, {27.5, 20.0, 18.3});
-        static Array1D<Real64> const NetCapacityFactorPLTestPoint(3, {0.75, 0.50, 0.25});
+        static EPVector<Real64> const OutdoorUnitInletAirDryBulbTempPLTestPoint(3, {27.5, 20.0, 18.3});
+        static EPVector<Real64> const NetCapacityFactorPLTestPoint(3, {0.75, 0.50, 0.25});
         Real64 const ConvFromSIToIP(3.412141633); // Conversion from SI to IP [3.412 Btu/hr-W]
 
         Real64 const AirMassFlowRatioRated(1.0); // AHRI test is at the design flow rate
@@ -13660,11 +13660,11 @@ namespace DXCoils {
         static Real64 EIRFlowModFac(0.0);      // EIR modifier (function of actual supply air flow vs rated flow) [-]
         Real64 EIR;
         Real64 TotalElecPowerRated;
-        Array1D<Real64> EER_TestPoint_SI(4);      // 1 = A, 2 = B, 3= C, 4= D
-        Array1D<Real64> EER_TestPoint_IP(4);      // 1 = A, 2 = B, 3= C, 4= D
-        Array1D<Real64> NetCapacity_TestPoint(4); // 1 = A, 2 = B, 3= C, 4= D
-        Array1D<Real64> NetPower_TestPoint(4);    // 1 = A, 2 = B, 3= C, 4= D
-        Array1D<Real64> SupAirMdot_TestPoint(4);  // 1 = A, 2 = B, 3= C, 4= D
+        EPVector<Real64> EER_TestPoint_SI(4);      // 1 = A, 2 = B, 3= C, 4= D
+        EPVector<Real64> EER_TestPoint_IP(4);      // 1 = A, 2 = B, 3= C, 4= D
+        EPVector<Real64> NetCapacity_TestPoint(4); // 1 = A, 2 = B, 3= C, 4= D
+        EPVector<Real64> NetPower_TestPoint(4);    // 1 = A, 2 = B, 3= C, 4= D
+        EPVector<Real64> SupAirMdot_TestPoint(4);  // 1 = A, 2 = B, 3= C, 4= D
 
         static Real64 TempDryBulb_Leaving_Apoint(0.0);
 
@@ -13676,7 +13676,7 @@ namespace DXCoils {
         static Real64 AccuracyTolerance(0.2); // tolerance in AHRI 340/360 Table 6 note 1
         static int MaximumIterations(1000);
         int SolverFlag;
-        Array1D<Real64> Par(12); // Parameter array passed to solver
+        EPVector<Real64> Par(12); // Parameter array passed to solver
         Real64 EIR_HighSpeed;
         Real64 EIR_LowSpeed;
         int FanInletNode;
@@ -16546,7 +16546,7 @@ namespace DXCoils {
         using Psychrometrics::PsyHFnTdbW;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D<Real64> Par(11);    // Parameter array for SolveRoot
+        EPVector<Real64> Par(11);    // Parameter array for SolveRoot
         int MaxIter(500);           // Max iteration numbers (-)
         int SolFla;                 // Solving flag for SolveRoot (-)
         int const FlagCoolMode(0);  // Flag for cooling mode

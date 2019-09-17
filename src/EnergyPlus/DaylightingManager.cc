@@ -189,16 +189,16 @@ namespace DaylightingManager {
     // MODULE VARIABLE DECLARATIONS:
     int TotWindowsWithDayl(0);         // Total number of exterior windows in all daylit zones
     int OutputFileDFS(0);              // Unit number for daylight factors
-    Array1D<Real64> DaylIllum;         // Daylight illuminance at reference points (lux)
+    EPVector<Real64> DaylIllum;         // Daylight illuminance at reference points (lux)
     int maxNumRefPtInAnyZone(0);       // The most number of reference points that any single zone has
     Real64 PHSUN(0.0);                 // Solar altitude (radians)
     Real64 SPHSUN(0.0);                // Sine of solar altitude
     Real64 CPHSUN(0.0);                // Cosine of solar altitude
     Real64 THSUN(0.0);                 // Solar azimuth (rad) in Absolute Coordinate System (azimuth=0 along east)
-    Array1D<Real64> PHSUNHR(24, 0.0);  // Hourly values of PHSUN
-    Array1D<Real64> SPHSUNHR(24, 0.0); // Hourly values of the sine of PHSUN
-    Array1D<Real64> CPHSUNHR(24, 0.0); // Hourly values of the cosine of PHSUN
-    Array1D<Real64> THSUNHR(24, 0.0);  // Hourly values of THSUN
+    EPVector<Real64> PHSUNHR(24, 0.0);  // Hourly values of PHSUN
+    EPVector<Real64> SPHSUNHR(24, 0.0); // Hourly values of the sine of PHSUN
+    EPVector<Real64> CPHSUNHR(24, 0.0); // Hourly values of the cosine of PHSUN
+    EPVector<Real64> THSUNHR(24, 0.0);  // Hourly values of THSUN
 
     // In the following I,J,K arrays:
     // I = 1 for clear sky, 2 for clear turbid, 3 for intermediate, 4 for overcast;
@@ -214,7 +214,7 @@ namespace DaylightingManager {
     Array2D<Real64> WLUMSUdisk(24, MaxSlatAngs + 1, 0.0); // Sun-related window luminance, due to view of solar disk
 
     Array2D<Real64> GILSK(24, 4, 0.0); // Horizontal illuminance from sky, by sky type, for each hour of the day
-    Array1D<Real64> GILSU(24, 0.0);    // Horizontal illuminance from sun for each hour of the day
+    EPVector<Real64> GILSU(24, 0.0);    // Horizontal illuminance from sun for each hour of the day
 
     Array3D<Real64> EDIRSK(24, MaxSlatAngs + 1, 4);  // Sky-related component of direct illuminance
     Array2D<Real64> EDIRSU(24, MaxSlatAngs + 1);     // Sun-related component of direct illuminance (excluding beam solar at ref pt)
@@ -2835,7 +2835,7 @@ namespace DaylightingManager {
         // This is the reason for making these temporary arrays local
         Array1D_int TmpSkyInd(NBasis, 0);                      // Temporary sky index list
         Array1D_int TmpGndInd(NBasis, 0);                      // Temporary gnd index list
-        Array1D<Real64> TmpGndMultiplier(NBasis, 0.0);         // Temporary ground obstruction multiplier
+        EPVector<Real64> TmpGndMultiplier(NBasis, 0.0);         // Temporary ground obstruction multiplier
         Array1D_int TmpRfSfInd(NBasis, 0);                     // Temporary RefSurfIndex
         Array1D_int TmpRfRyNH(NBasis, 0);                      // Temporary RefRayNHits
         Array2D_int TmpHSurfNo(TotSurfaces, NBasis, 0);        // Temporary HitSurfNo
@@ -2844,7 +2844,7 @@ namespace DaylightingManager {
         // Object Data
         Vector Centroid;                                                      // current window element centroid
         Vector HitPt;                                                         // surface hit point
-        Array1D<Vector> TmpGndPt(NBasis, Vector(0.0, 0.0, 0.0));              // Temporary ground intersection list
+        EPVector<Vector> TmpGndPt(NBasis, Vector(0.0, 0.0, 0.0));              // Temporary ground intersection list
         Array2D<Vector> TmpHitPt(TotSurfaces, NBasis, Vector(0.0, 0.0, 0.0)); // Temporary HitPt
 
         CFSRefPointPosFactor(RefPoint, StateRefPoint, iWin, CurFenState, NTrnBasis, AZVIEW);
@@ -3317,11 +3317,11 @@ namespace DaylightingManager {
         bool hitObs;                     // True iff obstruction is hit
         static Vector3<Real64> ObsHitPt; // Coordinates of hit point on an obstruction (m)
         static int AltSteps_last(0);
-        static Array1D<Real64> cos_Phi(AltAngStepsForSolReflCalc / 2); // cos( Phi ) table
-        static Array1D<Real64> sin_Phi(AltAngStepsForSolReflCalc / 2); // sin( Phi ) table
+        static EPVector<Real64> cos_Phi(AltAngStepsForSolReflCalc / 2); // cos( Phi ) table
+        static EPVector<Real64> sin_Phi(AltAngStepsForSolReflCalc / 2); // sin( Phi ) table
         static int AzimSteps_last(0);
-        static Array1D<Real64> cos_Theta(2 * AzimAngStepsForSolReflCalc); // cos( Theta ) table
-        static Array1D<Real64> sin_Theta(2 * AzimAngStepsForSolReflCalc); // sin( Theta ) table
+        static EPVector<Real64> cos_Theta(2 * AzimAngStepsForSolReflCalc); // cos( Theta ) table
+        static EPVector<Real64> sin_Theta(2 * AzimAngStepsForSolReflCalc); // sin( Theta ) table
 
         assert(AzimSteps <= AzimAngStepsForSolReflCalc);
 
@@ -3494,8 +3494,8 @@ namespace DaylightingManager {
         static Vector4<Real64> XAVWLSK;                        // Luminance of window element, sky-related
         static Vector3<Real64> RAYCOS;                         // Unit vector from reference point to sun
         int JB;                                                // Slat angle counter
-        static Array1D<Real64> TransBmBmMult(MaxSlatAngs);     // Beam-beam transmittance of isolated blind
-        static Array1D<Real64> TransBmBmMultRefl(MaxSlatAngs); // As above but for beam reflected from exterior obstruction
+        static EPVector<Real64> TransBmBmMult(MaxSlatAngs);     // Beam-beam transmittance of isolated blind
+        static EPVector<Real64> TransBmBmMultRefl(MaxSlatAngs); // As above but for beam reflected from exterior obstruction
         Real64 ProfAng;                                        // Solar profile angle on a window (radians)
         Real64 POSFAC;                                         // Position factor for a window element / ref point / view vector combination
         Real64 XR;                                             // Horizontal displacement ratio
@@ -6002,10 +6002,10 @@ namespace DaylightingManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IPH;                            // Altitude index for sky integration
         int ITH;                            // Azimuth index for sky integration
-        static Array1D<Real64> PH(NPH);     // Altitude of sky element (radians)
-        static Array1D<Real64> TH(NTH);     // Azimuth of sky element (radians)
+        static EPVector<Real64> PH(NPH);     // Altitude of sky element (radians)
+        static EPVector<Real64> TH(NTH);     // Azimuth of sky element (radians)
         int ISky;                           // Sky type index
-        static Array1D<Real64> SPHCPH(NPH); // Sine times cosine of altitude of sky element
+        static EPVector<Real64> SPHCPH(NPH); // Sine times cosine of altitude of sky element
 
         // FLOW:
         // Integrate to obtain illuminance from sky.
@@ -6385,7 +6385,7 @@ namespace DaylightingManager {
         int ISky;   // Sky type index
         int ISky1;  // Sky type index values for averaging two sky types
         int ISky2;
-        static Array1D<Real64> SetPnt;       // Illuminance setpoint at reference points (lux)
+        static EPVector<Real64> SetPnt;       // Illuminance setpoint at reference points (lux)
         static Array2D<Real64> DFSKHR(2, 4); // Sky daylight factor for sky type (second index),
         //   bare/shaded window (first index)
         static Vector2<Real64> DFSUHR;       // Sun daylight factor for bare/shaded window
@@ -6395,8 +6395,8 @@ namespace DaylightingManager {
         static Array2D<Real64> SFSKHR(2, 4); // Sky source luminance factor for sky type (second index),
         //   bare/shaded window (first index)
         static Vector2<Real64> SFSUHR; // Sun source luminance factor for bare/shaded window
-        static Array1D<Real64> GLRNDX; // Glare index at reference point
-        static Array1D<Real64> GLRNEW; // New glare index at reference point
+        static EPVector<Real64> GLRNDX; // Glare index at reference point
+        static EPVector<Real64> GLRNEW; // New glare index at reference point
         int IL;                        // Reference point index
         int IWin;                      // Window index
         int IS;                        // IS=1 for unshaded window, =2 for shaded window
@@ -6406,9 +6406,9 @@ namespace DaylightingManager {
         int IConst;       // Window construction pointer
         int IConstShaded; // Pointer to shaded window construction
         int ICtrl;        // Window shading control pointer
-        Array1D<Real64> TVIS1(
+        EPVector<Real64> TVIS1(
             ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Visible transmittance at normal incidence of unswitched glazing
-        Array1D<Real64> TVIS2(
+        EPVector<Real64> TVIS2(
             ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size()); // Visible transmittance at normal incidence of fully-switched glazing
         Real64 VTRAT;                                              // Ratio between switched and unswitched visible transmittance at normal incidence
         Real64 BACL;                                               // Window background (surround) luminance for glare calc (cd/m2)
@@ -6783,8 +6783,8 @@ namespace DaylightingManager {
         // unswitched state. Assumes some windows in a space may have this control and
         // others not.
 
-        Array1D<Real64> DILLSW;         // Illuminance a ref point from a group of windows that can be switched together,
-        Array1D<Real64> DILLUN;         //  and from those that aren't (lux)
+        EPVector<Real64> DILLSW;         // Illuminance a ref point from a group of windows that can be switched together,
+        EPVector<Real64> DILLUN;         //  and from those that aren't (lux)
         Array1D_bool previously_shaded; // array of flags to indicate that previously groups would have already shaded this window
         DILLSW.allocate(ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size());
         DILLUN.allocate(ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size());
@@ -6830,7 +6830,7 @@ namespace DaylightingManager {
                 }
             } // End of third window loop, IWin
 
-            Array1D<Real64> ASETIL; // Illuminance ratio (lux)
+            EPVector<Real64> ASETIL; // Illuminance ratio (lux)
             ASETIL.allocate(ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size());
 
             // Transmittance multiplier
@@ -7715,15 +7715,15 @@ namespace DaylightingManager {
         // I = sky type;
         // J = 1 for bare window, 2 and above for window with shade or blind.
         static Array2D<Real64> FLFWSK(MaxSlatAngs + 1, 4);  // Sky-related downgoing luminous flux
-        static Array1D<Real64> FLFWSU(MaxSlatAngs + 1);     // Sun-related downgoing luminous flux, excluding entering beam
-        static Array1D<Real64> FLFWSUdisk(MaxSlatAngs + 1); // Sun-related downgoing luminous flux, due to entering beam
+        static EPVector<Real64> FLFWSU(MaxSlatAngs + 1);     // Sun-related downgoing luminous flux, excluding entering beam
+        static EPVector<Real64> FLFWSUdisk(MaxSlatAngs + 1); // Sun-related downgoing luminous flux, due to entering beam
         static Array2D<Real64> FLCWSK(MaxSlatAngs + 1, 4);  // Sky-related upgoing luminous flux
-        static Array1D<Real64> FLCWSU(MaxSlatAngs + 1);     // Sun-related upgoing luminous flux
+        static EPVector<Real64> FLCWSU(MaxSlatAngs + 1);     // Sun-related upgoing luminous flux
 
         int ISky; // Sky type index: 1=clear, 2=clear turbid,
         //  3=intermediate, 4=overcast
-        static Array1D<Real64> TransMult(MaxSlatAngs);     // Transmittance multiplier
-        static Array1D<Real64> TransBmBmMult(MaxSlatAngs); // Isolated blind beam-beam transmittance
+        static EPVector<Real64> TransMult(MaxSlatAngs);     // Transmittance multiplier
+        static EPVector<Real64> TransBmBmMult(MaxSlatAngs); // Isolated blind beam-beam transmittance
         Real64 DPH;                                        // Sky/ground element altitude and azimuth increments (radians)
         Real64 DTH;
         int IPH; // Sky/ground element altitude and azimuth indices
@@ -8779,16 +8779,16 @@ namespace DaylightingManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         Array2D<Real64> FLSK;     // Sky related luminous flux
-        Array1D<Real64> FLSU;     // Sun related luminous flux, excluding entering beam
-        Array1D<Real64> FLSUdisk; // Sun related luminous flux, due to entering beam
+        EPVector<Real64> FLSU;     // Sun related luminous flux, excluding entering beam
+        EPVector<Real64> FLSUdisk; // Sun related luminous flux, due to entering beam
 
         Array2D<Real64> FirstFluxSK;     // Sky related first reflected flux
-        Array1D<Real64> FirstFluxSU;     // Sun related first reflected flux, excluding entering beam
-        Array1D<Real64> FirstFluxSUdisk; // Sun related first reflected flux, due to entering beam
+        EPVector<Real64> FirstFluxSU;     // Sun related first reflected flux, excluding entering beam
+        EPVector<Real64> FirstFluxSUdisk; // Sun related first reflected flux, due to entering beam
 
         Array2D<Real64> ElementLuminanceSky;     // sky related luminance at window element (exterior side)
-        Array1D<Real64> ElementLuminanceSun;     // sun related luminance at window element (exterior side), exluding beam
-        Array1D<Real64> ElementLuminanceSunDisk; // sun related luminance at window element (exterior side), due to sun beam
+        EPVector<Real64> ElementLuminanceSun;     // sun related luminance at window element (exterior side), exluding beam
+        EPVector<Real64> ElementLuminanceSunDisk; // sun related luminance at window element (exterior side), due to sun beam
         // Total transmitted flux
         //		static Vector4< Real64 > FLSKTot; //Unused
         Real64 FLSUTot;
@@ -8940,9 +8940,9 @@ namespace DaylightingManager {
 
         // Luminances from different sources to the window
         Array2D<Real64> ElementLuminanceSky; // sky related luminance at window element (exterior side)
-        Array1D<Real64> ElementLuminanceSun; // sun related luminance at window element (exterior side),
+        EPVector<Real64> ElementLuminanceSun; // sun related luminance at window element (exterior side),
         // exluding beam
-        Array1D<Real64> ElementLuminanceSunDisk; // sun related luminance at window element (exterior side),
+        EPVector<Real64> ElementLuminanceSunDisk; // sun related luminance at window element (exterior side),
         // due to sun beam
 
         static Vector4<Real64> WinLumSK; // Sky related window luminance
@@ -9577,7 +9577,7 @@ namespace DaylightingManager {
         using General::POLYF;
 
         // Locals
-        static Array1D<Real64> daylight_illum;
+        static EPVector<Real64> daylight_illum;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -9622,8 +9622,8 @@ namespace DaylightingManager {
         Real64 GTOT;
         Real64 GTOT1;
         Real64 GTOT2;
-        static Array1D<Real64> BACLUM;
-        static Array1D<Real64> GLRNDX;
+        static EPVector<Real64> BACLUM;
+        static EPVector<Real64> GLRNDX;
         int ILB;
 
         int IConst;
@@ -10076,8 +10076,8 @@ namespace DaylightingManager {
         int linelen;
         std::string AddXorYString;
         // BSLLC Start
-        static Array1D<Real64> XValue;
-        static Array1D<Real64> YValue;
+        static EPVector<Real64> XValue;
+        static EPVector<Real64> YValue;
         static Array2D<Real64> IllumValue;
         int SQYear;
         int SQMonth;
@@ -11113,7 +11113,7 @@ namespace DaylightingManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Array1D_string cAlphas(1);
-        static Array1D<Real64> rNumerics;
+        static EPVector<Real64> rNumerics;
         int NAlphas;
         int NNum;
         int IOStat;

@@ -181,10 +181,10 @@ namespace EvaporativeFluidCoolers {
     // Update routines to check convergence and update nodes
 
     // Object Data
-    Array1D<EvapFluidCoolerspecs> SimpleEvapFluidCooler; // dimension to number of machines
+    EPVector<EvapFluidCoolerspecs> SimpleEvapFluidCooler; // dimension to number of machines
     std::unordered_map<std::string, std::string> UniqueSimpleEvapFluidCoolerNames;
-    Array1D<EvapFluidCoolerInletConds> SimpleEvapFluidCoolerInlet; // inlet conditions
-    Array1D<ReportVars> SimpleEvapFluidCoolerReport;               // report variables
+    EPVector<EvapFluidCoolerInletConds> SimpleEvapFluidCoolerInlet; // inlet conditions
+    EPVector<ReportVars> SimpleEvapFluidCoolerReport;               // report variables
 
     // MODULE SUBROUTINES:
 
@@ -362,7 +362,7 @@ namespace EvaporativeFluidCoolers {
         int NumNums;                          // Number of elements in the numeric array
         int IOStat;                           // IO Status when calling get input subroutine
         static bool ErrorsFound(false);       // Logical flag set .TRUE. if errors found while getting input data
-        Array1D<Real64> NumArray(25);         // Numeric input data array
+        EPVector<Real64> NumArray(25);         // Numeric input data array
         Array1D_string AlphArray(13);         // Character string input data array
         std::string FluidName;
 
@@ -1538,7 +1538,7 @@ namespace EvaporativeFluidCoolers {
         // temperature specified in the plant:sizing object
         // is higher than the design entering air wet-bulb temp
         // when autosize feature is used
-        Array1D<Real64> Par(6); // Parameter array need for RegulaFalsi routine
+        EPVector<Real64> Par(6); // Parameter array need for RegulaFalsi routine
         std::string equipName;
         Real64 Cp;                            // local specific heat for fluid
         Real64 rho;                           // local density for fluid

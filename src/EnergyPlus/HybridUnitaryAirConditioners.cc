@@ -102,7 +102,7 @@ namespace HybridUnitaryAirConditioners {
     using CurveManager::GetCurveMinMaxValues;
     using HybridEvapCoolingModel::CMode;
 
-    Array1D<Model> ZoneHybridUnitaryAirConditioner;
+    EPVector<Model> ZoneHybridUnitaryAirConditioner;
     int NumZoneHybridEvap(0);
     Array1D_bool CheckZoneHybridEvapName;
     bool GetInputZoneHybridEvap(true);
@@ -413,7 +413,7 @@ namespace HybridUnitaryAirConditioners {
         using DataSizing::OARequirements; // to find DesignSpecification:OutdoorAir pointer
         std::string CurrentModuleObject;  // Object type for getting and error messages
         Array1D_string Alphas;            // Alpha items for object
-        Array1D<Real64> Numbers;          // Numeric items for object
+        EPVector<Real64> Numbers;          // Numeric items for object
         Array1D_string cAlphaFields;      // Alpha field names
         Array1D_string cNumericFields;    // Numeric field names
         Array1D_bool lAlphaBlanks;        // Logical array, alpha field input BLANK = .TRUE.

@@ -146,7 +146,7 @@ namespace WindTurbine {
     };
 
     // Object Data
-    extern Array1D<WindTurbineParams> WindTurbineSys;
+    extern EPVector<WindTurbineParams> WindTurbineSys;
 
     // Functions
 

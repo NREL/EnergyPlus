@@ -230,7 +230,7 @@ namespace DataErrorTracking {
     std::string LastSevereError;
 
     // Object Data
-    Array1D<RecurringErrorData> RecurringErrors;
+    EPVector<RecurringErrorData> RecurringErrors;
 
     // Clears the global data in DataErrorTracking
     // Needed for unit tests, should not normally be called.

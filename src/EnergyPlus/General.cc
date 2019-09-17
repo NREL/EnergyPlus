@@ -2021,7 +2021,7 @@ namespace General {
         // DERIVED TYPE DEFINITIONS
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D<Real64> TempData(3 * NumDataItems); // a scratch array
+        EPVector<Real64> TempData(3 * NumDataItems); // a scratch array
 
         for (int i = 1; i <= NumDataItems; ++i) {
             TempData(i) = TempData(NumDataItems + i) = TempData(2 * NumDataItems + i) = DataIn(i);
