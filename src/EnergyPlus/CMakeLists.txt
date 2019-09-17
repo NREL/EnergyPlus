@@ -348,6 +348,8 @@ SET( SRC
   IntegratedHeatPump.hh
   InternalHeatGains.cc
   InternalHeatGains.hh
+  IndoorIceRink.cc
+  IndoorIceRink.hh
   LowTempRadiantSystem.cc
   LowTempRadiantSystem.hh
   MatrixDataManager.cc
