@@ -160,9 +160,8 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnPb_Test)
 
     // Test 2: Cache version of the function - first call
     PB = 101325.0;
-    result = PsyTsatFnPb_raw(PB);
     Real64 cache_result = PsyTsatFnPb(PB);
-    EXPECT_DOUBLE_EQ(result, cache_result);
+    EXPECT_NEAR(actual_result, cache_result, 0.001);
 
     // Test 3: upper bound
     PB = 1555000.0;
@@ -184,9 +183,8 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnPb_Test)
 
     // Test 6: Cache version of the function - hit call
     PB = 101325.0;
-    result = PsyTsatFnPb_raw(PB);
-    Real64 cache_hit_result = PsyTsatFnPb(PB);
-    EXPECT_DOUBLE_EQ(result, cache_hit_result);
+    actual_result = 99.974;
+    EXPECT_NEAR(actual_result, cache_result, 0.001);
 
 }
 
