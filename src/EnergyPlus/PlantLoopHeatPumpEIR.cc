@@ -947,7 +947,7 @@ namespace EnergyPlus {
                 // given the value by the user
                 // set it directly
                 tmpSourceVolFlow = this->sourceSideDesignVolFlowRate;
-            } else if (!this->sourceSideDesignVolFlowRateWasAutoSized && this->sourceSideDesignVolFlowRate == 0) {
+            } else if (!this->sourceSideDesignVolFlowRateWasAutoSized && this->sourceSideDesignVolFlowRate == 0) {  // LCOV_EXCL_LINE
                 // user gave a flow rate of 0
                 // protected by the input processor to be >0.0
                 // fatal out just in case
@@ -963,7 +963,7 @@ namespace EnergyPlus {
             this->sourceSideDesignVolFlowRate = tmpSourceVolFlow;
 
             if (errorsFound) {
-                ShowFatalError("Preceding sizing errors cause program termination");
+                ShowFatalError("Preceding sizing errors cause program termination");   // LCOV_EXCL_LINE
             }
         }
 
@@ -1222,9 +1222,10 @@ namespace EnergyPlus {
                             condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType_OutsideAir;
                             condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType_OutsideAir;
                         } else {
-                            ShowErrorMessage("Invalid heat pump condenser type (name=" + thisPLHP.name +
-                            "; entered type: " + condenserType);
-                            errorsFound = true;
+                            // Again, this should be protected by the input processor
+                            ShowErrorMessage("Invalid heat pump condenser type (name=" + thisPLHP.name +  // LCOV_EXCL_LINE
+                            "; entered type: " + condenserType);  // LCOV_EXCL_LINE
+                            errorsFound = true;  // LCOV_EXCL_LINE
                         }
                         thisPLHP.sourceSideNodes.inlet = NodeInputManager::GetOnlySingleNode(sourceSideInletNodeName,
                                                                                              nodeErrorsFound,
