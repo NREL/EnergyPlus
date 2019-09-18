@@ -2561,12 +2561,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_OutsideSurfHeatBalanceWhenRa
     DataSurfaces::Surface(1).OutWetBulbTemp = 6.66143784594778;
     DataSurfaces::Surface(1).OutDryBulbTemp = 7.2;
    
-    
     // If Rain Flag = on, GetQdotConvOutRep uses Outdoor Air Wet Bulb Temp.
     DataEnvironment::IsRain = true;
     Real64 ExpectedQconv1 = -58.197 * 1000 * (6.71793958923051 - 6.66143784594778);
     Real64 Qdot1 = HeatBalanceSurfaceManager::GetQdotConvOutRep(1);
-
     EXPECT_EQ(ExpectedQconv1, Qdot1);
 
     // Otherwise, GetQdotConvOutRep uses Outdoor Air Dry Bulb Temp.
@@ -2574,7 +2572,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_OutsideSurfHeatBalanceWhenRa
     DataHeatBalSurface::HcExtSurf(1) = 5.65361106051348;
     Real64 ExpectedQconv2 = -58.197 * 5.65361106051348 * (6.71793958923051 - 7.2);
     Real64 Qdot2 = HeatBalanceSurfaceManager::GetQdotConvOutRep(1);
-
     EXPECT_EQ(ExpectedQconv2, Qdot2);
 }
 
