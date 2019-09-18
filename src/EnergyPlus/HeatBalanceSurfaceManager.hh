@@ -155,7 +155,7 @@ namespace HeatBalanceSurfaceManager {
 
     void CalcHeatBalanceOutsideSurf(Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
-    inline Real64 GetQdotConvOutRep(int SurfNum);
+    Real64 GetQdotConvOutRep(int SurfNum);
 
     void CalcHeatBalanceInsideSurf(Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
