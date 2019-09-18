@@ -189,6 +189,44 @@ namespace GroundHeatExchangers {
         // singleBoreholesVector.clear();
     }
 
+    Real64 FluidWorker::get_cp(Real64 &temperature, const std::string &routineName)
+    {
+        return FluidProperties::GetSpecificHeatGlycol(PlantLoop(this->loopNum).FluidName,
+                temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
+    }
+
+    Real64 FluidWorker::get_k(Real64 &temperature, const std::string &routineName)
+    {
+        return FluidProperties::GetConductivityGlycol(PlantLoop(this->loopNum).FluidName,
+                temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
+    }
+
+    Real64 FluidWorker::get_mu(Real64 &temperature, const std::string &routineName) {
+        return FluidProperties::GetViscosityGlycol(PlantLoop(this->loopNum).FluidName,
+                temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
+    }
+
+    Real64 FluidWorker::get_rho(Real64 &temperature, const std::string &routineName)
+    {
+        return FluidProperties::GetDensityGlycol(PlantLoop(this->loopNum).FluidName,
+                temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
+    }
+
+    Real64 FluidWorker::get_Pr(Real64 &temperature, const std::string &routineName)
+    {
+        // worker to get the Prandtl number
+
+        // @param temperature: fluid temperature, C
+        // @param routineName: caller routine name, str
+        // @returns Prandtl number
+
+        Real64 cp = this->get_cp(temperature, routineName);
+        Real64 mu = this->get_mu(temperature, routineName);
+        Real64 k = this->get_k(temperature, routineName);
+
+        return cp * mu / k;
+    }
+
     Real64 Pipe::calcTransitTime(Real64 flowRate, Real64 temperature)
     {
         // Compute the fluid transit time
@@ -197,35 +235,67 @@ namespace GroundHeatExchangers {
         // @param temperature: temperature, C
         // @returns pipe transit time
 
-        using FluidProperties::GetDensityGlycol;
-
         static std::string const routineName("Pipe::calcTransitTime");
 
-        Real64 cp = FluidProperties::GetDensityGlycol(PlantLoop(this->loopNum).FluidName,
-                    temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
-        Real64 vdot = flowRate / cp;
+        Real64 rho = this->fluid.get_rho(temperature, routineName);
+        Real64 vdot = flowRate / rho;
         return this->volFluid / vdot;
     }
 
-    Real64 Pipe::simulate(Real64 EP_UNUSED(time), Real64 EP_UNUSED(timeStep), Real64 EP_UNUSED(flowRate), Real64 EP_UNUSED(temperature))
+    void Pipe::simulate(Real64 EP_UNUSED(time), Real64 timeStep, Real64 flowRate, Real64 inletTemp)
     {
-
-        //  Simulate the temperature response of an adiabatic pipe with internal fluid mixing.
+        //  Simulate the inletTemp response of an adiabatic pipe with internal fluid mixing.
 
         //  Rees, S.J. 2015. 'An extended two-dimensional borehole heat exchanger model for
         //  simulation of short and medium timescale thermal response.' Renewable Energy. 83: 518-526.
 
         //  Skoglund, T, and P. Dejmek. 2007. 'A dynamic object-oriented model for efficient
-        //  fsimulation of fluid dispersion in turbulent flow with varying fluid properties.'
+        //  fluid simulation of fluid dispersion in turbulent flow with varying fluid properties.'
         //  Chem. Eng. Sci.. 62: 2168-2178.
 
         //  Bischoff, K.B., and O. Levenspiel. 1962. 'Fluid dispersion--generalization and comparision
         //  of mathematical models--II; Comparison of models.' Chem. Eng. Sci.. 17: 257-264.
 
-        //
+        // @param time: simulation time, s
+        // @param timeStep: simulation time step, s
+        // @param flowRate: mass flow rate, kg/s
+        // @param inletTemp: fluid inlet temperature, C
 
+        static std::string const routineName("Pipe::simulate");
 
-        return 0;
+        if (timeStep > 0) {
+            // Reynolds number
+            Real64 Re = this->mdotToRe(flowRate, inletTemp);
+
+            // total transit time
+            Real64 tau = this->calcTransitTime(flowRate, inletTemp);
+
+            // Peclet number
+            // Rees Eq. 18
+            Real64 Pe = 1 / (2 * this->innerRadius / this->length * (3E7 * std::pow(Re, -2.1) + 1.35 * std::pow(Re, -0.125)));
+
+            // transit time for plug-flow cell
+            // Rees Eq. 17
+            Real64 tau_n = tau * std::sqrt(2 / (this->numCells * Pe));
+
+            // transit time for ideal-mixed cells
+            Real64 tau_0 = tau - this->numCells * tau_n;
+
+            // volume flow rate
+            Real64 rho = this->fluid.get_rho(inletTemp, routineName);
+            Real64 v_dot = flowRate / rho;
+
+            // volume for ideal-mixed cells
+            Real64 v_n = tau_n * v_dot;
+
+            // check for sub-stepping
+            // limit maximum step to 10% of the transit time
+            int num_sub_steps = 1;
+            if (timeStep / tau > 0.1) {
+
+            }
+        }
+
     }
 
     Real64 Pipe::plugFlowOutletTemp(Real64 time)
@@ -250,10 +320,10 @@ namespace GroundHeatExchangers {
                 std::vector<int> x(idx_l);
                 std::iota(std::begin(x), std::end(x), 0);
 
-                for (auto it_in = this->inletTempTimes.begin(); it_in != this->inletTempTimes.end(); ++it_in) {
-                    this->inletTemps.pop_front();
-                    this->inletTempTimes.pop_front();
-                }
+//                for (auto it_in = this->inletTempTimes.begin(); it_in != this->inletTempTimes.end(); ++it_in) {
+////                    this->inletTemps.pop_front();
+////                    this->inletTempTimes.pop_front();
+//                }
                 return linInterp(time, t_l, t_h, temp_l, temp_h);
             }
             ++idx;
@@ -276,8 +346,7 @@ namespace GroundHeatExchangers {
         // @returns Reynolds number
 
         static std::string const routineName("Pipe::calcTransitTime");
-        Real64 mu = FluidProperties::GetViscosityGlycol(PlantLoop(this->loopNum).FluidName,
-                                                      temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
+        Real64 mu = this->fluid.get_mu(temperature, routineName);
         return 4 * flowRate / (mu * Pi * this->innerDia);
     }
 
@@ -328,16 +397,11 @@ namespace GroundHeatExchangers {
 
         static std::string const routineName("Pipe::turbulentNusselt");
 
+        // friction factor
         Real64 f = this->calcFrictionFactor(Re);
-        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(PlantLoop(this->loopNum).FluidName,
-                                                           temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
-        Real64 mu = FluidProperties::GetViscosityGlycol(PlantLoop(this->loopNum).FluidName,
-                                                        temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
-        Real64 k = FluidProperties::GetConductivityGlycol(PlantLoop(this->loopNum).FluidName,
-                                                          temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
 
-        // Prandtl
-        Real64 Pr = Cp * mu / k;
+        // Prandtl number
+        Real64 Pr = this->fluid.get_Pr(temperature, routineName);
 
         return (f / 8) * (Re - 1000) * Pr / (1 + 12.7 * std::pow(f / 8, 0.5) * (std::pow(Pr, 2.0 / 3.0) - 1));
     }
@@ -371,8 +435,7 @@ namespace GroundHeatExchangers {
         } else
             Nu = turbulentNusselt(Re, temperature);
 
-        Real64 k = FluidProperties::GetConductivityGlycol(PlantLoop(this->loopNum).FluidName,
-                                                          temperature, PlantLoop(this->loopNum).FluidIndex, routineName);
+        Real64 k = this->fluid.get_k(temperature, routineName);
         this->resistConv = 1 / (Nu * Pi * k);
         return this->resistConv;
     }

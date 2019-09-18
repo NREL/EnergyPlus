@@ -111,11 +111,38 @@ namespace GroundHeatExchangers {
         ~BaseProps() = default;
     };
 
-    struct Pipe : public BaseProps
+    struct FluidWorker
+    {
+        // E+ member variables
+        int loopNum = 0;
+
+        // constructor
+        FluidWorker(const json &j) {
+            this->loopNum = j["loop-num"];
+        }
+
+        // default constructor
+        FluidWorker() = default;
+
+        // destructor
+        ~FluidWorker() = default;
+
+        // member functions
+        Real64 get_cp(Real64 &temperature, const std::string &routineName);
+        Real64 get_k(Real64 &temperature, const std::string &routineName);
+        Real64 get_mu(Real64 &temperature, const std::string &routineName);
+        Real64 get_rho(Real64 &temperature, const std::string &routineName);
+        Real64 get_Pr(Real64 &temperature, const std::string &routineName);
+    };
+
+    struct Pipe : public BaseProps, FluidWorker
     {
 
         // E+ member variables
         int loopNum = 0;
+
+        // parent classes
+        FluidWorker fluid;
 
         // model member variables
         Real64 outDia = 0.0;        // Outer diameter [m]
@@ -138,18 +165,16 @@ namespace GroundHeatExchangers {
         int const numCells = 16;    // Number of pipe elements
         std::vector<Real64> cellTemps = {
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // Pipe temperature for each node
-        std::deque<Real64> inletTemps = {0.0};                                               // Inlet temperature history [C]
-        std::deque<Real64> inletTempTimes = {0.0};                                           // Times for respective inlet temperatures [s]
+        std::vector<Real64> inletTemps;                                                       // Inlet temperature history [C]
+        std::deque<Real64> inletTempTimes;                                                   // Times for respective inlet temperatures [s]
         Real64 outletTemp = 0.0;                                                             // Pipe outlet temperature [C]
 
         // constructor
         Pipe(const json &j)
         {
-            // E+
-            this->loopNum = j["loop-num"];
-
             // properties
             BaseProps tmpProps(j);
+            this->fluid = FluidWorker(j);
             this->k = tmpProps.k;
             this->rho = tmpProps.rho;
             this->cp = tmpProps.cp;
@@ -178,7 +203,8 @@ namespace GroundHeatExchangers {
 
             Real64 initTemp = j["initial-temperature"];
             std::replace(this->cellTemps.begin(), this->cellTemps.end(), 0.0, initTemp);
-            std::replace(this->inletTemps.begin(), this->inletTemps.end(), 0.0, initTemp);
+            this->inletTemps.emplace_back(initTemp);
+            this->inletTempTimes.emplace_back(0.0);
         }
 
         // default constructor
@@ -189,7 +215,7 @@ namespace GroundHeatExchangers {
 
         // members functions
         Real64 calcTransitTime(Real64 flowRate, Real64 temperature);
-        Real64 simulate(Real64 time, Real64 timeStep, Real64 flowRate, Real64 temperature);
+        void simulate(Real64 time, Real64 timeStep, Real64 flowRate, Real64 inletTemp);
         Real64 plugFlowOutletTemp(Real64 time);
         void logInletTemps(Real64 inletTemp, Real64 time);
         Real64 mdotToRe(Real64 flowRate, Real64 temperature);
