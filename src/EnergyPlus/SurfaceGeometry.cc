@@ -13285,10 +13285,9 @@ namespace SurfaceGeometry {
     )
     {
         
-        int LayerNo;
         RevLayerDiffs = false;
         
-        for (LayerNo = 1; LayerNo <= TotalLayers; ++LayerNo) {
+        for (int LayerNo = 1; LayerNo <= TotalLayers; ++LayerNo) {
             auto &thisConstLayer(Construct(ConstrNum).LayerPoint(LayerNo));
             auto &revConstLayer(Construct(ConstrNumRev).LayerPoint(TotalLayers - LayerNo + 1));
             auto &thisMatLay(Material(thisConstLayer));
@@ -13321,9 +13320,6 @@ namespace SurfaceGeometry {
                         break; // exit when diff
                     }   // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
                 } else if ((thisMatLay.Group == GlassEquivalentLayer) && (revMatLay.Group == GlassEquivalentLayer)) {
-                    auto &thisMatLay(Material(thisConstLayer));
-                    auto &revMatLay(Material(revConstLayer));
-                    Real64 const SmallDiff = 0.0001;
                     if ((abs(thisMatLay.TausBackBeamBeam - revMatLay.TausFrontBeamBeam) > SmallDiff) ||
                         (abs(thisMatLay.TausFrontBeamBeam - revMatLay.TausBackBeamBeam) > SmallDiff) ||
                         (abs(thisMatLay.ReflBackBeamBeam - revMatLay.ReflFrontBeamBeam) > SmallDiff) ||

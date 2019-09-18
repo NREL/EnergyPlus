@@ -4567,7 +4567,6 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test4)
 TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
 {
     bool RevLayerDiffs;
-    bool ExpectResult;
     Construct.allocate(6);
     Material.allocate(7);
     
@@ -4581,9 +4580,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     Construct(2).LayerPoint(2) = 2;
     Construct(2).LayerPoint(3) = 1;
     RevLayerDiffs = true;
-    ExpectResult = false;
+    // ExpectResult = false;
     CheckForReversedLayers(RevLayerDiffs, 1, 2, 3);
-    EXPECT_EQ(RevLayerDiffs, ExpectResult);
+    EXPECT_FALSE(RevLayerDiffs);
 
     // Case 1a: Constructs with regular materials are not reverse of each other--material layers do not match in reverse (should get a "true" answer)
     Construct(2).LayerPoint(1) = 1;
@@ -4592,9 +4591,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     Material(2).Group = RegularMaterial;
     Material(3).Group = RegularMaterial;
     RevLayerDiffs = false;
-    ExpectResult = true;
+    // ExpectResult = true;
     CheckForReversedLayers(RevLayerDiffs, 1, 2, 3);
-    EXPECT_EQ(RevLayerDiffs, ExpectResult);
+    EXPECT_TRUE(RevLayerDiffs);
 
     // Case 2a: Constructs are reverse of each other using WindowGlass, front/back properties properly switched (should get a "false" answer)
     Construct(3).TotLayers = 3;
@@ -4636,17 +4635,17 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     Material(5).YoungModulus = 0.89;
     Material(5).PoissonsRatio = 1.11;
     RevLayerDiffs = true;
-    ExpectResult = false;
+    // ExpectResult = false;
     CheckForReversedLayers(RevLayerDiffs, 3, 4, 3);
-    EXPECT_EQ(RevLayerDiffs, ExpectResult);
+    EXPECT_FALSE(RevLayerDiffs);
 
     // Case 2b: Constructs are reverse of each other using WindowGlass, front/back properties NOT properly switched (should get a "true" answer)
     Material(5).ReflectVisBeamFront = 0.34; // correct would be 0.24
     Material(5).ReflectVisBeamBack = 0.24;  // correct would be 0.34
     RevLayerDiffs = false;
-    ExpectResult = true;
+    // ExpectResult = true;
     CheckForReversedLayers(RevLayerDiffs, 3, 4, 3);
-    EXPECT_EQ(RevLayerDiffs, ExpectResult);
+    EXPECT_TRUE(RevLayerDiffs);
 
     // Case 3a: Single layer constructs using Equivalent Glass, front/back properties properly switched (should get a "false" answer)
     Construct(5).TotLayers = 1;
@@ -4708,13 +4707,15 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
     Material(7).EmissThermalBack = 0.888;
     Material(7).Resistance = 1.234;
     RevLayerDiffs = true;
-    ExpectResult = false;
+    // ExpectResult = false;
     CheckForReversedLayers(RevLayerDiffs, 5, 6, 1);
-    EXPECT_EQ(RevLayerDiffs, ExpectResult);
+    EXPECT_FALSE(RevLayerDiffs);
+
     // Case 3a: Single layer constructs using Equivalent Glass, front/back properties NOT properly switched (should get a "true" answer)
     Material(7).EmissThermalFront = 0.888;
     RevLayerDiffs = false;
-    ExpectResult = true;
+    // ExpectResult = true;
     CheckForReversedLayers(RevLayerDiffs, 5, 6, 1);
-    EXPECT_EQ(RevLayerDiffs, ExpectResult);
+    EXPECT_TRUE(RevLayerDiffs);
+
 }
