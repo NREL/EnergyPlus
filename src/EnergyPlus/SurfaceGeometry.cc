@@ -174,10 +174,11 @@ namespace SurfaceGeometry {
     // outside environment are used but no ground temperature object was input.
     bool NoFCGroundTempObjWarning(true); // This will cause a warning to be issued if surfaces with "GroundFCfactorMethod"
     // outside environment are used but no FC ground temperatures was input.
-    bool RectSurfRefWorldCoordSystem(false); // GlobalGeometryRules=World (true) or Relative (false)
-    int Warning1Count(0);                    // counts of Modify Window 5/6 windows
-    int Warning2Count(0);                    // counts of overriding exterior windows with Window 5/6 glazing systems
-    int Warning3Count(0);                    // counts of overriding interior windows with Window 5/6 glazing systems
+    bool
+        RectSurfRefWorldCoordSystem(false); // GlobalGeometryRules:Field Rectangular Surface Coordinate System (A5) = World (true) or Relative (false)
+    int Warning1Count(0);                   // counts of Modify Window 5/6 windows
+    int Warning2Count(0);                   // counts of overriding exterior windows with Window 5/6 glazing systems
+    int Warning3Count(0);                   // counts of overriding interior windows with Window 5/6 glazing systems
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE SurfaceGeometry
 
@@ -700,7 +701,6 @@ namespace SurfaceGeometry {
         // Do the Stratosphere check
         SetZoneOutBulbTempAt();
         CheckZoneOutBulbTempAt();
-
     }
 
     void AllocateModuleArrays()
@@ -1951,8 +1951,7 @@ namespace SurfaceGeometry {
                 if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass_Window) {
                     DataSurfaces::AllHTWindowSurfaceList.push_back(SurfNum);
                     surfZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
-                }
-                else {
+                } else {
                     DataSurfaces::AllHTNonWindowSurfaceList.push_back(SurfNum);
                     surfZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
                 }
@@ -1967,8 +1966,7 @@ namespace SurfaceGeometry {
                     // Sort window vs non-window surfaces
                     if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass_Window) {
                         adjZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
-                    }
-                    else {
+                    } else {
                         adjZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
                     }
                 }
@@ -2229,6 +2227,8 @@ namespace SurfaceGeometry {
         bool OK;
         int Found;
         std::string OutMsg;
+        int ZoneNum; //For loop counter
+        static bool RelWarning(false);
 
         // Formats
         static ObjexxFCL::gio::Fmt Format_720("(A)");
@@ -2376,6 +2376,22 @@ namespace SurfaceGeometry {
                 ShowWarningError(cCurrentModuleObject + ": Potential mismatch of coordinate specifications.");
                 ShowContinueError(cAlphaFieldNames(3) + "=\"" + GAlphas(3) + "\"; while ");
                 ShowContinueError(cAlphaFieldNames(5) + "=\"" + GAlphas(5) + "\".");
+            }
+        } else {
+            RelWarning = false;
+            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                if (Zone(ZoneNum).OriginX != 0.0) RelWarning = true;
+                if (Zone(ZoneNum).OriginY != 0.0) RelWarning = true;
+                if (Zone(ZoneNum).OriginZ != 0.0) RelWarning = true;
+            }
+            if (RelWarning && !RectSurfRefWorldCoordSystem) {
+                ShowWarningError(cCurrentModuleObject + ": Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on the default SurfaceGeometry for 'Relative to zone' coordinate.");
+                ShowContinueError(cAlphaFieldNames(3) + "=\"" + GAlphas(3) + "\"; while ");
+                if (GAlphas(5) == "RELATIVE") {
+                    ShowContinueError(cAlphaFieldNames(5) + "=\"" + GAlphas(5) + "\".");
+                } else if (GAlphas(5) != "ABSOLUTE") {
+                    ShowContinueError(cAlphaFieldNames(5) + "=\"defaults to RELATIVE\".");
+                }
             }
         }
 
@@ -12650,32 +12666,32 @@ namespace SurfaceGeometry {
                         surf.HeatTransSurf = false;
                         surf.HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_AirBoundaryNoHT;
                         anyRadiantGroupedZones = true;
-                        auto & thisSideEnclosureNum(Zone(surf.Zone).RadiantEnclosureNum);
-                        auto & otherSideEnclosureNum(Zone(Surface(surf.ExtBoundCond).Zone).RadiantEnclosureNum);
+                        auto &thisSideEnclosureNum(Zone(surf.Zone).RadiantEnclosureNum);
+                        auto &otherSideEnclosureNum(Zone(Surface(surf.ExtBoundCond).Zone).RadiantEnclosureNum);
                         if ((thisSideEnclosureNum == 0) && (otherSideEnclosureNum == 0)) {
                             // Neither zone is assigned to an enclosure, so increment the counter and assign to both
                             ++enclosureNum;
-                            auto & thisRadEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
+                            auto &thisRadEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
                             thisSideEnclosureNum = enclosureNum;
                             thisRadEnclosure.Name = "Radiant Enclosure " + General::RoundSigDigits(enclosureNum);
                             thisRadEnclosure.ZoneNames.push_back(surf.ZoneName);
                             thisRadEnclosure.ZoneNums.push_back(surf.Zone);
-                            thisRadEnclosure.FloorArea+=Zone(surf.Zone).FloorArea;
+                            thisRadEnclosure.FloorArea += Zone(surf.Zone).FloorArea;
                             otherSideEnclosureNum = enclosureNum;
                             thisRadEnclosure.ZoneNames.push_back(Surface(surf.ExtBoundCond).ZoneName);
                             thisRadEnclosure.ZoneNums.push_back(Surface(surf.ExtBoundCond).Zone);
                             thisRadEnclosure.FloorArea += Zone(Surface(surf.ExtBoundCond).Zone).FloorArea;
-                        } else if (thisSideEnclosureNum == 0){
+                        } else if (thisSideEnclosureNum == 0) {
                             // Other side is assigned, so use that one for both
                             thisSideEnclosureNum = otherSideEnclosureNum;
-                            auto & thisRadEnclosure(DataViewFactorInformation::ZoneRadiantInfo(thisSideEnclosureNum));
+                            auto &thisRadEnclosure(DataViewFactorInformation::ZoneRadiantInfo(thisSideEnclosureNum));
                             thisRadEnclosure.ZoneNames.push_back(surf.ZoneName);
                             thisRadEnclosure.ZoneNums.push_back(surf.Zone);
                             thisRadEnclosure.FloorArea += Zone(surf.Zone).FloorArea;
                         } else if (otherSideEnclosureNum == 0) {
                             // This side is assigned, so use that one for both
                             otherSideEnclosureNum = thisSideEnclosureNum;
-                            auto & thisRadEnclosure(DataViewFactorInformation::ZoneRadiantInfo(thisSideEnclosureNum));
+                            auto &thisRadEnclosure(DataViewFactorInformation::ZoneRadiantInfo(thisSideEnclosureNum));
                             thisRadEnclosure.ZoneNames.push_back(Surface(surf.ExtBoundCond).ZoneName);
                             thisRadEnclosure.ZoneNums.push_back(Surface(surf.ExtBoundCond).Zone);
                             thisRadEnclosure.FloorArea += Zone(Surface(surf.ExtBoundCond).Zone).FloorArea;
@@ -12698,10 +12714,10 @@ namespace SurfaceGeometry {
         if (anyRadiantGroupedZones) {
             // All grouped radiant zones have been assigned to an enclosure, now assign remaining zones
             for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
-                if(Zone(zoneNum).RadiantEnclosureNum == 0) {
+                if (Zone(zoneNum).RadiantEnclosureNum == 0) {
                     ++enclosureNum;
                     Zone(zoneNum).RadiantEnclosureNum = enclosureNum;
-                    auto & thisRadEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
+                    auto &thisRadEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
                     thisRadEnclosure.Name = Zone(zoneNum).Name;
                     thisRadEnclosure.ZoneNames.push_back(Zone(zoneNum).Name);
                     thisRadEnclosure.ZoneNums.push_back(zoneNum);
@@ -12713,7 +12729,7 @@ namespace SurfaceGeometry {
             // There are no grouped radiant air boundaries, assign each zone to it's own radiant enclosure
             for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
                 Zone(zoneNum).RadiantEnclosureNum = zoneNum;
-                auto & thisRadEnclosure(DataViewFactorInformation::ZoneRadiantInfo(zoneNum));
+                auto &thisRadEnclosure(DataViewFactorInformation::ZoneRadiantInfo(zoneNum));
                 thisRadEnclosure.Name = Zone(zoneNum).Name;
                 thisRadEnclosure.ZoneNames.push_back(Zone(zoneNum).Name);
                 thisRadEnclosure.ZoneNums.push_back(zoneNum);
@@ -12792,10 +12808,11 @@ namespace SurfaceGeometry {
                     if (constr.TypeIsAirBoundaryMixing) {
                         int zoneNum1 = min(surf.Zone, Surface(surf.ExtBoundCond).Zone);
                         int zoneNum2 = min(surf.Zone, Surface(surf.ExtBoundCond).Zone);
-                            // This pair already saved?
+                        // This pair already saved?
                         bool found = false;
-                        for (int n = 0; n < DataHeatBalance::NumAirBoundaryMixing-1; ++n) {
-                            if ((zoneNum1 == DataHeatBalance::AirBoundaryMixingZone1[n]) && (zoneNum2 == DataHeatBalance::AirBoundaryMixingZone2[n])) {
+                        for (int n = 0; n < DataHeatBalance::NumAirBoundaryMixing - 1; ++n) {
+                            if ((zoneNum1 == DataHeatBalance::AirBoundaryMixingZone1[n]) &&
+                                (zoneNum2 == DataHeatBalance::AirBoundaryMixingZone2[n])) {
                                 found = true;
                                 break;
                             }

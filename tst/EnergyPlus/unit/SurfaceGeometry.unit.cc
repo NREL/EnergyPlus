@@ -3644,7 +3644,6 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     zoneNum = UtilityRoutines::FindItemInList("ZONE1", DataHeatBalance::Zone);
     EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneHTSurfaceList.size(), 4u);
     EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
-
 }
 
 // Test for #7071: if a Surface references an outside boundary surface that cannot be found, we handle it gracefully with an error message
@@ -4432,6 +4431,138 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
     EXPECT_EQ("T SW APARTMENT", Zone(17).Name);
     EXPECT_EQ("TFLOORZONESINTMASS", DataSurfaces::IntMassObjects(3).Name);
     EXPECT_EQ("T SW APARTMENT TFLOORZONESINTMASS", SurfaceTmp(17).Name);
+}
+
+TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test1)
+{
+    // Case 1) NOT world coordinate system (Relative) - No error
+
+    std::string const idf_objects = delimited_string({
+
+        "GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    Relative,                !- Coordinate System",
+        "    Relative,                !- Daylighting Reference Point Coordinate System",
+        "    Relative;                !- Rectangular Surface Coordinate System",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    
+    bool ErrorsFound(false);
+
+    DataGlobals::NumOfZones = 1;
+    Zone.allocate(1);
+    Zone(1).Name = "ZONE 1";
+    Zone(1).OriginX = 0;
+    Zone(1).OriginY = 0;
+    Zone(1).OriginZ = 0;
+
+    GetGeometryParameters(ErrorsFound);
+    EXPECT_FALSE(has_err_output(true));
+}
+
+TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test2)
+{
+    // Case 2) World coordinate system & All zero zone origins - No error
+
+    std::string const idf_objects = delimited_string({
+
+        "GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    World,                   !- Coordinate System",
+        "    Relative,                !- Daylighting Reference Point Coordinate System",
+        "    Relative;                !- Rectangular Surface Coordinate System",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+
+    DataGlobals::NumOfZones = 1;
+    Zone.allocate(1);
+    Zone(1).Name = "ZONE 1";
+    Zone(1).OriginX = 0;
+    Zone(1).OriginY = 0;
+    Zone(1).OriginZ = 0;
+
+    GetGeometryParameters(ErrorsFound);
+    EXPECT_FALSE(has_err_output(true));
+}
+
+TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test3)
+{
+    // Case 3) World coordinate system & Relative Rect. surf, coordinate system & Non-zero zone origin
+
+    std::string const idf_objects = delimited_string({
+     
+        "GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    World,                   !- Coordinate System",
+        "    Relative,                !- Daylighting Reference Point Coordinate System",
+        "    Relative;                !- Rectangular Surface Coordinate System",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+
+    DataGlobals::NumOfZones = 1;
+    Zone.allocate(1);
+    Zone(1).Name = "ZONE 1";
+    Zone(1).OriginX = 6;
+    Zone(1).OriginY = 6;
+    Zone(1).OriginZ = 0;
+
+    GetGeometryParameters(ErrorsFound);
+    EXPECT_TRUE(has_err_output(false));
+    
+    std::string error_string = delimited_string({
+        "   ** Warning ** GlobalGeometryRules: Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on the default SurfaceGeometry for 'Relative to zone' coordinate.",
+        "   **   ~~~   ** Coordinate System=\"WORLD\"; while ",
+        "   **   ~~~   ** Rectangular Surface Coordinate System=\"RELATIVE\".",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test4)
+{
+    // Case 4) World coordinate system & Defalut Rect. surf, coordinate system & Non-zero zone origin
+
+    std::string const idf_objects = delimited_string({
+
+        "GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    World,                   !- Coordinate System",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+
+    DataGlobals::NumOfZones = 1;
+    Zone.allocate(1);
+    Zone(1).Name = "ZONE 1";
+    Zone(1).OriginX = 6;
+    Zone(1).OriginY = 6;
+    Zone(1).OriginZ = 0;
+
+    GetGeometryParameters(ErrorsFound);
+    EXPECT_TRUE(has_err_output(false));
+
+    std::string error_string = delimited_string({
+        "   ** Warning ** GlobalGeometryRules: Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on the default SurfaceGeometry for 'Relative to zone' coordinate.",
+        "   **   ~~~   ** Coordinate System=\"WORLD\"; while ",
+        "   **   ~~~   ** Rectangular Surface Coordinate System=\"defaults to RELATIVE\".",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundaries)

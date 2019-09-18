@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_VALIDATION_VISITOR_HPP
-#define __VALIJSON_VALIDATION_VISITOR_HPP
 
 #include <cmath>
 #include <string>
@@ -242,7 +240,7 @@ public:
 
     /**
      * @brief   Validate a value against a LinearItemsConstraint
-
+     *
      * A LinearItemsConstraint represents an 'items' constraint that specifies,
      * for each item in array, an individual sub-schema that the item must
      * validate against. The LinearItemsConstraint class also captures the
@@ -1704,5 +1702,3 @@ private:
 };
 
 }  // namespace valijson
-
-#endif

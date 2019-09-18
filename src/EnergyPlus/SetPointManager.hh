@@ -61,7 +61,10 @@ namespace EnergyPlus {
 
 namespace SetPointManager {
 
-    // Using/Aliasing
+    enum class CtrlNodeType: int {
+        control,
+        reference
+    };
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
@@ -183,14 +186,16 @@ namespace SetPointManager {
         // Members
         std::string Name;        // name of setpoint manager
         int SPMType;             // integer representing type of setpoint manager
+        int SPMIndex;            // index to specific set point manager
         int CtrlTypeMode;        // set to iCtrlVarType_xxxx
         int NumCtrlNodes;        // number of control nodes
         Array1D_int CtrlNodes;   // index to control node
         int AirLoopNum;          // index to air loop
         std::string AirLoopName; // name of air loop
+        int RefNode;             // index to reference node
 
         // Default Constructor
-        DataSetPointManager() : SPMType(0), CtrlTypeMode(0), NumCtrlNodes(0), AirLoopNum(0)
+        DataSetPointManager() : SPMType(0), SPMIndex(0), CtrlTypeMode(0), NumCtrlNodes(0), AirLoopNum(0), RefNode(0)
         {
         }
     };
@@ -1048,6 +1053,8 @@ namespace SetPointManager {
     void UpdateMixedAirSetPoints();
 
     void UpdateOAPretreatSetPoints();
+
+    int getSPMBasedOnNode(int const NodeNum, int const SetPtType, int const SMPType, CtrlNodeType ctrlOrRefNode);
 
     bool IsNodeOnSetPtManager(int const NodeNum, int const SetPtType);
 
