@@ -50,6 +50,9 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+// C++ Headers
+#include <vector>
+
 //// EnergyPlus Headers
 //#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataPlant.hh>
@@ -93,7 +96,23 @@ TEST_F(GHEFixture, smoothingFunc)
     EXPECT_NEAR(smoothingFunc(8, 0, 1), 1, tol);
 }
 
-TEST_F(GHEFixture, InitBaseProps)
+TEST_F(GHEFixture, TDMA)
+{
+    Real64 tol = 1E-6;
+    std::vector<Real64> a = {0, 3, 1, 3};
+    std::vector<Real64> b = {10, 10, 7, 4};
+    std::vector<Real64> c = {2, 4, 5, 0};
+    std::vector<Real64> d = {3, 4, 5, 6};
+    std::vector<Real64> result = TDMA(a, b, c, d);
+
+    EXPECT_NEAR(result[0], 0.148776, tol);
+    EXPECT_NEAR(result[1], 0.756120, tol);
+    EXPECT_NEAR(result[2], -1.001883, tol);
+    EXPECT_NEAR(result[3], 2.251412, tol);
+
+}
+
+TEST_F(GHEFixture, BaseProps_Init)
 {
     json j = {{"conductivity", 0.4}, {"density", 950}, {"specific-heat", 1900}};
 
@@ -105,7 +124,7 @@ TEST_F(GHEFixture, InitBaseProps)
     EXPECT_EQ(props.diffusivity, 0.4 / (950 * 1900));
 }
 
-TEST_F(GHEFixture, InitPipe)
+TEST_F(GHEFixture, Pipe_Init)
 {
 
     DataPlant::PlantLoop.allocate(2);
@@ -156,7 +175,7 @@ TEST_F(GHEFixture, InitPipe)
     DataPlant::PlantLoop.deallocate();
 }
 
-TEST_F(GHEFixture, CalcTransitTimePipe)
+TEST_F(GHEFixture, Pipe_CalcTransitTime)
 {
     DataPlant::PlantLoop.allocate(2);
     DataPlant::PlantLoop(1).PlantSizNum = 1;
@@ -179,7 +198,7 @@ TEST_F(GHEFixture, CalcTransitTimePipe)
     EXPECT_NEAR(pipe.calcTransitTime(0.1, 20), 567.3, tol);
 }
 
-TEST_F(GHEFixture, mdotToRePipe)
+TEST_F(GHEFixture, Pipe_mdotToRePipe)
 {
     DataPlant::PlantLoop.allocate(2);
     DataPlant::PlantLoop(1).PlantSizNum = 1;
@@ -202,7 +221,7 @@ TEST_F(GHEFixture, mdotToRePipe)
     EXPECT_NEAR(pipe.mdotToRe(0.1, 20), 4725.7, tol);
 }
 
-TEST_F(GHEFixture, calcFrictionFactor)
+TEST_F(GHEFixture, Pipe_calcFrictionFactor)
 {
     DataPlant::PlantLoop.allocate(2);
     DataPlant::PlantLoop(1).PlantSizNum = 1;
@@ -253,7 +272,7 @@ TEST_F(GHEFixture, calcFrictionFactor)
     EXPECT_NEAR(pipe.calcFrictionFactor(re), std::pow(0.79 * std::log(re) - 1.64, -2.0), tol);
 }
 
-TEST_F(GHEFixture, calcConductionResistance)
+TEST_F(GHEFixture, Pipe_calcConductionResistance)
 {
     DataPlant::PlantLoop.allocate(2);
     DataPlant::PlantLoop(1).PlantSizNum = 1;
@@ -271,11 +290,14 @@ TEST_F(GHEFixture, calcConductionResistance)
 
     Pipe pipe(j);
 
+    std::cout << pipe.inletTemps.size() << std::endl;
+    std::cout << pipe.inletTempTimes.size() << std::endl;
+
     Real64 tol = 1E-5;
     EXPECT_NEAR(pipe.calcConductionResistance(), 0.0861146, tol);
 }
 
-TEST_F(GHEFixture, calcConvectionResistance)
+TEST_F(GHEFixture, Pipe_calcConvectionResistance)
 {
     DataPlant::PlantLoop.allocate(2);
     DataPlant::PlantLoop(1).PlantSizNum = 1;
@@ -300,7 +322,7 @@ TEST_F(GHEFixture, calcConvectionResistance)
     EXPECT_NEAR(pipe.calcConvectionResistance(2, temp), 0.00094, tol);
 }
 
-TEST_F(GHEFixture, laminarNusselt)
+TEST_F(GHEFixture, Pipe_laminarNusselt)
 {
     DataPlant::PlantLoop.allocate(2);
     DataPlant::PlantLoop(1).PlantSizNum = 1;
@@ -322,7 +344,7 @@ TEST_F(GHEFixture, laminarNusselt)
     EXPECT_NEAR(pipe.laminarNusselt(), 4.01, tol);
 }
 
-TEST_F(GHEFixture, turbulentNusselt)
+TEST_F(GHEFixture, Pipe_turbulentNusselt)
 {
     DataPlant::PlantLoop.allocate(2);
     DataPlant::PlantLoop(1).PlantSizNum = 1;
@@ -346,7 +368,7 @@ TEST_F(GHEFixture, turbulentNusselt)
     EXPECT_NEAR(pipe.turbulentNusselt(10000, temp), 79.48, tol);
 }
 
-TEST_F(GHEFixture, calcResistance)
+TEST_F(GHEFixture, Pipe_calcResistance)
 {
     DataPlant::PlantLoop.allocate(2);
     DataPlant::PlantLoop(1).PlantSizNum = 1;
@@ -372,7 +394,7 @@ TEST_F(GHEFixture, calcResistance)
     EXPECT_NEAR(pipe.calcResistance(2, temp), 0.08704, tol);
 }
 
-TEST_F(GHEFixture, logInletTemps)
+TEST_F(GHEFixture, Pipe_logInletTemps)
 {
     DataPlant::PlantLoop.allocate(2);
     DataPlant::PlantLoop(1).PlantSizNum = 1;
@@ -406,7 +428,7 @@ TEST_F(GHEFixture, logInletTemps)
     EXPECT_NEAR(pipe.inletTempTimes[1], 100, tol);
 }
 
-TEST_F(GHEFixture, plugFlowOutletTemp) {
+TEST_F(GHEFixture, Pipe_plugFlowOutletTemp) {
     DataPlant::PlantLoop.allocate(2);
     DataPlant::PlantLoop(1).PlantSizNum = 1;
     DataPlant::PlantLoop(1).FluidIndex = 1;
@@ -428,11 +450,73 @@ TEST_F(GHEFixture, plugFlowOutletTemp) {
 
     pipe.logInletTemps(50, 50);
     pipe.logInletTemps(100, 100);
-    pipe.logInletTemps(150, 150);
 
     EXPECT_NEAR(pipe.plugFlowOutletTemp(75), 75.0, tol);
 }
 
+TEST_F(GHEFixture, Pipe_simulate)
+{
+    DataPlant::PlantLoop.allocate(2);
+    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    DataPlant::PlantLoop(1).FluidIndex = 1;
+    DataPlant::PlantLoop(1).FluidName = "WATER";
+
+    json j = {{"conductivity", 0.4},
+              {"density", 950},
+              {"specific-heat", 1900},
+              {"outer-diameter", 0.0334},
+              {"inner-diameter", 0.0269},
+              {"length", 100},
+              {"initial-temperature", 20},
+              {"loop-num", 1}};
+
+    Pipe pipe(j);
+    Real64 tol = 1E-2;
+
+    Real64 time = 0;
+    Real64 dt = 100;
+    Real64 m_dot = 0.1;
+    Real64 inlet_temp = 25;
+
+    pipe.simulate(time, dt, m_dot, inlet_temp);
+    Real64 outlet_temp = pipe.outletTemp;
+    EXPECT_NEAR(outlet_temp, 20, tol);
+
+    time += dt;
+    pipe.simulate(time, dt, m_dot, inlet_temp);
+    outlet_temp = pipe.outletTemp;
+    EXPECT_NEAR(outlet_temp, 20, tol);
+
+    time += dt;
+    pipe.simulate(time, dt, m_dot, inlet_temp);
+    outlet_temp = pipe.outletTemp;
+    EXPECT_NEAR(outlet_temp, 20, tol);
+
+    time += dt;
+    pipe.simulate(time, dt, m_dot, inlet_temp);
+    outlet_temp = pipe.outletTemp;
+    EXPECT_NEAR(outlet_temp, 20, tol);
+
+    time += dt;
+    pipe.simulate(time, dt, m_dot, inlet_temp);
+    outlet_temp = pipe.outletTemp;
+    EXPECT_NEAR(outlet_temp, 20, tol);
+
+    time += dt;
+    pipe.simulate(time, dt, m_dot, inlet_temp);
+    outlet_temp = pipe.outletTemp;
+    EXPECT_NEAR(outlet_temp, 22.63, tol);
+
+    time += dt;
+    pipe.simulate(time, dt, m_dot, inlet_temp);
+    outlet_temp = pipe.outletTemp;
+    EXPECT_NEAR(outlet_temp, 24.34, tol);
+
+    time += dt;
+    pipe.simulate(time, dt, m_dot, inlet_temp);
+    outlet_temp = pipe.outletTemp;
+    EXPECT_NEAR(outlet_temp, 24.87, tol);
+}
 // TEST_F(GHEFixture, GroundHeatExchangerTest_Interpolate)
 //{
 //

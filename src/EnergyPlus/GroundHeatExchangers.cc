@@ -49,7 +49,7 @@
 //// C++ Headers
 //#include <cmath>
 //#include <fstream>
-//#include <vector>
+#include <vector>
 //
 //// ObjexxFCL Headers
 //#include <ObjexxFCL/Array.functions.hh>
@@ -242,7 +242,7 @@ namespace GroundHeatExchangers {
         return this->volFluid / vdot;
     }
 
-    void Pipe::simulate(Real64 EP_UNUSED(time), Real64 timeStep, Real64 flowRate, Real64 inletTemp)
+    void Pipe::simulate(Real64 time, Real64 timeStep, Real64 flowRate, Real64 inletTemp)
     {
         //  Simulate the inletTemp response of an adiabatic pipe with internal fluid mixing.
 
@@ -291,11 +291,41 @@ namespace GroundHeatExchangers {
             // check for sub-stepping
             // limit maximum step to 10% of the transit time
             int num_sub_steps = 1;
+            Real64 dt_sub = timeStep;
             if (timeStep / tau > 0.1) {
-
+                num_sub_steps = std::ceil(timeStep/ tau);
+                dt_sub = timeStep / num_sub_steps;
             }
-        }
 
+            Real64 t_sub = time;
+
+            // setup tri-diagonal equations
+            std::vector<Real64> a(this->numCells, -v_dot);
+            a[0] = 0;
+            std::vector<Real64> b(this->numCells, v_n / dt_sub + v_dot);
+            b[0] = 1;
+            std::vector<Real64> c(this->numCells, 0);
+            for (int step = 0; step < num_sub_steps; ++step) {
+                // vector multiply
+                std::vector<Real64> d;
+                for (double cellTemp : this->cellTemps) {
+                    d.push_back(v_n / dt_sub * cellTemp);
+                }
+                if (this->applyTransitDelay) {
+                    this->logInletTemps(inletTemp, t_sub + dt_sub);
+                    d[0] = this->plugFlowOutletTemp(t_sub + dt_sub - tau_0);
+                } else {
+                    d[0] = inletTemp;
+                }
+
+                // solve for cell temps
+                this->cellTemps = TDMA(a, b, c, d);
+
+                // update time
+                t_sub += dt_sub;
+            }
+            this->outletTemp = this->cellTemps.back();
+        }
     }
 
     Real64 Pipe::plugFlowOutletTemp(Real64 time)
@@ -304,6 +334,10 @@ namespace GroundHeatExchangers {
 
         // @param time: simulation time, s
         // @returns outlet temperature for respective time, C
+
+        if (time <= 0) {
+            return this->inletTemps[0];
+        }
 
         int idx = 0;
         for (auto it = this->inletTempTimes.begin(); it != this->inletTempTimes.end(); ++it) {
@@ -320,10 +354,10 @@ namespace GroundHeatExchangers {
                 std::vector<int> x(idx_l);
                 std::iota(std::begin(x), std::end(x), 0);
 
-//                for (auto it_in = this->inletTempTimes.begin(); it_in != this->inletTempTimes.end(); ++it_in) {
-////                    this->inletTemps.pop_front();
-////                    this->inletTempTimes.pop_front();
-//                }
+                for (auto i : x) {
+                    this->inletTemps.pop_front();
+                    this->inletTempTimes.pop_front();
+                }
                 return linInterp(time, t_l, t_h, temp_l, temp_h);
             }
             ++idx;

@@ -83,8 +83,6 @@ namespace GroundHeatExchangers {
     // MODULE VARIABLE DECLARATIONS:
     // na
 
-    // Types
-
     struct BaseProps
     {
         // member variables
@@ -165,9 +163,10 @@ namespace GroundHeatExchangers {
         int const numCells = 16;    // Number of pipe elements
         std::vector<Real64> cellTemps = {
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // Pipe temperature for each node
-        std::vector<Real64> inletTemps;                                                       // Inlet temperature history [C]
-        std::deque<Real64> inletTempTimes;                                                   // Times for respective inlet temperatures [s]
+        std::deque<Real64> inletTemps = {0.0};                                              // Inlet temperature history [C]
+        std::deque<Real64> inletTempTimes = {0.0};                                           // Times for respective inlet temperatures [s]
         Real64 outletTemp = 0.0;                                                             // Pipe outlet temperature [C]
+        bool applyTransitDelay = true;
 
         // constructor
         Pipe(const json &j)
@@ -203,8 +202,7 @@ namespace GroundHeatExchangers {
 
             Real64 initTemp = j["initial-temperature"];
             std::replace(this->cellTemps.begin(), this->cellTemps.end(), 0.0, initTemp);
-            this->inletTemps.emplace_back(initTemp);
-            this->inletTempTimes.emplace_back(0.0);
+            std::replace(this->inletTemps.begin(), this->inletTemps.end(), 0.0, initTemp);
         }
 
         // default constructor
@@ -282,6 +280,44 @@ namespace GroundHeatExchangers {
         //  @return interpolated value
 
         return (x - x_l) / (x_h - x_l) * (y_h - y_l) + y_l;
+    }
+
+    static std::vector<Real64> TDMA(std::vector<Real64> a, std::vector<Real64> b, std::vector<Real64> c, std::vector<Real64> d)
+    {
+        // Tri-diagonal matrix solver
+
+        // This solver expects the ghost points at a(0) and c(n) to be present
+
+        // a(0) = 0
+        // c(n) = 0
+
+        // len(a) = len(b) = len(c) = len(d)
+
+        // Adapted from: https://en.wikibooks.org/wiki/Algorithm_Implementation/Linear_Algebra/Tridiagonal_matrix_algorithm#C++
+
+        // param a: west diagonal vector from coefficient matrix
+        // param b: center diagonal vector from coefficient matrix
+        // param c: east diagonal vector from coefficient matrix
+        // param d: column vector
+        // returns solution vector
+
+        u_int n = d.size() - 1;
+
+        c[0] /= b[0];
+        d[0] /= b[0];
+
+        for (u_int i = 1; i < n; ++i) {
+            c[i] /= b[i] - a[i] * c[i - 1];
+            d[i] = (d[i] - a[i] * d[i - 1]) / (b[i] - a[i] * c[i - 1]);
+        }
+
+        d[n] = (d[n] - a[n] * d[n - 1]) / (b[n] - a[n] * c[n - 1]);
+
+        for (int i = n; i-- > 0;) {
+            d[i] -= c[i] * d[i + 1];
+        }
+
+        return d;
     }
 
     // struct GLHEVertPropsStruct
