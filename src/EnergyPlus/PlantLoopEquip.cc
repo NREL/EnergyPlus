@@ -52,8 +52,6 @@
 
 // EnergyPlus Headers
 #include <BaseboardRadiator.hh>
-#include <BoilerSteam.hh>
-#include <Boilers.hh>
 #include <CTElectricGenerator.hh>
 #include <ChillerAbsorption.hh>
 #include <ChillerElectricEIR.hh>
@@ -61,43 +59,29 @@
 #include <ChillerGasAbsorption.hh>
 #include <ChillerIndirectAbsorption.hh>
 #include <ChillerReformulatedEIR.hh>
-#include <CondenserLoopTowers.hh>
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
 #include <DataPlant.hh>
 #include <DataPrecisionGlobals.hh>
 #include <EvaporativeFluidCoolers.hh>
 #include <FuelCellElectricGenerator.hh>
-#include <GroundHeatExchangers.hh>
 #include <HVACVariableRefrigerantFlow.hh>
 #include <HWBaseboardRadiator.hh>
-#include <HeatPumpWaterToWaterCOOLING.hh>
-#include <HeatPumpWaterToWaterHEATING.hh>
-#include <HeatPumpWaterToWaterSimple.hh>
 #include <ICEngineElectricGenerator.hh>
 #include <IceThermalStorage.hh>
 #include <MicroCHPElectricGenerator.hh>
 #include <MicroturbineElectricGenerator.hh>
-#include <OutsideEnergySources.hh>
 #include <PhotovoltaicThermalCollectors.hh>
-#include <PipeHeatTransfer.hh>
-#include <Pipes.hh>
 #include <Plant/PlantLocation.hh>
 #include <PlantCentralGSHP.hh>
 #include <PlantChillers.hh>
 #include <PlantComponentTemperatureSources.hh>
 #include <PlantHeatExchangerFluidToFluid.hh>
-#include <PlantLoadProfile.hh>
-#include <PlantLoopEquip.hh>
-#include <PlantPipingSystemsManager.hh>
-#include <PlantValves.hh>
-#include <PondGroundHeatExchanger.hh>
 #include <Pumps.hh>
 #include <RefrigeratedCase.hh>
 #include <ScheduleManager.hh>
 #include <SolarCollectors.hh>
 #include <SteamBaseboardRadiator.hh>
-#include <SurfaceGroundHeatExchanger.hh>
 #include <UserDefinedComponents.hh>
 #include <UtilityRoutines.hh>
 #include <WaterCoils.hh>
@@ -204,8 +188,6 @@ namespace PlantLoopEquip {
         using ScheduleManager::GetCurrentScheduleValue;
         using WaterThermalTanks::SimWaterThermalTank;
 
-        using BoilerSteam::SimSteamBoiler;
-        using CondenserLoopTowers::SimTowers;
         using CTElectricGenerator::SimCTPlantHeatRecovery;
         using EvaporativeFluidCoolers::SimEvapFluidCoolers;
         using FuelCellElectricGenerator::SimFuelCellPlantHeatRecovery;
@@ -614,106 +596,17 @@ namespace PlantLoopEquip {
 
             // TOWERS
             if (EquipTypeNum == TypeOf_CoolingTower_SingleSpd) {
-
-                SimTowers(sim_component.TypeOf,
-                          sim_component.Name,
-                          EquipNum,
-                          RunFlag,
-                          InitLoopEquip,
-                          CurLoad,
-                          MaxLoad,
-                          MinLoad,
-                          OptLoad,
-                          GetCompSizFac,
-                          SizingFac); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
-
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
             } else if (EquipTypeNum == TypeOf_CoolingTower_TwoSpd) {
-
-                SimTowers(sim_component.TypeOf,
-                          sim_component.Name,
-                          EquipNum,
-                          RunFlag,
-                          InitLoopEquip,
-                          CurLoad,
-                          MaxLoad,
-                          MinLoad,
-                          OptLoad,
-                          GetCompSizFac,
-                          SizingFac); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
-
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
             } else if (EquipTypeNum == TypeOf_CoolingTower_VarSpd) { // 'CoolingTower:VariableSpeed'
-
-                SimTowers(sim_component.TypeOf,
-                          sim_component.Name,
-                          EquipNum,
-                          RunFlag,
-                          InitLoopEquip,
-                          CurLoad,
-                          MaxLoad,
-                          MinLoad,
-                          OptLoad,
-                          GetCompSizFac,
-                          SizingFac); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
-
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
             } else if (EquipTypeNum == TypeOf_CoolingTower_VarSpdMerkel) {
-
-                SimTowers(sim_component.TypeOf,
-                          sim_component.Name,
-                          EquipNum,
-                          RunFlag,
-                          InitLoopEquip,
-                          CurLoad,
-                          MaxLoad,
-                          MinLoad,
-                          OptLoad,
-                          GetCompSizFac,
-                          SizingFac);
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Tower Type=" + sim_component.TypeOf);
                 ShowContinueError("Occurs in Plant Loop=" + PlantLoop(LoopNum).Name);
                 ShowFatalError("Preceding condition causes termination.");
-            }
-
-            if (InitLoopEquip && EquipNum == 0) {
-                ShowSevereError("InitLoop did not set Equipment Index for Cooling Tower=" + sim_component.TypeOf);
-                ShowContinueError("..Tower Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop(LoopNum).Name);
-                ShowFatalError("Previous condition causes termination.");
             }
 
             // FLUID COOLERS
@@ -779,28 +672,7 @@ namespace PlantLoopEquip {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Boiler_Steam) {
-                SimSteamBoiler(sim_component.TypeOf,
-                               sim_component.Name,
-                               EquipFlowCtrl,
-                               EquipNum,
-                               RunFlag,
-                               FirstHVACIteration,
-                               InitLoopEquip,
-                               CurLoad,
-                               MaxLoad,
-                               MinLoad,
-                               OptLoad,
-                               GetCompSizFac,
-                               SizingFac); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Boiler Type=" + sim_component.TypeOf);

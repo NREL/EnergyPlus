@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_SCHEMA_PARSER_HPP
-#define __VALIJSON_SCHEMA_PARSER_HPP
 
 #include <stdexcept>
 #include <iostream>
@@ -10,6 +8,7 @@
 
 #include <valijson/adapters/adapter.hpp>
 #include <valijson/constraints/concrete_constraints.hpp>
+#include <valijson/internal/debug.hpp>
 #include <valijson/internal/json_pointer.hpp>
 #include <valijson/internal/json_reference.hpp>
 #include <valijson/internal/uri.hpp>
@@ -204,7 +203,7 @@ private:
      * document URI should be used to replace the path, query and fragment
      * portions of URI provided by the resolution scope.
      */
-    static opt::optional<std::string> findAbsoluteDocumentUri(
+    virtual opt::optional<std::string> findAbsoluteDocumentUri(
             const opt::optional<std::string> resolutionScope,
             const opt::optional<std::string> documentUri)
     {
@@ -593,6 +592,15 @@ private:
             "SchemaParser::populateSchema must be invoked with an "
             "appropriate Adapter implementation");
 
+        if (!node.isObject()) {
+            std::string s;
+            s += "Expected node at ";
+            s += nodePath;
+            s += " to contain schema object; actual node type is: ";
+            s += internal::nodeTypeAsString(node);
+            throw std::runtime_error(s);
+        }
+
         const typename AdapterType::Object object = node.asObject();
         typename AdapterType::Object::const_iterator itr(object.end());
 
@@ -940,7 +948,7 @@ private:
     {
         std::string jsonRef;
         if (!extractJsonReference(node, jsonRef)) {
-            populateSchema(rootSchema, rootNode, node, subschema, currentScope, 
+            populateSchema(rootSchema, rootNode, node, subschema, currentScope,
                     nodePath, fetchDoc, parentSchema, ownName, docCache,
                     schemaCache);
             return;
@@ -1253,14 +1261,14 @@ private:
      * @brief   Make a new ItemsConstraint object.
      *
      * @param   rootSchema           The Schema instance, and root subschema,
-     *                               through which other subschemas can be 
+     *                               through which other subschemas can be
      *                               created and modified
      * @param   rootNode             Reference to the node from which JSON
      *                               References will be resolved when they refer
      *                               to the current document; used for recursive
      *                               parsing of schemas
      * @param   items                Optional pointer to a JSON node containing
-     *                               an object mapping property names to 
+     *                               an object mapping property names to
      *                               schemas.
      * @param   additionalItems      Optional pointer to a JSON node containing
      *                               an additional properties schema or a
@@ -1359,14 +1367,14 @@ private:
      * @brief   Make a new ItemsConstraint object.
      *
      * @param   rootSchema           The Schema instance, and root subschema,
-     *                               through which other subschemas can be 
+     *                               through which other subschemas can be
      *                               created and modified
      * @param   rootNode             Reference to the node from which JSON
      *                               References will be resolved when they refer
      *                               to the current document; used for recursive
      *                               parsing of schemas
      * @param   items                Optional pointer to a JSON node containing
-     *                               an object mapping property names to 
+     *                               an object mapping property names to
      *                               schemas.
      * @param   additionalItems      Optional pointer to a JSON node containing
      *                               an additional properties schema or a
@@ -1807,7 +1815,7 @@ private:
      * @brief   Make a new Properties object.
      *
      * @param   rootSchema                The Schema instance, and root
-     *                                    subschema, through which other 
+     *                                    subschema, through which other
      *                                    subschemas can be created and modified
      * @param   rootNode                  Reference to the node from which JSON
      *                                    References will be resolved when they
@@ -1975,7 +1983,7 @@ private:
         constraints::RequiredConstraint constraint;
 
         for (const AdapterType v : node.getArray()) {
-            if (!v.isString()) {
+            if (!v.maybeString()) {
                 throw std::runtime_error("Expected required property name to "
                         "be a string value");
             }
@@ -2018,7 +2026,7 @@ private:
 
         TypeConstraint constraint;
 
-        if (node.isString()) {
+        if (node.maybeString()) {
             const TypeConstraint::JsonType type =
                     TypeConstraint::jsonTypeFromString(node.getString());
 
@@ -2029,10 +2037,10 @@ private:
 
             constraint.addNamedType(type);
 
-        } else if (node.isArray()) {
+        } else if (node.maybeArray()) {
             int index = 0;
             for (const AdapterType v : node.getArray()) {
-                if (v.isString()) {
+                if (v.maybeString()) {
                     const TypeConstraint::JsonType type =
                             TypeConstraint::jsonTypeFromString(v.getString());
 
@@ -2044,7 +2052,7 @@ private:
 
                     constraint.addNamedType(type);
 
-                } else if (v.isObject() && version == kDraft3) {
+                } else if (v.maybeObject() && version == kDraft3) {
                     const std::string childPath = nodePath + "/" +
                             std::to_string(index);
                     const Subschema *subschema = makeOrReuseSchema<AdapterType>(
@@ -2059,7 +2067,7 @@ private:
                 index++;
             }
 
-        } else if (node.isObject() && version == kDraft3) {
+        } else if (node.maybeObject() && version == kDraft3) {
             const Subschema *subschema = makeOrReuseSchema<AdapterType>(
                     rootSchema, rootNode, node, currentScope, nodePath,
                     fetchDoc, NULL, NULL, docCache, schemaCache);
@@ -2105,6 +2113,4 @@ private:
 
 #ifdef __clang__
 #  pragma clang diagnostic pop
-#endif
-
 #endif
