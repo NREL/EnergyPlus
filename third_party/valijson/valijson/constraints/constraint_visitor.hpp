@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_CONSTRAINTS_CONSTRAINT_VISITOR_HPP
-#define __VALIJSON_CONSTRAINTS_CONSTRAINT_VISITOR_HPP
 
 namespace valijson {
 namespace constraints {
@@ -35,7 +33,7 @@ class ConstraintVisitor
 {
 protected:
     virtual ~ConstraintVisitor() {}
-    
+
     // Shorten type names for derived classes outside of this namespace
     typedef constraints::AllOfConstraint AllOfConstraint;
     typedef constraints::AnyOfConstraint AnyOfConstraint;
@@ -92,5 +90,3 @@ public:
 
 }  // namespace constraints
 }  // namespace valijson
-
-#endif

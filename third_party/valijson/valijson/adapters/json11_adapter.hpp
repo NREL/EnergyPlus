@@ -24,8 +24,6 @@
  */
 
 #pragma once
-#ifndef __VALIJSON_ADAPTERS_JSON11_ADAPTER_HPP
-#define __VALIJSON_ADAPTERS_JSON11_ADAPTER_HPP
 
 #include <string>
 #include <json11.hpp>
@@ -709,5 +707,3 @@ inline Json11ObjectMemberIterator Json11Object::find(
 
 }  // namespace adapters
 }  // namespace valijson
-
-#endif
