@@ -813,9 +813,10 @@ namespace HeatBalanceIntRadExchange {
                 for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
                     // Do not include non-heat transfer surfaces, unless it is an air boundary interior window
                     if (Surface(surfNum).Construction > 0) {
-                        if (!Surface(surfNum).HeatTransSurf && !Construct(Surface(surfNum).Construction).TypeIsAirBoundaryInteriorWindow) continue;
-                    }
-                    else if (!Surface(surfNum).HeatTransSurf) {
+                        if (!Surface(surfNum).HeatTransSurf && !Construct(Surface(surfNum).Construction).TypeIsAirBoundaryInteriorWindow) {
+                            continue;
+                        }
+                    } else if (!Surface(surfNum).HeatTransSurf) {
                         continue;
                     }
                     ++numEnclosureSurfaces;
@@ -838,7 +839,9 @@ namespace HeatBalanceIntRadExchange {
                 for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
                     // Do not include non-heat transfer surfaces, unless it is an air boundary interior window
                     if (Surface(surfNum).Construction > 0) {
-                        if (!Surface(surfNum).HeatTransSurf && !Construct(Surface(surfNum).Construction).TypeIsAirBoundaryInteriorWindow) continue;
+                        if (!Surface(surfNum).HeatTransSurf && !Construct(Surface(surfNum).Construction).TypeIsAirBoundaryInteriorWindow) {
+                            continue;
+                        }
                     } else if (!Surface(surfNum).HeatTransSurf) {
                         continue;
                     }
