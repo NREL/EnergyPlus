@@ -73,7 +73,7 @@ class Validation;
 namespace EnergyPlus {
 
 void cleanEPJSON(nlohmann::json &epjson);
-
+/*
 template <typename T> struct EPVector : std::vector<T>
 {
     using std::vector<T>::vector;
@@ -96,7 +96,7 @@ template <typename T> struct EPVector : std::vector<T>
         // return *this;
     }
 };
-
+*/
 class InputProcessor
 {
 public:
