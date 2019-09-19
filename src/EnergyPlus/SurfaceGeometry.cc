@@ -871,7 +871,6 @@ namespace SurfaceGeometry {
         int Found;                    // For matching interzone surfaces
         int ConstrNumFound;           // Construction number of matching interzone surface
         static bool NonMatch(false);  // Error for non-matching interzone surfaces
-        int Lay;                      // Layer number
         int MovedSurfs;               // Number of Moved Surfaces (when sorting into hierarchical structure)
         static bool SurfError(false); // General Surface Error, causes fatal error at end of routine
         int Loop;
@@ -1435,17 +1434,13 @@ namespace SurfaceGeometry {
                                 // check layers as number of layers is the same
                                 izConstDiff = false;
                                 // ok if same nominal U
-                                for (Lay = 1; Lay <= TotLay; ++Lay) {
-                                    if (Construct(ConstrNum).LayerPoint(Lay) != Construct(ConstrNumFound).LayerPoint(TotLay - Lay + 1)) {
-                                        izConstDiff = true;
-                                        break; // exit when diff
-                                    }
-                                }
+                                CheckForReversedLayers(izConstDiff, ConstrNum, ConstrNumFound, TotLay);
                                 if (izConstDiff && std::abs(NominalU(ConstrNum) - NominalU(ConstrNumFound)) > 0.001) {
                                     ShowSevereError(RoutineName + "Construction " + Construct(ConstrNum).Name + " of interzone surface " +
                                                     Surface(SurfNum).Name +
                                                     " does not have the same materials in the reverse order as the construction " +
                                                     Construct(ConstrNumFound).Name + " of adjacent surface " + Surface(Found).Name);
+                                    ShowContinueError("or the properties of the reversed layers are not correct due to differing layer front and back side values");
                                     if (!Construct(ConstrNum).ReverseConstructionLayersOrderWarning ||
                                         !Construct(ConstrNumFound).ReverseConstructionLayersOrderWarning) {
                                         ShowContinueError("...this problem for this pair will not be reported again.");
@@ -1458,6 +1453,7 @@ namespace SurfaceGeometry {
                                                      Surface(SurfNum).Name +
                                                      " does not have the same materials in the reverse order as the construction " +
                                                      Construct(ConstrNumFound).Name + " of adjacent surface " + Surface(Found).Name);
+                                    ShowContinueError("or the properties of the reversed layers are not correct due to differing layer front and back side values");
                                     ShowContinueError("...but Nominal U values are similar, diff=[" +
                                                       RoundSigDigits(std::abs(NominalU(ConstrNum) - NominalU(ConstrNumFound)), 4) +
                                                       "] ... simulation proceeds.");
@@ -13280,6 +13276,88 @@ namespace SurfaceGeometry {
         Surface(SurfNum).Width = WidthEff;
         Surface(SurfNum).Height = HeightEff;
     }
+    
+
+    void CheckForReversedLayers(bool &RevLayerDiffs,    // true when differences are discovered in interzone constructions
+                                int const ConstrNum,    // construction index
+                                int const ConstrNumRev, // construction index for reversed construction
+                                int const TotalLayers   // total layers for construction definition
+    )
+    {
+        
+        RevLayerDiffs = false;
+        
+        for (int LayerNo = 1; LayerNo <= TotalLayers; ++LayerNo) {
+            auto &thisConstLayer(Construct(ConstrNum).LayerPoint(LayerNo));
+            auto &revConstLayer(Construct(ConstrNumRev).LayerPoint(TotalLayers - LayerNo + 1));
+            auto &thisMatLay(Material(thisConstLayer));
+            auto &revMatLay(Material(revConstLayer));
+            if ((thisConstLayer != revConstLayer) ||    // Not pointing to the same layer
+                (thisMatLay.Group == WindowGlass) ||    // Not window glass or glass equivalent layer which have
+                (revMatLay.Group == WindowGlass) ||     // to have certain properties flipped from front to back
+                (thisMatLay.Group == GlassEquivalentLayer) ||
+                (revMatLay.Group == GlassEquivalentLayer)) {
+                // If not point to the same layer, check to see if this is window glass which might need to have
+                // front and back material properties reversed.
+                Real64 const SmallDiff = 0.0001;
+                if ((thisMatLay.Group == WindowGlass) && (revMatLay.Group == WindowGlass)) {
+                    // Both layers are window glass, so need to check to see if the properties are reversed
+                    if ((abs(thisMatLay.Thickness - revMatLay.Thickness) > SmallDiff) ||
+                        (abs(thisMatLay.ReflectSolBeamBack - revMatLay.ReflectSolBeamFront) > SmallDiff) ||
+                        (abs(thisMatLay.ReflectSolBeamFront - revMatLay.ReflectSolBeamBack) > SmallDiff) ||
+                        (abs(thisMatLay.TransVis - revMatLay.TransVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflectVisBeamBack - revMatLay.ReflectVisBeamFront) > SmallDiff) ||
+                        (abs(thisMatLay.ReflectVisBeamFront - revMatLay.ReflectVisBeamBack) > SmallDiff) ||
+                        (abs(thisMatLay.TransThermal - revMatLay.TransThermal) > SmallDiff) ||
+                        (abs(thisMatLay.AbsorpThermalBack - revMatLay.AbsorpThermalFront) > SmallDiff) ||
+                        (abs(thisMatLay.AbsorpThermalFront - revMatLay.AbsorpThermalBack) > SmallDiff) ||
+                        (abs(thisMatLay.Conductivity - revMatLay.Conductivity) > SmallDiff) ||
+                        (abs(thisMatLay.GlassTransDirtFactor - revMatLay.GlassTransDirtFactor) > SmallDiff) ||
+                        (thisMatLay.SolarDiffusing != revMatLay.SolarDiffusing) ||
+                        (abs(thisMatLay.YoungModulus - revMatLay.YoungModulus) > SmallDiff) ||
+                        (abs(thisMatLay.PoissonsRatio - revMatLay.PoissonsRatio) > SmallDiff)) {
+                        RevLayerDiffs = true;
+                        break; // exit when diff
+                    }   // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
+                } else if ((thisMatLay.Group == GlassEquivalentLayer) && (revMatLay.Group == GlassEquivalentLayer)) {
+                    if ((abs(thisMatLay.TausBackBeamBeam - revMatLay.TausFrontBeamBeam) > SmallDiff) ||
+                        (abs(thisMatLay.TausFrontBeamBeam - revMatLay.TausBackBeamBeam) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackBeamBeam - revMatLay.ReflFrontBeamBeam) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontBeamBeam - revMatLay.ReflBackBeamBeam) > SmallDiff) ||
+                        (abs(thisMatLay.TausBackBeamBeamVis - revMatLay.TausFrontBeamBeamVis) > SmallDiff) ||
+                        (abs(thisMatLay.TausFrontBeamBeamVis - revMatLay.TausBackBeamBeamVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackBeamBeamVis - revMatLay.ReflFrontBeamBeamVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontBeamBeamVis - revMatLay.ReflBackBeamBeamVis) > SmallDiff) ||
+                        (abs(thisMatLay.TausBackBeamDiff - revMatLay.TausFrontBeamDiff) > SmallDiff) ||
+                        (abs(thisMatLay.TausFrontBeamDiff - revMatLay.TausBackBeamDiff) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackBeamDiff - revMatLay.ReflFrontBeamDiff) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontBeamDiff - revMatLay.ReflBackBeamDiff) > SmallDiff) ||
+                        (abs(thisMatLay.TausBackBeamDiffVis - revMatLay.TausFrontBeamDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.TausFrontBeamDiffVis - revMatLay.TausBackBeamDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackBeamDiffVis - revMatLay.ReflFrontBeamDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontBeamDiffVis - revMatLay.ReflBackBeamDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.TausDiffDiff - revMatLay.TausDiffDiff) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackDiffDiff - revMatLay.ReflFrontDiffDiff) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontDiffDiff - revMatLay.ReflBackDiffDiff) > SmallDiff) ||
+                        (abs(thisMatLay.TausDiffDiffVis - revMatLay.TausDiffDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackDiffDiffVis - revMatLay.ReflFrontDiffDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontDiffDiffVis - revMatLay.ReflBackDiffDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.TausThermal - revMatLay.TausThermal) > SmallDiff) ||
+                        (abs(thisMatLay.EmissThermalBack - revMatLay.EmissThermalFront) > SmallDiff) ||
+                        (abs(thisMatLay.EmissThermalFront - revMatLay.EmissThermalBack) > SmallDiff) ||
+                        (abs(thisMatLay.Resistance - revMatLay.Resistance) > SmallDiff)) {
+                        RevLayerDiffs = true;
+                        break; // exit when diff
+                    }   // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
+                } else {
+                    // Other material types do not have reversed constructions so if they are not the same layer there is a problem (RevLayersDiffs = true)
+                    RevLayerDiffs = true;
+                    break; // exit when diff
+                }       // End check of whether or not these are WindowGlass
+            }           // else: thisConstLayer is the same as revConstLayer--so there is no problem (RevLayersDiffs = false)
+        }
+    }
+    
 } // namespace SurfaceGeometry
 
 } // namespace EnergyPlus
