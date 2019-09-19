@@ -9073,7 +9073,7 @@ DO iZone = 1, numCompactZoneVAV
       CALL AddToObjFld('Component Inlet Node Name', base + vzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + vzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + vzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -9568,7 +9568,7 @@ DO iZone = 1, numCompactZoneFPVAV
       CALL AddToObjFld('Component Inlet Node Name', base + fpvzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + fpvzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + fpvzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -9997,7 +9997,7 @@ DO iZone = 1, numCompactZoneHCVAV
       CALL AddToObjFld('Component Inlet Node Name', base + hcvzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + hcvzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + hcvzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -13430,7 +13430,7 @@ DO iZone = 1, numCompactZoneUnit
       CALL AddToObjFld('Component Inlet Node Name', base + uzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + uzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + uzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -18794,7 +18794,7 @@ DO iZone = 1, numCompactZoneConstVol
       CALL AddToObjFld('Component Inlet Node Name', base + cvzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + cvzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + cvzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -20661,7 +20661,7 @@ DO iZone = 1, numCompactZoneDualDuct
       CALL AddToObjFld('Component Inlet Node Name', base + ddzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + ddzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + ddzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -22929,7 +22929,7 @@ DO iZone = 1, numCompactZoneVRF
       CALL AddToObjFld('Component Inlet Node Name', base + vrfzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + vrfzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + vrfzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -24020,7 +24020,7 @@ IF (.NOT. isBaseboardNone) THEN
       CALL AddToObjFld('Component Inlet Node Name', base + fczNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + fczNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + fczNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -24590,7 +24590,7 @@ ELSE
       CALL AddToObjFld('Component Inlet Node Name', base + bbzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + bbzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + bbzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -25192,7 +25192,7 @@ IF (.NOT. isBaseboardNone) THEN
       CALL AddToObjFld('Component Inlet Node Name', base + ptaczNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + ptaczNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + ptaczNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -25892,7 +25892,7 @@ DO iZone = 1, numCompactPTHP
       CALL AddToObjFld('Component Inlet Node Name', base + pthpzNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + pthpzNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + pthpzNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
@@ -30146,7 +30146,7 @@ DO iZone = 1, numCompactWaterAirHP
       CALL AddToObjFld('Component Inlet Node Name', base + wahpNameOff,' Baseboard HW Inlet')
       CALL AddToObjFld('Component Outlet Node Name', base + wahpNameOff,' Baseboard HW Outlet',.TRUE.)
       CALL AddToStrList(TRIM(FldVal(base + wahpNameOff)) // ' Baseboard Heat HW Branch',handleHeatingCoilBranch)
-      IF ((compactHotLoopBase .EQ. 0) .OR. (numCompactBoiler .EQ. 0)) THEN
+      IF ((compactHotLoopBase .EQ. 0) .OR. ((numCompactBoiler + numCompactBoilerOR) .EQ. 0)) THEN
         CALL WriteError('Both a HVACTemplate:Plant:HotWaterLoop and a HVACTemplate:Plant:Boiler are needed ' // &
              'when using hot water baseboards.')
       END IF
