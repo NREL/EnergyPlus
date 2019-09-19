@@ -439,6 +439,18 @@ namespace IceRink {
 
         CurrentModuleObject = "IndoorIceRink:IndirectRefrigSystem";
         for (Item = 1; Item <= NumOfIndirectRefrigSys; ++Item) {
+
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          Item,
+                                          Alphas,
+                                          NumAlphas,
+                                          Numbers,
+                                          NumNumbers,
+                                          IOStatus,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
         }
 
         Alphas.deallocate();
@@ -449,5 +461,162 @@ namespace IceRink {
         lNumericBlanks.deallocate();
     }
 
+    Real64 IceRinkResurfacer(Real64 ResurfacerTank_capacity,  // Resurfacing machine tank capacity
+                             Real64 ResurfacingHWTemperature, // Temperature of flood water
+                             Real64 IceSurfaceTemperature,    // Temperature of ice rink surface
+                             Real64 InitResurfWaterTemp,      // Initial temperature of resurfacing water
+                             int const ResurfacerIndex)
+    {
+        static std::string const RoutineName("IceRinkResurfacer");
+        using FluidProperties::GetDensityGlycol;
+        using FluidProperties::GetSpecificHeatGlycol;
+
+        Real64 QResurfacing;  // Heat input(J) to the rink due to resurfacing events
+        Real64 EHeatingWater; // Electric energy(J) required to heat water
+        Real64 QHumidity;     // Heat input(J) to the ice rink due to humidity change during resurfacing events
+        Real64 CpWater;
+        // Real64 DeltaHWaterToIce;
+        Real64 RhoWater;
+        Real64 QFusion(333.55);
+        Real64 CpIce(2.108);
+        Real64 MolarMassWater(18.015);
+        Real64 T_air_preResurfacing;
+        Real64 T_air_postResurfacing;
+        Real64 RH_air_preResurfacing;
+        Real64 RH_air_postResurfacing;
+        Real64 VolumeRink;
+        Real64 DeltaT_ice;
+        Real64 DeltaAH_ice;
+        Real64 AH_preResurfacing;
+        Real64 AH_postResurfacing;
+
+        RhoWater = GetDensityGlycol(fluidNameWater, ResurfacingHWTemperature, Resurfacer(ResurfacerIndex).GlycolIndex, RoutineName);
+        CpWater = GetSpecificHeatGlycol(fluidNameWater, ResurfacingHWTemperature, Resurfacer(ResurfacerIndex).GlycolIndex, RoutineName);
+        QResurfacing = RhoWater * ResurfacerTank_capacity * ((CpWater * ResurfacingHWTemperature) + (QFusion) - (CpIce * IceSurfaceTemperature));
+        EHeatingWater = ResurfacerTank_capacity * RhoWater * CpWater * (ResurfacingHWTemperature - InitResurfWaterTemp);
+
+        T_air_preResurfacing = IceSurfaceTemperature;
+        T_air_postResurfacing = ResurfacingHWTemperature;
+        RH_air_preResurfacing = 0;
+        RH_air_postResurfacing = 1;
+        DeltaT_ice = abs(IceSurfaceTemperature - ResurfacingHWTemperature);
+        VolumeRink = DRink(1).LengthRink * DRink(1).WidthRink * DRink(1).DepthRink;
+        AH_preResurfacing = ((6.112 * exp((17.67 * T_air_preResurfacing) / (T_air_preResurfacing + 243.5)) * RH_air_preResurfacing * MolarMassWater) /
+                             (100 * 0.08314 * (273.15 + T_air_preResurfacing))) *
+                            (1 / RhoWater);
+        AH_postResurfacing =
+            ((6.112 * exp((17.67 * T_air_postResurfacing) / (T_air_postResurfacing + 243.5)) * RH_air_postResurfacing * MolarMassWater) /
+             (100 * 0.08314 * (273.15 + T_air_postResurfacing))) *
+            (1 / RhoWater);
+        DeltaAH_ice = abs(AH_preResurfacing - AH_postResurfacing);
+        QHumidity = DeltaAH_ice * VolumeRink * DeltaT_ice * CpWater;
+
+        return QResurfacing;
+        return EHeatingWater;
+        return QHumidity;
+    }
+
+    Real64 CalcDRinkHXEffectTerm(Real64 const Temperature,    // Temperature of refrigerant entering the radiant system, in C
+                                 int const SysNum,            // Index to the refrigeration system
+                                 Real64 const RefrigMassFlow, // Mass flow rate of refrigerant in direct refrigeration system, kg/s
+                                 Real64 TubeLength,           // Total length of the piping used in the radiant system
+                                 Real64 TubeDiameter)
+    {
+        // Using/Aliasing
+        using DataGlobals::Pi;
+        using DataPlant::PlantLoop;
+        using FluidProperties::GetSpecificHeatGlycol;
+
+        // Return Value
+        Real64 CalcDRinkHXEffectTerm;
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
+        int const NumOfPropDivisions(13);
+        Real64 const MaxExpPower(50.0); // Maximum power after which EXP argument would be zero for DP variables
+        static Array1D<Real64> const Temps(NumOfPropDivisions,
+                                           {-10.00, -9.00, -8.00, -7.00, -6.00, -5.00, -4.00, -3.00, -2.00, -1.00, 0.00, 1.00, 2.00});
+        static Array1D<Real64> const Mu(NumOfPropDivisions,
+                                        {0.000008843,
+                                         0.000008878,
+                                         0.000008913,
+                                         0.000008947,
+                                         0.000008982,
+                                         0.000009017,
+                                         0.000009052,
+                                         0.000009087,
+                                         0.000009123,
+                                         0.000009158,
+                                         0.000009193,
+                                         0.000009228,
+                                         0.000009264});
+
+        static Array1D<Real64> const Conductivity(
+            NumOfPropDivisions, {0.02224, 0.0223, 0.02237, 0.02243, 0.0225, 0.02257, 0.02264, 0.02271, 0.02277, 0.02285, 0.02292, 0.02299, 0.02306});
+        static Array1D<Real64> const Pr(NumOfPropDivisions,
+                                        {0.8741, 0.8741, 0.8741, 0.8741, 0.8741, 0.8741, 0.8741, 0.8742, 0.8742, 0.8742, 0.8743, 0.8744, 0.8744});
+        static std::string const RoutineName("CalcDRinkHXEffectTerm");
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int Index;
+        Real64 InterpFrac;
+        Real64 NuD;
+        Real64 ReD;
+        Real64 NTU;
+        Real64 CpRefrig(0.0);
+        Real64 Kactual;
+        Real64 MUactual;
+        Real64 PRactual;
+        Real64 Eff; // HX effectiveness
+
+        // First find out where we are in the range of temperatures
+        Index = 1;
+        while (Index <= NumOfPropDivisions) {
+            if (Temperature < Temps(Index)) break; // DO loop
+            ++Index;
+        }
+
+        // Initialize thermal properties of water
+        if (Index == 1) {
+            MUactual = Mu(Index);
+            Kactual = Conductivity(Index);
+            PRactual = Pr(Index);
+        } else if (Index > NumOfPropDivisions) {
+            Index = NumOfPropDivisions;
+            MUactual = Mu(Index);
+            Kactual = Conductivity(Index);
+            PRactual = Pr(Index);
+        } else {
+            InterpFrac = (Temperature - Temps(Index - 1)) / (Temps(Index) - Temps(Index - 1));
+            MUactual = Mu(Index - 1) + InterpFrac * (Mu(Index) - Mu(Index - 1));
+            Kactual = Conductivity(Index - 1) + InterpFrac * (Conductivity(Index) - Conductivity(Index - 1));
+            PRactual = Pr(Index - 1) + InterpFrac * (Pr(Index) - Pr(Index - 1));
+        }
+
+        CpRefrig = 2200.0;
+
+        // Claculate the reynold's number
+        ReD = 4.0 * RefrigMassFlow / (Pi * MUactual * TubeDiameter);
+
+        if (ReD >= MaxLaminarRe) { // Turbulent flow --> use Colburn equation
+
+            NuD = 0.023 * std::pow(ReD, 0.8) * std::pow(PRactual, 1.0 / 3.0);
+
+        } else { // Laminar flow --> use constant surface temperature relation
+
+            NuD = 3.66;
+        }
+
+        NTU = Pi * Kactual * TubeLength / (RefrigMassFlow * CpRefrig);
+        if (NTU > MaxExpPower) {
+            Eff = 1.0;
+            CalcDRinkHXEffectTerm = RefrigMassFlow * CpRefrig;
+        } else {
+            Eff = 1.0 - std::exp(-NTU);
+            CalcDRinkHXEffectTerm = Eff * RefrigMassFlow * CpRefrig;
+        }
+
+        return CalcDRinkHXEffectTerm;
+    }
 } // namespace IceRink
 } // namespace EnergyPlus

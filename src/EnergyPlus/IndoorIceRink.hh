@@ -40,6 +40,9 @@ namespace IceRink {
         int NumCircCalcMethod;           // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
         Real64 CircLength;               // Circuit length {m}
         int GlycolIndex;                 // Index to Glycol (Ammonia) Properties
+        Real64 LengthRink;               // Length of ice rink
+        Real64 WidthRink;                // Width of ice rink
+        Real64 DepthRink;                // Depth of ice rink
 
         // ReportData
 
@@ -47,7 +50,7 @@ namespace IceRink {
         DirectRefrigSysData()
             : SchedPtr(0), ZonePtr(0), SurfacePtr(0), NumOfSurfaces(0), TubeDiameter(0.0), TubeLength(0.0), ControlType(0), RefrigVolFlowMaxCool(0.0),
               ColdRefrigInNode(0), ColdRefrigOutNode(0), ColdThrottleRange(0.0), ColdSetptSchedPtr(0), CondCtrlType(0), CondDewPtDeltaT(0.0),
-              NumCircCalcMethod(0), CircLength(0.0), GlycolIndex(0)
+              NumCircCalcMethod(0), CircLength(0.0), GlycolIndex(0), LengthRink(0.0), WidthRink(0.0), DepthRink(0.0)
 
         {
         }
@@ -60,6 +63,9 @@ namespace IceRink {
         std::string Name; // name of indirect refrigeration system
         int SchedPtr;     // index to schedule
         int GlycolIndex;  // Index to Glycol (Brine) Properties
+
+        Real64 TubeDiameter; // tube diameter for embedded tubing
+        Real64 TubeLength;   // tube length embedded in radiant surface
 
         // Report Data
 
