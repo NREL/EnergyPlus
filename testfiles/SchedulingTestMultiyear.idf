@@ -56,16 +56,19 @@
     For: WinterDesignDay, Until: 24:00, 1.0,
     For: AllOtherDays, Until: 24:00, 2.0;
 
+  Schedule:Compact,
+    Day Varying Compact Sched 2,
+    ,
+    Through: 12/31,
+    For: Sundays, Until: 24:00, -1.0,
+    For: Saturdays, Until: 24:00, 1.0,
+    For: AllOtherDays, Until: 24:00, 0.0;
+
 ! Enabling this should cause a severe out of bounds error
 !  Schedule:Constant,
 !    Constant Schedule With Limits Bounded,
 !    Limits 0-10 Discrete,
 !    11;
-
-   Schedule:Constant,
-     Constant Schedule with Correct Limits,
-     Limits 0-10 Discrete,
-     10;
 
   ScheduleTypeLimits,
     Limits 0-10 Discrete,
@@ -101,52 +104,10 @@
     Until: 24:00,            !- Time 1
     4;                       !- Value Until Time 1
 
-  Schedule:Day:Interval,
-    CT Day Schedule Interp,  !- Name
-    ControlType,             !- Schedule Type Limits Name
-    Linear,                  !- Interpolate to Timestep
-    Until: 00:00,            !- Time 1
-    0,                       !- Value Until Time 1
-    Until: 24:00,            !- Time 2
-    4;                       !- Value Until Time 2
-
-  Schedule:Day:Hourly,
-    CT Day Hourly Schedule,  !- Name
-    ControlType,             !- Schedule Type Limits Name
-    0.0,                     !- Hour 1
-    0.2,                     !- Hour 2
-    0.4,                     !- Hour 3
-    0.8,                     !- Hour 4
-    1.0,                     !- Hour 5
-    1.2,                     !- Hour 6
-    1.4,                     !- Hour 7
-    1.6,                     !- Hour 8
-    1.8,                     !- Hour 9
-    2.0,                     !- Hour 10
-    2.2,                     !- Hour 11
-    2.4,                     !- Hour 12
-    2.2,                     !- Hour 13
-    2.0,                       !- Hour 14
-    1.8,                       !- Hour 15
-    1.6,                     !- Hour 16
-    1.4,                     !- Hour 17
-    1.2,                     !- Hour 18
-    1.0,                     !- Hour 19
-    0.8,                     !- Hour 20
-    0.6,                     !- Hour 21
-    0.4,                     !- Hour 22
-    0.2,                     !- Hour 23
-    0.0;                     !- Hour 24
-
   Schedule:Week:Compact,
     CT WeekSchedule,         !- Name
     For: Alldays,            !- DayType List 1
     CT Day Schedule;         !- Schedule:Day Name 1
-
-  Schedule:Week:Compact,
-    CT WeekSchedule Interp,  !- Name
-    For: Alldays,            !- DayType List 1
-    CT Day Schedule Interp;  !- Schedule:Day Name 1
 
   Schedule:Year,
     Zone Control Type Schedule,  !- Name
@@ -157,14 +118,67 @@
     12,                      !- End Month 1
     31;                      !- End Day 1
 
-  Schedule:Year,
-    Zone Control Type Schedule Interp,  !- Name
-    ControlType,             !- Schedule Type Limits Name
-    CT WeekSchedule Interp,  !- Schedule:Week Name 1
-    1,                       !- Start Month 1
-    1,                       !- Start Day 1
-    12,                      !- End Month 1
-    31;                      !- End Day 1
+! ***HOLIDAYS***
+
+  RunPeriodControl:SpecialDays,
+    New Years Day,           !- Name
+    January 1,               !- Start Date
+    1,                       !- Duration {days}
+    Holiday;                 !- Special Day Type
+
+  RunPeriodControl:SpecialDays,
+    MLK Day,                 !- Name
+    3rd Monday in January,   !- Start Date
+    1,                       !- Duration {days}
+    Holiday;                 !- Special Day Type
+
+  RunPeriodControl:SpecialDays,
+    Presidents Day,          !- Name
+    3rd Monday in February,  !- Start Date
+    1,                       !- Duration {days}
+    Holiday;                 !- Special Day Type
+
+  RunPeriodControl:SpecialDays,
+    Memorial Day,            !- Name
+    Last Monday in May,      !- Start Date
+    1,                       !- Duration {days}
+    Holiday;                 !- Special Day Type
+
+  RunPeriodControl:SpecialDays,
+    Independence Day,        !- Name
+    July 4,                  !- Start Date
+    1,                       !- Duration {days}
+    Holiday;                 !- Special Day Type
+
+  RunPeriodControl:SpecialDays,
+    Labor Day,               !- Name
+    1st Monday in September, !- Start Date
+    1,                       !- Duration {days}
+    Holiday;                 !- Special Day Type
+
+  RunPeriodControl:SpecialDays,
+    Columbus Day,            !- Name
+    2nd Monday in October,   !- Start Date
+    1,                       !- Duration {days}
+    Holiday;                 !- Special Day Type
+
+  RunPeriodControl:SpecialDays,
+    Veterans Day,            !- Name
+    November 11,             !- Start Date
+    1,                       !- Duration {days}
+    Holiday;                 !- Special Day Type
+
+  RunPeriodControl:SpecialDays,
+    Thanksgiving,            !- Name
+    4th Thursday in November,!- Start Date
+    1,                       !- Duration {days}
+    Holiday;                 !- Special Day Type
+
+  RunPeriodControl:SpecialDays,
+    Christmas,               !- Name
+    December 25,             !- Start Date
+    1,                       !- Duration {days}
+    Holiday;                 !- Special Day Type
 
   Version,9.2;
 
@@ -250,10 +264,25 @@
     Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
-    ,                        !- Begin Year
-    1,                       !- End Month
-    14,                      !- End Day of Month
-    ,                        !- End Year
+    2019,                    !- Begin Year
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    2022,                    !- End Year
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  RunPeriod,
+    Run Period 2,            !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    2022,                    !- Begin Year
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    2026,                    !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
@@ -265,7 +294,7 @@
     No,                      !- Do Zone Sizing Calculation
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    Yes,                     !- Run Simulation for Sizing Periods
+    No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
   Output:Variable,*,Schedule Value,Timestep;

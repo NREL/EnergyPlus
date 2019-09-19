@@ -596,4 +596,3 @@ TEST_F(SchedulingTestFixture, TestValidateContinuity) {
 }
 
 }
-
