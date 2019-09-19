@@ -322,6 +322,11 @@ CHECKED_AND_OKED = {
             "CannotShade"
         ]
     },
+    "SurfaceGeometry.cc": {
+        "CheckForReversedLayers": [
+                                    "RevLayerDiffs"
+                                    ]
+    },
     "SwimmingPool.cc": {
         # This is an inverse one-way toggle (can only set it to false if true
         # when passed)
