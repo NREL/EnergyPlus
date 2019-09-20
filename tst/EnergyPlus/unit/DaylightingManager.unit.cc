@@ -60,6 +60,7 @@
 #include <DataSurfaces.hh>
 #include <DaylightingManager.hh>
 #include <General.hh>
+#include <HeatBalanceIntRadExchange.hh>
 #include <HeatBalanceManager.hh>
 #include <InputProcessing/InputProcessor.hh>
 #include <InternalHeatGains.hh>
@@ -825,6 +826,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
 
     SurfaceGeometry::SetupZoneGeometry(foundErrors); // this calls GetSurfaceData()
     EXPECT_FALSE(foundErrors);                       // expect no errors
+    HeatBalanceIntRadExchange::InitSolarViewFactors();
 
     DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -1324,6 +1326,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
 
     SurfaceGeometry::SetupZoneGeometry(foundErrors); // this calls GetSurfaceData()
     EXPECT_FALSE(foundErrors);                       // expect no errors
+    HeatBalanceIntRadExchange::InitSolarViewFactors();
+
     int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", DataHeatBalance::Zone);
     InternalHeatGains::GetInternalHeatGainsInput();
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;

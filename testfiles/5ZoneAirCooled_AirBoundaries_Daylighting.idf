@@ -123,7 +123,8 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    relative;                !- Coordinate System
+    Relative,                !- Coordinate System
+    Relative;                !- Daylighting Reference Point Coordinate System
 
   ScheduleTypeLimits,
     Any Number;              !- Name
@@ -164,7 +165,22 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    12,                      !- End Month
+    1,                      !- End Month
+    31,                      !- End Day of Month
+    ,                        !- End Year
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  RunPeriod,
+    Run Period 2,            !- Name
+    7,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    7,                      !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
@@ -766,8 +782,33 @@
     0.2,                     !- Return Air Fraction
     0.59,                    !- Fraction Radiant
     0.2,                     !- Fraction Visible
-    0,                       !- Fraction Replaceable
+    1.0,                     !- Fraction Replaceable
     GeneralLights;           !- End-Use Subcategory
+
+  Daylighting:Controls,
+    SPACE1-1 Daylighting Control,  !- Name
+    SPACE1-1,                !- Zone Name
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    SPACE1-1 Reference Point1,  !- Glare Calculation Daylighting Reference Point Name
+    180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
+    20,                      !- Maximum Allowable Discomfort Glare Index
+    ,                        !- DElight Gridding Resolution {m2}
+    SPACE1-1 Reference Point1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    400.0000;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    SPACE1-1 Reference Point1,  !- Name
+    SPACE1-1,                !- Zone Name
+    15.0,                    !- X-Coordinate of Reference Point {m}
+    3.0,                     !- Y-Coordinate of Reference Point {m}
+    0.7;                     !- Z-Coordinate of Reference Point {m}
 
   ElectricEquipment,
     SPACE1-1 ElecEq 1,       !- Name
@@ -1512,8 +1553,33 @@
     0.2,                     !- Return Air Fraction
     0.59,                    !- Fraction Radiant
     0.2,                     !- Fraction Visible
-    0,                       !- Fraction Replaceable
+    1.0,                     !- Fraction Replaceable
     GeneralLights;           !- End-Use Subcategory
+
+  Daylighting:Controls,
+    SPACE5-1 Daylighting Control,  !- Name
+    SPACE5-1,                !- Zone Name
+    SplitFlux,               !- Daylighting Method
+    ,                        !- Availability Schedule Name
+    Stepped,                 !- Lighting Control Type
+    0.3000,                  !- Minimum Input Power Fraction for Continuous or ContinuousOff Dimming Control
+    0.2000,                  !- Minimum Light Output Fraction for Continuous or ContinuousOff Dimming Control
+    3,                       !- Number of Stepped Control Steps
+    1.0000,                  !- Probability Lighting will be Reset When Needed in Manual Stepped Control
+    SPACE5-1 Reference Point1,  !- Glare Calculation Daylighting Reference Point Name
+    180,                     !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis {deg}
+    20,                      !- Maximum Allowable Discomfort Glare Index
+    ,                        !- DElight Gridding Resolution {m2}
+    SPACE5-1 Reference Point1,  !- Daylighting Reference Point 1 Name
+    1.0000,                  !- Fraction of Zone Controlled by Reference Point 1
+    400.0000;                !- Illuminance Setpoint at Reference Point 1 {lux}
+
+  Daylighting:ReferencePoint,
+    SPACE5-1 Reference Point1,  !- Name
+    SPACE5-1,                !- Zone Name
+    8.0,                    !- X-Coordinate of Reference Point {m}
+    8.0,                     !- Y-Coordinate of Reference Point {m}
+    0.7;                     !- Z-Coordinate of Reference Point {m}
 
   ElectricEquipment,
     SPACE5-1 ElecEq 1,       !- Name
@@ -3440,6 +3506,7 @@
   Output:Surfaces:List,Details;
   Output:Surfaces:List,ViewFactorInfo;
   Output:Surfaces:List,ViewFactorInfo,idf;
+  Output:Surfaces:Drawing,dxf;
 
   Output:Variable,*,Surface Outside Face Temperature,Hourly;
 
@@ -3448,6 +3515,14 @@
   Output:Variable,*,Surface Inside Face Solar Radiation Heat Gain Energy,hourly;
 
   Output:Variable,*,Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,hourly;
+
+  Output:Variable,*,Daylighting Reference Point 1 Illuminance,hourly; !- Zone Average [lux]
+  Output:Variable,*,Daylighting Reference Point 1 Daylight Illuminance Setpoint Exceeded Time,hourly; !- Zone Sum [hr]
+  Output:Variable,*,Daylighting Reference Point 1 Glare Index,hourly; !- Zone Average []
+  Output:Variable,*,Daylighting Reference Point 1 Glare Index Setpoint Exceeded Time,hourly; !- Zone Sum [hr]
+  Output:Variable,*,Daylighting Lighting Power Multiplier,hourly; !- Zone Average []
+  Output:Variable,*,Daylighting Window Reference Point Illuminance,hourly; !- Zone Average [lux]
+  Output:Variable,*,Daylighting Window Reference Point View Luminance,hourly; !- Zone Average [cd/m2]
 
   Meter:Custom,
     Total Building Inside Face Solar Radiation Heat Gain Energy,  !- Name

@@ -1084,6 +1084,10 @@ namespace SurfaceGeometry {
 
         TotSurfaces = SurfNum + AddedSubSurfaces + NeedToAddSurfaces + NeedToAddSubSurfaces;
 
+        if (ErrorsFound) {
+            ShowFatalError(RoutineName + "Errors discovered, program terminates.");
+        }
+
         // Have to make room for added surfaces, if needed
         FirstTotalSurfaces = SurfNum + AddedSubSurfaces;
         if (NeedToAddSurfaces + NeedToAddSubSurfaces > 0) {
@@ -1988,7 +1992,9 @@ namespace SurfaceGeometry {
             for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (!Surface(SurfNum).HeatTransSurf) continue;                                               // ignore shading surfaces
                 if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum) continue; // interzone, not adiabatic surface
-                if (!Construct(Surface(SurfNum).Construction).TypeIsIRT) continue;
+                if (!Construct(Surface(SurfNum).Construction).TypeIsIRT) {
+                    continue;
+                }
                 if (!DisplayExtraWarnings) {
                     ++iTmp1;
                 } else {
@@ -7047,19 +7053,6 @@ namespace SurfaceGeometry {
                 surf.HeatTransferAlgorithm = HeatTransferModel_Kiva;
                 DataHeatBalance::AnyKiva = true;
             }
-            // if (surf.HeatTransSurf) {
-            //    if (DataHeatBalance::Construct(surf.Construction).TypeIsAirBoundaryIRTSurface) {
-            //        // IRT air boundaries use CTF algorithm
-            //        surf.HeatTransferAlgorithm = HeatTransferModel_CTF;
-            //        DataHeatBalance::AnyAirBoundary = true;
-            //    } else if (DataHeatBalance::Construct(surf.Construction).TypeIsAirBoundaryInteriorWindow) {
-            //        surf.HeatTransferAlgorithm = HeatTransferModel_AirBoundaryIntWin;
-            //        DataHeatBalance::AnyAirBoundary = true;
-            //    } else if (DataHeatBalance::Construct(surf.Construction).TypeIsAirBoundary) {
-            //        surf.HeatTransferAlgorithm = HeatTransferModel_AirBoundaryNoHT;
-            //        DataHeatBalance::AnyAirBoundary = true;
-            //    }
-            //}
         }
 
         // Setup Kiva instances
@@ -12744,11 +12737,9 @@ namespace SurfaceGeometry {
 
     void SetupSolarEnclosuresAndAirBoundaries(bool &ErrorsFound)
     {
-        bool anySolarGroupedZones = false;
         int enclosureNum = 0;
         if (std::any_of(Construct.begin(), Construct.end(), [](DataHeatBalance::ConstructionData const &e) { return e.TypeIsAirBoundary; })) {
             std::string RoutineName = "SetupSolarEnclosuresAndAirBoundaries";
-            int errorCount = 0;
             for (int surfNum = 1; surfNum <= DataSurfaces::TotSurfaces; ++surfNum) {
                 auto &surf(Surface(surfNum));
                 if (surf.Construction == 0) continue;
@@ -12764,7 +12755,7 @@ namespace SurfaceGeometry {
                     // Solar distribution
                     if (constr.TypeIsAirBoundarySolar) {
                         // Boundary is grouped - assign solar enclosure
-                        anySolarGroupedZones = true;
+                        DataHeatBalance::AnyAirBoundaryGroupedSolar = true;
                         auto &thisSideEnclosureNum(Zone(surf.Zone).SolarEnclosureNum);
                         auto &otherSideEnclosureNum(Zone(Surface(surf.ExtBoundCond).Zone).SolarEnclosureNum);
                         if ((thisSideEnclosureNum == 0) && (otherSideEnclosureNum == 0)) {
@@ -12835,13 +12826,8 @@ namespace SurfaceGeometry {
                     }
                 }
             }
-            if (errorCount > 0) {
-                ShowSevereError(RoutineName + ": " + General::TrimSigDigits(errorCount) +
-                                " surfaces use Construction:AirBoundary in non-interzone surfaces.");
-                ShowContinueError("For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
-            }
         }
-        if (anySolarGroupedZones) {
+        if (DataHeatBalance::AnyAirBoundaryGroupedSolar) {
             // All grouped solar zones have been assigned to an enclosure, now assign remaining zones
             for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
                 if (Zone(zoneNum).SolarEnclosureNum == 0) {
