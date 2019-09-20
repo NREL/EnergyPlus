@@ -5719,7 +5719,7 @@ namespace HeatBalanceSurfaceManager {
 
     Real64 GetQdotConvOutRepPerArea(int const SurfNum) 
     {
-        int OPtr = Surface(SurfNum).OSCPtr;
+        int OPtr = Surface(SurfNum).OSCMPtr;
         if (Surface(SurfNum).OSCMPtr > 0) { // Optr is set above in this case, use OSCM boundary data
             return -OSCM(OPtr).HConv * (TH(1, 1, SurfNum) - OSCM(OPtr).TConv);
         } else {
