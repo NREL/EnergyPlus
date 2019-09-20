@@ -12,6 +12,44 @@ namespace EnergyPlus {
 
 namespace IceRink {
 
+    // Data
+    // MODULE PARAMETER DEFINITIONS:
+    // System types:
+    extern int const DirectSystem;
+    extern int const IndirectSystem;
+    extern std::string const cDRink;
+    extern std::string const cIRink;
+
+    // Fluid types in indirect refrigeration system
+    extern int const CaCl2;
+    extern int const EG;
+
+    // Control types:
+    extern int const SurfaceTempControl;
+    extern int const BrineOutletTempControl;
+    extern Real64 HighTempCooling;
+
+    // Condensation control types:
+    extern int const CondCtrlNone;
+    extern int const CondCtrlSimpleOff;
+    extern int const CondCtrlVariedOff;
+
+    // Number of Circuits per Surface Calculation Method
+    extern int const OneCircuit;
+    extern int const CalculateFromLength;
+    extern std::string const OnePerSurf;
+    extern std::string const CalcFromLength;
+
+    // DERIVED TYPE DEFINITIONS:
+
+    // MODULE VARIABLE DECLARATIONS:
+    // Standard, run-of-the-mill variables...
+    extern int NumOfDirectRefrigSys;
+    extern int NumOfIndirectRefrigSys;
+    extern int TotalNumRefrigSystem;
+
+    extern Array1D_bool CheckEquipName;
+
     struct DirectRefrigSysData
     {
         // Members
@@ -43,6 +81,7 @@ namespace IceRink {
         Real64 LengthRink;               // Length of ice rink
         Real64 WidthRink;                // Width of ice rink
         Real64 DepthRink;                // Depth of ice rink
+        int CRefrigLoopNum;              // Cold refrigerant loop number
 
         // ReportData
 
@@ -106,30 +145,39 @@ namespace IceRink {
         }
     };
 
+    // Object Data:
+    extern Array1D<DirectRefrigSysData> DRink;
+    extern Array1D<IndirectRefrigSysData> IRink;
+    extern Array1D<RefrigSysTypeData> RefrigSysTypes;
+    extern Array1D<ResurfacerData> Resurfacer;
+
+    // Functions:
+    
+
     void GetIndoorIceRink();
 
-    void InitIndoorIceRink(bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-                           bool &InitErrorsFound,         // TRUE if some error is found in the initialization
-                           int const SystemType,          // Type of refrigeration system: Direct or Indirect
-                           int const SysNum,              // Index to the refrigeration system
-                           int const ResurfacerIndex      // Index to the resurfacer
+    
+
+    
+
+    
+
+    Real64 CalcDRinkHXEffectTerm(Real64 const Temperature,    // Temperature of refrigerant entering the radiant system, in C
+                                 int const SysNum,            // Index to the refrigeration system
+                                 Real64 const RefrigMassFlow, // Mass flow rate of refrigerant in direct refrigeration system, kg/s
+                                 Real64 TubeLength,           // Total length of the piping used in the radiant system
+                                 Real64 TubeDiameter);
+
+    Real64 CalcIRinkHXEffectTerm(Real64 const Temperature,    // Temperature of the refrigerant entering the radiant system
+                                 int const SysNum,            // Index to the refrigeration system
+                                 Real64 const RefrigMassFlow, // Mass flow rate of refrigerant in direct refrigeration system, kg/s
+                                 Real64 TubeLength,           // Total length of the piping used in the radiant system
+                                 Real64 TubeDiameter,         // Inner diameter of the piping used in the radiant system
+                                 int const RefrigType, // Refrigerant used in the radiant system: Ethylene Glycol(EG) or Cslcium Chloride(CaCl2)
+                                 Real64 Concentration  // Concentration of the brine(refrigerant) in the radiant system (allowed range 10% to 30%)
     );
 
-    void CalcDirectIndoorIceRinkSys(int const SysNum, // name of the direct refrigeration system
-                                    Real64 &LoadMet   // load met by the direct refrigeration system, in Watts
-    );
-
-    void CalcIndirectIndoorIceRinkSys(int const SysNum, // Index number for the direct refrigeration system
-                                      Real64 &LoadMet,
-                                      int const RefrigType // Type of refrigerant used in the indirect type refrigeration system
-    );
-
-    void UpdateIndoorIceRink(int const SysNum,    // index to the refrigeration system
-                             int const SystemType // Type of refrigeration system: Direct or indirect
-    );
-    void ReportIndoorIceRink(int const SysNum,    // Index to the refrigeration system
-                             int const SystemType // Type of refrigeration system: Direct or indirect
-    );
+   
 
 } // namespace IceRink
 } // namespace EnergyPlus

@@ -96,7 +96,7 @@ namespace IceRink {
 
     // Functions:
 
-    void SimIndoorIceRink(std::string &Name,             // name of the refrigeration system
+   /* void SimIndoorIceRink(std::string &Name,             // name of the refrigeration system
                           std::string &ResurfacerName,   // name of the resurfacer
                           bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                           Real64 &LoadMet,               // Load met by the refrigeration system, in Watts
@@ -172,7 +172,7 @@ namespace IceRink {
         UpdateIndoorIceRink(SysNum, SystemType);
 
         ReportIndoorIceRink(SysNum, SystemType);
-    }
+    }*/
 
     void GetIndoorIceRink()
     {
@@ -512,8 +512,8 @@ namespace IceRink {
         QHumidity = DeltaAH_ice * VolumeRink * DeltaT_ice * CpWater;
 
         return QResurfacing;
-        return EHeatingWater;
-        return QHumidity;
+        // return EHeatingWater;
+        // return QHumidity;
     }
 
     Real64 CalcDRinkHXEffectTerm(Real64 const Temperature,    // Temperature of refrigerant entering the radiant system, in C
@@ -593,7 +593,7 @@ namespace IceRink {
             PRactual = Pr(Index - 1) + InterpFrac * (Pr(Index) - Pr(Index - 1));
         }
 
-        CpRefrig = 2200.0;
+        CpRefrig = 2200;
 
         // Claculate the reynold's number
         ReD = 4.0 * RefrigMassFlow / (Pi * MUactual * TubeDiameter);
@@ -607,7 +607,7 @@ namespace IceRink {
             NuD = 3.66;
         }
 
-        NTU = Pi * Kactual * TubeLength / (RefrigMassFlow * CpRefrig);
+        NTU = Pi * Kactual * NuD * TubeLength / (RefrigMassFlow * CpRefrig);
         if (NTU > MaxExpPower) {
             Eff = 1.0;
             CalcDRinkHXEffectTerm = RefrigMassFlow * CpRefrig;
@@ -618,5 +618,252 @@ namespace IceRink {
 
         return CalcDRinkHXEffectTerm;
     }
+
+    Real64 CalcIRinkHXEffectTerm(Real64 const Temperature,    // Temperature of the refrigerant entering the radiant system
+                                 int const SysNum,            // Index to the refrigeration system
+                                 Real64 const RefrigMassFlow, // Mass flow rate of refrigerant in direct refrigeration system, kg/s
+                                 Real64 TubeLength,           // Total length of the piping used in the radiant system
+                                 Real64 TubeDiameter,         // Inner diameter of the piping used in the radiant system
+                                 int const RefrigType, // Refrigerant used in the radiant system: Ethylene Glycol(EG) or Cslcium Chloride(CaCl2)
+                                 Real64 Concentration  // Concentration of the brine(refrigerant) in the radiant system (allowed range 10% to 30%)
+    )
+    {
+        // Using/Aliasing
+        using DataGlobals::Pi;
+        using DataPlant::PlantLoop;
+        using FluidProperties::GetSpecificHeatGlycol;
+
+        // Return Value
+        Real64 CalcIRinkHXEffectTerm;
+
+        Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
+        int const NumOfConcDivisions(3);   // Number of Concentration divisions (i.e the number of concentration data points)
+        int const NumOfTempDivisions(13);  // Number of Temperature divisions (i.e the number of temperature data points)
+        Real64 const MaxExpPower(50.0);    // Maximum power after which EXP argument would be zero for DP variables
+
+        // Number of Data points for brines ( Calcium Chloride and Ethylene Glycol solution
+        static Array1D<Real64> const Temperatures(NumOfTempDivisions,
+                                                  {-10.00, -9.00, -8.00, -7.00, -6.00, -5.00, -4.00, -3.00, -2.00, -1.00, 0.00, 1.00, 2.00});
+
+        // Properties of Calcium chloride  solution at 10%, 20% and 30% concentration
+        // Conductivity (Watt/m-C)
+        static Array1D<Real64> const ConductivityCacl2_C10(
+            NumOfTempDivisions, {0.5395, 0.5411, 0.5427, 0.5442, 0.5458, 0.5474, 0.5489, 0.5505, 0.5521, 0.5537, 0.5552, 0.5568, 0.5584});
+        static Array1D<Real64> const ConductivityCacl2_C20(
+            NumOfTempDivisions, {0.5312, 0.5326, 0.5341, 0.5355, 0.537, 0.5384, 0.5399, 0.5413, 0.5427, 0.5442, 0.5456, 0.5471, 0.5485});
+        static Array1D<Real64> const ConductivityCacl2_C30(
+            NumOfTempDivisions, {0.5189, 0.5203, 0.5217, 0.5231, 0.5245, 0.5259, 0.5273, 0.5287, 0.5301, 0.5315, 0.5329, 0.5343, 0.5357});
+        // Viscousity
+        static Array1D<Real64> const MuCacl2_C10(
+            NumOfTempDivisions,
+            {0.003119, 0.003009, 0.002904, 0.002805, 0.00271, 0.002619, 0.002533, 0.002451, 0.002373, 0.002298, 0.002227, 0.002159, 0.002094});
+        static Array1D<Real64> const MuCacl2_C20(
+            NumOfTempDivisions,
+            {0.004336, 0.004196, 0.004063, 0.003935, 0.003813, 0.003696, 0.003585, 0.003478, 0.003375, 0.003277, 0.003183, 0.003093, 0.003006});
+        static Array1D<Real64> const MuCacl2_C30(
+            NumOfTempDivisions,
+            {0.007627, 0.00737, 0.007127, 0.006896, 0.006677, 0.006469, 0.006272, 0.006084, 0.005905, 0.005734, 0.005572, 0.005417, 0.005269});
+        // Prandlt Number
+        static Array1D<Real64> const PrCacl2_C10(NumOfTempDivisions,
+                                                 {20.54, 19.76, 19.03, 18.33, 17.67, 17.04, 16.44, 15.87, 15.32, 14.81, 14.32, 13.85, 13.4});
+        static Array1D<Real64> const PrCacl2_C20(NumOfTempDivisions,
+                                                 {24.68, 23.85, 23.05, 22.29, 21.56, 20.87, 20.21, 19.57, 18.96, 18.38, 17.83, 17.29, 16.78});
+        static Array1D<Real64> const PrCacl2_C30(NumOfTempDivisions,
+                                                 {39.59, 38.19, 36.86, 35.6, 34.41, 33.28, 32.2, 31.18, 30.21, 29.29, 28.41, 27.57, 26.77});
+
+        // Properties of Ethylene Glycol solution at 10%, 20% and 30% concentration
+        // Conductivity (Watt/m-C)
+        static Array1D<Real64> const ConductivityEG_C10(
+            NumOfTempDivisions, {0.5069, 0.5086, 0.5103, 0.5119, 0.5136, 0.5152, 0.5169, 0.5185, 0.5201, 0.5217, 0.5233, 0.5249, 0.5264});
+        static Array1D<Real64> const ConductivityEG_C20(
+            NumOfTempDivisions, {0.4716, 0.4729, 0.4742, 0.4754, 0.4767, 0.4779, 0.4792, 0.4804, 0.4817, 0.4829, 0.4841, 0.4854, 0.4866});
+        static Array1D<Real64> const ConductivityEG_C30(
+            NumOfTempDivisions, {0.4362, 0.4371, 0.4381, 0.4391, 0.4401, 0.4411, 0.442, 0.443, 0.444, 0.445, 0.4459, 0.4469, 0.4479});
+        // Viscousity
+        static Array1D<Real64> const MuEG_C10(
+            NumOfTempDivisions,
+            {0.003395, 0.003265, 0.003141, 0.003023, 0.002911, 0.002805, 0.002704, 0.002607, 0.002516, 0.002428, 0.002345, 0.002265, 0.00219});
+        static Array1D<Real64> const MuEG_C20(
+            NumOfTempDivisions,
+            {0.004699, 0.004509, 0.004328, 0.004157, 0.003995, 0.003841, 0.003694, 0.003555, 0.003423, 0.003297, 0.003178, 0.003064, 0.002955});
+        static Array1D<Real64> const MuEG_C30(
+            NumOfTempDivisions,
+            {0.006508, 0.006228, 0.005964, 0.005715, 0.005478, 0.005254, 0.005042, 0.004841, 0.00465, 0.004469, 0.004298, 0.004135, 0.00398});
+        // Prandlt Number
+        static Array1D<Real64> const PrEG_C10(NumOfTempDivisions,
+                                              {27.04, 25.91, 24.85, 23.84, 22.88, 21.98, 21.12, 20.3, 19.53, 18.79, 18.09, 17.43, 16.8});
+        static Array1D<Real64> const PrEG_C20(NumOfTempDivisions,
+                                              {38.3, 36.67, 35.12, 33.66, 32.27, 30.96, 29.71, 28.53, 27.41, 26.35, 25.34, 24.38, 23.47});
+        static Array1D<Real64> const PrEG_C30(NumOfTempDivisions,
+                                              {54.12, 51.72, 49.46, 47.32, 45.3, 43.39, 41.58, 39.87, 38.25, 36.71, 35.25, 33.87, 32.56});
+
+        static std::string const RoutineName("CalcIRinkHXEffectTerm");
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int Index;
+        Real64 InterpFrac;
+        Real64 NuD;
+        Real64 ReD;
+        Real64 NTU;
+        Real64 CpCacl2(0.0);
+        Real64 CpEG(0.0);
+        Real64 Kactual;
+        Real64 MUactual;
+        Real64 PRactual;
+        Real64 Eff; // HX effectiveness
+
+        // First find out where we are in the range of temperatures
+        Index = 1;
+        while (Index <= NumOfTempDivisions) {
+            if (Temperature < Temperatures(Index)) break; // DO loop
+            ++Index;
+        }
+
+        if (RefrigType == CaCl2) {
+            // Initialize thermal properties of Calcium Chloride Solution
+            if (Concentration == 10.00) {
+                if (Index == 1) {
+                    MUactual = MuCacl2_C10(Index);
+                    Kactual = ConductivityCacl2_C10(Index);
+                    PRactual = PrCacl2_C10(Index);
+                } else if (Index > NumOfTempDivisions) {
+                    Index = NumOfTempDivisions;
+                    MUactual = MuCacl2_C10(Index);
+                    Kactual = ConductivityCacl2_C10(Index);
+                    PRactual = PrCacl2_C10(Index);
+                } else {
+                    InterpFrac = (Temperature - Temperatures(Index - 1)) / (Temperatures(Index) - Temperatures(Index - 1));
+                    MUactual = MuCacl2_C10(Index - 1) + InterpFrac * (MuCacl2_C10(Index) - MuCacl2_C10(Index - 1));
+                    Kactual = ConductivityCacl2_C10(Index - 1) + InterpFrac * (ConductivityCacl2_C10(Index) - ConductivityCacl2_C10(Index - 1));
+                    PRactual = PrCacl2_C10(Index - 1) + InterpFrac * (PrCacl2_C10(Index) - PrCacl2_C10(Index - 1));
+                }
+            } else if (Concentration == 20.00) {
+                if (Index == 1) {
+                    MUactual = MuCacl2_C20(Index);
+                    Kactual = ConductivityCacl2_C20(Index);
+                    PRactual = PrCacl2_C20(Index);
+                } else if (Index > NumOfTempDivisions) {
+                    Index = NumOfTempDivisions;
+                    MUactual = MuCacl2_C20(Index);
+                    Kactual = ConductivityCacl2_C20(Index);
+                    PRactual = PrCacl2_C20(Index);
+                } else {
+                    InterpFrac = (Temperature - Temperatures(Index - 1)) / (Temperatures(Index) - Temperatures(Index - 1));
+                    MUactual = MuCacl2_C20(Index - 1) + InterpFrac * (MuCacl2_C20(Index) - MuCacl2_C20(Index - 1));
+                    Kactual = ConductivityCacl2_C20(Index - 1) + InterpFrac * (ConductivityCacl2_C20(Index) - ConductivityCacl2_C20(Index - 1));
+                    PRactual = PrCacl2_C20(Index - 1) + InterpFrac * (PrCacl2_C20(Index) - PrCacl2_C20(Index - 1));
+                }
+
+            } else {
+                if (Index == 1) {
+                    MUactual = MuCacl2_C30(Index);
+                    Kactual = ConductivityCacl2_C30(Index);
+                    PRactual = PrCacl2_C30(Index);
+                } else if (Index > NumOfTempDivisions) {
+                    Index = NumOfTempDivisions;
+                    MUactual = MuCacl2_C30(Index);
+                    Kactual = ConductivityCacl2_C30(Index);
+                    PRactual = PrCacl2_C30(Index);
+                } else {
+                    InterpFrac = (Temperature - Temperatures(Index - 1)) / (Temperatures(Index) - Temperatures(Index - 1));
+                    MUactual = MuCacl2_C30(Index - 1) + InterpFrac * (MuCacl2_C30(Index) - MuCacl2_C30(Index - 1));
+                    Kactual = ConductivityCacl2_C30(Index - 1) + InterpFrac * (ConductivityCacl2_C30(Index) - ConductivityCacl2_C30(Index - 1));
+                    PRactual = PrCacl2_C30(Index - 1) + InterpFrac * (PrCacl2_C30(Index) - PrCacl2_C30(Index - 1));
+                }
+            }
+        } else if (RefrigType == EG) {
+            // Initialize thermal properties of Ethylene Glycol Solution
+            if (Concentration == 10.00) {
+                if (Index == 1) {
+                    MUactual = MuEG_C10(Index);
+                    Kactual = ConductivityEG_C10(Index);
+                    PRactual = PrEG_C10(Index);
+                } else if (Index > NumOfTempDivisions) {
+                    Index = NumOfTempDivisions;
+                    MUactual = MuEG_C10(Index);
+                    Kactual = ConductivityEG_C10(Index);
+                    PRactual = PrEG_C10(Index);
+                } else {
+                    InterpFrac = (Temperature - Temperatures(Index - 1)) / (Temperatures(Index) - Temperatures(Index - 1));
+                    MUactual = MuEG_C10(Index - 1) + InterpFrac * (MuEG_C10(Index) - MuEG_C10(Index - 1));
+                    Kactual = ConductivityEG_C10(Index - 1) + InterpFrac * (ConductivityEG_C10(Index) - ConductivityEG_C10(Index - 1));
+                    PRactual = PrEG_C10(Index - 1) + InterpFrac * (PrEG_C10(Index) - PrEG_C10(Index - 1));
+                }
+            } else if (Concentration == 20.00) {
+                if (Index == 1) {
+                    MUactual = MuEG_C20(Index);
+                    Kactual = ConductivityEG_C20(Index);
+                    PRactual = PrEG_C20(Index);
+                } else if (Index > NumOfTempDivisions) {
+                    Index = NumOfTempDivisions;
+                    MUactual = MuEG_C20(Index);
+                    Kactual = ConductivityEG_C20(Index);
+                    PRactual = PrEG_C20(Index);
+                } else {
+                    InterpFrac = (Temperature - Temperatures(Index - 1)) / (Temperatures(Index) - Temperatures(Index - 1));
+                    MUactual = MuEG_C20(Index - 1) + InterpFrac * (MuEG_C20(Index) - MuEG_C20(Index - 1));
+                    Kactual = ConductivityEG_C20(Index - 1) + InterpFrac * (ConductivityEG_C20(Index) - ConductivityEG_C20(Index - 1));
+                    PRactual = PrEG_C20(Index - 1) + InterpFrac * (PrEG_C20(Index) - PrEG_C20(Index - 1));
+                }
+
+            } else {
+                if (Index == 1) {
+                    MUactual = MuEG_C30(Index);
+                    Kactual = ConductivityEG_C30(Index);
+                    PRactual = PrEG_C30(Index);
+                } else if (Index > NumOfTempDivisions) {
+                    Index = NumOfTempDivisions;
+                    MUactual = MuEG_C30(Index);
+                    Kactual = ConductivityEG_C30(Index);
+                    PRactual = PrEG_C30(Index);
+                } else {
+                    InterpFrac = (Temperature - Temperatures(Index - 1)) / (Temperatures(Index) - Temperatures(Index - 1));
+                    MUactual = MuEG_C30(Index - 1) + InterpFrac * (MuEG_C30(Index) - MuEG_C30(Index - 1));
+                    Kactual = ConductivityEG_C30(Index - 1) + InterpFrac * (ConductivityEG_C30(Index) - ConductivityEG_C30(Index - 1));
+                    PRactual = PrEG_C30(Index - 1) + InterpFrac * (PrEG_C30(Index) - PrEG_C30(Index - 1));
+                }
+            }
+        }
+
+        CpCacl2 = 2700;
+        CpEG = 3600;
+
+        // Claculate the reynold's number
+        ReD = 4.0 * RefrigMassFlow / (Pi * MUactual * TubeDiameter);
+
+        if (ReD >= MaxLaminarRe) { // Turbulent flow --> use Colburn equation
+
+            NuD = 0.023 * std::pow(ReD, 0.8) * std::pow(PRactual, 1.0 / 3.0);
+
+        } else { // Laminar flow --> use constant surface temperature relation
+
+            NuD = 3.66;
+        }
+
+        if (RefrigType == CaCl2) {
+            NTU = Pi * Kactual* NuD * TubeLength / (RefrigMassFlow * CpCacl2);
+        } else {
+            NTU = Pi * Kactual * NuD * TubeLength / (RefrigMassFlow * CpEG);
+        }
+
+        if (NTU > MaxExpPower) {
+            Eff = 1.0;
+            if (RefrigType == CaCl2) {
+                CalcIRinkHXEffectTerm = RefrigMassFlow * CpCacl2;
+            } else {
+                CalcIRinkHXEffectTerm = RefrigMassFlow * CpEG;
+            }
+        } else {
+            Eff = 1.0 - std::exp(-NTU);
+            if (RefrigType == CaCl2) {
+                CalcIRinkHXEffectTerm = Eff * RefrigMassFlow * CpCacl2;
+            } else {
+                CalcIRinkHXEffectTerm = Eff * RefrigMassFlow * CpEG;
+            }
+        }
+
+        return CalcIRinkHXEffectTerm;
+    }
+    
 } // namespace IceRink
 } // namespace EnergyPlus
