@@ -67,6 +67,10 @@ namespace IceRink {
                                          // Limit temperatures to indicate that a system cannot cool
     Real64 HighTempCooling(200.0);       // Used to indicate that a user does not have a cooling control temperature
 
+    // Operating Mode:
+    int NotOperating(0); // Parameter for use with OperatingMode variable, set for not operating
+    int CoolingMode(2);  // Parameter for use with OperatingMode variable, set for cooling
+
     // Condensation control types:
     int const CondCtrlNone(0);      // Condensation control--none, so system never shuts down
     int const CondCtrlSimpleOff(1); // Condensation control--simple off, system shuts off when condensation predicted
@@ -87,6 +91,9 @@ namespace IceRink {
     Array1D_bool CheckEquipName;
     int NumOfDirectRefrigSys(0);   // Number of direct refrigeration type ice rinks
     int NumOfIndirectRefrigSys(0); // Number of indirect refrigeration type ice rinks
+    int OperatingMode(0);          // Used to keep track of whether system is in heating or cooling mode
+    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+    Array1D<Real64> QRadSysSrcAvg;        // Average source over the time step for a particular radiant surface
 
     // Object Data
     Array1D<DirectRefrigSysData> DRink;
@@ -864,6 +871,473 @@ namespace IceRink {
 
         return CalcIRinkHXEffectTerm;
     }
+
+    void CalcDirectIndoorIceRinkComps(int const SysNum, // Index number for the indirect refrigeration system
+                                      Real64 &LoadMet)
+    {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Punya Sloka Dash
+        //       DATE WRITTEN   August 2019
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine solves the direct type refrigeration system based on
+        // how much refrigerant is (and the conditions of the refrigerant) supplied
+        // to the radiant system. (NOTE: The refrigerant in direct system is ammonia, NH3).
+
+        // METHODOLOGY EMPLOYED:
+        // Use heat exchanger formulas to obtain the heat source/sink for the radiant
+        // system based on the inlet conditions and flow rate of refrigerant. Once that is
+        // determined, recalculate the surface heat balances to reflect this heat
+        // addition/subtraction.  The load met by the system is determined by the
+        // difference between the convection from all surfaces in the zone when
+        // there was no radiant system output and with a source/sink added.
+
+        // Using/Aliasing
+        using DataEnvironment::OutBaroPress;
+        using DataHeatBalance::Zone;
+        using DataHeatBalFanSys::CTFTsrcConstPart;
+        using DataHeatBalFanSys::RadSysTiHBConstCoef;
+        using DataHeatBalFanSys::RadSysTiHBQsrcCoef;
+        using DataHeatBalFanSys::RadSysTiHBToutCoef;
+        using DataHeatBalFanSys::RadSysToHBConstCoef;
+        using DataHeatBalFanSys::RadSysToHBQsrcCoef;
+        using DataHeatBalFanSys::RadSysToHBTinCoef;
+        using DataHeatBalFanSys::ZoneAirHumRat;
+        using DataHeatBalSurface::TH;
+        using DataLoopNode::Node;
+        using DataSurfaces::HeatTransferModel_CTF;
+        using DataSurfaces::SurfaceClass_Floor;
+        using General::RoundSigDigits;
+        using PlantUtilities::SetComponentFlowRate;
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int CondSurfNum;           // Surface number (in radiant array) of
+        int RefrigNodeIn;          // Node number of the refrigerant entering the refrigeration system
+        int ZoneNum;               // Zone pointer for this refrigeration system
+        int SurfNum;               // DO loop counter for the surfaces that comprise a particular refrigeration system
+        int SurfNum2;              // Index to the floor in the surface derived type
+        int SurfNumA;              // DO loop counter for the surfaces that comprise a particular refrigeration system
+        int SurfNumB;              // DO loop counter for the surfaces that comprise a particular refrigeration system 
+        int SurfNum2A;             // Index to the floor in the surface derived type
+        int SurfNumC;              // Index to surface for condensation control 
+        int ConstrNum;             // Index for construction number in Construct derived type
+        Real64 SysRefrigMassFlow;  // System level refrigerant mass flow rate (includes effect of zone multiplier)
+        Real64 RefrigMassFlow;     // Refrigerant mass flow rate in the refrigeration system, kg/s
+        Real64 RefrigTempIn;       // Temperature of the refrigerant entering the refrigeration system, in C
+        Real64 EpsMdotCp;          // Epsilon (heat exchanger terminology) times refrigerant mass flow rate times water specific heat
+        Real64 DewPointTemp;       // Dew-point temperature based on the zone air conditions
+        Real64 LowestRadSurfTemp;  // Lowest surface temperature of a radiant system (when condensation is a concern)
+        Real64 FullRefrigMassFlow; // Original refrigerant mass flow rate before reducing the flow for condensation concerns
+        Real64 PredictedCondTemp;  // Temperature at which condensation is predicted (includes user parameter)
+        Real64 ZeroFlowSurfTemp;   // Temperature of radiant surface when flow is zero
+        Real64 ReductionFrac;      // Fraction that the flow should be reduced to avoid condensation
+
+        Real64 Ca; // Coefficients to relate the inlet refrigerant temperature to the heat source
+        Real64 Cb;
+        Real64 Cc;
+        Real64 Cd;
+        Real64 Ce;
+        Real64 Cf;
+        Real64 Cg;
+        Real64 Ch;
+        Real64 Ci;
+        Real64 Cj;
+        Real64 Ck;
+        Real64 Cl;
+
+        RefrigNodeIn = DRink(SysNum).ColdRefrigInNode;
+        if (RefrigNodeIn == 0) {
+            ShowSevereError("Illegal inlet node for the refrigerant in the direct system");
+            ShowFatalError("Preceding condition causes termination");
+        }
+
+        ZoneNum = DRink(SysNum).ZonePtr;
+        SysRefrigMassFlow = Node(RefrigNodeIn).MassFlowRate;
+        RefrigMassFlow = Node(RefrigNodeIn).MassFlowRate / double(Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier);
+        RefrigTempIn = Node(RefrigNodeIn).Temp;
+
+        if (RefrigMassFlow <= 0) {
+            // No flow or below minimum allowed so there is no heat source/sink
+            // This is possible with a mismatch between system and plant operation
+            // or a slight mismatch between zone and system controls.  This is not
+            // necessarily a "problem" so this exception is necessary in the code.
+            for (SurfNum = 1; SurfNum <= DRink(SysNum).NumOfSurfaces; ++SurfNum) {
+                if (Surface(DRink(SysNum).SurfacePtrArray(SurfNum)).Class == SurfaceClass_Floor) {
+                    SurfNum2 = DRink(SysNum).SurfacePtrArray(SurfNum);
+                    QRadSysSource(SurfNum2) = 0.0;
+                    if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
+                        QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                }
+            }
+        } else {    // Refrigerant mass flow rate is significant
+            for (SurfNum = 1; SurfNum <= DRink(SysNum).NumOfSurfaces; ++SurfNum) {
+                if (Surface(DRink(SysNum).SurfacePtrArray(SurfNum)).Class == SurfaceClass_Floor) {
+                    SurfNum2 = DRink(SysNum).SurfacePtrArray(SurfNum);
+                    // Determine the heat exchanger "effectiveness" term
+                    EpsMdotCp = CalcDRinkHXEffectTerm(RefrigTempIn, 
+                                                      SysNum, 
+                                                      RefrigMassFlow, 
+                                                      DRink(SysNum).TubeLength, 
+                                                      DRink(SysNum).TubeLength);
+
+                    ConstrNum = Surface(SurfNum2).Construction;
+                    if (Surface(SurfNum2).HeatTransferAlgorithm == HeatTransferModel_CTF) {
+
+                        Ca = RadSysTiHBConstCoef(SurfNum2);
+                        Cb = RadSysTiHBToutCoef(SurfNum2);
+                        Cc = RadSysTiHBQsrcCoef(SurfNum2);
+
+                        Cd = RadSysToHBConstCoef(SurfNum2);
+                        Ce = RadSysToHBTinCoef(SurfNum2);
+                        Cf = RadSysToHBQsrcCoef(SurfNum2);
+
+                        Cg = CTFTsrcConstPart(SurfNum2);
+                        Ch = Construct(ConstrNum).CTFTSourceQ(0);
+                        Ci = Construct(ConstrNum).CTFTSourceIn(0);
+                        Cj = Construct(ConstrNum).CTFTSourceOut(0);
+
+                        Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
+                        Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
+
+                        QRadSysSource(SurfNum2) = EpsMdotCp * (RefrigTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum2).Area));
+                    }
+
+                    if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
+                        QRadSysSource(Surface(SurfNum2).ExtBoundCond) = QRadSysSource(SurfNum2); // Also set the other side of an interzone
+                }
+            }
+
+            // "Temperature Comparision" Cut-off:
+            for (SurfNum = 1; SurfNum <= DRink(SysNum).NumOfSurfaces; ++SurfNum) {
+                if (Surface(DRink(SysNum).SurfacePtrArray(SurfNum)).Class == SurfaceClass_Floor) {
+                    // Check to see whether or not the system should really be running.  If
+                    // QRadSysSource is positive when we are in cooling mode, then the radiant system
+                    // will be doing the opposite of its intention.  In this case, the flow rate
+                    // is set to zero to avoid heating in cooling mode
+                    SurfNum2 = DRink(SysNum).SurfacePtrArray(SurfNum);
+                    if ((OperatingMode == CoolingMode) && (QRadSysSource(SurfNum) >= 0.0)) {
+                        RefrigMassFlow = 0.0;
+                        SetComponentFlowRate(RefrigMassFlow,
+                                             DRink(SysNum).ColdRefrigInNode,
+                                             DRink(SysNum).ColdRefrigOutNode,
+                                             DRink(SysNum).CRefrigLoopNum,
+                                             DRink(SysNum).CRefrigLoopSide,
+                                             DRink(SysNum).CRefrigBranchNum,
+                                             DRink(SysNum).CRefrigCompNum);
+                    }
+                    DRink(SysNum).RefrigMassFlowRate = RefrigMassFlow;
+
+                    for (SurfNumA = 1; SurfNumA <= DRink(SysNum).NumOfSurfaces; ++SurfNumA) {
+                        if (Surface(DRink(SysNum).SurfacePtrArray(SurfNumA)).Class == SurfaceClass_Floor) {
+                        SurfNum2A = DRink(SysNum).SurfacePtrArray(SurfNumA);
+                        QRadSysSource(SurfNum2A) = 0.0;
+                        if (Surface(SurfNum2A).ExtBoundCond > 0 && Surface(SurfNum2A).ExtBoundCond != SurfNum2A)
+                            QRadSysSource(Surface(SurfNum2A).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                        }
+                    }
+                    break;
+                }
+            }
+
+            // Condensation Cut-off:
+            // Check to see whether the ice floor temperature operated by the refrigeration system that have
+            // dropped below the dew-point temperature.  If so, we need to shut off this refrigeration system.
+            // A safety parameter is added (hardwired parameter) to avoid getting too close to condensation
+            // conditions.
+            DRink(SysNum).CondCausedShutDown = false;
+            DewPointTemp = PsyTdpFnWPb(ZoneAirHumRat(ZoneNum), OutBaroPress);
+
+            if ((OperatingMode == CoolingMode) && (DRink(SysNum).CondCtrlType == CondCtrlSimpleOff)) {
+                for (SurfNumC = 1; SurfNumC <= DRink(SysNum).NumOfSurfaces; ++SurfNumC) {
+                    if (Surface(DRink(SysNum).SurfacePtrArray(SurfNumC)).Class == SurfaceClass_Floor) {
+                    
+                        if (TH(2, 1, DRink(SysNum).SurfacePtrArray(SurfNumC)) < (DewPointTemp + DRink(SysNum).CondDewPtDeltaT)) {
+                            // Condensation warning--must shut off refrigeration system
+                            DRink(SysNum).CondCausedShutDown = true;
+                            RefrigMassFlow = 0.0;
+                            SetComponentFlowRate(RefrigMassFlow,
+                                                 DRink(SysNum).ColdRefrigInNode,
+                                                 DRink(SysNum).ColdRefrigOutNode,
+                                                 DRink(SysNum).CRefrigLoopNum,
+                                                 DRink(SysNum).CRefrigLoopSide,
+                                                 DRink(SysNum).CRefrigBranchNum,
+                                                 DRink(SysNum).CRefrigCompNum);
+                            DRink(SysNum).RefrigMassFlowRate = RefrigMassFlow;
+                            for (SurfNumB = 1; SurfNumB <= DRink(SysNum).NumOfSurfaces; ++SurfNumB) {
+                                if (Surface(DRink(SysNum).SurfacePtrArray(SurfNumB)).Class == SurfaceClass_Floor) {
+                                    SurfNum2A = DRink(SysNum).SurfacePtrArray(SurfNumB);
+                                    QRadSysSource(SurfNum2A) = 0.0;
+                                    if (Surface(SurfNum2A).ExtBoundCond > 0 && Surface(SurfNum2A).ExtBoundCond != SurfNum2A)
+                                        QRadSysSource(Surface(SurfNum2A).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                                }
+                            }
+                            // Produce a warning message so that user knows the system was shut-off due to potential for condensation
+                            if (!WarmupFlag) {
+                                if (DRink(SysNum).CondErrIndex == 0) {
+                                    ShowWarningMessage(cDRink + " [" + DRink(SysNum).Name + ']');
+                                    ShowContinueError("Surface [" + Surface(DRink(SysNum).SurfacePtrArray(SurfNumC)).Name +
+                                                      "] temperature below dew-point temperature--potential for condensation exists");
+                                    ShowContinueError("Flow to the radiant system will be shut-off to avoid condensation");
+                                    ShowContinueError("Predicted radiant system surface temperature = " +
+                                                      RoundSigDigits(TH(2, 1, DRink(SysNum).SurfacePtrArray(SurfNumC)), 2));
+                                    ShowContinueError("Zone dew-point temperature + safety delta T= " +
+                                                      RoundSigDigits(DewPointTemp + DRink(SysNum).CondDewPtDeltaT, 2));
+                                    ShowContinueErrorTimeStamp("");
+                                    ShowContinueError("Note that a " + RoundSigDigits(DRink(SysNum).CondDewPtDeltaT, 4) +
+                                                      " C safety was chosen in the input for the shut-off criteria");
+                                }
+                                ShowRecurringWarningErrorAtEnd(cDRink + " [" + DRink(SysNum).Name + "] condensation shut-off occurrence continues.",
+                                                               DRink(SysNum).CondErrIndex,
+                                                               DewPointTemp,
+                                                               DewPointTemp,
+                                                               _,
+                                                               "C",
+                                                               "C");
+                            }
+                            break; // outer do loop
+                        }
+                    }
+                }
+            } else if ((OperatingMode == CoolingMode) && (DRink(SysNum).CondCtrlType == CondCtrlNone)) {
+                for (SurfNumC = 1; SurfNumC <= DRink(SysNum).NumOfSurfaces; ++SurfNumC) {
+                    if (Surface(DRink(SysNum).SurfacePtrArray(SurfNumC)).Class == SurfaceClass_Floor) {
+                        if (TH(2, 1, DRink(SysNum).SurfacePtrArray(SurfNumC)) < DewPointTemp) {
+                            // Condensation occuring but user does not want to shut down the system off ever
+                            DRink(SysNum).CondCausedShutDown = true;
+                        }
+                    }
+                }
+            } else if ((OperatingMode == CoolingMode) && (DRink(SysNum).CondCtrlType == CondCtrlVariedOff)) {
+                LowestRadSurfTemp = 999.9;
+                CondSurfNum = 0;
+                for (SurfNumC = 1; SurfNumC <= DRink(SysNum).NumOfSurfaces; ++SurfNumC) {
+                    if (Surface(DRink(SysNum).SurfacePtrArray(SurfNumC)).Class == SurfaceClass_Floor) {
+                        if (TH(2, 1, DRink(SysNum).SurfacePtrArray(SurfNumC)) < (DewPointTemp + DRink(SysNum).CondDewPtDeltaT)) {
+                            if (TH(2, 1, DRink(SysNum).SurfacePtrArray(SurfNumC)) < LowestRadSurfTemp) {
+                                LowestRadSurfTemp = TH(2, 1, DRink(SysNum).SurfacePtrArray(SurfNumC));
+                                CondSurfNum = SurfNumC;
+                            }
+                        }
+                    }
+                }
+
+                if (CondSurfNum > 0) {
+                    // Condensation predicted so let's deal with it
+                    // Process here is: turn everything off and see what the resulting surface temperature is for
+                    // the surface that was causing the lowest temperature.  Then, interpolate to find the flow that
+                    // would still allow the system to operate without producing condensation.  Rerun the heat balance
+                    // and recheck for condensation.  If condensation still exists, shut everything down.  This avoids
+                    // excessive iteration and still makes an attempt to vary the flow rate.
+                    // First, shut everything off...
+
+                    FullRefrigMassFlow = RefrigMassFlow;
+                    RefrigMassFlow = 0.0;
+                    SetComponentFlowRate(RefrigMassFlow,
+                                         DRink(SysNum).ColdRefrigInNode,
+                                         DRink(SysNum).ColdRefrigOutNode,
+                                         DRink(SysNum).CRefrigLoopNum,
+                                         DRink(SysNum).CRefrigLoopSide,
+                                         DRink(SysNum).CRefrigBranchNum,
+                                         DRink(SysNum).CRefrigCompNum);
+                    DRink(SysNum).RefrigMassFlowRate = RefrigMassFlow;
+                    for (SurfNumB = 1; SurfNumB <= DRink(SysNum).NumOfSurfaces; ++SurfNumB) {
+                        if (Surface(DRink(SysNum).SurfacePtrArray(SurfNumB)).Class == SurfaceClass_Floor) {
+                            SurfNum2A = DRink(SysNum).SurfacePtrArray(SurfNumB);
+                            QRadSysSource(SurfNum2A) = 0.0;
+                            if (Surface(SurfNum2A).ExtBoundCond > 0 && Surface(SurfNum2A).ExtBoundCond != SurfNum2A)
+                            QRadSysSource(Surface(SurfNum2A).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                    
+                        }
+                    }
+                    // Redo the heat balances since we have changed the heat source (set it to zero)
+                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+                    // Now check the floor surface temperatures.  If any potentially have condensation, leave the system off.
+                    for (SurfNum2 = 1; SurfNum2 <= DRink(SysNum).NumOfSurfaces; ++SurfNum2) {
+                        if (Surface(DRink(SysNum).SurfacePtrArray(SurfNum2)).Class == SurfaceClass_Floor) {
+                        
+                            if (TH(2, 1, DRink(SysNum).SurfacePtrArray(SurfNum2)) < (DewPointTemp + DRink(SysNum).CondDewPtDeltaT)) {
+                                DRink(SysNum).CondCausedShutDown = true;
+                            }
+                        }
+                    }
+                    // If the system does not need to be shut down, then let's see if we can vary the flow based
+                    // on the lowest temperature surface from before.  This will use interpolation to try a new
+                    // flow rate.
+                    if (!DRink(SysNum).CondCausedShutDown) {
+                        PredictedCondTemp = DewPointTemp + DRink(SysNum).CondDewPtDeltaT;
+                        ZeroFlowSurfTemp = TH(2, 1, DRink(SysNum).SurfacePtrArray(CondSurfNum));
+                        ReductionFrac = (ZeroFlowSurfTemp - PredictedCondTemp) / std::abs(ZeroFlowSurfTemp - LowestRadSurfTemp);
+                        if (ReductionFrac < 0.0) ReductionFrac = 0.0; // Shouldn't happen as the above check should have screened this out
+                        if (ReductionFrac > 1.0) ReductionFrac = 1.0; // Shouldn't happen either because condensation doesn't exist then
+                        RefrigMassFlow = ReductionFrac * FullRefrigMassFlow;
+                        SysRefrigMassFlow = double(Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier) * RefrigMassFlow;
+                        // Got a new reduced flow rate that should work...reset loop variable and resimulate the system
+                        SetComponentFlowRate(SysRefrigMassFlow,
+                                             DRink(SysNum).ColdRefrigInNode,
+                                             DRink(SysNum).ColdRefrigOutNode,
+                                             DRink(SysNum).CRefrigLoopNum,
+                                             DRink(SysNum).CRefrigLoopSide,
+                                             DRink(SysNum).CRefrigBranchNum,
+                                             DRink(SysNum).CRefrigCompNum);
+                        DRink(SysNum).RefrigMassFlowRate = SysRefrigMassFlow;
+                        // Go through the floor surface again with the new flow rate...
+                        for (SurfNumB = 1; SurfNumB <= DRink(SysNum).NumOfSurfaces; ++SurfNumB) {
+                            if (Surface(DRink(SysNum).SurfacePtrArray(SurfNumB)).Class == SurfaceClass_Floor) {
+                            
+                                SurfNum = DRink(SysNum).SurfacePtrArray(SurfNumB);
+                                // Determine the heat exchanger "effectiveness" term
+                                EpsMdotCp =
+                                    CalcDRinkHXEffectTerm(RefrigTempIn, SysNum, RefrigMassFlow, DRink(SysNum).TubeLength, DRink(SysNum).TubeLength);
+                                if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF) {
+                                    // For documentation on coefficients, see code earlier in this subroutine
+                                    Ca = RadSysTiHBConstCoef(SurfNum);
+                                    Cb = RadSysTiHBToutCoef(SurfNum);
+                                    Cc = RadSysTiHBQsrcCoef(SurfNum);
+                                    Cd = RadSysToHBConstCoef(SurfNum);
+                                    Ce = RadSysToHBTinCoef(SurfNum);
+                                    Cf = RadSysToHBQsrcCoef(SurfNum);
+                                    Cg = CTFTsrcConstPart(SurfNum);
+                                    Ch = Construct(ConstrNum).CTFTSourceQ(0);
+                                    Ci = Construct(ConstrNum).CTFTSourceIn(0);
+                                    Cj = Construct(ConstrNum).CTFTSourceOut(0);
+                                    Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
+                                    Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
+                                    QRadSysSource(SurfNum) = EpsMdotCp * (RefrigTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
+                                }
+                                if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
+                                    QRadSysSource(Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum); // Also set the other side of an interzone
+                        
+                            }
+                        }
+                        // Redo the heat balances since we have changed the heat source
+                        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
+                        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+
+                        // Check for condensation one more time.  If no condensation, we are done.  If there is
+                        // condensation, shut things down and be done.
+                        for (SurfNum2 = 1; SurfNum2 <= DRink(SysNum).NumOfSurfaces; ++SurfNum2) {
+                            if (Surface(DRink(SysNum).SurfacePtrArray(SurfNum2)).Class == SurfaceClass_Floor) {
+                                SurfNum = DRink(SysNum).SurfacePtrArray(SurfNum2);
+                                if (DRink(SysNum).CondCausedShutDown) break;
+                                if (TH(2, 1, DRink(SysNum).SurfacePtrArray(SurfNum)) < (PredictedCondTemp)) {
+                                    // Condensation still present--must shut off radiant system
+                                    DRink(SysNum).CondCausedShutDown = true;
+                                    RefrigMassFlow = 0.0;
+                                    
+                                    SetComponentFlowRate(SysRefrigMassFlow,
+                                                         DRink(SysNum).ColdRefrigInNode,
+                                                         DRink(SysNum).ColdRefrigOutNode,
+                                                         DRink(SysNum).CRefrigLoopNum,
+                                                         DRink(SysNum).CRefrigLoopSide,
+                                                         DRink(SysNum).CRefrigBranchNum,
+                                                         DRink(SysNum).CRefrigCompNum);
+                                    DRink(SysNum).RefrigMassFlowRate = RefrigMassFlow;
+                                    for (SurfNumB = 1; SurfNumB <= DRink(SysNum).NumOfSurfaces; ++SurfNumB) {
+                                        SurfNum2A = DRink(SysNum).SurfacePtrArray(SurfNumB);
+                                        QRadSysSource(SurfNum2A) = 0.0;
+                                        if (Surface(SurfNum2A).ExtBoundCond > 0 && Surface(SurfNum2A).ExtBoundCond != SurfNum2A)
+                                            QRadSysSource(Surface(SurfNum2A).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (DRink(SysNum).CondCausedShutDown) {
+                        // Produce a warning message so that user knows the system was shut-off due to potential for condensation
+                        if (!WarmupFlag) {
+                            if (DRink(SysNum).CondErrIndex == 0) {
+                                ShowWarningMessage(cDRink + " [" + DRink(SysNum).Name + ']');
+                                ShowContinueError("Surface [" + Surface(DRink(SysNum).SurfacePtrArray(CondSurfNum)).Name +
+                                                  "] temperature below dew-point temperature--potential for condensation exists");
+                                ShowContinueError("Flow to the radiant system will be shut-off to avoid condensation");
+                                ShowContinueError("Predicted radiant system surface temperature = " +
+                                                  RoundSigDigits(TH(2, 1, DRink(SysNum).SurfacePtrArray(CondSurfNum)), 2));
+                                ShowContinueError("Zone dew-point temperature + safety delta T= " +
+                                                  RoundSigDigits(DewPointTemp + DRink(SysNum).CondDewPtDeltaT, 2));
+                                ShowContinueErrorTimeStamp("");
+                                ShowContinueError("Note that a " + RoundSigDigits(DRink(SysNum).CondDewPtDeltaT, 4) +
+                                                  " C safety was chosen in the input for the shut-off criteria");
+                            }
+                            ShowRecurringWarningErrorAtEnd(cDRink + " [" + DRink(SysNum).Name + "] condensation shut-off occurrence continues.",
+                                                           DRink(SysNum).CondErrIndex,
+                                                           DewPointTemp,
+                                                           DewPointTemp,
+                                                           _,
+                                                           "C",
+                                                           "C");
+                        }
+                    }
+                } // Condensation Predicted in Variable Shut-Off Control Type
+            }     // In cooling mode and one of the condensation control types
+        }         // There was a non-zero flow
+
+        // Now that we have the source/sink term, we must redo the heat balances to obtain
+        // the new SumHATsurf value for the zone.  Note that the difference between the new
+        // SumHATsurf and the value originally calculated by the heat balance with a zero
+        // source for all radiant systems in the zone is the load met by the system (approximately).
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
+        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+
+        LoadMet = SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
+    }
     
+    Real64 SumHATsurf(int const ZoneNum) // Zone number
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Peter Graham Ellis
+        //       DATE WRITTEN   July 2003
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function calculates the zone sum of Hc*Area*Tsurf.  It replaces the old SUMHAT.
+        // The SumHATsurf code below is also in the CalcZoneSums subroutine in ZoneTempPredictorCorrector
+        // and should be updated accordingly.
+
+        // Using/Aliasing
+        using namespace DataSurfaces;
+        using namespace DataHeatBalance;
+        using namespace DataHeatBalSurface;
+
+        // Return value
+        Real64 SumHATsurf;
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int SurfNum; // Surface number
+        Real64 Area; // Effective surface area
+
+        SumHATsurf = 0.0;
+
+        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+
+            Area = Surface(SurfNum).Area;
+
+            if (Surface(SurfNum).Class == SurfaceClass_Window) {
+                if (SurfaceWindow(SurfNum).ShadingFlag == IntShadeOn || SurfaceWindow(SurfNum).ShadingFlag == IntBlindOn) {
+                    // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
+                    Area += SurfaceWindow(SurfNum).DividerArea;
+                }
+
+                if (SurfaceWindow(SurfNum).FrameArea > 0.0) {
+                    // Window frame contribution
+                    SumHATsurf += HConvIn(SurfNum) * SurfaceWindow(SurfNum).FrameArea * (1.0 + SurfaceWindow(SurfNum).ProjCorrFrIn) *
+                                  SurfaceWindow(SurfNum).FrameTempSurfIn;
+                }
+
+                if (SurfaceWindow(SurfNum).DividerArea > 0.0 && SurfaceWindow(SurfNum).ShadingFlag != IntShadeOn &&
+                    SurfaceWindow(SurfNum).ShadingFlag != IntBlindOn) {
+                    // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
+                    SumHATsurf += HConvIn(SurfNum) * SurfaceWindow(SurfNum).DividerArea * (1.0 + 2.0 * SurfaceWindow(SurfNum).ProjCorrDivIn) *
+                                  SurfaceWindow(SurfNum).DividerTempSurfIn;
+                }
+            }
+
+            SumHATsurf += HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+        }
+
+        return SumHATsurf;
+    }
 } // namespace IceRink
 } // namespace EnergyPlus

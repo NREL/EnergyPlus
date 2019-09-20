@@ -29,6 +29,10 @@ namespace IceRink {
     extern int const BrineOutletTempControl;
     extern Real64 HighTempCooling;
 
+    // Operating Mode:
+    extern int NotOperating; // Parameter for use with OperatingMode variable, set for not operating
+    extern int CoolingMode;  // Parameter for use with OperatingMode variable, set for cooling
+
     // Condensation control types:
     extern int const CondCtrlNone;
     extern int const CondCtrlSimpleOff;
@@ -47,7 +51,9 @@ namespace IceRink {
     extern int NumOfDirectRefrigSys;
     extern int NumOfIndirectRefrigSys;
     extern int TotalNumRefrigSystem;
-
+    extern int OperatingMode; // Used to keep track of whether system is in heating or cooling mode
+    extern Array1D<Real64> QRadSysSrcAvg;        // Average source over the time step for a particular radiant surface
+    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
     extern Array1D_bool CheckEquipName;
 
     struct DirectRefrigSysData
@@ -60,7 +66,8 @@ namespace IceRink {
         std::string ZoneName;            // Name of zone the system is serving
         int ZonePtr;                     // Point to this zone in the Zone derived type
         std::string SurfaceName;         // surface name of rink floor
-        int SurfacePtr;                  // index to surface array
+        int SurfacePtr;                  // index to a surface
+        Array1D_int SurfacePtrArray;     // index to a surface array
         int NumOfSurfaces;               // Number of surfaces included in this refrigeration system (coordinated control)
         Array1D<Real64> SurfaceFlowFrac; // Fraction of flow/pipe length for the floor surface
         Array1D<Real64> NumCircuits;     // Number of fluid circuits in the surface
@@ -75,6 +82,7 @@ namespace IceRink {
         int ColdSetptSchedPtr;           // Schedule index for the ice rink setpoint temperature
         Real64 CondDewPtDeltaT;          // Diff between surface temperature and dew point for cond. shut-off
         int CondCtrlType;                // Condensation control type (initialize to simple off)
+        int CondErrIndex;                // Error index for recurring warning messages
         int NumCircCalcMethod;           // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
         Real64 CircLength;               // Circuit length {m}
         int GlycolIndex;                 // Index to Glycol (Ammonia) Properties
@@ -82,6 +90,11 @@ namespace IceRink {
         Real64 WidthRink;                // Width of ice rink
         Real64 DepthRink;                // Depth of ice rink
         int CRefrigLoopNum;              // Cold refrigerant loop number
+        int CRefrigLoopSide;
+        int CRefrigBranchNum;
+        int CRefrigCompNum;
+        Real64 RefrigMassFlowRate;       // Refrigerant mass flow rate
+        bool CondCausedShutDown;   // .TRUE. when condensation predicted at surface
 
         // ReportData
 
@@ -89,7 +102,8 @@ namespace IceRink {
         DirectRefrigSysData()
             : SchedPtr(0), ZonePtr(0), SurfacePtr(0), NumOfSurfaces(0), TubeDiameter(0.0), TubeLength(0.0), ControlType(0), RefrigVolFlowMaxCool(0.0),
               ColdRefrigInNode(0), ColdRefrigOutNode(0), ColdThrottleRange(0.0), ColdSetptSchedPtr(0), CondCtrlType(0), CondDewPtDeltaT(0.0),
-              NumCircCalcMethod(0), CircLength(0.0), GlycolIndex(0), LengthRink(0.0), WidthRink(0.0), DepthRink(0.0)
+              NumCircCalcMethod(0), CircLength(0.0), GlycolIndex(0), LengthRink(0.0), WidthRink(0.0), DepthRink(0.0), CRefrigLoopSide(0), 
+              CRefrigBranchNum(0), CRefrigCompNum(0), RefrigMassFlowRate(0.0), CondCausedShutDown(false), CondErrIndex(0)
 
         {
         }
@@ -152,15 +166,8 @@ namespace IceRink {
     extern Array1D<ResurfacerData> Resurfacer;
 
     // Functions:
-    
 
     void GetIndoorIceRink();
-
-    
-
-    
-
-    
 
     Real64 CalcDRinkHXEffectTerm(Real64 const Temperature,    // Temperature of refrigerant entering the radiant system, in C
                                  int const SysNum,            // Index to the refrigeration system
@@ -177,7 +184,11 @@ namespace IceRink {
                                  Real64 Concentration  // Concentration of the brine(refrigerant) in the radiant system (allowed range 10% to 30%)
     );
 
-   
+    void CalcDirectIndoorIceRinkComps(int const SysNum, // Index number for the indirect refrigeration system
+                                      Real64 &LoadMet);
+
+
+    Real64 SumHATsurf(int const ZoneNum);
 
 } // namespace IceRink
 } // namespace EnergyPlus
