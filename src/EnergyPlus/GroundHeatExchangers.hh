@@ -50,6 +50,7 @@
 
 // C++ headers
 #include <deque>
+#include <utility>
 
 // ObjexxFCL Headers
 //#include <ObjexxFCL/Array1D.hh>
@@ -61,6 +62,7 @@ using json = nlohmann::json;
 // EnergyPlus Headers
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
+#include <UtilityRoutines.hh>
 //#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 //#include <PlantComponent.hh>
 
@@ -93,7 +95,7 @@ namespace GroundHeatExchangers {
         Real64 diffusivity = 0.0; // Thermal diffusivity [m2/s]
 
         // constructor
-        BaseProps(const json &j)
+        explicit BaseProps(const json &j)
         {
             this->k = j["conductivity"];
             this->rho = j["density"];
@@ -115,7 +117,7 @@ namespace GroundHeatExchangers {
         int loopNum = 0;
 
         // constructor
-        FluidWorker(const json &j) {
+        explicit FluidWorker(const json &j) {
             this->loopNum = j["loop-num"];
         }
 
@@ -135,7 +137,6 @@ namespace GroundHeatExchangers {
 
     struct Pipe : public BaseProps, FluidWorker
     {
-
         // E+ member variables
         int loopNum = 0;
 
@@ -169,7 +170,7 @@ namespace GroundHeatExchangers {
         bool applyTransitDelay = true;
 
         // constructor
-        Pipe(const json &j)
+        explicit Pipe(const json &j)
         {
             // properties
             BaseProps tmpProps(j);
@@ -252,6 +253,44 @@ namespace GroundHeatExchangers {
 
             return std::pow(0.79 * std::log(Re) - 1.64, -2.0);
         }
+    };
+
+    struct Interp1D
+    {
+        std::vector<Real64> x_data;
+        std::vector<Real64> y_data;
+        std::string routineName;
+        std::vector<std::pair<Real64, Real64> > table;
+        bool extrapolate;
+
+        // constructor
+        Interp1D(std::vector<Real64> &x_data, std::vector<Real64> &y_data,
+                 std::string &routineName, bool extrapolate = false) {
+
+            this->x_data = x_data;
+            this->y_data = y_data;
+            this->routineName = routineName;
+            this->extrapolate = extrapolate;
+
+            if (this->x_data.size() == this->y_data.size()) {
+                for (unsigned i : this->x_data) {
+                    table.emplace_back(std::pair<Real64, Real64> {this->x_data[i], this->y_data[i]});
+                }
+            } else {
+                ShowFatalError(routineName + ": Number of X and Y data must be equal.");
+            }
+            // add option later to ask if the data needs to be sorted
+            // std::sort(table.begin(), table.end());
+        }
+
+        // default constructor
+        Interp1D() = default;
+
+        // destructor
+        ~Interp1D() = default;
+
+        // member functions
+        Real64 interpolate(Real64 &x);
     };
 
     static Real64 smoothingFunc(Real64 x, Real64 a, Real64 b)

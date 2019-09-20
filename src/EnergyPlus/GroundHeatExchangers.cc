@@ -50,6 +50,7 @@
 //#include <cmath>
 //#include <fstream>
 #include <vector>
+#include <math.h>
 //
 //// ObjexxFCL Headers
 //#include <ObjexxFCL/Array.functions.hh>
@@ -225,6 +226,39 @@ namespace GroundHeatExchangers {
         Real64 k = this->get_k(temperature, routineName);
 
         return cp * mu / k;
+    }
+
+    Real64 Interp1D::interpolate(Real64 &x)
+    {
+        // adapted from: https://stackoverflow.com/a/11675205/5965685
+        static const Real64 INF = INF;
+        // Assumes that "table" is sorted by .first
+        // Check if x is out of bounds. extrapolate if able
+        std::vector<std::pair<Real64, Real64> >::iterator it, it2;
+        if (x > this->table.back().first) {
+            if (this->extrapolate) {
+                it = std::prev(this->table.end());
+                it2 = it;
+                --it2;
+            } else {
+                ShowFatalError(this->routineName + ": interpolation out of bounds.");
+            }
+        } else if (x < this->table[0].first) {
+            if (this->extrapolate) {
+                it2 = this->table.begin();
+                it = it2;
+                ++it;
+            } else {
+                ShowFatalError(this->routineName + ": interpolation out of bounds.");
+            }
+        } else {
+            it = lower_bound(this->table.begin(), this->table.end(), std::pair<Real64, Real64> {x, -INF});
+            // Corner case
+            if (it == this->table.begin()) return it->second;
+            it2 = it;
+            --it2;
+        }
+        return it2->second + (it->second - it2->second)*(x - it2->first)/(it->first - it2->first);
     }
 
     Real64 Pipe::calcTransitTime(Real64 flowRate, Real64 temperature)

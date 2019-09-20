@@ -109,7 +109,75 @@ TEST_F(GHEFixture, TDMA)
     EXPECT_NEAR(result[1], 0.756120, tol);
     EXPECT_NEAR(result[2], -1.001883, tol);
     EXPECT_NEAR(result[3], 2.251412, tol);
+}
 
+TEST_F(GHEFixture, Interp1D)
+{
+    std::vector<Real64> xData {0, 1, 2, 3};
+    std::vector<Real64> yData {0, 1, 2, 3};
+    std::string routineName = "GHE Interp1D Test";
+
+    auto tst = Interp1D(xData, yData, routineName);
+
+    Real64 tol = 1E-6;
+
+    // extrapolate = false
+    Real64 test_val = 0.0;
+    EXPECT_NEAR(tst.interpolate(test_val), test_val, tol);
+
+    test_val = 0.5;
+    EXPECT_NEAR(tst.interpolate(test_val), test_val, tol);
+
+    test_val = 1.0;
+    EXPECT_NEAR(tst.interpolate(test_val), test_val, tol);
+
+    test_val = 1.5;
+    EXPECT_NEAR(tst.interpolate(test_val), test_val, tol);
+
+    test_val = 2.0;
+    EXPECT_NEAR(tst.interpolate(test_val), test_val, tol);
+
+    test_val = 2.5;
+    EXPECT_NEAR(tst.interpolate(test_val), test_val, tol);
+
+    test_val = 3.0;
+    EXPECT_NEAR(tst.interpolate(test_val), test_val, tol);
+
+    test_val = 4.0;
+    EXPECT_THROW(tst.interpolate(test_val), std::runtime_error);
+
+    test_val = -1.0;
+    EXPECT_THROW(tst.interpolate(test_val), std::runtime_error);
+
+    auto tst2 = Interp1D(xData, yData, routineName, true);
+
+    // extrapolate = true
+    test_val = 0.0;
+    EXPECT_NEAR(tst2.interpolate(test_val), test_val, tol);
+
+    test_val = 0.5;
+    EXPECT_NEAR(tst2.interpolate(test_val), test_val, tol);
+
+    test_val = 1.0;
+    EXPECT_NEAR(tst2.interpolate(test_val), test_val, tol);
+
+    test_val = 1.5;
+    EXPECT_NEAR(tst2.interpolate(test_val), test_val, tol);
+
+    test_val = 2.0;
+    EXPECT_NEAR(tst2.interpolate(test_val), test_val, tol);
+
+    test_val = 2.5;
+    EXPECT_NEAR(tst2.interpolate(test_val), test_val, tol);
+
+    test_val = 3.0;
+    EXPECT_NEAR(tst2.interpolate(test_val), test_val, tol);
+
+    test_val = 4.0;
+    EXPECT_NEAR(tst2.interpolate(test_val), test_val, tol);
+
+    test_val = -1.0;
+    EXPECT_NEAR(tst2.interpolate(test_val), test_val, tol);
 }
 
 TEST_F(GHEFixture, BaseProps_Init)
