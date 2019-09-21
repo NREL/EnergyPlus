@@ -1770,27 +1770,25 @@ namespace SimAirServingZones {
                                 // and the supply air path outlet
                                 if (SupplyAirPath(SupAirPathNum).OutletNode(SupAirPathOutNodeNum) ==
                                     ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).InNode) {
-                                    if (FindNumberInList(CtrlZoneNum, CtrlZoneNumsCool, NumZonesCool) == 0) {
-                                        ++NumZonesCool;
-                                        // Set Duct Type for branch for dual duct
-                                        if (NumZonesCool == 1 && OutBranchNum > 1) {
-                                            PrimaryAirSystem(AirLoopNum).Branch(OutBranchNum).DuctType = Cooling;
-                                        }
-                                        if (NumZonesCool == 1) {
-                                            AirToZoneNodeInfo(AirLoopNum).SupplyDuctType(OutNum) = Cooling;
-                                        }
-                                        CtrlZoneNumsCool(NumZonesCool) = CtrlZoneNum;
-                                        ZoneInletNodesCool(NumZonesCool) = ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
-                                        TermInletNodesCool(NumZonesCool) = ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).InNode;
-                                        TermUnitSizingNumsCool(NumZonesCool) =
-                                            ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).TermUnitSizingIndex;
-                                        if (AirLoopNum > 0) {
-                                            if (PrimaryAirSystem(AirLoopNum).OASysExists) {
-                                                ZoneEquipConfig(CtrlZoneNum).ZoneHasAirLoopWithOASys = true;
-                                            }
-                                        }
-                                        ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) = AirLoopNum;
+                                    ++NumZonesCool;
+                                    // Set Duct Type for branch for dual duct
+                                    if (NumZonesCool == 1 && OutBranchNum > 1) {
+                                        PrimaryAirSystem(AirLoopNum).Branch(OutBranchNum).DuctType = Cooling;
                                     }
+                                    if (NumZonesCool == 1) {
+                                        AirToZoneNodeInfo(AirLoopNum).SupplyDuctType(OutNum) = Cooling;
+                                    }
+                                    CtrlZoneNumsCool(NumZonesCool) = CtrlZoneNum;
+                                    ZoneInletNodesCool(NumZonesCool) = ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
+                                    TermInletNodesCool(NumZonesCool) = ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).InNode;
+                                    TermUnitSizingNumsCool(NumZonesCool) =
+                                        ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInNum).TermUnitSizingIndex;
+                                    if (AirLoopNum > 0) {
+                                        if (PrimaryAirSystem(AirLoopNum).OASysExists) {
+                                            ZoneEquipConfig(CtrlZoneNum).ZoneHasAirLoopWithOASys = true;
+                                        }
+                                    }
+                                    ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) = AirLoopNum;
                                     FoundSupPathZoneConnect = true;
 
                                     // set the supply air path
@@ -1808,23 +1806,21 @@ namespace SimAirServingZones {
                                 // BEGIN HEATING: If we don't get a match, check for a heating match
                                 if (SupplyAirPath(SupAirPathNum).OutletNode(SupAirPathOutNodeNum) ==
                                     ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).InNode) {
-                                    if (FindNumberInList(CtrlZoneNum, CtrlZoneNumsHeat, NumZonesHeat) == 0) {
-                                        ++NumZonesHeat;
-                                        // Set Duct Type for branch for dual duct
-                                        if (NumZonesHeat == 1 && OutBranchNum > 1) {
-                                            PrimaryAirSystem(AirLoopNum).Branch(OutBranchNum).DuctType = Heating;
-                                        }
-                                        if (NumZonesHeat == 1) {
-                                            AirToZoneNodeInfo(AirLoopNum).SupplyDuctType(OutNum) = Heating;
-                                        }
-                                        CtrlZoneNumsHeat(NumZonesHeat) = CtrlZoneNum;
-                                        ZoneInletNodesHeat(NumZonesHeat) = ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
-                                        TermInletNodesHeat(NumZonesHeat) = ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).InNode;
-                                        TermUnitSizingNumsHeat(NumZonesHeat) =
-                                            ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).TermUnitSizingIndex;
-                                        if (ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) == 0)
-                                            ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) = AirLoopNum;
+                                    ++NumZonesHeat;
+                                    // Set Duct Type for branch for dual duct
+                                    if (NumZonesHeat == 1 && OutBranchNum > 1) {
+                                        PrimaryAirSystem(AirLoopNum).Branch(OutBranchNum).DuctType = Heating;
                                     }
+                                    if (NumZonesHeat == 1) {
+                                        AirToZoneNodeInfo(AirLoopNum).SupplyDuctType(OutNum) = Heating;
+                                    }
+                                    CtrlZoneNumsHeat(NumZonesHeat) = CtrlZoneNum;
+                                    ZoneInletNodesHeat(NumZonesHeat) = ZoneEquipConfig(CtrlZoneNum).InletNode(ZoneInNum);
+                                    TermInletNodesHeat(NumZonesHeat) = ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).InNode;
+                                    TermUnitSizingNumsHeat(NumZonesHeat) =
+                                        ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInNum).TermUnitSizingIndex;
+                                    if (ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) == 0)
+                                        ZoneEquipConfig(CtrlZoneNum).InletNodeAirLoopNum(ZoneInNum) = AirLoopNum;
                                     FoundSupPathZoneConnect = true;
 
                                     // Set the supply air path flag
