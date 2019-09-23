@@ -171,13 +171,22 @@ TEST_F(EnergyPlusFixture, IndoorIceRink_IndirectSysHXEffectTest)
     EXPECT_NEAR(HXEffectFuncResult, 9779.3628, 0.001);
 }
 
-TEST(EnergyPlusFixture, IndoorIceRink_Resurfacer)
+TEST_F(EnergyPlusFixture, IndoorIceRink_BOTC)
 {
-    Real64 Capacity;
-    Real64 HWTemp;
-    Real64 IceTemp;
-    Real64 InitWaterTemp;
-    int Index;
+    DRink.allocate(1);
+    Node.allocate(1);
+    int SystemType = DirectSystem;
+    int SysNum = 1;
+    Real64 Result;
+    DRink(SysNum).RefrigerantName = "NH3";
+    DRink(SysNum).ColdRefrigInNode = 1;
+    DRink(SysNum).RefIndex = 1;
+    DRink(SysNum).TubeDiameter = 1.0;
+    DRink(SysNum).TubeLength = 200.0;
+    Node(1).Temp = 2.0;
+    Result = BOTC(DirectSystem, SysNum);
+
+    EXPECT_NEAR(Result, 4214.0, 0.1);
 
     // Set values of items that will stay constant
 }

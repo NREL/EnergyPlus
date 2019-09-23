@@ -51,7 +51,7 @@ namespace IceRink {
     extern int NumOfDirectRefrigSys;
     extern int NumOfIndirectRefrigSys;
     extern int TotalNumRefrigSystem;
-    extern int OperatingMode; // Used to keep track of whether system is in heating or cooling mode
+    extern int OperatingMode;                    // Used to keep track of whether system is in heating or cooling mode
     extern Array1D<Real64> QRadSysSrcAvg;        // Average source over the time step for a particular radiant surface
     extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
     extern Array1D_bool CheckEquipName;
@@ -61,6 +61,10 @@ namespace IceRink {
         // Members
         // Input data
         std::string Name;                // name of direct refrigeration system
+        std::string RefrigerantName;     // Name of refrigerant, must match name in FluidName
+                                         //    (see fluidpropertiesrefdata.idf)
+        int RefIndex;                    // Index number of refrigerant, automatically assigned on first call to fluid property
+                                         //   and used thereafter
         std::string SchedName;           // availability schedule
         int SchedPtr;                    // index to schedule
         std::string ZoneName;            // Name of zone the system is serving
@@ -75,6 +79,7 @@ namespace IceRink {
         Real64 TubeLength;               // tube length embedded in radiant surface
         int ControlType;                 // Control type for the system(BOTC or STC)
         Real64 RefrigVolFlowMaxCool;     // maximum refrigerant flow rate for cooling, m3/s
+        Real64 RefrigFlowMaxCool;        // maximum refrigerant mass flow rate for cooling. Kg/s
         int ColdRefrigInNode;            // cold refrigerant inlet node
         int ColdRefrigOutNode;           // cold refrigerant Outlet node
         Real64 ColdThrottleRange;        // Throttling range for cooling [C]
@@ -93,7 +98,7 @@ namespace IceRink {
         int CRefrigLoopSide;
         int CRefrigBranchNum;
         int CRefrigCompNum;
-        Real64 RefrigMassFlowRate;       // Refrigerant mass flow rate
+        Real64 RefrigMassFlowRate; // Refrigerant mass flow rate
         bool CondCausedShutDown;   // .TRUE. when condensation predicted at surface
 
         // ReportData
@@ -102,8 +107,8 @@ namespace IceRink {
         DirectRefrigSysData()
             : SchedPtr(0), ZonePtr(0), SurfacePtr(0), NumOfSurfaces(0), TubeDiameter(0.0), TubeLength(0.0), ControlType(0), RefrigVolFlowMaxCool(0.0),
               ColdRefrigInNode(0), ColdRefrigOutNode(0), ColdThrottleRange(0.0), ColdSetptSchedPtr(0), CondCtrlType(0), CondDewPtDeltaT(0.0),
-              NumCircCalcMethod(0), CircLength(0.0), GlycolIndex(0), LengthRink(0.0), WidthRink(0.0), DepthRink(0.0), CRefrigLoopSide(0), 
-              CRefrigBranchNum(0), CRefrigCompNum(0), RefrigMassFlowRate(0.0), CondCausedShutDown(false), CondErrIndex(0)
+              NumCircCalcMethod(0), CircLength(0.0), GlycolIndex(0), LengthRink(0.0), WidthRink(0.0), DepthRink(0.0), CRefrigLoopSide(0),
+              CRefrigBranchNum(0), CRefrigCompNum(0), RefrigMassFlowRate(0.0), CondCausedShutDown(false), CondErrIndex(0), RefrigFlowMaxCool(0.0)
 
         {
         }
@@ -187,8 +192,15 @@ namespace IceRink {
     void CalcDirectIndoorIceRinkComps(int const SysNum, // Index number for the indirect refrigeration system
                                       Real64 &LoadMet);
 
+    void CalcDirectIndoorIceRinkSys(int const SysNum, // name of the direct refrigeration system
+                                    Real64 &LoadMet   // load met by the direct refrigeration system, in Watts
+    );
 
     Real64 SumHATsurf(int const ZoneNum);
+
+    Real64 BOTC(int const SystemType, int const SysNum);
+
+    Real64 STC(int const SystemType, int const SysNum);
 
 } // namespace IceRink
 } // namespace EnergyPlus

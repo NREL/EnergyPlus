@@ -89,9 +89,9 @@ namespace IceRink {
     bool GetInputFlag = true;
     int TotalNumRefrigSystem(0); // Total number of refrigeration systems
     Array1D_bool CheckEquipName;
-    int NumOfDirectRefrigSys(0);   // Number of direct refrigeration type ice rinks
-    int NumOfIndirectRefrigSys(0); // Number of indirect refrigeration type ice rinks
-    int OperatingMode(0);          // Used to keep track of whether system is in heating or cooling mode
+    int NumOfDirectRefrigSys(0);          // Number of direct refrigeration type ice rinks
+    int NumOfIndirectRefrigSys(0);        // Number of indirect refrigeration type ice rinks
+    int OperatingMode(0);                 // Used to keep track of whether system is in heating or cooling mode
     Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
     Array1D<Real64> QRadSysSrcAvg;        // Average source over the time step for a particular radiant surface
 
@@ -103,83 +103,83 @@ namespace IceRink {
 
     // Functions:
 
-   /* void SimIndoorIceRink(std::string &Name,             // name of the refrigeration system
-                          std::string &ResurfacerName,   // name of the resurfacer
-                          bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-                          Real64 &LoadMet,               // Load met by the refrigeration system, in Watts
-                          int const RefrigType,          // Type of refrigerant used in the indirect type refrigeration system
-                          int &CompIndex,
-                          int &ResurfacerIndex)
-    {
-        // Using/Aliasing
-        using General::TrimSigDigits;
+    /* void SimIndoorIceRink(std::string &Name,             // name of the refrigeration system
+                           std::string &ResurfacerName,   // name of the resurfacer
+                           bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+                           Real64 &LoadMet,               // Load met by the refrigeration system, in Watts
+                           int const RefrigType,          // Type of refrigerant used in the indirect type refrigeration system
+                           int &CompIndex,
+                           int &ResurfacerIndex)
+     {
+         // Using/Aliasing
+         using General::TrimSigDigits;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SysNum;        // Refrigeration system number/index in local derived types
-        int SystemType;    // Type of refrigeration system: Direct or Indirect
-        int ResurfacerNum; // Resurfacer machine number/index in local derived types
-        bool InitErrorFound(false);
+         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+         int SysNum;        // Refrigeration system number/index in local derived types
+         int SystemType;    // Type of refrigeration system: Direct or Indirect
+         int ResurfacerNum; // Resurfacer machine number/index in local derived types
+         bool InitErrorFound(false);
 
-        // FLOW:
-        if (GetInputFlag) {
-            GetIndoorIceRink();
-            GetInputFlag = false;
-        }
+         // FLOW:
+         if (GetInputFlag) {
+             GetIndoorIceRink();
+             GetInputFlag = false;
+         }
 
-        // Find what type of system is it, is it a direct refrigeration system
-        // or indirect refrigeration system ?
-        if (CompIndex == 0) {
-            SysNum = UtilityRoutines::FindItemInList(Name, RefrigSysTypes);
-            if (SysNum == 0) {
-                ShowFatalError("SimIndoorIceRink: Unit not found =" + Name);
-            }
-            CompIndex = SysNum;
-            SystemType = RefrigSysTypes(SysNum).SystemType;
-            {
-                auto const SELECT_CASE_var(SystemType);
-                if (SELECT_CASE_var == DirectSystem) {
-                    RefrigSysTypes(SysNum).CompIndex = UtilityRoutines::FindItemInList(Name, DRink);
-                } else if (SELECT_CASE_var == IndirectSystem) {
-                    RefrigSysTypes(SysNum).CompIndex = UtilityRoutines::FindItemInList(Name, IRink);
-                }
-            }
+         // Find what type of system is it, is it a direct refrigeration system
+         // or indirect refrigeration system ?
+         if (CompIndex == 0) {
+             SysNum = UtilityRoutines::FindItemInList(Name, RefrigSysTypes);
+             if (SysNum == 0) {
+                 ShowFatalError("SimIndoorIceRink: Unit not found =" + Name);
+             }
+             CompIndex = SysNum;
+             SystemType = RefrigSysTypes(SysNum).SystemType;
+             {
+                 auto const SELECT_CASE_var(SystemType);
+                 if (SELECT_CASE_var == DirectSystem) {
+                     RefrigSysTypes(SysNum).CompIndex = UtilityRoutines::FindItemInList(Name, DRink);
+                 } else if (SELECT_CASE_var == IndirectSystem) {
+                     RefrigSysTypes(SysNum).CompIndex = UtilityRoutines::FindItemInList(Name, IRink);
+                 }
+             }
 
-        } else {
-            SysNum = CompIndex;
-            SystemType = RefrigSysTypes(SysNum).SystemType;
-            if (SysNum > TotalNumRefrigSystem || SysNum < 1) {
-                ShowFatalError("SimIndoorIceRink:  Invalid CompIndex passed=" + TrimSigDigits(SysNum) +
-                               ", Number of Units=" + TrimSigDigits(TotalNumRefrigSystem) + ", Entered Unit name=" + Name);
-            }
-            if (CheckEquipName(SysNum)) {
-                if (Name != RefrigSysTypes(SysNum).Name) {
-                    ShowFatalError("SimIndoorIceRink: Invalid CompIndex passed=" + TrimSigDigits(SysNum) + ", Unit name=" + Name +
-                                   ", stored Unit Name for that index=" + RefrigSysTypes(SysNum).Name);
-                }
-                CheckEquipName(SysNum) = false;
-            }
-        }
+         } else {
+             SysNum = CompIndex;
+             SystemType = RefrigSysTypes(SysNum).SystemType;
+             if (SysNum > TotalNumRefrigSystem || SysNum < 1) {
+                 ShowFatalError("SimIndoorIceRink:  Invalid CompIndex passed=" + TrimSigDigits(SysNum) +
+                                ", Number of Units=" + TrimSigDigits(TotalNumRefrigSystem) + ", Entered Unit name=" + Name);
+             }
+             if (CheckEquipName(SysNum)) {
+                 if (Name != RefrigSysTypes(SysNum).Name) {
+                     ShowFatalError("SimIndoorIceRink: Invalid CompIndex passed=" + TrimSigDigits(SysNum) + ", Unit name=" + Name +
+                                    ", stored Unit Name for that index=" + RefrigSysTypes(SysNum).Name);
+                 }
+                 CheckEquipName(SysNum) = false;
+             }
+         }
 
-        InitIndoorIceRink(FirstHVACIteration, InitErrorFound, SystemType, SysNum, ResurfacerIndex);
-        if (InitErrorFound) {
-            ShowFatalError("InitLowTempRadiantSystem: Preceding error is not allowed to proceed with the simulation.  Correct this input problem.");
-        }
+         InitIndoorIceRink(FirstHVACIteration, InitErrorFound, SystemType, SysNum, ResurfacerIndex);
+         if (InitErrorFound) {
+             ShowFatalError("InitLowTempRadiantSystem: Preceding error is not allowed to proceed with the simulation.  Correct this input problem.");
+         }
 
-        {
-            auto const SELECT_CASE_var(SystemType);
-            if (SystemType == DirectSystem) {
-                CalcDirectIndoorIceRinkSys(RefrigSysTypes(SysNum).CompIndex, LoadMet);
-            } else if (SystemType == IndirectSystem) {
-                CalcIndirectIndoorIceRinkSys(RefrigSysTypes(SysNum).CompIndex, LoadMet, RefrigType);
-            } else {
-                ShowFatalError("SimIndoorIceRink: Illegal system type for system " + Name);
-            }
-        }
+         {
+             auto const SELECT_CASE_var(SystemType);
+             if (SystemType == DirectSystem) {
+                 CalcDirectIndoorIceRinkSys(RefrigSysTypes(SysNum).CompIndex, LoadMet);
+             } else if (SystemType == IndirectSystem) {
+                 CalcIndirectIndoorIceRinkSys(RefrigSysTypes(SysNum).CompIndex, LoadMet, RefrigType);
+             } else {
+                 ShowFatalError("SimIndoorIceRink: Illegal system type for system " + Name);
+             }
+         }
 
-        UpdateIndoorIceRink(SysNum, SystemType);
+         UpdateIndoorIceRink(SysNum, SystemType);
 
-        ReportIndoorIceRink(SysNum, SystemType);
-    }*/
+         ReportIndoorIceRink(SysNum, SystemType);
+     }*/
 
     void GetIndoorIceRink()
     {
@@ -848,7 +848,7 @@ namespace IceRink {
         }
 
         if (RefrigType == CaCl2) {
-            NTU = Pi * Kactual* NuD * TubeLength / (RefrigMassFlow * CpCacl2);
+            NTU = Pi * Kactual * NuD * TubeLength / (RefrigMassFlow * CpCacl2);
         } else {
             NTU = Pi * Kactual * NuD * TubeLength / (RefrigMassFlow * CpEG);
         }
@@ -917,9 +917,9 @@ namespace IceRink {
         int SurfNum;               // DO loop counter for the surfaces that comprise a particular refrigeration system
         int SurfNum2;              // Index to the floor in the surface derived type
         int SurfNumA;              // DO loop counter for the surfaces that comprise a particular refrigeration system
-        int SurfNumB;              // DO loop counter for the surfaces that comprise a particular refrigeration system 
+        int SurfNumB;              // DO loop counter for the surfaces that comprise a particular refrigeration system
         int SurfNum2A;             // Index to the floor in the surface derived type
-        int SurfNumC;              // Index to surface for condensation control 
+        int SurfNumC;              // Index to surface for condensation control
         int ConstrNum;             // Index for construction number in Construct derived type
         Real64 SysRefrigMassFlow;  // System level refrigerant mass flow rate (includes effect of zone multiplier)
         Real64 RefrigMassFlow;     // Refrigerant mass flow rate in the refrigeration system, kg/s
@@ -969,16 +969,12 @@ namespace IceRink {
                         QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                 }
             }
-        } else {    // Refrigerant mass flow rate is significant
+        } else { // Refrigerant mass flow rate is significant
             for (SurfNum = 1; SurfNum <= DRink(SysNum).NumOfSurfaces; ++SurfNum) {
                 if (Surface(DRink(SysNum).SurfacePtrArray(SurfNum)).Class == SurfaceClass_Floor) {
                     SurfNum2 = DRink(SysNum).SurfacePtrArray(SurfNum);
                     // Determine the heat exchanger "effectiveness" term
-                    EpsMdotCp = CalcDRinkHXEffectTerm(RefrigTempIn, 
-                                                      SysNum, 
-                                                      RefrigMassFlow, 
-                                                      DRink(SysNum).TubeLength, 
-                                                      DRink(SysNum).TubeLength);
+                    EpsMdotCp = CalcDRinkHXEffectTerm(RefrigTempIn, SysNum, RefrigMassFlow, DRink(SysNum).TubeLength, DRink(SysNum).TubeLength);
 
                     ConstrNum = Surface(SurfNum2).Construction;
                     if (Surface(SurfNum2).HeatTransferAlgorithm == HeatTransferModel_CTF) {
@@ -1029,10 +1025,10 @@ namespace IceRink {
 
                     for (SurfNumA = 1; SurfNumA <= DRink(SysNum).NumOfSurfaces; ++SurfNumA) {
                         if (Surface(DRink(SysNum).SurfacePtrArray(SurfNumA)).Class == SurfaceClass_Floor) {
-                        SurfNum2A = DRink(SysNum).SurfacePtrArray(SurfNumA);
-                        QRadSysSource(SurfNum2A) = 0.0;
-                        if (Surface(SurfNum2A).ExtBoundCond > 0 && Surface(SurfNum2A).ExtBoundCond != SurfNum2A)
-                            QRadSysSource(Surface(SurfNum2A).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                            SurfNum2A = DRink(SysNum).SurfacePtrArray(SurfNumA);
+                            QRadSysSource(SurfNum2A) = 0.0;
+                            if (Surface(SurfNum2A).ExtBoundCond > 0 && Surface(SurfNum2A).ExtBoundCond != SurfNum2A)
+                                QRadSysSource(Surface(SurfNum2A).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                         }
                     }
                     break;
@@ -1050,7 +1046,7 @@ namespace IceRink {
             if ((OperatingMode == CoolingMode) && (DRink(SysNum).CondCtrlType == CondCtrlSimpleOff)) {
                 for (SurfNumC = 1; SurfNumC <= DRink(SysNum).NumOfSurfaces; ++SurfNumC) {
                     if (Surface(DRink(SysNum).SurfacePtrArray(SurfNumC)).Class == SurfaceClass_Floor) {
-                    
+
                         if (TH(2, 1, DRink(SysNum).SurfacePtrArray(SurfNumC)) < (DewPointTemp + DRink(SysNum).CondDewPtDeltaT)) {
                             // Condensation warning--must shut off refrigeration system
                             DRink(SysNum).CondCausedShutDown = true;
@@ -1145,8 +1141,7 @@ namespace IceRink {
                             SurfNum2A = DRink(SysNum).SurfacePtrArray(SurfNumB);
                             QRadSysSource(SurfNum2A) = 0.0;
                             if (Surface(SurfNum2A).ExtBoundCond > 0 && Surface(SurfNum2A).ExtBoundCond != SurfNum2A)
-                            QRadSysSource(Surface(SurfNum2A).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
-                    
+                                QRadSysSource(Surface(SurfNum2A).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                         }
                     }
                     // Redo the heat balances since we have changed the heat source (set it to zero)
@@ -1155,7 +1150,7 @@ namespace IceRink {
                     // Now check the floor surface temperatures.  If any potentially have condensation, leave the system off.
                     for (SurfNum2 = 1; SurfNum2 <= DRink(SysNum).NumOfSurfaces; ++SurfNum2) {
                         if (Surface(DRink(SysNum).SurfacePtrArray(SurfNum2)).Class == SurfaceClass_Floor) {
-                        
+
                             if (TH(2, 1, DRink(SysNum).SurfacePtrArray(SurfNum2)) < (DewPointTemp + DRink(SysNum).CondDewPtDeltaT)) {
                                 DRink(SysNum).CondCausedShutDown = true;
                             }
@@ -1184,7 +1179,7 @@ namespace IceRink {
                         // Go through the floor surface again with the new flow rate...
                         for (SurfNumB = 1; SurfNumB <= DRink(SysNum).NumOfSurfaces; ++SurfNumB) {
                             if (Surface(DRink(SysNum).SurfacePtrArray(SurfNumB)).Class == SurfaceClass_Floor) {
-                            
+
                                 SurfNum = DRink(SysNum).SurfacePtrArray(SurfNumB);
                                 // Determine the heat exchanger "effectiveness" term
                                 EpsMdotCp =
@@ -1207,7 +1202,6 @@ namespace IceRink {
                                 }
                                 if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
                                     QRadSysSource(Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum); // Also set the other side of an interzone
-                        
                             }
                         }
                         // Redo the heat balances since we have changed the heat source
@@ -1224,7 +1218,7 @@ namespace IceRink {
                                     // Condensation still present--must shut off radiant system
                                     DRink(SysNum).CondCausedShutDown = true;
                                     RefrigMassFlow = 0.0;
-                                    
+
                                     SetComponentFlowRate(SysRefrigMassFlow,
                                                          DRink(SysNum).ColdRefrigInNode,
                                                          DRink(SysNum).ColdRefrigOutNode,
@@ -1282,7 +1276,110 @@ namespace IceRink {
 
         LoadMet = SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
     }
-    
+
+    void CalcDirectIndoorIceRinkSys(int const SysNum, // name of the direct refrigeration system
+                                    Real64 &LoadMet   // load met by the direct refrigeration system, in Watts
+    )
+    {
+        // Using/Aliasing
+        using DataBranchAirLoopPlant::MassFlowTolerance;
+        using DataSurfaces::SurfaceClass_Floor;
+        using PlantUtilities::SetComponentFlowRate;
+        using ScheduleManager::GetCurrentScheduleValue;
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int SurfNum;          // Surface number in the Surface derived type for a radiant system surface
+        int SurfNum2;         // Surface number in the Surface derived type for a radiant system surface
+        Real64 mdot;          // local temporary for fluid mass flow rate
+        Real64 ControlTemp;   // temperature of whatever is controlling the refrigerant system
+        Real64 SetPointTemp;  // temperature "goal" for the refrigerant system [Celsius]
+        Real64 OffTempCool;   // temperature at which the flow rate throttles back to zero for cooling
+        int ControlNode;      // the cold refrigerant inlet node
+        Real64 MassFlowFrac;  // fraction of the maximum refrigerant flow rate as determined by the control algorithm
+        Real64 MaxRefrigFlow; // maximum refrigerant flow for heating or cooling [kg/sec]
+        Real64 ActRefrigFlow; // actual refrigerant flow for cooling
+        bool SysRunning;      // True when system is running
+
+        ControlNode = 0;
+        MaxRefrigFlow = 0.0;
+        ActRefrigFlow = 0.0;
+        SysRunning = true;
+
+        if (GetCurrentScheduleValue(DRink(SysNum).SchedPtr) <= 0) {
+            // Unit is off or has no load upon it; set the flow rates to zero and then
+            // simulate the components with the no flow conditions
+
+            for (SurfNum = 1; SurfNum <= DRink(SysNum).NumOfSurfaces; ++SurfNum) {
+                if (Surface(DRink(SysNum).SurfacePtrArray(SurfNum)).Class == SurfaceClass_Floor) {
+                    SurfNum2 = DRink(SysNum).SurfacePtrArray(SurfNum);
+                    QRadSysSource(SurfNum2) = 0.0;
+                    if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
+                        QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                }
+            }
+
+            mdot = 0.0;
+            SetComponentFlowRate(mdot,
+                                 DRink(SysNum).ColdRefrigInNode,
+                                 DRink(SysNum).ColdRefrigOutNode,
+                                 DRink(SysNum).CRefrigLoopNum,
+                                 DRink(SysNum).CRefrigLoopSide,
+                                 DRink(SysNum).CRefrigBranchNum,
+                                 DRink(SysNum).CRefrigBranchNum);
+
+        } else { // Unit might be on-->this section is intended to control the refrigerant mass flow rate being
+            // sent to the radiant system
+            {
+                auto const SELECT_CASE_var(DRink(SysNum).ControlType);
+                if (SELECT_CASE_var == SurfaceTempControl) {
+                    ControlTemp = STC(DirectSystem, SysNum);
+                } else if (SELECT_CASE_var == BrineOutletTempControl) {
+                    ControlTemp = BOTC(DirectSystem, SysNum);
+                } else { // Should never get here
+                    ControlTemp = STC(DirectSystem, SysNum);
+                    ShowSevereError("Illegal control type in direct refrigeration system: " + DRink(SysNum).Name);
+                    ShowFatalError("Preceding condition causes termination.");
+                }
+            }
+
+            if (DRink(SysNum).ColdSetptSchedPtr > 0) {
+                SetPointTemp = GetCurrentScheduleValue(DRink(SysNum).ColdSetptSchedPtr);
+                OffTempCool = SetPointTemp - 0.5 * DRink(SysNum).ColdThrottleRange;
+            } else { // This system is not capable of cooling, set OffTempCool to something really high
+                OffTempCool = HighTempCooling;
+            }
+
+            if (ControlTemp > OffTempCool) {
+                OperatingMode = CoolingMode;
+                ControlNode = DRink(SysNum).ColdRefrigInNode;
+                MaxRefrigFlow = DRink(SysNum).RefrigFlowMaxCool;
+                MassFlowFrac = (ControlTemp - OffTempCool) / DRink(SysNum).ColdThrottleRange;
+            } else {
+                MassFlowFrac = 0.0;
+            }
+
+            // Calculate and limit the refrigerant flow rate
+            ActRefrigFlow = MassFlowFrac * MaxRefrigFlow;
+            if (ActRefrigFlow < MassFlowTolerance) ActRefrigFlow = 0.0;
+            if (OperatingMode == CoolingMode) {
+
+                SetComponentFlowRate(ActRefrigFlow,
+                                     DRink(SysNum).ColdRefrigInNode,
+                                     DRink(SysNum).ColdRefrigOutNode,
+                                     DRink(SysNum).CRefrigLoopNum,
+                                     DRink(SysNum).CRefrigLoopSide,
+                                     DRink(SysNum).CRefrigBranchNum,
+                                     DRink(SysNum).CRefrigCompNum);
+
+            } else {
+                SysRunning = false;
+            }
+
+            // Now simulate the system...
+            if ((OperatingMode == CoolingMode) && SysRunning) CalcDirectIndoorIceRinkComps(SysNum, LoadMet);
+        }
+    }
+
     Real64 SumHATsurf(int const ZoneNum) // Zone number
     {
 
@@ -1339,5 +1436,90 @@ namespace IceRink {
 
         return SumHATsurf;
     }
+
+    Real64 BOTC(int SystemType, int SysNum)
+    {
+        // Using/ Aliasing
+        using DataHeatBalFanSys::CTFTsrcConstPart;
+        using DataHeatBalFanSys::RadSysTiHBConstCoef;
+        using DataHeatBalFanSys::RadSysTiHBQsrcCoef;
+        using DataHeatBalFanSys::RadSysTiHBToutCoef;
+        using DataHeatBalFanSys::RadSysToHBConstCoef;
+        using DataHeatBalFanSys::RadSysToHBQsrcCoef;
+        using DataHeatBalFanSys::RadSysToHBTinCoef;
+        using DataLoopNode::Node;
+        using DataSurfaces::SurfaceClass_Floor;
+        using FluidProperties::GetSatSpecificHeatRefrig;
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static std::string const RoutineName("BrineOutletTemperatureControl");
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int SurfNum;           // Index to the surface number having source/sink (Floor)
+        int ConstrNum;         // Index for construction number in Construct derived type
+        Real64 Eff;            // Effectiveness of the heat exchanger
+        Real64 RefrigInTemp;   // Refrigerant inlet temperature
+        int RefrigNodeIn;      // Inlet node of refrigerant
+        Real64 RefrigMassFlow; // Initial guess value for mass flow rate of refrigerant
+        Real64 CpRef;          // Specific heat of Ammonia used in direct refrigeration system
+        Real64 QSource;        // Heat flux from the heat source/sink
+        Real64 Ca;             // Coefficients to relate the inlet water temperature to the heat source
+        Real64 Cb;
+        Real64 Cc;
+        Real64 Cd;
+        Real64 Ce;
+        Real64 Cf;
+        Real64 Cg;
+        Real64 Ch;
+        Real64 Ci;
+        Real64 Cj;
+        Real64 Ck;
+        Real64 Cl;
+
+        // auto &DRink_SysNum(DRink(SysNum));
+        // auto &RefrigerantName(DRink_SysNum.RefrigerantName);
+        // auto &RefIndex(DRink_SysNum.RefIndex);
+
+        // FLOW:
+        if (SystemType == DirectSystem) {
+            RefrigMassFlow = 20.0;
+            RefrigNodeIn = DRink(SysNum).ColdRefrigInNode;
+            RefrigInTemp = Node(RefrigNodeIn).Temp;
+            CpRef = GetSatSpecificHeatRefrig(DRink(SysNum).RefrigerantName, RefrigInTemp, 0.0, DRink(SysNum).RefIndex, RoutineName);
+
+            Eff = CalcDRinkHXEffectTerm(RefrigInTemp, SysNum, RefrigMassFlow, DRink(SysNum).TubeLength, DRink(SysNum).TubeDiameter) /
+                  (RefrigMassFlow * CpRef);
+            for (SurfNum = 1; SurfNum <= DRink(SysNum).NumOfSurfaces; ++SurfNum) {
+                if (Surface(DRink(SysNum).SurfacePtrArray(SurfNum)).Class == SurfaceClass_Floor) {
+                    ConstrNum = Surface(SurfNum).Construction;
+
+                    Ca = RadSysTiHBConstCoef(SurfNum);
+                    Cb = RadSysTiHBToutCoef(SurfNum);
+                    Cc = RadSysTiHBQsrcCoef(SurfNum);
+
+                    Cd = RadSysToHBConstCoef(SurfNum);
+                    Ce = RadSysToHBTinCoef(SurfNum);
+                    Cf = RadSysToHBQsrcCoef(SurfNum);
+
+                    Cg = CTFTsrcConstPart(SurfNum);
+                    Ch = Construct(ConstrNum).CTFTSourceQ(0);
+                    Ci = Construct(ConstrNum).CTFTSourceIn(0);
+                    Cj = Construct(ConstrNum).CTFTSourceOut(0);
+
+                    Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
+                    Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
+                }
+
+                QSource = (RefrigInTemp - Ck) / ((Cl /Surface(SurfNum).Area) + (1/(RefrigMassFlow * CpRef)));
+            }
+        }
+
+        return Eff;
+    }
+
+    Real64 STC(int const SysTemType, int const SysNum)
+    {
+        return (0.0);
+    }
+
 } // namespace IceRink
 } // namespace EnergyPlus
