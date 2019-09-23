@@ -152,7 +152,7 @@
     ,                        !- Nuclear High Level Emission Factor Schedule Name
     0;                       !- Nuclear Low Level Emission Factor {m3/MJ}
 
-!NOTE:  EnergyPlus does not yet include LPG as a fuel.  Included here for future use.
+!NOTE:  EnergyPlus does not include LPG as a fuel type, use Propane as the resource name.
 !
 ! USEPA Compilation of Air Pollutant Emission Factors, AP-42, Fifth Edition
 ! Volume I: Stationary Point and Area Sources
@@ -162,7 +162,7 @@
 !
 
   FuelFactors,
-    LPG,                     !- Existing Fuel Resource Name
+    Propane,                 !- Existing Fuel Resource Name
     kg,                      !- Units of Measure
     ,                        !- Energy per Unit Factor
     1,                       !- Source Energy Factor {J/J}
