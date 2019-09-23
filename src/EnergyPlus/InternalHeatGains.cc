@@ -6309,12 +6309,12 @@ namespace InternalHeatGains {
                     TAirIn = TRecirc * RecircFrac + TSupply * (1.0 - RecircFrac);
                     WAirIn = WRecirc * RecircFrac + WSupply * (1.0 - RecircFrac);
                 } else if (AirConnection == ITEInletRoomAirModel) {
-                    // Room air model option: TAirIn=TAirZone, according to EngineeringRef 17.1.4 (Yanfei Li, 09/05/2019)
+                    // Room air model option: TAirIn=TAirZone, according to EngineeringRef 17.1.4
                     TAirIn = MAT(NZ);
 		    TSupply = TAirIn;
                     WAirIn = ZoneAirHumRat(NZ);
-                } else { // Default to ITEInletZoneAirNode
-			//TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4 (Yanfei Li, 09/05/2019)
+                } else { 
+		    // TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4
 		    int ZoneAirInletNode = DataZoneEquipment::ZoneEquipConfig(NZ).InletNode(1);
 		    TSupply = Node(ZoneAirInletNode).Temp;
                     TAirIn = MAT(NZ);
