@@ -494,11 +494,6 @@ namespace ChillerAbsorption {
                 auto const SELECT_CASE_var(cAlphaArgs(8));
                 if (SELECT_CASE_var == "CONSTANTFLOW") {
                     BLASTAbsorber(AbsorberNum).FlowMode = ConstantFlow;
-                } else if (SELECT_CASE_var == "VARIABLEFLOW") {
-                    BLASTAbsorber(AbsorberNum).FlowMode = LeavingSetPointModulated;
-                    ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\",");
-                    ShowContinueError("Invalid " + cAlphaFieldNames(8) + '=' + cAlphaArgs(8));
-                    ShowContinueError("Key choice is now called \"LeavingSetpointModulated\" and the simulation continues");
                 } else if (SELECT_CASE_var == "LEAVINGSETPOINTMODULATED") {
                     BLASTAbsorber(AbsorberNum).FlowMode = LeavingSetPointModulated;
                 } else if (SELECT_CASE_var == "NOTMODULATED") {

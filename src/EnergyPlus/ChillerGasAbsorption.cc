@@ -483,7 +483,7 @@ namespace ChillerGasAbsorption {
             // Fuel Type Case Statement
             {
                 auto const SELECT_CASE_var(cAlphaArgs(17));
-                if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
+                if (SELECT_CASE_var == "NATURALGAS") {
                     GasAbsorber(AbsorberNum).FuelType = "Gas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
@@ -492,15 +492,13 @@ namespace ChillerGasAbsorption {
                 } else if (SELECT_CASE_var == "GASOLINE") {
                     GasAbsorber(AbsorberNum).FuelType = "Gasoline";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #1") || (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL") ||
-                           (SELECT_CASE_var == "DISTILLATE OIL")) {
+                } else if (SELECT_CASE_var == "FUELOIL#1") {
                     GasAbsorber(AbsorberNum).FuelType = "FuelOil#1";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #2") || (SELECT_CASE_var == "FUELOIL#2") || (SELECT_CASE_var == "RESIDUAL OIL")) {
+                } else if (SELECT_CASE_var == "FUELOIL#2") {
                     GasAbsorber(AbsorberNum).FuelType = "FuelOil#2";
 
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
+                } else if (SELECT_CASE_var == "PROPANEGAS") {
                     GasAbsorber(AbsorberNum).FuelType = "Propane";
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {

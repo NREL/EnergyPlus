@@ -747,7 +747,7 @@ namespace PollutionModule {
 
             {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelType.FuelTypeNames(Loop)));
-                if ((SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS") || (SELECT_CASE_var == "GAS")) {
+                if (SELECT_CASE_var == "NATURALGAS") {
                     if (Pollution.NatGasCoef.FuelFactorUsed) {
                         ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
@@ -841,8 +841,7 @@ namespace PollutionModule {
                             cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.NatGasCoef.NucLoSched, ErrorsFound);
                     }
 
-                } else if ((SELECT_CASE_var == "RESIDUALOIL") || (SELECT_CASE_var == "RESIDUAL OIL") || (SELECT_CASE_var == "FUEL OIL #2") ||
-                           (SELECT_CASE_var == "FUELOIL#2")) {
+                } else if (SELECT_CASE_var == "FUELOIL#2") {
                     if (Pollution.FuelOil2Coef.FuelFactorUsed) {
                         ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
@@ -936,8 +935,7 @@ namespace PollutionModule {
                             cCurrentModuleObject, "Fuel Oil#2", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.FuelOil2Coef.NucLoSched, ErrorsFound);
                     }
 
-                } else if ((SELECT_CASE_var == "DISTILLATEOIL") || (SELECT_CASE_var == "DISTILLATE OIL") || (SELECT_CASE_var == "FUEL OIL #1") ||
-                           (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL")) {
+                } else if (SELECT_CASE_var == "FUELOIL#1") {
                     if (Pollution.FuelOil1Coef.FuelFactorUsed) {
                         ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
@@ -1851,7 +1849,7 @@ namespace PollutionModule {
 
             {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelType.FuelTypeNames(Loop)));
-                if ((SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS") || (SELECT_CASE_var == "GAS")) {
+                if (SELECT_CASE_var == "NATURALGAS") {
                     // Pollutants from Natural Gas
                     SetupOutputVariable("Environmental Impact Natural Gas Source Energy",
                                         OutputProcessor::Unit::J,
@@ -2041,8 +2039,7 @@ namespace PollutionModule {
                                         _,
                                         "");
 
-                } else if ((SELECT_CASE_var == "RESIDUALOIL") || (SELECT_CASE_var == "RESIDUAL OIL") || (SELECT_CASE_var == "FUEL OIL #2") ||
-                           (SELECT_CASE_var == "FUELOIL#2")) {
+                } else if (SELECT_CASE_var == "FUELOIL#2") {
                     // Pollutants from FuelOil#2
                     SetupOutputVariable("Environmental Impact Fuel Oil #2 Source Energy",
                                         OutputProcessor::Unit::J,
@@ -2232,8 +2229,7 @@ namespace PollutionModule {
                                         _,
                                         "");
 
-                } else if ((SELECT_CASE_var == "DISTILLATEOIL") || (SELECT_CASE_var == "DISTILLATE OIL") || (SELECT_CASE_var == "FUEL OIL #1") ||
-                           (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL")) {
+                } else if (SELECT_CASE_var == "FUELOIL#1") {
                     // Pollutants from FuelOil#1
                     SetupOutputVariable("Environmental Impact Fuel Oil #1 Source Energy",
                                         OutputProcessor::Unit::J,
@@ -2613,7 +2609,7 @@ namespace PollutionModule {
                                         _,
                                         "");
 
-                } else if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
+                } else if (SELECT_CASE_var == "ELECTRICITY") {
                     // Pollutants from Electricity
                     SetupOutputVariable("Environmental Impact Electricity Source Energy",
                                         OutputProcessor::Unit::J,
@@ -3014,8 +3010,7 @@ namespace PollutionModule {
                                         _,
                                         "");
 
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
+                } else if (SELECT_CASE_var == "PROPANEGAS") {
                     // Pollutants from Propane
                     SetupOutputVariable("Environmental Impact Propane Source Energy",
                                         OutputProcessor::Unit::J,
@@ -5892,7 +5887,7 @@ namespace PollutionModule {
                     fuelSourceFactor = 3.167;
                 }
 
-            } else if ((SELECT_CASE_var == "ResidualOil") || (SELECT_CASE_var == "FuelOil#2")) {
+            } else if (SELECT_CASE_var == "FuelOil#2") {
                 if (Pollution.FuelOil2Coef.FuelFactorUsed) {
                     fuelFactorUsed = true;
                     fuelSourceFactor = Pollution.FuelOil2Coef.Source;
@@ -5906,7 +5901,7 @@ namespace PollutionModule {
                     fuelSourceFactor = 1.05;
                 }
 
-            } else if ((SELECT_CASE_var == "DistillateOil") || (SELECT_CASE_var == "FuelOil#1")) {
+            } else if (SELECT_CASE_var == "FuelOil#1") {
                 if (Pollution.FuelOil1Coef.FuelFactorUsed) {
                     fuelFactorUsed = true;
                     fuelSourceFactor = Pollution.FuelOil1Coef.Source;

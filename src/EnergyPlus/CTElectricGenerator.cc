@@ -381,7 +381,7 @@ namespace CTElectricGenerator {
                 if (is_blank(SELECT_CASE_var)) { // If blank then the default is Natural Gas
                     CTGenerator(GeneratorNum).FuelType = "Gas";
 
-                } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
+                } else if (SELECT_CASE_var == "NATURALGAS") {
                     CTGenerator(GeneratorNum).FuelType = "Gas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
@@ -390,15 +390,13 @@ namespace CTElectricGenerator {
                 } else if (SELECT_CASE_var == "GASOLINE") {
                     CTGenerator(GeneratorNum).FuelType = "Gasoline";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #1") || (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL") ||
-                           (SELECT_CASE_var == "DISTILLATE OIL")) {
+                } else if (SELECT_CASE_var == "FUELOIL#1") {
                     CTGenerator(GeneratorNum).FuelType = "FuelOil#1";
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #2") || (SELECT_CASE_var == "FUELOIL#2") || (SELECT_CASE_var == "RESIDUAL OIL")) {
+                } else if (SELECT_CASE_var == "FUELOIL#2") {
                     CTGenerator(GeneratorNum).FuelType = "FuelOil#2";
 
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
+                } else if (SELECT_CASE_var == "PROPANEGAS") {
                     CTGenerator(GeneratorNum).FuelType = "Propane";
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {

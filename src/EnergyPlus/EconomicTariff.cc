@@ -503,7 +503,7 @@ namespace EconomicTariff {
                            SELECT_CASE_var == "WELLWATER" || SELECT_CASE_var == "GROUNDWATER" || SELECT_CASE_var == "CONDENSATE") {
                     tariff(iInObj).kindWaterMtr = kindMeterWater;
                     // Or a Natural Gas meter
-                } else if (SELECT_CASE_var == "GAS" || SELECT_CASE_var == "NATURALGAS" || SELECT_CASE_var == "NATURAL GAS") {
+                } else if (SELECT_CASE_var == "GAS" || SELECT_CASE_var == "NATURALGAS") {
                     tariff(iInObj).kindGasMtr = kindMeterGas;
                 }
             }

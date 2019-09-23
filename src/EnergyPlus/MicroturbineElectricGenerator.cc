@@ -487,30 +487,11 @@ namespace MicroturbineElectricGenerator {
                 if (is_blank(SELECT_CASE_var)) { // If blank, then the default is Natural Gas
                     FuelType = "Gas";
 
-                } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
+                } else if (SELECT_CASE_var == "NATURALGAS") {
                     FuelType = "Gas";
 
-                    //    CASE ('DIESEL')
-                    //      FuelType = 'Diesel'
-
-                    //    CASE ('GASOLINE')
-                    //      FuelType = 'Gasoline'
-
-                    //    CASE ('FUEL OIL #1','FUELOIL#1','FUEL OIL','DISTILLATE OIL')
-                    //      FuelType = 'FuelOil#1'
-
-                    //    CASE ('FUEL OIL #2','FUELOIL#2','RESIDUAL OIL')
-                    //      FuelType = 'FuelOil#2'
-
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
+                } else if (SELECT_CASE_var == "PROPANEGAS") {
                     FuelType = "Propane";
-
-                    //    CASE ('OTHERFUEL1')
-                    //       FuelType = 'OtherFuel1'
-
-                    //    CASE ('OTHERFUEL2')
-                    //       FuelType = 'OtherFuel2'
 
                 } else {
                     ShowSevereError(cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");

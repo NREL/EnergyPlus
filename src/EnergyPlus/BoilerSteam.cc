@@ -212,7 +212,7 @@ namespace BoilerSteam {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Electric";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
 
-                } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
+                } else if (SELECT_CASE_var == "NATURALGAS") {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Gas";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
 
@@ -228,17 +228,15 @@ namespace BoilerSteam {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Coal";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("COAL");
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #1") || (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL") ||
-                           (SELECT_CASE_var == "DISTILLATE OIL")) {
+                } else if (SELECT_CASE_var == "FUELOIL#1") {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#1";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("DISTILLATE OIL");
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #2") || (SELECT_CASE_var == "FUELOIL#2") || (SELECT_CASE_var == "RESIDUAL OIL")) {
+                } else if (SELECT_CASE_var == "FUELOIL#2") {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#2";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("RESIDUAL OIL");
 
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
+                } else if (SELECT_CASE_var == "PROPANEGAS") {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Propane";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("PROPANE");
 
@@ -423,7 +421,7 @@ namespace BoilerSteam {
                     EMSManager::CheckIfNodeSetPointManagedByEMS(this->BoilerOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
                     if (FatalError) {
                         if (!this->MissingSetPointErrDone) {
-                            ShowWarningError("Missing temperature setpoint for VariableFlow mode Boiler named " + this->Name);
+                            ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + this->Name);
                             ShowContinueError(" A temperature setpoint is needed at the outlet node of the boiler.");
                             ShowContinueError(" Use a Setpoint Manager to establish a setpoint at the boiler outlet node ");
                             ShowContinueError(" or use an EMS actuator to establish a setpoint at the boiler outlet node.");
