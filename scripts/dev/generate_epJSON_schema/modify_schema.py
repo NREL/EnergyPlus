@@ -280,20 +280,20 @@ def change_89_release_issues(schema):
             'Pressure',
             'Temperature'
         ]
-    get_schema_object(schema, 'OtherEquipment')['properties']['fuel_type']['enum'].append('Water')
-    get_schema_object(schema, 'WindowMaterial:Glazing:EquivalentLayer')['properties']['optical_data_type']['enum'].append('SpectralAverage')
-    get_schema_object(schema, 'ZoneHVAC:CoolingPanel:RadiantConvective:Water')['properties']['control_type']['enum'].append('ZoneTotalLoad')
-    get_schema_object(schema, 'ZoneHVAC:CoolingPanel:RadiantConvective:Water')['properties']['control_type']['enum'].append('ZoneConvectiveLoad')
+#    get_schema_object(schema, 'OtherEquipment')['properties']['fuel_type']['enum'].append('Water')
+#    get_schema_object(schema, 'WindowMaterial:Glazing:EquivalentLayer')['properties']['optical_data_type']['enum'].append('SpectralAverage')
+#    get_schema_object(schema, 'ZoneHVAC:CoolingPanel:RadiantConvective:Water')['properties']['control_type']['enum'].append('ZoneTotalLoad')
+#    get_schema_object(schema, 'ZoneHVAC:CoolingPanel:RadiantConvective:Water')['properties']['control_type']['enum'].append('ZoneConvectiveLoad')
 
-    get_schema_object(schema, 'FuelFactors')['properties']['existing_fuel_resource_name'].pop('enum')
-    get_schema_object(schema, 'LifeCycleCost:UsePriceEscalation')['properties']['resource'].pop('enum')
-    get_schema_object(schema, 'AirConditioner:VariableRefrigerantFlow')['properties']['fuel_type'].pop('enum')
-    get_schema_object(schema, 'GlobalGeometryRules')['properties']['starting_vertex_position'].pop('enum')
-    get_schema_object(schema, 'GlobalGeometryRules')['properties']['vertex_entry_direction'].pop('enum')
-    get_schema_object(schema, 'GlobalGeometryRules')['properties']['coordinate_system'].pop('enum')
-    get_schema_object(schema, 'WaterHeater:Mixed')['properties']['heater_fuel_type'].pop('enum')
-    get_schema_object(schema, 'Boiler:HotWater')['properties']['fuel_type'].pop('enum')
+#    get_schema_object(schema, 'FuelFactors')['properties']['existing_fuel_resource_name'].pop('enum')
+#    get_schema_object(schema, 'LifeCycleCost:UsePriceEscalation')['properties']['resource'].pop('enum')
+#    get_schema_object(schema, 'AirConditioner:VariableRefrigerantFlow')['properties']['fuel_type'].pop('enum')
+#    get_schema_object(schema, 'GlobalGeometryRules')['properties']['starting_vertex_position'].pop('enum')
+#    get_schema_object(schema, 'GlobalGeometryRules')['properties']['vertex_entry_direction'].pop('enum')
+#    get_schema_object(schema, 'GlobalGeometryRules')['properties']['coordinate_system'].pop('enum')
+#    get_schema_object(schema, 'WaterHeater:Mixed')['properties']['heater_fuel_type'].pop('enum')
+#    get_schema_object(schema, 'Boiler:HotWater')['properties']['fuel_type'].pop('enum')
     get_schema_object(schema, 'Schedule:Week:Compact')['properties']['data']['items']['properties']['daytype_list'].pop('enum')
-    get_schema_object(schema, 'Output:Table:SummaryReports')['properties']['reports']['items']['properties']['report_name'].pop('enum')
+#    get_schema_object(schema, 'Output:Table:SummaryReports')['properties']['reports']['items']['properties']['report_name'].pop('enum')
 
 
