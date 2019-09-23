@@ -6161,7 +6161,7 @@ namespace InternalHeatGains {
         Real64 OperSchedFrac;                             // Operating schedule fraction
         Real64 CPULoadSchedFrac;                          // CPU loading schedule fraction
         Real64 AirConnection;                             // Air connection type
-        Real64 TSupply;                                   // Supply air temperature [C]
+        Real64 TSupply(0.0);                                   // Supply air temperature [C]
         Real64 WSupply;                                   // Supply air humidity ratio [kgH2O/kgdryair]
         Real64 RecircFrac;                                // Recirulation fraction - current
         Real64 TRecirc;                                   // Recirulation air temperature [C]
@@ -6309,10 +6309,14 @@ namespace InternalHeatGains {
                     TAirIn = TRecirc * RecircFrac + TSupply * (1.0 - RecircFrac);
                     WAirIn = WRecirc * RecircFrac + WSupply * (1.0 - RecircFrac);
                 } else if (AirConnection == ITEInletRoomAirModel) {
-                    // Room air model option not implemented yet
+                    // Room air model option: TAirIn=TAirZone, according to EngineeringRef 17.1.4 (Yanfei Li, 09/05/2019)
                     TAirIn = MAT(NZ);
+		    TSupply = TAirIn;
                     WAirIn = ZoneAirHumRat(NZ);
                 } else { // Default to ITEInletZoneAirNode
+			//TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4 (Yanfei Li, 09/05/2019)
+		    int ZoneAirInletNode = DataZoneEquipment::ZoneEquipConfig(NZ).InletNode(1);
+		    TSupply = Node(ZoneAirInletNode).Temp;
                     TAirIn = MAT(NZ);
                     WAirIn = ZoneAirHumRat(NZ);
                 }
