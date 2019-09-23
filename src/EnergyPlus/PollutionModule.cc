@@ -1301,8 +1301,7 @@ namespace PollutionModule {
                             cCurrentModuleObject, "Gasoline", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.GasolineCoef.NucLoSched, ErrorsFound);
                     }
 
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
+                } else if (SELECT_CASE_var == "PROPANE") {
                     if (Pollution.PropaneCoef.FuelFactorUsed) {
                         ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");
@@ -3010,7 +3009,7 @@ namespace PollutionModule {
                                         _,
                                         "");
 
-                } else if (SELECT_CASE_var == "PROPANEGAS") {
+                } else if (SELECT_CASE_var == "PROPANE") {
                     // Pollutants from Propane
                     SetupOutputVariable("Environmental Impact Propane Source Energy",
                                         OutputProcessor::Unit::J,

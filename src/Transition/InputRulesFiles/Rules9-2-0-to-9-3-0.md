@@ -20,6 +20,8 @@ d) change "Fuel Oil #2" or "Residual Oil" to "FuelOil#2"
 
 e) change "Propane" or "LPG" or "Propane Gas" to "PropaneGas"
 
+*EXCEPT for FuelFactors, change to "Propane" (for now, until 5941 is done)*
+
 # Object Change: GlobalGeometryRules
 Field 1, Starting Vertex Position:
 

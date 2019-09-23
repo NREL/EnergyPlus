@@ -612,6 +612,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 1) THEN
                    CALL FixFuelTypes(OutArgs(1))
+                   ! For fuelfactors, the current IDD choice is Propane, so override that here until #5941 is resolved (standardize fuel types)
+                   IF (SameString(OutArgs(1), "PropaneGas")) OutArgs(1) = "Propane"
                  END IF
 
              CASE('GENERATOR:COMBUSTIONTURBINE')
