@@ -58,7 +58,12 @@
 // EnergyPlus Headers
 #include <DataSurfaces.hh>
 #include <EnergyPlus.hh>
-#include <PVWattsSSC.hh>
+
+// SSC Headers
+#include <lib_irradproc.h>
+#include <lib_pvwatts.h>
+#include <lib_pvshade.h>
+#include <lib_pv_incidence_modifier.h>
 
 namespace EnergyPlus {
 

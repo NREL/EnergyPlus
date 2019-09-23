@@ -61,9 +61,14 @@
 #include <InputProcessing/InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <PVWatts.hh>
-#include <PVWattsSSC.hh>
 #include <UtilityRoutines.hh>
 #include <WeatherManager.hh>
+
+// SSC Headers
+#include <lib_irradproc.h>
+#include <lib_pvwatts.h>
+#include <lib_pvshade.h>
+#include <lib_pv_incidence_modifier.h>
 
 namespace EnergyPlus {
 
@@ -473,7 +478,7 @@ namespace PVWatts {
 
         if (irr_st.sunup > 0) {
             if (m_trackMode == 1 && m_shadeMode1x == 0) {
-                Real64 shad1xf = shade_fraction_1x(irr_st.solazi, irr_st.solzen, m_tilt, m_azimuth, m_groundCoverageRatio, irr_st.rot);
+                Real64 shad1xf = shadeFraction1x(irr_st.solazi, irr_st.solzen, m_tilt, m_azimuth, m_groundCoverageRatio, irr_st.rot);
                 shad_beam *= 1 - shad1xf;
 
                 if (irr_st.iskydiff > 0) {
