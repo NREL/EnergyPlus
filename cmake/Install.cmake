@@ -555,6 +555,10 @@ include(CPack)
 include(CPackIFW)
 # include(CPackComponent)
 
+# Note: If you ever need to debug a CPack Package Error in MSVC, right-click on "PACKAGE" target, click Properties
+# and in the Build Events > Post Build Event, edit the command that calls cpack to add `--verbose --debug`:
+# eg: `"C:\Program Files\CMake\bin\cpack.exe" -C $(Configuration) --config ./CPackConfig.cmake --verbose --debug`
+
 #cpack_add_component(EnergyPlus
   #DISPLAY_NAME "EnergyPlus"
   #DESCRIPTION "The EnergyPlus program itself"
