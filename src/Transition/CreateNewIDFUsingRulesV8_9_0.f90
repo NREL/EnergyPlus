@@ -667,7 +667,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      OutArgs(3) = 'World'
                    ELSE IF (SameString( InArgs(3), 'Local' )) THEN
                      OutArgs(3) = 'Relative'
-                   ELSE IF (SameString( Left(InArgs(3),3), 'Rel' )) THEN
+                   ELSE IF (SameString( InArgs(3)(1:3), 'Rel' )) THEN
                      OutArgs(3) = 'Relative'
                    END IF
                  END IF
@@ -678,7 +678,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      OutArgs(4) = 'World'
                    ELSE IF (SameString( InArgs(4), 'Local' )) THEN
                      OutArgs(4) = 'Relative'
-                   ELSE IF (SameString( Left(InArgs(4),3), 'Rel' )) THEN
+                   ELSE IF (SameString( InArgs(4)(1:3), 'Rel' )) THEN
                      OutArgs(4) = 'Relative'
                    END IF
                  END IF
@@ -689,7 +689,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                      OutArgs(5) = 'World'
                    ELSE IF (SameString( InArgs(5), 'Local' )) THEN
                      OutArgs(5) = 'Relative'
-                   ELSE IF (SameString( Left(InArgs(5),3), 'Rel' )) THEN
+                   ELSE IF (SameString( InArgs(5)(1:3), 'Rel' )) THEN
                      OutArgs(5) = 'Relative'
                    END IF
                  END IF
@@ -727,16 +727,16 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 1) THEN
-                   IF (SameString( Left(InArgs(1),3), 'Con' )) THEN
+                   IF (SameString( InArgs(1)(1:3), 'Con' )) THEN
                      OutArgs(1) = 'Constructions'
-                   ELSE IF (SameString( Left(InArgs(1),3), 'Mat' )) THEN
+                   ELSE IF (SameString( InArgs(1)(1:3), 'Mat' )) THEN
                      OutArgs(1) = 'Materials'
                    END IF
                  END IF
                  IF (CurArgs .GE. 2) THEN
-                   IF (SameString( Left(InArgs(2),3), 'Con' )) THEN
+                   IF (SameString( InArgs(2)(1:3), 'Con' )) THEN
                      OutArgs(2) = 'Constructions'
-                   ELSE IF (SameString( Left(InArgs(2),3), 'Mat' )) THEN
+                   ELSE IF (SameString( InArgs(2)(1:3), 'Mat' )) THEN
                      OutArgs(2) = 'Materials'
                    END IF
                  END IF
@@ -745,21 +745,21 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 DO iArg=1,CurArgs,1
-                   IF (SameString( (InArgs(iArg),3), 'ABUPS' )) THEN
-                     OutArgs(iArg) = 'AnnualBuildingUtilityPerformanceSummary'
-                   ELSE IF (SameString( (InArgs(iArg),3), 'BEPS' )) THEN
-                     OutArgs(iArg) = 'AnnualBuildingUtilityPerformanceSummary'
-                   ELSE IF (SameString( (InArgs(iArg),3), 'IVRS' )) THEN
-                     OutArgs(iArg) = 'InputVerificationandResultsSummary'
-                   ELSE IF (SameString( (InArgs(iArg),3), 'CSS' )) THEN
-                     OutArgs(iArg) = 'ComponentSizingSummary'
-                   ELSE IF (SameString( (InArgs(iArg),3), 'SHAD' )) THEN
-                     OutArgs(iArg) = 'SurfaceShadowingSummary'
-                   ELSE IF (SameString( (InArgs(iArg),3), 'EIO' )) THEN
-                     OutArgs(iArg) = 'InitializationSummary'
+                 DO TempArgsNum=1,CurArgs,1
+                   IF (SameString(InArgs(TempArgsNum), 'ABUPS' )) THEN
+                     OutArgs(TempArgsNum) = 'AnnualBuildingUtilityPerformanceSummary'
+                   ELSE IF (SameString(InArgs(TempArgsNum), 'BEPS' )) THEN
+                     OutArgs(TempArgsNum) = 'AnnualBuildingUtilityPerformanceSummary'
+                   ELSE IF (SameString(InArgs(TempArgsNum), 'IVRS' )) THEN
+                     OutArgs(TempArgsNum) = 'InputVerificationandResultsSummary'
+                   ELSE IF (SameString(InArgs(TempArgsNum), 'CSS' )) THEN
+                     OutArgs(TempArgsNum) = 'ComponentSizingSummary'
+                   ELSE IF (SameString(InArgs(TempArgsNum), 'SHAD' )) THEN
+                     OutArgs(TempArgsNum) = 'SurfaceShadowingSummary'
+                   ELSE IF (SameString(InArgs(TempArgsNum), 'EIO' )) THEN
+                     OutArgs(TempArgsNum) = 'InitializationSummary'
                    END IF
-                 END IF
+                 END DO
 
              CASE('SCHEDULE:DAY:INTERVAL')
                  ObjectName='Schedule:Day:Interval'
@@ -1452,3 +1452,38 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   RETURN
 
 END SUBROUTINE CreateNewIDFUsingRules
+
+SUBROUTINE FixFuelTypes(InOutArg)
+  USE InputProcessor, ONLY: SameString
+  CHARACTER(len=*), INTENT(INOUT) :: InOutArg
+      
+  IF (SameString( InOutArg, 'Electric' )) THEN
+    InOutArg = 'Electricity'
+  ELSE IF (SameString( InOutArg, 'Elec' )) THEN
+    InOutArg = 'Electricity'
+  ELSE IF (SameString( InOutArg, 'Gas' )) THEN
+    InOutArg = 'NaturalGas'
+  ELSE IF (SameString( InOutArg, 'Natural Gas' )) THEN
+    InOutArg = 'NaturalGas'
+  ELSE IF (SameString( InOutArg, 'Propane' )) THEN
+    InOutArg = 'PropaneGas'
+  ELSE IF (SameString( InOutArg, 'LPG' )) THEN
+    InOutArg = 'PropaneGas'
+  ELSE IF (SameString( InOutArg, 'Propane Gas' )) THEN
+    InOutArg = 'PropaneGas'
+  ELSE IF (SameString( InOutArg, 'FUEL OIL #1' )) THEN
+    InOutArg = 'FuelOil#1'
+  ELSE IF (SameString( InOutArg, 'FUEL OIL' )) THEN
+    InOutArg = 'FuelOil#1'
+  ELSE IF (SameString( InOutArg, 'DISTILLATE OIL' )) THEN
+    InOutArg = 'FuelOil#1'
+  ELSE IF (SameString( InOutArg, 'DISTILLATEOIL' )) THEN
+    InOutArg = 'FuelOil#1'
+  ELSE IF (SameString( InOutArg, 'FUEL OIL #2' )) THEN
+    InOutArg = 'FuelOil#2'
+  ELSE IF (SameString( InOutArg, 'RESIDUAL OIL' )) THEN
+    InOutArg = 'FuelOil#2'
+  ELSE IF (SameString( InOutArg, 'RESIDUALOIL' )) THEN
+    InOutArg = 'FuelOil#2'
+  END IF
+END SUBROUTINE
