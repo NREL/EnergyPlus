@@ -2276,8 +2276,6 @@ namespace HVACVariableRefrigerantFlow {
                 // A39; \field Fuel type
                 if (UtilityRoutines::SameString(cAlphaArgs(39), "ELECTRICITY")) {
                     VRF(VRFNum).FuelType = FuelTypeElectric;
-                } else if (UtilityRoutines::SameString(cAlphaArgs(39), "ELECTRIC")) {
-                    VRF(VRFNum).FuelType = FuelTypeElectric;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(39), "NATURALGAS")) {
                     VRF(VRFNum).FuelType = FuelTypeNaturalGas;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(39), "PROPANEGAS")) {
@@ -2298,7 +2296,7 @@ namespace HVACVariableRefrigerantFlow {
                     ShowSevereError(cCurrentModuleObject + ", \"" + VRF(VRFNum).Name + "\", " + cAlphaFieldNames(39) +
                                     " not found = " + cAlphaArgs(39));
                     ShowContinueError(
-                        "Valid choices are Electric, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2, OtherFuel1 or OtherFuel2");
+                        "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2, OtherFuel1 or OtherFuel2");
                     ErrorsFound = true;
                 }
             }

@@ -540,7 +540,7 @@ namespace ExteriorEnergyUse {
         FuelTypeString = "";
 
         // Select the correct Number for the associated ascii name for the fuel type
-        if (UtilityRoutines::SameString(FuelTypeAlpha, "Electricity") || UtilityRoutines::SameString(FuelTypeAlpha, "Electric")) {
+        if (UtilityRoutines::SameString(FuelTypeAlpha, "Electricity")) {
             FuelTypeNumber = ElecUse;
             FuelTypeString = "Electric";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "NaturalGas")) {
