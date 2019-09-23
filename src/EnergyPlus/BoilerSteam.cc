@@ -208,7 +208,7 @@ namespace BoilerSteam {
             {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(2));
 
-                if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
+                if (SELECT_CASE_var == "ELECTRICITY") {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Electric";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
 
