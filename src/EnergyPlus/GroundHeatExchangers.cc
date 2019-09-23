@@ -261,6 +261,54 @@ namespace GroundHeatExchangers {
         return it2->second + (it->second - it2->second)*(x - it2->first)/(it->first - it2->first);
     }
 
+    void SubHourAgg::aggregate(Real64 &time, Real64 &energy) {
+
+        Real64 const small_value = 1E-3;
+
+        // check for iteration
+        // if time is same as previous, we're iterating so do nothing.
+        // else aggregate the energy
+        if (std::abs(this->prev_update_time - time) < small_value) {
+            this->subHrEnergy = 0;
+        } else {
+            // store current energy value
+            this->energy.emplace_back(energy);
+
+            // store respective time step for each bin
+            this->dts.emplace_back(time - this->prev_update_time);
+
+            // find upper bin edge referenced from current simulation time
+            auto dt_u = calc_times(this->dts);
+
+            // find lower bin edge referenced from current simulation time
+//            auto dt_l =
+
+            Real64 delteme = 0;
+
+        }
+    };
+
+    Real64 SubHourAgg::calc_temporal_superposition(Real64 &EP_UNUSED(timeStep), Real64 &EP_UNUSED(flowRate)) {
+        // not currently used
+        // fatal if called
+        ShowFatalError(this->routineName + ": calculate temporal superpostion not implemented.");
+        return 0;
+    };
+
+    Real64 SubHourAgg::get_g_value(Real64 &EP_UNUSED(time)) {
+        // not currently used
+        // fatal if called
+        ShowFatalError(this->routineName + ": get g value is not implemented.");
+        return 0;
+    };
+
+    Real64 SubHourAgg::get_q_prev() {
+        // not currently used
+        // fatal if called
+        ShowFatalError(this->routineName + ": get previous q value is not implemented.");
+        return 0;
+    };
+
     Real64 Pipe::calcTransitTime(Real64 flowRate, Real64 temperature)
     {
         // Compute the fluid transit time

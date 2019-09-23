@@ -585,6 +585,44 @@ TEST_F(GHEFixture, Pipe_simulate)
     outlet_temp = pipe.outletTemp;
     EXPECT_NEAR(outlet_temp, 24.87, tol);
 }
+
+TEST_F(GHEFixture, SubHourAgg_aggregate)
+{
+
+    json j = {{"time-scale", 5E9},
+              {"g-function-data", {
+                  {"lntts", {-14, -13, -12}},
+                  {"g", {0, 1, 2}}}
+              }
+    };
+
+    SubHourAgg subHr(j);
+
+    Real64 tol = 1E-6;
+
+    // check time = 0
+    Real64 time = 0.0;
+    Real64 energy = 10.0;
+    subHr.aggregate(time, energy);
+    EXPECT_NEAR(subHr.subHrEnergy, 0.0, tol);
+
+    Real64 dt_huge = 3600;
+    Real64 dt_lrg = 3150;
+    Real64 dt_med = 1800;
+    Real64 dt_sml = 900;
+
+    // no shift
+    time = 900.0;
+    energy = 1.0;
+    subHr.aggregate(time, energy);
+    EXPECT_NEAR(subHr.subHrEnergy, 0.0, tol);
+
+    // no shift
+    time += dt_sml;
+    subHr.aggregate(time, energy);
+    EXPECT_NEAR(subHr.subHrEnergy, 0, tol);
+}
+
 // TEST_F(GHEFixture, GroundHeatExchangerTest_Interpolate)
 //{
 //

@@ -261,7 +261,7 @@ namespace GroundHeatExchangers {
         std::vector<Real64> y_data;
         std::string routineName;
         std::vector<std::pair<Real64, Real64> > table;
-        bool extrapolate;
+        bool extrapolate = false;
 
         // constructor
         Interp1D(std::vector<Real64> &x_data, std::vector<Real64> &y_data,
@@ -273,8 +273,8 @@ namespace GroundHeatExchangers {
             this->extrapolate = extrapolate;
 
             if (this->x_data.size() == this->y_data.size()) {
-                for (unsigned i : this->x_data) {
-                    table.emplace_back(std::pair<Real64, Real64> {this->x_data[i], this->y_data[i]});
+                for (std::size_t i = 0; i != this->x_data.size(); ++i) {
+                    this->table.emplace_back(std::pair<Real64, Real64> {this->x_data[i], this->y_data[i]});
                 }
             } else {
                 ShowFatalError(routineName + ": Number of X and Y data must be equal.");
@@ -293,71 +293,67 @@ namespace GroundHeatExchangers {
         Real64 interpolate(Real64 &x);
     };
 
-    static Real64 smoothingFunc(Real64 x, Real64 a, Real64 b)
+    struct BaseAgg
     {
-        //  Sigmoid smoothing function
-        //
-        //  https://en.wikipedia.org/wiki/Sigmoid_function
-        //
-        //  @param x: independent variable
-        //  @param a: fitting parameter 1
-        //  @param b: fitting parameter 2
-        //  @return float between 0-1
+        // member variables
+        Real64 ts;  // GHE time scale
+        Interp1D g_data;  // g-function data
+        std::vector<Real64> energy;  // energy history
+        std::vector<Real64> dts;  // time steps
+        Real64 prev_update_time;  // previous update time
 
-        return 1 / (1 + std::exp(-(x - a) / b));
-    }
+        // constructor
+        BaseAgg() : ts(0.0), prev_update_time(0.0)
+        {};
 
-    static Real64 linInterp(Real64 x, Real64 x_l, Real64 x_h, Real64 y_l, Real64 y_h)
-    {
-        //  Simple linear interpolation
-        //
-        //  @param x: independent input variable
-        //  @param x_l: low independent interval bound
-        //  @param x_h: high independent interval bound
-        //  @param y_l: low dependent interval bound
-        //  @param y_h: high dependent interval bound
-        //  @return interpolated value
+        // destructor
+        ~BaseAgg() = default;
 
-        return (x - x_l) / (x_h - x_l) * (y_h - y_l) + y_l;
-    }
-
-    static std::vector<Real64> TDMA(std::vector<Real64> a, std::vector<Real64> b, std::vector<Real64> c, std::vector<Real64> d)
-    {
-        // Tri-diagonal matrix solver
-
-        // This solver expects the ghost points at a(0) and c(n) to be present
-
-        // a(0) = 0
-        // c(n) = 0
-
-        // len(a) = len(b) = len(c) = len(d)
-
-        // Adapted from: https://en.wikibooks.org/wiki/Algorithm_Implementation/Linear_Algebra/Tridiagonal_matrix_algorithm#C++
-
-        // param a: west diagonal vector from coefficient matrix
-        // param b: center diagonal vector from coefficient matrix
-        // param c: east diagonal vector from coefficient matrix
-        // param d: column vector
-        // returns solution vector
-
-        u_int n = d.size() - 1;
-
-        c[0] /= b[0];
-        d[0] /= b[0];
-
-        for (u_int i = 1; i < n; ++i) {
-            c[i] /= b[i] - a[i] * c[i - 1];
-            d[i] = (d[i] - a[i] * d[i - 1]) / (b[i] - a[i] * c[i - 1]);
+        // member functions
+        static std::vector<Real64> calc_times(std::vector<Real64> &times)
+        {
+            std::vector<Real64> v = times;
+            std::reverse(std::begin(v), std::end(v));
+            std::vector<Real64> sums (v.size());
+            std::partial_sum(std::begin(v), std::end(v), sums.begin());
+            std::reverse(std::begin(sums), std::end(sums));
+            return sums;
         }
 
-        d[n] = (d[n] - a[n] * d[n - 1]) / (b[n] - a[n] * c[n - 1]);
+        // virtual functions
+        virtual void aggregate(Real64 &time, Real64 &energy) = 0;
+        virtual Real64 calc_temporal_superposition(Real64 &timeStep, Real64 & flowRate) = 0;
+        virtual Real64 get_g_value(Real64 &time) = 0;
+        virtual Real64 get_q_prev() = 0;
 
-        for (int i = n; i-- > 0;) {
-            d[i] -= c[i] * d[i + 1];
-        }
+    };
 
-        return d;
-    }
+    struct SubHourAgg : BaseAgg
+    {
+        std::string routineName = "Subhourly Aggregation";
+        Real64 subHrEnergy = 0.0;
+
+        // constructor
+        explicit SubHourAgg(const json &j)
+        {
+            this->energy.emplace_back(0.0);
+            this->dts.emplace_back(DataGlobals::SecInHour);
+            this->ts = j["time-scale"];
+            std::vector<Real64> lntts = j["g-function-data"]["lntts"];
+            std::vector<Real64> g = j["g-function-data"]["g"];
+            this->g_data = Interp1D(lntts, g, routineName, true);
+        };
+
+        // destructor
+        ~SubHourAgg() = default;
+
+        // member functions
+        void aggregate(Real64 &time, Real64 &energy) override;
+        Real64 calc_temporal_superposition(Real64 &timeStep, Real64 & flowRate) override;
+        Real64 get_g_value(Real64 &time) override;
+        Real64 get_q_prev() override;
+    };
+
 
     // struct GLHEVertPropsStruct
     //{
