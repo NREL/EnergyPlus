@@ -31,6 +31,7 @@ introduced in new field A3.
 
 
 # Transitioning "AirTerminal:SingleDuct:Uncontrolled" to "AirTerminal:SingleDuct:ConstantVolume:NoReheat". Require five steps:
+*Note: these rules were not implemented in Transition8-8-0-to-8-9-0. AirTerminal:SingleDuct:Uncontrolled was simply tagged as obsolete.*
 
 # (1) Object Change: ZoneHVAC:EquipmentList
 
@@ -111,3 +112,63 @@ Field F4(A4): Inlet Node Name, no change
     use the new Air Inlet Node Name created in Step 3 above for "AirTerminal:SingleDuct:ConstantVolume:NoReheat" object. 
 
 Field >=FX(AX): Outlet X Node Name, modify the matching Outlet X Node Name, should be the same node name as the new Air Inlet Node Name of "AirTerminal:SingleDuct:ConstantVolume:NoReheat" object, old name + 2AT -> example, "SPACE3-1 Supply Inlet 2AT"
+
+# Object Change: Boiler and Chiller flow mode synonyms
+For all Boiler:HotWater and all Chiller:\*
+
+Field: Flow Mode, change VariableFlow to LeavingSetpointModulated.
+
+# Object Change: HeatBalanceAlgorithm
+Field 1, Algorithm:
+
+a) change "DEFAULT" or "CTF" to "ConductionTransferFunction"
+
+b) change "EMPD" to "MoisturePenetrationDepthConductionTransferFunction"
+
+c) change "CONDFD" or "CONDUCTIONFINITEDIFFERENCEDETAILED" to "ConductionFiniteDifference"
+
+d) change "HAMT" to "CombinedHeatAndMoistureFiniteElement"
+
+# Object Change: ZoneAirHeatBalanceAlgorithm
+Field 1, Algorithm, change "3RDORDERBACKWARDDIFFERENCE" to "ThirdOrderBackwardDifference"
+
+# Object Change: Zone
+Field 12 Zone Outside Convection Algorithm, change "DOE2" to "DOE-2"
+
+# Object Change: Generator:WindTurbine
+Field 3 Rotor Type:
+
+a) change "HAWT" or "None" to "HorizontalAxisWindTurbine"
+
+b) change "VAWT" to "VerticalAxisWindTurbine"
+
+Field 4 Control Type:
+
+a) change "FSFP" to "FixedSpeedFixedPitch"
+
+b) change "FSVP" to "FixedSpeedVariablePitch"
+
+c) change "VSFP" to "VariableSpeedFixedPitch"
+
+d) change "VSVP" or "None" to "VariableSpeedVariablePitch"
+
+# Object Change: SizingPeriod:DesignDay
+Field 18, Rain Indicator
+Field 19, Snow Indicator
+Field 20, Daylight Saving Time Indicator
+
+a) change "0" to "No"
+
+b) change "1" to "Yes"
+
+# Object Change: Output:Constructions
+Fields 1 and 2
+
+a) change "Construc\*" to "Constructions"
+
+b) change "Mat\*" to "Materials"
+
+# GroundHeatExchanger:Vertical --> GroundHeatExchanger:System
+???????????????
+lots of rules
+???????????????
