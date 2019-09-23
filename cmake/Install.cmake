@@ -540,11 +540,11 @@ endif ()
 
 ##########################################################   S Y S T E M    L I B R A R I E S   ######################################################
 
-# TODO: is this unecessary now? I had forgotten to actually create a Libraries via cpack_add_component but everything seemed fined
-# At worse, try not to uncomment this as is, but place it inside an if(PLATFORM) statement
-#SET(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
-#INCLUDE(InstallRequiredSystemLibraries)
-#INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./" COMPONENT Libraries)
+# Set to TRUE to install the Windows Universal CRT libraries for app-local deployment (e.g. to Windows XP).
+# This is meaningful only with MSVC from Visual Studio 2015 or higher, which is our case
+SET(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
+INCLUDE(InstallRequiredSystemLibraries)
+INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION "./" COMPONENT Libraries)
 
 ######################################################################################################################################################
 #                                                    P A C K A G I N G   &   C O M P O N E N T S                                                     #
@@ -597,7 +597,8 @@ cpack_add_component(Symlinks
 cpack_add_component(Licenses
   DISPLAY_NAME "Licenses"
   DESCRIPTION "License files for EnergyPlus"
-  REQUIRED)
+  REQUIRED
+  HIDDEN)
 
 # No need for system privileges for this
 cpack_add_component(CreateStartMenu
@@ -614,6 +615,7 @@ cpack_add_component(CopyAndRegisterSystemDLLs
   DISPLAY_NAME "Copy and Register DLLs"
   DESCRIPTION "This will copy and register system DLLs such as Fortran if they don't already exist"
   REQUIRED
+  HIDDEN
 )
 
 #cpack_add_component(Libraries
