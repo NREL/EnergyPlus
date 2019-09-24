@@ -3324,7 +3324,7 @@ namespace OutputReportTabular {
             ffSchedIndex(2) = ffScheduleIndex;
         }
 
-        GetFuelFactorInfo("ResidualOil", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+        GetFuelFactorInfo("FuelOil#2", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorFuelOil2 = curSourceFactor;
             fuelfactorsused(7) = true;
@@ -3337,7 +3337,7 @@ namespace OutputReportTabular {
             ffSchedIndex(11) = ffScheduleIndex;
         }
 
-        GetFuelFactorInfo("DistillateOil", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+        GetFuelFactorInfo("FuelOil#1", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorFuelOil1 = curSourceFactor;
             fuelfactorsused(6) = true;

@@ -1772,14 +1772,14 @@ namespace PollutionModule {
                 ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for NATURAL GAS");
                 ErrorsFound = true;
             }
-            // Check for Residual Oil
+            // Check for FuelOil#2 (Residual Oil)
             if (!Pollution.FuelOil2Coef.FuelFactorUsed && (FuelType.FuelOil2FacilityIndex > 0)) {
-                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for RESIDUAL/FUEL OIL #2");
+                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #2");
                 ErrorsFound = true;
             }
-            // Check for Distillate Oil
+            // Check for FuelOil#1 (Distillate Oil)
             if (!Pollution.FuelOil1Coef.FuelFactorUsed && (FuelType.FuelOil1FacilityIndex > 0)) {
-                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for DISTILLATE/FUEL OIL #1");
+                ShowSevereError(cCurrentModuleObject + " Not Found or Fuel not specified For Pollution Calculation for FUEL OIL #1");
                 ErrorsFound = true;
             }
             // Check for Coal
@@ -5773,7 +5773,7 @@ namespace PollutionModule {
         // The Distillate Oil or Fuel Oil #1
         FuelType.FuelOil1 = FuelType.FuelOil1Facility;
 
-        // The Residual Oil fuel type will be summed with the Fuel Oils
+        // The Residual Oil or Fuel Oil #2
         FuelType.FuelOil2 = FuelType.FuelOil2Facility;
 
         // The Gasoline fuel type will be summed

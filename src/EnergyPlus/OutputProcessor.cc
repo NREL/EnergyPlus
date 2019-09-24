@@ -1917,7 +1917,7 @@ namespace OutputProcessor {
             if (meterType == "ELECTRICITY" || meterType == "ELECTRIC" || meterType == "ELEC") {
                 OutResourceType = "Electricity";
 
-            } else if (meterType == "GAS" || meterType == "NATURALGAS" || meterType == "NATURAL GAS") {
+            } else if (meterType == "GAS" || meterType == "NATURALGAS") {
                 OutResourceType = "Gas";
 
             } else if (meterType == "GASOLINE") {
@@ -1929,13 +1929,13 @@ namespace OutputProcessor {
             } else if (meterType == "COAL") {
                 OutResourceType = "Coal";
 
-            } else if (meterType == "FUEL OIL #1" || meterType == "FUELOIL#1" || meterType == "FUEL OIL" || meterType == "DISTILLATE OIL") {
+            } else if (meterType ==  "FUELOIL#1") {
                 OutResourceType = "FuelOil#1";
 
-            } else if (meterType == "FUEL OIL #2" || meterType == "FUELOIL#2" || meterType == "RESIDUAL OIL") {
+            } else if (meterType == "FUELOIL#2") {
                 OutResourceType = "FuelOil#2";
 
-            } else if (meterType == "PROPANE" || meterType == "LPG" || meterType == "PROPANEGAS" || meterType == "PROPANE GAS") {
+            } else if (meterType == "PROPANE" || meterType == "PROPANEGAS") {
                 OutResourceType = "Propane";
 
             } else if (meterType == "WATER" || meterType == "H2O") {

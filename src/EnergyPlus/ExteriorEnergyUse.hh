@@ -69,7 +69,7 @@ namespace ExteriorEnergyUse {
     extern int const CoalUse;         // Coal
     extern int const FuelOil1Use;     // FuelOil#1
     extern int const FuelOil2Use;     // FuelOil#2
-    extern int const LPGUse;          // PropaneGas
+    extern int const PropaneUse;      // Propane
     extern int const GasolineUse;     // Gasoline
     extern int const DieselUse;       // Diesel
     extern int const SteamUse;        // Steam

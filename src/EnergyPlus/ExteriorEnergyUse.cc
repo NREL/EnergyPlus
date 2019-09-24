@@ -100,7 +100,7 @@ namespace ExteriorEnergyUse {
     int const CoalUse(4);                  // Coal
     int const FuelOil1Use(5);              // FuelOil#1
     int const FuelOil2Use(6);              // FuelOil#2
-    int const LPGUse(7);                   // PropaneGas
+    int const PropaneUse(7);               // Propane
     int const GasolineUse(8);              // Gasoline
     int const DieselUse(9);                // Diesel
     int const SteamUse(10);                // Steam
@@ -553,7 +553,7 @@ namespace ExteriorEnergyUse {
             FuelTypeNumber = FuelOil1Use;
             FuelTypeString = "FuelOil#1";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "PropaneGas")) {
-            FuelTypeNumber = LPGUse;
+            FuelTypeNumber = PropaneUse;
             FuelTypeString = "Propane";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Gasoline")) {
             FuelTypeNumber = GasolineUse;
