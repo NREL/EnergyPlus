@@ -129,7 +129,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     NorthEast Residential-LPG,  !- Name
-    PropaneGas,                         !- Resource
+    Propane,                            !- Resource
   2019,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     0.9922,                              !- Year 1 Escalation
@@ -647,7 +647,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     MidWest Residential-LPG,  !- Name
-    PropaneGas,                         !- Resource
+    Propane,                            !- Resource
   2019,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     0.9922,                              !- Year 1 Escalation
@@ -1165,7 +1165,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     South Residential-LPG,  !- Name
-    PropaneGas,                         !- Resource
+    Propane,                            !- Resource
   2019,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     0.9933,                              !- Year 1 Escalation
@@ -1683,7 +1683,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     West Residential-LPG,  !- Name
-    PropaneGas,                         !- Resource
+    Propane,                            !- Resource
   2019,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     0.9948,                              !- Year 1 Escalation
@@ -2201,7 +2201,7 @@ LifeCycleCost:UsePriceEscalation,
 
 LifeCycleCost:UsePriceEscalation,
     U.S. Avg Residential-LPG,  !- Name
-    PropaneGas,                         !- Resource
+    Propane,                            !- Resource
   2019,                                !- Escalation Start Year
     January,                             !- Escalation Start Month
     0.9922,                              !- Year 1 Escalation

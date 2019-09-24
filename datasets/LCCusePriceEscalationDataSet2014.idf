@@ -137,7 +137,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     NorthEast  Residential-LPG,  !- Name
-    PropaneGas,              !- Resource
+    Propane,                 !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9783,                  !- Year 1 Escalation
@@ -641,7 +641,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     MidWest  Residential-LPG,!- Name
-    PropaneGas,              !- Resource
+    Propane,                 !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9783,                  !- Year 1 Escalation
@@ -1145,7 +1145,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     South  Residential-LPG,  !- Name
-    PropaneGas,              !- Resource
+    Propane,                 !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9783,                  !- Year 1 Escalation
@@ -1649,7 +1649,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     West  Residential-LPG,   !- Name
-    PropaneGas,              !- Resource
+    Propane,                 !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9789,                  !- Year 1 Escalation
@@ -2153,7 +2153,7 @@
 
   LifeCycleCost:UsePriceEscalation,
     U.S. Avg  Residential-LPG,  !- Name
-    PropaneGas,              !- Resource
+    Propane,                 !- Resource
     2015,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9783,                  !- Year 1 Escalation

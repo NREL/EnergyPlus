@@ -136,8 +136,8 @@
     1.4818;                  !- Year 30 Escalation
 
   LifeCycleCost:UsePriceEscalation,
-    NorthEast  Residential-PropaneGas,  !- Name
-    PropaneGas,              !- Resource
+    NorthEast  Residential-Propane,     !- Name
+    Propane,                 !- Resource
     2014,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9709,                  !- Year 1 Escalation
@@ -640,8 +640,8 @@
     1.6638;                  !- Year 30 Escalation
 
   LifeCycleCost:UsePriceEscalation,
-    MidWest  Residential-PropaneGas,  !- Name
-    PropaneGas,              !- Resource
+    MidWest  Residential-Propane,     !- Name
+    Propane,                 !- Resource
     2014,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9711,                  !- Year 1 Escalation
@@ -1144,8 +1144,8 @@
     1.5473;                  !- Year 30 Escalation
 
   LifeCycleCost:UsePriceEscalation,
-    South  Residential-PropaneGas,  !- Name
-    PropaneGas,              !- Resource
+    South  Residential-Propane,     !- Name
+    Propane,                 !- Resource
     2014,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9710,                  !- Year 1 Escalation
@@ -1648,8 +1648,8 @@
     1.7944;                  !- Year 30 Escalation
 
   LifeCycleCost:UsePriceEscalation,
-    West  Residential-PropaneGas,  !- Name
-    PropaneGas,              !- Resource
+    West  Residential-Propane,     !- Name
+    Propane,                 !- Resource
     2014,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9707,                  !- Year 1 Escalation
@@ -2152,8 +2152,8 @@
     1.6275;                  !- Year 30 Escalation
 
   LifeCycleCost:UsePriceEscalation,
-    U.S. Avg  Residential-PropaneGas,  !- Name
-    PropaneGas,              !- Resource
+    U.S. Avg  Residential-Propane,     !- Name
+    Propane,                 !- Resource
     2014,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     0.9706,                  !- Year 1 Escalation
