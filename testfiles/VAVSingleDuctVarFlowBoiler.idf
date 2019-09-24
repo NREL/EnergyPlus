@@ -2026,7 +2026,7 @@
 
   Boiler:HotWater,
     Boiler Plant Boiler,     !- Name
-    GAS,                     !- Fuel Type
+    NaturalGas,              !- Fuel Type
     25000,                   !- Nominal Capacity {W}
     0.8,                     !- Nominal Thermal Efficiency
     LeavingBoiler,           !- Efficiency Curve Temperature Evaluation Variable
