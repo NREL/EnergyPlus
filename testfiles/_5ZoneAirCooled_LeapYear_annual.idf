@@ -173,7 +173,7 @@
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
-	
+
 RunPeriodControl:DaylightSavingTime,
     3/11,                    !- Start Date
     11/4;                    !- End Date

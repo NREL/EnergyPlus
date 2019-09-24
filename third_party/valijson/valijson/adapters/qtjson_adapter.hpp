@@ -24,15 +24,12 @@
  */
 
 #pragma once
-#ifndef __VALIJSON_ADAPTERS_QTJSON_ADAPTER_HPP
-#define __VALIJSON_ADAPTERS_QTJSON_ADAPTER_HPP
 
 #include <string>
 
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonArray>
-
 
 #include <valijson/adapters/adapter.hpp>
 #include <valijson/adapters/basic_adapter.hpp>
@@ -721,5 +718,3 @@ inline QtJsonObjectMemberIterator QtJsonObject::find(
 
 }  // namespace adapters
 }  // namespace valijson
-
-#endif
