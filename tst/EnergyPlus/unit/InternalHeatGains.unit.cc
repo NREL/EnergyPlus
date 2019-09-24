@@ -127,7 +127,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
         if (equip.Name == "OTHEREQ1") {
             ASSERT_EQ(equip.OtherEquipFuelType, 0);
         } else if (equip.Name == "OTHEREQ2") {
-            ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::LPGUse);
+            ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::PropaneUse);
         }
     }
 }
