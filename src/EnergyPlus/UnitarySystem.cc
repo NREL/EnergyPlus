@@ -8814,11 +8814,11 @@ namespace UnitarySystems {
         CoolingLoad = false;
         HeatingLoad = false;
 
-        if (QZnReq > Small5WLoad / this->ControlZoneMassFlowFrac && !DataZoneEnergyDemands::CurDeadBandOrSetback(this->ControlZoneNum)) {
+        if (QZnReq > Small5WLoad / this->ControlZoneMassFlowFrac) { // no need to check deadband flag, QZnReq is correct.
             if (DataHeatBalFanSys::TempControlType(this->ControlZoneNum) != DataHVACGlobals::SingleCoolingSetPoint) {
                 HeatingLoad = true;
             }
-        } else if (QZnReq < -Small5WLoad / this->ControlZoneMassFlowFrac && !DataZoneEnergyDemands::CurDeadBandOrSetback(this->ControlZoneNum)) {
+        } else if (QZnReq < -Small5WLoad / this->ControlZoneMassFlowFrac) {
             if (DataHeatBalFanSys::TempControlType(this->ControlZoneNum) != DataHVACGlobals::SingleHeatingSetPoint) {
                 CoolingLoad = true;
             }
