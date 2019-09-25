@@ -1440,6 +1440,7 @@ namespace IceRink {
     Real64 BOTC(int SystemType, int SysNum)
     {
         // Using/ Aliasing
+        using DataGlobals::Pi;
         using DataHeatBalFanSys::CTFTsrcConstPart;
         using DataHeatBalFanSys::RadSysTiHBConstCoef;
         using DataHeatBalFanSys::RadSysTiHBQsrcCoef;
@@ -1450,19 +1451,25 @@ namespace IceRink {
         using DataLoopNode::Node;
         using DataSurfaces::SurfaceClass_Floor;
         using FluidProperties::GetSatSpecificHeatRefrig;
+        using ScheduleManager::GetScheduleIndex;
+
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("BrineOutletTemperatureControl");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SurfNum;           // Index to the surface number having source/sink (Floor)
-        int ConstrNum;         // Index for construction number in Construct derived type
-        Real64 Eff;            // Effectiveness of the heat exchanger
-        Real64 RefrigInTemp;   // Refrigerant inlet temperature
-        int RefrigNodeIn;      // Inlet node of refrigerant
-        Real64 RefrigMassFlow; // Initial guess value for mass flow rate of refrigerant
-        Real64 CpRef;          // Specific heat of Ammonia used in direct refrigeration system
-        Real64 QSource;        // Heat flux from the heat source/sink
-        Real64 Ca;             // Coefficients to relate the inlet water temperature to the heat source
+        int SurfNum;                    // Index to the surface number having source/sink (Floor)
+        int ConstrNum;                  // Index for construction number in Construct derived type
+        Real64 Eff;                     // Effectiveness of the heat exchanger
+        Real64 RefrigInTemp;            // Refrigerant inlet temperature
+        Real64 RefrigOutTemp;           // Refrigerant outlet temperature 
+        Real64 RefrigOutTempDesired;    // Refrigerant outlet temperature which is desired, 
+                                        // so that BOTC can be established (to be obtained from the set point temperature)
+        int RefrigNodeIn;               // Inlet node of refrigerant
+        Real64 RefrigMassFlow;          // Initial guess value for mass flow rate of refrigerant
+        Real64 CpRef;                   // Specific heat of Ammonia used in direct refrigeration system
+        Real64 QSource;                 // Heat flux from the heat source/sink
+        Real64 PipeArea;                // Total area of the pipe used in the ice rink
+        Real64 Ca;                      // Coefficients to relate the inlet water temperature to the heat source
         Real64 Cb;
         Real64 Cc;
         Real64 Cd;
@@ -1475,12 +1482,12 @@ namespace IceRink {
         Real64 Ck;
         Real64 Cl;
 
-        // auto &DRink_SysNum(DRink(SysNum));
-        // auto &RefrigerantName(DRink_SysNum.RefrigerantName);
-        // auto &RefIndex(DRink_SysNum.RefIndex);
 
         // FLOW:
+        
         if (SystemType == DirectSystem) {
+            PipeArea = Pi * DRink(SysNum).TubeDiameter * DRink(SysNum).TubeLength;
+            RefrigOutTempDesired = DRink(SysNum).RefOutBOTCtrlTemp;
             RefrigMassFlow = 20.0;
             RefrigNodeIn = DRink(SysNum).ColdRefrigInNode;
             RefrigInTemp = Node(RefrigNodeIn).Temp;
@@ -1507,13 +1514,34 @@ namespace IceRink {
 
                     Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
+
+                    QSource = (RefrigInTemp - Ck) / ((Cl / Surface(SurfNum).Area) + (1 / (RefrigMassFlow * CpRef)));
+
+                    RefrigOutTemp = RefrigInTemp - (QSource / (RefrigMassFlow * CpRef));
+                   
+
+                    if (RefrigOutTemp <= RefrigOutTempDesired) {  // Cooling is not required and refrigeration system should be off
+
+                        RefrigOutTemp = RefrigOutTempDesired;
+                        RefrigMassFlow = DRink(SysNum).RefrigFlowMinCool;
+
+                    } else if (RefrigOutTemp > RefrigOutTempDesired) {  // Cooling is required and refrigeration system should be on
+
+                        RefrigMassFlow = (((Ck - RefrigInTemp) / (RefrigOutTemp - RefrigInTemp)) - (1 / Eff)) * ((PipeArea) / (CpRef * Cl));
+                        
+                        if (RefrigMassFlow >= DRink(SysNum).RefrigFlowMaxCool) {  // The refrigeration system is undersized
+                            RefrigMassFlow = DRink(SysNum).RefrigFlowMaxCool; 
+                        }
+                    }
+
                 }
 
-                QSource = (RefrigInTemp - Ck) / ((Cl /Surface(SurfNum).Area) + (1/(RefrigMassFlow * CpRef)));
+                
             }
         }
 
-        return Eff;
+        return RefrigMassFlow;
+        
     }
 
     Real64 STC(int const SysTemType, int const SysNum)

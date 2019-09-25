@@ -80,6 +80,7 @@ namespace IceRink {
         int ControlType;                 // Control type for the system(BOTC or STC)
         Real64 RefrigVolFlowMaxCool;     // maximum refrigerant flow rate for cooling, m3/s
         Real64 RefrigFlowMaxCool;        // maximum refrigerant mass flow rate for cooling. Kg/s
+        Real64 RefrigFlowMinCool;        // manimum refrigerant mass flow rate for cooling. Kg/s
         int ColdRefrigInNode;            // cold refrigerant inlet node
         int ColdRefrigOutNode;           // cold refrigerant Outlet node
         Real64 ColdThrottleRange;        // Throttling range for cooling [C]
@@ -100,6 +101,7 @@ namespace IceRink {
         int CRefrigCompNum;
         Real64 RefrigMassFlowRate; // Refrigerant mass flow rate
         bool CondCausedShutDown;   // .TRUE. when condensation predicted at surface
+        Real64 RefOutBOTCtrlTemp;   // Outlet temperature of brine (To be )
 
         // ReportData
 
@@ -108,7 +110,8 @@ namespace IceRink {
             : SchedPtr(0), ZonePtr(0), SurfacePtr(0), NumOfSurfaces(0), TubeDiameter(0.0), TubeLength(0.0), ControlType(0), RefrigVolFlowMaxCool(0.0),
               ColdRefrigInNode(0), ColdRefrigOutNode(0), ColdThrottleRange(0.0), ColdSetptSchedPtr(0), CondCtrlType(0), CondDewPtDeltaT(0.0),
               NumCircCalcMethod(0), CircLength(0.0), GlycolIndex(0), LengthRink(0.0), WidthRink(0.0), DepthRink(0.0), CRefrigLoopSide(0),
-              CRefrigBranchNum(0), CRefrigCompNum(0), RefrigMassFlowRate(0.0), CondCausedShutDown(false), CondErrIndex(0), RefrigFlowMaxCool(0.0)
+              CRefrigBranchNum(0), CRefrigCompNum(0), RefrigMassFlowRate(0.0), CondCausedShutDown(false), CondErrIndex(0), 
+              RefrigFlowMaxCool(0.0), RefrigFlowMinCool(0.0), RefOutBOTCtrlTemp(0.0)
 
         {
         }
