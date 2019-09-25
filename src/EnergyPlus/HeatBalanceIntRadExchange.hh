@@ -73,6 +73,8 @@ namespace HeatBalanceIntRadExchange {
     // MODULE VARIABLE DECLARATIONS:
     extern int MaxNumOfRadEnclosureSurfs; // Max saved to get large enough space for SendSurfaceTempInKto4thPrecalc
 
+    extern bool CarrollMethod;  // Use Carroll MRT method
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceIntRadExchange
 
     // Functions
@@ -95,6 +97,8 @@ namespace HeatBalanceIntRadExchange {
     void AlignInputViewFactors(std::string const &cCurrentModuleObject, // Object type
                                bool &ErrorsFound                        // True when errors are found
     );
+
+    void SetRadiantExchangeMethod();
 
     void GetInputViewFactors(std::string const &EnclosureName, // Needed to check for user input view factors.
                              int const N,                      // NUMBER OF SURFACES
@@ -139,7 +143,18 @@ namespace HeatBalanceIntRadExchange {
                      Array2<Real64> &ScriptF  // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
     );
 
-    void CalcMatrixInverse(Array2<Real64> &A, // Matrix: Gets reduced to L\U form
+    void CalcFMRT(int const N,             // Number of surfaces
+                  Array1<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                  Array1<Real64> &FMRT     // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
+    );
+
+    void CalcFp(int const N,             // Number of surfaces
+                Array1<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
+                Array1<Real64> &FMRT,    // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
+                Array1<Real64> &Fp       // VECTOR OF OPPENHEIM RESISTNACE VALUES
+    );
+
+void CalcMatrixInverse(Array2<Real64> &A, // Matrix: Gets reduced to L\U form
                            Array2<Real64> &I  // Returned as inverse matrix
     );
 
