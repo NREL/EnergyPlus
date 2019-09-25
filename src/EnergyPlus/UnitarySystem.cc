@@ -8683,10 +8683,6 @@ namespace UnitarySystems {
             this->m_MyEnvrnFlag2 = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
-            this->m_MyEnvrnFlag2 = true;
-        }
-
         if (allocated(DataZoneEquipment::ZoneEquipConfig) && this->m_MyCheckFlag) {
             if (this->m_AirLoopEquipment) {
                 int zoneNum = DataHeatBalance::Zone(this->ControlZoneNum).ZoneEqNum;
@@ -8735,6 +8731,7 @@ namespace UnitarySystems {
             m_initLoadBasedControlAirLoopPass = false;
         }
         if (!DataGlobals::BeginEnvrnFlag) {
+            this->m_MyEnvrnFlag2 = true; // this does not appear to be needed, only initializes autosized coil fluid flow rates
             m_initLoadBasedControlAirLoopPass = true;
         }
 
