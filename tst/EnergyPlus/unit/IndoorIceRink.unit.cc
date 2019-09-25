@@ -183,10 +183,11 @@ TEST_F(EnergyPlusFixture, IndoorIceRink_BOTC)
     DRink(SysNum).RefIndex = 1;
     DRink(SysNum).TubeDiameter = 1.0;
     DRink(SysNum).TubeLength = 200.0;
+    DRink(SysNum).RefOutBOTCtrlTemp = -5.0;
     Node(1).Temp = 2.0;
     Result = BOTC(DirectSystem, SysNum);
 
-    EXPECT_NEAR(Result, 4214.0, 0.1);
+    EXPECT_NEAR(Result, 20.0, 0.1);
 
     // Set values of items that will stay constant
 }
