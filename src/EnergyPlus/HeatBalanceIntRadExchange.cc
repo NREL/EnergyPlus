@@ -360,14 +360,15 @@ namespace HeatBalanceIntRadExchange {
                 } else {
                     SendSurfTemp = SurfaceTemp(SendSurfNum);
                 }
-#ifdef EP_HBIRE_SEQ
-                SendSurfaceTempInKto4thPrecalc[SendZoneSurfNum] = pow_4(SendSurfTemp + KelvinConv);
-#else
-                SendSurfaceTempInKto4thPrecalc(SendSurfNum) = pow_4(SendSurfTemp + KelvinConv);
-#endif
                 if (CarrollMethod) {
                     CarrollMRTNumerator += SendSurfTemp*zone_info.Fp[SendZoneSurfNum]*zone_info.Area[SendZoneSurfNum];
                     CarrollMRTDenominator += zone_info.Fp[SendZoneSurfNum]*zone_info.Area[SendZoneSurfNum];
+                } else {
+#ifdef EP_HBIRE_SEQ
+                    SendSurfaceTempInKto4thPrecalc[SendZoneSurfNum] = pow_4(SendSurfTemp + KelvinConv);
+#else
+                    SendSurfaceTempInKto4thPrecalc(SendSurfNum) = pow_4(SendSurfTemp + KelvinConv);
+#endif
                 }
             }
 
