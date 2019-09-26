@@ -1080,6 +1080,7 @@ namespace HeatBalanceIntRadExchange {
     void SetRadiantExchangeMethod() {
         bool hasZoneRadiantMethod = inputProcessor->getNumObjectsFound("ZoneRadiantExchangeAlgorithm");
         if (hasZoneRadiantMethod) {
+            // TODO: Should only be one of these (don't need to loop)
             auto const &zrmInstances = inputProcessor->getObjectInstances("ZoneRadiantExchangeAlgorithm");
             for (auto &instance : zrmInstances.items()) {
                 auto const &fields = instance.value();
@@ -1088,6 +1089,8 @@ namespace HeatBalanceIntRadExchange {
                 CarrollMethod = UtilityRoutines::MakeUPPERCase(fields.at("algorithm")) == "CARROLLMRT";
             }
         }
+        // TODO: Remove after testing CI
+        CarrollMethod = true;
     }
 
     void GetInputViewFactors(std::string const &ZoneName, // Needed to check for user input view factors.
