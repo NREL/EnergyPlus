@@ -4820,7 +4820,7 @@ namespace OutputReportTabular {
         using ChillerReformulatedEIR::ElecReformEIRChillerReport;
         using ChillerReformulatedEIR::NumElecReformEIRChillers;
         using CondenserLoopTowers::NumSimpleTowers;
-        using CondenserLoopTowers::SimpleTowerReport;
+        using CondenserLoopTowers::towers;
         using DataEnvironment::WeatherFileLocationTitle;
         using DataGlobals::convertJtoGJ;
         using DataHeatBalance::BuildingPreDefRep;
@@ -4904,8 +4904,8 @@ namespace OutputReportTabular {
 
         // Condenser water loop
         for (iCooler = 1; iCooler <= NumSimpleTowers; ++iCooler) {
-            SysTotalHVACRejectHeatLoss += SimpleTowerReport(iCooler).Qactual * TimeStepSysSec + SimpleTowerReport(iCooler).FanEnergy +
-                                          SimpleTowerReport(iCooler).BasinHeaterConsumption;
+            SysTotalHVACRejectHeatLoss += towers(iCooler).Qactual * TimeStepSysSec + towers(iCooler).FanEnergy +
+                                          towers(iCooler).BasinHeaterConsumption;
         }
         for (iCooler = 1; iCooler <= NumSimpleEvapFluidCoolers; ++iCooler) {
             SysTotalHVACRejectHeatLoss +=

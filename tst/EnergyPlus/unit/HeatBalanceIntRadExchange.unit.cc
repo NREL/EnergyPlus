@@ -308,8 +308,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest)
         });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    //auto numZones = inputProcessor->getNumObjectsFound("Zone");
-    //DataHeatBalFanSys::ZoneReOrder.allocate(numZones);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -390,8 +388,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest2)
         });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    //auto numZones = inputProcessor->getNumObjectsFound("Zone");
-    //DataHeatBalFanSys::ZoneReOrder.allocate(numZones);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
@@ -422,6 +418,165 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest2)
     EXPECT_EQ(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Perimeter Zones");
     EXPECT_EQ(DataViewFactorInformation::ZoneSolarInfo(2).Name, "Enclosure 2");
     EXPECT_EQ(DataViewFactorInformation::ZoneSolarInfo(3).Name, "Zone 3");
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest3)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "Zone 1;             !- Name",
+
+        "Zone,",
+        "Zone 2;             !- Name",
+
+        "Zone,",
+        "Zone 3;             !- Name",
+
+        "Zone,",
+        "Zone 4;             !- Name",
+
+        "Zone,",
+        "Zone 5;             !- Name",
+
+        "ZoneProperty:UserViewFactors:bySurfaceName,",
+        "Zone 3,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+
+        "ZoneProperty:UserViewFactors:bySurfaceName,",
+        "Perimeter Zones,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+
+        "ZoneList,",
+        "Perimeter Zones, !- Name",
+        "Zone 5, !- Zone 1 Name",
+        "Zone 2; !- Zone 2 Name",
+
+        "ZoneProperty:UserViewFactors:bySurfaceName,",
+        "Zone 6,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+        });
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    DataViewFactorInformation::NumOfSolarEnclosures = 3;
+    DataViewFactorInformation::ZoneSolarInfo.allocate(3);
+    DataViewFactorInformation::ZoneSolarInfo(1).Name = "Enclosure 1";
+    DataViewFactorInformation::ZoneSolarInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 2"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneSolarInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 1"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneSolarInfo(2).Name = "Enclosure 2";
+    DataViewFactorInformation::ZoneSolarInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 4"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneSolarInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneSolarInfo(3).Name = "Zone 3";
+    DataViewFactorInformation::ZoneSolarInfo(3).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+
+    ErrorsFound = false;
+    HeatBalanceIntRadExchange::AlignInputViewFactors("ZoneProperty:UserViewFactors:bySurfaceName", ErrorsFound);
+    EXPECT_TRUE(ErrorsFound);
+    std::string const error_string = delimited_string({
+    "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:bySurfaceName=\"Perimeter Zones\" found a matching ZoneList, but did not find a matching radiant or solar enclosure with the same zones.",
+    "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:bySurfaceName=\"Zone 6\" did not find a matching radiant or solar enclosure name."
+        });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    EXPECT_EQ(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Enclosure 1");
+    EXPECT_EQ(DataViewFactorInformation::ZoneSolarInfo(2).Name, "Enclosure 2");
+    EXPECT_EQ(DataViewFactorInformation::ZoneSolarInfo(3).Name, "Zone 3");
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest4)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "Zone 1;             !- Name",
+
+        "Zone,",
+        "Zone 2;             !- Name",
+
+        "Zone,",
+        "Zone 3;             !- Name",
+
+        "Zone,",
+        "Zone 4;             !- Name",
+
+        "Zone,",
+        "Zone 5;             !- Name",
+
+        "ZoneProperty:UserViewFactors:bySurfaceName,",
+        "Zone 3,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+
+        "ZoneProperty:UserViewFactors:bySurfaceName,",
+        "Perimeter Zones,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+
+        "ZoneList,",
+        "Perimeter Zones, !- Name",
+        "Zone 5, !- Zone 1 Name",
+        "Zone 2; !- Zone 2 Name",
+
+        "ZoneProperty:UserViewFactors:bySurfaceName,",
+        "Zone 6,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+        });
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    DataViewFactorInformation::NumOfRadiantEnclosures = 3;
+    DataViewFactorInformation::ZoneRadiantInfo.allocate(3);
+    DataViewFactorInformation::ZoneRadiantInfo(1).Name = "Enclosure 1";
+    DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 2"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneRadiantInfo(2).Name = "Enclosure 2";
+    DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 4"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneRadiantInfo(3).Name = "Zone 3";
+    DataViewFactorInformation::ZoneRadiantInfo(3).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+
+    ErrorsFound = false;
+    HeatBalanceIntRadExchange::AlignInputViewFactors("ZoneProperty:UserViewFactors:bySurfaceName", ErrorsFound);
+    EXPECT_TRUE(ErrorsFound);
+    std::string const error_string = delimited_string({
+    "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:bySurfaceName=\"Zone 6\" did not find a matching radiant or solar enclosure name."
+        });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    EXPECT_EQ(DataViewFactorInformation::ZoneRadiantInfo(1).Name, "Perimeter Zones");
+    EXPECT_EQ(DataViewFactorInformation::ZoneRadiantInfo(2).Name, "Enclosure 2");
+    EXPECT_EQ(DataViewFactorInformation::ZoneRadiantInfo(3).Name, "Zone 3");
 }
 
 } // namespace EnergyPlus

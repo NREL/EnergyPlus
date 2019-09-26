@@ -13,7 +13,6 @@
 #include "re2/re2.h"
 
 using re2::StringPiece;
-using std::string;
 
 // NOT static, NOT signed.
 uint8_t dummy = 0;
@@ -21,25 +20,6 @@ uint8_t dummy = 0;
 void Test(StringPiece pattern, const RE2::Options& options, StringPiece text) {
   RE2 re(pattern, options);
   if (!re.ok())
-    return;
-
-  // Don't waste time fuzzing high-size programs.
-  // They can cause bug reports due to fuzzer timeouts.
-  int size = re.ProgramSize();
-  if (size > 9999)
-    return;
-  int rsize = re.ReverseProgramSize();
-  if (rsize > 9999)
-    return;
-
-  // Don't waste time fuzzing high-fanout programs.
-  // They can cause bug reports due to fuzzer timeouts.
-  std::map<int, int> histogram;
-  int fanout = re.ProgramFanout(&histogram);
-  if (fanout > 9)
-    return;
-  int rfanout = re.ReverseProgramFanout(&histogram);
-  if (rfanout > 9)
     return;
 
   // Don't waste time fuzzing programs with large substrings.
@@ -64,6 +44,25 @@ void Test(StringPiece pattern, const RE2::Options& options, StringPiece text) {
     }
   }
 
+  // Don't waste time fuzzing high-size programs.
+  // They can cause bug reports due to fuzzer timeouts.
+  int size = re.ProgramSize();
+  if (size > 9999)
+    return;
+  int rsize = re.ReverseProgramSize();
+  if (rsize > 9999)
+    return;
+
+  // Don't waste time fuzzing high-fanout programs.
+  // They can cause bug reports due to fuzzer timeouts.
+  std::map<int, int> histogram;
+  int fanout = re.ProgramFanout(&histogram);
+  if (fanout > 9)
+    return;
+  int rfanout = re.ReverseProgramFanout(&histogram);
+  if (rfanout > 9)
+    return;
+
   if (re.NumberOfCapturingGroups() == 0) {
     // Avoid early return due to too many arguments.
     StringPiece sp = text;
@@ -87,12 +86,12 @@ void Test(StringPiece pattern, const RE2::Options& options, StringPiece text) {
     RE2::FindAndConsume(&sp, re, &d);
   }
 
-  string s = string(text);
+  std::string s = std::string(text);
   RE2::Replace(&s, re, "");
-  s = string(text);  // Reset.
+  s = std::string(text);  // Reset.
   RE2::GlobalReplace(&s, re, "");
 
-  string min, max;
+  std::string min, max;
   re.PossibleMatchRange(&min, &max, /*maxlen=*/9);
 
   // Exercise some other API functionality.

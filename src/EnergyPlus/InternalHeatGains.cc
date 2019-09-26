@@ -6037,7 +6037,7 @@ namespace InternalHeatGains {
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
             auto & thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
             QL(enclosureNum) = 0.0;
-            for (int zoneNum : thisEnclosure.ZoneNums) {
+            for (int const zoneNum : thisEnclosure.ZoneNums) {
                 Real64 zoneQL;
                 SumAllInternalRadiationGains(zoneNum, zoneQL);
                 QL(enclosureNum) += zoneQL;
@@ -6051,15 +6051,15 @@ namespace InternalHeatGains {
             AllocateLoadComponentArrays();
         }
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            int NZ = Surface(SurfNum).Zone;
+            int const NZ = Surface(SurfNum).Zone;
             if (!Surface(SurfNum).HeatTransSurf || NZ == 0) continue; // Skip non-heat transfer surfaces
-            int radEnclosureNum = Zone(Surface(SurfNum).Zone).RadiantEnclosureNum;
+            int const radEnclosureNum = Zone(Surface(SurfNum).Zone).RadiantEnclosureNum;
             if (!doLoadComponentPulseNow) {
                 QRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
             } else {
                 curQL = QL(radEnclosureNum);
                 // for the loads component report during the special sizing run increase the radiant portion
-                // a small amount to create a "pulse" of heat that is used for the
+                // a small amount to create a "pulse" of heat that is used for the delayed loads
                 adjQL = curQL + DataViewFactorInformation::ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
                 // ITABSF is the Inside Thermal Absorptance
                 // TMULT is a mulipliter for each zone

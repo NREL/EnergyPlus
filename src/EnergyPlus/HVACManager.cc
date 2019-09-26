@@ -702,7 +702,6 @@ namespace HVACManager {
         using PlantUtilities::CheckPlantMixerSplitterConsistency;
         using PlantUtilities::SetAllPlantSimFlagsToValue;
         using SetPointManager::ManageSetPoints;
-        using SimAirServingZones::ManageAirLoops;
         using SystemAvailabilityManager::ManageSystemAvailability;
         using ZoneEquipmentManager::ManageZoneEquipment;
 
