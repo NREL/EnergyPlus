@@ -727,15 +727,9 @@ namespace DataHeatBalance {
     EPVector<Real64> MultCircumSolar;   // Contribution to eff sky view factor from circumsolar brightening
     EPVector<Real64> MultHorizonZenith; // Contribution to eff sky view factor from horizon or zenith brightening
 
-<<<<<<< HEAD
     EPVector<Real64> QS; // Zone short-wave flux density; used to calculate short-wave
-    //     radiation absorbed on inside surfaces of zone
-    EPVector<Real64> QSLights; // Like QS, but Lights short-wave only.
-=======
-    Array1D<Real64> QS; // Zone short-wave flux density; used to calculate short-wave
     //     radiation absorbed on inside surfaces of zone or enclosure
-    Array1D<Real64> QSLights; // Like QS, but Lights short-wave only.
->>>>>>> origin/develop
+    EPVector<Real64> QSLights; // Like QS, but Lights short-wave only.
 
     EPVector<Real64> QSDifSol;                // Like QS, but diffuse solar short-wave only.
     EPVector<Real64> ITABSF;                  // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)

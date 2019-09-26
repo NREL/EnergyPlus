@@ -1004,8 +1004,8 @@ namespace DataSurfaces {
         Real64 FrameTempSurfIn;    // Frame inside surface temperature (C)
         Real64 FrameTempSurfInOld; // Previous value of frame inside surface temperature (C)
         Real64 FrameTempSurfOut;   // Frame outside surface temperature (C)
-        
-        
+
+
 
         Real64 ProjCorrFrOut;      // Correction factor to absorbed radiation due to frame outside projection
         Real64 ProjCorrFrIn;       // Correction factor to absorbed radiation due to frame inside projection
@@ -1085,14 +1085,8 @@ namespace DataSurfaces {
         Real64 VentingOpenFactorMultRep;        // Window/door opening modulation multiplier on venting open factor, for reporting
         Real64 InsideTempForVentingRep;         // Inside air temp used to control window/door venting, for reporting (C)
         Real64 VentingAvailabilityRep;          // Venting availability schedule value (0.0/1.0 = no venting allowed/not allowed)
-<<<<<<< HEAD
-        EPVector<Real64> IllumFromWinAtRefPtRep; // Illuminance from window at reference point #1 [lux]
-        EPVector<Real64> LumWinFromRefPtRep;     // Window luminance as viewed from reference point #1 [cd/m2]
-        Real64 LumWinFromRefPt2Rep;             // Window luminance as viewed from reference point #2 [cd/m2]
-=======
-        Array1D<Real64> IllumFromWinAtRefPtRep; // Illuminance from window at reference point N [lux]
-        Array1D<Real64> LumWinFromRefPtRep;     // Window luminance as viewed from reference point N [cd/m2]
->>>>>>> origin/develop
+        EPVector<Real64> IllumFromWinAtRefPtRep; // Illuminance from window at reference point N [lux]
+        EPVector<Real64> LumWinFromRefPtRep;     // Window luminance as viewed from reference point N [cd/m2]
         // for shadowing of ground by building and obstructions [W/m2]
         Real64 SkyGndSolarInc; // Incident diffuse solar from ground-reflected sky radiation; used for
         // Complex Fen; if CalcSolRefl is true, accounts for shadowing of ground by building and obstructions [W/m2]

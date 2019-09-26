@@ -250,16 +250,8 @@ namespace CondenserLoopTowers {
         Real64 StarvedMakeUpVdot;
         Real64 StarvedMakeUpVol;
 
-<<<<<<< HEAD
-    struct VSTowerData
-    {
-        // Members
-        // variables specific to variable-speed towers
-        EPVector<Real64> Coeff;      // - model coefficients
-=======
         // From VSTower struct - for Variable speed towers only
-        Array1D<Real64> Coeff;      // - model coefficients
->>>>>>> origin/develop
+        EPVector<Real64> Coeff;      // - model coefficients
         bool FoundModelCoeff;       // - TRUE if model is calibratable
         Real64 MinInletAirWBTemp;   // - model limit for min inlet air WB temp
         Real64 MaxInletAirWBTemp;   // - model limit for max inlet air WB temp
@@ -357,15 +349,7 @@ namespace CondenserLoopTowers {
         {
         }
 
-<<<<<<< HEAD
-    // Object Data
-    extern EPVector<Towerspecs> SimpleTower;           // dimension to number of machines
-    extern EPVector<TowerInletConds> SimpleTowerInlet; // inlet conditions
-    extern EPVector<ReportVars> SimpleTowerReport;     // report variables
-    extern EPVector<VSTowerData> VSTower;              // model coefficients and specific variables for VS tower
-=======
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
->>>>>>> origin/develop
 
         void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
@@ -438,7 +422,7 @@ namespace CondenserLoopTowers {
     };
 
     // Object Data
-    extern Array1D<CoolingTower> towers; // dimension to number of machines
+    extern EPVector<CoolingTower> towers; // dimension to number of machines
 
     // Functions
     void clear_state();
