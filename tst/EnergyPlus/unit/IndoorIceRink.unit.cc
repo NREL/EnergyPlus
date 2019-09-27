@@ -149,35 +149,37 @@ TEST_F(EnergyPlusFixture, IndoorIceRink_IndirectSysHXEffectTest)
 
     // Set values of items that will stay constant for all calls to the HX Effectiveness function
 
-    RefrigMassFlow = 10;
-    TubeLength = 20;
+    RefrigMassFlow = 0.1;
+    TubeLength = 10;
     TubeDiameter = 0.1;
     SysNum = 1;
 
     // Test 1: Cooling for Indirect Refrigeration System with CaCl2
     HXEffectFuncResult = 0.0;
-    Temperature = -3.5;
-    RefrigType = 1;
+    Temperature = -9.5;
+    RefrigType = 2;
     Concentration = 10.00;
 
-    HXEffectFuncResult = CalcIRinkHXEffectTerm(Temperature, SysNum, RefrigMassFlow, TubeLength, TubeDiameter, RefrigType, Concentration);
-    EXPECT_NEAR(HXEffectFuncResult, 9517.5375, 0.001);
+   // HXEffectFuncResult = CalcIRinkHXEffectTerm(Temperature, SysNum, RefrigMassFlow, TubeLength, TubeDiameter, RefrigType, Concentration);
+   // EXPECT_NEAR(HXEffectFuncResult, 9517.5375, 0.001);
 
     // Test 2: Cooling for Indirect Refrigeration System with EG
-    HXEffectFuncResult = 0.0;
-    RefrigType = 2;
+    //HXEffectFuncResult = 0.0;
+    //RefrigType = 2;
 
     HXEffectFuncResult = CalcIRinkHXEffectTerm(Temperature, SysNum, RefrigMassFlow, TubeLength, TubeDiameter, RefrigType, Concentration);
-    EXPECT_NEAR(HXEffectFuncResult, 9779.3628, 0.001);
+    EXPECT_NEAR(HXEffectFuncResult, 53.89, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, IndoorIceRink_BOTC)
 {
-    DRink.allocate(1);
-    Node.allocate(1);
-    int SystemType = DirectSystem;
+    // Set values of items that will stay constant for all calls to the BOTC function
     int SysNum = 1;
     Real64 Result;
+    // Test 1: BOTC test for direct refrigeration type ice rink
+    /*DRink.allocate(1);
+    Node.allocate(1);
+    
     DRink(SysNum).RefrigerantName = "NH3";
     DRink(SysNum).ColdRefrigInNode = 1;
     DRink(SysNum).RefIndex = 1;
@@ -187,7 +189,23 @@ TEST_F(EnergyPlusFixture, IndoorIceRink_BOTC)
     Node(1).Temp = 2.0;
     Result = BOTC(DirectSystem, SysNum);
 
-    EXPECT_NEAR(Result, 20.0, 0.1);
+    EXPECT_NEAR(Result, 20.0, 0.1);*/
 
-    // Set values of items that will stay constant
+    // Test 2: BOTC test for indirect refrigeration type ice rink
+    Node.allocate(1);
+    Node(1).Temp = 2.0;
+
+    IRink.allocate(1);
+    int SystemType = IndirectSystem;
+    IRink(SysNum).RefrigerantName = "EG";
+    IRink(SysNum).ColdRefrigInNode = 1;
+    IRink(SysNum).RefIndex = 1;
+    IRink(SysNum).TubeDiameter = 1;
+    IRink(SysNum).TubeLength = 1000.0;
+    IRink(SysNum).RefOutBOTCtrlTemp = -5.0;
+    IRink(SysNum).Concentration = 10.00;
+    IRink(SysNum).RefrigType = 2;
+    Result = BOTC(IndirectSystem, SysNum);
+
+    EXPECT_NEAR(Result, 10.0, 0.1);
 }

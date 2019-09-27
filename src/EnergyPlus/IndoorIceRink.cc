@@ -1450,6 +1450,7 @@ namespace IceRink {
         using DataHeatBalFanSys::RadSysToHBTinCoef;
         using DataLoopNode::Node;
         using DataSurfaces::SurfaceClass_Floor;
+        using FluidProperties::GetSpecificHeatGlycol;
         using FluidProperties::GetSatSpecificHeatRefrig;
         using ScheduleManager::GetScheduleIndex;
 
@@ -1466,6 +1467,7 @@ namespace IceRink {
                                         // so that BOTC can be established (to be obtained from the set point temperature)
         int RefrigNodeIn;               // Inlet node of refrigerant
         Real64 RefrigMassFlow;          // Initial guess value for mass flow rate of refrigerant
+        Real64 RefrigMassFlow_Req(0.0); // Required mass flow rate of refrigerant to satisfy the BOTC
         Real64 CpRef;                   // Specific heat of Ammonia used in direct refrigeration system
         Real64 QSource;                 // Heat flux from the heat source/sink
         Real64 PipeArea;                // Total area of the pipe used in the ice rink
@@ -1537,10 +1539,60 @@ namespace IceRink {
                 }
 
                 
+            } 
+        } else if (SystemType == IndirectSystem) {
+            PipeArea = Pi * IRink(SysNum).TubeDiameter * IRink(SysNum).TubeLength;
+            RefrigOutTempDesired = IRink(SysNum).RefOutBOTCtrlTemp;
+            RefrigMassFlow = 0.1;
+            RefrigNodeIn = IRink(SysNum).ColdRefrigInNode;
+            RefrigInTemp = Node(RefrigNodeIn).Temp;
+            CpRef = GetSpecificHeatGlycol(IRink(SysNum).RefrigerantName, RefrigInTemp, IRink(SysNum).RefIndex, RoutineName);
+
+            Eff = CalcIRinkHXEffectTerm(RefrigInTemp, SysNum, RefrigMassFlow, IRink(SysNum).TubeLength, IRink(SysNum).TubeDiameter, IRink(SysNum).RefrigType, IRink(SysNum).Concentration) /
+                  (RefrigMassFlow * CpRef);
+
+            for (SurfNum = 1; SurfNum <= IRink(SysNum).NumOfSurfaces; ++SurfNum) {
+                if (Surface(IRink(SysNum).SurfacePtrArray(SurfNum)).Class == SurfaceClass_Floor) {
+                    ConstrNum = Surface(SurfNum).Construction;
+
+                    Ca = RadSysTiHBConstCoef(SurfNum);
+                    Cb = RadSysTiHBToutCoef(SurfNum);
+                    Cc = RadSysTiHBQsrcCoef(SurfNum);
+
+                    Cd = RadSysToHBConstCoef(SurfNum);
+                    Ce = RadSysToHBTinCoef(SurfNum);
+                    Cf = RadSysToHBQsrcCoef(SurfNum);
+
+                    Cg = CTFTsrcConstPart(SurfNum);
+                    Ch = Construct(ConstrNum).CTFTSourceQ(0);
+                    Ci = Construct(ConstrNum).CTFTSourceIn(0);
+                    Cj = Construct(ConstrNum).CTFTSourceOut(0);
+
+                    Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
+                    Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
+
+                    QSource = (RefrigInTemp - Ck) / ((Cl / Surface(SurfNum).Area) + (1 / (RefrigMassFlow * CpRef)));
+
+                    RefrigOutTemp = RefrigInTemp - (QSource / (RefrigMassFlow * CpRef));
+
+                    if (RefrigOutTemp <= RefrigOutTempDesired) { // Cooling is not required and refrigeration system should be off
+
+                        RefrigOutTemp = RefrigOutTempDesired;
+                        RefrigMassFlow_Req = IRink(SysNum).RefrigFlowMinCool;
+
+                    } else if (RefrigOutTemp > RefrigOutTempDesired) { // Cooling is required and refrigeration system should be on
+
+                        RefrigMassFlow_Req = (((Ck - RefrigInTemp) / (RefrigOutTemp - RefrigInTemp)) - (1 / Eff)) * ((PipeArea) / (CpRef * Cl));
+
+                        if (RefrigMassFlow >= IRink(SysNum).RefrigFlowMaxCool) { // The refrigeration system is undersized
+                            RefrigMassFlow = IRink(SysNum).RefrigFlowMaxCool;
+                        }
+                    }
+                }
             }
         }
 
-        return RefrigMassFlow;
+        return Ca;
         
     }
 
