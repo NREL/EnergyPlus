@@ -8,12 +8,12 @@ PUBLIC
 CONTAINS
 
 SUBROUTINE SetThisVersionVariables()
-      VerString='Conversion 8.8 => 8.9'
-      VersionNum=8.9
-      sVersionNum='8.9'
-      IDDFileNameWithPath=TRIM(ProgramPath)//'V8-8-0-Energy+.idd'
-      NewIDDFileNameWithPath=TRIM(ProgramPath)//'V8-9-0-Energy+.idd'
-      RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 8-8-0 to 8-9-0.csv'
+      VerString='Conversion 9.2 => 9.2.1'
+      VersionNum=9.2
+      sVersionNum='9.2.1'
+      IDDFileNameWithPath=TRIM(ProgramPath)//'V9-2-0-Energy+.idd'
+      NewIDDFileNameWithPath=TRIM(ProgramPath)//'V9-2-1-Energy+.idd'
+      RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 9-2-0 to 9-3-0.csv'
 END SUBROUTINE
 
 END MODULE
@@ -99,18 +99,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=10) :: LocalFileExtension=' '
   LOGICAL :: WildMatch
 
-  ! For exposed foundation perimeter objects
-  INTEGER NumPerimObjs
-  INTEGER PArgs
-  INTEGER PerimNum
-  CHARACTER(len=MaxNameLength*2), ALLOCATABLE, DIMENSION(:) :: PFldNames
-  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: PFldDefaults
-  CHARACTER(len=20), ALLOCATABLE, DIMENSION(:) :: PFldUnits
-  INTEGER PObjMinFlds
-  LOGICAL, ALLOCATABLE, DIMENSION(:) :: PAOrN
-  LOGICAL, ALLOCATABLE, DIMENSION(:) :: PReqFld
-  INTEGER PNumArgs   ! Number of Arguments in a definition
-  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: POutArgs
+
 
   LOGICAL :: ConnComp
   LOGICAL :: ConnCompCtrl
@@ -133,9 +122,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER :: I, CurField, NewField, KAindex=0, SearchNum
   INTEGER :: AlphaNumI
   REAL :: SaveNumber
+  CHARACTER(len=MaxNameLength*2), ALLOCATABLE, DIMENSION(:) :: PFldNames
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: PFldDefaults
+  CHARACTER(len=20), ALLOCATABLE, DIMENSION(:) :: PFldUnits
+  INTEGER PObjMinFlds
+  LOGICAL, ALLOCATABLE, DIMENSION(:) :: PAOrN
+  LOGICAL, ALLOCATABLE, DIMENSION(:) :: PReqFld
+  INTEGER PNumArgs   ! Number of Arguments in a definition
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: POutArgs
 
-  ! for Schedule:Compact from 8.8 to 8.9
-  CHARACTER(len=MaxNameLength) ::  UpperInArg=blank
+
+
+
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -278,6 +276,17 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
             ENDIF
           ENDDO
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                                                    P R E P R O C E S S I N G                                                     !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                                                       P R O C E S S I N G                                                        !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+          CALL DisplayString('Processing IDF -- Processing idf objects . . .')
           DO Num=1,NumIDFRecords
 
             IF (DeleteThisRecord(Num)) CYCLE
@@ -376,344 +385,250 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ENDIF
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1) = sVersionNum
-                nodiff=.false.
+                NoDiff=.false.
 
-    ! changes for this version
+    ! changes for this version, pick one of the spots to add rules, this will reduce the possibility of merge conflicts
 
-             CASE('ZONEHVAC:EQUIPMENTLIST')
+!             CASE('OBJECTNAMEHERE')
+!                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+!                 nodiff=.false.
+!                 OutArgs(1)=InArgs(1)
+!                 OutArgs(2) = 'SequentialLoad'
+!                 OutArgs(3:CurArgs+1)=InArgs(2:CurArgs)
+!                 CurArgs = CurArgs + 1
+!                 NoDiff = .false.
+
+              ! If your original object starts with A, insert the rules here
+
+             CASE('AIRCONDITIONER:VARIABLEREFRIGERANTFLOW')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
-                 OutArgs(1)=InArgs(1)
-                 OutArgs(2) = 'SequentialLoad'
-                 OutArgs(3:CurArgs+1)=InArgs(2:CurArgs)
-                 CurArgs = CurArgs + 1
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (CurArgs .GE. 67) THEN
+                   CALL FixFuelTypes(OutArgs(67))
+                 END IF
 
-              CASE('GROUNDHEATEXCHANGER:VERTICAL')
-                 nodiff=.false.
-                 ObjectName='GroundHeatExchanger:System'
-                 ! store the date for later
-                 TempArgs=InArgs
-                 TempArgsNum=CurArgs
-
-                 ! write the GLHE:System object
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 OutArgs(1:4)=TempArgs(1:4) ! no change
-                 OutArgs(5)='Site:GroundTemperature:Undisturbed:KusudaAchenbach'
-                 OutArgs(6)=TRIM(TempArgs(1)) // TRIM(' Ground Temps')
-                 OutArgs(7:8)=TempArgs(8:9)
-                 OutArgs(9)=TRIM(TempArgs(1)) // TRIM(' Response Factors')
-                 CurArgs=9
-                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
-
-                 ! write the GLHE:Props object
-                 ObjectName='GroundHeatExchanger:Vertical:Properties'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 OutArgs(1)=TRIM(TempArgs(1)) // TRIM(' Properties')
-                 OutArgs(2)='1'
-                 OutArgs(3)=TempArgs(6)
-                 !OutArgs(4)=TempArgs(7)
-                 READ(TempArgs(7), *) GLHETempVal
-                 WRITE(OutArgs(4), *) GLHETempVal * 2
-                 OutArgs(5)=TempArgs(11)
-                 OutArgs(6)='3.90E+06'
-                 OutArgs(7)=TempArgs(12)
-                 OutArgs(8)='1.77E+06'
-                 OutArgs(9)=TempArgs(13)
-                 OutArgs(10)=TempArgs(15)
-                 OutArgs(11)=TempArgs(14)
-                 CurArgs=11
-                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
-
-                 ! write the ground temps object
-                 ObjectName='Site:GroundTemperature:Undisturbed:KusudaAchenbach'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 OutArgs(1)=TRIM(TempArgs(1)) // TRIM(' Ground Temps')
-                 OutArgs(2)=TempArgs(8)
-                 OutArgs(3)='920'
-                 GLHETempVal = 0.0
-                 READ(TempArgs(9), *) GLHETempVal
-                 WRITE(OutArgs(4), *) GLHETempVal / 920
-                 OutArgs(5)=TempArgs(10)
-                 OutArgs(6)='3.2'
-                 OutArgs(7)='8'
-                 CurArgs=7
-                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
-
-                 ObjectName='GroundHeatExchanger:ResponseFactors'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 OutArgs(1)=TRIM(TempArgs(1)) // TRIM(' Response Factors')
-                 OutArgs(2)=TRIM(TempArgs(1)) // TRIM(' Properties')
-                 OutArgs(3)=TempArgs(5)
-                 OutArgs(4)=TempArgs(17)
-                 CurArgs=4
-                 I = 0
-                 DO WHILE (.TRUE.)
-                   I = I + 1
-                   CurField = 2*(I-1) + 19
-                   IF (CurField > TempArgsNum) EXIT
-                   OutArgs(CurArgs + 1)=TempArgs(CurField)
-                   OutArgs(CurArgs + 2)=TempArgs(CurField + 1)
-                   CurArgs=CurArgs + 2
-                 END DO
-
-                 CALL WriteOutIDFLines(DifLfn,ObjectName,CurArgs,OutArgs,NwFldNames,NwFldUnits)
-
-                 ! already written
-                 Written = .true.
+              ! If your original object starts with B, insert the rules here
 
              CASE('BOILER:HOTWATER')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF ( (CurArgs .GE. 15) .AND. SameString( InArgs(15), 'VariableFlow' ) ) THEN
-                   OutArgs(15) = 'LeavingSetpointModulated'
+                 IF (CurArgs .GE. 2) THEN
+                   CALL FixFuelTypes(OutArgs(2))
                  END IF
 
-               CASE('BRANCH')
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 nodiff=.true.
-                 ! replace GLHE object type name
-                 ! object types are on fields: 3, 7, 11, 15, ...
-                 I = 0
-                 DO WHILE (.TRUE.)
-                   I = I + 1
-                   CurField = 4*(I-1) + 3
-                   IF ( CurField > CurArgs ) EXIT
-                   IF ( SameString( InArgs(CurField), "GroundHeatExchanger:Vertical" ) ) THEN
-                     OutArgs(CurField) = "GroundHeatExchanger:System"
-                   END IF
-                 END DO
-
-             CASE('CHILLER:ELECTRIC:EIR')
+             CASE('BOILER:STEAM')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF ( (CurArgs .GE. 23) .AND. SameString( InArgs(23), 'VariableFlow' ) ) THEN
-                   OutArgs(23) = 'LeavingSetpointModulated'
+                 IF (CurArgs .GE. 2) THEN
+                   CALL FixFuelTypes(OutArgs(2))
                  END IF
 
-             CASE('CHILLER:ELECTRIC:REFORMULATEDEIR')
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF ( (CurArgs .GE. 22) .AND. SameString( InArgs(22), 'VariableFlow' ) ) THEN
-                   OutArgs(22) = 'LeavingSetpointModulated'
-                 END IF
-
-             CASE('CHILLER:ELECTRIC')
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF ( (CurArgs .GE. 27) .AND. SameString( InArgs(27), 'VariableFlow' ) ) THEN
-                   OutArgs(27) = 'LeavingSetpointModulated'
-                 END IF
-
-             CASE('CHILLER:ABSORPTION:INDIRECT')
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF ( (CurArgs .GE. 16) .AND. SameString( InArgs(16), 'VariableFlow' ) ) THEN
-                   OutArgs(16) = 'LeavingSetpointModulated'
-                 END IF
-
-             CASE('CHILLER:ABSORPTION')
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF ( (CurArgs .GE. 23) .AND. SameString( InArgs(23), 'VariableFlow' ) ) THEN
-                   OutArgs(23) = 'LeavingSetpointModulated'
-                 END IF
-
-             CASE('CHILLER:CONSTANTCOP')
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF ( (CurArgs .GE. 11) .AND. SameString( InArgs(11), 'VariableFlow' ) ) THEN
-                   OutArgs(11) = 'LeavingSetpointModulated'
-                 END IF
+              ! If your original object starts with C, insert the rules here
 
              CASE('CHILLER:ENGINEDRIVEN')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF ( (CurArgs .GE. 41) .AND. SameString( InArgs(41), 'VariableFlow' ) ) THEN
-                   OutArgs(41) = 'LeavingSetpointModulated'
+                 IF (CurArgs .GE. 36) THEN
+                   CALL FixFuelTypes(OutArgs(36))
                  END IF
 
              CASE('CHILLER:COMBUSTIONTURBINE')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF ( (CurArgs .GE. 54) .AND. (SameString( InArgs(54), 'VariableFlow' )) ) THEN
-                   OutArgs(54) = 'LeavingSetpointModulated'
+                 IF (CurArgs .GE. 55) THEN
+                   CALL FixFuelTypes(OutArgs(55))
                  END IF
 
-               CASE('CONDENSEREQUIPMENTLIST')
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 nodiff=.true.
-                 ! replace GLHE object type name
-                 ! object types are on fields: 2, 4, 6, 8, ...
-                 I = 0
-                 DO WHILE (.TRUE.)
-                   I = I + 1
-                   CurField = 2*(I-1) + 2
-                   IF ( CurField > CurArgs ) EXIT
-                   IF ( SameString( InArgs(CurField), "GroundHeatExchanger:Vertical" ) ) THEN
-                     OutArgs(CurField) = "GroundHeatExchanger:System"
-                   END IF
-                 END DO
-
-             CASE('ELECTRICEQUIPMENT:ITE:AIRCOOLED')
+             CASE('CHILLERHEATER:ABSORPTION:DIRECTFIRED')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
-                 OutArgs(1:2)=InArgs(1:2)
-                 OutArgs(3) = 'FlowFromSystem'
-                 OutArgs(4:CurArgs+1)=InArgs(3:CurArgs)
-                 CurArgs = CurArgs + 1
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (CurArgs .GE. 33) THEN
+                   CALL FixFuelTypes(OutArgs(33))
+                 END IF
 
-             CASE('HEATBALANCEALGORITHM')
+              ! If your original object starts with D, insert the rules here
+
+              ! If your original object starts with E, insert the rules here
+
+              ! If your original object starts with F, insert the rules here
+
+             CASE('FUELFACTORS')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 1) THEN
-                   IF (SameString( InArgs(1), 'Default' )) THEN
-                     OutArgs(1) = 'ConductionTransferFunction'
-                   ELSE IF (SameString( InArgs(1), 'CTF' )) THEN
-                     OutArgs(1) = 'ConductionTransferFunction'
-                   ELSE IF (SameString( InArgs(1), 'EMPD' )) THEN
-                     OutArgs(1) = 'MoisturePenetrationDepthConductionTransferFunction'
-                   ELSE IF (SameString( InArgs(1), 'CondFD' )) THEN
-                     OutArgs(1) = 'ConductionFiniteDifference'
-                   ELSE IF (SameString( InArgs(1), 'CONDUCTIONFINITEDIFFERENCEDETAILED' )) THEN
-                     OutArgs(1) = 'ConductionFiniteDifference'
-                   ELSE IF (SameString( InArgs(1), 'HAMT' )) THEN
-                     OutArgs(1) = 'CombinedHeatAndMoistureFiniteElement'
-                   END IF
+                   CALL FixFuelTypes(OutArgs(1))
+                   ! For fuelfactors, the current IDD choice is Propane, so override that here until #5941 is resolved (standardize fuel types)
+                   IF (SameString(OutArgs(1), "PropaneGas")) OutArgs(1) = "Propane"
                  END IF
 
-             CASE('OUTPUT:CONSTRUCTIONS')
+              ! If your original object starts with G, insert the rules here
+
+             CASE('GENERATOR:COMBUSTIONTURBINE')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF (CurArgs .GE. 1) THEN
-                   IF (SameString( InArgs(1)(1:3), 'Con' )) THEN
-                     OutArgs(1) = 'Constructions'
-                   ELSE IF (SameString( InArgs(1)(1:3), 'Mat' )) THEN
-                     OutArgs(1) = 'Materials'
-                   END IF
-                 END IF
-                 IF (CurArgs .GE. 2) THEN
-                   IF (SameString( InArgs(2)(1:3), 'Con' )) THEN
-                     OutArgs(2) = 'Constructions'
-                   ELSE IF (SameString( InArgs(2)(1:3), 'Mat' )) THEN
-                     OutArgs(2) = 'Materials'
-                   END IF
+                 IF (CurArgs .GE. 21) THEN
+                   CALL FixFuelTypes(OutArgs(21))
                  END IF
 
-             CASE('SCHEDULE:DAY:INTERVAL')
-                 ObjectName='Schedule:Day:Interval'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs=InArgs
-                 IF (SameString(InArgs(3), 'YES')) THEN
-                   OutArgs(3) = 'Average'
-                 ENDIF
-
-             CASE('SCHEDULE:DAY:LIST')
-                 ObjectName='Schedule:Day:List'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs=InArgs
-                 IF (SameString(InArgs(3), 'YES')) THEN
-                   OutArgs(3) = 'Average'
-                 ENDIF
-
-             CASE('SCHEDULE:COMPACT')
-                 ObjectName='Schedule:Compact'
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs=InArgs
-                 DO Arg=3,CurArgs
-                    UpperInArg = MakeUpperCase(InArgs(Arg))
-                    IF ( ( INDEX(UpperInArg,"INTERPOLATE") .GT. 0 ).AND. (INDEX(UpperInArg,"YES") .GT. 0 ) ) THEN
-                      OutArgs(Arg) = "Interpolate:Average"
-                    ENDIF
-                 ENDDO
-
-             CASE('SIZINGPERIOD:DESIGNDAY')
+             CASE('GENERATOR:INTERNALCOMBUSTIONENGINE')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF (CurArgs .GE. 18) THEN
-                   IF (SameString( InArgs(18), '0' )) THEN
-                     OutArgs(18) = 'No'
-                   ELSE IF (SameString( InArgs(18), '1' )) THEN
-                     OutArgs(18) = 'Yes'
-                   END IF
-                 END IF
-                 IF (CurArgs .GE. 19) THEN
-                   IF (SameString( InArgs(19), '0' )) THEN
-                     OutArgs(19) = 'No'
-                   ELSE IF (SameString( InArgs(19), '1' )) THEN
-                     OutArgs(19) = 'Yes'
-                   END IF
-                 END IF
                  IF (CurArgs .GE. 20) THEN
-                   IF (SameString( InArgs(20), '0' )) THEN
-                     OutArgs(20) = 'No'
-                   ELSE IF (SameString( InArgs(20), '1' )) THEN
-                     OutArgs(20) = 'Yes'
-                   END IF
+                   CALL FixFuelTypes(OutArgs(20))
                  END IF
 
-             CASE('GENERATOR:WINDTURBINE')
-                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                 nodiff=.false.
-                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF (CurArgs .GE. 3) THEN
-                   IF (SameString( InArgs(3), 'HAWT' )) THEN
-                     OutArgs(3) = 'HorizontalAxisWindTurbine'
-                   ELSE IF (SameString( InArgs(3), 'None' )) THEN
-                     OutArgs(3) = 'HorizontalAxisWindTurbine'
-                   ELSE IF (SameString( InArgs(3), 'VAWT' )) THEN
-                     OutArgs(3) = 'VerticalAxisWindTurbine'
-                   END IF
-                 END IF
-                 IF (CurArgs .GE. 4) THEN
-                   IF (SameString( InArgs(4), 'FSFP' )) THEN
-                     OutArgs(4) = 'FixedSpeedFixedPitch'
-                   ELSE IF (SameString( InArgs(4), 'FSVP' )) THEN
-                     OutArgs(4) = 'FixedSpeedVariablePitch'
-                   ELSE IF (SameString( InArgs(4), 'VSFP' )) THEN
-                     OutArgs(4) = 'VariableSpeedFixedPitch'
-                   ELSE IF (SameString( InArgs(4), 'VSVP' )) THEN
-                     OutArgs(4) = 'VariableSpeedVariablePitch'
-                   ELSE IF (SameString( InArgs(4), 'None' )) THEN
-                     OutArgs(4) = 'VariableSpeedVariablePitch'
-                   END IF
-                 END IF
-
-             CASE('ZONE')
+             CASE('GENERATOR:MICROTURBINE')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 12) THEN
-                   IF (SameString( InArgs(12), 'DOE2' )) THEN
-                     OutArgs(12) = 'DOE-2'
-                   END IF
+                   CALL FixFuelTypes(OutArgs(12))
                  END IF
 
-             CASE('ZONEAIRHEATBALANCEALGORITHM')
+             CASE('GLOBALGEOMETRYRULES')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF (CurArgs .GE. 1) THEN
-                   IF (SameString( InArgs(1), '3RDORDERBACKWARDDIFFERENCE' )) THEN
-                     OutArgs(1) = 'ThirdOrderBackwardDifference'
+                   IF (SameString( InArgs(1), 'ULC' )) THEN
+                     OutArgs(1) = 'UpperLeftCorner'
+                   ELSE IF (SameString( InArgs(1), 'LLC' )) THEN
+                     OutArgs(1) = 'LowerLeftCorner'
+                   ELSE IF (SameString( InArgs(1), 'LRC' )) THEN
+                     OutArgs(1) = 'LowerRightCorner'
+                   ELSE IF (SameString( InArgs(1), 'URC' )) THEN
+                     OutArgs(1) = 'UpperRightCorner'
                    END IF
                  END IF
+                 IF (CurArgs .GE. 2) THEN
+                   IF (SameString( InArgs(2), 'CCW' )) THEN
+                     OutArgs(2) = 'Counterclockwise'
+                   ELSE IF (SameString( InArgs(2), 'CW' )) THEN
+                     OutArgs(2) = 'Clockwise'
+                   END IF
+                 END IF
+                 IF (CurArgs .GE. 3) THEN
+                   IF (SameString( InArgs(3), 'WCS' )) THEN
+                     OutArgs(3) = 'World'
+                   ELSE IF (SameString( InArgs(3), 'WorldCoordinateSystem' )) THEN
+                     OutArgs(3) = 'World'
+                   ELSE IF (SameString( InArgs(3), 'Local' )) THEN
+                     OutArgs(3) = 'Relative'
+                   ELSE IF (SameString( InArgs(3)(1:3), 'Rel' )) THEN
+                     OutArgs(3) = 'Relative'
+                   END IF
+                 END IF
+                 IF (CurArgs .GE. 4) THEN
+                   IF (SameString( InArgs(4), 'WCS' )) THEN
+                     OutArgs(4) = 'World'
+                   ELSE IF (SameString( InArgs(4), 'WorldCoordinateSystem' )) THEN
+                     OutArgs(4) = 'World'
+                   ELSE IF (SameString( InArgs(4), 'Local' )) THEN
+                     OutArgs(4) = 'Relative'
+                   ELSE IF (SameString( InArgs(4)(1:3), 'Rel' )) THEN
+                     OutArgs(4) = 'Relative'
+                   END IF
+                 END IF
+                 IF (CurArgs .GE. 5) THEN
+                   IF (SameString( InArgs(5), 'WCS' )) THEN
+                     OutArgs(5) = 'World'
+                   ELSE IF (SameString( InArgs(5), 'WorldCoordinateSystem' )) THEN
+                     OutArgs(5) = 'World'
+                   ELSE IF (SameString( InArgs(5), 'Local' )) THEN
+                     OutArgs(5) = 'Relative'
+                   ELSE IF (SameString( InArgs(5)(1:3), 'Rel' )) THEN
+                     OutArgs(5) = 'Relative'
+                   END IF
+                 END IF
+
+              ! If your original object starts with H, insert the rules here
+
+              ! If your original object starts with I, insert the rules here
+
+              ! If your original object starts with L, insert the rules here
+
+             CASE('LIFECYCLECOST:USEPRICEESCALATION')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (CurArgs .GE. 2) THEN
+                   CALL FixFuelTypes(OutArgs(2))
+                 END IF
+
+              ! If your original object starts with M, insert the rules here
+
+              ! If your original object starts with N, insert the rules here
+
+              ! If your original object starts with O, insert the rules here
+
+             CASE('OUTPUT:TABLE:SUMMARYREPORTS')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 DO TempArgsNum=1,CurArgs,1
+                   IF (SameString(InArgs(TempArgsNum), 'ABUPS' )) THEN
+                     OutArgs(TempArgsNum) = 'AnnualBuildingUtilityPerformanceSummary'
+                   ELSE IF (SameString(InArgs(TempArgsNum), 'BEPS' )) THEN
+                     OutArgs(TempArgsNum) = 'AnnualBuildingUtilityPerformanceSummary'
+                   ELSE IF (SameString(InArgs(TempArgsNum), 'IVRS' )) THEN
+                     OutArgs(TempArgsNum) = 'InputVerificationandResultsSummary'
+                   ELSE IF (SameString(InArgs(TempArgsNum), 'CSS' )) THEN
+                     OutArgs(TempArgsNum) = 'ComponentSizingSummary'
+                   ELSE IF (SameString(InArgs(TempArgsNum), 'SHAD' )) THEN
+                     OutArgs(TempArgsNum) = 'SurfaceShadowingSummary'
+                   ELSE IF (SameString(InArgs(TempArgsNum), 'EIO' )) THEN
+                     OutArgs(TempArgsNum) = 'InitializationSummary'
+                   END IF
+                 END DO
+
+              ! If your original object starts with P, insert the rules here
+
+              ! If your original object starts with R, insert the rules here
+
+              ! If your original object starts with U, insert the rules here
+
+              ! If your original object starts with V, insert the rules here
+
+              ! If your original object starts with W, insert the rules here
+
+             CASE('WATERHEATER:MIXED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (CurArgs .GE. 11) THEN
+                   CALL FixFuelTypes(OutArgs(11))
+                 END IF
+                 IF (CurArgs .GE. 15) THEN
+                   CALL FixFuelTypes(OutArgs(15))
+                 END IF
+                 IF (CurArgs .GE. 18) THEN
+                   CALL FixFuelTypes(OutArgs(18))
+                 END IF
+
+             CASE('WATERHEATER:STRATIFIED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (CurArgs .GE. 17) THEN
+                   CALL FixFuelTypes(OutArgs(17))
+                 END IF
+                 IF (CurArgs .GE. 20) THEN
+                   CALL FixFuelTypes(OutArgs(20))
+                 END IF
+                 IF (CurArgs .GE. 24) THEN
+                   CALL FixFuelTypes(OutArgs(24))
+                 END IF
+
+              ! If your original object starts with Z, insert the rules here
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
@@ -1198,6 +1113,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
           ENDDO  ! IDFRecords
 
+          CALL DisplayString('Processing IDF -- Processing idf objects complete.')
           IF (IDFRecords(NumIDFRecords)%CommtE /= CurComment) THEN
             DO xcount=IDFRecords(NumIDFRecords)%CommtE+1,CurComment
               WRITE(DifLfn,fmta) TRIM(Comments(xcount))
@@ -1275,3 +1191,38 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   RETURN
 
 END SUBROUTINE CreateNewIDFUsingRules
+
+SUBROUTINE FixFuelTypes(InOutArg)
+  USE InputProcessor, ONLY: SameString
+  CHARACTER(len=*), INTENT(INOUT) :: InOutArg
+      
+  IF (SameString( InOutArg, 'Electric' )) THEN
+    InOutArg = 'Electricity'
+  ELSE IF (SameString( InOutArg, 'Elec' )) THEN
+    InOutArg = 'Electricity'
+  ELSE IF (SameString( InOutArg, 'Gas' )) THEN
+    InOutArg = 'NaturalGas'
+  ELSE IF (SameString( InOutArg, 'Natural Gas' )) THEN
+    InOutArg = 'NaturalGas'
+  ELSE IF (SameString( InOutArg, 'Propane' )) THEN
+    InOutArg = 'PropaneGas'
+  ELSE IF (SameString( InOutArg, 'LPG' )) THEN
+    InOutArg = 'PropaneGas'
+  ELSE IF (SameString( InOutArg, 'Propane Gas' )) THEN
+    InOutArg = 'PropaneGas'
+  ELSE IF (SameString( InOutArg, 'FUEL OIL #1' )) THEN
+    InOutArg = 'FuelOil#1'
+  ELSE IF (SameString( InOutArg, 'FUEL OIL' )) THEN
+    InOutArg = 'FuelOil#1'
+  ELSE IF (SameString( InOutArg, 'DISTILLATE OIL' )) THEN
+    InOutArg = 'FuelOil#1'
+  ELSE IF (SameString( InOutArg, 'DISTILLATEOIL' )) THEN
+    InOutArg = 'FuelOil#1'
+  ELSE IF (SameString( InOutArg, 'FUEL OIL #2' )) THEN
+    InOutArg = 'FuelOil#2'
+  ELSE IF (SameString( InOutArg, 'RESIDUAL OIL' )) THEN
+    InOutArg = 'FuelOil#2'
+  ELSE IF (SameString( InOutArg, 'RESIDUALOIL' )) THEN
+    InOutArg = 'FuelOil#2'
+  END IF
+END SUBROUTINE
