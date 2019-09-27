@@ -3652,15 +3652,15 @@ namespace General {
                                               lAlphaFieldBlanks,
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
-                if (has_prefix(cAlphaArgs(1), "CONSTRUCT")) {
+                if (UtilityRoutines::SameString(cAlphaArgs(1), "CONSTRUCTIONS")) {
                     Constructions = true;
-                } else if (has_prefix(cAlphaArgs(1), "MAT")) {
+                } else if (UtilityRoutines::SameString(cAlphaArgs(1), "MATERIALS")) {
                     Materials = true;
                 }
                 if (NumNames > 1) {
-                    if (has_prefix(cAlphaArgs(2), "CONSTRUCT")) {
+                    if (UtilityRoutines::SameString(cAlphaArgs(2), "CONSTRUCTIONS")) {
                         Constructions = true;
-                    } else if (has_prefix(cAlphaArgs(2), "MAT")) {
+                    } else if (UtilityRoutines::SameString(cAlphaArgs(2), "MATERIALS")) {
                         Materials = true;
                     }
                 }

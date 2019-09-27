@@ -397,11 +397,6 @@ namespace Boilers {
 
             if (DataIPShortCuts::cAlphaArgs(7) == "CONSTANTFLOW") {
                 Boiler(BoilerNum).FlowMode = ConstantFlow;
-            } else if (DataIPShortCuts::cAlphaArgs(7) == "VARIABLEFLOW") { // backward compatible, clean out eventually
-                Boiler(BoilerNum).FlowMode = LeavingSetPointModulated;
-                ShowWarningError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
-                ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + DataIPShortCuts::cAlphaArgs(7));
-                ShowContinueError("Key choice is now called \"LeavingSetpointModulated\" and the simulation continues");
             } else if (DataIPShortCuts::cAlphaArgs(7) == "LEAVINGSETPOINTMODULATED") {
                 Boiler(BoilerNum).FlowMode = LeavingSetPointModulated;
             } else if (DataIPShortCuts::cAlphaArgs(7) == "NOTMODULATED") {
