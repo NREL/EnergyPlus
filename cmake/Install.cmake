@@ -288,7 +288,7 @@ INSTALL( DIRECTORY testfiles/ DESTINATION ExampleFiles/
 # These files names are stored in variables because they also appear as start menu shortcuts later.
 set( RULES_XLS Rules9-1-0-to-9-2-0.md )
 install(FILES "${CMAKE_SOURCE_DIR}/release/Bugreprt.txt" DESTINATION "./")
-install(FILES "${CMAKE_SOURCE_DIR}/release/ep.gif" DESTINATION "./")
+install(FILES "${CMAKE_SOURCE_DIR}/release/favicon.png" DESTINATION "./")
 install(FILES "${CMAKE_SOURCE_DIR}/release/readme.html" DESTINATION "./")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/release/readme.html")
 
