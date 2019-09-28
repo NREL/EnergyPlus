@@ -2504,14 +2504,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestReportIntMovInsInsideSurfTemp)
 {
-    
+
     Real64 ExpectedResult1;
     Real64 ExpectedResult2;
     Real64 ExpectedResult3;
 
     DataSurfaces::clear_state();
     DataHeatBalSurface::clear_state();
-    
+
     DataSurfaces::TotSurfaces = 3;
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataHeatBalSurface::TempSurfIn.allocate(DataSurfaces::TotSurfaces);
@@ -2519,35 +2519,60 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestReportIntMovInsInsideSur
     DataHeatBalSurface::TempSurfInMovInsRep.allocate(DataSurfaces::TotSurfaces);
 
     // Test 1 Data: Surface does NOT have movable insulation
-    DataSurfaces::Surface(1).MaterialMovInsulInt = 0;   // No material means no movable insulation
-    DataSurfaces::Surface(1).SchedMovInsulInt = 0;      // Schedule index of zero returns zero value (not scheduled)
+    DataSurfaces::Surface(1).MaterialMovInsulInt = 0; // No material means no movable insulation
+    DataSurfaces::Surface(1).SchedMovInsulInt = 0;    // Schedule index of zero returns zero value (not scheduled)
     DataHeatBalSurface::TempSurfIn(1) = 23.0;
     DataHeatBalSurface::TempSurfInTmp(1) = 12.3;
     DataHeatBalSurface::TempSurfInMovInsRep(1) = 1.23;
-    ExpectedResult1 = 23.0;                             // TempSurfInMovInsRep should be set to TempSurfIn
-    
+    ExpectedResult1 = 23.0; // TempSurfInMovInsRep should be set to TempSurfIn
+
     // Test 2 Data: Surface does have movable insulation but it is scheduled OFF
-    DataSurfaces::Surface(2).MaterialMovInsulInt = 1;   // Material index present means there is movable insulation
-    DataSurfaces::Surface(2).SchedMovInsulInt = 0;      // Schedule index of zero returns zero value (not scheduled)
+    DataSurfaces::Surface(2).MaterialMovInsulInt = 1; // Material index present means there is movable insulation
+    DataSurfaces::Surface(2).SchedMovInsulInt = 0;    // Schedule index of zero returns zero value (not scheduled)
     DataHeatBalSurface::TempSurfIn(2) = 123.0;
     DataHeatBalSurface::TempSurfInTmp(2) = 12.3;
     DataHeatBalSurface::TempSurfInMovInsRep(2) = 1.23;
-    ExpectedResult2 = 123.0;                             // TempSurfInMovInsRep should be set to TempSurfIn
-    
+    ExpectedResult2 = 123.0; // TempSurfInMovInsRep should be set to TempSurfIn
+
     // Test 3 Data: Surface does have movable insulation and it is scheduled ON
-    DataSurfaces::Surface(3).MaterialMovInsulInt = 1;   // Material index present means there is movable insulation
-    DataSurfaces::Surface(3).SchedMovInsulInt = -1;     // Schedule index of -1 returns 1.0 value
+    DataSurfaces::Surface(3).MaterialMovInsulInt = 1; // Material index present means there is movable insulation
+    DataSurfaces::Surface(3).SchedMovInsulInt = -1;   // Schedule index of -1 returns 1.0 value
     DataHeatBalSurface::TempSurfIn(3) = 12.3;
     DataHeatBalSurface::TempSurfInTmp(3) = 1.23;
     DataHeatBalSurface::TempSurfInMovInsRep(3) = -9999.9;
-    ExpectedResult3 = 1.23;                             // TempSurfInMovInsRep should be set to TempSurfInTmp
+    ExpectedResult3 = 1.23; // TempSurfInMovInsRep should be set to TempSurfInTmp
 
     // Now call the subroutine which will run all of the test cases at once and then make the comparisons
     HeatBalanceSurfaceManager::ReportIntMovInsInsideSurfTemp();
-    EXPECT_NEAR(DataHeatBalSurface::TempSurfInMovInsRep(1),ExpectedResult1,0.00001);
-    EXPECT_NEAR(DataHeatBalSurface::TempSurfInMovInsRep(2),ExpectedResult2,0.00001);
-    EXPECT_NEAR(DataHeatBalSurface::TempSurfInMovInsRep(3),ExpectedResult3,0.00001);
-    
+    EXPECT_NEAR(DataHeatBalSurface::TempSurfInMovInsRep(1), ExpectedResult1, 0.00001);
+    EXPECT_NEAR(DataHeatBalSurface::TempSurfInMovInsRep(2), ExpectedResult2, 0.00001);
+    EXPECT_NEAR(DataHeatBalSurface::TempSurfInMovInsRep(3), ExpectedResult3, 0.00001);
 }
-    
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_OutsideSurfHeatBalanceWhenRainFlag)
+{
+    DataSurfaces::Surface.allocate(1);
+    DataHeatBalSurface::HcExtSurf.allocate(1);
+    DataHeatBalSurface::TH.allocate(1, 1, 1);
+
+    DataSurfaces::Surface(1).Area = 58.197;
+    DataHeatBalSurface::HcExtSurf(1) = 1000;
+    DataHeatBalSurface::TH(1, 1, 1) = 6.71793958923051;
+    DataSurfaces::Surface(1).OutWetBulbTemp = 6.66143784594778;
+    DataSurfaces::Surface(1).OutDryBulbTemp = 7.2;
+   
+    // If Rain Flag = on, GetQdotConvOutRep uses Outdoor Air Wet Bulb Temp.
+    DataEnvironment::IsRain = true;
+    Real64 ExpectedQconvPerArea1 = -1000 * (6.71793958923051 - 6.66143784594778);
+
+    EXPECT_NEAR(ExpectedQconvPerArea1, GetQdotConvOutRepPerArea(1), 0.01);
+
+    // Otherwise, GetQdotConvOutRep uses Outdoor Air Dry Bulb Temp.
+    DataEnvironment::IsRain = false;
+    DataHeatBalSurface::HcExtSurf(1) = 5.65361106051348;
+    Real64 ExpectedQconvPerArea2 = -5.65361106051348 * (6.71793958923051 - 7.2);
+
+    EXPECT_NEAR(ExpectedQconvPerArea2, GetQdotConvOutRepPerArea(1), 0.01);
+}
+
 } // namespace EnergyPlus
