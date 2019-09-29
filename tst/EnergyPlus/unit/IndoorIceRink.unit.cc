@@ -154,21 +154,23 @@ TEST_F(EnergyPlusFixture, IndoorIceRink_IndirectSysHXEffectTest)
     TubeDiameter = 0.1;
     SysNum = 1;
 
-    // Test 1: Cooling for Indirect Refrigeration System with CaCl2
+    // Test 1: Cooling for Indirect Refrigeration System with Calcium Chloride solution
+    HXEffectFuncResult = 0.0;
+    Temperature = -9.5;
+    RefrigType = 1;
+    Concentration = 25.00;
+
+    HXEffectFuncResult = CalcIRinkHXEffectTerm(Temperature, SysNum, RefrigMassFlow, TubeLength, TubeDiameter, RefrigType, Concentration);
+    EXPECT_NEAR(HXEffectFuncResult, 54.471, 0.01);
+
+    // Test 2: Cooling for Indirect Refrigeration System with Ethylene Glycol solution
     HXEffectFuncResult = 0.0;
     Temperature = -9.5;
     RefrigType = 2;
-    Concentration = 10.00;
-
-   // HXEffectFuncResult = CalcIRinkHXEffectTerm(Temperature, SysNum, RefrigMassFlow, TubeLength, TubeDiameter, RefrigType, Concentration);
-   // EXPECT_NEAR(HXEffectFuncResult, 9517.5375, 0.001);
-
-    // Test 2: Cooling for Indirect Refrigeration System with EG
-    //HXEffectFuncResult = 0.0;
-    //RefrigType = 2;
-
+    Concentration = 25.00;
+    
     HXEffectFuncResult = CalcIRinkHXEffectTerm(Temperature, SysNum, RefrigMassFlow, TubeLength, TubeDiameter, RefrigType, Concentration);
-    EXPECT_NEAR(HXEffectFuncResult, 53.89, 0.01);
+    EXPECT_NEAR(HXEffectFuncResult, 48.7575, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, IndoorIceRink_BOTC)
