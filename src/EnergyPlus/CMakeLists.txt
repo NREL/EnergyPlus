@@ -17,6 +17,10 @@ SET( SRC
   "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.h"
   "${CMAKE_SOURCE_DIR}/third_party/milo/diyfp.h"
   "${CMAKE_SOURCE_DIR}/third_party/milo/ieee754.h"
+  api/wallwrapper.h
+  api/wallwrapper.cc
+  api/wall.hh
+  api/wall.cc
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
   AirLoopHVACDOAS.cc
@@ -715,3 +719,11 @@ if(UNIX AND NOT APPLE)
   COMMAND ${CMAKE_COMMAND} -E create_symlink energyplus EnergyPlus
   COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${CMAKE_BINARY_DIR}/Products/EnergyPlus")
 endif()
+
+# API Stuff
+# Functional API test
+add_executable( TestAPI_Functional_Cpp api/TestFunctional.cc )
+target_link_libraries( TestAPI_Functional_Cpp energyplusapi )
+
+add_executable( TestAPI_Functional_C api/TestFunctional.c )
+target_link_libraries( TestAPI_Functional_C energyplusapi )
