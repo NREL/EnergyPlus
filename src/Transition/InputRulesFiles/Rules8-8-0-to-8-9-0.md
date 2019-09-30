@@ -168,6 +168,26 @@ a) change "Construc\*" to "Constructions"
 
 b) change "Mat\*" to "Materials"
 
+# Object Change: Fuel type synonyms
+For Boiler:Steam, WaterHeater:\* , Generator:\* , FuelFactors, ChillerHeater:Absorption:DirectFired, AirConditioner:VariableRefrigerantFlow,
+LifeCycleCost:UsePriceEscalation and other objects with a fuel type field
+
+Field: Fuel Type (or similar)
+
+
+a) change "Gas" or "Natural Gas" to "NaturalGas"
+
+b) change "Electric" or "Elec" to "Electricity"
+
+c) change "Fuel Oil #1" or "Fuel Oil" or "Distillate Oil" to "FuelOil#1"
+
+d) change "Fuel Oil #2" or "Residual Oil" to "FuelOil#2"
+
+e) change "Propane" or "LPG" or "Propane Gas" to "PropaneGas"
+
+*Note for some objects, these synonyms for fuel types remained valid thru v9.2 due to modifications to the JSON schema, this includes: FuelFactors, AirConditioner:VariableRefrigerantFlow, 
+WaterHeater:Mixed (Heater Fuel Type only), and Boiler:HotWater. So these transition rules appear again for v9.3 along with additional rules to standardize fule types across all objects.*
+
 # Object Change: GroundHeatExchanger:Vertical
 
 Old GroundHeatExchanger:Vertical becomes four new objects:
