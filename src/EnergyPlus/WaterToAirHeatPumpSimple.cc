@@ -1889,6 +1889,7 @@ namespace WaterToAirHeatPumpSimple {
             if (SimpleWatertoAirHP(HPNum).RatedCapHeat == AutoSize && SimpleWatertoAirHP(HPNum).WatertoAirHPType == "HEATING") {
                 IsAutoSize = true;
             }
+            if (SizingDesRunThisAirSys || SizingDesRunThisZone) HardSizeNoDesRun = false;
             //   simply set heating capacity equal to the cooling capacity
             if (SimpleWatertoAirHP(HPNum).WatertoAirHPType == "HEATING") {
                 RatedCapHeatDes = DXCoolCap;
@@ -1936,6 +1937,14 @@ namespace WaterToAirHeatPumpSimple {
                             ShowContinueError("This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
                         }
+                    }
+                } else {
+                    if (SimpleWatertoAirHP(HPNum).RatedCapHeat > 0.0) {
+                        RatedCapHeatUser = SimpleWatertoAirHP(HPNum).RatedCapHeat;
+                        ReportSizingOutput("COIL:" + SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
+                                           SimpleWatertoAirHP(HPNum).Name,
+                                           "User-Specified Rated Heating Capacity [W]",
+                                           RatedCapHeatUser);
                     }
                 }
             }

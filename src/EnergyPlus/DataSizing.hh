@@ -92,7 +92,7 @@ namespace DataSizing {
     extern int const CondenserLoop;
     extern int const SteamLoop;
 
-    // paramters for sizing
+    // parameters for sizing
     extern int const NonCoincident;
     extern int const Coincident;
 
