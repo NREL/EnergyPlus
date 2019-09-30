@@ -373,7 +373,12 @@ namespace HeatBalanceIntRadExchange {
             }
 
             if (CarrollMethod) {
-                CarrollMRTInKTo4th = pow_4(CarrollMRTNumerator/CarrollMRTDenominator + KelvinConv);
+                if (CarrollMRTDenominator > 0.0) {
+                    CarrollMRTInKTo4th = pow_4(CarrollMRTNumerator/CarrollMRTDenominator + KelvinConv);
+                } else {
+                    // Likely only one surface in this enclosure
+                    CarrollMRTInKTo4th = 293.15;  // arbitrary value, IR will be zero
+                }
             }
 
             // These are the money loops
@@ -422,11 +427,10 @@ namespace HeatBalanceIntRadExchange {
                 // Calculate net long-wave radiation for opaque surfaces and incident
                 // long-wave radiation for windows.
                 if (CarrollMethod) {
-                    const Real64 IRfromParentZone = zone_info.Fp[RecZoneSurfNum] * (CarrollMRTInKTo4th - RecSurfTempInKTo4th);
                     if (construct.TypeIsWindow) {
-                        surface_window.IRfromParentZone += IRfromParentZone / RecSurfEmiss;
+                        surface_window.IRfromParentZone += (zone_info.Fp[RecZoneSurfNum] * CarrollMRTInKTo4th) / RecSurfEmiss;
                     }
-                    netLWRadToRecSurf += IRfromParentZone;
+                    netLWRadToRecSurf += zone_info.Fp[RecZoneSurfNum] * (CarrollMRTInKTo4th - RecSurfTempInKTo4th);
                 } else {
                     if (construct.TypeIsWindow) {          // Window
                         Real64 scriptF_acc(0.0);           // Local accumulator
