@@ -368,6 +368,7 @@ namespace OutputReportPredefined {
     extern int pdchCoilDateTimeTotIdealPeak;
     extern int pdchCoilDDnameAirFlowIdealPeak;
     extern int pdchCoilDateTimeAirFlowIdealPeak;
+    extern int pdchCoilPeakLoadTypeToSizeOn;
     extern int pdchCoilTotalCapIdealPeak;
     extern int pdchCoilSensCapIdealPeak;
     extern int pdchCoilOffRatingCapacityModifierIdealPeak;

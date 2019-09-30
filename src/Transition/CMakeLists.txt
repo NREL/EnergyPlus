@@ -136,6 +136,11 @@ endforeach()
 
 # then install all the support files
 
+install(FILES "InputRulesFiles/Rules7-2-0-to-8-0-0.xls" DESTINATION "PreProcess/IDFVersionUpdater")
+install(FILES "InputRulesFiles/Rules8-0-0-to-8-1-0.xls" DESTINATION "PreProcess/IDFVersionUpdater")
+install(FILES "InputRulesFiles/Rules8-1-0-to-8-2-0.xls" DESTINATION "PreProcess/IDFVersionUpdater")
+install(FILES "InputRulesFiles/Rules8-2-0-to-8-3-0.xls" DESTINATION "PreProcess/IDFVersionUpdater")
+install(FILES "InputRulesFiles/Rules8-3-0-to-8-4-0.xls" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "InputRulesFiles/Rules8-4-0-to-8-5-0.xls" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "InputRulesFiles/Rules8-5-0-to-8-6-0.xls" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "InputRulesFiles/Rules8-6-0-to-8-7-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
@@ -145,6 +150,7 @@ install(FILES "InputRulesFiles/Rules8-9-0-to-9-0-0.md" DESTINATION "PreProcess/I
 install(FILES "InputRulesFiles/Rules9-0-0-to-9-1-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "InputRulesFiles/Rules9-1-0-to-9-2-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 
+# output changes file first introduced with v8.5.0, so no older ones exist
 install(FILES "OutputRulesFiles/OutputChanges8-4-0-to-8-5-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "OutputRulesFiles/OutputChanges8-5-0-to-8-6-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "OutputRulesFiles/OutputChanges8-6-0-to-8-7-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
@@ -154,6 +160,11 @@ install(FILES "OutputRulesFiles/OutputChanges8-9-0-to-9-0-0.md" DESTINATION "Pre
 install(FILES "OutputRulesFiles/OutputChanges9-0-0-to-9-1-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "OutputRulesFiles/OutputChanges9-1-0-to-9-2-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 
+install(FILES "SupportFiles/Report Variables 7-2-0-006 to 8-0-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "SupportFiles/Report Variables 8-0-0-007 to 8-1-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "SupportFiles/Report Variables 8-1-0-009 to 8-2-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "SupportFiles/Report Variables 8-2-0 to 8-3-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "SupportFiles/Report Variables 8-3-0 to 8-4-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "SupportFiles/Report Variables 8-4-0 to 8-5-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "SupportFiles/Report Variables 8-5-0 to 8-6-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "SupportFiles/Report Variables 8-6-0 to 8-7-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
