@@ -99,6 +99,13 @@ namespace PlantComponentTemperatureSources {
     // Object Data
     Array1D<WaterSourceSpecs> WaterSource; // dimension to number of machines
 
+    void clear_state()
+    {
+        NumSources = 0;
+        GetInput = true;
+        WaterSource.deallocate();
+    }
+
     void SimWaterSource(std::string const &SourceName,            // user-specified name for this component
                         int const EP_UNUSED(EquipFlowCtrl),       // Flow control mode for the equipment
                         int &CompIndex,                           // HX number pointer
