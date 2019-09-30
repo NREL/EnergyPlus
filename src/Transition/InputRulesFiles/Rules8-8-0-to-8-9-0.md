@@ -168,7 +168,91 @@ a) change "Construc\*" to "Constructions"
 
 b) change "Mat\*" to "Materials"
 
-# GroundHeatExchanger:Vertical --> GroundHeatExchanger:System
-???????????????
-lots of rules
-???????????????
+# Object Change: GroundHeatExchanger:Vertical
+
+Old GroundHeatExchanger:Vertical becomes four new objects:
+GroundHeatExchanger:System
+GroundHeatExchanger:Vertical:Properties
+Site:GroundTemperature:Undisturbed:KusudaAchenbach
+GroundHeatExchanger:ResponseFactors
+
+*All OLD fields below are incoming from the original GroundHeatExchanger:Vertical object.*
+
+## 1. New GroundHeatExchanger:System object
+
+Fields F1:F4, no change (from 
+
+Insert new F5 = "Site:GroundTemperature:Undisturbed:KusudaAchenbach"
+
+New field F6 = <object-name old F1> + " Ground Temps"
+	
+New fields F7:F8 = old F8:F9
+
+New field F9 = <object-name old F1> + " Response Factors"
+
+*End of new GroundHeatExchanger:System object.*
+
+## 2. New GroundHeatExchanger:Vertical:Properties object
+
+*Old F fields are still incoming from old GroundHeatExchanger:Vertical object.*
+
+New field F1 = <object-name old F1> + " Properties"
+	
+New F2 = "1"
+
+New F3 = old F6
+
+New F4 = old F7 * 2.0
+
+New F5 = old F11
+
+New F6 = "3.90E+06"
+
+New F7 = old F12
+
+New F8 = "1.77E+06"
+
+New F9 = old F13
+
+New F10 = old F15
+
+New F11 = old F14
+
+*End of new GroundHeatExchanger:Vertical:Properties object.*
+
+## 3. New Site:GroundTemperature:Undisturbed:KusudaAchenbach object
+
+*Old F fields are still incoming from old GroundHeatExchanger:Vertical object.*
+
+New field F1 = <object-name old F1> + " Ground Temps"
+
+New F2 = old F8
+
+New F3 = 920
+
+New F4 = old F9 / 920
+
+New F5 = old F10
+
+New F6 = 3.2
+
+New F7 = 8
+
+*End of new Site:GroundTemperature:Undisturbed:KusudaAchenbach object.*
+
+## 4. New Site:GroundHeatExchanger:ResponseFactors object
+
+*Old F fields are still incoming from old GroundHeatExchanger:Vertical object.*
+
+New field F1 = <object-name old F1> + " Response Factors"
+
+New F2 = <object-name old F1> + " Properties"
+
+New F3 = old F5
+
+New F4 = old F17
+
+New F5:end = old F19:end
+
+*End of new Site:GroundHeatExchanger:ResponseFactors object.*
+
