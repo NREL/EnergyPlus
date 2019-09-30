@@ -197,8 +197,7 @@ namespace PlantComponentTemperatureSources {
         // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SourceNum;
+        // LOCAL VARIABLES:
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
@@ -218,7 +217,7 @@ namespace PlantComponentTemperatureSources {
         WaterSource.allocate(NumSources);
 
         // fill arrays
-        for (SourceNum = 1; SourceNum <= NumSources; ++SourceNum) {
+        for (int SourceNum = 1; SourceNum <= NumSources; ++SourceNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           SourceNum,
                                           cAlphaArgs,
@@ -263,8 +262,7 @@ namespace PlantComponentTemperatureSources {
                 }
             } else {
                 ShowSevereError("Input error for " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                ShowContinueError("Invalid temperature specification type.  Expected either \"Constant\" or \"Scheduled\". Encountered \"" +
-                                  cAlphaArgs(4) + "\"");
+                ShowContinueError(R"(Invalid temperature specification type.  Expected either "Constant" or "Scheduled". Encountered ")" + cAlphaArgs(4) + "\"");
                 ErrorsFound = true;
             }
         }
@@ -273,7 +271,7 @@ namespace PlantComponentTemperatureSources {
             ShowFatalError("Errors found in processing input for " + cCurrentModuleObject);
         }
 
-        for (SourceNum = 1; SourceNum <= NumSources; ++SourceNum) {
+        for (int SourceNum = 1; SourceNum <= NumSources; ++SourceNum) {
             SetupOutputVariable("Plant Temperature Source Component Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 WaterSource(SourceNum).MassFlowRate,
@@ -340,15 +338,9 @@ namespace PlantComponentTemperatureSources {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitWaterSource");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 rho; // local fluid density
-        Real64 cp;  // local specific heat
-        bool errFlag;
-
-        // Init more variables
         if (WaterSource(SourceNum).MyFlag) {
             // Locate the component on the plant loops for later usage
-            errFlag = false;
+            bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(WaterSource(SourceNum).Name,
                                     DataPlant::TypeOf_WaterSource,
                                     WaterSource(SourceNum).Location.loopNum,
@@ -370,7 +362,7 @@ namespace PlantComponentTemperatureSources {
         // Initialize critical Demand Side Variables at the beginning of each environment
         if (WaterSource(SourceNum).MyEnvironFlag && DataGlobals::BeginEnvrnFlag && (DataPlant::PlantFirstSizesOkayToFinalize)) {
 
-            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidName,
+            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidName,
                                    DataGlobals::InitConvTemp,
                                    DataPlant::PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidIndex,
                                    RoutineName);
@@ -398,7 +390,7 @@ namespace PlantComponentTemperatureSources {
         }
 
         // Calculate specific heat
-        cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidName,
+        Real64 cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidName,
                                    WaterSource(SourceNum).BoundaryTemp,
                                    DataPlant::PlantLoop(WaterSource(SourceNum).Location.loopNum).FluidIndex,
                                    RoutineName);
@@ -469,14 +461,10 @@ namespace PlantComponentTemperatureSources {
         // Obtains flow rate from the plant sizing array.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int PltSizNum(0);               // Plant Sizing index corresponding to CurLoopNum
         bool ErrorsFound(false);        // If errors detected in input
-        Real64 tmpVolFlowRate;          // local design volume flow rate
         Real64 DesVolFlowRateUser(0.0); // Hardsized design volume flow rate for reporting
-
-        tmpVolFlowRate = WaterSource(SourceNum).DesVolFlowRate;
-
-        PltSizNum = DataPlant::PlantLoop(WaterSource(SourceNum).Location.loopNum).PlantSizNum;
+        Real64 tmpVolFlowRate = WaterSource(SourceNum).DesVolFlowRate;
+        int PltSizNum = DataPlant::PlantLoop(WaterSource(SourceNum).Location.loopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
             if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
