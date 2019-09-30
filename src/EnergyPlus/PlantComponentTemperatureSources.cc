@@ -494,7 +494,6 @@ namespace PlantComponentTemperatureSources {
         // METHODOLOGY EMPLOYED:
         // Obtains flow rate from the plant sizing array.
 
-        // Using/Aliasing
         using namespace DataSizing;
         using DataPlant::PlantFinalSizesOkayToReport;
         using DataPlant::PlantFirstSizesOkayToFinalize;
@@ -597,13 +596,11 @@ namespace PlantComponentTemperatureSources {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // Using/Aliasing
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcWaterSource");
 
         if (WaterSource(SourceNum).MassFlowRate > 0.0) {

@@ -61,20 +61,13 @@ namespace EnergyPlus {
 
 namespace PlantComponentTemperatureSources {
 
-    // Data
     // MODULE PARAMETER DEFINITIONS:
     extern int const TempSpecType_Constant;
     extern int const TempSpecType_Schedule;
 
-    // MODULE DERIVED TYPE DEFINITIONS:
-
     // MODULE VARIABLES
     extern int NumSources;
     extern bool GetInput; // then TRUE, calls subroutine to read input file.
-
-    // MODULE ROUTINES
-
-    // Types
 
     struct WaterSourceSpecs
     {
@@ -83,7 +76,7 @@ namespace PlantComponentTemperatureSources {
         int InletNodeNum;                       // Node number on the inlet side of the plant
         int OutletNodeNum;                      // Node number on the outlet side of the plant
         Real64 DesVolFlowRate;                  // m**3/s - design nominal volumetric flow rate
-        bool DesVolFlowRateWasAutoSized;        // true if desing flow rate was autosized on input
+        bool DesVolFlowRateWasAutoSized;        // true if design flow rate was autosized on input
         Real64 MassFlowRateMax;                 // kg/s - design mass flow rate
         bool EMSOverrideOnMassFlowRateMax;      // if true EMS is calling to override maximum mass flow
         Real64 EMSOverrideValueMassFlowRateMax; // value to use if EMS is overriding max mass flow
@@ -117,7 +110,6 @@ namespace PlantComponentTemperatureSources {
     extern Array1D<WaterSourceSpecs> WaterSource; // dimension to number of machines
 
     // Functions
-
     void SimWaterSource(std::string const &SourceName, // user-specified name for this component
                         int const EquipFlowCtrl,       // Flow control mode for the equipment
                         int &CompIndex,                // HX number pointer
@@ -142,9 +134,6 @@ namespace PlantComponentTemperatureSources {
     void CalcWaterSource(int const SourceNum);
 
     void UpdateWaterSource(int const SourceNum);
-
-    // End of Record Keeping subroutines for the Const COP Chiller Module
-    // *****************************************************************************
 
 } // namespace PlantComponentTemperatureSources
 
