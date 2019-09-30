@@ -95,6 +95,7 @@ namespace IceRink {
         Real64 LengthRink;               // Length of ice rink
         Real64 WidthRink;                // Width of ice rink
         Real64 DepthRink;                // Depth of ice rink
+        Real64 IceThickness;             // Thickness of ice surface
         int CRefrigLoopNum;              // Cold refrigerant loop number
         int CRefrigLoopSide;
         int CRefrigBranchNum;
@@ -109,7 +110,7 @@ namespace IceRink {
         DirectRefrigSysData()
             : SchedPtr(0), ZonePtr(0), SurfacePtr(0), NumOfSurfaces(0), TubeDiameter(0.0), TubeLength(0.0), ControlType(0), RefrigVolFlowMaxCool(0.0),
               ColdRefrigInNode(0), ColdRefrigOutNode(0), ColdThrottleRange(0.0), ColdSetptSchedPtr(0), CondCtrlType(0), CondDewPtDeltaT(0.0),
-              NumCircCalcMethod(0), CircLength(0.0), GlycolIndex(0), LengthRink(0.0), WidthRink(0.0), DepthRink(0.0), CRefrigLoopSide(0),
+              NumCircCalcMethod(0), CircLength(0.0), GlycolIndex(0), LengthRink(0.0), WidthRink(0.0), DepthRink(0.0), IceThickness(0.0), CRefrigLoopSide(0),
               CRefrigBranchNum(0), CRefrigCompNum(0), RefrigMassFlowRate(0.0), CondCausedShutDown(false), CondErrIndex(0), 
               RefrigFlowMaxCool(0.0), RefrigFlowMinCool(0.0), RefOutBOTCtrlTemp(0.0)
 
@@ -157,6 +158,7 @@ namespace IceRink {
         Real64 LengthRink;               // Length of ice rink
         Real64 WidthRink;                // Width of ice rink
         Real64 DepthRink;                // Depth of ice rink
+        Real64 IceThickness;             // Thickness of ice surface
         int CRefrigLoopNum;              // Cold refrigerant loop number
         int CRefrigLoopSide;
         int CRefrigBranchNum;
@@ -172,7 +174,7 @@ namespace IceRink {
         IndirectRefrigSysData()
             : SchedPtr(0), ZonePtr(0), SurfacePtr(0), NumOfSurfaces(0), TubeDiameter(0.0), TubeLength(0.0), ControlType(0), RefrigVolFlowMaxCool(0.0),
               ColdRefrigInNode(0), ColdRefrigOutNode(0), ColdThrottleRange(0.0), ColdSetptSchedPtr(0), CondCtrlType(0), CondDewPtDeltaT(0.0),
-              NumCircCalcMethod(0), CircLength(0.0), GlycolIndex(0), LengthRink(0.0), WidthRink(0.0), DepthRink(0.0), CRefrigLoopSide(0),
+              NumCircCalcMethod(0), CircLength(0.0), GlycolIndex(0), LengthRink(0.0), WidthRink(0.0), DepthRink(0.0), IceThickness(0.0), CRefrigLoopSide(0),
               CRefrigBranchNum(0), CRefrigCompNum(0), RefrigMassFlowRate(0.0), CondCausedShutDown(false), CondErrIndex(0), RefrigFlowMaxCool(0.0),
               RefrigFlowMinCool(0.0), RefOutBOTCtrlTemp(0.0)
 
@@ -220,6 +222,13 @@ namespace IceRink {
     // Functions:
 
     void GetIndoorIceRink();
+
+    Real64 IceRinkResurfacer(Real64 ResurfacerTank_capacity,  
+                             Real64 ResurfacingHWTemperature, 
+                             Real64 IceSurfaceTemperature,    
+                             Real64 InitResurfWaterTemp,      
+                             int const ResurfacerIndex,
+                             int const SysNum);
 
     Real64 CalcDRinkHXEffectTerm(Real64 const Temperature,    // Temperature of refrigerant entering the radiant system, in C
                                  int const SysNum,            // Index to the refrigeration system

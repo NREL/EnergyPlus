@@ -110,7 +110,7 @@ protected:
     }
 };
 
-TEST_F(IndoorIceRinkTest, IndoorIceRink_DirectSysHXEffectTest)
+TEST_F(EnergyPlusFixture, IndoorIceRink_DirectSysHXEffectTest)
 {
     Real64 Temperature;
     Real64 RefrigMassFlow;
@@ -121,19 +121,19 @@ TEST_F(IndoorIceRinkTest, IndoorIceRink_DirectSysHXEffectTest)
 
     // Set values of items that will stay constant for all calls to the HX Effectiveness function
 
-    RefrigMassFlow = 10;
-    TubeLength = 20;
+    RefrigMassFlow = 0.1;
+    TubeLength = 10;
     TubeDiameter = 0.1;
     SysNum = 1;
     // PlantLoop(1).FluidName = "WATER";
 
     // Test 1: Cooling for Direct Refrigeration System
     HXEffectFuncResult = 0.0;
-    Temperature = -3.5;
+    Temperature = -10;
     // DRink(SysNum).CRefrigLoopNum = 1;
 
     HXEffectFuncResult = CalcDRinkHXEffectTerm(Temperature, SysNum, RefrigMassFlow, TubeLength, TubeDiameter);
-    EXPECT_NEAR(HXEffectFuncResult, 11542.7, 0.001);
+    EXPECT_NEAR(HXEffectFuncResult, 321.781, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, IndoorIceRink_IndirectSysHXEffectTest)
@@ -210,4 +210,59 @@ TEST_F(EnergyPlusFixture, IndoorIceRink_BOTC)
     Result = BOTC(IndirectSystem, SysNum);
 
     EXPECT_NEAR(Result, 10.0, 0.1);
+}
+
+TEST_F(EnergyPlusFixture, IndoorIceRink_Resurfacer)
+{
+    Real64 ResurfacerTank_capacity;      
+    Real64 ResurfacingHWTemperature; 
+    Real64 IceSurfaceTemperature;    
+    Real64 InitResurfWaterTemp;
+    int SysNum(1);
+    int ResurfacerIndex(1);
+    DRink.allocate(1);
+    IRink.allocate(1);
+    RefrigSysTypes.allocate(1);
+
+    // Dimensions of Direct refrigeration type rink
+    DRink(SysNum).LengthRink = 61;
+    DRink(SysNum).WidthRink = 26;
+    DRink(SysNum).DepthRink = 1.3;
+    // Dimensions of Indirect refrigeration type rink
+    IRink(SysNum).LengthRink = 61;
+    IRink(SysNum).WidthRink = 26;
+    IRink(SysNum).DepthRink = 1.3;
+
+    Resurfacer.allocate(1);
+    Resurfacer(ResurfacerIndex).GlycolIndex = 1;
+    Real64 FunctResult;
+
+    // Set values of items that will stay constant for all calls to the resurfacer function
+    ResurfacerTank_capacity = 2;
+    ResurfacingHWTemperature = 15;
+    IceSurfaceTemperature = -3.00;
+    InitResurfWaterTemp = 10.00;
+    
+    // Test 1: Test for direct refrigeration type ice rink
+    RefrigSysTypes(SysNum).SystemType = 1;
+    FunctResult = IceRinkResurfacer(ResurfacerTank_capacity,
+                                    ResurfacingHWTemperature,
+                                    IceSurfaceTemperature,
+                                    InitResurfWaterTemp,
+                                    ResurfacerIndex,
+                                    SysNum);
+    EXPECT_NEAR(FunctResult, 824493.416, 0.001);
+
+    // Test 2: Test for indirect refrigeration type ice rink
+    RefrigSysTypes(SysNum).SystemType = 2;
+    FunctResult =
+        IceRinkResurfacer(ResurfacerTank_capacity, 
+                          ResurfacingHWTemperature, 
+                          IceSurfaceTemperature, 
+                          InitResurfWaterTemp, 
+                          ResurfacerIndex, 
+                          SysNum);
+    EXPECT_NEAR(FunctResult, 824493.416, 0.001);
+
+
 }
