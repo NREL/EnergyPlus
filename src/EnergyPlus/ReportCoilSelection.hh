@@ -113,6 +113,9 @@ public:                                  // data
                                  //  5=FractionOfAutosizedHeatingAirflow, 6=FlowPerCoolingCapacity, 7=FlowPerHeatingCapacity
     std::string coilSizingMethodAirFlowName;
 
+    bool isCoilSizingForTotalLoad; // Type of peak to size (cooling) coils on: True is TotalCoolingLoad, False is sensible
+    std::string coilPeakLoadTypeToSizeOnName;
+
     // Real64 coilDesCapUser; // coil capacity original input value [W]; -999 means field not applicable to this coil
     bool capIsAutosized;        // true if the coil's capacity was autosized
     std::string coilCapAutoMsg; // Yes if user cap was autosized, No if hard value entered
