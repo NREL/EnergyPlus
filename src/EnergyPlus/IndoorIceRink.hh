@@ -91,18 +91,24 @@ namespace IceRink {
         int CondErrIndex;                // Error index for recurring warning messages
         int NumCircCalcMethod;           // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
         Real64 CircLength;               // Circuit length {m}
-        int GlycolIndex;                 // Index to Glycol (Ammonia) Properties
+        int GlycolIndex;                 // Index to fluid properties routines for water
         Real64 LengthRink;               // Length of ice rink
         Real64 WidthRink;                // Width of ice rink
         Real64 DepthRink;                // Depth of ice rink
         Real64 IceThickness;             // Thickness of ice surface
+        Real64 FloodWaterTemp;           // Temperature of flood water used in the beginning of freezing the rink
         int CRefrigLoopNum;              // Cold refrigerant loop number
         int CRefrigLoopSide;
         int CRefrigBranchNum;
         int CRefrigCompNum;
         Real64 RefrigMassFlowRate; // Refrigerant mass flow rate
         bool CondCausedShutDown;   // .TRUE. when condensation predicted at surface
-        Real64 RefOutBOTCtrlTemp;   // Outlet temperature of brine (To be )
+        Real64 RefOutBOTCCtrlTemp;   // Outlet temperature of brine (To be )
+        std::string PeopleSchedName;   // surface name of rink floor
+        int PeopleSchedPtr;       // index to schedule of people 
+        Real64 PeopleHeatGain;      // Heat gain from people (Watt/m2)
+        Real64 SpectatorArea;       // Area over which spectators are present
+        Real64 RefrigInletTemp;     // Temperature at which refrigerant enters 
 
         // ReportData
 
@@ -110,9 +116,10 @@ namespace IceRink {
         DirectRefrigSysData()
             : SchedPtr(0), ZonePtr(0), SurfacePtr(0), NumOfSurfaces(0), TubeDiameter(0.0), TubeLength(0.0), ControlType(0), RefrigVolFlowMaxCool(0.0),
               ColdRefrigInNode(0), ColdRefrigOutNode(0), ColdThrottleRange(0.0), ColdSetptSchedPtr(0), CondCtrlType(0), CondDewPtDeltaT(0.0),
-              NumCircCalcMethod(0), CircLength(0.0), GlycolIndex(0), LengthRink(0.0), WidthRink(0.0), DepthRink(0.0), IceThickness(0.0), CRefrigLoopSide(0),
-              CRefrigBranchNum(0), CRefrigCompNum(0), RefrigMassFlowRate(0.0), CondCausedShutDown(false), CondErrIndex(0), 
-              RefrigFlowMaxCool(0.0), RefrigFlowMinCool(0.0), RefOutBOTCtrlTemp(0.0)
+              NumCircCalcMethod(0), CircLength(0.0), GlycolIndex(0), LengthRink(0.0), WidthRink(0.0), DepthRink(0.0), IceThickness(0.0),
+              FloodWaterTemp(0.0), CRefrigLoopSide(0),CRefrigBranchNum(0), CRefrigCompNum(0), RefrigMassFlowRate(0.0), 
+              CondCausedShutDown(false), CondErrIndex(0), RefrigFlowMaxCool(0.0), RefrigFlowMinCool(0.0), RefOutBOTCCtrlTemp(0.0), PeopleSchedPtr(0), 
+              PeopleHeatGain(0.0), SpectatorArea(0.0), RefrigInletTemp(0.0)
 
         {
         }
@@ -154,7 +161,7 @@ namespace IceRink {
         int CondErrIndex;                // Error index for recurring warning messages
         int NumCircCalcMethod;           // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
         Real64 CircLength;               // Circuit length {m}
-        int GlycolIndex;                 // Index to Glycol (Ammonia) Properties
+        int GlycolIndex;                 // Index to fluid properties routines for water
         Real64 LengthRink;               // Length of ice rink
         Real64 WidthRink;                // Width of ice rink
         Real64 DepthRink;                // Depth of ice rink
@@ -254,7 +261,7 @@ namespace IceRink {
 
     Real64 SumHATsurf(int const ZoneNum);
 
-    Real64 BOTC(int const SystemType, int const SysNum);
+    Real64 BOTC(int const SystemType, int const SysNum, Real64 const Temperature);
 
     Real64 STC(int const SystemType, int const SysNum);
 
