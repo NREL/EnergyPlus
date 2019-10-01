@@ -474,8 +474,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF (CurArgs .GE. 21) THEN
-                   CALL FixFuelTypes(OutArgs(21))
+                 IF (CurArgs .GE. 22) THEN
+                   CALL FixFuelTypes(OutArgs(22))
                  END IF
 
              CASE('GENERATOR:INTERNALCOMBUSTIONENGINE')
