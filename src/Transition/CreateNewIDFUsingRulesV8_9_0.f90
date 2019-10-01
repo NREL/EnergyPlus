@@ -461,12 +461,31 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! already written
                  Written = .true.
 
+             CASE('AIRCONDITIONER:VARIABLEREFRIGERANTFLOW')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (CurArgs .GE. 67) THEN
+                   CALL FixFuelTypes(OutArgs(67))
+                 END IF
+
              CASE('BOILER:HOTWATER')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (CurArgs .GE. 2) THEN
+                   CALL FixFuelTypes(OutArgs(2))
+                 END IF
                  IF ( (CurArgs .GE. 15) .AND. SameString( InArgs(15), 'VariableFlow' ) ) THEN
                    OutArgs(15) = 'LeavingSetpointModulated'
+                 END IF
+
+             CASE('BOILER:STEAM')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (CurArgs .GE. 2) THEN
+                   CALL FixFuelTypes(OutArgs(2))
                  END IF
 
                CASE('BRANCH')
@@ -537,6 +556,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (CurArgs .GE. 36) THEN
+                   CALL FixFuelTypes(OutArgs(36))
+                 END IF
                  IF ( (CurArgs .GE. 41) .AND. SameString( InArgs(41), 'VariableFlow' ) ) THEN
                    OutArgs(41) = 'LeavingSetpointModulated'
                  END IF
@@ -547,6 +569,79 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                  IF ( (CurArgs .GE. 54) .AND. (SameString( InArgs(54), 'VariableFlow' )) ) THEN
                    OutArgs(54) = 'LeavingSetpointModulated'
+                 END IF
+                 IF (CurArgs .GE. 55) THEN
+                   CALL FixFuelTypes(OutArgs(55))
+                 END IF
+
+             CASE('CHILLERHEATER:ABSORPTION:DIRECTFIRED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (CurArgs .GE. 33) THEN
+                   CALL FixFuelTypes(OutArgs(33))
+                 END IF
+
+             CASE('FUELFACTORS')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (CurArgs .GE. 1) THEN
+                   CALL FixFuelTypes(OutArgs(1))
+                   ! For fuelfactors, the current IDD choice is Propane, so override that here until #5941 is resolved (standardize fuel types)
+                   IF (SameString(OutArgs(1), "PropaneGas")) OutArgs(1) = "Propane"
+                 END IF
+
+             CASE('GENERATOR:COMBUSTIONTURBINE')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (CurArgs .GE. 22) THEN
+                   CALL FixFuelTypes(OutArgs(22))
+                 END IF
+
+             CASE('GENERATOR:INTERNALCOMBUSTIONENGINE')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (CurArgs .GE. 20) THEN
+                   CALL FixFuelTypes(OutArgs(20))
+                 END IF
+
+             CASE('GENERATOR:MICROTURBINE')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (CurArgs .GE. 12) THEN
+                   CALL FixFuelTypes(OutArgs(12))
+                 END IF
+
+             CASE('WATERHEATER:MIXED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (CurArgs .GE. 11) THEN
+                   CALL FixFuelTypes(OutArgs(11))
+                 END IF
+                 IF (CurArgs .GE. 15) THEN
+                   CALL FixFuelTypes(OutArgs(15))
+                 END IF
+                 IF (CurArgs .GE. 18) THEN
+                   CALL FixFuelTypes(OutArgs(18))
+                 END IF
+
+             CASE('WATERHEATER:STRATIFIED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (CurArgs .GE. 17) THEN
+                   CALL FixFuelTypes(OutArgs(17))
+                 END IF
+                 IF (CurArgs .GE. 20) THEN
+                   CALL FixFuelTypes(OutArgs(20))
+                 END IF
+                 IF (CurArgs .GE. 24) THEN
+                   CALL FixFuelTypes(OutArgs(24))
                  END IF
 
                CASE('CONDENSEREQUIPMENTLIST')
@@ -1275,3 +1370,38 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   RETURN
 
 END SUBROUTINE CreateNewIDFUsingRules
+
+SUBROUTINE FixFuelTypes(InOutArg)
+  USE InputProcessor, ONLY: SameString
+  CHARACTER(len=*), INTENT(INOUT) :: InOutArg
+      
+  IF (SameString( InOutArg, 'Electric' )) THEN
+    InOutArg = 'Electricity'
+  ELSE IF (SameString( InOutArg, 'Elec' )) THEN
+    InOutArg = 'Electricity'
+  ELSE IF (SameString( InOutArg, 'Gas' )) THEN
+    InOutArg = 'NaturalGas'
+  ELSE IF (SameString( InOutArg, 'Natural Gas' )) THEN
+    InOutArg = 'NaturalGas'
+  ELSE IF (SameString( InOutArg, 'Propane' )) THEN
+    InOutArg = 'PropaneGas'
+  ELSE IF (SameString( InOutArg, 'LPG' )) THEN
+    InOutArg = 'PropaneGas'
+  ELSE IF (SameString( InOutArg, 'Propane Gas' )) THEN
+    InOutArg = 'PropaneGas'
+  ELSE IF (SameString( InOutArg, 'FUEL OIL #1' )) THEN
+    InOutArg = 'FuelOil#1'
+  ELSE IF (SameString( InOutArg, 'FUEL OIL' )) THEN
+    InOutArg = 'FuelOil#1'
+  ELSE IF (SameString( InOutArg, 'DISTILLATE OIL' )) THEN
+    InOutArg = 'FuelOil#1'
+  ELSE IF (SameString( InOutArg, 'DISTILLATEOIL' )) THEN
+    InOutArg = 'FuelOil#1'
+  ELSE IF (SameString( InOutArg, 'FUEL OIL #2' )) THEN
+    InOutArg = 'FuelOil#2'
+  ELSE IF (SameString( InOutArg, 'RESIDUAL OIL' )) THEN
+    InOutArg = 'FuelOil#2'
+  ELSE IF (SameString( InOutArg, 'RESIDUALOIL' )) THEN
+    InOutArg = 'FuelOil#2'
+  END IF
+END SUBROUTINE
