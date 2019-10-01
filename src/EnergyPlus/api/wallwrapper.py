@@ -1,12 +1,18 @@
 from ctypes import cdll, c_double, c_void_p
 import os
+import sys
 
 
 class Wall:
 
     def __init__(self, resistance: float):
         this_absolute_dir = os.path.dirname(os.path.realpath(__file__))
-        self.api = cdll.LoadLibrary(os.path.join(this_absolute_dir, "libenergyplusapi.dylib"))
+        if sys.platform.startswith('linux'):
+            self.api = cdll.LoadLibrary(os.path.join(this_absolute_dir, 'libenergyplusapi.so'))
+        elif sys.platform.startswith('darwin'):
+            self.api = cdll.LoadLibrary(os.path.join(this_absolute_dir, 'libenergyplusapi.dylib'))
+        else:  # assume Windows
+            self.api = cdll.LoadLibrary(os.path.join(this_absolute_dir, 'EnergyPlusAPI.dll'))
         # constructor
         self.api.newCWall.argtypes = [c_double]
         self.api.newCWall.restype = c_void_p
