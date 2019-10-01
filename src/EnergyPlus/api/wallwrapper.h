@@ -51,12 +51,14 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 typedef double Real64;
 typedef void *CWall;
 CWall newCWall(Real64 resistance); // constructor
 void delCWall(CWall); // destructor
 Real64 calculateCWall(CWall, Real64 multiplier); // public method takes opaque reference
 void setCWallThickness(CWall, Real64 thickness); // field setter
+
 #ifdef __cplusplus
 };
 #endif

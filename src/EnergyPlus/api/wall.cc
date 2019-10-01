@@ -51,6 +51,7 @@
 Wall::Wall(Real64 _resistance) : thickness(0.0){
     this->resistance = _resistance;
 }
+
 Real64 Wall::calculate(Real64 multiplier) {
     return thickness * resistance * multiplier;
 }

@@ -67,6 +67,8 @@
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
 
+#include <api/wallwrapper.h>
+
 namespace EnergyPlus {
 
 namespace BaseboardElectric {
@@ -117,6 +119,9 @@ namespace BaseboardElectric {
 
     void clear_state()
     {
+        auto w2 = newCWall(5.0);
+        delCWall(w2);
+
         NumBaseboards = 0;
         MySizeFlag.deallocate();
         CheckEquipName.deallocate();

@@ -1,20 +1,12 @@
 from ctypes import cdll, c_double, c_void_p
+import os
 
 
 class Wall:
 
     def __init__(self, resistance: float):
-        #     # we expect the C++ DLL to be available at the root of the installation.
-        #     # we also expect this interface folder to be placed at the root of the installation
-        #     # so the DLL is simply one folder up, and at the appropriate name
-        #     dir_path = os.path.dirname(os.path.realpath(__file__))
-        #     if sys.platform.startswith('linux'):
-        #         self.api = cdll.LoadLibrary(os.path.join(dir_path, '..', 'libFakeAPI.so'))
-        #     elif sys.platform.startswith('darwin'):
-        #         self.api = cdll.LoadLibrary(os.path.join(dir_path, '..', 'libFakeAPI.dylib'))
-        #     else:  # assume Windows
-        #         self.api = cdll.LoadLibrary(os.path.join(dir_path, '..', 'FakeAPI.dll'))
-        self.api = cdll.LoadLibrary("/eplus/repos/myoldmopar/cmake-build-debug/Products/libenergyplusapi.dylib")
+        this_absolute_dir = os.path.dirname(os.path.realpath(__file__))
+        self.api = cdll.LoadLibrary(os.path.join(this_absolute_dir, "libenergyplusapi.dylib"))
         # constructor
         self.api.newCWall.argtypes = [c_double]
         self.api.newCWall.restype = c_void_p

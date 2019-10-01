@@ -55,8 +55,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to 'Release' as none was specified.")
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
   # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
-    "MinSizeRel" "RelWithDebInfo")
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
 option( BUILD_PACKAGE "Build package" OFF )
@@ -73,7 +72,7 @@ option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist co
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
 # we are making python a required dependency, so find it here...starting off by requiring at least 2.7
-find_package(PythonInterp 2.7 REQUIRED)
+find_package(PythonInterp 3.4 REQUIRED)
 
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )

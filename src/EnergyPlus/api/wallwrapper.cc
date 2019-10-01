@@ -48,8 +48,6 @@
 #include <api/wall.hh>
 #include <api/wallwrapper.h>
 
-extern "C" {
-
 CWall newCWall(Real64 resistance) {
     return reinterpret_cast<void *>(new Wall(resistance));
 }
@@ -64,6 +62,4 @@ Real64 calculateCWall(CWall wall, Real64 mult) {
 
 void setCWallThickness(CWall wall, Real64 _thickness) {
     reinterpret_cast<Wall * >(wall)->thickness = _thickness;
-}
-
 }
