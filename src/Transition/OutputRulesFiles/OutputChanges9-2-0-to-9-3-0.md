@@ -34,18 +34,18 @@ Water to Water Heat Pump Source Side Mass Flow Rate
 
 *9.3.0*
 ```
-Plant Loop Heat Pump Load Side Heat Transfer Rate
-Plant Loop Heat Pump Load Side Heat Transfer Energy
-Plant Loop Heat Pump Source Side Heat Transfer Rate
-Plant Loop Heat Pump Source Side Heat Transfer Energy
-Plant Loop Heat Pump Load Side Inlet Temperature
-Plant Loop Heat Pump Load Side Outlet Temperature
-Plant Loop Heat Pump Source Side Inlet Temperature
-Plant Loop Heat Pump Source Side Outlet Temperature
-Plant Loop Heat Pump Electric Power
-Plant Loop Heat Pump Electric Energy
-Plant Loop Heat Pump Load Side Mass Flow Rate
-Plant Loop Heat Pump Source Side Mass Flow Rate
+Heat Pump Load Side Heat Transfer Rate
+Heat Pump Load Side Heat Transfer Energy
+Heat Pump Source Side Heat Transfer Rate
+Heat Pump Source Side Heat Transfer Energy
+Heat Pump Load Side Inlet Temperature
+Heat Pump Load Side Outlet Temperature
+Heat Pump Source Side Inlet Temperature
+Heat Pump Source Side Outlet Temperature
+Heat Pump Electric Power
+Heat Pump Electric Energy
+Heat Pump Load Side Mass Flow Rate
+Heat Pump Source Side Mass Flow Rate
 ```
 
 See [7489](https://github.com/NREL/EnergyPlus/pull/7489/)

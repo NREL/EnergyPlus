@@ -364,49 +364,49 @@ namespace EnergyPlus {
 
                 // setup output variables
                 SetupOutputVariable(
-                        "Plant Loop Heat Pump Load Side Heat Transfer Rate", OutputProcessor::Unit::W,
+                        "Heat Pump Load Side Heat Transfer Rate", OutputProcessor::Unit::W,
                         this->loadSideHeatTransfer,
                         "System", "Average", this->name);
                 SetupOutputVariable(
-                        "Plant Loop Heat Pump Load Side Heat Transfer Energy", OutputProcessor::Unit::J,
+                        "Heat Pump Load Side Heat Transfer Energy", OutputProcessor::Unit::J,
                         this->loadSideEnergy,
                         "System", "Sum", this->name);
                 SetupOutputVariable(
-                        "Plant Loop Heat Pump Source Side Heat Transfer Rate", OutputProcessor::Unit::W,
+                        "Heat Pump Source Side Heat Transfer Rate", OutputProcessor::Unit::W,
                         this->sourceSideHeatTransfer,
                         "System", "Average", this->name);
                 SetupOutputVariable(
-                        "Plant Loop Heat Pump Source Side Heat Transfer Energy", OutputProcessor::Unit::J,
+                        "Heat Pump Source Side Heat Transfer Energy", OutputProcessor::Unit::J,
                         this->sourceSideEnergy,
                         "System", "Sum", this->name);
                 SetupOutputVariable(
-                        "Plant Loop Heat Pump Load Side Inlet Temperature", OutputProcessor::Unit::C,
+                        "Heat Pump Load Side Inlet Temperature", OutputProcessor::Unit::C,
                         this->loadSideInletTemp,
                         "System", "Average", this->name);
                 SetupOutputVariable(
-                        "Plant Loop Heat Pump Load Side Outlet Temperature", OutputProcessor::Unit::C,
+                        "Heat Pump Load Side Outlet Temperature", OutputProcessor::Unit::C,
                         this->loadSideOutletTemp,
                         "System", "Average", this->name);
                 SetupOutputVariable(
-                        "Plant Loop Heat Pump Source Side Inlet Temperature", OutputProcessor::Unit::C,
+                        "Heat Pump Source Side Inlet Temperature", OutputProcessor::Unit::C,
                         this->sourceSideInletTemp,
                         "System", "Average", this->name);
                 SetupOutputVariable(
-                        "Plant Loop Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C,
+                        "Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C,
                         this->sourceSideOutletTemp,
                         "System", "Average", this->name);
                 SetupOutputVariable(
-                        "Plant Loop Heat Pump Electric Power", OutputProcessor::Unit::W, this->powerUsage, "System",
+                        "Heat Pump Electric Power", OutputProcessor::Unit::W, this->powerUsage, "System",
                         "Average", this->name);
                 SetupOutputVariable(
-                        "Plant Loop Heat Pump Electric Energy", OutputProcessor::Unit::J, this->powerEnergy,
+                        "Heat Pump Electric Energy", OutputProcessor::Unit::J, this->powerEnergy,
                         "System", "Sum", this->name);
                 SetupOutputVariable(
-                        "Plant Loop Heat Pump Load Side Mass Flow Rate", OutputProcessor::Unit::kg_s,
+                        "Heat Pump Load Side Mass Flow Rate", OutputProcessor::Unit::kg_s,
                         this->loadSideMassFlowRate,
                         "System", "Average", this->name);
                 SetupOutputVariable(
-                        "Plant Loop Heat Pump Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s,
+                        "Heat Pump Source Side Mass Flow Rate", OutputProcessor::Unit::kg_s,
                         this->sourceSideMassFlowRate,
                         "System", "Average", this->name);
 
