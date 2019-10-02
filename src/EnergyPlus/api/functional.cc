@@ -45,22 +45,21 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef EnergyPlusAPIWallWrapper_h_INCLUDED
-#define EnergyPlusAPIWallWrapper_h_INCLUDED
+#include <api/wall.hh>
+#include <api/functional.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+CWall newCWall(Real64 resistance) {
+    return reinterpret_cast<void *>(new Wall(resistance));
+}
 
-typedef double Real64;
-typedef void *CWall;
-CWall newCWall(Real64 resistance); // constructor
-void delCWall(CWall); // destructor
-Real64 calculateCWall(CWall, Real64 multiplier); // public method takes opaque reference
-void setCWallThickness(CWall, Real64 thickness); // field setter
+void delCWall(CWall wall) {
+    delete reinterpret_cast<Wall * >(wall);
+}
 
-#ifdef __cplusplus
-};
-#endif
+Real64 calculateCWall(CWall wall, Real64 mult) {
+    return reinterpret_cast<Wall * >(wall)->calculate(mult);
+}
 
-#endif
+void setCWallThickness(CWall wall, Real64 _thickness) {
+    reinterpret_cast<Wall * >(wall)->thickness = _thickness;
+}

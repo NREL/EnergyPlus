@@ -67,7 +67,7 @@
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
 
-#include <api/wallwrapper.h>
+#include <api/functional.h>
 
 namespace EnergyPlus {
 

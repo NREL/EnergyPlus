@@ -45,21 +45,12 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <api/wall.hh>
-#include <api/wallwrapper.h>
+#ifndef EnergyPlusBase_h_INCLUDED
+#define EnergyPlusBase_h_INCLUDED
 
-CWall newCWall(Real64 resistance) {
-    return reinterpret_cast<void *>(new Wall(resistance));
-}
+typedef std::int32_t Int32;
+typedef std::int64_t Int64;
+typedef float Real32;  // Platform-specific: C++ has no defined precision floating point types
+typedef double Real64; // Platform-specific: C++ has no defined precision floating point types
 
-void delCWall(CWall wall) {
-    delete reinterpret_cast<Wall * >(wall);
-}
-
-Real64 calculateCWall(CWall wall, Real64 mult) {
-    return reinterpret_cast<Wall * >(wall)->calculate(mult);
-}
-
-void setCWallThickness(CWall wall, Real64 _thickness) {
-    reinterpret_cast<Wall * >(wall)->thickness = _thickness;
-}
+#endif

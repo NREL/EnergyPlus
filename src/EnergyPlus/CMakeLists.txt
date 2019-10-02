@@ -17,8 +17,8 @@ SET( SRC
   "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.h"
   "${CMAKE_SOURCE_DIR}/third_party/milo/diyfp.h"
   "${CMAKE_SOURCE_DIR}/third_party/milo/ieee754.h"
-  api/wallwrapper.h
-  api/wallwrapper.cc
+  api/functional.h
+  api/functional.cc
   api/wall.hh
   api/wall.cc
   AirflowNetworkBalanceManager.cc
@@ -721,16 +721,4 @@ endif()
 
 # API Stuff
 # Functional API test
-add_executable( TestAPI_Functional_Cpp api/TestFunctional.cc )
-target_link_libraries( TestAPI_Functional_Cpp energyplusapi )
-add_executable( TestAPI_Functional_C api/TestFunctional.c )
-target_link_libraries( TestAPI_Functional_C energyplusapi )
-configure_file( api/wallwrapper.py "${CMAKE_BINARY_DIR}/Products/wallwrapper.py" )
-configure_file( api/TestFunctional.py "${CMAKE_BINARY_DIR}/Products/TestFunctional.py" )
-
-if( BUILD_TESTING )
-  # Run API tests
-  add_test(NAME "API.TestFunctionalCpp" COMMAND TestAPI_Functional_Cpp)
-  add_test(NAME "API.TestFunctionalC" COMMAND TestAPI_Functional_C)
-  add_test(NAME "API.TestFunctionalPy" COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_BINARY_DIR}/Products/TestFunctional.py")
-endif()
+configure_file( api/functional.py "${CMAKE_BINARY_DIR}/Products/functional.py" )
