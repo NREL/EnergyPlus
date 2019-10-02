@@ -52,133 +52,140 @@
 #include <string>
 #include <vector>
 
-#include <PlantComponent.hh>
 #include <Plant/PlantLocation.hh>
+#include <PlantComponent.hh>
 #include <WaterToWaterHeatPumps.hh>
 
 namespace EnergyPlus {
 
-    namespace EIRPlantLoopHeatPumps {
+namespace EIRPlantLoopHeatPumps {
 
-        struct InOutNodePair {
-            int inlet;
-            int outlet;
+    struct InOutNodePair
+    {
+        int inlet;
+        int outlet;
 
-            InOutNodePair() : inlet(0), outlet(0) {
-            }
-        };
+        InOutNodePair() : inlet(0), outlet(0)
+        {
+        }
+    };
 
-        struct EIRPlantLoopHeatPump : public EnergyPlus::BasePlantLoopHeatPump {
+    struct EIRPlantLoopHeatPump : public EnergyPlus::BasePlantLoopHeatPump
+    {
 
-            // fixed configuration parameters
-            std::string name = "";
-            int plantTypeOfNum = -1;
-            std::string companionCoilName = "";
-            EIRPlantLoopHeatPump *companionHeatPumpCoil = nullptr;
-            Real64 sizingFactor = 1.0;
-            bool waterSource = false;
-            bool airSource = false;
+        // fixed configuration parameters
+        std::string name = "";
+        int plantTypeOfNum = -1;
+        std::string companionCoilName = "";
+        EIRPlantLoopHeatPump *companionHeatPumpCoil = nullptr;
+        Real64 sizingFactor = 1.0;
+        bool waterSource = false;
+        bool airSource = false;
 
-            // reference data
-            Real64 referenceCapacity = 0.0;
-            bool referenceCapacityWasAutoSized = false;
-            Real64 referenceCOP = 0.0;
+        // reference data
+        Real64 referenceCapacity = 0.0;
+        bool referenceCapacityWasAutoSized = false;
+        Real64 referenceCOP = 0.0;
 
-            // curve references
-            int capFuncTempCurveIndex = 0;
-            int powerRatioFuncTempCurveIndex = 0;
-            int powerRatioFuncPLRCurveIndex = 0;
+        // curve references
+        int capFuncTempCurveIndex = 0;
+        int powerRatioFuncTempCurveIndex = 0;
+        int powerRatioFuncPLRCurveIndex = 0;
 
-            // flow rate terms
-            Real64 loadSideDesignVolFlowRate = 0.0;
-            bool loadSideDesignVolFlowRateWasAutoSized = false;
-            Real64 sourceSideDesignVolFlowRate = 0.0;
-            bool sourceSideDesignVolFlowRateWasAutoSized = false;
-            Real64 loadSideDesignMassFlowRate = 0.0;
-            Real64 sourceSideDesignMassFlowRate = 0.0;
-            Real64 loadSideMassFlowRate = 0.0;
-            Real64 sourceSideMassFlowRate = 0.0;
+        // flow rate terms
+        Real64 loadSideDesignVolFlowRate = 0.0;
+        bool loadSideDesignVolFlowRateWasAutoSized = false;
+        Real64 sourceSideDesignVolFlowRate = 0.0;
+        bool sourceSideDesignVolFlowRateWasAutoSized = false;
+        Real64 loadSideDesignMassFlowRate = 0.0;
+        Real64 sourceSideDesignMassFlowRate = 0.0;
+        Real64 loadSideMassFlowRate = 0.0;
+        Real64 sourceSideMassFlowRate = 0.0;
 
-            // simulation variables
-            Real64 loadSideHeatTransfer = 0.0;
-            Real64 sourceSideHeatTransfer = 0.0;
-            Real64 loadSideInletTemp = 0.0;
-            Real64 loadSideOutletTemp = 0.0;
-            Real64 sourceSideInletTemp = 0.0;
-            Real64 sourceSideOutletTemp = 0.0;
-            Real64 powerUsage = 0.0;
-            Real64 loadSideEnergy = 0.0;
-            Real64 sourceSideEnergy = 0.0;
-            Real64 powerEnergy = 0.0;
-            bool running = false;
+        // simulation variables
+        Real64 loadSideHeatTransfer = 0.0;
+        Real64 sourceSideHeatTransfer = 0.0;
+        Real64 loadSideInletTemp = 0.0;
+        Real64 loadSideOutletTemp = 0.0;
+        Real64 sourceSideInletTemp = 0.0;
+        Real64 sourceSideOutletTemp = 0.0;
+        Real64 powerUsage = 0.0;
+        Real64 loadSideEnergy = 0.0;
+        Real64 sourceSideEnergy = 0.0;
+        Real64 powerEnergy = 0.0;
+        bool running = false;
 
-            // topology variables
-            PlantLocation loadSideLocation;
-            PlantLocation sourceSideLocation;
-            InOutNodePair loadSideNodes;
-            InOutNodePair sourceSideNodes;
+        // topology variables
+        PlantLocation loadSideLocation;
+        PlantLocation sourceSideLocation;
+        InOutNodePair loadSideNodes;
+        InOutNodePair sourceSideNodes;
 
-            // counters and indexes
-            int condMassFlowRateTriggerIndex = 0;
-            int recurringConcurrentOperationWarningIndex = 0;
+        // counters and indexes
+        int condMassFlowRateTriggerIndex = 0;
+        int recurringConcurrentOperationWarningIndex = 0;
 
-            // logic flags
-            bool oneTimeInit = true;
-            bool envrnInit = true;
+        // logic flags
+        bool oneTimeInit = true;
+        bool envrnInit = true;
 
-            // a couple worker functions to easily allow merging of cooling and heating operations
-            std::function<Real64 (Real64, Real64)> calcLoadOutletTemp;
-            std::function<Real64 (Real64, Real64)> calcQsource;
-            std::function<Real64 (Real64, Real64)> calcSourceOutletTemp;
+        // a couple worker functions to easily allow merging of cooling and heating operations
+        std::function<Real64(Real64, Real64)> calcLoadOutletTemp;
+        std::function<Real64(Real64, Real64)> calcQsource;
+        std::function<Real64(Real64, Real64)> calcSourceOutletTemp;
 
-            virtual ~EIRPlantLoopHeatPump() = default;
+        virtual ~EIRPlantLoopHeatPump() = default;
 
-            EIRPlantLoopHeatPump() = default;
+        EIRPlantLoopHeatPump() = default;
 
-            void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
-                          bool RunFlag) override;
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-            void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-            void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
-                                     Real64 &EP_UNUSED(MaxLoad),
-                                     Real64 &EP_UNUSED(MinLoad),
-                                     Real64 &EP_UNUSED(OptLoad)) override;
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                 Real64 &EP_UNUSED(MaxLoad),
+                                 Real64 &EP_UNUSED(MinLoad),
+                                 Real64 &EP_UNUSED(OptLoad)) override;
 
-            void doPhysics(Real64 currentLoad);
+        void doPhysics(Real64 currentLoad);
 
-            void sizeLoadSide();
+        void sizeLoadSide();
 
-            void sizeSrcSideWSHP();
+        void sizeSrcSideWSHP();
 
-            void sizeSrcSideASHP();
+        void sizeSrcSideASHP();
 
-            Real64 getLoadSideOutletSetPointTemp();
+        Real64 getLoadSideOutletSetPointTemp();
 
-            void setOperatingFlowRatesASHP();
+        void setOperatingFlowRatesASHP();
 
-            void setOperatingFlowRatesWSHP();
+        void setOperatingFlowRatesWSHP();
 
+        void resetReportingVariables();
 
-            void resetReportingVariables();
+        static PlantComponent *factory(int hp_type_of_num, std::string hp_name);
 
-            static PlantComponent *factory(int hp_type_of_num, std::string hp_name);
+        static void pairUpCompanionCoils();
 
-            static void pairUpCompanionCoils();
+        static void processInputForEIRPLHP();
 
-            static void processInputForEIRPLHP();
+        static void clear_state();
 
-            static void clear_state();
+        static void checkConcurrentOperation();
 
-            static void checkConcurrentOperation();
+        static Real64 add(Real64 const a, Real64 const b)
+        {
+            return a + b;
+        }
 
-            static Real64 add(Real64 const a, Real64 const b) {return a + b;}
+        static Real64 subtract(Real64 const a, Real64 const b)
+        {
+            return a - b;
+        }
+    };
 
-            static Real64 subtract(Real64 const a, Real64 const b) {return a - b;}
-        };
-
-        extern std::vector<EIRPlantLoopHeatPump> heatPumps;
-    } // namespace EIRPlantLoopHeatPumps
+    extern std::vector<EIRPlantLoopHeatPump> heatPumps;
+} // namespace EIRPlantLoopHeatPumps
 } // namespace EnergyPlus
 
-#endif //ENERGYPLUS_PLANTLOOPHEATPUMPEIR_HH
+#endif // ENERGYPLUS_PLANTLOOPHEATPUMPEIR_HH
