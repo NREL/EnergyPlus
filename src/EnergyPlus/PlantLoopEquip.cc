@@ -204,7 +204,6 @@ namespace PlantLoopEquip {
         using PhotovoltaicThermalCollectors::CalledFromPlantLoopEquipMgr;
         using PhotovoltaicThermalCollectors::SimPVTcollectors;
         using PlantCentralGSHP::SimCentralGroundSourceHeatPump;
-        using PlantComponentTemperatureSources::SimWaterSource;
         using RefrigeratedCase::SimRefrigCondenser;
         using SolarCollectors::SimSolarCollector;
         using SteamBaseboardRadiator::UpdateSteamBaseboardPlantConnection;
@@ -679,12 +678,6 @@ namespace PlantLoopEquip {
                 ShowContinueError("Occurs in Plant Loop=" + PlantLoop(LoopNum).Name);
                 ShowFatalError("Preceding condition causes termination.");
             }
-
-            //            if (InitLoopEquip && EquipNum == 0) {
-            //                ShowSevereError("InitLoop did not set Equipment Index for Boiler=" + sim_component.TypeOf);
-            //                ShowContinueError("..Boiler Name=" + sim_component.Name + ", in Plant Loop=" + PlantLoop(LoopNum).Name);
-            //                ShowFatalError("Previous condition causes termination.");
-            //            }
 
             // WATER HEATER
         } else if (GeneralEquipType == GenEquipTypes_WaterThermalTank) {
@@ -1189,26 +1182,7 @@ namespace PlantLoopEquip {
                 }
 
             } else if (EquipTypeNum == TypeOf_WaterSource) {
-
-                SimWaterSource(sim_component.Name,
-                               EquipFlowCtrl,
-                               EquipNum,
-                               RunFlag,
-                               FirstHVACIteration,
-                               InitLoopEquip,
-                               CurLoad,
-                               MaxLoad,
-                               MinLoad,
-                               OptLoad,
-                               GetCompSizFac,
-                               SizingFac); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
-
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
             } else {
                 //        CALL ShowSevereError('SimPlantEquip: Invalid Component Equipment Type='//TRIM(EquipType))
                 //        CALL ShowContinueError('Occurs in Plant Loop='//TRIM(PlantLoop(LoopNum)%Name))

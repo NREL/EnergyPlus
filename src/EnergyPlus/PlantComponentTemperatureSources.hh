@@ -55,6 +55,7 @@
 #include <DataGlobals.hh>
 #include <DataPlant.hh>
 #include <EnergyPlus.hh>
+#include <PlantComponent.hh>
 #include <Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
@@ -62,14 +63,14 @@ namespace EnergyPlus {
 namespace PlantComponentTemperatureSources {
 
     // MODULE PARAMETER DEFINITIONS:
-    extern int const TempSpecType_Constant;
-    extern int const TempSpecType_Schedule;
+    extern int const modTempSpecType_Constant;
+    extern int const modTempSpecType_Schedule;
 
     // MODULE VARIABLES
     extern int NumSources;
-    extern bool GetInput; // then TRUE, calls subroutine to read input file.
+    extern bool getWaterSourceInput; // then TRUE, calls subroutine to read input file.
 
-    struct WaterSourceSpecs
+    struct WaterSourceSpecs : PlantComponent
     {
         // Members
         std::string Name;                       // user identifier
@@ -104,36 +105,41 @@ namespace PlantComponentTemperatureSources {
               CheckEquipName(true), MyFlag(true), MyEnvironFlag(true), IsThisSized(false)
         {
         }
+
+        // Destructor
+        ~WaterSourceSpecs() = default;
+
+        void initialize(Real64 &MyLoad);
+
+        void setupOutputVars();
+
+        void autosize();
+
+        void calculate();
+
+        void update();
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+        void getSizingFactor(Real64 &_SizFac) override;
+
+        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+
+        static PlantComponent *factory(std::string const &objectName);
+
     };
 
     // Object Data
     extern Array1D<WaterSourceSpecs> WaterSource; // dimension to number of machines
 
-    // Functions
-    void SimWaterSource(std::string const &SourceName, // user-specified name for this component
-                        int const EquipFlowCtrl,       // Flow control mode for the equipment
-                        int &CompIndex,                // HX number pointer
-                        bool const RunFlag,            // simulate HX when TRUE
-                        bool const FirstHVACIteration, // initialize variables when TRUE
-                        bool &InitLoopEquip,           // If not zero, calculate the max load for operating conditions
-                        Real64 &MyLoad,                // loop demand component will meet
-                        Real64 &MaxLoad,
-                        Real64 &MinLoad,
-                        Real64 &OptLoad,
-                        bool const GetSizingFactor, // TRUE when just the sizing factor is requested
-                        Real64 &SizingFactor        // sizing factor
-    );
+    void GetWaterSourceInput();
 
-    void GetWaterSource();
+    // object data
+    extern Array1D<WaterSourceSpecs> WaterSource;
 
-    void InitWaterSource(int const SourceNum, // number of the current component being simulated
-                         Real64 const MyLoad);
-
-    void SizeWaterSource(int const SourceNum);
-
-    void CalcWaterSource(int const SourceNum);
-
-    void UpdateWaterSource(int const SourceNum);
+    void clear_state();
 
 } // namespace PlantComponentTemperatureSources
 

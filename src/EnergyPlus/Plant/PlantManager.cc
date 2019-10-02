@@ -85,6 +85,7 @@
 #include <Pipes.hh>
 #include <Plant/PlantLoopSolver.hh>
 #include <Plant/PlantManager.hh>
+#include <PlantComponentTemperatureSources.hh>
 #include <PlantLoadProfile.hh>
 #include <PlantLoopEquip.hh>
 #include <PlantPipingSystemsManager.hh>
@@ -1423,11 +1424,11 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_AirTerminalUserDefined;
                                 this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
-                            } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "PlantComponent:TemperatureSource")) {
+                            } else if (UtilityRoutines::SameString(this_comp_type,"PlantComponent:TemperatureSource")) {
                                 this_comp.TypeOf_Num = TypeOf_WaterSource;
                                 this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+                                this_comp.compPtr = PlantComponentTemperatureSources::WaterSourceSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "GroundHeatExchanger:HorizontalTrench")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgHorizTrench;
