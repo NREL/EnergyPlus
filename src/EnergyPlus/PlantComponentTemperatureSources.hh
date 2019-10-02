@@ -55,8 +55,8 @@
 #include <DataGlobals.hh>
 #include <DataPlant.hh>
 #include <EnergyPlus.hh>
-#include <PlantComponent.hh>
 #include <Plant/PlantLocation.hh>
+#include <PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -128,7 +128,6 @@ namespace PlantComponentTemperatureSources {
         void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
         static PlantComponent *factory(std::string const &objectName);
-
     };
 
     // Object Data

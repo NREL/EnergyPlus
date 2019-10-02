@@ -52,8 +52,8 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <DataPlant.hh>
-#include <PlantComponentTemperatureSources.hh>
 #include <Plant/PlantLocation.hh>
+#include <PlantComponentTemperatureSources.hh>
 
 namespace EnergyPlus {
 
@@ -61,15 +61,14 @@ TEST_F(EnergyPlusFixture, TestPlantComponentTemperatureSource)
 {
 
     // Setup the Plant temperature source object from IDF
-    std::string const idf_objects =
-        delimited_string({"PlantComponent:TemperatureSource,",
-                          " FluidSource,             !- Name",
-                          " FluidSource Inlet Node,  !- Inlet Node",
-                          " FluidSource Outlet Node, !- Outlet Node",
-                          " 0.001,                   !- Design Volume Flow Rate {m3/s}",
-                          " Constant,                !- Temperature Specification Type",
-                          " 8,                       !- Source Temperature {C}",
-                          " ;                        !- Source Temperature Schedule Name"});
+    std::string const idf_objects = delimited_string({"PlantComponent:TemperatureSource,",
+                                                      " FluidSource,             !- Name",
+                                                      " FluidSource Inlet Node,  !- Inlet Node",
+                                                      " FluidSource Outlet Node, !- Outlet Node",
+                                                      " 0.001,                   !- Design Volume Flow Rate {m3/s}",
+                                                      " Constant,                !- Temperature Specification Type",
+                                                      " 8,                       !- Source Temperature {C}",
+                                                      " ;                        !- Source Temperature Schedule Name"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Setup the plant itself manually

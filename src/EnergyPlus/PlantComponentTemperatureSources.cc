@@ -125,7 +125,8 @@ namespace PlantComponentTemperatureSources {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void WaterSourceSpecs::initialize(Real64 &MyLoad) {
+    void WaterSourceSpecs::initialize(Real64 &MyLoad)
+    {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -234,8 +235,7 @@ namespace PlantComponentTemperatureSources {
             if (!this->EMSOverrideOnMassFlowRateMax) {
                 this->MassFlowRate = min(this->MassFlowRate, this->MassFlowRateMax);
             } else {
-                this->MassFlowRate =
-                        min(this->MassFlowRate, this->EMSOverrideValueMassFlowRateMax);
+                this->MassFlowRate = min(this->MassFlowRate, this->EMSOverrideValueMassFlowRateMax);
             }
         }
 
@@ -251,44 +251,21 @@ namespace PlantComponentTemperatureSources {
         // the calc routine will update the outlet temp and heat transfer rate/energies
     }
 
-    void WaterSourceSpecs::setupOutputVars() {
+    void WaterSourceSpecs::setupOutputVars()
+    {
 
-        SetupOutputVariable("Plant Temperature Source Component Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
-                            this->MassFlowRate,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Plant Temperature Source Component Inlet Temperature",
-                            OutputProcessor::Unit::C,
-                            this->InletTemp,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Plant Temperature Source Component Outlet Temperature",
-                            OutputProcessor::Unit::C,
-                            this->OutletTemp,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Plant Temperature Source Component Source Temperature",
-                            OutputProcessor::Unit::C,
-                            this->BoundaryTemp,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Plant Temperature Source Component Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
-                            this->HeatRate,
-                            "System",
-                            "Average",
-                            this->Name);
-        SetupOutputVariable("Plant Temperature Source Component Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
-                            this->HeatEnergy,
-                            "System",
-                            "Sum",
-                            this->Name);
+        SetupOutputVariable(
+            "Plant Temperature Source Component Mass Flow Rate", OutputProcessor::Unit::kg_s, this->MassFlowRate, "System", "Average", this->Name);
+        SetupOutputVariable(
+            "Plant Temperature Source Component Inlet Temperature", OutputProcessor::Unit::C, this->InletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(
+            "Plant Temperature Source Component Outlet Temperature", OutputProcessor::Unit::C, this->OutletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(
+            "Plant Temperature Source Component Source Temperature", OutputProcessor::Unit::C, this->BoundaryTemp, "System", "Average", this->Name);
+        SetupOutputVariable(
+            "Plant Temperature Source Component Heat Transfer Rate", OutputProcessor::Unit::W, this->HeatRate, "System", "Average", this->Name);
+        SetupOutputVariable(
+            "Plant Temperature Source Component Heat Transfer Energy", OutputProcessor::Unit::J, this->HeatEnergy, "System", "Sum", this->Name);
         if (DataGlobals::AnyEnergyManagementSystemInModel) {
             SetupEMSActuator("PlantComponent:TemperatureSource",
                              this->Name,
@@ -331,16 +308,12 @@ namespace PlantComponentTemperatureSources {
                 if (this->DesVolFlowRateWasAutoSized) {
                     this->DesVolFlowRate = tmpVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("PlantComponent:TemperatureSource",
-                                                                this->Name,
-                                                                "Design Size Design Fluid Flow Rate [m3/s]",
-                                                                tmpVolFlowRate);
+                        ReportSizingManager::ReportSizingOutput(
+                            "PlantComponent:TemperatureSource", this->Name, "Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("PlantComponent:TemperatureSource",
-                                                                this->Name,
-                                                                "Initial Design Size Design Fluid Flow Rate [m3/s]",
-                                                                tmpVolFlowRate);
+                        ReportSizingManager::ReportSizingOutput(
+                            "PlantComponent:TemperatureSource", this->Name, "Initial Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate);
                     }
                 } else {
                     if (this->DesVolFlowRate > 0.0 && tmpVolFlowRate > 0.0) {
@@ -354,12 +327,11 @@ namespace PlantComponentTemperatureSources {
                                                                     DesVolFlowRateUser);
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpVolFlowRate - DesVolFlowRateUser) / DesVolFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
-                                    ShowMessage("SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " +
-                                                this->Name);
+                                    ShowMessage("SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError("User-Specified Design Fluid Flow Rate of " + General::RoundSigDigits(DesVolFlowRateUser, 5) +
                                                       " [m3/s]");
-                                    ShowContinueError("differs from Design Size Design Fluid Flow Rate of " + General::RoundSigDigits(tmpVolFlowRate, 5) +
-                                                      " [m3/s]");
+                                    ShowContinueError("differs from Design Size Design Fluid Flow Rate of " +
+                                                      General::RoundSigDigits(tmpVolFlowRate, 5) + " [m3/s]");
                                     ShowContinueError("This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError("Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -377,10 +349,8 @@ namespace PlantComponentTemperatureSources {
             }
             if (!this->DesVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport) {
                 if (this->DesVolFlowRate > 0.0) {
-                    ReportSizingManager::ReportSizingOutput("PlantComponent:TemperatureSource",
-                                                            this->Name,
-                                                            "User-Specified Design Fluid Flow Rate [m3/s]",
-                                                            this->DesVolFlowRate);
+                    ReportSizingManager::ReportSizingOutput(
+                        "PlantComponent:TemperatureSource", this->Name, "User-Specified Design Fluid Flow Rate [m3/s]", this->DesVolFlowRate);
                 }
             }
         }
@@ -423,14 +393,18 @@ namespace PlantComponentTemperatureSources {
         DataLoopNode::Node(this->OutletNodeNum).Temp = this->OutletTemp;
     }
 
-    void WaterSourceSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &CurLoad, bool EP_UNUSED(RunFlag)){
+    void WaterSourceSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                    bool EP_UNUSED(FirstHVACIteration),
+                                    Real64 &CurLoad,
+                                    bool EP_UNUSED(RunFlag))
+    {
         this->initialize(CurLoad);
         this->calculate();
         this->update();
     }
 
-    void WaterSourceSpecs::getDesignCapacities(const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad,
-                                               Real64 &OptLoad) {
+    void WaterSourceSpecs::getDesignCapacities(const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    {
 
         MaxLoad = DataGlobals::BigNumber;
         MinLoad = 0.0;
@@ -511,14 +485,22 @@ namespace PlantComponentTemperatureSources {
 
             WaterSource(SourceNum).Name = cAlphaArgs(1);
 
-            WaterSource(SourceNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(
-                cAlphaArgs(2), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1,
-                DataLoopNode::ObjectIsNotParent);
-            WaterSource(SourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1),
-                DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1,
-                DataLoopNode::ObjectIsNotParent);
+            WaterSource(SourceNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(2),
+                                                                                      ErrorsFound,
+                                                                                      cCurrentModuleObject,
+                                                                                      cAlphaArgs(1),
+                                                                                      DataLoopNode::NodeType_Water,
+                                                                                      DataLoopNode::NodeConnectionType_Inlet,
+                                                                                      1,
+                                                                                      DataLoopNode::ObjectIsNotParent);
+            WaterSource(SourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(cAlphaArgs(3),
+                                                                                       ErrorsFound,
+                                                                                       cCurrentModuleObject,
+                                                                                       cAlphaArgs(1),
+                                                                                       DataLoopNode::NodeType_Water,
+                                                                                       DataLoopNode::NodeConnectionType_Outlet,
+                                                                                       1,
+                                                                                       DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Chilled Water Nodes");
 
             WaterSource(SourceNum).DesVolFlowRate = rNumericArgs(1);
@@ -540,7 +522,8 @@ namespace PlantComponentTemperatureSources {
                 }
             } else {
                 ShowSevereError("Input error for " + cCurrentModuleObject + '=' + cAlphaArgs(1));
-                ShowContinueError(R"(Invalid temperature specification type.  Expected either "Constant" or "Scheduled". Encountered ")" + cAlphaArgs(4) + "\"");
+                ShowContinueError(R"(Invalid temperature specification type.  Expected either "Constant" or "Scheduled". Encountered ")" +
+                                  cAlphaArgs(4) + "\"");
                 ErrorsFound = true;
             }
         }
