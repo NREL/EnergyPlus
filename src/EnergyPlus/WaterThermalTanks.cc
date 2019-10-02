@@ -126,7 +126,6 @@ namespace WaterThermalTanks {
 
     // ThermalStorage:ChilledWater:Stratified simulates a stratified, multi-node tank for chilled water applications.
 
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using DataGlobals::NumOfTimeStepInHour;
     using DataGlobals::OutputFileInits;
@@ -142,8 +141,6 @@ namespace WaterThermalTanks {
     using ReportSizingManager::ReportSizingOutput;
     using VariableSpeedCoils::MaxSpedLevels;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     std::string const cMixedWHModuleObj("WaterHeater:Mixed");
     std::string const cStratifiedWHModuleObj("WaterHeater:Stratified");
     std::string const cMixedCWTankModuleObj("ThermalStorage:ChilledWater:Mixed");
@@ -221,9 +218,6 @@ namespace WaterThermalTanks {
 
     static std::string const fluidNameWater("WATER");
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
     Array1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
     Array1D_bool MyHPSizeFlag;    // Used to report autosize info in Init
     Array1D_bool CheckWTTEquipName;
@@ -237,7 +231,6 @@ namespace WaterThermalTanks {
     int NumWaterThermalTank(0);         // total number of water thermal tanks, hot and cold (MIXED + STRATIFIED)
     int NumWaterHeaterDesuperheater(0); // number of desuperheater heating coils
     int NumHeatPumpWaterHeater(0);      // number of heat pump water heaters
-    // INTEGER :: MaxCyclesErrorCount           =0 ! error counter for water heater that cycles more than max during time step
 
     Real64 HPPartLoadRatio(0.0);             // part load ratio of HPWH
     bool GetWaterThermalTankInputFlag(true); // Calls to Water Heater from multiple places in code
@@ -266,10 +259,6 @@ namespace WaterThermalTanks {
     Array1D<WaterHeaterDesuperheaterData> WaterHeaterDesuperheater;
 
     static ObjexxFCL::gio::Fmt fmtLD("*");
-
-    // MODULE SUBROUTINES:
-
-    // Functions
 
     // Default Constructor
     HeatPumpWaterHeaterData::HeatPumpWaterHeaterData()
@@ -845,15 +834,12 @@ namespace WaterThermalTanks {
         // METHODOLOGY EMPLOYED:
         // Sums the tank losses from all of the water heaters in the zone to add as a gain to the zone.
         // Now used to determine tank losses during sizing.  Internal gains are summed in a centralized way now
-
-        // Using/Aliasing
+        
         using DataGlobals::BeginEnvrnFlag;
         using DataGlobals::DoingSizing;
         using DataHeatBalFanSys::MAT;
         using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        
         int WaterThermalTankNum;
         int ZoneNum;
         Real64 TankTemp;
@@ -969,9 +955,6 @@ namespace WaterThermalTanks {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Gets the water heater, HPWH, and/or desuperheater heating coil input from the input file.
-
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
 
         using DataGlobals::AutoCalculate;
         using DataGlobals::NumOfZones;
@@ -1170,7 +1153,7 @@ namespace WaterThermalTanks {
                 CoilSaveNodeNames.allocate(NumWaterHeaterDesuperheater);
             }
 
-            //!!=======   Get Coil:WaterHeating:Desuperheater ======================================================================
+            // =======   Get Coil:WaterHeating:Desuperheater ======================================================================
             if (NumWaterHeaterDesuperheater > 0) {
                 cCurrentModuleObject = "Coil:WaterHeating:Desuperheater";
                 for (DesuperheaterNum = 1; DesuperheaterNum <= NumWaterHeaterDesuperheater; ++DesuperheaterNum) {
@@ -1457,7 +1440,7 @@ namespace WaterThermalTanks {
                 }
             }
 
-            //!!=======   Get HEAT PUMP:WATER HEATER ===============================================================================
+            //  =======   Get HEAT PUMP:WATER HEATER ===============================================================================
 
             //   get input for heat pump water heater object
             if (NumHeatPumpWaterHeater > 0) {
@@ -2561,7 +2544,7 @@ namespace WaterThermalTanks {
 
             } // IF (NumHeatPumpWaterHeater > 0) THEN
 
-            //!!=======   Get WATER HEATER:MIXED ===================================================================================
+            //  =======   Get WATER HEATER:MIXED ===================================================================================
             if (NumWaterHeaterMixed > 0) {
                 cCurrentModuleObject = cMixedWHModuleObj;
                 for (WaterThermalTankNum = 1; WaterThermalTankNum <= NumWaterHeaterMixed; ++WaterThermalTankNum) {
@@ -2660,8 +2643,6 @@ namespace WaterThermalTanks {
                     }
                     WaterThermalTank(WaterThermalTankNum).VolFlowRateMin = rNumericArgs(6);
                     WaterThermalTank(WaterThermalTankNum).VolFlowRateMin = max(0.0, WaterThermalTank(WaterThermalTankNum).VolFlowRateMin);
-                    //        rho = GetDensityGlycol('WATER', InitConvTemp, DummyWaterIndex, 'GetWaterThermalTankInput')
-                    //        WaterThermalTank(WaterThermalTankNum)%MassFlowRateMin = rNumericArgs(6) * rho   ! Not yet implemented
                     WaterThermalTank(WaterThermalTankNum).IgnitionDelay = rNumericArgs(7); // Not yet implemented
 
                     // Validate Heater Fuel Type
@@ -3079,7 +3060,7 @@ namespace WaterThermalTanks {
                 } // WaterThermalTankNum
             }
 
-            //!!=======   Get WATER HEATER:STRATIFIED ==============================================================================
+            //  =======   Get WATER HEATER:STRATIFIED ==============================================================================
             if (NumWaterHeaterStratified > 0) {
                 cCurrentModuleObject = cStratifiedWHModuleObj; //'WaterHeater:Stratified'
 
@@ -3722,7 +3703,7 @@ namespace WaterThermalTanks {
                 } // WaterThermalTankNum
             }
 
-            //!!=======   Get Chilled Water :MIXED ===================================================================================
+            //  =======   Get Chilled Water :MIXED ===================================================================================
             if (NumChilledWaterMixed > 0) {
                 cCurrentModuleObject = cMixedCWTankModuleObj; // 'ThermalStorage:ChilledWater:Mixed'
                 for (WaterThermalTankNum = NumWaterHeaterMixed + NumWaterHeaterStratified + 1;
@@ -3983,9 +3964,9 @@ namespace WaterThermalTanks {
                 } // WaterThermalTankNum
             }
 
-            //! end chilled water mixed storage
+            // end chilled water mixed storage
 
-            //!!=======   Get 'ThermalStorage:ChilledWater:Stratified' =======================================================
+            //  =======   Get 'ThermalStorage:ChilledWater:Stratified' =======================================================
             if (NumChilledWaterStratified > 0) {
                 cCurrentModuleObject = cStratifiedCWTankModuleObj; // 'ThermalStorage:ChilledWater:Stratified'
 
@@ -4337,9 +4318,9 @@ namespace WaterThermalTanks {
 
                 } // WaterThermalTankNum
             }
-            //!  end stratified chilled water storage
+            //   end stratified chilled water storage
 
-            //!!=======   Check Water Heaters ======================================================================================
+            //  =======   Check Water Heaters ======================================================================================
 
             //   Loop through all desuperheating coils and then search all water heaters for the tank connected to the desuperheating coil
             if (NumWaterHeaterDesuperheater > 0) {
@@ -4972,7 +4953,7 @@ namespace WaterThermalTanks {
                 }
             }
 
-            //!   now do calls to TestCompSet for tanks, depending on nodes and heat pump water heater
+            //    now do calls to TestCompSet for tanks, depending on nodes and heat pump water heater
             if (NumWaterThermalTank > 0) {
                 for (WaterThermalTankNum = 1; WaterThermalTankNum <= NumWaterThermalTank; ++WaterThermalTankNum) {
                     if (WaterThermalTank(WaterThermalTankNum).UseInletNode > 0 && WaterThermalTank(WaterThermalTankNum).UseOutletNode > 0) {
@@ -9484,7 +9465,7 @@ namespace WaterThermalTanks {
                     HPMinTemp = SetPointTemp - DeadBandTempDiff;
                     ObjexxFCL::gio::write(HPMinTempChar, fmtLD) << HPMinTemp;
                     ++HeatPump.HPSetPointError;
-                    //! add logic for warmup, kickoffsimulation and doing sizing here
+                    //  add logic for warmup, kickoffsimulation and doing sizing here
                     if (HeatPump.HPSetPointError == 1) {
                         ShowWarningError(HeatPump.Type + " \"" + HeatPump.Name +
                                          ":  Water heater tank set point temperature is greater than or equal to the cut-in temperature of the heat "
