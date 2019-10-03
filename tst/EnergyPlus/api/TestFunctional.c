@@ -1,13 +1,14 @@
 #include <stdio.h>
-#include <api/wallwrapper.h>
+#include <EnergyPlus/api/functional.h>
 
 int main() {
-    CWall *w = NULL;
-    w = newCWall(5.0);
-    setCWallThickness(w, 3.2);
-    Real64 c = calculateCWall(w, 6.3);
-    delCWall(w);
-    printf("Doing wall calcs: %4.2f \n", c);
-    // w = NULL;
+    CBaseThermalPropertySet *props = NULL;
+    props = newCBaseThermalPropertySet(1.0, 2.0, 3.0);
+    Real64 diffusivity = cBaseThermalPropertySet_diffusivity(props);
+    printf("C API Test: Calculated thermal diffusivity: %8.4f \n", diffusivity);
+    cBaseThermalPropertySet_setConductivity(props, 4.0);
+    diffusivity = cBaseThermalPropertySet_diffusivity(props);
+    printf("C API Test: Updated thermal diffusivity: %8.4f \n", diffusivity);
+    delCBaseThermalPropertySet(props);
     return 0;
 }

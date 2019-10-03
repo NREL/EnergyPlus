@@ -19,8 +19,6 @@ SET( SRC
   "${CMAKE_SOURCE_DIR}/third_party/milo/ieee754.h"
   api/functional.h
   api/functional.cc
-  api/wall.hh
-  api/wall.cc
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
   AirLoopHVACDOAS.cc

@@ -45,21 +45,32 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <api/wall.hh>
 #include <api/functional.h>
+#include <FluidProperties.hh>
+#include <EnergyPlus/PlantPipingSystemsManager.hh>
 
-CWall newCWall(Real64 resistance) {
-    return reinterpret_cast<void *>(new Wall(resistance));
+CBaseThermalPropertySet newCBaseThermalPropertySet(Real64 conductivity, Real64 density, Real64 specificHeat) {
+    auto props = new EnergyPlus::PlantPipingSystemsManager::BaseThermalPropertySet;
+    props->Conductivity = conductivity;
+    props->Density = density;
+    props->SpecificHeat = specificHeat;
+    return reinterpret_cast<CBaseThermalPropertySet>(props);
 }
 
-void delCWall(CWall wall) {
-    delete reinterpret_cast<Wall * >(wall);
+void delCBaseThermalPropertySet(CBaseThermalPropertySet props) {
+    delete reinterpret_cast<EnergyPlus::PlantPipingSystemsManager::BaseThermalPropertySet *>(props);
 }
 
-Real64 calculateCWall(CWall wall, Real64 mult) {
-    return reinterpret_cast<Wall * >(wall)->calculate(mult);
+Real64 cBaseThermalPropertySet_diffusivity(CBaseThermalPropertySet props) {
+    return reinterpret_cast<EnergyPlus::PlantPipingSystemsManager::BaseThermalPropertySet *>(props)->diffusivity();
 }
 
-void setCWallThickness(CWall wall, Real64 _thickness) {
-    reinterpret_cast<Wall * >(wall)->thickness = _thickness;
+void cBaseThermalPropertySet_setConductivity(CBaseThermalPropertySet props, Real64 conductivity) {
+    reinterpret_cast<EnergyPlus::PlantPipingSystemsManager::BaseThermalPropertySet *>(props)->Conductivity = conductivity;
 }
+
+//Real64 fluidProperty_GetSatPressureRefrig(const char* refrigerantName, Real64 const temperatureC, int & refrigerantIndex) {
+//    auto const name = std::string(refrigerantName);
+//    auto val = EnergyPlus::FluidProperties::GetSatPressureRefrig(name, temperatureC, refrigerantIndex, "");
+//    return val;
+//}

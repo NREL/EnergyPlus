@@ -48,19 +48,22 @@
 #ifndef EnergyPlusAPIFunctional_h_INCLUDED
 #define EnergyPlusAPIFunctional_h_INCLUDED
 
-#include <TypeDefs.h>
+#include <EnergyPlus/TypeDefs.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 //
-//GetSatPressureRefrig
 
-typedef void *CWall;
-CWall newCWall(Real64 resistance); // constructor
-void delCWall(CWall); // destructor
-Real64 calculateCWall(CWall, Real64 multiplier); // public method takes opaque reference
-void setCWallThickness(CWall, Real64 thickness); // field setter
+// Test out a real E+ struct with methods
+typedef void *CBaseThermalPropertySet;
+CBaseThermalPropertySet newCBaseThermalPropertySet(Real64 conductivity, Real64 density, Real64 specificHeat);
+void delCBaseThermalPropertySet(CBaseThermalPropertySet);
+Real64 cBaseThermalPropertySet_diffusivity(CBaseThermalPropertySet);
+void cBaseThermalPropertySet_setConductivity(CBaseThermalPropertySet props, Real64 conductivity);
+
+// Test out a real E+ global function
+// Real64 fluidProperty_GetSatPressureRefrig(const char* refrigerantName, Real64 temperatureC, int refrigerantIndex);
 
 #ifdef __cplusplus
 }

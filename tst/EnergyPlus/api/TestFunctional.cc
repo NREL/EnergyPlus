@@ -45,13 +45,22 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <api/wall.hh>
+#include <EnergyPlus/api/functional.h>
+#include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <iostream>
 
-
-int main(int argc, char *argv[])
+int main(int, char *[])
 {
-    Wall w(0.1);
-    w.thickness = 0.2;
-    std::cout << "Doing wall calcs: " << w.calculate(3) << std::endl;
+    EnergyPlus::PlantPipingSystemsManager::BaseThermalPropertySet props;
+    props.Conductivity = 1;
+    props.Density = 2;
+    props.SpecificHeat = 3;
+    std::cout << "C++ API Test: Calculated thermal diffusivity = " << props.diffusivity() << std::endl;
+
+    props.Conductivity = 4;
+    std::cout << "C++ API Test: Updated thermal diffusivity = " << props.diffusivity() << std::endl;
+
+//    int index = 0;
+//    auto saturationPressure = EnergyPlus::API::fluidProperty_GetSatPressureRefrig("Water", 25.5, index);
+
 }

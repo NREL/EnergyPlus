@@ -55,11 +55,14 @@
 // C++ Headers
 #include <cstdint> // C++11
 
-#include <TypeDefs.h>
+#include <EnergyPlus/TypeDefs.h>
 
 // macro to supress unused parameter
 // UNUSED( foo );
 #define EP_UNUSED(expr)
+
+typedef std::int32_t Int32;
+typedef std::int64_t Int64;
 
 // ObjexxFCL
 #include <ObjexxFCL/Array1.fwd.hh>

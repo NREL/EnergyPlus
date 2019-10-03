@@ -119,8 +119,9 @@ namespace BaseboardElectric {
 
     void clear_state()
     {
-        auto w2 = newCWall(5.0);
-        delCWall(w2);
+        // I need to figure out how to get the linker to keep the unused functions in there without them having to be used somewhere...
+        auto props = newCBaseThermalPropertySet(0.0, 0.0, 0.0);
+        delCBaseThermalPropertySet(props);
 
         NumBaseboards = 0;
         MySizeFlag.deallocate();

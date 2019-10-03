@@ -48,8 +48,6 @@
 #ifndef EnergyPlusBase_h_INCLUDED
 #define EnergyPlusBase_h_INCLUDED
 
-typedef std::int32_t Int32;
-typedef std::int64_t Int64;
 typedef float Real32;  // Platform-specific: C++ has no defined precision floating point types
 typedef double Real64; // Platform-specific: C++ has no defined precision floating point types
 
