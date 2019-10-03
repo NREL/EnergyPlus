@@ -6187,6 +6187,8 @@ namespace InternalHeatGains {
         Array1D<Real64> ZoneSumToutMinusTSup(NumOfZones); // Denominator for zone-level sensible heat index (SHI)
 
         std::map<int, std::vector<int>> ZoneITEMap;
+        
+	int ZoneAirInletNode = DataZoneEquipment::ZoneEquipConfig(NZ).InletNode(1);
 
         //  Zero out time step variables
         // Object report variables
@@ -6315,7 +6317,6 @@ namespace InternalHeatGains {
                     WAirIn = ZoneAirHumRat(NZ);
                 } else { 
 		    // TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4
-		    int ZoneAirInletNode = DataZoneEquipment::ZoneEquipConfig(NZ).InletNode(1);
 		    TSupply = Node(ZoneAirInletNode).Temp;
                     TAirIn = MAT(NZ);
                     WAirIn = ZoneAirHumRat(NZ);
