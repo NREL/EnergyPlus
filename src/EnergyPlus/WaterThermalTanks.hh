@@ -54,19 +54,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include <VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 
 namespace WaterThermalTanks {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern std::string const cMixedWHModuleObj;
-    extern std::string const cStratifiedWHModuleObj;
-    extern std::string const cMixedCWTankModuleObj;
-    extern std::string const cStratifiedCWTankModuleObj;
 
     extern int const HeatMode;  // heating source is on, source will not turn off until setpoint temp is reached
     extern int const FloatMode; // heating source is off, source will not turn on until cutin temp is reached
@@ -419,6 +411,7 @@ namespace WaterThermalTanks {
         int MaxCycleErrorIndex;        // recurring error index
         int FreezingErrorIndex;        // recurring error index for freeze conditions
         WaterHeaterSizingData Sizing;  // ancillary data for autosizing
+        int FluidIndex;                // fluid properties index
 
         // Default Constructor
         WaterThermalTankData()
@@ -507,6 +500,8 @@ namespace WaterThermalTanks {
         std::string FanType;                                // Type of Fan (Fan:OnOff)
         int FanType_Num;                                    // Integer type of fan (3 = Fan:OnOff)
         std::string FanName;                                // Name of Fan
+        std::string FanInletNode_str;                       // Fan inlet node name
+        std::string FanOutletNode_str;                      // Fan outlet node name
         int FanNum;                                         // Index of Fan
         int FanPlacement;                                   // Location of Fan
         int FanOutletNode;                                  // Outlet node of heat pump water heater fan
@@ -579,7 +574,29 @@ namespace WaterThermalTanks {
         // end of variables for variable-speed HPWH
 
         // Default Constructor
-        HeatPumpWaterHeaterData();
+        HeatPumpWaterHeaterData()
+                : TypeNum(0), TankTypeNum(0), StandAlone(false), AvailSchedPtr(0), SetPointTempSchedule(0), DeadBandTempDiff(0.0), Capacity(0.0),
+                  BackupElementCapacity(0.0), BackupElementEfficiency(0.0), WHOnCycParaLoad(0.0), WHOffCycParaLoad(0.0), WHOnCycParaFracToTank(0.0),
+                  WHOffCycParaFracToTank(0.0), WHPLFCurve(0), OperatingAirFlowRate(0.0), OperatingAirMassFlowRate(0.0), OperatingWaterFlowRate(0.0), COP(0.0), SHR(0.0),
+                  RatedInletDBTemp(0.0), RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0), FoundTank(false), HeatPumpAirInletNode(0), HeatPumpAirOutletNode(0),
+                  OutsideAirNode(0), ExhaustAirNode(0), CondWaterInletNode(0), CondWaterOutletNode(0), WHUseInletNode(0), WHUseOutletNode(0),
+                  WHUseSidePlantLoopNum(0), DXCoilNum(0), DXCoilTypeNum(0), DXCoilAirInletNode(0), DXCoilPLFFPLR(0), FanType_Num(0), FanNum(0),
+                  FanPlacement(0), FanOutletNode(0), WaterHeaterTankNum(0), OutletAirSplitterSchPtr(0), InletAirMixerSchPtr(0), Mode(0), SaveMode(0),
+                  SaveWHMode(0), Power(0.0), Energy(0.0), HeatingPLR(0.0), SetPointTemp(0.0), MinAirTempForHPOperation(5.0),
+                  MaxAirTempForHPOperation(48.8888888889), InletAirMixerNode(0), OutletAirSplitterNode(0), SourceMassFlowRate(0.0), InletAirConfiguration(0),
+                  AmbientTempSchedule(0), AmbientRHSchedule(0), AmbientTempZone(0), CrankcaseTempIndicator(0), CrankcaseTempSchedule(0), CrankcaseTempZone(0),
+                  OffCycParaLoad(0.0), OnCycParaLoad(0.0), ParasiticTempIndicator(0), OffCycParaFuelRate(0.0), OnCycParaFuelRate(0.0),
+                  OffCycParaFuelEnergy(0.0), OnCycParaFuelEnergy(0.0), AirFlowRateAutoSized(false), WaterFlowRateAutoSized(false), HPSetPointError(0),
+                  HPSetPointErrIndex1(0), IterLimitErrIndex1(0), IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0), RegulaFalsiFailedNum1(0),
+                  IterLimitErrIndex2(0), IterLimitExceededNum2(0), RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(true),
+                  ShowSetPointWarning(true), HPWaterHeaterSensibleCapacity(0.0), HPWaterHeaterLatentCapacity(0.0), WrappedCondenserBottomLocation(0.0),
+                  WrappedCondenserTopLocation(0.0), ControlSensor1Height(-1.0), ControlSensor1Node(1), ControlSensor1Weight(1.0), ControlSensor2Height(-1.0),
+                  ControlSensor2Node(2), ControlSensor2Weight(0.0), ControlTempAvg(0.0), ControlTempFinal(0.0),
+                  AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0), HPWHAirVolFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0),
+                  HPWHAirMassFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0), HPWHWaterVolFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0), HPWHWaterMassFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0),
+                  MSAirSpeedRatio(VariableSpeedCoils::MaxSpedLevels, 0.0), MSWaterSpeedRatio(VariableSpeedCoils::MaxSpedLevels, 0.0), bIsIHP(false)
+        {
+        }
     };
 
     struct WaterHeaterDesuperheaterData
@@ -601,7 +618,6 @@ namespace WaterThermalTanks {
         int TankTypeNum;               // Parameter for tank type (MIXED or STRATIFIED)
         std::string TankName;          // Name of tank associated with desuperheater
         bool StandAlone;               // Flag for operation with no plant connections (no use nodes)
-        // note char variable heatingsourcetype doesn't seem to be used anywhere
         std::string HeatingSourceType;        // Type of heating source (DX coil or refrigerated rack)
         std::string HeatingSourceName;        // Name of heating source
         Real64 HeaterRate;                    // Report variable for desuperheater heating rate [W]
@@ -687,8 +703,6 @@ namespace WaterThermalTanks {
     void CalcWaterThermalTankZoneGains();
 
     bool GetWaterThermalTankInput();
-
-    bool GetWaterThermalTankInputData(bool &ErrorFlag);
 
     void ValidatePLFCurve(int CurveIndex, bool &IsValid);
 
