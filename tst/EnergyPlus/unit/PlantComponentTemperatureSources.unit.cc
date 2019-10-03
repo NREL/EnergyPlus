@@ -51,8 +51,8 @@
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataPlant.hh>
-#include <PlantComponentTemperatureSources.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/PlantComponentTemperatureSources.hh>
 
 namespace EnergyPlus {
 

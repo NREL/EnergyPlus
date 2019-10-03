@@ -51,8 +51,8 @@
 #ifndef PVWattsSSC_hh_INCLUDED
 #define PVWattsSSC_hh_INCLUDED
 
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 

@@ -53,7 +53,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Plant/Subcomponents.hh>
 
-#include "Fixtures/EnergyPlusFixture.hh"
+#include "../Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 

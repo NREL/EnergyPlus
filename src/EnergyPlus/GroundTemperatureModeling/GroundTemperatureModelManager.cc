@@ -50,17 +50,17 @@
 #include <vector>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
-#include <GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
-#include <GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
-#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
-#include <GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh>
-#include <GroundTemperatureModeling/SiteDeepGroundTemperatures.hh>
-#include <GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh>
-#include <GroundTemperatureModeling/SiteShallowGroundTemperatures.hh>
-#include <GroundTemperatureModeling/XingGroundTemperatureModel.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
+#include <EnergyPlus/GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <EnergyPlus/GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
+#include <EnergyPlus/GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh>
+#include <EnergyPlus/GroundTemperatureModeling/SiteDeepGroundTemperatures.hh>
+#include <EnergyPlus/GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh>
+#include <EnergyPlus/GroundTemperatureModeling/SiteShallowGroundTemperatures.hh>
+#include <EnergyPlus/GroundTemperatureModeling/XingGroundTemperatureModel.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

@@ -69,9 +69,9 @@
 //   Don't make changes here without validating the performance impact
 
 // EnergyPlus Headers
-#include <DataSurfaces.hh>
-#include <EnergyPlus.hh>
-#include <Platform.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Platform.hh>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Vector2.hh>

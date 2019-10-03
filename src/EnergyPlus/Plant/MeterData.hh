@@ -48,7 +48,7 @@
 #ifndef PlantReportingMeterData_hh_INCLUDED
 #define PlantReportingMeterData_hh_INCLUDED
 
-#include <OutputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {
