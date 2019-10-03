@@ -131,7 +131,7 @@ namespace WaterThermalTanks {
     std::string const cStratifiedCWTankModuleObj("ThermalStorage:ChilledWater:Stratified");
     std::string const cHPWHPumpedCondenser("WaterHeater:HeatPump:PumpedCondenser");
     std::string const cHPWHWrappedCondenser("WaterHeater:HeatPump:WrappedCondenser");
-    static std::string const BlankString;
+    std::string const BlankString;
 
     int const HeatMode(1);  // heating source is on, source will not turn off until setpoint temp is reached
     int const FloatMode(0); // heating source is off, source will not turn on until cutin temp is reached
@@ -214,50 +214,52 @@ namespace WaterThermalTanks {
     int NumWaterHeaterSizing(0);             // Number of sizing/design objects for water heaters.
     Array1D_bool AlreadyRated;               // control so we don't repeat again
 
-    namespace {
-        // These were static variables within different functions. They were pulled out into the namespace
-        // to facilitate easier unit testing of those functions.
-        // These are purposefully not in the header file as an extern variable. No one outside of this should
-        // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
-        // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-        bool InitWaterThermalTanksOnce(true); // flag for 1 time initialization
-        bool SimWaterThermalTank_OneTimeSetupFlag(true);
-        bool CalcWaterThermalTankZoneGains_MyEnvrnFlag(true);
-    } // namespace
-
-    // SUBROUTINE SPECIFICATIONS:
-
     // Object Data
     Array1D<WaterThermalTankData> WaterThermalTank;
     std::unordered_map<std::string, std::string> UniqueWaterThermalTankNames;
     Array1D<HeatPumpWaterHeaterData> HPWaterHeater;
     Array1D<WaterHeaterDesuperheaterData> WaterHeaterDesuperheater;
 
-    static ObjexxFCL::gio::Fmt fmtLD("*");
+    ObjexxFCL::gio::Fmt fmtLD("*");
 
-    // Default Constructor
-    HeatPumpWaterHeaterData::HeatPumpWaterHeaterData()
-        : TypeNum(0), TankTypeNum(0), StandAlone(false), AvailSchedPtr(0), SetPointTempSchedule(0), DeadBandTempDiff(0.0), Capacity(0.0),
-          BackupElementCapacity(0.0), BackupElementEfficiency(0.0), WHOnCycParaLoad(0.0), WHOffCycParaLoad(0.0), WHOnCycParaFracToTank(0.0),
-          WHOffCycParaFracToTank(0.0), WHPLFCurve(0), OperatingAirFlowRate(0.0), OperatingAirMassFlowRate(0.0), OperatingWaterFlowRate(0.0), COP(0.0), SHR(0.0),
-          RatedInletDBTemp(0.0), RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0), FoundTank(false), HeatPumpAirInletNode(0), HeatPumpAirOutletNode(0),
-          OutsideAirNode(0), ExhaustAirNode(0), CondWaterInletNode(0), CondWaterOutletNode(0), WHUseInletNode(0), WHUseOutletNode(0),
-          WHUseSidePlantLoopNum(0), DXCoilNum(0), DXCoilTypeNum(0), DXCoilAirInletNode(0), DXCoilPLFFPLR(0), FanType_Num(0), FanNum(0),
-          FanPlacement(0), FanOutletNode(0), WaterHeaterTankNum(0), OutletAirSplitterSchPtr(0), InletAirMixerSchPtr(0), Mode(0), SaveMode(0),
-          SaveWHMode(0), Power(0.0), Energy(0.0), HeatingPLR(0.0), SetPointTemp(0.0), MinAirTempForHPOperation(5.0),
-          MaxAirTempForHPOperation(48.8888888889), InletAirMixerNode(0), OutletAirSplitterNode(0), SourceMassFlowRate(0.0), InletAirConfiguration(0),
-          AmbientTempSchedule(0), AmbientRHSchedule(0), AmbientTempZone(0), CrankcaseTempIndicator(0), CrankcaseTempSchedule(0), CrankcaseTempZone(0),
-          OffCycParaLoad(0.0), OnCycParaLoad(0.0), ParasiticTempIndicator(0), OffCycParaFuelRate(0.0), OnCycParaFuelRate(0.0),
-          OffCycParaFuelEnergy(0.0), OnCycParaFuelEnergy(0.0), AirFlowRateAutoSized(false), WaterFlowRateAutoSized(false), HPSetPointError(0),
-          HPSetPointErrIndex1(0), IterLimitErrIndex1(0), IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0), RegulaFalsiFailedNum1(0),
-          IterLimitErrIndex2(0), IterLimitExceededNum2(0), RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(true),
-          ShowSetPointWarning(true), HPWaterHeaterSensibleCapacity(0.0), HPWaterHeaterLatentCapacity(0.0), WrappedCondenserBottomLocation(0.0),
-          WrappedCondenserTopLocation(0.0), ControlSensor1Height(-1.0), ControlSensor1Node(1), ControlSensor1Weight(1.0), ControlSensor2Height(-1.0),
-          ControlSensor2Node(2), ControlSensor2Weight(0.0), ControlTempAvg(0.0), ControlTempFinal(0.0),
-          AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0), HPWHAirVolFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0),
-          HPWHAirMassFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0), HPWHWaterVolFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0), HPWHWaterMassFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0),
-          MSAirSpeedRatio(VariableSpeedCoils::MaxSpedLevels, 0.0), MSWaterSpeedRatio(VariableSpeedCoils::MaxSpedLevels, 0.0), bIsIHP(false)
+    bool InitWaterThermalTanksOnce(true); // flag for 1 time initialization
+    bool SimWaterThermalTank_OneTimeSetupFlag(true);
+    bool CalcWaterThermalTankZoneGains_MyEnvrnFlag(true);
+
+    void clear_state()
     {
+        ValidSourceType.deallocate();
+        MyHPSizeFlag.deallocate();
+        CheckWTTEquipName.deallocate();
+        CheckHPWHEquipName.deallocate();
+
+        NumChilledWaterMixed = 0;
+        NumChilledWaterStratified = 0;
+        NumWaterHeaterMixed = 0;
+        NumWaterHeaterStratified = 0;
+        NumWaterThermalTank = 0;
+        NumWaterHeaterDesuperheater = 0;
+        NumHeatPumpWaterHeater = 0;
+
+        HPPartLoadRatio = 0.0;
+        GetWaterThermalTankInputFlag = true;
+        MixerInletAirSchedule = 0.0;
+        MdotAir = 0.0;
+        NumWaterHeaterSizing = 0;
+        AlreadyRated.deallocate();
+
+        SimWaterThermalTank_OneTimeSetupFlag = true;
+        InitWaterThermalTanksOnce = true;
+        CalcWaterThermalTankZoneGains_MyEnvrnFlag = true;
+        WaterThermalTank.deallocate();
+        UniqueWaterThermalTankNames.clear();
+        HPWaterHeater.deallocate();
+        WaterHeaterDesuperheater.deallocate();
+
+        WaterThermalTank.deallocate();
+        UniqueWaterThermalTankNames.clear();
+        HPWaterHeater.deallocate();
+        WaterHeaterDesuperheater.deallocate();
     }
 
     void SimWaterThermalTank(int const CompType,
@@ -289,10 +291,10 @@ namespace WaterThermalTanks {
         // 4. Calls simulation routines
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyOneTimeFlagWH; // first pass log
-        static Array1D_bool MyTwoTimeFlagWH; // second pass do input check
-        static Array1D_bool MyOneTimeFlagHP; // first pass log
-        static Array1D_bool MyTwoTimeFlagHP; // second pass do input check
+        Array1D_bool MyOneTimeFlagWH; // first pass log
+        Array1D_bool MyTwoTimeFlagWH; // second pass do input check
+        Array1D_bool MyOneTimeFlagHP; // first pass log
+        Array1D_bool MyTwoTimeFlagHP; // second pass do input check
         int tmpLoopNum;
         int tmpLoopSideNum;
         int CompNum;
@@ -872,7 +874,7 @@ namespace WaterThermalTanks {
         // Manages GetInput processing and program termination
 
         static std::string const RoutineName("GetWaterThermalTankInput: "); // include trailing blank space
-        static bool ErrorsFound(false);                                     // true if errors detected in GetUnitarySystemInputData
+        bool ErrorsFound(false);                                     // true if errors detected in GetUnitarySystemInputData
 
         GetWaterThermalTankInputData(ErrorsFound);
 
@@ -915,35 +917,35 @@ namespace WaterThermalTanks {
         int CondNum;                              // Index to refrigration condenser
         int IOStat;                               // IO Status when calling get input subroutine
         bool IsValid;                             // Flag for validating PLF curve, OutsideAirNode
-        static std::string FanInletNode;          // Used to set up comp set
-        static std::string FanOutletNode;         // Used to set up comp set
-        static std::string CoilInletNode;         // Used to set up comp set
-        static std::string CoilOutletNode;        // Used to set up comp set
-        static int SupAirIn(0);                   // Used for error checking HPWHs
-        static int ExhAirOut(0);                  // Used for error checking HPWHs
-        static bool FoundInletNode(false);        // Used for error checking HPWHs
-        static bool FoundOutletNode(false);       // Used for error checking HPWHs
-        static int ZoneNum(0);                    // Used for error checking HPWHs
-        static bool ValidScheduleValue(false);    // Used for error checking HPWH's inlet air mixer schedule
-        static int ZoneEquipConfigNum(0);         // Used to determine if HPWH tank is in a Zone Equipment List (ZEL)
-        static int ZoneEquipListNum(0);           // Used to determine if HPWH tank is in a Zone Equipment List
-        static int EquipmentTypeNum(0);           // Used to determine if HPWH tank is in a Zone Equipment List
-        static bool FoundTankInList(false);       // Used to determine if HPWH tank is listed in a Zone Equipment List
-        static bool TankNotLowestPriority(false); // Used to determine if HPWH tank is prioritized correctly in ZEL
-        static int TankCoolingPriority(0);        // Used to determine if a HPWH tank is prioritized correctly in ZEL
-        static int TankHeatingPriority(0);        // Used to determine if a HPWH tank is prioritized correctly in ZEL
-        static bool DXCoilErrFlag(false);         // Used for error checking DX coils used with HPWHs
-        static Real64 FanVolFlow(0.0);            // Used for error checking fans used with HPWHs
-        static bool errFlag(false);               // Used for error checking used with HPWHs
-        static Real64 HEffFTemp(0.0);             // Used for error checking desuperheater heating coils
+        std::string FanInletNode;          // Used to set up comp set
+        std::string FanOutletNode;         // Used to set up comp set
+        std::string CoilInletNode;         // Used to set up comp set
+        std::string CoilOutletNode;        // Used to set up comp set
+        int SupAirIn(0);                   // Used for error checking HPWHs
+        int ExhAirOut(0);                  // Used for error checking HPWHs
+        bool FoundInletNode(false);        // Used for error checking HPWHs
+        bool FoundOutletNode(false);       // Used for error checking HPWHs
+        int ZoneNum(0);                    // Used for error checking HPWHs
+        bool ValidScheduleValue(false);    // Used for error checking HPWH's inlet air mixer schedule
+        int ZoneEquipConfigNum(0);         // Used to determine if HPWH tank is in a Zone Equipment List (ZEL)
+        int ZoneEquipListNum(0);           // Used to determine if HPWH tank is in a Zone Equipment List
+        int EquipmentTypeNum(0);           // Used to determine if HPWH tank is in a Zone Equipment List
+        bool FoundTankInList(false);       // Used to determine if HPWH tank is listed in a Zone Equipment List
+        bool TankNotLowestPriority(false); // Used to determine if HPWH tank is prioritized correctly in ZEL
+        int TankCoolingPriority(0);        // Used to determine if a HPWH tank is prioritized correctly in ZEL
+        int TankHeatingPriority(0);        // Used to determine if a HPWH tank is prioritized correctly in ZEL
+        bool DXCoilErrFlag(false);         // Used for error checking DX coils used with HPWHs
+        Real64 FanVolFlow(0.0);            // Used for error checking fans used with HPWHs
+        bool errFlag(false);               // Used for error checking used with HPWHs
+        Real64 HEffFTemp(0.0);             // Used for error checking desuperheater heating coils
         bool Okay;
         bool bIsVScoil(false); // indicate if the heat pump WH coil is a variable-speed coil
         int IHPIndex(0);       // coil No for integrated heat pump
-        std::string IHPCoilName("");
+        std::string IHPCoilName();
 
         // Following allow for temporary storage of character strings but not saved in main structure
         Real64 rho; // local fluid density
-        static int DummyWaterIndex(1);
+        int DummyWaterIndex(1);
 
         struct WaterHeaterSaveNodes
         {
@@ -965,18 +967,18 @@ namespace WaterThermalTanks {
         Array1D<WaterHeaterSaveNodes> CoilSaveNodeNames; // temporary for coil node names used in later checks
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_720("('! <Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},Standard Rated Recovery Efficiency, "
+        ObjexxFCL::gio::Fmt Format_720("('! <Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},Standard Rated Recovery Efficiency, "
                                    "','Standard Rated Energy Factor')");
-        static ObjexxFCL::gio::Fmt Format_721("('! <Heat Pump Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},','Standard Rated Recovery "
+        ObjexxFCL::gio::Fmt Format_721("('! <Heat Pump Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},','Standard Rated Recovery "
                                    "Efficiency,Standard Rated Energy Factor,\"DX Coil Total Cooling Rate {W, HPWH Only}\"')");
-        static ObjexxFCL::gio::Fmt Format_722("('! <Water Heater Stratified Node Information>,Node Number,Height {m},Volume {m3},Maximum Capacity "
+        ObjexxFCL::gio::Fmt Format_722("('! <Water Heater Stratified Node Information>,Node Number,Height {m},Volume {m3},Maximum Capacity "
                                    "{W},','Off-Cycle UA {W/K},On-Cycle UA {W/K},Number Of Inlets,Number Of Outlets')");
-        static ObjexxFCL::gio::Fmt Format_725(
+        ObjexxFCL::gio::Fmt Format_725(
             "('! <Chilled Water Tank Information>,Type,Name,Volume {m3},Use Side Design Flow Rate {m3/s}, ','Source Side Design Flow Rate {m3/s}')");
-        static ObjexxFCL::gio::Fmt Format_726("('! <Chilled Water Tank Stratified Node Information>,Node Number,Height {m},Volume {m3},','UA {W/K},Number Of "
+        ObjexxFCL::gio::Fmt Format_726("('! <Chilled Water Tank Stratified Node Information>,Node Number,Height {m},Volume {m3},','UA {W/K},Number Of "
                                    "Inlets,Number Of Outlets')");
-        static ObjexxFCL::gio::Fmt Format_723("('Water Heater Stratified Node Information',8(',',A))");
-        static ObjexxFCL::gio::Fmt Format_724("('Chilled Water Tank Stratified Node Information',6(',',A))");
+        ObjexxFCL::gio::Fmt Format_723("('Water Heater Stratified Node Information',8(',',A))");
+        ObjexxFCL::gio::Fmt Format_724("('Chilled Water Tank Stratified Node Information',6(',',A))");
 
         // FLOW:
 
@@ -5625,8 +5627,8 @@ namespace WaterThermalTanks {
         // the Newton-Raphson iterative method.  For vertical cylinders and other shapes, the node heights are calculated
         // using basic geometry.
 
-        static Real64 Tolerance(1.0e-8); // Tolerance for Newton-Raphson solution
-        static Real64 FluidCond(0.6);    // Conductivity of water (W/m-K)
+        Real64 Tolerance(1.0e-8); // Tolerance for Newton-Raphson solution
+        Real64 FluidCond(0.6);    // Conductivity of water (W/m-K)
         static std::string const RoutineName("GetWaterThermalTankInput");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -5656,7 +5658,7 @@ namespace WaterThermalTanks {
         Real64 c0;
         Real64 G;   // Function that should converge to zero for the Newton-Raphson solution
         Real64 rho; // local fluid density (kg/m3)
-        static int DummyWaterIndex(1);
+        int DummyWaterIndex(1);
 
         WaterThermalTankData &Tank = WaterThermalTank(WaterThermalTankNum);
 
@@ -5900,9 +5902,9 @@ namespace WaterThermalTanks {
         Real64 FanVolFlow(0.0);                 // Used for error checking fans used with HPWHs
         //  LOGICAL,SAVE        :: ZoneEquipmentListChecked = .FALSE.  ! True after the Zone Equipment List has been checked for items
         //  Integer             :: Loop
-        static Array1D_bool MyEnvrnFlag;      // flag for init once at start of environment
-        static Array1D_bool WarmupFlag;     // flag for init after warmup complete
-        static Array1D_bool SetLoopIndexFlag; // get loop number flag
+        Array1D_bool MyEnvrnFlag;      // flag for init once at start of environment
+        Array1D_bool WarmupFlag;     // flag for init after warmup complete
+        Array1D_bool SetLoopIndexFlag; // get loop number flag
                                               //		static Array1D_bool MySizingDoneFlag; // true if sizing is finished
 
         static std::string const RoutineName("InitWaterThermalTank");
@@ -5915,9 +5917,9 @@ namespace WaterThermalTanks {
         Real64 mdotSource; // local temporary for source side mass flow
         bool errFlag;
         Real64 rho; // local fluid density
-        static int DummyWaterIndex(1);
-        static Real64 TankChangeRateScale(0.0); // local temporary for nominal tank change rate
-        static Real64 MaxSideVolFlow(0.0);      // local temporary for largest connection design flow
+        int DummyWaterIndex(1);
+        Real64 TankChangeRateScale(0.0); // local temporary for nominal tank change rate
+        Real64 MaxSideVolFlow(0.0);      // local temporary for largest connection design flow
         int VSCoilID(0);                        // id of variable-speed HPWH coil
 
         // FLOW:
@@ -6805,7 +6807,7 @@ namespace WaterThermalTanks {
         bool SetPointRecovered;    // Flag to indicate when setpoint is recovered for the first time
         Real64 rho;
         Real64 HPWHCondenserDeltaT(0.0); // Temperature difference across the condenser for a heat pump water heater
-        static int DummyWaterIndex(1);
+        int DummyWaterIndex(1);
 
         // Reference to objects
         WaterThermalTankData &Tank = WaterThermalTank(WaterThermalTankNum); // Reference to the tank object to save typing
@@ -7750,7 +7752,7 @@ namespace WaterThermalTanks {
         const Real64 MinTemp2 = Tank.SetPointTemp2 - Tank.DeadBandDeltaTemp2;
 
         // Specific Heat of water (J/kg K)
-        static int DummyWaterIndex = 1;
+        int DummyWaterIndex = 1;
         const Real64 Cp = [&]{
             if (Tank.UseSidePlantLoopNum > 0) {
                 return FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(Tank.UseSidePlantLoopNum).FluidName, Tank.TankTemp, DataPlant::PlantLoop(Tank.UseSidePlantLoopNum).FluidIndex, RoutineName);
@@ -8511,7 +8513,7 @@ namespace WaterThermalTanks {
         int SolFla;                 // Flag of RegulaFalsi solver
         int SourceID;               // Waste Heat Source ID number
         Array1D<Real64> Par(5);     // Parameters passed to RegulaFalsi
-        static Real64 MinTemp(0.0); // used for error messages, C
+        Real64 MinTemp(0.0); // used for error messages, C
         std::string IterNum;        // Max number of iterations for warning message
 
         // FLOW:
@@ -10858,7 +10860,7 @@ namespace WaterThermalTanks {
 
         int PltSizNum;    // Plant Sizing index corresponding to CurLoopNum
         bool ErrorsFound; // If errors detected in input
-        static int DummyWaterIndex(1);
+        int DummyWaterIndex(1);
         Real64 rho; // temporary fluid density
         int tmpLoopNum;
         int tmpLoopSideNum;
@@ -11053,15 +11055,12 @@ namespace WaterThermalTanks {
         Real64 Tfinish; // final target temp for sizing
         Real64 SumPeopleAllZones;
         Real64 SumFloorAreaAllZones;
-        // unused  INTEGER   :: CollectorNum  ! do loop index
-        //		static bool SizeVolume( false );
-        //		static bool SizeMaxCapacity( false );
         Real64 rho;
         Real64 Cp;
-        static int DummyWaterIndex(1);
+        int DummyWaterIndex(1);
         Real64 tmpTankVolume;  // local temporary for tank volume m3
         Real64 tmpMaxCapacity; // local temporary for heating capacity W
-        static bool FuelTypeIsLikeGas(false);
+        bool FuelTypeIsLikeGas(false);
 
         // local inits
         Tstart = 14.44;
@@ -11461,7 +11460,7 @@ namespace WaterThermalTanks {
         int CollectorNum;
         Real64 rho;
         Real64 Cp;
-        static int DummyWaterIndex(1);
+        int DummyWaterIndex(1);
         Real64 tmpTankVolume;  // local temporary for tank volume m3
         Real64 tmpMaxCapacity; // local temporary for heating capacity W
 
@@ -11630,7 +11629,7 @@ namespace WaterThermalTanks {
 
         Real64 eff; // temporary effectiveness value for heat exchanger inside tank
 
-        static int DummyWaterIndex(1);
+        int DummyWaterIndex(1);
         Real64 rho;
         Real64 tmpUseDesignVolFlowRate;    // local use side design flow rate
         Real64 tmpSourceDesignVolFlowRate; // local use side design flow rate
@@ -11867,8 +11866,8 @@ namespace WaterThermalTanks {
         Real64 tmpMaxCapacity; // local temporary for heating capacity W
         Real64 Tstart;         // initial tank temp for sizing.
         Real64 Tfinish;        // final target temp for sizing
-        static bool FuelTypeIsLikeGas(false);
-        static int DummyWaterIndex(1);
+        bool FuelTypeIsLikeGas(false);
+        int DummyWaterIndex(1);
         Real64 rho;
         Real64 Cp;
         Real64 DrawDesignVolFlowRate;
@@ -12322,8 +12321,8 @@ namespace WaterThermalTanks {
         std::string VSCoilName = "";
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_720("('Water Heater Information',6(',',A))");
-        static ObjexxFCL::gio::Fmt Format_721("('Heat Pump Water Heater Information',7(',',A))");
+        ObjexxFCL::gio::Fmt Format_720("('Water Heater Information',6(',',A))");
+        ObjexxFCL::gio::Fmt Format_721("('Heat Pump Water Heater Information',7(',',A))");
 
         if (AlreadyRated(WaterThermalTankNum)) { // bail we already did this one
             return;
@@ -12719,11 +12718,11 @@ namespace WaterThermalTanks {
         // PURPOSE OF THIS SUBROUTINE:
         // send chilled water tank info to EIO
 
-        static bool MyOneTimeSetupFlag(true); // one time setup flag
-        static Array1D_bool AlreadyReported;  // control so we don't repeat again
+        bool MyOneTimeSetupFlag(true); // one time setup flag
+        Array1D_bool AlreadyReported;  // control so we don't repeat again
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_728("('Chilled Water Tank Information',5(',',A))");
+        ObjexxFCL::gio::Fmt Format_728("('Chilled Water Tank Information',5(',',A))");
 
         if (MyOneTimeSetupFlag) {
             AlreadyReported.dimension(NumWaterThermalTank, false);
@@ -12803,37 +12802,6 @@ namespace WaterThermalTanks {
         } else {
             return (this->SetPointTemp - this->DeadBandDeltaTemp);
         }
-    }
-
-    void clear_state()
-    {
-        ValidSourceType.deallocate();
-        MyHPSizeFlag.deallocate();
-        CheckWTTEquipName.deallocate();
-        CheckHPWHEquipName.deallocate();
-
-        NumChilledWaterMixed = 0;
-        NumChilledWaterStratified = 0;
-        NumWaterHeaterMixed = 0;
-        NumWaterHeaterStratified = 0;
-        NumWaterThermalTank = 0;
-        NumWaterHeaterDesuperheater = 0;
-        NumHeatPumpWaterHeater = 0;
-
-        HPPartLoadRatio = 0.0;
-        GetWaterThermalTankInputFlag = true;
-        MixerInletAirSchedule = 0.0;
-        MdotAir = 0.0;
-        NumWaterHeaterSizing = 0;
-        AlreadyRated.deallocate();
-
-        SimWaterThermalTank_OneTimeSetupFlag = true;
-        InitWaterThermalTanksOnce = true;
-        CalcWaterThermalTankZoneGains_MyEnvrnFlag = true;
-        WaterThermalTank.deallocate();
-        UniqueWaterThermalTankNames.clear();
-        HPWaterHeater.deallocate();
-        WaterHeaterDesuperheater.deallocate();
     }
 
 } // namespace WaterThermalTanks
