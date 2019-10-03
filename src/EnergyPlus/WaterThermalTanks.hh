@@ -99,7 +99,6 @@ namespace WaterThermalTanks {
     extern int const MixedWaterHeater;      // WaterHeater:Mixed
     extern int const StratifiedWaterHeater; // WaterHeater:Stratified
     // stovall, next line never used because all desuperheater coils used in mixed water heater types
-    extern int const CoilWaterDesuperHeater;        // Coil:WaterHeating:Desuperheater
     extern int const MixedChilledWaterStorage;      // 'ThermalStorage:ChilledWater:Mixed'
     extern int const StratifiedChilledWaterStorage; // 'ThermalStorage:ChilledWater:Stratified'
 
@@ -122,14 +121,6 @@ namespace WaterThermalTanks {
     extern int const SizePerFloorArea;
     extern int const SizePerUnit;
     extern int const SizePerSolarColArea;
-
-    extern int const HPWHControlNotSet;
-    extern int const Heater1HPWHControl;
-    extern int const Heater2HPWHControl;
-    extern int const SourceInletHPWHControl;
-    extern int const SourceOutletHPWHControl;
-    extern int const UseInletHPWHControl;
-    extern int const UseOutletHPWHControl;
 
     extern int const SourceSideStorageTank;
     extern int const SourceSideIndirectHeatPrimarySetpoint;
@@ -636,14 +627,8 @@ namespace WaterThermalTanks {
         int SaveWHMode;                       // mode of water heater tank element (backup element)
         Real64 BackupElementCapacity;         // Tank backup element capacity (W)
         Real64 DXSysPLR;                      // runtime fraction of desuperheater heating coil
-        std::string ReclaimHeatingSourceName; // The source name for the Desuperheater Heating Coil
         int ReclaimHeatingSourceIndexNum;     // Index to reclaim heating source (condenser) of a specific type
         int ReclaimHeatingSource;             // The source for the Desuperheater Heating Coil
-        // COMPRESSOR RACK:REFRIGERATED CASE    = 1
-        // COIL:DX:COOLINGBYPASSFACTOREMPIRICAL = 2
-        // COIL:DX:MULTISPEED:COOLINGEMPIRICAL  = 3
-        // COIL:DX:MultiMode:CoolingEmpirical   = 4
-        // CONDENSER:REFRIGERATION              = 5
         int SetPointError;           // Used when temp SP in tank and desuperheater are reversed
         int SetPointErrIndex1;       // Index to recurring error for tank/desuperheater set point temp
         int IterLimitErrIndex1;      // Index for recurring iteration limit warning messages
@@ -678,23 +663,23 @@ namespace WaterThermalTanks {
 
     // Functions
 
-    void SimWaterThermalTank(int const CompType,
+    void SimWaterThermalTank(int CompType,
                              std::string const &CompName,
                              int &CompIndex,
-                             bool const RunFlag, // unused1208
-                             bool const InitLoopEquip,
+                             bool RunFlag, // unused1208
+                             bool InitLoopEquip,
                              Real64 &MyLoad,
                              Real64 &MaxCap,
                              Real64 &MinCap,
                              Real64 &OptCap,
-                             bool const FirstHVACIteration, // TRUE if First iteration of simulation
+                             bool FirstHVACIteration, // TRUE if First iteration of simulation
                              Optional_int_const LoopNum = _,
                              Optional_int_const LoopSideNum = _);
 
-    void SimulateWaterHeaterStandAlone(int const WaterHeaterNum, bool const FirstHVACIteration);
+    void SimulateWaterHeaterStandAlone(int WaterHeaterNum, bool FirstHVACIteration);
 
     void SimHeatPumpWaterHeater(std::string const &CompName,
-                                bool const FirstHVACIteration,
+                                bool FirstHVACIteration,
                                 Real64 &SensLoadMet, // sensible load met by this equipment and sent to zone, W
                                 Real64 &LatLoadMet,  // net latent load met and sent to zone (kg/s), dehumid = negative
                                 int &CompIndex);
@@ -705,16 +690,16 @@ namespace WaterThermalTanks {
 
     bool GetWaterThermalTankInputData(bool &ErrorFlag);
 
-    void ValidatePLFCurve(int const CurveIndex, bool &IsValid);
+    void ValidatePLFCurve(int CurveIndex, bool &IsValid);
 
-    void SetupStratifiedNodes(int const WaterThermalTankNum); // Water Heater being simulated
+    void SetupStratifiedNodes(int WaterThermalTankNum); // Water Heater being simulated
 
-    void InitWaterThermalTank(int const WaterThermalTankNum,
-                              bool const FirstHVACIteration,
+    void InitWaterThermalTank(int WaterThermalTankNum,
+                              bool FirstHVACIteration,
                               Optional_int_const LoopNum = _,
                               Optional_int_const LoopSideNum = _);
 
-    void CalcWaterThermalTankMixed(int const WaterThermalTankNum); // Water Heater being simulated
+    void CalcWaterThermalTankMixed(int WaterThermalTankNum); // Water Heater being simulated
 
     void CalcMixedTankSourceSideHeatTransferRate(Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if
                                                                              // there is no heat pump or if the heat pump is off
@@ -726,124 +711,124 @@ namespace WaterThermalTanks {
                                                  Real64 &Qsource             // steady state heat transfer rate from a constant source side flow
     );
 
-    Real64 CalcTimeNeeded(Real64 const Ti, // Initial tank temperature (C)
-                          Real64 const Tf, // Final tank temperature (C)
-                          Real64 const Ta, // Ambient environment temperature (C)
-                          Real64 const T1, // Temperature of flow 1 (C)
-                          Real64 const T2, // Temperature of flow 2 (C)
-                          Real64 const m,  // Mass of tank fluid (kg)
-                          Real64 const Cp, // Specific heat of fluid (J/kg deltaC)
-                          Real64 const m1, // Mass flow rate 1 (kg/s)
-                          Real64 const m2, // Mass flow rate 2 (kg/s)
-                          Real64 const UA, // Heat loss coefficient to ambient environment (W/deltaC)
-                          Real64 const Q   // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
+    Real64 CalcTimeNeeded(Real64 Ti, // Initial tank temperature (C)
+                          Real64 Tf, // Final tank temperature (C)
+                          Real64 Ta, // Ambient environment temperature (C)
+                          Real64 T1, // Temperature of flow 1 (C)
+                          Real64 T2, // Temperature of flow 2 (C)
+                          Real64 m,  // Mass of tank fluid (kg)
+                          Real64 Cp, // Specific heat of fluid (J/kg deltaC)
+                          Real64 m1, // Mass flow rate 1 (kg/s)
+                          Real64 m2, // Mass flow rate 2 (kg/s)
+                          Real64 UA, // Heat loss coefficient to ambient environment (W/deltaC)
+                          Real64 Q   // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
     );
 
-    Real64 CalcTankTemp(Real64 const Ti, // Initial tank temperature (C)
-                        Real64 const Ta, // Ambient environment temperature (C)
-                        Real64 const T1, // Temperature of flow 1 (C)
-                        Real64 const T2, // Temperature of flow 2 (C)
-                        Real64 const m,  // Mass of tank fluid (kg)
-                        Real64 const Cp, // Specific heat of fluid (J/kg deltaC)
-                        Real64 const m1, // Mass flow rate 1 (kg/s)
-                        Real64 const m2, // Mass flow rate 2 (kg/s)
-                        Real64 const UA, // Heat loss coefficient to ambient environment (W/deltaC)
-                        Real64 const Q,  // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
-                        Real64 const t   // Time elapsed from Ti to Tf (s)
+    Real64 CalcTankTemp(Real64 Ti, // Initial tank temperature (C)
+                        Real64 Ta, // Ambient environment temperature (C)
+                        Real64 T1, // Temperature of flow 1 (C)
+                        Real64 T2, // Temperature of flow 2 (C)
+                        Real64 m,  // Mass of tank fluid (kg)
+                        Real64 Cp, // Specific heat of fluid (J/kg deltaC)
+                        Real64 m1, // Mass flow rate 1 (kg/s)
+                        Real64 m2, // Mass flow rate 2 (kg/s)
+                        Real64 UA, // Heat loss coefficient to ambient environment (W/deltaC)
+                        Real64 Q,  // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
+                        Real64 t   // Time elapsed from Ti to Tf (s)
     );
 
-    Real64 CalcTempIntegral(Real64 const Ti, // Initial tank temperature (C)
-                            Real64 const Tf, // Final tank temperature (C)
-                            Real64 const Ta, // Ambient environment temperature (C)
-                            Real64 const T1, // Temperature of flow 1 (C)
-                            Real64 const T2, // Temperature of flow 2 (C)
-                            Real64 const m,  // Mass of tank fluid (kg)
-                            Real64 const Cp, // Specific heat of fluid (J/kg deltaC)
-                            Real64 const m1, // Mass flow rate 1 (kg/s)
-                            Real64 const m2, // Mass flow rate 2 (kg/s)
-                            Real64 const UA, // Heat loss coefficient to ambient environment (W/deltaC)
-                            Real64 const Q,  // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
-                            Real64 const t   // Time elapsed from Ti to Tf (s)
+    Real64 CalcTempIntegral(Real64 Ti, // Initial tank temperature (C)
+                            Real64 Tf, // Final tank temperature (C)
+                            Real64 Ta, // Ambient environment temperature (C)
+                            Real64 T1, // Temperature of flow 1 (C)
+                            Real64 T2, // Temperature of flow 2 (C)
+                            Real64 m,  // Mass of tank fluid (kg)
+                            Real64 Cp, // Specific heat of fluid (J/kg deltaC)
+                            Real64 m1, // Mass flow rate 1 (kg/s)
+                            Real64 m2, // Mass flow rate 2 (kg/s)
+                            Real64 UA, // Heat loss coefficient to ambient environment (W/deltaC)
+                            Real64 Q,  // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
+                            Real64 t   // Time elapsed from Ti to Tf (s)
     );
 
-    Real64 PartLoadFactor(int const WaterThermalTankNum, Real64 const PartLoadRatio);
+    Real64 PartLoadFactor(int WaterThermalTankNum, Real64 PartLoadRatio);
 
-    void CalcWaterThermalTankStratified(int const WaterThermalTankNum // Water Heater being simulated
+    void CalcWaterThermalTankStratified(int WaterThermalTankNum // Water Heater being simulated
     );
 
-    void CalcNodeMassFlows(int const WaterThermalTankNum, // Water Heater being simulated
-                           int const InletMode            // InletModeFixed or InletModeSeeking
+    void CalcNodeMassFlows(int WaterThermalTankNum, // Water Heater being simulated
+                           int InletMode            // InletModeFixed or InletModeSeeking
     );
 
-    void CalcDesuperheaterWaterHeater(int const WaterThermalTankNum, // Water Heater being simulated
-                                      bool const FirstHVACIteration  // TRUE if First iteration of simulation
+    void CalcDesuperheaterWaterHeater(int WaterThermalTankNum, // Water Heater being simulated
+                                      bool FirstHVACIteration  // TRUE if First iteration of simulation
     );
 
-    void CalcHeatPumpWaterHeater(int const WaterThermalTankNum, // Water Heater tank being simulated
-                                 bool const FirstHVACIteration  // TRUE if First iteration of simulation
+    void CalcHeatPumpWaterHeater(int WaterThermalTankNum, // Water Heater tank being simulated
+                                 bool FirstHVACIteration  // TRUE if First iteration of simulation
     );
 
-    void CalcWaterThermalTank(int const WaterThermalTankNum);
+    void CalcWaterThermalTank(int WaterThermalTankNum);
 
     Real64 GetHPWHSensedTankTemp(WaterThermalTankData const &Tank);
 
-    void ConvergeSingleSpeedHPWHCoilAndTank(int const WaterThermalTankNum, Real64 const PartLoadRatio);
+    void ConvergeSingleSpeedHPWHCoilAndTank(int WaterThermalTankNum, Real64 PartLoadRatio);
 
-    Real64 PLRResidualIterSpeed(Real64 const SpeedRatio,  // speed ratio between two speed levels
+    Real64 PLRResidualIterSpeed(Real64 SpeedRatio,  // speed ratio between two speed levels
                                 Array1<Real64> const &Par //
     );
 
-    Real64 PLRResidualWaterThermalTank(Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 PLRResidualWaterThermalTank(Real64 HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                 Array1<Real64> const &Par     // par(1) = HP set point temperature [C]
     );
 
-    Real64 PLRResidualHPWH(Real64 const HPPartLoadRatio, Array1<Real64> const &Par);
+    Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1<Real64> const &Par);
 
-    bool SourceHeatNeed(WaterThermalTankData const WaterThermalTank,
-                        Real64 const OutletTemp,
-                        Real64 const DeadBandTemp,
-                        Real64 const SetPointTemp);
+    bool SourceHeatNeed(WaterThermalTankData WaterThermalTank,
+                        Real64 OutletTemp,
+                        Real64 DeadBandTemp,
+                        Real64 SetPointTemp);
 
-    Real64 PlantMassFlowRatesFunc(int const WaterThermalTankNum,
-                                  int const InNodeNum,
-                                  bool const FirstHVACIteration,
-                                  int const WaterThermalTankSide,
-                                  int const PlantLoopSide,
-                                  bool const PlumbedInSeries, // !unused1208
-                                  int const BranchControlType,
-                                  Real64 const OutletTemp,
-                                  Real64 const DeadBandTemp,
-                                  Real64 const SetPointTemp);
+    Real64 PlantMassFlowRatesFunc(int WaterThermalTankNum,
+                                  int InNodeNum,
+                                  bool FirstHVACIteration,
+                                  int WaterThermalTankSide,
+                                  int PlantLoopSide,
+                                  bool PlumbedInSeries, // !unused1208
+                                  int BranchControlType,
+                                  Real64 OutletTemp,
+                                  Real64 DeadBandTemp,
+                                  Real64 SetPointTemp);
 
-    void MinePlantStructForInfo(int const WaterThermalTankNum);
+    void MinePlantStructForInfo(int WaterThermalTankNum);
 
-    void SizeSupplySidePlantConnections(int const WaterThermalTankNum, Optional_int_const LoopNum = _, Optional_int_const LoopSideNum = _);
+    void SizeSupplySidePlantConnections(int WaterThermalTankNum, Optional_int_const LoopNum = _, Optional_int_const LoopSideNum = _);
 
-    void SizeTankForDemandSide(int const WaterThermalTankNum);
+    void SizeTankForDemandSide(int WaterThermalTankNum);
 
-    void SizeTankForSupplySide(int const WaterThermalTankNum);
+    void SizeTankForSupplySide(int WaterThermalTankNum);
 
-    void SizeDemandSidePlantConnections(int const WaterThermalTankNum);
+    void SizeDemandSidePlantConnections(int WaterThermalTankNum);
 
-    void SizeStandAloneWaterHeater(int const WaterThermalTankNum);
+    void SizeStandAloneWaterHeater(int WaterThermalTankNum);
 
-    void UpdateWaterThermalTank(int const WaterThermalTankNum);
+    void UpdateWaterThermalTank(int WaterThermalTankNum);
 
-    void ReportWaterThermalTank(int const WaterThermalTankNum);
+    void ReportWaterThermalTank(int WaterThermalTankNum);
 
-    void CalcStandardRatings(int const WaterThermalTankNum);
+    void CalcStandardRatings(int WaterThermalTankNum);
 
-    void ReportCWTankInits(int const WaterThermalTankNum);
+    void ReportCWTankInits(int WaterThermalTankNum);
 
     Real64 FindStratifiedTankSensedTemp(WaterThermalTankData const &Tank, bool UseAverage = false);
 
-    void SetVSHPWHFlowRates(int const WaterThermalTankNum, // Water Heater tank being simulated
-                            int const HPNum,
-                            int const SpeedNum,
-                            Real64 const SpeedRatio,
-                            Real64 const WaterDens,
+    void SetVSHPWHFlowRates(int WaterThermalTankNum, // Water Heater tank being simulated
+                            int HPNum,
+                            int SpeedNum,
+                            Real64 SpeedRatio,
+                            Real64 WaterDens,
                             Real64 &MdotWater,            // water flow rate
-                            bool const FirstHVACIteration // TRUE if First iteration of simulation
+                            bool FirstHVACIteration // TRUE if First iteration of simulation
     );
 
     void clear_state();
