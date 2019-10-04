@@ -9023,6 +9023,7 @@ int initErrorFile() {
         }
     }
     DataGlobals::err_stream = ObjexxFCL::gio::out_stream(DataGlobals::OutputStandardError);
+    return EXIT_SUCCESS;
 }
 
 } // namespace EnergyPlus

@@ -58,14 +58,12 @@ extern "C" {
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/environment.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <BranchInputManager.hh>
 #include <BranchNodeConnections.hh>
-#include <CommandLineInterface.hh>
 #include <CostEstimateManager.hh>
 #include <CurveManager.hh>
 #include <DataAirLoop.hh>
@@ -175,17 +173,10 @@ namespace SimulationManager {
     using namespace WeatherManager;
     using namespace ExternalInterface;
 
-    // Data
     // MODULE PARAMETER DEFINITIONS:
     static std::string const BlankString;
     static ObjexxFCL::gio::Fmt fmtLD("*");
     static ObjexxFCL::gio::Fmt fmtA("(A)");
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
 
     // MODULE VARIABLE DECLARATIONS:
     bool RunPeriodsInInput(false);
@@ -200,10 +191,6 @@ namespace SimulationManager {
         bool PreP_Fatal(false);
     } // namespace
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
-
-    // MODULE SUBROUTINES:
-
     // Functions
     void clear_state()
     {
@@ -212,100 +199,8 @@ namespace SimulationManager {
         PreP_Fatal = false;
     }
 
-    void ManageSimulation()
-    {
+    void initializeSimulation() {
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Rick Strand
-        //       DATE WRITTEN   January 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine is the main driver of the simulation manager module.
-        // It contains the main environment-time loops for the building
-        // simulation.  This includes the environment loop, a day loop, an
-        // hour loop, and a time step loop.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataEnvironment::CurMnDy;
-        using DataEnvironment::CurrentOverallSimDay;
-        using DataEnvironment::CurrentYearIsLeapYear;
-        using DataEnvironment::EndMonthFlag;
-        using DataEnvironment::EnvironmentName;
-        using DataEnvironment::TotalOverallSimDays;
-        using DataEnvironment::TotDesDays;
-        using DataEnvironment::TotRunDesPersDays;
-        using DataHVACGlobals::TimeStepSys;
-
-        using BranchInputManager::InvalidBranchDefinitions;
-        using BranchInputManager::ManageBranchInput;
-        using BranchInputManager::TestBranchIntegrity;
-        using BranchNodeConnections::CheckNodeConnections;
-        using BranchNodeConnections::TestCompSetInletOutletNodes;
-        using CostEstimateManager::SimCostEstimate;
-        using CurveManager::InitCurveReporting;
-        using DataErrorTracking::AskForConnectionsReport;
-        using DataErrorTracking::ExitDuringSimulations;
-        using DemandManager::InitDemandManagers;
-        using EconomicLifeCycleCost::ComputeLifeCycleCostAndReport;
-        using EconomicLifeCycleCost::GetInputForLifeCycleCost;
-        using EconomicTariff::ComputeTariff; // added for computing annual utility costs
-        using EconomicTariff::WriteTabularTariffReports;
-        using EMSManager::CheckIfAnyEMS;
-        using EMSManager::ManageEMS;
-        using ExteriorEnergyUse::ManageExteriorEnergyUse;
-        using General::TrimSigDigits;
-        using HVACControllers::DumpAirLoopStatistics;
-        using MixedAir::CheckControllerLists;
-        using NodeInputManager::CheckMarkedNodes;
-        using NodeInputManager::SetupNodeVarsForReporting;
-        using OutputProcessor::ReportForTabularReports;
-        using OutputProcessor::SetupTimePointers;
-        using OutputReportPredefined::SetPredefinedTables;
-        using OutputReportTabular::CloseOutputTabularFile;
-        using OutputReportTabular::OpenOutputTabularFile;
-        using OutputReportTabular::ResetTabularReports;
-        using OutputReportTabular::WriteTabularReports;
-        using PlantManager::CheckIfAnyPlant;
-        using PollutionModule::CheckPollutionMeterReporting;
-        using PollutionModule::SetupPollutionCalculations;
-        using PollutionModule::SetupPollutionMeterReporting;
-        using SizingManager::ManageSizing;
-        using SystemReports::CreateEnergyReportStructure;
-        using SystemReports::ReportAirLoopConnections;
-        using namespace DataTimings;
-        using DataSystemVariables::FullAnnualRun;
-        using FaultsManager::CheckAndReadFaults;
-        using OutputProcessor::isFinalYear;
-        using OutputProcessor::ResetAccumulationWhenWarmupComplete;
-        using PlantPipingSystemsManager::CheckIfAnyBasements;
-        using PlantPipingSystemsManager::CheckIfAnySlabs;
-        using PlantPipingSystemsManager::SimulateGroundDomains;
-        using Psychrometrics::InitializePsychRoutines;
-        using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
-        using WeatherManager::CheckIfAnyUnderwaterBoundaries;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool Available; // an environment is available to process
-        static bool ErrorsFound(false);
-        static bool TerminalError(false);
-        bool SimsDone;
-        bool ErrFound;
-        bool oneTimeUnderwaterBoundaryCheck = true;
-        bool AnyUnderwaterBoundaries = false;
-        int EnvCount;
-
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_700("('Environment:WarmupDays,',I3)");
-
-        // CreateSQLiteDatabase();
         sqlite = EnergyPlus::CreateSQLiteDatabase();
 
         if (sqlite) {
@@ -314,10 +209,9 @@ namespace SimulationManager {
             sqlite->sqliteCommit();
         }
 
-        // FLOW:
         PostIPProcessing();
 
-        InitializePsychRoutines();
+        Psychrometrics::InitializePsychRoutines();
 
         BeginSimFlag = true;
         BeginFullSimFlag = false;
@@ -326,33 +220,32 @@ namespace SimulationManager {
         DoWeatherInitReporting = false;
         RunPeriodsInInput =
             (inputProcessor->getNumObjectsFound("RunPeriod") > 0 || inputProcessor->getNumObjectsFound("RunPeriod:CustomRange") > 0 || FullAnnualRun);
-        AskForConnectionsReport = false; // set to false until sizing is finished
+        DataErrorTracking::AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles();
         GetProjectData();
         CheckForMisMatchedEnvironmentSpecifications();
         CheckForRequestedReporting();
-        SetPredefinedTables();
+        OutputReportPredefined::SetPredefinedTables();
         SetPreConstructionInputParameters(); // establish array bounds for constructions early
 
-        SetupTimePointers("Zone", TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-        SetupTimePointers("HVAC", TimeStepSys);
+        OutputProcessor::SetupTimePointers("Zone", TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+        OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
 
-        CheckIfAnyEMS();
-        CheckIfAnyPlant();
-        CheckIfAnySlabs();
-        CheckIfAnyBasements();
-        CheckIfAnyIdealCondEntSetPoint();
+        EMSManager::CheckIfAnyEMS();
+        PlantManager::CheckIfAnyPlant();
+        PlantPipingSystemsManager::CheckIfAnySlabs();
+        PlantPipingSystemsManager::CheckIfAnyBasements();
+        SetPointManager::CheckIfAnyIdealCondEntSetPoint();
         createFacilityElectricPowerServiceObject();
         createCoilSelectionReportObj();
 
-        ManageBranchInput(); // just gets input and returns.
+        BranchInputManager::ManageBranchInput(); // just gets input and returns.
 
         DoingSizing = true;
-        ManageSizing();
+        SizingManager::ManageSizing();
 
         BeginFullSimFlag = true;
-        SimsDone = false;
         if (DoDesDaySim || DoWeathSim || DoHVACSizingSimulation) {
             DoOutputReporting = true;
         }
@@ -362,9 +255,8 @@ namespace SimulationManager {
             ShowWarningError("ManageSimulation: Input file has requested Sizing Calculations but no Simulations are requested (in SimulationControl "
                              "object). Succeeding warnings/errors may be confusing.");
         }
-        Available = true;
 
-        if (InvalidBranchDefinitions) {
+        if (BranchInputManager::InvalidBranchDefinitions) {
             ShowFatalError("Preceding error(s) in Branch Input cause termination.");
         }
 
@@ -380,56 +272,57 @@ namespace SimulationManager {
         ResetEnvironmentCounter();
         SetupSimulation(ErrorsFound);
 
-        CheckAndReadFaults();
+        FaultsManager::CheckAndReadFaults();
 
-        InitCurveReporting();
+        CurveManager::InitCurveReporting();
 
-        AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
+        DataErrorTracking::AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
         KickOffSimulation = false;
         WarmupFlag = false;
         DoWeatherInitReporting = true;
 
         //  Note:  All the inputs have been 'gotten' by the time we get here.
-        ErrFound = false;
+        bool ErrFound = false;
         if (DoOutputReporting) {
             DisplayString("Reporting Surfaces");
 
             ReportSurfaces();
 
-            SetupNodeVarsForReporting();
+            NodeInputManager::SetupNodeVarsForReporting();
             MetersHaveBeenInitialized = true;
-            SetupPollutionMeterReporting();
+            PollutionModule::SetupPollutionMeterReporting();
             UpdateMeterReporting();
-            CheckPollutionMeterReporting();
+            PollutionModule::CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
-            SetupPollutionCalculations();
-            InitDemandManagers();
+            PollutionModule::SetupPollutionCalculations();
+            DemandManager::InitDemandManagers();
 
-            TestBranchIntegrity(ErrFound);
+            bool TerminalError = false;
+            BranchInputManager::TestBranchIntegrity(ErrFound);
             if (ErrFound) TerminalError = true;
             TestAirPathIntegrity(ErrFound);
             if (ErrFound) TerminalError = true;
-            CheckMarkedNodes(ErrFound);
+            NodeInputManager::CheckMarkedNodes(ErrFound);
             if (ErrFound) TerminalError = true;
-            CheckNodeConnections(ErrFound);
+            BranchNodeConnections::CheckNodeConnections(ErrFound);
             if (ErrFound) TerminalError = true;
-            TestCompSetInletOutletNodes(ErrFound);
+            BranchNodeConnections::TestCompSetInletOutletNodes(ErrFound);
             if (ErrFound) TerminalError = true;
-            CheckControllerLists(ErrFound);
+            MixedAir::CheckControllerLists(ErrFound);
             if (ErrFound) TerminalError = true;
 
             if (DoDesDaySim || DoWeathSim) {
                 ReportLoopConnections();
-                ReportAirLoopConnections();
+                SystemReports::ReportAirLoopConnections();
                 ReportNodeConnections();
                 // Debug reports
                 //      CALL ReportCompSetMeterVariables
                 //      CALL ReportParentChildren
             }
 
-            CreateEnergyReportStructure();
+            SystemReports::CreateEnergyReportStructure();
             bool anyEMSRan;
-            ManageEMS(emsCallFromSetupSimulation, anyEMSRan); // point to finish setup processing EMS, sensor ready now
+            EMSManager::ManageEMS(emsCallFromSetupSimulation, anyEMSRan); // point to finish setup processing EMS, sensor ready now
 
             ProduceRDDMDD();
 
@@ -444,7 +337,7 @@ namespace SimulationManager {
             sqlite->sqliteCommit();
         }
 
-        GetInputForLifeCycleCost(); // must be prior to WriteTabularReports -- do here before big simulation stuff.
+        EconomicLifeCycleCost::GetInputForLifeCycleCost(); // must be prior to WriteTabularReports -- do here before big simulation stuff.
 
         // check for variable latitude/location/etc
         WeatherManager::ReadVariableLocationOrientation();
@@ -459,8 +352,21 @@ namespace SimulationManager {
 
         ResetEnvironmentCounter();
 
-        EnvCount = 0;
         WarmupFlag = true;
+
+    }
+
+    void runAllEnvironments() {
+
+        static ObjexxFCL::gio::Fmt Format_700("('Environment:WarmupDays,',I3)");
+
+        bool Available = true; // an environment is available to process
+        static bool ErrorsFound(false);
+        bool oneTimeUnderwaterBoundaryCheck = true;
+        bool AnyUnderwaterBoundaries = false;
+        int EnvCount = 0;
+
+        bool SimsDone = false;
 
         while (Available) {
 
@@ -482,31 +388,31 @@ namespace SimulationManager {
                 sqlite->sqliteCommit();
             }
 
-            ExitDuringSimulations = true;
+            DataErrorTracking::ExitDuringSimulations = true;
             SimsDone = true;
             DisplayString("Initializing New Environment Parameters");
 
             BeginEnvrnFlag = true;
             EndEnvrnFlag = false;
-            EndMonthFlag = false;
+            DataEnvironment::EndMonthFlag = false;
             WarmupFlag = true;
             DayOfSim = 0;
             DayOfSimChr = "0";
             NumOfWarmupDays = 0;
-            if (CurrentYearIsLeapYear) {
+            if (DataEnvironment::CurrentYearIsLeapYear) {
                 if (NumOfDayInEnvrn <= 366) {
-                    isFinalYear = true;
+                    OutputProcessor::isFinalYear = true;
                 }
             } else {
                 if (NumOfDayInEnvrn <= 365) {
-                    isFinalYear = true;
+                    OutputProcessor::isFinalYear = true;
                 }
             }
-            
+
             HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
             bool anyEMSRan;
-            ManageEMS(emsCallFromBeginNewEvironment, anyEMSRan); // calling point
+            EMSManager::ManageEMS(emsCallFromBeginNewEvironment, anyEMSRan); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
@@ -516,8 +422,8 @@ namespace SimulationManager {
                 ObjexxFCL::gio::write(DayOfSimChr, fmtLD) << DayOfSim;
                 strip(DayOfSimChr);
                 if (!WarmupFlag) {
-                    ++CurrentOverallSimDay;
-                    DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);
+                    ++DataEnvironment::CurrentOverallSimDay;
+                    DisplaySimDaysProgress(DataEnvironment::CurrentOverallSimDay, DataEnvironment::TotalOverallSimDays);
                 } else {
                     DayOfSimChr = "0";
                 }
@@ -526,28 +432,28 @@ namespace SimulationManager {
 
                 if (WarmupFlag) {
                     ++NumOfWarmupDays;
-                    cWarmupDay = TrimSigDigits(NumOfWarmupDays);
+                    cWarmupDay = General::TrimSigDigits(NumOfWarmupDays);
                     DisplayString("Warming up {" + cWarmupDay + '}');
                 } else if (DayOfSim == 1) {
                     if (KindOfSim == ksRunPeriodWeather) {
-                        DisplayString("Starting Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
+                        DisplayString("Starting Simulation at " + DataEnvironment::CurMnDyYr + " for " + DataEnvironment::EnvironmentName);
                     } else {
-                        DisplayString("Starting Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
+                        DisplayString("Starting Simulation at " + DataEnvironment::CurMnDy + " for " + DataEnvironment::EnvironmentName);
                     }
                     ObjexxFCL::gio::write(OutputFileInits, Format_700) << NumOfWarmupDays;
-                    ResetAccumulationWhenWarmupComplete();
+                    OutputProcessor::ResetAccumulationWhenWarmupComplete();
                 } else if (DisplayPerfSimulationFlag) {
                     if (KindOfSim == ksRunPeriodWeather) {
-                        DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDyYr + " for " + EnvironmentName);
+                        DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDyYr + " for " + DataEnvironment::EnvironmentName);
                     } else {
-                        DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
+                        DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDy + " for " + DataEnvironment::EnvironmentName);
                     }
                     DisplayPerfSimulationFlag = false;
                 }
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
                 if ((DayOfSim > 365) && ((NumOfDayInEnvrn - DayOfSim) == 364) && !WarmupFlag) {
                     DisplayString("Starting last  year of environment at:  " + DayOfSimChr);
-                    ResetTabularReports();
+                    OutputReportTabular::ResetTabularReports();
                 }
 
                 for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
@@ -557,7 +463,7 @@ namespace SimulationManager {
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
                         if (AnySlabsInModel || AnyBasementsInModel) {
-                            SimulateGroundDomains(false);
+                            PlantPipingSystemsManager::SimulateGroundDomains(false);
                         }
 
                         if (AnyUnderwaterBoundaries) {
@@ -591,7 +497,7 @@ namespace SimulationManager {
 
                         ManageWeather();
 
-                        ManageExteriorEnergyUse();
+                        ExteriorEnergyUse::ManageExteriorEnergyUse();
 
                         ManageHeatBalance();
 
@@ -623,7 +529,7 @@ namespace SimulationManager {
 
         WarmupFlag = false;
         if (!SimsDone && DoDesDaySim) {
-            if ((TotDesDays + TotRunDesPersDays) == 0) { // if sum is 0, then there was no sizing done.
+            if ((DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays) == 0) { // if sum is 0, then there was no sizing done.
                 ShowWarningError("ManageSimulation: SizingPeriod:* were requested in SimulationControl but no SizingPeriod:* objects in input.");
             }
         }
@@ -634,6 +540,10 @@ namespace SimulationManager {
             }
         }
 
+    }
+
+    void wrapUpSimulation() {
+
         PlantManager::CheckOngoingPlantWarnings();
 
         if (sqlite) sqlite->sqliteBegin(); // for final data to write
@@ -641,25 +551,25 @@ namespace SimulationManager {
 #ifdef EP_Detailed_Timings
         epStartTime("Closeout Reporting=");
 #endif
-        SimCostEstimate();
+        CostEstimateManager::SimCostEstimate();
 
-        ComputeTariff(); //     Compute the utility bills
+        EconomicTariff::ComputeTariff(); //     Compute the utility bills
 
         EMSManager::checkForUnusedActuatorsAtEnd();
 
-        ReportForTabularReports(); // For Energy Meters (could have other things that need to be pushed to after simulation)
+        OutputProcessor::ReportForTabularReports(); // For Energy Meters (could have other things that need to be pushed to after simulation)
 
-        OpenOutputTabularFile();
+        OutputReportTabular::OpenOutputTabularFile();
 
-        WriteTabularReports(); //     Create the tabular reports at completion of each
+        OutputReportTabular::WriteTabularReports(); //     Create the tabular reports at completion of each
 
-        WriteTabularTariffReports();
+        EconomicTariff::WriteTabularTariffReports();
 
-        ComputeLifeCycleCostAndReport(); // must be after WriteTabularReports and WriteTabularTariffReports
+        EconomicLifeCycleCost::ComputeLifeCycleCostAndReport(); // must be after WriteTabularReports and WriteTabularTariffReports
 
-        CloseOutputTabularFile();
+        OutputReportTabular::CloseOutputTabularFile();
 
-        DumpAirLoopStatistics(); // Dump runtime statistics for air loop controller simulation to csv file
+        HVACControllers::DumpAirLoopStatistics(); // Dump runtime statistics for air loop controller simulation to csv file
 
 #ifdef EP_Detailed_Timings
         epStopTime("Closeout Reporting=");
@@ -679,6 +589,36 @@ namespace SimulationManager {
             ShowFatalError("Error condition occurred.  Previous Severe Errors cause termination.");
         }
     }
+
+    void ManageSimulation()
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Rick Strand
+        //       DATE WRITTEN   January 1997
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine is the main driver of the simulation manager module.
+        // It contains the main environment-time loops for the building
+        // simulation.  This includes the environment loop, a day loop, an
+        // hour loop, and a time step loop.
+
+        // Formats
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+
+        initializeSimulation();
+
+        runAllEnvironments();
+
+        wrapUpSimulation();
+
+    }
+
+
 
     void GetProjectData()
     {
@@ -1225,22 +1165,6 @@ namespace SimulationManager {
         ObjexxFCL::gio::write(OutputFileInits, Format_751) << RoundSigDigits(std::abs(deviationFromSetPtThresholdHtg), 3)
                                                 << RoundSigDigits(deviationFromSetPtThresholdClg, 3);
 
-        //  IF (DisplayExtraWarnings) THEN
-        //    Write(OutputFileInits,740)
-        //    Write(OutputFileInits,741) (TRIM(Alphas(Num)),Num=1,5)
-        // 742 Format('! <Display Extra Warnings>, Display Advanced Report Variables, Do Not Mirror Detached Shading')
-        //    IF (DisplayAdvancedReportVariables) THEN
-        //      NumOut1='Yes'
-        //    ELSE
-        //      NumOut2='No'
-        //    ENDIF
-        //    IF (.not. MakeMirroredDetachedShading) THEN
-        //      NumOut1='Yes'
-        //    ELSE
-        //      NumOut2='No'
-        //    ENDIF
-        // unused0909743 Format(' Display Extra Warnings',2(', ',A))
-        //  ENDIF
     }
 
     void CheckForMisMatchedEnvironmentSpecifications()
@@ -1558,27 +1482,8 @@ namespace SimulationManager {
         // This subroutine opens all of the input and output files needed for
         // an EnergyPlus run.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataStringGlobals::VerString;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int write_stat;
@@ -1841,8 +1746,6 @@ namespace SimulationManager {
         using ExteriorEnergyUse::ManageExteriorEnergyUse;
         using General::TrimSigDigits;
         using namespace DataTimings;
-        using PlantPipingSystemsManager::CheckIfAnyBasements;
-        using PlantPipingSystemsManager::CheckIfAnySlabs;
         using PlantPipingSystemsManager::SimulateGroundDomains;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
