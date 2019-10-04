@@ -181,6 +181,10 @@ namespace SimulationManager {
     // MODULE VARIABLE DECLARATIONS:
     bool RunPeriodsInInput(false);
     bool RunControlInInput(false);
+    bool oneTimeUnderwaterBoundaryCheck(true);
+    bool AnyUnderwaterBoundaries(false);
+    int EnvCount(0);
+    bool SimsDone(false);
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -196,6 +200,10 @@ namespace SimulationManager {
     {
         RunPeriodsInInput = false;
         RunControlInInput = false;
+        oneTimeUnderwaterBoundaryCheck = true;
+        AnyUnderwaterBoundaries = false;
+        EnvCount = 0;
+        SimsDone = false;
         PreP_Fatal = false;
     }
 
@@ -356,176 +364,190 @@ namespace SimulationManager {
 
     }
 
-    void runAllEnvironments() {
+    void runOneTimeStep() {
 
+        if (AnySlabsInModel || AnyBasementsInModel) {
+            PlantPipingSystemsManager::SimulateGroundDomains(false);
+        }
+
+        if (AnyUnderwaterBoundaries) {
+            WeatherManager::UpdateUnderwaterBoundaries();
+        }
+
+        if (DataEnvironment::varyingLocationSchedIndexLat > 0 || DataEnvironment::varyingLocationSchedIndexLong > 0 ||
+            DataEnvironment::varyingOrientationSchedIndex > 0) {
+            WeatherManager::UpdateLocationAndOrientation();
+        }
+
+        BeginTimeStepFlag = true;
+        ExternalInterfaceExchangeVariables();
+
+        // Set the End__Flag variables to true if necessary.  Note that
+        // each flag builds on the previous level.  EndDayFlag cannot be
+        // .TRUE. unless EndHourFlag is also .TRUE., etc.  Note that the
+        // EndEnvrnFlag and the EndSimFlag cannot be set during warmup.
+        // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
+        // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
+
+        if (TimeStep == NumOfTimeStepInHour) {
+            EndHourFlag = true;
+            if (HourOfDay == 24) {
+                EndDayFlag = true;
+                if ((!WarmupFlag) && (DayOfSim == NumOfDayInEnvrn)) {
+                    EndEnvrnFlag = true;
+                }
+            }
+        }
+
+        ManageWeather();
+
+        ExteriorEnergyUse::ManageExteriorEnergyUse();
+
+        ManageHeatBalance();
+
+        if (oneTimeUnderwaterBoundaryCheck) {
+            AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
+            oneTimeUnderwaterBoundaryCheck = false;
+        }
+
+        BeginHourFlag = false;
+        BeginDayFlag = false;
+        BeginEnvrnFlag = false;
+        BeginSimFlag = false;
+        BeginFullSimFlag = false;
+
+    }
+
+    void runOneHour() {
+        BeginHourFlag = true;
+        EndHourFlag = false;
+        for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+            runOneTimeStep();
+        } // TimeStep loop
+        PreviousHour = HourOfDay;
+    }
+
+    void runOneDay() {
         static ObjexxFCL::gio::Fmt Format_700("('Environment:WarmupDays,',I3)");
 
+        if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
+
+        ++DayOfSim;
+        ObjexxFCL::gio::write(DayOfSimChr, fmtLD) << DayOfSim;
+        strip(DayOfSimChr);
+        if (!WarmupFlag) {
+            ++DataEnvironment::CurrentOverallSimDay;
+            DisplaySimDaysProgress(DataEnvironment::CurrentOverallSimDay, DataEnvironment::TotalOverallSimDays);
+        } else {
+            DayOfSimChr = "0";
+        }
+        BeginDayFlag = true;
+        EndDayFlag = false;
+
+        if (WarmupFlag) {
+            ++NumOfWarmupDays;
+            cWarmupDay = General::TrimSigDigits(NumOfWarmupDays);
+            DisplayString("Warming up {" + cWarmupDay + '}');
+        } else if (DayOfSim == 1) {
+            if (DataGlobals::KindOfSim == ksRunPeriodWeather) {
+                DisplayString("Starting Simulation at " + DataEnvironment::CurMnDyYr + " for " + DataEnvironment::EnvironmentName);
+            } else {
+                DisplayString("Starting Simulation at " + DataEnvironment::CurMnDy + " for " + DataEnvironment::EnvironmentName);
+            }
+            ObjexxFCL::gio::write(OutputFileInits, Format_700) << NumOfWarmupDays;
+            OutputProcessor::ResetAccumulationWhenWarmupComplete();
+        } else if (DisplayPerfSimulationFlag) {
+            if (DataGlobals::KindOfSim == ksRunPeriodWeather) {
+                DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDyYr + " for " + DataEnvironment::EnvironmentName);
+            } else {
+                DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDy + " for " + DataEnvironment::EnvironmentName);
+            }
+            DisplayPerfSimulationFlag = false;
+        }
+        // for simulations that last longer than a week, identify when the last year of the simulation is started
+        if ((DayOfSim > 365) && ((NumOfDayInEnvrn - DayOfSim) == 364) && !WarmupFlag) {
+            DisplayString("Starting last  year of environment at:  " + DayOfSimChr);
+            OutputReportTabular::ResetTabularReports();
+        }
+
+        for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+
+            runOneHour();
+
+        } // ... End hour loop.
+
+        if (sqlite) sqlite->sqliteCommit(); // one transaction per day
+    }
+
+    void runEnvironment() {
+
+        ++EnvCount;
+        if (sqlite) {
+            sqlite->sqliteBegin();
+            sqlite->createSQLiteEnvironmentPeriodRecord(DataEnvironment::CurEnvirNum, DataEnvironment::EnvironmentName, DataGlobals::KindOfSim);
+            sqlite->sqliteCommit();
+        }
+
+        DataErrorTracking::ExitDuringSimulations = true;
+        SimsDone = true;
+        DisplayString("Initializing New Environment Parameters");
+
+        BeginEnvrnFlag = true;
+        EndEnvrnFlag = false;
+        DataEnvironment::EndMonthFlag = false;
+        WarmupFlag = true;
+        DayOfSim = 0;
+        DayOfSimChr = "0";
+        NumOfWarmupDays = 0;
+        if (DataEnvironment::CurrentYearIsLeapYear) {
+            if (NumOfDayInEnvrn <= 366) {
+                OutputProcessor::isFinalYear = true;
+            }
+        } else {
+            if (NumOfDayInEnvrn <= 365) {
+                OutputProcessor::isFinalYear = true;
+            }
+        }
+
+        HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
+
+        bool anyEMSRan;
+        EMSManager::ManageEMS(emsCallFromBeginNewEvironment, anyEMSRan); // calling point
+
+        while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
+
+            runOneDay();
+
+        } // ... End day loop.
+
+        // Need one last call to send latest states to middleware
+        ExternalInterfaceExchangeVariables();
+
+    }
+
+    bool skipCurrentEnvironment() {
+        if ((!DoDesDaySim) && (DataGlobals::KindOfSim != ksRunPeriodWeather)) return true;
+        if ((!DoWeathSim) && (DataGlobals::KindOfSim == ksRunPeriodWeather)) return true;
+        if (DataGlobals::KindOfSim == ksHVACSizeDesignDay) return true; // don't run these here, only for sizing simulations
+        if (DataGlobals::KindOfSim == ksHVACSizeRunPeriodDesign) return true; // don't run these here, only for sizing simulations
+        return false;
+    }
+
+    void runAllEnvironments() {
         bool Available = true; // an environment is available to process
         static bool ErrorsFound(false);
-        bool oneTimeUnderwaterBoundaryCheck = true;
-        bool AnyUnderwaterBoundaries = false;
-        int EnvCount = 0;
-
-        bool SimsDone = false;
-
         while (Available) {
-
-            GetNextEnvironment(Available, ErrorsFound);
-
-            if (!Available) break;
-            if (ErrorsFound) break;
-            if ((!DoDesDaySim) && (KindOfSim != ksRunPeriodWeather)) continue;
-            if ((!DoWeathSim) && (KindOfSim == ksRunPeriodWeather)) continue;
-            if (KindOfSim == ksHVACSizeDesignDay) continue; // don't run these here, only for sizing simulations
-
-            if (KindOfSim == ksHVACSizeRunPeriodDesign) continue; // don't run these here, only for sizing simulations
-
-            ++EnvCount;
-
-            if (sqlite) {
-                sqlite->sqliteBegin();
-                sqlite->createSQLiteEnvironmentPeriodRecord(DataEnvironment::CurEnvirNum, DataEnvironment::EnvironmentName, DataGlobals::KindOfSim);
-                sqlite->sqliteCommit();
+            if (!GetNextEnvironment(Available, ErrorsFound)) {
+                break;
             }
-
-            DataErrorTracking::ExitDuringSimulations = true;
-            SimsDone = true;
-            DisplayString("Initializing New Environment Parameters");
-
-            BeginEnvrnFlag = true;
-            EndEnvrnFlag = false;
-            DataEnvironment::EndMonthFlag = false;
-            WarmupFlag = true;
-            DayOfSim = 0;
-            DayOfSimChr = "0";
-            NumOfWarmupDays = 0;
-            if (DataEnvironment::CurrentYearIsLeapYear) {
-                if (NumOfDayInEnvrn <= 366) {
-                    OutputProcessor::isFinalYear = true;
-                }
-            } else {
-                if (NumOfDayInEnvrn <= 365) {
-                    OutputProcessor::isFinalYear = true;
-                }
+            if (skipCurrentEnvironment()) {
+                continue;
             }
-
-            HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
-
-            bool anyEMSRan;
-            EMSManager::ManageEMS(emsCallFromBeginNewEvironment, anyEMSRan); // calling point
-
-            while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
-
-                if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
-
-                ++DayOfSim;
-                ObjexxFCL::gio::write(DayOfSimChr, fmtLD) << DayOfSim;
-                strip(DayOfSimChr);
-                if (!WarmupFlag) {
-                    ++DataEnvironment::CurrentOverallSimDay;
-                    DisplaySimDaysProgress(DataEnvironment::CurrentOverallSimDay, DataEnvironment::TotalOverallSimDays);
-                } else {
-                    DayOfSimChr = "0";
-                }
-                BeginDayFlag = true;
-                EndDayFlag = false;
-
-                if (WarmupFlag) {
-                    ++NumOfWarmupDays;
-                    cWarmupDay = General::TrimSigDigits(NumOfWarmupDays);
-                    DisplayString("Warming up {" + cWarmupDay + '}');
-                } else if (DayOfSim == 1) {
-                    if (KindOfSim == ksRunPeriodWeather) {
-                        DisplayString("Starting Simulation at " + DataEnvironment::CurMnDyYr + " for " + DataEnvironment::EnvironmentName);
-                    } else {
-                        DisplayString("Starting Simulation at " + DataEnvironment::CurMnDy + " for " + DataEnvironment::EnvironmentName);
-                    }
-                    ObjexxFCL::gio::write(OutputFileInits, Format_700) << NumOfWarmupDays;
-                    OutputProcessor::ResetAccumulationWhenWarmupComplete();
-                } else if (DisplayPerfSimulationFlag) {
-                    if (KindOfSim == ksRunPeriodWeather) {
-                        DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDyYr + " for " + DataEnvironment::EnvironmentName);
-                    } else {
-                        DisplayString("Continuing Simulation at " + DataEnvironment::CurMnDy + " for " + DataEnvironment::EnvironmentName);
-                    }
-                    DisplayPerfSimulationFlag = false;
-                }
-                // for simulations that last longer than a week, identify when the last year of the simulation is started
-                if ((DayOfSim > 365) && ((NumOfDayInEnvrn - DayOfSim) == 364) && !WarmupFlag) {
-                    DisplayString("Starting last  year of environment at:  " + DayOfSimChr);
-                    OutputReportTabular::ResetTabularReports();
-                }
-
-                for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
-
-                    BeginHourFlag = true;
-                    EndHourFlag = false;
-
-                    for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
-                        if (AnySlabsInModel || AnyBasementsInModel) {
-                            PlantPipingSystemsManager::SimulateGroundDomains(false);
-                        }
-
-                        if (AnyUnderwaterBoundaries) {
-                            WeatherManager::UpdateUnderwaterBoundaries();
-                        }
-
-                        if (DataEnvironment::varyingLocationSchedIndexLat > 0 || DataEnvironment::varyingLocationSchedIndexLong > 0 ||
-                            DataEnvironment::varyingOrientationSchedIndex > 0) {
-                            WeatherManager::UpdateLocationAndOrientation();
-                        }
-
-                        BeginTimeStepFlag = true;
-                        ExternalInterfaceExchangeVariables();
-
-                        // Set the End__Flag variables to true if necessary.  Note that
-                        // each flag builds on the previous level.  EndDayFlag cannot be
-                        // .TRUE. unless EndHourFlag is also .TRUE., etc.  Note that the
-                        // EndEnvrnFlag and the EndSimFlag cannot be set during warmup.
-                        // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
-                        // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
-
-                        if (TimeStep == NumOfTimeStepInHour) {
-                            EndHourFlag = true;
-                            if (HourOfDay == 24) {
-                                EndDayFlag = true;
-                                if ((!WarmupFlag) && (DayOfSim == NumOfDayInEnvrn)) {
-                                    EndEnvrnFlag = true;
-                                }
-                            }
-                        }
-
-                        ManageWeather();
-
-                        ExteriorEnergyUse::ManageExteriorEnergyUse();
-
-                        ManageHeatBalance();
-
-                        if (oneTimeUnderwaterBoundaryCheck) {
-                            AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
-                            oneTimeUnderwaterBoundaryCheck = false;
-                        }
-
-                        BeginHourFlag = false;
-                        BeginDayFlag = false;
-                        BeginEnvrnFlag = false;
-                        BeginSimFlag = false;
-                        BeginFullSimFlag = false;
-
-                    } // TimeStep loop
-
-                    PreviousHour = HourOfDay;
-
-                } // ... End hour loop.
-
-                if (sqlite) sqlite->sqliteCommit(); // one transaction per day
-
-            } // ... End day loop.
-
-            // Need one last call to send latest states to middleware
-            ExternalInterfaceExchangeVariables();
-
+            runEnvironment();
         } // ... End environment loop.
+    }
+
+    void wrapUpSimulation() {
 
         WarmupFlag = false;
         if (!SimsDone && DoDesDaySim) {
@@ -539,10 +561,6 @@ namespace SimulationManager {
                 ShowWarningError("ManageSimulation: Weather Simulation was requested in SimulationControl but no RunPeriods in input.");
             }
         }
-
-    }
-
-    void wrapUpSimulation() {
 
         PlantManager::CheckOngoingPlantWarnings();
 
@@ -592,33 +610,10 @@ namespace SimulationManager {
 
     void ManageSimulation()
     {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Rick Strand
-        //       DATE WRITTEN   January 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine is the main driver of the simulation manager module.
-        // It contains the main environment-time loops for the building
-        // simulation.  This includes the environment loop, a day loop, an
-        // hour loop, and a time step loop.
-
-        // Formats
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-
         initializeSimulation();
-
         runAllEnvironments();
-
         wrapUpSimulation();
-
     }
-
-
 
     void GetProjectData()
     {
