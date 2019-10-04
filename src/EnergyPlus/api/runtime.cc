@@ -47,6 +47,14 @@
 
 #include <EnergyPlus/public/EnergyPlusPgm.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/api/runtime.h>
+
+void cRuntimeNoOp() {}
+
+int cRunEnergyPlus(const char* filepath) {
+    std::string path(filepath);
+    return RunEnergyPlus(path);
+}
 
 int cInitializeEnergyPlus(const char* filepath) {
     std::string path(filepath);
@@ -61,23 +69,23 @@ void cInitializeSimulation() {
     return EnergyPlus::SimulationManager::initializeSimulation();
 }
 void cRunOneTimeStep() {
-    
+    EnergyPlus::SimulationManager::runOneTimeStep();
 }
 void cRunOneHour() {
-
+    EnergyPlus::SimulationManager::runOneHour();
 }
 void cRunOneDay() {
-
+    EnergyPlus::SimulationManager::runOneDay();
 }
 void cRunEnvironment() {
-
+    EnergyPlus::SimulationManager::runEnvironment();
 }
 bool cSkipCurrentEnvironment() {
-
+    return EnergyPlus::SimulationManager::skipCurrentEnvironment();
 }
 void cRunAllEnvironments() {
-
+    EnergyPlus::SimulationManager::runAllEnvironments();
 }
 void cWrapUpSimulation() {
-
+    EnergyPlus::SimulationManager::wrapUpSimulation();
 }

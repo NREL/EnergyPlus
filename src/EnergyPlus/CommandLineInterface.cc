@@ -899,6 +899,7 @@ namespace CommandLineInterface {
         if (!mviFileExists) removeFile(MVIfile.c_str());
 
         moveFile("readvars.audit", outputRvauditFileName);
+        return EXIT_SUCCESS;
     }
 
 } // namespace CommandLineInterface

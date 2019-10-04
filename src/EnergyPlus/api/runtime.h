@@ -45,8 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef EnergyPlusAPIFunctional_h_INCLUDED
-#define EnergyPlusAPIFunctional_h_INCLUDED
+#ifndef EnergyPlusAPIRuntime_h_INCLUDED
+#define EnergyPlusAPIRuntime_h_INCLUDED
 
 #include <EnergyPlus/TypeDefs.h>
 
@@ -54,12 +54,15 @@
 extern "C" {
 #endif
 
+void cRuntimeNoOp();
+
     // Program level functions
+int cRunEnergyPlus(const char* filepath);
 int cInitializeEnergyPlus(const char* filepath);
 int cWrapUpEnergyPlus();
 
     // Simulation manager level functions
-void cIinitializeSimulation();
+void cInitializeSimulation();
 void cRunOneTimeStep();
 void cRunOneHour();
 void cRunOneDay();
@@ -72,4 +75,4 @@ void cWrapUpSimulation();
 }
 #endif
 
-#endif // EnergyPlusAPIFunctional_h_INCLUDED
+#endif // EnergyPlusAPIRuntime_h_INCLUDED

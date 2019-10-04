@@ -68,6 +68,7 @@
 #include <UtilityRoutines.hh>
 
 #include <api/functional.h>
+#include <api/runtime.h>
 
 namespace EnergyPlus {
 
@@ -122,6 +123,8 @@ namespace BaseboardElectric {
         // I need to figure out how to get the linker to keep the unused functions in there without them having to be used somewhere...
         auto props = newCBaseThermalPropertySet(0.0, 0.0, 0.0);
         delCBaseThermalPropertySet(props);
+
+        cRuntimeNoOp();
 
         NumBaseboards = 0;
         MySizeFlag.deallocate();

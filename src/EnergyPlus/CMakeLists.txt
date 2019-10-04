@@ -722,7 +722,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # API Stuff
-# Functional API test
+configure_file( api/common.py "${CMAKE_BINARY_DIR}/Products/common.py" )
 configure_file( api/datatransfer.py "${CMAKE_BINARY_DIR}/Products/datatransfer.py" )
 configure_file( api/energyplus_api.py "${CMAKE_BINARY_DIR}/Products/energyplus_api.py" )
 configure_file( api/functional.py "${CMAKE_BINARY_DIR}/Products/functional.py" )

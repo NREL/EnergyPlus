@@ -258,7 +258,7 @@ int initializeEnergyPlus(std::string const & filepath) {
     DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
 
     DataSystemVariables::processEnvironmentVariables();
-
+std::cout << "RUNNING IN : " << filepath << std::endl;
     if (!filepath.empty()) {
         // if filepath is not empty, then we are using E+ as a library API call
         // change the directory to the specified folder, and pass in dummy args to command line parser
