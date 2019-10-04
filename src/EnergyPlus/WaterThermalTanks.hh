@@ -87,13 +87,6 @@ namespace WaterThermalTanks {
     extern int const InletModeFixed;   // water heater only, inlet water always enters at the user-specified height
     extern int const InletModeSeeking; // water heater only, inlet water seeks out the node with the closest temperature
 
-    // integer parameter for water heater
-    extern int const MixedWaterHeater;      // WaterHeater:Mixed
-    extern int const StratifiedWaterHeater; // WaterHeater:Stratified
-    // stovall, next line never used because all desuperheater coils used in mixed water heater types
-    extern int const MixedChilledWaterStorage;      // 'ThermalStorage:ChilledWater:Mixed'
-    extern int const StratifiedChilledWaterStorage; // 'ThermalStorage:ChilledWater:Stratified'
-
     // reclaim heat object types for Coil:WaterHeating:Desuperheater object
     extern int const COMPRESSORRACK_REFRIGERATEDCASE; // reclaim heating source is refrigerated case compressor rack
     extern int const COIL_DX_COOLING;                 // reclaim heating source is DX cooling coil
@@ -126,7 +119,6 @@ namespace WaterThermalTanks {
     extern int NumWaterThermalTank;         // total number of water thermal tanks, hot and cold (MIXED + STRATIFIED)
     extern int NumWaterHeaterDesuperheater; // number of desuperheater heating coils
     extern int NumHeatPumpWaterHeater;      // number of heat pump water heaters
-    // INTEGER :: MaxCyclesErrorCount           =0 ! error counter for water heater that cycles more than max during time step
 
     extern Real64 modHPPartLoadRatio;            // part load ratio of HPWH
     extern bool modGetWaterThermalTankInputFlag; // Calls to Water Heater from multiple places in code
@@ -134,10 +126,6 @@ namespace WaterThermalTanks {
     extern Real64 modMdotAir;                    // mass flow rate of evaporator air, kg/s
     extern int NumWaterHeaterSizing;          // Number of sizing/design objects for water heaters.
     extern Array1D_bool AlreadyRated;         // control so we don't repeat again
-
-    // SUBROUTINE SPECIFICATIONS:
-
-    // Types
 
     struct StratifiedNodeData
     {
