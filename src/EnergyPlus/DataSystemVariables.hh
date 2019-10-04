@@ -172,6 +172,8 @@ namespace DataSystemVariables {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
+    void processEnvironmentVariables();
+
 } // namespace DataSystemVariables
 
 } // namespace EnergyPlus

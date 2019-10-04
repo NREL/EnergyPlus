@@ -17,8 +17,12 @@ SET( SRC
   "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.h"
   "${CMAKE_SOURCE_DIR}/third_party/milo/diyfp.h"
   "${CMAKE_SOURCE_DIR}/third_party/milo/ieee754.h"
+  api/datatransfer.h
+  api/datatransfer.cc
   api/functional.h
   api/functional.cc
+  api/runtime.h
+  api/runtime.cc
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
   AirLoopHVACDOAS.cc
@@ -719,4 +723,8 @@ endif()
 
 # API Stuff
 # Functional API test
+configure_file( api/datatransfer.py "${CMAKE_BINARY_DIR}/Products/datatransfer.py" )
+configure_file( api/energyplus_api.py "${CMAKE_BINARY_DIR}/Products/energyplus_api.py" )
 configure_file( api/functional.py "${CMAKE_BINARY_DIR}/Products/functional.py" )
+configure_file( api/datatransfer.py "${CMAKE_BINARY_DIR}/Products/datatransfer.py" )
+configure_file( api/runtime.py "${CMAKE_BINARY_DIR}/Products/runtime.py" )

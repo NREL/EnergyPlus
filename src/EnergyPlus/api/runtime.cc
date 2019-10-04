@@ -45,29 +45,48 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef CommandLineInterface_hh_INCLUDED
-#define CommandLineInterface_hh_INCLUDED
+#include <EnergyPlus/api/datatransfer.h>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 
-#include <EnergyPlusAPI.hh>
-#include <string>
+int getVariableHandle(const int vt, std::string const & type, std::string const & key) {
+    int handle;
+    switch(vt) {
+    case VariableTypeActuator:
+        handle = 0;
+        for (auto const & availActuator : EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable) {
+            handle++;
+            if (type == availActuator.ControlTypeName && key == availActuator.UniqueIDName) {
+                return handle;
+            }
+        }
+        break;
+    case VariableTypeSensor:
+        handle = 0;
+        for (auto const & availOutputVar : EnergyPlus::OutputProcessor::RVariableTypes) {
+            handle++;
+            if (type == availOutputVar.VarNameUC && key == availOutputVar.KeyNameOnlyUC) {
+                return handle;
+            }
+        }
+        break;
+    default:
+        ;
+    }
+    return 0;
+}
 
-namespace EnergyPlus {
+double getVariable(const int handle) {
+    return EnergyPlus::OutputProcessor::RVariableTypes(handle).VarPtr().Which;
+}
 
-namespace CommandLineInterface {
-
-    // Process command line arguments
-    int ENERGYPLUSLIB_API ProcessArgs(int argc, const char *argv[]);
-
-    void ReadINIFile(int const UnitNumber,               // Unit number of the opened INI file
-                     std::string const &Heading,         // Heading for the parameters ('[heading]')
-                     std::string const &KindofParameter, // Kind of parameter to be found (String)
-                     std::string &DataOut                // Output from the retrieval
-    );
-
-    int runReadVarsESO();
-
-} // namespace CommandLineInterface
-
-} // namespace EnergyPlus
-
-#endif
+bool setVariable(const int handle, const double value) {
+    if (handle == 0) {
+        return false;
+    }
+    // the handle is based on the available actuator list
+    auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
+    theActuator.RealValue = value;
+    theActuator.Actuated = true;
+    return true;
+}

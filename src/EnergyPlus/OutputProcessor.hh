@@ -62,6 +62,7 @@
 // EnergyPlus Headers
 #include <DataGlobals.hh>
 #include <EnergyPlus.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -1012,6 +1013,8 @@ void AddToOutputVariableList(std::string const &VarName, // Variable Name
                              OutputProcessor::Unit const unitsForVar,
                              Optional_string_const customUnitName = _ // the custom name for the units from EMS definition of units
 );
+
+int initErrorFile();
 
 } // namespace EnergyPlus
 

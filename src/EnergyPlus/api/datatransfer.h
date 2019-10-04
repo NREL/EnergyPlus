@@ -45,29 +45,23 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef CommandLineInterface_hh_INCLUDED
-#define CommandLineInterface_hh_INCLUDED
+#ifndef EnergyPlusAPIFunctional_h_INCLUDED
+#define EnergyPlusAPIFunctional_h_INCLUDED
 
-#include <EnergyPlusAPI.hh>
-#include <string>
+#include <EnergyPlus/TypeDefs.h>
 
-namespace EnergyPlus {
-
-namespace CommandLineInterface {
-
-    // Process command line arguments
-    int ENERGYPLUSLIB_API ProcessArgs(int argc, const char *argv[]);
-
-    void ReadINIFile(int const UnitNumber,               // Unit number of the opened INI file
-                     std::string const &Heading,         // Heading for the parameters ('[heading]')
-                     std::string const &KindofParameter, // Kind of parameter to be found (String)
-                     std::string &DataOut                // Output from the retrieval
-    );
-
-    int runReadVarsESO();
-
-} // namespace CommandLineInterface
-
-} // namespace EnergyPlus
-
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+int const VariableTypeSensor = 0;
+int const VariableTypeActuator = 1;
+int getVariableHandle(int vt, const char* type, const char* key);
+double getVariable(int handle);
+bool setVariable(int handle, double value);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // EnergyPlusAPIFunctional_h_INCLUDED

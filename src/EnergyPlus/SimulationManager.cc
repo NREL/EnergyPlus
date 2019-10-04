@@ -292,16 +292,6 @@ namespace SimulationManager {
         using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
         using WeatherManager::CheckIfAnyUnderwaterBoundaries;
 
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool Available; // an environment is available to process
         static bool ErrorsFound(false);
@@ -1669,59 +1659,12 @@ namespace SimulationManager {
         // an EnergyPlus run.  It also prints the end of data marker for each
         // output file.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using namespace DataOutputs;
-        using OutputProcessor::InstMeterCacheSize;
-        using OutputProcessor::MaxIVariable;
-        using OutputProcessor::MaxRVariable;
-        using OutputProcessor::NumEnergyMeters;
-        using OutputProcessor::NumOfIVariable;
-        using OutputProcessor::NumOfIVariable_Setup;
-        using OutputProcessor::NumOfIVariable_Sum;
-        using OutputProcessor::NumOfRVariable;
-        using OutputProcessor::NumOfRVariable_Meter;
-        using OutputProcessor::NumOfRVariable_Setup;
-        using OutputProcessor::NumOfRVariable_Sum;
-        using OutputProcessor::NumReportList;
-        using OutputProcessor::NumTotalIVariable;
-        using OutputProcessor::NumTotalRVariable;
-        using OutputProcessor::NumVarMeterArrays;
-        using OutputReportTabular::maxUniqueKeyCount;
-        using OutputReportTabular::MonthlyFieldSetInputCount;
-        using SolarShading::MAXHCArrayBounds;
-        using SolarShading::maxNumberOfFigures;
-        using namespace DataRuntimeLanguage;
-        using DataBranchNodeConnections::MaxNumOfNodeConnections;
-        using DataBranchNodeConnections::NumOfNodeConnections;
-        using DataHeatBalance::CondFDRelaxFactor;
-        using DataHeatBalance::CondFDRelaxFactorInput;
-        using General::RoundSigDigits;
-        using namespace DataSystemVariables; // , ONLY: MaxNumberOfThreads,NumberIntRadThreads,iEnvSetThreads
-        using DataSurfaces::MaxVerticesPerSurface;
-        using namespace DataTimings;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt EndOfDataFormat("(\"End of Data\")"); // Signifies the end of the data block in the output file
         static std::string const ThreadingHeader("! <Program Control Information:Threads/Parallel Sims>, Threading Supported,Maximum Number of "
                                                  "Threads, Env Set Threads (OMP_NUM_THREADS), EP Env Set Threads (EP_OMP_NUM_THREADS), IDF Set "
                                                  "Threads, Number of Threads Used (Interior Radiant Exchange), Number Nominal Surfaces, Number "
                                                  "Parallel Sims");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EchoInputFile; // found unit number for 'eplusout.audit'
@@ -1731,43 +1674,43 @@ namespace SimulationManager {
 
         EchoInputFile = FindUnitNumber(DataStringGlobals::outputAuditFileName);
         // Record some items on the audit file
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable=" << NumOfRVariable_Setup;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable(Total)=" << NumTotalRVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable(Actual)=" << NumOfRVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable(Summed)=" << NumOfRVariable_Sum;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable(Meter)=" << NumOfRVariable_Meter;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfIVariable=" << NumOfIVariable_Setup;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfIVariable(Total)=" << NumTotalIVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfIVariable(Actual)=" << NumOfIVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfIVariable(Summed)=" << NumOfIVariable_Sum;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxRVariable=" << MaxRVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxIVariable=" << MaxIVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumEnergyMeters=" << NumEnergyMeters;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumVarMeterArrays=" << NumVarMeterArrays;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "maxUniqueKeyCount=" << maxUniqueKeyCount;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "maxNumberOfFigures=" << maxNumberOfFigures;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MAXHCArrayBounds=" << MAXHCArrayBounds;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxVerticesPerSurface=" << MaxVerticesPerSurface;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumReportList=" << NumReportList;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "InstMeterCacheSize=" << InstMeterCacheSize;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable=" << OutputProcessor::NumOfRVariable_Setup;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable(Total)=" << OutputProcessor::NumTotalRVariable;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable(Actual)=" << OutputProcessor::NumOfRVariable;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable(Summed)=" << OutputProcessor::NumOfRVariable_Sum;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable(Meter)=" << OutputProcessor::NumOfRVariable_Meter;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfIVariable=" << OutputProcessor::NumOfIVariable_Setup;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfIVariable(Total)=" << OutputProcessor::NumTotalIVariable;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfIVariable(Actual)=" << OutputProcessor::NumOfIVariable;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfIVariable(Summed)=" << OutputProcessor::NumOfIVariable_Sum;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxRVariable=" << OutputProcessor::MaxRVariable;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxIVariable=" << OutputProcessor::MaxIVariable;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumEnergyMeters=" << OutputProcessor::NumEnergyMeters;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumVarMeterArrays=" << OutputProcessor::NumVarMeterArrays;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "maxUniqueKeyCount=" << OutputReportTabular::maxUniqueKeyCount;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "maxNumberOfFigures=" << SolarShading::maxNumberOfFigures;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MAXHCArrayBounds=" << SolarShading::MAXHCArrayBounds;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxVerticesPerSurface=" << DataSurfaces::MaxVerticesPerSurface;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumReportList=" << OutputProcessor::NumReportList;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "InstMeterCacheSize=" << OutputProcessor::InstMeterCacheSize;
         if (SutherlandHodgman) {
             ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=SutherlandHodgman";
         } else {
             ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=ConvexWeilerAtherton";
         }
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MonthlyFieldSetInputCount=" << MonthlyFieldSetInputCount;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumConsideredOutputVariables=" << NumConsideredOutputVariables;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxConsideredOutputVariables=" << MaxConsideredOutputVariables;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MonthlyFieldSetInputCount=" << OutputReportTabular::MonthlyFieldSetInputCount;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumConsideredOutputVariables=" << DataOutputs::NumConsideredOutputVariables;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxConsideredOutputVariables=" << DataOutputs::MaxConsideredOutputVariables;
 
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numActuatorsUsed=" << numActuatorsUsed;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numEMSActuatorsAvailable=" << numEMSActuatorsAvailable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "maxEMSActuatorsAvailable=" << maxEMSActuatorsAvailable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numInternalVariablesUsed=" << NumInternalVariablesUsed;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numEMSInternalVarsAvailable=" << numEMSInternalVarsAvailable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "maxEMSInternalVarsAvailable=" << maxEMSInternalVarsAvailable;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numActuatorsUsed=" << DataRuntimeLanguage::numActuatorsUsed;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numEMSActuatorsAvailable=" << DataRuntimeLanguage::numEMSActuatorsAvailable;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "maxEMSActuatorsAvailable=" << DataRuntimeLanguage::maxEMSActuatorsAvailable;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numInternalVariablesUsed=" << DataRuntimeLanguage::NumInternalVariablesUsed;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numEMSInternalVarsAvailable=" << DataRuntimeLanguage::numEMSInternalVarsAvailable;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "maxEMSInternalVarsAvailable=" << DataRuntimeLanguage::maxEMSInternalVarsAvailable;
 
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfNodeConnections=" << NumOfNodeConnections;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxNumOfNodeConnections=" << MaxNumOfNodeConnections;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfNodeConnections=" << DataBranchNodeConnections::NumOfNodeConnections;
+        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxNumOfNodeConnections=" << DataBranchNodeConnections::MaxNumOfNodeConnections;
 #ifdef EP_Count_Calls
         ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumShadow_Calls=" << NumShadow_Calls;
         ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumShadowAtTS_Calls=" << NumShadowAtTS_Calls;
@@ -1803,46 +1746,46 @@ namespace SimulationManager {
         if (DataHeatBalance::AnyCondFD) { // echo out relaxation factor, it may have been changed by the program
             ObjexxFCL::gio::write(OutputFileInits, fmtA)
                 << "! <ConductionFiniteDifference Numerical Parameters>, Starting Relaxation Factor, Final Relaxation Factor";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "ConductionFiniteDifference Numerical Parameters, " + RoundSigDigits(CondFDRelaxFactorInput, 3) +
-                                                     ", " + RoundSigDigits(CondFDRelaxFactor, 3);
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "ConductionFiniteDifference Numerical Parameters, " + General::RoundSigDigits(DataHeatBalance::CondFDRelaxFactorInput, 3) +
+                                                     ", " + General::RoundSigDigits(DataHeatBalance::CondFDRelaxFactor, 3);
         }
         // Report number of threads to eio file
         if (Threading) {
             if (iEnvSetThreads == 0) {
                 cEnvSetThreads = "Not Set";
             } else {
-                cEnvSetThreads = RoundSigDigits(iEnvSetThreads);
+                cEnvSetThreads = General::RoundSigDigits(iEnvSetThreads);
             }
             if (iepEnvSetThreads == 0) {
                 cepEnvSetThreads = "Not Set";
             } else {
-                cepEnvSetThreads = RoundSigDigits(iepEnvSetThreads);
+                cepEnvSetThreads = General::RoundSigDigits(iepEnvSetThreads);
             }
             if (iIDFSetThreads == 0) {
                 cIDFSetThreads = "Not Set";
             } else {
-                cIDFSetThreads = RoundSigDigits(iIDFSetThreads);
+                cIDFSetThreads = General::RoundSigDigits(iIDFSetThreads);
             }
             if (lnumActiveSims) {
                 ObjexxFCL::gio::write(OutputFileInits, fmtA) << ThreadingHeader;
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Program Control:Threads/Parallel Sims, Yes," + RoundSigDigits(MaxNumberOfThreads) + ", " +
+                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Program Control:Threads/Parallel Sims, Yes," + General::RoundSigDigits(MaxNumberOfThreads) + ", " +
                                                          cEnvSetThreads + ", " + cepEnvSetThreads + ", " + cIDFSetThreads + ", " +
-                                                         RoundSigDigits(NumberIntRadThreads) + ", " + RoundSigDigits(iNominalTotSurfaces) + ", " +
-                                                         RoundSigDigits(inumActiveSims);
+                    General::RoundSigDigits(NumberIntRadThreads) + ", " + General::RoundSigDigits(iNominalTotSurfaces) + ", " +
+                    General::RoundSigDigits(inumActiveSims);
             } else {
                 ObjexxFCL::gio::write(OutputFileInits, fmtA) << ThreadingHeader;
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Program Control:Threads/Parallel Sims, Yes," + RoundSigDigits(MaxNumberOfThreads) + ", " +
+                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Program Control:Threads/Parallel Sims, Yes," + General::RoundSigDigits(MaxNumberOfThreads) + ", " +
                                                          cEnvSetThreads + ", " + cepEnvSetThreads + ", " + cIDFSetThreads + ", " +
-                                                         RoundSigDigits(NumberIntRadThreads) + ", " + RoundSigDigits(iNominalTotSurfaces) + ", N/A";
+                    General::RoundSigDigits(NumberIntRadThreads) + ", " + General::RoundSigDigits(iNominalTotSurfaces) + ", N/A";
             }
         } else { // no threading
             if (lnumActiveSims) {
                 ObjexxFCL::gio::write(OutputFileInits, fmtA) << ThreadingHeader;
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Program Control:Threads/Parallel Sims, No," + RoundSigDigits(MaxNumberOfThreads) +
-                                                         ", N/A, N/A, N/A, N/A, N/A, " + RoundSigDigits(inumActiveSims);
+                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Program Control:Threads/Parallel Sims, No," + General::RoundSigDigits(MaxNumberOfThreads) +
+                                                         ", N/A, N/A, N/A, N/A, N/A, " + General::RoundSigDigits(inumActiveSims);
             } else {
                 ObjexxFCL::gio::write(OutputFileInits, fmtA) << ThreadingHeader;
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Program Control:Threads/Parallel Sims, No," + RoundSigDigits(MaxNumberOfThreads) +
+                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Program Control:Threads/Parallel Sims, No," + General::RoundSigDigits(MaxNumberOfThreads) +
                                                          ", N/A, N/A, N/A, N/A, N/A, N/A";
             }
         }
@@ -1904,10 +1847,6 @@ namespace SimulationManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool Available(false); // an environment is available to process
-        //  integer :: env_iteration=0
-        //  CHARACTER(len=32) :: cEnvChar
-
-        //  return  ! remove comment to do 'old way'
 
         Available = true;
 
@@ -2692,29 +2631,11 @@ namespace SimulationManager {
         // METHODOLOGY EMPLOYED:
         // Uses IsParentObject,GetNumChildren,GetChildrenData
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
         // Using/Aliasing
         using DataGlobals::OutputFileDebug;
         using General::TrimSigDigits;
         using namespace DataBranchNodeConnections;
         using namespace BranchNodeConnections;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -2788,29 +2709,11 @@ namespace SimulationManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Reports comp set meter variables.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataGlobals::OutputFileDebug;
         using namespace DataBranchNodeConnections;
         using namespace BranchNodeConnections;
         using namespace DataGlobalConstants;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -2883,18 +2786,6 @@ namespace SimulationManager {
         // This provides post processing (for errors, etc) directly after the InputProcessor
         // finishes.  Code originally in the Input Processor.
 
-        // Using/Aliasing
-        // using SQLiteProcedures::CreateSQLiteDatabase;
-        using FluidProperties::FindGlycol;
-        using FluidProperties::FluidIndex_EthyleneGlycol;
-        using FluidProperties::FluidIndex_PropoleneGlycol;
-        using FluidProperties::FluidIndex_Water;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool PreP_Fatal( false ); // True if a preprocessor flags a fatal error
-        ////////////////////////////////////////////////////////////////////////////////////
-
         DoingInputProcessing = false;
 
         inputProcessor->preProcessorCheck(PreP_Fatal); // Check Preprocessor objects for warning, severe, etc errors.
@@ -2904,9 +2795,9 @@ namespace SimulationManager {
         }
 
         // Set up more globals - process fluid input.
-        FluidIndex_Water = FindGlycol("Water");
-        FluidIndex_EthyleneGlycol = FindGlycol("EthyleneGlycol");
-        FluidIndex_PropoleneGlycol = FindGlycol("PropoleneGlycol");
+        FluidProperties::FluidIndex_Water = FluidProperties::FindGlycol("Water");
+        FluidProperties::FluidIndex_EthyleneGlycol = FluidProperties::FindGlycol("EthyleneGlycol");
+        FluidProperties::FluidIndex_PropoleneGlycol = FluidProperties::FindGlycol("PropoleneGlycol");
 
         inputProcessor->preScanReportingVariables();
     }
