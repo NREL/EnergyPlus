@@ -103,10 +103,11 @@ TEST_F(EnergyPlusFixture, Fans_FanSizing)
 TEST_F(EnergyPlusFixture, Fans_ConstantVolume_EMSPressureRiseResetTest)
 {
 
-    Fans::NumFans = 1;
-    Fans::Fan.allocate(NumFans);
-    Fans::FanNumericFields.allocate(NumFans);
-    Fans::FanNumericFields(NumFans).FieldNames.allocate(2);
+    //!$Fans::NumFans = 1;
+    ep_globals.NumFans = 1;
+    Fans::Fan.allocate(ep_globals.NumFans);
+    Fans::FanNumericFields.allocate(ep_globals.NumFans);
+    Fans::FanNumericFields(ep_globals.NumFans).FieldNames.allocate(2);
     // set standard air density
     DataEnvironment::StdRhoAir = 1.0;
     // set fan model inputs
@@ -150,10 +151,11 @@ TEST_F(EnergyPlusFixture, Fans_ConstantVolume_EMSPressureRiseResetTest)
 TEST_F(EnergyPlusFixture, Fans_OnOff_EMSPressureRiseResetTest)
 {
 
-    Fans::NumFans = 1;
-    Fans::Fan.allocate(NumFans);
-    Fans::FanNumericFields.allocate(NumFans);
-    Fans::FanNumericFields(NumFans).FieldNames.allocate(2);
+    //!$Fans::NumFans = 1;
+    ep_globals.NumFans = 1;
+    Fans::Fan.allocate(ep_globals.NumFans);
+    Fans::FanNumericFields.allocate(ep_globals.NumFans);
+    Fans::FanNumericFields(ep_globals.NumFans).FieldNames.allocate(2);
     // set standard air density
     DataEnvironment::StdRhoAir = 1.0;
     // set fan model inputs
@@ -197,10 +199,11 @@ TEST_F(EnergyPlusFixture, Fans_OnOff_EMSPressureRiseResetTest)
 TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)
 {
 
-    Fans::NumFans = 1;
-    Fans::Fan.allocate(NumFans);
-    Fans::FanNumericFields.allocate(NumFans);
-    Fans::FanNumericFields(NumFans).FieldNames.allocate(2);
+    //!$Fans::NumFans = 1;
+    ep_globals.NumFans = 1;
+    Fans::Fan.allocate(ep_globals.NumFans);
+    Fans::FanNumericFields.allocate(ep_globals.NumFans);
+    Fans::FanNumericFields(ep_globals.NumFans).FieldNames.allocate(2);
     // set standard air density
     DataEnvironment::StdRhoAir = 1.0;
     // set fan model inputs
