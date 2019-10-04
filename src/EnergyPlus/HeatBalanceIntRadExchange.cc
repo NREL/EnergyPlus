@@ -428,7 +428,19 @@ namespace HeatBalanceIntRadExchange {
                 // long-wave radiation for windows.
                 if (CarrollMethod) {
                     if (construct.TypeIsWindow) {
-                        surface_window.IRfromParentZone += (zone_info.Fp[RecZoneSurfNum] * CarrollMRTInKTo4th) / RecSurfEmiss;
+                        Real64 CarrollMRTInKTo4thWin = CarrollMRTInKTo4th;  // arbitrary value, IR will be zero
+                        Real64 CarrollMRTNumeratorWin(0.0);
+                        Real64 CarrollMRTDenominatorWin(0.0);
+                        for (size_type SendZoneSurfNum = 0; SendZoneSurfNum < s_zone_Surfaces; ++SendZoneSurfNum) {
+                            if (SendZoneSurfNum != RecZoneSurfNum) {
+                                CarrollMRTNumeratorWin += SendSurfTemp*zone_info.Fp[SendZoneSurfNum]*zone_info.Area[SendZoneSurfNum];
+                                CarrollMRTDenominatorWin += zone_info.Fp[SendZoneSurfNum]*zone_info.Area[SendZoneSurfNum];
+                            }
+                        }
+                        if (CarrollMRTDenominatorWin > 0.0) {
+                            CarrollMRTInKTo4thWin = pow_4(CarrollMRTNumeratorWin/CarrollMRTDenominatorWin + KelvinConv);
+                        }
+                        surface_window.IRfromParentZone += (zone_info.Fp[RecZoneSurfNum] * CarrollMRTInKTo4thWin) / RecSurfEmiss;
                     }
                     netLWRadToRecSurf += zone_info.Fp[RecZoneSurfNum] * (CarrollMRTInKTo4th - RecSurfTempInKTo4th);
                 } else {
