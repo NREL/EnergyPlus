@@ -118,14 +118,6 @@ namespace WaterThermalTanks {
     extern int const SourceSideIndirectHeatPrimarySetpoint;
     extern int const SourceSideIndirectHeatAltSetpoint;
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
-    extern Array1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
-    extern Array1D_bool MyHPSizeFlag;    // Used to report autosize info in Init
-    extern Array1D_bool CheckWTTEquipName;
-    extern Array1D_bool CheckHPWHEquipName;
-
     // MODULE VARIABLE DECLARATIONS:
     extern int NumChilledWaterMixed;        // number of mixed chilled water tanks
     extern int NumChilledWaterStratified;   // number of stratified chilled water tanks
@@ -412,6 +404,16 @@ namespace WaterThermalTanks {
         int FreezingErrorIndex;        // recurring error index for freeze conditions
         WaterHeaterSizingData Sizing;  // ancillary data for autosizing
         int FluidIndex;                // fluid properties index
+        bool MyOneTimeFlagWH; // first pass log
+        bool MyTwoTimeFlagWH; // second pass do input check
+        bool MyEnvrnFlag;
+        bool WarmupFlag;
+        bool SetLoopIndexFlag;
+        bool MyOneTimeSetupFlag;
+        bool AlreadyReported;
+        bool AlreadyRated;
+        bool MyHPSizeFlag;
+        bool CheckWTTEquipName;
 
         // Default Constructor
         WaterThermalTankData()
@@ -445,7 +447,9 @@ namespace WaterThermalTanks {
               HeaterEnergy(0.0), HeaterEnergy1(0.0), HeaterEnergy2(0.0), FuelEnergy(0.0), FuelEnergy1(0.0), FuelEnergy2(0.0), VentEnergy(0.0),
               OffCycParaFuelEnergy(0.0), OffCycParaEnergyToTank(0.0), OnCycParaFuelEnergy(0.0), OnCycParaEnergyToTank(0.0),
               NetHeatTransferEnergy(0.0), FirstRecoveryDone(false), FirstRecoveryFuel(0.0), HeatPumpNum(0), DesuperheaterNum(0),
-              ShowSetPointWarning(true), MaxCycleErrorIndex(0), FreezingErrorIndex(0)
+              ShowSetPointWarning(true), MaxCycleErrorIndex(0), FreezingErrorIndex(0), FluidIndex(0), MyOneTimeFlagWH(true), MyTwoTimeFlagWH(true),
+              MyEnvrnFlag(true), WarmupFlag(false), SetLoopIndexFlag(true), MyOneTimeSetupFlag(true), AlreadyReported(false), AlreadyRated(false),
+              MyHPSizeFlag(true), CheckWTTEquipName(true)
         {
         }
 
@@ -571,6 +575,12 @@ namespace WaterThermalTanks {
         Array1D<Real64> MSAirSpeedRatio;       // air speed ratio in heating mode
         Array1D<Real64> MSWaterSpeedRatio;     // water speed ratio in heating mode
         bool bIsIHP;                           // whether the HP is a part of Integrated Heat Pump
+        bool MyOneTimeFlagHP; // first pass log
+        bool MyTwoTimeFlagHP; // second pass do input check
+        std::string CoilInletNode_str;         // Used to set up comp set
+        std::string CoilOutletNode_str;        // Used to set up comp set
+        bool CheckHPWHEquipName;
+
         // end of variables for variable-speed HPWH
 
         // Default Constructor
@@ -594,7 +604,8 @@ namespace WaterThermalTanks {
                   ControlSensor2Node(2), ControlSensor2Weight(0.0), ControlTempAvg(0.0), ControlTempFinal(0.0),
                   AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0), HPWHAirVolFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0),
                   HPWHAirMassFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0), HPWHWaterVolFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0), HPWHWaterMassFlowRate(VariableSpeedCoils::MaxSpedLevels, 0.0),
-                  MSAirSpeedRatio(VariableSpeedCoils::MaxSpedLevels, 0.0), MSWaterSpeedRatio(VariableSpeedCoils::MaxSpedLevels, 0.0), bIsIHP(false)
+                  MSAirSpeedRatio(VariableSpeedCoils::MaxSpedLevels, 0.0), MSWaterSpeedRatio(VariableSpeedCoils::MaxSpedLevels, 0.0), bIsIHP(false),
+                  MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true), CheckHPWHEquipName(true)
         {
         }
     };
@@ -656,6 +667,7 @@ namespace WaterThermalTanks {
         int RegulaFalsiFailedIndex2; // Index for recurring RegulaFalsi failed warning messages
         int RegulaFalsiFailedNum2;   // Counter for recurring RegulaFalsi failed warning messages
         bool FirstTimeThroughFlag;   // Flag for saving water heater status
+        bool ValidSourceType;
 
         // Default Constructor
         WaterHeaterDesuperheaterData()
@@ -667,7 +679,7 @@ namespace WaterThermalTanks {
               OffCycParaFuelRate(0.0), Mode(0), SaveMode(0), SaveWHMode(0), BackupElementCapacity(0.0), DXSysPLR(0.0),
               ReclaimHeatingSourceIndexNum(0), ReclaimHeatingSource(0), SetPointError(0), SetPointErrIndex1(0), IterLimitErrIndex1(0),
               IterLimitExceededNum1(0), RegulaFalsiFailedIndex1(0), RegulaFalsiFailedNum1(0), IterLimitErrIndex2(0), IterLimitExceededNum2(0),
-              RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(true)
+              RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(true), ValidSourceType(false)
         {
         }
     };
