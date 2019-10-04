@@ -773,7 +773,7 @@ TEST_F(WaterThermalTanksFixture, HPWHEnergyBalance)
     DataHVACGlobals::HPWHInletWBTemp = 14.963459972723468;
     HPWH.SetPointTemp = 51.666666666666664;
     OutputReportPredefined::pdstHeatCoil = -1;
-    WaterThermalTanks::MdotAir = 0.0993699992873531;
+    WaterThermalTanks::modMdotAir = 0.0993699992873531;
 
     int GlycolIndex = 0;
     const Real64 Cp = FluidProperties::GetSpecificHeatGlycol(Water, Tank.TankTemp, GlycolIndex, "HPWHEnergyBalance");

@@ -128,10 +128,10 @@ namespace WaterThermalTanks {
     extern int NumHeatPumpWaterHeater;      // number of heat pump water heaters
     // INTEGER :: MaxCyclesErrorCount           =0 ! error counter for water heater that cycles more than max during time step
 
-    extern Real64 HPPartLoadRatio;            // part load ratio of HPWH
-    extern bool GetWaterThermalTankInputFlag; // Calls to Water Heater from multiple places in code
-    extern Real64 MixerInletAirSchedule;      // output of inlet air mixer node schedule
-    extern Real64 MdotAir;                    // mass flow rate of evaporator air, kg/s
+    extern Real64 modHPPartLoadRatio;            // part load ratio of HPWH
+    extern bool modGetWaterThermalTankInputFlag; // Calls to Water Heater from multiple places in code
+    extern Real64 modMixerInletAirSchedule;      // output of inlet air mixer node schedule
+    extern Real64 modMdotAir;                    // mass flow rate of evaporator air, kg/s
     extern int NumWaterHeaterSizing;          // Number of sizing/design objects for water heaters.
     extern Array1D_bool AlreadyRated;         // control so we don't repeat again
 
