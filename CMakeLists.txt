@@ -73,7 +73,7 @@ option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist co
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
 # we are making python a required dependency, so find it here
-find_package(PythonInterp 3.6 REQUIRED)
+find_package(PythonInterp 3 REQUIRED)
 
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
