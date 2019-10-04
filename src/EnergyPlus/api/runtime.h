@@ -54,11 +54,19 @@
 extern "C" {
 #endif
 
-int const VariableTypeSensor = 0;
-int const VariableTypeActuator = 1;
-int getVariableHandle(int vt, const char* type, const char* key);
-double getVariable(int handle);
-bool setVariable(int handle, double value);
+    // Program level functions
+int cInitializeEnergyPlus(const char* filepath);
+int cWrapUpEnergyPlus();
+
+    // Simulation manager level functions
+void cIinitializeSimulation();
+void cRunOneTimeStep();
+void cRunOneHour();
+void cRunOneDay();
+void cRunEnvironment();
+bool cSkipCurrentEnvironment();
+void cRunAllEnvironments();
+void cWrapUpSimulation();
 
 #ifdef __cplusplus
 }

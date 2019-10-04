@@ -45,48 +45,39 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/api/datatransfer.h>
-#include <EnergyPlus/DataRuntimeLanguage.hh>
-#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/public/EnergyPlusPgm.hh>
+#include <EnergyPlus/SimulationManager.hh>
 
-int getVariableHandle(const int vt, std::string const & type, std::string const & key) {
-    int handle;
-    switch(vt) {
-    case VariableTypeActuator:
-        handle = 0;
-        for (auto const & availActuator : EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable) {
-            handle++;
-            if (type == availActuator.ControlTypeName && key == availActuator.UniqueIDName) {
-                return handle;
-            }
-        }
-        break;
-    case VariableTypeSensor:
-        handle = 0;
-        for (auto const & availOutputVar : EnergyPlus::OutputProcessor::RVariableTypes) {
-            handle++;
-            if (type == availOutputVar.VarNameUC && key == availOutputVar.KeyNameOnlyUC) {
-                return handle;
-            }
-        }
-        break;
-    default:
-        ;
-    }
-    return 0;
+int cInitializeEnergyPlus(const char* filepath) {
+    std::string path(filepath);
+    return initializeEnergyPlus(path);
+}
+int cWrapUpEnergyPlus() {
+    return wrapUpEnergyPlus();
 }
 
-double getVariable(const int handle) {
-    return EnergyPlus::OutputProcessor::RVariableTypes(handle).VarPtr().Which;
+// Simulation manager level functions
+void cInitializeSimulation() {
+    return EnergyPlus::SimulationManager::initializeSimulation();
 }
+void cRunOneTimeStep() {
+    
+}
+void cRunOneHour() {
 
-bool setVariable(const int handle, const double value) {
-    if (handle == 0) {
-        return false;
-    }
-    // the handle is based on the available actuator list
-    auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
-    theActuator.RealValue = value;
-    theActuator.Actuated = true;
-    return true;
+}
+void cRunOneDay() {
+
+}
+void cRunEnvironment() {
+
+}
+bool cSkipCurrentEnvironment() {
+
+}
+void cRunAllEnvironments() {
+
+}
+void cWrapUpSimulation() {
+
 }
