@@ -69,6 +69,7 @@
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataReportingFlags.hh>
+#include <DataViewFactorInformation.hh>
 #include <DataWindowEquivalentLayer.hh>
 #include <DataZoneEquipment.hh>
 #include <DaylightingManager.hh>
@@ -173,10 +174,11 @@ namespace SurfaceGeometry {
     // outside environment are used but no ground temperature object was input.
     bool NoFCGroundTempObjWarning(true); // This will cause a warning to be issued if surfaces with "GroundFCfactorMethod"
     // outside environment are used but no FC ground temperatures was input.
-    bool RectSurfRefWorldCoordSystem(false); // GlobalGeometryRules=World (true) or Relative (false)
-    int Warning1Count(0);                    // counts of Modify Window 5/6 windows
-    int Warning2Count(0);                    // counts of overriding exterior windows with Window 5/6 glazing systems
-    int Warning3Count(0);                    // counts of overriding interior windows with Window 5/6 glazing systems
+    bool
+        RectSurfRefWorldCoordSystem(false); // GlobalGeometryRules:Field Rectangular Surface Coordinate System (A5) = World (true) or Relative (false)
+    int Warning1Count(0);                   // counts of Modify Window 5/6 windows
+    int Warning2Count(0);                   // counts of overriding exterior windows with Window 5/6 glazing systems
+    int Warning3Count(0);                   // counts of overriding interior windows with Window 5/6 glazing systems
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE SurfaceGeometry
 
@@ -693,10 +695,12 @@ namespace SurfaceGeometry {
 
         } // ZoneNum
 
+        // Set up solar distribution enclosures allowing for any air boundaries
+        SetupSolarEnclosuresAndAirBoundaries(ErrorsFound);
+
         // Do the Stratosphere check
         SetZoneOutBulbTempAt();
         CheckZoneOutBulbTempAt();
-
     }
 
     void AllocateModuleArrays()
@@ -867,7 +871,6 @@ namespace SurfaceGeometry {
         int Found;                    // For matching interzone surfaces
         int ConstrNumFound;           // Construction number of matching interzone surface
         static bool NonMatch(false);  // Error for non-matching interzone surfaces
-        int Lay;                      // Layer number
         int MovedSurfs;               // Number of Moved Surfaces (when sorting into hierarchical structure)
         static bool SurfError(false); // General Surface Error, causes fatal error at end of routine
         int Loop;
@@ -1080,6 +1083,10 @@ namespace SurfaceGeometry {
         if (CalcSolRefl) GetShadingSurfReflectanceData(ErrorsFound);
 
         TotSurfaces = SurfNum + AddedSubSurfaces + NeedToAddSurfaces + NeedToAddSubSurfaces;
+
+        if (ErrorsFound) {
+            ShowFatalError(RoutineName + "Errors discovered, program terminates.");
+        }
 
         // Have to make room for added surfaces, if needed
         FirstTotalSurfaces = SurfNum + AddedSubSurfaces;
@@ -1431,17 +1438,13 @@ namespace SurfaceGeometry {
                                 // check layers as number of layers is the same
                                 izConstDiff = false;
                                 // ok if same nominal U
-                                for (Lay = 1; Lay <= TotLay; ++Lay) {
-                                    if (Construct(ConstrNum).LayerPoint(Lay) != Construct(ConstrNumFound).LayerPoint(TotLay - Lay + 1)) {
-                                        izConstDiff = true;
-                                        break; // exit when diff
-                                    }
-                                }
+                                CheckForReversedLayers(izConstDiff, ConstrNum, ConstrNumFound, TotLay);
                                 if (izConstDiff && std::abs(NominalU(ConstrNum) - NominalU(ConstrNumFound)) > 0.001) {
                                     ShowSevereError(RoutineName + "Construction " + Construct(ConstrNum).Name + " of interzone surface " +
                                                     Surface(SurfNum).Name +
                                                     " does not have the same materials in the reverse order as the construction " +
                                                     Construct(ConstrNumFound).Name + " of adjacent surface " + Surface(Found).Name);
+                                    ShowContinueError("or the properties of the reversed layers are not correct due to differing layer front and back side values");
                                     if (!Construct(ConstrNum).ReverseConstructionLayersOrderWarning ||
                                         !Construct(ConstrNumFound).ReverseConstructionLayersOrderWarning) {
                                         ShowContinueError("...this problem for this pair will not be reported again.");
@@ -1454,6 +1457,7 @@ namespace SurfaceGeometry {
                                                      Surface(SurfNum).Name +
                                                      " does not have the same materials in the reverse order as the construction " +
                                                      Construct(ConstrNumFound).Name + " of adjacent surface " + Surface(Found).Name);
+                                    ShowContinueError("or the properties of the reversed layers are not correct due to differing layer front and back side values");
                                     ShowContinueError("...but Nominal U values are similar, diff=[" +
                                                       RoundSigDigits(std::abs(NominalU(ConstrNum) - NominalU(ConstrNumFound)), 4) +
                                                       "] ... simulation proceeds.");
@@ -1943,8 +1947,7 @@ namespace SurfaceGeometry {
                 if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass_Window) {
                     DataSurfaces::AllHTWindowSurfaceList.push_back(SurfNum);
                     surfZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
-                }
-                else {
+                } else {
                     DataSurfaces::AllHTNonWindowSurfaceList.push_back(SurfNum);
                     surfZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
                 }
@@ -1959,8 +1962,7 @@ namespace SurfaceGeometry {
                     // Sort window vs non-window surfaces
                     if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass_Window) {
                         adjZone.ZoneHTWindowSurfaceList.push_back(SurfNum);
-                    }
-                    else {
+                    } else {
                         adjZone.ZoneHTNonWindowSurfaceList.push_back(SurfNum);
                     }
                 }
@@ -1977,11 +1979,9 @@ namespace SurfaceGeometry {
             // Exclude windows and doors, i.e., consider only their base surfaces as possible obstructions
             if (Surface(SurfNum).Class == SurfaceClass_Window || Surface(SurfNum).Class == SurfaceClass_Door) continue;
             // Exclude duplicate shading surfaces
-            // TH 3/25/2010 CR 7872
-            //  Shading surface names can start with Mir, a better way to use another flag
-            //   to indicate whether a surface is a mirrored one.
-            // IF(Surface(SurfNum)%Name(1:3) == 'Mir') CYCLE
             if (Surface(SurfNum).MirroredSurf) continue;
+            // Exclude air boundary surfaces
+            if (Surface(SurfNum).HeatTransSurf && Construct(Surface(SurfNum).Construction).TypeIsAirBoundary) continue;
 
             Surface(SurfNum).ShadowSurfPossibleObstruction = true;
         }
@@ -1992,7 +1992,9 @@ namespace SurfaceGeometry {
             for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                 if (!Surface(SurfNum).HeatTransSurf) continue;                                               // ignore shading surfaces
                 if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum) continue; // interzone, not adiabatic surface
-                if (!Construct(Surface(SurfNum).Construction).TypeIsIRT) continue;
+                if (!Construct(Surface(SurfNum).Construction).TypeIsIRT) {
+                    continue;
+                }
                 if (!DisplayExtraWarnings) {
                     ++iTmp1;
                 } else {
@@ -2055,6 +2057,9 @@ namespace SurfaceGeometry {
         exposedFoundationPerimeter.getData(ErrorsFound);
 
         GetSurfaceHeatTransferAlgorithmOverrides(ErrorsFound);
+
+        // Set up enclosures, process Air Boundaries if any
+        SetupRadiantEnclosuresAndAirBoundaries(ErrorsFound);
 
         GetSurfaceSrdSurfsData(ErrorsFound);
 
@@ -2218,6 +2223,8 @@ namespace SurfaceGeometry {
         bool OK;
         int Found;
         std::string OutMsg;
+        int ZoneNum; //For loop counter
+        static bool RelWarning(false);
 
         // Formats
         static ObjexxFCL::gio::Fmt Format_720("(A)");
@@ -2365,6 +2372,22 @@ namespace SurfaceGeometry {
                 ShowWarningError(cCurrentModuleObject + ": Potential mismatch of coordinate specifications.");
                 ShowContinueError(cAlphaFieldNames(3) + "=\"" + GAlphas(3) + "\"; while ");
                 ShowContinueError(cAlphaFieldNames(5) + "=\"" + GAlphas(5) + "\".");
+            }
+        } else {
+            RelWarning = false;
+            for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+                if (Zone(ZoneNum).OriginX != 0.0) RelWarning = true;
+                if (Zone(ZoneNum).OriginY != 0.0) RelWarning = true;
+                if (Zone(ZoneNum).OriginZ != 0.0) RelWarning = true;
+            }
+            if (RelWarning && !RectSurfRefWorldCoordSystem) {
+                ShowWarningError(cCurrentModuleObject + ": Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on the default SurfaceGeometry for 'Relative to zone' coordinate.");
+                ShowContinueError(cAlphaFieldNames(3) + "=\"" + GAlphas(3) + "\"; while ");
+                if (GAlphas(5) == "RELATIVE") {
+                    ShowContinueError(cAlphaFieldNames(5) + "=\"" + GAlphas(5) + "\".");
+                } else if (GAlphas(5) != "ABSOLUTE") {
+                    ShowContinueError(cAlphaFieldNames(5) + "=\"defaults to RELATIVE\".");
+                }
             }
         }
 
@@ -4076,13 +4099,13 @@ namespace SurfaceGeometry {
 
                 if (SurfaceTmp(SurfNum).ExtBoundCond == Ground) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
-                                    "\", Exterior boundary condition = Ground is not be allowed with windows.");
+                                    "\", Exterior boundary condition = Ground is not allowed with windows.");
                     ErrorsFound = true;
                 }
 
                 if (SurfaceTmp(SurfNum).ExtBoundCond == KivaFoundation) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
-                                    "\", Exterior boundary condition = Foundation is not be allowed with windows.");
+                                    "\", Exterior boundary condition = Foundation is not allowed with windows.");
                     ErrorsFound = true;
                 }
 
@@ -4397,7 +4420,7 @@ namespace SurfaceGeometry {
 
                     if (SurfaceTmp(SurfNum).ExtBoundCond == Ground) {
                         ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
-                                        "\", Exterior boundary condition = Ground is not be allowed with windows.");
+                                        "\", Exterior boundary condition = Ground is not allowed with windows.");
                         ErrorsFound = true;
                     }
 
@@ -7024,7 +7047,7 @@ namespace SurfaceGeometry {
             }
         }
 
-        // Change algorithm for Kiva foundation surfaces
+        // Change algorithm for Kiva and air boundary foundation surfaces
         for (auto &surf : Surface) {
             if (surf.ExtBoundCond == KivaFoundation) {
                 surf.HeatTransferAlgorithm = HeatTransferModel_Kiva;
@@ -7032,7 +7055,7 @@ namespace SurfaceGeometry {
             }
         }
 
-        // Setup Kiva intances
+        // Setup Kiva instances
         if (DataHeatBalance::AnyKiva) {
             if (!ErrorsFound) ErrorsFound = kivaManager.setupKivaInstances();
         }
@@ -8895,6 +8918,14 @@ namespace SurfaceGeometry {
                 auto &fnd = fndInput.foundation;
                 fnd = kivaManager.defaultFoundation.foundation;
 
+                // Indoor temperature
+                if (!lNumericFieldBlanks(numF)) {
+                    fndInput.assumedIndoorTemperature = rNumericArgs(numF);
+                } else {
+                    fndInput.assumedIndoorTemperature = -9999;
+                }
+                numF++;
+
                 // Interior horizontal insulation
                 if (!lAlphaFieldBlanks(alpF)) {
                     int index = UtilityRoutines::FindItemInList(cAlphaArgs(alpF), Material);
@@ -9671,10 +9702,9 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 } else {
                     int const MaterialLayerGroup = Material(MaterNum).Group;
-                    if ((MaterialLayerGroup == WindowSimpleGlazing) || (MaterialLayerGroup == GlassEquivalentLayer) ||
-                        (MaterialLayerGroup == ShadeEquivalentLayer) || (MaterialLayerGroup == DrapeEquivalentLayer) ||
-                        (MaterialLayerGroup == BlindEquivalentLayer) || (MaterialLayerGroup == ScreenEquivalentLayer) ||
-                        (MaterialLayerGroup == GapEquivalentLayer)) {
+                    if ((MaterialLayerGroup == WindowSimpleGlazing) || (MaterialLayerGroup == ShadeEquivalentLayer) ||
+                        (MaterialLayerGroup == DrapeEquivalentLayer) || (MaterialLayerGroup == BlindEquivalentLayer) ||
+                        (MaterialLayerGroup == ScreenEquivalentLayer) || (MaterialLayerGroup == GapEquivalentLayer)) {
                         ShowSevereError("Invalid movable insulation material for " + cCurrentModuleObject + ":");
                         ShowSevereError("...Movable insulation material type specified = " + DataHeatBalance::cMaterialGroupType(MaterialLayerGroup));
                         ShowSevereError("...Movable insulation material name specified = " + cAlphaArgs(3));
@@ -12597,6 +12627,238 @@ namespace SurfaceGeometry {
         }
     }
 
+    void SetupRadiantEnclosuresAndAirBoundaries(bool &ErrorsFound)
+    {
+        bool anyRadiantGroupedZones = false;
+        int enclosureNum = 0;
+        if (std::any_of(Construct.begin(), Construct.end(), [](DataHeatBalance::ConstructionData const &e) { return e.TypeIsAirBoundary; })) {
+            std::string RoutineName = "SetupRadiantEnclosuresAndAirBoundaries";
+            int errorCount = 0;
+            for (int surfNum = 1; surfNum <= DataSurfaces::TotSurfaces; ++surfNum) {
+                auto &surf(Surface(surfNum));
+                if (surf.Construction == 0) continue;
+                auto &constr(Construct(surf.Construction));
+                if (!constr.TypeIsAirBoundary) continue;
+
+                // Check for invalid air boundary surfaces - valid only on non-adiabatic interzone surfaces
+                if (surf.ExtBoundCond <= 0 || surf.ExtBoundCond == surfNum) {
+                    ErrorsFound = true;
+                    if (!DisplayExtraWarnings) {
+                        ++errorCount;
+                    } else {
+                        ShowSevereError(RoutineName + ": Surface=\"" + surf.Name + "\" uses Construction:AirBoundary in a non-interzone surface.");
+                    }
+                } else {
+                    // Process air boundary - set surface properties and set up enclosures
+                    // Radiant exchange
+                    if (constr.TypeIsAirBoundaryIRTSurface) {
+                        // IRT air boundaries use CTF algorithm
+                        surf.HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
+                        surf.HeatTransSurf = true;
+                        // Interior convection coefficient set to low H limit in ConvectionCoefficients::GetUserConvectionCoefficients
+                    } else {
+                        // Boundary is grouped - assign radiant enclosure
+                        constr.IsUsedCTF = false;
+                        surf.HeatTransSurf = false;
+                        surf.HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_AirBoundaryNoHT;
+                        anyRadiantGroupedZones = true;
+                        auto &thisSideEnclosureNum(Zone(surf.Zone).RadiantEnclosureNum);
+                        auto &otherSideEnclosureNum(Zone(Surface(surf.ExtBoundCond).Zone).RadiantEnclosureNum);
+                        if ((thisSideEnclosureNum == 0) && (otherSideEnclosureNum == 0)) {
+                            // Neither zone is assigned to an enclosure, so increment the counter and assign to both
+                            ++enclosureNum;
+                            auto &thisRadEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
+                            thisSideEnclosureNum = enclosureNum;
+                            thisRadEnclosure.Name = "Radiant Enclosure " + General::RoundSigDigits(enclosureNum);
+                            thisRadEnclosure.ZoneNames.push_back(surf.ZoneName);
+                            thisRadEnclosure.ZoneNums.push_back(surf.Zone);
+                            thisRadEnclosure.FloorArea += Zone(surf.Zone).FloorArea;
+                            otherSideEnclosureNum = enclosureNum;
+                            thisRadEnclosure.ZoneNames.push_back(Surface(surf.ExtBoundCond).ZoneName);
+                            thisRadEnclosure.ZoneNums.push_back(Surface(surf.ExtBoundCond).Zone);
+                            thisRadEnclosure.FloorArea += Zone(Surface(surf.ExtBoundCond).Zone).FloorArea;
+                        } else if (thisSideEnclosureNum == 0) {
+                            // Other side is assigned, so use that one for both
+                            thisSideEnclosureNum = otherSideEnclosureNum;
+                            auto &thisRadEnclosure(DataViewFactorInformation::ZoneRadiantInfo(thisSideEnclosureNum));
+                            thisRadEnclosure.ZoneNames.push_back(surf.ZoneName);
+                            thisRadEnclosure.ZoneNums.push_back(surf.Zone);
+                            thisRadEnclosure.FloorArea += Zone(surf.Zone).FloorArea;
+                        } else if (otherSideEnclosureNum == 0) {
+                            // This side is assigned, so use that one for both
+                            otherSideEnclosureNum = thisSideEnclosureNum;
+                            auto &thisRadEnclosure(DataViewFactorInformation::ZoneRadiantInfo(thisSideEnclosureNum));
+                            thisRadEnclosure.ZoneNames.push_back(Surface(surf.ExtBoundCond).ZoneName);
+                            thisRadEnclosure.ZoneNums.push_back(Surface(surf.ExtBoundCond).Zone);
+                            thisRadEnclosure.FloorArea += Zone(Surface(surf.ExtBoundCond).Zone).FloorArea;
+                        } else if (thisSideEnclosureNum != otherSideEnclosureNum) {
+                            // This should never happen
+                            ErrorsFound = true;
+                            ShowSevereError(RoutineName + ": Radiant enclosure grouping error for Surface=\"" + surf.Name + "\"." +
+                                            "This surface enclosure num=" + General::RoundSigDigits(thisSideEnclosureNum) +
+                                            ". Other side enclosure num=" + General::RoundSigDigits(otherSideEnclosureNum));
+                        }
+                    }
+                }
+            }
+            if (errorCount > 0) {
+                ShowSevereError(RoutineName + ": " + General::TrimSigDigits(errorCount) +
+                                " surfaces use Construction:AirBoundary in non-interzone surfaces.");
+                ShowContinueError("For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
+            }
+        }
+        if (anyRadiantGroupedZones) {
+            // All grouped radiant zones have been assigned to an enclosure, now assign remaining zones
+            for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+                if (Zone(zoneNum).RadiantEnclosureNum == 0) {
+                    ++enclosureNum;
+                    Zone(zoneNum).RadiantEnclosureNum = enclosureNum;
+                    auto &thisRadEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
+                    thisRadEnclosure.Name = Zone(zoneNum).Name;
+                    thisRadEnclosure.ZoneNames.push_back(Zone(zoneNum).Name);
+                    thisRadEnclosure.ZoneNums.push_back(zoneNum);
+                    thisRadEnclosure.FloorArea = Zone(zoneNum).FloorArea;
+                }
+            }
+            DataViewFactorInformation::NumOfRadiantEnclosures = enclosureNum;
+        } else {
+            // There are no grouped radiant air boundaries, assign each zone to it's own radiant enclosure
+            for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+                Zone(zoneNum).RadiantEnclosureNum = zoneNum;
+                auto &thisRadEnclosure(DataViewFactorInformation::ZoneRadiantInfo(zoneNum));
+                thisRadEnclosure.Name = Zone(zoneNum).Name;
+                thisRadEnclosure.ZoneNames.push_back(Zone(zoneNum).Name);
+                thisRadEnclosure.ZoneNums.push_back(zoneNum);
+                thisRadEnclosure.FloorArea = Zone(zoneNum).FloorArea;
+            }
+            DataViewFactorInformation::NumOfRadiantEnclosures = DataGlobals::NumOfZones;
+        }
+    }
+
+    void SetupSolarEnclosuresAndAirBoundaries(bool &ErrorsFound)
+    {
+        int enclosureNum = 0;
+        if (std::any_of(Construct.begin(), Construct.end(), [](DataHeatBalance::ConstructionData const &e) { return e.TypeIsAirBoundary; })) {
+            std::string RoutineName = "SetupSolarEnclosuresAndAirBoundaries";
+            for (int surfNum = 1; surfNum <= DataSurfaces::TotSurfaces; ++surfNum) {
+                auto &surf(Surface(surfNum));
+                if (surf.Construction == 0) continue;
+                auto &constr(Construct(surf.Construction));
+                if (!constr.TypeIsAirBoundary) continue;
+
+                // Check for invalid air boundary surfaces - valid only on non-adiabatic interzone surfaces
+                if (surf.ExtBoundCond <= 0 || surf.ExtBoundCond == surfNum) {
+                    // Error messages were done in SetupRadiantEnclosuresAndAirBoundaries
+                    continue;
+                } else {
+                    // Process air boundary - set surface properties and set up enclosures
+                    // Solar distribution
+                    if (constr.TypeIsAirBoundarySolar) {
+                        // Boundary is grouped - assign solar enclosure
+                        DataHeatBalance::AnyAirBoundaryGroupedSolar = true;
+                        auto &thisSideEnclosureNum(Zone(surf.Zone).SolarEnclosureNum);
+                        auto &otherSideEnclosureNum(Zone(Surface(surf.ExtBoundCond).Zone).SolarEnclosureNum);
+                        if ((thisSideEnclosureNum == 0) && (otherSideEnclosureNum == 0)) {
+                            // Neither zone is assigned to an enclosure, so increment the counter and assign to both
+                            ++enclosureNum;
+                            auto &thisSolEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
+                            thisSideEnclosureNum = enclosureNum;
+                            thisSolEnclosure.Name = "Solar Enclosure " + General::RoundSigDigits(enclosureNum);
+                            thisSolEnclosure.ZoneNames.push_back(surf.ZoneName);
+                            thisSolEnclosure.ZoneNums.push_back(surf.Zone);
+                            thisSolEnclosure.FloorArea += Zone(surf.Zone).FloorArea;
+                            thisSolEnclosure.ExtWindowArea += Zone(surf.Zone).ExtWindowArea;
+                            thisSolEnclosure.TotalSurfArea += Zone(surf.Zone).TotalSurfArea;
+                            otherSideEnclosureNum = enclosureNum;
+                            thisSolEnclosure.ZoneNames.push_back(Surface(surf.ExtBoundCond).ZoneName);
+                            thisSolEnclosure.ZoneNums.push_back(Surface(surf.ExtBoundCond).Zone);
+                            thisSolEnclosure.FloorArea += Zone(Surface(surf.ExtBoundCond).Zone).FloorArea;
+                            thisSolEnclosure.ExtWindowArea += Zone(Surface(surf.ExtBoundCond).Zone).ExtWindowArea;
+                            thisSolEnclosure.TotalSurfArea += Zone(Surface(surf.ExtBoundCond).Zone).TotalSurfArea;
+                        } else if (thisSideEnclosureNum == 0) {
+                            // Other side is assigned, so use that one for both
+                            thisSideEnclosureNum = otherSideEnclosureNum;
+                            auto &thisSolEnclosure(DataViewFactorInformation::ZoneSolarInfo(thisSideEnclosureNum));
+                            thisSolEnclosure.ZoneNames.push_back(surf.ZoneName);
+                            thisSolEnclosure.ZoneNums.push_back(surf.Zone);
+                            thisSolEnclosure.FloorArea += Zone(surf.Zone).FloorArea;
+                            thisSolEnclosure.ExtWindowArea += Zone(surf.Zone).ExtWindowArea;
+                            thisSolEnclosure.TotalSurfArea += Zone(surf.Zone).TotalSurfArea;
+                        } else if (otherSideEnclosureNum == 0) {
+                            // This side is assigned, so use that one for both
+                            otherSideEnclosureNum = thisSideEnclosureNum;
+                            auto &thisSolEnclosure(DataViewFactorInformation::ZoneSolarInfo(thisSideEnclosureNum));
+                            thisSolEnclosure.ZoneNames.push_back(Surface(surf.ExtBoundCond).ZoneName);
+                            thisSolEnclosure.ZoneNums.push_back(Surface(surf.ExtBoundCond).Zone);
+                            thisSolEnclosure.FloorArea += Zone(Surface(surf.ExtBoundCond).Zone).FloorArea;
+                            thisSolEnclosure.ExtWindowArea += Zone(Surface(surf.ExtBoundCond).Zone).ExtWindowArea;
+                            thisSolEnclosure.TotalSurfArea += Zone(Surface(surf.ExtBoundCond).Zone).TotalSurfArea;
+                        } else if (thisSideEnclosureNum != otherSideEnclosureNum) {
+                            // This should never happen
+                            ErrorsFound = true;
+                            ShowSevereError(RoutineName + ": Solar enclosure grouping error for Surface=\"" + surf.Name + "\"." +
+                                            "This surface enclosure num=" + General::RoundSigDigits(thisSideEnclosureNum) +
+                                            ". Other side enclosure num=" + General::RoundSigDigits(otherSideEnclosureNum));
+                        }
+                    }
+                    if (constr.TypeIsAirBoundaryMixing) {
+                        int zoneNum1 = min(surf.Zone, Surface(surf.ExtBoundCond).Zone);
+                        int zoneNum2 = min(surf.Zone, Surface(surf.ExtBoundCond).Zone);
+                        // This pair already saved?
+                        bool found = false;
+                        for (int n = 0; n < DataHeatBalance::NumAirBoundaryMixing - 1; ++n) {
+                            if ((zoneNum1 == DataHeatBalance::AirBoundaryMixingZone1[n]) &&
+                                (zoneNum2 == DataHeatBalance::AirBoundaryMixingZone2[n])) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            // Store the zone pairs to use later to create cross mixing objects
+                            ++DataHeatBalance::NumAirBoundaryMixing;
+                            DataHeatBalance::AirBoundaryMixingZone1.push_back(zoneNum1);
+                            DataHeatBalance::AirBoundaryMixingZone2.push_back(zoneNum2);
+                            DataHeatBalance::AirBoundaryMixingSched.push_back(DataHeatBalance::Construct(surf.Construction).AirBoundaryMixingSched);
+                            Real64 mixingVol = Construct(surf.Construction).AirBoundaryACH * min(Zone(zoneNum1).Volume, Zone(zoneNum2).Volume) /
+                                               DataGlobals::SecInHour;
+                            DataHeatBalance::AirBoundaryMixingVol.push_back(mixingVol);
+                        }
+                    }
+                }
+            }
+        }
+        if (DataHeatBalance::AnyAirBoundaryGroupedSolar) {
+            // All grouped solar zones have been assigned to an enclosure, now assign remaining zones
+            for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+                if (Zone(zoneNum).SolarEnclosureNum == 0) {
+                    ++enclosureNum;
+                    Zone(zoneNum).SolarEnclosureNum = enclosureNum;
+                    auto &thisSolEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
+                    thisSolEnclosure.Name = Zone(zoneNum).Name;
+                    thisSolEnclosure.ZoneNames.push_back(Zone(zoneNum).Name);
+                    thisSolEnclosure.ZoneNums.push_back(zoneNum);
+                    thisSolEnclosure.FloorArea = Zone(zoneNum).FloorArea;
+                    thisSolEnclosure.ExtWindowArea = Zone(zoneNum).ExtWindowArea;
+                    thisSolEnclosure.TotalSurfArea = Zone(zoneNum).TotalSurfArea;
+                }
+            }
+            DataViewFactorInformation::NumOfSolarEnclosures = enclosureNum;
+        } else {
+            // There are no grouped solar air boundaries, assign each zone to it's own solar enclosure
+            for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+                Zone(zoneNum).SolarEnclosureNum = zoneNum;
+                auto &thisSolEnclosure(DataViewFactorInformation::ZoneSolarInfo(zoneNum));
+                thisSolEnclosure.Name = Zone(zoneNum).Name;
+                thisSolEnclosure.ZoneNames.push_back(Zone(zoneNum).Name);
+                thisSolEnclosure.ZoneNums.push_back(zoneNum);
+                thisSolEnclosure.FloorArea = Zone(zoneNum).FloorArea;
+                thisSolEnclosure.ExtWindowArea = Zone(zoneNum).ExtWindowArea;
+                thisSolEnclosure.TotalSurfArea = Zone(zoneNum).TotalSurfArea;
+            }
+            DataViewFactorInformation::NumOfSolarEnclosures = DataGlobals::NumOfZones;
+        }
+    }
+
     void CheckConvexity(int const SurfNum, // Current surface number
                         int const NSides   // Number of sides to figure
     )
@@ -13000,6 +13262,88 @@ namespace SurfaceGeometry {
         Surface(SurfNum).Width = WidthEff;
         Surface(SurfNum).Height = HeightEff;
     }
+    
+
+    void CheckForReversedLayers(bool &RevLayerDiffs,    // true when differences are discovered in interzone constructions
+                                int const ConstrNum,    // construction index
+                                int const ConstrNumRev, // construction index for reversed construction
+                                int const TotalLayers   // total layers for construction definition
+    )
+    {
+        
+        RevLayerDiffs = false;
+        
+        for (int LayerNo = 1; LayerNo <= TotalLayers; ++LayerNo) {
+            auto &thisConstLayer(Construct(ConstrNum).LayerPoint(LayerNo));
+            auto &revConstLayer(Construct(ConstrNumRev).LayerPoint(TotalLayers - LayerNo + 1));
+            auto &thisMatLay(Material(thisConstLayer));
+            auto &revMatLay(Material(revConstLayer));
+            if ((thisConstLayer != revConstLayer) ||    // Not pointing to the same layer
+                (thisMatLay.Group == WindowGlass) ||    // Not window glass or glass equivalent layer which have
+                (revMatLay.Group == WindowGlass) ||     // to have certain properties flipped from front to back
+                (thisMatLay.Group == GlassEquivalentLayer) ||
+                (revMatLay.Group == GlassEquivalentLayer)) {
+                // If not point to the same layer, check to see if this is window glass which might need to have
+                // front and back material properties reversed.
+                Real64 const SmallDiff = 0.0001;
+                if ((thisMatLay.Group == WindowGlass) && (revMatLay.Group == WindowGlass)) {
+                    // Both layers are window glass, so need to check to see if the properties are reversed
+                    if ((abs(thisMatLay.Thickness - revMatLay.Thickness) > SmallDiff) ||
+                        (abs(thisMatLay.ReflectSolBeamBack - revMatLay.ReflectSolBeamFront) > SmallDiff) ||
+                        (abs(thisMatLay.ReflectSolBeamFront - revMatLay.ReflectSolBeamBack) > SmallDiff) ||
+                        (abs(thisMatLay.TransVis - revMatLay.TransVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflectVisBeamBack - revMatLay.ReflectVisBeamFront) > SmallDiff) ||
+                        (abs(thisMatLay.ReflectVisBeamFront - revMatLay.ReflectVisBeamBack) > SmallDiff) ||
+                        (abs(thisMatLay.TransThermal - revMatLay.TransThermal) > SmallDiff) ||
+                        (abs(thisMatLay.AbsorpThermalBack - revMatLay.AbsorpThermalFront) > SmallDiff) ||
+                        (abs(thisMatLay.AbsorpThermalFront - revMatLay.AbsorpThermalBack) > SmallDiff) ||
+                        (abs(thisMatLay.Conductivity - revMatLay.Conductivity) > SmallDiff) ||
+                        (abs(thisMatLay.GlassTransDirtFactor - revMatLay.GlassTransDirtFactor) > SmallDiff) ||
+                        (thisMatLay.SolarDiffusing != revMatLay.SolarDiffusing) ||
+                        (abs(thisMatLay.YoungModulus - revMatLay.YoungModulus) > SmallDiff) ||
+                        (abs(thisMatLay.PoissonsRatio - revMatLay.PoissonsRatio) > SmallDiff)) {
+                        RevLayerDiffs = true;
+                        break; // exit when diff
+                    }   // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
+                } else if ((thisMatLay.Group == GlassEquivalentLayer) && (revMatLay.Group == GlassEquivalentLayer)) {
+                    if ((abs(thisMatLay.TausBackBeamBeam - revMatLay.TausFrontBeamBeam) > SmallDiff) ||
+                        (abs(thisMatLay.TausFrontBeamBeam - revMatLay.TausBackBeamBeam) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackBeamBeam - revMatLay.ReflFrontBeamBeam) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontBeamBeam - revMatLay.ReflBackBeamBeam) > SmallDiff) ||
+                        (abs(thisMatLay.TausBackBeamBeamVis - revMatLay.TausFrontBeamBeamVis) > SmallDiff) ||
+                        (abs(thisMatLay.TausFrontBeamBeamVis - revMatLay.TausBackBeamBeamVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackBeamBeamVis - revMatLay.ReflFrontBeamBeamVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontBeamBeamVis - revMatLay.ReflBackBeamBeamVis) > SmallDiff) ||
+                        (abs(thisMatLay.TausBackBeamDiff - revMatLay.TausFrontBeamDiff) > SmallDiff) ||
+                        (abs(thisMatLay.TausFrontBeamDiff - revMatLay.TausBackBeamDiff) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackBeamDiff - revMatLay.ReflFrontBeamDiff) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontBeamDiff - revMatLay.ReflBackBeamDiff) > SmallDiff) ||
+                        (abs(thisMatLay.TausBackBeamDiffVis - revMatLay.TausFrontBeamDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.TausFrontBeamDiffVis - revMatLay.TausBackBeamDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackBeamDiffVis - revMatLay.ReflFrontBeamDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontBeamDiffVis - revMatLay.ReflBackBeamDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.TausDiffDiff - revMatLay.TausDiffDiff) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackDiffDiff - revMatLay.ReflFrontDiffDiff) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontDiffDiff - revMatLay.ReflBackDiffDiff) > SmallDiff) ||
+                        (abs(thisMatLay.TausDiffDiffVis - revMatLay.TausDiffDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflBackDiffDiffVis - revMatLay.ReflFrontDiffDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.ReflFrontDiffDiffVis - revMatLay.ReflBackDiffDiffVis) > SmallDiff) ||
+                        (abs(thisMatLay.TausThermal - revMatLay.TausThermal) > SmallDiff) ||
+                        (abs(thisMatLay.EmissThermalBack - revMatLay.EmissThermalFront) > SmallDiff) ||
+                        (abs(thisMatLay.EmissThermalFront - revMatLay.EmissThermalBack) > SmallDiff) ||
+                        (abs(thisMatLay.Resistance - revMatLay.Resistance) > SmallDiff)) {
+                        RevLayerDiffs = true;
+                        break; // exit when diff
+                    }   // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
+                } else {
+                    // Other material types do not have reversed constructions so if they are not the same layer there is a problem (RevLayersDiffs = true)
+                    RevLayerDiffs = true;
+                    break; // exit when diff
+                }       // End check of whether or not these are WindowGlass
+            }           // else: thisConstLayer is the same as revConstLayer--so there is no problem (RevLayersDiffs = false)
+        }
+    }
+    
 } // namespace SurfaceGeometry
 
 } // namespace EnergyPlus

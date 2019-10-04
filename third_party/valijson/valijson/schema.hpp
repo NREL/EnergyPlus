@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_SCHEMA_HPP
-#define __VALIJSON_SCHEMA_HPP
 
 #include <cstdio>
 #include <set>
@@ -209,5 +207,3 @@ private:
 };
 
 } // namespace valijson
-
-#endif

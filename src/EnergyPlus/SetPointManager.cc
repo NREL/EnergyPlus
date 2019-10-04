@@ -916,6 +916,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = SchSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_Scheduled;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = SchSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = SchSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -1016,6 +1017,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = DualSchSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_ScheduledDual;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = DualSchSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = DualSchSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -1126,6 +1128,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = OutAirSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_OutsideAir;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = OutAirSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = OutAirSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -1221,6 +1224,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = SingZoneRhSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_SZReheat;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = SingZoneRhSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = SingZoneRhSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -1316,6 +1320,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = SingZoneHtSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_SZHeating;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = SingZoneHtSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = SingZoneHtSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -1410,6 +1415,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = SingZoneClSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_SZCooling;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = SingZoneClSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = SingZoneClSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -1514,6 +1520,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = SZMinHumSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_SZMinHum;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = SZMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = SZMinHumSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -1619,6 +1626,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = SZMaxHumSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_SZMaxHum;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = SZMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = SZMaxHumSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -1721,8 +1729,10 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = MixedAirSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_MixedAir;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = MixedAirSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = MixedAirSetPtMgr(SetPtMgrNum).NumCtrlNodes;
+            AllSetPtMgr(AllSetPtMgrNum).RefNode = MixedAirSetPtMgr(SetPtMgrNum).RefNode;
         }
 
         // Input the Outside Air Pretreat Setpoint Managers
@@ -1857,6 +1867,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = OAPretreatSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_OutsideAirPretreat;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = OAPretreatSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -1953,6 +1964,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = WarmestSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_Warmest;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = WarmestSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = WarmestSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -2050,6 +2062,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = ColdestSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_Coldest;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = ColdestSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = ColdestSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -2155,6 +2168,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = WarmestSetPtMgrTempFlow(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_WarmestTempFlow;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = WarmestSetPtMgrTempFlow(SetPtMgrNum).NumCtrlNodes;
         }
@@ -2220,6 +2234,7 @@ namespace SetPointManager {
             AllSetPtMgr(AllSetPtMgrNum).CtrlNodes = RABFlowSetPtMgr(SetPtMgrNum).CtrlNodes;
             AllSetPtMgr(AllSetPtMgrNum).Name = RABFlowSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_RAB;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = RABFlowSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = RABFlowSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -2297,6 +2312,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = MZAverageCoolingSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_MZCoolingAverage;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = MZAverageCoolingSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = MZAverageCoolingSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -2374,6 +2390,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = MZAverageHeatingSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_MZHeatingAverage;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = MZAverageHeatingSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = MZAverageHeatingSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -2452,6 +2469,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = MZAverageMinHumSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_MZMinHumAverage;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = MZAverageMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = MZAverageMinHumSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -2530,6 +2548,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = MZAverageMaxHumSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_MZMaxHumAverage;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = MZAverageMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = MZAverageMaxHumSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -2608,6 +2627,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = MZMinHumSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_MZMinHum;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = MZMinHumSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = MZMinHumSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -2687,6 +2707,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = MZMaxHumSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_MZMaxHum;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = MZMaxHumSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = MZMaxHumSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -2788,6 +2809,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = FollowOATempSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_FollowOATemp;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = FollowOATempSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -2892,6 +2914,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = FollowSysNodeTempSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_FollowSysNodeTemp;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = FollowSysNodeTempSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -3031,6 +3054,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = GroundTempSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_GroundTemp;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = GroundTempSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -3137,6 +3161,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = CondEntSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_CondEntReset;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = CondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = CondEntSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -3216,6 +3241,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = IdealCondEntSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_IdealCondEntReset;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = IdealCondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = IdealCondEntSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -3308,6 +3334,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = SZOneStageCoolingSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_SZOneStageCooling;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = SZOneStageCoolingSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = SZOneStageCoolingSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -3400,6 +3427,7 @@ namespace SetPointManager {
             }
             AllSetPtMgr(AllSetPtMgrNum).Name = SZOneStageHeatingSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_SZOneStageHeating;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = SZOneStageHeatingSetPtMgr(SetPtMgrNum).CtrlTypeMode;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = SZOneStageHeatingSetPtMgr(SetPtMgrNum).NumCtrlNodes;
         }
@@ -3481,6 +3509,7 @@ namespace SetPointManager {
             AllSetPtMgr(AllSetPtMgrNum).CtrlNodes(1) = ReturnWaterResetChWSetPtMgr(SetPtMgrNum).supplyNodeIndex;
             AllSetPtMgr(AllSetPtMgrNum).Name = ReturnWaterResetChWSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_ReturnWaterResetChW;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = 1;
         }
@@ -3562,6 +3591,7 @@ namespace SetPointManager {
             AllSetPtMgr(AllSetPtMgrNum).CtrlNodes(1) = ReturnWaterResetHWSetPtMgr(SetPtMgrNum).supplyNodeIndex;
             AllSetPtMgr(AllSetPtMgrNum).Name = ReturnWaterResetHWSetPtMgr(SetPtMgrNum).Name;
             AllSetPtMgr(AllSetPtMgrNum).SPMType = iSPMType_ReturnWaterResetHW;
+            AllSetPtMgr(AllSetPtMgrNum).SPMIndex = SetPtMgrNum;
             AllSetPtMgr(AllSetPtMgrNum).CtrlTypeMode = iCtrlVarType_Temp;
             AllSetPtMgr(AllSetPtMgrNum).NumCtrlNodes = 1;
         }
@@ -7760,7 +7790,7 @@ namespace SetPointManager {
 
         Array1D_int VarIndexes;                     // Variable Numbers
         Array1D_int VarTypes;                       // Variable Types (1=integer, 2=real, 3=meter)
-        Array1D_int IndexTypes;                     // Variable Index Types (1=Zone,2=HVAC)
+        Array1D<OutputProcessor::TimeStepType> IndexTypes;                     // Variable Index Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
         Array1D_int ResourceTypes;                  // ResourceTypes for each variable
         Array1D_string EndUses;                     // EndUses for each variable
@@ -8427,6 +8457,43 @@ namespace SetPointManager {
                 }
             }
         }
+    }
+
+    int getSPMBasedOnNode(int const NodeNum, int const SetPtType, int const SPMType, CtrlNodeType ctrlOrRefNode) {
+
+        if (GetInputFlag) {
+            GetSetPointManagerInputs();
+            GetInputFlag = false;
+        }
+
+        int getSPMBasedOnNode = 0;
+
+        for (int SetPtMgrNum = 1; SetPtMgrNum <= NumAllSetPtMgrs; ++SetPtMgrNum) {
+            if (SetPtType == AllSetPtMgr(SetPtMgrNum).CtrlTypeMode) { // SetPtType is e.g., iCtrlVarType_Temp, iCtrlVarType_HumRat, etc.
+                switch (ctrlOrRefNode) { // ctrlOrRefNode is enum type of node to look for, either control node or reference node
+                case CtrlNodeType::control: {
+                        for (int NumNode = 1; NumNode <= AllSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++NumNode) {
+                            // SPMType is type of set point manager, e.g., iSPMType_Scheduled, iSPMType_MixedAir, etc.
+                            if (NodeNum == AllSetPtMgr(SetPtMgrNum).CtrlNodes(NumNode) && SPMType == AllSetPtMgr(SetPtMgrNum).SPMType) {
+                                getSPMBasedOnNode = AllSetPtMgr(SetPtMgrNum).SPMIndex; // SPMIndex is index to specific type of SPM
+                                break;
+                            }
+                        }
+                        break;
+                }
+                case CtrlNodeType::reference: {
+                        // SPMType is type of set point manager, e.g., iSPMType_Scheduled, iSPMType_MixedAir, etc.
+                        if (NodeNum == AllSetPtMgr(SetPtMgrNum).RefNode && SPMType == AllSetPtMgr(SetPtMgrNum).SPMType) {
+                            getSPMBasedOnNode = AllSetPtMgr(SetPtMgrNum).SPMIndex; // SPMIndex is index to specific type of SPM
+                        }
+                        break;
+                }
+                }
+            }
+            if (getSPMBasedOnNode > 0) break;
+        }
+
+        return getSPMBasedOnNode;
     }
 
     bool IsNodeOnSetPtManager(int const NodeNum, int const SetPtType)

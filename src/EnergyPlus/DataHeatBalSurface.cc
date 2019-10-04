@@ -102,6 +102,7 @@ namespace DataHeatBalSurface {
     Array1D<Real64> TempSource;                   // Temperature at the source location for each heat transfer surface
     Array1D<Real64> TempUserLoc;                  // Temperature at the user specified location for each heat transfer surface
     Array1D<Real64> TempSurfInRep;                // Temperature of the Inside Surface for each heat transfer surface
+    Array1D<Real64> TempSurfInMovInsRep;          // Temperature of interior movable insulation on the side facing the zone
     // (report)
     Array1D<Real64> QConvInReport; // Surface convection heat gain at inside face [J]
     Array1D<Real64> QdotConvInRep; // Surface convection heat transfer rate at inside face surface [W]
@@ -214,7 +215,6 @@ namespace DataHeatBalSurface {
     // Originally QD, now used only for QSDifSol calc for daylighting
     Array1D<Real64> QDV; // Diffuse solar radiation in a zone from sky and ground diffuse entering
     // through exterior windows
-    Array1D<Real64> TCONV;             // Fraction Of Radiated Thermal Converted To Convection In Interior Shades
     Array1D<Real64> VMULT;             // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
     Array1D<Real64> VCONV;             // Fraction Of Short-Wave Radiation From Lights Converted To Convection
     Array1D<Real64> NetLWRadToSurf;    // Net interior long wavelength radiation to a surface from other surfaces
@@ -273,6 +273,7 @@ namespace DataHeatBalSurface {
         TempSource.deallocate();
         TempUserLoc.deallocate();
         TempSurfInRep.deallocate();
+        TempSurfInMovInsRep.deallocate();
         QConvInReport.deallocate();
         QdotConvInRep.deallocate();
         QdotConvInRepPerArea.deallocate();
@@ -324,7 +325,6 @@ namespace DataHeatBalSurface {
         QD.deallocate();
         QDforDaylight.deallocate();
         QDV.deallocate();
-        TCONV.deallocate();
         VMULT.deallocate();
         VCONV.deallocate();
         NetLWRadToSurf.deallocate();

@@ -2024,7 +2024,7 @@ namespace SizingManager {
                             }
                             if (TotConcurrentPeopleOnSys >= DataSizing::PsBySys(AirLoopNum)) {
                                 DataSizing::PsBySys(AirLoopNum) = TotConcurrentPeopleOnSys; // store max concurrent occupancy on system
-                                // store timing description of Last occurance of max
+                                // store timing description of Last occurrence of max
                                 int Month(0);
                                 int DayOfMonth(0);
                                 General::InvOrdinalDay(DayLoop, Month, DayOfMonth, 1);
@@ -2539,7 +2539,7 @@ namespace SizingManager {
             GlobalCoolSizingFactor = 1.0;
             NumTimeStepsInAvg = NumOfTimeStepInHour;
         } else {
-            ShowFatalError(cCurrentModuleObject + ": More than 1 occurence of this object; only 1 allowed");
+            ShowFatalError(cCurrentModuleObject + ": More than 1 occurrence of this object; only 1 allowed");
         }
 
         if (NumTimeStepsInAvg < NumOfTimeStepInHour) {

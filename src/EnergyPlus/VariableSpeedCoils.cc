@@ -7073,6 +7073,44 @@ namespace VariableSpeedCoils {
         return MinOAT;
     }
 
+    Real64 GetVSCoilMinOATCompressorUsingIndex(int const CoilIndex, // index to cooling coil
+                                               bool &ErrorsFound    // set to true if problem
+    )
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         R. Raustad
+        //       DATE WRITTEN   August 2019
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the the min oat for the cooling coil compressor and returns it.  If
+        // incorrect coil index is given, ErrorsFound is returned as true and value is returned
+        // as negative 1000.
+
+        // Return value
+        Real64 MinOAT; // returned min oa temperature of matched coil
+
+        // Obtains and Allocates WatertoAirHP related parameters from input file
+        if (GetCoilsInputFlag) { // First time subroutine has been entered
+            GetVarSpeedCoilInput();
+            GetCoilsInputFlag = false;
+        }
+
+        if (CoilIndex == 0) {
+
+            ShowSevereError("GetVSCoilMinOATCompressorUsingIndex: Index passed = 0");
+            ShowContinueError("... returning Min OAT as -1000.");
+            ErrorsFound = true;
+            MinOAT = -1000.0;
+
+        } else {
+
+            MinOAT = VarSpeedCoil(CoilIndex).MinOATCompressor;
+        }
+
+        return MinOAT;
+    }
+
     int GetVSCoilNumOfSpeeds(std::string const &CoilName, // must match coil names for the coil type
                              bool &ErrorsFound            // set to true if problem
     )
