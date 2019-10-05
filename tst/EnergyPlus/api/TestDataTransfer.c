@@ -45,23 +45,43 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef EnergyPlusAPIFunctional_h_INCLUDED
-#define EnergyPlusAPIFunctional_h_INCLUDED
+#include <stdio.h>
+#include <EnergyPlus/api/datatransfer.h>
+#include <EnergyPlus/api/runtime.h>
 
-#include <EnergyPlus/TypeDefs.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void dataTransferNoOp();
-int getVariableHandle(const char* type, const char* key);
-int getActuatorHandle(const char* type, const char* key);
-double getVariable(int handle);
-int setVariable(int handle, double value);
-
-#ifdef __cplusplus
+int main() {
+    cInitializeEnergyPlus("/tmp/epdll");
+    cInitializeSimulation();
+    int env_count = 0;
+    while (1) {
+        int env = cGetNextEnvironment();
+        if (env == 0) {
+            env_count++;
+        } else {
+            break;
+        }
+        int skip = cSkipCurrentEnvironment();
+        if (skip == 0) {
+            continue;
+        }
+        cBeforeRunEnvironment();
+        unsigned int outdoorTempSensor = getVariableHandle("ENVIRONMENT:SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
+        unsigned int outdoorDewPointSensor = getVariableHandle("ENVIRONMENT:SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
+        unsigned int outdoorDewPointActuator = getActuatorHandle("Outdoor Dew Point", "Environment");
+        printf("Handle IDs: %d, %d, %d \n", outdoorTempSensor, outdoorDewPointSensor, outdoorDewPointActuator);
+        int response = setVariable(outdoorDewPointActuator, -25);
+        if (response != 0) {
+            printf("Could not set actuator...\n");
+        }
+        cRunEnvironment();
+        Real64 oa_temp = getVariable(outdoorTempSensor);
+        printf("Reading outdoor temp via getVariable, value is: %8.4f \n", oa_temp);
+        Real64 dp_temp = getVariable(outdoorDewPointSensor);
+        printf("Actuated Dew Point temp value is: %8.4f \n", dp_temp);
+        cAfterRunEnvironment();
+    }
+    cWrapUpSimulation();
+    cWrapUpEnergyPlus();
+    return 0;
 }
-#endif
 
-#endif // EnergyPlusAPIFunctional_h_INCLUDED

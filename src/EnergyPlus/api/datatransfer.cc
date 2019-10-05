@@ -49,29 +49,28 @@
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 
-int getVariableHandle(const int vt, std::string const & type, std::string const & key) {
+void dataTransferNoOp() {}
+
+int getVariableHandle(const char* type, const char* key) {
     int handle;
-    switch(vt) {
-    case VariableTypeActuator:
-        handle = 0;
-        for (auto const & availActuator : EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable) {
-            handle++;
-            if (type == availActuator.ControlTypeName && key == availActuator.UniqueIDName) {
-                return handle;
-            }
+    handle = 0;
+    for (auto const & availOutputVar : EnergyPlus::OutputProcessor::RVariableTypes) {
+        handle++;
+        if (type == availOutputVar.VarNameUC && key == availOutputVar.KeyNameOnlyUC) {
+            return handle;
         }
-        break;
-    case VariableTypeSensor:
-        handle = 0;
-        for (auto const & availOutputVar : EnergyPlus::OutputProcessor::RVariableTypes) {
-            handle++;
-            if (type == availOutputVar.VarNameUC && key == availOutputVar.KeyNameOnlyUC) {
-                return handle;
-            }
+    }
+    return 0;
+}
+
+int getActuatorHandle(const char* type, const char* key) {
+    int handle;
+    handle = 0;
+    for (auto const & availActuator : EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable) {
+        handle++;
+        if (type == availActuator.ControlTypeName && key == availActuator.UniqueIDName) {
+            return handle;
         }
-        break;
-    default:
-        ;
     }
     return 0;
 }
@@ -80,13 +79,13 @@ double getVariable(const int handle) {
     return EnergyPlus::OutputProcessor::RVariableTypes(handle).VarPtr().Which;
 }
 
-bool setVariable(const int handle, const double value) {
+int setVariable(const int handle, const double value) {
     if (handle == 0) {
-        return false;
+        return 1;
     }
     // the handle is based on the available actuator list
     auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
     theActuator.RealValue = value;
     theActuator.Actuated = true;
-    return true;
+    return 0;
 }
