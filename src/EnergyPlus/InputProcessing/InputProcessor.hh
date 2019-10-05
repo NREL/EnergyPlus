@@ -63,9 +63,9 @@
 #include <nlohmann/json.hpp>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <InputProcessing/DataStorage.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/InputProcessing/DataStorage.hh>
 
 class IdfParser;
 class Validation;
@@ -181,6 +181,8 @@ public:
 
     const json& getObjectInstances(std::string const &ObjType);
 
+    void clear_state();
+
 private:
     struct ObjectInfo
     {
@@ -252,8 +254,6 @@ private:
         }
         return s;
     }
-
-    void clear_state();
 
     using UnorderedObjectTypeMap = std::unordered_map<std::string, std::string>;
     using UnorderedObjectCacheMap = std::unordered_map<std::string, ObjectCache>;

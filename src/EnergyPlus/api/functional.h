@@ -62,8 +62,8 @@ void delCBaseThermalPropertySet(CBaseThermalPropertySet);
 Real64 cBaseThermalPropertySet_diffusivity(CBaseThermalPropertySet);
 void cBaseThermalPropertySet_setConductivity(CBaseThermalPropertySet props, Real64 conductivity);
 
-// Test out a real E+ global function
-// Real64 fluidProperty_GetSatPressureRefrig(const char* refrigerantName, Real64 temperatureC, int refrigerantIndex);
+void initializeFunctionalAPI();
+Real64 fluidProperty_GetSatPressureRefrig(const char* refrigerantName, Real64 temperatureC, int refrigerantIndex);
 
 #ifdef __cplusplus
 }

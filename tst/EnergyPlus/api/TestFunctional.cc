@@ -47,6 +47,11 @@
 
 #include <EnergyPlus/api/functional.h>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/InputValidation.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <iostream>
 
 int main(int, char *[])
@@ -60,7 +65,10 @@ int main(int, char *[])
     props.Conductivity = 4;
     std::cout << "C++ API Test: Updated thermal diffusivity = " << props.diffusivity() << std::endl;
 
-//    int index = 0;
-//    auto saturationPressure = EnergyPlus::API::fluidProperty_GetSatPressureRefrig("Water", 25.5, index);
-
+    EnergyPlus::inputProcessor = EnergyPlus::InputProcessor::factory();
+    EnergyPlus::Psychrometrics::InitializePsychRoutines();
+    EnergyPlus::FluidProperties::InitializeGlycRoutines();
+    int index = 0;
+    auto saturationPressure = EnergyPlus::FluidProperties::GetSatPressureRefrig("STEAM", 25.5, index, "calledfrom");
+    std::cout << "C++ API Test: Calculated saturated pressure = " << saturationPressure << std::endl;
 }

@@ -54,20 +54,24 @@
 extern "C" {
 #endif
 
+void cClearAllStates();
 void cRuntimeNoOp();
 
     // Program level functions
 int cRunEnergyPlus(const char* filepath);
 int cInitializeEnergyPlus(const char* filepath);
 int cWrapUpEnergyPlus();
+int cGetNextEnvironment();
 
     // Simulation manager level functions
 void cInitializeSimulation();
 void cRunOneTimeStep();
 void cRunOneHour();
 void cRunOneDay();
+void cBeforeRunEnvironment();
 void cRunEnvironment();
-bool cSkipCurrentEnvironment();
+void cAfterRunEnvironment();
+int cSkipCurrentEnvironment();
 void cRunAllEnvironments();
 void cWrapUpSimulation();
 

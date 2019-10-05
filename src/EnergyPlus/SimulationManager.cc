@@ -479,8 +479,7 @@ namespace SimulationManager {
         if (sqlite) sqlite->sqliteCommit(); // one transaction per day
     }
 
-    void runEnvironment() {
-
+    void beforeRunEnvironment() {
         ++EnvCount;
         if (sqlite) {
             sqlite->sqliteBegin();
@@ -513,16 +512,19 @@ namespace SimulationManager {
 
         bool anyEMSRan;
         EMSManager::ManageEMS(emsCallFromBeginNewEvironment, anyEMSRan); // calling point
+    }
 
-        while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
-
-            runOneDay();
-
-        } // ... End day loop.
-
+    void afterRunEnvironment() {
         // Need one last call to send latest states to middleware
         ExternalInterfaceExchangeVariables();
+    }
 
+    void runEnvironment() {
+        beforeRunEnvironment();
+        while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
+            runOneDay();
+        } // ... End day loop.
+        afterRunEnvironment();
     }
 
     bool skipCurrentEnvironment() {

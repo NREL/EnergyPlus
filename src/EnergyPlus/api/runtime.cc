@@ -47,9 +47,26 @@
 
 #include <EnergyPlus/public/EnergyPlusPgm.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/api/runtime.h>
+#include <EnergyPlus/StateManagement.hh>
 
 void cRuntimeNoOp() {}
+
+void cClearAllStates() {
+    EnergyPlus::clearAllStates();
+}
+
+int cGetNextEnvironment() {
+    bool boolAvail = true;
+    bool boolErrorsFound = false;
+    bool val = EnergyPlus::WeatherManager::GetNextEnvironment(boolAvail, boolErrorsFound);
+    if (val) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
 
 int cRunEnergyPlus(const char* filepath) {
     std::string path(filepath);
@@ -60,6 +77,7 @@ int cInitializeEnergyPlus(const char* filepath) {
     std::string path(filepath);
     return initializeEnergyPlus(path);
 }
+
 int cWrapUpEnergyPlus() {
     return wrapUpEnergyPlus();
 }
@@ -68,24 +86,44 @@ int cWrapUpEnergyPlus() {
 void cInitializeSimulation() {
     return EnergyPlus::SimulationManager::initializeSimulation();
 }
+
 void cRunOneTimeStep() {
     EnergyPlus::SimulationManager::runOneTimeStep();
 }
+
 void cRunOneHour() {
     EnergyPlus::SimulationManager::runOneHour();
 }
+
 void cRunOneDay() {
     EnergyPlus::SimulationManager::runOneDay();
 }
+
+void cBeforeRunEnvironment() {
+    EnergyPlus::SimulationManager::beforeRunEnvironment();
+}
+
 void cRunEnvironment() {
     EnergyPlus::SimulationManager::runEnvironment();
 }
-bool cSkipCurrentEnvironment() {
-    return EnergyPlus::SimulationManager::skipCurrentEnvironment();
+
+void cAfterRunEnvironment() {
+    EnergyPlus::SimulationManager::afterRunEnvironment();
 }
+
+int cSkipCurrentEnvironment() {
+    bool val = EnergyPlus::SimulationManager::skipCurrentEnvironment();
+    if (val) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
 void cRunAllEnvironments() {
     EnergyPlus::SimulationManager::runAllEnvironments();
 }
+
 void cWrapUpSimulation() {
     EnergyPlus::SimulationManager::wrapUpSimulation();
 }

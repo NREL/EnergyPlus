@@ -235,6 +235,7 @@
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
+#include <EnergyPlus/StateManagement.hh>
 #include <algorithm>
 #include <fstream>
 
@@ -249,7 +250,7 @@ void EnergyPlusFixture::SetUpTestCase()
 
 void EnergyPlusFixture::SetUp()
 {
-    clear_all_states();
+    EnergyPlus::clearAllStates();
 
     show_message();
 
@@ -281,7 +282,7 @@ void EnergyPlusFixture::SetUp()
 void EnergyPlusFixture::TearDown()
 {
 
-    clear_all_states();
+    clearAllStates();
 
     {
         IOFlags flags;
@@ -300,185 +301,6 @@ void EnergyPlusFixture::TearDown()
         ObjexxFCL::gio::close(DataGlobals::OutputDElightIn, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputFileShadingFrac, flags);
     }
-}
-
-void EnergyPlusFixture::clear_all_states()
-{
-    // A to Z order
-    AirflowNetworkBalanceManager::clear_state();
-    BaseboardElectric::clear_state();
-    BaseboardRadiator::clear_state();
-    Boilers::clear_state();
-    BoilerSteam::clear_state();
-    BranchInputManager::clear_state();
-    CoolingPanelSimple::clear_state();
-    ChillerElectricEIR::clear_state();
-    ChillerExhaustAbsorption::clear_state();
-    ChillerGasAbsorption::clear_state();
-    ChillerIndirectAbsorption::clear_state();
-    CondenserLoopTowers::clear_state();
-    CoolTower::clear_state();
-    CrossVentMgr::clear_state();
-    CurveManager::clear_state();
-    AirflowNetwork::clear_state();
-    DataAirLoop::clear_state();
-    DataBranchAirLoopPlant::clear_state();
-    DataAirSystems::clear_state();
-    DataBranchNodeConnections::clear_state();
-    DataContaminantBalance::clear_state();
-    DataConvergParams::clear_state();
-    DataDefineEquip::clear_state();
-    DataEnvironment::clear_state();
-    DataErrorTracking::clear_state();
-    DataGenerators::clear_state();
-    DataGlobals::clear_state();
-    DataHeatBalance::clear_state();
-    DataHeatBalFanSys::clear_state();
-    DataHeatBalSurface::clear_state();
-    DataHVACGlobals::clear_state();
-    DataIPShortCuts::clear_state();
-    DataLoopNode::clear_state();
-    DataMoistureBalance::clear_state();
-    DataMoistureBalanceEMPD::clear_state();
-    DataOutputs::clear_state();
-    DataPhotovoltaics::clear_state();
-    DataPlant::clear_state();
-    DataRoomAirModel::clear_state();
-    DataRuntimeLanguage::clear_state();
-    DataSizing::clear_state();
-    DataStringGlobals::clear_state();
-    DataSurfaceLists::clear_state();
-    DataSurfaces::clear_state();
-    DataSystemVariables::clear_state();
-    DataUCSDSharedData::clear_state();
-    DataViewFactorInformation::clear_state();
-    DataZoneControls::clear_state();
-    DataZoneEnergyDemands::clear_state();
-    DataZoneEquipment::clear_state();
-    DaylightingManager::clear_state();
-    DemandManager::clear_state();
-    DesiccantDehumidifiers::clear_state();
-    DirectAirManager::clear_state();
-    DualDuct::clear_state();
-    DXCoils::clear_state();
-    clearFacilityElectricPowerServiceObject();
-    EarthTube::clear_state();
-    EconomicLifeCycleCost::clear_state();
-    EconomicTariff::clear_state();
-    EMSManager::clear_state();
-    EvaporativeCoolers::clear_state();
-    EvaporativeFluidCoolers::clear_state();
-    ExteriorEnergyUse::clear_state();
-    FanCoilUnits::clear_state();
-    Fans::clear_state();
-    FaultsManager::clear_state();
-    FluidCoolers::clear_state();
-    FluidProperties::clear_state();
-    Furnaces::clear_state();
-    GlobalNames::clear_state();
-    GroundHeatExchangers::clear_state();
-    GroundTemperatureManager::clear_state();
-    HeatBalanceAirManager::clear_state();
-    HeatBalanceIntRadExchange::clear_state();
-    HeatBalanceManager::clear_state();
-    HeatBalanceSurfaceManager::clear_state();
-    HeatBalFiniteDiffManager::clear_state();
-    HeatPumpWaterToWaterSimple::GshpSpecs::clear_state();
-    HeatPumpWaterToWaterCOOLING::clear_state();
-    HeatPumpWaterToWaterHEATING::clear_state();
-    HeatRecovery::clear_state();
-    HeatingCoils::clear_state();
-    HighTempRadiantSystem::clear_state();
-    Humidifiers::clear_state();
-    HVACControllers::clear_state();
-    HVACDXHeatPumpSystem::clear_state();
-    HVACDXSystem::clear_state();
-    HVACHXAssistedCoolingCoil::clear_state();
-    HVACFan::clearHVACFanObjects();
-    HVACManager::clear_state();
-    HVACSingleDuctInduc::clear_state();
-    HVACStandAloneERV::clear_state();
-    HVACUnitaryBypassVAV::clear_state();
-    HVACVariableRefrigerantFlow::clear_state();
-    HybridModel::clear_state();
-    HysteresisPhaseChange::clear_state();
-    EnergyPlus::inputProcessor->clear_state();
-    IceThermalStorage::clear_state();
-    IntegratedHeatPump::clear_state();
-    InternalHeatGains::clear_state();
-    LowTempRadiantSystem::clear_state();
-    MixedAir::clear_state();
-    MixerComponent::clear_state();
-    MoistureBalanceEMPDManager::clear_state();
-    NodeInputManager::clear_state();
-    OutAirNodeManager::clear_state();
-    OutdoorAirUnit::clear_state();
-    OutputProcessor::clear_state();
-    OutputReportPredefined::clear_state();
-    OutputReportTabular::clear_state();
-    OutputReportTabularAnnual::clear_state();
-    OutsideEnergySources::clear_state();
-    PackagedTerminalHeatPump::clear_state();
-    Pipes::clear_state();
-    PipeHeatTransfer::clear_state();
-    PlantCentralGSHP::clear_state();
-    PlantChillers::clear_state();
-    PlantCondLoopOperation::clear_state();
-    PlantLoadProfile::clear_state();
-    PlantLoopSolver::clear_state();
-    PlantManager::clear_state();
-    PlantPipingSystemsManager::clear_state();
-    PlantPressureSystem::clear_state();
-    PlantUtilities::clear_state();
-    PlantPipingSystemsManager::clear_state();
-    PlantValves::clear_state();
-    PollutionModule::clear_state();
-    PoweredInductionUnits::clear_state();
-    Psychrometrics::clear_state();
-    Pumps::clear_state();
-    PurchasedAirManager::clear_state();
-    PVWatts::clear_state();
-    clearCoilSelectionReportObj(); // ReportCoilSelection
-    ReturnAirPathManager::clear_state();
-    RoomAirModelAirflowNetwork::clear_state();
-    RoomAirModelManager::clear_state();
-    RuntimeLanguageProcessor::clear_state();
-    ScheduleManager::clear_state();
-    SetPointManager::clear_state();
-    SimAirServingZones::clear_state();
-    SimulationManager::clear_state();
-    SingleDuct::clear_state();
-    SizingManager::clear_state();
-    SolarCollectors::clear_state();
-    SolarShading::clear_state();
-    SplitterComponent::clear_state();
-    SteamCoils::clear_state();
-    SurfaceGeometry::clear_state();
-    SystemAvailabilityManager::clear_state();
-    SwimmingPool::clear_state();
-    ThermalComfort::clear_state();
-    UnitarySystems::clear_state();
-    UnitHeater::clear_state();
-    UnitVentilator::clear_state();
-    VariableSpeedCoils::clear_state();
-    VentilatedSlab::clear_state();
-    WaterCoils::clear_state();
-    WaterThermalTanks::clear_state();
-    WaterToAirHeatPumpSimple::clear_state();
-    EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::clear_state();
-    WaterUse::clear_state();
-    WeatherManager::clear_state();
-    WindowAC::clear_state();
-    WindowComplexManager::clear_state();
-    WindowEquivalentLayer::clear_state();
-    WindowManager::clear_state();
-    ZoneAirLoopEquipmentManager::clear_state();
-    ZoneContaminantPredictorCorrector::clear_state();
-    ZoneDehumidifier::clear_state();
-    ZoneEquipmentManager::clear_state();
-    ZonePlenum::clear_state();
-    ZoneTempPredictorCorrector::clear_state();
-    ResultsFramework::clear_state();
 }
 
 std::string EnergyPlusFixture::delimited_string(std::vector<std::string> const &strings, std::string const &delimiter)

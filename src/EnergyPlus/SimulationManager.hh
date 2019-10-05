@@ -105,7 +105,9 @@ namespace SimulationManager {
     void runOneTimeStep();
     void runOneHour();
     void runOneDay();
+    void beforeRunEnvironment();
     void runEnvironment();
+    void afterRunEnvironment();
     bool skipCurrentEnvironment();
     void runAllEnvironments();
     void wrapUpSimulation();

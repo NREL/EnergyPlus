@@ -633,7 +633,9 @@ SET( SRC
   ZonePlenum.cc
   ZonePlenum.hh
   ZoneTempPredictorCorrector.cc
-  ZoneTempPredictorCorrector.hh)
+  ZoneTempPredictorCorrector.hh
+  StateManagement.cc
+  StateManagement.hh)
 
 CREATE_SRC_GROUPS( "${SRC}" )
 

@@ -2,7 +2,7 @@ from ctypes import cdll
 import os
 import sys
 
-from functional import BaseThermalPropertySet
+from functional import Functional
 from datatransfer import DataTransfer
 from runtime import Runtime
 
@@ -21,8 +21,8 @@ class EnergyPlusAPI:
     def __init__(self):
         self.api = cdll.LoadLibrary(api_path())
 
-    def props(self, conductivity: float, density: float, specific_heat: float) -> BaseThermalPropertySet:
-        return BaseThermalPropertySet(self.api, conductivity, density, specific_heat)
+    def functional(self) -> Functional:
+        return Functional(self.api)
 
     def data_transfer(self):
         return DataTransfer(self.api)
