@@ -6338,8 +6338,8 @@ namespace WaterThermalTanks {
             WaterThermalTank(WaterThermalTankNum).SourceInletTemp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp;
 
             //   determine HPWH inlet air conditions based on inlet air configuration (Zone, ZoneAndOA, OutdoorAir, or Schedule)
-            Real64 HPInletDryBulbTemp;
-            Real64 HPInletHumRat;
+            Real64 HPInletDryBulbTemp = 0.0;
+            Real64 HPInletHumRat = 0.0;
             Real64 HPInletRelHum;
             {
                 auto const SELECT_CASE_var(HPWaterHeater(HPNum).InletAirConfiguration);
@@ -6670,8 +6670,8 @@ namespace WaterThermalTanks {
             TimeNeeded = 0.0;
 
             Real64 NewTankTemp = TankTemp;
-            Real64 LossCoeff;
-            Real64 LossFracToZone;
+            Real64 LossCoeff = 0.0;
+            Real64 LossFracToZone = 0.0;
 
             {
                 auto const SELECT_CASE_var(Mode);
