@@ -723,10 +723,11 @@ if(UNIX AND NOT APPLE)
   COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${CMAKE_BINARY_DIR}/Products/EnergyPlus")
 endif()
 
-# API Stuff
-configure_file( api/common.py "${CMAKE_BINARY_DIR}/Products/common.py" )
-configure_file( api/datatransfer.py "${CMAKE_BINARY_DIR}/Products/datatransfer.py" )
-configure_file( api/energyplus_api.py "${CMAKE_BINARY_DIR}/Products/energyplus_api.py" )
-configure_file( api/functional.py "${CMAKE_BINARY_DIR}/Products/functional.py" )
-configure_file( api/datatransfer.py "${CMAKE_BINARY_DIR}/Products/datatransfer.py" )
-configure_file( api/runtime.py "${CMAKE_BINARY_DIR}/Products/runtime.py" )
+add_custom_target(
+  pythonapi
+  COMMAND ${CMAKE_COMMAND}
+        -DREPO_ROOT="${CMAKE_SOURCE_DIR}"
+        -DBUILD_DIR="${CMAKE_BINARY_DIR}"
+        -P "${CMAKE_SOURCE_DIR}/cmake/SetPythonAPI.cmake"
+)
+add_dependencies(pythonapi energyplusapi)
