@@ -53,8 +53,8 @@
 #include <ObjexxFCL/Optional.fwd.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
-#include <VariableSpeedCoils.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 
