@@ -52,10 +52,10 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EconomicTariff.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EconomicTariff.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

@@ -46,9 +46,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataContaminantBalance.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSurfaces.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 
 namespace EnergyPlus {
 

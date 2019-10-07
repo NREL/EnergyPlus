@@ -74,9 +74,9 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include <Psychrometrics.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
-#include <Fixtures/EnergyPlusFixture.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace DataAirLoop;

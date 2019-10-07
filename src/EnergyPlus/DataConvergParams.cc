@@ -50,8 +50,8 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DataConvergParams.hh>
-#include <DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataConvergParams.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 

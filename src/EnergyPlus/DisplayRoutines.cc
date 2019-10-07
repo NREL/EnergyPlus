@@ -53,9 +53,9 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataSystemVariables.hh>
-#include <DisplayRoutines.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
 
 namespace EnergyPlus {
 

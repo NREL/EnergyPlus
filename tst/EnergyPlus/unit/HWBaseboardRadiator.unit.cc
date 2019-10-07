@@ -51,14 +51,14 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <FluidProperties.hh>
-#include <HWBaseboardRadiator.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/HWBaseboardRadiator.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

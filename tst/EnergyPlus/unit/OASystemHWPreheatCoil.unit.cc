@@ -60,7 +60,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include <HVACControllers.hh>
+#include <EnergyPlus/HVACControllers.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;

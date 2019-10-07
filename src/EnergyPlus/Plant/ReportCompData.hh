@@ -48,9 +48,9 @@
 #ifndef PlantReportingReportCompData_hh_INCLUDED
 #define PlantReportingReportCompData_hh_INCLUDED
 
-#include <Plant/Connection.hh>
-#include <Plant/MeterData.hh>
-#include <Plant/Subcomponents.hh>
+#include <EnergyPlus/Plant/Connection.hh>
+#include <EnergyPlus/Plant/MeterData.hh>
+#include <EnergyPlus/Plant/Subcomponents.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {

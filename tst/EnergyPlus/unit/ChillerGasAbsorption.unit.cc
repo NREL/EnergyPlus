@@ -52,8 +52,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <ChillerGasAbsorption.hh>
-#include <DataGlobals.hh>
+#include <EnergyPlus/ChillerGasAbsorption.hh>
+#include <EnergyPlus/DataGlobals.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
