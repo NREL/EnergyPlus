@@ -19,8 +19,8 @@ SET( SRC
   "${CMAKE_SOURCE_DIR}/third_party/milo/ieee754.h"
   api/datatransfer.h
   api/datatransfer.cc
-  api/functional.h
-  api/functional.cc
+  api/func.h
+  api/func.cc
   api/runtime.h
   api/runtime.cc
   AirflowNetworkBalanceManager.cc
@@ -635,7 +635,7 @@ SET( SRC
   ZoneTempPredictorCorrector.cc
   ZoneTempPredictorCorrector.hh
   StateManagement.cc
-  StateManagement.hh)
+  StateManagement.hh api/func.cc api/func.h)
 
 CREATE_SRC_GROUPS( "${SRC}" )
 

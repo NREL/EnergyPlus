@@ -2,7 +2,7 @@ from ctypes import cdll
 import os
 import sys
 
-from functional import Functional
+from func import Functional
 from datatransfer import DataTransfer
 from runtime import Runtime
 

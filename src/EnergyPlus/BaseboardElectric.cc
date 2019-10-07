@@ -67,10 +67,6 @@
 #include <ScheduleManager.hh>
 #include <UtilityRoutines.hh>
 
-#include <EnergyPlus/api/datatransfer.h>
-#include <EnergyPlus/api/functional.h>
-#include <EnergyPlus/api/runtime.h>
-
 namespace EnergyPlus {
 
 namespace BaseboardElectric {
@@ -121,13 +117,6 @@ namespace BaseboardElectric {
 
     void clear_state()
     {
-        // I need to figure out how to get the linker to keep the unused functions in there without them having to be used somewhere...
-        //auto props = newCBaseThermalPropertySet(0.0, 0.0, 0.0);
-        //delCBaseThermalPropertySet(props);
-
-        cRuntimeNoOp();
-        dataTransferNoOp();
-
         NumBaseboards = 0;
         MySizeFlag.deallocate();
         CheckEquipName.deallocate();

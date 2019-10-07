@@ -54,6 +54,11 @@
 // EnergyPlus Headers
 #include <DataGlobals.hh>
 
+
+#include <EnergyPlus/api/datatransfer.h>
+#include <EnergyPlus/api/func.h>
+#include <EnergyPlus/api/runtime.h>
+
 namespace EnergyPlus {
 
 namespace DataGlobals {
@@ -267,6 +272,12 @@ namespace DataGlobals {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
+
+        // having some simple noOp functions included from the API files ensures the functions are in the final DLL
+        functionalNoOp();
+        cRuntimeNoOp();
+        dataTransferNoOp();
+
         runReadVars = false;
         DDOnlySimulation = false;
         AnnualSimulation = false;

@@ -4,9 +4,6 @@ from common import RealEP
 
 class DataTransfer:
 
-    VariableTypeSensor = 0
-    VariableTypeActuator = 1
-
     def __init__(self, api: cdll):
         self.api = api
         self.api.getVariableHandle.argtypes = [c_char_p, c_char_p]
