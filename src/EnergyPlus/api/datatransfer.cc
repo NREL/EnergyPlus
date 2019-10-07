@@ -56,7 +56,7 @@ int getVariableHandle(const char* type, const char* key) {
     handle = 0;
     for (auto const & availOutputVar : EnergyPlus::OutputProcessor::RVariableTypes) {
         handle++;
-        if (type == availOutputVar.VarNameUC && key == availOutputVar.KeyNameOnlyUC) {
+        if (type == availOutputVar.VarNameOnlyUC && key == availOutputVar.KeyNameOnlyUC) {
             return handle;
         }
     }
@@ -75,11 +75,11 @@ int getActuatorHandle(const char* type, const char* key) {
     return 0;
 }
 
-double getVariable(const int handle) {
+double getVariableValue(const int handle) {
     return EnergyPlus::OutputProcessor::RVariableTypes(handle).VarPtr().Which;
 }
 
-int setVariable(const int handle, const double value) {
+int setActuatorValue(const int handle, const double value) {
     if (handle == 0) {
         return 1;
     }

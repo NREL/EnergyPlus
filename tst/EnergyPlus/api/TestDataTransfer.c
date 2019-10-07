@@ -65,18 +65,18 @@ int main() {
             continue;
         }
         cBeforeRunEnvironment();
-        unsigned int outdoorTempSensor = getVariableHandle("ENVIRONMENT:SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
-        unsigned int outdoorDewPointSensor = getVariableHandle("ENVIRONMENT:SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
-        unsigned int outdoorDewPointActuator = getActuatorHandle("Outdoor Dew Point", "Environment");
+        int outdoorTempSensor = getVariableHandle("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
+        int outdoorDewPointSensor = getVariableHandle("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
+        int outdoorDewPointActuator = getActuatorHandle("Outdoor Dew Point", "Environment");
         printf("Handle IDs: %d, %d, %d \n", outdoorTempSensor, outdoorDewPointSensor, outdoorDewPointActuator);
-        int response = setVariable(outdoorDewPointActuator, -25);
+        int response = setActuatorValue(outdoorDewPointActuator, -25);
         if (response != 0) {
             printf("Could not set actuator...\n");
         }
         cRunEnvironment();
-        Real64 oa_temp = getVariable(outdoorTempSensor);
+        Real64 oa_temp = getVariableValue(outdoorTempSensor);
         printf("Reading outdoor temp via getVariable, value is: %8.4f \n", oa_temp);
-        Real64 dp_temp = getVariable(outdoorDewPointSensor);
+        Real64 dp_temp = getVariableValue(outdoorDewPointSensor);
         printf("Actuated Dew Point temp value is: %8.4f \n", dp_temp);
         cAfterRunEnvironment();
     }
@@ -84,4 +84,3 @@ int main() {
     cWrapUpEnergyPlus();
     return 0;
 }
-

@@ -46,7 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdio.h>
-#include <EnergyPlus/api/functional.h>
+#include <EnergyPlus/api/func.h>
 
 int main() {
     initializeFunctionalAPI();

@@ -223,7 +223,7 @@ namespace EMSManager {
         } else {
             AnyEnergyManagementSystemInModel = false;
         }
-
+        AnyEnergyManagementSystemInModel = true;
         if (AnyEnergyManagementSystemInModel) {
 
             ScanForReports("EnergyManagementSystem", OutputEDDFile);

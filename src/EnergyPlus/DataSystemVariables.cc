@@ -58,6 +58,7 @@
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 
 namespace EnergyPlus {
 

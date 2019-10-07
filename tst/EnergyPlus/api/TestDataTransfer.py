@@ -22,11 +22,11 @@ while True:
         continue
     runtime.api.cBeforeRunEnvironment()
     outdoorTempSensor = data.get_variable_handle(
-        "ENVIRONMENT:SITE OUTDOOR AIR DRYBULB TEMPERATURE".encode('utf-8'),
+        "SITE OUTDOOR AIR DRYBULB TEMPERATURE".encode('utf-8'),
         "ENVIRONMENT".encode('utf-8')
     )
     outdoorDewPointSensor = data.get_variable_handle(
-        "ENVIRONMENT:SITE OUTDOOR AIR DEWPOINT TEMPERATURE".encode('utf-8'),
+        "SITE OUTDOOR AIR DEWPOINT TEMPERATURE".encode('utf-8'),
         "ENVIRONMENT".encode('utf-8')
     )
     outdoorDewPointActuator = data.get_actuator_handle(

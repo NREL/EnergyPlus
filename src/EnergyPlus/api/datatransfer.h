@@ -57,8 +57,8 @@ extern "C" {
 void dataTransferNoOp();
 int getVariableHandle(const char* type, const char* key);
 int getActuatorHandle(const char* type, const char* key);
-double getVariable(int handle);
-int setVariable(int handle, double value);
+double getVariableValue(int handle);
+int setActuatorValue(int handle, double value);
 
 #ifdef __cplusplus
 }
