@@ -441,6 +441,12 @@ namespace WaterThermalTanks {
         {
         }
 
+        void SizeStandAloneWaterHeater();
+
+        void UpdateWaterThermalTank();
+
+        void ReportWaterThermalTank();
+
         void CalcWaterThermalTankStratified(int WaterThermalTankNum); // Water Heater being simulated
 
         void CalcWaterThermalTankMixed(int WaterThermalTankNum); // Water Heater being simulated
@@ -828,12 +834,6 @@ namespace WaterThermalTanks {
     void SizeTankForSupplySide(int WaterThermalTankNum);
 
     void SizeDemandSidePlantConnections(int WaterThermalTankNum);
-
-    void SizeStandAloneWaterHeater(int WaterThermalTankNum);
-
-    void UpdateWaterThermalTank(int WaterThermalTankNum);
-
-    void ReportWaterThermalTank(int WaterThermalTankNum);
 
     void SetVSHPWHFlowRates(int WaterThermalTankNum, // Water Heater tank being simulated
                             int HPNum,
