@@ -441,6 +441,18 @@ namespace WaterThermalTanks {
         {
         }
 
+        void CalcWaterThermalTankStratified(int WaterThermalTankNum); // Water Heater being simulated
+
+        void CalcWaterThermalTankMixed(int WaterThermalTankNum); // Water Heater being simulated
+
+        void CalcStandardRatings(int WaterThermalTankNum);
+
+        void ReportCWTankInits();
+
+        Real64 GetHPWHSensedTankTemp();
+
+        Real64 FindStratifiedTankSensedTemp(bool UseAverage = false);
+
         Real64 getDeadBandTemp();
     };
 
@@ -713,8 +725,6 @@ namespace WaterThermalTanks {
                               Optional_int_const LoopNum = _,
                               Optional_int_const LoopSideNum = _);
 
-    void CalcWaterThermalTankMixed(int WaterThermalTankNum); // Water Heater being simulated
-
     void CalcMixedTankSourceSideHeatTransferRate(Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if
                                                                              // there is no heat pump or if the heat pump is off
                                                  Real64 SourceInletTemp,     // input, Source inlet temperature (C)
@@ -767,9 +777,6 @@ namespace WaterThermalTanks {
 
     Real64 PartLoadFactor(int WaterThermalTankNum, Real64 PartLoadRatio);
 
-    void CalcWaterThermalTankStratified(int WaterThermalTankNum // Water Heater being simulated
-    );
-
     void CalcNodeMassFlows(int WaterThermalTankNum, // Water Heater being simulated
                            int InletMode            // InletModeFixed or InletModeSeeking
     );
@@ -783,8 +790,6 @@ namespace WaterThermalTanks {
     );
 
     void CalcWaterThermalTank(int WaterThermalTankNum);
-
-    Real64 GetHPWHSensedTankTemp(WaterThermalTankData const &Tank);
 
     void ConvergeSingleSpeedHPWHCoilAndTank(int WaterThermalTankNum, Real64 PartLoadRatio);
 
@@ -829,12 +834,6 @@ namespace WaterThermalTanks {
     void UpdateWaterThermalTank(int WaterThermalTankNum);
 
     void ReportWaterThermalTank(int WaterThermalTankNum);
-
-    void CalcStandardRatings(int WaterThermalTankNum);
-
-    void ReportCWTankInits(int WaterThermalTankNum);
-
-    Real64 FindStratifiedTankSensedTemp(WaterThermalTankData const &Tank, bool UseAverage = false);
 
     void SetVSHPWHFlowRates(int WaterThermalTankNum, // Water Heater tank being simulated
                             int HPNum,

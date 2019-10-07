@@ -1613,7 +1613,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankUseEnergy)
     Tank.SetPointTemp2 = Tank.SetPointTemp;
     Tank.UseMassFlowRate = 0.000189;
 
-    WaterThermalTanks::CalcWaterThermalTankStratified(1);
+    Tank.CalcWaterThermalTankStratified(1);
 
     // Energy Use is negative relative to the tank
     ASSERT_LT(Tank.UseRate, 0.0);
@@ -1742,7 +1742,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankSourceTemperatures)
     TimeStepSys = TimeStepZone;
     SysTimeElapsed = 0.0;
 
-    WaterThermalTanks::CalcWaterThermalTankStratified(TankNum);
+    Tank.CalcWaterThermalTankStratified(TankNum);
 
     // check source inlet and outlet temperatures are different
     EXPECT_EQ(Tank.SourceInletTemp, 5.0);
@@ -1842,7 +1842,7 @@ TEST_F(WaterThermalTanksFixture, MixedTankTimeNeededCalc)
     // zero source mass flow rate
     Tank.SourceMassFlowRate = 0.0;
 
-    WaterThermalTanks::CalcWaterThermalTankMixed(TankNum);
+    Tank.CalcWaterThermalTankMixed(TankNum);
 
     // steady state estimated tank skin heat loss rate (1 minute time step)
     Real64 TankSkinHeatLossRate = -Tank.OffCycLossFracToZone * Tank.OffCycLossCoeff * (Tank.AmbientTempZone - Tank.TankTempAvg);
@@ -1959,7 +1959,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankCalc)
     Tank.UseMassFlowRate = 0.0;
     Tank.SourceMassFlowRate = 0.0;
 
-    WaterThermalTanks::CalcWaterThermalTankStratified(TankNum);
+    Tank.CalcWaterThermalTankStratified(TankNum);
 
     std::vector<Real64> NodeTemps;
     NodeTemps.resize(Tank.Nodes);
@@ -1984,7 +1984,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankCalc)
         node.SavedTemp = 58.05;
     }
 
-    WaterThermalTanks::CalcWaterThermalTankStratified(TankNum);
+    Tank.CalcWaterThermalTankStratified(TankNum);
 
     for (int i = 0; i < Tank.Nodes; ++i) {
         NodeTemps[i] = Tank.Node[i].Temp;
@@ -2007,7 +2007,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankCalc)
 
     Tank.UseMassFlowRate = 2 * 6.30901964e-5 * 997; // 2 gal/min
 
-    WaterThermalTanks::CalcWaterThermalTankStratified(TankNum);
+    Tank.CalcWaterThermalTankStratified(TankNum);
 
     for (int i = 0; i < Tank.Nodes; ++i) {
         NodeTemps[i] = Tank.Node[i].Temp;
@@ -2044,7 +2044,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankCalc)
         node.SavedTemp = node.Temp;
     }
 
-    WaterThermalTanks::CalcWaterThermalTankStratified(TankNum);
+    Tank.CalcWaterThermalTankStratified(TankNum);
 
     for (auto &node : Tank.Node) {
         EXPECT_LE(node.Temp, Tank.TankTempLimit);
@@ -2172,7 +2172,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankSourceFlowRateCalc) {
     int DummyIndex = 1;
     Real64 Cp = FluidProperties::GetSpecificHeatGlycol("WATER", 60.0, DummyIndex, "StratifiedTankCalcNoDraw");
 
-    WaterThermalTanks::CalcWaterThermalTankStratified(TankNum);
+    Tank.CalcWaterThermalTankStratified(TankNum);
 
     Real64 EnergySum = 0.0;
     for (int i = 0; i < Tank.Nodes; ++i) {
@@ -2181,8 +2181,6 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankSourceFlowRateCalc) {
     }
     Real64 Esource = Tank.SourceEffectiveness * Tank.SourceMassFlowRate * Cp * (Tank.SourceInletTemp - Tank.Node(Tank.SourceOutletStratNode).TempAvg) * TimeStepSys * SecInHour;
     EXPECT_NEAR(Esource, EnergySum, EnergySum * 0.001);
-
-
 }
 
 TEST_F(WaterThermalTanksFixture, DesuperheaterTimeAdvanceCheck){
