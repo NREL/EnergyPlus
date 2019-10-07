@@ -441,6 +441,16 @@ namespace WaterThermalTanks {
         {
         }
 
+        void SizeDemandSidePlantConnections();
+
+        void SizeTankForSupplySide();
+
+        void MinePlantStructForInfo();
+
+        void SizeSupplySidePlantConnections(Optional_int_const LoopNum = _, Optional_int_const LoopSideNum = _);
+
+        void CalcWaterThermalTank(int WaterThermalTankNum);
+
         void SizeStandAloneWaterHeater();
 
         void UpdateWaterThermalTank();
@@ -795,8 +805,6 @@ namespace WaterThermalTanks {
                                  bool FirstHVACIteration  // TRUE if First iteration of simulation
     );
 
-    void CalcWaterThermalTank(int WaterThermalTankNum);
-
     void ConvergeSingleSpeedHPWHCoilAndTank(int WaterThermalTankNum, Real64 PartLoadRatio);
 
     Real64 PLRResidualIterSpeed(Real64 SpeedRatio,  // speed ratio between two speed levels
@@ -825,15 +833,7 @@ namespace WaterThermalTanks {
                                   Real64 DeadBandTemp,
                                   Real64 SetPointTemp);
 
-    void MinePlantStructForInfo(int WaterThermalTankNum);
-
-    void SizeSupplySidePlantConnections(int WaterThermalTankNum, Optional_int_const LoopNum = _, Optional_int_const LoopSideNum = _);
-
     void SizeTankForDemandSide(int WaterThermalTankNum);
-
-    void SizeTankForSupplySide(int WaterThermalTankNum);
-
-    void SizeDemandSidePlantConnections(int WaterThermalTankNum);
 
     void SetVSHPWHFlowRates(int WaterThermalTankNum, // Water Heater tank being simulated
                             int HPNum,

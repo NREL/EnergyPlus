@@ -3314,7 +3314,7 @@ TEST_F(WaterThermalTanksFixture, MixedTank_WarnPotentialFreeze)
     Tank.SourceMassFlowRate = 0.0;
 
     // Calls CalcWaterThermalTankMixed
-    WaterThermalTanks::CalcWaterThermalTank(TankNum);
+    Tank.CalcWaterThermalTank(TankNum);
 
     // expected tank avg temp less than starting value of 2 C
     EXPECT_LT(Tank.TankTempAvg, 2.0);
@@ -3421,7 +3421,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTank_WarnPotentialFreeze)
     Tank.SourceMassFlowRate = 0.0;
 
     // Calls CalcWaterThermalTankStratified
-    WaterThermalTanks::CalcWaterThermalTank(TankNum);
+    Tank.CalcWaterThermalTank(TankNum);
 
     // expected tank avg temp less than starting value of 2 C
     EXPECT_LT(Tank.TankTempAvg, 2.0);
