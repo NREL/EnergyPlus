@@ -52,7 +52,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataSurfaces.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>

@@ -53,12 +53,12 @@
 
 // EnergyPlus Headers
 #include "re2/re2.h"
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 #include <cstddef>
 #include <unordered_map>
 #include <vector>
-#include "UtilityRoutines.hh"
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

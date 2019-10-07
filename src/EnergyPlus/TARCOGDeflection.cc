@@ -50,10 +50,10 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <TARCOGCommon.hh>
-#include <TARCOGDeflection.hh>
-#include <TARCOGParams.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/TARCOGCommon.hh>
+#include <EnergyPlus/TARCOGDeflection.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 
 namespace EnergyPlus {
 

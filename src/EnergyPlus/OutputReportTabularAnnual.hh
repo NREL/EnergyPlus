@@ -62,9 +62,9 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
-#include <OutputReportData.hh>
-#include <ScheduleManager.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/OutputReportData.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 namespace EnergyPlus {
 

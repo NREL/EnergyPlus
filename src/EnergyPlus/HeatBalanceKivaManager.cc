@@ -57,27 +57,27 @@
 #endif
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataStringGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataSystemVariables.hh>
-#include <DataVectorTypes.hh>
-#include <DataZoneControls.hh>
-#include <DisplayRoutines.hh>
-#include <General.hh>
-#include <HeatBalanceKivaManager.hh>
-#include <ScheduleManager.hh>
-#include <SurfaceGeometry.hh>
-#include <ThermalComfort.hh> // MRT Weighting
-#include <UtilityRoutines.hh>
-#include <Vectors.hh>
-#include <WeatherManager.hh>
-#include <ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HeatBalanceKivaManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/ThermalComfort.hh> // MRT Weighting
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Vectors.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 namespace HeatBalanceKivaManager {
