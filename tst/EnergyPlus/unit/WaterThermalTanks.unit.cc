@@ -3223,12 +3223,12 @@ TEST_F(WaterThermalTanksFixture, MixedTankAlternateSchedule){
     DataLoopNode::Node(1).MassFlowRateMax = Tank.PlantSourceMassFlowRateMax;
     DataLoopNode::Node(1).MassFlowRateMaxAvail = Tank.PlantSourceMassFlowRateMax;
 
-    NeedsHeatOrCool = WaterThermalTanks::SourceHeatNeed(Tank, 70.0, Tank.SetPointTemp - 2.0, Tank.SetPointTemp);
+    NeedsHeatOrCool = Tank.SourceHeatNeed( 70.0, Tank.SetPointTemp - 2.0, Tank.SetPointTemp);
     EXPECT_FALSE(NeedsHeatOrCool);
 
     //set tank temp between 55 to 70 to enable alternate setpoint control
     Tank.TankTemp = 60.0;
-    NeedsHeatOrCool = WaterThermalTanks::SourceHeatNeed(Tank, 60.0, Tank.SetPointTemp - 2.0, Tank.SetPointTemp);
+    NeedsHeatOrCool = Tank.SourceHeatNeed( 60.0, Tank.SetPointTemp - 2.0, Tank.SetPointTemp);
     EXPECT_TRUE(NeedsHeatOrCool);
 
     //plant mass flow rate logic for firstHVAC mode not crashed

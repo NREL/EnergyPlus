@@ -441,9 +441,15 @@ namespace WaterThermalTanks {
         {
         }
 
+        bool SourceHeatNeed(Real64 OutletTemp,
+                            Real64 DeadBandTemp,
+                            Real64 SetPointTemp);
+
         void SizeDemandSidePlantConnections();
 
         void SizeTankForSupplySide();
+
+        void SizeTankForDemandSide();
 
         void MinePlantStructForInfo();
 
@@ -817,11 +823,6 @@ namespace WaterThermalTanks {
 
     Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1<Real64> const &Par);
 
-    bool SourceHeatNeed(WaterThermalTankData WaterThermalTank,
-                        Real64 OutletTemp,
-                        Real64 DeadBandTemp,
-                        Real64 SetPointTemp);
-
     Real64 PlantMassFlowRatesFunc(int WaterThermalTankNum,
                                   int InNodeNum,
                                   bool FirstHVACIteration,
@@ -833,9 +834,7 @@ namespace WaterThermalTanks {
                                   Real64 DeadBandTemp,
                                   Real64 SetPointTemp);
 
-    void SizeTankForDemandSide(int WaterThermalTankNum);
-
-    void SetVSHPWHFlowRates(int WaterThermalTankNum, // Water Heater tank being simulated
+    void SetVSHPWHFlowRates(int WaterThermalTankNum,
                             int HPNum,
                             int SpeedNum,
                             Real64 SpeedRatio,
