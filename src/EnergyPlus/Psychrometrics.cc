@@ -560,7 +560,6 @@ namespace Psychrometrics {
         //       MODIFIED       na
         //       RE-ENGINEERED  Dec 2003; Rahul Chillar
         //                      2011; as time saving measure, cache some values.
-        //                      Oct 2019; Dareum Nam, humidity ratio calculation when below freezing was added according to ASHRAE Handbook Fundamentals 2013
 
         // PURPOSE OF THIS FUNCTION:
         // This function provides the wet-bulb temperature from dry-bulb temperature,
