@@ -52,9 +52,9 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <CurveManager.hh>
-#include <DataGlobals.hh>
-#include <DataIPShortCuts.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

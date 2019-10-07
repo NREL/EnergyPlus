@@ -46,11 +46,11 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NonZoneEquipmentManager.hh>
-#include <WaterThermalTanks.hh>
-#include <WaterUse.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NonZoneEquipmentManager.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WaterUse.hh>
 
 namespace EnergyPlus {
 

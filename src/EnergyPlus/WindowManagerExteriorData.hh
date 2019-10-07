@@ -52,7 +52,7 @@
 #include <memory>
 #include <vector>
 
-#include <Vectors.hh>
+#include <EnergyPlus/Vectors.hh>
 
 namespace EnergyPlus {
 namespace DataHeatBalance {

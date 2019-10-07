@@ -44,17 +44,16 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-#include <CurveManager.hh>
-#include <HybridEvapCoolingModel.hh>
-
-#include <EnergyPlus/General.hh>
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/HybridEvapCoolingModel.hh>
+#include <EnergyPlus/General.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <ConfiguredFunctions.hh>
+#include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
@@ -77,7 +76,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
-#include <FileSystem.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <fstream>
 using namespace EnergyPlus::MixedAir;
 using namespace EnergyPlus::DataContaminantBalance;

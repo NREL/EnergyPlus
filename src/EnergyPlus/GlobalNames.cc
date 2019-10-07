@@ -46,10 +46,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataPrecisionGlobals.hh>
-#include <GlobalNames.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

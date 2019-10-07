@@ -50,7 +50,7 @@
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
-#include <InputProcessing/InputValidation.hh>
+#include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <valijson/adapters/nlohmann_json_adapter.hpp>
 #include <valijson/schema.hpp>
 #include <valijson/schema_parser.hpp>

@@ -54,9 +54,9 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataLoopNode.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 

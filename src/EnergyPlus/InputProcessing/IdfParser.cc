@@ -45,7 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
 

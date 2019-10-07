@@ -61,16 +61,16 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataAirSystems.hh>
-#include <DataSizing.hh>
-#include <DataZoneEquipment.hh>
-#include <HeatBalanceManager.hh>
-#include <MixedAir.hh>
-#include <SimAirServingZones.hh>
-#include <SingleDuct.hh>
-#include <SplitterComponent.hh>
-#include <UtilityRoutines.hh>
-#include <ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/SingleDuct.hh>
+#include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 using namespace EnergyPlus;
 using namespace DataAirSystems;

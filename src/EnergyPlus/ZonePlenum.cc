@@ -53,23 +53,23 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DataContaminantBalance.hh>
-#include <DataDefineEquip.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataZoneEquipment.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <PoweredInductionUnits.hh>
-#include <Psychrometrics.hh>
-#include <PurchasedAirManager.hh>
-#include <UtilityRoutines.hh>
-#include <ZonePlenum.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/PoweredInductionUnits.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZonePlenum.hh>
 
 namespace EnergyPlus {
 

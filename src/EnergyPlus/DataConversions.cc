@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataConversions.hh>
-#include <DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataConversions.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 

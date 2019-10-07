@@ -52,8 +52,8 @@
 #include <string>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
-#include <UnitarySystem.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 
 namespace EnergyPlus {
 
