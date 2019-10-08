@@ -1422,9 +1422,9 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
     //	Tank.SavedTankTemp = 60.0;
     HeatPump.SaveMode = WaterThermalTanks::modFloatMode;
     Tank.Mode = WaterThermalTanks::modFloatMode;
-    WaterThermalTanks::InitWaterThermalTank(1, FirstHVACIteration);
+    Tank.InitWaterThermalTank(1, FirstHVACIteration);
     DataGlobals::WarmupFlag = false;
-    WaterThermalTanks::InitWaterThermalTank(1, FirstHVACIteration); // read set point schedules on second pass when WarmupFlag is false.
+    Tank.InitWaterThermalTank(1, FirstHVACIteration); // read set point schedules on second pass when WarmupFlag is false.
     WaterThermalTanks::CalcHeatPumpWaterHeater(1, FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 60 C, tank should remain at 60 C and HP should be off.
@@ -1441,7 +1441,7 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
     Tank.SavedTankTemp = 50.0;
     HeatPump.SaveMode = WaterThermalTanks::modHeatMode;
     Tank.SavedMode = WaterThermalTanks::modHeatMode;
-    WaterThermalTanks::InitWaterThermalTank(1, FirstHVACIteration);
+    Tank.InitWaterThermalTank(1, FirstHVACIteration);
     WaterThermalTanks::CalcHeatPumpWaterHeater(1, FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 50 C, tank should heat up and HP should be on.
@@ -2147,7 +2147,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankSourceFlowRateCalc) {
     WaterThermalTanks::WaterThermalTankData &Tank = WaterThermalTank(TankNum);
     Tank.SourceInletNode = 1;
     Tank.SourceOutletNode = 2;
-    WaterThermalTanks::SetupStratifiedNodes(TankNum);
+    Tank.SetupStratifiedNodes();
 
     HourOfDay = 0;
     TimeStep = 1;
@@ -2711,7 +2711,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     SysTimeElapsed = 0.0;
     DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity = 1000;
     WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).PartLoadRatio = 0.0;
-    WaterThermalTanks::InitWaterThermalTank(TankNum, true);
+    Tank.InitWaterThermalTank(TankNum, true);
     Tank.SetPointTemp = 45;
     Tank.SetPointTemp2 = 45;
     WaterThermalTanks::CalcDesuperheaterWaterHeater(TankNum, true);
@@ -2730,7 +2730,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Node(Desuperheater.WaterInletNode).Temp = Tank.SavedSourceOutletTemp;
 
     WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).PartLoadRatio = 0.8;
-    WaterThermalTanks::InitWaterThermalTank(TankNum, false);
+    Tank.InitWaterThermalTank(TankNum, false);
     Desuperheater.SaveMode = 1;
     WaterThermalTanks::CalcDesuperheaterWaterHeater(TankNum, false);
     //The HVAC part load ratio is successfully passed to waterthermaltank desuperheater data struct
@@ -3232,11 +3232,11 @@ TEST_F(WaterThermalTanksFixture, MixedTankAlternateSchedule){
     EXPECT_TRUE(NeedsHeatOrCool);
 
     //plant mass flow rate logic for firstHVAC mode not crashed
-    WaterThermalTanks::InitWaterThermalTank(TankNum,true);
+    Tank.InitWaterThermalTank(TankNum,true);
     EXPECT_EQ(Tank.SourceMassFlowRate, 0.0005* rho);
 
     //plant mass flow rate logic added to other iterations run
-    WaterThermalTanks::InitWaterThermalTank(TankNum,false);
+    Tank.InitWaterThermalTank(TankNum,false);
     EXPECT_EQ(Tank.SourceMassFlowRate, 0.0005* rho);
 
 }

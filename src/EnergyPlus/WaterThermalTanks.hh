@@ -486,6 +486,13 @@ namespace WaterThermalTanks {
         {
         }
 
+        void SetupStratifiedNodes();
+
+        void InitWaterThermalTank(int WaterThermalTankNum,
+                                  bool FirstHVACIteration,
+                                  Optional_int_const LoopNum = _,
+                                  Optional_int_const LoopSideNum = _);
+
         bool SourceHeatNeed(Real64 OutletTemp,
                             Real64 DeadBandTemp,
                             Real64 SetPointTemp);
@@ -779,18 +786,7 @@ namespace WaterThermalTanks {
                                 Real64 &LatLoadMet,  // net latent load met and sent to zone (kg/s), dehumid = negative
                                 int &CompIndex);
 
-    void CalcWaterThermalTankZoneGains();
-
     bool GetWaterThermalTankInput();
-
-    void ValidatePLFCurve(int CurveIndex, bool &IsValid);
-
-    void SetupStratifiedNodes(int WaterThermalTankNum); // Water Heater being simulated
-
-    void InitWaterThermalTank(int WaterThermalTankNum,
-                              bool FirstHVACIteration,
-                              Optional_int_const LoopNum = _,
-                              Optional_int_const LoopSideNum = _);
 
     void CalcMixedTankSourceSideHeatTransferRate(Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if
                                                                              // there is no heat pump or if the heat pump is off
@@ -866,8 +862,6 @@ namespace WaterThermalTanks {
                                 Array1<Real64> const &Par     // par(1) = HP set point temperature [C]
     );
 
-    Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1<Real64> const &Par);
-
     Real64 PlantMassFlowRatesFunc(int WaterThermalTankNum,
                                   int InNodeNum,
                                   bool FirstHVACIteration,
@@ -887,6 +881,17 @@ namespace WaterThermalTanks {
                             Real64 &MdotWater,            // water flow rate
                             bool FirstHVACIteration // TRUE if First iteration of simulation
     );
+
+    // STATIC FUNCTIONS
+
+    // used by: CalcHeatPumpWaterHeater
+    Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1<Real64> const &Par);
+
+    // used by: GetWaterThermalTankInput
+    void ValidatePLFCurve(int CurveIndex, bool &IsValid);
+
+    // used by: InternalHeatGains.cc
+    void CalcWaterThermalTankZoneGains();
 
     void clear_state();
 
