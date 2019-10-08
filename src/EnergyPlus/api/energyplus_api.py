@@ -25,8 +25,8 @@ class EnergyPlusAPI:
     def functional(self) -> Functional:
         return Functional(self.api)
 
-    def data_transfer(self):
+    def data_transfer(self) -> DataTransfer:
         return DataTransfer(self.api)
 
-    def runtime(self):
+    def runtime(self) -> Runtime:
         return Runtime(self.api)

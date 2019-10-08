@@ -1,4 +1,5 @@
 from ctypes import cdll, c_int, c_char_p, c_void_p, CFUNCTYPE
+from typing import Union
 
 
 class Runtime:
@@ -43,7 +44,7 @@ class Runtime:
         self.api.registerRuntimeCallbackFromEndZoneTimestepAfterZoneReporting.argtypes = [self.py_callback_type]
         self.api.registerRuntimeCallbackFromEndZoneTimestepAfterZoneReporting.restype = c_void_p
 
-    def run_energyplus(self, path_to_dir: str):
+    def run_energyplus(self, path_to_dir: Union[str, bytes]):
         return self.api.cRunEnergyPlus(path_to_dir)
 
     def register_callback_new_environment(self, f):

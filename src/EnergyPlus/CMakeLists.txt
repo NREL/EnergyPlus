@@ -724,6 +724,7 @@ endif()
 
 add_custom_target(
   pythonapi
+  ALL
   COMMAND ${CMAKE_COMMAND}
         -DREPO_ROOT="${CMAKE_SOURCE_DIR}"
         -DBUILD_DIR="${CMAKE_BINARY_DIR}"

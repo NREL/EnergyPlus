@@ -63,6 +63,10 @@ int getVariableHandle(const char* type, const char* key) {
     return 0;
 }
 
+int getMeterHandle(const char* meterName) {
+    return EnergyPlus::GetMeterIndex(meterName);
+}
+
 int getActuatorHandle(const char* type, const char* key) {
     int handle;
     handle = 0;
@@ -77,6 +81,10 @@ int getActuatorHandle(const char* type, const char* key) {
 
 double getVariableValue(const int handle) {
     return EnergyPlus::OutputProcessor::RVariableTypes(handle).VarPtr().Which;
+}
+
+double getMeterValue(int handle) {
+    return EnergyPlus::GetInstantMeterValue(handle, EnergyPlus::OutputProcessor::TimeStepType::TimeStepSystem);
 }
 
 int setActuatorValue(const int handle, const double value) {

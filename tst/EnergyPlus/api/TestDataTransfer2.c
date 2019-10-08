@@ -45,25 +45,20 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <stdio.h>
+
+#include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/api/func.h>
-#include <EnergyPlus/PlantPipingSystemsManager.hh>
-#include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/InputProcessing/IdfParser.hh>
-#include <iostream>
+#include <EnergyPlus/api/runtime.h>
 
-int main(int, char *[])
-{
-    EnergyPlus::PlantPipingSystemsManager::BaseThermalPropertySet props;
-    props.Conductivity = 1;
-    props.Density = 2;
-    props.SpecificHeat = 3;
-    std::cout << "C++ API Test: Calculated thermal diffusivity = " << props.diffusivity() << std::endl;
+void afterTimestepHandler() {
+    int electricitySensor = getMeterHandle("ELECTRICITY:FACILITY");
+    Real64 electricity = getMeterValue(electricitySensor);
+    printf("***ELECTRICITY : %8.4f \n", electricity);
+}
 
-    props.Conductivity = 4;
-    std::cout << "C++ API Test: Updated thermal diffusivity = " << props.diffusivity() << std::endl;
-
-    initializeFunctionalAPI();
-    int index = 0;
-    auto saturationPressure = EnergyPlus::FluidProperties::GetSatPressureRefrig("STEAM", 25.5, index, "calledfrom");
-    std::cout << "C++ API Test: Calculated saturated pressure = " << saturationPressure << std::endl;
+int main() {
+    registerRuntimeCallbackFromEndSystemTimestepAfterHVACReporting(afterTimestepHandler);
+    cRunEnergyPlus("/tmp/epdll");
+    return 0;
 }

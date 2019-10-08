@@ -56,8 +56,10 @@ extern "C" {
 
 void dataTransferNoOp();
 int getVariableHandle(const char* type, const char* key);
+int getMeterHandle(const char* meterName);
 int getActuatorHandle(const char* type, const char* key);
 double getVariableValue(int handle);
+double getMeterValue(int handle);
 int setActuatorValue(int handle, double value);
 
 #ifdef __cplusplus
