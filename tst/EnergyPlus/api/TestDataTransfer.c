@@ -46,41 +46,39 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdio.h>
+#include <stdbool.h>
+
 #include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/api/runtime.h>
 
-int main() {
-    cInitializeEnergyPlus("/tmp/epdll");
-    cInitializeSimulation();
-    int env_count = 0;
-    while (1) {
-        int env = cGetNextEnvironment();
-        if (env == 0) {
-            env_count++;
-        } else {
-            break;
-        }
-        int skip = cSkipCurrentEnvironment();
-        if (skip == 0) {
-            continue;
-        }
-        cBeforeRunEnvironment();
-        int outdoorTempSensor = getVariableHandle("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
-        int outdoorDewPointSensor = getVariableHandle("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
-        int outdoorDewPointActuator = getActuatorHandle("Outdoor Dew Point", "Environment");
+bool alreadySetupSensors = false;
+int outdoorTempSensor;
+int outdoorDewPointSensor;
+int outdoorDewPointActuator;
+
+void newEnvrnHandler()
+{
+    printf("STARTING A NEW ENVIRONMENT\n");
+    if (!alreadySetupSensors) {
+        outdoorTempSensor = getVariableHandle("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
+        outdoorDewPointSensor = getVariableHandle("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
+        outdoorDewPointActuator = getActuatorHandle("Outdoor Dew Point", "Environment");
         printf("Handle IDs: %d, %d, %d \n", outdoorTempSensor, outdoorDewPointSensor, outdoorDewPointActuator);
         int response = setActuatorValue(outdoorDewPointActuator, -25);
         if (response != 0) {
             printf("Could not set actuator...\n");
         }
-        cRunEnvironment();
+        alreadySetupSensors = true;
+    } else {
         Real64 oa_temp = getVariableValue(outdoorTempSensor);
         printf("Reading outdoor temp via getVariable, value is: %8.4f \n", oa_temp);
         Real64 dp_temp = getVariableValue(outdoorDewPointSensor);
         printf("Actuated Dew Point temp value is: %8.4f \n", dp_temp);
-        cAfterRunEnvironment();
     }
-    cWrapUpSimulation();
-    cWrapUpEnergyPlus();
+}
+
+int main() {
+    registerRuntimeCallbackFromBeginNewEvironment(newEnvrnHandler);
+    cRunEnergyPlus("/tmp/epdll");
     return 0;
 }

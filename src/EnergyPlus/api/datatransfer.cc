@@ -83,6 +83,7 @@ int setActuatorValue(const int handle, const double value) {
     if (handle == 0) {
         return 1;
     }
+    std::cout << "Setting actuator for handle: " << handle << "; with value " << value << std::endl;
     // the handle is based on the available actuator list
     auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
     theActuator.RealValue = value;

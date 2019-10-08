@@ -45,9 +45,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/public/EnergyPlusPgm.hh>
-#include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/api/runtime.h>
 #include <EnergyPlus/StateManagement.hh>
 
@@ -57,73 +57,57 @@ void cClearAllStates() {
     EnergyPlus::clearAllStates();
 }
 
-int cGetNextEnvironment() {
-    bool boolAvail = true;
-    bool boolErrorsFound = false;
-    bool val = EnergyPlus::WeatherManager::GetNextEnvironment(boolAvail, boolErrorsFound);
-    if (val) {
-        return 0;
-    } else {
-        return 1;
-    }
-}
-
 int cRunEnergyPlus(const char* filepath) {
     std::string path(filepath);
     return RunEnergyPlus(path);
 }
 
-int cInitializeEnergyPlus(const char* filepath) {
-    std::string path(filepath);
-    return initializeEnergyPlus(path);
+void registerRuntimeCallbackFromBeginNewEvironment(void (*f)()) {
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginNewEvironment, f);
+}
+void registerRuntimeCallbackFromZoneSizing(void (*f)()) {
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromZoneSizing, f);
+}
+void registerRuntimeCallbackFromSystemSizing(void (*f)()){
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromSystemSizing, f);
+}
+void registerRuntimeCallbackFromBeginTimestepBeforePredictor(void (*f)()){
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginTimestepBeforePredictor, f);
+}
+void registerRuntimeCallbackFromEndSystemTimestepBeforeHVACReporting(void (*f)()){
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting, f);
+}
+void registerRuntimeCallbackFromEndSystemTimestepAfterHVACReporting(void (*f)()){
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting, f);
+}
+void registerRuntimeCallbackFromBeforeHVACManagers(void (*f)()){
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeforeHVACManagers, f);
+}
+void registerRuntimeCallbackFromAfterHVACManagers(void (*f)()){
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromAfterHVACManagers, f);
+}
+void registerRuntimeCallbackFromHVACIterationLoop(void (*f)()){
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromHVACIterationLoop, f);
+}
+void registerRuntimeCallbackFromBeginZoneTimestepBeforeInitHeatBalance(void (*f)()){
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, f);
+}
+void registerRuntimeCallbackFromBeginZoneTimestepAfterInitHeatBalance(void (*f)()){
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, f);
+}
+void registerRuntimeCallbackFromEndZoneTimestepBeforeZoneReporting(void (*f)()){
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting, f);
+}
+void registerRuntimeCallbackFromEndZoneTimestepAfterZoneReporting(void (*f)()){
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting, f);
+}
+void registerRuntimeCallbackFromBeginNewEnvironmentAfterWarmUp(void (*f)()){
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp, f);
+}
+void registerRuntimeCallbackFromUnitarySizing(void (*f)()){
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromUnitarySystemSizing, f);
+}
+void registerRuntimeCallbackFromExternalInterface(void (*f)()){
+    EnergyPlus::PluginManager::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromExternalInterface, f);
 }
 
-int cWrapUpEnergyPlus() {
-    return wrapUpEnergyPlus();
-}
-
-// Simulation manager level functions
-void cInitializeSimulation() {
-    return EnergyPlus::SimulationManager::initializeSimulation();
-}
-
-void cRunOneTimeStep() {
-    EnergyPlus::SimulationManager::runOneTimeStep();
-}
-
-void cRunOneHour() {
-    EnergyPlus::SimulationManager::runOneHour();
-}
-
-void cRunOneDay() {
-    EnergyPlus::SimulationManager::runOneDay();
-}
-
-void cBeforeRunEnvironment() {
-    EnergyPlus::SimulationManager::beforeRunEnvironment();
-}
-
-void cRunEnvironment() {
-    EnergyPlus::SimulationManager::runEnvironment();
-}
-
-void cAfterRunEnvironment() {
-    EnergyPlus::SimulationManager::afterRunEnvironment();
-}
-
-int cSkipCurrentEnvironment() {
-    bool val = EnergyPlus::SimulationManager::skipCurrentEnvironment();
-    if (val) {
-        return 0;
-    } else {
-        return 1;
-    }
-}
-
-void cRunAllEnvironments() {
-    EnergyPlus::SimulationManager::runAllEnvironments();
-}
-
-void cWrapUpSimulation() {
-    EnergyPlus::SimulationManager::wrapUpSimulation();
-}

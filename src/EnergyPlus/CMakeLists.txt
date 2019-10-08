@@ -630,7 +630,11 @@ SET( SRC
   ZoneTempPredictorCorrector.cc
   ZoneTempPredictorCorrector.hh
   StateManagement.cc
-  StateManagement.hh api/func.cc api/func.h)
+  StateManagement.hh
+  api/func.cc
+  api/func.h
+  PluginManager.cc
+  PluginManager.hh)
 
 CREATE_SRC_GROUPS( "${SRC}" )
 

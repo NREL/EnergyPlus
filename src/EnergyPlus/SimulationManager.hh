@@ -101,16 +101,8 @@ namespace SimulationManager {
 
     void PostIPProcessing();
 
-    void initializeSimulation();
-    void runOneTimeStep();
-    void runOneHour();
-    void runOneDay();
-    void beforeRunEnvironment();
-    void runEnvironment();
-    void afterRunEnvironment();
-    bool skipCurrentEnvironment();
-    void runAllEnvironments();
-    void wrapUpSimulation();
+    //	void
+    //	CheckCachedIPErrors();
 
 } // namespace SimulationManager
 

@@ -71,6 +71,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -294,6 +295,8 @@ namespace EMSManager {
 
         int tmpInteger;
         //  INTEGER  :: ProgramNum
+
+        PluginManager::runAnyRegisteredCallbacks(iCalledFrom);
 
         // FLOW:
         anyProgramRan = false;

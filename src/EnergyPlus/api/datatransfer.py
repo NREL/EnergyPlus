@@ -1,5 +1,7 @@
 from ctypes import cdll, c_bool, c_int, c_char_p
 from common import RealEP
+from typing import Union
+import sys
 
 
 class DataTransfer:
@@ -15,10 +17,18 @@ class DataTransfer:
         self.api.setActuatorValue.argtypes = [c_int, RealEP]
         self.api.setActuatorValue.restype = c_bool
 
-    def get_variable_handle(self, variable_name: str, variable_key: str):
+    def get_variable_handle(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]):
+        if isinstance(variable_name, str):
+            variable_name = variable_name.encode('utf-8')
+        if isinstance(variable_key, str):
+            variable_key = variable_key.encode('utf-8')
         return self.api.getVariableHandle(variable_name, variable_key)
 
-    def get_actuator_handle(self, variable_name: str, variable_key: str):
+    def get_actuator_handle(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]):
+        if isinstance(variable_name, str):
+            variable_name = variable_name.encode('utf-8')
+        if isinstance(variable_key, str):
+            variable_key = variable_key.encode('utf-8')
         return self.api.getActuatorHandle(variable_name, variable_key)
 
     def get_variable_value(self, variable_handle: int):

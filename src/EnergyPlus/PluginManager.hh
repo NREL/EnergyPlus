@@ -45,40 +45,23 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef EnergyPlusAPIRuntime_h_INCLUDED
-#define EnergyPlusAPIRuntime_h_INCLUDED
+#ifndef EPLUS_PLUGINMANAGER_HH
+#define EPLUS_PLUGINMANAGER_HH
 
-#include <EnergyPlus/TypeDefs.h>
+#include <vector>
+#include <EnergyPlus/EnergyPlus.hh>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace EnergyPlus {
 
-void cClearAllStates();
-void cRuntimeNoOp();
+namespace PluginManager {
 
-    // Program level functions
-int cRunEnergyPlus(const char* filepath);
+    void registerNewCallback(int iCalledFrom, void (*f)());
 
-void registerRuntimeCallbackFromBeginNewEvironment(void (*f)());
-void registerRuntimeCallbackFromZoneSizing(void (*f)());
-void registerRuntimeCallbackFromSystemSizing(void (*f)());
-void registerRuntimeCallbackFromBeginTimestepBeforePredictor(void (*f)());
-void registerRuntimeCallbackFromEndSystemTimestepBeforeHVACReporting(void (*f)());
-void registerRuntimeCallbackFromEndSystemTimestepAfterHVACReporting(void (*f)());
-void registerRuntimeCallbackFromBeforeHVACManagers(void (*f)());
-void registerRuntimeCallbackFromAfterHVACManagers(void (*f)());
-void registerRuntimeCallbackFromHVACIterationLoop(void (*f)());
-void registerRuntimeCallbackFromBeginZoneTimestepBeforeInitHeatBalance(void (*f)());
-void registerRuntimeCallbackFromBeginZoneTimestepAfterInitHeatBalance(void (*f)());
-void registerRuntimeCallbackFromEndZoneTimestepBeforeZoneReporting(void (*f)());
-void registerRuntimeCallbackFromBeginNewEnvironmentAfterWarmUp(void (*f)());
-void registerRuntimeCallbackFromUnitarySizing(void (*f)());
-void registerRuntimeCallbackFromExternalInterface(void (*f)());
-void registerRuntimeCallbackFromEndZoneTimestepAfterZoneReporting(void (*f)());
+    void runAnyRegisteredCallbacks(int);
 
-#ifdef __cplusplus
+    void clear_state();
+
 }
-#endif
+}
 
-#endif // EnergyPlusAPIRuntime_h_INCLUDED
+#endif // EPLUS_PLUGINMANAGER_HH

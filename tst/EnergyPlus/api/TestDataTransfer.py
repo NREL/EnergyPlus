@@ -8,40 +8,27 @@ from energyplus_api import EnergyPlusAPI
 api = EnergyPlusAPI()
 runtime = api.runtime()
 data = api.data_transfer()
-runtime.api.cInitializeEnergyPlus('/tmp/epdll'.encode('utf-8'))
-runtime.api.cInitializeSimulation()
 env_count = 0
-while True:
-    env = runtime.api.cGetNextEnvironment()
-    if env == 0:
-        env_count += 1
-    else:
-        break
-    skip = runtime.api.cSkipCurrentEnvironment()
-    if skip == 0:
-        continue
-    runtime.api.cBeforeRunEnvironment()
-    outdoorTempSensor = data.get_variable_handle(
-        "SITE OUTDOOR AIR DRYBULB TEMPERATURE".encode('utf-8'),
-        "ENVIRONMENT".encode('utf-8')
-    )
-    outdoorDewPointSensor = data.get_variable_handle(
-        "SITE OUTDOOR AIR DEWPOINT TEMPERATURE".encode('utf-8'),
-        "ENVIRONMENT".encode('utf-8')
-    )
-    outdoorDewPointActuator = data.get_actuator_handle(
-        "Outdoor Dew Point".encode('utf-8'),
-        "Environment".encode('utf-8')
-    )
-    print("Handle IDs: %s, %s, %s" % (outdoorTempSensor, outdoorDewPointSensor, outdoorDewPointActuator))
-    response = data.set_actuator_value(outdoorDewPointActuator, -25)
-    if response != 0:
-        print("Could not set actuator...")
-    runtime.api.cRunEnvironment()
-    oa_temp = data.get_variable_value(outdoorTempSensor)
+
+
+def environment_handler():
+    global env_count
+    env_count += 1
+    print("OH HAI NEW ENVIRONMENT")
+    sys.stdout.flush()
+    outdoor_temp_sensor = data.get_variable_handle(u"SITE OUTDOOR AIR DRYBULB TEMPERATURE", u"ENVIRONMENT")
+    outdoor_dew_point_sensor = data.get_variable_handle(u"SITE OUTDOOR AIR DEWPOINT TEMPERATURE", u"ENVIRONMENT")
+    if env_count > 1:
+        outdoor_dew_point_actuator = data.get_actuator_handle("Outdoor Dew Point", "Environment")
+        print("Handle IDs: %s, %s, %s" % (outdoor_temp_sensor, outdoor_dew_point_sensor, outdoor_dew_point_actuator))
+        response = data.set_actuator_value(outdoor_dew_point_actuator, -25)
+        if response != 0:
+            print("Could not set actuator...")
+    oa_temp = data.get_variable_value(outdoor_temp_sensor)
     print("Reading outdoor temp via getVariable, value is: %s" % oa_temp)
-    dp_temp = data.get_variable_value(outdoorDewPointSensor)
+    dp_temp = data.get_variable_value(outdoor_dew_point_sensor)
     print("Actuated Dew Point temp value is: %s" % dp_temp)
-    runtime.api.cAfterRunEnvironment()
-runtime.api.cWrapUpSimulation()
-runtime.api.cWrapUpEnergyPlus()
+
+
+runtime.register_callback_new_environment(environment_handler)
+runtime.run_energyplus('/tmp/epdll'.encode('utf-8'))
