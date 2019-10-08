@@ -7824,7 +7824,7 @@ namespace WaterThermalTanks {
 
                         // From the node above the inversion, move down calculating a weighted average
                         // of node temperatures until the node below the group of mixed nodes isn't hotter
-                        // or we hit the bottom of the this->
+                        // or we hit the bottom of the tank.
                         Real64 Tmixed = 0.0;
                         Real64 MassMixed = 0.0;
                         int m;
@@ -9340,7 +9340,7 @@ namespace WaterThermalTanks {
                                 NewTankTemp = Tank.TankTemp;
                             } else if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterStratified) {
                                 WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankStratified(WaterThermalTankNum);
-                                Tank.FindStratifiedTankSensedTemp();
+                                NewTankTemp = Tank.FindStratifiedTankSensedTemp();
                             }
                         }
 
@@ -9470,7 +9470,7 @@ namespace WaterThermalTanks {
                             NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
                         } else if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterStratified) {
                             WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankStratified(WaterThermalTankNum);
-                            WaterThermalTank(WaterThermalTankNum).FindStratifiedTankSensedTemp();
+                            NewTankTemp = WaterThermalTank(WaterThermalTankNum).FindStratifiedTankSensedTemp();
                         }
                     }
                     // update inlet temp
@@ -9761,8 +9761,8 @@ namespace WaterThermalTanks {
             HeatPump.ControlTempAvg = Tank.TankTempAvg;
             HeatPump.ControlTempFinal = Tank.TankTemp;
         } else if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
-            Tank.FindStratifiedTankSensedTemp(true);
-            Tank.FindStratifiedTankSensedTemp();
+            HeatPump.ControlTempAvg = Tank.FindStratifiedTankSensedTemp(true);
+            HeatPump.ControlTempFinal = Tank.FindStratifiedTankSensedTemp();
         } else {
             assert(0);
         }
@@ -10010,7 +10010,7 @@ namespace WaterThermalTanks {
                 NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
             } else if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterStratified) {
                 WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankStratified(WaterThermalTankNum);
-                WaterThermalTank(WaterThermalTankNum).FindStratifiedTankSensedTemp();
+                NewTankTemp = WaterThermalTank(WaterThermalTankNum).FindStratifiedTankSensedTemp();
             }
         }
 
