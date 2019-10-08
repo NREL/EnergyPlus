@@ -1420,8 +1420,8 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
     //	Tank.SetPointTemp = 30.0, tank elements should not be used
     //	Tank.TankTemp = 60.0; // based on schedule
     //	Tank.SavedTankTemp = 60.0;
-    HeatPump.SaveMode = WaterThermalTanks::FloatMode;
-    Tank.Mode = WaterThermalTanks::FloatMode;
+    HeatPump.SaveMode = WaterThermalTanks::modFloatMode;
+    Tank.Mode = WaterThermalTanks::modFloatMode;
     WaterThermalTanks::InitWaterThermalTank(1, FirstHVACIteration);
     DataGlobals::WarmupFlag = false;
     WaterThermalTanks::InitWaterThermalTank(1, FirstHVACIteration); // read set point schedules on second pass when WarmupFlag is false.
@@ -1430,7 +1430,7 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
     // no standby losses, tank at 60 C, tank should remain at 60 C and HP should be off.
     EXPECT_NEAR(60.0, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.0, HeatPump.HeatingPLR, 0.0000001);
-    EXPECT_EQ(WaterThermalTanks::FloatMode, HeatPump.Mode); // expect HP to remain in floating mode
+    EXPECT_EQ(WaterThermalTanks::modFloatMode, HeatPump.Mode); // expect HP to remain in floating mode
     EXPECT_NEAR(60.0, Tank.TankTempAvg, 0.0000001);         // average tank temp over time step
     EXPECT_NEAR(60.0, Tank.SourceOutletTemp, 0.0000001);    // source outlet = average tank temp
 
@@ -1439,37 +1439,37 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
     // HP in heating mode and tank at low temp needing full HP operation. Use nodes not adding heat to tank.
     Tank.TankTemp = 50.0;
     Tank.SavedTankTemp = 50.0;
-    HeatPump.SaveMode = WaterThermalTanks::HeatMode;
-    Tank.SavedMode = WaterThermalTanks::HeatMode;
+    HeatPump.SaveMode = WaterThermalTanks::modHeatMode;
+    Tank.SavedMode = WaterThermalTanks::modHeatMode;
     WaterThermalTanks::InitWaterThermalTank(1, FirstHVACIteration);
     WaterThermalTanks::CalcHeatPumpWaterHeater(1, FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 50 C, tank should heat up and HP should be on.
     EXPECT_NEAR(57.2000377, Tank.TankTemp, 0.0000001);         // final tank temperature
     EXPECT_NEAR(1.0, HeatPump.HeatingPLR, 0.0000001);          // HP operating at full capacity
-    EXPECT_EQ(WaterThermalTanks::HeatMode, HeatPump.Mode);     // expect HP to remain in heating mode
+    EXPECT_EQ(WaterThermalTanks::modHeatMode, HeatPump.Mode);     // expect HP to remain in heating mode
     EXPECT_NEAR(53.6000188, Tank.TankTempAvg, 0.0000001);      // average tank temp over time step
     EXPECT_NEAR(53.6000188, Tank.SourceOutletTemp, 0.0000001); // source outlet = average tank temp
 
     // HP in heating mode and tank at moderate temp needing only partial HP operation. Use nodes not adding heat to tank.
     Tank.TankTemp = 56.0;
     Tank.SavedTankTemp = 56.0;
-    HeatPump.SaveMode = WaterThermalTanks::HeatMode;
-    Tank.SavedMode = WaterThermalTanks::HeatMode;
+    HeatPump.SaveMode = WaterThermalTanks::modHeatMode;
+    Tank.SavedMode = WaterThermalTanks::modHeatMode;
     WaterThermalTanks::CalcHeatPumpWaterHeater(1, FirstHVACIteration);
     Tank.UpdateWaterThermalTank();
     // no standby losses, tank at 56 C, tank should heat up to 60 C (within convergence tolerance) and HP should cycle.
     EXPECT_NEAR(60.00110205, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.5550125, HeatPump.HeatingPLR, 0.0000001);
-    EXPECT_EQ(WaterThermalTanks::FloatMode, HeatPump.Mode);     // expect HP to switch to floating mode since it reached set point
+    EXPECT_EQ(WaterThermalTanks::modFloatMode, HeatPump.Mode);     // expect HP to switch to floating mode since it reached set point
     EXPECT_NEAR(58.00055103, Tank.TankTempAvg, 0.0000001);      // average tank temp over time step
     EXPECT_NEAR(58.00055103, Tank.SourceOutletTemp, 0.0000001); // source outlet = average tank temp
 
     // HP in heating mode and tank at moderate temp with use node adding heat to tank
     Tank.TankTemp = 56.0;
     Tank.SavedTankTemp = 56.0;
-    HeatPump.SaveMode = WaterThermalTanks::HeatMode;
-    Tank.SavedMode = WaterThermalTanks::HeatMode;
+    HeatPump.SaveMode = WaterThermalTanks::modHeatMode;
+    Tank.SavedMode = WaterThermalTanks::modHeatMode;
     Tank.UseMassFlowRate = 0.02;
     Tank.UseInletTemp = 90.0;
     WaterThermalTanks::CalcHeatPumpWaterHeater(1, FirstHVACIteration);
@@ -1477,7 +1477,7 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
     // no standby losses, tank at 56 C, tank should heat up > 60 C since use nodes add heat to tank and HP should be off and floating.
     EXPECT_NEAR(61.96991668, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.0, HeatPump.HeatingPLR, 0.0000001);
-    EXPECT_EQ(WaterThermalTanks::FloatMode,
+    EXPECT_EQ(WaterThermalTanks::modFloatMode,
               HeatPump.Mode); // expect HP to switch to floating mode since use nodes added sufficient heat to exceed set point
     EXPECT_NEAR(59.08095576, Tank.TankTempAvg, 0.0000001);      // average tank temp over time step
     EXPECT_NEAR(59.08095576, Tank.SourceOutletTemp, 0.0000001); // source outlet = average tank temp
@@ -1485,8 +1485,8 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
     // HP in floating mode and tank at moderate temp with use node adding heat to tank
     Tank.TankTemp = 56.0;
     Tank.SavedTankTemp = 56.0;
-    HeatPump.SaveMode = WaterThermalTanks::FloatMode;
-    Tank.SavedMode = WaterThermalTanks::FloatMode;
+    HeatPump.SaveMode = WaterThermalTanks::modFloatMode;
+    Tank.SavedMode = WaterThermalTanks::modFloatMode;
     Tank.UseMassFlowRate = 0.02;
     Tank.UseInletTemp = 90.0;
     WaterThermalTanks::CalcHeatPumpWaterHeater(1, FirstHVACIteration);
@@ -1494,7 +1494,7 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
     // no standby losses, tank at 56 C, tank should heat up > 60 C since use nodes add heat to tank and HP should be off and floating.
     EXPECT_NEAR(61.96991668, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.0, HeatPump.HeatingPLR, 0.0000001);
-    EXPECT_EQ(WaterThermalTanks::FloatMode,
+    EXPECT_EQ(WaterThermalTanks::modFloatMode,
               HeatPump.Mode); // expect HP to remain in floating mode since use nodes added sufficient heat to exceed set point
     EXPECT_NEAR(59.08095576, Tank.TankTempAvg, 0.0000001);      // average tank temp over time step
     EXPECT_NEAR(59.08095576, Tank.SourceOutletTemp, 0.0000001); // source outlet = average tank temp
@@ -1503,8 +1503,8 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
     Tank.TankTemp = 56.0;
     Tank.SavedTankTemp = 56.0;
     HeatPump.SetPointTemp = 30.0; // SP reduced below tank temperature while in heating mode
-    HeatPump.SaveMode = WaterThermalTanks::HeatMode;
-    Tank.SavedMode = WaterThermalTanks::HeatMode;
+    HeatPump.SaveMode = WaterThermalTanks::modHeatMode;
+    Tank.SavedMode = WaterThermalTanks::modHeatMode;
     Tank.UseMassFlowRate = 0.0;
     Tank.UseInletTemp = 90.0;
     WaterThermalTanks::CalcHeatPumpWaterHeater(1, FirstHVACIteration);
@@ -1512,7 +1512,7 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
     // no standby losses, tank at 56 C, tank should remain at 56 C since use nodes are not adding heat to tank and HP set point temp was reduced
     EXPECT_NEAR(56.0, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.0, HeatPump.HeatingPLR, 0.0000001);
-    EXPECT_EQ(WaterThermalTanks::FloatMode, HeatPump.Mode); // expect HP to switch to floating mode since HP set point temperature was reduced
+    EXPECT_EQ(WaterThermalTanks::modFloatMode, HeatPump.Mode); // expect HP to switch to floating mode since HP set point temperature was reduced
     EXPECT_NEAR(56.0, Tank.TankTempAvg, 0.0000001);         // average tank temp over time step
     EXPECT_NEAR(56.0, Tank.SourceOutletTemp, 0.0000001);    // source outlet = average tank temp
 }
