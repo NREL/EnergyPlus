@@ -46,39 +46,59 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdio.h>
-#include <stdbool.h>
 
 #include <EnergyPlus/api/datatransfer.h>
+#include <EnergyPlus/api/func.h>
 #include <EnergyPlus/api/runtime.h>
-
-bool alreadySetupSensors = false;
-int outdoorTempSensor;
-int outdoorDewPointSensor;
-int outdoorDewPointActuator;
 
 void newEnvrnHandler()
 {
     printf("STARTING A NEW ENVIRONMENT\n");
-    if (!alreadySetupSensors) {
-        outdoorTempSensor = getVariableHandle("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
-        outdoorDewPointSensor = getVariableHandle("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
-        outdoorDewPointActuator = getActuatorHandle("Outdoor Dew Point", "Environment");
-        printf("Handle IDs: %d, %d, %d \n", outdoorTempSensor, outdoorDewPointSensor, outdoorDewPointActuator);
+    int kindOfSim = simDataGetKindOfSim();
+    switch (kindOfSim) {
+    case 1:
+        // design day
+        printf("ITS A DESIGN DAY!\n");
+        break;
+    case 2:
+    case 3:
+        // run periods, either weather file or design
+        printf("ITS A RUN PERIOD!\n");
+        break;
+    case 4:
+    case 5:
+        // hvac sizing
+        printf("ITS AN HVAC SIZING RUN\n");
+        break;
+    case 6:
+        // read weather data
+        printf("ITS A READ WEATHER DATA RUN\n");
+        break;
+    default:
+        printf("UNKNOWN ENVIRONMENT\n");
+        // what?
+    }
+    if (kindOfSim == 2 || kindOfSim == 3) {
+        int outdoorDewPointActuator = getActuatorHandle("Outdoor Dew Point", "Environment");
         int response = setActuatorValue(outdoorDewPointActuator, -25);
         if (response != 0) {
             printf("Could not set actuator...\n");
         }
-        alreadySetupSensors = true;
-    } else {
-        Real64 oa_temp = getVariableValue(outdoorTempSensor);
-        printf("Reading outdoor temp via getVariable, value is: %8.4f \n", oa_temp);
-        Real64 dp_temp = getVariableValue(outdoorDewPointSensor);
-        printf("Actuated Dew Point temp value is: %8.4f \n", dp_temp);
     }
+}
+
+void afterTimestepHandler() {
+    int outdoorTempSensor = getVariableHandle("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
+    int outdoorDewPointSensor = getVariableHandle("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
+    Real64 oa_temp = getVariableValue(outdoorTempSensor);
+    printf("Reading outdoor temp via getVariable, value is: %8.4f \n", oa_temp);
+    Real64 dp_temp = getVariableValue(outdoorDewPointSensor);
+    printf("Actuated Dew Point temp value is: %8.4f \n", dp_temp);
 }
 
 int main() {
     registerRuntimeCallbackFromBeginNewEvironment(newEnvrnHandler);
+    registerRuntimeCallbackFromEndSystemTimestepAfterHVACReporting(afterTimestepHandler);
     cRunEnergyPlus("/tmp/epdll");
     return 0;
 }

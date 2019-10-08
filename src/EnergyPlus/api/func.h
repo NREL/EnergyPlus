@@ -67,6 +67,8 @@ void cBaseThermalPropertySet_setConductivity(CBaseThermalPropertySet props, Real
 void initializeFunctionalAPI();
 Real64 fluidProperty_GetSatPressureRefrig(const char* refrigerantName, Real64 temperatureC, int refrigerantIndex);
 
+int simDataGetKindOfSim();
+
 #ifdef __cplusplus
 }
 #endif
