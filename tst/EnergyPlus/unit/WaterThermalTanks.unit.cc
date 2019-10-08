@@ -1613,7 +1613,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankUseEnergy)
     Tank.SetPointTemp2 = Tank.SetPointTemp;
     Tank.UseMassFlowRate = 0.000189;
 
-    Tank.CalcWaterThermalTankStratified(1);
+    Tank.CalcWaterThermalTankStratified();
 
     // Energy Use is negative relative to the tank
     ASSERT_LT(Tank.UseRate, 0.0);
@@ -1742,7 +1742,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankSourceTemperatures)
     TimeStepSys = TimeStepZone;
     SysTimeElapsed = 0.0;
 
-    Tank.CalcWaterThermalTankStratified(TankNum);
+    Tank.CalcWaterThermalTankStratified();
 
     // check source inlet and outlet temperatures are different
     EXPECT_EQ(Tank.SourceInletTemp, 5.0);
@@ -1959,7 +1959,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankCalc)
     Tank.UseMassFlowRate = 0.0;
     Tank.SourceMassFlowRate = 0.0;
 
-    Tank.CalcWaterThermalTankStratified(TankNum);
+    Tank.CalcWaterThermalTankStratified();
 
     std::vector<Real64> NodeTemps;
     NodeTemps.resize(Tank.Nodes);
@@ -1984,7 +1984,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankCalc)
         node.SavedTemp = 58.05;
     }
 
-    Tank.CalcWaterThermalTankStratified(TankNum);
+    Tank.CalcWaterThermalTankStratified();
 
     for (int i = 0; i < Tank.Nodes; ++i) {
         NodeTemps[i] = Tank.Node[i].Temp;
@@ -2007,7 +2007,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankCalc)
 
     Tank.UseMassFlowRate = 2 * 6.30901964e-5 * 997; // 2 gal/min
 
-    Tank.CalcWaterThermalTankStratified(TankNum);
+    Tank.CalcWaterThermalTankStratified();
 
     for (int i = 0; i < Tank.Nodes; ++i) {
         NodeTemps[i] = Tank.Node[i].Temp;
@@ -2044,7 +2044,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankCalc)
         node.SavedTemp = node.Temp;
     }
 
-    Tank.CalcWaterThermalTankStratified(TankNum);
+    Tank.CalcWaterThermalTankStratified();
 
     for (auto &node : Tank.Node) {
         EXPECT_LE(node.Temp, Tank.TankTempLimit);
@@ -2172,7 +2172,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankSourceFlowRateCalc) {
     int DummyIndex = 1;
     Real64 Cp = FluidProperties::GetSpecificHeatGlycol("WATER", 60.0, DummyIndex, "StratifiedTankCalcNoDraw");
 
-    Tank.CalcWaterThermalTankStratified(TankNum);
+    Tank.CalcWaterThermalTankStratified();
 
     Real64 EnergySum = 0.0;
     for (int i = 0; i < Tank.Nodes; ++i) {

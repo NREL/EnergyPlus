@@ -366,7 +366,7 @@ namespace WaterThermalTanks {
                         WaterThermalTank(CompNum).CalcWaterThermalTankMixed(CompNum);
                     } else if ((WaterThermalTank(CompNum).TypeNum == DataPlant::TypeOf_WtrHeaterStratified) ||
                                (WaterThermalTank(CompNum).TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
-                        WaterThermalTank(CompNum).CalcWaterThermalTankStratified(CompNum);
+                        WaterThermalTank(CompNum).CalcWaterThermalTankStratified();
                     }
                 } else if (WaterThermalTank(CompNum).DesuperheaterNum > 0) {
                     CalcDesuperheaterWaterHeater(CompNum, FirstHVACIteration);
@@ -7371,7 +7371,7 @@ namespace WaterThermalTanks {
         return PartLoadFactor;
     }
 
-    void WaterThermalTankData::CalcWaterThermalTankStratified(int const WaterThermalTankNum)
+    void WaterThermalTankData::CalcWaterThermalTankStratified()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Noel Merket, originally by Peter Graham Ellis
@@ -7482,7 +7482,7 @@ namespace WaterThermalTanks {
         Real64 Qheater1;            // Heating rate of burner or electric heating element 1 (W)
         Real64 Qheater2;            // Heating rate of burner or electric heating element 2 (W)
 
-        if (this->InletMode == InletMode::Fixed) CalcNodeMassFlows(WaterThermalTankNum, InletMode::Fixed);
+        if (this->InletMode == InletMode::Fixed) CalcNodeMassFlows(InletMode::Fixed);
 
         // Time remaining in the current DataGlobals::TimeStep (s)
         Real64 TimeRemaining = SecInTimeStep;
@@ -7510,7 +7510,7 @@ namespace WaterThermalTanks {
             bool PrevHeaterOn1 = this->HeaterOn1;
             bool PrevHeaterOn2 = this->HeaterOn2;
 
-            if (this->InletMode == InletMode::Seeking) CalcNodeMassFlows(WaterThermalTankNum, InletMode::Seeking);
+            if (this->InletMode == InletMode::Seeking) CalcNodeMassFlows(InletMode::Seeking);
 
             // Heater control logic
             if (this->IsChilledWaterTank) {
@@ -8008,9 +8008,7 @@ namespace WaterThermalTanks {
 
     }
 
-    void CalcNodeMassFlows(int const WaterThermalTankNum, // Water Heater being simulated
-                           int const InletMode            // InletModeFixed or InletModeSeeking
-    )
+    void WaterThermalTankData::CalcNodeMassFlows(int const InletMode)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8029,17 +8027,15 @@ namespace WaterThermalTanks {
         // Upward and downward flows are added to each node between an inlet and outlet.  Flows in both directions cancel out
         // to leave only the net flow in one direction.
 
-        WaterThermalTankData &Tank = WaterThermalTank(WaterThermalTankNum);
+        int UseInletStratNode_loc = this->UseInletStratNode;
+        int UseOutletStratNode_loc = this->UseOutletStratNode;
+        int SourceInletStratNode_loc = this->SourceInletStratNode;
+        int SourceOutletStratNode_loc = this->SourceOutletStratNode;
 
-        int UseInletStratNode = Tank.UseInletStratNode;
-        int UseOutletStratNode = Tank.UseOutletStratNode;
-        int SourceInletStratNode = Tank.SourceInletStratNode;
-        int SourceOutletStratNode = Tank.SourceOutletStratNode;
+        Real64 UseMassFlowRate_loc = this->UseMassFlowRate * this->UseEffectiveness;
+        Real64 SourceMassFlowRate_loc = this->SourceMassFlowRate * this->SourceEffectiveness;
 
-        Real64 UseMassFlowRate = Tank.UseMassFlowRate * Tank.UseEffectiveness;
-        Real64 SourceMassFlowRate = Tank.SourceMassFlowRate * Tank.SourceEffectiveness;
-
-        for (auto &e : Tank.Node) {
+        for (auto &e : this->Node) {
             e.UseMassFlowRate = 0.0;
             e.SourceMassFlowRate = 0.0;
             e.MassFlowFromUpper = 0.0;
@@ -8052,38 +8048,38 @@ namespace WaterThermalTanks {
             // 'Seek' the node with the temperature closest to the inlet temperature
             // Start at the user-specified inlet node and search to the user-specified outlet node
             int Step;
-            if (UseMassFlowRate > 0.0) {
-                if (UseInletStratNode > UseOutletStratNode) {
+            if (UseMassFlowRate_loc > 0.0) {
+                if (UseInletStratNode_loc > UseOutletStratNode_loc) {
                     Step = -1;
                 } else {
                     Step = 1;
                 }
                 Real64 MinDeltaTemp = 1.0e6; // Some big number
-                int const NodeNum_stop(floop_end(UseInletStratNode, UseOutletStratNode, Step));
-                for (int NodeNum = UseInletStratNode; NodeNum != NodeNum_stop; NodeNum += Step) {
-                    Real64 DeltaTemp = std::abs(Tank.Node(NodeNum).Temp - Tank.UseInletTemp);
+                int const NodeNum_stop(floop_end(UseInletStratNode_loc, UseOutletStratNode_loc, Step));
+                for (int NodeNum = UseInletStratNode_loc; NodeNum != NodeNum_stop; NodeNum += Step) {
+                    Real64 DeltaTemp = std::abs(this->Node(NodeNum).Temp - this->UseInletTemp);
                     if (DeltaTemp < MinDeltaTemp) {
                         MinDeltaTemp = DeltaTemp;
-                        UseInletStratNode = NodeNum;
+                        UseInletStratNode_loc = NodeNum;
                     } else if (DeltaTemp > MinDeltaTemp) {
                         break;
                     }
                 }
             }
 
-            if (SourceMassFlowRate > 0.0) {
-                if (SourceInletStratNode > SourceOutletStratNode) {
+            if (SourceMassFlowRate_loc > 0.0) {
+                if (SourceInletStratNode_loc > SourceOutletStratNode_loc) {
                     Step = -1;
                 } else {
                     Step = 1;
                 }
                 Real64 MinDeltaTemp = 1.0e6; // Some big number
-                int const NodeNum_stop(floop_end(SourceInletStratNode, SourceOutletStratNode, Step));
-                for (int NodeNum = SourceInletStratNode; NodeNum != NodeNum_stop; NodeNum += Step) {
-                    Real64 DeltaTemp = std::abs(Tank.Node(NodeNum).Temp - Tank.SourceInletTemp);
+                int const NodeNum_stop(floop_end(SourceInletStratNode_loc, SourceOutletStratNode_loc, Step));
+                for (int NodeNum = SourceInletStratNode_loc; NodeNum != NodeNum_stop; NodeNum += Step) {
+                    Real64 DeltaTemp = std::abs(this->Node(NodeNum).Temp - this->SourceInletTemp);
                     if (DeltaTemp < MinDeltaTemp) {
                         MinDeltaTemp = DeltaTemp;
-                        SourceInletStratNode = NodeNum;
+                        SourceInletStratNode_loc = NodeNum;
                     } else if (DeltaTemp > MinDeltaTemp) {
                         break;
                     }
@@ -8091,26 +8087,26 @@ namespace WaterThermalTanks {
             }
         }
 
-        if (UseInletStratNode > 0) Tank.Node(UseInletStratNode).UseMassFlowRate = UseMassFlowRate;
-        if (SourceInletStratNode > 0) Tank.Node(SourceInletStratNode).SourceMassFlowRate = SourceMassFlowRate;
+        if (UseInletStratNode_loc > 0) this->Node(UseInletStratNode_loc).UseMassFlowRate = UseMassFlowRate_loc;
+        if (SourceInletStratNode_loc > 0) this->Node(SourceInletStratNode_loc).SourceMassFlowRate = SourceMassFlowRate_loc;
 
-        if (UseMassFlowRate > 0.0) {
-            if (UseOutletStratNode > UseInletStratNode) {
+        if (UseMassFlowRate_loc > 0.0) {
+            if (UseOutletStratNode_loc > UseInletStratNode_loc) {
                 // Use-side flow is down
-                for (int NodeNum = UseInletStratNode; NodeNum <= UseOutletStratNode - 1; ++NodeNum) {
-                    Tank.Node(NodeNum).MassFlowToLower += UseMassFlowRate;
+                for (int NodeNum = UseInletStratNode_loc; NodeNum <= UseOutletStratNode_loc - 1; ++NodeNum) {
+                    this->Node(NodeNum).MassFlowToLower += UseMassFlowRate_loc;
                 }
-                for (int NodeNum = UseInletStratNode + 1; NodeNum <= UseOutletStratNode; ++NodeNum) {
-                    Tank.Node(NodeNum).MassFlowFromUpper += UseMassFlowRate;
+                for (int NodeNum = UseInletStratNode_loc + 1; NodeNum <= UseOutletStratNode_loc; ++NodeNum) {
+                    this->Node(NodeNum).MassFlowFromUpper += UseMassFlowRate_loc;
                 }
 
-            } else if (UseOutletStratNode < UseInletStratNode) {
+            } else if (UseOutletStratNode_loc < UseInletStratNode_loc) {
                 // Use-side flow is up
-                for (int NodeNum = UseOutletStratNode; NodeNum <= UseInletStratNode - 1; ++NodeNum) {
-                    Tank.Node(NodeNum).MassFlowFromLower += UseMassFlowRate;
+                for (int NodeNum = UseOutletStratNode_loc; NodeNum <= UseInletStratNode_loc - 1; ++NodeNum) {
+                    this->Node(NodeNum).MassFlowFromLower += UseMassFlowRate_loc;
                 }
-                for (int NodeNum = UseOutletStratNode + 1; NodeNum <= UseInletStratNode; ++NodeNum) {
-                    Tank.Node(NodeNum).MassFlowToUpper += UseMassFlowRate;
+                for (int NodeNum = UseOutletStratNode_loc + 1; NodeNum <= UseInletStratNode_loc; ++NodeNum) {
+                    this->Node(NodeNum).MassFlowToUpper += UseMassFlowRate_loc;
                 }
 
             } else {
@@ -8118,23 +8114,23 @@ namespace WaterThermalTanks {
             }
         }
 
-        if (SourceMassFlowRate > 0.0) {
-            if (SourceOutletStratNode > SourceInletStratNode) {
+        if (SourceMassFlowRate_loc > 0.0) {
+            if (SourceOutletStratNode_loc > SourceInletStratNode_loc) {
                 // Source-side flow is down
-                for (int NodeNum = SourceInletStratNode; NodeNum <= SourceOutletStratNode - 1; ++NodeNum) {
-                    Tank.Node(NodeNum).MassFlowToLower += SourceMassFlowRate;
+                for (int NodeNum = SourceInletStratNode_loc; NodeNum <= SourceOutletStratNode_loc - 1; ++NodeNum) {
+                    this->Node(NodeNum).MassFlowToLower += SourceMassFlowRate_loc;
                 }
-                for (int NodeNum = SourceInletStratNode + 1; NodeNum <= SourceOutletStratNode; ++NodeNum) {
-                    Tank.Node(NodeNum).MassFlowFromUpper += SourceMassFlowRate;
+                for (int NodeNum = SourceInletStratNode_loc + 1; NodeNum <= SourceOutletStratNode_loc; ++NodeNum) {
+                    this->Node(NodeNum).MassFlowFromUpper += SourceMassFlowRate_loc;
                 }
 
-            } else if (SourceOutletStratNode < SourceInletStratNode) {
+            } else if (SourceOutletStratNode_loc < SourceInletStratNode_loc) {
                 // Source-side flow is up
-                for (int NodeNum = SourceOutletStratNode; NodeNum <= SourceInletStratNode - 1; ++NodeNum) {
-                    Tank.Node(NodeNum).MassFlowFromLower += SourceMassFlowRate;
+                for (int NodeNum = SourceOutletStratNode_loc; NodeNum <= SourceInletStratNode_loc - 1; ++NodeNum) {
+                    this->Node(NodeNum).MassFlowFromLower += SourceMassFlowRate_loc;
                 }
-                for (int NodeNum = SourceOutletStratNode + 1; NodeNum <= SourceInletStratNode; ++NodeNum) {
-                    Tank.Node(NodeNum).MassFlowToUpper += SourceMassFlowRate;
+                for (int NodeNum = SourceOutletStratNode_loc + 1; NodeNum <= SourceInletStratNode_loc; ++NodeNum) {
+                    this->Node(NodeNum).MassFlowToUpper += SourceMassFlowRate_loc;
                 }
 
             } else {
@@ -8143,9 +8139,9 @@ namespace WaterThermalTanks {
         }
 
         // Cancel out any up and down flows
-        for (int NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum) {
-            Tank.Node(NodeNum).MassFlowFromUpper = max((Tank.Node(NodeNum).MassFlowFromUpper - Tank.Node(NodeNum).MassFlowToUpper), 0.0);
-            Tank.Node(NodeNum).MassFlowFromLower = max((Tank.Node(NodeNum).MassFlowFromLower - Tank.Node(NodeNum).MassFlowToLower), 0.0);
+        for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
+            this->Node(NodeNum).MassFlowFromUpper = max((this->Node(NodeNum).MassFlowFromUpper - this->Node(NodeNum).MassFlowToUpper), 0.0);
+            this->Node(NodeNum).MassFlowFromLower = max((this->Node(NodeNum).MassFlowFromLower - this->Node(NodeNum).MassFlowToLower), 0.0);
         }
     }
 
@@ -9288,7 +9284,7 @@ namespace WaterThermalTanks {
                                 WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankMixed(WaterThermalTankNum);
                                 NewTankTemp = Tank.TankTemp;
                             } else if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterStratified) {
-                                WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankStratified(WaterThermalTankNum);
+                                WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankStratified();
                                 NewTankTemp = Tank.FindStratifiedTankSensedTemp();
                             }
                         }
@@ -9418,7 +9414,7 @@ namespace WaterThermalTanks {
                             WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankMixed(WaterThermalTankNum);
                             NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
                         } else if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterStratified) {
-                            WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankStratified(WaterThermalTankNum);
+                            WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankStratified();
                             NewTankTemp = WaterThermalTank(WaterThermalTankNum).FindStratifiedTankSensedTemp();
                         }
                     }
@@ -9683,7 +9679,7 @@ namespace WaterThermalTanks {
         if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
             WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankMixed(WaterThermalTankNum);
         } else if (HeatPump.TankTypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
-            WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankStratified(WaterThermalTankNum);
+            WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankStratified();
         } else {
             assert(0);
         }
@@ -9753,7 +9749,7 @@ namespace WaterThermalTanks {
         if (this->TypeNum == DataPlant::TypeOf_WtrHeaterMixed) {
            this->CalcWaterThermalTankMixed(WaterThermalTankNum);
         } else if (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
-            this->CalcWaterThermalTankStratified(WaterThermalTankNum);
+            this->CalcWaterThermalTankStratified();
         } else {
             assert(false);
         }
@@ -9958,7 +9954,7 @@ namespace WaterThermalTanks {
                 WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankMixed(WaterThermalTankNum);
                 NewTankTemp = WaterThermalTank(WaterThermalTankNum).TankTemp;
             } else if (SELECT_CASE_var1 == DataPlant::TypeOf_WtrHeaterStratified) {
-                WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankStratified(WaterThermalTankNum);
+                WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankStratified();
                 NewTankTemp = WaterThermalTank(WaterThermalTankNum).FindStratifiedTankSensedTemp();
             }
         }
@@ -10055,7 +10051,7 @@ namespace WaterThermalTanks {
             // Apply the PLR
             *CoilTotalHeatingEnergyRatePtr *= HPPartLoadRatio;
             // Tank Calculation
-            WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankStratified(WaterThermalTankNum);
+            WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTankStratified();
             // Restore the original value
             *CoilTotalHeatingEnergyRatePtr = CoilTotalHeatingEnergyRateBackup;
         }
@@ -11852,7 +11848,7 @@ namespace WaterThermalTanks {
                             this->CalcWaterThermalTankMixed(WaterThermalTankNum);
 
                         } else if (SELECT_CASE_var == DataPlant::TypeOf_WtrHeaterStratified) {
-                            this->CalcWaterThermalTankStratified(WaterThermalTankNum);
+                            this->CalcWaterThermalTankStratified();
 
                         } else {
                             //         Unhandled water heater type
@@ -12082,7 +12078,7 @@ namespace WaterThermalTanks {
                             if (this->Efficiency > 0.0) this->CalcWaterThermalTankMixed(WaterThermalTankNum);
 
                         } else if (SELECT_CASE_var == DataPlant::TypeOf_WtrHeaterStratified) {
-                            if (this->Efficiency > 0.0) this->CalcWaterThermalTankStratified(WaterThermalTankNum);
+                            if (this->Efficiency > 0.0) this->CalcWaterThermalTankStratified();
 
                         } else {
                             //         Unhandled water heater type

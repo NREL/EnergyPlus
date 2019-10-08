@@ -486,6 +486,8 @@ namespace WaterThermalTanks {
         {
         }
 
+        void CalcNodeMassFlows(int InletMode);
+
         void SetupStratifiedNodes();
 
         void InitWaterThermalTank(int WaterThermalTankNum,
@@ -515,7 +517,7 @@ namespace WaterThermalTanks {
 
         void ReportWaterThermalTank();
 
-        void CalcWaterThermalTankStratified(int WaterThermalTankNum); // Water Heater being simulated
+        void CalcWaterThermalTankStratified(); // Water Heater being simulated
 
         void CalcWaterThermalTankMixed(int WaterThermalTankNum); // Water Heater being simulated
 
@@ -839,10 +841,6 @@ namespace WaterThermalTanks {
     );
 
     Real64 PartLoadFactor(int WaterThermalTankNum, Real64 PartLoadRatio);
-
-    void CalcNodeMassFlows(int WaterThermalTankNum, // Water Heater being simulated
-                           int InletMode            // InletModeFixed or InletModeSeeking
-    );
 
     void CalcDesuperheaterWaterHeater(int WaterThermalTankNum, // Water Heater being simulated
                                       bool FirstHVACIteration  // TRUE if First iteration of simulation
