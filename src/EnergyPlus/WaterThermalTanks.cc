@@ -139,51 +139,8 @@ namespace WaterThermalTanks {
     int const modVentMode(-1); // tank temp is above maximum temperature and water is venting
     int const modCoolMode(2);  // cooling source is on, source will not turn off until setpoint temp is reached
 
-    int const modAmbientTempSchedule(1);   // ambient temperature around tank (or HPWH inlet air) is scheduled
-    int const modAmbientTempZone(2);       // tank is located in a zone or HPWH inlet air is zone air only
-    int const modAmbientTempOutsideAir(3); // tank is located outdoors or HPWH inlet air is outdoor air only
-    int const modAmbientTempZoneAndOA(4);  // applicable to HPWH only, inlet air is mixture of OA and zone air
-
-    int const modCrankcaseTempSchedule(1); // temperature controlling compressor crankcase heater is scheduled
-    int const modCrankcaseTempZone(2);     // temperature controlling compressor crankcase heater is zone air
-    int const modCrankcaseTempExterior(3); // temperature controlling compressor crankcase heater is outdoor air
-
     int const modControlTypeCycle(1);    // water heater only, cycling heating source control
     int const modControlTypeModulate(2); // water heater only, modulating heating source control
-
-    int const modTankShapeVertCylinder(1);  // tank shape is a vertical cylinder
-    int const modTankShapeHorizCylinder(2); // tank shape is a horizontal cylinder
-    int const modTankShapeOther(3);         // tank shape has an arbitrary perimeter shape
-
-    int const modPriorityMasterSlave(1);  // water heater only, master-slave priority control of heater elements
-    int const modPrioritySimultaneous(2); // water heater only, simultaneous control of heater elements
-
-    int const modInletModeFixed(1);   // water heater only, inlet water always enters at the user-specified height
-    int const modInletModeSeeking(2); // water heater only, inlet water seeks out the node with the closest temperature
-
-    // reclaim heat object types for Coil:WaterHeating:Desuperheater object
-    int const modCOMPRESSORRACK_REFRIGERATEDCASE(1); // reclaim heating source is refrigerated case compressor rack
-    int const modCOIL_DX_COOLING(2);                 // reclaim heating source is DX cooling coil
-    int const modCOIL_DX_MULTISPEED(3);              // reclaim heating source is DX multispeed coil
-    int const modCOIL_DX_MULTIMODE(4);               // reclaim heating source is DX multimode coil
-    int const modCONDENSER_REFRIGERATION(5);         // reclaim heating source is detailed refrigeration system condenser
-    int const modCOIL_DX_VARIABLE_COOLING(6);        // reclaim heating source is Variable Speed DX cooling coil
-    int const modCOIL_AIR_WATER_HEATPUMP_EQ(7);      // reclaim heating source is Water to air heat pump cooling coil
-
-    int const modUseSide(101);    // Indicates Use side of water heater
-    int const modSourceSide(102); // Indicates Source side of water heater
-
-    int const modSizeNotSet(200);
-    int const modSizePeakDraw(201);
-    int const modSizeResidentialMin(202);
-    int const modSizePerPerson(203);
-    int const modSizePerFloorArea(204);
-    int const modSizePerUnit(205);
-    int const modSizePerSolarColArea(206);
-
-    int const modSourceSideStorageTank(600);
-    int const modSourceSideIndirectHeatPrimarySetpoint(601);
-    int const modSourceSideIndirectHeatAltSetpoint(602);
 
     int modWaterIndex(1);
 
@@ -596,8 +553,8 @@ namespace WaterThermalTanks {
         } else if (WaterThermalTank(WaterHeaterNum).HeatPumpNum > 0) {
             //   Only HPWHs with inlet air from outdoors or scheduled HPWHs (not connected to a plant loop) are simulated here.
             if (HPWaterHeater(WaterThermalTank(WaterHeaterNum).HeatPumpNum).StandAlone &&
-                (HPWaterHeater(WaterThermalTank(WaterHeaterNum).HeatPumpNum).InletAirConfiguration == modAmbientTempOutsideAir ||
-                 HPWaterHeater(WaterThermalTank(WaterHeaterNum).HeatPumpNum).InletAirConfiguration == modAmbientTempSchedule)) {
+                (HPWaterHeater(WaterThermalTank(WaterHeaterNum).HeatPumpNum).InletAirConfiguration == AmbientTemp::OutsideAir ||
+                 HPWaterHeater(WaterThermalTank(WaterHeaterNum).HeatPumpNum).InletAirConfiguration == AmbientTemp::Schedule)) {
                 bool LocalRunFlag = true;
                 bool LocalInitLoopEquip = false;
                 SimWaterThermalTank(HPWaterHeater(WaterThermalTank(WaterHeaterNum).HeatPumpNum).TypeNum,
@@ -972,10 +929,9 @@ namespace WaterThermalTanks {
                                                                         DataIPShortCuts::cCurrentModuleObject,                                 // Object Type
                                                                         WaterHeaterDesuperheater(DesuperheaterNum).Name,      // Object Name
                                                                         DataIPShortCuts::cAlphaFieldNames(4));                                 // Field Name
-                            Real64 HEffFTemp = 0.0;
                             if (!ErrorsFound) {
                                 if (WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp > 0) {
-                                    HEffFTemp = min(1.0,
+                                    Real64 HEffFTemp = min(1.0,
                                                     max(0.0,
                                                         CurveManager::CurveValue(WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp,
                                                                    WaterHeaterDesuperheater(DesuperheaterNum).RatedInletWaterTemp,
@@ -1032,7 +988,7 @@ namespace WaterThermalTanks {
                     WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceType = DataIPShortCuts::cAlphaArgs(9);
                     WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName = DataIPShortCuts::cAlphaArgs(10);
                     if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Refrigeration:CompressorRack")) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = modCOMPRESSORRACK_REFRIGERATEDCASE;
+                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::CompressorRackRefrigeratedCase;
                         for (int RackNum = 1; RackNum <= DataHeatBalance::NumRefrigeratedRacks; ++RackNum) {
                             if (!UtilityRoutines::SameString(DataHeatBalance::HeatReclaimRefrigeratedRack(RackNum).Name, DataIPShortCuts::cAlphaArgs(10))) continue;
                             WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = RackNum;
@@ -1042,7 +998,7 @@ namespace WaterThermalTanks {
                     } else if ((UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Refrigeration:Condenser:AirCooled")) ||
                                (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Refrigeration:Condenser:EvaporativeCooled")) ||
                                (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Refrigeration:Condenser:WaterCooled"))) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = modCONDENSER_REFRIGERATION;
+                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::CondenserRefrigeration;
                         for (int CondNum = 1; CondNum <= DataHeatBalance::NumRefrigCondensers; ++CondNum) {
                             if (!UtilityRoutines::SameString(DataHeatBalance::HeatReclaimRefrigCondenser(CondNum).Name, DataIPShortCuts::cAlphaArgs(10))) continue;
                             WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = CondNum;
@@ -1050,23 +1006,23 @@ namespace WaterThermalTanks {
                             break;
                         }
                     } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:DX:SingleSpeed")) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = modCOIL_DX_COOLING;
+                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::DXCooling;
                         DXCoils::GetDXCoilIndex(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName, WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
                         if (allocated(DataHeatBalance::HeatReclaimDXCoil)) WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
                     } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:DX:TwoSpeed") || UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:DX:MultiSpeed")) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = modCOIL_DX_MULTISPEED;
+                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::DXMultiSpeed;
                         DXCoils::GetDXCoilIndex(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName, WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
                         if (allocated(DataHeatBalance::HeatReclaimDXCoil)) WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
                     } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = modCOIL_DX_MULTIMODE;
+                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::DXMultiMode;
                         DXCoils::GetDXCoilIndex(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName, WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
                         if (allocated(DataHeatBalance::HeatReclaimDXCoil)) WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
                     } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:DX:VariableSpeed")) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = modCOIL_DX_VARIABLE_COOLING;
+                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::DXVariableCooling;
                         WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(DataIPShortCuts::cAlphaArgs(9), DataIPShortCuts::cAlphaArgs(10), errFlag);
                         if (allocated(DataHeatBalance::HeatReclaimVS_DXCoil)) WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
                     } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:WaterToAirHeatPump:EquationFit")) {
-                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = modCOIL_AIR_WATER_HEATPUMP_EQ;
+                        WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObj::AirWaterHeatPumpEQ;
                         WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = WaterToAirHeatPumpSimple::GetCoilIndex(DataIPShortCuts::cAlphaArgs(9), DataIPShortCuts::cAlphaArgs(10), errFlag);
                         if (allocated(DataHeatBalance::HeatReclaimSimple_WAHPCoil)) {
                             DataHeatBalance::HeatReclaimHPCoilData &HeatReclaim = DataHeatBalance::HeatReclaimSimple_WAHPCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
@@ -1099,7 +1055,7 @@ namespace WaterThermalTanks {
                     }
 
                     // Now have source type, so set limits on heat recovery efficiency
-                    if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == modCONDENSER_REFRIGERATION) {
+                    if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::CondenserRefrigeration) {
                         if (DataIPShortCuts::lNumericFieldBlanks(2)) {
                             WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = 0.8;
                         } else {
@@ -1363,7 +1319,7 @@ namespace WaterThermalTanks {
                         auto const SELECT_CASE_var(hpwhAlpha[6 + nAlphaOffset]);
 
                         if (SELECT_CASE_var == "SCHEDULE") {
-                            HPWH.InletAirConfiguration = modAmbientTempSchedule;
+                            HPWH.InletAirConfiguration = AmbientTemp::Schedule;
 
                             // Inlet Air Temperature Schedule
                             if (!hpwhAlphaBlank[11 + nAlphaOffset]) {
@@ -1401,7 +1357,7 @@ namespace WaterThermalTanks {
                             }
 
                         } else if (SELECT_CASE_var == "ZONEAIRONLY") {
-                            HPWH.InletAirConfiguration = modAmbientTempZone;
+                            HPWH.InletAirConfiguration = AmbientTemp::TempZone;
 
                             // Inlet Air Zone
                             if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
@@ -1418,10 +1374,10 @@ namespace WaterThermalTanks {
                             }
 
                         } else if (SELECT_CASE_var == "OUTDOORAIRONLY") {
-                            HPWH.InletAirConfiguration = modAmbientTempOutsideAir;
+                            HPWH.InletAirConfiguration = AmbientTemp::OutsideAir;
 
                         } else if (SELECT_CASE_var == "ZONEANDOUTDOORAIR") {
-                            HPWH.InletAirConfiguration = modAmbientTempZoneAndOA;
+                            HPWH.InletAirConfiguration = AmbientTemp::ZoneAndOA;
 
                             // Inlet Air Zone
                             if (!hpwhAlphaBlank[13 + nAlphaOffset]) {
@@ -1599,7 +1555,7 @@ namespace WaterThermalTanks {
                     {
                         auto const SELECT_CASE_var(hpwhAlpha[20 + nAlphaOffset]);
                         if (SELECT_CASE_var == "SCHEDULE") {
-                            HPWH.CrankcaseTempIndicator = modCrankcaseTempSchedule;
+                            HPWH.CrankcaseTempIndicator = CrankTemp::Schedule;
                             if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
                                 // Compressor Ambient Temperature Schedule
                                 HPWH.CrankcaseTempSchedule = ScheduleManager::GetScheduleIndex(hpwhAlpha[21 + nAlphaOffset]);
@@ -1615,8 +1571,8 @@ namespace WaterThermalTanks {
                             }
 
                         } else if (SELECT_CASE_var == "ZONE") {
-                            HPWH.CrankcaseTempIndicator = modCrankcaseTempZone;
-                            if (HPWH.InletAirConfiguration == modAmbientTempOutsideAir || HPWH.InletAirConfiguration == modAmbientTempSchedule) {
+                            HPWH.CrankcaseTempIndicator = CrankTemp::Zone;
+                            if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir || HPWH.InletAirConfiguration == AmbientTemp::Schedule) {
                                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name +
                                                 "\":  Inlet Air Configuration must be Zone Air Only or Zone And");
                                 ShowContinueError(" Outdoor Air when compressor location equals ZONE.");
@@ -1629,7 +1585,7 @@ namespace WaterThermalTanks {
                                                  hpwhAlpha[20 + nAlphaOffset] + "\".");
                             }
                         } else if (SELECT_CASE_var == "OUTDOORS") {
-                            HPWH.CrankcaseTempIndicator = modCrankcaseTempExterior;
+                            HPWH.CrankcaseTempIndicator = CrankTemp::Exterior;
                             if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
                                 ShowWarningError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + hpwhAlphaFieldNames[21 + nAlphaOffset] +
                                                  " was provided but will not be used based on " + hpwhAlphaFieldNames[21 + nAlphaOffset] + "=\"" +
@@ -1772,15 +1728,15 @@ namespace WaterThermalTanks {
 
                     // Parasitic Heat Rejection Location
                     if (UtilityRoutines::SameString(hpwhAlpha[25 + nAlphaOffset], "Zone")) {
-                        HPWH.ParasiticTempIndicator = modAmbientTempZone;
-                        if (HPWH.InletAirConfiguration == modAmbientTempOutsideAir || HPWH.InletAirConfiguration == modAmbientTempSchedule) {
+                        HPWH.ParasiticTempIndicator = AmbientTemp::TempZone;
+                        if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir || HPWH.InletAirConfiguration == AmbientTemp::Schedule) {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\",");
                             ShowContinueError(hpwhAlphaFieldNames[25 + nAlphaOffset] + " must be ZoneAirOnly or ZoneAndOutdoorAir");
                             ShowContinueError(" when parasitic heat rejection location equals Zone.");
                             ErrorsFound = true;
                         }
                     } else if (UtilityRoutines::SameString(hpwhAlpha[25 + nAlphaOffset], "Outdoors")) {
-                        HPWH.ParasiticTempIndicator = modAmbientTempOutsideAir;
+                        HPWH.ParasiticTempIndicator = AmbientTemp::OutsideAir;
                     } else {
                         ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
                         ShowContinueError(" parasitic heat rejection location must be either Zone or Outdoors.");
@@ -1791,7 +1747,7 @@ namespace WaterThermalTanks {
                     // get mixer/splitter nodes only when Inlet Air Configuration is ZoneAndOutdoorAir
                     if (!hpwhAlphaBlank[26 + nAlphaOffset]) {
                         // For the inlet air mixer node, NodeConnectionType is outlet from the HPWH inlet air node
-                        if (HPWH.InletAirConfiguration == modAmbientTempZoneAndOA) {
+                        if (HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
                             HPWH.InletAirMixerNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[26 + nAlphaOffset],
                                                                        ErrorsFound,
                                                                        DataIPShortCuts::cCurrentModuleObject + " inlet air mixer",
@@ -1805,7 +1761,7 @@ namespace WaterThermalTanks {
                             ShowContinueError("Inlet air mixer node name specified but only required when Inlet Air Configuration is selected as "
                                               "Zone and OutdoorAir. Node name disregarded and simulation continues.");
                         }
-                    } else if (hpwhAlphaBlank[26 + nAlphaOffset] && HPWH.InletAirConfiguration == modAmbientTempZoneAndOA) {
+                    } else if (hpwhAlphaBlank[26 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
                         ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
                         ShowContinueError("Inlet air mixer node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir.");
                         ErrorsFound = true;
@@ -1814,7 +1770,7 @@ namespace WaterThermalTanks {
                     // Outlet Air Splitter Node
                     if (!hpwhAlphaBlank[27 + nAlphaOffset]) {
                         //  For the outlet air splitter node, NodeConnectionType is inlet to the HPWH outlet air node
-                        if (HPWH.InletAirConfiguration == modAmbientTempZoneAndOA) {
+                        if (HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
                             HPWH.OutletAirSplitterNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[27 + nAlphaOffset],
                                                                            ErrorsFound,
                                                                            DataIPShortCuts::cCurrentModuleObject + "-OUTLET AIR SPLITTER",
@@ -1828,7 +1784,7 @@ namespace WaterThermalTanks {
                             ShowContinueError("Outlet air splitter node name specified but only required when Inlet Air Configuration is selected as "
                                               "ZoneAndOutdoorAir. Node name disregarded and simulation continues.");
                         }
-                    } else if (hpwhAlphaBlank[27 + nAlphaOffset] && HPWH.InletAirConfiguration == modAmbientTempZoneAndOA) {
+                    } else if (hpwhAlphaBlank[27 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
                         ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
                         ShowContinueError("Outlet air splitter node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir.");
                         ErrorsFound = true;
@@ -1884,7 +1840,7 @@ namespace WaterThermalTanks {
 
                     } else {
                         // when mixer/splitter nodes are NOT used the HPWH's inlet/outlet nodes are set up as DataLoopNode::ObjectIsParent
-                        if (HPWH.InletAirConfiguration == modAmbientTempSchedule) {
+                        if (HPWH.InletAirConfiguration == AmbientTemp::Schedule) {
                             // for scheduled HPWH's the inlet node is not on any branch or parent object, make it an outlet node
                             // to avoid node connection errors
                             HPWH.HeatPumpAirInletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[7 + nAlphaOffset],
@@ -1906,7 +1862,7 @@ namespace WaterThermalTanks {
                                                                            DataLoopNode::ObjectIsParent);
 
                         } else { // HPWH is connected to a zone with no mixer/splitter nodes
-                            if (HPWH.InletAirConfiguration == modAmbientTempZone) {
+                            if (HPWH.InletAirConfiguration == AmbientTemp::TempZone) {
                                 HPWH.HeatPumpAirInletNode = NodeInputManager::GetOnlySingleNode(hpwhAlpha[7 + nAlphaOffset],
                                                                               ErrorsFound,
                                                                               DataIPShortCuts::cCurrentModuleObject,
@@ -1954,7 +1910,7 @@ namespace WaterThermalTanks {
                         }
                     }
                     // check that required node names are present
-                    if (HPWH.InletAirConfiguration == modAmbientTempSchedule || HPWH.InletAirConfiguration == modAmbientTempZone) {
+                    if (HPWH.InletAirConfiguration == AmbientTemp::Schedule || HPWH.InletAirConfiguration == AmbientTemp::TempZone) {
                         if (HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0) {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
                             ShowContinueError("When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
@@ -1962,7 +1918,7 @@ namespace WaterThermalTanks {
                                               " must be specified.");
                             ErrorsFound = true;
                         }
-                    } else if (HPWH.InletAirConfiguration == modAmbientTempOutsideAir) {
+                    } else if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir) {
                         if (HPWH.OutsideAirNode == 0 || HPWH.ExhaustAirNode == 0) {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
                             ShowContinueError("When " + hpwhAlphaFieldNames[6 + nAlphaOffset] + "=\"" + hpwhAlpha[6 + nAlphaOffset] + "\".");
@@ -1970,7 +1926,7 @@ namespace WaterThermalTanks {
                                               " must be specified.");
                             ErrorsFound = true;
                         }
-                    } else if (HPWH.InletAirMixerNode > 0 && HPWH.OutletAirSplitterNode > 0 && HPWH.InletAirConfiguration == modAmbientTempZoneAndOA) {
+                    } else if (HPWH.InletAirMixerNode > 0 && HPWH.OutletAirSplitterNode > 0 && HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
                         if (HPWH.HeatPumpAirInletNode == 0 || HPWH.HeatPumpAirOutletNode == 0 || HPWH.OutsideAirNode == 0 ||
                             HPWH.ExhaustAirNode == 0) {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\":");
@@ -1989,7 +1945,7 @@ namespace WaterThermalTanks {
 
                     // check that the HPWH inlet and outlet nodes are in the same zone (ZoneHVAC:EquipmentConnections) when
                     // Inlet Air Configuration is Zone Air Only or Zone and Outdoor Air
-                    if ((HPWH.InletAirConfiguration == modAmbientTempZone || HPWH.InletAirConfiguration == modAmbientTempZoneAndOA) &&
+                    if ((HPWH.InletAirConfiguration == AmbientTemp::TempZone || HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) &&
                         HPWH.AmbientTempZone > 0) {
                         if (!DataZoneEquipment::ZoneEquipInputsFilled) {
                             DataZoneEquipment::GetZoneEquipmentData();
@@ -2038,7 +1994,7 @@ namespace WaterThermalTanks {
                     }
 
                     // only get the inlet air mixer schedule if the inlet air configuration is zone and outdoor air
-                    if (!hpwhAlphaBlank[28 + nAlphaOffset] && HPWH.InletAirConfiguration == modAmbientTempZoneAndOA) {
+                    if (!hpwhAlphaBlank[28 + nAlphaOffset] && HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
                         HPWH.InletAirMixerSchPtr = ScheduleManager::GetScheduleIndex(hpwhAlpha[28 + nAlphaOffset]);
                         if (HPWH.InletAirMixerSchPtr == 0) {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found");
@@ -2063,7 +2019,7 @@ namespace WaterThermalTanks {
                         if (HPWH.OutletAirSplitterNode != 0) {
                             HPWH.FanOutletNode = HPWH.OutletAirSplitterNode;
                         } else {
-                            if (HPWH.InletAirConfiguration == modAmbientTempOutsideAir) {
+                            if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir) {
                                 HPWH.FanOutletNode = HPWH.ExhaustAirNode;
                             } else {
                                 HPWH.FanOutletNode = HPWH.HeatPumpAirOutletNode;
@@ -2120,7 +2076,7 @@ namespace WaterThermalTanks {
                     if (HPWH.InletAirMixerNode != 0) {
                         HPWHFanInletNodeNum = HPWH.InletAirMixerNode;
                     } else {
-                        if (HPWH.InletAirConfiguration == modAmbientTempOutsideAir) {
+                        if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir) {
                             HPWHFanInletNodeNum = HPWH.OutsideAirNode;
                         } else {
                             HPWHFanInletNodeNum = HPWH.HeatPumpAirInletNode;
@@ -2168,7 +2124,7 @@ namespace WaterThermalTanks {
                         if (HPWH.OutletAirSplitterNode != 0) {
                             HPWHCoilOutletNodeNum = HPWH.OutletAirSplitterNode;
                         } else {
-                            if (HPWH.InletAirConfiguration == modAmbientTempOutsideAir) {
+                            if (HPWH.InletAirConfiguration == AmbientTemp::OutsideAir) {
                                 HPWHCoilOutletNodeNum = HPWH.ExhaustAirNode;
                             } else {
                                 HPWHCoilOutletNodeNum = HPWH.HeatPumpAirOutletNode;
@@ -2591,7 +2547,7 @@ namespace WaterThermalTanks {
                     {
                         auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(8));
                         if (SELECT_CASE_var == "SCHEDULE") {
-                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = modAmbientTempSchedule;
+                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = AmbientTemp::Schedule;
                             WaterThermalTank(WaterThermalTankNum).AmbientTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(9));
                             if (WaterThermalTank(WaterThermalTankNum).AmbientTempSchedule == 0) {
                                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
@@ -2600,7 +2556,7 @@ namespace WaterThermalTanks {
                             }
 
                         } else if (SELECT_CASE_var == "ZONE") {
-                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = modAmbientTempZone;
+                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = AmbientTemp::TempZone;
                             WaterThermalTank(WaterThermalTankNum).AmbientTempZone = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(10), DataHeatBalance::Zone);
                             if (WaterThermalTank(WaterThermalTankNum).AmbientTempZone == 0) {
                                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
@@ -2609,7 +2565,7 @@ namespace WaterThermalTanks {
                             }
 
                         } else if (SELECT_CASE_var == "OUTDOORS") {
-                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = modAmbientTempOutsideAir;
+                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = AmbientTemp::OutsideAir;
                             WaterThermalTank(WaterThermalTankNum).AmbientTempOutsideAirNode =
                                 NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(11),
                                                   ErrorsFound,
@@ -2780,18 +2736,18 @@ namespace WaterThermalTanks {
                         {
                             auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(18));
                             if (SELECT_CASE_var == "STORAGETANK") {
-                                WaterThermalTank(WaterThermalTankNum).SourceSideControlMode = modSourceSideStorageTank;
+                                WaterThermalTank(WaterThermalTankNum).SourceSideControlMode = SourceSide::StorageTank;
                             } else if (SELECT_CASE_var == "INDIRECTHEATPRIMARYSETPOINT") {
-                                WaterThermalTank(WaterThermalTankNum).SourceSideControlMode = modSourceSideIndirectHeatPrimarySetpoint;
+                                WaterThermalTank(WaterThermalTankNum).SourceSideControlMode = SourceSide::IndirectHeatPrimarySetpoint;
                             } else if (SELECT_CASE_var == "INDIRECTHEATALTERNATESETPOINT") {
-                                WaterThermalTank(WaterThermalTankNum).SourceSideControlMode = modSourceSideIndirectHeatAltSetpoint;
+                                WaterThermalTank(WaterThermalTankNum).SourceSideControlMode = SourceSide::IndirectHeatAltSetpoint;
                             } else {
                                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ":  Invalid Control Mode entered=" + DataIPShortCuts::cAlphaArgs(18));
                                 ErrorsFound = true;
                             }
                         }
                     } else {
-                        WaterThermalTank(WaterThermalTankNum).SourceSideControlMode = modSourceSideIndirectHeatPrimarySetpoint;
+                        WaterThermalTank(WaterThermalTankNum).SourceSideControlMode = SourceSide::IndirectHeatPrimarySetpoint;
                     }
 
                     if (!DataIPShortCuts::lAlphaFieldBlanks(19)) {
@@ -2857,13 +2813,13 @@ namespace WaterThermalTanks {
                     {
                         auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(3));
                         if (SELECT_CASE_var == "VERTICALCYLINDER") {
-                            WaterThermalTank(WaterThermalTankNum).Shape = modTankShapeVertCylinder;
+                            WaterThermalTank(WaterThermalTankNum).Shape = TankShape::VertCylinder;
 
                         } else if (SELECT_CASE_var == "HORIZONTALCYLINDER") {
-                            WaterThermalTank(WaterThermalTankNum).Shape = modTankShapeHorizCylinder;
+                            WaterThermalTank(WaterThermalTankNum).Shape = TankShape::HorizCylinder;
 
                         } else if (SELECT_CASE_var == "OTHER") {
-                            WaterThermalTank(WaterThermalTankNum).Shape = modTankShapeOther;
+                            WaterThermalTank(WaterThermalTankNum).Shape = TankShape::Other;
                             if (DataIPShortCuts::rNumericArgs(3) > 0.0) {
                                 WaterThermalTank(WaterThermalTankNum).Perimeter = DataIPShortCuts::rNumericArgs(3);
                             } else {
@@ -2874,7 +2830,7 @@ namespace WaterThermalTanks {
 
                         } else {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ":  Invalid Tank Shape entered=" + DataIPShortCuts::cAlphaArgs(3));
-                            WaterThermalTank(WaterThermalTankNum).Shape = modTankShapeVertCylinder;
+                            WaterThermalTank(WaterThermalTankNum).Shape = TankShape::VertCylinder;
                             ErrorsFound = true;
                         }
                     }
@@ -2890,10 +2846,10 @@ namespace WaterThermalTanks {
                     {
                         auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(4));
                         if (SELECT_CASE_var == "MASTERSLAVE") {
-                            WaterThermalTank(WaterThermalTankNum).ControlType = modPriorityMasterSlave;
+                            WaterThermalTank(WaterThermalTankNum).ControlType = Priority::MasterSlave;
 
                         } else if (SELECT_CASE_var == "SIMULTANEOUS") {
-                            WaterThermalTank(WaterThermalTankNum).ControlType = modPrioritySimultaneous;
+                            WaterThermalTank(WaterThermalTankNum).ControlType = Priority::Simultaneous;
 
                         } else {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
@@ -2928,7 +2884,7 @@ namespace WaterThermalTanks {
 
                     // adjust tank height used in these calculations for testing heater height
                     Real64 tankHeightForTesting = 0.0;
-                    if (WaterThermalTank(WaterThermalTankNum).Shape == modTankShapeHorizCylinder) {
+                    if (WaterThermalTank(WaterThermalTankNum).Shape == TankShape::HorizCylinder) {
                         tankHeightForTesting =
                             2.0 *
                             sqrt((WaterThermalTank(WaterThermalTankNum).Volume / WaterThermalTank(WaterThermalTankNum).Height) / DataGlobals::Pi);
@@ -3149,7 +3105,7 @@ namespace WaterThermalTanks {
                     {
                         auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(10));
                         if (SELECT_CASE_var == "SCHEDULE") {
-                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = modAmbientTempSchedule;
+                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = AmbientTemp::Schedule;
                             WaterThermalTank(WaterThermalTankNum).AmbientTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(11));
                             if (WaterThermalTank(WaterThermalTankNum).AmbientTempSchedule == 0) {
                                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
@@ -3158,7 +3114,7 @@ namespace WaterThermalTanks {
                             }
 
                         } else if (SELECT_CASE_var == "ZONE") {
-                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = modAmbientTempZone;
+                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = AmbientTemp::TempZone;
                             WaterThermalTank(WaterThermalTankNum).AmbientTempZone = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(12), DataHeatBalance::Zone);
                             if (WaterThermalTank(WaterThermalTankNum).AmbientTempZone == 0) {
                                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
@@ -3167,7 +3123,7 @@ namespace WaterThermalTanks {
                             }
 
                         } else if (SELECT_CASE_var == "OUTDOORS") {
-                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = modAmbientTempOutsideAir;
+                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = AmbientTemp::OutsideAir;
                             WaterThermalTank(WaterThermalTankNum).AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(13),
                                                                                                                 ErrorsFound,
                                                                                                                 DataIPShortCuts::cCurrentModuleObject,
@@ -3397,10 +3353,10 @@ namespace WaterThermalTanks {
                     {
                         auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(20));
                         if (SELECT_CASE_var == "FIXED") {
-                            WaterThermalTank(WaterThermalTankNum).InletMode = modInletModeFixed;
+                            WaterThermalTank(WaterThermalTankNum).InletMode = InletMode::Fixed;
 
                         } else if (SELECT_CASE_var == "SEEKING") {
-                            WaterThermalTank(WaterThermalTankNum).InletMode = modInletModeSeeking;
+                            WaterThermalTank(WaterThermalTankNum).InletMode = InletMode::Seeking;
                         }
                     }
 
@@ -3429,18 +3385,18 @@ namespace WaterThermalTanks {
                         {
                             auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(21));
                             if (SELECT_CASE_var == "STORAGETANK") {
-                                WaterThermalTank(WaterThermalTankNum).SourceSideControlMode = modSourceSideStorageTank;
+                                WaterThermalTank(WaterThermalTankNum).SourceSideControlMode = SourceSide::StorageTank;
                             } else if (SELECT_CASE_var == "INDIRECTHEATPRIMARYSETPOINT") {
-                                WaterThermalTank(WaterThermalTankNum).SourceSideControlMode = modSourceSideIndirectHeatPrimarySetpoint;
+                                WaterThermalTank(WaterThermalTankNum).SourceSideControlMode = SourceSide::IndirectHeatPrimarySetpoint;
                             } else if (SELECT_CASE_var == "INDIRECTHEATALTERNATESETPOINT") {
-                                WaterThermalTank(WaterThermalTankNum).SourceSideControlMode = modSourceSideIndirectHeatAltSetpoint;
+                                WaterThermalTank(WaterThermalTankNum).SourceSideControlMode = SourceSide::IndirectHeatAltSetpoint;
                             } else {
                                 ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ":  Invalid Control Mode entered=" + DataIPShortCuts::cAlphaArgs(21));
                                 ErrorsFound = true;
                             }
                         }
                     } else {
-                        WaterThermalTank(WaterThermalTankNum).SourceSideControlMode = modSourceSideIndirectHeatPrimarySetpoint;
+                        WaterThermalTank(WaterThermalTankNum).SourceSideControlMode = SourceSide::IndirectHeatPrimarySetpoint;
                     }
 
                     if (!DataIPShortCuts::lAlphaFieldBlanks(22)) {
@@ -3539,7 +3495,7 @@ namespace WaterThermalTanks {
                     {
                         auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(3));
                         if (SELECT_CASE_var == "SCHEDULE") {
-                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = modAmbientTempSchedule;
+                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = AmbientTemp::Schedule;
                             WaterThermalTank(WaterThermalTankNum).AmbientTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(4));
                             if (WaterThermalTank(WaterThermalTankNum).AmbientTempSchedule == 0) {
                                 ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(4) + " = " + DataIPShortCuts::cAlphaArgs(4));
@@ -3549,7 +3505,7 @@ namespace WaterThermalTanks {
                             }
 
                         } else if (SELECT_CASE_var == "ZONE") {
-                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = modAmbientTempZone;
+                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = AmbientTemp::TempZone;
                             WaterThermalTank(WaterThermalTankNum).AmbientTempZone = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(5), DataHeatBalance::Zone);
                             if (WaterThermalTank(WaterThermalTankNum).AmbientTempZone == 0) {
                                 ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + DataIPShortCuts::cAlphaArgs(5));
@@ -3559,7 +3515,7 @@ namespace WaterThermalTanks {
                             }
 
                         } else if (SELECT_CASE_var == "OUTDOORS") {
-                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = modAmbientTempOutsideAir;
+                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = AmbientTemp::OutsideAir;
                             WaterThermalTank(WaterThermalTankNum).AmbientTempOutsideAirNode =
                                 NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
                                                   ErrorsFound,
@@ -3766,13 +3722,13 @@ namespace WaterThermalTanks {
                     {
                         auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(2));
                         if (SELECT_CASE_var == "VERTICALCYLINDER") {
-                            WaterThermalTank(WaterThermalTankNum).Shape = modTankShapeVertCylinder;
+                            WaterThermalTank(WaterThermalTankNum).Shape = TankShape::VertCylinder;
 
                         } else if (SELECT_CASE_var == "HORIZONTALCYLINDER") {
-                            WaterThermalTank(WaterThermalTankNum).Shape = modTankShapeHorizCylinder;
+                            WaterThermalTank(WaterThermalTankNum).Shape = TankShape::HorizCylinder;
 
                         } else if (SELECT_CASE_var == "OTHER") {
-                            WaterThermalTank(WaterThermalTankNum).Shape = modTankShapeOther;
+                            WaterThermalTank(WaterThermalTankNum).Shape = TankShape::Other;
                             if (DataIPShortCuts::rNumericArgs(3) > 0.0) {
                                 WaterThermalTank(WaterThermalTankNum).Perimeter = DataIPShortCuts::rNumericArgs(3);
                             } else {
@@ -3783,7 +3739,7 @@ namespace WaterThermalTanks {
 
                         } else {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ":  Invalid Tank Shape entered=" + DataIPShortCuts::cAlphaArgs(2));
-                            WaterThermalTank(WaterThermalTankNum).Shape = modTankShapeVertCylinder;
+                            WaterThermalTank(WaterThermalTankNum).Shape = TankShape::VertCylinder;
                             ErrorsFound = true;
                         }
                     }
@@ -3834,7 +3790,7 @@ namespace WaterThermalTanks {
                     {
                         auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(4));
                         if (SELECT_CASE_var == "SCHEDULE") {
-                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = modAmbientTempSchedule;
+                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = AmbientTemp::Schedule;
                             WaterThermalTank(WaterThermalTankNum).AmbientTempSchedule = ScheduleManager::GetScheduleIndex(DataIPShortCuts::cAlphaArgs(5));
                             if (WaterThermalTank(WaterThermalTankNum).AmbientTempSchedule == 0) {
                                 ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(5) + " = " + DataIPShortCuts::cAlphaArgs(5));
@@ -3844,7 +3800,7 @@ namespace WaterThermalTanks {
                             }
 
                         } else if (SELECT_CASE_var == "ZONE") {
-                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = modAmbientTempZone;
+                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = AmbientTemp::TempZone;
                             WaterThermalTank(WaterThermalTankNum).AmbientTempZone = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6), DataHeatBalance::Zone);
                             if (WaterThermalTank(WaterThermalTankNum).AmbientTempZone == 0) {
                                 ShowSevereError("Invalid, " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + DataIPShortCuts::cAlphaArgs(6));
@@ -3855,7 +3811,7 @@ namespace WaterThermalTanks {
                             WaterThermalTank(WaterThermalTankNum).OffCycLossFracToZone = 1.0;
 
                         } else if (SELECT_CASE_var == "OUTDOORS") {
-                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = modAmbientTempOutsideAir;
+                            WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator = AmbientTemp::OutsideAir;
                             WaterThermalTank(WaterThermalTankNum).AmbientTempOutsideAirNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(7),
                                                                                                                 ErrorsFound,
                                                                                                                 DataIPShortCuts::cCurrentModuleObject,
@@ -4046,10 +4002,10 @@ namespace WaterThermalTanks {
                     {
                         auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(14));
                         if (SELECT_CASE_var == "FIXED") {
-                            WaterThermalTank(WaterThermalTankNum).InletMode = modInletModeFixed;
+                            WaterThermalTank(WaterThermalTankNum).InletMode = InletMode::Fixed;
 
                         } else if (SELECT_CASE_var == "SEEKING") {
-                            WaterThermalTank(WaterThermalTankNum).InletMode = modInletModeSeeking;
+                            WaterThermalTank(WaterThermalTankNum).InletMode = InletMode::Seeking;
                         }
                     }
 
@@ -4335,7 +4291,7 @@ namespace WaterThermalTanks {
                         }
 
                         // Verify tank name is in a zone equipment list if HPWH Inlet Air Configuration is Zone Air Only or Zone and Outdoor Air
-                        if (HPWH.InletAirConfiguration == modAmbientTempZone || HPWH.InletAirConfiguration == modAmbientTempZoneAndOA) {
+                        if (HPWH.InletAirConfiguration == AmbientTemp::TempZone || HPWH.InletAirConfiguration == AmbientTemp::ZoneAndOA) {
                             if (allocated(DataZoneEquipment::ZoneEquipConfig) && allocated(DataZoneEquipment::ZoneEquipList)) {
                                 bool FoundTankInList = false;
                                 bool TankNotLowestPriority = false;
@@ -4399,7 +4355,7 @@ namespace WaterThermalTanks {
 
                             // Nodal heat distribution fraction for stratified tank wrapped condensers
                             if (HPWH.TypeNum == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
-                                if (Tank.Shape == modTankShapeHorizCylinder) {
+                                if (Tank.Shape == TankShape::HorizCylinder) {
                                     ShowWarningError(DataIPShortCuts::cCurrentModuleObject + " = " + HPWH.Name + ":");
                                     ShowContinueError("A wrapped condenser HPWH model should not be used with a horizontal stratified tank.");
                                     ShowContinueError(
@@ -4457,10 +4413,10 @@ namespace WaterThermalTanks {
 
                             // Get the vertical tank height depending on the type of tank
                             Real64 TankHeight;
-                            if (Tank.Shape == modTankShapeVertCylinder || Tank.Shape == modTankShapeOther) {
+                            if (Tank.Shape == TankShape::VertCylinder || Tank.Shape == TankShape::Other) {
                                 TankHeight = Tank.Height;
                             } else {
-                                assert(Tank.Shape == modTankShapeHorizCylinder);
+                                assert(Tank.Shape == TankShape::HorizCylinder);
                                 // For horizontal cylinders, the tank "height" is actually the length.
                                 // We need to calculate the height.
                                 Real64 EndArea = Tank.Volume / Tank.Height;
@@ -4540,17 +4496,17 @@ namespace WaterThermalTanks {
                         // store the sizing data in "sizing" nested derived type for the correct water heater
 
                         if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "PeakDraw")) {
-                            WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = modSizePeakDraw;
+                            WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = Size::PeakDraw;
                         } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "ResidentialHUD-FHAMinimum")) {
-                            WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = modSizeResidentialMin;
+                            WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = Size::ResidentialMin;
                         } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "PerPerson")) {
-                            WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = modSizePerPerson;
+                            WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = Size::PerPerson;
                         } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "PerFloorArea")) {
-                            WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = modSizePerFloorArea;
+                            WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = Size::PerFloorArea;
                         } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "PerUnit")) {
-                            WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = modSizePerUnit;
+                            WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = Size::PerUnit;
                         } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "PerSolarCollectorArea")) {
-                            WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = modSizePerSolarColArea;
+                            WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode = Size::PerSolarColArea;
                         } else {
                             // wrong design mode entered, throw error
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " object named: " + DataIPShortCuts::cAlphaArgs(1) +
@@ -4576,9 +4532,9 @@ namespace WaterThermalTanks {
                         {
                             auto const SELECT_CASE_var(WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode);
 
-                            if (SELECT_CASE_var == modSizeNotSet) {
+                            if (SELECT_CASE_var == Size::NotSet) {
                                 // do nothing, error thrown if design mode not found
-                            } else if (SELECT_CASE_var == modSizePeakDraw) { // need to have entered a reasonable value for TankDrawTime
+                            } else if (SELECT_CASE_var == Size::PeakDraw) { // need to have entered a reasonable value for TankDrawTime
                                 if (WaterThermalTank(WaterThermalTankNum).Sizing.TankDrawTime <= 0.0) {
                                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ", named " + DataIPShortCuts::cAlphaArgs(1) +
                                                     ", design mode set to Peak Draw but needs a positive value for tank draw time");
@@ -4608,7 +4564,7 @@ namespace WaterThermalTanks {
                                     }
                                 }
 
-                            } else if (SELECT_CASE_var == modSizeResidentialMin) {
+                            } else if (SELECT_CASE_var == Size::ResidentialMin) {
                                 // it would have to have at least on bedroom and any more than 10 is crazy for this mode
                                 if (WaterThermalTank(WaterThermalTankNum).Sizing.NumberOfBedrooms < 1) {
                                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ", named " + DataIPShortCuts::cAlphaArgs(1) + ", mode needs at least one bedroom");
@@ -4619,7 +4575,7 @@ namespace WaterThermalTanks {
                                                      ", probably has too many bedrooms for the selected design mode");
                                 }
 
-                            } else if (SELECT_CASE_var == modSizePerPerson) {
+                            } else if (SELECT_CASE_var == Size::PerPerson) {
 
                                 if ((WaterThermalTank(WaterThermalTankNum).VolumeWasAutoSized) &&
                                     (WaterThermalTank(WaterThermalTankNum).Sizing.TankCapacityPerPerson <= 0.0)) {
@@ -4635,7 +4591,7 @@ namespace WaterThermalTanks {
                                     ErrorsFound = true;
                                 }
 
-                            } else if (SELECT_CASE_var == modSizePerFloorArea) {
+                            } else if (SELECT_CASE_var == Size::PerFloorArea) {
                                 if ((WaterThermalTank(WaterThermalTankNum).VolumeWasAutoSized) &&
                                     (WaterThermalTank(WaterThermalTankNum).Sizing.TankCapacityPerArea <= 0.0)) {
                                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ", named " + DataIPShortCuts::cAlphaArgs(1) +
@@ -4649,7 +4605,7 @@ namespace WaterThermalTanks {
                                     ErrorsFound = true;
                                 }
 
-                            } else if (SELECT_CASE_var == modSizePerUnit) {
+                            } else if (SELECT_CASE_var == Size::PerUnit) {
                                 if ((WaterThermalTank(WaterThermalTankNum).VolumeWasAutoSized) &&
                                     (WaterThermalTank(WaterThermalTankNum).Sizing.TankCapacityPerUnit <= 0.0)) {
                                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ", named " + DataIPShortCuts::cAlphaArgs(1) +
@@ -4674,7 +4630,7 @@ namespace WaterThermalTanks {
                                                     ", PerUnit mode needs positive value input for number of units");
                                     ErrorsFound = true;
                                 }
-                            } else if (SELECT_CASE_var == modSizePerSolarColArea) {
+                            } else if (SELECT_CASE_var == Size::PerSolarColArea) {
                                 if ((WaterThermalTank(WaterThermalTankNum).VolumeWasAutoSized) &&
                                     (WaterThermalTank(WaterThermalTankNum).Sizing.TankCapacityPerCollectorArea <= 0.0)) {
                                     ShowSevereError(
@@ -4695,19 +4651,19 @@ namespace WaterThermalTanks {
                 for (int WaterThermalTankNum = 1; WaterThermalTankNum <= NumWaterThermalTank; ++WaterThermalTankNum) {
 
                     if ((WaterThermalTank(WaterThermalTankNum).VolumeWasAutoSized) &&
-                        (WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == modSizeNotSet)) {
+                        (WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == Size::NotSet)) {
                         ShowWarningError("Water heater named " + WaterThermalTank(WaterThermalTankNum).Name +
                                          "has tank volume set to AUTOSIZE but it is missing associated WaterHeater:Sizing object");
                         ErrorsFound = true;
                     }
                     if ((WaterThermalTank(WaterThermalTankNum).MaxCapacityWasAutoSized) &&
-                        (WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == modSizeNotSet)) {
+                        (WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == Size::NotSet)) {
                         ShowWarningError("Water heater named " + WaterThermalTank(WaterThermalTankNum).Name +
                                          "has heater capacity set to AUTOSIZE but it is missing associated WaterHeater:Sizing object");
                         ErrorsFound = true;
                     }
                     if ((WaterThermalTank(WaterThermalTankNum).HeightWasAutoSized) &&
-                        (WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == modSizeNotSet)) {
+                        (WaterThermalTank(WaterThermalTankNum).Sizing.DesignMode == Size::NotSet)) {
                         ShowWarningError("Water heater named " + WaterThermalTank(WaterThermalTankNum).Name +
                                          "has tank height set to AUTOSIZE but it is missing associated WaterHeater:Sizing object");
                         ErrorsFound = true;
@@ -5541,14 +5497,14 @@ namespace WaterThermalTanks {
         // Mixing rate set to 50% of the max value for dt = 1.0
         Tank.InversionMixingRate = NodeMass * 0.5 * 1.0;
 
-        if ((Tank.Shape == modTankShapeVertCylinder) || (Tank.Shape == modTankShapeOther)) {
+        if ((Tank.Shape == TankShape::VertCylinder) || (Tank.Shape == TankShape::Other)) {
             TankHeight = Tank.Height;
             Real64 EndArea = Tank.Volume / TankHeight;
             Real64 NodeHeight = TankHeight / NumNodes;
             Real64 CondCoeff = (FluidCond + Tank.AdditionalCond) * EndArea / NodeHeight;
 
             Real64 Perimeter;
-            if (Tank.Shape == modTankShapeVertCylinder) {
+            if (Tank.Shape == TankShape::VertCylinder) {
                 Real64 Radius = std::sqrt(EndArea / DataGlobals::Pi);
                 Perimeter = 2.0 * DataGlobals::Pi * Radius;
             } else { // TankShapeOther
@@ -5672,7 +5628,7 @@ namespace WaterThermalTanks {
                 //      .AND. (Tank%MaxCapacity2 > 0.0d0)) THEN
                 Tank.HeaterNode2 = NodeNum;
 
-                if ((NodeNum == Tank.HeaterNode1) && (Tank.ControlType == modPrioritySimultaneous)) {
+                if ((NodeNum == Tank.HeaterNode1) && (Tank.ControlType == Priority::Simultaneous)) {
                     Tank.Node(NodeNum).MaxCapacity += Tank.MaxCapacity2;
                 } else {
                     Tank.Node(NodeNum).MaxCapacity = Tank.MaxCapacity2;
@@ -6141,14 +6097,14 @@ namespace WaterThermalTanks {
 
             {
                 auto const SELECT_CASE_var(WaterThermalTank(WaterThermalTankNum).AmbientTempIndicator);
-                if (SELECT_CASE_var == modAmbientTempSchedule) {
+                if (SELECT_CASE_var == AmbientTemp::Schedule) {
                     SchIndex = WaterThermalTank(WaterThermalTankNum).AmbientTempSchedule;
                     WaterThermalTank(WaterThermalTankNum).AmbientTemp = ScheduleManager::GetCurrentScheduleValue(SchIndex);
 
-                } else if (SELECT_CASE_var == modAmbientTempZone) {
+                } else if (SELECT_CASE_var == AmbientTemp::TempZone) {
                     WaterThermalTank(WaterThermalTankNum).AmbientTemp = DataHeatBalFanSys::MAT(WaterThermalTank(WaterThermalTankNum).AmbientTempZone);
 
-                } else if (SELECT_CASE_var == modAmbientTempOutsideAir) {
+                } else if (SELECT_CASE_var == AmbientTemp::OutsideAir) {
                     WaterThermalTank(WaterThermalTankNum).AmbientTemp = DataLoopNode::Node(WaterThermalTank(WaterThermalTankNum).AmbientTempOutsideAirNode).Temp;
                 }
             }
@@ -6216,7 +6172,7 @@ namespace WaterThermalTanks {
             Real64 mdotUse = PlantMassFlowRatesFunc(WaterThermalTankNum,
                                                     UseInletNode,
                                                     FirstHVACIteration,
-                                                    modUseSide,
+                                                    Side::Use,
                                                     WaterThermalTank(WaterThermalTankNum).UseSidePlantLoopSide,
                                                     WaterThermalTank(WaterThermalTankNum).UseSideSeries,
                                                     WaterThermalTank(WaterThermalTankNum).UseBranchControlType,
@@ -6254,7 +6210,7 @@ namespace WaterThermalTanks {
             Real64 mdotSource = PlantMassFlowRatesFunc(WaterThermalTankNum,
                                                        SourceInletNode,
                                                        FirstHVACIteration,
-                                                       modSourceSide,
+                                                       Side::Source,
                                                        WaterThermalTank(WaterThermalTankNum).SourceSidePlantLoopSide,
                                                        WaterThermalTank(WaterThermalTankNum).SourceSideSeries,
                                                        WaterThermalTank(WaterThermalTankNum).SourceBranchControlType,
@@ -6321,11 +6277,11 @@ namespace WaterThermalTanks {
 
             {
                 auto const SELECT_CASE_var(HPWaterHeater(HPNum).CrankcaseTempIndicator);
-                if (SELECT_CASE_var == modCrankcaseTempZone) {
+                if (SELECT_CASE_var == CrankTemp::Zone) {
                     DataHVACGlobals::HPWHCrankcaseDBTemp = DataHeatBalFanSys::MAT(HPWaterHeater(HPNum).AmbientTempZone);
-                } else if (SELECT_CASE_var == modCrankcaseTempExterior) {
+                } else if (SELECT_CASE_var == CrankTemp::Exterior) {
                     DataHVACGlobals::HPWHCrankcaseDBTemp = DataEnvironment::OutDryBulbTemp;
-                } else if (SELECT_CASE_var == modCrankcaseTempSchedule) {
+                } else if (SELECT_CASE_var == CrankTemp::Schedule) {
                     DataHVACGlobals::HPWHCrankcaseDBTemp = ScheduleManager::GetCurrentScheduleValue(HPWaterHeater(HPNum).CrankcaseTempSchedule);
                 }
             }
@@ -6343,11 +6299,11 @@ namespace WaterThermalTanks {
             Real64 HPInletRelHum;
             {
                 auto const SELECT_CASE_var(HPWaterHeater(HPNum).InletAirConfiguration);
-                if (SELECT_CASE_var == modAmbientTempZone) {
+                if (SELECT_CASE_var == AmbientTemp::TempZone) {
                     modMixerInletAirSchedule = 0.0;
                     HPInletDryBulbTemp = DataLoopNode::Node(HPAirInletNode).Temp;
                     HPInletHumRat = DataLoopNode::Node(HPAirInletNode).HumRat;
-                } else if (SELECT_CASE_var == modAmbientTempZoneAndOA) {
+                } else if (SELECT_CASE_var == AmbientTemp::ZoneAndOA) {
                     if (HPWaterHeater(HPNum).InletAirMixerSchPtr > 0) {
                         //         schedule values are checked for boundary of 0 and 1 in GetWaterThermalTankInputFlag
                         modMixerInletAirSchedule = ScheduleManager::GetCurrentScheduleValue(HPWaterHeater(HPNum).InletAirMixerSchPtr);
@@ -6357,12 +6313,12 @@ namespace WaterThermalTanks {
                     HPInletDryBulbTemp =
                             modMixerInletAirSchedule * DataLoopNode::Node(OutdoorAirNode).Temp + (1.0 - modMixerInletAirSchedule) * DataLoopNode::Node(HPAirInletNode).Temp;
                     HPInletHumRat = modMixerInletAirSchedule * DataLoopNode::Node(OutdoorAirNode).HumRat + (1.0 - modMixerInletAirSchedule) * DataLoopNode::Node(HPAirInletNode).HumRat;
-                } else if (SELECT_CASE_var == modAmbientTempOutsideAir) {
+                } else if (SELECT_CASE_var == AmbientTemp::OutsideAir) {
                     modMixerInletAirSchedule = 1.0;
                     HPInletDryBulbTemp = DataLoopNode::Node(OutdoorAirNode).Temp;
                     HPInletHumRat = DataLoopNode::Node(OutdoorAirNode).HumRat;
 
-                } else if (SELECT_CASE_var == modAmbientTempSchedule) {
+                } else if (SELECT_CASE_var == AmbientTemp::Schedule) {
                     HPInletDryBulbTemp = ScheduleManager::GetCurrentScheduleValue(HPWaterHeater(HPNum).AmbientTempSchedule);
                     HPInletRelHum = ScheduleManager::GetCurrentScheduleValue(HPWaterHeater(HPNum).AmbientRHSchedule);
                     HPInletHumRat = Psychrometrics::PsyWFnTdbRhPb(HPInletDryBulbTemp, HPInletRelHum, DataEnvironment::OutBaroPress, RoutineName);
@@ -7533,7 +7489,7 @@ namespace WaterThermalTanks {
         Real64 Qheater1;            // Heating rate of burner or electric heating element 1 (W)
         Real64 Qheater2;            // Heating rate of burner or electric heating element 2 (W)
 
-        if (this->InletMode == modInletModeFixed) CalcNodeMassFlows(WaterThermalTankNum, modInletModeFixed);
+        if (this->InletMode == InletMode::Fixed) CalcNodeMassFlows(WaterThermalTankNum, InletMode::Fixed);
 
         // Time remaining in the current DataGlobals::TimeStep (s)
         Real64 TimeRemaining = SecInTimeStep;
@@ -7561,7 +7517,7 @@ namespace WaterThermalTanks {
             bool PrevHeaterOn1 = this->HeaterOn1;
             bool PrevHeaterOn2 = this->HeaterOn2;
 
-            if (this->InletMode == modInletModeSeeking) CalcNodeMassFlows(WaterThermalTankNum, modInletModeSeeking);
+            if (this->InletMode == InletMode::Seeking) CalcNodeMassFlows(WaterThermalTankNum, InletMode::Seeking);
 
             // Heater control logic
             if (this->IsChilledWaterTank) {
@@ -7594,7 +7550,7 @@ namespace WaterThermalTanks {
 
                 // Control the second heater element (slave)
                 if (this->MaxCapacity2 > 0.0) {
-                    if ((this->ControlType == modPriorityMasterSlave) && this->HeaterOn1) {
+                    if ((this->ControlType == Priority::MasterSlave) && this->HeaterOn1) {
                         this->HeaterOn2 = false;
 
                     } else {
@@ -8099,7 +8055,7 @@ namespace WaterThermalTanks {
             e.MassFlowToLower = 0.0;
         }
 
-        if (InletMode == modInletModeSeeking) {
+        if (InletMode == InletMode::Seeking) {
             // 'Seek' the node with the temperature closest to the inlet temperature
             // Start at the user-specified inlet node and search to the user-specified outlet node
             int Step;
@@ -8275,7 +8231,7 @@ namespace WaterThermalTanks {
         // is less than water inlet temperature if the reclaim source is a refrigeration condenser
         if (WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType) {
             int SourceID = WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum;
-            if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == modCONDENSER_REFRIGERATION) {
+            if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::CondenserRefrigeration) {
                 if (DataHeatBalance::HeatReclaimRefrigCondenser(SourceID).AvailTemperature <= WaterThermalTank(WaterThermalTankNum).SourceInletTemp) {
                     WaterHeaterDesuperheater(DesuperheaterNum).Mode = modFloatMode;
                     WaterThermalTank(WaterThermalTankNum).CalcWaterThermalTank(WaterThermalTankNum);
@@ -8333,7 +8289,7 @@ namespace WaterThermalTanks {
         }
 
         // set limits on heat recovery efficiency
-        if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == modCONDENSER_REFRIGERATION) {
+        if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::CondenserRefrigeration) {
             if ((HEffFTemp * Effic) > 0.9) HEffFTemp = 0.9 / Effic;
         } else { // max is 0.3 for all other sources
             if ((HEffFTemp * Effic) > 0.3) HEffFTemp = 0.3 / Effic;
@@ -8343,23 +8299,23 @@ namespace WaterThermalTanks {
         Real64 AverageWasteHeat;
         if (WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType) {
             int SourceID = WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum;
-            if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == modCOMPRESSORRACK_REFRIGERATEDCASE) {
+            if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::CompressorRackRefrigeratedCase) {
                 // Refrigeration systems are solved outside the time step iteration, so the
                 //  appropriate decrement for other waste heat applications is handled differently
                 AverageWasteHeat = DataHeatBalance::HeatReclaimRefrigeratedRack(SourceID).AvailCapacity - DataHeatBalance::HeatReclaimRefrigeratedRack(SourceID).UsedHVACCoil;
                 WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR = 1.0;
-            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == modCONDENSER_REFRIGERATION) {
+            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::CondenserRefrigeration) {
                 AverageWasteHeat = DataHeatBalance::HeatReclaimRefrigCondenser(SourceID).AvailCapacity - DataHeatBalance::HeatReclaimRefrigCondenser(SourceID).UsedHVACCoil;
                 WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR = 1.0;
-            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == modCOIL_DX_COOLING ||
-                       WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == modCOIL_DX_MULTISPEED ||
-                       WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == modCOIL_DX_MULTIMODE) {
+            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::DXCooling ||
+                       WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::DXMultiSpeed ||
+                       WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::DXMultiMode) {
                 AverageWasteHeat = DataHeatBalance::HeatReclaimDXCoil(SourceID).AvailCapacity;
                 WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR = DXCoils::DXCoil(SourceID).PartLoadRatio;
-            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == modCOIL_DX_VARIABLE_COOLING) {
+            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::DXVariableCooling) {
                 AverageWasteHeat = DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity;
                 WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR = VariableSpeedCoils::VarSpeedCoil(SourceID).PartLoadRatio;
-            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == modCOIL_AIR_WATER_HEATPUMP_EQ) {
+            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::AirWaterHeatPumpEQ) {
                 AverageWasteHeat = DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity;
                 WaterHeaterDesuperheater(DesuperheaterNum).DXSysPLR = WaterToAirHeatPumpSimple::SimpleWatertoAirHP(SourceID).PartLoadRatio;
             }
@@ -8661,18 +8617,18 @@ namespace WaterThermalTanks {
         // Update remaining waste heat (just in case multiple users of waste heat use same source)
         if (WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType) {
             int SourceID = WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum;
-            if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == modCOMPRESSORRACK_REFRIGERATEDCASE) {
+            if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::CompressorRackRefrigeratedCase) {
                 //    Refrigeration systems are simulated at the zone time step, do not decrement available capacity
                 DataHeatBalance::HeatReclaimRefrigeratedRack(SourceID).UsedWaterHeater = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
-            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == modCONDENSER_REFRIGERATION) {
+            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::CondenserRefrigeration) {
                 DataHeatBalance::HeatReclaimRefrigCondenser(SourceID).UsedWaterHeater = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
-            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == modCOIL_DX_COOLING ||
-                       WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == modCOIL_DX_MULTISPEED ||
-                       WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == modCOIL_DX_MULTIMODE) {
+            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::DXCooling ||
+                       WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::DXMultiSpeed ||
+                       WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::DXMultiMode) {
                 DataHeatBalance::HeatReclaimDXCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
-            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == modCOIL_DX_VARIABLE_COOLING) {
+            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::DXVariableCooling) {
                 DataHeatBalance::HeatReclaimVS_DXCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
-            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == modCOIL_AIR_WATER_HEATPUMP_EQ) {
+            } else if (WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource == CoilObj::AirWaterHeatPumpEQ) {
                 DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity -= WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
                 DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeat(DesuperheaterNum) = WaterHeaterDesuperheater(DesuperheaterNum).HeaterRate;
             }
@@ -9771,11 +9727,11 @@ namespace WaterThermalTanks {
             auto const SELECT_CASE_var(HeatPump.InletAirConfiguration);
 
             //   no sensible capacity to zone for outdoor and scheduled HPWH
-            if (SELECT_CASE_var == modAmbientTempOutsideAir) {
+            if (SELECT_CASE_var == AmbientTemp::OutsideAir) {
                 HeatPump.HPWaterHeaterSensibleCapacity = 0.0;
                 HeatPump.HPWaterHeaterLatentCapacity = 0.0;
 
-            } else if (SELECT_CASE_var == modAmbientTempSchedule) {
+            } else if (SELECT_CASE_var == AmbientTemp::Schedule) {
                 HeatPump.HPWaterHeaterSensibleCapacity = 0.0;
                 HeatPump.HPWaterHeaterLatentCapacity = 0.0;
 
@@ -9784,7 +9740,7 @@ namespace WaterThermalTanks {
                 Real64 CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(HPAirInletNode).HumRat, DataLoopNode::Node(HPAirInletNode).Temp);
 
                 //     add parasitics to zone heat balance if parasitic heat load is to zone otherwise neglect parasitics
-                if (HeatPump.ParasiticTempIndicator == modAmbientTempZone) {
+                if (HeatPump.ParasiticTempIndicator == AmbientTemp::TempZone) {
                     HeatPump.HPWaterHeaterSensibleCapacity =
                         (DataLoopNode::Node(HPAirOutletNode).MassFlowRate * CpAir * (DataLoopNode::Node(HPAirOutletNode).Temp - DataLoopNode::Node(HPAirInletNode).Temp)) +
                         HeatPump.OnCycParaFuelRate + HeatPump.OffCycParaFuelRate;
@@ -10133,7 +10089,7 @@ namespace WaterThermalTanks {
         bool NeedsHeatOrCool = false;
 
         if (!this->IsChilledWaterTank) {
-            if (this->SourceSideControlMode == modSourceSideIndirectHeatPrimarySetpoint) {
+            if (this->SourceSideControlMode == SourceSide::IndirectHeatPrimarySetpoint) {
                 if (OutletTemp < DeadBandTemp) {
                     NeedsHeatOrCool = true;
                 } else if ((OutletTemp >= DeadBandTemp) && (OutletTemp < SetPointTemp)) {
@@ -10147,7 +10103,7 @@ namespace WaterThermalTanks {
                 } else if (OutletTemp >= SetPointTemp) {
                     NeedsHeatOrCool = false;
                 }
-            } else if (this->SourceSideControlMode == modSourceSideIndirectHeatAltSetpoint) {
+            } else if (this->SourceSideControlMode == SourceSide::IndirectHeatAltSetpoint) {
                 // get alternate setpoint
                 Real64 const AltSetpointTemp = ScheduleManager::GetCurrentScheduleValue(this->SourceSideAltSetpointSchedNum);
                 Real64 const AltDeadBandTemp = AltSetpointTemp - this->DeadBandDeltaTemp;
@@ -10164,7 +10120,7 @@ namespace WaterThermalTanks {
                 } else if (OutletTemp >= AltSetpointTemp) {
                     NeedsHeatOrCool = false;
                 }
-            } else if (this->SourceSideControlMode == modSourceSideStorageTank) {
+            } else if (this->SourceSideControlMode == SourceSide::StorageTank) {
                 if (OutletTemp < this->TankTempLimit) {
                     NeedsHeatOrCool = true;
                 } else {
@@ -10237,13 +10193,13 @@ namespace WaterThermalTanks {
             // If FlowLock is True (1),  the new resolved plant loop mdot is used
             if (WaterThermalTank(WaterThermalTankNum).UseCurrentFlowLock == 0) {
                 CurrentMode = PassingFlowThru;
-                if ((WaterThermalTank(WaterThermalTankNum).UseSideLoadRequested > 0.0) && (WaterThermalTankSide == modUseSide)) {
+                if ((WaterThermalTank(WaterThermalTankNum).UseSideLoadRequested > 0.0) && (WaterThermalTankSide == Side::Use)) {
                     CurrentMode = MaybeRequestingFlow;
                 }
             } else {
                 CurrentMode = PassingFlowThru;
             }
-            if (WaterThermalTankSide == modSourceSide) {
+            if (WaterThermalTankSide == Side::Source) {
                 CurrentMode = MaybeRequestingFlow;
             }
         } else if (PlantLoopSide == DataPlant::DemandSide) {
@@ -10268,11 +10224,11 @@ namespace WaterThermalTanks {
 
         // evaluate Availability schedule,
         bool ScheduledAvail = true;
-        if (WaterThermalTankSide == modUseSide) {
+        if (WaterThermalTankSide == Side::Use) {
             if (ScheduleManager::GetCurrentScheduleValue(WaterThermalTank(WaterThermalTankNum).UseSideAvailSchedNum) == 0.0) {
                 ScheduledAvail = false;
             }
-        } else if (WaterThermalTankSide == modSourceSide) {
+        } else if (WaterThermalTankSide == Side::Source) {
             if (ScheduleManager::GetCurrentScheduleValue(WaterThermalTank(WaterThermalTankNum).SourceSideAvailSchedNum) == 0.0) {
                 ScheduledAvail = false;
             }
@@ -10296,9 +10252,9 @@ namespace WaterThermalTanks {
                 if (!ScheduledAvail) {
                     MassFlowRequest = 0.0;
                 } else {
-                    if (WaterThermalTankSide == modUseSide) {
+                    if (WaterThermalTankSide == Side::Use) {
                         MassFlowRequest = WaterThermalTank(WaterThermalTankNum).PlantUseMassFlowRateMax;
-                    } else if (WaterThermalTankSide == modSourceSide) {
+                    } else if (WaterThermalTankSide == Side::Source) {
                         MassFlowRequest = WaterThermalTank(WaterThermalTankNum).PlantSourceMassFlowRateMax;
                     } else {
                         assert(false);
@@ -10309,9 +10265,9 @@ namespace WaterThermalTanks {
                 bool NeedsHeatOrCool = WaterThermalTank(WaterThermalTankNum).SourceHeatNeed(OutletTemp, DeadBandTemp, SetPointTemp);
 
                 if (MassFlowRequest > 0.0) {
-                    if (WaterThermalTankSide == modUseSide) {
+                    if (WaterThermalTankSide == Side::Use) {
                         FlowResult = MassFlowRequest;
-                    } else if (WaterThermalTankSide == modSourceSide) {
+                    } else if (WaterThermalTankSide == Side::Source) {
                         if (NeedsHeatOrCool) {
                             FlowResult = MassFlowRequest;
                         } else {
@@ -10341,7 +10297,7 @@ namespace WaterThermalTanks {
                 if (!ScheduledAvail) {
                     MassFlowRequest = 0.0;
                 } else {
-                    if (WaterThermalTankSide == modUseSide) {
+                    if (WaterThermalTankSide == Side::Use) {
                         if ((WaterThermalTank(WaterThermalTankNum).IsChilledWaterTank) &&
                             (WaterThermalTank(WaterThermalTankNum).UseSideLoadRequested > 0.0)) {
                             MassFlowRequest = WaterThermalTank(WaterThermalTankNum).PlantUseMassFlowRateMax;
@@ -10352,12 +10308,12 @@ namespace WaterThermalTanks {
                             MassFlowRequest = WaterThermalTank(WaterThermalTankNum).PlantUseMassFlowRateMax;
                         }
 
-                    } else if (WaterThermalTankSide == modSourceSide) {
+                    } else if (WaterThermalTankSide == Side::Source) {
                         MassFlowRequest = WaterThermalTank(WaterThermalTankNum).PlantSourceMassFlowRateMax;
                     }
                 }
 
-                if (WaterThermalTankSide == modSourceSide) { // temperature dependent controls for indirect heating/cooling
+                if (WaterThermalTankSide == Side::Source) { // temperature dependent controls for indirect heating/cooling
                     bool NeedsHeatOrCool = WaterThermalTank(WaterThermalTankNum).SourceHeatNeed(OutletTemp, DeadBandTemp, SetPointTemp);
                     if (MassFlowRequest > 0.0) {
                         if (NeedsHeatOrCool) {
@@ -10668,11 +10624,11 @@ namespace WaterThermalTanks {
         {
             auto const SELECT_CASE_var(this->Sizing.DesignMode);
 
-            if (SELECT_CASE_var == modSizeNotSet) {
+            if (SELECT_CASE_var == Size::NotSet) {
 
-            } else if (SELECT_CASE_var == modSizePeakDraw) {
+            } else if (SELECT_CASE_var == Size::PeakDraw) {
 
-            } else if (SELECT_CASE_var == modSizeResidentialMin) {
+            } else if (SELECT_CASE_var == Size::ResidentialMin) {
 
                 // assume can propagate rules for gas to other fuels.
                 bool FuelTypeIsLikeGas = false;
@@ -10838,7 +10794,7 @@ namespace WaterThermalTanks {
                                            this->MaxCapacity);
                     }
                 }
-            } else if (SELECT_CASE_var == modSizePerPerson) {
+            } else if (SELECT_CASE_var == Size::PerPerson) {
                 // how to get number of people?
 
                 Real64 SumPeopleAllZones = sum(DataHeatBalance::Zone, &DataHeatBalance::ZoneData::TotOccupants);
@@ -10896,7 +10852,7 @@ namespace WaterThermalTanks {
                                            this->MaxCapacity);
                     }
                 }
-            } else if (SELECT_CASE_var == modSizePerFloorArea) {
+            } else if (SELECT_CASE_var == Size::PerFloorArea) {
 
                 Real64 SumFloorAreaAllZones = sum(DataHeatBalance::Zone, &DataHeatBalance::ZoneData::FloorArea);
                 if (this->VolumeWasAutoSized)
@@ -10951,7 +10907,7 @@ namespace WaterThermalTanks {
                                            this->MaxCapacity);
                     }
                 }
-            } else if (SELECT_CASE_var == modSizePerUnit) {
+            } else if (SELECT_CASE_var == Size::PerUnit) {
 
                 if (this->VolumeWasAutoSized)
                     tmpTankVolume =
@@ -11008,7 +10964,7 @@ namespace WaterThermalTanks {
                                            this->MaxCapacity);
                     }
                 }
-            } else if (SELECT_CASE_var == modSizePerSolarColArea) {
+            } else if (SELECT_CASE_var == Size::PerSolarColArea) {
             }
         }
 
@@ -11072,7 +11028,7 @@ namespace WaterThermalTanks {
         {
             auto const SELECT_CASE_var(this->Sizing.DesignMode);
 
-            if (SELECT_CASE_var == modSizePeakDraw) {
+            if (SELECT_CASE_var == Size::PeakDraw) {
                 if (this->VolumeWasAutoSized)
                     tmpTankVolume = this->Sizing.TankDrawTime *
                                     this->UseDesignVolFlowRate * DataGlobals::SecInHour; // hours | m3/s | (3600 s/1 hour)
@@ -11131,7 +11087,7 @@ namespace WaterThermalTanks {
                                            this->MaxCapacity);
                     }
                 }
-            } else if (SELECT_CASE_var == modSizePerSolarColArea) {
+            } else if (SELECT_CASE_var == Size::PerSolarColArea) {
 
                 this->Sizing.TotalSolarCollectorArea = 0.0;
                 for (int CollectorNum = 1; CollectorNum <= SolarCollectors::NumOfCollectors; ++CollectorNum) {
@@ -11459,7 +11415,7 @@ namespace WaterThermalTanks {
             {
                 auto const SELECT_CASE_var(this->Sizing.DesignMode);
 
-                if (SELECT_CASE_var == modSizePeakDraw) {
+                if (SELECT_CASE_var == Size::PeakDraw) {
                     // get draw rate from maximum in schedule
                     Real64 rho = FluidProperties::GetDensityGlycol(modFluidNameWater, DataGlobals::InitConvTemp, modWaterIndex, RoutineName);
                     Real64 DrawDesignVolFlowRate = ScheduleManager::GetScheduleMaxValue(this->FlowRateSchedule) *
@@ -11493,7 +11449,7 @@ namespace WaterThermalTanks {
                                            this->MaxCapacity);
                     }
 
-                } else if (SELECT_CASE_var == modSizeResidentialMin) {
+                } else if (SELECT_CASE_var == Size::ResidentialMin) {
                     // assume can propagate rules for gas to other fuels.
                     bool FuelTypeIsLikeGas = false;
                     if (UtilityRoutines::SameString(this->FuelType, "Gas")) {
@@ -11651,7 +11607,7 @@ namespace WaterThermalTanks {
                                            this->MaxCapacity);
                     }
 
-                } else if (SELECT_CASE_var == modSizePerPerson) {
+                } else if (SELECT_CASE_var == Size::PerPerson) {
                     // how to get number of people?
 
                     Real64 SumPeopleAllZones = sum(DataHeatBalance::Zone, &DataHeatBalance::ZoneData::TotOccupants);
@@ -11681,7 +11637,7 @@ namespace WaterThermalTanks {
                                            this->MaxCapacity);
                     }
 
-                } else if (SELECT_CASE_var == modSizePerFloorArea) {
+                } else if (SELECT_CASE_var == Size::PerFloorArea) {
 
                     Real64 SumFloorAreaAllZones = sum(DataHeatBalance::Zone, &DataHeatBalance::ZoneData::FloorArea);
                     if (this->VolumeWasAutoSized) {
@@ -11709,7 +11665,7 @@ namespace WaterThermalTanks {
                                            "Maximum Heater Capacity [W]",
                                            this->MaxCapacity);
                     }
-                } else if (SELECT_CASE_var == modSizePerUnit) {
+                } else if (SELECT_CASE_var == Size::PerUnit) {
 
                     if (this->VolumeWasAutoSized)
                         tmpTankVolume = this->Sizing.TankCapacityPerUnit *
@@ -11737,7 +11693,7 @@ namespace WaterThermalTanks {
                                            "Maximum Heater Capacity [W]",
                                            this->MaxCapacity);
                     }
-                } else if (SELECT_CASE_var == modSizePerSolarColArea) {
+                } else if (SELECT_CASE_var == Size::PerSolarColArea) {
                     this->Sizing.TotalSolarCollectorArea = 0.0;
                     for (int CollectorNum = 1; CollectorNum <= SolarCollectors::NumOfCollectors; ++CollectorNum) {
                         this->Sizing.TotalSolarCollectorArea += DataSurfaces::Surface(SolarCollectors::Collector(CollectorNum).Surface).Area;
@@ -12222,7 +12178,7 @@ namespace WaterThermalTanks {
         if (this->HeatPumpNum == 0) {
             Real64 MaxCapacity;
             if (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
-                if (this->ControlType == modPriorityMasterSlave) {
+                if (this->ControlType == Priority::MasterSlave) {
                     MaxCapacity = max(this->MaxCapacity, this->MaxCapacity2);
                 } else { // PrioritySimultaneous
                     MaxCapacity = this->MaxCapacity + this->MaxCapacity2;

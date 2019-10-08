@@ -4866,8 +4866,6 @@ namespace OutputReportTabular {
         using RefrigeratedCase::Condenser;
         using VariableSpeedCoils::NumVarSpeedCoils;
         using VariableSpeedCoils::VarSpeedCoil;
-        using WaterThermalTanks::modAmbientTempOutsideAir;
-        using WaterThermalTanks::NumWaterThermalTank;
         using WaterThermalTanks::WaterThermalTank;
 
         static int iOACtrl(0);
@@ -5012,8 +5010,8 @@ namespace OutputReportTabular {
         }
 
         // Water heater and thermal storage
-        for (iTank = 1; iTank <= NumWaterThermalTank; ++iTank) {
-            if (WaterThermalTank(iTank).AmbientTempIndicator == modAmbientTempOutsideAir) {
+        for (iTank = 1; iTank <= WaterThermalTanks::NumWaterThermalTank; ++iTank) {
+            if (WaterThermalTank(iTank).AmbientTempIndicator == WaterThermalTanks::AmbientTemp::OutsideAir) {
                 SysTotalHVACRejectHeatLoss += WaterThermalTank(iTank).FuelEnergy - WaterThermalTank(iTank).TotalDemandEnergy;
             }
         }

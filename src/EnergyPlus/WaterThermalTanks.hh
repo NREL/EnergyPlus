@@ -65,56 +65,96 @@ namespace WaterThermalTanks {
     extern int const modVentMode;  // tank temp is above maximum temperature and water is venting
     extern int const modCoolMode;  // cooling source is on, source will not turn off until setpoint temp is reached
 
-    extern int const AmbientTempSchedule;   // ambient temperature around tank (or HPWH inlet air) is scheduled
-    extern int const AmbientTempZone;       // tank is located in a zone or HPWH inlet air is zone air only
-    extern int const AmbientTempOutsideAir; // tank is located outdoors or HPWH inlet air is outdoor air only
-    extern int const AmbientTempZoneAndOA;  // applicable to HPWH only, inlet air is mixture of OA and zone air
+    struct AmbientTemp
+    {
+        enum {
+            Schedule,   // ambient temperature around tank (or HPWH inlet air) is scheduled
+            TempZone,       // tank is located in a zone or HPWH inlet air is zone air only
+            OutsideAir, // tank is located outdoors or HPWH inlet air is outdoor air only
+            ZoneAndOA   // applicable to HPWH only, inlet air is mixture of OA and zone air
+        };
+    };
 
-    extern int const modAmbientTempSchedule;   // ambient temperature around tank (or HPWH inlet air) is scheduled
-    extern int const modAmbientTempZone;       // tank is located in a zone or HPWH inlet air is zone air only
-    extern int const modAmbientTempOutsideAir; // tank is located outdoors or HPWH inlet air is outdoor air only
-    extern int const modAmbientTempZoneAndOA;  // applicable to HPWH only, inlet air is mixture of OA and zone air
-
-    extern int const modCrankcaseTempSchedule; // temperature controlling compressor crankcase heater is scheduled
-    extern int const modCrankcaseTempZone;     // temperature controlling compressor crankcase heater is zone air
-    extern int const modCrankcaseTempExterior; // temperature controlling compressor crankcase heater is outdoor air
-
+    struct CrankTemp
+    {
+        enum {
+            Schedule, // temperature controlling compressor crankcase heater is scheduled
+            Zone,     // temperature controlling compressor crankcase heater is zone air
+            Exterior // temperature controlling compressor crankcase heater is outdoor air
+        };
+    };
+    
     extern int const modControlTypeCycle;    // water heater only, cycling heating source control
     extern int const modControlTypeModulate; // water heater only, modulating heating source control
 
-    extern int const modTankShapeVertCylinder;  // tank shape is a vertical cylinder
-    extern int const modTankShapeHorizCylinder; // tank shape is a horizontal cylinder
-    extern int const modTankShapeOther;         // tank shape has an arbitrary perimeter shape
+    struct TankShape
+    {
+        enum {
+            VertCylinder,  // tank shape is a vertical cylinder
+            HorizCylinder, // tank shape is a horizontal cylinder
+            Other          // tank shape has an arbitrary perimeter shape
+        };
+    };
 
-    extern int const modPriorityMasterSlave;  // water heater only, master-slave priority control of heater elements
-    extern int const modPrioritySimultaneous; // water heater only, simultaneous control of heater elements
+    struct Priority
+    {
+        enum {
+            MasterSlave,  // water heater only, master-slave priority control of heater elements
+            Simultaneous  // water heater only, simultaneous control of heater elements
+        };
+    };
 
-    extern int const modInletModeFixed;   // water heater only, inlet water always enters at the user-specified height
-    extern int const modInletModeSeeking; // water heater only, inlet water seeks out the node with the closest temperature
+    struct InletMode
+    {
+        enum {
+            Fixed,   // water heater only, inlet water always enters at the user-specified height
+            Seeking  // water heater only, inlet water seeks out the node with the closest temperature
+        };
+    };
 
     // reclaim heat object types for Coil:WaterHeating:Desuperheater object
-    extern int const modCOMPRESSORRACK_REFRIGERATEDCASE; // reclaim heating source is refrigerated case compressor rack
-    extern int const modCOIL_DX_COOLING;                 // reclaim heating source is DX cooling coil
-    extern int const modCOIL_DX_MULTISPEED;              // reclaim heating source is DX multispeed coil
-    extern int const modCOIL_DX_MULTIMODE;               // reclaim heating source is DX multimode coil
-    extern int const modCONDENSER_REFRIGERATION;         // reclaim heating source is detailed refrigeration system condenser
-    extern int const modCOIL_DX_VARIABLE_COOLING;        // reclaim heating source is Variable Speed DX cooling coil
-    extern int const modCOIL_AIR_WATER_HEATPUMP_EQ;      // reclaim heating source is Water to air heat pump cooling coil
+    struct CoilObj
+    {
+        enum {
+            CompressorRackRefrigeratedCase,  // reclaim heating source is refrigerated case compressor rack
+            DXCooling,                       // reclaim heating source is DX cooling coil
+            DXMultiSpeed,                    // reclaim heating source is DX multispeed coil
+            DXMultiMode,                     // reclaim heating source is DX multimode coil
+            CondenserRefrigeration,          // reclaim heating source is detailed refrigeration system condenser
+            DXVariableCooling,               // reclaim heating source is Variable Speed DX cooling coil
+            AirWaterHeatPumpEQ               // reclaim heating source is Water to air heat pump cooling coil
+        };
+    };
 
-    extern int const modUseSide;    // Indicates Use side of water heater
-    extern int const modSourceSide; // Indicates Source side of water heater
+    struct Side
+    {
+        enum {
+            Use,  // Indicates Use side of water heater
+            Source // Indicates Source side of water heater
+        };
+    };
 
-    extern int const modSizeNotSet;
-    extern int const modSizePeakDraw;
-    extern int const modSizeResidentialMin;
-    extern int const modSizePerPerson;
-    extern int const modSizePerFloorArea;
-    extern int const modSizePerUnit;
-    extern int const modSizePerSolarColArea;
+    struct Size
+    {
+        enum {
+            NotSet,
+            PeakDraw,
+            ResidentialMin,
+            PerPerson,
+            PerFloorArea,
+            PerUnit,
+            PerSolarColArea
+        };
+    };
 
-    extern int const modSourceSideStorageTank;
-    extern int const modSourceSideIndirectHeatPrimarySetpoint;
-    extern int const modSourceSideIndirectHeatAltSetpoint;
+    struct SourceSide
+    {
+        enum {
+            StorageTank,
+            IndirectHeatPrimarySetpoint,
+            IndirectHeatAltSetpoint
+        };
+    };
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumChilledWaterMixed;        // number of mixed chilled water tanks
@@ -198,7 +238,7 @@ namespace WaterThermalTanks {
 
         // Default Constructor
         WaterHeaterSizingData()
-            : DesignMode(modSizeNotSet), TankDrawTime(0.0), RecoveryTime(0.0), NominalVolForSizingDemandSideFlow(0.0), NumberOfBedrooms(0),
+            : DesignMode(Size::NotSet), TankDrawTime(0.0), RecoveryTime(0.0), NominalVolForSizingDemandSideFlow(0.0), NumberOfBedrooms(0),
               NumberOfBathrooms(0.0), TankCapacityPerPerson(0.0), RecoveryCapacityPerPerson(0.0), TankCapacityPerArea(0.0),
               RecoveryCapacityPerArea(0.0), NumberOfUnits(0.0), TankCapacityPerUnit(0.0), RecoveryCapacityPerUnit(0.0),
               TankCapacityPerCollectorArea(0.0), HeightAspectRatio(0.0), PeakDemand(0.0), PeakNumberOfPeople(0.0), TotalFloorArea(0.0),
