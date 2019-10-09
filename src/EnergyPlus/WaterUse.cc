@@ -138,8 +138,6 @@ namespace WaterUse {
         // This routine is called from non zone equipment manager and serves to call
         // water use and connections that are not connected to a full plant loop
 
-        // METHODOLOGY EMPLOYED:
-
         // Using/Aliasing
         using General::RoundSigDigits;
 
@@ -147,8 +145,6 @@ namespace WaterUse {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIterations(100);
         Real64 const Tolerance(0.1); // Make input?
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterEquipNum;
@@ -252,8 +248,6 @@ namespace WaterUse {
         // Plant sim call for plant loop connected water use and connections
         // (based on SimulateWaterUse by P. Ellis)
 
-        // METHODOLOGY EMPLOYED:
-
         // Using/Aliasing
         using General::RoundSigDigits;
         using General::TrimSigDigits;
@@ -262,8 +256,6 @@ namespace WaterUse {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIterations(100);
         Real64 const Tolerance(0.1); // Make input?
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //  INTEGER :: WaterEquipNum
@@ -364,10 +356,7 @@ namespace WaterUse {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
+        // METHODOLOGY EMPLOYED: Standard EnergyPlus methodology.
 
         // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
@@ -1073,7 +1062,6 @@ namespace WaterUse {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate desired hot and cold water flow rates
 
-        // METHODOLOGY EMPLOYED:
 
         // Using/Aliasing
         using DataEnvironment::WaterMainsTemp;
@@ -1081,8 +1069,6 @@ namespace WaterUse {
         using Psychrometrics::RhoH2O;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterConnNum;
@@ -1189,7 +1175,6 @@ namespace WaterUse {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate drainwater temperature and heat and moisture gains to zone.
 
-        // METHODOLOGY EMPLOYED:
 
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
@@ -1287,10 +1272,6 @@ namespace WaterUse {
         //       MODIFIED       Brent Griffith 2010, demand side update
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED:
-
         // Using/Aliasing
         using DataEnvironment::WaterMainsTemp;
         using DataGlobals::DoingSizing;
@@ -1303,8 +1284,6 @@ namespace WaterUse {
         using PlantUtilities::ScanPlantLoopsForObject;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;
@@ -1412,16 +1391,11 @@ namespace WaterUse {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate summed values for WATER USE CONNECTIONS (to prepare to request flow from plant, and for reporting).
 
-        // METHODOLOGY EMPLOYED:
-
         // Using/Aliasing
         using DataLoopNode::Node;
         using DataWater::WaterStorage;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::RhoH2O;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterEquipNum;
@@ -1543,13 +1517,8 @@ namespace WaterUse {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate
 
-        // METHODOLOGY EMPLOYED:
-
         // Using/Aliasing
         using Psychrometrics::RhoH2O;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterEquipNum;
@@ -1590,15 +1559,10 @@ namespace WaterUse {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate drainwater heat recovery
 
-        // METHODOLOGY EMPLOYED:
-
         // Using/Aliasing
         using Psychrometrics::CPHW;
         // unused0909  USE DataEnvironment, ONLY: WaterMainsTemp
         using DataWater::WaterStorage;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CapacityRatio;
@@ -1716,15 +1680,9 @@ namespace WaterUse {
         // PURPOSE OF THIS SUBROUTINE:
         // Updates the node variables with local variables.
 
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-
         // Using/Aliasing
         using DataLoopNode::Node;
         using PlantUtilities::SafeCopyPlantNode;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;
@@ -1758,9 +1716,6 @@ namespace WaterUse {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates report variables for stand alone water use
-
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
 
         // Using/Aliasing
         using DataGlobals::SecInHour;
@@ -1808,9 +1763,6 @@ namespace WaterUse {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates report variables.
-
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
 
         // Using/Aliasing
         using DataGlobals::SecInHour;
@@ -1876,8 +1828,6 @@ namespace WaterUse {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates the zone internal gains due to water use sensible and latent loads.
 
-        // METHODOLOGY EMPLOYED:
-
         // Using/Aliasing
         using DataGlobals::BeginEnvrnFlag;
         using DataHeatBalance::Zone;
@@ -1923,13 +1873,7 @@ namespace WaterUse {
                 WaterEquipment(WaterEquipNum).LatentRate / (Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier); // CR7401, back out multipliers
         }
 
-        //  ! this routine needs to model approx zone gains for use during sizing
-        //  IF(DoingSizing)THEN
-        //    DO WaterEquipNum = 1, NumWaterEquipment
-        //      WaterEquipment(WaterEquipNum)%SensibleRateNoMultiplier =
-        //      WaterEquipment(WaterEquipNum)%LatentRateNoMultiplier   =
-        //    END DO
-        //  ENDIF
+      
     }
 
 } // namespace WaterUse
