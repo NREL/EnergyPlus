@@ -17,7 +17,7 @@ fig.show()
 fig.canvas.draw()
 
 
-def timestep_handler():
+def end_of_hour_handler():
     global electricity_sensor
     if not electricity_sensor:
         electricity_sensor = data.get_meter_handle(u"ELECTRICITY:FACILITY")
@@ -27,5 +27,5 @@ def timestep_handler():
     fig.canvas.draw()
 
 
-runtime.register_callback_new_timestep(timestep_handler)
+runtime.register_callback_end_of_hour(end_of_hour_handler)
 runtime.run_energyplus('/tmp/epdll'.encode('utf-8'))

@@ -51,148 +51,154 @@
 namespace EnergyPlus {
 namespace PluginManager {
 
-std::vector<void (*)()> callbacksCallFromBeginNewEvironment;
-std::vector<void (*)()> callbacksCallFromZoneSizing;
-std::vector<void (*)()> callbacksCallFromSystemSizing;
-std::vector<void (*)()> callbacksCallFromBeginTimestepBeforePredictor;
-std::vector<void (*)()> callbacksCallFromEndSystemTimestepBeforeHVACReporting;
-std::vector<void (*)()> callbacksCallFromEndSystemTimestepAfterHVACReporting;
-std::vector<void (*)()> callbacksCallFromBeforeHVACManagers;
-std::vector<void (*)()> callbacksCallFromAfterHVACManagers;
-std::vector<void (*)()> callbacksCallFromHVACIterationLoop;
-std::vector<void (*)()> callbacksCallFromBeginZoneTimestepBeforeInitHeatBalance;
-std::vector<void (*)()> callbacksCallFromBeginZoneTimestepAfterInitHeatBalance;
-std::vector<void (*)()> callbacksCallFromEndZoneTimestepBeforeZoneReporting;
-std::vector<void (*)()> callbacksCallFromBeginNewEnvironmentAfterWarmUp;
-std::vector<void (*)()> callbacksCallFromUnitarySizing;
-std::vector<void (*)()> callbacksCallFromExternalInterface;
-std::vector<void (*)()> callbacksCallFromEndZoneTimestepAfterZoneReporting;
+//std::vector<void (*)()> callbacksCallFromBeginNewEvironment;
+//std::vector<void (*)()> callbacksCallFromZoneSizing;
+//std::vector<void (*)()> callbacksCallFromSystemSizing;
+//std::vector<void (*)()> callbacksCallFromBeginTimestepBeforePredictor;
+//std::vector<void (*)()> callbacksCallFromEndSystemTimestepBeforeHVACReporting;
+//std::vector<void (*)()> callbacksCallFromEndSystemTimestepAfterHVACReporting;
+//std::vector<void (*)()> callbacksCallFromBeforeHVACManagers;
+//std::vector<void (*)()> callbacksCallFromAfterHVACManagers;
+//std::vector<void (*)()> callbacksCallFromHVACIterationLoop;
+//std::vector<void (*)()> callbacksCallFromBeginZoneTimestepBeforeInitHeatBalance;
+//std::vector<void (*)()> callbacksCallFromBeginZoneTimestepAfterInitHeatBalance;
+//std::vector<void (*)()> callbacksCallFromEndZoneTimestepBeforeZoneReporting;
+//std::vector<void (*)()> callbacksCallFromBeginNewEnvironmentAfterWarmUp;
+//std::vector<void (*)()> callbacksCallFromUnitarySizing;
+//std::vector<void (*)()> callbacksCallFromExternalInterface;
+//std::vector<void (*)()> callbacksCallFromEndZoneTimestepAfterZoneReporting;
+std::vector<void (*)()> callbacksCallFromEndOfHour;
 
-void registerNewCallback(int iCalledFrom, void (*f)()) {
-    if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromSetupSimulation) {
-        return;
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginNewEvironment) {
-        callbacksCallFromBeginNewEvironment.push_back(f);
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromZoneSizing) {
-        callbacksCallFromZoneSizing.push_back(f);
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromSystemSizing) {
-        callbacksCallFromSystemSizing.push_back(f);
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginTimestepBeforePredictor) {
-        callbacksCallFromBeginTimestepBeforePredictor.push_back(f);
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting) {
-        callbacksCallFromEndSystemTimestepBeforeHVACReporting.push_back(f);
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting) {
-        callbacksCallFromEndSystemTimestepAfterHVACReporting.push_back(f);
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeforeHVACManagers) {
-        callbacksCallFromBeforeHVACManagers.push_back(f);
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromAfterHVACManagers) {
-        callbacksCallFromAfterHVACManagers.push_back(f);
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromHVACIterationLoop) {
-        callbacksCallFromHVACIterationLoop.push_back(f);
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance) {
-        callbacksCallFromBeginZoneTimestepBeforeInitHeatBalance.push_back(f);
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance) {
-        callbacksCallFromBeginZoneTimestepAfterInitHeatBalance.push_back(f);
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting) {
-        callbacksCallFromEndZoneTimestepBeforeZoneReporting.push_back(f);
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting) {
-        callbacksCallFromEndZoneTimestepAfterZoneReporting.push_back(f);
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp) {
-        callbacksCallFromBeginNewEnvironmentAfterWarmUp.push_back(f);
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromUnitarySystemSizing) {
-        callbacksCallFromUnitarySizing.push_back(f);
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromExternalInterface) {
-        callbacksCallFromExternalInterface.push_back(f);
+void registerNewCallback(EnergyPlus::PluginManager::PluginCallingPoints iCalledFrom, void (*f)()) {
+    if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::EndOfHour) {
+        callbacksCallFromEndOfHour.push_back(f);
     }
+//    else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginNewEvironment) {
+//        callbacksCallFromBeginNewEvironment.push_back(f);
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromZoneSizing) {
+//        callbacksCallFromZoneSizing.push_back(f);
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromSystemSizing) {
+//        callbacksCallFromSystemSizing.push_back(f);
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginTimestepBeforePredictor) {
+//        callbacksCallFromBeginTimestepBeforePredictor.push_back(f);
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting) {
+//        callbacksCallFromEndSystemTimestepBeforeHVACReporting.push_back(f);
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting) {
+//        callbacksCallFromEndSystemTimestepAfterHVACReporting.push_back(f);
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeforeHVACManagers) {
+//        callbacksCallFromBeforeHVACManagers.push_back(f);
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromAfterHVACManagers) {
+//        callbacksCallFromAfterHVACManagers.push_back(f);
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromHVACIterationLoop) {
+//        callbacksCallFromHVACIterationLoop.push_back(f);
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance) {
+//        callbacksCallFromBeginZoneTimestepBeforeInitHeatBalance.push_back(f);
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance) {
+//        callbacksCallFromBeginZoneTimestepAfterInitHeatBalance.push_back(f);
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting) {
+//        callbacksCallFromEndZoneTimestepBeforeZoneReporting.push_back(f);
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting) {
+//        callbacksCallFromEndZoneTimestepAfterZoneReporting.push_back(f);
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp) {
+//        callbacksCallFromBeginNewEnvironmentAfterWarmUp.push_back(f);
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromUnitarySystemSizing) {
+//        callbacksCallFromUnitarySizing.push_back(f);
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromExternalInterface) {
+//        callbacksCallFromExternalInterface.push_back(f);
+//    }
 }
 
-void runAnyRegisteredCallbacks(int iCalledFrom) {
-    if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromSetupSimulation) {
-        return;
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginNewEvironment) {
-        for (auto const & cb : callbacksCallFromBeginNewEvironment) {
-            cb();
-        }
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromZoneSizing) {
-        for (auto const & cb : callbacksCallFromZoneSizing) {
-            cb();
-        }
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromSystemSizing) {
-        for (auto const & cb : callbacksCallFromSystemSizing) {
-            cb();
-        }
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginTimestepBeforePredictor) {
-        for (auto const & cb : callbacksCallFromBeginTimestepBeforePredictor) {
-            cb();
-        }
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting) {
-        for (auto const & cb : callbacksCallFromEndSystemTimestepBeforeHVACReporting) {
-            cb();
-        }
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting) {
-        for (auto const & cb : callbacksCallFromEndSystemTimestepAfterHVACReporting) {
-            cb();
-        }
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeforeHVACManagers) {
-        for (auto const & cb : callbacksCallFromBeforeHVACManagers) {
-            cb();
-        }
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromAfterHVACManagers) {
-        for (auto const & cb : callbacksCallFromAfterHVACManagers) {
-            cb();
-        }
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromHVACIterationLoop) {
-        for (auto const & cb : callbacksCallFromHVACIterationLoop) {
-            cb();
-        }
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance) {
-        for (auto const & cb : callbacksCallFromBeginZoneTimestepBeforeInitHeatBalance) {
-            cb();
-        }
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance) {
-        for (auto const & cb : callbacksCallFromBeginZoneTimestepAfterInitHeatBalance) {
-            cb();
-        }
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting) {
-        for (auto const & cb : callbacksCallFromEndZoneTimestepBeforeZoneReporting) {
-            cb();
-        }
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting) {
-        for (auto const & cb : callbacksCallFromEndZoneTimestepAfterZoneReporting) {
-            cb();
-        }
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp) {
-        for (auto const & cb : callbacksCallFromBeginNewEnvironmentAfterWarmUp) {
-            cb();
-        }
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromUnitarySystemSizing) {
-        for (auto const & cb : callbacksCallFromUnitarySizing) {
-            cb();
-        }
-    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromExternalInterface) {
-        for (auto const & cb : callbacksCallFromExternalInterface) {
+void runAnyRegisteredCallbacks(PluginCallingPoints iCalledFrom) {
+    if (iCalledFrom == EnergyPlus::PluginManager::PluginCallingPoints::EndOfHour) {
+        for (auto const &cb : callbacksCallFromEndOfHour) {
             cb();
         }
     }
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginNewEvironment) {
+//        for (auto const & cb : callbacksCallFromBeginNewEvironment) {
+//            cb();
+//        }
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromZoneSizing) {
+//        for (auto const & cb : callbacksCallFromZoneSizing) {
+//            cb();
+//        }
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromSystemSizing) {
+//        for (auto const & cb : callbacksCallFromSystemSizing) {
+//            cb();
+//        }
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginTimestepBeforePredictor) {
+//        for (auto const & cb : callbacksCallFromBeginTimestepBeforePredictor) {
+//            cb();
+//        }
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting) {
+//        for (auto const & cb : callbacksCallFromEndSystemTimestepBeforeHVACReporting) {
+//            cb();
+//        }
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting) {
+//        for (auto const & cb : callbacksCallFromEndSystemTimestepAfterHVACReporting) {
+//            cb();
+//        }
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeforeHVACManagers) {
+//        for (auto const & cb : callbacksCallFromBeforeHVACManagers) {
+//            cb();
+//        }
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromAfterHVACManagers) {
+//        for (auto const & cb : callbacksCallFromAfterHVACManagers) {
+//            cb();
+//        }
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromHVACIterationLoop) {
+//        for (auto const & cb : callbacksCallFromHVACIterationLoop) {
+//            cb();
+//        }
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance) {
+//        for (auto const & cb : callbacksCallFromBeginZoneTimestepBeforeInitHeatBalance) {
+//            cb();
+//        }
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance) {
+//        for (auto const & cb : callbacksCallFromBeginZoneTimestepAfterInitHeatBalance) {
+//            cb();
+//        }
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting) {
+//        for (auto const & cb : callbacksCallFromEndZoneTimestepBeforeZoneReporting) {
+//            cb();
+//        }
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting) {
+//        for (auto const & cb : callbacksCallFromEndZoneTimestepAfterZoneReporting) {
+//            cb();
+//        }
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp) {
+//        for (auto const & cb : callbacksCallFromBeginNewEnvironmentAfterWarmUp) {
+//            cb();
+//        }
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromUnitarySystemSizing) {
+//        for (auto const & cb : callbacksCallFromUnitarySizing) {
+//            cb();
+//        }
+//    } else if (iCalledFrom == EnergyPlus::DataGlobals::emsCallFromExternalInterface) {
+//        for (auto const & cb : callbacksCallFromExternalInterface) {
+//            cb();
+//        }
+//    }
 }
 
 void clear_state() {
-    callbacksCallFromBeginNewEvironment.empty();
-    callbacksCallFromZoneSizing.empty();
-    callbacksCallFromSystemSizing.empty();
-    callbacksCallFromBeginTimestepBeforePredictor.empty();
-    callbacksCallFromEndSystemTimestepBeforeHVACReporting.empty();
-    callbacksCallFromEndSystemTimestepAfterHVACReporting.empty();
-    callbacksCallFromBeforeHVACManagers.empty();
-    callbacksCallFromAfterHVACManagers.empty();
-    callbacksCallFromHVACIterationLoop.empty();
-    callbacksCallFromBeginZoneTimestepBeforeInitHeatBalance.empty();
-    callbacksCallFromBeginZoneTimestepAfterInitHeatBalance.empty();
-    callbacksCallFromEndZoneTimestepBeforeZoneReporting.empty();
-    callbacksCallFromBeginNewEnvironmentAfterWarmUp.empty();
-    callbacksCallFromUnitarySizing.empty();
-    callbacksCallFromExternalInterface.empty();
-    callbacksCallFromEndZoneTimestepAfterZoneReporting.empty();
+    callbacksCallFromEndOfHour.clear();
+//    callbacksCallFromBeginNewEvironment.clear();
+//    callbacksCallFromZoneSizing.clear();
+//    callbacksCallFromSystemSizing.clear();
+//    callbacksCallFromBeginTimestepBeforePredictor.clear();
+//    callbacksCallFromEndSystemTimestepBeforeHVACReporting.clear();
+//    callbacksCallFromEndSystemTimestepAfterHVACReporting.clear();
+//    callbacksCallFromBeforeHVACManagers.clear();
+//    callbacksCallFromAfterHVACManagers.clear();
+//    callbacksCallFromHVACIterationLoop.clear();
+//    callbacksCallFromBeginZoneTimestepBeforeInitHeatBalance.clear();
+//    callbacksCallFromBeginZoneTimestepAfterInitHeatBalance.clear();
+//    callbacksCallFromEndZoneTimestepBeforeZoneReporting.clear();
+//    callbacksCallFromBeginNewEnvironmentAfterWarmUp.clear();
+//    callbacksCallFromUnitarySizing.clear();
+//    callbacksCallFromExternalInterface.clear();
+//    callbacksCallFromEndZoneTimestepAfterZoneReporting.clear();
 }
 
 

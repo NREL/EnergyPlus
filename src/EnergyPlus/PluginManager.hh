@@ -55,9 +55,13 @@ namespace EnergyPlus {
 
 namespace PluginManager {
 
-    void registerNewCallback(int iCalledFrom, void (*f)());
+    enum class PluginCallingPoints {
+        EndOfHour = 0
+    };
 
-    void runAnyRegisteredCallbacks(int);
+    void registerNewCallback(EnergyPlus::PluginManager::PluginCallingPoints iCalledFrom, void (*f)());
+
+    void runAnyRegisteredCallbacks(EnergyPlus::PluginManager::PluginCallingPoints iCalledFrom);
 
     void clear_state();
 

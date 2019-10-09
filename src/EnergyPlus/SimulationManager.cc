@@ -121,6 +121,7 @@ extern "C" {
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
@@ -597,6 +598,7 @@ namespace SimulationManager {
                                     EndEnvrnFlag = true;
                                 }
                             }
+                            if (!WarmupFlag) PluginManager::runAnyRegisteredCallbacks(PluginManager::PluginCallingPoints::EndOfHour);
                         }
 
                         ManageWeather();
