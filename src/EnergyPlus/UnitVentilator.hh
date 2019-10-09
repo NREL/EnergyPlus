@@ -53,8 +53,8 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -315,6 +315,13 @@ namespace UnitVentilator {
                                                       Real64 const MaxOAFrac,       // Maximum Outside Air Fraction
                                                       Real64 const Tinlet,          // Inlet Temperature to Unit or Zone Temperature
                                                       Real64 const Toutdoor         // Outdoor Air Temperature
+    );
+    
+    void CalcMdotCCoilCycFan(Real64 &mdot,                  // mass flow rate
+                             Real64 &QCoilReq,              // Remaining cooling coil load
+                             Real64 const QZnReq,           // Zone load to setpoint
+                               int const UnitVentNum,       // Unit Ventilator index
+                               Real64 const PartLoadRatio   // Part load ratio for unit ventilator
     );
 
 } // namespace UnitVentilator

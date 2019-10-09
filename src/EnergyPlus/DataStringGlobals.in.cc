@@ -46,7 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataStringGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
 
 namespace EnergyPlus {
 

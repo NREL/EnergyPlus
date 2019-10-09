@@ -63,14 +63,16 @@
 #include <nlohmann/json.hpp>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <InputProcessing/DataStorage.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/InputProcessing/DataStorage.hh>
 
 class IdfParser;
 class Validation;
 
 namespace EnergyPlus {
+
+void cleanEPJSON(nlohmann::json &epjson);
 
 class InputProcessor
 {
@@ -176,6 +178,8 @@ public:
     void preScanReportingVariables();
 
     void reportOrphanRecordObjects();
+
+    const json& getObjectInstances(std::string const &ObjType);
 
 private:
     struct ObjectInfo

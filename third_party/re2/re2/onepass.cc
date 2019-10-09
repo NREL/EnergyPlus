@@ -235,7 +235,7 @@ bool Prog::SearchOnePass(const StringPiece& text,
     matchcap[i] = NULL;
 
   StringPiece context = const_context;
-  if (context.begin() == NULL)
+  if (context.data() == NULL)
     context = text;
   if (anchor_start() && context.begin() != text.begin())
     return false;
@@ -249,8 +249,8 @@ bool Prog::SearchOnePass(const StringPiece& text,
   // start() is always mapped to the zeroth OneState.
   OneState* state = IndexToNode(nodes, statesize, 0);
   uint8_t* bytemap = bytemap_;
-  const char* bp = text.begin();
-  const char* ep = text.end();
+  const char* bp = text.data();
+  const char* ep = text.data() + text.size();
   const char* p;
   bool matched = false;
   matchcap[0] = bp;
@@ -590,22 +590,22 @@ bool Prog::IsOnePass() {
       if (nodebyid[i] != -1)
         idmap[nodebyid[i]] = i;
 
-    string dump;
+    std::string dump;
     for (Instq::iterator it = tovisit.begin(); it != tovisit.end(); ++it) {
       int id = *it;
       int nodeindex = nodebyid[id];
       if (nodeindex == -1)
         continue;
       OneState* node = IndexToNode(nodes.data(), statesize, nodeindex);
-      StringAppendF(&dump, "node %d id=%d: matchcond=%#x\n",
-                    nodeindex, id, node->matchcond);
+      dump += StringPrintf("node %d id=%d: matchcond=%#x\n",
+                           nodeindex, id, node->matchcond);
       for (int i = 0; i < bytemap_range_; i++) {
         if ((node->action[i] & kImpossible) == kImpossible)
           continue;
-        StringAppendF(&dump, "  %d cond %#x -> %d id=%d\n",
-                      i, node->action[i] & 0xFFFF,
-                      node->action[i] >> kIndexShift,
-                      idmap[node->action[i] >> kIndexShift]);
+        dump += StringPrintf("  %d cond %#x -> %d id=%d\n",
+                             i, node->action[i] & 0xFFFF,
+                             node->action[i] >> kIndexShift,
+                             idmap[node->action[i] >> kIndexShift]);
       }
     }
     LOG(ERROR) << "nodes:\n" << dump;

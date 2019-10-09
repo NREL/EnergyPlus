@@ -55,7 +55,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 // EnergyPlus Headers
-#include <ElectricPowerServiceManager.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
@@ -1110,7 +1110,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
 
     ASSERT_TRUE(process_idf(idf_objects));
     compare_err_stream("");
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
     GetProjectData();
@@ -2118,7 +2118,7 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
     GetProjectData();

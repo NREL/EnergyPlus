@@ -56,28 +56,28 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <CommandLineInterface.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataRoomAirModel.hh>
-#include <DataStringGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <OutputReportTabular.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <ThermalComfort.hh>
-#include <UtilityRoutines.hh>
-#include <ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -464,6 +464,12 @@ namespace ThermalComfort {
                 SetupOutputVariable("Zone Thermal Comfort Pierce Model Thermal Sensation Index",
                                     OutputProcessor::Unit::None,
                                     ThermalComfortData(Loop).PierceTSENS,
+                                    "Zone",
+                                    "State",
+                                    People(Loop).Name);
+                SetupOutputVariable("Zone Thermal Comfort Pierce Model Standard Effective Temperature",
+                                    OutputProcessor::Unit::C,
+                                    ThermalComfortData(Loop).PierceSET,
                                     "Zone",
                                     "State",
                                     People(Loop).Name);
@@ -1071,7 +1077,7 @@ namespace ThermalComfort {
 
             CloCond = 1.0 / (CloUnit * 0.155);
 
-            // INITIALIZE THE POLLOWING VARIABLES
+            // INITIALIZE THE FOLLOWING VARIABLES
             if (AirVel < 0.137) AirVel = 0.137;
 
             Hc = 8.6 * std::pow(AirVel, 0.53);
@@ -1367,6 +1373,7 @@ namespace ThermalComfort {
 
             ThermalComfortData(PeopleNum).ThermalComfortMRT = RadTemp;
             ThermalComfortData(PeopleNum).ThermalComfortOpTemp = (RadTemp + AirTemp) / 2.0;
+            ThermalComfortData(PeopleNum).PierceSET = SET;
         }
     }
 

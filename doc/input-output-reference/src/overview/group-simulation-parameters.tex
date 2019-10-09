@@ -790,6 +790,109 @@ SimulationControl,
   2;                       !- Maximum Number of HVAC Sizing Simulation Passes
 \end{lstlisting}
 
+\subsection{PerformancePrecisionTradeoffs}\label{performanceprecisiontradeoffs}
+
+The PerformancePrecisionTradeoffs object can be used to control tradeoffs between performance (speed) and precision for certain EnergyPlus features. This object enables users to choose to use selected options that are intended to shorten the time needed for the computer to run EnergyPlus simulations, but may tend to decrease the accuracy of results compared to methods that require longer computing time. 
+
+\paragraph{Field: Use Coil Direct Solutions}\label{use-coil-direct-solutions}
+
+If Yes, an analytical or empirical solution will be used instead of iteration based method in calculations that determine how to control the coil model.  The tradeoff is between an iterative solution algorithm, see \hyperref[hvacystemrootfindingalgorithm]{HVACSystemRootFindingAlgorithm}, or a direct solution algorithm as described below.  These calculations are at the level of how the coil component model is to be controlled by the parent system object as it tries to find a part load ratio that just meets a coil load or coil leaving temperature condition.  Once the control calculations have been completed to determine the part load ratio (or speed ratio for variable speed) the full coil model is still used for the final calculation,
+
+Although this input field may eventually affect all coils, the current implementation is available for only the limited number of systems and coil configurations listed in the following table. Since a linear relationship between system output and part load ratio, or speed ratio, is expected, an analytical direct solution is applied to all coils in the listed in the table when Yes is selected. More coils will be allowed when time allows. Note that this simulation parameter is global and when used every such coil model included in the entire building model will be changed to use the direct method.
+
+The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below
+
+\begin{equation}
+{\left {PLR}\right} = \frac{SystemLoad-OutputOff}{OutputFull - OutputOff}
+\end{equation}
+
+where
+
+PLR = Part load ratio for a single speed coil or for a multiple speed coil at speed 1
+
+SystemLoad = Load requested to meet thermostat setpoint
+
+OutputOff = System output at PLR = 0 as coil off
+
+OutputFull = System output at PLR =1 as full output
+
+The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below
+
+\begin{equation}
+{\left {SpeedRatio}\right} = \frac{SystemLoad-OutputFull_{i-1}}{OutputFull_{i} - OutputFull_{i-1}}
+\end{equation}
+
+where
+
+SpeedRatio = Ratio to represent how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep
+
+SystemLoad = Load requested to meet thermostat setpoint
+
+OutputFull_{i} = System full output at the higher speed
+
+OutputFull_{i-1} = System full output at the lower speed
+
+Note: When a DX cooling coil with a constant volume fan is used, latent degradation is disabled.
+
+When coils of Coil:Cooling:DX:VariableSpeed, Coil:Heating:DX:SingleSpeed, and Coil:Heating:DX:VariableSpeed are applied, the desired outlet temperature are used to determine part load ratio or speed ratio.
+
+The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below
+
+\begin{equation}
+{\left {PLR}\right} = \frac{DesOutTemp - InletTemp}{OutTempFull - InletTemp}
+\end{equation}
+
+where
+
+PLR = Part load ratio for a single speed coil or for a multiple speed coil at speed 1
+
+DesOutTemp = Desired outlet temperature to meet setpoint
+
+InletTemp = Inlet temperature
+
+OutTemptFull = Outlet temperature at PLR =1 as full output
+
+The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below
+
+\begin{equation}
+{\left {SpeedRatio}\right} = \frac{DesOutTemp - OutTempFull_{i-1}}{OutTempFull_{i} - OutTempFull_{i-1}}
+\end{equation}
+
+where
+
+SpeedRatio = Ratio to represent how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep
+
+DesOutTemp = Desired outlet temperature to meet setpoint
+
+OutTempFull_{i} = Outlet temperature of full output at the higher speed
+
+OutTempFull_{i-1} = Outlet temperature of full output at the lower speed
+
+% table 2
+\begin{longtable}[c]{p{4in}p{2.5in}}
+\caption{A list of air systems and associated coils allowed for direct solutions\label{table:a_list_of_air_systems_and_associated_coils_allowed_for_direct solutions}} \tabularnewline
+\toprule
+System & Allowed Coil \tabularnewline
+\midrule
+\endfirsthead
+
+AirLoopHVAC:UnitarySystem & Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Heating:Electric, Coil:Heating:Fuel,  Coil:Heating:DX:MultiSpeed\tabularnewline
+AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed & Coil:Heating:DX:MultiSpeed, Coil:Heating:Electric:MultiStage, Coil:Heating:Gas:MultiStage, Coil:Cooling:DX:MultiSpeed\tabularnewline
+CoilSystem:Cooling:DX & Coil:Cooling:DX:SingleSpeed, Coil:Cooling:DX:VariableSpeed \tabularnewline
+CoilSystem:Heating:DX & Coil:Heating:DX:SingleSpeed, Coil:Heating:DX:VariableSpeed \tabularnewline
+
+\bottomrule
+\end{longtable}
+
+Note: The choice of Load in the Control Type of the AirLoopHVAC:UnitarySystem object is required for all coils listed in the above table.
+
+An IDF example:
+
+\begin{lstlisting}
+PerformancePrecisionTradeoffs,
+  Yes;                      !- Use Coil Direct Solutions
+\end{lstlisting}
+
 \subsection{HVACSystemRootFindingAlgorithm}\label{hvacystemrootfindingalgorithm}
 
 The HVACSystemRootFindingAlgorithm object provides a way to select what type of solution

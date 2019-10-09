@@ -51,10 +51,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataHeatBalance.hh>
-#include <DataPhotovoltaics.hh>
-#include <DataSurfaces.hh>
-#include <Photovoltaics.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataPhotovoltaics.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/Photovoltaics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

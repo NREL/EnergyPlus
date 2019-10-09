@@ -54,16 +54,16 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <DataHVACGlobals.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataSizing.hh>
-#include <General.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <SizingAnalysisObjects.hh>
-#include <UtilityRoutines.hh>
-#include <WeatherManager.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/SizingAnalysisObjects.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 ZoneTimestepObject::ZoneTimestepObject()
@@ -370,8 +370,6 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp()
     // prepare current timing data once and then pass into fill routines
     // function used by both zone and system frequency log updates
 
-    int const ZoneIndex(1);
-
     int locDayOfSim(1);
 
     if (DataGlobals::WarmupFlag) { // DayOfSim not okay during warmup, keeps incrementing up during warmup days
@@ -386,7 +384,7 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp()
         locDayOfSim,
         DataGlobals::HourOfDay,
         DataGlobals::TimeStep,
-        OutputProcessor::TimeValue(ZoneIndex).TimeStep,
+        OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep,
         DataGlobals::NumOfTimeStepInHour);
 
     return tmpztStepStamp;
@@ -405,7 +403,6 @@ void SizingLoggerFramework::UpdateSizingLogValuesZoneStep()
 
 void SizingLoggerFramework::UpdateSizingLogValuesSystemStep()
 {
-    int const SysIndex(2);
     Real64 const MinutesPerHour(60.0);
     ZoneTimestepObject tmpztStepStamp;
     SystemTimestepObject tmpSysStepStamp;
@@ -413,12 +410,12 @@ void SizingLoggerFramework::UpdateSizingLogValuesSystemStep()
     tmpztStepStamp = PrepareZoneTimestepStamp();
 
     // pepare system timestep stamp
-    tmpSysStepStamp.CurMinuteEnd = OutputProcessor::TimeValue(SysIndex).CurMinute;
+    tmpSysStepStamp.CurMinuteEnd = OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute;
     if (tmpSysStepStamp.CurMinuteEnd == 0.0) {
         tmpSysStepStamp.CurMinuteEnd = MinutesPerHour;
     }
-    tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - OutputProcessor::TimeValue(SysIndex).TimeStep * MinutesPerHour;
-    tmpSysStepStamp.TimeStepDuration = OutputProcessor::TimeValue(SysIndex).TimeStep;
+    tmpSysStepStamp.CurMinuteStart = tmpSysStepStamp.CurMinuteEnd - OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep * MinutesPerHour;
+    tmpSysStepStamp.TimeStepDuration = OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep;
 
     for (auto &l : logObjs) {
         l.FillSysStep(tmpztStepStamp, tmpSysStepStamp);

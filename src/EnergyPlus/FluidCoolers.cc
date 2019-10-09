@@ -56,30 +56,30 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <CurveManager.hh>
-#include <DataBranchAirLoopPlant.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <FluidCoolers.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GlobalNames.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <PlantUtilities.hh>
-#include <Psychrometrics.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/FluidCoolers.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -247,6 +247,9 @@ namespace FluidCoolers {
                                                                                                        DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
             SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA = NumArray(1);
+            if (SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUA == DataSizing::AutoSize) {
+                SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized = true;
+            }
             SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity = NumArray(2);
             SimpleFluidCooler(FluidCoolerNum).DesignEnteringWaterTemp = NumArray(3);
             SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirTemp = NumArray(4);
@@ -502,15 +505,16 @@ namespace FluidCoolers {
             }
             if (this->HighSpeedFluidCoolerUA != 0.0) {
                 if (this->HighSpeedFluidCoolerUA > 0.0) {
-                    ShowSevereError(cCurrentModuleObject + "= \"" + this->Name +
-                                    "\". Nominal fluid cooler capacity and design fluid cooler UA have been specified.");
+                    ShowWarningError(cCurrentModuleObject + "= \"" + this->Name +
+                                     "\". Nominal fluid cooler capacity and design fluid cooler UA have been specified.");
                 } else {
-                    ShowSevereError(cCurrentModuleObject + "= \"" + this->Name +
-                                    "\". Nominal fluid cooler capacity has been specified and design fluid cooler UA is being autosized.");
+                    ShowWarningError(cCurrentModuleObject + "= \"" + this->Name +
+                                     "\". Nominal fluid cooler capacity has been specified and design fluid cooler UA is being autosized.");
                 }
                 ShowContinueError(
                     "Design fluid cooler UA field must be left blank when nominal fluid cooler capacity performance input method is used.");
-                ErrorsFound = true;
+                ShowContinueError("Design fluid cooler UA value will be reset to zero and the simulation continuous.");
+                this->HighSpeedFluidCoolerUA = 0.0;
             }
         } else { // Fluid cooler performance input method is not specified as a valid "choice"
             ShowSevereError(cCurrentModuleObject + "= \"" + AlphArray(1) + "\", invalid " + cAlphaFieldNames(4) + " = \"" + AlphArray(4) + "\".");
@@ -1826,6 +1830,7 @@ namespace FluidCoolers {
 
     void clear_state()
     {
+        NumSimpleFluidCoolers = 0;
         SimpleFluidCooler.clear();
         UniqueSimpleFluidCoolerNames.clear();
         GetFluidCoolerInputFlag = true;

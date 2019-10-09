@@ -58,9 +58,9 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportData.hh>
 
 namespace EnergyPlus {
 
@@ -73,7 +73,7 @@ AnnualFieldSet::AnnualFieldSet(std::string varName, AnnualFieldSet::AggregationK
 
 int AnnualFieldSet::getVariableKeyCountandTypeFromFldSt(int &typeVar,
                                                         OutputProcessor::StoreType &avgSumVar,
-                                                        int &stepTypeVar,
+                                                        OutputProcessor::TimeStepType &stepTypeVar,
                                                         OutputProcessor::Unit &unitsVar)
 {
     int numkeys;

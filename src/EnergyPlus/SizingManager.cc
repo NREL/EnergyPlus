@@ -54,43 +54,43 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <AirTerminalUnit.hh>
-#include <CommandLineInterface.hh>
-#include <CostEstimateManager.hh>
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataContaminantBalance.hh>
-#include <DataDefineEquip.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataStringGlobals.hh>
-#include <DataZoneEquipment.hh>
-#include <DisplayRoutines.hh>
-#include <DualDuct.hh>
-#include <EMSManager.hh>
-#include <General.hh>
-#include <HVACCooledBeam.hh>
-#include <HVACFourPipeBeam.hh>
-#include <HVACSingleDuctInduc.hh>
-#include <HeatBalanceManager.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <OutputReportTabular.hh>
-#include <PoweredInductionUnits.hh>
-#include <ReportSizingManager.hh>
-#include <SQLiteProcedures.hh>
-#include <ScheduleManager.hh>
-#include <SimAirServingZones.hh>
-#include <SimulationManager.hh>
-#include <SingleDuct.hh>
-#include <SizingManager.hh>
-#include <UtilityRoutines.hh>
-#include <WeatherManager.hh>
-#include <ZoneEquipmentManager.hh>
+#include <EnergyPlus/AirTerminalUnit.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/CostEstimateManager.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/DualDuct.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACCooledBeam.hh>
+#include <EnergyPlus/HVACFourPipeBeam.hh>
+#include <EnergyPlus/HVACSingleDuctInduc.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/PoweredInductionUnits.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SingleDuct.hh>
+#include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 
 namespace EnergyPlus {
 
@@ -1994,7 +1994,7 @@ namespace SizingManager {
                             }
                             if (TotConcurrentPeopleOnSys >= DataSizing::PsBySys(AirLoopNum)) {
                                 DataSizing::PsBySys(AirLoopNum) = TotConcurrentPeopleOnSys; // store max concurrent occupancy on system
-                                // store timing description of Last occurance of max
+                                // store timing description of Last occurrence of max
                                 int Month(0);
                                 int DayOfMonth(0);
                                 General::InvOrdinalDay(DayLoop, Month, DayOfMonth, 1);
@@ -2509,7 +2509,7 @@ namespace SizingManager {
             GlobalCoolSizingFactor = 1.0;
             NumTimeStepsInAvg = NumOfTimeStepInHour;
         } else {
-            ShowFatalError(cCurrentModuleObject + ": More than 1 occurence of this object; only 1 allowed");
+            ShowFatalError(cCurrentModuleObject + ": More than 1 occurrence of this object; only 1 allowed");
         }
 
         if (NumTimeStepsInAvg < NumOfTimeStepInHour) {

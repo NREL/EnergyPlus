@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_UTILS_QTJSON_UTILS_HPP
-#define __VALIJSON_UTILS_QTJSON_UTILS_HPP
 
 #include <QFile>
 
@@ -44,5 +42,3 @@ inline bool loadDocument(const std::string &path, QJsonValue &root)
 
 }  // namespace utils
 }  // namespace valijson
-
-#endif

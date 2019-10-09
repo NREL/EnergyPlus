@@ -56,15 +56,15 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace HVACFan {
 
-    int getFanObjectVectorIndex(std::string const &objectName);
+    int getFanObjectVectorIndex(std::string const &objectName, bool const CheckFlag = true);
 
     bool checkIfFanNameIsAFanSystem(std::string const &objectName);
 
