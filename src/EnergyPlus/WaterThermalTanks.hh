@@ -523,7 +523,7 @@ namespace WaterThermalTanks {
 
         void CalcWaterThermalTankMixed(); // Water Heater being simulated
 
-        void CalcStandardRatings(int WaterThermalTankNum);
+        void CalcStandardRatings();
 
         void ReportCWTankInits();
 
@@ -871,8 +871,8 @@ namespace WaterThermalTanks {
                                   Real64 DeadBandTemp,
                                   Real64 SetPointTemp);
 
-    void SetVSHPWHFlowRates(int WaterThermalTankNum,
-                            int HPNum,
+    void SetVSHPWHFlowRates(WaterThermalTankData &Tank,
+                            HeatPumpWaterHeaterData &HPWH,
                             int SpeedNum,
                             Real64 SpeedRatio,
                             Real64 WaterDens,
