@@ -157,19 +157,19 @@ namespace WaterThermalTanks {
     };
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int NumChilledWaterMixed;        // number of mixed chilled water tanks
-    extern int NumChilledWaterStratified;   // number of stratified chilled water tanks
-    extern int NumWaterHeaterMixed;         // number of mixed water heaters
-    extern int NumWaterHeaterStratified;    // number of stratified water heaters
-    extern int NumWaterThermalTank;         // total number of water thermal tanks, hot and cold (MIXED + STRATIFIED)
-    extern int NumWaterHeaterDesuperheater; // number of desuperheater heating coils
-    extern int NumHeatPumpWaterHeater;      // number of heat pump water heaters
+    extern int modNumChilledWaterMixed;        // number of mixed chilled water tanks
+    extern int modNumChilledWaterStratified;   // number of stratified chilled water tanks
+    extern int modNumWaterHeaterMixed;         // number of mixed water heaters
+    extern int modNumWaterHeaterStratified;    // number of stratified water heaters
+    extern int modNumWaterThermalTank;         // total number of water thermal tanks, hot and cold (MIXED + STRATIFIED)
+    extern int modNumWaterHeaterDesuperheater; // number of desuperheater heating coils
+    extern int modNumHeatPumpWaterHeater;      // number of heat pump water heaters
 
     extern Real64 modHPPartLoadRatio;            // part load ratio of HPWH
     extern bool modGetWaterThermalTankInputFlag; // Calls to Water Heater from multiple places in code
     extern Real64 modMixerInletAirSchedule;      // output of inlet air mixer node schedule
     extern Real64 modMdotAir;                    // mass flow rate of evaporator air, kg/s
-    extern int NumWaterHeaterSizing;          // Number of sizing/design objects for water heaters.
+    extern int modNumWaterHeaterSizing;          // Number of sizing/design objects for water heaters.
     extern Array1D_bool AlreadyRated;         // control so we don't repeat again
 
     struct StratifiedNodeData
@@ -486,9 +486,9 @@ namespace WaterThermalTanks {
         {
         }
 
-        Real64 PartLoadFactor(Real64 PartLoadRatio);
+        Real64 PartLoadFactor(Real64 PartLoadRatio_loc);
 
-        void CalcNodeMassFlows(int InletMode);
+        void CalcNodeMassFlows(int InletMode_loc);
 
         void SetupStratifiedNodes();
 
@@ -499,7 +499,7 @@ namespace WaterThermalTanks {
 
         bool SourceHeatNeed(Real64 OutletTemp,
                             Real64 DeadBandTemp,
-                            Real64 SetPointTemp);
+                            Real64 SetPointTemp_loc);
 
         void SizeDemandSidePlantConnections();
 

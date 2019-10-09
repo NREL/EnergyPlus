@@ -532,7 +532,7 @@ TEST_F(WaterThermalTanksFixture, HPWHWrappedDummyNodeConfig)
 
     WaterThermalTanks::GetWaterThermalTankInput();
 
-    for (int i = 1; i <= WaterThermalTanks::NumHeatPumpWaterHeater; ++i) {
+    for (int i = 1; i <= WaterThermalTanks::modNumHeatPumpWaterHeater; ++i) {
         auto const &HPWH = WaterThermalTanks::HPWaterHeater(i);
         auto const &Tank = WaterThermalTanks::WaterThermalTank(HPWH.WaterHeaterTankNum);
         EXPECT_EQ(HPWH.CondWaterInletNode, Tank.SourceOutletNode);
