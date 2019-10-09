@@ -9,18 +9,20 @@ import matplotlib.pyplot as plt
 api = EnergyPlusAPI()
 runtime = api.runtime()
 data = api.data_transfer()
-ydata = []
+y_data = []
+electricity_sensor = 0
 
 
 def timestep_handler():
-    electricity_sensor = data.get_meter_handle(u"ELECTRICITY:FACILITY")
+    global electricity_sensor
+    if not electricity_sensor:
+        electricity_sensor = data.get_meter_handle(u"ELECTRICITY:FACILITY")
     electricity = data.get_meter_value(electricity_sensor)
-    ydata.append(electricity)
-    plt.plot(ydata)
+    y_data.append(electricity)
 
 
 runtime.register_callback_new_timestep(timestep_handler)
 runtime.run_energyplus('/tmp/epdll'.encode('utf-8'))
 
-# plt.plot(ydata)
-# plt.show()
+plt.plot(y_data)
+plt.show()

@@ -2,6 +2,9 @@ from ctypes import cdll, c_int, c_char_p, c_void_p, CFUNCTYPE
 from typing import Union
 
 
+all_callbacks = []  # CFUNCTYPE wrapped Python callbacks need to be kept in memory explicitly, otherwise we may segfault
+
+
 class Runtime:
 
     def __init__(self, api: cdll):
@@ -48,7 +51,11 @@ class Runtime:
         return self.api.cRunEnergyPlus(path_to_dir)
 
     def register_callback_new_environment(self, f):
-        self.api.registerRuntimeCallbackFromBeginNewEvironment(self.py_callback_type(f))
+        cb_ptr = self.py_callback_type(f)
+        all_callbacks.append(cb_ptr)
+        self.api.registerRuntimeCallbackFromBeginNewEvironment(cb_ptr)
 
     def register_callback_new_timestep(self, f):
-        self.api.registerRuntimeCallbackFromBeginZoneTimestepBeforeInitHeatBalance(self.py_callback_type(f))
+        cb_ptr = self.py_callback_type(f)
+        all_callbacks.append(cb_ptr)
+        self.api.registerRuntimeCallbackFromBeginZoneTimestepBeforeInitHeatBalance(cb_ptr)
