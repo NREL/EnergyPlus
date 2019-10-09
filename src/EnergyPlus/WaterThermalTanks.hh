@@ -486,6 +486,8 @@ namespace WaterThermalTanks {
         {
         }
 
+        Real64 PartLoadFactor(Real64 PartLoadRatio);
+
         void CalcNodeMassFlows(int InletMode);
 
         void SetupStratifiedNodes();
@@ -509,7 +511,7 @@ namespace WaterThermalTanks {
 
         void SizeSupplySidePlantConnections(Optional_int_const LoopNum = _, Optional_int_const LoopSideNum = _);
 
-        void CalcWaterThermalTank(int WaterThermalTankNum);
+        void CalcWaterThermalTank();
 
         void SizeStandAloneWaterHeater();
 
@@ -519,7 +521,7 @@ namespace WaterThermalTanks {
 
         void CalcWaterThermalTankStratified(); // Water Heater being simulated
 
-        void CalcWaterThermalTankMixed(int WaterThermalTankNum); // Water Heater being simulated
+        void CalcWaterThermalTankMixed(); // Water Heater being simulated
 
         void CalcStandardRatings(int WaterThermalTankNum);
 
@@ -839,8 +841,6 @@ namespace WaterThermalTanks {
                             Real64 Q,  // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
                             Real64 t   // Time elapsed from Ti to Tf (s)
     );
-
-    Real64 PartLoadFactor(int WaterThermalTankNum, Real64 PartLoadRatio);
 
     void CalcDesuperheaterWaterHeater(int WaterThermalTankNum, // Water Heater being simulated
                                       bool FirstHVACIteration  // TRUE if First iteration of simulation

@@ -1842,7 +1842,7 @@ TEST_F(WaterThermalTanksFixture, MixedTankTimeNeededCalc)
     // zero source mass flow rate
     Tank.SourceMassFlowRate = 0.0;
 
-    Tank.CalcWaterThermalTankMixed(TankNum);
+    Tank.CalcWaterThermalTankMixed();
 
     // steady state estimated tank skin heat loss rate (1 minute time step)
     Real64 TankSkinHeatLossRate = -Tank.OffCycLossFracToZone * Tank.OffCycLossCoeff * (Tank.AmbientTempZone - Tank.TankTempAvg);
@@ -3314,7 +3314,7 @@ TEST_F(WaterThermalTanksFixture, MixedTank_WarnPotentialFreeze)
     Tank.SourceMassFlowRate = 0.0;
 
     // Calls CalcWaterThermalTankMixed
-    Tank.CalcWaterThermalTank(TankNum);
+    Tank.CalcWaterThermalTank();
 
     // expected tank avg temp less than starting value of 2 C
     EXPECT_LT(Tank.TankTempAvg, 2.0);
@@ -3421,7 +3421,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTank_WarnPotentialFreeze)
     Tank.SourceMassFlowRate = 0.0;
 
     // Calls CalcWaterThermalTankStratified
-    Tank.CalcWaterThermalTank(TankNum);
+    Tank.CalcWaterThermalTank();
 
     // expected tank avg temp less than starting value of 2 C
     EXPECT_LT(Tank.TankTempAvg, 2.0);
