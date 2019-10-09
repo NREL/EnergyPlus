@@ -84,7 +84,7 @@ double getVariableValue(const int handle) {
 }
 
 double getMeterValue(int handle) {
-    return EnergyPlus::GetInstantMeterValue(handle, EnergyPlus::OutputProcessor::TimeStepType::TimeStepSystem);
+    return EnergyPlus::GetCurrentMeterValue(handle);
 }
 
 int setActuatorValue(const int handle, const double value) {

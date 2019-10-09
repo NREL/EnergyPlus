@@ -619,6 +619,7 @@ namespace OutputProcessor {
                                          ReportingFrequency const ReportFreq // Reporting Frequency
     );
 
+    // TODO: GET RID OF THESE REDIMENSIONS
     inline void ReallocateIntegerArray(Array1D_int &Array,
                                        int &ArrayMax,     // Current and resultant dimension for Array
                                        int const ArrayInc // increment for redimension

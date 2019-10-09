@@ -8,7 +8,7 @@ class Runtime:
         self.api = api
         self.api.cRunEnergyPlus.argtypes = [c_char_p]
         self.api.cRunEnergyPlus.restype = c_int
-        self.py_callback_type = CFUNCTYPE(None)
+        self.py_callback_type = CFUNCTYPE(c_void_p)
         self.api.registerRuntimeCallbackFromBeginNewEvironment.argtypes = [self.py_callback_type]
         self.api.registerRuntimeCallbackFromBeginNewEvironment.restype = c_void_p
         self.api.registerRuntimeCallbackFromBeginNewEvironment.argtypes = [self.py_callback_type]
