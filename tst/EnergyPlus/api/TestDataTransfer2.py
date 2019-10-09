@@ -16,10 +16,11 @@ def timestep_handler():
     electricity_sensor = data.get_meter_handle(u"ELECTRICITY:FACILITY")
     electricity = data.get_meter_value(electricity_sensor)
     ydata.append(electricity)
+    plt.plot(ydata)
 
 
 runtime.register_callback_new_timestep(timestep_handler)
 runtime.run_energyplus('/tmp/epdll'.encode('utf-8'))
 
-plt.plot(ydata)
-plt.show()
+# plt.plot(ydata)
+# plt.show()
