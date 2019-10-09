@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
@@ -247,7 +248,7 @@ namespace WaterThermalTanks {
         }
     };
 
-    struct WaterThermalTankData
+    struct WaterThermalTankData : PlantComponent
     {
         // Members
         std::string Name;                  // Name of water heater
@@ -486,6 +487,8 @@ namespace WaterThermalTanks {
         {
         }
 
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
         Real64 PartLoadFactor(Real64 PartLoadRatio_loc);
 
         void CalcNodeMassFlows(int InletMode_loc);
@@ -534,7 +537,7 @@ namespace WaterThermalTanks {
         Real64 getDeadBandTemp();
     };
 
-    struct HeatPumpWaterHeaterData
+    struct HeatPumpWaterHeaterData : PlantComponent
     {
         // Members
         std::string Name;                                   // Name of heat pump water heater
@@ -686,9 +689,12 @@ namespace WaterThermalTanks {
                   MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true), CheckHPWHEquipName(true)
         {
         }
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
     };
 
-    struct WaterHeaterDesuperheaterData
+    struct WaterHeaterDesuperheaterData : PlantComponent
     {
         // Members
         std::string Name;              // Name of heat pump water heater desuperheater
@@ -760,6 +766,9 @@ namespace WaterThermalTanks {
               RegulaFalsiFailedIndex2(0), RegulaFalsiFailedNum2(0), FirstTimeThroughFlag(true), ValidSourceType(false)
         {
         }
+
+        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
     };
 
     // Object Data

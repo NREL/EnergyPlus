@@ -197,6 +197,12 @@ namespace WaterThermalTanks {
         modCalcWaterThermalTankZoneGains_MyEnvrnFlag = true;
     }
 
+    void WaterThermalTankData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+            bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    {
+
+    }
+
     void SimWaterThermalTank(int const CompType,
                              std::string const &CompName,
                              int &CompIndex,
@@ -496,6 +502,12 @@ namespace WaterThermalTanks {
         }
     }
 
+    void WaterHeaterDesuperheaterData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                        bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    {
+
+    }
+
     void SimulateWaterHeaterStandAlone(int const WaterHeaterNum, bool const FirstHVACIteration)
     {
 
@@ -593,6 +605,12 @@ namespace WaterThermalTanks {
                 }
             }
         }
+    }
+
+    void HeatPumpWaterHeaterData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                        bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    {
+
     }
 
     void SimHeatPumpWaterHeater(std::string const &CompName,
