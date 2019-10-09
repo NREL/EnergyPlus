@@ -12,6 +12,10 @@ data = api.data_transfer()
 y_data = []
 electricity_sensor = 0
 
+fig = plt.gcf()
+fig.show()
+fig.canvas.draw()
+
 
 def timestep_handler():
     global electricity_sensor
@@ -19,10 +23,9 @@ def timestep_handler():
         electricity_sensor = data.get_meter_handle(u"ELECTRICITY:FACILITY")
     electricity = data.get_meter_value(electricity_sensor)
     y_data.append(electricity)
+    plt.plot(y_data)
+    fig.canvas.draw()
 
 
 runtime.register_callback_new_timestep(timestep_handler)
 runtime.run_energyplus('/tmp/epdll'.encode('utf-8'))
-
-plt.plot(y_data)
-plt.show()
