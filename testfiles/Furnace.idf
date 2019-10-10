@@ -75,7 +75,7 @@
 ! HVAC:                           Example of Constant Volume blowthru furnace, heat only, gas heater.
 !                                 Central gas heating coil.  Thermostat setting at 20 C in winter with 15 C set back temperature.
 !
-! Zonal Equipment:                AirTerminal:SingleDuct:Uncontrolled
+! Zonal Equipment:                AirTerminal:SingleDuct:ConstantVolume:NoRheat
 ! Central Air Handling Equipment: Yes
 ! System Equipment Autosize:      No
 ! Purchased Cooling:              No

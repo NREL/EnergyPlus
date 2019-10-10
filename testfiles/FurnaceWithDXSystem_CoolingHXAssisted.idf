@@ -81,7 +81,7 @@
 !                                 summer with 30 C set back temperature.
 !                                 The cooling coil is scheduled off in winter, the heating coil is scheduled on all year.
 !
-! Zonal Equipment:                AirTerminal:SingleDuct:Uncontrolled
+! Zonal Equipment:                AirTerminal:SingleDuct:ConstantVolume:NoRheat
 ! Central Air Handling Equipment: Yes
 ! System Equipment Autosize:      No (chilled water loop volume is autosized although not used)
 ! Purchased Cooling:              No

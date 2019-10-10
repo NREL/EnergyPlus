@@ -3,7 +3,7 @@
 !                          Regular roof.  No Windows.
 !
 ! Highlights:              Example of zone HVAC system (WSHP) with dedicated outdoor air system (DOAS).
-!                          A AirTerminal:SingleDuct:Uncontrolled specifies outdoor air flow rate for the zone with OutDoor Air Method = Sum in
+!                          A AirTerminal:SingleDuct:ConstantVolume:NoRheat specifies outdoor air flow rate for the zone with OutDoor Air Method = Sum in
 !                          DesignSpecification:OutdoorAir.
 !
 ! Simulation Location/Run: Denver Stapleton Intl Arpt CO USA WMO=724690, 2 design days, 1 run period,

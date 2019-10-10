@@ -5224,7 +5224,7 @@
     HTGSETP_SCH_NO_OPTIMUM,  !- Heating Setpoint Temperature Schedule Name
     CLGSETP_SCH_NO_OPTIMUM;  !- Cooling Setpoint Temperature Schedule Name
 
-!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:UNCONTROLLED ===========
+!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT ===========
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Core_ZN Direct Air,      !- Name
