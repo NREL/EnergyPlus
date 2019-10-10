@@ -18667,9 +18667,7 @@ DO iZone = 1, numCompactZoneConstVol
       CALL AddToObjStr('Maximum Hot Water or Steam Flow Rate {m3/s}  ','autosize')
       CALL AddToObjStr('Minimum Hot Water or Steam Flow Rate {m3/s}  ','0')
       CALL AddToObjStr('Convergence Tolerance','0.001')
-      CALL AddToObjFld('Maximum Reheat Air Temperature', base + cvzMaxReheatAirTempOff,' ')
-      CALL AddToObjStr('Design Specification Outdoor Air Object Name', '')
-      CALL AddToObjStr('Per Person Ventilation Rate Mode', '',.TRUE.)
+      CALL AddToObjFld('Maximum Reheat Air Temperature', base + cvzMaxReheatAirTempOff,' ',.TRUE.)
       !COIL:Water:SimpleHeating  ~ line 104
       CALL CreateNewObj('Coil:Heating:Water')
       CALL AddToObjFld('Name', base + cvzNameOff,' Reheat Coil')
@@ -18708,9 +18706,7 @@ DO iZone = 1, numCompactZoneConstVol
       CALL AddToObjStr('Maximum Hot Water or Steam Flow Rate {m3/s}','')
       CALL AddToObjStr('Minimum Hot Water or Steam Flow Rate {m3/s}','')
       CALL AddToObjStr('Convergence Tolerance','0.001')
-      CALL AddToObjFld('Maximum Reheat Air Temperature', base + cvzMaxReheatAirTempOff,' ')
-      CALL AddToObjStr('Design Specification Outdoor Air Object Name', '')
-      CALL AddToObjStr('Per Person Ventilation Rate Mode', '',.TRUE.)
+      CALL AddToObjFld('Maximum Reheat Air Temperature', base + cvzMaxReheatAirTempOff,' ',.TRUE.)
       !COIL:Electric:Heating ~ line 139
       CALL CreateNewObj('Coil:Heating:Electric')
       CALL AddToObjFld('Name', base + cvzNameOff,' Reheat Coil')
@@ -18731,9 +18727,7 @@ DO iZone = 1, numCompactZoneConstVol
       CALL AddToObjStr('Maximum Hot Water or Steam Flow Rate {m3/s}','')
       CALL AddToObjStr('Minimum Hot Water or Steam Flow Rate {m3/s}','')
       CALL AddToObjStr('Convergence Tolerance','0.001')
-      CALL AddToObjFld('Maximum Reheat Air Temperature', base + cvzMaxReheatAirTempOff,' ')
-      CALL AddToObjStr('Design Specification Outdoor Air Object Name', '')
-      CALL AddToObjStr('Per Person Ventilation Rate Mode', '',.TRUE.)
+      CALL AddToObjFld('Maximum Reheat Air Temperature', base + cvzMaxReheatAirTempOff,' ',.TRUE.)
       !Coil:Heating:Fuel
       CALL CreateNewObj('Coil:Heating:Fuel')
       CALL AddToObjFld('Name', base + cvzNameOff,' Reheat Coil')
