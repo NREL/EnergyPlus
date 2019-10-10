@@ -119,7 +119,7 @@ namespace WaterUse {
         WaterConnections.deallocate();
     }
 
-    void SimulateWaterUse(bool const FirstHVACIteration)
+    void SimulateWaterUse(bool FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -226,7 +226,7 @@ namespace WaterUse {
     }
 
     void SimulateWaterUseConnection(
-        int const EP_UNUSED(EquipTypeNum), std::string const &CompName, int &CompIndex, bool const InitLoopEquip, bool const FirstHVACIteration)
+        int EP_UNUSED(EquipTypeNum), std::string &CompName, int &CompIndex, bool InitLoopEquip, bool FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1031,7 +1031,7 @@ namespace WaterUse {
         } // WaterConnNum
     }
 
-    void CalcEquipmentFlowRates(int const WaterEquipNum)
+    void CalcEquipmentFlowRates(int WaterEquipNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1140,7 +1140,7 @@ namespace WaterUse {
         }
     }
 
-    void CalcEquipmentDrainTemp(int const WaterEquipNum)
+    void CalcEquipmentDrainTemp(int WaterEquipNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1237,7 +1237,7 @@ namespace WaterUse {
         }
     }
 
-    void InitConnections(int const WaterConnNum)
+    void InitConnections(int WaterConnNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1341,7 +1341,7 @@ namespace WaterUse {
         }
     }
 
-    void CalcConnectionsFlowRates(int const WaterConnNum, bool const FirstHVACIteration)
+    void CalcConnectionsFlowRates(int WaterConnNum, bool FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1464,7 +1464,7 @@ namespace WaterUse {
         }
     }
 
-    void CalcConnectionsDrainTemp(int const WaterConnNum)
+    void CalcConnectionsDrainTemp(int WaterConnNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1505,7 +1505,7 @@ namespace WaterUse {
             WaterConnections(WaterConnNum).DrainMassFlowRate * Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
     }
 
-    void CalcConnectionsHeatRecovery(int const WaterConnNum)
+    void CalcConnectionsHeatRecovery(int WaterConnNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1623,7 +1623,7 @@ namespace WaterUse {
         }
     }
 
-    void UpdateWaterConnections(int const WaterConnNum)
+    void UpdateWaterConnections(int WaterConnNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1704,7 +1704,7 @@ namespace WaterUse {
         }
     }
 
-    void ReportWaterUse(int const WaterConnNum)
+    void ReportWaterUse(int WaterConnNum)
     {
 
         // SUBROUTINE INFORMATION:

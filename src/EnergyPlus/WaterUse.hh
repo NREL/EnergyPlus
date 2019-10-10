@@ -237,30 +237,30 @@ namespace WaterUse {
 
     void clear_state();
 
-    void SimulateWaterUse(bool const FirstHVACIteration);
+    void SimulateWaterUse(bool FirstHVACIteration);
 
     void SimulateWaterUseConnection(
-        int const EquipTypeNum, std::string const &CompName, int &CompIndex, bool const InitLoopEquip, bool const FirstHVACIteration);
+        int EquipTypeNum, std::string &CompName, int &CompIndex, bool InitLoopEquip, bool FirstHVACIteration);
 
     void GetWaterUseInput();
 
-    void CalcEquipmentFlowRates(int const WaterEquipNum);
+    void CalcEquipmentFlowRates(int WaterEquipNum);
 
-    void CalcEquipmentDrainTemp(int const WaterEquipNum);
+    void CalcEquipmentDrainTemp(int WaterEquipNum);
 
-    void InitConnections(int const WaterConnNum);
+    void InitConnections(int WaterConnNum);
 
-    void CalcConnectionsFlowRates(int const WaterConnNum, bool const FirstHVACIteration);
+    void CalcConnectionsFlowRates(int WaterConnNum, bool FirstHVACIteration);
 
-    void CalcConnectionsDrainTemp(int const WaterConnNum);
+    void CalcConnectionsDrainTemp(int WaterConnNum);
 
-    void CalcConnectionsHeatRecovery(int const WaterConnNum);
+    void CalcConnectionsHeatRecovery(int WaterConnNum);
 
-    void UpdateWaterConnections(int const WaterConnNum);
+    void UpdateWaterConnections(int WaterConnNum);
 
     void ReportStandAloneWaterUse();
 
-    void ReportWaterUse(int const WaterConnNum);
+    void ReportWaterUse(int WaterConnNum);
 
     void CalcWaterUseZoneGains();
 
