@@ -166,9 +166,7 @@ namespace WaterThermalTanks {
 
     static ObjexxFCL::gio::Fmt fmtLD("*");
 
-    bool modInitWaterThermalTanksOnce(true); // flag for 1 time initialization
     bool modGetWaterThermalTankInputFlag(true); // Calls to Water Heater from multiple places in code
-    bool modSimWaterThermalTank_OneTimeSetupFlag(true);
     bool modCalcWaterThermalTankZoneGains_MyEnvrnFlag(true);
 
     void clear_state()
@@ -191,10 +189,28 @@ namespace WaterThermalTanks {
         WaterHeaterDesuperheater.deallocate();
         UniqueWaterThermalTankNames.clear();
 
-        modInitWaterThermalTanksOnce = true;
         modGetWaterThermalTankInputFlag = true;
-        modSimWaterThermalTank_OneTimeSetupFlag = true;
         modCalcWaterThermalTankZoneGains_MyEnvrnFlag = true;
+    }
+
+    PlantComponent *WaterThermalTankData::factory(std::string const &objectName)
+    {
+        // Process the input data
+        if (modGetWaterThermalTankInputFlag) {
+            GetWaterThermalTankInput();
+            modGetWaterThermalTankInputFlag = false;
+        }
+
+        // Now look for this particular pipe in the list
+        for (auto &tank : WaterThermalTank) {
+            if (tank.Name == objectName) {
+                return &tank;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalWaterTankFactory: Error getting inputs for tank named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
     }
 
     void WaterThermalTankData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
@@ -237,10 +253,6 @@ namespace WaterThermalTanks {
         if (modGetWaterThermalTankInputFlag) {
             GetWaterThermalTankInput();
             modGetWaterThermalTankInputFlag = false;
-        }
-
-        if (modSimWaterThermalTank_OneTimeSetupFlag) {
-            modSimWaterThermalTank_OneTimeSetupFlag = false;
         }
 
         int CompNum;
@@ -789,7 +801,7 @@ namespace WaterThermalTanks {
         //       MODIFIED       R. Raustad, June 2005, added HPWH and desuperheater water heating coils
         //                      B. Griffith, Oct. 2007 extensions for indirect water heaters
         //                      B. Griffith, Feb. 2008 extensions for autosizing water heaters
-        //                      BG Mar 2009.  Trap for bad heater height input for stratefied water heater CR7718
+        //                      BG Mar 2009.  Trap for bad heater height input for stratified water heater CR7718
         //						B. Shen 12/2014, add air-source variable-speed heat pump water heating
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -5723,10 +5735,6 @@ namespace WaterThermalTanks {
         static std::string const GetWaterThermalTankInput("GetWaterThermalTankInput");
         static std::string const SizeTankForDemand("SizeTankForDemandSide");
 
-        if (modInitWaterThermalTanksOnce) {
-            modInitWaterThermalTanksOnce = false;
-        }
-
         if (this->SetLoopIndexFlag && allocated(DataPlant::PlantLoop)) {
 
             if ((this->UseInletNode > 0) && (this->HeatPumpNum == 0)) {
@@ -10154,11 +10162,11 @@ namespace WaterThermalTanks {
                                   bool const FirstHVACIteration,
                                   int const WaterThermalTankSide,
                                   int const PlantLoopSide,
-                                  bool const EP_UNUSED(PlumbedInSeries), // !unused1208
+                                  bool const EP_UNUSED(PlumbedInSeries),
                                   int const BranchControlType,
                                   Real64 const OutletTemp,
                                   Real64 const DeadBandTemp,
-                                  Real64 const SetPointTemp)
+                                  Real64 const SetPointTemp_loc)
     {
 
         // FUNCTION INFORMATION:
@@ -10262,7 +10270,7 @@ namespace WaterThermalTanks {
                 }
 
                 // next determine if tank temperature is such that source side flow might be requested
-                bool NeedsHeatOrCool = WaterThermalTank(WaterThermalTankNum).SourceHeatNeed(OutletTemp, DeadBandTemp, SetPointTemp);
+                bool NeedsHeatOrCool = WaterThermalTank(WaterThermalTankNum).SourceHeatNeed(OutletTemp, DeadBandTemp, SetPointTemp_loc);
 
                 if (MassFlowRequest > 0.0) {
                     if (WaterThermalTankSide == Side::Use) {
@@ -10314,7 +10322,7 @@ namespace WaterThermalTanks {
                 }
 
                 if (WaterThermalTankSide == Side::Source) { // temperature dependent controls for indirect heating/cooling
-                    bool NeedsHeatOrCool = WaterThermalTank(WaterThermalTankNum).SourceHeatNeed(OutletTemp, DeadBandTemp, SetPointTemp);
+                    bool NeedsHeatOrCool = WaterThermalTank(WaterThermalTankNum).SourceHeatNeed(OutletTemp, DeadBandTemp, SetPointTemp_loc);
                     if (MassFlowRequest > 0.0) {
                         if (NeedsHeatOrCool) {
                             FlowResult = MassFlowRequest;

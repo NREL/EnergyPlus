@@ -63,7 +63,7 @@ namespace NonZoneEquipmentManager {
 
     // Functions
 
-    void ManageNonZoneEquipment(bool const FirstHVACIteration,
+    void ManageNonZoneEquipment(bool FirstHVACIteration,
                                 bool &SimNonZoneEquipment // Simulation convergence flag
     );
 

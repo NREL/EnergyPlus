@@ -690,6 +690,9 @@ namespace PlantLoopEquip {
         } else if (GeneralEquipType == GenEquipTypes_WaterThermalTank) {
 
             if ((EquipTypeNum == TypeOf_WtrHeaterMixed) || (EquipTypeNum == TypeOf_WtrHeaterStratified)) {
+
+//                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
                 SimWaterThermalTank(EquipTypeNum,
                                     sim_component.Name,
                                     EquipNum,
@@ -711,6 +714,9 @@ namespace PlantLoopEquip {
 
                 // HEAT PUMP WATER HEATER
             } else if (EquipTypeNum == TypeOf_HeatPumpWtrHeaterPumped || EquipTypeNum == TypeOf_HeatPumpWtrHeaterWrapped) {
+
+//                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
                 SimWaterThermalTank(EquipTypeNum,
                                     sim_component.Name,
                                     EquipNum,
@@ -852,6 +858,9 @@ namespace PlantLoopEquip {
                 }
 
             } else if ((EquipTypeNum == TypeOf_ChilledWaterTankMixed) || (EquipTypeNum == TypeOf_ChilledWaterTankStratified)) {
+
+//                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
                 SimWaterThermalTank(EquipTypeNum,
                                     sim_component.Name,
                                     EquipNum,

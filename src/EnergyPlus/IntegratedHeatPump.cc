@@ -51,8 +51,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
@@ -154,7 +152,7 @@ namespace IntegratedHeatPump {
             }
         };
 
-        if (IntegratedHeatPumps(DXCoilNum).IHPCoilsSized == false) SizeIHP(DXCoilNum);
+        if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(DXCoilNum);
 
         InitializeIHP(DXCoilNum);
 
@@ -2786,7 +2784,7 @@ namespace IntegratedHeatPump {
                            ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
         }
 
-        if (IntegratedHeatPumps(DXCoilNum).IHPCoilsSized == false) SizeIHP(DXCoilNum);
+        if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(DXCoilNum);
 
         FlowScale = 0.0;
         switch (IntegratedHeatPumps(DXCoilNum).CurMode) {
@@ -2795,7 +2793,7 @@ namespace IntegratedHeatPump {
             break;
         case IHPOperationMode::SCMode:
             IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).SCCoilIndex;
-            if (false == IsCallbyWH) // call from air loop
+            if (!IsCallbyWH) // call from air loop
             {
                 FlowScale = IntegratedHeatPumps(DXCoilNum).CoolVolFlowScale;
             }
@@ -2803,7 +2801,7 @@ namespace IntegratedHeatPump {
             break;
         case IHPOperationMode::SHMode:
             IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).SHCoilIndex;
-            if (false == IsCallbyWH) // call from air loop
+            if (!IsCallbyWH) // call from air loop
             {
                 FlowScale = IntegratedHeatPumps(DXCoilNum).HeatVolFlowScale;
             }
@@ -2824,7 +2822,7 @@ namespace IntegratedHeatPump {
         case IHPOperationMode::SCWHMatchWHMode:
             IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex;
             FlowScale = IntegratedHeatPumps(DXCoilNum).CoolVolFlowScale;
-            if (false == IsCallbyWH) {
+            if (!IsCallbyWH) {
                 IsResultFlow = true;
                 AirVolFlowRate = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).AirVolFlowRate;
             }
@@ -2852,7 +2850,7 @@ namespace IntegratedHeatPump {
             break;
         }
 
-        if (false == IsResultFlow) {
+        if (!IsResultFlow) {
             if (1 == SpeedNum)
                 AirVolFlowRate = VarSpeedCoil(IHPCoilIndex).MSRatedAirVolFlowRate(SpeedNum);
             else
@@ -2892,7 +2890,7 @@ namespace IntegratedHeatPump {
                            ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
         }
 
-        if (IntegratedHeatPumps(DXCoilNum).IHPCoilsSized == false) SizeIHP(DXCoilNum);
+        if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(DXCoilNum);
 
         switch (IntegratedHeatPumps(DXCoilNum).CurMode) {
         case IHPOperationMode::IdleMode:
@@ -2972,7 +2970,7 @@ namespace IntegratedHeatPump {
                            ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
         }
 
-        if (IntegratedHeatPumps(DXCoilNum).IHPCoilsSized == false) SizeIHP(DXCoilNum);
+        if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(DXCoilNum);
 
         FlowScale = 0.0;
         switch (IntegratedHeatPumps(DXCoilNum).CurMode) {
@@ -2982,7 +2980,7 @@ namespace IntegratedHeatPump {
             break;
         case IHPOperationMode::SCMode:
             IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).SCCoilIndex;
-            if (false == IsCallbyWH) {
+            if (!IsCallbyWH) {
                 FlowScale = IntegratedHeatPumps(DXCoilNum).CoolVolFlowScale;
             } else {
                 IsResultFlow = true;
@@ -2991,7 +2989,7 @@ namespace IntegratedHeatPump {
             break;
         case IHPOperationMode::SHMode:
             IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).SHCoilIndex;
-            if (false == IsCallbyWH) {
+            if (!IsCallbyWH) {
                 FlowScale = IntegratedHeatPumps(DXCoilNum).HeatVolFlowScale;
             } else {
                 IsResultFlow = true;
@@ -3015,7 +3013,7 @@ namespace IntegratedHeatPump {
         case IHPOperationMode::SCWHMatchWHMode:
             IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex;
             FlowScale = IntegratedHeatPumps(DXCoilNum).CoolVolFlowScale;
-            if (false == IsCallbyWH) {
+            if (!IsCallbyWH) {
                 IsResultFlow = true;
                 AirMassFlowRate = IntegratedHeatPumps(DXCoilNum).AirFlowSavInWaterLoop;
             }

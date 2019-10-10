@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
@@ -171,7 +172,6 @@ namespace WaterThermalTanks {
     extern Real64 modMixerInletAirSchedule;      // output of inlet air mixer node schedule
     extern Real64 modMdotAir;                    // mass flow rate of evaporator air, kg/s
     extern int modNumWaterHeaterSizing;          // Number of sizing/design objects for water heaters.
-    extern Array1D_bool AlreadyRated;         // control so we don't repeat again
 
     struct StratifiedNodeData
     {
@@ -487,6 +487,8 @@ namespace WaterThermalTanks {
         {
         }
 
+        static PlantComponent *factory(std::string const &objectName);
+
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         Real64 PartLoadFactor(Real64 PartLoadRatio_loc);
@@ -712,6 +714,7 @@ namespace WaterThermalTanks {
         std::string TankType;          // Type of water heater (MIXED or STRATIFIED)
         int TankTypeNum;               // Parameter for tank type (MIXED or STRATIFIED)
         std::string TankName;          // Name of tank associated with desuperheater
+        int TankNum;
         bool StandAlone;               // Flag for operation with no plant connections (no use nodes)
         std::string HeatingSourceType;        // Type of heating source (DX coil or refrigerated rack)
         std::string HeatingSourceName;        // Name of heating source
@@ -757,7 +760,7 @@ namespace WaterThermalTanks {
         WaterHeaterDesuperheaterData()
             : InsuffTemperatureWarn(0), AvailSchedPtr(0), SetPointTempSchedule(0), DeadBandTempDiff(0.0), HeatReclaimRecoveryEff(0.0),
               WaterInletNode(0), WaterOutletNode(0), RatedInletWaterTemp(0.0), RatedOutdoorAirTemp(0.0), MaxInletWaterTemp(0.0), TankTypeNum(0),
-              StandAlone(false), HeaterRate(0.0), HeaterEnergy(0.0), PumpPower(0.0), PumpEnergy(0.0), PumpElecPower(0.0), PumpFracToWater(0.0),
+              TankNum(0), StandAlone(false), HeaterRate(0.0), HeaterEnergy(0.0), PumpPower(0.0), PumpEnergy(0.0), PumpElecPower(0.0), PumpFracToWater(0.0),
               OperatingWaterFlowRate(0.0), HEffFTemp(0), HEffFTempOutput(0.0), SetPointTemp(0.0), WaterHeaterTankNum(0), DesuperheaterPLR(0.0),
               OnCycParaLoad(0.0), OffCycParaLoad(0.0), OnCycParaFuelEnergy(0.0), OnCycParaFuelRate(0.0), OffCycParaFuelEnergy(0.0),
               OffCycParaFuelRate(0.0), Mode(0), SaveMode(0), SaveWHMode(0), BackupElementCapacity(0.0), DXSysPLR(0.0),
