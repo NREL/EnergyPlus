@@ -1892,6 +1892,7 @@ namespace MixedAir {
                                                     if (UtilityRoutines::SameString(ZoneEquipList(EquipListNum).EquipName(EquipNum),
                                                                                     AirDistUnit(ADUNum).Name)) {
                                                         if ((AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctVAVReheat) ||
+                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctConstVolNoReheat) ||
                                                             (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctConstVolReheat) ||
                                                             (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctVAVNoReheat) ||
                                                             (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctVAVReheatVSFan) ||

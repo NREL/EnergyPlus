@@ -899,7 +899,8 @@ namespace SizingManager {
                             DataSizing::VpzClgByZone(termUnitSizingIndex) =
                                 SingleDuct::Sys(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
 
-                            if (SingleDuct::Sys(singleDuctATUNum).SysType_Num == SingleDuct::SingleDuctConstVolReheat) {
+                            if (SingleDuct::Sys(singleDuctATUNum).SysType_Num == SingleDuct::SingleDuctConstVolReheat ||
+                                SingleDuct::Sys(singleDuctATUNum).SysType_Num == SingleDuct::SingleDuctConstVolNoReheat) {
                                 airLoopHeatingMinimumFlowRateSum += SingleDuct::Sys(singleDuctATUNum).MaxAirVolFlowRate;
                                 airLoopHeatingMaximumFlowRateSum += SingleDuct::Sys(singleDuctATUNum).MaxAirVolFlowRate;
 
