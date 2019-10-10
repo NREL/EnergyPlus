@@ -8,12 +8,12 @@ PUBLIC
 CONTAINS
 
 SUBROUTINE SetThisVersionVariables()
-      VerString='Conversion 9.2 => 9.2b'
-      VersionNum=9.2
-      sVersionNum='9.2'
-      IDDFileNameWithPath=TRIM(ProgramPath)//'V9-2-0-Energy+Old.idd'
-      NewIDDFileNameWithPath=TRIM(ProgramPath)//'V9-2-0-Energy+.idd'
-      RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 9-1-0 to 9-2-0.csv'
+      VerString='Conversion 9.2 => 9.3'
+      VersionNum=9.3
+      sVersionNum='9.3'
+      IDDFileNameWithPath=TRIM(ProgramPath)//'V9-2-0-Energy+.idd'
+      NewIDDFileNameWithPath=TRIM(ProgramPath)//'V9-3-0-Energy+.idd'
+      RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 9-2-0 to 9-3-0.csv'
 END SUBROUTINE
 
 END MODULE
@@ -99,6 +99,17 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=10) :: LocalFileExtension=' '
   LOGICAL :: WildMatch
 
+  ! For Table:Lookup objects
+  INTEGER NumPerimObjs
+  INTEGER PArgs
+
+  INTEGER :: iPt, iPt2, iPt3
+  INTEGER, ALLOCATABLE, DIMENSION(:) :: NumIndVarsVals, CurIndices, Increments, StepSize
+  INTEGER NumOutputVals, NumIndVars, RefIndex, FlatIndex, NumMiniTables, MiniTableSize
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:,:) :: IndVars
+  INTEGER, ALLOCATABLE, DIMENSION(:,:) :: IndVarOrder
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: OutputVals
+
   LOGICAL :: ConnComp
   LOGICAL :: ConnCompCtrl
   LOGICAL :: FileExist
@@ -129,20 +140,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER PNumArgs   ! Number of Arguments in a definition
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: POutArgs
 
-
-  ! For Defaulting now-required RunPeriod Name
-  INTEGER :: TotRunPeriods = 0
-  INTEGER :: runPeriodNum = 0
-  INTEGER :: iterateRunPeriod = 0
-  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: CurrentRunPeriodNames
-  CHARACTER(len=20) :: PotentialRunPeriodName
-
-  ! Only needed for ZoneHVAC:EquipmentList translation
-  INTEGER zeqNum
-  CHARACTER(len=20) :: zeqNumStr
-  CHARACTER(len=7) :: zeqHeatingOrCooling
-  LOGICAL :: writeScheduleTypeObj = .true.
-  
   ! For AirTerminal:SingleDuct:Uncontrolled transition
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: ATSDUNodeNames
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: MatchingATSDUAirFlowNodeNames
@@ -154,6 +151,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER nodeListCount
   INTEGER nodeCountA
   LOGICAL :: nodeFound = .false.
+
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -325,8 +323,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
             END IF
           ENDDO
 
- 
-
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                                       P R O C E S S I N G                                                        !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -423,13 +419,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               SELECT CASE (MakeUPPERCase(TRIM(IDFRecords(Num)%Name)))
 
               CASE ('VERSION')
-!                IF ((InArgs(1)(1:3)) == sVersionNum .and. ArgFile) THEN
-!                  CALL ShowWarningError('File is already at latest version.  No new diff file made.',Auditf)
-!                  CLOSE(diflfn,STATUS='DELETE')
-!                  LatestVersion=.true.
-!                  EXIT
-!                ENDIF
-!                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                IF ((InArgs(1)(1:3)) == sVersionNum .and. ArgFile) THEN
+                  CALL ShowWarningError('File is already at latest version.  No new diff file made.',Auditf)
+                  CLOSE(diflfn,STATUS='DELETE')
+                  LatestVersion=.true.
+                  EXIT
+                ENDIF
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1) = sVersionNum
                 NoDiff=.false.
 
@@ -467,6 +463,25 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 POutArgs(6) = Blank
                 POutArgs(7) = InArgs(7)
                 CALL WriteOutIDFLines(DifLfn,'ZoneHVAC:AirDistributionUnit',PNumArgs,POutArgs,PFldNames,PFldUnits)
+
+              ! This is part of the transition for AirTerminal:SingleDuct:Uncontrolled
+              CASE('ZONEHVAC:EQUIPMENTLIST')
+                nodiff = .false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                DO CurField = 1, CurArgs
+                    ! Add air terminal unit object type and name change here (see AirTerminal:SingleDuct:Uncontrolled above)
+                    IF (CurField > 2) THEN
+                      IF (SameString(TRIM(InArgs(CurField)),'AirTerminal:SingleDuct:Uncontrolled')) THEN
+                        OutArgs(CurField) = 'ZoneHVAC:AirDistributionUnit'
+                      ELSE IF (SameString(TRIM(InArgs(CurField-1)),'AirTerminal:SingleDuct:Uncontrolled')) THEN
+                        OutArgs(CurField) = TRIM(InArgs(CurField)) // ' ADU'
+                      ELSE
+                        OutArgs(CurField) = InArgs(CurField)
+                      END IF
+                    ELSE
+                      OutArgs(CurField) = InArgs(CurField)
+                    END IF
+                END DO
 
               ! This is part of the transition for AirTerminal:SingleDuct:Uncontrolled
               CASE('AIRLOOPHVAC:ZONESPLITTER')
@@ -747,7 +762,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 NoDiff=.true.
               ENDIF
               ! Whew - Done with the transition for AirTerminal:SingleDuct:Uncontrolled
-              ! Well - almost done, there's more in the case below for ZoneHVAC:EquipmentList . . .
 
               ! If your original object starts with B, insert the rules here
 
@@ -777,6 +791,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with R, insert the rules here
 
+              ! See above - this object is part of the transition for AirTerminal:SingleDuct:Uncontrolled
+              ! CASE('ROOMAIR:NODE:AIRFLOWNETWORK:HVACEQUIPMENT')
+
+              ! If your original object starts with S, insert the rules here
+
               ! If your original object starts with T, insert the rules here
 
               ! If your original object starts with U, insert the rules here
@@ -786,23 +805,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with W, insert the rules here
 
               ! If your original object starts with Z, insert the rules here
-              CASE('ZONEHVAC:EQUIPMENTLIST')
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                DO CurField = 1, CurArgs
-                    ! Add air terminal unit object type and name change here (see AirTerminal:SingleDuct:Uncontrolled above)
-                    IF (CurField > 2) THEN
-                      IF (SameString(TRIM(InArgs(CurField)),'AirTerminal:SingleDuct:Uncontrolled')) THEN
-                        OutArgs(CurField) = 'ZoneHVAC:AirDistributionUnit'
-                      ELSE IF (SameString(TRIM(InArgs(CurField-1)),'AirTerminal:SingleDuct:Uncontrolled')) THEN
-                        OutArgs(CurField) = TRIM(InArgs(CurField)) // ' ADU'
-                      ELSE
-                        OutArgs(CurField) = InArgs(CurField)
-                      END IF
-                    ELSE
-                      OutArgs(CurField) = InArgs(CurField)
-                    END IF
-                END DO
+              
+              ! See above - this object is part of the transition for AirTerminal:SingleDuct:Uncontrolled
+              ! CASE('ZONEHVAC:EQUIPMENTLIST')
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
@@ -1365,3 +1370,49 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   RETURN
 
 END SUBROUTINE CreateNewIDFUsingRules
+
+SUBROUTINE SortUnique(StrArray, Size, Order)
+  IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
+  CHARACTER(len=*), DIMENSION(Size) :: StrArray
+  Integer, DIMENSION(Size) :: Order
+  INTEGER :: Size, InitSize
+
+  REAL, ALLOCATABLE, DIMENSION(:)  :: InNumbers
+  REAL, ALLOCATABLE, DIMENSION(:)  :: OutNumbers
+  INTEGER :: I, I2
+  REAL :: min_val, max_val
+
+  ALLOCATE(InNumbers(Size))
+  ALLOCATE(OutNumbers(Size))
+
+  InitSize = Size
+
+  DO I=1,Size
+    READ(StrArray(I),*) InNumbers(I)
+  END DO
+
+  min_val = minval(InNumbers)-1
+  max_val = maxval(InNumbers)
+
+  Size = 0
+  DO WHILE (min_val<max_val)
+    Size = Size+1
+    min_val = minval(InNumbers, MASK=InNumbers>min_val)
+    OutNumbers(Size) = min_val
+  END DO
+
+  DO I=1,Size
+    WRITE(StrArray(I),'(F0.5)') OutNumbers(I)
+    StrArray(I) =  TRIM(StrArray(I))
+  END DO
+
+  DO I=1,InitSize
+    DO I2=1,Size
+      IF (OutNumbers(I2) == InNumbers(I)) THEN
+        Order(I) = I2
+        EXIT
+      END IF
+    END DO
+  END DO
+
+END SUBROUTINE SortUnique
