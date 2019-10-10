@@ -891,6 +891,10 @@ namespace WaterThermalTanks {
 
     // STATIC FUNCTIONS
 
+    void SetupWaterHeaterOutputs(int WaterThermalTankNum);
+
+    void SetupChilledWaterTankOutputs(int WaterThermalTankNum);
+
     // used by: CalcHeatPumpWaterHeater
     Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1<Real64> const &Par);
 
