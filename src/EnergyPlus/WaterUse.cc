@@ -85,11 +85,6 @@ namespace WaterUse {
     //       MODIFIED       Brent Griffith, plant upgrade
     //       RE-ENGINEERED  na
 
-    // Using/Aliasing
-    //using namespace DataPrecisionGlobals;
-    //using DataGlobals::NumOfZones;
-    //using DataGlobals::WarmupFlag;
-
     // MODULE PARAMETER DEFINITIONS:
     int const HeatRecoveryHXIdeal(1);
     int const HeatRecoveryHXCounterFlow(2);
@@ -136,9 +131,6 @@ namespace WaterUse {
         // PURPOSE OF THIS SUBROUTINE:
         // This routine is called from non zone equipment manager and serves to call
         // water use and connections that are not connected to a full plant loop
-
-        // Using/Aliasing
-        //using General::RoundSigDigits;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -247,10 +239,6 @@ namespace WaterUse {
         // Plant sim call for plant loop connected water use and connections
         // (based on SimulateWaterUse by P. Ellis)
 
-        // Using/Aliasing
-        //using General::RoundSigDigits;
-        //using General::TrimSigDigits;
-
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIterations(100);
@@ -356,18 +344,6 @@ namespace WaterUse {
         //       RE-ENGINEERED  na
 
         // METHODOLOGY EMPLOYED: Standard EnergyPlus methodology.
-
-        // Using/Aliasing
-        //using namespace DataIPShortCuts; // Data for field names, blank numerics
-        //using BranchNodeConnections::TestCompSet;
-        //using NodeInputManager::GetOnlySingleNode;
-        //using ScheduleManager::GetScheduleIndex;
-        //using namespace DataLoopNode;
-        //using namespace DataHeatBalance;
-        //using PlantUtilities::RegisterPlantCompDesignFlow;
-        //using Psychrometrics::RhoH2O;
-        //using WaterManager::SetupTankDemandComponent;
-        //using WaterManager::SetupTankSupplyComponent;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
@@ -1066,13 +1042,6 @@ namespace WaterUse {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate desired hot and cold water flow rates
-        
-
-        // Using/Aliasing
-        //using DataEnvironment::WaterMainsTemp;
-        //using DataHeatBalance::Zone;
-        //using Psychrometrics::RhoH2O;
-        //using ScheduleManager::GetCurrentScheduleValue;
 
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1184,19 +1153,6 @@ namespace WaterUse {
         // Calculate drainwater temperature and heat and moisture gains to zone.
 
 
-        // Using/Aliasing
-        //using DataEnvironment::OutBaroPress;
-        //using DataGlobals::SecInHour;
-        //using DataHeatBalance::Zone;
-        //using DataHeatBalFanSys::MAT;
-        //using DataHeatBalFanSys::ZoneAirHumRat;
-        //using DataHVACGlobals::TimeStepSys;
-        //using Psychrometrics::CPHW;
-        //using Psychrometrics::PsyHfgAirFnWTdb;
-        //using Psychrometrics::PsyRhoAirFnPbTdbW;
-        //using Psychrometrics::PsyWFnTdbRhPb;
-        //using ScheduleManager::GetCurrentScheduleValue;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1289,18 +1245,6 @@ namespace WaterUse {
         //       DATE WRITTEN   August 2006
         //       MODIFIED       Brent Griffith 2010, demand side update
         //       RE-ENGINEERED  na
-
-        // Using/Aliasing
-        //using DataEnvironment::WaterMainsTemp;
-        //using DataGlobals::DoingSizing;
-        //using DataHeatBalance::Zone;
-        //using DataLoopNode::Node;
-        //using DataPlant::PlantLoop;
-        //using DataPlant::TypeOf_WaterUseConnection;
-        //using DataWater::WaterStorage;
-        //using PlantUtilities::InitComponentNodes;
-        //using PlantUtilities::ScanPlantLoopsForObject;
-        //using ScheduleManager::GetCurrentScheduleValue;
 
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1409,11 +1353,6 @@ namespace WaterUse {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate summed values for WATER USE CONNECTIONS (to prepare to request flow from plant, and for reporting).
 
-        // Using/Aliasing
-        //using DataLoopNode::Node;
-        //using DataWater::WaterStorage;
-        //using PlantUtilities::SetComponentFlowRate;
-        //using Psychrometrics::RhoH2O;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterEquipNum;
@@ -1537,8 +1476,6 @@ namespace WaterUse {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate
 
-        // Using/Aliasing
-        //using Psychrometrics::RhoH2O;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterEquipNum;
@@ -1579,11 +1516,6 @@ namespace WaterUse {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate drainwater heat recovery
-
-        // Using/Aliasing
-       // using Psychrometrics::CPHW;
-        // unused0909  USE DataEnvironment, ONLY: WaterMainsTemp
-        //using DataWater::WaterStorage;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CapacityRatio;
@@ -1703,10 +1635,6 @@ namespace WaterUse {
         // PURPOSE OF THIS SUBROUTINE:
         // Updates the node variables with local variables.
 
-        // Using/Aliasing
-        //using DataLoopNode::Node;
-        //using PlantUtilities::SafeCopyPlantNode;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;
         int OutletNode;
@@ -1740,11 +1668,6 @@ namespace WaterUse {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates report variables for stand alone water use
 
-        // Using/Aliasing
-        //using DataGlobals::SecInHour;
-        //using DataHVACGlobals::TimeStepSys;
-        //using Psychrometrics::CPHW;
-        //using Psychrometrics::RhoH2O;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1792,12 +1715,6 @@ namespace WaterUse {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates report variables.
-
-        // Using/Aliasing
-        //using DataGlobals::SecInHour;
-        //using DataHVACGlobals::TimeStepSys;
-        //using Psychrometrics::CPHW;
-        //using Psychrometrics::RhoH2O;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1868,9 +1785,6 @@ namespace WaterUse {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates the zone internal gains due to water use sensible and latent loads.
-
-        // Using/Aliasing
-        //using DataHeatBalance::Zone;
 
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
