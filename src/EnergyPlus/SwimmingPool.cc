@@ -91,8 +91,6 @@ namespace EnergyPlus {
 
 namespace SwimmingPool {
 
-    // Module containing the routines dealing with swimming pools
-
     // MODULE INFORMATION:
     //       AUTHOR         Rick Strand, Ho-Sung Kim
     //       DATE WRITTEN   June 2012 (F90) and October 2014 (C++)
@@ -113,16 +111,12 @@ namespace SwimmingPool {
     // 3. Kittler, R. (1989). Indoor Natatorium Design and Energy Recycling. ASHRAE Transactions 95(1), p.521-526.
     // 4. Smith, C., R. Jones, and G. Lof (1993). Energy Requirements and Potential Savings for Heated
     //    Indoor Swimming Pools. ASHRAE Transactions 99(2), p.864-874.
-    // USE STATEMENTS:
-    // Use statements for data only modules
+
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using DataSurfaces::Surface;
     using DataSurfaces::TotSurfaces;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // System types:
     static std::string const BlankString;
 
     // MODULE VARIABLE DECLARATIONS:
@@ -138,10 +132,7 @@ namespace SwimmingPool {
     Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
 
-    // Object Data
     Array1D<SwimmingPoolData> Pool;
-
-    // Functions
 
     void clear_state()
     {
@@ -160,7 +151,6 @@ namespace SwimmingPool {
 
     void SimSwimmingPool(bool const FirstHVACIteration)
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
         //       DATE WRITTEN   October 2014
@@ -181,7 +171,6 @@ namespace SwimmingPool {
         static bool GetInputFlag(true); // First time, input is "gotten"
         int PoolNum;                    // Pool number index
 
-        // FLOW:
         if (GetInputFlag) {
             GetSwimmingPool();
             GetInputFlag = false;
@@ -207,7 +196,6 @@ namespace SwimmingPool {
 
     void GetSwimmingPool()
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
         //       DATE WRITTEN   October 2014
@@ -257,7 +245,6 @@ namespace SwimmingPool {
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         int SurfNum;                     // Surface number
 
-        // FLOW:
         // Initializations and allocations
         MaxAlphas = 0;
         MaxNumbers = 0;
@@ -626,7 +613,6 @@ namespace SwimmingPool {
                           int const PoolNum              // Index for the low temperature radiant system under consideration within the derived types
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
         //       DATE WRITTEN   October 2014
@@ -660,8 +646,6 @@ namespace SwimmingPool {
         int ZoneNum;
         int SurfNum;
         Real64 Density;
-
-        // FLOW:
 
         if (MyOneTimeFlag) {
             MyOneTimeFlag = false;
@@ -831,7 +815,6 @@ namespace SwimmingPool {
                                         bool &MyPlantScanFlagPool // logical flag true when plant index has not yet been set
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 2017
@@ -893,7 +876,6 @@ namespace SwimmingPool {
     void CalcSwimmingPool(int const PoolNum // number of the swimming pool
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
         //       DATE WRITTEN   October 2014
@@ -961,9 +943,6 @@ namespace SwimmingPool {
         using Psychrometrics::PsyHfgAirFnWTdb;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcSwimmingPool");
 
@@ -991,7 +970,6 @@ namespace SwimmingPool {
         Real64 CpDeltaTi;             // inverse of specific heat of water times the plant loop temperature difference
         Real64 MassFlowRate;          // Target mass flow rate to achieve the proper setpoint temperature
 
-        // FLOW:
         // initialize local variables
         SurfNum = Pool(PoolNum).SurfacePtr;
         ZoneNum = Surface(SurfNum).Zone;
@@ -1073,7 +1051,6 @@ namespace SwimmingPool {
                               Real64 const HumRat // zone air humidity ratio
     )
     {
-
         using DataConversions::CFA;
         using DataConversions::CFMF;
         using DataEnvironment::OutBaroPress;
@@ -1103,7 +1080,6 @@ namespace SwimmingPool {
     void UpdateSwimmingPool(int const PoolNum // number of the swimming pool
     )
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
         //       DATE WRITTEN   October 2014
@@ -1131,8 +1107,6 @@ namespace SwimmingPool {
         int WaterInletNode;   // inlet node number
         int WaterOutletNode;  // outlet node number
         Real64 WaterMassFlow; // water mass flow rate
-
-        // FLOW:
 
         SurfNum = Pool(PoolNum).SurfacePtr;
 
@@ -1162,7 +1136,6 @@ namespace SwimmingPool {
 
     void UpdatePoolSourceValAvg(bool &SwimmingPoolOn) // .TRUE. if the swimming pool "runs" this zone time step
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   October 2014
@@ -1238,7 +1211,6 @@ namespace SwimmingPool {
 
     Real64 SumHATsurf(int const ZoneNum) // Zone number
     {
-
         // FUNCTION INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   July 2003
@@ -1260,7 +1232,6 @@ namespace SwimmingPool {
         int SurfNum; // Surface number
         Real64 Area; // Effective surface area
 
-        // FLOW:
         SumHATsurf = 0.0;
 
         for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
@@ -1296,7 +1267,6 @@ namespace SwimmingPool {
 
     void ReportSwimmingPool()
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand, Ho-Sung Kim
         //       DATE WRITTEN   October 2014
@@ -1323,7 +1293,6 @@ namespace SwimmingPool {
         Real64 Cp;      // specific heat of water
         Real64 Density; // density of water
 
-        // FLOW:
         for (PoolNum = 1; PoolNum <= NumSwimmingPools; ++PoolNum) {
 
             SurfNum = Pool(PoolNum).SurfacePtr;
