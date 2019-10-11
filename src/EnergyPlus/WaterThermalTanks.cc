@@ -125,13 +125,14 @@ namespace WaterThermalTanks {
 
     // ThermalStorage:ChilledWater:Stratified simulates a stratified, multi-node tank for chilled water applications.
 
-    std::string const cMixedWHModuleObj("WaterHeater:Mixed");
-    std::string const cStratifiedWHModuleObj("WaterHeater:Stratified");
-    std::string const cMixedCWTankModuleObj("ThermalStorage:ChilledWater:Mixed");
-    std::string const cStratifiedCWTankModuleObj("ThermalStorage:ChilledWater:Stratified");
-    std::string const cHPWHPumpedCondenser("WaterHeater:HeatPump:PumpedCondenser");
-    std::string const cHPWHWrappedCondenser("WaterHeater:HeatPump:WrappedCondenser");
-    std::string const modFluidNameWater("WATER");
+    std::string const cMixedWHModuleObj = "WaterHeater:Mixed";
+    std::string const cStratifiedWHModuleObj ="WaterHeater:Stratified";
+    std::string const cMixedCWTankModuleObj ="ThermalStorage:ChilledWater:Mixed";
+    std::string const cStratifiedCWTankModuleObj ="ThermalStorage:ChilledWater:Stratified";
+    std::string const cHPWHPumpedCondenser ="WaterHeater:HeatPump:PumpedCondenser";
+    std::string const cHPWHWrappedCondenser ="WaterHeater:HeatPump:WrappedCondenser";
+    std::string const cCoilDesuperheater ="Coil:WaterHeating:Desuperheater";
+    std::string const modFluidNameWater ="WATER";
     std::string const modBlankString;
 
     int const modHeatMode(1);  // heating source is on, source will not turn off until setpoint temp is reached
@@ -312,9 +313,9 @@ namespace WaterThermalTanks {
 
                 if (InitLoopEquip) {
                     if (present(LoopNum)) {
-                        WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration, LoopNum, LoopSideNum);
+                        WaterThermalTank(CompNum).InitWaterThermalTank(FirstHVACIteration, LoopNum, LoopSideNum);
                     } else {
-                        WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration);
+                        WaterThermalTank(CompNum).InitWaterThermalTank(FirstHVACIteration);
                     }
                     WaterThermalTank(CompNum).MinePlantStructForInfo();
                     if (present(LoopNum)) {
@@ -349,9 +350,9 @@ namespace WaterThermalTanks {
                     MaxCap = WaterThermalTank(CompNum).MaxCapacity;
                     OptCap = WaterThermalTank(CompNum).MaxCapacity;
                     if (present(LoopNum)) {
-                        WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration, LoopNum, LoopSideNum);
+                        WaterThermalTank(CompNum).InitWaterThermalTank(FirstHVACIteration, LoopNum, LoopSideNum);
                     } else {
-                        WaterThermalTank(CompNum).InitWaterThermalTank(CompNum, FirstHVACIteration);
+                        WaterThermalTank(CompNum).InitWaterThermalTank(FirstHVACIteration);
                     }
                     return;
                 }
@@ -398,9 +399,9 @@ namespace WaterThermalTanks {
                     // CompNum is index to heatpump model, not tank so get the tank index
                     int TankNum = HPWaterHeater(CompNum).WaterHeaterTankNum;
                     if (present(LoopNum)) {
-                        WaterThermalTank(TankNum).InitWaterThermalTank(TankNum, FirstHVACIteration, LoopNum, LoopSideNum);
+                        WaterThermalTank(TankNum).InitWaterThermalTank(FirstHVACIteration, LoopNum, LoopSideNum);
                     } else {
-                        WaterThermalTank(TankNum).InitWaterThermalTank(TankNum, FirstHVACIteration);
+                        WaterThermalTank(TankNum).InitWaterThermalTank(FirstHVACIteration);
                     }
                     WaterThermalTank(TankNum).MinePlantStructForInfo();
                     if (present(LoopNum)) {
@@ -451,9 +452,9 @@ namespace WaterThermalTanks {
                     WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).UseCurrentFlowLock = 1;
                 }
                 if (present(LoopNum)) {
-                    WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).InitWaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum, FirstHVACIteration, LoopNum, LoopSideNum);
+                    WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).InitWaterThermalTank(FirstHVACIteration, LoopNum, LoopSideNum);
                 } else {
-                    WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).InitWaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum, FirstHVACIteration);
+                    WaterThermalTank(HPWaterHeater(CompNum).WaterHeaterTankNum).InitWaterThermalTank(FirstHVACIteration);
                 }
 
                 int InletNodeSav = HPWaterHeater(CompNum).HeatPumpAirInletNode;
@@ -850,9 +851,8 @@ namespace WaterThermalTanks {
             modNumChilledWaterMixed = inputProcessor->getNumObjectsFound(cMixedCWTankModuleObj);
             modNumChilledWaterStratified = inputProcessor->getNumObjectsFound(cStratifiedCWTankModuleObj);
             modNumWaterThermalTank = modNumWaterHeaterMixed + modNumWaterHeaterStratified + modNumChilledWaterMixed + modNumChilledWaterStratified;
-            modNumHeatPumpWaterHeater =
-                inputProcessor->getNumObjectsFound(cHPWHPumpedCondenser) + inputProcessor->getNumObjectsFound(cHPWHWrappedCondenser);
-            modNumWaterHeaterDesuperheater = inputProcessor->getNumObjectsFound("Coil:WaterHeating:Desuperheater");
+            modNumHeatPumpWaterHeater = inputProcessor->getNumObjectsFound(cHPWHPumpedCondenser) + inputProcessor->getNumObjectsFound(cHPWHWrappedCondenser);
+            modNumWaterHeaterDesuperheater = inputProcessor->getNumObjectsFound(cCoilDesuperheater);
 
             if (modNumWaterThermalTank > 0) {
                 // Write water heater header for EIO
@@ -882,7 +882,7 @@ namespace WaterThermalTanks {
 
             // =======   Get Coil:WaterHeating:Desuperheater ======================================================================
             if (modNumWaterHeaterDesuperheater > 0) {
-                DataIPShortCuts::cCurrentModuleObject = "Coil:WaterHeating:Desuperheater";
+                DataIPShortCuts::cCurrentModuleObject = cCoilDesuperheater;
                 for (int DesuperheaterNum = 1; DesuperheaterNum <= modNumWaterHeaterDesuperheater; ++DesuperheaterNum) {
                     int NumAlphas;
                     int NumNums;
@@ -4064,7 +4064,7 @@ namespace WaterThermalTanks {
 
             //   Loop through all desuperheating coils and then search all water heaters for the tank connected to the desuperheating coil
             if (modNumWaterHeaterDesuperheater > 0) {
-                DataIPShortCuts::cCurrentModuleObject = "Coil:WaterHeating:Desuperheater";
+                DataIPShortCuts::cCurrentModuleObject = cCoilDesuperheater;
                 for (int DesuperheaterNum = 1; DesuperheaterNum <= modNumWaterHeaterDesuperheater; ++DesuperheaterNum) {
                     for (int CheckWaterHeaterNum = 1; CheckWaterHeaterNum <= modNumWaterThermalTank; ++CheckWaterHeaterNum) {
                         if (!UtilityRoutines::SameString(WaterHeaterDesuperheater(DesuperheaterNum).TankName,
@@ -5710,8 +5710,7 @@ namespace WaterThermalTanks {
         } // NodeNum
     }
 
-    void WaterThermalTankData::InitWaterThermalTank(int const WaterThermalTankNum,
-                              bool const FirstHVACIteration,
+    void WaterThermalTankData::InitWaterThermalTank(bool const FirstHVACIteration,
                               Optional_int_const EP_UNUSED(LoopNum),
                               Optional_int_const EP_UNUSED(LoopSideNum))
     {
@@ -6197,8 +6196,7 @@ namespace WaterThermalTanks {
                 DeadBandTemp = this->SetPointTemp - this->DeadBandDeltaTemp;
             }
 
-            Real64 mdotUse = PlantMassFlowRatesFunc(WaterThermalTankNum,
-                                                    this->UseInletNode,
+            Real64 mdotUse = this->PlantMassFlowRatesFunc(this->UseInletNode,
                                                     FirstHVACIteration,
                                                     Side::Use,
                                                     this->UseSide.loopSideNum,
@@ -6235,8 +6233,7 @@ namespace WaterThermalTanks {
                 sensedTemp = this->SavedSourceOutletTemp;
             }
 
-            Real64 mdotSource = PlantMassFlowRatesFunc(WaterThermalTankNum,
-                                                       this->SourceInletNode,
+            Real64 mdotSource = this->PlantMassFlowRatesFunc(this->SourceInletNode,
                                                        FirstHVACIteration,
                                                        Side::Source,
                                                        this->SrcSide.loopSideNum,
@@ -10157,8 +10154,7 @@ namespace WaterThermalTanks {
         return NeedsHeatOrCool;
     }
 
-    Real64 PlantMassFlowRatesFunc(int const WaterThermalTankNum,
-                                  int const InNodeNum,
+    Real64 WaterThermalTankData::PlantMassFlowRatesFunc(int const InNodeNum,
                                   bool const FirstHVACIteration,
                                   int const WaterThermalTankSide,
                                   int const PlantLoopSide,
@@ -10179,10 +10175,6 @@ namespace WaterThermalTanks {
         // collect routines for setting flow rates for Water heaters
         // with plant connections.
 
-        // Return value
-        Real64 PlantMassFlowRatesFunc;
-
-        // FUNCTION PARAMETER DEFINITIONS:
         int const PassingFlowThru(1);
         int const MaybeRequestingFlow(2);
         int const ThrottlingFlow(3);
@@ -10199,9 +10191,9 @@ namespace WaterThermalTanks {
         } else if (PlantLoopSide == DataPlant::SupplySide) {
             // If FlowLock is False (0), the tank sets the plant loop mdot
             // If FlowLock is True (1),  the new resolved plant loop mdot is used
-            if (WaterThermalTank(WaterThermalTankNum).UseCurrentFlowLock == 0) {
+            if (this->UseCurrentFlowLock == 0) {
                 CurrentMode = PassingFlowThru;
-                if ((WaterThermalTank(WaterThermalTankNum).UseSideLoadRequested > 0.0) && (WaterThermalTankSide == Side::Use)) {
+                if ((this->UseSideLoadRequested > 0.0) && (WaterThermalTankSide == Side::Use)) {
                     CurrentMode = MaybeRequestingFlow;
                 }
             } else {
@@ -10211,8 +10203,6 @@ namespace WaterThermalTanks {
                 CurrentMode = MaybeRequestingFlow;
             }
         } else if (PlantLoopSide == DataPlant::DemandSide) {
-            //  1.  pass thru is default
-            CurrentMode = PassingFlowThru;
 
             //  2.  Might be Requesting Flow.
             if (FirstHVACIteration) {
@@ -10233,11 +10223,11 @@ namespace WaterThermalTanks {
         // evaluate Availability schedule,
         bool ScheduledAvail = true;
         if (WaterThermalTankSide == Side::Use) {
-            if (ScheduleManager::GetCurrentScheduleValue(WaterThermalTank(WaterThermalTankNum).UseSideAvailSchedNum) == 0.0) {
+            if (ScheduleManager::GetCurrentScheduleValue(this->UseSideAvailSchedNum) == 0.0) {
                 ScheduledAvail = false;
             }
         } else if (WaterThermalTankSide == Side::Source) {
-            if (ScheduleManager::GetCurrentScheduleValue(WaterThermalTank(WaterThermalTankNum).SourceSideAvailSchedNum) == 0.0) {
+            if (ScheduleManager::GetCurrentScheduleValue(this->SourceSideAvailSchedNum) == 0.0) {
                 ScheduledAvail = false;
             }
         }
@@ -10261,16 +10251,16 @@ namespace WaterThermalTanks {
                     MassFlowRequest = 0.0;
                 } else {
                     if (WaterThermalTankSide == Side::Use) {
-                        MassFlowRequest = WaterThermalTank(WaterThermalTankNum).PlantUseMassFlowRateMax;
+                        MassFlowRequest = this->PlantUseMassFlowRateMax;
                     } else if (WaterThermalTankSide == Side::Source) {
-                        MassFlowRequest = WaterThermalTank(WaterThermalTankNum).PlantSourceMassFlowRateMax;
+                        MassFlowRequest = this->PlantSourceMassFlowRateMax;
                     } else {
                         assert(false);
                     }
                 }
 
                 // next determine if tank temperature is such that source side flow might be requested
-                bool NeedsHeatOrCool = WaterThermalTank(WaterThermalTankNum).SourceHeatNeed(OutletTemp, DeadBandTemp, SetPointTemp_loc);
+                bool NeedsHeatOrCool = this->SourceHeatNeed(OutletTemp, DeadBandTemp, SetPointTemp_loc);
 
                 if (MassFlowRequest > 0.0) {
                     if (WaterThermalTankSide == Side::Use) {
@@ -10306,23 +10296,23 @@ namespace WaterThermalTanks {
                     MassFlowRequest = 0.0;
                 } else {
                     if (WaterThermalTankSide == Side::Use) {
-                        if ((WaterThermalTank(WaterThermalTankNum).IsChilledWaterTank) &&
-                            (WaterThermalTank(WaterThermalTankNum).UseSideLoadRequested > 0.0)) {
-                            MassFlowRequest = WaterThermalTank(WaterThermalTankNum).PlantUseMassFlowRateMax;
-                        } else if ((WaterThermalTank(WaterThermalTankNum).IsChilledWaterTank) &&
-                                   (WaterThermalTank(WaterThermalTankNum).UseSideLoadRequested == 0.0)) {
+                        if ((this->IsChilledWaterTank) &&
+                            (this->UseSideLoadRequested > 0.0)) {
+                            MassFlowRequest = this->PlantUseMassFlowRateMax;
+                        } else if ((this->IsChilledWaterTank) &&
+                                   (this->UseSideLoadRequested == 0.0)) {
                             MassFlowRequest = 0.0;
                         } else {
-                            MassFlowRequest = WaterThermalTank(WaterThermalTankNum).PlantUseMassFlowRateMax;
+                            MassFlowRequest = this->PlantUseMassFlowRateMax;
                         }
 
                     } else if (WaterThermalTankSide == Side::Source) {
-                        MassFlowRequest = WaterThermalTank(WaterThermalTankNum).PlantSourceMassFlowRateMax;
+                        MassFlowRequest = this->PlantSourceMassFlowRateMax;
                     }
                 }
 
                 if (WaterThermalTankSide == Side::Source) { // temperature dependent controls for indirect heating/cooling
-                    bool NeedsHeatOrCool = WaterThermalTank(WaterThermalTankNum).SourceHeatNeed(OutletTemp, DeadBandTemp, SetPointTemp_loc);
+                    bool NeedsHeatOrCool = this->SourceHeatNeed(OutletTemp, DeadBandTemp, SetPointTemp_loc);
                     if (MassFlowRequest > 0.0) {
                         if (NeedsHeatOrCool) {
                             FlowResult = MassFlowRequest;
@@ -10342,9 +10332,7 @@ namespace WaterThermalTanks {
             }
         }
 
-        PlantMassFlowRatesFunc = FlowResult;
-
-        return PlantMassFlowRatesFunc;
+        return FlowResult;
     }
 
     void WaterThermalTankData::MinePlantStructForInfo()
