@@ -3214,7 +3214,7 @@ TEST_F(WaterThermalTanksFixture, MixedTankAlternateSchedule){
     Tank.SetPointTemp = 55.0;
 
     //Source side is in the demand side of the plant loop
-    Tank.SourceSidePlantLoopSide = DemandSide;
+    Tank.SrcSide.loopSideNum = DemandSide;
     Tank.SavedSourceOutletTemp = 60.0;
     rho = GetDensityGlycol("Water", Tank.TankTemp, WaterIndex , "MixedTankAlternateSchedule");
 

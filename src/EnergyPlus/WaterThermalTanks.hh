@@ -310,10 +310,7 @@ namespace WaterThermalTanks {
         bool UseSideSeries;
         int UseSideAvailSchedNum;                 // use side availability schedule
         Real64 UseSideLoadRequested;              // hold MyLoad request from plant management.
-        int UseSidePlantLoopNum;                  // if not zero, then this use side is on plant loop #
-        int UseSidePlantLoopSide;                 // use side is on loop side index
-        int UseSidePlantBranchNum;                // use side branch num in plant topology
-        int UseSidePlantCompNum;                  // use side component num in plant topology
+        PlantLocation UseSide;
         int SourceCurrentFlowLock;                // current flow lock setting on source side
         int SourceInletNode;                      // Inlet node for the source side; hot water from supply
         Real64 SourceInletTemp;                   // Source side inlet temperature (C)
@@ -329,10 +326,7 @@ namespace WaterThermalTanks {
         int SourceSidePlantSizNum;                // index in plant sizing that the source side is on
         bool SourceSideSeries;
         int SourceSideAvailSchedNum;       // source side availability schedule.
-        int SourceSidePlantLoopNum;        // if not zero, then this use side is on plant loop #
-        int SourceSidePlantLoopSide;       // loop side that Source side is one eg. supply or demand
-        int SourceSidePlantBranchNum;      // Source side branch num in plant topology
-        int SourceSidePlantCompNum;        // Source side component num in plant topology
+        PlantLocation SrcSide;
         int SourceSideControlMode;         // flag for how source side flow is controlled
         int SourceSideAltSetpointSchedNum; // schedule of alternate temperature setpoint values
         Real64 SizingRecoveryTime;         // sizing parameter for autosizing indirect water heaters (hr)
@@ -459,12 +453,11 @@ namespace WaterThermalTanks {
               OffCycParaFracToTank(0.0), OnCycParaLoad(0.0), OnCycParaFracToTank(0.0), UseCurrentFlowLock(0), UseInletNode(0), UseInletTemp(0.0),
               UseOutletNode(0), UseOutletTemp(0.0), UseMassFlowRate(0.0), UseEffectiveness(0.0), PlantUseMassFlowRateMax(0.0),
               SavedUseOutletTemp(0.0), UseDesignVolFlowRate(0.0), UseDesignVolFlowRateWasAutoSized(false), UseBranchControlType(2),
-              UseSidePlantSizNum(0), UseSideSeries(true), UseSideAvailSchedNum(0), UseSideLoadRequested(0.0), UseSidePlantLoopNum(0),
-              UseSidePlantLoopSide(0), UseSidePlantBranchNum(0), UseSidePlantCompNum(0), SourceCurrentFlowLock(0), SourceInletNode(0),
+              UseSidePlantSizNum(0), UseSideSeries(true), UseSideAvailSchedNum(0), UseSideLoadRequested(0.0),
+              SourceCurrentFlowLock(0), SourceInletNode(0),
               SourceInletTemp(0.0), SourceOutletNode(0), SourceOutletTemp(0.0), SourceMassFlowRate(0.0), SourceEffectiveness(0.0),
               PlantSourceMassFlowRateMax(0.0), SavedSourceOutletTemp(0.0), SourceDesignVolFlowRate(0.0), SourceDesignVolFlowRateWasAutoSized(false),
-              SourceBranchControlType(2), SourceSidePlantSizNum(0), SourceSideSeries(true), SourceSideAvailSchedNum(0), SourceSidePlantLoopNum(0),
-              SourceSidePlantLoopSide(0), SourceSidePlantBranchNum(0), SourceSidePlantCompNum(0), SourceSideControlMode(0),
+              SourceBranchControlType(2), SourceSidePlantSizNum(0), SourceSideSeries(true), SourceSideAvailSchedNum(0), SourceSideControlMode(0),
               SourceSideAltSetpointSchedNum(0), SizingRecoveryTime(0.0), MassFlowRateMax(0.0), VolFlowRateMin(0.0), MassFlowRateMin(0.0),
               FlowRateSchedule(0), UseInletTempSchedule(0), TankTemp(0.0), SavedTankTemp(0.0), TankTempAvg(0.0), Height(0.0),
               HeightWasAutoSized(false), Perimeter(0.0), Shape(0), HeaterHeight1(0.0), HeaterNode1(0), HeaterOn1(false), SavedHeaterOn1(false),
