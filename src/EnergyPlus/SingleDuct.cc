@@ -4745,7 +4745,7 @@ namespace SingleDuct {
             SensOutputProvided = MassFlow * CpAir * (Node(this->OutletNodeNum).Temp - Node(ZoneNodeNum).Temp);
         } else {
             SensOutputProvided = 0.0;
-            MassFlow = 0.0;
+            //MassFlow = 0.0;
         }
 
         // set the outlet node air conditions to that of the inlet
