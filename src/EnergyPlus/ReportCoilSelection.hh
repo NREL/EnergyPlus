@@ -57,8 +57,8 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <DataAirSystems.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 

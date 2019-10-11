@@ -65,8 +65,8 @@
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
-#include <DataRuntimeLanguage.hh>
-#include <EMSManager.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/EMSManager.hh>
 
 // EnergyPlus Headers
 using namespace EnergyPlus::DataDefineEquip;

@@ -61,14 +61,14 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <CurveManager.hh>
-#include <DataLoopNode.hh>
-#include <Fans.hh>
-#include <FaultsManager.hh>
-#include <HVACControllers.hh>
-#include <MixedAir.hh>
-#include <ScheduleManager.hh>
-#include <SetPointManager.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/HVACControllers.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SetPointManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

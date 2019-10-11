@@ -46,22 +46,21 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
-#include <HybridEvapCoolingModel.hh>
+#include <EnergyPlus/HybridEvapCoolingModel.hh>
 
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 #include <cmath>
 #include <string>
-//#include <windows.h>
-#include <CurveManager.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobalConstants.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataZoneEquipment.hh>
-#include <General.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>

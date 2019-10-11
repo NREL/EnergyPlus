@@ -46,9 +46,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataAirSystems.hh>
-#include <Fans.hh>
-#include <HVACFan.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/HVACFan.hh>
 
 namespace EnergyPlus {
 

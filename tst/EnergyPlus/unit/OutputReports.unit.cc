@@ -53,13 +53,13 @@
 #include <ObjexxFCL/Array1D.hh>
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataHeatBalance.hh>
-#include <HeatBalanceManager.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 //#include <OutputReportData.hh>
 //#include <UtilityRoutines.hh>
 //#include <EnergyPlus/OutputProcessor.hh>
-#include <OutputReports.hh>
-#include <SurfaceGeometry.hh>
+#include <EnergyPlus/OutputReports.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;

@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataPrecisionGlobals.hh>
-#include <DataUCSDSharedData.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataUCSDSharedData.hh>
 
 namespace EnergyPlus {
 

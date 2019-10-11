@@ -57,14 +57,14 @@
 #include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
-#include <DataBSDFWindow.hh>
-#include <DataComplexFenestration.hh>
-#include <DataGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataVectorTypes.hh>
-#include <DataWindowEquivalentLayer.hh>
-#include <EnergyPlus.hh>
-#include <PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataComplexFenestration.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 
 namespace EnergyPlus {
 

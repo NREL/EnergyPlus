@@ -60,7 +60,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 
-#include <Plant/PlantLocation.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 using namespace EnergyPlus;
 using namespace PlantPipingSystemsManager;

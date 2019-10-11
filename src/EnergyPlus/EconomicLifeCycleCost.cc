@@ -53,18 +53,18 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <DataCostEstimate.hh>
-#include <DataGlobalConstants.hh>
-#include <DataIPShortCuts.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DisplayRoutines.hh>
-#include <EconomicLifeCycleCost.hh>
-#include <EconomicTariff.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputReportTabular.hh>
-#include <ResultsSchema.hh>
-#include <SQLiteProcedures.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataCostEstimate.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EconomicLifeCycleCost.hh>
+#include <EnergyPlus/EconomicTariff.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

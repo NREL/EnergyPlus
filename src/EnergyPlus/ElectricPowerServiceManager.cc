@@ -53,33 +53,33 @@
 #include <ObjexxFCL/Array1.hh>
 
 // EnergyPlus Headers
-#include <CTElectricGenerator.hh>
-#include <CurveManager.hh>
-#include <DataGlobalConstants.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <EMSManager.hh>
-#include <ElectricPowerServiceManager.hh>
-#include <FuelCellElectricGenerator.hh>
-#include <General.hh>
-#include <HeatBalanceInternalHeatGains.hh>
-#include <ICEngineElectricGenerator.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <MicroCHPElectricGenerator.hh>
-#include <MicroturbineElectricGenerator.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <PVWatts.hh>
-#include <Photovoltaics.hh>
-#include <Plant/PlantLocation.hh>
-#include <PlantUtilities.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
-#include <WindTurbine.hh>
+#include <EnergyPlus/CTElectricGenerator.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/FuelCellElectricGenerator.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/ICEngineElectricGenerator.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MicroCHPElectricGenerator.hh>
+#include <EnergyPlus/MicroturbineElectricGenerator.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/PVWatts.hh>
+#include <EnergyPlus/Photovoltaics.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WindTurbine.hh>
 
 namespace EnergyPlus {
 
