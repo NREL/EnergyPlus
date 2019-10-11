@@ -492,19 +492,10 @@ namespace WaterThermalTanks {
 
         void SetupStratifiedNodes();
 
-        void InitWaterThermalTank(bool FirstHVACIteration,
+        void InitWaterThermalTank(int WaterThermalTankNum,
+                                  bool FirstHVACIteration,
                                   Optional_int_const LoopNum = _,
                                   Optional_int_const LoopSideNum = _);
-
-        Real64 PlantMassFlowRatesFunc(int InNodeNum,
-                                      bool FirstHVACIteration,
-                                      int WaterThermalTankSide,
-                                      int PlantLoopSide,
-                                      bool PlumbedInSeries, // !unused1208
-                                      int BranchControlType,
-                                      Real64 OutletTemp,
-                                      Real64 DeadBandTemp,
-                                      Real64 SetPointTemp);
 
         bool SourceHeatNeed(Real64 OutletTemp,
                             Real64 DeadBandTemp,
@@ -875,6 +866,17 @@ namespace WaterThermalTanks {
     Real64 PLRResidualWaterThermalTank(Real64 HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                 Array1<Real64> const &Par     // par(1) = HP set point temperature [C]
     );
+
+    Real64 PlantMassFlowRatesFunc(int WaterThermalTankNum,
+                                  int InNodeNum,
+                                  bool FirstHVACIteration,
+                                  int WaterThermalTankSide,
+                                  int PlantLoopSide,
+                                  bool PlumbedInSeries, // !unused1208
+                                  int BranchControlType,
+                                  Real64 OutletTemp,
+                                  Real64 DeadBandTemp,
+                                  Real64 SetPointTemp);
 
     void SetVSHPWHFlowRates(WaterThermalTankData &Tank,
                             HeatPumpWaterHeaterData &HPWH,
