@@ -141,8 +141,8 @@ namespace WaterUse {
         int WaterEquipNum;
         int WaterConnNum;
         int NumIteration;
-        static int MaxIterationsErrorCount;
-        static bool MyEnvrnFlag(true);
+        int MaxIterationsErrorCount;
+        bool MyEnvrnFlag(true);
 
         // FLOW:
         if (GetWaterUseInputFlag) {
@@ -248,8 +248,8 @@ namespace WaterUse {
         //  INTEGER :: WaterEquipNum
         int WaterConnNum;
         int NumIteration;
-        static int MaxIterationsErrorCount;
-        static bool MyEnvrnFlag(true);
+        int MaxIterationsErrorCount;
+        bool MyEnvrnFlag(true);
 
         // FLOW:
         if (GetWaterUseInputFlag) {
@@ -346,7 +346,7 @@ namespace WaterUse {
         // METHODOLOGY EMPLOYED: Standard EnergyPlus methodology.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int IOStatus;                   // Used in GetObjectItem
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call
@@ -1250,7 +1250,7 @@ namespace WaterUse {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;
         int OutletNode;
-        static bool MyOneTimeFlag(true);      // one time flag                    !DSU
+        bool MyOneTimeFlag(true);      // one time flag                    !DSU
         static Array1D_bool SetLoopIndexFlag; // get loop number flag             !DSU
         bool errFlag;
 
@@ -1790,7 +1790,7 @@ namespace WaterUse {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WaterEquipNum;
         int ZoneNum;
-        static bool MyEnvrnFlag(true);
+        bool MyEnvrnFlag(true);
 
         // FLOW:
         if (NumWaterEquipment == 0) return;
