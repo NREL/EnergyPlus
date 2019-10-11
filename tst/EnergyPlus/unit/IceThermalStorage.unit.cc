@@ -65,7 +65,9 @@ using namespace DataGlobals;
 using namespace CurveManager;
 using namespace EnergyPlus::General;
 
-TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
+class IceStorageFixture : public EnergyPlusFixture {};
+
+TEST_F(IceStorageFixture, IceThermalStorage_CalcQstarTest)
 {
     
     IceThermalStorage::clear_state();

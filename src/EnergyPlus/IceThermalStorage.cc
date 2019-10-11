@@ -97,16 +97,9 @@ namespace IceThermalStorage {
 
     // REFERENCES: Dion J. King, ASHRAE Transactions v104, pt1, 1998.
 
-    // OTHER NOTES: na
-
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace CurveManager;
     using namespace DataLoopNode;
-    using DataGlobals::BeginDayFlag;
-    using DataGlobals::EndDayFlag;
-    using DataGlobals::HourOfDay;
-    using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SecInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
@@ -114,8 +107,6 @@ namespace IceThermalStorage {
     using namespace DataHVACGlobals;
     using General::TrimSigDigits;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
     static std::string const BlankString;
 
     std::string const cIceStorageSimple("ThermalStorage:Ice:Simple");
@@ -159,18 +150,6 @@ namespace IceThermalStorage {
     Real64 const DeltaTifMin(1.0); // Minimum allowed inlet side temperature difference [C]
     // This is (Tin - Tfreezing)
 
-    // DERIVED TYPE DEFINITIONS
-    // TYPE ITSSetCap is used for information of ITS plant in Loop, Brach, and Components.
-    //  TYPE ITSSetCapData
-    //    LOGICAL :: ITSFlag    = .FALSE.
-    //    INTEGER :: LoopNum    =0
-    //    INTEGER :: BranchNum  =0
-    //    INTEGER :: CompNum    =0
-    //  END TYPE ITSSetCapData
-
-    // TYPE (ITSSetCapData), SAVE                   :: ITSSetCap=ITSSetCapData(.FALSE.,0,0,0)
-
-    // MODULE VARIABLE DECLARATIONS:
     bool ResetXForITSFlag(false);
 
     // Input data
@@ -254,15 +233,6 @@ namespace IceThermalStorage {
                        Real64 &MyLoad)
     {
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR
-        //       DATE WRITTEN
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // Using/Aliasing
         using DataGlobals::BeginEnvrnFlag;
         using DataPlant::DualSetPointDeadBand;
         using DataPlant::PlantLoop;
@@ -288,8 +258,6 @@ namespace IceThermalStorage {
         static bool firstTime(true);
         static bool MyEnvrnFlag(true);
         int IceStorageNum;
-
-        // FLOW
 
         //  Set initialization flags
         //  Allow ice to build up during warmup?
@@ -476,7 +444,6 @@ namespace IceThermalStorage {
         // REFERENCES:
         // Ice Storage Component Model Proposal (Revised).doc by Rick Strand (Dec 2005/Jan 2006)
 
-        // Using/Aliasing
         using CurveManager::CurveValue;
         using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataGlobals::WarmupFlag;
@@ -488,11 +455,6 @@ namespace IceThermalStorage {
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIterNum(100);                      // Maximum number of internal iterations for ice storage solution
         Real64 const SmallestLoad(0.1);                 // Smallest load to actually run the ice storage unit [Watts]
         Real64 const TankDischargeToler(0.001);         // Below this fraction, there is nothing left to discharge
@@ -503,13 +465,6 @@ namespace IceThermalStorage {
                                                         // Assumes approximate density of 1000 kg/m3 to get an estimate for mass flow rate
         static std::string const RoutineName("SimDetailedIceStorage");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ActualLoad;     // Actual load on the ice storage unit [W]
         Real64 AvgFracCharged; // Average fraction charged for the current time step
         Real64 ChargeFrac;     // Fraction of tank to be charged in the current time step
@@ -527,8 +482,6 @@ namespace IceThermalStorage {
         Real64 mdot;           // local mass flow rate for plant connection
         Real64 MassFlowstar;   // non-dimensional mass flow rate for charge curve use [non-dimensional]
 
-        // FLOW:
-        // Set local variables
         NodeNumIn = DetIceStor(IceNum).PlantInNodeNum;
         NodeNumOut = DetIceStor(IceNum).PlantOutNodeNum;
         TempIn = Node(NodeNumIn).Temp;
@@ -871,8 +824,6 @@ namespace IceThermalStorage {
         }
     }
 
-    //******************************************************************************
-
     void GetIceStorageInput()
     {
         // SUBROUTINE INFORMATION:
@@ -888,7 +839,6 @@ namespace IceThermalStorage {
 
         // METHODOLOGY EMPLOYED: to be determined...
 
-        // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using namespace ScheduleManager;
         using BranchNodeConnections::TestCompSet;
@@ -903,7 +853,6 @@ namespace IceThermalStorage {
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound;
-        // FLOW:
 
         ErrorsFound = false; // Always need to reset this since there are multiple types of ice storage systems
 
@@ -1085,7 +1034,7 @@ namespace IceThermalStorage {
             // Get and verify availability schedule
             DetIceStor(IceNum).ScheduleName = cAlphaArgs(2); // Detailed ice storage availability schedule name
             if (lAlphaFieldBlanks(2)) {
-                DetIceStor(IceNum).ScheduleIndex = ScheduleAlwaysOn;
+                DetIceStor(IceNum).ScheduleIndex = DataGlobals::ScheduleAlwaysOn;
             } else {
                 DetIceStor(IceNum).ScheduleIndex = GetScheduleIndex(DetIceStor(IceNum).ScheduleName);
                 if (DetIceStor(IceNum).ScheduleIndex == 0) {
@@ -1394,8 +1343,6 @@ namespace IceThermalStorage {
         } // ...over detailed ice storage units
     }
 
-    //******************************************************************************
-
     void InitDetailedIceStorage()
     {
 
@@ -1411,10 +1358,6 @@ namespace IceThermalStorage {
         // METHODOLOGY EMPLOYED:
         // Initializes parameters based on current status flag values.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataGlobals::BeginEnvrnFlag;
         using DataPlant::CommonPipe_TwoWay;
         using DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
@@ -1424,20 +1367,6 @@ namespace IceThermalStorage {
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true);
         static Array1D_bool MyPlantScanFlag;
         static Array1D_bool MyEnvrnFlag;
@@ -1525,22 +1454,6 @@ namespace IceThermalStorage {
     void InitSimpleIceStorage()
     {
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brent Griffith
-        //       DATE WRITTEN   Jan 2010
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // do initializations for simple ice storage
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataGlobals::BeginEnvrnFlag;
         using DataPlant::CommonPipe_TwoWay;
         using DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
@@ -1550,20 +1463,6 @@ namespace IceThermalStorage {
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Array1D_bool MyPlantScanFlag;
         static bool MyOneTimeFlag(true);
         static Array1D_bool MyEnvrnFlag;
@@ -1645,36 +1544,15 @@ namespace IceThermalStorage {
 
     void CalcIceStorageCapacity(int const IceStorageType, Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap)
     {
-        // SUBROUTINE INFORMATION:
-
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // Using/Aliasing
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Umin(0.0); // Min Urate  [fraction]
         Real64 Uact(0.0); // Acting between Umax and Umin [fraction]
         Real64 ITSCoolingRateMax;
         Real64 ITSCoolingRateOpt;
         Real64 ITSCoolingRateMin;
         Real64 QiceMin;
-        // unused  REAL(r64)    :: Tdb
 
-        // FLOW
         {
             auto const SELECT_CASE_var(IceStorageType);
             if (SELECT_CASE_var == IceStorageType_Simple) {
@@ -1731,33 +1609,12 @@ namespace IceThermalStorage {
     void CalcIceStorageDormant(int const IceStorageType, // BY ZG
                                int &IceNum)
     {
-        // SUBROUTINE INFORMATION:
-
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // Using/Aliasing
         using DataPlant::DualSetPointDeadBand;
         using DataPlant::PlantLoop;
         using DataPlant::SingleSetPoint;
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // FLOW
         {
             auto const SELECT_CASE_var(IceStorageType); // by ZG
 
@@ -1799,15 +1656,6 @@ namespace IceThermalStorage {
     void CalcIceStorageCharge(int const IceStorageType, // BY ZG
                               int &IceNum)
     {
-        // SUBROUTINE INFORMATION:
-
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
         using DataPlant::DualSetPointDeadBand;
         using DataPlant::PlantLoop;
@@ -1816,20 +1664,6 @@ namespace IceThermalStorage {
         using Psychrometrics::CPCW;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // FLOW
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Umax(0.0);        // Max Urate adjusted Urate based on Error protection (I) [fraction]
         Real64 Umin(0.0);        // Min Urate adjusted Urate based on Error protection (I) [fraction]
         Real64 Uact(0.0);        // Acting between Usys and UsysLow Urate adjusted Urate based on Error protection (I) [fraction]
@@ -1839,7 +1673,6 @@ namespace IceThermalStorage {
         Real64 Qice;             // [W]
         Real64 DeltaTemp;        // [C]
 
-        // FLOW
         {
             auto const SELECT_CASE_var(IceStorageType);
             if (SELECT_CASE_var == IceStorageType_Simple) {
@@ -1959,31 +1792,10 @@ namespace IceThermalStorage {
 
     void CalcQiceChargeMaxByChiller(int &IceNum, Real64 &QiceMaxByChiller)
     {
-
-        // SUBROUTINE INFORMATION:
-
-        // PURPOSE OF THIS SUBROUTINE:
-
         // METHODOLOGY EMPLOYED:
         // Calculation inside is IP unit, then return QiceMaxByChiller as SI [W] unit.
 
-        // REFERENCES:
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TchillerOut;
-
-        // FLOW
 
         // Chiller is remote now, so chiller out is inlet node temp
         TchillerOut = Node(IceStorage(IceNum).PltInletNodeNum).Temp;
@@ -1995,40 +1807,16 @@ namespace IceThermalStorage {
         }
     }
 
-    //******************************************************************************
-
     void CalcQiceChargeMaxByITS(int &EP_UNUSED(IceNum),
                                 Real64 const ChillerOutletTemp, // [degC]
                                 Real64 &QiceMaxByITS            // [W]
     )
     {
-
-        // SUBROUTINE INFORMATION:
-
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 Tfr;
         Real64 ChillerInletTemp;
         Real64 ChOutletTemp;
         Real64 LogTerm;
 
-        // FLOW
         // Qice is maximized when ChillerInletTemp and ChillerOutletTemp(input data) is almost same due to LMTD method.
         // Qice is minimized(=0) when ChillerInletTemp is almost same as FreezTemp(=0).
 
@@ -2057,8 +1845,6 @@ namespace IceThermalStorage {
         }
     }
 
-    //******************************************************************************
-
     void CalcIceStorageDischarge(int const IceStorageType,             // by ZG
                                  int const IceNum,                     // ice storage number
                                  Real64 const MyLoad,                  // operating load
@@ -2067,16 +1853,6 @@ namespace IceThermalStorage {
                                  Real64 const MaxCap                   // Max possible discharge rate (positive value)
     )
     {
-
-        // SUBROUTINE INFORMATION:
-
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // Using/Aliasing
         using DataBranchAirLoopPlant::MassFlowTolerance;
         using DataHVACGlobals::TimeStepSys;
         using DataPlant::DualSetPointDeadBand;
@@ -2085,22 +1861,7 @@ namespace IceThermalStorage {
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::SetComponentFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcIceStorageDischarge");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // FLOW
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // External function
-        // Local
         static Real64 Umax(0.0); // Max Urate adjusted Urate based on Error protection (I) [fraction]
         static Real64 Umin(0.0); // Min Urate adjusted Urate based on Error protection (I) [fraction]
         static Real64 Uact(0.0); // Acting between Usys and UsysLow Urate adjusted Urate based on Error protection (I) [fraction]
@@ -2113,7 +1874,6 @@ namespace IceThermalStorage {
         int LoopSideNum;
         Real64 CpFluid; // local temporary for plant loop's fluid specific heat
 
-        // FLOW
         {
             auto const SELECT_CASE_var(IceStorageType);
             if (SELECT_CASE_var == IceStorageType_Simple) {
@@ -2217,47 +1977,20 @@ namespace IceThermalStorage {
         }
     }
 
-    //******************************************************************************
-
     void CalcQiceDischageMax(Real64 &QiceMin)
     {
-
-        // SUBROUTINE INFORMATION:
-
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // Using/Aliasing
         using DataPlant::DualSetPointDeadBand;
         using DataPlant::PlantLoop;
         using DataPlant::SingleSetPoint;
 
-        // Locals
         Real64 ITSInletTemp;
         Real64 ITSOutletTemp(0.0);
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 LogTerm;
 
-        // FLOW
         // Qice is minimized when ITSInletTemp and ITSOutletTemp is almost same due to LMTD method.
         // Qice is maximized(=0) when ITSOutletTemp is almost same as FreezTemp(=0).
 
-        // Set ITSInletTemp from E+.
         ITSInletTemp = Node(InletNodeNum).Temp;
-
-        // Make ITSOutletTemp as almost same as ITSInletTemp
         {
             auto const SELECT_CASE_var(PlantLoop(IceStorage(IceNum).LoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == SingleSetPoint) {
@@ -2278,8 +2011,6 @@ namespace IceThermalStorage {
         }
     }
 
-    //******************************************************************************
-
     void CalcUAIce(int const IceNum, Real64 const XCurIceFrac, Real64 &UAIceCh, Real64 &UAIceDisCh, Real64 &HLoss)
     {
         // SUBROUTINE INFORMATION:
@@ -2291,28 +2022,9 @@ namespace IceThermalStorage {
         // PURPOSE OF THIS SUBROUTINE:
 
         // METHODOLOGY EMPLOYED:
-        // This routine is funtion of XCurIceFrac, and UA vaule is based on 1 hour.
+        // This routine is function of XCurIceFrac, and UA value is based on 1 hour.
 
-        // REFERENCES:
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 y;
-        //  REAL(r64)  :: dTlmic
-        //  REAL(r64)  :: Tfr     ! IP freezing temperature
-
-        // Flow
-
         {
             auto const SELECT_CASE_var(IceStorage(IceNum).ITSType_Num);
             if (SELECT_CASE_var == ITSType_IceOnCoilInternal) {
@@ -2358,33 +2070,13 @@ namespace IceThermalStorage {
         // LMTD* = LMTD/Tnom
         // LMTD = (Tin-Tout)/ln((Tin-Tfr)/(Tout-Tfr))
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
         Real64 CalcDetIceStorLMTDstar;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const Tnom(10.0); // Nominal temperature difference across the ice storage unit [C]
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 DeltaTio; // Inlet to outlet temperature difference
         Real64 DeltaTif; // Inlet to freezing temperature difference
         Real64 DeltaTof; // Outlet to freezing temperature difference
 
-        // FLOW:
         // First set the temperature differences and avoid problems with the LOG
         // term by setting some reasonable minimums
         DeltaTio = std::abs(Tin - Tout);
@@ -2425,32 +2117,15 @@ namespace IceThermalStorage {
 
     }
 
-    
-    // *****************************************************************************
-
     Real64 TempSItoIP(Real64 const Temp)
     {
-
-        // Return value
-        Real64 TempSItoIP;
-
-        TempSItoIP = (Temp * 9.0 / 5.0) + 32.0;
-        return TempSItoIP;
+        return (Temp * 9.0 / 5.0) + 32.0;
     }
-
-    // *****************************************************************************
 
     Real64 TempIPtoSI(Real64 const Temp)
     {
-
-        // Return value
-        Real64 TempIPtoSI;
-
-        TempIPtoSI = (Temp - 32.0) * 5.0 / 9.0;
-        return TempIPtoSI;
+        return (Temp - 32.0) * 5.0 / 9.0;
     }
-
-    // *****************************************************************************
 
     void UpdateNode(Real64 const MyLoad, bool const RunFlag, int const EP_UNUSED(Num))
     {
@@ -2458,31 +2133,7 @@ namespace IceThermalStorage {
         //       AUTHOR:          Dan Fisher
         //       DATE WRITTEN:    October 1998
 
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // Using/Aliasing
         using PlantUtilities::SafeCopyPlantNode;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // FLOW
 
         // Update Node Inlet & Outlet MassFlowRat
         SafeCopyPlantNode(InletNodeNum, OutletNodeNum);
@@ -2492,53 +2143,10 @@ namespace IceThermalStorage {
         } else {
             Node(OutletNodeNum).Temp = ITSOutletTemp;
         }
-
-        //! ??? For now, always set outletnode mass flow equal to inletnode mass flow
-        //! ??? Node(InletNodeNum)%MassFlowRate   = ITSMassFlowRate
-        //! ???  Node(OutletNodeNum)%MassFlowRate  = ITSMassFlowRate
-        //!  IF (Node(InletNodeNum)%MassFlowRate > 0.0) THEN
-        //    Node(OutletNodeNum)%MassFlowRate = Node(InletNodeNum)%MassFlowRate
-        //!  ELSE
-        //!    Node(InletNodeNum)%MassFlowRate  = Node(InletNodeNum)%MassFlowRateMaxAvail
-        //!    Node(OutletNodeNum)%MassFlowRate = Node(InletNodeNum)%MassFlowRateMaxAvail
-        //!  ENDIF
-        //  Node(OutletNodeNum)%MassFlowRateMax = Node(InletNodeNum)%MassFlowRateMax
-        //  Node(OutletNodeNum)%MassFlowRateMin = Node(InletNodeNum)%MassFlowRateMin
-        //  Node(OutletNodeNum)%MassFlowRateMaxAvail = Node(InletNodeNum)%MassFlowRateMaxAvail
-        //  Node(OutletNodeNum)%MassFlowRateMinAvail = Node(InletNodeNum)%MassFlowRateMinAvail
     }
-
-    // *****************************************************************************
 
     void RecordOutput(int const IceNum, Real64 const MyLoad, bool const RunFlag)
     {
-
-        // SUBROUTINE INFORMATION:
-
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // FLOW
-
         if (MyLoad == 0 || !RunFlag) {
             IceStorageReport(IceNum).MyLoad = MyLoad;
             IceStorageReport(IceNum).U = U;
@@ -2572,8 +2180,6 @@ namespace IceThermalStorage {
         }
     }
 
-    // *****************************************************************************
-
     void UpdateIceFractions()
     {
 
@@ -2590,29 +2196,7 @@ namespace IceThermalStorage {
         // This is called from HVACManager once we have actually stepped forward
         // a system time step.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IceNum2;
-
-        // FLOW
 
         for (IceNum2 = 1; IceNum2 <= NumIceStorages; ++IceNum2) {
             IceStorageReport(IceNum2).IceFracRemain += IceStorageReport(IceNum2).Urate * TimeStepSys;
@@ -2661,30 +2245,11 @@ namespace IceThermalStorage {
         // Not much mystery here--just move the data to the appropriate place
         // for the detailed ice storage system in question.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using PlantUtilities::SafeCopyPlantNode;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InNodeNum;  // Plant inlet node number for component
         int OutNodeNum; // Plant outlet node number for component
 
-        // FLOW:
         // Set the temperature and flow rate for the component outlet node
         InNodeNum = DetIceStor(IceNum).PlantInNodeNum;
         OutNodeNum = DetIceStor(IceNum).PlantOutNodeNum;
@@ -2710,30 +2275,7 @@ namespace IceThermalStorage {
         // Just take what has already been calculated or calculate the appropriate
         // output value based on simulation data.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
         Real64 const LowLoadLimit(0.1); // Load below which device can be assumed off [W]
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        // FLOW:
-        // Determine what is going on  based on load and the inlet and outlet temperature comparison
 
         if (DetIceStor(IceNum).CompLoad < LowLoadLimit) { // No load condition
 
