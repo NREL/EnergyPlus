@@ -1057,7 +1057,7 @@ namespace SingleDuct {
             }
             Sys(SysNum).ReheatAirOutletNode = Sys(SysNum).OutletNodeNum;
             Sys(SysNum).MaxAirVolFlowRate = Numbers(1);
-            Sys(SysNum).ZoneMinAirFrac = 1.0;
+            Sys(SysNum).ZoneMinAirFrac = 0.0;
             Sys(SysNum).ZoneMinAirFracMethod = MinFracNotUsed;
             Sys(SysNum).DamperHeatingAction = HeatingActionNotUsed;
             if (Sys(SysNum).ReheatComp_Num == HCoilType_SteamAirHeating) {
@@ -1197,7 +1197,7 @@ namespace SingleDuct {
                                                           cAlphaFields(4));
 
             Sys(SysNum).MaxAirVolFlowRate = Numbers(1);
-            Sys(SysNum).ZoneMinAirFrac = 1.0;
+            Sys(SysNum).ZoneMinAirFrac = 0.0;
             Sys(SysNum).ZoneMinAirFracMethod = MinFracNotUsed;
             Sys(SysNum).DamperHeatingAction = HeatingActionNotUsed;
 
