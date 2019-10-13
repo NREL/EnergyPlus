@@ -60,73 +60,53 @@ namespace IceRink {
     {
         // Members
         // Input data
-        std::string Name;                // name of direct refrigeration system
-        std::string RefrigerantName;     // Name of refrigerant, must match name in FluidName
-                                         //    (see fluidpropertiesrefdata.idf)
-        int RefIndex;                    // Index number of refrigerant, automatically assigned on first call to fluid property
-                                         //   and used thereafter
-        std::string SchedName;           // availability schedule
-        int SchedPtr;                    // index to schedule
-        std::string ZoneName;            // Name of zone the system is serving
-        int ZonePtr;                     // Point to this zone in the Zone derived type
-        std::string SurfaceName;         // surface name of rink floor
-        int SurfacePtr;                  // index to a surface
-        Array1D_int SurfacePtrArray;     // index to a surface array
-        int NumOfSurfaces;               // Number of surfaces included in this refrigeration system (coordinated control)
-        Array1D<Real64> SurfaceFlowFrac; // Fraction of flow/pipe length for the floor surface
-        Array1D<Real64> NumCircuits;     // Number of fluid circuits in the surface
-        Real64 TubeDiameter;             // tube diameter for embedded tubing
-        Real64 TubeLength;               // tube length embedded in radiant surface
-        int ControlType;                 // Control type for the system(BOTC or STC)
-        Real64 RefrigVolFlowMaxCool;     // maximum refrigerant flow rate for cooling, m3/s
-        Real64 RefrigFlowMaxCool;        // maximum refrigerant mass flow rate for cooling. Kg/s
-        Real64 RefrigFlowMinCool;        // manimum refrigerant mass flow rate for cooling. Kg/s
-        int ColdRefrigInNode;            // cold refrigerant inlet node
-        int ColdRefrigOutNode;           // cold refrigerant Outlet node
-        Real64 ColdThrottleRange;        // Throttling range for cooling [C]
-        std::string ColdSetptSched;      // Schedule name for the ice rink setpoint temperature
-        int ColdSetptSchedPtr;           // Schedule index for the ice rink setpoint temperature
-        Real64 CondDewPtDeltaT;          // Diff between surface temperature and dew point for cond. shut-off
-        int CondCtrlType;                // Condensation control type (initialize to simple off)
-        int CondErrIndex;                // Error index for recurring warning messages
-        int NumCircCalcMethod;           // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
-        Real64 CircLength;               // Circuit length {m}
-        int GlycolIndex;                 // Index to fluid properties routines for water
-        Real64 LengthRink;               // Length of ice rink
-        Real64 WidthRink;                // Width of ice rink
-        Real64 DepthRink;                // Depth of ice rink
-        Real64 IceThickness;             // Thickness of ice surface
-        Real64 SurfaceArea;              // Surface area of the rink
-        Real64 FloodWaterTemp;           // Temperature of flood water used in the beginning of freezing the rink
-        int CRefrigLoopNum;              // Cold refrigerant loop number
-        int CRefrigLoopSide;
-        int CRefrigBranchNum;
-        int CRefrigCompNum;
-        Real64 RefrigMassFlowRate;   // Refrigerant mass flow rate
-        bool CondCausedShutDown;     // .TRUE. when condensation predicted at surface
-        Real64 RefOutBOTCCtrlTemp;   // Outlet temperature of brine (To be )
-        std::string PeopleSchedName; // surface name of rink floor
-        int PeopleSchedPtr;          // index to schedule of people
-        Real64 PeopleHeatGain;       // Heat gain from people (Watt/m2)
-        Real64 SpectatorArea;        // Area over which spectators are present
-        Real64 RefrigInletTemp;      // Temperature at which refrigerant enters
+        std::string Name; // name of direct system
+        int ZonePtr;      // Pointer to the zone in which the floor radiant system is present
+        int RefrigLoopNum;
+        int RefrigLoopSide;
+        int RefrigBranchNum;
+        int RefrigCompNum;
+        int ControlStrategy;                 // Control strategy for the ice rink (BOTC or STC)
+        Real64 MinRefrigMassFlow;            // Minimum mass flow rate of refrigerant allowed in the floor radiant system(kg/s)
+        Real64 MaxRefrigMassFlow;            // Miximum mass flow rate of refrigerant allowed in the floor radiant system(kg/s)
+        int NumCircuits;                     // Number of fluid circuits in the floor radiant system
+        Real64 TubeLength;                   // Length of the piping used in the floor radiant system
+        Real64 TubeDiameter;                 // Diameter of the piping used in the floor radiant system
+        int RefrigInNode;                    // Inlet node number for the cold refrigerant entring the floor radiant system
+        int RefrigOutNode;                   // Outlet node number for the hot refrigerant exiting the floor radiant system
+        int RefrigSetptSchedPtr;             // Pointer to set point temperature of refrigerant outlet
+        int IceSetptSchedPtr;                // Pointer to set point temperature of ice surface
+        Real64 RefrigSetptTemp;              // Set point temperature for refrigerant outlet
+        Real64 IceSetptTemp;                 // Set point temperature for ice surface
+        int NumOfSurfaces;                   // Total number of surfaces in the ice rink arena
+        Array1D_int SurfacePtrArray;         // index to a surface array
+        Real64 TotalSurfaceArea;             // Surface area of the rink
+        Real64 RefrigVolFlowMaxCool;         // maximum refrigerant flow rate for cooling, m3/s
+        Real64 RefrigFlowMaxCool;            // maximum refrigerant flow rate for cooling, kg/s
+        int PeopleHeatGainSchedPtr;          // People schedule index
+        std::string PeopleHeatGainSchedName; // Name of people heat gain schedule
+        std::string PeopleSchedName;         // Name of people schedule
+        int PeopleSchedPtr;                  // People schedule index
+        Real64 PeopleHeatGain;               // Current heat gain from people
+        Real64 MaxNumOfPeople;               // Number of people in the rink as defined by user input
+        Real64 LengthRink;
+        Real64 WidthRink;
+        Real64 DepthRink;
+        Real64 IceThickness;
+        int WaterIndex;
+        Real64 FloorWaterTemp;
+        // Inputs used in calcEffectiveness
 
         // ReportData
-        Real64 RefrigInletTemp;         // Refrigerat inlet temperature
-        Real64 RefrigOutletTemp;        // Refrigerant outlet temperature
-        Real64 RefrigMassFlowRate;      // Refrigerant mass flow rate
-        Real64 CoolPower;               // Cooling sent to rink floor in Watts
-        Real64 CoolEnergy;              // Cooling sent to rink floor in Joules
+        Real64 RefrigInletTemp;   // Refrigerant inlet temperature
+        Real64 RefrigOutletTemp;  // Refrigerant outlet temperature
+        Real64 RefrigMassFlow;    // Refrigerant mass flow rate in the floor radiant system(Kg/s)
+        Real64 CoolPower;         // Cooling sent to rink floor in Watts
+        Real64 CoolEnergy;        // Cooling sent to rink floor in Joules
+        int OutRangeHiErrorCount; // recurring errors for crazy results too high fluid temperature
+        int OutRangeLoErrorCount; // recurring errors for crazy results too low fluid temperature
         // Default Constructor
-        DirectRefrigSysData()
-            : SchedPtr(0), ZonePtr(0), SurfacePtr(0), NumOfSurfaces(0), TubeDiameter(0.0), TubeLength(0.0), ControlType(0), RefrigVolFlowMaxCool(0.0),
-              ColdRefrigInNode(0), ColdRefrigOutNode(0), ColdThrottleRange(0.0), ColdSetptSchedPtr(0), CondCtrlType(0), CondDewPtDeltaT(0.0),
-              NumCircCalcMethod(0), CircLength(0.0), GlycolIndex(0), LengthRink(0.0), WidthRink(0.0), DepthRink(0.0), IceThickness(0.0),
-              SurfaceArea(0.0),
-              FloodWaterTemp(0.0), CRefrigLoopSide(0), CRefrigBranchNum(0), CRefrigCompNum(0), RefrigMassFlowRate(0.0), CondCausedShutDown(false),
-              CondErrIndex(0), RefrigFlowMaxCool(0.0), RefrigFlowMinCool(0.0), RefOutBOTCCtrlTemp(0.0), PeopleSchedPtr(0), PeopleHeatGain(0.0), 
-              SpectatorArea(0.0), RefrigInletTemp(0.0), RefrigOutletTemp(0.0), RefrigMassFlowRate(0.0), CoolPower(0.0),
-              CoolEnergy(0.0)
+        DirectRefrigSysData() : RefrigLoopNum(0)
 
         {
         }
@@ -136,61 +116,55 @@ namespace IceRink {
     {
         // Members
         // Input Data
-        std::string Name;            // name of indirect refrigeration system
-        std::string RefrigerantName; // Name of refrigerant, must match name in FluidName
-                                     //    (see fluidpropertiesrefdata.idf)
-        int RefIndex;                // Index number of refrigerant, automatically assigned on first call to fluid property
-                                     //   and used thereafter
+        std::string Name; // name of indirect system
+        int ZonePtr;      // Pointer to the zone in which the floor radiant system is present
+        int RefrigLoopNum;
+        int RefrigLoopSide;
+        int RefrigBranchNum;
+        int RefrigCompNum;
+        int ControlStrategy;                 // Control strategy for the ice rink (BOTC or STC)
+        Real64 MinRefrigMassFlow;            // Minimum mass flow rate of refrigerant allowed in the floor radiant system(kg/s)
+        Real64 MaxRefrigMassFlow;            // Miximum mass flow rate of refrigerant allowed in the floor radiant system(kg/s)
+        int NumCircuits;                     // Number of fluid circuits in the floor radiant system
+        Real64 TubeLength;                   // Length of the piping used in the floor radiant system
+        Real64 TubeDiameter;                 // Diameter of the piping used in the floor radiant system
+        int RefrigInNode;                    // Inlet node number for the cold refrigerant entring the floor radiant system
+        int RefrigOutNode;                   // Outlet node number for the hot refrigerant exiting the floor radiant system
+        int RefrigSetptSchedPtr;             // Pointer to set point temperature of refrigerant outlet
+        Real64 RefrigSetptTemp;              // Set point temperature for refrigerant outlet
+        Real64 IceSetptTemp;                 // Set point temperature for ice surface
+        int IceSetptSchedPtr;                // Pointer to set point temperature of ice surface
+        int NumOfSurfaces;                   // Total number of surfaces in the ice rink arena
+        Array1D_int SurfacePtrArray;         // index to a surface array
+        Real64 TotalSurfaceArea;             // Surface area of the rink
+        Real64 RefrigVolFlowMaxCool;         // maximum refrigerant flow rate for cooling, m3/s
+        Real64 RefrigFlowMaxCool;            // maximum refrigerant flow rate for cooling, kg/s
+        int PeopleHeatGainSchedPtr;          // People schedule index
+        std::string PeopleHeatGainSchedName; // Name of people heat gain schedule
+        std::string PeopleSchedName;         // Name of people schedule
+        int PeopleSchedPtr;                  // People schedule index
+        Real64 PeopleHeatGain;               // Current heat gain from people
+        Real64 MaxNumOfPeople;               // Number of people in the rink as defined by user input
+        Real64 LengthRink;
+        Real64 WidthRink;
+        Real64 DepthRink;
+        Real64 IceThickness;
+        int WaterIndex;
+        Real64 FloorWaterTemp;
+        int RefrigType;
+        Real64 RefrigConc;
+        // Inputs used in calcEffectiveness
 
-        std::string SchedName;           // availability schedule
-        int SchedPtr;                    // index to schedule
-        std::string ZoneName;            // Name of zone the system is serving
-        int ZonePtr;                     // Point to this zone in the Zone derived type
-        std::string SurfaceName;         // surface name of rink floor
-        int SurfacePtr;                  // index to a surface
-        Array1D_int SurfacePtrArray;     // index to a surface array
-        int NumOfSurfaces;               // Number of surfaces included in this refrigeration system (coordinated control)
-        Array1D<Real64> SurfaceFlowFrac; // Fraction of flow/pipe length for the floor surface
-        Array1D<Real64> NumCircuits;     // Number of fluid circuits in the surface
-        Real64 TubeDiameter;             // tube diameter for embedded tubing
-        Real64 TubeLength;               // tube length embedded in radiant surface
-        int ControlType;                 // Control type for the system(BOTC or STC)
-        Real64 RefrigVolFlowMaxCool;     // maximum refrigerant flow rate for cooling, m3/s
-        Real64 RefrigFlowMaxCool;        // maximum refrigerant mass flow rate for cooling. Kg/s
-        Real64 RefrigFlowMinCool;        // manimum refrigerant mass flow rate for cooling. Kg/s
-        int ColdRefrigInNode;            // cold refrigerant inlet node
-        int ColdRefrigOutNode;           // cold refrigerant Outlet node
-        Real64 ColdThrottleRange;        // Throttling range for cooling [C]
-        std::string ColdSetptSched;      // Schedule name for the ice rink setpoint temperature
-        int ColdSetptSchedPtr;           // Schedule index for the ice rink setpoint temperature
-        Real64 CondDewPtDeltaT;          // Diff between surface temperature and dew point for cond. shut-off
-        int CondCtrlType;                // Condensation control type (initialize to simple off)
-        int CondErrIndex;                // Error index for recurring warning messages
-        int NumCircCalcMethod;           // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
-        Real64 CircLength;               // Circuit length {m}
-        int GlycolIndex;                 // Index to fluid properties routines for water
-        Real64 LengthRink;               // Length of ice rink
-        Real64 WidthRink;                // Width of ice rink
-        Real64 DepthRink;                // Depth of ice rink
-        Real64 IceThickness;             // Thickness of ice surface
-        int CRefrigLoopNum;              // Cold refrigerant loop number
-        int CRefrigLoopSide;
-        int CRefrigBranchNum;
-        int CRefrigCompNum;
-        Real64 RefrigMassFlowRate; // Refrigerant mass flow rate
-        bool CondCausedShutDown;   // .TRUE. when condensation predicted at surface
-        Real64 RefOutBOTCtrlTemp;  // Outlet temperature of brine (To be )
-        Real64 Concentration;      // Concentration of the brine used in the secondary refrigeration system
-        int RefrigType;            // Type of secondary refrigerant, EG or CaCl2
         // ReportData
-
+        Real64 RefrigInletTemp;   // Refrigerant inlet temperature
+        Real64 RefrigOutletTemp;  // Refrigerant outlet temperature
+        Real64 RefrigMassFlow;    // Refrigerant mass flow rate in the floor radiant system(Kg/s)
+        Real64 CoolPower;         // Cooling sent to rink floor in Watts
+        Real64 CoolEnergy;        // Cooling sent to rink floor in Joules
+        int OutRangeHiErrorCount; // recurring errors for crazy results too high fluid temperature
+        int OutRangeLoErrorCount; // recurring errors for crazy results too low fluid temperature
         // Default Constructor
-        IndirectRefrigSysData()
-            : SchedPtr(0), ZonePtr(0), SurfacePtr(0), NumOfSurfaces(0), TubeDiameter(0.0), TubeLength(0.0), ControlType(0), RefrigVolFlowMaxCool(0.0),
-              ColdRefrigInNode(0), ColdRefrigOutNode(0), ColdThrottleRange(0.0), ColdSetptSchedPtr(0), CondCtrlType(0), CondDewPtDeltaT(0.0),
-              NumCircCalcMethod(0), CircLength(0.0), GlycolIndex(0), LengthRink(0.0), WidthRink(0.0), DepthRink(0.0), IceThickness(0.0),
-              CRefrigLoopSide(0), CRefrigBranchNum(0), CRefrigCompNum(0), RefrigMassFlowRate(0.0), CondCausedShutDown(false), CondErrIndex(0),
-              RefrigFlowMaxCool(0.0), RefrigFlowMinCool(0.0), RefOutBOTCtrlTemp(0.0)
+        IndirectRefrigSysData() : RefrigLoopNum(0)
 
         {
         }
@@ -216,7 +190,11 @@ namespace IceRink {
         std::string Name;
         int GlycolIndex;
         int ResurfacingSchedPtr;
+        int NoOfResurfEvents;
         Real64 ResurfacingWaterTemp;
+        Real64 InitWaterTemp;
+        Real64 TankCapacity; // in ltr
+
         // Report Data
         Real64 QResurfacing;
         Real64 EHeatingWater;
@@ -234,49 +212,44 @@ namespace IceRink {
     extern Array1D<ResurfacerData> Resurfacer;
 
     // Functions:
+    void SimIndoorIceRink(std::string const &CompName, bool const FirstHVACIteration, Real64 &LoadMet, int &CompIndex);
 
     void GetIndoorIceRink();
 
-    void InitIndoorIceRink(bool const FirstHVACIteration, 
-                           int const SysNum,              
-                           int const SystemType,
-                           bool &InitErrorsFound);
+    void InitIndoorIceRink(bool const FirstHVACIteration, int const SysNum, int const SystemType, bool &InitErrorsFound);
 
-    Real64 IceRinkResurfacer(Real64 ResurfacerTank_capacity,
-                             Real64 ResurfacingHWTemperature,
-                             Real64 IceSurfaceTemperature,
-                             Real64 InitResurfWaterTemp,
-                             int const ResurfacerIndex,
-                             int const SysNum);
+    void IceRinkResurfacer(Real64 &ResurfacerHeatLoad, int const SysNum, int const SystemType, int const MachineNum);
 
-    Real64 CalcDRinkHXEffectTerm(Real64 const Temperature,    // Temperature of refrigerant entering the radiant system, in C
-                                 int const SysNum,            // Index to the refrigeration system
-                                 Real64 const RefrigMassFlow, // Mass flow rate of refrigerant in direct refrigeration system, kg/s
-                                 Real64 TubeLength,           // Total length of the piping used in the radiant system
-                                 Real64 TubeDiameter);
+    Real64 CalcEffectivenessDRink(int const SysNum,
+                                  Real64 const Temperature,
+                                  Real64 const RefrigMassFlow,
+                                  Real64 const NumCircs,
+                                  Real64 const TubeLength,
+                                  Real64 const TubeDiameter);
 
-    Real64 CalcIRinkHXEffectTerm(Real64 const Temperature,    // Temperature of the refrigerant entering the radiant system
-                                 int const SysNum,            // Index to the refrigeration system
-                                 Real64 const RefrigMassFlow, // Mass flow rate of refrigerant in direct refrigeration system, kg/s
-                                 Real64 TubeLength,           // Total length of the piping used in the radiant system
-                                 Real64 TubeDiameter,         // Inner diameter of the piping used in the radiant system
-                                 int const RefrigType, // Refrigerant used in the radiant system: Ethylene Glycol(EG) or Cslcium Chloride(CaCl2)
-                                 Real64 Concentration  // Concentration of the brine(refrigerant) in the radiant system (allowed range 10% to 30%)
-    );
+    Real64 CalcEffectivenessIRink(int const SysNum,
+                                  Real64 const Temperature,
+                                  Real64 const RefrigMassFlow,
+                                  Real64 const NumCircs,
+                                  Real64 const TubeLength,
+                                  Real64 const TubeDiameter,
+                                  Real64 const RefrigType,
+                                  Real64 const Concentration);
 
-    void CalcDirectIndoorIceRinkComps(int const SysNum, // Index number for the indirect refrigeration system
-                                      Real64 &LoadMet);
+    void CalcIndirectIndoorIceRink(int const SysNum, Real64 &LoadMet);
 
-    void CalcDirectIndoorIceRinkSys(int const SysNum, // name of the direct refrigeration system
-                                    Real64 &LoadMet   // load met by the direct refrigeration system, in Watts
-    );
+    void CalcDirectIndoorIceRink(int const SysNum, Real64 &LoadMet);
+
+    void UpdateIndoorIceRink(bool const FirstHVACIteration, int const RadSysNum, int const SystemType);
+
+    void UpdateRinkRadSysSourceValAvg(bool &FloorRadSysOn, int const SystemType);
+
+    void CheckForOutOfRangeTempResult(
+        int const SystemType, int const SysNum, Real64 const outletTemp, Real64 const inletTemp, Real64 const EP_UNUSED(mdot));
 
     Real64 SumHATsurf(int const ZoneNum);
 
-    Real64 BOTC(int const SystemType, int const SysNum, Real64 const Temperature);
-
-    Real64 STC(int const SystemType, int const SysNum);
-
+    void ReportIndoorIceRink(int const SysNum, int const SystemType);
 } // namespace IceRink
 } // namespace EnergyPlus
 

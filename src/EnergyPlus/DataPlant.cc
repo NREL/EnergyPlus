@@ -455,6 +455,7 @@ namespace DataPlant {
     int const TypeOf_CoolingPanel_Simple(94);
     int const TypeOf_HeatPumpEIRCooling(95);
     int const TypeOf_HeatPumpEIRHeating(96);
+    int const TypeOf_IceRink_Indoor(97);
 
     // Parameters for General Equipment Types
     int const NumGeneralEquipTypes(23);
