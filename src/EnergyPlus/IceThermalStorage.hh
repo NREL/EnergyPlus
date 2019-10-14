@@ -87,16 +87,6 @@ namespace IceThermalStorage {
     extern int modNumDetIceStorages;
     extern int modTotalIceStorages;
 
-    // ITS UAice and HLoss
-    extern Real64 modUAIceCh;    // Charging Ice Thermal Storage overall heat transfer coefficient [W/C]
-    extern Real64 modUAIceDisCh; // Discharging Ice Thermal Storage overall heat transfer coefficient [W/C]
-    extern Real64 modHLoss;      // ITS Heat Loss
-
-    // ITS State
-    extern Real64 modXCurIceFrac; // Current Fraction of Ice Thermal Storage remaining [fraction]
-    extern Real64 modU;           // Adjusted input U after reading U Schedule [fraction]
-    extern Real64 modUrate;       // Final Urate adjusted Urate based on Error protection (I) [fraction] by HOUR
-
     // ITS status information
     extern Real64 modITSMassFlowRate;       // ITS water mass flow rate [kg/s]
     extern Real64 modITSInletTemp;          // ITS inlet water temperature [C]
@@ -173,11 +163,16 @@ namespace IceThermalStorage {
         Real64 FreezeTemp;
         bool ResetXForITSFlag;
         bool MyEnvrnFlag;
+        Real64 UAIceCh;
+        Real64 UAIceDisCh;
+        Real64 HLoss;
+        Real64 XCurIceFrac;
 
         // Default Constructor
         IceStorageSpecs()
             : ITSType_Num(0), MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSideNum(0),
-              BranchNum(0), CompNum(0), DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForITSFlag(false), MyEnvrnFlag(true)
+              BranchNum(0), CompNum(0), DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForITSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0),
+              UAIceDisCh(0.0), HLoss(0.0), XCurIceFrac(0.0)
         {
         }
     };
@@ -255,7 +250,6 @@ namespace IceThermalStorage {
     {
         // Members
         Real64 MyLoad;            // load requested by plant [W]
-        Real64 U;                 // [fraction]
         Real64 Urate;             // [fraction]
         Real64 IceFracRemain;     // Fraction of ice remaining in storage [fraction]
         Real64 ITSCoolingRate;    // [W]
@@ -268,7 +262,7 @@ namespace IceThermalStorage {
 
         // Default Constructor
         ReportVars()
-            : MyLoad(0.0), U(0.0), Urate(0.0), IceFracRemain(0.0), ITSCoolingRate(0.0), ITSCoolingEnergy(0.0), ITSChargingRate(0.0),
+            : MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSCoolingRate(0.0), ITSCoolingEnergy(0.0), ITSChargingRate(0.0),
               ITSChargingEnergy(0.0), ITSmdot(0.0), ITSInletTemp(0.0), ITSOutletTemp(0.0)
         {
         }
@@ -324,7 +318,7 @@ namespace IceThermalStorage {
 
     //******************************************************************************
 
-    void CalcQiceChargeMaxByITS(int &IceNum,
+    void CalcQiceChargeMaxByITS(int iceNum,
                                 Real64 chillerOutletTemp, // [degC]
                                 Real64 &QiceMaxByITS            // [W]
     );
