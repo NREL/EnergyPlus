@@ -7556,15 +7556,12 @@ namespace HeatBalanceManager {
                 if (UtilityRoutines::SameString(solarMethod, "GroupedZones")) {
                     thisConstruct.TypeIsAirBoundarySolar = true;
                 } else if (UtilityRoutines::SameString(solarMethod, "InteriorWindow")) {
-                    ShowWarningError(RoutineName + ": Construction:AirBoundary Solar and Daylighting Method=InteriorWindow is not functional.");
-                    ShowContinueError("Using GroupedZones method instead for Construction:AirBoundary = " + thisConstruct.Name + ".");
-                    thisConstruct.TypeIsAirBoundarySolar = true;
-                    //thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
-                    //thisConstruct.TransDiff = 1.0;
-                    //thisConstruct.TransDiffVis = 1.0;
-                    //thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
-                    //thisConstruct.TransSolBeamCoef = 1.0;
-                    //thisConstruct.ReflectSolDiffBack = 0.0;
+                    thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
+                    thisConstruct.TransDiff = 1.0;
+                    thisConstruct.TransDiffVis = 1.0;
+                    thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
+                    thisConstruct.TransSolBeamCoef = 1.0;
+                    thisConstruct.ReflectSolDiffBack = 0.0;
                 }
 
                 // Radiant Exchange Method
