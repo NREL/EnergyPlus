@@ -255,8 +255,21 @@ namespace IceThermalStorage {
         }
     };
 
+    struct ReportVars
+    {
+        Real64 ITSCoolingRate;    // [W]
+        Real64 ITSCoolingEnergy;  // [J]
+
+        // Default Constructor
+        ReportVars()
+                : ITSCoolingRate(0.0), ITSCoolingEnergy(0.0)
+        {
+        }
+    };
+
     // Object Data
     extern Array1D<IceStorageSpecs> IceStorage;        // dimension to number of machines
+    extern Array1D<ReportVars> IceStorageReport;       // dimension to number of machines
     extern Array1D<DetailedIceStorageData> DetIceStor; // Derived type for detailed ice storage model
     extern Array1D<IceStorageMapping> IceStorageTypeMap;
 
