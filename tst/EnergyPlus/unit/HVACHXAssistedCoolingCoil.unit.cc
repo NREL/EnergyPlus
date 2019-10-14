@@ -48,25 +48,25 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "DataEnvironment.hh"
-#include "DataGlobals.hh"
-#include "DataHVACGlobals.hh"
-#include "DataHeatBalFanSys.hh"
-#include "DataLoopNode.hh"
-#include "DataSizing.hh"
-#include "DataZoneEnergyDemands.hh"
-#include "DataZoneEquipment.hh"
-#include "ElectricPowerServiceManager.hh"
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
-#include "HVACHXAssistedCoolingCoil.hh"
-#include "HeatBalanceManager.hh"
-#include "OutputProcessor.hh"
-#include "OutputReportPredefined.hh"
-#include "Psychrometrics.hh"
-#include "ScheduleManager.hh"
-#include "SimulationManager.hh"
-#include "SizingManager.hh"
-#include "UnitarySystem.hh"
+#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 
 using namespace EnergyPlus;
 

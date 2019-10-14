@@ -49,7 +49,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <SimulationManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

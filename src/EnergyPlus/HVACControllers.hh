@@ -53,11 +53,11 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataAirSystems.hh>
-#include <DataGlobals.hh>
-#include <DataHVACControllers.hh>
-#include <DataRootFinder.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACControllers.hh>
+#include <EnergyPlus/DataRootFinder.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 

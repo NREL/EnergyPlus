@@ -50,8 +50,8 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <DataPrecisionGlobals.hh>
-#include <OutputReportPredefined.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 
 namespace EnergyPlus {
 

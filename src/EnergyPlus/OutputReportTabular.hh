@@ -61,10 +61,10 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <Globals.hh>
-#include <EnergyPlus.hh>
-#include <OutputProcessor.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Globals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
 

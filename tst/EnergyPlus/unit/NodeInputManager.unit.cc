@@ -52,12 +52,12 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataEnvironment.hh>
-#include <DataLoopNode.hh>
-#include <EMSManager.hh>
-#include <HeatBalanceManager.hh>
-#include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::NodeInputManager;

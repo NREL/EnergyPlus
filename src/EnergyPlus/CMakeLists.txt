@@ -1,8 +1,3 @@
-INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
-
-# public API headers go in the src/EnergyPlus/public folder
-INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
-
 if(WIN32)
   configure_file( energyplus.rc.in "${CMAKE_CURRENT_BINARY_DIR}/energyplus.rc" )
   configure_file( energyplusapi.rc.in "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )

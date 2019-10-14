@@ -53,8 +53,8 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataRootFinder.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataRootFinder.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 

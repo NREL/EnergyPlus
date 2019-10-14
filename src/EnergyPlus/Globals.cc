@@ -49,7 +49,7 @@
 #include <ObjexxFCL/numeric.hh>
 
 // EnergyPlus Headers
-#include <Globals.hh>
+#include <EnergyPlus/Globals.hh>
 
 
     // MODULE INFORMATION:

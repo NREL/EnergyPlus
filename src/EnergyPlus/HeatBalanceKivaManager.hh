@@ -54,8 +54,8 @@
 #include <libkiva/Instance.hpp>
 
 // EnergyPlus Headers
-#include <DataHeatBalance.hh>
-#include <DataSurfaces.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 
 namespace EnergyPlus {
 namespace HeatBalanceKivaManager {
