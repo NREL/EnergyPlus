@@ -96,8 +96,6 @@ namespace IceThermalStorage {
 
     // REFERENCES: Dion J. King, ASHRAE Transactions v104, pt1, 1998.
 
-    static std::string const BlankString;
-
     std::string const cIceStorageSimple("ThermalStorage:Ice:Simple");
     std::string const cIceStorageDetailed("ThermalStorage:Ice:Detailed");
 
@@ -425,7 +423,7 @@ namespace IceThermalStorage {
         Real64 const SIEquiv100GPMinMassFlowRate(6.31); // Used to non-dimensionalize flow rate for use in CubicLinear charging equation
                                                         // Flow rate divided by nominal 100GPM used to non-dimensionalize volume flow rate
                                                         // Assumes approximate density of 1000 kg/m3 to get an estimate for mass flow rate
-        static std::string const RoutineName("SimDetailedIceStorage");
+        std::string const RoutineName("SimDetailedIceStorage");
 
         Real64 ActualLoad;     // Actual load on the ice storage unit [W]
         Real64 AvgFracCharged; // Average fraction charged for the current time step
@@ -1768,14 +1766,13 @@ namespace IceThermalStorage {
                                  Real64 const MaxCap                   // Max possible discharge rate (positive value)
     )
     {
-        static std::string const RoutineName("CalcIceStorageDischarge");
-        static Real64 Umax(0.0); // Max Urate adjusted Urate based on Error protection (I) [fraction]
-        static Real64 Umin(0.0); // Min Urate adjusted Urate based on Error protection (I) [fraction]
-        static Real64 Uact(0.0); // Acting between Usys and UsysLow Urate adjusted Urate based on Error protection (I) [fraction]
-        static Real64 Umyload(0.0);
-        // unused  REAL(r64)    :: QiceMin
-        static Real64 Qice(0.0);
-        static Real64 DeltaTemp(0.0);
+        std::string const RoutineName("CalcIceStorageDischarge");
+        Real64 Umax(0.0); // Max Urate adjusted Urate based on Error protection (I) [fraction]
+        Real64 Umin(0.0); // Min Urate adjusted Urate based on Error protection (I) [fraction]
+        Real64 Uact(0.0); // Acting between Usys and UsysLow Urate adjusted Urate based on Error protection (I) [fraction]
+        Real64 Umyload(0.0);
+        Real64 Qice(0.0);
+        Real64 DeltaTemp(0.0);
 
         int LoopNum;
         Real64 CpFluid; // local temporary for plant loop's fluid specific heat
