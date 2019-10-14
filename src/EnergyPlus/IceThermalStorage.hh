@@ -114,7 +114,6 @@ namespace IceThermalStorage {
     extern int modOutletNodeNum; // Node number on the inlet side of the plant
 
     // ITS numbers and FoundOrNot
-    extern int IceNum;
     extern int modNumIceStorages;
     extern int modNumDetIceStorages;
     extern int modTotalIceStorages;
@@ -202,11 +201,12 @@ namespace IceThermalStorage {
         int BranchNum;
         int CompNum;
         Real64 DesignMassFlowRate;
+        Real64 FreezeTemp;
 
         // Default Constructor
         IceStorageSpecs()
             : ITSType_Num(0), MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSideNum(0),
-              BranchNum(0), CompNum(0), DesignMassFlowRate(0.0)
+              BranchNum(0), CompNum(0), DesignMassFlowRate(0.0), FreezeTemp(0.0)
         {
         }
     };
@@ -319,7 +319,7 @@ namespace IceThermalStorage {
                        bool InitLoopEquip,
                        Real64 &MyLoad);
 
-    void SimDetailedIceStorage();
+    void SimDetailedIceStorage(int iceNum);
 
     //******************************************************************************
 
@@ -327,13 +327,13 @@ namespace IceThermalStorage {
 
     //******************************************************************************
 
-    void InitDetailedIceStorage();
+    void InitDetailedIceStorage(int iceNum);
 
-    void InitSimpleIceStorage();
+    void InitSimpleIceStorage(int iceNum);
 
     //******************************************************************************
 
-    void CalcIceStorageCapacity(int IceStorageType, Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
+    void CalcIceStorageCapacity(int IceStorageType, Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap, int iceNum);
 
     //******************************************************************************
 
@@ -368,7 +368,7 @@ namespace IceThermalStorage {
 
     //******************************************************************************
 
-    void CalcQiceDischageMax(Real64 &QiceMin);
+    void CalcQiceDischageMax(Real64 &QiceMin, int iceNum);
 
     //******************************************************************************
 
@@ -406,9 +406,9 @@ namespace IceThermalStorage {
 
     void UpdateIceFractions();
 
-    void UpdateDetailedIceStorage();
+    void UpdateDetailedIceStorage(int iceNum);
 
-    void ReportDetailedIceStorage();
+    void ReportDetailedIceStorage(int iceNum);
 
 } // namespace IceThermalStorage
 
