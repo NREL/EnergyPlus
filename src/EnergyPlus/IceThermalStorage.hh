@@ -90,12 +90,10 @@ namespace IceThermalStorage {
 
     // variable used by simple model
     extern Real64 const Delta;
-    extern Real64 const PLRmin;
     extern Real64 const Pa;
     extern Real64 const Pb;
     extern Real64 const Pc;
     extern Real64 const Tref;       // F
-    extern Real64 const Tcharge;    // F
     extern Real64 const Tdischarge; // F
 
     // Parameter used by the Detailed Ice Storage Model
@@ -126,7 +124,6 @@ namespace IceThermalStorage {
     // ITS numbers and FoundOrNot
     extern int IceNum;
     extern int NumIceStorages;
-    extern bool IceStorageNotFound;
     extern int NumDetIceStorages;
     extern int TotalIceStorages;
     // ITS UAice and HLoss
@@ -146,11 +143,6 @@ namespace IceThermalStorage {
     extern Real64 ITSCoolingEnergy;
     extern Real64 ChillerOutletTemp; // Chiller outlet brine temperature [C]
     extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-    // General routine
-
-    // Types
 
     struct IceStorageMapping
     {
@@ -213,10 +205,10 @@ namespace IceThermalStorage {
         int MapNum;                     // Number to Map structure
         std::string DischargeCurveName; // Curve name for discharging (used to find the curve index)
         int DischargeCurveNum;          // Curve index for discharging
-        int DischargeCurveTypeNum;      // Integer version of discharging curve independent variables type
+        int DischargeCurveTypeNum{};      // Integer version of discharging curve independent variables type
         std::string ChargeCurveName;    // Curve name for charging (used to find the curve index)
         int ChargeCurveNum;             // Curve index for charging
-        int ChargeCurveTypeNum;         // Integer version of charging curve independent variables type
+        int ChargeCurveTypeNum{};         // Integer version of charging curve independent variables type
         Real64 CurveFitTimeStep;        // Time step used to generate performance data [hours]
         Real64 DischargeParaElecLoad;   // Parasitic electric load duing discharging [dimensionless]
         // (This is multiplied by the tank capacity to obtain elec consump)
@@ -297,9 +289,9 @@ namespace IceThermalStorage {
     void SimIceStorage(std::string const &IceStorageType,
                        std::string const &IceStorageName,
                        int &CompIndex,
-                       bool const RunFlag,
-                       bool const FirstIteration,
-                       bool const InitLoopEquip,
+                       bool RunFlag,
+                       bool FirstIteration,
+                       bool InitLoopEquip,
                        Real64 &MyLoad);
 
     void SimDetailedIceStorage();
@@ -316,37 +308,37 @@ namespace IceThermalStorage {
 
     //******************************************************************************
 
-    void CalcIceStorageCapacity(int const IceStorageType, Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
+    void CalcIceStorageCapacity(int IceStorageType, Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
 
     //******************************************************************************
 
-    void CalcIceStorageDormant(int const IceStorageType, // BY ZG
-                               int &IceNum);
+    void CalcIceStorageDormant(int IceStorageType, // BY ZG
+                               int &iceNum);
 
     //******************************************************************************
 
-    void CalcIceStorageCharge(int const IceStorageType, // BY ZG
-                              int &IceNum);
+    void CalcIceStorageCharge(int IceStorageType, // BY ZG
+                              int &iceNum);
 
     //******************************************************************************
 
-    void CalcQiceChargeMaxByChiller(int &IceNum, Real64 &QiceMaxByChiller);
+    void CalcQiceChargeMaxByChiller(int &iceNum, Real64 &QiceMaxByChiller);
 
     //******************************************************************************
 
     void CalcQiceChargeMaxByITS(int &IceNum,
-                                Real64 const ChillerOutletTemp, // [degC]
+                                Real64 chillerOutletTemp, // [degC]
                                 Real64 &QiceMaxByITS            // [W]
     );
 
     //******************************************************************************
 
-    void CalcIceStorageDischarge(int const IceStorageType,  // by ZG
-                                 int const IceNum,          // ice storage number
-                                 Real64 const MyLoad,       // operating load
-                                 bool const RunFlag,        // TRUE when ice storage operating
-                                 bool const FirstIteration, // TRUE when first iteration of timestep
-                                 Real64 const MaxCap        // Max possible discharge rate (positive value)
+    void CalcIceStorageDischarge(int IceStorageType,  // by ZG
+                                 int iceNum,          // ice storage number
+                                 Real64 MyLoad,       // operating load
+                                 bool RunFlag,        // TRUE when ice storage operating
+                                 bool FirstIteration, // TRUE when first iteration of timestep
+                                 Real64 MaxCap        // Max possible discharge rate (positive value)
     );
 
     //******************************************************************************
@@ -355,35 +347,35 @@ namespace IceThermalStorage {
 
     //******************************************************************************
 
-    void CalcUAIce(int const IceNum, Real64 const XCurIceFrac, Real64 &UAIceCh, Real64 &UAIceDisCh, Real64 &HLoss);
+    void CalcUAIce(int iceNum, Real64 XCurIceFrac_loc, Real64 &UAIceCh_loc, Real64 &UAIceDisCh_loc, Real64 &HLoss_loc);
 
-    Real64 CalcDetIceStorLMTDstar(Real64 const Tin,  // ice storage unit inlet temperature
-                                  Real64 const Tout, // ice storage unit outlet (setpoint) temperature
-                                  Real64 const Tfr   // freezing temperature
+    Real64 CalcDetIceStorLMTDstar(Real64 Tin,  // ice storage unit inlet temperature
+                                  Real64 Tout, // ice storage unit outlet (setpoint) temperature
+                                  Real64 Tfr   // freezing temperature
     );
 
-    Real64 CalcQstar(int const CurveIndex,      // curve index
-                     int const CurveIndVarType, // independent variable type for ice storage
-                     Real64 const FracCharged,  // fraction charged for ice storage unit
-                     Real64 const LMTDstar,     // normalized log mean temperature difference across the ice storage unit
-                     Real64 const MassFlowstar  // normalized mass flow rate through the ice storage unit
+    Real64 CalcQstar(int CurveIndex,      // curve index
+                     int CurveIndVarType, // independent variable type for ice storage
+                     Real64 FracCharged,  // fraction charged for ice storage unit
+                     Real64 LMTDstar,     // normalized log mean temperature difference across the ice storage unit
+                     Real64 MassFlowstar  // normalized mass flow rate through the ice storage unit
     );
     
     // *****************************************************************************
 
-    Real64 TempSItoIP(Real64 const Temp);
+    Real64 TempSItoIP(Real64 Temp);
 
     // *****************************************************************************
 
-    Real64 TempIPtoSI(Real64 const Temp);
+    Real64 TempIPtoSI(Real64 Temp);
 
     // *****************************************************************************
 
-    void UpdateNode(Real64 const MyLoad, bool const RunFlag, int const Num);
+    void UpdateNode(Real64 MyLoad, bool RunFlag, int Num);
 
     // *****************************************************************************
 
-    void RecordOutput(int const IceNum, Real64 const MyLoad, bool const RunFlag);
+    void RecordOutput(int iceNum, Real64 MyLoad, bool RunFlag);
 
     // *****************************************************************************
 
