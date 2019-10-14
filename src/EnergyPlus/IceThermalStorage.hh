@@ -87,8 +87,6 @@ namespace IceThermalStorage {
     extern int modNumDetIceStorages;
     extern int modTotalIceStorages;
 
-    extern Array1D_bool modCheckEquipName;
-
     struct IceStorageType {
         enum {
             Simple,
@@ -174,13 +172,18 @@ namespace IceThermalStorage {
         Real64 ITSChargingEnergy; // [J]
         Real64 ITSmdot;           // [kg/s]
 
+        // Duplicated reporting vars for now. Investigate diffs when time to remove.
+        Real64 ITSCoolingRate_rep;    // [W]
+        Real64 ITSCoolingEnergy_rep;  // [J]
+
         // Default Constructor
         IceStorageSpecs()
             : ITSType_Num(0), MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSideNum(0),
               BranchNum(0), CompNum(0), DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForITSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0),
               UAIceDisCh(0.0), HLoss(0.0), XCurIceFrac(0.0), ITSMassFlowRate(0.0), ITSInletTemp(0.0), ITSOutletTemp(0.0),
               ITSOutletSetPointTemp(0.0), ITSCoolingRate(0.0), ITSCoolingEnergy(0.0), CheckEquipName(true),
-              MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSChargingRate(0.0), ITSChargingEnergy(0.0), ITSmdot(0.0)
+              MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSChargingRate(0.0), ITSChargingEnergy(0.0), ITSmdot(0.0),
+              ITSCoolingRate_rep(0.0), ITSCoolingEnergy_rep(0.0)
         {
         }
     };
@@ -255,21 +258,8 @@ namespace IceThermalStorage {
         }
     };
 
-    struct ReportVars
-    {
-        Real64 ITSCoolingRate;    // [W]
-        Real64 ITSCoolingEnergy;  // [J]
-
-        // Default Constructor
-        ReportVars()
-                : ITSCoolingRate(0.0), ITSCoolingEnergy(0.0)
-        {
-        }
-    };
-
     // Object Data
     extern Array1D<IceStorageSpecs> IceStorage;        // dimension to number of machines
-    extern Array1D<ReportVars> IceStorageReport;       // dimension to number of machines
     extern Array1D<DetailedIceStorageData> DetIceStor; // Derived type for detailed ice storage model
     extern Array1D<IceStorageMapping> IceStorageTypeMap;
 
