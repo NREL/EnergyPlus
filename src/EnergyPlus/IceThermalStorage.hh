@@ -167,12 +167,20 @@ namespace IceThermalStorage {
         Real64 ITSCoolingEnergy;
         bool CheckEquipName;
 
+        Real64 MyLoad;            // load requested by plant [W]
+        Real64 Urate;             // [fraction]
+        Real64 IceFracRemain;     // Fraction of ice remaining in storage [fraction]
+        Real64 ITSChargingRate;   // [W]
+        Real64 ITSChargingEnergy; // [J]
+        Real64 ITSmdot;           // [kg/s]
+
         // Default Constructor
         IceStorageSpecs()
             : ITSType_Num(0), MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSideNum(0),
               BranchNum(0), CompNum(0), DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForITSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0),
               UAIceDisCh(0.0), HLoss(0.0), XCurIceFrac(0.0), ITSMassFlowRate(0.0), ITSInletTemp(0.0), ITSOutletTemp(0.0),
-              ITSOutletSetPointTemp(0.0), ITSCoolingRate(0.0), ITSCoolingEnergy(0.0), CheckEquipName(true)
+              ITSOutletSetPointTemp(0.0), ITSCoolingRate(0.0), ITSCoolingEnergy(0.0), CheckEquipName(true),
+              MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSChargingRate(0.0), ITSChargingEnergy(0.0), ITSmdot(0.0)
         {
         }
     };
@@ -247,31 +255,8 @@ namespace IceThermalStorage {
         }
     };
 
-    struct ReportVars
-    {
-        // Members
-        Real64 MyLoad;            // load requested by plant [W]
-        Real64 Urate;             // [fraction]
-        Real64 IceFracRemain;     // Fraction of ice remaining in storage [fraction]
-        Real64 ITSCoolingRate;    // [W]
-        Real64 ITSCoolingEnergy;  // [J]
-        Real64 ITSChargingRate;   // [W]
-        Real64 ITSChargingEnergy; // [J]
-        Real64 ITSmdot;           // [kg/s]
-        Real64 ITSInletTemp;      // [C]
-        Real64 ITSOutletTemp;     // [C]
-
-        // Default Constructor
-        ReportVars()
-            : MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSCoolingRate(0.0), ITSCoolingEnergy(0.0), ITSChargingRate(0.0),
-              ITSChargingEnergy(0.0), ITSmdot(0.0), ITSInletTemp(0.0), ITSOutletTemp(0.0)
-        {
-        }
-    };
-
     // Object Data
     extern Array1D<IceStorageSpecs> IceStorage;        // dimension to number of machines
-    extern Array1D<ReportVars> IceStorageReport;       // dimension to number of machines
     extern Array1D<DetailedIceStorageData> DetIceStor; // Derived type for detailed ice storage model
     extern Array1D<IceStorageMapping> IceStorageTypeMap;
 

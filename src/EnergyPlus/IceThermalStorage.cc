@@ -122,7 +122,6 @@ namespace IceThermalStorage {
 
     // Object Data
     Array1D<IceStorageSpecs> IceStorage;        // dimension to number of machines
-    Array1D<ReportVars> IceStorageReport;       // dimension to number of machines
     Array1D<DetailedIceStorageData> DetIceStor; // Derived type for detailed ice storage model
     Array1D<IceStorageMapping> IceStorageTypeMap;
 
@@ -135,7 +134,6 @@ namespace IceThermalStorage {
         modNumDetIceStorages = 0;
         modTotalIceStorages = 0;
         IceStorage.deallocate();
-        IceStorageReport.deallocate();
         DetIceStor.deallocate();
         IceStorageTypeMap.deallocate();
     }
@@ -283,7 +281,7 @@ namespace IceThermalStorage {
                 MyLoad = MyLoad2;
 
                 //     Set fraction of ice remaining in storage
-                IceStorage(iceNum).XCurIceFrac = IceStorageReport(iceNum).IceFracRemain;
+                IceStorage(iceNum).XCurIceFrac = IceStorage(iceNum).IceFracRemain;
 
                 //***** Dormant Process for ITS *****************************************
                 //************************************************************************
@@ -765,7 +763,6 @@ namespace IceThermalStorage {
 
         // Allocate IceStorage based on NumOfIceStorage
         IceStorage.allocate(modNumIceStorages);
-        IceStorageReport.allocate(modNumIceStorages);
 
         DataIPShortCuts::cCurrentModuleObject = cIceStorageSimple;
         for (int iceNum = 1; iceNum <= modNumIceStorages; ++iceNum) {
@@ -816,16 +813,16 @@ namespace IceThermalStorage {
             BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cAlphaArgs(3), DataIPShortCuts::cAlphaArgs(4), "Chilled Water Nodes");
 
             // Initialize Report Variables
-            IceStorageReport(iceNum).MyLoad = 0.0;
-            IceStorageReport(iceNum).Urate = 0.0;
-            IceStorageReport(iceNum).IceFracRemain = 1.0;
-            IceStorageReport(iceNum).ITSCoolingRate = 0.0;
-            IceStorageReport(iceNum).ITSCoolingEnergy = 0.0;
-            IceStorageReport(iceNum).ITSChargingRate = 0.0;
-            IceStorageReport(iceNum).ITSChargingEnergy = 0.0;
-            IceStorageReport(iceNum).ITSmdot = 0.0;
-            IceStorageReport(iceNum).ITSInletTemp = 0.0;
-            IceStorageReport(iceNum).ITSOutletTemp = 0.0;
+            IceStorage(iceNum).MyLoad = 0.0;
+            IceStorage(iceNum).Urate = 0.0;
+            IceStorage(iceNum).IceFracRemain = 1.0;
+            IceStorage(iceNum).ITSCoolingRate = 0.0;
+            IceStorage(iceNum).ITSCoolingEnergy = 0.0;
+            IceStorage(iceNum).ITSChargingRate = 0.0;
+            IceStorage(iceNum).ITSChargingEnergy = 0.0;
+            IceStorage(iceNum).ITSmdot = 0.0;
+            IceStorage(iceNum).ITSInletTemp = 0.0;
+            IceStorage(iceNum).ITSOutletTemp = 0.0;
 
         } // IceNum
 
@@ -839,7 +836,7 @@ namespace IceThermalStorage {
 
             SetupOutputVariable("Ice Thermal Storage Requested Load",
                                 OutputProcessor::Unit::W,
-                                IceStorageReport(iceNum).MyLoad,
+                                IceStorage(iceNum).MyLoad,
                                 "System",
                                 "Average",
                                 IceStorage(iceNum).Name);
@@ -847,7 +844,7 @@ namespace IceThermalStorage {
             // Ice fraction
             SetupOutputVariable("Ice Thermal Storage End Fraction",
                                 OutputProcessor::Unit::None,
-                                IceStorageReport(iceNum).IceFracRemain,
+                                IceStorage(iceNum).IceFracRemain,
                                 "Zone",
                                 "Average",
                                 IceStorage(iceNum).Name);
@@ -855,43 +852,43 @@ namespace IceThermalStorage {
             // Discharge: ITS Information
             SetupOutputVariable("Ice Thermal Storage Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                IceStorageReport(iceNum).ITSmdot,
+                                IceStorage(iceNum).ITSmdot,
                                 "System",
                                 "Average",
                                 IceStorage(iceNum).Name);
             SetupOutputVariable("Ice Thermal Storage Inlet Temperature",
                                 OutputProcessor::Unit::C,
-                                IceStorageReport(iceNum).ITSInletTemp,
+                                IceStorage(iceNum).ITSInletTemp,
                                 "System",
                                 "Average",
                                 IceStorage(iceNum).Name);
             SetupOutputVariable("Ice Thermal Storage Outlet Temperature",
                                 OutputProcessor::Unit::C,
-                                IceStorageReport(iceNum).ITSOutletTemp,
+                                IceStorage(iceNum).ITSOutletTemp,
                                 "System",
                                 "Average",
                                 IceStorage(iceNum).Name);
             SetupOutputVariable("Ice Thermal Storage Cooling Discharge Rate",
                                 OutputProcessor::Unit::W,
-                                IceStorageReport(iceNum).ITSCoolingRate,
+                                IceStorage(iceNum).ITSCoolingRate,
                                 "System",
                                 "Average",
                                 IceStorage(iceNum).Name);
             SetupOutputVariable("Ice Thermal Storage Cooling Discharge Energy",
                                 OutputProcessor::Unit::J,
-                                IceStorageReport(iceNum).ITSCoolingEnergy,
+                                IceStorage(iceNum).ITSCoolingEnergy,
                                 "System",
                                 "Sum",
                                 IceStorage(iceNum).Name);
             SetupOutputVariable("Ice Thermal Storage Cooling Charge Rate",
                                 OutputProcessor::Unit::W,
-                                IceStorageReport(iceNum).ITSChargingRate,
+                                IceStorage(iceNum).ITSChargingRate,
                                 "System",
                                 "Average",
                                 IceStorage(iceNum).Name);
             SetupOutputVariable("Ice Thermal Storage Cooling Charge Energy",
                                 OutputProcessor::Unit::J,
-                                IceStorageReport(iceNum).ITSChargingEnergy,
+                                IceStorage(iceNum).ITSChargingEnergy,
                                 "System",
                                 "Sum",
                                 IceStorage(iceNum).Name);
@@ -1398,16 +1395,16 @@ namespace IceThermalStorage {
                         DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
                 }
             }
-            IceStorageReport(iceNum).MyLoad = 0.0;
-            IceStorageReport(iceNum).Urate = 0.0;
-            IceStorageReport(iceNum).IceFracRemain = 1.0;
-            IceStorageReport(iceNum).ITSCoolingRate = 0.0;
-            IceStorageReport(iceNum).ITSCoolingEnergy = 0.0;
-            IceStorageReport(iceNum).ITSChargingRate = 0.0;
-            IceStorageReport(iceNum).ITSChargingEnergy = 0.0;
-            IceStorageReport(iceNum).ITSmdot = 0.0;
-            IceStorageReport(iceNum).ITSInletTemp = 0.0;
-            IceStorageReport(iceNum).ITSOutletTemp = 0.0;
+            IceStorage(iceNum).MyLoad = 0.0;
+            IceStorage(iceNum).Urate = 0.0;
+            IceStorage(iceNum).IceFracRemain = 1.0;
+            IceStorage(iceNum).ITSCoolingRate = 0.0;
+            IceStorage(iceNum).ITSCoolingEnergy = 0.0;
+            IceStorage(iceNum).ITSChargingRate = 0.0;
+            IceStorage(iceNum).ITSChargingEnergy = 0.0;
+            IceStorage(iceNum).ITSmdot = 0.0;
+            IceStorage(iceNum).ITSInletTemp = 0.0;
+            IceStorage(iceNum).ITSOutletTemp = 0.0;
 
             MyEnvrnFlag(iceNum) = false;
         }
@@ -1445,8 +1442,8 @@ namespace IceThermalStorage {
                 // Starting full is assumed, because most ice systems are fully charged overnight
                 if (IceStorage(iceNum).ResetXForITSFlag) {
                     IceStorage(iceNum).XCurIceFrac = 1.0;
-                    IceStorageReport(iceNum).IceFracRemain = 1.0;
-                    IceStorageReport(iceNum).Urate = 0.0;
+                    IceStorage(iceNum).IceFracRemain = 1.0;
+                    IceStorage(iceNum).Urate = 0.0;
                     IceStorage(iceNum).ResetXForITSFlag = false;
                 }
 
@@ -1512,7 +1509,7 @@ namespace IceThermalStorage {
                 IceStorage(iceNum).ITSCoolingRate = 0.0;   //[W]
                 IceStorage(iceNum).ITSCoolingEnergy = 0.0; //[J]
 
-                IceStorageReport(iceNum).Urate = 0.0; //[n/a]
+                IceStorage(iceNum).Urate = 0.0; //[n/a]
 
             } else {
             }
@@ -1564,7 +1561,7 @@ namespace IceThermalStorage {
                 IceStorage(iceNum).ITSCoolingEnergy = 0.0; //[J]
 
                 // Initialize processed U values
-                IceStorageReport(iceNum).Urate = 0.0;
+                IceStorage(iceNum).Urate = 0.0;
 
                 // Calculate QiceMax which is REAL(r64) ITS capacity.
                 // There are three possible to calculate QiceMax
@@ -1593,7 +1590,7 @@ namespace IceThermalStorage {
                 Umax = max(min(((1.0 - modEpsLimitForCharge) * QiceMax * modTimeInterval / IceStorage(iceNum).ITSNomCap), (1.0 - IceStorage(iceNum).XCurIceFrac - modEpsLimitForX)), 0.0);
 
                 // Cannot charge more than the fraction that is left uncharged
-                Umax = min(Umax, (1.0 - IceStorageReport(iceNum).IceFracRemain) / DataHVACGlobals::TimeStepSys);
+                Umax = min(Umax, (1.0 - IceStorage(iceNum).IceFracRemain) / DataHVACGlobals::TimeStepSys);
                 // First, check input U value.
                 // Based on Umax and Umin, if necessary to run E+, calculate proper Uact.
                 if (Umax == 0.0) { //(No Capacity of ITS), ITS is OFF.
@@ -1610,7 +1607,7 @@ namespace IceThermalStorage {
                 Qice = Uact * IceStorage(iceNum).ITSNomCap / modTimeInterval; //[W]
                 // If Qice is equal or less than 0.0, no need to calculate anymore.
                 if (Qice <= 0.0) {
-                    IceStorageReport(iceNum).Urate = 0.0; //[ratio]
+                    IceStorage(iceNum).Urate = 0.0; //[ratio]
                 }
 
                 // Calculate leaving water temperature
@@ -1630,7 +1627,7 @@ namespace IceThermalStorage {
                     Uact = Qice / (IceStorage(iceNum).ITSNomCap / modTimeInterval);
                 } // End of leaving temp checks
 
-                IceStorageReport(iceNum).Urate = Uact;
+                IceStorage(iceNum).Urate = Uact;
                 IceStorage(iceNum).ITSCoolingRate = -Qice;
                 IceStorage(iceNum).ITSCoolingEnergy = IceStorage(iceNum).ITSCoolingRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
@@ -1733,7 +1730,7 @@ namespace IceThermalStorage {
                 }
 
                 // Initialize processed U values
-                IceStorageReport(iceNum).Urate = 0.0;
+                IceStorage(iceNum).Urate = 0.0;
 
                 // If no component demand or ITS OFF, then RETURN.
                 if (MyLoad == 0 || !RunFlag) {
@@ -1757,7 +1754,7 @@ namespace IceThermalStorage {
                 Umyload = -MyLoad * modTimeInterval / IceStorage(iceNum).ITSNomCap;
                 // Calculate Umax and Umin
                 // Cannot discharge more than the fraction that is left
-                Umax = -IceStorageReport(iceNum).IceFracRemain / DataHVACGlobals::TimeStepSys;
+                Umax = -IceStorage(iceNum).IceFracRemain / DataHVACGlobals::TimeStepSys;
                 // Calculate Umin based on returned MyLoad from E+.
                 Umin = min(Umyload, 0.0);
                 // Based on Umax and Umin, if necessary to run E+, calculate proper Uact
@@ -1801,7 +1798,7 @@ namespace IceThermalStorage {
                 } // End of leaving temp checks
 
                 // Calculate reported U value
-                IceStorageReport(iceNum).Urate = Uact;
+                IceStorage(iceNum).Urate = Uact;
                 // Calculate ITSCoolingEnergy [J]
                 IceStorage(iceNum).ITSCoolingRate = -Qice;
                 IceStorage(iceNum).ITSCoolingEnergy = IceStorage(iceNum).ITSCoolingRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -1976,31 +1973,27 @@ namespace IceThermalStorage {
     void RecordOutput(int const iceNum, Real64 const MyLoad, bool const RunFlag)
     {
         if (MyLoad == 0 || !RunFlag) {
-            IceStorageReport(iceNum).MyLoad = MyLoad;
-            IceStorageReport(iceNum).ITSCoolingRate = 0.0;
-            IceStorageReport(iceNum).ITSCoolingEnergy = 0.0;
-            IceStorageReport(iceNum).ITSChargingRate = 0.0;
-            IceStorageReport(iceNum).ITSChargingEnergy = 0.0;
-            IceStorageReport(iceNum).ITSmdot = 0.0;
-            IceStorageReport(iceNum).ITSInletTemp = IceStorage(iceNum).ITSInletTemp;
-            IceStorageReport(iceNum).ITSOutletTemp = IceStorage(iceNum).ITSOutletTemp;
+            IceStorage(iceNum).MyLoad = MyLoad;
+            IceStorage(iceNum).ITSCoolingRate = 0.0;
+            IceStorage(iceNum).ITSCoolingEnergy = 0.0;
+            IceStorage(iceNum).ITSChargingRate = 0.0;
+            IceStorage(iceNum).ITSChargingEnergy = 0.0;
+            IceStorage(iceNum).ITSmdot = 0.0;
 
         } else {
-            IceStorageReport(iceNum).MyLoad = MyLoad;
+            IceStorage(iceNum).MyLoad = MyLoad;
             if (IceStorage(iceNum).ITSCoolingRate > 0.0) {
-                IceStorageReport(iceNum).ITSCoolingRate = IceStorage(iceNum).ITSCoolingRate;
-                IceStorageReport(iceNum).ITSCoolingEnergy = IceStorage(iceNum).ITSCoolingEnergy;
-                IceStorageReport(iceNum).ITSChargingRate = 0.0;
-                IceStorageReport(iceNum).ITSChargingEnergy = 0.0;
+                IceStorage(iceNum).ITSCoolingRate = IceStorage(iceNum).ITSCoolingRate;
+                IceStorage(iceNum).ITSCoolingEnergy = IceStorage(iceNum).ITSCoolingEnergy;
+                IceStorage(iceNum).ITSChargingRate = 0.0;
+                IceStorage(iceNum).ITSChargingEnergy = 0.0;
             } else {
-                IceStorageReport(iceNum).ITSCoolingRate = 0.0;
-                IceStorageReport(iceNum).ITSCoolingEnergy = 0.0;
-                IceStorageReport(iceNum).ITSChargingRate = -IceStorage(iceNum).ITSCoolingRate;
-                IceStorageReport(iceNum).ITSChargingEnergy = -IceStorage(iceNum).ITSCoolingEnergy;
+                IceStorage(iceNum).ITSCoolingRate = 0.0;
+                IceStorage(iceNum).ITSCoolingEnergy = 0.0;
+                IceStorage(iceNum).ITSChargingRate = -IceStorage(iceNum).ITSCoolingRate;
+                IceStorage(iceNum).ITSChargingEnergy = -IceStorage(iceNum).ITSCoolingEnergy;
             }
-            IceStorageReport(iceNum).ITSmdot = IceStorage(iceNum).ITSMassFlowRate;
-            IceStorageReport(iceNum).ITSInletTemp = IceStorage(iceNum).ITSInletTemp;
-            IceStorageReport(iceNum).ITSOutletTemp = IceStorage(iceNum).ITSOutletTemp;
+            IceStorage(iceNum).ITSmdot = IceStorage(iceNum).ITSMassFlowRate;
         }
     }
 
@@ -2023,9 +2016,9 @@ namespace IceThermalStorage {
         int IceNum2;
 
         for (IceNum2 = 1; IceNum2 <= modNumIceStorages; ++IceNum2) {
-            IceStorageReport(IceNum2).IceFracRemain += IceStorageReport(IceNum2).Urate * DataHVACGlobals::TimeStepSys;
-            if (IceStorageReport(IceNum2).IceFracRemain <= 0.001) IceStorageReport(IceNum2).IceFracRemain = 0.0;
-            if (IceStorageReport(IceNum2).IceFracRemain > 1.0) IceStorageReport(IceNum2).IceFracRemain = 1.0;
+            IceStorage(IceNum2).IceFracRemain += IceStorage(IceNum2).Urate * DataHVACGlobals::TimeStepSys;
+            if (IceStorage(IceNum2).IceFracRemain <= 0.001) IceStorage(IceNum2).IceFracRemain = 0.0;
+            if (IceStorage(IceNum2).IceFracRemain > 1.0) IceStorage(IceNum2).IceFracRemain = 1.0;
         }
 
         for (IceNum2 = 1; IceNum2 <= modNumDetIceStorages; ++IceNum2) {
