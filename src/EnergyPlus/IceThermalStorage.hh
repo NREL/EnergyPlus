@@ -87,14 +87,6 @@ namespace IceThermalStorage {
     extern int modNumDetIceStorages;
     extern int modTotalIceStorages;
 
-    // ITS status information
-    extern Real64 modITSMassFlowRate;       // ITS water mass flow rate [kg/s]
-    extern Real64 modITSInletTemp;          // ITS inlet water temperature [C]
-    extern Real64 modITSOutletTemp;         // ITS outlet water temperature [C]
-    extern Real64 modITSOutletSetPointTemp; // ITS outlet water temperature setpoint [C]
-    extern Real64 modITSCoolingRate;        // ITS Discharge(-)/Charge(+) rate [W]
-    extern Real64 modITSCoolingEnergy;
-    extern Real64 modChillerOutletTemp; // Chiller outlet brine temperature [C]
     extern Array1D_bool modCheckEquipName;
 
     struct IceStorageType {
@@ -167,12 +159,20 @@ namespace IceThermalStorage {
         Real64 UAIceDisCh;
         Real64 HLoss;
         Real64 XCurIceFrac;
+        Real64 ITSMassFlowRate;
+        Real64 ITSInletTemp;
+        Real64 ITSOutletTemp;
+        Real64 ITSOutletSetPointTemp;
+        Real64 ITSCoolingRate;
+        Real64 ITSCoolingEnergy;
+        bool CheckEquipName;
 
         // Default Constructor
         IceStorageSpecs()
             : ITSType_Num(0), MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSideNum(0),
               BranchNum(0), CompNum(0), DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForITSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0),
-              UAIceDisCh(0.0), HLoss(0.0), XCurIceFrac(0.0)
+              UAIceDisCh(0.0), HLoss(0.0), XCurIceFrac(0.0), ITSMassFlowRate(0.0), ITSInletTemp(0.0), ITSOutletTemp(0.0),
+              ITSOutletSetPointTemp(0.0), ITSCoolingRate(0.0), ITSCoolingEnergy(0.0), CheckEquipName(true)
         {
         }
     };
@@ -232,6 +232,7 @@ namespace IceThermalStorage {
         int ChargeErrorCount;             // Index for error counting routine
         bool ResetXForITSFlag;
         bool MyEnvrnFlag;
+        bool CheckEquipName;
 
         // Default Constructor
         DetailedIceStorageData()
@@ -241,7 +242,7 @@ namespace IceThermalStorage {
               IceFracRemaining(1.0), ThawProcessIndex(0), IceFracOnCoil(1.0), DischargingRate(0.0), DischargingEnergy(0.0), ChargingRate(0.0),
               ChargingEnergy(0.0), MassFlowRate(0.0), BypassMassFlowRate(0.0), TankMassFlowRate(0.0), InletTemp(0.0), OutletTemp(0.0),
               TankOutletTemp(0.0), ParasiticElecRate(0.0), ParasiticElecEnergy(0.0), DischargeIterErrors(0), DischargeErrorCount(0),
-              ChargeIterErrors(0), ChargeErrorCount(0), ResetXForITSFlag(false), MyEnvrnFlag(true)
+              ChargeIterErrors(0), ChargeErrorCount(0), ResetXForITSFlag(false), MyEnvrnFlag(true), CheckEquipName(true)
         {
         }
     };
