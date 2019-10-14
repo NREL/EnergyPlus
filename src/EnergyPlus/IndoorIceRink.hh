@@ -51,6 +51,7 @@ namespace IceRink {
     extern int NumOfDirectRefrigSys;
     extern int NumOfIndirectRefrigSys;
     extern int TotalNumRefrigSystem;
+    extern int NumOfResurfacer;
     extern int OperatingMode;                    // Used to keep track of whether system is in heating or cooling mode
     extern Array1D<Real64> QRadSysSrcAvg;        // Average source over the time step for a particular radiant surface
     extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
@@ -61,11 +62,16 @@ namespace IceRink {
         // Members
         // Input data
         std::string Name; // name of direct system
+        std::string SchedName; // availability schedule
+        int SchedPtr;          // index to schedule
+        std::string ZoneName;  // Name of zone the system is present
         int ZonePtr;      // Pointer to the zone in which the floor radiant system is present
+        std::string SurfaceName; // surface name of rink
         int RefrigLoopNum;
         int RefrigLoopSide;
         int RefrigBranchNum;
         int RefrigCompNum;
+        int RefrigIndex;                     // Index to refrigerant (NH3) properties
         int ControlStrategy;                 // Control strategy for the ice rink (BOTC or STC)
         Real64 MinRefrigMassFlow;            // Minimum mass flow rate of refrigerant allowed in the floor radiant system(kg/s)
         Real64 MaxRefrigMassFlow;            // Miximum mass flow rate of refrigerant allowed in the floor radiant system(kg/s)
@@ -78,11 +84,13 @@ namespace IceRink {
         int IceSetptSchedPtr;                // Pointer to set point temperature of ice surface
         Real64 RefrigSetptTemp;              // Set point temperature for refrigerant outlet
         Real64 IceSetptTemp;                 // Set point temperature for ice surface
+        std::string RefrigSetptSched;        // Set point schedule name for BOTC
+        std::string IceSetptSched;           // Set point schedule name for STC
         int NumOfSurfaces;                   // Total number of surfaces in the ice rink arena
         Array1D_int SurfacePtrArray;         // index to a surface array
         Real64 TotalSurfaceArea;             // Surface area of the rink
-        Real64 RefrigVolFlowMaxCool;         // maximum refrigerant flow rate for cooling, m3/s
-        Real64 RefrigFlowMaxCool;            // maximum refrigerant flow rate for cooling, kg/s
+        //Real64 RefrigVolFlowMaxCool;         // maximum refrigerant flow rate for cooling, m3/s
+        //Real64 RefrigFlowMaxCool;            // maximum refrigerant flow rate for cooling, kg/s
         int PeopleHeatGainSchedPtr;          // People schedule index
         std::string PeopleHeatGainSchedName; // Name of people heat gain schedule
         std::string PeopleSchedName;         // Name of people schedule
@@ -94,7 +102,7 @@ namespace IceRink {
         Real64 DepthRink;
         Real64 IceThickness;
         int WaterIndex;
-        Real64 FloorWaterTemp;
+        Real64 FloodWaterTemp;
         // Inputs used in calcEffectiveness
 
         // ReportData
@@ -117,11 +125,17 @@ namespace IceRink {
         // Members
         // Input Data
         std::string Name; // name of indirect system
+        std::string SchedName;      // availability schedule
+        int SchedPtr;          // index to schedule
+        std::string ZoneName;       // Name of zone the system is present
         int ZonePtr;      // Pointer to the zone in which the floor radiant system is present
         int RefrigLoopNum;
         int RefrigLoopSide;
         int RefrigBranchNum;
         int RefrigCompNum;
+        std::string SurfaceName;             // surface name of rink
+        int GlycolIndex1;                    // Index to Ethylene Glycol properties
+        int GlycolIndex2;                    // Index to Calcium Chloride properties
         int ControlStrategy;                 // Control strategy for the ice rink (BOTC or STC)
         Real64 MinRefrigMassFlow;            // Minimum mass flow rate of refrigerant allowed in the floor radiant system(kg/s)
         Real64 MaxRefrigMassFlow;            // Miximum mass flow rate of refrigerant allowed in the floor radiant system(kg/s)
@@ -134,11 +148,13 @@ namespace IceRink {
         Real64 RefrigSetptTemp;              // Set point temperature for refrigerant outlet
         Real64 IceSetptTemp;                 // Set point temperature for ice surface
         int IceSetptSchedPtr;                // Pointer to set point temperature of ice surface
+        std::string RefrigSetptSched;        // Set point schedule name for BOTC
+        std::string IceSetptSched;           // Set point schedule name for STC
         int NumOfSurfaces;                   // Total number of surfaces in the ice rink arena
         Array1D_int SurfacePtrArray;         // index to a surface array
         Real64 TotalSurfaceArea;             // Surface area of the rink
-        Real64 RefrigVolFlowMaxCool;         // maximum refrigerant flow rate for cooling, m3/s
-        Real64 RefrigFlowMaxCool;            // maximum refrigerant flow rate for cooling, kg/s
+        //Real64 RefrigVolFlowMaxCool;         // maximum refrigerant flow rate for cooling, m3/s
+        //Real64 RefrigFlowMaxCool;            // maximum refrigerant flow rate for cooling, kg/s
         int PeopleHeatGainSchedPtr;          // People schedule index
         std::string PeopleHeatGainSchedName; // Name of people heat gain schedule
         std::string PeopleSchedName;         // Name of people schedule
@@ -150,10 +166,10 @@ namespace IceRink {
         Real64 DepthRink;
         Real64 IceThickness;
         int WaterIndex;
-        Real64 FloorWaterTemp;
+        Real64 FloodWaterTemp;
         int RefrigType;
         Real64 RefrigConc;
-        // Inputs used in calcEffectiveness
+        
 
         // ReportData
         Real64 RefrigInletTemp;   // Refrigerant inlet temperature
@@ -188,7 +204,9 @@ namespace IceRink {
     {
         // Members
         std::string Name;
+        int CompIndex;
         int GlycolIndex;
+        std::string ResurfacingSchedName;
         int ResurfacingSchedPtr;
         int NoOfResurfEvents;
         Real64 ResurfacingWaterTemp;
@@ -212,11 +230,18 @@ namespace IceRink {
     extern Array1D<ResurfacerData> Resurfacer;
 
     // Functions:
-    void SimIndoorIceRink(std::string const &CompName, bool const FirstHVACIteration, Real64 &LoadMet, int &CompIndex);
+    void SimIndoorIceRink(std::string const &CompName,
+                          std::string const &ResurfacerName,
+                          bool const FirstHVACIteration,
+                          Real64 &LoadMet,
+                          int &CompIndex,
+                          int &ResurfacerIndex);
 
     void GetIndoorIceRink();
 
     void InitIndoorIceRink(bool const FirstHVACIteration, int const SysNum, int const SystemType, bool &InitErrorsFound);
+
+    void IceRinkFreezing(Real64 &FreezingLoad, int const SysNum, int const SystemType);
 
     void IceRinkResurfacer(Real64 &ResurfacerHeatLoad, int const SysNum, int const SystemType, int const MachineNum);
 
@@ -236,13 +261,13 @@ namespace IceRink {
                                   Real64 const RefrigType,
                                   Real64 const Concentration);
 
-    void CalcIndirectIndoorIceRink(int const SysNum, Real64 &LoadMet);
+    void CalcIndirectIndoorIceRink(int const SysNum, int const MachineNum, Real64 &LoadMet);
 
-    void CalcDirectIndoorIceRink(int const SysNum, Real64 &LoadMet);
+    void CalcDirectIndoorIceRink(int const SysNum, int const MachineNum, Real64 &LoadMet);
 
     void UpdateIndoorIceRink(bool const FirstHVACIteration, int const RadSysNum, int const SystemType);
 
-    void UpdateRinkRadSysSourceValAvg(bool &FloorRadSysOn, int const SystemType);
+    void UpdateRinkRadSysSourceValAvg(bool &FloorRadSysOn);
 
     void CheckForOutOfRangeTempResult(
         int const SystemType, int const SysNum, Real64 const outletTemp, Real64 const inletTemp, Real64 const EP_UNUSED(mdot));

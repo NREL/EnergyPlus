@@ -42,8 +42,6 @@ using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::SurfaceGeometry;
 
-
-
 TEST_F(EnergyPlusFixture, IndoorIceRink_DRinkEff)
 {
     Real64 Temperature;
@@ -67,7 +65,6 @@ TEST_F(EnergyPlusFixture, IndoorIceRink_DRinkEff)
     TubeDiameter = 0.1;
     SysNum = 1;
     NumCircs = 1;
-    
 
     // Test 1: Cooling for Direct Refrigeration System
     Effectiveness = 0.0;
@@ -126,14 +123,16 @@ TEST_F(EnergyPlusFixture, Resurfacing)
     DRink.allocate(1);
     IRink.allocate(1);
     Resurfacer.allocate(1);
+    Schedule.allocate(1);
 
     // Set values of items that will stay constant
     SysNum = 1;
     MachineNum = 1;
 
+    Schedule(1).CurrentValue = 3;
     Resurfacer(MachineNum).InitWaterTemp = 10.00;
     Resurfacer(MachineNum).TankCapacity = 3.00;
-    //Resurfacer(MachineNum).ResurfacingSchedPtr = 1;
+    Resurfacer(MachineNum).ResurfacingSchedPtr = 1;
     Resurfacer(MachineNum).ResurfacingWaterTemp = 15.00;
     Resurfacer(MachineNum).NoOfResurfEvents = 3;
     Resurfacer(MachineNum).GlycolIndex = 1;
@@ -153,6 +152,44 @@ TEST_F(EnergyPlusFixture, Resurfacing)
     IceRinkResurfacer(HeatLoad, SysNum, SystemType, MachineNum);
     EXPECT_NEAR(HeatLoad, 3625796.78, 0.1);
 
+    // Test 2: Resurfacing for IRink
+    SystemType = 2;
+    IceRinkResurfacer(HeatLoad, SysNum, SystemType, MachineNum);
+    EXPECT_NEAR(HeatLoad, 3625796.78, 0.1);
 }
 
+TEST_F(EnergyPlusFixture, RinkFreezing)
+{
+    Real64 FreezingLoad;
+    int SysNum;
+    int SystemType;
 
+    SysNum = 1;
+    DRink.allocate(1);
+    IRink.allocate(1);
+
+    // Set values of items that will stay constant
+    DRink(SysNum).LengthRink = 60.00;
+    DRink(SysNum).WidthRink = 30.00;
+    DRink(SysNum).IceThickness = 0.02;
+    DRink(SysNum).IceSetptTemp = -3.00;
+    DRink(SysNum).FloorWaterTemp = 15.00;
+    DRink(SysNum).WaterIndex = 1;
+
+    IRink(SysNum).LengthRink = 60.00;
+    IRink(SysNum).WidthRink = 30.00;
+    IRink(SysNum).IceThickness = 0.02;
+    IRink(SysNum).IceSetptTemp = -3.00;
+    IRink(SysNum).FloorWaterTemp = 15.00;
+    IRink(SysNum).WaterIndex = 1;
+
+    // Test 1: Freezing of DRink
+    SystemType = 1;
+    IceRinkFreezing(FreezingLoad, SysNum, SystemType);
+    EXPECT_NEAR(FreezingLoad, 14482318172.4, 0.001);
+
+    // Test 2: Freezing of IRink
+    SystemType = 2;
+    IceRinkFreezing(FreezingLoad, SysNum, SystemType);
+    EXPECT_NEAR(FreezingLoad, 14482318172.4, 0.1);
+}
