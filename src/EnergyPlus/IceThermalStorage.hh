@@ -66,23 +66,11 @@ namespace IceThermalStorage {
     extern std::string const cIceStorageSimple;
     extern std::string const cIceStorageDetailed;
 
-    extern int const IceStorageType_Simple;
-    extern int const IceStorageType_Detailed;
-
-    extern int const CurveVarsFracChargedLMTD;
-    extern int const CurveVarsFracDischargedLMTD;
-    extern int const CurveVarsLMTDMassFlow;
-    extern int const CurveVarsLMTDFracCharged;
-    
-    extern int const DetIceInsideMelt;  // Inside melt system--charge starting with bare coil
-    extern int const DetIceOutsideMelt; // Outside melt system--charge from existing ice layer on coil
-
     // ITS parameter
     extern Real64 const modFreezTemp;    // Water freezing Temperature, 0[C]
     extern Real64 const modFreezTempIP;  // Water freezing Temperature, 32[F]
     extern Real64 const modTimeInterval; // Time Interval (1 hr) [s]
-    extern int const ITSType_IceOnCoilInternal;
-    extern int const ITSType_IceOnCoilExternal;
+
     // Conversion parameter
     extern Real64 const modEpsLimitForX;         // 0.02  ! See Dion's code as eps1
     extern Real64 const modEpsLimitForDisCharge; // 0.20  ! See Dion's code as eps2
@@ -93,25 +81,6 @@ namespace IceThermalStorage {
     // This is (Tout - Tfreezing)
     extern Real64 const modDeltaTifMin; // Minimum allowed inlet side temperature difference [C]
     // This is (Tin - Tfreezing)
-
-    // DERIVED TYPE DEFINITIONS
-    // TYPE ITSSetCap is used for information of ITS plant in Loop, Brach, and Components.
-    //  TYPE ITSSetCapData
-    //    LOGICAL :: ITSFlag    = .FALSE.
-    //    INTEGER :: LoopNum    =0
-    //    INTEGER :: BranchNum  =0
-    //    INTEGER :: CompNum    =0
-    //  END TYPE ITSSetCapData
-
-    // TYPE (ITSSetCapData), SAVE                   :: ITSSetCap=ITSSetCapData(.FALSE.,0,0,0)
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern bool modResetXForITSFlag;
-
-    // Input data
-    extern Real64 modITSNomCap;  // Design nominal capacity of Ice Thermal Storage [J] (user input in GJ)
-    extern int modInletNodeNum;  // Node number on the inlet side of the plant
-    extern int modOutletNodeNum; // Node number on the inlet side of the plant
 
     // ITS numbers and FoundOrNot
     extern int modNumIceStorages;
@@ -202,11 +171,13 @@ namespace IceThermalStorage {
         int CompNum;
         Real64 DesignMassFlowRate;
         Real64 FreezeTemp;
+        bool ResetXForITSFlag;
+        bool MyEnvrnFlag;
 
         // Default Constructor
         IceStorageSpecs()
             : ITSType_Num(0), MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSideNum(0),
-              BranchNum(0), CompNum(0), DesignMassFlowRate(0.0), FreezeTemp(0.0)
+              BranchNum(0), CompNum(0), DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForITSFlag(false), MyEnvrnFlag(true)
         {
         }
     };
@@ -264,6 +235,8 @@ namespace IceThermalStorage {
         int DischargeErrorCount;          // Index for error counting routine
         int ChargeIterErrors;             // Number of max iterations exceeded errors during charging
         int ChargeErrorCount;             // Index for error counting routine
+        bool ResetXForITSFlag;
+        bool MyEnvrnFlag;
 
         // Default Constructor
         DetailedIceStorageData()
@@ -273,7 +246,7 @@ namespace IceThermalStorage {
               IceFracRemaining(1.0), ThawProcessIndex(0), IceFracOnCoil(1.0), DischargingRate(0.0), DischargingEnergy(0.0), ChargingRate(0.0),
               ChargingEnergy(0.0), MassFlowRate(0.0), BypassMassFlowRate(0.0), TankMassFlowRate(0.0), InletTemp(0.0), OutletTemp(0.0),
               TankOutletTemp(0.0), ParasiticElecRate(0.0), ParasiticElecEnergy(0.0), DischargeIterErrors(0), DischargeErrorCount(0),
-              ChargeIterErrors(0), ChargeErrorCount(0)
+              ChargeIterErrors(0), ChargeErrorCount(0), ResetXForITSFlag(false), MyEnvrnFlag(true)
         {
         }
     };
@@ -396,7 +369,7 @@ namespace IceThermalStorage {
 
     // *****************************************************************************
 
-    void UpdateNode(Real64 MyLoad, bool RunFlag, int Num);
+    void UpdateNode(Real64 MyLoad, bool RunFlag, int iceNum);
 
     // *****************************************************************************
 
