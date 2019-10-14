@@ -60,8 +60,11 @@ function Component()
       component.addOperation("Execute", reg, "ADD", keyName, "/v", valueName, "/d", data, "/f");
 
       // Delete the entire keyName upon uninstallation
-      var keyName = "HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch";
-      component.addOperation("Execute", "cmd", "/C", "echo Set up uninstall operation to delete EP-Launch registry keys", "UNDOEXECUTE", reg, "DELETE", keyName, "/f");
+      // Upon discussion, we do not want to delete this key where EP-Launch
+      // stores its settings (Options) such as text editor of choice etc
+      // So they remain available for other installations or next installation
+      // var keyName = "HKEY_CURRENT_USER\\Software\\VB and VBA Program Settings\\EP-Launch";
+      // component.addOperation("Execute", "cmd", "/C", "echo Set up uninstall operation to delete EP-Launch registry keys", "UNDOEXECUTE", reg, "DELETE", keyName, "/f");
 
       // And weirder still, to copy and register DLLs: done separately
     }

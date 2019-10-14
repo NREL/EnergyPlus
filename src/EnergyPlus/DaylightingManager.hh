@@ -57,8 +57,8 @@
 #include <ObjexxFCL/Vector3.fwd.hh>
 
 // EnergyPlus Headers
-#include <DataBSDFWindow.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -77,6 +77,7 @@ namespace DaylightingManager {
     extern int OutputFileDFS;         // Unit number for daylight factors
     extern Array1D<Real64> DaylIllum; // Daylight illuminance at reference points (lux)
     extern int maxNumRefPtInAnyZone;  // The most number of reference points that any single zone has
+    extern int maxNumRefPtInAnyEncl;  // The most number of reference points that any single enclosure has
     extern Real64 PHSUN;              // Solar altitude (radians)
     extern Real64 SPHSUN;             // Sine of solar altitude
     extern Real64 CPHSUN;             // Cosine of solar altitude

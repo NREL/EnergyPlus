@@ -51,8 +51,8 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataPlant.hh>
-#include <DataSizing.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/PlantChillers.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"

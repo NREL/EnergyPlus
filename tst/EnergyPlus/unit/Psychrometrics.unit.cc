@@ -45,15 +45,148 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::Pumps Unit Tests
-
 // Google Test Headers
 #include <gtest/gtest.h>
 
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <Psychrometrics.hh>
+// EnergyPlus Headers
+#include <EnergyPlus/Psychrometrics.hh>
 
-namespace EnergyPlus {
+#include "Fixtures/EnergyPlusFixture.hh"
+using namespace EnergyPlus;
+using namespace EnergyPlus::Psychrometrics;
+
+TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnHPb_Test)
+{
+
+    InitializePsychRoutines();
+
+    // Test 1: TEMP. IS FROM  20 C  TO   40 C
+    Real64 H = 7.5223e4 - 1.78637e4;
+    Real64 PB = 1.01325e5;
+    Real64 result = PsyTsatFnHPb_raw(H, PB);
+    Real64 actual_result = 20.0;
+    EXPECT_NEAR(actual_result, result, 0.001);
+
+    // Test 2: Cache version of the function - first call
+    Real64 cache_miss_result = PsyTsatFnHPb(H, PB);
+    EXPECT_NEAR(actual_result, cache_miss_result, 0.001);
+
+    // Test 3: TEMP. IS FROM   0 C  TO   20 C
+    H = 2.7298e4 - 1.78637e4;
+    result = PsyTsatFnHPb_raw(H, PB);
+    actual_result = 0.0;
+    EXPECT_NEAR(actual_result, result, 0.001);
+
+    // Test 4: TEMP. IS FROM   -20 C  TO   0 C
+    H = -6.7011e2 - 1.78637e4;
+    result = PsyTsatFnHPb_raw(H, PB);
+    actual_result = -20.0;
+    EXPECT_NEAR(actual_result, result, 0.001);
+
+    // Test 5: TEMP. IS FROM   -40 C  TO   -20 C
+    H = -2.21379e4 - 1.78637e4;
+    result = PsyTsatFnHPb_raw(H, PB);
+    actual_result = -40.0;
+    EXPECT_NEAR(actual_result, result, 0.001);
+
+    // Test 6: TEMP. IS FROM   -60 C  TO   -40 C
+    H = -4.2399e4 - 1.78637e4;
+    result = PsyTsatFnHPb_raw(H, PB);
+    actual_result = -60.0;
+    EXPECT_NEAR(actual_result, result, 0.1);
+
+    // Test 7: TEMP. IS <  -60 C
+    H = -5.2399e4 - 1.78637e4;
+    result = PsyTsatFnHPb_raw(H, PB);
+    actual_result = -60.0;
+    EXPECT_NEAR(actual_result, result, 0.1);
+
+    // Test 8: TEMP. IS FROM   40 C  TO   60 C
+    H = 1.8379e5 - 1.78637e4;
+    result = PsyTsatFnHPb_raw(H, PB);
+    actual_result = 40.0;
+    EXPECT_NEAR(actual_result, result, 0.001);
+
+    // Test 9: Label90 - TEMP. IS FROM   60 C  TO   80 C
+    H = 4.7577e5 - 1.78637e4;
+    result = PsyTsatFnHPb_raw(H, PB);
+    actual_result = 60.0;
+    EXPECT_NEAR(actual_result, result, 0.001);
+
+    // Test 10: Label100 - TEMP. IS FROM   80 C  TO   90 C
+    H = 1.5445e6 - 1.78637e4;
+    result = PsyTsatFnHPb_raw(H, PB);
+    actual_result = 80.0;
+    EXPECT_NEAR(actual_result, result, 0.001);
+
+    // Test 11: Label110 - TEMP. IS FROM   90 C  TO   100 C
+    H = 3.8353e6 - 1.78637e4;
+    result = PsyTsatFnHPb_raw(H, PB);
+    actual_result = 90.0;
+    EXPECT_NEAR(actual_result, result, 0.001);
+
+    // Test 12: TEMP > 100 C
+    H = 4.5866e7 - 1.78637e4;
+    result = PsyTsatFnHPb_raw(H, PB);
+    actual_result = 100.0;
+    EXPECT_NEAR(actual_result, result, 1);
+
+    // Test 13: PB != 1.0133e5
+    H = 7.5223e4 - 1.78637e4;
+    PB = 0.91325e5;
+    result = PsyTsatFnHPb_raw(H, PB);
+    actual_result = 18.819;
+    EXPECT_NEAR(actual_result, result, 0.001);
+
+    // Test 14: Cache version of the function - hit call
+    H = 7.5223e4 - 1.78637e4;
+    PB = 1.0133e5;
+    actual_result = 20.0;
+    Real64 cache_hit_result = PsyTsatFnHPb(H, PB);
+    EXPECT_NEAR(actual_result, cache_hit_result, 0.001);
+
+}
+
+TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnPb_Test)
+{
+
+    InitializePsychRoutines();
+
+    // Test 1: general
+    Real64 PB = 101325.0;
+    Real64 result = PsyTsatFnPb_raw(PB);
+    Real64 actual_result = 99.974;
+    EXPECT_NEAR(actual_result, result, 0.001);
+
+    // Test 2: Cache version of the function - first call
+    PB = 101325.0;
+    Real64 cache_result = PsyTsatFnPb(PB);
+    EXPECT_NEAR(actual_result, cache_result, 0.001);
+
+    // Test 3: upper bound
+    PB = 1555000.0;
+    result = PsyTsatFnPb_raw(PB);
+    actual_result = 200.0;
+    EXPECT_DOUBLE_EQ(actual_result, result);
+
+    // Test 4: lower bound
+    PB = 0.0017;
+    result = PsyTsatFnPb_raw(PB);
+    actual_result = -100.0;
+    EXPECT_DOUBLE_EQ(actual_result, result);
+
+    // Test 5: zero
+    PB = 611.1;
+    result = PsyTsatFnPb_raw(PB);
+    actual_result = 0.0;
+    EXPECT_DOUBLE_EQ(actual_result, result);
+
+    // Test 6: Cache version of the function - hit call
+    PB = 101325.0;
+    actual_result = 99.974;
+    EXPECT_NEAR(actual_result, cache_result, 0.001);
+
+}
 
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
 {
@@ -95,4 +228,3 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
     EXPECT_TRUE(compare_err_stream(error_string1, true));
 
 }
-} // namespace EnergyPlus

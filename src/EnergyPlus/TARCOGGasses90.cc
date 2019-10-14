@@ -54,9 +54,9 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <TARCOGGasses90.hh>
-#include <TARCOGGassesParams.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/TARCOGGasses90.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
 
 namespace EnergyPlus {
 

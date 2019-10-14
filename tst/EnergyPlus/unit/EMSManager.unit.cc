@@ -52,9 +52,9 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <CurveManager.hh>
-#include <DataRuntimeLanguage.hh>
-#include <EMSManager.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/NodeInputManager.hh>

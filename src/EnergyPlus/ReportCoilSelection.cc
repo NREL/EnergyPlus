@@ -50,36 +50,36 @@
 #include <vector>
 
 // EnergyPlus Headers
-#include <BoilerSteam.hh>
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataPlant.hh>
-#include <DataSizing.hh>
-#include <DataZoneEquipment.hh>
-#include <FanCoilUnits.hh>
-#include <Fans.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <HVACFan.hh>
-#include <HVACVariableRefrigerantFlow.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <MixedAir.hh>
-#include <OutdoorAirUnit.hh>
-#include <OutputReportPredefined.hh>
-#include <PackagedTerminalHeatPump.hh>
-#include <PlantUtilities.hh>
-#include <Psychrometrics.hh>
-#include <ReportCoilSelection.hh>
-#include <UnitHeater.hh>
-#include <UnitVentilator.hh>
-#include <UtilityRoutines.hh>
-#include <WeatherManager.hh>
-#include <WindowAC.hh>
+#include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/FanCoilUnits.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/OutdoorAirUnit.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/PackagedTerminalHeatPump.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/UnitHeater.hh>
+#include <EnergyPlus/UnitVentilator.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/WindowAC.hh>
 
 namespace EnergyPlus {
 
@@ -99,19 +99,19 @@ CoilSelectionData::CoilSelectionData( // constructor
     std::string const &coilName)
     : isCooling(false), isHeating(false), coilNum(-999), airloopNum(-999), oaControllerNum(-999), zoneEqNum(-999), oASysNum(-999), zoneHVACTypeNum(0),
       zoneHVACIndex(0), typeof_Coil(-999), coilSizingMethodConcurrence(-999), coilSizingMethodCapacity(-999), coilSizingMethodAirFlow(-999),
-      capIsAutosized(false), volFlowIsAutosized(false), coilWaterFlowUser(-999.0), oaPretreated(false), isSupplementalHeater(false),
-      coilTotCapFinal(-999.0), coilSensCapFinal(-999.0), coilRefAirVolFlowFinal(-999.0), coilRefWaterVolFlowFinal(-999.0), coilTotCapAtPeak(-999.0),
-      coilSensCapAtPeak(-999.0), coilDesMassFlow(-999.0), coilDesVolFlow(-999.0), coilDesEntTemp(-999.0), coilDesEntWetBulb(-999.0),
-      coilDesEntHumRat(-999.0), coilDesEntEnth(-999.0), coilDesLvgTemp(-999.0), coilDesLvgWetBulb(-999.0), coilDesLvgHumRat(-999.0),
-      coilDesLvgEnth(-999.0), coilDesWaterMassFlow(-999.0), coilDesWaterEntTemp(-999.0), coilDesWaterLvgTemp(-999.0), coilDesWaterTempDiff(-999.0),
-      pltSizNum(-999), waterLoopNum(-999), oaPeakTemp(-999.00), oaPeakHumRat(-999.0), oaPeakWetBulb(-999.0), oaPeakVolFlow(-999.0),
-      oaPeakVolFrac(-999.0), oaDoaTemp(-999.0), oaDoaHumRat(-999.0), raPeakTemp(-999.0), raPeakHumRat(-999.0), rmPeakTemp(-999.0),
-      rmPeakHumRat(-999.0), rmPeakRelHum(-999.0), rmSensibleAtPeak(-999.0), rmLatentAtPeak(0.0), coilIdealSizCapOverSimPeakCap(-999.0),
-      coilIdealSizCapUnderSimPeakCap(-999.0), reheatLoadMult(-999.0), minRatio(-999.0), maxRatio(-999.0), cpMoistAir(-999.0), cpDryAir(-999.0),
-      rhoStandAir(-999.0), rhoFluid(-999.0), cpFluid(-999.0), coilCapFTIdealPeak(1.0), coilRatedTotCap(-999.0), coilRatedSensCap(-999.0),
-      ratedAirMassFlow(-999.0), ratedCoilInDb(-999.0), ratedCoilInWb(-999.0), ratedCoilInHumRat(-999.0), ratedCoilInEnth(-999.0),
-      ratedCoilOutDb(-999.0), ratedCoilOutWb(-999.0), ratedCoilOutHumRat(-999.0), ratedCoilOutEnth(-999.0), ratedCoilEff(-999.0),
-      ratedCoilBpFactor(-999.0), ratedCoilAppDewPt(-999.0), ratedCoilOadbRef(-999.0), ratedCoilOawbRef(-999.0),
+      isCoilSizingForTotalLoad(false), capIsAutosized(false), volFlowIsAutosized(false), coilWaterFlowUser(-999.0), oaPretreated(false),
+      isSupplementalHeater(false), coilTotCapFinal(-999.0), coilSensCapFinal(-999.0), coilRefAirVolFlowFinal(-999.0),
+      coilRefWaterVolFlowFinal(-999.0), coilTotCapAtPeak(-999.0), coilSensCapAtPeak(-999.0), coilDesMassFlow(-999.0), coilDesVolFlow(-999.0),
+      coilDesEntTemp(-999.0), coilDesEntWetBulb(-999.0), coilDesEntHumRat(-999.0), coilDesEntEnth(-999.0), coilDesLvgTemp(-999.0),
+      coilDesLvgWetBulb(-999.0), coilDesLvgHumRat(-999.0), coilDesLvgEnth(-999.0), coilDesWaterMassFlow(-999.0), coilDesWaterEntTemp(-999.0),
+      coilDesWaterLvgTemp(-999.0), coilDesWaterTempDiff(-999.0), pltSizNum(-999), waterLoopNum(-999), oaPeakTemp(-999.00), oaPeakHumRat(-999.0),
+      oaPeakWetBulb(-999.0), oaPeakVolFlow(-999.0), oaPeakVolFrac(-999.0), oaDoaTemp(-999.0), oaDoaHumRat(-999.0), raPeakTemp(-999.0),
+      raPeakHumRat(-999.0), rmPeakTemp(-999.0), rmPeakHumRat(-999.0), rmPeakRelHum(-999.0), rmSensibleAtPeak(-999.0), rmLatentAtPeak(0.0),
+      coilIdealSizCapOverSimPeakCap(-999.0), coilIdealSizCapUnderSimPeakCap(-999.0), reheatLoadMult(-999.0), minRatio(-999.0), maxRatio(-999.0),
+      cpMoistAir(-999.0), cpDryAir(-999.0), rhoStandAir(-999.0), rhoFluid(-999.0), cpFluid(-999.0), coilCapFTIdealPeak(1.0), coilRatedTotCap(-999.0),
+      coilRatedSensCap(-999.0), ratedAirMassFlow(-999.0), ratedCoilInDb(-999.0), ratedCoilInWb(-999.0), ratedCoilInHumRat(-999.0),
+      ratedCoilInEnth(-999.0), ratedCoilOutDb(-999.0), ratedCoilOutWb(-999.0), ratedCoilOutHumRat(-999.0), ratedCoilOutEnth(-999.0),
+      ratedCoilEff(-999.0), ratedCoilBpFactor(-999.0), ratedCoilAppDewPt(-999.0), ratedCoilOadbRef(-999.0), ratedCoilOawbRef(-999.0),
 
       supFanModelTypeEnum(DataAirSystems::fanModelTypeNotYetSet), supFanNum(0), supFanVecIndex(-1), fanSizeMaxAirVolumeFlow(-999.0),
       fanSizeMaxAirMassFlow(-999.0), fanHeatGainIdealPeak(-999.0), coilAndFanNetTotalCapacityIdealPeak(-999.0), plantDesMaxMassFlowRate(-999.0),
@@ -131,6 +131,7 @@ CoilSelectionData::CoilSelectionData( // constructor
     coilSizingMethodConcurrenceName = "N/A";
     coilSizingMethodCapacityName = "N/A";
     coilSizingMethodAirFlowName = "N/A";
+    coilPeakLoadTypeToSizeOnName = "N/A";
     coilCapAutoMsg = "unknown";
     coilVolFlowAutoMsg = "unknown";
     coilWaterFlowAutoMsg = "unknown";
@@ -212,6 +213,9 @@ void ReportCoilSelection::writeCoilSelectionOutput()
         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilDateTimeTotIdealPeak, c->coilName_, c->coilTotalPeakHrMin);
         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilDDnameAirFlowIdealPeak, c->coilName_, c->desDayNameAtAirFlowPeak);
         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilDateTimeAirFlowIdealPeak, c->coilName_, c->airPeakHrMin);
+
+        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilPeakLoadTypeToSizeOn, c->coilName_, c->coilPeakLoadTypeToSizeOnName);
+
         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilTotalCapIdealPeak, c->coilName_, c->coilTotCapAtPeak, 2);
         OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchCoilSensCapIdealPeak, c->coilName_, c->coilSensCapAtPeak, 2);
         if (c->coilDesMassFlow == -999.0 || c->coilDesMassFlow == -99999.0) {
@@ -693,6 +697,12 @@ void ReportCoilSelection::doFinalProcessingOfCoilData()
             c->coilSizingMethodAirFlowName = "FractionOfAutosizedCoolingAirflow";
         } else if (c->coilSizingMethodAirFlow == DataSizing::FractionOfAutosizedHeatingAirflow) {
             c->coilSizingMethodAirFlowName = "FractionOfAutosizedHeatingAirflow";
+        }
+
+        if (c->isCoilSizingForTotalLoad) {
+            c->coilPeakLoadTypeToSizeOnName = "Total";
+        } else {
+            c->coilPeakLoadTypeToSizeOnName = "Sensible";
         }
 
         if (c->capIsAutosized) {
@@ -1179,6 +1189,12 @@ void ReportCoilSelection::setCoilCoolingCapacity(
                 getTimeText(DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtCoolFlowPk(DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD));
         }
 
+        if (DataSizing::FinalSysSizing(curSysNum).CoolingPeakLoadType == DataSizing::TotalCoolingLoad) {
+            c->isCoilSizingForTotalLoad = true;
+        } else {
+            c->isCoilSizingForTotalLoad = false;
+        }
+
         c->oaPeakTemp = DataSizing::FinalSysSizing(curSysNum).OutTempAtCoolPeak;
         c->oaPeakVolFlow = DataSizing::FinalSysSizing(curSysNum).DesOutAirVolFlow;
         c->oaPeakHumRat = DataSizing::FinalSysSizing(curSysNum).OutHumRatAtCoolPeak;
@@ -1424,6 +1440,10 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         c->coilSizingMethodConcurrence = DataSizing::FinalSysSizing(curSysNum).SizingOption;
         c->coilSizingMethodCapacity = DataSizing::FinalSysSizing(curSysNum).HeatingCapMethod;
         c->coilSizingMethodAirFlow = DataSizing::FinalSysSizing(curSysNum).ScaleHeatSAFMethod;
+
+        // Central Heating Coils are always sized at the conditions at the peak Sensible Heating Load
+        c->isCoilSizingForTotalLoad = false;
+
         // DesOutAirVolFlow
 
         // loop over heated zones attached to this airloop to find average Room condition, if none heated use cooled zones

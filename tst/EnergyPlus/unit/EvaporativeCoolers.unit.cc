@@ -59,8 +59,8 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <DataAirLoop.hh>
-#include <SimAirServingZones.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

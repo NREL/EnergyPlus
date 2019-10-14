@@ -49,11 +49,11 @@
 #define DataSurfaces_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <DataBSDFWindow.hh>
-#include <DataGlobals.hh>
-#include <DataVectorTypes.hh>
-#include <EnergyPlus.hh>
-#include <Shape.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Shape.hh>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -168,7 +168,6 @@ namespace DataSurfaces {
     extern int const HeatTransferModel_TDD;                 // tubular daylighting device
     extern int const HeatTransferModel_Kiva;                // Kiva ground calculations
     extern int const HeatTransferModel_AirBoundaryNoHT;     // Construction:AirBoundary - not IRT or interior window
-    extern int const HeatTransferModel_AirBoundaryIntWin;   // Construction:AirBoundary - interior window for solar/daylighting
 
     // Parameters for classification of outside face of surfaces
     extern int const OutConvClass_WindwardVertWall;
@@ -1085,9 +1084,8 @@ namespace DataSurfaces {
         Real64 VentingOpenFactorMultRep;        // Window/door opening modulation multiplier on venting open factor, for reporting
         Real64 InsideTempForVentingRep;         // Inside air temp used to control window/door venting, for reporting (C)
         Real64 VentingAvailabilityRep;          // Venting availability schedule value (0.0/1.0 = no venting allowed/not allowed)
-        Array1D<Real64> IllumFromWinAtRefPtRep; // Illuminance from window at reference point #1 [lux]
-        Array1D<Real64> LumWinFromRefPtRep;     // Window luminance as viewed from reference point #1 [cd/m2]
-        Real64 LumWinFromRefPt2Rep;             // Window luminance as viewed from reference point #2 [cd/m2]
+        Array1D<Real64> IllumFromWinAtRefPtRep; // Illuminance from window at reference point N [lux]
+        Array1D<Real64> LumWinFromRefPtRep;     // Window luminance as viewed from reference point N [cd/m2]
         // for shadowing of ground by building and obstructions [W/m2]
         Real64 SkyGndSolarInc; // Incident diffuse solar from ground-reflected sky radiation; used for
         // Complex Fen; if CalcSolRefl is true, accounts for shadowing of ground by building and obstructions [W/m2]
@@ -1153,7 +1151,7 @@ namespace DataSurfaces {
               AirflowDestination(0), AirflowReturnNodePtr(0), MaxAirflow(0.0), AirflowControlType(0), AirflowHasSchedule(false),
               AirflowSchedulePtr(0), AirflowThisTS(0.0), TAirflowGapOutlet(0.0), WindowCalcIterationsRep(0),
               VentingOpenFactorRep(0.0), VentingOpenFactorMultRep(0.0), InsideTempForVentingRep(0.0), VentingAvailabilityRep(0.0),
-              LumWinFromRefPt2Rep(0.0), SkyGndSolarInc(0.0), BmGndSolarInc(0.0), ZoneAreaMinusThisSurf(3, 0.0), ZoneAreaReflProdMinusThisSurf(3, 0.0),
+              SkyGndSolarInc(0.0), BmGndSolarInc(0.0), ZoneAreaMinusThisSurf(3, 0.0), ZoneAreaReflProdMinusThisSurf(3, 0.0),
               LightWellEff(1.0), SolarDiffusing(false), FrameHeatGain(0.0), FrameHeatLoss(0.0), DividerHeatLoss(0.0),
               TCLayerTemp(0.0), SpecTemp(0.0), WindowModelType(Window5DetailedModel), TDDPipeNum(0)
         {

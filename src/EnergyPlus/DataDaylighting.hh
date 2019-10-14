@@ -56,8 +56,8 @@
 #include <ObjexxFCL/Array5D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -148,7 +148,7 @@ namespace DataDaylighting {
         Real64 MinLightFraction;                   // Minimum fraction of light output that continuous dimming system can dim down to
         int LightControlSteps;                     // Number of levels (excluding zero) of stepped control system
         Real64 LightControlProbability;            // For manual control of stepped systems, probability that lighting will
-        int TotalExtWindows;                       // Total number of exterior windows in the zone
+        int TotalExtWindows;                       // Total number of exterior windows in the zone or same solar enclosure
         Real64 AveVisDiffReflect;                  // Area-weighted average inside surface visible reflectance of zone
         Real64 DElightGriddingResolution;          // Field: Delight Gridding Resolution
         Array1D<Real64> RefPtPowerReductionFactor; // =1.0  ! Electric power reduction factor at reference points

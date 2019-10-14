@@ -51,9 +51,9 @@
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataGlobals.hh>
-#include <DemandManager.hh>
-#include <MixedAir.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DemandManager.hh>
+#include <EnergyPlus/MixedAir.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
