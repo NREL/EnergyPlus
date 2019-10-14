@@ -176,6 +176,9 @@ namespace IceThermalStorage {
         Real64 ITSCoolingRate_rep;    // [W]
         Real64 ITSCoolingEnergy_rep;  // [J]
 
+        bool MyPlantScanFlag;
+        bool MyEnvrnFlag2;
+
         // Default Constructor
         IceStorageSpecs()
             : ITSType_Num(0), MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSideNum(0),
@@ -183,7 +186,7 @@ namespace IceThermalStorage {
               UAIceDisCh(0.0), HLoss(0.0), XCurIceFrac(0.0), ITSMassFlowRate(0.0), ITSInletTemp(0.0), ITSOutletTemp(0.0),
               ITSOutletSetPointTemp(0.0), ITSCoolingRate(0.0), ITSCoolingEnergy(0.0), CheckEquipName(true),
               MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSChargingRate(0.0), ITSChargingEnergy(0.0), ITSmdot(0.0),
-              ITSCoolingRate_rep(0.0), ITSCoolingEnergy_rep(0.0)
+              ITSCoolingRate_rep(0.0), ITSCoolingEnergy_rep(0.0), MyPlantScanFlag(true), MyEnvrnFlag2(true)
         {
         }
     };
@@ -244,6 +247,8 @@ namespace IceThermalStorage {
         bool ResetXForITSFlag;
         bool MyEnvrnFlag;
         bool CheckEquipName;
+        bool MyPlantScanFlag;
+        bool MyEnvrnFlag2;
 
         // Default Constructor
         DetailedIceStorageData()
@@ -253,7 +258,8 @@ namespace IceThermalStorage {
               IceFracRemaining(1.0), ThawProcessIndex(0), IceFracOnCoil(1.0), DischargingRate(0.0), DischargingEnergy(0.0), ChargingRate(0.0),
               ChargingEnergy(0.0), MassFlowRate(0.0), BypassMassFlowRate(0.0), TankMassFlowRate(0.0), InletTemp(0.0), OutletTemp(0.0),
               TankOutletTemp(0.0), ParasiticElecRate(0.0), ParasiticElecEnergy(0.0), DischargeIterErrors(0), DischargeErrorCount(0),
-              ChargeIterErrors(0), ChargeErrorCount(0), ResetXForITSFlag(false), MyEnvrnFlag(true), CheckEquipName(true)
+              ChargeIterErrors(0), ChargeErrorCount(0), ResetXForITSFlag(false), MyEnvrnFlag(true), CheckEquipName(true),
+              MyPlantScanFlag(true), MyEnvrnFlag2(true)
         {
         }
     };
