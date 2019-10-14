@@ -147,15 +147,6 @@ namespace IceThermalStorage {
                        Real64 &MyLoad)
     {
 
-        Real64 DemandMdot;
-        Real64 TempIn;
-        Real64 TempSetPt(0.0);
-        Real64 MyLoad2;
-        Real64 MaxCap;
-        Real64 MinCap;
-        Real64 OptCap;
-        Real64 Cp; // local plant fluid specific heat
-
         static std::string const RoutineName("SimIceStorage");
         static bool firstTime(true);
         int IceStorageNum;
@@ -261,7 +252,8 @@ namespace IceThermalStorage {
 
                 // DSU? can we now use MyLoad? lets not yet to try to avoid scope creep
 
-                TempIn = DataLoopNode::Node(IceStorage(iceNum).PltInletNodeNum).Temp;
+                Real64 TempSetPt(0.0);
+                Real64 TempIn = DataLoopNode::Node(IceStorage(iceNum).PltInletNodeNum).Temp;
                 {
                     auto const SELECT_CASE_var1(DataPlant::PlantLoop(IceStorage(iceNum).LoopNum).LoopDemandCalcScheme);
                     if (SELECT_CASE_var1 == DataPlant::SingleSetPoint) {
@@ -272,12 +264,12 @@ namespace IceThermalStorage {
                         assert(false);
                     }
                 }
-                DemandMdot = IceStorage(iceNum).DesignMassFlowRate;
+                Real64 DemandMdot = IceStorage(iceNum).DesignMassFlowRate;
 
-                Cp = FluidProperties::GetSpecificHeatGlycol(
+                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
                         DataPlant::PlantLoop(IceStorage(iceNum).LoopNum).FluidName, TempIn, DataPlant::PlantLoop(IceStorage(iceNum).LoopNum).FluidIndex, RoutineName);
 
-                MyLoad2 = (DemandMdot * Cp * (TempIn - TempSetPt));
+                Real64 MyLoad2 = (DemandMdot * Cp * (TempIn - TempSetPt));
                 MyLoad = MyLoad2;
 
                 //     Set fraction of ice remaining in storage
@@ -294,18 +286,21 @@ namespace IceThermalStorage {
                     //        ELSE IF( U .GT. 0.0 ) THEN
                 } else if (MyLoad2 < 0.0) {
 
-                    //             Call CalcIceStorageCapacity from here - MJW - 19 Sep 2005
+                    Real64 MaxCap;
+                    Real64 MinCap;
+                    Real64 OptCap;
                     CalcIceStorageCapacity(IceStorageType::Simple, MaxCap, MinCap, OptCap, iceNum);
-
                     CalcIceStorageCharge(IceStorageType::Simple, iceNum);
 
                     //***** Discharging Process for ITS *****************************************
                     //************************************************************************
                     //        ELSE IF( U .LT. 0.0 ) THEN
                 } else if (MyLoad2 > 0.0) {
-                    //             Call CalcIceStorageCapacity from here - MJW - 19 Sep 2005
-                    CalcIceStorageCapacity(IceStorageType::Simple, MaxCap, MinCap, OptCap, iceNum);
 
+                    Real64 MaxCap;
+                    Real64 MinCap;
+                    Real64 OptCap;
+                    CalcIceStorageCapacity(IceStorageType::Simple, MaxCap, MinCap, OptCap, iceNum);
                     CalcIceStorageDischarge(IceStorageType::Simple, iceNum, MyLoad, RunFlag, FirstIteration, MaxCap);
                 } // Based on input of U value, deciding Dormant/Charge/Discharge process
 
@@ -374,26 +369,10 @@ namespace IceThermalStorage {
                                                         // Assumes approximate density of 1000 kg/m3 to get an estimate for mass flow rate
         std::string const RoutineName("SimDetailedIceStorage");
 
-        Real64 ActualLoad;     // Actual load on the ice storage unit [W]
-        Real64 AvgFracCharged; // Average fraction charged for the current time step
-        Real64 ChargeFrac;     // Fraction of tank to be charged in the current time step
-        int IterNum;           // Iteration number
-        Real64 LMTDstar;       // Non-dimensional log mean temperature difference of ice storage unit [non-dimensional]
-        Real64 LocalLoad;      // Estimated load on the ice storage unit [W]
-        int NodeNumIn;         // Plant loop inlet node number for component
-        int NodeNumOut;        // Plant loop outlet node number for component
-        Real64 Qstar;          // Current load on the ice storage unit [non-dimensional]
-        Real64 TempIn;         // Inlet temperature to component (from plant loop) [C]
-        Real64 TempSetPt(0.0); // Setpoint temperature defined by loop controls [C]
-        Real64 ToutNew;        // Updated outlet temperature from the tank [C]
-        Real64 ToutOld;        // Tank outlet temperature from the last iteration [C]
-        Real64 Cp;             // local plant fluid specific heat
-        Real64 mdot;           // local mass flow rate for plant connection
-        Real64 MassFlowstar;   // non-dimensional mass flow rate for charge curve use [non-dimensional]
-
-        NodeNumIn = DetIceStor(iceNum).PlantInNodeNum;
-        NodeNumOut = DetIceStor(iceNum).PlantOutNodeNum;
-        TempIn = DataLoopNode::Node(NodeNumIn).Temp;
+        int NodeNumIn = DetIceStor(iceNum).PlantInNodeNum;  // Plant loop inlet node number for component
+        int NodeNumOut = DetIceStor(iceNum).PlantOutNodeNum;  // Plant loop outlet node number for component
+        Real64 TempIn = DataLoopNode::Node(NodeNumIn).Temp;  // Inlet temperature to component (from plant loop) [C]
+        Real64 TempSetPt(0.0);  // Setpoint temperature defined by loop controls [C]
         {
             auto const SELECT_CASE_var(DataPlant::PlantLoop(DetIceStor(iceNum).PlantLoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
@@ -405,7 +384,7 @@ namespace IceThermalStorage {
             }
         }
 
-        IterNum = 0;
+        int IterNum = 0;
 
         // Set derived type variables
         DetIceStor(iceNum).InletTemp = TempIn;
@@ -418,10 +397,11 @@ namespace IceThermalStorage {
         }
 
         // Calculate the current load on the ice storage unit
-        Cp = FluidProperties::GetSpecificHeatGlycol(
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
                 DataPlant::PlantLoop(DetIceStor(iceNum).PlantLoopNum).FluidName, TempIn, DataPlant::PlantLoop(DetIceStor(iceNum).PlantLoopNum).FluidIndex, RoutineName);
 
-        LocalLoad = DetIceStor(iceNum).MassFlowRate * Cp * (TempIn - TempSetPt);
+        // Estimated load on the ice storage unit [W]
+        Real64 LocalLoad = DetIceStor(iceNum).MassFlowRate * Cp * (TempIn - TempSetPt);
 
         // Determine what the status is regarding the ice storage unit and the loop level flow
         if ((std::abs(LocalLoad) <= SmallestLoad) || (ScheduleManager::GetCurrentScheduleValue(DetIceStor(iceNum).ScheduleIndex) <= 0)) {
@@ -429,7 +409,7 @@ namespace IceThermalStorage {
             DetIceStor(iceNum).CompLoad = 0.0;
             DetIceStor(iceNum).OutletTemp = TempIn;
             DetIceStor(iceNum).TankOutletTemp = TempIn;
-            mdot = 0.0;
+            Real64 mdot = 0.0;
             PlantUtilities::SetComponentFlowRate(mdot,
                                  DetIceStor(iceNum).PlantInNodeNum,
                                  DetIceStor(iceNum).PlantOutNodeNum,
@@ -454,7 +434,7 @@ namespace IceThermalStorage {
                 DetIceStor(iceNum).CompLoad = 0.0;
                 DetIceStor(iceNum).OutletTemp = TempIn;
                 DetIceStor(iceNum).TankOutletTemp = TempIn;
-                mdot = 0.0;
+                Real64 mdot = 0.0;
                 PlantUtilities::SetComponentFlowRate(mdot,
                                      DetIceStor(iceNum).PlantInNodeNum,
                                      DetIceStor(iceNum).PlantOutNodeNum,
@@ -469,7 +449,7 @@ namespace IceThermalStorage {
 
             } else {
                 // make flow request so tank will get flow
-                mdot = DetIceStor(iceNum).DesignMassFlowRate;
+                Real64 mdot = DetIceStor(iceNum).DesignMassFlowRate;
                 PlantUtilities::SetComponentFlowRate(mdot,
                                      DetIceStor(iceNum).PlantInNodeNum,
                                      DetIceStor(iceNum).PlantOutNodeNum,
@@ -489,26 +469,34 @@ namespace IceThermalStorage {
                     TempSetPt = DetIceStor(iceNum).FreezingTemp - modDeltaTofMin;
                 }
 
-                ToutOld = TempSetPt;
-                LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, DetIceStor(iceNum).FreezingTemp);
-                MassFlowstar = DetIceStor(iceNum).MassFlowRate / SIEquiv100GPMinMassFlowRate;
+                // Tank outlet temperature from the last iteration [C]
+                Real64 ToutOld = TempSetPt;
+                // Non-dimensional log mean temperature difference of ice storage unit [non-dimensional]
+                Real64 LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, DetIceStor(iceNum).FreezingTemp);
+                Real64 MassFlowstar = DetIceStor(iceNum).MassFlowRate / SIEquiv100GPMinMassFlowRate;
 
                 // Find initial guess at average fraction charged during time step
-                ChargeFrac = LocalLoad * DataHVACGlobals::TimeStepSys / DetIceStor(iceNum).NomCapacity;
+                // Fraction of tank to be charged in the current time step
+                Real64 ChargeFrac = LocalLoad * DataHVACGlobals::TimeStepSys / DetIceStor(iceNum).NomCapacity;
                 if ((DetIceStor(iceNum).IceFracRemaining + ChargeFrac) > 1.0) {
                     ChargeFrac = 1.0 - DetIceStor(iceNum).IceFracRemaining;
                 }
+
+                Real64 AvgFracCharged;  // Average fraction charged for the current time step
                 if (DetIceStor(iceNum).ThawProcessIndex == DetIce::InsideMelt) {
                     AvgFracCharged = DetIceStor(iceNum).IceFracOnCoil + (ChargeFrac / 2.0);
                 } else { // (DetIceStor(IceNum)%ThawProcessIndex == DetIce::OutsideMelt)
                     AvgFracCharged = DetIceStor(iceNum).IceFracRemaining + (ChargeFrac / 2.0);
                 }
 
-                Qstar = std::abs(CalcQstar(DetIceStor(iceNum).ChargeCurveNum, DetIceStor(iceNum).ChargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
+                // Current load on the ice storage unit [non-dimensional]
+                Real64 Qstar = std::abs(CalcQstar(DetIceStor(iceNum).ChargeCurveNum, DetIceStor(iceNum).ChargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
 
-                ActualLoad = Qstar * DetIceStor(iceNum).NomCapacity / DetIceStor(iceNum).CurveFitTimeStep;
+                // Actual load on the ice storage unit [W]
+                Real64 ActualLoad = Qstar * DetIceStor(iceNum).NomCapacity / DetIceStor(iceNum).CurveFitTimeStep;
 
-                ToutNew = TempIn + (ActualLoad / (DetIceStor(iceNum).MassFlowRate * Cp));
+                // Updated outlet temperature from the tank [C]
+                Real64 ToutNew = TempIn + (ActualLoad / (DetIceStor(iceNum).MassFlowRate * Cp));
                 // Again, the outlet temperature cannot be above the freezing temperature (factoring in the tolerance)
                 if (ToutNew > (DetIceStor(iceNum).FreezingTemp - modDeltaTofMin)) ToutNew = DetIceStor(iceNum).FreezingTemp - modDeltaTofMin;
 
@@ -598,7 +586,7 @@ namespace IceThermalStorage {
                 DetIceStor(iceNum).CompLoad = 0.0;
                 DetIceStor(iceNum).OutletTemp = DetIceStor(iceNum).InletTemp;
                 DetIceStor(iceNum).TankOutletTemp = DetIceStor(iceNum).InletTemp;
-                mdot = 0.0;
+                Real64 mdot = 0.0;
                 PlantUtilities::SetComponentFlowRate(mdot,
                                      DetIceStor(iceNum).PlantInNodeNum,
                                      DetIceStor(iceNum).PlantOutNodeNum,
@@ -614,7 +602,7 @@ namespace IceThermalStorage {
             } else {
 
                 // make flow request so tank will get flow
-                mdot = DetIceStor(iceNum).DesignMassFlowRate;
+                Real64 mdot = DetIceStor(iceNum).DesignMassFlowRate;
                 PlantUtilities::SetComponentFlowRate(mdot,
                                      DetIceStor(iceNum).PlantInNodeNum,
                                      DetIceStor(iceNum).PlantOutNodeNum,
@@ -632,20 +620,25 @@ namespace IceThermalStorage {
                     TempSetPt = DetIceStor(iceNum).FreezingTemp + modDeltaTofMin;
                 }
 
-                ToutOld = TempSetPt;
-                LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, DetIceStor(iceNum).FreezingTemp);
-                MassFlowstar = DetIceStor(iceNum).MassFlowRate / SIEquiv100GPMinMassFlowRate;
+                // Tank outlet temperature from the last iteration [C]
+                Real64 ToutOld = TempSetPt;
+                // Non-dimensional log mean temperature difference of ice storage unit [non-dimensional]
+                Real64 LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, DetIceStor(iceNum).FreezingTemp);
+                Real64 MassFlowstar = DetIceStor(iceNum).MassFlowRate / SIEquiv100GPMinMassFlowRate;
 
                 // Find initial guess at average fraction charged during time step
-                ChargeFrac = LocalLoad * DataHVACGlobals::TimeStepSys / DetIceStor(iceNum).NomCapacity;
+                Real64 ChargeFrac = LocalLoad * DataHVACGlobals::TimeStepSys / DetIceStor(iceNum).NomCapacity;
                 if ((DetIceStor(iceNum).IceFracRemaining - ChargeFrac) < 0.0) ChargeFrac = DetIceStor(iceNum).IceFracRemaining;
-                AvgFracCharged = DetIceStor(iceNum).IceFracRemaining - (ChargeFrac / 2.0);
+                Real64 AvgFracCharged = DetIceStor(iceNum).IceFracRemaining - (ChargeFrac / 2.0);
 
-                Qstar = std::abs(CalcQstar(DetIceStor(iceNum).DischargeCurveNum, DetIceStor(iceNum).DischargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
+                // Current load on the ice storage unit [non-dimensional]
+                Real64 Qstar = std::abs(CalcQstar(DetIceStor(iceNum).DischargeCurveNum, DetIceStor(iceNum).DischargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
 
-                ActualLoad = Qstar * DetIceStor(iceNum).NomCapacity / DetIceStor(iceNum).CurveFitTimeStep;
+                // Actual load on the ice storage unit [W]
+                Real64 ActualLoad = Qstar * DetIceStor(iceNum).NomCapacity / DetIceStor(iceNum).CurveFitTimeStep;
 
-                ToutNew = TempIn - (ActualLoad / (DetIceStor(iceNum).MassFlowRate * Cp));
+                // Updated outlet temperature from the tank [C]
+                Real64 ToutNew = TempIn - (ActualLoad / (DetIceStor(iceNum).MassFlowRate * Cp));
                 // Again, the outlet temperature cannot be below the freezing temperature (factoring in the tolerance)
                 if (ToutNew < (DetIceStor(iceNum).FreezingTemp + modDeltaTofMin)) ToutNew = DetIceStor(iceNum).FreezingTemp + modDeltaTofMin;
 
@@ -748,9 +741,6 @@ namespace IceThermalStorage {
 
         // METHODOLOGY EMPLOYED: to be determined...
 
-        int NumAlphas; // Number of elements in the alpha array
-        int NumNums;   // Number of elements in the numeric array
-        int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound;
 
         ErrorsFound = false; // Always need to reset this since there are multiple types of ice storage systems
@@ -767,6 +757,9 @@ namespace IceThermalStorage {
         DataIPShortCuts::cCurrentModuleObject = cIceStorageSimple;
         for (int iceNum = 1; iceNum <= modNumIceStorages; ++iceNum) {
 
+            int NumAlphas;
+            int NumNums;  
+            int IOStat;   
             inputProcessor->getObjectItem(
                     DataIPShortCuts::cCurrentModuleObject, iceNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNums, IOStat, _, _, _, DataIPShortCuts::cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
@@ -904,6 +897,9 @@ namespace IceThermalStorage {
 
         for (int iceNum = 1; iceNum <= modNumDetIceStorages; ++iceNum) {
 
+            int NumAlphas;
+            int NumNums;
+            int IOStat;
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           iceNum,
                                           DataIPShortCuts::cAlphaArgs,
