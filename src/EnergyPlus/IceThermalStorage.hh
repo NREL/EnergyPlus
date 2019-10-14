@@ -78,28 +78,20 @@ namespace IceThermalStorage {
     extern int const DetIceOutsideMelt; // Outside melt system--charge from existing ice layer on coil
 
     // ITS parameter
-    extern Real64 const FreezTemp;    // Water freezing Temperature, 0[C]
-    extern Real64 const FreezTempIP;  // Water freezing Temperature, 32[F]
-    extern Real64 const TimeInterval; // Time Interval (1 hr) [s]
+    extern Real64 const modFreezTemp;    // Water freezing Temperature, 0[C]
+    extern Real64 const modFreezTempIP;  // Water freezing Temperature, 32[F]
+    extern Real64 const modTimeInterval; // Time Interval (1 hr) [s]
     extern int const ITSType_IceOnCoilInternal;
     extern int const ITSType_IceOnCoilExternal;
     // Conversion parameter
-    extern Real64 const EpsLimitForX;         // 0.02  ! See Dion's code as eps1
-    extern Real64 const EpsLimitForDisCharge; // 0.20  ! See Dion's code as eps2
-    extern Real64 const EpsLimitForCharge;    // 0.20  ! See Dion's code as eps3
-
-    // variable used by simple model
-    extern Real64 const Delta;
-    extern Real64 const Pa;
-    extern Real64 const Pb;
-    extern Real64 const Pc;
-    extern Real64 const Tref;       // F
-    extern Real64 const Tdischarge; // F
+    extern Real64 const modEpsLimitForX;         // 0.02  ! See Dion's code as eps1
+    extern Real64 const modEpsLimitForDisCharge; // 0.20  ! See Dion's code as eps2
+    extern Real64 const modEpsLimitForCharge;    // 0.20  ! See Dion's code as eps3
 
     // Parameter used by the Detailed Ice Storage Model
-    extern Real64 const DeltaTofMin; // Minimum allowed outlet side temperature difference [C]
+    extern Real64 const modDeltaTofMin; // Minimum allowed outlet side temperature difference [C]
     // This is (Tout - Tfreezing)
-    extern Real64 const DeltaTifMin; // Minimum allowed inlet side temperature difference [C]
+    extern Real64 const modDeltaTifMin; // Minimum allowed inlet side temperature difference [C]
     // This is (Tin - Tfreezing)
 
     // DERIVED TYPE DEFINITIONS
@@ -114,35 +106,68 @@ namespace IceThermalStorage {
     // TYPE (ITSSetCapData), SAVE                   :: ITSSetCap=ITSSetCapData(.FALSE.,0,0,0)
 
     // MODULE VARIABLE DECLARATIONS:
-    extern bool ResetXForITSFlag;
+    extern bool modResetXForITSFlag;
 
     // Input data
-    extern Real64 ITSNomCap;  // Design nominal capacity of Ice Thermal Storage [J] (user input in GJ)
-    extern int InletNodeNum;  // Node number on the inlet side of the plant
-    extern int OutletNodeNum; // Node number on the inlet side of the plant
+    extern Real64 modITSNomCap;  // Design nominal capacity of Ice Thermal Storage [J] (user input in GJ)
+    extern int modInletNodeNum;  // Node number on the inlet side of the plant
+    extern int modOutletNodeNum; // Node number on the inlet side of the plant
 
     // ITS numbers and FoundOrNot
     extern int IceNum;
-    extern int NumIceStorages;
-    extern int NumDetIceStorages;
-    extern int TotalIceStorages;
+    extern int modNumIceStorages;
+    extern int modNumDetIceStorages;
+    extern int modTotalIceStorages;
+
     // ITS UAice and HLoss
-    extern Real64 UAIceCh;    // Charging Ice Thermal Storage overall heat transfer coefficient [W/C]
-    extern Real64 UAIceDisCh; // Discharging Ice Thermal Storage overall heat transfer coefficient [W/C]
-    extern Real64 HLoss;      // ITS Heat Loss
+    extern Real64 modUAIceCh;    // Charging Ice Thermal Storage overall heat transfer coefficient [W/C]
+    extern Real64 modUAIceDisCh; // Discharging Ice Thermal Storage overall heat transfer coefficient [W/C]
+    extern Real64 modHLoss;      // ITS Heat Loss
+
     // ITS State
-    extern Real64 XCurIceFrac; // Current Fraction of Ice Thermal Storage remaining [fraction]
-    extern Real64 U;           // Adjusted input U after reading U Schedule [fraction]
-    extern Real64 Urate;       // Final Urate adjusted Urate based on Error protection (I) [fraction] by HOUR
+    extern Real64 modXCurIceFrac; // Current Fraction of Ice Thermal Storage remaining [fraction]
+    extern Real64 modU;           // Adjusted input U after reading U Schedule [fraction]
+    extern Real64 modUrate;       // Final Urate adjusted Urate based on Error protection (I) [fraction] by HOUR
+
     // ITS status information
-    extern Real64 ITSMassFlowRate;       // ITS water mass flow rate [kg/s]
-    extern Real64 ITSInletTemp;          // ITS inlet water temperature [C]
-    extern Real64 ITSOutletTemp;         // ITS outlet water temperature [C]
-    extern Real64 ITSOutletSetPointTemp; // ITS outlet water temperature setpoint [C]
-    extern Real64 ITSCoolingRate;        // ITS Discharge(-)/Charge(+) rate [W]
-    extern Real64 ITSCoolingEnergy;
-    extern Real64 ChillerOutletTemp; // Chiller outlet brine temperature [C]
-    extern Array1D_bool CheckEquipName;
+    extern Real64 modITSMassFlowRate;       // ITS water mass flow rate [kg/s]
+    extern Real64 modITSInletTemp;          // ITS inlet water temperature [C]
+    extern Real64 modITSOutletTemp;         // ITS outlet water temperature [C]
+    extern Real64 modITSOutletSetPointTemp; // ITS outlet water temperature setpoint [C]
+    extern Real64 modITSCoolingRate;        // ITS Discharge(-)/Charge(+) rate [W]
+    extern Real64 modITSCoolingEnergy;
+    extern Real64 modChillerOutletTemp; // Chiller outlet brine temperature [C]
+    extern Array1D_bool modCheckEquipName;
+
+    struct IceStorageType {
+        enum {
+            Simple,
+            Detailed
+        };
+    };
+    
+    struct CurveVars {
+        enum {
+            FracChargedLMTD,
+            FracDischargedLMTD,
+            LMTDMassFlow,
+            LMTDFracCharged
+        };
+    };
+    
+    struct DetIce {
+        enum {
+            InsideMelt,  // Inside melt system--charge starting with bare coil
+            OutsideMelt // Outside melt system--charge from existing ice layer on coil
+        };
+    };
+
+    struct ITSType {
+        enum {
+            IceOnCoilInternal,
+            IceOnCoilExternal
+        };
+    };
 
     struct IceStorageMapping
     {

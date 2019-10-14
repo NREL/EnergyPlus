@@ -88,7 +88,7 @@ TEST_F(IceStorageFixture, IceThermalStorage_CalcQstarTest)
     
     //Test 1: CurveVarsFracChargedLMTD Curve is QuadraticLinear
     TestNum = 1;
-    IceStorageCurveType = IceThermalStorage::CurveVarsFracChargedLMTD;
+    IceStorageCurveType = IceThermalStorage::CurveVars::FracChargedLMTD;
     CurveManager::PerfCurve(TestNum).CurveType = CurveManager::QuadraticLinear;
     CurveManager::PerfCurve(TestNum).InterpolationType = CurveManager::EvaluateCurveToLimits;
     CurveManager::PerfCurve(TestNum).Var1Max = 1.0;
@@ -107,7 +107,7 @@ TEST_F(IceStorageFixture, IceThermalStorage_CalcQstarTest)
 
     //Test 2: CurveVarsFracDischargedLMTD Curve is BiQuadratic
     TestNum = 2;
-    IceStorageCurveType = IceThermalStorage::CurveVarsFracDischargedLMTD;
+    IceStorageCurveType = IceThermalStorage::CurveVars::FracDischargedLMTD;
     CurveManager::PerfCurve(TestNum).CurveType = CurveManager::BiQuadratic;
     CurveManager::PerfCurve(TestNum).InterpolationType = CurveManager::EvaluateCurveToLimits;
     CurveManager::PerfCurve(TestNum).Var1Max = 1.0;
@@ -126,7 +126,7 @@ TEST_F(IceStorageFixture, IceThermalStorage_CalcQstarTest)
     
     //Test 3: CurveVarsLMTDMassFlow Curve is CubicLinear
     TestNum = 3;
-    IceStorageCurveType = IceThermalStorage::CurveVarsLMTDMassFlow;
+    IceStorageCurveType = IceThermalStorage::CurveVars::LMTDMassFlow;
     CurveManager::PerfCurve(TestNum).CurveType = CurveManager::CubicLinear;
     CurveManager::PerfCurve(TestNum).InterpolationType = CurveManager::EvaluateCurveToLimits;
     CurveManager::PerfCurve(TestNum).Var1Max = 10.0;
@@ -145,7 +145,7 @@ TEST_F(IceStorageFixture, IceThermalStorage_CalcQstarTest)
 
     //Test 4: CurveVarsFracLMTDFracCharged Curve is CubicLinear
     TestNum = 4;
-    IceStorageCurveType = IceThermalStorage::CurveVarsLMTDFracCharged;
+    IceStorageCurveType = IceThermalStorage::CurveVars::LMTDFracCharged;
     CurveManager::PerfCurve(TestNum).CurveType = CurveManager::CubicLinear;
     CurveManager::PerfCurve(TestNum).InterpolationType = CurveManager::EvaluateCurveToLimits;
     CurveManager::PerfCurve(TestNum).Var1Max = 10.0;
