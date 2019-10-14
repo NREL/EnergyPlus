@@ -103,7 +103,6 @@ namespace IceRink {
         Real64 IceThickness;
         int WaterIndex;
         Real64 FloodWaterTemp;
-        // Inputs used in calcEffectiveness
 
         // ReportData
         Real64 RefrigInletTemp;   // Refrigerant inlet temperature
@@ -114,7 +113,13 @@ namespace IceRink {
         int OutRangeHiErrorCount; // recurring errors for crazy results too high fluid temperature
         int OutRangeLoErrorCount; // recurring errors for crazy results too low fluid temperature
         // Default Constructor
-        DirectRefrigSysData() : RefrigLoopNum(0)
+        DirectRefrigSysData()
+            : SchedPtr(0), ZonePtr(0), RefrigLoopNum(0), RefrigLoopSide(0), RefrigBranchNum(0), RefrigCompNum(0), RefrigIndex(0),
+              ControlStrategy(0), MinRefrigMassFlow(0.0), MaxRefrigMassFlow(0.0), NumCircuits(0), TubeLength(0.0), TubeDiameter(0.0), RefrigInNode(0),
+              RefrigOutNode(0), RefrigSetptSchedPtr(0), RefrigSetptTemp(0.0), IceSetptTemp(0.0), IceSetptSchedPtr(0), NumOfSurfaces(0),
+              TotalSurfaceArea(0.0), PeopleHeatGainSchedPtr(0), PeopleSchedPtr(0), PeopleHeatGain(0.0), MaxNumOfPeople(0), LengthRink(0.0), WidthRink(0.0), DepthRink(0.0),
+              IceThickness(0.0), WaterIndex(0), FloodWaterTemp(0.0), RefrigInletTemp(0.0), RefrigOutletTemp(0.0), RefrigMassFlow(0.0), CoolPower(0.0),
+              CoolEnergy(0.0), OutRangeHiErrorCount(0), OutRangeLoErrorCount(0)
 
         {
         }
@@ -180,7 +185,16 @@ namespace IceRink {
         int OutRangeHiErrorCount; // recurring errors for crazy results too high fluid temperature
         int OutRangeLoErrorCount; // recurring errors for crazy results too low fluid temperature
         // Default Constructor
-        IndirectRefrigSysData() : RefrigLoopNum(0)
+        IndirectRefrigSysData() : SchedPtr(0), ZonePtr(0), RefrigLoopNum(0), RefrigLoopSide(0), 
+            RefrigBranchNum(0), RefrigCompNum(0), GlycolIndex1(0), GlycolIndex2(0),
+            ControlStrategy(0), MinRefrigMassFlow(0.0), MaxRefrigMassFlow(0.0), NumCircuits(0), 
+            TubeLength(0.0), TubeDiameter(0.0), RefrigInNode(0), RefrigOutNode(0), 
+            RefrigSetptSchedPtr(0), RefrigSetptTemp(0.0), IceSetptTemp(0.0), IceSetptSchedPtr(0), 
+            NumOfSurfaces(0), TotalSurfaceArea(0.0), PeopleHeatGainSchedPtr(0), PeopleSchedPtr(0), 
+            PeopleHeatGain(0.0), MaxNumOfPeople(0), LengthRink(0.0), WidthRink(0.0), DepthRink(0.0), 
+            IceThickness(0.0), WaterIndex(0), FloodWaterTemp(0.0), RefrigType(0), RefrigConc(0.0), 
+            RefrigInletTemp(0.0), RefrigOutletTemp(0.0), RefrigMassFlow(0.0), CoolPower(0.0), 
+            CoolEnergy(0.0), OutRangeHiErrorCount(0), OutRangeLoErrorCount(0)
 
         {
         }
@@ -195,7 +209,7 @@ namespace IceRink {
         int CompIndex;    // Index in specific system types
 
         // Default Constructor
-        RefrigSysTypeData() : SystemType(0), CompIndex(0)
+        RefrigSysTypeData() : SystemType(0), CompIndex(0)  
         {
         }
     };
@@ -214,11 +228,15 @@ namespace IceRink {
         Real64 TankCapacity; // in ltr
 
         // Report Data
+        Real64 ResurfacingHeatLoad;
         Real64 QResurfacing;
         Real64 EHeatingWater;
         Real64 QHumidity;
         // Default Constructor
-        ResurfacerData() : GlycolIndex(0), ResurfacingSchedPtr(0), ResurfacingWaterTemp(0.0), QResurfacing(0.0), EHeatingWater(0.0), QHumidity(0.0)
+        ResurfacerData() : CompIndex(0), GlycolIndex(0), ResurfacingSchedPtr(0), 
+            NoOfResurfEvents(0), ResurfacingWaterTemp(0.0), InitWaterTemp(0.0),
+            TankCapacity(0.0), QResurfacing(0.0), EHeatingWater(0.0), QHumidity(0.0), 
+            ResurfacingHeatLoad(0.0)
         {
         }
     };

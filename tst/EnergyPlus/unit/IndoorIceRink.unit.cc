@@ -173,14 +173,14 @@ TEST_F(EnergyPlusFixture, RinkFreezing)
     DRink(SysNum).WidthRink = 30.00;
     DRink(SysNum).IceThickness = 0.02;
     DRink(SysNum).IceSetptTemp = -3.00;
-    DRink(SysNum).FloorWaterTemp = 15.00;
+    DRink(SysNum).FloodWaterTemp = 15.00;
     DRink(SysNum).WaterIndex = 1;
 
     IRink(SysNum).LengthRink = 60.00;
     IRink(SysNum).WidthRink = 30.00;
     IRink(SysNum).IceThickness = 0.02;
     IRink(SysNum).IceSetptTemp = -3.00;
-    IRink(SysNum).FloorWaterTemp = 15.00;
+    IRink(SysNum).FloodWaterTemp = 15.00;
     IRink(SysNum).WaterIndex = 1;
 
     // Test 1: Freezing of DRink
