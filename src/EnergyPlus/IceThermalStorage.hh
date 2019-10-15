@@ -211,6 +211,8 @@ namespace IceThermalStorage {
         void UpdateNode(Real64 myLoad, bool RunFlag);
 
         void RecordOutput(Real64 MyLoad, bool RunFlag);
+
+        void setupOutputVars();
     };
 
     struct DetailedIceStorageData
