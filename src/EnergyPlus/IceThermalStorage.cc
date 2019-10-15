@@ -100,19 +100,19 @@ namespace IceThermalStorage {
     std::string const cIceStorageDetailed("ThermalStorage:Ice:Detailed");
 
     // ITS parameter
-    Real64 const modFreezTemp(0.0);       // Water freezing Temperature, 0[C]
-    Real64 const modFreezTempIP(32.0);    // Water freezing Temperature, 32[F]
-    Real64 const modTimeInterval(3600.0); // Time Interval (1 hr) [s]
+    Real64 const FreezTemp(0.0);       // Water freezing Temperature, 0[C]
+    Real64 const FreezTempIP(32.0);    // Water freezing Temperature, 32[F]
+    Real64 const TimeInterval(3600.0); // Time Interval (1 hr) [s]
 
     // Conversion parameter
-    Real64 const modEpsLimitForX(0.0);         // 0.02  ! See Dion's code as eps1
-    Real64 const modEpsLimitForDisCharge(0.0); // 0.20  ! See Dion's code as eps2
-    Real64 const modEpsLimitForCharge(0.0);    // 0.20  ! See Dion's code as eps3
+    Real64 const EpsLimitForX(0.0);         // 0.02  ! See Dion's code as eps1
+    Real64 const EpsLimitForDisCharge(0.0); // 0.20  ! See Dion's code as eps2
+    Real64 const EpsLimitForCharge(0.0);    // 0.20  ! See Dion's code as eps3
 
     // Parameter used by the Detailed Ice Storage Model
-    Real64 const modDeltaTofMin(0.5); // Minimum allowed outlet side temperature difference [C]
+    Real64 const DeltaTofMin(0.5); // Minimum allowed outlet side temperature difference [C]
     // This is (Tout - Tfreezing)
-    Real64 const modDeltaTifMin(1.0); // Minimum allowed inlet side temperature difference [C]
+    Real64 const DeltaTifMin(1.0); // Minimum allowed inlet side temperature difference [C]
     // This is (Tin - Tfreezing)
 
     int NumSimpleIceStorage(0);
@@ -130,6 +130,7 @@ namespace IceThermalStorage {
     // Functions
     void clear_state()
     {
+        getITSInput = true;
         NumSimpleIceStorage = 0;
         NumDetailedIceStorage = 0;
         TotalNumIceStorage = 0;
@@ -388,7 +389,7 @@ namespace IceThermalStorage {
             // The load is less than zero so we should be charging
             // Before we do anything, we should check to make sure that we will actually be charging the unit
 
-            if ((TempIn > (this->FreezingTemp - modDeltaTifMin)) || (this->IceFracRemaining >= TankChargeToler)) {
+            if ((TempIn > (this->FreezingTemp - DeltaTifMin)) || (this->IceFracRemaining >= TankChargeToler)) {
                 // If the inlet temperature is not below the freezing temperature of the
                 // device, then we cannot actually do any charging.  Bypass all of the flow.
                 // Also, if the tank is already sufficiently charged, we don't need to
@@ -424,11 +425,11 @@ namespace IceThermalStorage {
                 // the tank, and we have some charging left to do.
                 // Make first guess at Qstar based on the current ice fraction remaining
                 // and LMTDstar that is based on the freezing or TempSetPt temperature.
-                if (TempSetPt > (this->FreezingTemp - modDeltaTofMin)) {
+                if (TempSetPt > (this->FreezingTemp - DeltaTofMin)) {
                     // Outlet temperature cannot be above the freezing temperature so set
                     // the outlet temperature to the freezing temperature and calculate
                     // LMTDstar based on that assumption.
-                    TempSetPt = this->FreezingTemp - modDeltaTofMin;
+                    TempSetPt = this->FreezingTemp - DeltaTofMin;
                 }
 
                 // Tank outlet temperature from the last iteration [C]
@@ -460,7 +461,7 @@ namespace IceThermalStorage {
                 // Updated outlet temperature from the tank [C]
                 Real64 ToutNew = TempIn + (ActualLoad / (this->MassFlowRate * Cp));
                 // Again, the outlet temperature cannot be above the freezing temperature (factoring in the tolerance)
-                if (ToutNew > (this->FreezingTemp - modDeltaTofMin)) ToutNew = this->FreezingTemp - modDeltaTofMin;
+                if (ToutNew > (this->FreezingTemp - DeltaTofMin)) ToutNew = this->FreezingTemp - DeltaTofMin;
 
                 if (ActualLoad > std::abs(LocalLoad)) {
                     // We have more than enough capacity to meet the load so no need to iterate to find a solution
@@ -497,7 +498,7 @@ namespace IceThermalStorage {
                             ActualLoad = Qstar * this->NomCapacity / this->CurveFitTimeStep;
                             ToutNew = TempIn + (ActualLoad / (this->MassFlowRate * Cp));
                             // Again, the outlet temperature cannot be above the freezing temperature (factoring in the tolerance)
-                            if (ToutNew < (this->FreezingTemp - modDeltaTofMin)) ToutNew = this->FreezingTemp - modDeltaTofMin;
+                            if (ToutNew < (this->FreezingTemp - DeltaTofMin)) ToutNew = this->FreezingTemp - DeltaTofMin;
                             ++IterNum;
 
                         } else {
@@ -539,7 +540,7 @@ namespace IceThermalStorage {
             // The load is greater than zero so we should be discharging
             // Before we do anything, we should check to make sure that we will actually be discharging the unit
 
-            if ((this->InletTemp < (this->FreezingTemp + modDeltaTifMin)) || (this->IceFracRemaining <= TankDischargeToler)) {
+            if ((this->InletTemp < (this->FreezingTemp + DeltaTifMin)) || (this->IceFracRemaining <= TankDischargeToler)) {
                 // If the inlet temperature is below the freezing temperature of the
                 // device, then we cannot actually do any discharging.  Bypass all of the flow.
                 // Also, if the tank is already discharged, we can't to do any further
@@ -574,11 +575,11 @@ namespace IceThermalStorage {
 
                 // We are in discharging mode, the temperatures are high enough to discharge
                 // the tank, and we have some discharging left to do.
-                if (TempSetPt < (this->FreezingTemp + modDeltaTofMin)) {
+                if (TempSetPt < (this->FreezingTemp + DeltaTofMin)) {
                     // Outlet temperature cannot be below the freezing temperature so set
                     // the outlet temperature to the freezing temperature and calculate
                     // LMTDstar based on that assumption.
-                    TempSetPt = this->FreezingTemp + modDeltaTofMin;
+                    TempSetPt = this->FreezingTemp + DeltaTofMin;
                 }
 
                 // Tank outlet temperature from the last iteration [C]
@@ -601,7 +602,7 @@ namespace IceThermalStorage {
                 // Updated outlet temperature from the tank [C]
                 Real64 ToutNew = TempIn - (ActualLoad / (this->MassFlowRate * Cp));
                 // Again, the outlet temperature cannot be below the freezing temperature (factoring in the tolerance)
-                if (ToutNew < (this->FreezingTemp + modDeltaTofMin)) ToutNew = this->FreezingTemp + modDeltaTofMin;
+                if (ToutNew < (this->FreezingTemp + DeltaTofMin)) ToutNew = this->FreezingTemp + DeltaTofMin;
 
                 if (ActualLoad > LocalLoad) {
                     // We have more than enough storage to meet the load so no need to iterate to find a solution
@@ -634,7 +635,7 @@ namespace IceThermalStorage {
                             ActualLoad = Qstar * this->NomCapacity / this->CurveFitTimeStep;
                             ToutNew = TempIn - (ActualLoad / (this->MassFlowRate * Cp));
                             // Again, the outlet temperature cannot be below the freezing temperature (factoring in the tolerance)
-                            if (ToutNew < (this->FreezingTemp + modDeltaTofMin)) ToutNew = this->FreezingTemp + modDeltaTofMin;
+                            if (ToutNew < (this->FreezingTemp + DeltaTofMin)) ToutNew = this->FreezingTemp + DeltaTofMin;
                             ++IterNum;
 
                         } else {
@@ -1314,11 +1315,11 @@ namespace IceThermalStorage {
         // At the first call of ITS model, MyLoad is 0. After that proper MyLoad will be provided by E+.
         // Therefore, Umin is decided between input U and ITS REAL(r64) capacity.
         Real64 Umin =
-            min(max((-(1.0 - modEpsLimitForDisCharge) * QiceMin * modTimeInterval / this->ITSNomCap), (-this->XCurIceFrac + modEpsLimitForX)), 0.0);
+            min(max((-(1.0 - EpsLimitForDisCharge) * QiceMin * TimeInterval / this->ITSNomCap), (-this->XCurIceFrac + EpsLimitForX)), 0.0);
 
         // Calculate CoolingRate with Uact to provide E+.
         Real64 Uact = Umin;
-        Real64 ITSCoolingRateMax = std::abs(Uact * this->ITSNomCap / modTimeInterval);
+        Real64 ITSCoolingRateMax = std::abs(Uact * this->ITSNomCap / TimeInterval);
         Real64 ITSCoolingRateOpt = ITSCoolingRateMax;
         Real64 ITSCoolingRateMin = 0.0;
 
@@ -1410,7 +1411,7 @@ namespace IceThermalStorage {
         // Calculate Umax based on real ITS Max Capacity and remained XCurIceFrac.
         // Umax should be equal or larger than 0.02 for realistic purpose by Dion.
         Real64 Umax =
-            max(min(((1.0 - modEpsLimitForCharge) * QiceMax * modTimeInterval / this->ITSNomCap), (1.0 - this->XCurIceFrac - modEpsLimitForX)), 0.0);
+            max(min(((1.0 - EpsLimitForCharge) * QiceMax * TimeInterval / this->ITSNomCap), (1.0 - this->XCurIceFrac - EpsLimitForX)), 0.0);
 
         // Cannot charge more than the fraction that is left uncharged
         Umax = min(Umax, (1.0 - this->IceFracRemain) / DataHVACGlobals::TimeStepSys);
@@ -1428,7 +1429,7 @@ namespace IceThermalStorage {
         // Calcualte possible ITSChargingRate with Uact, Then error check
         //--------------------------------------------------------
         // Calculate possible ITSChargingRate with Uact
-        Real64 Qice = Uact * this->ITSNomCap / modTimeInterval; //[W]
+        Real64 Qice = Uact * this->ITSNomCap / TimeInterval; //[W]
         // If Qice is equal or less than 0.0, no need to calculate anymore.
         if (Qice <= 0.0) {
             this->Urate = 0.0; //[ratio]
@@ -1443,12 +1444,12 @@ namespace IceThermalStorage {
             Real64 DeltaTemp = Qice / Psychrometrics::CPCW(this->ITSInletTemp) / this->ITSMassFlowRate;
             this->ITSOutletTemp = this->ITSInletTemp + DeltaTemp;
             // Limit leaving temp to be no greater than setpoint or freezing temp minus 1C
-            this->ITSOutletTemp = min(this->ITSOutletTemp, this->ITSOutletSetPointTemp, (modFreezTemp - 1));
+            this->ITSOutletTemp = min(this->ITSOutletTemp, this->ITSOutletSetPointTemp, (FreezTemp - 1));
             // Limit leaving temp to be no less than inlet temp
             this->ITSOutletTemp = max(this->ITSOutletTemp, this->ITSInletTemp);
             DeltaTemp = this->ITSOutletTemp - this->ITSInletTemp;
             Qice = DeltaTemp * Psychrometrics::CPCW(this->ITSInletTemp) * this->ITSMassFlowRate;
-            Uact = Qice / (this->ITSNomCap / modTimeInterval);
+            Uact = Qice / (this->ITSNomCap / TimeInterval);
         } // End of leaving temp checks
 
         this->Urate = Uact;
@@ -1465,7 +1466,7 @@ namespace IceThermalStorage {
 
         // Chiller is remote now, so chiller out is inlet node temp
         Real64 TchillerOut = DataLoopNode::Node(this->PltInletNodeNum).Temp;
-        QiceMaxByChiller = this->UAIceCh * (modFreezTemp - TchillerOut); //[W] = [W/degC]*[degC]
+        QiceMaxByChiller = this->UAIceCh * (FreezTemp - TchillerOut); //[W] = [W/degC]*[degC]
 
         // If it happened, it is occurred at the Discharging or Dormant process.
         if (QiceMaxByChiller <= 0.0) {
@@ -1481,7 +1482,7 @@ namespace IceThermalStorage {
         // Qice is minimized(=0) when ChillerInletTemp is almost same as FreezTemp(=0).
 
         // Initilize
-        Real64 Tfr = modFreezTempIP;
+        Real64 Tfr = FreezTempIP;
         Real64 ChOutletTemp = TempSItoIP(chillerOutletTemp); //[degF] = ConvertSItoIP[degC]
         // Chiller outlet temp must be below freeze temp, or else no charge
         if (ChOutletTemp >= Tfr) {
@@ -1550,7 +1551,7 @@ namespace IceThermalStorage {
                                                            RoutineName);
 
         // Calculate Umyload based on MyLoad from E+
-        Real64 Umyload = -myLoad * modTimeInterval / this->ITSNomCap;
+        Real64 Umyload = -myLoad * TimeInterval / this->ITSNomCap;
         // Calculate Umax and Umin
         // Cannot discharge more than the fraction that is left
         Real64 Umax = -this->IceFracRemain / DataHVACGlobals::TimeStepSys;
@@ -1569,7 +1570,7 @@ namespace IceThermalStorage {
             this->ITSMassFlowRate, this->PltInletNodeNum, this->PltOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
         // Qice is calculate input U which is within boundary between Umin and Umax.
-        Real64 Qice = Uact * this->ITSNomCap / modTimeInterval;
+        Real64 Qice = Uact * this->ITSNomCap / TimeInterval;
         // Qice cannot exceed MaxCap calulated by CalcIceStorageCapacity
         // Note Qice is negative here, MaxCap is positive
         Qice = max(Qice, -MaxCap);
@@ -1583,12 +1584,12 @@ namespace IceThermalStorage {
             Real64 DeltaTemp = Qice / CpFluid / this->ITSMassFlowRate;
             this->ITSOutletTemp = this->ITSInletTemp + DeltaTemp;
             // Limit leaving temp to be no less than setpoint or freezing temp plus 1C
-            this->ITSOutletTemp = max(this->ITSOutletTemp, this->ITSOutletSetPointTemp, (modFreezTemp + 1));
+            this->ITSOutletTemp = max(this->ITSOutletTemp, this->ITSOutletSetPointTemp, (FreezTemp + 1));
             // Limit leaving temp to be no greater than inlet temp
             this->ITSOutletTemp = min(this->ITSOutletTemp, this->ITSInletTemp);
             DeltaTemp = this->ITSOutletTemp - this->ITSInletTemp;
             Qice = DeltaTemp * CpFluid * this->ITSMassFlowRate;
-            Uact = Qice / (this->ITSNomCap / modTimeInterval);
+            Uact = Qice / (this->ITSNomCap / TimeInterval);
         } // End of leaving temp checks
 
         // Calculate reported U value
@@ -1617,7 +1618,7 @@ namespace IceThermalStorage {
             }
         }
 
-        Real64 LogTerm = (ITSInletTemp_loc - modFreezTemp) / (ITSOutletTemp_loc - modFreezTemp);
+        Real64 LogTerm = (ITSInletTemp_loc - FreezTemp) / (ITSOutletTemp_loc - FreezTemp);
 
         if (LogTerm <= 1) {
             QiceMin = 0.0;
@@ -1644,18 +1645,18 @@ namespace IceThermalStorage {
             if (SELECT_CASE_var == ITSType::IceOnCoilInternal) {
                 Real64 y = XCurIceFrac_loc;
                 UAIceCh_loc = (1.3879 - 7.6333 * y + 26.3423 * pow_2(y) - 47.6084 * pow_3(y) + 41.8498 * pow_4(y) - 14.2948 * pow_5(y)) *
-                              this->ITSNomCap / modTimeInterval / 10.0; // [W/C]
+                              this->ITSNomCap / TimeInterval / 10.0; // [W/C]
                 y = 1.0 - XCurIceFrac_loc;
                 UAIceDisCh_loc = (1.3879 - 7.6333 * y + 26.3423 * pow_2(y) - 47.6084 * pow_3(y) + 41.8498 * pow_4(y) - 14.2948 * pow_5(y)) *
-                                 this->ITSNomCap / modTimeInterval / 10.0; // [W/C]
+                                 this->ITSNomCap / TimeInterval / 10.0; // [W/C]
                 HLoss_loc = 0.0;
             } else if (SELECT_CASE_var == ITSType::IceOnCoilExternal) {
                 Real64 y = XCurIceFrac_loc;
                 UAIceCh_loc = (1.3879 - 7.6333 * y + 26.3423 * pow_2(y) - 47.6084 * pow_3(y) + 41.8498 * pow_4(y) - 14.2948 * pow_5(y)) *
-                              this->ITSNomCap / modTimeInterval / 10.0; // [W/C]
+                              this->ITSNomCap / TimeInterval / 10.0; // [W/C]
                 y = 1.0 - XCurIceFrac_loc;
                 UAIceDisCh_loc = (1.1756 - 5.3689 * y + 17.3602 * pow_2(y) - 30.1077 * pow_3(y) + 25.6387 * pow_4(y) - 8.5102 * pow_5(y)) *
-                                 this->ITSNomCap / modTimeInterval / 10.0; // [W/C]
+                                 this->ITSNomCap / TimeInterval / 10.0; // [W/C]
                 HLoss_loc = 0.0;
             }
         }
@@ -1693,8 +1694,8 @@ namespace IceThermalStorage {
         Real64 DeltaTif = std::abs(Tin - Tfr);  // Inlet to freezing temperature difference
         Real64 DeltaTof = std::abs(Tout - Tfr); // Outlet to freezing temperature difference
 
-        if (DeltaTif < modDeltaTifMin) DeltaTif = modDeltaTifMin;
-        if (DeltaTof < modDeltaTofMin) DeltaTof = modDeltaTofMin;
+        if (DeltaTif < DeltaTifMin) DeltaTif = DeltaTifMin;
+        if (DeltaTof < DeltaTofMin) DeltaTof = DeltaTofMin;
 
         CalcDetIceStorLMTDstar = (DeltaTio / std::log(DeltaTif / DeltaTof)) / Tnom;
 
@@ -1702,7 +1703,7 @@ namespace IceThermalStorage {
     }
 
     Real64 CalcQstar(int const CurveIndex,      // curve index
-                     int const CurveIndVarType, // independent variable type for ice storage
+                     enum CurveVars CurveIndVarType, // independent variable type for ice storage
                      Real64 const FracCharged,  // fraction charged for ice storage unit
                      Real64 const LMTDstar,     // normalized log mean temperature difference across the ice storage unit
                      Real64 const MassFlowstar  // normalized mass flow rate through the ice storage unit

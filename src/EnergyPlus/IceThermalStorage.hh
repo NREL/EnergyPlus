@@ -69,51 +69,37 @@ namespace IceThermalStorage {
     extern int NumDetailedIceStorage;
     extern int TotalNumIceStorage;
 
-    struct IceStorageType
+    enum class IceStorageType
     {
-        enum
-        {
-            Simple,
-            Detailed
-        };
+        Simple,
+        Detailed
     };
 
-    struct CurveVars
+    enum class CurveVars
     {
-        enum
-        {
-            FracChargedLMTD,
-            FracDischargedLMTD,
-            LMTDMassFlow,
-            LMTDFracCharged
-        };
+        FracChargedLMTD,
+        FracDischargedLMTD,
+        LMTDMassFlow,
+        LMTDFracCharged
     };
 
-    struct DetIce
+    enum class DetIce
     {
-        enum
-        {
-            InsideMelt, // Inside melt system--charge starting with bare coil
-            OutsideMelt // Outside melt system--charge from existing ice layer on coil
-        };
+        InsideMelt, // Inside melt system--charge starting with bare coil
+        OutsideMelt // Outside melt system--charge from existing ice layer on coil
     };
 
-    struct ITSType
+    enum class ITSType
     {
-        enum
-        {
-            IceOnCoilInternal,
-            IceOnCoilExternal
-        };
+        IceOnCoilInternal,
+        IceOnCoilExternal
     };
 
     struct SimpleIceStorageData : PlantComponent
     {
-        // Members
-        // Input data
         std::string Name;     // User identifier
         std::string ITSType;  // Ice Thermal Storage Type
-        int ITSType_Num;      // Storage Type as number (IceOnCoilInternal,IceOnCoilExternal)
+        enum ITSType ITSType_Num;      // Storage Type as number (IceOnCoilInternal,IceOnCoilExternal)
         int MapNum;           // Number to Map structure
         int UratePtr;         // Charging/Discharging SchedulePtr: u value schedule
         Real64 ITSNomCap;     // Design nominal capacity of Ice Thermal Storage [J] (user input in GJ)
@@ -156,7 +142,7 @@ namespace IceThermalStorage {
 
         // Default Constructor
         SimpleIceStorageData()
-            : ITSType_Num(0), MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSideNum(0),
+            : MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSideNum(0),
               BranchNum(0), CompNum(0), DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForITSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0),
               UAIceDisCh(0.0), HLoss(0.0), XCurIceFrac(0.0), ITSMassFlowRate(0.0), ITSInletTemp(0.0), ITSOutletTemp(0.0), ITSOutletSetPointTemp(0.0),
               ITSCoolingRate(0.0), ITSCoolingEnergy(0.0), CheckEquipName(true), MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSChargingRate(0.0),
@@ -195,8 +181,6 @@ namespace IceThermalStorage {
 
     struct DetailedIceStorageData : PlantComponent
     {
-        // Members
-        // Input data
         std::string Name;         // User identifier
         std::string ScheduleName; // User identifier
         int ScheduleIndex;        // Plant inlet node number for ice storage unit
@@ -212,10 +196,10 @@ namespace IceThermalStorage {
         int MapNum;                     // Number to Map structure
         std::string DischargeCurveName; // Curve name for discharging (used to find the curve index)
         int DischargeCurveNum;          // Curve index for discharging
-        int DischargeCurveTypeNum{};    // Integer version of discharging curve independent variables type
+        enum CurveVars DischargeCurveTypeNum;    // Integer version of discharging curve independent variables type
         std::string ChargeCurveName;    // Curve name for charging (used to find the curve index)
         int ChargeCurveNum;             // Curve index for charging
-        int ChargeCurveTypeNum{};       // Integer version of charging curve independent variables type
+        enum CurveVars ChargeCurveTypeNum;       // Integer version of charging curve independent variables type
         Real64 CurveFitTimeStep;        // Time step used to generate performance data [hours]
         Real64 DischargeParaElecLoad;   // Parasitic electric load duing discharging [dimensionless]
         // (This is multiplied by the tank capacity to obtain elec consump)
@@ -228,7 +212,7 @@ namespace IceThermalStorage {
         Real64 IceFracChange;             // Change in fraction of ice stored during the time step [fraction]
         Real64 IceFracRemaining;          // Fraction of ice remaining in storage [fraction]
         std::string ThawProcessIndicator; // User input determining whether system is inside or outside melt
-        int ThawProcessIndex;             // Conversion of thaw process indicator to integer index
+        enum DetIce ThawProcessIndex;             // Conversion of thaw process indicator to integer index
         Real64 IceFracOnCoil;             // Fraction of ice on the coil (affects charging) [fraction]
         Real64 DischargingRate;           // Rate at which energy is being added (thawing) to ice unit [W]
         Real64 DischargingEnergy;         // Total energy added to the ice storage unit [J]
@@ -257,7 +241,7 @@ namespace IceThermalStorage {
             : ScheduleIndex(0), NomCapacity(0.0), PlantInNodeNum(0), PlantOutNodeNum(0), PlantLoopNum(0), PlantLoopSideNum(0), PlantBranchNum(0),
               PlantCompNum(0), DesignMassFlowRate(0.0), MapNum(0), DischargeCurveNum(0), ChargeCurveNum(0), CurveFitTimeStep(1.0),
               DischargeParaElecLoad(0.0), ChargeParaElecLoad(0.0), TankLossCoeff(0.0), FreezingTemp(0.0), CompLoad(0.0), IceFracChange(0.0),
-              IceFracRemaining(1.0), ThawProcessIndex(0), IceFracOnCoil(1.0), DischargingRate(0.0), DischargingEnergy(0.0), ChargingRate(0.0),
+              IceFracRemaining(1.0), IceFracOnCoil(1.0), DischargingRate(0.0), DischargingEnergy(0.0), ChargingRate(0.0),
               ChargingEnergy(0.0), MassFlowRate(0.0), BypassMassFlowRate(0.0), TankMassFlowRate(0.0), InletTemp(0.0), OutletTemp(0.0),
               TankOutletTemp(0.0), ParasiticElecRate(0.0), ParasiticElecEnergy(0.0), DischargeIterErrors(0), DischargeErrorCount(0),
               ChargeIterErrors(0), ChargeErrorCount(0), ResetXForITSFlag(false), MyEnvrnFlag(true), CheckEquipName(true), MyPlantScanFlag(true),
@@ -295,7 +279,7 @@ namespace IceThermalStorage {
     );
 
     Real64 CalcQstar(int CurveIndex,      // curve index
-                     int CurveIndVarType, // independent variable type for ice storage
+                     enum CurveVars CurveIndVarType, // independent variable type for ice storage
                      Real64 FracCharged,  // fraction charged for ice storage unit
                      Real64 LMTDstar,     // normalized log mean temperature difference across the ice storage unit
                      Real64 MassFlowstar  // normalized mass flow rate through the ice storage unit

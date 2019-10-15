@@ -77,7 +77,7 @@ TEST_F(IceStorageFixture, IceThermalStorage_CalcQstarTest)
 
     int TotDetailedIce = 4;
     int TotCurves = 4;
-    int IceStorageCurveType;
+    enum CurveVars IceStorageCurveType;
     int TestNum;
     Real64 CurveAnswer = 0.0;
     Real64 ExpectedValue = 0.0;
