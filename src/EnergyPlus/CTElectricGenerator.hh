@@ -60,24 +60,12 @@ namespace EnergyPlus {
 
 namespace CTElectricGenerator {
 
-    // Using/Aliasing
     using DataGlobalConstants::iGeneratorCombTurbine;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
     extern int NumCTGenerators; // number of CT Generators specified in input
     extern bool GetCTInput;     // then TRUE, calls subroutine to read input file.
 
     extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
-
-    // Types
 
     struct CTGeneratorSpecs
     {
@@ -134,7 +122,10 @@ namespace CTElectricGenerator {
         Real64 ElecPowerGenerated;        // reporting: power generated (W)
         Real64 ElecEnergyGenerated;       // reporting: power generated (W)
         Real64 HeatRecMaxTemp;            // Max Temp that can be produced in heat recovery
-        int OAInletNode;                  // optional inlet node index pointer for outdoor air for compustion
+        int OAInletNode;                  // optional inlet node index pointer for outdoor air for combustion
+        bool MyEnvrnFlag;
+        bool MyPlantScanFlag;
+        bool MySizeAndNodeInitFlag;
 
         // Default Constructor
         CTGeneratorSpecs()
@@ -146,7 +137,8 @@ namespace CTElectricGenerator {
               DesignHeatRecVolFlowRate(0.0), DesignHeatRecMassFlowRate(0.0), DesignMinExitGasTemp(0.0), DesignAirInletTemp(0.0),
               ExhaustStackTemp(0.0), HeatRecActive(false), HeatRecInletNodeNum(0), HeatRecOutletNodeNum(0), HeatRecInletTemp(0.0),
               HeatRecOutletTemp(0.0), HeatRecMdot(0.0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), FuelMdot(0.0),
-              FuelHeatingValue(0.0), ElecPowerGenerated(0.0), ElecEnergyGenerated(0.0), HeatRecMaxTemp(0.0), OAInletNode(0)
+              FuelHeatingValue(0.0), ElecPowerGenerated(0.0), ElecEnergyGenerated(0.0), HeatRecMaxTemp(0.0), OAInletNode(0), MyEnvrnFlag(true),
+              MyPlantScanFlag(true), MySizeAndNodeInitFlag(true)
         {
         }
     };
@@ -183,8 +175,7 @@ namespace CTElectricGenerator {
     extern Array1D<CTGeneratorSpecs> CTGenerator; // dimension to number of machines
     extern Array1D<ReportVars> CTGeneratorReport;
 
-    // Functions
-
+    // Static functions
     void SimCTGenerator(int GeneratorType,          // type of Generator
                         std::string const &GeneratorName, // user specified name of Generator
                         int &GeneratorIndex,
@@ -205,41 +196,17 @@ namespace CTElectricGenerator {
                                 bool FirstHVACIteration // TRUE if First iteration of simulation
     );
 
-    // End CT Generator Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of CT Generator Module Get Input subroutines
-    //******************************************************************************
-
     void GetCTGeneratorInput();
-
-    // End of Get Input subroutines for the CT Generator Module
-    //******************************************************************************
-
-    // Beginning of Generator model Subroutines
-    // *****************************************************************************
 
     void CalcCTGeneratorModel(int GeneratorNum, // Generator number
                               bool RunFlag,     // TRUE when Generator operating
                               Real64 MyLoad,    // Generator demand
                               bool FirstHVACIteration);
 
-    // End of CT Generator Module Model Subroutines
-    // *****************************************************************************
-
-    // Begin CT Generator Module Utility Subroutines
-    // *****************************************************************************
-
     void InitCTGenerators(int GeneratorNum, // Generator number
                           bool RunFlag,     // TRUE when Generator operating
                           Real64 MyLoad,    // Generator demand
                           bool FirstHVACIteration);
-
-    // End CT Generator Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the CT Generator Module
-    // *****************************************************************************
 
     void UpdateCTGeneratorRecords(bool RunFlag, // TRUE if Generator operating
                                   int Num       // Generator number
@@ -252,10 +219,6 @@ namespace CTElectricGenerator {
                                Real64 &ThermalPower,    // heat power
                                Real64 &ThermalEnergy    // heat energy
     );
-
-    // End of Record Keeping subroutines for the CT Generator Module
-    // *****************************************************************************
-
 } // namespace CTElectricGenerator
 
 } // namespace EnergyPlus

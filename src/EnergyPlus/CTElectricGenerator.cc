@@ -210,8 +210,6 @@ namespace CTElectricGenerator {
         // This routine will get the input
         // required by the CT Generator models.
 
-        using namespace DataIPShortCuts; // Data for field names, blank numerics
-
         int GeneratorNum;               // Generator counter
         int NumAlphas;                  // Number of elements in the alpha array
         int NumNums;                    // Number of elements in the numeric array
@@ -220,11 +218,11 @@ namespace CTElectricGenerator {
         Array1D<Real64> NumArray(12);   // numeric data
         static bool ErrorsFound(false); // error flag
 
-        cCurrentModuleObject = "Generator:CombustionTurbine";
-        NumCTGenerators = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        DataIPShortCuts::cCurrentModuleObject = "Generator:CombustionTurbine";
+        NumCTGenerators = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
         if (NumCTGenerators <= 0) {
-            ShowSevereError("No " + cCurrentModuleObject + " equipment specified in input file");
+            ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
@@ -236,7 +234,7 @@ namespace CTElectricGenerator {
 
         // LOAD ARRAYS WITH CT CURVE FIT Generator DATA
         for (GeneratorNum = 1; GeneratorNum <= NumCTGenerators; ++GeneratorNum) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
+            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           GeneratorNum,
                                           AlphArray,
                                           NumAlphas,
@@ -244,23 +242,23 @@ namespace CTElectricGenerator {
                                           NumNums,
                                           IOStat,
                                           _,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(AlphArray(1), cCurrentModuleObject, ErrorsFound);
+                                          DataIPShortCuts::lAlphaFieldBlanks,
+                                          DataIPShortCuts::cAlphaFieldNames,
+                                          DataIPShortCuts::cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(AlphArray(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
             CTGenerator(GeneratorNum).Name = AlphArray(1);
 
             CTGenerator(GeneratorNum).RatedPowerOutput = NumArray(1);
             if (NumArray(1) == 0.0) {
-                ShowSevereError("Invalid " + cNumericFieldNames(1) + '=' + General::RoundSigDigits(NumArray(1), 2));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' + General::RoundSigDigits(NumArray(1), 2));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             // Not sure what to do with electric nodes, so do not use optional arguments
             CTGenerator(GeneratorNum).ElectricCircuitNode = NodeInputManager::GetOnlySingleNode(
-                AlphArray(2), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Electric, DataLoopNode::NodeConnectionType_Electric, 1, DataLoopNode::ObjectIsNotParent);
+                AlphArray(2), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Electric, DataLoopNode::NodeConnectionType_Electric, 1, DataLoopNode::ObjectIsNotParent);
 
             CTGenerator(GeneratorNum).MinPartLoadRat = NumArray(2);
             CTGenerator(GeneratorNum).MaxPartLoadRat = NumArray(3);
@@ -270,43 +268,43 @@ namespace CTElectricGenerator {
 
             CTGenerator(GeneratorNum).PLBasedFuelInputCurve = CurveManager::GetCurveIndex(AlphArray(3)); // convert curve name to number
             if (CTGenerator(GeneratorNum).PLBasedFuelInputCurve == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(3) + '=' + AlphArray(3));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + AlphArray(3));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             CTGenerator(GeneratorNum).TempBasedFuelInputCurve = CurveManager::GetCurveIndex(AlphArray(4)); // convert curve name to number
             if (CTGenerator(GeneratorNum).TempBasedFuelInputCurve == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(4) + '=' + AlphArray(4));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '=' + AlphArray(4));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             CTGenerator(GeneratorNum).ExhaustFlowCurve = CurveManager::GetCurveIndex(AlphArray(5)); // convert curve name to number
             if (CTGenerator(GeneratorNum).ExhaustFlowCurve == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(5) + '=' + AlphArray(5));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + '=' + AlphArray(5));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             CTGenerator(GeneratorNum).PLBasedExhaustTempCurve = CurveManager::GetCurveIndex(AlphArray(6)); // convert curve name to number
             if (CTGenerator(GeneratorNum).PLBasedExhaustTempCurve == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(6) + '=' + AlphArray(6));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + '=' + AlphArray(6));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             CTGenerator(GeneratorNum).TempBasedExhaustTempCurve = CurveManager::GetCurveIndex(AlphArray(7)); // convert curve name to number
             if (CTGenerator(GeneratorNum).TempBasedExhaustTempCurve == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(7) + '=' + AlphArray(7));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + AlphArray(7));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             CTGenerator(GeneratorNum).QLubeOilRecoveredCurve = CurveManager::GetCurveIndex(AlphArray(8)); // convert curve name to number
             if (CTGenerator(GeneratorNum).QLubeOilRecoveredCurve == 0) {
-                ShowSevereError("Invalid " + cAlphaFieldNames(8) + '=' + AlphArray(8));
-                ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + '=' + AlphArray(8));
+                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
@@ -322,25 +320,25 @@ namespace CTElectricGenerator {
             if (CTGenerator(GeneratorNum).DesignHeatRecVolFlowRate > 0.0) {
                 CTGenerator(GeneratorNum).HeatRecActive = true;
                 CTGenerator(GeneratorNum).HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(
-                    AlphArray(9), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
+                    AlphArray(9), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
                 if (CTGenerator(GeneratorNum).HeatRecInletNodeNum == 0) {
-                    ShowSevereError("Missing Node Name, Heat Recovery Inlet, for " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError("Missing Node Name, Heat Recovery Inlet, for " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
                 CTGenerator(GeneratorNum).HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(
-                    AlphArray(10), ErrorsFound, cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
+                    AlphArray(10), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
                 if (CTGenerator(GeneratorNum).HeatRecOutletNodeNum == 0) {
-                    ShowSevereError("Missing Node Name, Heat Recovery Outlet, for " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError("Missing Node Name, Heat Recovery Outlet, for " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
-                BranchNodeConnections::TestCompSet(cCurrentModuleObject, AlphArray(1), AlphArray(9), AlphArray(10), "Heat Recovery Nodes");
+                BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject, AlphArray(1), AlphArray(9), AlphArray(10), "Heat Recovery Nodes");
                 PlantUtilities::RegisterPlantCompDesignFlow(CTGenerator(GeneratorNum).HeatRecInletNodeNum, CTGenerator(GeneratorNum).DesignHeatRecVolFlowRate);
             } else {
                 CTGenerator(GeneratorNum).HeatRecActive = false;
                 CTGenerator(GeneratorNum).HeatRecInletNodeNum = 0;
                 CTGenerator(GeneratorNum).HeatRecOutletNodeNum = 0;
-                if (!lAlphaFieldBlanks(9) || !lAlphaFieldBlanks(10)) {
-                    ShowWarningError("Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + cCurrentModuleObject + '=' + AlphArray(1));
+                if (!DataIPShortCuts::lAlphaFieldBlanks(9) || !DataIPShortCuts::lAlphaFieldBlanks(10)) {
+                    ShowWarningError("Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError("However, Node names were specified for Heat Recovery inlet or outlet nodes");
                 }
             }
@@ -378,8 +376,8 @@ namespace CTElectricGenerator {
                     CTGenerator(GeneratorNum).FuelType = "OtherFuel2";
 
                 } else {
-                    ShowSevereError("Invalid " + cAlphaFieldNames(11) + '=' + AlphArray(11));
-                    ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
+                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + '=' + AlphArray(11));
+                    ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
             }
@@ -387,19 +385,19 @@ namespace CTElectricGenerator {
             CTGenerator(GeneratorNum).HeatRecMaxTemp = NumArray(12);
 
             // begin CR7021
-            if (lAlphaFieldBlanks(12)) {
+            if (DataIPShortCuts::lAlphaFieldBlanks(12)) {
                 CTGenerator(GeneratorNum).OAInletNode = 0;
             } else {
                 CTGenerator(GeneratorNum).OAInletNode = NodeInputManager::GetOnlySingleNode(AlphArray(12),
                                                                           ErrorsFound,
-                                                                          cCurrentModuleObject,
+                                                                          DataIPShortCuts::cCurrentModuleObject,
                                                                           AlphArray(1),
                                                                           DataLoopNode::NodeType_Air,
                                                                           DataLoopNode::NodeConnectionType_OutsideAirReference,
                                                                           1,
                                                                           DataLoopNode::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(CTGenerator(GeneratorNum).OAInletNode)) {
-                    ShowSevereError(cCurrentModuleObject + ", \"" + CTGenerator(GeneratorNum).Name +
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ", \"" + CTGenerator(GeneratorNum).Name +
                                     "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + AlphArray(12));
                     ShowContinueError("...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                     ErrorsFound = true;
@@ -408,7 +406,7 @@ namespace CTElectricGenerator {
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in processing input for " + cCurrentModuleObject);
+            ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
         }
 
         for (GeneratorNum = 1; GeneratorNum <= NumCTGenerators; ++GeneratorNum) {
@@ -779,25 +777,16 @@ namespace CTElectricGenerator {
         int HeatRecOutletNode;           // outlet node number in heat recovery loop
         static bool MyOneTimeFlag(true); // Initialization flag
 
-        static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-        static Array1D_bool MyPlantScanFlag;
-        static Array1D_bool MySizeAndNodeInitFlag;
         Real64 mdot;
         Real64 rho;
         bool errFlag;
 
         // Do the one time initializations
         if (MyOneTimeFlag) {
-            MyEnvrnFlag.allocate(NumCTGenerators);
-            MyPlantScanFlag.allocate(NumCTGenerators);
-            MySizeAndNodeInitFlag.allocate(NumCTGenerators);
-            MyEnvrnFlag = true;
-            MyPlantScanFlag = true;
             MyOneTimeFlag = false;
-            MySizeAndNodeInitFlag = true;
         }
 
-        if (MyPlantScanFlag(GeneratorNum) && allocated(DataPlant::PlantLoop) && CTGenerator(GeneratorNum).HeatRecActive) {
+        if (CTGenerator(GeneratorNum).MyPlantScanFlag && allocated(DataPlant::PlantLoop) && CTGenerator(GeneratorNum).HeatRecActive) {
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(CTGenerator(GeneratorNum).Name,
                                     DataPlant::TypeOf_Generator_CTurbine,
@@ -814,10 +803,10 @@ namespace CTElectricGenerator {
             if (errFlag) {
                 ShowFatalError("InitCTGenerators: Program terminated due to previous condition(s).");
             }
-            MyPlantScanFlag(GeneratorNum) = false;
+            CTGenerator(GeneratorNum).MyPlantScanFlag = false;
         }
 
-        if (MySizeAndNodeInitFlag(GeneratorNum) && (!MyPlantScanFlag(GeneratorNum)) && CTGenerator(GeneratorNum).HeatRecActive) {
+        if (CTGenerator(GeneratorNum).MySizeAndNodeInitFlag && (!CTGenerator(GeneratorNum).MyPlantScanFlag) && CTGenerator(GeneratorNum).HeatRecActive) {
             HeatRecInletNode = CTGenerator(GeneratorNum).HeatRecInletNodeNum;
             HeatRecOutletNode = CTGenerator(GeneratorNum).HeatRecOutletNodeNum;
 
@@ -838,11 +827,11 @@ namespace CTElectricGenerator {
                                CTGenerator(GeneratorNum).HRBranchNum,
                                CTGenerator(GeneratorNum).HRCompNum);
 
-            MySizeAndNodeInitFlag(GeneratorNum) = false;
+            CTGenerator(GeneratorNum).MySizeAndNodeInitFlag = false;
         } // end one time inits
 
         // Do the Begin Environment initializations
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag(GeneratorNum) && CTGenerator(GeneratorNum).HeatRecActive) {
+        if (DataGlobals::BeginEnvrnFlag && CTGenerator(GeneratorNum).MyEnvrnFlag && CTGenerator(GeneratorNum).HeatRecActive) {
             HeatRecInletNode = CTGenerator(GeneratorNum).HeatRecInletNodeNum;
             HeatRecOutletNode = CTGenerator(GeneratorNum).HeatRecOutletNodeNum;
             // set the node Temperature, assuming freeze control
@@ -858,11 +847,11 @@ namespace CTElectricGenerator {
                                CTGenerator(GeneratorNum).HRBranchNum,
                                CTGenerator(GeneratorNum).HRCompNum);
 
-            MyEnvrnFlag(GeneratorNum) = false;
+            CTGenerator(GeneratorNum).MyEnvrnFlag = false;
         } // end environmental inits
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(GeneratorNum) = true;
+            CTGenerator(GeneratorNum).MyEnvrnFlag = true;
         }
 
         if (CTGenerator(GeneratorNum).HeatRecActive) {
