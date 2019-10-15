@@ -98,6 +98,7 @@
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
+#include <EnergyPlus/IceThermalStorage.hh>
 
 namespace EnergyPlus {
 
@@ -1230,9 +1231,11 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Simple")) {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceSimple;
                                 this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
+                                this_comp.compPtr = IceThermalStorage::IceStorageSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Detailed")) {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceDetailed;
                                 this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
+                                this_comp.compPtr = IceThermalStorage::DetailedIceStorageData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "TemperingValve")) {
                                 this_comp.compPtr = PlantValves::TemperValveData::factory(CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_ValveTempering;

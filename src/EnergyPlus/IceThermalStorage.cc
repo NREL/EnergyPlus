@@ -115,10 +115,11 @@ namespace IceThermalStorage {
     Real64 const modDeltaTifMin(1.0); // Minimum allowed inlet side temperature difference [C]
     // This is (Tin - Tfreezing)
 
-    // ITS numbers and FoundOrNot
     int modNumIceStorages(0);
     int modNumDetIceStorages(0);
     int modTotalIceStorages(0);
+
+    bool getITSInput = true;
 
     // Object Data
     Array1D<IceStorageSpecs> IceStorage;        // dimension to number of machines
@@ -138,211 +139,158 @@ namespace IceThermalStorage {
         IceStorageTypeMap.deallocate();
     }
 
-    void IceStorageSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    PlantComponent *IceStorageSpecs::factory(std::string const &objectName)
     {
+        // Process the input data for boilers if it hasn't been done already
+        if (getITSInput) {
+            GetIceStorageInput();
+            getITSInput = false;
+        }
+
+        // Now look for this particular pipe in the list
+        for (auto &ITS : IceStorage) {
+            if (ITS.Name == objectName) {
+                return &ITS;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalSimpleIceStorageFactory: Error getting inputs for simple ice storage named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    PlantComponent *DetailedIceStorageData::factory(std::string const &objectName)
+    {
+        // Process the input data for boilers if it hasn't been done already
+        if (getITSInput) {
+            GetIceStorageInput();
+            getITSInput = false;
+        }
+
+        // Now look for this particular pipe in the list
+        for (auto &ITS : DetIceStor) {
+            if (ITS.Name == objectName) {
+                return &ITS;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalDetailedIceStorageFactory: Error getting inputs for detailed ice storage named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+    void IceStorageSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool RunFlag)
+    {
+        std::string const RoutineName("IceStorageSpecs::simulate");
+
+        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
+            this->ResetXForITSFlag = true;
+            this->MyEnvrnFlag = false;
+        }
+
+        if (!DataGlobals::BeginEnvrnFlag) {
+            this->MyEnvrnFlag = true;
+        }
+
+        this->InitSimpleIceStorage();
+
+        //------------------------------------------------------------------------
+        // FIRST PROCESS (MyLoad = 0.0 as IN)
+        // At this moment as first calling of ITS, ITS provide ONLY MaxCap/OptCap/MinCap.
+        //------------------------------------------------------------------------
+        // First process is in subroutine CalcIceStorageCapacity(MaxCap,MinCap,OptCap) shown bellow.
+
+        //------------------------------------------------------------------------
+        // SECOND PROCESS (MyLoad is provided by E+ based on MaxCap/OptCap/MinCap)
+        //------------------------------------------------------------------------
+        // Below routines are starting when second calling.
+        // After previous return, MyLoad is calculated based on MaxCap, OptCap, and MinCap.
+        // Then PlandSupplySideManager provides MyLoad to simulate Ice Thermal Storage.
+        // The process will be decided based on sign(+,-,0) of input U.
+
+        // MJW 19 Sep 2005 - New approach - calculate MyLoad locally from inlet node temp
+        //                   and outlet node setpoint until MyLoad that is passed in behaves well
+
+        // DSU? can we now use MyLoad? lets not yet to try to avoid scope creep
+
+        Real64 TempSetPt(0.0);
+        Real64 TempIn = DataLoopNode::Node(this->PltInletNodeNum).Temp;
+        {
+            auto const SELECT_CASE_var1(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
+            if (SELECT_CASE_var1 == DataPlant::SingleSetPoint) {
+                TempSetPt = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPoint;
+            } else if (SELECT_CASE_var1 == DataPlant::DualSetPointDeadBand) {
+                TempSetPt = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPointHi;
+            } else {
+                assert(false);
+            }
+        }
+        Real64 DemandMdot = this->DesignMassFlowRate;
+
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
+                DataPlant::PlantLoop(this->LoopNum).FluidName, TempIn, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+
+        Real64 MyLoad2 = (DemandMdot * Cp * (TempIn - TempSetPt));
+        MyLoad = MyLoad2;
+
+        //     Set fraction of ice remaining in storage
+        this->XCurIceFrac = this->IceFracRemain;
+
+        //***** Dormant Process for ITS *****************************************
+        //************************************************************************
+        //        IF( U .EQ. 0.0 ) THEN
+        if ((MyLoad2 == 0.0) || (DemandMdot == 0.0)) {
+            this->CalcIceStorageDormant();
+
+            //***** Charging Process for ITS *****************************************
+            //************************************************************************
+            //        ELSE IF( U .GT. 0.0 ) THEN
+        } else if (MyLoad2 < 0.0) {
+
+            Real64 MaxCap;
+            Real64 MinCap;
+            Real64 OptCap;
+            this->CalcIceStorageCapacity(MaxCap, MinCap, OptCap);
+            this->CalcIceStorageCharge();
+
+            //***** Discharging Process for ITS *****************************************
+            //************************************************************************
+            //        ELSE IF( U .LT. 0.0 ) THEN
+        } else if (MyLoad2 > 0.0) {
+
+            Real64 MaxCap;
+            Real64 MinCap;
+            Real64 OptCap;
+            this->CalcIceStorageCapacity(MaxCap, MinCap, OptCap);
+            this->CalcIceStorageDischarge(MyLoad, RunFlag, MaxCap);
+        } // Based on input of U value, deciding Dormant/Charge/Discharge process
+
+        // Update Node properties: mdot and Temperature
+        this->UpdateNode(MyLoad2, RunFlag);
+
+        // Update report variables.
+        this->RecordOutput(MyLoad2, RunFlag);
 
     }
 
     void DetailedIceStorageData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
     {
-
-    }
-
-    void SimIceStorage(std::string const &IceStorageType,
-                       std::string const &IceStorageName,
-                       int &CompIndex,
-                       bool const RunFlag,
-                       bool const FirstIteration,
-                       bool const InitLoopEquip,
-                       Real64 &MyLoad)
-    {
-
-        static std::string const RoutineName("SimIceStorage");
-        static bool firstTime(true);
-        int IceStorageNum;
-
-        //  Set initialization flags
-        //  Allow ice to build up during warmup?
-        //  IF( (BeginEnvrnFlag) .OR. (WarmupFlag) ) THEN
-
-        if (firstTime) {
-            GetIceStorageInput();
-            firstTime = false;
+        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
+            this->ResetXForITSFlag = true;
+            this->MyEnvrnFlag = false;
         }
 
-        // Find the correct Equipment
-        if (CompIndex == 0) {
-            IceStorageNum = UtilityRoutines::FindItemInList(IceStorageName, IceStorageTypeMap, modTotalIceStorages);
-            if (IceStorageNum == 0) {
-                ShowFatalError("SimIceStorage: Unit not found=" + IceStorageName);
-            }
-            CompIndex = IceStorageNum;
-        } else {
-            IceStorageNum = CompIndex;
-            if (IceStorageNum > modTotalIceStorages || IceStorageNum < 1) {
-                ShowFatalError("SimIceStorage:  Invalid CompIndex passed=" + General::TrimSigDigits(IceStorageNum) +
-                               ", Number of Units=" + General::TrimSigDigits(modTotalIceStorages) + ", Entered Unit name=" + IceStorageName);
-            }
-
-            for (auto &thisITS : IceStorage) {
-                if (IceStorageName != thisITS.Name) {
-                    ShowFatalError("SimIceStorage: Invalid CompIndex passed=" + General::TrimSigDigits(IceStorageNum) + ", Unit name=" + IceStorageName +
-                                   ", stored Unit Name for that index=" + thisITS.Name);
-                }
-                thisITS.CheckEquipName = false;
-            }
-
-            for (auto &thisITS : DetIceStor) {
-                if (IceStorageName != thisITS.Name) {
-                    ShowFatalError("SimIceStorage: Invalid CompIndex passed=" + General::TrimSigDigits(IceStorageNum) + ", Unit name=" + IceStorageName +
-                                   ", stored Unit Name for that index=" + thisITS.Name);
-                }
-                thisITS.CheckEquipName = false;
-            }
+        if (!DataGlobals::BeginEnvrnFlag) {
+            this->MyEnvrnFlag = true;
         }
 
-        int iceNum = IceStorageTypeMap(IceStorageNum).LocalEqNum;
+        this->InitDetailedIceStorage(); // Initialize detailed ice storage
 
-        {
-            auto const SELECT_CASE_var(IceStorageTypeMap(IceStorageNum).StorageType_Num);
+        this->SimDetailedIceStorage(); // Simulate detailed ice storage
 
-            if (SELECT_CASE_var == IceStorageType::Simple) {
-                if (DataGlobals::BeginEnvrnFlag && IceStorage(iceNum).MyEnvrnFlag) {
-                    IceStorage(iceNum).ResetXForITSFlag = true;
-                    IceStorage(iceNum).MyEnvrnFlag = false;
-                }
+        this->UpdateDetailedIceStorage(); // Update detailed ice storage
 
-                if (!DataGlobals::BeginEnvrnFlag) {
-                    IceStorage(iceNum).MyEnvrnFlag = true;
-                }
-            }  else if (SELECT_CASE_var == IceStorageType::Detailed) {
-                if (DataGlobals::BeginEnvrnFlag && DetIceStor(iceNum).MyEnvrnFlag) {
-                    DetIceStor(iceNum).ResetXForITSFlag = true;
-                    DetIceStor(iceNum).MyEnvrnFlag = false;
-                }
-
-                if (!DataGlobals::BeginEnvrnFlag) {
-                    DetIceStor(iceNum).MyEnvrnFlag = true;
-                }
-            }
-        }
-
-        {
-            auto const SELECT_CASE_var(IceStorageTypeMap(IceStorageNum).StorageType_Num);
-
-            if (SELECT_CASE_var == IceStorageType::Simple) {
-
-                //------------------------------------------------------------------------
-                // READING INPUT when first calling SimIceStorage
-                //------------------------------------------------------------------------
-                iceNum = IceStorageTypeMap(IceStorageNum).LocalEqNum;
-                auto &thisITS = IceStorage(iceNum);
-
-                thisITS.InitSimpleIceStorage();
-
-                if (InitLoopEquip) {
-                    return;
-                } // End Of InitLoopEquip
-
-                //------------------------------------------------------------------------
-                // FIRST PROCESS (MyLoad = 0.0 as IN)
-                // At this moment as first calling of ITS, ITS provide ONLY MaxCap/OptCap/MinCap.
-                //------------------------------------------------------------------------
-                // First process is in subroutine CalcIceStorageCapacity(MaxCap,MinCap,OptCap) shown bellow.
-
-                //------------------------------------------------------------------------
-                // SECOND PROCESS (MyLoad is provided by E+ based on MaxCap/OptCap/MinCap)
-                //------------------------------------------------------------------------
-                // Below routines are starting when second calling.
-                // After previous return, MyLoad is calculated based on MaxCap, OptCap, and MinCap.
-                // Then PlandSupplySideManager provides MyLoad to simulate Ice Thermal Storage.
-                // The process will be decided based on sign(+,-,0) of input U.
-
-                // MJW 19 Sep 2005 - New approach - calculate MyLoad locally from inlet node temp
-                //                   and outlet node setpoint until MyLoad that is passed in behaves well
-
-                // DSU? can we now use MyLoad? lets not yet to try to avoid scope creep
-
-                Real64 TempSetPt(0.0);
-                Real64 TempIn = DataLoopNode::Node(IceStorage(iceNum).PltInletNodeNum).Temp;
-                {
-                    auto const SELECT_CASE_var1(DataPlant::PlantLoop(IceStorage(iceNum).LoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var1 == DataPlant::SingleSetPoint) {
-                        TempSetPt = DataLoopNode::Node(IceStorage(iceNum).PltOutletNodeNum).TempSetPoint;
-                    } else if (SELECT_CASE_var1 == DataPlant::DualSetPointDeadBand) {
-                        TempSetPt = DataLoopNode::Node(IceStorage(iceNum).PltOutletNodeNum).TempSetPointHi;
-                    } else {
-                        assert(false);
-                    }
-                }
-                Real64 DemandMdot = IceStorage(iceNum).DesignMassFlowRate;
-
-                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-                        DataPlant::PlantLoop(IceStorage(iceNum).LoopNum).FluidName, TempIn, DataPlant::PlantLoop(IceStorage(iceNum).LoopNum).FluidIndex, RoutineName);
-
-                Real64 MyLoad2 = (DemandMdot * Cp * (TempIn - TempSetPt));
-                MyLoad = MyLoad2;
-
-                //     Set fraction of ice remaining in storage
-                IceStorage(iceNum).XCurIceFrac = IceStorage(iceNum).IceFracRemain;
-
-                //***** Dormant Process for ITS *****************************************
-                //************************************************************************
-                //        IF( U .EQ. 0.0 ) THEN
-                if ((MyLoad2 == 0.0) || (DemandMdot == 0.0)) {
-                    thisITS.CalcIceStorageDormant();
-
-                    //***** Charging Process for ITS *****************************************
-                    //************************************************************************
-                    //        ELSE IF( U .GT. 0.0 ) THEN
-                } else if (MyLoad2 < 0.0) {
-
-                    Real64 MaxCap;
-                    Real64 MinCap;
-                    Real64 OptCap;
-                    thisITS.CalcIceStorageCapacity(MaxCap, MinCap, OptCap);
-                    thisITS.CalcIceStorageCharge();
-
-                    //***** Discharging Process for ITS *****************************************
-                    //************************************************************************
-                    //        ELSE IF( U .LT. 0.0 ) THEN
-                } else if (MyLoad2 > 0.0) {
-
-                    Real64 MaxCap;
-                    Real64 MinCap;
-                    Real64 OptCap;
-                    thisITS.CalcIceStorageCapacity(MaxCap, MinCap, OptCap);
-                    thisITS.CalcIceStorageDischarge(MyLoad, RunFlag, FirstIteration, MaxCap);
-                } // Based on input of U value, deciding Dormant/Charge/Discharge process
-
-                // Update Node properties: mdot and Temperature
-                thisITS.UpdateNode(MyLoad2, RunFlag);
-
-                // Update report variables.
-                thisITS.RecordOutput(MyLoad2, RunFlag);
-
-            } else if (SELECT_CASE_var == IceStorageType::Detailed) {
-
-                iceNum = IceStorageTypeMap(IceStorageNum).LocalEqNum;
-                auto &thisITS = DetIceStor(iceNum);
-
-                // Read input when first calling SimIceStorage
-                if (InitLoopEquip) {
-                    return;
-                } // End Of InitLoopEquip
-
-                thisITS.InitDetailedIceStorage(); // Initialize detailed ice storage
-
-                thisITS.SimDetailedIceStorage(); // Simulate detailed ice storage
-
-                thisITS.UpdateDetailedIceStorage(); // Update detailed ice storage
-
-                thisITS.ReportDetailedIceStorage(); // Report detailed ice storage
-
-            } else {
-                ShowFatalError("Specified IceStorage not found in SimIceStorage" + IceStorageType);
-            }
-        }
+        this->ReportDetailedIceStorage(); // Report detailed ice storage
     }
 
     void DetailedIceStorageData::SimDetailedIceStorage()
@@ -749,8 +697,6 @@ namespace IceThermalStorage {
         // information from the input file, count the number of
         // heating and cooling loops and begin to fill the
         // arrays associated with the type PlantLoopProps.
-
-        // METHODOLOGY EMPLOYED: to be determined...
 
         bool ErrorsFound;
 
@@ -1646,7 +1592,6 @@ namespace IceThermalStorage {
 
     void IceStorageSpecs::CalcIceStorageDischarge(Real64 const myLoad,                  // operating load
                                  bool const RunFlag,                   // TRUE when ice storage operating
-                                 bool const EP_UNUSED(FirstIteration), // TRUE when first iteration of timestep
                                  Real64 const MaxCap                   // Max possible discharge rate (positive value)
     )
     {

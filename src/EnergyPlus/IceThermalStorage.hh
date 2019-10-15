@@ -191,6 +191,8 @@ namespace IceThermalStorage {
         {
         }
 
+        static PlantComponent *factory(std::string const &objectName);
+
         void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag);
 
         void InitSimpleIceStorage();
@@ -199,7 +201,7 @@ namespace IceThermalStorage {
 
         void CalcIceStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
 
-        void CalcIceStorageDischarge(Real64 myLoad, bool RunFlag, bool FirstIteration, Real64 MaxCap);
+        void CalcIceStorageDischarge(Real64 myLoad, bool RunFlag, Real64 MaxCap);
 
         void CalcQiceDischageMax(Real64 &QiceMin);
 
@@ -290,6 +292,8 @@ namespace IceThermalStorage {
         {
         }
 
+        static PlantComponent *factory(std::string const &objectName);
+
         void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag);
 
         void InitDetailedIceStorage();
@@ -311,14 +315,6 @@ namespace IceThermalStorage {
     // Functions
 
     void clear_state();
-
-    void SimIceStorage(std::string const &IceStorageType,
-                       std::string const &IceStorageName,
-                       int &CompIndex,
-                       bool RunFlag,
-                       bool FirstIteration,
-                       bool InitLoopEquip,
-                       Real64 &MyLoad);
 
     void GetIceStorageInput();
 

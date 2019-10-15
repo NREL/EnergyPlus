@@ -192,12 +192,10 @@ namespace PlantLoopEquip {
         using EvaporativeFluidCoolers::SimEvapFluidCoolers;
         using FuelCellElectricGenerator::SimFuelCellPlantHeatRecovery;
         using ICEngineElectricGenerator::SimICEPlantHeatRecovery;
-        using IceThermalStorage::SimIceStorage;
         using MicroCHPElectricGenerator::SimMicroCHPPlantHeatRecovery;
         using MicroturbineElectricGenerator::SimMTPlantHeatRecovery;
         using PlantHeatExchangerFluidToFluid::SimFluidHeatExchanger;
 
-        // using PlantLoadProfile::PlantProfileData::simulate;
         using BaseboardRadiator::UpdateBaseboardPlantConnection;
         using HVACVariableRefrigerantFlow::SimVRFCondenserPlant;
         using HWBaseboardRadiator::UpdateHWBaseboardPlantConnection;
@@ -817,39 +815,10 @@ namespace PlantLoopEquip {
             }
 
             if (EquipTypeNum == TypeOf_TS_IceSimple) {
-
-                SimIceStorage(sim_component.TypeOf,
-                              sim_component.Name,
-                              EquipNum,
-                              RunFlag,
-                              FirstHVACIteration,
-                              InitLoopEquip,
-                              CurLoad); // DSU | ,EquipFlowCtrl
-
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = 0.0;
-                    sim_component.MinLoad = 0.0;
-                    sim_component.OptLoad = 0.0;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_TS_IceDetailed) {
-
-                SimIceStorage(sim_component.TypeOf,
-                              sim_component.Name,
-                              EquipNum,
-                              RunFlag,
-                              FirstHVACIteration,
-                              InitLoopEquip,
-                              CurLoad); // DSU | ,EquipFlowCtrl
-
-                // Not sure what this really needs to do here...
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = 0.0;
-                    sim_component.MinLoad = 0.0;
-                    sim_component.OptLoad = 0.0;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if ((EquipTypeNum == TypeOf_ChilledWaterTankMixed) || (EquipTypeNum == TypeOf_ChilledWaterTankStratified)) {
                 SimWaterThermalTank(EquipTypeNum,
