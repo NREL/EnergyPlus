@@ -98,8 +98,6 @@ namespace CTElectricGenerator {
     int NumCTGenerators(0); // number of CT Generators specified in input
     bool GetCTInput(true);  // then TRUE, calls subroutine to read input file.
 
-    Array1D_bool CheckEquipName;
-
     Array1D<CTGeneratorSpecs> CTGenerator; // dimension to number of machines
     Array1D<ReportVars> CTGeneratorReport;
 
@@ -120,7 +118,7 @@ namespace CTElectricGenerator {
         // gets the input for the models, initializes simulation variables, call
         // the appropriate model and sets up reporting variables.
 
-        int GenNum; // Generator number counter
+        int genNum; // Generator number counter
 
         // Get Generator data from input file
         if (GetCTInput) {
@@ -130,27 +128,27 @@ namespace CTElectricGenerator {
 
         // SELECT and CALL MODELS
         if (GeneratorIndex == 0) {
-            GenNum = UtilityRoutines::FindItemInList(GeneratorName, CTGenerator);
-            if (GenNum == 0) ShowFatalError("SimCTGenerator: Specified Generator not one of Valid COMBUSTION Turbine Generators " + GeneratorName);
-            GeneratorIndex = GenNum;
+            genNum = UtilityRoutines::FindItemInList(GeneratorName, CTGenerator);
+            if (genNum == 0) ShowFatalError("SimCTGenerator: Specified Generator not one of Valid COMBUSTION Turbine Generators " + GeneratorName);
+            GeneratorIndex = genNum;
         } else {
-            GenNum = GeneratorIndex;
-            if (GenNum > NumCTGenerators || GenNum < 1) {
-                ShowFatalError("SimCTGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(GenNum) +
+            genNum = GeneratorIndex;
+            if (genNum > NumCTGenerators || genNum < 1) {
+                ShowFatalError("SimCTGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(genNum) +
                                ", Number of CT Engine Generators=" + General::TrimSigDigits(NumCTGenerators) + ", Generator name=" + GeneratorName);
             }
-            if (CheckEquipName(GenNum)) {
-                if (GeneratorName != CTGenerator(GenNum).Name) {
-                    ShowFatalError("SimCTGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(GenNum) + ", Generator name=" + GeneratorName +
-                                   ", stored Generator Name for that index=" + CTGenerator(GenNum).Name);
+            if (CTGenerator(genNum).CheckEquipName) {
+                if (GeneratorName != CTGenerator(genNum).Name) {
+                    ShowFatalError("SimCTGenerator: Invalid GeneratorIndex passed=" + General::TrimSigDigits(genNum) + ", Generator name=" + GeneratorName +
+                                   ", stored Generator Name for that index=" + CTGenerator(genNum).Name);
                 }
-                CheckEquipName(GenNum) = false;
+                CTGenerator(genNum).CheckEquipName = false;
             }
         }
 
-        InitCTGenerators(GenNum, RunFlag, MyLoad, FirstHVACIteration);
-        CalcCTGeneratorModel(GenNum, RunFlag, MyLoad, FirstHVACIteration);
-        UpdateCTGeneratorRecords(RunFlag, GenNum);
+        InitCTGenerators(genNum, RunFlag, MyLoad, FirstHVACIteration);
+        CalcCTGeneratorModel(genNum, RunFlag, MyLoad, FirstHVACIteration);
+        UpdateCTGeneratorRecords(RunFlag, genNum);
     }
 
     void SimCTPlantHeatRecovery(std::string const &EP_UNUSED(CompType), // unused1208
@@ -210,7 +208,7 @@ namespace CTElectricGenerator {
         // This routine will get the input
         // required by the CT Generator models.
 
-        int GeneratorNum;               // Generator counter
+        int genNum;               // Generator counter
         int NumAlphas;                  // Number of elements in the alpha array
         int NumNums;                    // Number of elements in the numeric array
         int IOStat;                     // IO Status when calling get input subroutine
@@ -228,14 +226,13 @@ namespace CTElectricGenerator {
 
         // ALLOCATE ARRAYS
         CTGenerator.allocate(NumCTGenerators);
-        CheckEquipName.dimension(NumCTGenerators, true);
 
         CTGeneratorReport.allocate(NumCTGenerators);
 
         // LOAD ARRAYS WITH CT CURVE FIT Generator DATA
-        for (GeneratorNum = 1; GeneratorNum <= NumCTGenerators; ++GeneratorNum) {
+        for (genNum = 1; genNum <= NumCTGenerators; ++genNum) {
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
-                                          GeneratorNum,
+                                          genNum,
                                           AlphArray,
                                           NumAlphas,
                                           NumArray,
@@ -247,9 +244,9 @@ namespace CTElectricGenerator {
                                           DataIPShortCuts::cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(AlphArray(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
 
-            CTGenerator(GeneratorNum).Name = AlphArray(1);
+            CTGenerator(genNum).Name = AlphArray(1);
 
-            CTGenerator(GeneratorNum).RatedPowerOutput = NumArray(1);
+            CTGenerator(genNum).RatedPowerOutput = NumArray(1);
             if (NumArray(1) == 0.0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' + General::RoundSigDigits(NumArray(1), 2));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
@@ -257,86 +254,86 @@ namespace CTElectricGenerator {
             }
 
             // Not sure what to do with electric nodes, so do not use optional arguments
-            CTGenerator(GeneratorNum).ElectricCircuitNode = NodeInputManager::GetOnlySingleNode(
+            CTGenerator(genNum).ElectricCircuitNode = NodeInputManager::GetOnlySingleNode(
                 AlphArray(2), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Electric, DataLoopNode::NodeConnectionType_Electric, 1, DataLoopNode::ObjectIsNotParent);
 
-            CTGenerator(GeneratorNum).MinPartLoadRat = NumArray(2);
-            CTGenerator(GeneratorNum).MaxPartLoadRat = NumArray(3);
-            CTGenerator(GeneratorNum).OptPartLoadRat = NumArray(4);
+            CTGenerator(genNum).MinPartLoadRat = NumArray(2);
+            CTGenerator(genNum).MaxPartLoadRat = NumArray(3);
+            CTGenerator(genNum).OptPartLoadRat = NumArray(4);
 
             // Load Special CT Generator Input
 
-            CTGenerator(GeneratorNum).PLBasedFuelInputCurve = CurveManager::GetCurveIndex(AlphArray(3)); // convert curve name to number
-            if (CTGenerator(GeneratorNum).PLBasedFuelInputCurve == 0) {
+            CTGenerator(genNum).PLBasedFuelInputCurve = CurveManager::GetCurveIndex(AlphArray(3)); // convert curve name to number
+            if (CTGenerator(genNum).PLBasedFuelInputCurve == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + AlphArray(3));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            CTGenerator(GeneratorNum).TempBasedFuelInputCurve = CurveManager::GetCurveIndex(AlphArray(4)); // convert curve name to number
-            if (CTGenerator(GeneratorNum).TempBasedFuelInputCurve == 0) {
+            CTGenerator(genNum).TempBasedFuelInputCurve = CurveManager::GetCurveIndex(AlphArray(4)); // convert curve name to number
+            if (CTGenerator(genNum).TempBasedFuelInputCurve == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '=' + AlphArray(4));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            CTGenerator(GeneratorNum).ExhaustFlowCurve = CurveManager::GetCurveIndex(AlphArray(5)); // convert curve name to number
-            if (CTGenerator(GeneratorNum).ExhaustFlowCurve == 0) {
+            CTGenerator(genNum).ExhaustFlowCurve = CurveManager::GetCurveIndex(AlphArray(5)); // convert curve name to number
+            if (CTGenerator(genNum).ExhaustFlowCurve == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + '=' + AlphArray(5));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            CTGenerator(GeneratorNum).PLBasedExhaustTempCurve = CurveManager::GetCurveIndex(AlphArray(6)); // convert curve name to number
-            if (CTGenerator(GeneratorNum).PLBasedExhaustTempCurve == 0) {
+            CTGenerator(genNum).PLBasedExhaustTempCurve = CurveManager::GetCurveIndex(AlphArray(6)); // convert curve name to number
+            if (CTGenerator(genNum).PLBasedExhaustTempCurve == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + '=' + AlphArray(6));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            CTGenerator(GeneratorNum).TempBasedExhaustTempCurve = CurveManager::GetCurveIndex(AlphArray(7)); // convert curve name to number
-            if (CTGenerator(GeneratorNum).TempBasedExhaustTempCurve == 0) {
+            CTGenerator(genNum).TempBasedExhaustTempCurve = CurveManager::GetCurveIndex(AlphArray(7)); // convert curve name to number
+            if (CTGenerator(genNum).TempBasedExhaustTempCurve == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + AlphArray(7));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            CTGenerator(GeneratorNum).QLubeOilRecoveredCurve = CurveManager::GetCurveIndex(AlphArray(8)); // convert curve name to number
-            if (CTGenerator(GeneratorNum).QLubeOilRecoveredCurve == 0) {
+            CTGenerator(genNum).QLubeOilRecoveredCurve = CurveManager::GetCurveIndex(AlphArray(8)); // convert curve name to number
+            if (CTGenerator(genNum).QLubeOilRecoveredCurve == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + '=' + AlphArray(8));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            CTGenerator(GeneratorNum).UACoef(1) = NumArray(5);
-            CTGenerator(GeneratorNum).UACoef(2) = NumArray(6);
+            CTGenerator(genNum).UACoef(1) = NumArray(5);
+            CTGenerator(genNum).UACoef(2) = NumArray(6);
 
-            CTGenerator(GeneratorNum).MaxExhaustperCTPower = NumArray(7);
-            CTGenerator(GeneratorNum).DesignMinExitGasTemp = NumArray(8);
-            CTGenerator(GeneratorNum).DesignAirInletTemp = NumArray(9);
-            CTGenerator(GeneratorNum).FuelHeatingValue = NumArray(10);
-            CTGenerator(GeneratorNum).DesignHeatRecVolFlowRate = NumArray(11);
+            CTGenerator(genNum).MaxExhaustperCTPower = NumArray(7);
+            CTGenerator(genNum).DesignMinExitGasTemp = NumArray(8);
+            CTGenerator(genNum).DesignAirInletTemp = NumArray(9);
+            CTGenerator(genNum).FuelHeatingValue = NumArray(10);
+            CTGenerator(genNum).DesignHeatRecVolFlowRate = NumArray(11);
 
-            if (CTGenerator(GeneratorNum).DesignHeatRecVolFlowRate > 0.0) {
-                CTGenerator(GeneratorNum).HeatRecActive = true;
-                CTGenerator(GeneratorNum).HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(
+            if (CTGenerator(genNum).DesignHeatRecVolFlowRate > 0.0) {
+                CTGenerator(genNum).HeatRecActive = true;
+                CTGenerator(genNum).HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(
                     AlphArray(9), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent);
-                if (CTGenerator(GeneratorNum).HeatRecInletNodeNum == 0) {
+                if (CTGenerator(genNum).HeatRecInletNodeNum == 0) {
                     ShowSevereError("Missing Node Name, Heat Recovery Inlet, for " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
-                CTGenerator(GeneratorNum).HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(
+                CTGenerator(genNum).HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(
                     AlphArray(10), ErrorsFound, DataIPShortCuts::cCurrentModuleObject, AlphArray(1), DataLoopNode::NodeType_Water, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent);
-                if (CTGenerator(GeneratorNum).HeatRecOutletNodeNum == 0) {
+                if (CTGenerator(genNum).HeatRecOutletNodeNum == 0) {
                     ShowSevereError("Missing Node Name, Heat Recovery Outlet, for " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
                 BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject, AlphArray(1), AlphArray(9), AlphArray(10), "Heat Recovery Nodes");
-                PlantUtilities::RegisterPlantCompDesignFlow(CTGenerator(GeneratorNum).HeatRecInletNodeNum, CTGenerator(GeneratorNum).DesignHeatRecVolFlowRate);
+                PlantUtilities::RegisterPlantCompDesignFlow(CTGenerator(genNum).HeatRecInletNodeNum, CTGenerator(genNum).DesignHeatRecVolFlowRate);
             } else {
-                CTGenerator(GeneratorNum).HeatRecActive = false;
-                CTGenerator(GeneratorNum).HeatRecInletNodeNum = 0;
-                CTGenerator(GeneratorNum).HeatRecOutletNodeNum = 0;
+                CTGenerator(genNum).HeatRecActive = false;
+                CTGenerator(genNum).HeatRecInletNodeNum = 0;
+                CTGenerator(genNum).HeatRecOutletNodeNum = 0;
                 if (!DataIPShortCuts::lAlphaFieldBlanks(9) || !DataIPShortCuts::lAlphaFieldBlanks(10)) {
                     ShowWarningError("Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError("However, Node names were specified for Heat Recovery inlet or outlet nodes");
@@ -347,33 +344,33 @@ namespace CTElectricGenerator {
             {
                 auto const SELECT_CASE_var(AlphArray(11));
                 if (is_blank(SELECT_CASE_var)) { // If blank then the default is Natural Gas
-                    CTGenerator(GeneratorNum).FuelType = "Gas";
+                    CTGenerator(genNum).FuelType = "Gas";
 
                 } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
-                    CTGenerator(GeneratorNum).FuelType = "Gas";
+                    CTGenerator(genNum).FuelType = "Gas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
-                    CTGenerator(GeneratorNum).FuelType = "Diesel";
+                    CTGenerator(genNum).FuelType = "Diesel";
 
                 } else if (SELECT_CASE_var == "GASOLINE") {
-                    CTGenerator(GeneratorNum).FuelType = "Gasoline";
+                    CTGenerator(genNum).FuelType = "Gasoline";
 
                 } else if ((SELECT_CASE_var == "FUEL OIL #1") || (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL") ||
                            (SELECT_CASE_var == "DISTILLATE OIL")) {
-                    CTGenerator(GeneratorNum).FuelType = "FuelOil#1";
+                    CTGenerator(genNum).FuelType = "FuelOil#1";
 
                 } else if ((SELECT_CASE_var == "FUEL OIL #2") || (SELECT_CASE_var == "FUELOIL#2") || (SELECT_CASE_var == "RESIDUAL OIL")) {
-                    CTGenerator(GeneratorNum).FuelType = "FuelOil#2";
+                    CTGenerator(genNum).FuelType = "FuelOil#2";
 
                 } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
                            (SELECT_CASE_var == "PROPANE GAS")) {
-                    CTGenerator(GeneratorNum).FuelType = "Propane";
+                    CTGenerator(genNum).FuelType = "Propane";
 
                 } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                    CTGenerator(GeneratorNum).FuelType = "OtherFuel1";
+                    CTGenerator(genNum).FuelType = "OtherFuel1";
 
                 } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                    CTGenerator(GeneratorNum).FuelType = "OtherFuel2";
+                    CTGenerator(genNum).FuelType = "OtherFuel2";
 
                 } else {
                     ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + '=' + AlphArray(11));
@@ -382,22 +379,22 @@ namespace CTElectricGenerator {
                 }
             }
 
-            CTGenerator(GeneratorNum).HeatRecMaxTemp = NumArray(12);
+            CTGenerator(genNum).HeatRecMaxTemp = NumArray(12);
 
             // begin CR7021
             if (DataIPShortCuts::lAlphaFieldBlanks(12)) {
-                CTGenerator(GeneratorNum).OAInletNode = 0;
+                CTGenerator(genNum).OAInletNode = 0;
             } else {
-                CTGenerator(GeneratorNum).OAInletNode = NodeInputManager::GetOnlySingleNode(AlphArray(12),
-                                                                          ErrorsFound,
-                                                                          DataIPShortCuts::cCurrentModuleObject,
-                                                                          AlphArray(1),
-                                                                          DataLoopNode::NodeType_Air,
-                                                                          DataLoopNode::NodeConnectionType_OutsideAirReference,
-                                                                          1,
-                                                                          DataLoopNode::ObjectIsNotParent);
-                if (!OutAirNodeManager::CheckOutAirNodeNumber(CTGenerator(GeneratorNum).OAInletNode)) {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ", \"" + CTGenerator(GeneratorNum).Name +
+                CTGenerator(genNum).OAInletNode = NodeInputManager::GetOnlySingleNode(AlphArray(12),
+                                                                                      ErrorsFound,
+                                                                                      DataIPShortCuts::cCurrentModuleObject,
+                                                                                      AlphArray(1),
+                                                                                      DataLoopNode::NodeType_Air,
+                                                                                      DataLoopNode::NodeConnectionType_OutsideAirReference,
+                                                                                      1,
+                                                                                      DataLoopNode::ObjectIsNotParent);
+                if (!OutAirNodeManager::CheckOutAirNodeNumber(CTGenerator(genNum).OAInletNode)) {
+                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + ", \"" + CTGenerator(genNum).Name +
                                     "\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= " + AlphArray(12));
                     ShowContinueError("...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                     ErrorsFound = true;
@@ -409,39 +406,39 @@ namespace CTElectricGenerator {
             ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
         }
 
-        for (GeneratorNum = 1; GeneratorNum <= NumCTGenerators; ++GeneratorNum) {
+        for (genNum = 1; genNum <= NumCTGenerators; ++genNum) {
             SetupOutputVariable("Generator Produced Electric Power",
                                 OutputProcessor::Unit::W,
-                                CTGeneratorReport(GeneratorNum).PowerGen,
+                                CTGenerator(genNum).ElecPowerGenerated,
                                 "System",
                                 "Average",
-                                CTGenerator(GeneratorNum).Name);
+                                CTGenerator(genNum).Name);
             SetupOutputVariable("Generator Produced Electric Energy",
                                 OutputProcessor::Unit::J,
-                                CTGeneratorReport(GeneratorNum).EnergyGen,
+                                CTGenerator(genNum).ElecEnergyGenerated,
                                 "System",
                                 "Sum",
-                                CTGenerator(GeneratorNum).Name,
+                                CTGenerator(genNum).Name,
                                 _,
                                 "ElectricityProduced",
                                 "COGENERATION",
                                 _,
                                 "Plant");
 
-            SetupOutputVariable("Generator " + CTGenerator(GeneratorNum).FuelType + " Rate",
+            SetupOutputVariable("Generator " + CTGenerator(genNum).FuelType + " Rate",
                                 OutputProcessor::Unit::W,
-                                CTGeneratorReport(GeneratorNum).FuelEnergyUseRate,
+                                CTGeneratorReport(genNum).FuelEnergyUseRate,
                                 "System",
                                 "Average",
-                                CTGenerator(GeneratorNum).Name);
-            SetupOutputVariable("Generator " + CTGenerator(GeneratorNum).FuelType + " Energy",
+                                CTGenerator(genNum).Name);
+            SetupOutputVariable("Generator " + CTGenerator(genNum).FuelType + " Energy",
                                 OutputProcessor::Unit::J,
-                                CTGeneratorReport(GeneratorNum).FuelEnergy,
+                                CTGeneratorReport(genNum).FuelEnergy,
                                 "System",
                                 "Sum",
-                                CTGenerator(GeneratorNum).Name,
+                                CTGenerator(genNum).Name,
                                 _,
-                                CTGenerator(GeneratorNum).FuelType,
+                                CTGenerator(genNum).FuelType,
                                 "COGENERATION",
                                 _,
                                 "Plant");
@@ -449,44 +446,44 @@ namespace CTElectricGenerator {
             //    general fuel use report (to match other generators)
             SetupOutputVariable("Generator Fuel HHV Basis Rate",
                                 OutputProcessor::Unit::W,
-                                CTGeneratorReport(GeneratorNum).FuelEnergyUseRate,
+                                CTGeneratorReport(genNum).FuelEnergyUseRate,
                                 "System",
                                 "Average",
-                                CTGenerator(GeneratorNum).Name);
+                                CTGenerator(genNum).Name);
             SetupOutputVariable("Generator Fuel HHV Basis Energy",
                                 OutputProcessor::Unit::J,
-                                CTGeneratorReport(GeneratorNum).FuelEnergy,
+                                CTGeneratorReport(genNum).FuelEnergy,
                                 "System",
                                 "Sum",
-                                CTGenerator(GeneratorNum).Name);
+                                CTGenerator(genNum).Name);
 
-            SetupOutputVariable("Generator " + CTGenerator(GeneratorNum).FuelType + " Mass Flow Rate",
+            SetupOutputVariable("Generator " + CTGenerator(genNum).FuelType + " Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
-                                CTGeneratorReport(GeneratorNum).FuelMdot,
+                                CTGeneratorReport(genNum).FuelMdot,
                                 "System",
                                 "Average",
-                                CTGenerator(GeneratorNum).Name);
+                                CTGenerator(genNum).Name);
 
             SetupOutputVariable("Generator Exhaust Air Temperature",
                                 OutputProcessor::Unit::C,
-                                CTGeneratorReport(GeneratorNum).ExhaustStackTemp,
+                                CTGeneratorReport(genNum).ExhaustStackTemp,
                                 "System",
                                 "Average",
-                                CTGenerator(GeneratorNum).Name);
+                                CTGenerator(genNum).Name);
 
-            if (CTGenerator(GeneratorNum).HeatRecActive) {
+            if (CTGenerator(genNum).HeatRecActive) {
                 SetupOutputVariable("Generator Exhaust Heat Recovery Rate",
                                     OutputProcessor::Unit::W,
-                                    CTGeneratorReport(GeneratorNum).QExhaustRecovered,
+                                    CTGeneratorReport(genNum).QExhaustRecovered,
                                     "System",
                                     "Average",
-                                    CTGenerator(GeneratorNum).Name);
+                                    CTGenerator(genNum).Name);
                 SetupOutputVariable("Generator Exhaust Heat Recovery Energy",
                                     OutputProcessor::Unit::J,
-                                    CTGeneratorReport(GeneratorNum).ExhaustEnergyRec,
+                                    CTGeneratorReport(genNum).ExhaustEnergyRec,
                                     "System",
                                     "Sum",
-                                    CTGenerator(GeneratorNum).Name,
+                                    CTGenerator(genNum).Name,
                                     _,
                                     "ENERGYTRANSFER",
                                     "HEATRECOVERY",
@@ -495,16 +492,16 @@ namespace CTElectricGenerator {
 
                 SetupOutputVariable("Generator Lube Heat Recovery Rate",
                                     OutputProcessor::Unit::W,
-                                    CTGeneratorReport(GeneratorNum).QLubeOilRecovered,
+                                    CTGeneratorReport(genNum).QLubeOilRecovered,
                                     "System",
                                     "Average",
-                                    CTGenerator(GeneratorNum).Name);
+                                    CTGenerator(genNum).Name);
                 SetupOutputVariable("Generator Lube Heat Recovery Energy",
                                     OutputProcessor::Unit::J,
-                                    CTGeneratorReport(GeneratorNum).LubeOilEnergyRec,
+                                    CTGeneratorReport(genNum).LubeOilEnergyRec,
                                     "System",
                                     "Sum",
-                                    CTGenerator(GeneratorNum).Name,
+                                    CTGenerator(genNum).Name,
                                     _,
                                     "ENERGYTRANSFER",
                                     "HEATRECOVERY",
@@ -513,40 +510,40 @@ namespace CTElectricGenerator {
 
                 SetupOutputVariable("Generator Produced Thermal Rate",
                                     OutputProcessor::Unit::W,
-                                    CTGeneratorReport(GeneratorNum).QTotalHeatRecovered,
+                                    CTGeneratorReport(genNum).QTotalHeatRecovered,
                                     "System",
                                     "Average",
-                                    CTGenerator(GeneratorNum).Name);
+                                    CTGenerator(genNum).Name);
                 SetupOutputVariable("Generator Produced Thermal Energy",
                                     OutputProcessor::Unit::J,
-                                    CTGeneratorReport(GeneratorNum).TotalHeatEnergyRec,
+                                    CTGeneratorReport(genNum).TotalHeatEnergyRec,
                                     "System",
                                     "Sum",
-                                    CTGenerator(GeneratorNum).Name);
+                                    CTGenerator(genNum).Name);
 
                 SetupOutputVariable("Generator Heat Recovery Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    CTGeneratorReport(GeneratorNum).HeatRecInletTemp,
+                                    CTGeneratorReport(genNum).HeatRecInletTemp,
                                     "System",
                                     "Average",
-                                    CTGenerator(GeneratorNum).Name);
+                                    CTGenerator(genNum).Name);
                 SetupOutputVariable("Generator Heat Recovery Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    CTGeneratorReport(GeneratorNum).HeatRecOutletTemp,
+                                    CTGeneratorReport(genNum).HeatRecOutletTemp,
                                     "System",
                                     "Average",
-                                    CTGenerator(GeneratorNum).Name);
+                                    CTGenerator(genNum).Name);
                 SetupOutputVariable("Generator Heat Recovery Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    CTGeneratorReport(GeneratorNum).HeatRecMdot,
+                                    CTGeneratorReport(genNum).HeatRecMdot,
                                     "System",
                                     "Average",
-                                    CTGenerator(GeneratorNum).Name);
+                                    CTGenerator(genNum).Name);
             }
         }
     }
 
-    void CalcCTGeneratorModel(int const GeneratorNum, // Generator number
+    void CalcCTGeneratorModel(int const genNum, // Generator number
                               bool const RunFlag,     // TRUE when Generator operating
                               Real64 const MyLoad,    // Generator demand
                               bool const FirstHVACIteration)
@@ -600,21 +597,21 @@ namespace CTElectricGenerator {
         Real64 HRecRatio;        // When Max Temp is reached the amount of recovered heat has to be reduced.
         // and this assumption uses this ratio to accomplish this task.
 
-        MinPartLoadRat = CTGenerator(GeneratorNum).MinPartLoadRat;
-        MaxPartLoadRat = CTGenerator(GeneratorNum).MaxPartLoadRat;
-        RatedPowerOutput = CTGenerator(GeneratorNum).RatedPowerOutput;
-        MaxExhaustperCTPower = CTGenerator(GeneratorNum).MaxExhaustperCTPower;
-        DesignAirInletTemp = CTGenerator(GeneratorNum).DesignAirInletTemp;
-        if (CTGenerator(GeneratorNum).HeatRecActive) {
-            HeatRecInNode = CTGenerator(GeneratorNum).HeatRecInletNodeNum;
+        MinPartLoadRat = CTGenerator(genNum).MinPartLoadRat;
+        MaxPartLoadRat = CTGenerator(genNum).MaxPartLoadRat;
+        RatedPowerOutput = CTGenerator(genNum).RatedPowerOutput;
+        MaxExhaustperCTPower = CTGenerator(genNum).MaxExhaustperCTPower;
+        DesignAirInletTemp = CTGenerator(genNum).DesignAirInletTemp;
+        if (CTGenerator(genNum).HeatRecActive) {
+            HeatRecInNode = CTGenerator(genNum).HeatRecInletNodeNum;
             HeatRecInTemp = DataLoopNode::Node(HeatRecInNode).Temp;
 
-            HeatRecCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(CTGenerator(GeneratorNum).HRLoopNum).FluidName,
+            HeatRecCp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(CTGenerator(genNum).HRLoopNum).FluidName,
                                               HeatRecInTemp,
-                                              DataPlant::PlantLoop(CTGenerator(GeneratorNum).HRLoopNum).FluidIndex,
+                                              DataPlant::PlantLoop(CTGenerator(genNum).HRLoopNum).FluidIndex,
                                               RoutineName);
             if (FirstHVACIteration && RunFlag) {
-                HeatRecMdot = CTGenerator(GeneratorNum).DesignHeatRecMassFlowRate;
+                HeatRecMdot = CTGenerator(genNum).DesignHeatRecMassFlowRate;
             } else {
                 HeatRecMdot = DataLoopNode::Node(HeatRecInNode).MassFlowRate;
             }
@@ -626,21 +623,21 @@ namespace CTElectricGenerator {
 
         // If no loop demand or Generator OFF, return
         if (!RunFlag) {
-            CTGenerator(GeneratorNum).ElecPowerGenerated = 0.0;
-            CTGenerator(GeneratorNum).ElecEnergyGenerated = 0.0;
-            CTGenerator(GeneratorNum).HeatRecInletTemp = HeatRecInTemp;
-            CTGenerator(GeneratorNum).HeatRecOutletTemp = HeatRecInTemp;
-            CTGenerator(GeneratorNum).HeatRecMdot = 0.0;
-            CTGenerator(GeneratorNum).QLubeOilRecovered = 0.0;
-            CTGenerator(GeneratorNum).QExhaustRecovered = 0.0;
-            CTGenerator(GeneratorNum).QTotalHeatRecovered = 0.0;
-            CTGenerator(GeneratorNum).LubeOilEnergyRec = 0.0;
-            CTGenerator(GeneratorNum).ExhaustEnergyRec = 0.0;
-            CTGenerator(GeneratorNum).TotalHeatEnergyRec = 0.0;
-            CTGenerator(GeneratorNum).FuelEnergyUseRate = 0.0;
-            CTGenerator(GeneratorNum).FuelEnergy = 0.0;
-            CTGenerator(GeneratorNum).FuelMdot = 0.0;
-            CTGenerator(GeneratorNum).ExhaustStackTemp = 0.0;
+            CTGenerator(genNum).ElecPowerGenerated = 0.0;
+            CTGenerator(genNum).ElecEnergyGenerated = 0.0;
+            CTGenerator(genNum).HeatRecInletTemp = HeatRecInTemp;
+            CTGenerator(genNum).HeatRecOutletTemp = HeatRecInTemp;
+            CTGenerator(genNum).HeatRecMdot = 0.0;
+            CTGenerator(genNum).QLubeOilRecovered = 0.0;
+            CTGenerator(genNum).QExhaustRecovered = 0.0;
+            CTGenerator(genNum).QTotalHeatRecovered = 0.0;
+            CTGenerator(genNum).LubeOilEnergyRec = 0.0;
+            CTGenerator(genNum).ExhaustEnergyRec = 0.0;
+            CTGenerator(genNum).TotalHeatEnergyRec = 0.0;
+            CTGenerator(genNum).FuelEnergyUseRate = 0.0;
+            CTGenerator(genNum).FuelEnergy = 0.0;
+            CTGenerator(genNum).FuelMdot = 0.0;
+            CTGenerator(genNum).ExhaustStackTemp = 0.0;
             return;
         }
 
@@ -653,48 +650,48 @@ namespace CTElectricGenerator {
 
         // SET OFF-DESIGN AIR TEMPERATURE DIFFERENCE
         //   use OA node if set by user CR7021
-        if (CTGenerator(GeneratorNum).OAInletNode == 0) {
+        if (CTGenerator(genNum).OAInletNode == 0) {
             AmbientDeltaT = DataEnvironment::OutDryBulbTemp - DesignAirInletTemp;
         } else {
-            AmbientDeltaT = DataLoopNode::Node(CTGenerator(GeneratorNum).OAInletNode).Temp - DesignAirInletTemp;
+            AmbientDeltaT = DataLoopNode::Node(CTGenerator(genNum).OAInletNode).Temp - DesignAirInletTemp;
         }
 
         // Use Curve fit to determine Fuel Energy Input.  For electric power generated in Watts, the fuel
         // energy input is calculated in J/s.  The PLBasedFuelInputCurve selects ratio of fuel flow (J/s)/power generated (J/s).
         // The TempBasedFuelInputCurve is a correction based on deviation from design inlet air temperature conditions.
         // The first coefficient of this fit should be 1.0 to ensure that no correction is made at design conditions.
-        FuelUseRate = ElecPowerGenerated * CurveManager::CurveValue(CTGenerator(GeneratorNum).PLBasedFuelInputCurve, PLR) *
-                      CurveManager::CurveValue(CTGenerator(GeneratorNum).TempBasedFuelInputCurve, AmbientDeltaT);
+        FuelUseRate = ElecPowerGenerated * CurveManager::CurveValue(CTGenerator(genNum).PLBasedFuelInputCurve, PLR) *
+                      CurveManager::CurveValue(CTGenerator(genNum).TempBasedFuelInputCurve, AmbientDeltaT);
 
         // Use Curve fit to determine Exhaust Flow.  This curve shows the ratio of exhaust gas flow (kg/s) to electric power
         // output (J/s).  The units on ExhaustFlowCurve are (kg/J).  When multiplied by the rated power of the unit,
         // it gives the exhaust flow rate in kg/s
-        ExhaustFlow = RatedPowerOutput * CurveManager::CurveValue(CTGenerator(GeneratorNum).ExhaustFlowCurve, AmbientDeltaT);
+        ExhaustFlow = RatedPowerOutput * CurveManager::CurveValue(CTGenerator(genNum).ExhaustFlowCurve, AmbientDeltaT);
 
         // Use Curve fit to determine Exhaust Temperature.  This curve calculates the exhaust temperature (C) by
         // multiplying the exhaust temperature (C) for a particular part load as given by PLBasedExhaustTempCurve
         // a correction factor based on the deviation from design temperature, TempBasedExhaustTempCurve
         if ((PLR > 0.0) && ((ExhaustFlow > 0.0) || (MaxExhaustperCTPower > 0.0))) {
 
-            ExhaustTemp = CurveManager::CurveValue(CTGenerator(GeneratorNum).PLBasedExhaustTempCurve, PLR) *
-                          CurveManager::CurveValue(CTGenerator(GeneratorNum).TempBasedExhaustTempCurve, AmbientDeltaT);
+            ExhaustTemp = CurveManager::CurveValue(CTGenerator(genNum).PLBasedExhaustTempCurve, PLR) *
+                          CurveManager::CurveValue(CTGenerator(genNum).TempBasedExhaustTempCurve, AmbientDeltaT);
 
-            UA = CTGenerator(GeneratorNum).UACoef(1) * std::pow(RatedPowerOutput, CTGenerator(GeneratorNum).UACoef(2));
+            UA = CTGenerator(genNum).UACoef(1) * std::pow(RatedPowerOutput, CTGenerator(genNum).UACoef(2));
 
-            DesignMinExitGasTemp = CTGenerator(GeneratorNum).DesignMinExitGasTemp;
+            DesignMinExitGasTemp = CTGenerator(genNum).DesignMinExitGasTemp;
             ExhaustStackTemp = DesignMinExitGasTemp + (ExhaustTemp - DesignMinExitGasTemp) /
                                                           std::exp(UA / (max(ExhaustFlow, MaxExhaustperCTPower * RatedPowerOutput) * ExhaustCP));
 
             QExhaustRec = max(ExhaustFlow * ExhaustCP * (ExhaustTemp - ExhaustStackTemp), 0.0);
         } else {
-            ExhaustStackTemp = CTGenerator(GeneratorNum).DesignMinExitGasTemp;
+            ExhaustStackTemp = CTGenerator(genNum).DesignMinExitGasTemp;
             QExhaustRec = 0.0;
         }
 
         // Use Curve fit to determine Heat Recovered Lubricant heat.  This curve calculates the lube heat recovered (J/s) by
         // multiplying the total power generated by the fraction of that power that could be recovered in the lube oil at that
         // particular part load.
-        QLubeOilRec = ElecPowerGenerated * CurveManager::CurveValue(CTGenerator(GeneratorNum).QLubeOilRecoveredCurve, PLR);
+        QLubeOilRec = ElecPowerGenerated * CurveManager::CurveValue(CTGenerator(genNum).QLubeOilRecoveredCurve, PLR);
 
         // Check for divide by zero
         if ((HeatRecMdot > 0.0) && (HeatRecCp > 0.0)) {
@@ -709,9 +706,9 @@ namespace CTElectricGenerator {
         // Now verify the maximum temperature was not exceeded
         HRecRatio = 1.0;
         MinHeatRecMdot = 0.0;
-        if (HeatRecOutTemp > CTGenerator(GeneratorNum).HeatRecMaxTemp) {
-            if (CTGenerator(GeneratorNum).HeatRecMaxTemp != HeatRecInTemp) {
-                MinHeatRecMdot = (QExhaustRec + QLubeOilRec) / (HeatRecCp * (CTGenerator(GeneratorNum).HeatRecMaxTemp - HeatRecInTemp));
+        if (HeatRecOutTemp > CTGenerator(genNum).HeatRecMaxTemp) {
+            if (CTGenerator(genNum).HeatRecMaxTemp != HeatRecInTemp) {
+                MinHeatRecMdot = (QExhaustRec + QLubeOilRec) / (HeatRecCp * (CTGenerator(genNum).HeatRecMaxTemp - HeatRecInTemp));
                 if (MinHeatRecMdot < 0.0) MinHeatRecMdot = 0.0;
             }
 
@@ -733,30 +730,30 @@ namespace CTElectricGenerator {
         LubeOilEnergyRec = QLubeOilRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         ExhaustEnergyRec = QExhaustRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
-        CTGenerator(GeneratorNum).ElecPowerGenerated = ElecPowerGenerated;
-        CTGenerator(GeneratorNum).ElecEnergyGenerated = ElectricEnergyGen;
+        CTGenerator(genNum).ElecPowerGenerated = ElecPowerGenerated;
+        CTGenerator(genNum).ElecEnergyGenerated = ElectricEnergyGen;
 
-        CTGenerator(GeneratorNum).HeatRecInletTemp = HeatRecInTemp;
-        CTGenerator(GeneratorNum).HeatRecOutletTemp = HeatRecOutTemp;
+        CTGenerator(genNum).HeatRecInletTemp = HeatRecInTemp;
+        CTGenerator(genNum).HeatRecOutletTemp = HeatRecOutTemp;
 
-        CTGenerator(GeneratorNum).HeatRecMdot = HeatRecMdot;
-        CTGenerator(GeneratorNum).QExhaustRecovered = QExhaustRec;
-        CTGenerator(GeneratorNum).QLubeOilRecovered = QLubeOilRec;
-        CTGenerator(GeneratorNum).QTotalHeatRecovered = QExhaustRec + QLubeOilRec;
-        CTGenerator(GeneratorNum).FuelEnergyUseRate = std::abs(FuelUseRate);
-        CTGenerator(GeneratorNum).ExhaustEnergyRec = ExhaustEnergyRec;
-        CTGenerator(GeneratorNum).LubeOilEnergyRec = LubeOilEnergyRec;
-        CTGenerator(GeneratorNum).TotalHeatEnergyRec = ExhaustEnergyRec + LubeOilEnergyRec;
-        CTGenerator(GeneratorNum).FuelEnergy = std::abs(FuelEnergyUsed);
+        CTGenerator(genNum).HeatRecMdot = HeatRecMdot;
+        CTGenerator(genNum).QExhaustRecovered = QExhaustRec;
+        CTGenerator(genNum).QLubeOilRecovered = QLubeOilRec;
+        CTGenerator(genNum).QTotalHeatRecovered = QExhaustRec + QLubeOilRec;
+        CTGenerator(genNum).FuelEnergyUseRate = std::abs(FuelUseRate);
+        CTGenerator(genNum).ExhaustEnergyRec = ExhaustEnergyRec;
+        CTGenerator(genNum).LubeOilEnergyRec = LubeOilEnergyRec;
+        CTGenerator(genNum).TotalHeatEnergyRec = ExhaustEnergyRec + LubeOilEnergyRec;
+        CTGenerator(genNum).FuelEnergy = std::abs(FuelEnergyUsed);
 
-        FuelHeatingValue = CTGenerator(GeneratorNum).FuelHeatingValue;
+        FuelHeatingValue = CTGenerator(genNum).FuelHeatingValue;
 
-        CTGenerator(GeneratorNum).FuelMdot = std::abs(FuelUseRate) / (FuelHeatingValue * KJtoJ);
+        CTGenerator(genNum).FuelMdot = std::abs(FuelUseRate) / (FuelHeatingValue * KJtoJ);
 
-        CTGenerator(GeneratorNum).ExhaustStackTemp = ExhaustStackTemp;
+        CTGenerator(genNum).ExhaustStackTemp = ExhaustStackTemp;
     }
 
-    void InitCTGenerators(int const GeneratorNum,         // Generator number
+    void InitCTGenerators(int const genNum,         // Generator number
                           bool const RunFlag,             // TRUE when Generator operating
                           Real64 const EP_UNUSED(MyLoad), // Generator demand
                           bool const FirstHVACIteration)
@@ -786,14 +783,14 @@ namespace CTElectricGenerator {
             MyOneTimeFlag = false;
         }
 
-        if (CTGenerator(GeneratorNum).MyPlantScanFlag && allocated(DataPlant::PlantLoop) && CTGenerator(GeneratorNum).HeatRecActive) {
+        if (CTGenerator(genNum).MyPlantScanFlag && allocated(DataPlant::PlantLoop) && CTGenerator(genNum).HeatRecActive) {
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(CTGenerator(GeneratorNum).Name,
+            PlantUtilities::ScanPlantLoopsForObject(CTGenerator(genNum).Name,
                                     DataPlant::TypeOf_Generator_CTurbine,
-                                    CTGenerator(GeneratorNum).HRLoopNum,
-                                    CTGenerator(GeneratorNum).HRLoopSideNum,
-                                    CTGenerator(GeneratorNum).HRBranchNum,
-                                    CTGenerator(GeneratorNum).HRCompNum,
+                                    CTGenerator(genNum).HRLoopNum,
+                                    CTGenerator(genNum).HRLoopSideNum,
+                                    CTGenerator(genNum).HRBranchNum,
+                                    CTGenerator(genNum).HRCompNum,
                                     errFlag,
                                     _,
                                     _,
@@ -803,86 +800,86 @@ namespace CTElectricGenerator {
             if (errFlag) {
                 ShowFatalError("InitCTGenerators: Program terminated due to previous condition(s).");
             }
-            CTGenerator(GeneratorNum).MyPlantScanFlag = false;
+            CTGenerator(genNum).MyPlantScanFlag = false;
         }
 
-        if (CTGenerator(GeneratorNum).MySizeAndNodeInitFlag && (!CTGenerator(GeneratorNum).MyPlantScanFlag) && CTGenerator(GeneratorNum).HeatRecActive) {
-            HeatRecInletNode = CTGenerator(GeneratorNum).HeatRecInletNodeNum;
-            HeatRecOutletNode = CTGenerator(GeneratorNum).HeatRecOutletNodeNum;
+        if (CTGenerator(genNum).MySizeAndNodeInitFlag && (!CTGenerator(genNum).MyPlantScanFlag) && CTGenerator(genNum).HeatRecActive) {
+            HeatRecInletNode = CTGenerator(genNum).HeatRecInletNodeNum;
+            HeatRecOutletNode = CTGenerator(genNum).HeatRecOutletNodeNum;
 
             // size mass flow rate
-            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(CTGenerator(GeneratorNum).HRLoopNum).FluidName,
+            rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(CTGenerator(genNum).HRLoopNum).FluidName,
                                    DataGlobals::InitConvTemp,
-                                   DataPlant::PlantLoop(CTGenerator(GeneratorNum).HRLoopNum).FluidIndex,
+                                   DataPlant::PlantLoop(CTGenerator(genNum).HRLoopNum).FluidIndex,
                                    RoutineName);
 
-            CTGenerator(GeneratorNum).DesignHeatRecMassFlowRate = rho * CTGenerator(GeneratorNum).DesignHeatRecVolFlowRate;
+            CTGenerator(genNum).DesignHeatRecMassFlowRate = rho * CTGenerator(genNum).DesignHeatRecVolFlowRate;
 
             PlantUtilities::InitComponentNodes(0.0,
-                               CTGenerator(GeneratorNum).DesignHeatRecMassFlowRate,
+                               CTGenerator(genNum).DesignHeatRecMassFlowRate,
                                HeatRecInletNode,
                                HeatRecOutletNode,
-                               CTGenerator(GeneratorNum).HRLoopNum,
-                               CTGenerator(GeneratorNum).HRLoopSideNum,
-                               CTGenerator(GeneratorNum).HRBranchNum,
-                               CTGenerator(GeneratorNum).HRCompNum);
+                               CTGenerator(genNum).HRLoopNum,
+                               CTGenerator(genNum).HRLoopSideNum,
+                               CTGenerator(genNum).HRBranchNum,
+                               CTGenerator(genNum).HRCompNum);
 
-            CTGenerator(GeneratorNum).MySizeAndNodeInitFlag = false;
+            CTGenerator(genNum).MySizeAndNodeInitFlag = false;
         } // end one time inits
 
         // Do the Begin Environment initializations
-        if (DataGlobals::BeginEnvrnFlag && CTGenerator(GeneratorNum).MyEnvrnFlag && CTGenerator(GeneratorNum).HeatRecActive) {
-            HeatRecInletNode = CTGenerator(GeneratorNum).HeatRecInletNodeNum;
-            HeatRecOutletNode = CTGenerator(GeneratorNum).HeatRecOutletNodeNum;
+        if (DataGlobals::BeginEnvrnFlag && CTGenerator(genNum).MyEnvrnFlag && CTGenerator(genNum).HeatRecActive) {
+            HeatRecInletNode = CTGenerator(genNum).HeatRecInletNodeNum;
+            HeatRecOutletNode = CTGenerator(genNum).HeatRecOutletNodeNum;
             // set the node Temperature, assuming freeze control
             DataLoopNode::Node(HeatRecInletNode).Temp = 20.0;
             DataLoopNode::Node(HeatRecOutletNode).Temp = 20.0;
             // set the node max and min mass flow rates
             PlantUtilities::InitComponentNodes(0.0,
-                               CTGenerator(GeneratorNum).DesignHeatRecMassFlowRate,
+                               CTGenerator(genNum).DesignHeatRecMassFlowRate,
                                HeatRecInletNode,
                                HeatRecOutletNode,
-                               CTGenerator(GeneratorNum).HRLoopNum,
-                               CTGenerator(GeneratorNum).HRLoopSideNum,
-                               CTGenerator(GeneratorNum).HRBranchNum,
-                               CTGenerator(GeneratorNum).HRCompNum);
+                               CTGenerator(genNum).HRLoopNum,
+                               CTGenerator(genNum).HRLoopSideNum,
+                               CTGenerator(genNum).HRBranchNum,
+                               CTGenerator(genNum).HRCompNum);
 
-            CTGenerator(GeneratorNum).MyEnvrnFlag = false;
+            CTGenerator(genNum).MyEnvrnFlag = false;
         } // end environmental inits
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            CTGenerator(GeneratorNum).MyEnvrnFlag = true;
+            CTGenerator(genNum).MyEnvrnFlag = true;
         }
 
-        if (CTGenerator(GeneratorNum).HeatRecActive) {
+        if (CTGenerator(genNum).HeatRecActive) {
             if (FirstHVACIteration) {
                 if (RunFlag) {
-                    mdot = CTGenerator(GeneratorNum).DesignHeatRecMassFlowRate;
+                    mdot = CTGenerator(genNum).DesignHeatRecMassFlowRate;
                 } else {
                     mdot = 0.0;
                 }
                 PlantUtilities::SetComponentFlowRate(mdot,
-                                     CTGenerator(GeneratorNum).HeatRecInletNodeNum,
-                                     CTGenerator(GeneratorNum).HeatRecOutletNodeNum,
-                                     CTGenerator(GeneratorNum).HRLoopNum,
-                                     CTGenerator(GeneratorNum).HRLoopSideNum,
-                                     CTGenerator(GeneratorNum).HRBranchNum,
-                                     CTGenerator(GeneratorNum).HRCompNum);
+                                     CTGenerator(genNum).HeatRecInletNodeNum,
+                                     CTGenerator(genNum).HeatRecOutletNodeNum,
+                                     CTGenerator(genNum).HRLoopNum,
+                                     CTGenerator(genNum).HRLoopSideNum,
+                                     CTGenerator(genNum).HRBranchNum,
+                                     CTGenerator(genNum).HRCompNum);
 
             } else {
-                PlantUtilities::SetComponentFlowRate(CTGenerator(GeneratorNum).HeatRecMdot,
-                                     CTGenerator(GeneratorNum).HeatRecInletNodeNum,
-                                     CTGenerator(GeneratorNum).HeatRecOutletNodeNum,
-                                     CTGenerator(GeneratorNum).HRLoopNum,
-                                     CTGenerator(GeneratorNum).HRLoopSideNum,
-                                     CTGenerator(GeneratorNum).HRBranchNum,
-                                     CTGenerator(GeneratorNum).HRCompNum);
+                PlantUtilities::SetComponentFlowRate(CTGenerator(genNum).HeatRecMdot,
+                                     CTGenerator(genNum).HeatRecInletNodeNum,
+                                     CTGenerator(genNum).HeatRecOutletNodeNum,
+                                     CTGenerator(genNum).HRLoopNum,
+                                     CTGenerator(genNum).HRLoopSideNum,
+                                     CTGenerator(genNum).HRBranchNum,
+                                     CTGenerator(genNum).HRCompNum);
             }
         }
     }
 
     void UpdateCTGeneratorRecords(bool const EP_UNUSED(RunFlag), // TRUE if Generator operating
-                                  int const Num                  // Generator number
+                                  int const genNUm                  // Generator number
     )
     {
         // SUBROUTINE INFORMATION:
@@ -891,29 +888,27 @@ namespace CTElectricGenerator {
 
         int HeatRecOutletNode;
 
-        if (CTGenerator(Num).HeatRecActive) {
-            HeatRecOutletNode = CTGenerator(Num).HeatRecOutletNodeNum;
-            DataLoopNode::Node(HeatRecOutletNode).Temp = CTGenerator(Num).HeatRecOutletTemp;
+        if (CTGenerator(genNUm).HeatRecActive) {
+            HeatRecOutletNode = CTGenerator(genNUm).HeatRecOutletNodeNum;
+            DataLoopNode::Node(HeatRecOutletNode).Temp = CTGenerator(genNUm).HeatRecOutletTemp;
         }
-        CTGeneratorReport(Num).PowerGen = CTGenerator(Num).ElecPowerGenerated;
-        CTGeneratorReport(Num).EnergyGen = CTGenerator(Num).ElecEnergyGenerated;
-        CTGeneratorReport(Num).QExhaustRecovered = CTGenerator(Num).QExhaustRecovered;
-        CTGeneratorReport(Num).QLubeOilRecovered = CTGenerator(Num).QLubeOilRecovered;
-        CTGeneratorReport(Num).ExhaustEnergyRec = CTGenerator(Num).ExhaustEnergyRec;
-        CTGeneratorReport(Num).LubeOilEnergyRec = CTGenerator(Num).LubeOilEnergyRec;
-        CTGeneratorReport(Num).QTotalHeatRecovered = CTGenerator(Num).QTotalHeatRecovered;
-        CTGeneratorReport(Num).TotalHeatEnergyRec = CTGenerator(Num).TotalHeatEnergyRec;
-        CTGeneratorReport(Num).FuelEnergyUseRate = CTGenerator(Num).FuelEnergyUseRate;
-        CTGeneratorReport(Num).FuelEnergy = CTGenerator(Num).FuelEnergy;
-        CTGeneratorReport(Num).FuelMdot = CTGenerator(Num).FuelMdot;
-        CTGeneratorReport(Num).ExhaustStackTemp = CTGenerator(Num).ExhaustStackTemp;
-        CTGeneratorReport(Num).HeatRecInletTemp = CTGenerator(Num).HeatRecInletTemp;
-        CTGeneratorReport(Num).HeatRecOutletTemp = CTGenerator(Num).HeatRecOutletTemp;
-        CTGeneratorReport(Num).HeatRecMdot = CTGenerator(Num).HeatRecMdot;
+        CTGeneratorReport(genNUm).QExhaustRecovered = CTGenerator(genNUm).QExhaustRecovered;
+        CTGeneratorReport(genNUm).QLubeOilRecovered = CTGenerator(genNUm).QLubeOilRecovered;
+        CTGeneratorReport(genNUm).ExhaustEnergyRec = CTGenerator(genNUm).ExhaustEnergyRec;
+        CTGeneratorReport(genNUm).LubeOilEnergyRec = CTGenerator(genNUm).LubeOilEnergyRec;
+        CTGeneratorReport(genNUm).QTotalHeatRecovered = CTGenerator(genNUm).QTotalHeatRecovered;
+        CTGeneratorReport(genNUm).TotalHeatEnergyRec = CTGenerator(genNUm).TotalHeatEnergyRec;
+        CTGeneratorReport(genNUm).FuelEnergyUseRate = CTGenerator(genNUm).FuelEnergyUseRate;
+        CTGeneratorReport(genNUm).FuelEnergy = CTGenerator(genNUm).FuelEnergy;
+        CTGeneratorReport(genNUm).FuelMdot = CTGenerator(genNUm).FuelMdot;
+        CTGeneratorReport(genNUm).ExhaustStackTemp = CTGenerator(genNUm).ExhaustStackTemp;
+        CTGeneratorReport(genNUm).HeatRecInletTemp = CTGenerator(genNUm).HeatRecInletTemp;
+        CTGeneratorReport(genNUm).HeatRecOutletTemp = CTGenerator(genNUm).HeatRecOutletTemp;
+        CTGeneratorReport(genNUm).HeatRecMdot = CTGenerator(genNUm).HeatRecMdot;
     }
 
     void GetCTGeneratorResults(int const EP_UNUSED(GeneratorType), // type of Generator
-                               int const GeneratorIndex,
+                               int const genNum,
                                Real64 &GeneratorPower,  // electrical power
                                Real64 &GeneratorEnergy, // electrical energy
                                Real64 &ThermalPower,    // heat power
@@ -929,10 +924,10 @@ namespace CTElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // get some results for load center's aggregation
 
-        GeneratorPower = CTGeneratorReport(GeneratorIndex).PowerGen;
-        GeneratorEnergy = CTGeneratorReport(GeneratorIndex).EnergyGen;
-        ThermalPower = CTGeneratorReport(GeneratorIndex).QTotalHeatRecovered;
-        ThermalEnergy = CTGeneratorReport(GeneratorIndex).TotalHeatEnergyRec;
+        GeneratorPower = CTGenerator(genNum).ElecPowerGenerated;
+        GeneratorEnergy = CTGenerator(genNum).ElecEnergyGenerated;
+        ThermalPower = CTGeneratorReport(genNum).QTotalHeatRecovered;
+        ThermalEnergy = CTGeneratorReport(genNum).TotalHeatEnergyRec;
     }
 
 } // namespace CTElectricGenerator

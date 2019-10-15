@@ -126,6 +126,7 @@ namespace CTElectricGenerator {
         bool MyEnvrnFlag;
         bool MyPlantScanFlag;
         bool MySizeAndNodeInitFlag;
+        bool CheckEquipName;
 
         // Default Constructor
         CTGeneratorSpecs()
@@ -138,7 +139,7 @@ namespace CTElectricGenerator {
               ExhaustStackTemp(0.0), HeatRecActive(false), HeatRecInletNodeNum(0), HeatRecOutletNodeNum(0), HeatRecInletTemp(0.0),
               HeatRecOutletTemp(0.0), HeatRecMdot(0.0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), FuelMdot(0.0),
               FuelHeatingValue(0.0), ElecPowerGenerated(0.0), ElecEnergyGenerated(0.0), HeatRecMaxTemp(0.0), OAInletNode(0), MyEnvrnFlag(true),
-              MyPlantScanFlag(true), MySizeAndNodeInitFlag(true)
+              MyPlantScanFlag(true), MySizeAndNodeInitFlag(true), CheckEquipName(true)
         {
         }
     };
@@ -146,8 +147,8 @@ namespace CTElectricGenerator {
     struct ReportVars
     {
         // Members
-        Real64 PowerGen;            // reporting: power (W)
-        Real64 EnergyGen;           // reporting: power (W)
+//        Real64 PowerGen;            // reporting: power (W)
+//        Real64 EnergyGen;           // reporting: power (W)
         Real64 QTotalHeatRecovered; // reporting: total Heat Recovered (W)
         Real64 QLubeOilRecovered;   // reporting: Heat Recovered from Lubricant (W)
         Real64 QExhaustRecovered;   // reporting: Heat Recovered from exhaust (W)
@@ -164,7 +165,7 @@ namespace CTElectricGenerator {
 
         // Default Constructor
         ReportVars()
-            : PowerGen(0.0), EnergyGen(0.0), QTotalHeatRecovered(0.0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0), TotalHeatEnergyRec(0.0),
+            : QTotalHeatRecovered(0.0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0), TotalHeatEnergyRec(0.0),
               LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergyUseRate(0.0), FuelEnergy(0.0), FuelMdot(0.0), ExhaustStackTemp(0.0),
               HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0)
         {
@@ -198,22 +199,22 @@ namespace CTElectricGenerator {
 
     void GetCTGeneratorInput();
 
-    void CalcCTGeneratorModel(int GeneratorNum, // Generator number
+    void CalcCTGeneratorModel(int genNum, // Generator number
                               bool RunFlag,     // TRUE when Generator operating
                               Real64 MyLoad,    // Generator demand
                               bool FirstHVACIteration);
 
-    void InitCTGenerators(int GeneratorNum, // Generator number
+    void InitCTGenerators(int genNum, // Generator number
                           bool RunFlag,     // TRUE when Generator operating
                           Real64 MyLoad,    // Generator demand
                           bool FirstHVACIteration);
 
     void UpdateCTGeneratorRecords(bool RunFlag, // TRUE if Generator operating
-                                  int Num       // Generator number
+                                  int genNUm       // Generator number
     );
 
     void GetCTGeneratorResults(int GeneratorType, // type of Generator
-                               int GeneratorIndex,
+                               int genNum,
                                Real64 &GeneratorPower,  // electrical power
                                Real64 &GeneratorEnergy, // electrical energy
                                Real64 &ThermalPower,    // heat power
