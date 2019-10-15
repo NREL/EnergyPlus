@@ -189,6 +189,10 @@ namespace IceThermalStorage {
               ITSCoolingRate_rep(0.0), ITSCoolingEnergy_rep(0.0), MyPlantScanFlag(true), MyEnvrnFlag2(true)
         {
         }
+
+        void InitSimpleIceStorage();
+
+        void CalcIceStorageDormant();
     };
 
     struct DetailedIceStorageData
@@ -283,42 +287,21 @@ namespace IceThermalStorage {
 
     void SimDetailedIceStorage(int iceNum);
 
-    //******************************************************************************
-
     void GetIceStorageInput();
-
-    //******************************************************************************
 
     void InitDetailedIceStorage(int iceNum);
 
-    void InitSimpleIceStorage(int iceNum);
-
-    //******************************************************************************
-
     void CalcIceStorageCapacity(int IceStorageType, Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap, int iceNum);
-
-    //******************************************************************************
-
-    void CalcIceStorageDormant(int IceStorageType, // BY ZG
-                               int &iceNum);
-
-    //******************************************************************************
 
     void CalcIceStorageCharge(int IceStorageType, // BY ZG
                               int &iceNum);
 
-    //******************************************************************************
-
     void CalcQiceChargeMaxByChiller(int &iceNum, Real64 &QiceMaxByChiller);
-
-    //******************************************************************************
 
     void CalcQiceChargeMaxByITS(int iceNum,
                                 Real64 chillerOutletTemp, // [degC]
                                 Real64 &QiceMaxByITS            // [W]
     );
-
-    //******************************************************************************
 
     void CalcIceStorageDischarge(int IceStorageType,  // by ZG
                                  int iceNum,          // ice storage number
@@ -328,11 +311,7 @@ namespace IceThermalStorage {
                                  Real64 MaxCap        // Max possible discharge rate (positive value)
     );
 
-    //******************************************************************************
-
     void CalcQiceDischageMax(Real64 &QiceMin, int iceNum);
-
-    //******************************************************************************
 
     void CalcUAIce(int iceNum, Real64 XCurIceFrac_loc, Real64 &UAIceCh_loc, Real64 &UAIceDisCh_loc, Real64 &HLoss_loc);
 
@@ -348,23 +327,13 @@ namespace IceThermalStorage {
                      Real64 MassFlowstar  // normalized mass flow rate through the ice storage unit
     );
     
-    // *****************************************************************************
-
     Real64 TempSItoIP(Real64 Temp);
-
-    // *****************************************************************************
 
     Real64 TempIPtoSI(Real64 Temp);
 
-    // *****************************************************************************
-
     void UpdateNode(Real64 MyLoad, bool RunFlag, int iceNum);
 
-    // *****************************************************************************
-
     void RecordOutput(int iceNum, Real64 MyLoad, bool RunFlag);
-
-    // *****************************************************************************
 
     void UpdateIceFractions();
 

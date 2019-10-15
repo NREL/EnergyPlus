@@ -226,8 +226,9 @@ namespace IceThermalStorage {
                 // READING INPUT when first calling SimIceStorage
                 //------------------------------------------------------------------------
                 iceNum = IceStorageTypeMap(IceStorageNum).LocalEqNum;
+                auto &thisITS = IceStorage(iceNum);
 
-                InitSimpleIceStorage(iceNum);
+                thisITS.InitSimpleIceStorage();
 
                 if (InitLoopEquip) {
                     return;
@@ -279,7 +280,7 @@ namespace IceThermalStorage {
                 //************************************************************************
                 //        IF( U .EQ. 0.0 ) THEN
                 if ((MyLoad2 == 0.0) || (DemandMdot == 0.0)) {
-                    CalcIceStorageDormant(IceStorageType::Simple, iceNum);
+                    thisITS.CalcIceStorageDormant();
 
                     //***** Charging Process for ITS *****************************************
                     //************************************************************************
@@ -1321,20 +1322,20 @@ namespace IceThermalStorage {
         DetIceStor(iceNum).ParasiticElecEnergy = 0.0;
     }
 
-    void InitSimpleIceStorage(int const iceNum)
+    void IceStorageSpecs::InitSimpleIceStorage()
     {
 
         bool errFlag;
 
-        if (IceStorage(iceNum).MyPlantScanFlag) {
+        if (this->MyPlantScanFlag) {
             // Locate the storage on the plant loops for later usage
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(IceStorage(iceNum).Name,
+            PlantUtilities::ScanPlantLoopsForObject(this->Name,
                                     DataPlant::TypeOf_TS_IceSimple,
-                                    IceStorage(iceNum).LoopNum,
-                                    IceStorage(iceNum).LoopSideNum,
-                                    IceStorage(iceNum).BranchNum,
-                                    IceStorage(iceNum).CompNum,
+                                    this->LoopNum,
+                                    this->LoopSideNum,
+                                    this->BranchNum,
+                                    this->CompNum,
                                     errFlag,
                                     _,
                                     _,
@@ -1344,44 +1345,44 @@ namespace IceThermalStorage {
             if (errFlag) {
                 ShowFatalError("InitSimpleIceStorage: Program terminated due to previous condition(s).");
             }
-            IceStorage(iceNum).MyPlantScanFlag = false;
+            this->MyPlantScanFlag = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && IceStorage(iceNum).MyEnvrnFlag2) {
-            IceStorage(iceNum).DesignMassFlowRate = DataPlant::PlantLoop(IceStorage(iceNum).LoopNum).MaxMassFlowRate;
+        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag2) {
+            this->DesignMassFlowRate = DataPlant::PlantLoop(this->LoopNum).MaxMassFlowRate;
             // no design flow rates for model, assume min is zero and max is plant loop's max
             PlantUtilities::InitComponentNodes(0.0,
-                               IceStorage(iceNum).DesignMassFlowRate,
-                               IceStorage(iceNum).PltInletNodeNum,
-                               IceStorage(iceNum).PltOutletNodeNum,
-                               IceStorage(iceNum).LoopNum,
-                               IceStorage(iceNum).LoopSideNum,
-                               IceStorage(iceNum).BranchNum,
-                               IceStorage(iceNum).CompNum);
-            if ((DataPlant::PlantLoop(IceStorage(iceNum).LoopNum).CommonPipeType == DataPlant::CommonPipe_TwoWay) && (IceStorage(iceNum).LoopSideNum == DataPlant::SupplySide)) {
+                               this->DesignMassFlowRate,
+                               this->PltInletNodeNum,
+                               this->PltOutletNodeNum,
+                               this->LoopNum,
+                               this->LoopSideNum,
+                               this->BranchNum,
+                               this->CompNum);
+            if ((DataPlant::PlantLoop(this->LoopNum).CommonPipeType == DataPlant::CommonPipe_TwoWay) && (this->LoopSideNum == DataPlant::SupplySide)) {
                 // up flow priority of other components on the same branch as the Ice tank
                 for (int CompNum = 1;
-                     CompNum <= DataPlant::PlantLoop(IceStorage(iceNum).LoopNum).LoopSide(DataPlant::SupplySide).Branch(IceStorage(iceNum).BranchNum).TotalComponents;
+                     CompNum <= DataPlant::PlantLoop(this->LoopNum).LoopSide(DataPlant::SupplySide).Branch(this->BranchNum).TotalComponents;
                      ++CompNum) {
-                    DataPlant::PlantLoop(IceStorage(iceNum).LoopNum).LoopSide(DataPlant::SupplySide).Branch(IceStorage(iceNum).BranchNum).Comp(CompNum).FlowPriority =
+                    DataPlant::PlantLoop(this->LoopNum).LoopSide(DataPlant::SupplySide).Branch(this->BranchNum).Comp(CompNum).FlowPriority =
                         DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
                 }
             }
-            IceStorage(iceNum).MyLoad = 0.0;
-            IceStorage(iceNum).Urate = 0.0;
-            IceStorage(iceNum).IceFracRemain = 1.0;
-            IceStorage(iceNum).ITSCoolingRate = 0.0;
-            IceStorage(iceNum).ITSCoolingEnergy_rep = 0.0;
-            IceStorage(iceNum).ITSChargingRate = 0.0;
-            IceStorage(iceNum).ITSChargingEnergy = 0.0;
-            IceStorage(iceNum).ITSmdot = 0.0;
-            IceStorage(iceNum).ITSInletTemp = 0.0;
-            IceStorage(iceNum).ITSOutletTemp = 0.0;
+            this->MyLoad = 0.0;
+            this->Urate = 0.0;
+            this->IceFracRemain = 1.0;
+            this->ITSCoolingRate = 0.0;
+            this->ITSCoolingEnergy_rep = 0.0;
+            this->ITSChargingRate = 0.0;
+            this->ITSChargingEnergy = 0.0;
+            this->ITSmdot = 0.0;
+            this->ITSInletTemp = 0.0;
+            this->ITSOutletTemp = 0.0;
 
-            IceStorage(iceNum).MyEnvrnFlag2 = false;
+            this->MyEnvrnFlag2 = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) IceStorage(iceNum).MyEnvrnFlag2 = true;
+        if (!DataGlobals::BeginEnvrnFlag) this->MyEnvrnFlag2 = true;
     }
 
     //******************************************************************************
@@ -1442,43 +1443,33 @@ namespace IceThermalStorage {
 
     //******************************************************************************
 
-    void CalcIceStorageDormant(int const IceStorageType, // BY ZG
-                               int &iceNum)
+    void IceStorageSpecs::CalcIceStorageDormant()
     {
+        // Provide output results for ITS.
+        this->ITSMassFlowRate = 0.0; //[kg/s]
+
+        PlantUtilities::SetComponentFlowRate(this->ITSMassFlowRate,
+                                             this->PltInletNodeNum,
+                                             this->PltOutletNodeNum,
+                                             this->LoopNum,
+                                             this->LoopSideNum,
+                                             this->BranchNum,
+                                             this->CompNum);
+
+        this->ITSInletTemp = DataLoopNode::Node(this->PltInletNodeNum).Temp; //[C]
+        this->ITSOutletTemp = this->ITSInletTemp;           //[C]
         {
-            auto const SELECT_CASE_var(IceStorageType); // by ZG
-
-            if (SELECT_CASE_var == IceStorageType::Simple) { // by ZG
-
-                // Provide output results for ITS.
-                IceStorage(iceNum).ITSMassFlowRate = 0.0; //[kg/s]
-
-                PlantUtilities::SetComponentFlowRate(IceStorage(iceNum).ITSMassFlowRate,
-                                                     IceStorage(iceNum).PltInletNodeNum,
-                                                     IceStorage(iceNum).PltOutletNodeNum,
-                                                     IceStorage(iceNum).LoopNum,
-                                                     IceStorage(iceNum).LoopSideNum,
-                                                     IceStorage(iceNum).BranchNum,
-                                                     IceStorage(iceNum).CompNum);
-
-                IceStorage(iceNum).ITSInletTemp = DataLoopNode::Node(IceStorage(iceNum).PltInletNodeNum).Temp; //[C]
-                IceStorage(iceNum).ITSOutletTemp = IceStorage(iceNum).ITSInletTemp;           //[C]
-                {
-                    auto const SELECT_CASE_var1(DataPlant::PlantLoop(IceStorage(iceNum).LoopNum).LoopDemandCalcScheme);
-                    if (SELECT_CASE_var1 == DataPlant::SingleSetPoint) {
-                        IceStorage(iceNum).ITSOutletSetPointTemp = DataLoopNode::Node(IceStorage(iceNum).PltOutletNodeNum).TempSetPoint;
-                    } else if (SELECT_CASE_var1 == DataPlant::DualSetPointDeadBand) {
-                        IceStorage(iceNum).ITSOutletSetPointTemp = DataLoopNode::Node(IceStorage(iceNum).PltOutletNodeNum).TempSetPointHi;
-                    }
-                }
-                IceStorage(iceNum).ITSCoolingRate = 0.0;   //[W]
-                IceStorage(iceNum).ITSCoolingEnergy = 0.0; //[J]
-
-                IceStorage(iceNum).Urate = 0.0; //[n/a]
-
-            } else {
+            auto const SELECT_CASE_var1(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
+            if (SELECT_CASE_var1 == DataPlant::SingleSetPoint) {
+                this->ITSOutletSetPointTemp = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPoint;
+            } else if (SELECT_CASE_var1 == DataPlant::DualSetPointDeadBand) {
+                this->ITSOutletSetPointTemp = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPointHi;
             }
         }
+        this->ITSCoolingRate = 0.0;   //[W]
+        this->ITSCoolingEnergy = 0.0; //[J]
+
+        this->Urate = 0.0; //[n/a]
     }
 
     //******************************************************************************
