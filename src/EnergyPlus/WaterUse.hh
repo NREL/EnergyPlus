@@ -206,6 +206,13 @@ namespace WaterUse {
         Real64 TotalVolume; // Water consumption (m3)
         Real64 Power;       // Heating rate required to raise temperature from cold to hot (W)
         Real64 Energy;      // Heating energy required to raise temperature from cold to hot (J)
+        Real64 CapacityRatio; 
+        Real64 MinCapacityRate;
+        Real64 HXCapacityRate;
+        Real64 DrainCapacityRate;
+        Real64 NTU;
+        Real64 ExpVal;
+        Real64 AvailableFraction;
         int NumWaterEquipment;
         int MaxIterationsErrorIndex; // recurring error index
         Array1D_int WaterEquipment;
@@ -223,7 +230,8 @@ namespace WaterUse {
               MainsVolFlowRate(0.0), TankVolFlowRate(0.0), ColdVolFlowRate(0.0), HotVolFlowRate(0.0), TotalVolFlowRate(0.0), DrainVolFlowRate(0.0),
               PeakMassFlowRate(0.0), ColdTempSchedule(0), HotTempSchedule(0), MainsTemp(0.0), TankTemp(0.0), ColdSupplyTemp(0.0), ColdTemp(0.0),
               HotTemp(0.0), DrainTemp(0.0), RecoveryTemp(0.0), ReturnTemp(0.0), WasteTemp(0.0), TempError(0.0), MainsVolume(0.0), TankVolume(0.0),
-              ColdVolume(0.0), HotVolume(0.0), TotalVolume(0.0), Power(0.0), Energy(0.0), NumWaterEquipment(0), MaxIterationsErrorIndex(0),
+              ColdVolume(0.0), HotVolume(0.0), TotalVolume(0.0), Power(0.0), Energy(0.0), CapacityRatio(0.0), MinCapacityRate(0.0),
+              HXCapacityRate(0.0), DrainCapacityRate(0.0), NTU(0.0), ExpVal(0.0), AvailableFraction(0.0), NumWaterEquipment(0), MaxIterationsErrorIndex(0),
               PlantLoopNum(0), PlantLoopSide(0), PlantLoopBranchNum(0), PlantLoopCompNum(0)
         {
         }
