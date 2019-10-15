@@ -97,8 +97,8 @@ namespace WaterUse {
     static std::string const BlankString;
 
     // MODULE VARIABLE DECLARATIONS:
-    int NumWaterEquipment(0);
-    int NumWaterConnections(0);
+    int modNumWaterEquipment(0);
+    int modNumWaterConnections(0);
     bool GetWaterUseInputFlag(true);
 
     Array1D_bool CheckEquipName;
@@ -110,8 +110,8 @@ namespace WaterUse {
 
     void clear_state()
     {
-        NumWaterEquipment = 0;
-        NumWaterConnections = 0;
+        modNumWaterEquipment = 0;
+        modNumWaterConnections = 0;
         GetWaterUseInputFlag = true;
         CheckEquipName.deallocate();
         CheckPlantLoop.deallocate();
@@ -152,7 +152,7 @@ namespace WaterUse {
 
         if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag) {
             MaxIterationsErrorCount = 0;
-            if (NumWaterEquipment > 0) {
+            if (modNumWaterEquipment > 0) {
                 for (auto &e : WaterEquipment) {
                     e.SensibleRate = 0.0;
                     e.SensibleEnergy = 0.0;
@@ -164,7 +164,7 @@ namespace WaterUse {
                 }
             }
 
-            if (NumWaterConnections > 0) {
+            if (modNumWaterConnections > 0) {
                 for (auto &e : WaterConnections)
                     e.TotalMassFlowRate = 0.0;
             }
@@ -175,7 +175,7 @@ namespace WaterUse {
         if (!DataGlobals::BeginEnvrnFlag) MyEnvrnFlag = true;
 
         // Simulate all unconnected WATER USE EQUIPMENT objects
-        for (WaterEquipNum = 1; WaterEquipNum <= NumWaterEquipment; ++WaterEquipNum) {
+        for (WaterEquipNum = 1; WaterEquipNum <= modNumWaterEquipment; ++WaterEquipNum) {
             if (WaterEquipment(WaterEquipNum).Connections == 0) {
                 CalcEquipmentFlowRates(WaterEquipNum);
                 CalcEquipmentDrainTemp(WaterEquipNum);
@@ -185,7 +185,7 @@ namespace WaterUse {
         ReportStandAloneWaterUse();
 
         // Simulate WATER USE CONNECTIONS objects and connected WATER USE EQUIPMENT objects
-        for (WaterConnNum = 1; WaterConnNum <= NumWaterConnections; ++WaterConnNum) {
+        for (WaterConnNum = 1; WaterConnNum <= modNumWaterConnections; ++WaterConnNum) {
 
             if (!WaterConnections(WaterConnNum).StandAlone) continue; // only model non plant connections here
 
@@ -265,9 +265,9 @@ namespace WaterUse {
             CompIndex = WaterConnNum;
         } else {
             WaterConnNum = CompIndex;
-            if (WaterConnNum > NumWaterConnections || WaterConnNum < 1) {
+            if (WaterConnNum > modNumWaterConnections || WaterConnNum < 1) {
                 ShowFatalError("SimulateWaterUseConnection: Invalid CompIndex passed=" + General::TrimSigDigits(WaterConnNum) +
-                               ", Number of Units=" + General::TrimSigDigits(NumWaterConnections) + ", Entered Unit name=" + CompName);
+                               ", Number of Units=" + General::TrimSigDigits(modNumWaterConnections) + ", Entered Unit name=" + CompName);
             }
             if (CheckEquipName(WaterConnNum)) {
                 if (CompName != WaterConnections(WaterConnNum).Name) {
@@ -284,13 +284,13 @@ namespace WaterUse {
 
         if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag) {
             MaxIterationsErrorCount = 0;
-            if (NumWaterEquipment > 0) {
+            if (modNumWaterEquipment > 0) {
                 for (int i = WaterEquipment.l(), e = WaterEquipment.u(); i <= e; ++i) {
                     WaterEquipment(i).reset();
                 }
             }
 
-            if (NumWaterConnections > 0) {
+            if (modNumWaterConnections > 0) {
                 for (auto &e : WaterConnections)
                     e.TotalMassFlowRate = 0.0;
             }
@@ -359,12 +359,12 @@ namespace WaterUse {
         // FLOW:
 
         DataIPShortCuts::cCurrentModuleObject = "WaterUse:Equipment";
-        NumWaterEquipment = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        modNumWaterEquipment = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (NumWaterEquipment > 0) {
-            WaterEquipment.allocate(NumWaterEquipment);
+        if (modNumWaterEquipment > 0) {
+            WaterEquipment.allocate(modNumWaterEquipment);
 
-            for (WaterEquipNum = 1; WaterEquipNum <= NumWaterEquipment; ++WaterEquipNum) {
+            for (WaterEquipNum = 1; WaterEquipNum <= modNumWaterEquipment; ++WaterEquipNum) {
                 inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                               WaterEquipNum,
                                               DataIPShortCuts::cAlphaArgs,
@@ -463,12 +463,12 @@ namespace WaterUse {
         }
 
         DataIPShortCuts::cCurrentModuleObject = "WaterUse:Connections";
-        NumWaterConnections = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        modNumWaterConnections = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (NumWaterConnections > 0) {
-            WaterConnections.allocate(NumWaterConnections);
+        if (modNumWaterConnections > 0) {
+            WaterConnections.allocate(modNumWaterConnections);
 
-            for (WaterConnNum = 1; WaterConnNum <= NumWaterConnections; ++WaterConnNum) {
+            for (WaterConnNum = 1; WaterConnNum <= modNumWaterConnections; ++WaterConnNum) {
                 inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                               WaterConnNum,
                                               DataIPShortCuts::cAlphaArgs,
@@ -621,17 +621,17 @@ namespace WaterUse {
 
             if (ErrorsFound) ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
 
-            if (NumWaterConnections > 0) {
-                CheckEquipName.allocate(NumWaterConnections);
-                CheckPlantLoop.allocate(NumWaterConnections);
+            if (modNumWaterConnections > 0) {
+                CheckEquipName.allocate(modNumWaterConnections);
+                CheckPlantLoop.allocate(modNumWaterConnections);
                 CheckEquipName = true;
                 CheckPlantLoop = true;
             }
         }
 
         // determine connection's peak mass flow rates.
-        if (NumWaterConnections > 0) {
-            for (WaterConnNum = 1; WaterConnNum <= NumWaterConnections; ++WaterConnNum) {
+        if (modNumWaterConnections > 0) {
+            for (WaterConnNum = 1; WaterConnNum <= modNumWaterConnections; ++WaterConnNum) {
                 WaterConnections(WaterConnNum).PeakMassFlowRate = 0.0;
                 for (WaterEquipNum = 1; WaterEquipNum <= WaterConnections(WaterConnNum).NumWaterEquipment; ++WaterEquipNum) {
                     thisWaterEquipNum = WaterConnections(WaterConnNum).WaterEquipment(WaterEquipNum);
@@ -651,7 +651,7 @@ namespace WaterUse {
 
         // Setup EQUIPMENT report variables (now that connections have been established)
         // CurrentModuleObject='WaterUse:Equipment'
-        for (WaterEquipNum = 1; WaterEquipNum <= NumWaterEquipment; ++WaterEquipNum) {
+        for (WaterEquipNum = 1; WaterEquipNum <= modNumWaterEquipment; ++WaterEquipNum) {
 
             SetupOutputVariable("Water Use Equipment Hot Water Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
@@ -868,7 +868,7 @@ namespace WaterUse {
 
         // Setup CONNECTIONS report variables (don't put any on meters; they are metered at WATER USE EQUIPMENT level)
         // CurrentModuleObject='WaterUse:Connections'
-        for (WaterConnNum = 1; WaterConnNum <= NumWaterConnections; ++WaterConnNum) {
+        for (WaterConnNum = 1; WaterConnNum <= modNumWaterConnections; ++WaterConnNum) {
 
             SetupOutputVariable("Water Use Connections Hot Water Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
@@ -1251,11 +1251,11 @@ namespace WaterUse {
         int InletNode;
         int OutletNode;
         bool MyOneTimeFlag(true);      // one time flag                    !DSU
-        static Array1D_bool SetLoopIndexFlag; // get loop number flag             !DSU
+        Array1D_bool SetLoopIndexFlag; // get loop number flag             !DSU
         bool errFlag;
 
         if (MyOneTimeFlag) {                                       // DSU
-            SetLoopIndexFlag.dimension(NumWaterConnections, true); // DSU
+            SetLoopIndexFlag.dimension(modNumWaterConnections, true); // DSU
             MyOneTimeFlag = false;                                 // DSU
         }                                                          // DSU
 
@@ -1675,7 +1675,7 @@ namespace WaterUse {
         int WaterEquipNum;
 
         // FLOW:
-        for (WaterEquipNum = 1; WaterEquipNum <= NumWaterEquipment; ++WaterEquipNum) {
+        for (WaterEquipNum = 1; WaterEquipNum <= modNumWaterEquipment; ++WaterEquipNum) {
             WaterEquipment(WaterEquipNum).ColdVolFlowRate =
                 WaterEquipment(WaterEquipNum).ColdMassFlowRate / Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
             WaterEquipment(WaterEquipNum).HotVolFlowRate =
@@ -1793,7 +1793,7 @@ namespace WaterUse {
         bool MyEnvrnFlag(true);
 
         // FLOW:
-        if (NumWaterEquipment == 0) return;
+        if (modNumWaterEquipment == 0) return;
 
         if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag) {
             for (auto &e : WaterEquipment) {
@@ -1817,7 +1817,7 @@ namespace WaterUse {
 
         if (!DataGlobals::BeginEnvrnFlag) MyEnvrnFlag = true;
 
-        for (WaterEquipNum = 1; WaterEquipNum <= NumWaterEquipment; ++WaterEquipNum) {
+        for (WaterEquipNum = 1; WaterEquipNum <= modNumWaterEquipment; ++WaterEquipNum) {
             if (WaterEquipment(WaterEquipNum).Zone == 0) continue;
             ZoneNum = WaterEquipment(WaterEquipNum).Zone;
             WaterEquipment(WaterEquipNum).SensibleRateNoMultiplier =
