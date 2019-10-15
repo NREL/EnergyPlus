@@ -49,7 +49,7 @@
 #define PROPERTIES_HPP
 
 #ifndef AIRDENSITY
-#include "Psychrometrics.hh"
+#include "../../../Psychrometrics.hh"
 #define AIRDENSITY(P, T, W) Psychrometrics::PsyRhoAirFnPbTdbW(P, T, W)
 #define AIRCP(W, T) Psychrometrics::PsyCpAirFnWTdb(W, T)
 #else
@@ -63,7 +63,7 @@
 #endif
 
 #ifndef TOKELVIN
-#include "DataGlobals.hh"
+#include "../../../DataGlobals.hh"
 #define TOKELVIN(T) (T+DataGlobals::KelvinConv)
 #else
 // Need a fallback

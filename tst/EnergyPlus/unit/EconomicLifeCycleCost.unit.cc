@@ -57,11 +57,10 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataGlobalConstants.hh>
-#include <EconomicTariff.hh>
-
-#include <EconomicLifeCycleCost.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/EconomicTariff.hh>
+#include <EnergyPlus/EconomicLifeCycleCost.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

@@ -54,18 +54,18 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataAirLoop.hh>
-#include <DataEnvironment.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataSizing.hh>
-#include <DataZoneEquipment.hh>
-#include <DualDuct.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DualDuct.hh>
 
-#include <DataGlobals.hh>
-#include <HeatBalanceManager.hh>
-#include <ScheduleManager.hh>
-#include <ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 using namespace EnergyPlus;
 using namespace DualDuct;

@@ -57,8 +57,8 @@
 #include <ObjexxFCL/Vector3.fwd.hh>
 
 // EnergyPlus Headers
-#include <DataBSDFWindow.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 

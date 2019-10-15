@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataPrecisionGlobals.hh>
-#include <TARCOGParams.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 
 namespace EnergyPlus {
 

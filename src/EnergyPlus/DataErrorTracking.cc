@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataErrorTracking.hh>
-#include <DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 

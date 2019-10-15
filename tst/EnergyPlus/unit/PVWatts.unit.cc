@@ -53,13 +53,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataSurfaces.hh>
-#include <ElectricPowerServiceManager.hh>
-#include <PVWatts.hh>
-#include <WeatherManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/PVWatts.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

@@ -52,9 +52,9 @@
 #include <string>
 #include <vector>
 
-#include <PlantComponent.hh>
-#include <Plant/PlantLocation.hh>
-#include <WaterToWaterHeatPumps.hh>
+#include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/WaterToWaterHeatPumps.hh>
 
 namespace EnergyPlus {
 

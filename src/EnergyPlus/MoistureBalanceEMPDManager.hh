@@ -52,8 +52,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataHeatBalance.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 

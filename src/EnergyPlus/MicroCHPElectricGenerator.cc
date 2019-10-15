@@ -53,32 +53,32 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <CurveManager.hh>
-#include <DataEnvironment.hh>
-#include <DataGenerators.hh>
-#include <DataGlobalConstants.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GeneratorDynamicsManager.hh>
-#include <GeneratorFuelSupply.hh>
-#include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <MicroCHPElectricGenerator.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <PlantUtilities.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGenerators.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneratorDynamicsManager.hh>
+#include <EnergyPlus/GeneratorFuelSupply.hh>
+#include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MicroCHPElectricGenerator.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

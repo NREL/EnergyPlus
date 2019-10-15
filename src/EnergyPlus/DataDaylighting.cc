@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataDaylighting.hh>
-#include <DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataDaylighting.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 

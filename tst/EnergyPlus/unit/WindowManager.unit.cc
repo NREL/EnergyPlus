@@ -57,27 +57,27 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <ConvectionCoefficients.hh>
-#include <CurveManager.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataSurfaces.hh>
-#include <ElectricPowerServiceManager.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <HeatBalanceIntRadExchange.hh>
-#include <HeatBalanceManager.hh>
-#include <HeatBalanceSurfaceManager.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <SolarShading.hh>
-#include <WindowManager.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/WindowManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 

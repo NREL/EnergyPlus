@@ -57,9 +57,9 @@
 #include <ObjexxFCL/Array3D.hh>
 
 // EnergyPlus Headers
-#include <DataBSDFWindow.hh>
-#include <DataVectorTypes.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 

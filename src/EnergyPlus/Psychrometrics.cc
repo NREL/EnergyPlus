@@ -55,12 +55,12 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <CommandLineInterface.hh>
-#include <DataEnvironment.hh>
-#include <DataPrecisionGlobals.hh>
-#include <General.hh>
-#include <Psychrometrics.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

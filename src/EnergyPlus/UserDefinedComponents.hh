@@ -52,9 +52,9 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataPlant.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
