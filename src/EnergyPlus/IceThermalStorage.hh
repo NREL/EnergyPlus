@@ -286,6 +286,8 @@ namespace IceThermalStorage {
         }
 
         void InitDetailedIceStorage();
+
+        void SimDetailedIceStorage();
     };
 
     // Object Data
@@ -304,8 +306,6 @@ namespace IceThermalStorage {
                        bool FirstIteration,
                        bool InitLoopEquip,
                        Real64 &MyLoad);
-
-    void SimDetailedIceStorage(int iceNum);
 
     void GetIceStorageInput();
 

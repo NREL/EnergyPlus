@@ -323,7 +323,7 @@ namespace IceThermalStorage {
 
                 thisITS.InitDetailedIceStorage(); // Initialize detailed ice storage
 
-                SimDetailedIceStorage(iceNum); // Simulate detailed ice storage
+                thisITS.SimDetailedIceStorage(); // Simulate detailed ice storage
 
                 UpdateDetailedIceStorage(iceNum); // Update detailed ice storage
 
@@ -335,7 +335,7 @@ namespace IceThermalStorage {
         }
     }
 
-    void SimDetailedIceStorage(int const iceNum)
+    void DetailedIceStorageData::SimDetailedIceStorage()
     {
 
         // SUBROUTINE INFORMATION:
@@ -370,12 +370,12 @@ namespace IceThermalStorage {
                                                         // Assumes approximate density of 1000 kg/m3 to get an estimate for mass flow rate
         std::string const RoutineName("SimDetailedIceStorage");
 
-        int NodeNumIn = DetIceStor(iceNum).PlantInNodeNum;  // Plant loop inlet node number for component
-        int NodeNumOut = DetIceStor(iceNum).PlantOutNodeNum;  // Plant loop outlet node number for component
+        int NodeNumIn = this->PlantInNodeNum;  // Plant loop inlet node number for component
+        int NodeNumOut = this->PlantOutNodeNum;  // Plant loop outlet node number for component
         Real64 TempIn = DataLoopNode::Node(NodeNumIn).Temp;  // Inlet temperature to component (from plant loop) [C]
         Real64 TempSetPt(0.0);  // Setpoint temperature defined by loop controls [C]
         {
-            auto const SELECT_CASE_var(DataPlant::PlantLoop(DetIceStor(iceNum).PlantLoopNum).LoopDemandCalcScheme);
+            auto const SELECT_CASE_var(DataPlant::PlantLoop(this->PlantLoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
                 TempSetPt = DataLoopNode::Node(NodeNumOut).TempSetPoint;
             } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
@@ -388,126 +388,126 @@ namespace IceThermalStorage {
         int IterNum = 0;
 
         // Set derived type variables
-        DetIceStor(iceNum).InletTemp = TempIn;
-        DetIceStor(iceNum).MassFlowRate = DataLoopNode::Node(NodeNumIn).MassFlowRate;
+        this->InletTemp = TempIn;
+        this->MassFlowRate = DataLoopNode::Node(NodeNumIn).MassFlowRate;
 
         // if two-way common pipe and no mass flow and tank is not full, then use design flow rate
-        if ((DataPlant::PlantLoop(DetIceStor(iceNum).PlantLoopNum).CommonPipeType == DataPlant::CommonPipe_TwoWay) &&
-            (std::abs(DetIceStor(iceNum).MassFlowRate) < DataBranchAirLoopPlant::MassFlowTolerance) && (DetIceStor(iceNum).IceFracRemaining < TankChargeToler)) {
-            DetIceStor(iceNum).MassFlowRate = DetIceStor(iceNum).DesignMassFlowRate;
+        if ((DataPlant::PlantLoop(this->PlantLoopNum).CommonPipeType == DataPlant::CommonPipe_TwoWay) &&
+            (std::abs(this->MassFlowRate) < DataBranchAirLoopPlant::MassFlowTolerance) && (this->IceFracRemaining < TankChargeToler)) {
+            this->MassFlowRate = this->DesignMassFlowRate;
         }
 
         // Calculate the current load on the ice storage unit
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-                DataPlant::PlantLoop(DetIceStor(iceNum).PlantLoopNum).FluidName, TempIn, DataPlant::PlantLoop(DetIceStor(iceNum).PlantLoopNum).FluidIndex, RoutineName);
+                DataPlant::PlantLoop(this->PlantLoopNum).FluidName, TempIn, DataPlant::PlantLoop(this->PlantLoopNum).FluidIndex, RoutineName);
 
         // Estimated load on the ice storage unit [W]
-        Real64 LocalLoad = DetIceStor(iceNum).MassFlowRate * Cp * (TempIn - TempSetPt);
+        Real64 LocalLoad = this->MassFlowRate * Cp * (TempIn - TempSetPt);
 
         // Determine what the status is regarding the ice storage unit and the loop level flow
-        if ((std::abs(LocalLoad) <= SmallestLoad) || (ScheduleManager::GetCurrentScheduleValue(DetIceStor(iceNum).ScheduleIndex) <= 0)) {
+        if ((std::abs(LocalLoad) <= SmallestLoad) || (ScheduleManager::GetCurrentScheduleValue(this->ScheduleIndex) <= 0)) {
             // No real load on the ice storage device or ice storage OFF--bypass all of the flow and leave the tank alone
-            DetIceStor(iceNum).CompLoad = 0.0;
-            DetIceStor(iceNum).OutletTemp = TempIn;
-            DetIceStor(iceNum).TankOutletTemp = TempIn;
+            this->CompLoad = 0.0;
+            this->OutletTemp = TempIn;
+            this->TankOutletTemp = TempIn;
             Real64 mdot = 0.0;
             PlantUtilities::SetComponentFlowRate(mdot,
-                                 DetIceStor(iceNum).PlantInNodeNum,
-                                 DetIceStor(iceNum).PlantOutNodeNum,
-                                 DetIceStor(iceNum).PlantLoopNum,
-                                 DetIceStor(iceNum).PlantLoopSideNum,
-                                 DetIceStor(iceNum).PlantBranchNum,
-                                 DetIceStor(iceNum).PlantCompNum);
+                                 this->PlantInNodeNum,
+                                 this->PlantOutNodeNum,
+                                 this->PlantLoopNum,
+                                 this->PlantLoopSideNum,
+                                 this->PlantBranchNum,
+                                 this->PlantCompNum);
 
-            DetIceStor(iceNum).BypassMassFlowRate = mdot;
-            DetIceStor(iceNum).TankMassFlowRate = 0.0;
-            DetIceStor(iceNum).MassFlowRate = mdot;
+            this->BypassMassFlowRate = mdot;
+            this->TankMassFlowRate = 0.0;
+            this->MassFlowRate = mdot;
 
         } else if (LocalLoad < 0.0) {
             // The load is less than zero so we should be charging
             // Before we do anything, we should check to make sure that we will actually be charging the unit
 
-            if ((TempIn > (DetIceStor(iceNum).FreezingTemp - modDeltaTifMin)) || (DetIceStor(iceNum).IceFracRemaining >= TankChargeToler)) {
+            if ((TempIn > (this->FreezingTemp - modDeltaTifMin)) || (this->IceFracRemaining >= TankChargeToler)) {
                 // If the inlet temperature is not below the freezing temperature of the
                 // device, then we cannot actually do any charging.  Bypass all of the flow.
                 // Also, if the tank is already sufficiently charged, we don't need to
                 // do any further charging.  So, bypass all of the flow.
-                DetIceStor(iceNum).CompLoad = 0.0;
-                DetIceStor(iceNum).OutletTemp = TempIn;
-                DetIceStor(iceNum).TankOutletTemp = TempIn;
+                this->CompLoad = 0.0;
+                this->OutletTemp = TempIn;
+                this->TankOutletTemp = TempIn;
                 Real64 mdot = 0.0;
                 PlantUtilities::SetComponentFlowRate(mdot,
-                                     DetIceStor(iceNum).PlantInNodeNum,
-                                     DetIceStor(iceNum).PlantOutNodeNum,
-                                     DetIceStor(iceNum).PlantLoopNum,
-                                     DetIceStor(iceNum).PlantLoopSideNum,
-                                     DetIceStor(iceNum).PlantBranchNum,
-                                     DetIceStor(iceNum).PlantCompNum);
+                                     this->PlantInNodeNum,
+                                     this->PlantOutNodeNum,
+                                     this->PlantLoopNum,
+                                     this->PlantLoopSideNum,
+                                     this->PlantBranchNum,
+                                     this->PlantCompNum);
 
-                DetIceStor(iceNum).BypassMassFlowRate = mdot;
-                DetIceStor(iceNum).TankMassFlowRate = 0.0;
-                DetIceStor(iceNum).MassFlowRate = mdot;
+                this->BypassMassFlowRate = mdot;
+                this->TankMassFlowRate = 0.0;
+                this->MassFlowRate = mdot;
 
             } else {
                 // make flow request so tank will get flow
-                Real64 mdot = DetIceStor(iceNum).DesignMassFlowRate;
+                Real64 mdot = this->DesignMassFlowRate;
                 PlantUtilities::SetComponentFlowRate(mdot,
-                                     DetIceStor(iceNum).PlantInNodeNum,
-                                     DetIceStor(iceNum).PlantOutNodeNum,
-                                     DetIceStor(iceNum).PlantLoopNum,
-                                     DetIceStor(iceNum).PlantLoopSideNum,
-                                     DetIceStor(iceNum).PlantBranchNum,
-                                     DetIceStor(iceNum).PlantCompNum);
+                                     this->PlantInNodeNum,
+                                     this->PlantOutNodeNum,
+                                     this->PlantLoopNum,
+                                     this->PlantLoopSideNum,
+                                     this->PlantBranchNum,
+                                     this->PlantCompNum);
 
                 // We are in charging mode, the temperatures are low enough to charge
                 // the tank, and we have some charging left to do.
                 // Make first guess at Qstar based on the current ice fraction remaining
                 // and LMTDstar that is based on the freezing or TempSetPt temperature.
-                if (TempSetPt > (DetIceStor(iceNum).FreezingTemp - modDeltaTofMin)) {
+                if (TempSetPt > (this->FreezingTemp - modDeltaTofMin)) {
                     // Outlet temperature cannot be above the freezing temperature so set
                     // the outlet temperature to the freezing temperature and calculate
                     // LMTDstar based on that assumption.
-                    TempSetPt = DetIceStor(iceNum).FreezingTemp - modDeltaTofMin;
+                    TempSetPt = this->FreezingTemp - modDeltaTofMin;
                 }
 
                 // Tank outlet temperature from the last iteration [C]
                 Real64 ToutOld = TempSetPt;
                 // Non-dimensional log mean temperature difference of ice storage unit [non-dimensional]
-                Real64 LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, DetIceStor(iceNum).FreezingTemp);
-                Real64 MassFlowstar = DetIceStor(iceNum).MassFlowRate / SIEquiv100GPMinMassFlowRate;
+                Real64 LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, this->FreezingTemp);
+                Real64 MassFlowstar = this->MassFlowRate / SIEquiv100GPMinMassFlowRate;
 
                 // Find initial guess at average fraction charged during time step
                 // Fraction of tank to be charged in the current time step
-                Real64 ChargeFrac = LocalLoad * DataHVACGlobals::TimeStepSys / DetIceStor(iceNum).NomCapacity;
-                if ((DetIceStor(iceNum).IceFracRemaining + ChargeFrac) > 1.0) {
-                    ChargeFrac = 1.0 - DetIceStor(iceNum).IceFracRemaining;
+                Real64 ChargeFrac = LocalLoad * DataHVACGlobals::TimeStepSys / this->NomCapacity;
+                if ((this->IceFracRemaining + ChargeFrac) > 1.0) {
+                    ChargeFrac = 1.0 - this->IceFracRemaining;
                 }
 
                 Real64 AvgFracCharged;  // Average fraction charged for the current time step
-                if (DetIceStor(iceNum).ThawProcessIndex == DetIce::InsideMelt) {
-                    AvgFracCharged = DetIceStor(iceNum).IceFracOnCoil + (ChargeFrac / 2.0);
+                if (this->ThawProcessIndex == DetIce::InsideMelt) {
+                    AvgFracCharged = this->IceFracOnCoil + (ChargeFrac / 2.0);
                 } else { // (DetIceStor(IceNum)%ThawProcessIndex == DetIce::OutsideMelt)
-                    AvgFracCharged = DetIceStor(iceNum).IceFracRemaining + (ChargeFrac / 2.0);
+                    AvgFracCharged = this->IceFracRemaining + (ChargeFrac / 2.0);
                 }
 
                 // Current load on the ice storage unit [non-dimensional]
-                Real64 Qstar = std::abs(CalcQstar(DetIceStor(iceNum).ChargeCurveNum, DetIceStor(iceNum).ChargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
+                Real64 Qstar = std::abs(CalcQstar(this->ChargeCurveNum, this->ChargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
 
                 // Actual load on the ice storage unit [W]
-                Real64 ActualLoad = Qstar * DetIceStor(iceNum).NomCapacity / DetIceStor(iceNum).CurveFitTimeStep;
+                Real64 ActualLoad = Qstar * this->NomCapacity / this->CurveFitTimeStep;
 
                 // Updated outlet temperature from the tank [C]
-                Real64 ToutNew = TempIn + (ActualLoad / (DetIceStor(iceNum).MassFlowRate * Cp));
+                Real64 ToutNew = TempIn + (ActualLoad / (this->MassFlowRate * Cp));
                 // Again, the outlet temperature cannot be above the freezing temperature (factoring in the tolerance)
-                if (ToutNew > (DetIceStor(iceNum).FreezingTemp - modDeltaTofMin)) ToutNew = DetIceStor(iceNum).FreezingTemp - modDeltaTofMin;
+                if (ToutNew > (this->FreezingTemp - modDeltaTofMin)) ToutNew = this->FreezingTemp - modDeltaTofMin;
 
                 if (ActualLoad > std::abs(LocalLoad)) {
                     // We have more than enough capacity to meet the load so no need to iterate to find a solution
-                    DetIceStor(iceNum).OutletTemp = TempSetPt;
-                    DetIceStor(iceNum).TankOutletTemp = ToutNew;
-                    DetIceStor(iceNum).CompLoad = DetIceStor(iceNum).MassFlowRate * Cp * std::abs(TempIn - TempSetPt);
-                    DetIceStor(iceNum).TankMassFlowRate = DetIceStor(iceNum).CompLoad / Cp / std::abs(TempIn - ToutNew);
-                    DetIceStor(iceNum).BypassMassFlowRate = DetIceStor(iceNum).MassFlowRate - DetIceStor(iceNum).TankMassFlowRate;
+                    this->OutletTemp = TempSetPt;
+                    this->TankOutletTemp = ToutNew;
+                    this->CompLoad = this->MassFlowRate * Cp * std::abs(TempIn - TempSetPt);
+                    this->TankMassFlowRate = this->CompLoad / Cp / std::abs(TempIn - ToutNew);
+                    this->BypassMassFlowRate = this->MassFlowRate - this->TankMassFlowRate;
 
                 } else {
 
@@ -516,27 +516,27 @@ namespace IceThermalStorage {
                             // Not converged yet so recalculated what is needed and keep iterating
                             // Calculate new values for LMTDstar and Qstar based on updated outlet temperature
                             ToutOld = ToutNew;
-                            LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, DetIceStor(iceNum).FreezingTemp);
-                            MassFlowstar = DetIceStor(iceNum).MassFlowRate / SIEquiv100GPMinMassFlowRate;
-                            Qstar = std::abs(CalcQstar(DetIceStor(iceNum).ChargeCurveNum, DetIceStor(iceNum).ChargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
+                            LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, this->FreezingTemp);
+                            MassFlowstar = this->MassFlowRate / SIEquiv100GPMinMassFlowRate;
+                            Qstar = std::abs(CalcQstar(this->ChargeCurveNum, this->ChargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
 
                             // Now make sure that we don't go above 100% charged and calculate the new average fraction
-                            ChargeFrac = Qstar * (DataHVACGlobals::TimeStepSys / DetIceStor(iceNum).CurveFitTimeStep);
-                            if ((DetIceStor(iceNum).IceFracRemaining + ChargeFrac) > 1.0) {
-                                ChargeFrac = 1.0 - DetIceStor(iceNum).IceFracRemaining;
+                            ChargeFrac = Qstar * (DataHVACGlobals::TimeStepSys / this->CurveFitTimeStep);
+                            if ((this->IceFracRemaining + ChargeFrac) > 1.0) {
+                                ChargeFrac = 1.0 - this->IceFracRemaining;
                                 Qstar = ChargeFrac;
                             }
-                            if (DetIceStor(iceNum).ThawProcessIndex == DetIce::InsideMelt) {
-                                AvgFracCharged = DetIceStor(iceNum).IceFracOnCoil + (ChargeFrac / 2.0);
+                            if (this->ThawProcessIndex == DetIce::InsideMelt) {
+                                AvgFracCharged = this->IceFracOnCoil + (ChargeFrac / 2.0);
                             } else { // (DetIceStor(IceNum)%ThawProcessIndex == DetIce::OutsideMelt)
-                                AvgFracCharged = DetIceStor(iceNum).IceFracRemaining + (ChargeFrac / 2.0);
+                                AvgFracCharged = this->IceFracRemaining + (ChargeFrac / 2.0);
                             }
 
                             // Finally, update the actual load and calculate the new outlet temperature; increment iteration counter
-                            ActualLoad = Qstar * DetIceStor(iceNum).NomCapacity / DetIceStor(iceNum).CurveFitTimeStep;
-                            ToutNew = TempIn + (ActualLoad / (DetIceStor(iceNum).MassFlowRate * Cp));
+                            ActualLoad = Qstar * this->NomCapacity / this->CurveFitTimeStep;
+                            ToutNew = TempIn + (ActualLoad / (this->MassFlowRate * Cp));
                             // Again, the outlet temperature cannot be above the freezing temperature (factoring in the tolerance)
-                            if (ToutNew < (DetIceStor(iceNum).FreezingTemp - modDeltaTofMin)) ToutNew = DetIceStor(iceNum).FreezingTemp - modDeltaTofMin;
+                            if (ToutNew < (this->FreezingTemp - modDeltaTofMin)) ToutNew = this->FreezingTemp - modDeltaTofMin;
                             ++IterNum;
 
                         } else {
@@ -548,15 +548,15 @@ namespace IceThermalStorage {
 
                     // Keep track of times that the iterations got excessive and report if necessary
                     if (IterNum >= MaxIterNum) {
-                        ++DetIceStor(iceNum).ChargeIterErrors;
-                        if (DetIceStor(iceNum).ChargeIterErrors <= 25) {
+                        ++this->ChargeIterErrors;
+                        if (this->ChargeIterErrors <= 25) {
                             ShowWarningError("Detailed Ice Storage model exceeded its internal charging maximum iteration limit");
-                            ShowContinueError("Detailed Ice Storage System Name = " + DetIceStor(iceNum).Name);
+                            ShowContinueError("Detailed Ice Storage System Name = " + this->Name);
                             ShowContinueErrorTimeStamp("");
                         } else {
-                            ShowRecurringWarningErrorAtEnd("Detailed Ice Storage system [" + DetIceStor(iceNum).Name +
+                            ShowRecurringWarningErrorAtEnd("Detailed Ice Storage system [" + this->Name +
                                                            "]  charging maximum iteration limit exceeded occurrence continues.",
-                                                           DetIceStor(iceNum).ChargeErrorCount);
+                                                           this->ChargeErrorCount);
                         }
                     }
 
@@ -566,11 +566,11 @@ namespace IceThermalStorage {
                     // all flow through the tank during charging and a lower delta T near
                     // the full charge level.  From an energy perspective, this is a reasonable
                     // approximation.
-                    DetIceStor(iceNum).OutletTemp = ToutNew;
-                    DetIceStor(iceNum).TankOutletTemp = ToutNew;
-                    DetIceStor(iceNum).BypassMassFlowRate = 0.0;
-                    DetIceStor(iceNum).TankMassFlowRate = DetIceStor(iceNum).MassFlowRate;
-                    DetIceStor(iceNum).CompLoad = DetIceStor(iceNum).MassFlowRate * Cp * std::abs(TempIn - ToutNew);
+                    this->OutletTemp = ToutNew;
+                    this->TankOutletTemp = ToutNew;
+                    this->BypassMassFlowRate = 0.0;
+                    this->TankMassFlowRate = this->MassFlowRate;
+                    this->CompLoad = this->MassFlowRate * Cp * std::abs(TempIn - ToutNew);
                 }
             }
 
@@ -578,78 +578,78 @@ namespace IceThermalStorage {
             // The load is greater than zero so we should be discharging
             // Before we do anything, we should check to make sure that we will actually be discharging the unit
 
-            if ((DetIceStor(iceNum).InletTemp < (DetIceStor(iceNum).FreezingTemp + modDeltaTifMin)) ||
-                (DetIceStor(iceNum).IceFracRemaining <= TankDischargeToler)) {
+            if ((this->InletTemp < (this->FreezingTemp + modDeltaTifMin)) ||
+                (this->IceFracRemaining <= TankDischargeToler)) {
                 // If the inlet temperature is below the freezing temperature of the
                 // device, then we cannot actually do any discharging.  Bypass all of the flow.
                 // Also, if the tank is already discharged, we can't to do any further
                 // discharging.  So, bypass all of the flow.
-                DetIceStor(iceNum).CompLoad = 0.0;
-                DetIceStor(iceNum).OutletTemp = DetIceStor(iceNum).InletTemp;
-                DetIceStor(iceNum).TankOutletTemp = DetIceStor(iceNum).InletTemp;
+                this->CompLoad = 0.0;
+                this->OutletTemp = this->InletTemp;
+                this->TankOutletTemp = this->InletTemp;
                 Real64 mdot = 0.0;
                 PlantUtilities::SetComponentFlowRate(mdot,
-                                     DetIceStor(iceNum).PlantInNodeNum,
-                                     DetIceStor(iceNum).PlantOutNodeNum,
-                                     DetIceStor(iceNum).PlantLoopNum,
-                                     DetIceStor(iceNum).PlantLoopSideNum,
-                                     DetIceStor(iceNum).PlantBranchNum,
-                                     DetIceStor(iceNum).PlantCompNum);
+                                     this->PlantInNodeNum,
+                                     this->PlantOutNodeNum,
+                                     this->PlantLoopNum,
+                                     this->PlantLoopSideNum,
+                                     this->PlantBranchNum,
+                                     this->PlantCompNum);
 
-                DetIceStor(iceNum).BypassMassFlowRate = mdot;
-                DetIceStor(iceNum).TankMassFlowRate = 0.0;
-                DetIceStor(iceNum).MassFlowRate = mdot;
+                this->BypassMassFlowRate = mdot;
+                this->TankMassFlowRate = 0.0;
+                this->MassFlowRate = mdot;
 
             } else {
 
                 // make flow request so tank will get flow
-                Real64 mdot = DetIceStor(iceNum).DesignMassFlowRate;
+                Real64 mdot = this->DesignMassFlowRate;
                 PlantUtilities::SetComponentFlowRate(mdot,
-                                     DetIceStor(iceNum).PlantInNodeNum,
-                                     DetIceStor(iceNum).PlantOutNodeNum,
-                                     DetIceStor(iceNum).PlantLoopNum,
-                                     DetIceStor(iceNum).PlantLoopSideNum,
-                                     DetIceStor(iceNum).PlantBranchNum,
-                                     DetIceStor(iceNum).PlantCompNum);
+                                     this->PlantInNodeNum,
+                                     this->PlantOutNodeNum,
+                                     this->PlantLoopNum,
+                                     this->PlantLoopSideNum,
+                                     this->PlantBranchNum,
+                                     this->PlantCompNum);
 
                 // We are in discharging mode, the temperatures are high enough to discharge
                 // the tank, and we have some discharging left to do.
-                if (TempSetPt < (DetIceStor(iceNum).FreezingTemp + modDeltaTofMin)) {
+                if (TempSetPt < (this->FreezingTemp + modDeltaTofMin)) {
                     // Outlet temperature cannot be below the freezing temperature so set
                     // the outlet temperature to the freezing temperature and calculate
                     // LMTDstar based on that assumption.
-                    TempSetPt = DetIceStor(iceNum).FreezingTemp + modDeltaTofMin;
+                    TempSetPt = this->FreezingTemp + modDeltaTofMin;
                 }
 
                 // Tank outlet temperature from the last iteration [C]
                 Real64 ToutOld = TempSetPt;
                 // Non-dimensional log mean temperature difference of ice storage unit [non-dimensional]
-                Real64 LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, DetIceStor(iceNum).FreezingTemp);
-                Real64 MassFlowstar = DetIceStor(iceNum).MassFlowRate / SIEquiv100GPMinMassFlowRate;
+                Real64 LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, this->FreezingTemp);
+                Real64 MassFlowstar = this->MassFlowRate / SIEquiv100GPMinMassFlowRate;
 
                 // Find initial guess at average fraction charged during time step
-                Real64 ChargeFrac = LocalLoad * DataHVACGlobals::TimeStepSys / DetIceStor(iceNum).NomCapacity;
-                if ((DetIceStor(iceNum).IceFracRemaining - ChargeFrac) < 0.0) ChargeFrac = DetIceStor(iceNum).IceFracRemaining;
-                Real64 AvgFracCharged = DetIceStor(iceNum).IceFracRemaining - (ChargeFrac / 2.0);
+                Real64 ChargeFrac = LocalLoad * DataHVACGlobals::TimeStepSys / this->NomCapacity;
+                if ((this->IceFracRemaining - ChargeFrac) < 0.0) ChargeFrac = this->IceFracRemaining;
+                Real64 AvgFracCharged = this->IceFracRemaining - (ChargeFrac / 2.0);
 
                 // Current load on the ice storage unit [non-dimensional]
-                Real64 Qstar = std::abs(CalcQstar(DetIceStor(iceNum).DischargeCurveNum, DetIceStor(iceNum).DischargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
+                Real64 Qstar = std::abs(CalcQstar(this->DischargeCurveNum, this->DischargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
 
                 // Actual load on the ice storage unit [W]
-                Real64 ActualLoad = Qstar * DetIceStor(iceNum).NomCapacity / DetIceStor(iceNum).CurveFitTimeStep;
+                Real64 ActualLoad = Qstar * this->NomCapacity / this->CurveFitTimeStep;
 
                 // Updated outlet temperature from the tank [C]
-                Real64 ToutNew = TempIn - (ActualLoad / (DetIceStor(iceNum).MassFlowRate * Cp));
+                Real64 ToutNew = TempIn - (ActualLoad / (this->MassFlowRate * Cp));
                 // Again, the outlet temperature cannot be below the freezing temperature (factoring in the tolerance)
-                if (ToutNew < (DetIceStor(iceNum).FreezingTemp + modDeltaTofMin)) ToutNew = DetIceStor(iceNum).FreezingTemp + modDeltaTofMin;
+                if (ToutNew < (this->FreezingTemp + modDeltaTofMin)) ToutNew = this->FreezingTemp + modDeltaTofMin;
 
                 if (ActualLoad > LocalLoad) {
                     // We have more than enough storage to meet the load so no need to iterate to find a solution
-                    DetIceStor(iceNum).OutletTemp = TempSetPt;
-                    DetIceStor(iceNum).TankOutletTemp = ToutNew;
-                    DetIceStor(iceNum).CompLoad = DetIceStor(iceNum).MassFlowRate * Cp * std::abs(TempIn - TempSetPt);
-                    DetIceStor(iceNum).TankMassFlowRate = DetIceStor(iceNum).CompLoad / Cp / std::abs(TempIn - ToutNew);
-                    DetIceStor(iceNum).BypassMassFlowRate = DetIceStor(iceNum).MassFlowRate - DetIceStor(iceNum).TankMassFlowRate;
+                    this->OutletTemp = TempSetPt;
+                    this->TankOutletTemp = ToutNew;
+                    this->CompLoad = this->MassFlowRate * Cp * std::abs(TempIn - TempSetPt);
+                    this->TankMassFlowRate = this->CompLoad / Cp / std::abs(TempIn - ToutNew);
+                    this->BypassMassFlowRate = this->MassFlowRate - this->TankMassFlowRate;
 
                 } else {
 
@@ -658,23 +658,23 @@ namespace IceThermalStorage {
                             // Not converged yet so recalculated what is needed and keep iterating
                             // Calculate new values for LMTDstar and Qstar based on updated outlet temperature
                             ToutOld = ToutNew;
-                            LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, DetIceStor(iceNum).FreezingTemp);
+                            LMTDstar = CalcDetIceStorLMTDstar(TempIn, ToutOld, this->FreezingTemp);
 
-                            Qstar = std::abs(CalcQstar(DetIceStor(iceNum).DischargeCurveNum, DetIceStor(iceNum).DischargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
+                            Qstar = std::abs(CalcQstar(this->DischargeCurveNum, this->DischargeCurveTypeNum, AvgFracCharged, LMTDstar, MassFlowstar));
 
                             // Now make sure that we don't go below 100% discharged and calculate the new average fraction
-                            ChargeFrac = Qstar * (DataHVACGlobals::TimeStepSys / DetIceStor(iceNum).CurveFitTimeStep);
-                            if ((DetIceStor(iceNum).IceFracRemaining - ChargeFrac) < 0.0) {
-                                ChargeFrac = DetIceStor(iceNum).IceFracRemaining;
+                            ChargeFrac = Qstar * (DataHVACGlobals::TimeStepSys / this->CurveFitTimeStep);
+                            if ((this->IceFracRemaining - ChargeFrac) < 0.0) {
+                                ChargeFrac = this->IceFracRemaining;
                                 Qstar = ChargeFrac;
                             }
-                            AvgFracCharged = DetIceStor(iceNum).IceFracRemaining - (ChargeFrac / 2.0);
+                            AvgFracCharged = this->IceFracRemaining - (ChargeFrac / 2.0);
 
                             // Finally, update the actual load and calculate the new outlet temperature; increment iteration counter
-                            ActualLoad = Qstar * DetIceStor(iceNum).NomCapacity / DetIceStor(iceNum).CurveFitTimeStep;
-                            ToutNew = TempIn - (ActualLoad / (DetIceStor(iceNum).MassFlowRate * Cp));
+                            ActualLoad = Qstar * this->NomCapacity / this->CurveFitTimeStep;
+                            ToutNew = TempIn - (ActualLoad / (this->MassFlowRate * Cp));
                             // Again, the outlet temperature cannot be below the freezing temperature (factoring in the tolerance)
-                            if (ToutNew < (DetIceStor(iceNum).FreezingTemp + modDeltaTofMin)) ToutNew = DetIceStor(iceNum).FreezingTemp + modDeltaTofMin;
+                            if (ToutNew < (this->FreezingTemp + modDeltaTofMin)) ToutNew = this->FreezingTemp + modDeltaTofMin;
                             ++IterNum;
 
                         } else {
@@ -686,15 +686,15 @@ namespace IceThermalStorage {
 
                     // Keep track of times that the iterations got excessive
                     if (IterNum >= MaxIterNum && (!DataGlobals::WarmupFlag)) {
-                        ++DetIceStor(iceNum).DischargeIterErrors;
-                        if (DetIceStor(iceNum).DischargeIterErrors <= 25) {
+                        ++this->DischargeIterErrors;
+                        if (this->DischargeIterErrors <= 25) {
                             ShowWarningError("Detailed Ice Storage model exceeded its internal discharging maximum iteration limit");
-                            ShowContinueError("Detailed Ice Storage System Name = " + DetIceStor(iceNum).Name);
+                            ShowContinueError("Detailed Ice Storage System Name = " + this->Name);
                             ShowContinueErrorTimeStamp("");
                         } else {
-                            ShowRecurringWarningErrorAtEnd("Detailed Ice Storage system [" + DetIceStor(iceNum).Name +
+                            ShowRecurringWarningErrorAtEnd("Detailed Ice Storage system [" + this->Name +
                                                            "]  discharging maximum iteration limit exceeded occurrence continues.",
-                                                           DetIceStor(iceNum).DischargeErrorCount);
+                                                           this->DischargeErrorCount);
                         }
                     }
 
@@ -706,17 +706,17 @@ namespace IceThermalStorage {
                     // Otherwise, we have more capacity than needed so let's bypass some
                     // flow and meet the setpoint temperautre.
                     if (ToutNew >= TempSetPt) {
-                        DetIceStor(iceNum).OutletTemp = ToutNew;
-                        DetIceStor(iceNum).TankOutletTemp = ToutNew;
-                        DetIceStor(iceNum).BypassMassFlowRate = 0.0;
-                        DetIceStor(iceNum).TankMassFlowRate = DetIceStor(iceNum).MassFlowRate;
-                        DetIceStor(iceNum).CompLoad = DetIceStor(iceNum).MassFlowRate * Cp * std::abs(TempIn - ToutNew);
+                        this->OutletTemp = ToutNew;
+                        this->TankOutletTemp = ToutNew;
+                        this->BypassMassFlowRate = 0.0;
+                        this->TankMassFlowRate = this->MassFlowRate;
+                        this->CompLoad = this->MassFlowRate * Cp * std::abs(TempIn - ToutNew);
                     } else {
-                        DetIceStor(iceNum).OutletTemp = TempSetPt;
-                        DetIceStor(iceNum).TankOutletTemp = ToutNew;
-                        DetIceStor(iceNum).CompLoad = DetIceStor(iceNum).MassFlowRate * Cp * std::abs(TempIn - TempSetPt);
-                        DetIceStor(iceNum).TankMassFlowRate = DetIceStor(iceNum).CompLoad / (Cp * std::abs(TempIn - ToutNew));
-                        DetIceStor(iceNum).BypassMassFlowRate = DetIceStor(iceNum).MassFlowRate - DetIceStor(iceNum).TankMassFlowRate;
+                        this->OutletTemp = TempSetPt;
+                        this->TankOutletTemp = ToutNew;
+                        this->CompLoad = this->MassFlowRate * Cp * std::abs(TempIn - TempSetPt);
+                        this->TankMassFlowRate = this->CompLoad / (Cp * std::abs(TempIn - ToutNew));
+                        this->BypassMassFlowRate = this->MassFlowRate - this->TankMassFlowRate;
                     }
                 }
             }
