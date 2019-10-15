@@ -142,6 +142,17 @@ namespace CTElectricGenerator {
               MyPlantScanFlag(true), MySizeAndNodeInitFlag(true), CheckEquipName(true)
         {
         }
+
+        void InitCTGenerators(bool RunFlag,
+                              Real64 MyLoad,
+                              bool FirstHVACIteration);
+
+        void CalcCTGeneratorModel(bool RunFlag,
+                                  Real64 MyLoad,
+                                  bool FirstHVACIteration);
+
+        void UpdateCTGeneratorRecords();
+
     };
 
     // Object Data
@@ -169,20 +180,6 @@ namespace CTElectricGenerator {
     );
 
     void GetCTGeneratorInput();
-
-    void CalcCTGeneratorModel(int genNum, // Generator number
-                              bool RunFlag,     // TRUE when Generator operating
-                              Real64 MyLoad,    // Generator demand
-                              bool FirstHVACIteration);
-
-    void InitCTGenerators(int genNum, // Generator number
-                          bool RunFlag,     // TRUE when Generator operating
-                          Real64 MyLoad,    // Generator demand
-                          bool FirstHVACIteration);
-
-    void UpdateCTGeneratorRecords(bool RunFlag, // TRUE if Generator operating
-                                  int genNUm       // Generator number
-    );
 
     void GetCTGeneratorResults(int GeneratorType, // type of Generator
                                int genNum,
