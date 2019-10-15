@@ -1056,118 +1056,6 @@ namespace IceThermalStorage {
         if (ErrorsFound) {
             ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
         }
-
-        // Setup Output Variables to Report CurrentModuleObject='ThermalStorage:Ice:Detailed'
-        //********************************************
-        for (int iceNum = 1; iceNum <= modNumDetIceStorages; ++iceNum) {
-
-            SetupOutputVariable("Ice Thermal Storage Cooling Rate",
-                                OutputProcessor::Unit::W,
-                                DetIceStor(iceNum).CompLoad,
-                                "System",
-                                "Average",
-                                DetIceStor(iceNum).Name);
-
-            // Ice fraction
-            SetupOutputVariable("Ice Thermal Storage Change Fraction",
-                                OutputProcessor::Unit::None,
-                                DetIceStor(iceNum).IceFracChange,
-                                "System",
-                                "Average",
-                                DetIceStor(iceNum).Name);
-            SetupOutputVariable("Ice Thermal Storage End Fraction",
-                                OutputProcessor::Unit::None,
-                                DetIceStor(iceNum).IceFracRemaining,
-                                "System",
-                                "Average",
-                                DetIceStor(iceNum).Name);
-            SetupOutputVariable("Ice Thermal Storage On Coil Fraction",
-                                OutputProcessor::Unit::None,
-                                DetIceStor(iceNum).IceFracOnCoil,
-                                "System",
-                                "Average",
-                                DetIceStor(iceNum).Name);
-
-            // Discharge: ITS Information
-            SetupOutputVariable("Ice Thermal Storage Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                DetIceStor(iceNum).MassFlowRate,
-                                "System",
-                                "Average",
-                                DetIceStor(iceNum).Name);
-            SetupOutputVariable("Ice Thermal Storage Bypass Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                DetIceStor(iceNum).BypassMassFlowRate,
-                                "System",
-                                "Average",
-                                DetIceStor(iceNum).Name);
-            SetupOutputVariable("Ice Thermal Storage Tank Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
-                                DetIceStor(iceNum).TankMassFlowRate,
-                                "System",
-                                "Average",
-                                DetIceStor(iceNum).Name);
-            SetupOutputVariable("Ice Thermal Storage Fluid Inlet Temperature",
-                                OutputProcessor::Unit::C,
-                                DetIceStor(iceNum).InletTemp,
-                                "System",
-                                "Average",
-                                DetIceStor(iceNum).Name);
-            SetupOutputVariable("Ice Thermal Storage Blended Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                DetIceStor(iceNum).OutletTemp,
-                                "System",
-                                "Average",
-                                DetIceStor(iceNum).Name);
-            SetupOutputVariable("Ice Thermal Storage Tank Outlet Temperature",
-                                OutputProcessor::Unit::C,
-                                DetIceStor(iceNum).TankOutletTemp,
-                                "System",
-                                "Average",
-                                DetIceStor(iceNum).Name);
-            SetupOutputVariable("Ice Thermal Storage Cooling Discharge Rate",
-                                OutputProcessor::Unit::W,
-                                DetIceStor(iceNum).DischargingRate,
-                                "System",
-                                "Average",
-                                DetIceStor(iceNum).Name);
-            SetupOutputVariable("Ice Thermal Storage Cooling Discharge Energy",
-                                OutputProcessor::Unit::J,
-                                DetIceStor(iceNum).DischargingEnergy,
-                                "System",
-                                "Sum",
-                                DetIceStor(iceNum).Name);
-            SetupOutputVariable("Ice Thermal Storage Cooling Charge Rate",
-                                OutputProcessor::Unit::W,
-                                DetIceStor(iceNum).ChargingRate,
-                                "System",
-                                "Average",
-                                DetIceStor(iceNum).Name);
-            SetupOutputVariable("Ice Thermal Storage Cooling Charge Energy",
-                                OutputProcessor::Unit::J,
-                                DetIceStor(iceNum).ChargingEnergy,
-                                "System",
-                                "Sum",
-                                DetIceStor(iceNum).Name);
-            SetupOutputVariable("Ice Thermal Storage Ancillary Electric Power",
-                                OutputProcessor::Unit::W,
-                                DetIceStor(iceNum).ParasiticElecRate,
-                                "System",
-                                "Average",
-                                DetIceStor(iceNum).Name);
-            SetupOutputVariable("Ice Thermal Storage Ancillary Electric Energy",
-                                OutputProcessor::Unit::J,
-                                DetIceStor(iceNum).ParasiticElecEnergy,
-                                "System",
-                                "Sum",
-                                DetIceStor(iceNum).Name,
-                                _,
-                                "ELECTRICITY",
-                                _,
-                                _,
-                                "System");
-
-        } // ...over detailed ice storage units
     }
 
     void IceStorageSpecs::setupOutputVars()
@@ -1236,6 +1124,126 @@ namespace IceThermalStorage {
                             this->Name);
     }
 
+    void DetailedIceStorageData::setupOutputVars()
+    {
+        SetupOutputVariable("Ice Thermal Storage Cooling Rate",
+                            OutputProcessor::Unit::W,
+                            this->CompLoad,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Ice Thermal Storage Change Fraction",
+                            OutputProcessor::Unit::None,
+                            this->IceFracChange,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Ice Thermal Storage End Fraction",
+                            OutputProcessor::Unit::None,
+                            this->IceFracRemaining,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Ice Thermal Storage On Coil Fraction",
+                            OutputProcessor::Unit::None,
+                            this->IceFracOnCoil,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Ice Thermal Storage Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->MassFlowRate,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Ice Thermal Storage Bypass Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->BypassMassFlowRate,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Ice Thermal Storage Tank Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->TankMassFlowRate,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Ice Thermal Storage Fluid Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->InletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Ice Thermal Storage Blended Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->OutletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Ice Thermal Storage Tank Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->TankOutletTemp,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Ice Thermal Storage Cooling Discharge Rate",
+                            OutputProcessor::Unit::W,
+                            this->DischargingRate,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Ice Thermal Storage Cooling Discharge Energy",
+                            OutputProcessor::Unit::J,
+                            this->DischargingEnergy,
+                            "System",
+                            "Sum",
+                            this->Name);
+
+        SetupOutputVariable("Ice Thermal Storage Cooling Charge Rate",
+                            OutputProcessor::Unit::W,
+                            this->ChargingRate,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Ice Thermal Storage Cooling Charge Energy",
+                            OutputProcessor::Unit::J,
+                            this->ChargingEnergy,
+                            "System",
+                            "Sum",
+                            this->Name);
+
+        SetupOutputVariable("Ice Thermal Storage Ancillary Electric Power",
+                            OutputProcessor::Unit::W,
+                            this->ParasiticElecRate,
+                            "System",
+                            "Average",
+                            this->Name);
+
+        SetupOutputVariable("Ice Thermal Storage Ancillary Electric Energy",
+                            OutputProcessor::Unit::J,
+                            this->ParasiticElecEnergy,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            "ELECTRICITY",
+                            _,
+                            _,
+                            "System");
+    }
+
     void DetailedIceStorageData::InitDetailedIceStorage()
     {
 
@@ -1262,7 +1270,12 @@ namespace IceThermalStorage {
                                     this->PlantBranchNum,
                                     this->PlantCompNum,
                                     errFlag);
-            // if errFlag then do something...
+
+            if (errFlag) {
+                ShowFatalError("InitDetailedIceStorage: Program terminated due to previous condition(s).");
+            }
+
+            this->setupOutputVars();
             this->MyPlantScanFlag = false;
         }
 
@@ -1348,7 +1361,6 @@ namespace IceThermalStorage {
             }
 
             this->setupOutputVars();
-
             this->MyPlantScanFlag = false;
         }
 

@@ -294,6 +294,8 @@ namespace IceThermalStorage {
         void UpdateDetailedIceStorage();
 
         void ReportDetailedIceStorage();
+
+        void setupOutputVars();
     };
 
     // Object Data
