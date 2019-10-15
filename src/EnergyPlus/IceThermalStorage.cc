@@ -138,6 +138,16 @@ namespace IceThermalStorage {
         IceStorageTypeMap.deallocate();
     }
 
+    void IceStorageSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    {
+
+    }
+
+    void DetailedIceStorageData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    {
+
+    }
+
     void SimIceStorage(std::string const &IceStorageType,
                        std::string const &IceStorageName,
                        int &CompIndex,
@@ -174,7 +184,7 @@ namespace IceThermalStorage {
                                ", Number of Units=" + General::TrimSigDigits(modTotalIceStorages) + ", Entered Unit name=" + IceStorageName);
             }
 
-            for (auto thisITS : IceStorage) {
+            for (auto &thisITS : IceStorage) {
                 if (IceStorageName != thisITS.Name) {
                     ShowFatalError("SimIceStorage: Invalid CompIndex passed=" + General::TrimSigDigits(IceStorageNum) + ", Unit name=" + IceStorageName +
                                    ", stored Unit Name for that index=" + thisITS.Name);
@@ -182,7 +192,7 @@ namespace IceThermalStorage {
                 thisITS.CheckEquipName = false;
             }
 
-            for (auto thisITS : DetIceStor) {
+            for (auto &thisITS : DetIceStor) {
                 if (IceStorageName != thisITS.Name) {
                     ShowFatalError("SimIceStorage: Invalid CompIndex passed=" + General::TrimSigDigits(IceStorageNum) + ", Unit name=" + IceStorageName +
                                    ", stored Unit Name for that index=" + thisITS.Name);
@@ -1377,10 +1387,10 @@ namespace IceThermalStorage {
                                this->CompNum);
             if ((DataPlant::PlantLoop(this->LoopNum).CommonPipeType == DataPlant::CommonPipe_TwoWay) && (this->LoopSideNum == DataPlant::SupplySide)) {
                 // up flow priority of other components on the same branch as the Ice tank
-                for (int CompNum = 1;
-                     CompNum <= DataPlant::PlantLoop(this->LoopNum).LoopSide(DataPlant::SupplySide).Branch(this->BranchNum).TotalComponents;
-                     ++CompNum) {
-                    DataPlant::PlantLoop(this->LoopNum).LoopSide(DataPlant::SupplySide).Branch(this->BranchNum).Comp(CompNum).FlowPriority =
+                for (int compNum = 1;
+                     compNum <= DataPlant::PlantLoop(this->LoopNum).LoopSide(DataPlant::SupplySide).Branch(this->BranchNum).TotalComponents;
+                     ++compNum) {
+                    DataPlant::PlantLoop(this->LoopNum).LoopSide(DataPlant::SupplySide).Branch(this->BranchNum).Comp(compNum).FlowPriority =
                         DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
                 }
             }
@@ -1546,7 +1556,7 @@ namespace IceThermalStorage {
         Umax = min(Umax, (1.0 - this->IceFracRemain) / DataHVACGlobals::TimeStepSys);
         // First, check input U value.
         // Based on Umax and Umin, if necessary to run E+, calculate proper Uact.
-        Real64 Uact = 0.0;
+        Real64 Uact;
         if (Umax == 0.0) { //(No Capacity of ITS), ITS is OFF.
             Uact = 0.0;
 
@@ -1886,10 +1896,10 @@ namespace IceThermalStorage {
         }
     }
 
-    void IceStorageSpecs::RecordOutput(Real64 const MyLoad, bool const RunFlag)
+    void IceStorageSpecs::RecordOutput(Real64 const myLoad, bool const RunFlag)
     {
-        if (MyLoad == 0 || !RunFlag) {
-            this->MyLoad = MyLoad;
+        if (myLoad == 0 || !RunFlag) {
+            this->MyLoad = myLoad;
             this->ITSCoolingRate_rep = 0.0;
             this->ITSCoolingEnergy_rep = 0.0;
             this->ITSChargingRate = 0.0;
@@ -1897,7 +1907,7 @@ namespace IceThermalStorage {
             this->ITSmdot = 0.0;
 
         } else {
-            this->MyLoad = MyLoad;
+            this->MyLoad = myLoad;
             if (this->ITSCoolingRate > 0.0) {
                 this->ITSCoolingRate_rep = this->ITSCoolingRate;
                 this->ITSCoolingEnergy_rep = this->ITSCoolingEnergy;

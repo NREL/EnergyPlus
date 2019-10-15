@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -132,7 +133,7 @@ namespace IceThermalStorage {
         }
     };
 
-    struct IceStorageSpecs
+    struct IceStorageSpecs : PlantComponent
     {
         // Members
         // Input data
@@ -190,6 +191,8 @@ namespace IceThermalStorage {
         {
         }
 
+        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag);
+
         void InitSimpleIceStorage();
 
         void CalcIceStorageDormant();
@@ -210,12 +213,12 @@ namespace IceThermalStorage {
 
         void UpdateNode(Real64 myLoad, bool RunFlag);
 
-        void RecordOutput(Real64 MyLoad, bool RunFlag);
+        void RecordOutput(Real64 myLoad, bool RunFlag);
 
         void setupOutputVars();
     };
 
-    struct DetailedIceStorageData
+    struct DetailedIceStorageData : PlantComponent
     {
         // Members
         // Input data
@@ -286,6 +289,8 @@ namespace IceThermalStorage {
               MyPlantScanFlag(true), MyEnvrnFlag2(true)
         {
         }
+
+        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag);
 
         void InitDetailedIceStorage();
 
