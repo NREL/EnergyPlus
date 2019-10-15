@@ -185,24 +185,24 @@ namespace CTElectricGenerator {
 
     // Functions
 
-    void SimCTGenerator(int const GeneratorType,          // type of Generator
+    void SimCTGenerator(int GeneratorType,          // type of Generator
                         std::string const &GeneratorName, // user specified name of Generator
                         int &GeneratorIndex,
-                        bool const RunFlag,  // simulate Generator when TRUE
-                        Real64 const MyLoad, // generator demand
-                        bool const FirstHVACIteration);
+                        bool RunFlag,  // simulate Generator when TRUE
+                        Real64 MyLoad, // generator demand
+                        bool FirstHVACIteration);
 
     void SimCTPlantHeatRecovery(std::string const &CompType, // unused1208
                                 std::string const &CompName,
-                                int const CompTypeNum, // unused1208
+                                int CompTypeNum, // unused1208
                                 int &CompNum,
-                                bool const RunFlag,
+                                bool RunFlag,
                                 bool &InitLoopEquip,
                                 Real64 &MyLoad,
                                 Real64 &MaxCap,
                                 Real64 &MinCap,
                                 Real64 &OptCap,
-                                bool const FirstHVACIteration // TRUE if First iteration of simulation
+                                bool FirstHVACIteration // TRUE if First iteration of simulation
     );
 
     // End CT Generator Module Driver Subroutines
@@ -219,10 +219,10 @@ namespace CTElectricGenerator {
     // Beginning of Generator model Subroutines
     // *****************************************************************************
 
-    void CalcCTGeneratorModel(int const GeneratorNum, // Generator number
-                              bool const RunFlag,     // TRUE when Generator operating
-                              Real64 const MyLoad,    // Generator demand
-                              bool const FirstHVACIteration);
+    void CalcCTGeneratorModel(int GeneratorNum, // Generator number
+                              bool RunFlag,     // TRUE when Generator operating
+                              Real64 MyLoad,    // Generator demand
+                              bool FirstHVACIteration);
 
     // End of CT Generator Module Model Subroutines
     // *****************************************************************************
@@ -230,10 +230,10 @@ namespace CTElectricGenerator {
     // Begin CT Generator Module Utility Subroutines
     // *****************************************************************************
 
-    void InitCTGenerators(int const GeneratorNum, // Generator number
-                          bool const RunFlag,     // TRUE when Generator operating
-                          Real64 const MyLoad,    // Generator demand
-                          bool const FirstHVACIteration);
+    void InitCTGenerators(int GeneratorNum, // Generator number
+                          bool RunFlag,     // TRUE when Generator operating
+                          Real64 MyLoad,    // Generator demand
+                          bool FirstHVACIteration);
 
     // End CT Generator Module Utility Subroutines
     // *****************************************************************************
@@ -241,12 +241,12 @@ namespace CTElectricGenerator {
     // Beginning of Record Keeping subroutines for the CT Generator Module
     // *****************************************************************************
 
-    void UpdateCTGeneratorRecords(bool const RunFlag, // TRUE if Generator operating
-                                  int const Num       // Generator number
+    void UpdateCTGeneratorRecords(bool RunFlag, // TRUE if Generator operating
+                                  int Num       // Generator number
     );
 
-    void GetCTGeneratorResults(int const GeneratorType, // type of Generator
-                               int const GeneratorIndex,
+    void GetCTGeneratorResults(int GeneratorType, // type of Generator
+                               int GeneratorIndex,
                                Real64 &GeneratorPower,  // electrical power
                                Real64 &GeneratorEnergy, // electrical energy
                                Real64 &ThermalPower,    // heat power
