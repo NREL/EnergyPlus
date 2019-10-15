@@ -69,31 +69,39 @@ namespace IceThermalStorage {
     extern int NumDetailedIceStorage;
     extern int TotalNumIceStorage;
 
-    struct IceStorageType {
-        enum {
+    struct IceStorageType
+    {
+        enum
+        {
             Simple,
             Detailed
         };
     };
-    
-    struct CurveVars {
-        enum {
+
+    struct CurveVars
+    {
+        enum
+        {
             FracChargedLMTD,
             FracDischargedLMTD,
             LMTDMassFlow,
             LMTDFracCharged
         };
     };
-    
-    struct DetIce {
-        enum {
-            InsideMelt,  // Inside melt system--charge starting with bare coil
+
+    struct DetIce
+    {
+        enum
+        {
+            InsideMelt, // Inside melt system--charge starting with bare coil
             OutsideMelt // Outside melt system--charge from existing ice layer on coil
         };
     };
 
-    struct ITSType {
-        enum {
+    struct ITSType
+    {
+        enum
+        {
             IceOnCoilInternal,
             IceOnCoilExternal
         };
@@ -140,8 +148,8 @@ namespace IceThermalStorage {
         Real64 ITSmdot;           // [kg/s]
 
         // Duplicated reporting vars for now. Investigate diffs when time to remove.
-        Real64 ITSCoolingRate_rep;    // [W]
-        Real64 ITSCoolingEnergy_rep;  // [J]
+        Real64 ITSCoolingRate_rep;   // [W]
+        Real64 ITSCoolingEnergy_rep; // [J]
 
         bool MyPlantScanFlag;
         bool MyEnvrnFlag2;
@@ -150,10 +158,9 @@ namespace IceThermalStorage {
         SimpleIceStorageData()
             : ITSType_Num(0), MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSideNum(0),
               BranchNum(0), CompNum(0), DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForITSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0),
-              UAIceDisCh(0.0), HLoss(0.0), XCurIceFrac(0.0), ITSMassFlowRate(0.0), ITSInletTemp(0.0), ITSOutletTemp(0.0),
-              ITSOutletSetPointTemp(0.0), ITSCoolingRate(0.0), ITSCoolingEnergy(0.0), CheckEquipName(true),
-              MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSChargingRate(0.0), ITSChargingEnergy(0.0), ITSmdot(0.0),
-              ITSCoolingRate_rep(0.0), ITSCoolingEnergy_rep(0.0), MyPlantScanFlag(true), MyEnvrnFlag2(true)
+              UAIceDisCh(0.0), HLoss(0.0), XCurIceFrac(0.0), ITSMassFlowRate(0.0), ITSInletTemp(0.0), ITSOutletTemp(0.0), ITSOutletSetPointTemp(0.0),
+              ITSCoolingRate(0.0), ITSCoolingEnergy(0.0), CheckEquipName(true), MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSChargingRate(0.0),
+              ITSChargingEnergy(0.0), ITSmdot(0.0), ITSCoolingRate_rep(0.0), ITSCoolingEnergy_rep(0.0), MyPlantScanFlag(true), MyEnvrnFlag2(true)
         {
         }
 
@@ -205,10 +212,10 @@ namespace IceThermalStorage {
         int MapNum;                     // Number to Map structure
         std::string DischargeCurveName; // Curve name for discharging (used to find the curve index)
         int DischargeCurveNum;          // Curve index for discharging
-        int DischargeCurveTypeNum{};      // Integer version of discharging curve independent variables type
+        int DischargeCurveTypeNum{};    // Integer version of discharging curve independent variables type
         std::string ChargeCurveName;    // Curve name for charging (used to find the curve index)
         int ChargeCurveNum;             // Curve index for charging
-        int ChargeCurveTypeNum{};         // Integer version of charging curve independent variables type
+        int ChargeCurveTypeNum{};       // Integer version of charging curve independent variables type
         Real64 CurveFitTimeStep;        // Time step used to generate performance data [hours]
         Real64 DischargeParaElecLoad;   // Parasitic electric load duing discharging [dimensionless]
         // (This is multiplied by the tank capacity to obtain elec consump)
@@ -253,8 +260,8 @@ namespace IceThermalStorage {
               IceFracRemaining(1.0), ThawProcessIndex(0), IceFracOnCoil(1.0), DischargingRate(0.0), DischargingEnergy(0.0), ChargingRate(0.0),
               ChargingEnergy(0.0), MassFlowRate(0.0), BypassMassFlowRate(0.0), TankMassFlowRate(0.0), InletTemp(0.0), OutletTemp(0.0),
               TankOutletTemp(0.0), ParasiticElecRate(0.0), ParasiticElecEnergy(0.0), DischargeIterErrors(0), DischargeErrorCount(0),
-              ChargeIterErrors(0), ChargeErrorCount(0), ResetXForITSFlag(false), MyEnvrnFlag(true), CheckEquipName(true),
-              MyPlantScanFlag(true), MyEnvrnFlag2(true)
+              ChargeIterErrors(0), ChargeErrorCount(0), ResetXForITSFlag(false), MyEnvrnFlag(true), CheckEquipName(true), MyPlantScanFlag(true),
+              MyEnvrnFlag2(true)
         {
         }
 
@@ -274,7 +281,7 @@ namespace IceThermalStorage {
     };
 
     // Object Data
-    extern Array1D<SimpleIceStorageData> SimpleIceStorage;        // dimension to number of machines
+    extern Array1D<SimpleIceStorageData> SimpleIceStorage;     // dimension to number of machines
     extern Array1D<DetailedIceStorageData> DetailedIceStorage; // Derived type for detailed ice storage model
 
     // Static Functions
